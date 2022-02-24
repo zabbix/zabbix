@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2021 Zabbix SIA
+ ** Copyright (C) 2001-2022 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -355,8 +355,8 @@
 					url.setArgument('_', request_start.toString(34));
 
 					// Create temp image in buffer.
-					var	img = $('<img/>', {
-							'class': domImg.attr('class'),
+					var	img = $('<img>', {
+							class: domImg.attr('class'),
 							id: domImg.attr('id'),
 							name: domImg.attr('name'),
 							border: domImg.attr('border'),

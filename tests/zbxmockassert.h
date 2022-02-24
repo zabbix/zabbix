@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Ge_neral Public License as published by
@@ -21,8 +21,6 @@
 #define ZABBIX_MOCK_ASSERT_H
 
 #include "common.h"
-
-extern double	ZBX_DOUBLE_EPSILON;
 
 void	__zbx_mock_assert_str_eq(const char *file, int line, const char *prefix_msg, const char *expected_value,
 		const char *returned_value);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,8 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  */
 class testSID extends CWebTest {
 
+	const UPDATE_TOKEN = 'api_update';
+
 	/**
 	 * Token ID used for update.
 	 *
@@ -40,7 +42,7 @@ class testSID extends CWebTest {
 
 	public function prepareTokenData() {
 		$response = CDataHelper::call('token.create', [
-			'name' => 'api_update',
+			'name' => self::UPDATE_TOKEN,
 			'userid' => '1'
 		]);
 		$this->assertArrayHasKey('tokenids', $response);
@@ -331,7 +333,7 @@ class testSID extends CWebTest {
 			// User role creation.
 			[['link' => 'zabbix.php?form_refresh=1&name=sadasda&type=1&ui_monitoring_dashboard=1&ui_monitoring_problems='.
 					'1&ui_monitoring_hosts=1&ui_monitoring_overview=1&ui_monitoring_latest_data=1&ui_monitoring_screens=1'.
-					'&ui_monitoring_maps=1&ui_monitoring_discovery=0&ui_monitoring_services=1&ui_inventory_overview=1&'.
+					'&ui_monitoring_maps=1&ui_monitoring_discovery=0&ui_services_services=1&ui_inventory_overview=1&'.
 					'ui_inventory_hosts=1&ui_reports_system_info=0&ui_reports_availability_report=1&ui_reports_top_triggers'.
 					'=1&ui_reports_audit=0&ui_reports_action_log=0&ui_reports_notifications=0&ui_configuration_host_groups=0'.
 					'&ui_configuration_templates=0&ui_configuration_hosts=0&ui_configuration_maintenance=0&'.
@@ -348,7 +350,7 @@ class testSID extends CWebTest {
 			[['link' => 'zabbix.php?form_refresh=1&roleid=5&name=sadasda&type=2&ui_monitoring_dashboard=1&'.
 					'ui_monitoring_problems=1&ui_monitoring_hosts=1&ui_monitoring_overview=1&ui_monitoring_latest_data=1'.
 					'&ui_monitoring_screens=1&ui_monitoring_maps=1&ui_monitoring_discovery=0&ui_monitoring_discovery=1&'.
-					'ui_monitoring_services=1&ui_inventory_overview=1&ui_inventory_hosts=1&ui_reports_system_info=0&'.
+					'ui_services_services=1&ui_inventory_overview=1&ui_inventory_hosts=1&ui_reports_system_info=0&'.
 					'ui_reports_availability_report=1&ui_reports_top_triggers=1&ui_reports_audit=0&ui_reports_action_log=0'.
 					'&ui_reports_notifications=0&ui_reports_notifications=1&ui_configuration_host_groups=0&'.
 					'ui_configuration_host_groups=1&ui_configuration_templates=0&ui_configuration_templates=1&'.
@@ -668,7 +670,7 @@ class testSID extends CWebTest {
 			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to access this page.');
 			$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
 
-			$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
+			$this->assertStringContainsString('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 		}
 	}
 
@@ -991,8 +993,9 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM token',
-					'incorrect_request' => true,
-					'link' => 'zabbix.php?action=token.edit'
+					'server_error' => true,
+					'link' => 'zabbix.php?action=token.list',
+					'case' => 'token create'
 				]
 			],
 
@@ -1000,8 +1003,9 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM token',
-					'incorrect_request' => true,
-					'link' => 'zabbix.php?action=token.edit&tokenid='
+					'server_error' => true,
+					'link' => 'zabbix.php?action=token.list',
+					'case' => 'token update'
 				]
 			],
 
@@ -1144,8 +1148,9 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM token',
-					'incorrect_request' => true,
-					'link' => 'zabbix.php?action=user.token.edit'
+					'server_error' => true,
+					'link' => 'zabbix.php?action=user.token.list',
+					'case' => 'token create'
 				]
 			],
 
@@ -1153,8 +1158,9 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM token',
-					'incorrect_request' => true,
-					'link' => 'zabbix.php?action=user.token.edit&tokenid='
+					'server_error' => true,
+					'link' => 'zabbix.php?action=user.token.list',
+					'case' => 'token update'
 				]
 			],
 
@@ -1184,9 +1190,32 @@ class testSID extends CWebTest {
 		$hash_before = CDBHelper::getHash($data['db']);
 		$url = (!str_contains($data['link'], 'tokenid') ? $data['link'] : $data['link'].self::$token_id);
 		$this->page->login()->open($url)->waitUntilReady();
-		$this->query('xpath://input[@name="sid"]')->one()->delete();
-		$this->query(($this->query('button:Update')->exists()) ? 'button:Update' : 'xpath://button[text()="Add" and'.
-				' @type="submit"]')->waitUntilClickable()->one()->click();
+
+		if (CTestArrayHelper::get($data, 'case') === 'token create') {
+			$this->query('button:Create API token')->waitUntilClickable()->one()->click();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+			$fill_data = ['Name' => 'test', 'User' => 'admin-zabbix', 'Expires at' => '2037-12-31 00:00:00'];
+
+			if (strpos($data['link'], 'user') ) {
+				unset($fill_data['User']);
+			}
+
+			$dialog->asForm()->fill($fill_data);
+		}
+		elseif ((CTestArrayHelper::get($data, 'case') === 'token update')) {
+			$this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()->findRow('Name',
+					self::UPDATE_TOKEN)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		}
+
+		foreach ($this->query('xpath://input[@name="sid"]')->all() as $input) {
+			$input->delete();
+		}
+
+		$query = ($this->query('button:Update')->exists())
+			? 'button:Update'
+			: 'xpath://button[text()="Add" and @type="submit"] | //div[@class="overlay-dialogue-footer"]//button[text()="Add"]';
+		$this->query($query)->waitUntilClickable()->one()->click();
 
 		if (CTestArrayHelper::get($data, 'incorrect_request')) {
 			$message = 'Access denied';
@@ -1205,9 +1234,13 @@ class testSID extends CWebTest {
 		if (CTestArrayHelper::get($data, 'incorrect_request'))  {
 			$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
-			$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
+			$this->assertStringContainsString('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 		}
 
 		$this->assertEquals($hash_before, CDBHelper::getHash($data['db']));
+
+		if (CTestArrayHelper::get($data, 'case')) {
+			$dialog->close();
+		}
 	}
 }

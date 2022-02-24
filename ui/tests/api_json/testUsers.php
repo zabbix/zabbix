@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -421,7 +421,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [[
 					'userid' => '2',
-					'username' => 'Try rename guest'
+					'username' => 'Try to rename guest'
 				]],
 				'expected_error' => 'Cannot rename guest user.'
 			],
@@ -529,7 +529,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [[
 					'userid' => '1',
-					'username' => 'Try add user to group with disabled GUI access',
+					'username' => 'Try to add user to group with disabled GUI access',
 					'usrgrps' => [
 						['usrgrpid' => '12']
 					]
@@ -539,7 +539,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [[
 					'userid' => '1',
-					'username' => 'Try add user to a disabled group',
+					'username' => 'Try to add user to a disabled group',
 					'usrgrps' => [
 						['usrgrpid' => '9']
 					]

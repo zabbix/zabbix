@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,16 +22,14 @@
 #include "zbxself.h"
 #include "log.h"
 #include "db.h"
-#include "dbcache.h"
 #include "zbxipcservice.h"
 #include "zbxjson.h"
-#include "alert_manager.h"
-#include "alert_syncer.h"
 #include "alerter_protocol.h"
 #include "zbxservice.h"
 #include "service_protocol.h"
-
 #include "../../libs/zbxalgo/vectorimpl.h"
+
+#include "alert_syncer.h"
 
 #define ZBX_POLL_INTERVAL	1
 
@@ -52,8 +50,6 @@ typedef struct
 zbx_am_db_t;
 
 /******************************************************************************
- *                                                                            *
- * Function: am_db_create_alert                                               *
  *                                                                            *
  * Purpose: creates new alert object                                          *
  *                                                                            *
@@ -88,11 +84,6 @@ static zbx_am_db_alert_t	*am_db_create_alert(zbx_uint64_t alertid, zbx_uint64_t 
 	return alert;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: am_db_init                                                       *
- *                                                                            *
- ******************************************************************************/
 static int 	am_db_init(zbx_am_db_t *amdb, char **error)
 {
 	zbx_hashset_create(&amdb->mediatypes, 5, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -103,11 +94,6 @@ static int 	am_db_init(zbx_am_db_t *amdb, char **error)
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: am_db_clear                                                      *
- *                                                                            *
- ******************************************************************************/
 static void	am_db_clear(zbx_am_db_t *amdb)
 {
 	zbx_hashset_iter_t	iter;
@@ -121,8 +107,6 @@ static void	am_db_clear(zbx_am_db_t *amdb)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: am_db_get_alerts                                                 *
  *                                                                            *
  * Purpose: reads the new alerts from database                                *
  *                                                                            *
@@ -254,8 +238,6 @@ static int	am_db_get_alerts(zbx_vector_ptr_t *alerts)
 
 /******************************************************************************
  *                                                                            *
- * Function: am_db_update_mediatype                                           *
- *                                                                            *
  * Purpose: updates media type object, creating one if necessary              *
  *                                                                            *
  * Return value: Updated mediatype or NULL, if the cached media was up to     *
@@ -314,8 +296,6 @@ static zbx_am_db_mediatype_t	*am_db_update_mediatype(zbx_am_db_t *amdb, time_t n
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: am_db_update_mediatypes                                          *
  *                                                                            *
  * Purpose: updates alert manager media types                                 *
  *                                                                            *
@@ -387,8 +367,6 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: am_db_queue_alerts                                               *
  *                                                                            *
  * Purpose: reads alerts/mediatypes from database and queues them in alert    *
  *          manager                                                           *
@@ -504,8 +482,6 @@ static void	event_tags_free(zbx_event_tags_t *event_tags)
 
 /******************************************************************************
  *                                                                            *
- * Function: am_db_update_event_tags                                          *
- *                                                                            *
  * Purpose: adds event tags to sql query                                      *
  *                                                                            *
  * Parameters: eventid     - [IN]  problem_tag update db event                *
@@ -604,8 +580,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: am_db_validate_tags_for_update                                   *
- *                                                                            *
  * Purpose: removes duplicate event tags and checks if problem tags need to   *
  *          be updated                                                        *
  *                                                                            *
@@ -691,8 +665,6 @@ static void	am_service_add_event_tags(zbx_vector_events_tags_t *events_tags)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: am_db_flush_results                                              *
  *                                                                            *
  * Purpose: retrieves alert updates from alert manager and flushes them into  *
  *          database                                                          *
@@ -816,8 +788,6 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 }
 /******************************************************************************
  *                                                                            *
- * Function: am_db_remove_expired_mediatypes                                  *
- *                                                                            *
  * Purpose: removes cached media types used more than a day ago               *
  *                                                                            *
  * Parameters: amdb            - [IN] the alert manager cache                 *
@@ -863,8 +833,6 @@ static void	am_db_remove_expired_mediatypes(zbx_am_db_t *amdb)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: am_db_update_watchdog                                            *
  *                                                                            *
  * Purpose: updates watchdog recipients                                       *
  *                                                                            *
@@ -912,7 +880,6 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 		zbx_vector_uint64_append(&mediatypeids, media->mediatypeid);
 	}
 	DBfree_result(result);
-
 
 	/* update media types used for watchdog alerts */
 

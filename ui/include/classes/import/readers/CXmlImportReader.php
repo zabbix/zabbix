@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -95,7 +95,7 @@ class CXmlImportReader extends CImportReader {
 							$data[$node_name][$xml->name] = $xml->value;
 						}
 
-						// it make $this->isEmptyElement valid after processing attributes
+						// it makes $this->isEmptyElement valid after processing attributes
 						$xml->moveToElement();
 
 						/*

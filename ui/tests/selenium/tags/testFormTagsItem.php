@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ require_once dirname(__FILE__).'/../common/testFormTags.php';
 class testFormTagsItem extends testFormTags {
 	public $update_name = 'Item with tags for updating';
 	public $clone_name = 'Item with tags for cloning';
+	public $remove_name = 'Item for tags removing';
 	public $link;
 	public $saved_link = 'items.php?form=update&context=host&itemid=';
 	public $host = 'Host for tags testing';
@@ -144,5 +145,14 @@ class testFormTagsItem extends testFormTags {
 		$host_link = 'items.php?filter_set=1&context=host&filter_hostids[0]='.$hostid;
 
 		$this->checkInheritedElementTags($data, 'item', $host_link);
+	}
+
+	/**
+	 * Test removing tags from Item.
+	 */
+	public function testFormTagsItem_RemoveTags() {
+		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
+		$this->link = 'items.php?filter_set=1&filter_hostids[0]='.$hostid.'&context=host';
+		$this->clearTags('item');
 	}
 }

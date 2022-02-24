@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,6 +42,15 @@ const (
 
 	defaultIndex = 60
 )
+
+func numCPUOnline() int {
+	return numCPU()
+}
+
+func numCPUConf() int {
+	// unsupported on Windows
+	return 0
+}
 
 func numCPU() (numCpu int) {
 	size, err := win32.GetLogicalProcessorInformationEx(win32.RelationProcessorCore, nil)

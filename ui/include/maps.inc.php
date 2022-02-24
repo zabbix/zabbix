@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -715,7 +715,7 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 			$filtered_problems = getProblemsMatchingTags($filtered_problems, $selement['tags'], $selement['evaltype']);
 		}
 
-		// Apply filtgered problems to elements they belong to.
+		// Apply filtered problems to elements they belong to.
 		foreach ($filtered_problems as $problem) {
 			$selement['triggers'][$problem['objectid']]['problems'][] = $problem;
 		}
@@ -825,9 +825,9 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 				}
 			}
 
-			$i['latelyChanged'] |= ((time() - $lately_changed) < timeUnitToSeconds(CSettingsHelper::get(
-				CSettingsHelper::BLINK_PERIOD
-			)));
+			if ((time() - $lately_changed) < timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD))) {
+				$i['latelyChanged'] = true;
+			}
 		}
 
 		if ($critical_problem) {

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,17 +30,20 @@ abstract class CControllerServiceListGeneral extends CController {
 	protected const FILTER_DEFAULT_TAG_SOURCE = ZBX_SERVICE_FILTER_TAGS_SERVICE;
 	protected const FILTER_DEFAULT_EVALTYPE = TAG_EVAL_TYPE_AND_OR;
 
+	/**
+	 * @var array
+	 */
 	protected $service;
 
 	/**
-	 * @return bool
-
 	 * @throws APIException
+	 *
+	 * @return bool
 	 */
 	protected function checkPermissions(): bool {
 		if ($this->hasInput('serviceid')) {
 			$db_service = API::Service()->get([
-				'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla', 'readonly'],
+				'output' => ['serviceid', 'name', 'status', 'readonly'],
 				'serviceids' => $this->getInput('serviceid'),
 				'selectParents' => ['serviceid'],
 				'selectTags' => ['tag', 'value']
@@ -58,6 +61,8 @@ abstract class CControllerServiceListGeneral extends CController {
 
 	/**
 	 * @throws APIException
+	 *
+	 * @return bool
 	 */
 	protected function canEdit(): bool {
 		$db_roles = API::Role()->get([
@@ -90,9 +95,9 @@ abstract class CControllerServiceListGeneral extends CController {
 	}
 
 	/**
-	 * @return array
-	 *
 	 * @throws APIException
+	 *
+	 * @return array
 	 */
 	protected function getPath(): array {
 		if ($this->service === null) {
@@ -133,12 +138,12 @@ abstract class CControllerServiceListGeneral extends CController {
 	}
 
 	/**
-	 * @param array  $path
-	 * @param bool   $is_filtered
-	 *
-	 * @return array
+	 * @param array $path
+	 * @param bool  $is_filtered
 	 *
 	 * @throws APIException
+	 *
+	 * @return array
 	 */
 	protected function getBreadcrumbs(array $path, bool $is_filtered): array {
 		$breadcrumbs = [[
@@ -186,14 +191,51 @@ abstract class CControllerServiceListGeneral extends CController {
 	}
 
 	/**
+	 * @throws APIException
+	 *
+	 * @return array
+	 */
+	protected function getSlas(): array {
+		$limit = CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE);
+
+		$slas = API::Sla()->get([
+			'output' => ['slaid', 'name', 'period', 'slo', 'timezone'],
+			'serviceids' => $this->service['serviceid'],
+			'filter' => [
+				'status' => ZBX_SLA_STATUS_ENABLED
+			],
+			'sortfield' => 'name',
+			'sortorder' => ZBX_SORT_UP,
+			'limit' => $limit + 1
+		]);
+
+		$slas_count = count($slas);
+		$slas = array_slice($slas, 0, $limit);
+
+		foreach ($slas as &$sla) {
+			$sla['sli'] = API::Sla()->getSli([
+				'slaid' => $sla['slaid'],
+				'periods' => 1,
+				'serviceids' => $this->service['serviceid']
+			]);
+		}
+		unset($sla);
+
+		return [
+			'slas' => $slas,
+			'slas_count' => $slas_count
+		];
+	}
+
+	/**
 	 * @param array  $filter
 	 * @param bool   $is_filtered
 	 *
-	 * @return array
-	 *
 	 * @throws APIException
+	 *
+	 * @return array
 	 */
-	protected function prepareData(array $filter, bool $is_filtered): array {
+	protected static function getServiceIds(array $filter, bool $is_filtered): array {
 		if ($filter['status'] == SERVICE_STATUS_OK) {
 			$filter_status = ZBX_SEVERITY_OK;
 		}

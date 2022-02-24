@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 
 			if ($fields['itemids']) {
 				$items = API::Item()->get([
-					'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+					'output' => ['itemid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 					'selectHosts' => ['name'],
 					'selectValueMap' => ['mappings'],
 					'itemids' => $fields['itemids'],
@@ -64,19 +64,14 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 
 				$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 
-				$keys = [];
-				foreach ($items as $item) {
-					$keys[$item['key_']] = true;
-				}
-
 				if ($items && $is_dynamic_item && $dynamic_hostid) {
 					$items = API::Item()->get([
-						'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+						'output' => ['itemid', 'name', 'value_type', 'units', 'valuemapid'],
 						'selectHosts' => ['name'],
 						'selectValueMap' => ['mappings'],
 						'filter' => [
 							'hostid' => $dynamic_hostid,
-							'key_' => array_keys($keys)
+							'key_' => array_keys(array_column($items, null, 'key_'))
 						],
 						'webitems' => true,
 						'preservekeys' => true
@@ -88,9 +83,6 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 				$error = _('No permissions to referred object or it does not exist!');
 			}
 			else {
-				// macros
-				$items = CMacrosResolverHelper::resolveItemNames($items);
-
 				$histories = Manager::History()->getLastValues($items, $fields['show_lines']);
 
 				if ($histories) {
@@ -126,8 +118,8 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 				if ($items_count == 1) {
 					$item = reset($items);
 					$dynamic_widget_name = $is_template_dashboard
-						? $item['name_expanded']
-						: $host_name.NAME_DELIMITER.$item['name_expanded'];
+						? $item['name']
+						: $host_name.NAME_DELIMITER.$item['name'];
 				}
 				elseif ($same_host && $items_count > 1) {
 					$dynamic_widget_name = $is_template_dashboard

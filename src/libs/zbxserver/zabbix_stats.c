@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,22 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zabbix_stats.h"
+
 #include "common.h"
-#include "zbxjson.h"
 #include "dbcache.h"
 #include "zbxself.h"
-#include "valuecache.h"
 #include "../../zabbix_server/vmware/vmware.h"
 #include "preproc.h"
-#include "zbxtrends.h"
-
-#include "zabbix_stats.h"
 
 extern unsigned char	program_type;
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_send_zabbix_stats                                            *
  *                                                                            *
  * Purpose: collects all metrics required for Zabbix stats request            *
  *                                                                            *
@@ -173,4 +168,3 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 
 	zbx_json_close(json);
 }
-

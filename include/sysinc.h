@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -353,6 +353,11 @@
 
 #ifdef HAVE_PCRE_H
 #	include <pcre.h>
+#endif
+
+#ifdef HAVE_PCRE2_H
+#	define PCRE2_CODE_UNIT_WIDTH 8
+#	include <pcre2.h>
 #endif
 
 #ifdef HAVE_VM_VM_PARAM_H

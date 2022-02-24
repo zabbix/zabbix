@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2035,7 +2035,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			$operation_count = $operation_container->getRows()->count();
 
 			if (array_key_exists('Operations', $override)) {
-				// Write Condititons from data to array.
+				// Write Conditions from data to array.
 				$condition_text = [];
 				foreach ($override['Operations'] as $operation) {
 					$fields = array_key_exists('fields', $operation) ? $operation['fields'] : $operation;

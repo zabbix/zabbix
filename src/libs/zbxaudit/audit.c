@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "audit.h"
+
 #include "log.h"
 #include "zbxjson.h"
 #include "dbcache.h"
-
-#include "audit.h"
 
 #define AUDIT_USERID	0
 #define AUDIT_USERNAME	"System"
@@ -159,8 +159,6 @@ static void	delete_json(struct zbx_json *json, const char *audit_op, const char 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_auditlog_global_script                                       *
  *                                                                            *
  * Purpose: record global script execution results into audit log             *
  *                                                                            *
@@ -665,5 +663,3 @@ void	zbx_audit_entry_append_string(zbx_audit_entry_t *entry, int audit_op, const
 
 	va_end(args);
 }
-
-

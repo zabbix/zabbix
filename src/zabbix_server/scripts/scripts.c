@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,10 +27,10 @@
 #include "db.h"
 #include "log.h"
 #include "zbxtasks.h"
-#include "scripts.h"
 #include "zbxjson.h"
 #include "zbxembed.h"
-#include "../events.h"
+
+#include "scripts.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_IPMIPOLLER_FORKS;
@@ -284,8 +284,6 @@ void	zbx_script_clean(zbx_script_t *script)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_webhook_params_pack_json                                     *
- *                                                                            *
  * Purpose: pack webhook script parameters into JSON                          *
  *                                                                            *
  * Parameters: params      - [IN] vector of pairs of pointers to parameter    *
@@ -313,8 +311,6 @@ void	zbx_webhook_params_pack_json(const zbx_vector_ptr_pair_t *params, char **pa
 }
 
 /***********************************************************************************
- *                                                                                 *
- * Function: zbx_script_prepare                                                    *
  *                                                                                 *
  * Purpose: prepares user script                                                   *
  *                                                                                 *
@@ -380,8 +376,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: DBfetch_webhook_params                                           *
- *                                                                            *
  * Purpose: fetch webhook parameters                                          *
  *                                                                            *
  * Parameters:  scriptid  - [IN] the id of script to be executed              *
@@ -426,8 +420,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_script_execute                                               *
  *                                                                            *
  * Purpose: executing user scripts or remote commands                         *
  *                                                                            *
@@ -515,8 +507,6 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const ch
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_script_create_task                                           *
  *                                                                            *
  * Purpose: creates remote command task from a script                         *
  *                                                                            *

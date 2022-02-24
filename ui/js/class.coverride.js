@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2021 Zabbix SIA
+ ** Copyright (C) 2001-2022 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ jQuery(function ($) {
 	"use strict";
 
 	function createOverrideElement($override, option, value) {
-		var close = $('<button></button>', {'type': 'button'})
+		var close = $('<button>', {'type': 'button'})
 				.on('click', function(e) {
 					$override.overrides('removeOverride', $override, option);
 					e.stopPropagation();
@@ -40,13 +40,13 @@ jQuery(function ($) {
 			const id = field_name.replace(/\]/g, '_').replace(/\[/g, '_');
 			const input = $('<input>', {'name': field_name, 'type': 'hidden', 'id': id}).val(value);
 
-			return $('<div></div>')
-				.addClass('input-color-picker')
+			return $('<div>')
+				.addClass('color-picker')
 				.append(input)
 				.append(close);
 		}
 		else if (option === 'timeshift') {
-			return $('<div></div>')
+			return $('<div>')
 				.append($('<input>', {
 						'name': field_name,
 						'maxlength': 10,
@@ -69,11 +69,11 @@ jQuery(function ($) {
 			}
 
 			var content = [
-				$('<span></span>', {'data-option': option}).text(visible_name + ': ' + visible_value),
+				$('<span>', {'data-option': option}).text(visible_name + ': ' + visible_value),
 				$('<input>').attr({'name': field_name, 'type': 'hidden'}).val(value)
 			];
 
-			return $('<div></div>')
+			return $('<div>')
 				.append(content)
 				.append(close);
 		}
@@ -268,7 +268,7 @@ jQuery(function ($) {
 			}
 			else {
 				var elmnt = createOverrideElement($override, option, value);
-				$('<li></li>')
+				$('<li>')
 					.append(elmnt)
 					.insertBefore($('li:last', $override));
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -458,7 +458,7 @@ class CMap extends CMapElement {
 	}
 
 	/**
-	 * Removes all inaccessible maps by inacessible elements.
+	 * Removes all inaccessible maps by inaccessible elements.
 	 *
 	 * @param array $sysmaps_rw[<sysmapids>]              The list of writable maps.
 	 * @param array $elements                             The map elements.

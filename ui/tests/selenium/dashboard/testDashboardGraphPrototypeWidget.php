@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,8 +49,8 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
 			' wf.value_itemid, wf.value_graphid';
 
-	const DASHBOARD_ID = 140;
-	const SCREENSHOT_DASHBOARD_ID = 141;
+	const DASHBOARD_ID = 1400;
+	const SCREENSHOT_DASHBOARD_ID = 1410;
 
 	private static $previous_widget_name = 'Graph prototype widget for update';
 

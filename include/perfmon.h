@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 #	error "This module is only available for Windows OS"
 #endif
+
+#include "sysinc.h"
 
 /* this struct must be only modified along with mapping builtin_counter_ref[] in perfmon.c */
 typedef enum

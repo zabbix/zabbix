@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 	}
 
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)) {
+		if (!$this->checkAccess(CRoleHelper::UI_SERVICES_SERVICES)) {
 			return false;
 		}
 
@@ -94,7 +94,7 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 			]
 		];
 
-		$db_serviceids = $this->prepareData($filter, $filter['filter_set']);
+		$db_serviceids = self::getServiceIds($filter, $filter['filter_set']);
 
 		$paging_curl = (new CUrl('zabbix.php'))
 			->setArgument('action', 'service.list')
@@ -114,7 +114,7 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $paging_curl);
 
 		$data['services'] = API::Service()->get([
-			'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla', 'readonly'],
+			'output' => ['serviceid', 'name', 'status', 'created_at', 'readonly'],
 			'selectParents' => $filter['filter_set'] ? ['serviceid', 'name'] : null,
 			'selectChildren' => API_OUTPUT_COUNT,
 			'selectProblemEvents' => ['eventid', 'severity', 'name'],

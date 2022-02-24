@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -340,10 +340,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			]);
 
 			if ($dbTriggers) {
-				$result &= copyTriggersToHosts(zbx_objectValues($dbTriggers, 'triggerid'),
-						$input_templateid, $cloneTemplateId);
-
-				if (!$result) {
+				if (!copyTriggersToHosts(zbx_objectValues($dbTriggers, 'triggerid'), $input_templateid,
+						$cloneTemplateId)) {
 					throw new Exception();
 				}
 			}
@@ -367,10 +365,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			]);
 
 			if ($dbDiscoveryRules) {
-				$result &= API::DiscoveryRule()->copy([
+				if (!API::DiscoveryRule()->copy([
 					'discoveryids' => zbx_objectValues($dbDiscoveryRules, 'itemid'),
 					'hostids' => [$input_templateid]
-				]);
+				])) {
+					$result = false;
+				}
 
 				if (!$result) {
 					throw new Exception();

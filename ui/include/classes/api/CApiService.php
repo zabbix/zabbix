@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -169,7 +169,7 @@ class CApiService {
 	}
 
 	/**
-	 * Returns the name of the option that refers the PK column. If the $tableName parameter
+	 * Returns the name of the option that refers to the PK column. If the $tableName parameter
 	 * is not given, the Pk option of the current table will be returned.
 	 *
 	 * @param string $tableName

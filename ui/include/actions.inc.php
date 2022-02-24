@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2156,7 +2156,7 @@ function makeActionTableStatus(array $action) {
  * @param string $action['status']             Alert status.
  * @param string $action['alerttype']          Type of alert.
  * @param string $action['mediatypeid']        ID for mediatype, where alert message was sent.
- * @param string $action['retries']            How many retries was done for pending alert message.
+ * @param string $action['retries']            How many retries were done for pending alert message.
  * @param array  $mediatypes                   Array of media type data.
  * @param array  $mediatypes[]['maxattempts']  Maximum attempts for this mediatype.
  *

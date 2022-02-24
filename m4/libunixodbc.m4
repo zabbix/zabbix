@@ -1,6 +1,5 @@
 # LIBUNIXODBC_CHECK_CONFIG ([DEFAULT-ACTION])
 # ----------------------------------------------------------
-#    Eugene Grigorjev <eugene@zabbix.com>   June-07-2007
 #
 # Checks for unixodbc.  DEFAULT-ACTION is the string yes or no to
 # specify whether to default to --with-unixodbc

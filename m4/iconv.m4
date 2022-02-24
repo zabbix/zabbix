@@ -1,6 +1,5 @@
 # LIBICONV_CHECK_CONFIG ([DEFAULT-ACTION])
 # ----------------------------------------------------------
-#    Alexander Vladishev                      Feb-02-2007
 #
 # Checks for iconv.  DEFAULT-ACTION is the string yes or no to
 # specify whether to default to --with-iconv or --without-iconv.

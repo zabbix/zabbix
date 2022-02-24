@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -206,7 +206,7 @@ func (t *exporterTask) perform(s Scheduler) {
 
 func (t *exporterTask) reschedule(now time.Time) (err error) {
 	var nextcheck time.Time
-	nextcheck, err = zbxlib.GetNextcheck(t.item.itemid, t.item.delay, now)
+	nextcheck, _, err = zbxlib.GetNextcheck(t.item.itemid, t.item.delay, now)
 	if err != nil {
 		return
 	}

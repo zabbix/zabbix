@@ -94,6 +94,7 @@ $menu-main-icons: (
 	dashboard: -570px -664px,
 	problems: -570px -688px,
 	monitoring: -570px -712px,
+	services: -570px -832px,
 	inventory: -570px -736px,
 	reports: -570px -760px,
 	configuration: -570px -784px,
@@ -165,6 +166,7 @@ $msg-warning-border-color: #ffb319;
 $btn-font-color: #ffffff;
 $btn-bg-color: #555555;
 $btn-border-color: #333333;
+$btn-border-focus-color: #000000;
 
 $btn-alt-font-color: #000000;
 $btn-alt-bg-color: transparent;
@@ -372,14 +374,14 @@ $arrow-fill-up-down: #000000;
 }
 
 $var-icons: (
-	maint: url($sprite-path) no-repeat -203px -802px,
+	maintenance: url($sprite-path) no-repeat -203px -802px,
 	depend-up: url($sprite-path) no-repeat -208px -729px,
 	depend-down: url($sprite-path) no-repeat -208px -765px,
 	ackn: url($sprite-path) no-repeat -203px -693px
 );
 
 // Dynamically generated classes:
-//  .icon-maint
+//  .icon-maintenance
 //  .icon-depend-up
 //  .icon-depend-down
 //  .icon-ackn
@@ -817,7 +819,7 @@ a.link-action {
 
 			box-shadow: inset 0 -1px 0 0 $table-border-color;
 
-			.icon-maint::before {
+			.icon-maintenance::before {
 				background-position: -206px -804px;
 			}
 
@@ -1239,6 +1241,13 @@ td.inactive-bg {
 	}
 }
 
+.problem-icon-link {
+	&:focus {
+		box-shadow: 0 0 0 2px $blue;
+	}
+}
+
+.problem-icon-link,
 .problem-icon-list {
 	.problem-icon-list-item {
 		background: transparent;

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: condition_match_service                                          *
- *                                                                            *
  * Purpose: match service update by service id                                *
  *                                                                            *
  ******************************************************************************/
@@ -41,8 +39,6 @@ static int	condition_match_service(const zbx_service_action_condition_t *conditi
 
 /******************************************************************************
  *                                                                            *
- * Function: condition_match_service_name                                     *
- *                                                                            *
  * Purpose: match service update by service name                              *
  *                                                                            *
  ******************************************************************************/
@@ -53,8 +49,6 @@ static int	condition_match_service_name(const zbx_service_action_condition_t *co
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: match_tags                                                       *
  *                                                                            *
  * Purpose: match tag/tag+value using the specified operator                  *
  *                                                                            *
@@ -109,8 +103,6 @@ static int	match_tags(const zbx_vector_ptr_t *tags, const char *name, const char
 
 /******************************************************************************
  *                                                                            *
- * Function: condition_match_service_tag                                      *
- *                                                                            *
  * Purpose: match service update by service tag name                          *
  *                                                                            *
  ******************************************************************************/
@@ -122,8 +114,6 @@ static int	condition_match_service_tag(const zbx_service_action_condition_t *con
 
 /******************************************************************************
  *                                                                            *
- * Function: condition_match_service_tag_value                                *
- *                                                                            *
  * Purpose: match service update by service tag and its value                 *
  *                                                                            *
  ******************************************************************************/
@@ -134,8 +124,6 @@ static int	condition_match_service_tag_value(const zbx_service_action_condition_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: service_update_match_condition                                   *
  *                                                                            *
  * Purpose: match service update by the specified condition                   *
  *                                                                            *
@@ -168,8 +156,6 @@ static const char	*service_update_match_condition(const zbx_service_update_t *up
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: service_update_match_action                                      *
  *                                                                            *
  * Purpose: match service update against the specified action                 *
  *                                                                            *
@@ -236,8 +222,6 @@ static int	service_update_match_action(const zbx_service_update_t *update, const
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: service_update_process_actions                                   *
  *                                                                            *
  * Purpose: match service update against service actions                      *
  *                                                                            *

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ class CAutoloader {
 	/**
 	 * Register supported namespace.
 	 *
-	 * @param string $namespace  Namespace value without trainling '\'.
+	 * @param string $namespace  Namespace value without trailing '\'.
 	 * @param array  $paths      Array of namespace files directory absolute path without trailing '/'.
 	 */
 	public function addNamespace(string $namespace, array $paths): void {

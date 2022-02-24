@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1330,48 +1330,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Resolve item name macros to "name_expanded" field.
-	 *
-	 * @param array  $items
-	 * @param string $items[n]['itemid']
-	 * @param string $items[n]['hostid']
-	 * @param string $items[n]['name']
-	 *
-	 * @return array
-	 */
-	public function resolveItemNames(array $items) {
-		$types = ['usermacros' => true];
-		$usermacros = [];
-
-		foreach ($items as $key => &$item) {
-			$item['name_expanded'] = $item['name'];
-			$matched_macros = self::extractMacros([$item['name_expanded']], $types);
-
-			if ($matched_macros['usermacros']) {
-				$usermacros[$key] = ['hostids' => [$item['hostid']], 'macros' => $matched_macros['usermacros']];
-			}
-		}
-		unset($item);
-
-		$macro_values = array_combine(array_keys($usermacros),
-			array_column($this->getUserMacros($usermacros), 'macros')
-		);
-		$types = $this->transformToPositionTypes($types);
-
-		// Replace macros to value.
-		foreach (array_keys($macro_values) as $key) {
-			$matched_macros = $this->getMacroPositions($items[$key]['name_expanded'], $types);
-
-			foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-				$items[$key]['name_expanded'] =
-					substr_replace($items[$key]['name_expanded'], $macro_values[$key][$macro], $pos, strlen($macro));
-			}
-		}
-
-		return $items;
-	}
-
-	/**
 	 * Resolve item key macros to "key_expanded" field.
 	 *
 	 * @param array  $items
@@ -1691,6 +1649,81 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		return $items;
+	}
+
+	/**
+	 * Resolve text-type column macros for top-hosts widget.
+	 *
+	 * @param array $columns
+	 * @param array $items
+	 *
+	 * @return array
+	 */
+	public function resolveWidgetTopHostsTextColumns(array $columns, array $items): array {
+		$types = [
+			'macros' => [
+				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
+				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+				'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap())
+			],
+			'usermacros' => true
+		];
+
+		$macro_values = [];
+		$macros = ['host' => [], 'interface' => [], 'inventory' => []];
+		$usermacros = [];
+
+		$matched_macros = self::extractMacros($columns, $types);
+
+		foreach ($items as $key => $item) {
+			$macro_values[$key] = [];
+
+			foreach ($matched_macros['macros']['host'] as $token) {
+				if ($token === '{HOST.ID}') {
+					$macro_values[$key][$token] = $item['hostid'];
+				}
+				else {
+					$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
+					$macros['host'][$item['hostid']][$key] = true;
+				}
+			}
+
+			foreach ($matched_macros['macros']['interface'] as $token) {
+				$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['interface'][$item['itemid']][$key] = true;
+			}
+
+			foreach ($matched_macros['macros']['inventory'] as $token) {
+				$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['inventory'][$item['hostid']][$key] = true;
+			}
+
+			if ($matched_macros['usermacros']) {
+				$usermacros[$key] = ['hostids' => [$item['hostid']], 'macros' => $matched_macros['usermacros']];
+			}
+		}
+
+		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
+		$macro_values = self::getInterfaceMacrosByItemId($macros['interface'], $macro_values);
+		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
+
+		foreach ($this->getUserMacros($usermacros) as $key => $usermacros_data) {
+			$macro_values[$key] = array_key_exists($key, $macro_values)
+				? array_merge($macro_values[$key], $usermacros_data['macros'])
+				: $usermacros_data['macros'];
+		}
+
+		$data = [];
+
+		foreach ($columns as $column => $value) {
+			$data[$column] = [];
+
+			foreach ($items as $key => $item) {
+				$data[$column][$key] = strtr($value, $macro_values[$key]);
+			}
+		}
+
+		return $data;
 	}
 
 	/**

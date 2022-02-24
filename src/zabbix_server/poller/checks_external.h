@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #define ZABBIX_CHECKS_EXTERNAL_H
 
 #include "dbcache.h"
-#include "sysinfo.h"
+#include "module.h"
 
 int	get_value_external(const DC_ITEM *item, AGENT_RESULT *result);
 

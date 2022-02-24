@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 #
 # Zabbix
-# Copyright (C) 2001-2021 Zabbix SIA
+# Copyright (C) 2001-2022 Zabbix SIA
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
@@ -46,7 +46,7 @@ my %c = (
 
 $c{"before"} = "/*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,8 +63,8 @@ $c{"before"} = "/*
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include \"common.h\"
 #include \"dbschema.h\"
+#include \"common.h\"
 
 const ZBX_TABLE\ttables[] = {
 

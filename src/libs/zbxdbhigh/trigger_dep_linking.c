@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,9 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "db.h"
-#include "../../libs/zbxaudit/audit_trigger.h"
 #include "trigger_dep_linking.h"
+
+#include "db.h"
+#include "log.h"
+#include "../../libs/zbxaudit/audit_trigger.h"
+#include "../../libs/zbxalgo/vectorimpl.h"
 
 typedef struct
 {
@@ -109,8 +112,6 @@ static void	zbx_triggers_dep_entries_clean(zbx_hashset_t *h)
 }
 
 /*********************************************************************************
- *                                                                               *
- * Function: DBresolve_template_trigger_dependencies                             *
  *                                                                               *
  * Purpose: resolves trigger dependencies for the specified triggers based on    *
  *          host and linked templates                                            *
@@ -269,8 +270,6 @@ clean:
 }
 
 /**********************************************************************************************************
- *                                                                                                        *
- * Function: prepare_trigger_dependencies_updates_and_deletes                                             *
  *                                                                                                        *
  * Purpose: takes a list of pending trigger dependencies (links) and excludes entries that are            *
  *          already present on the target host to generate a new list (links_processed). Also, prepare    *
@@ -520,8 +519,6 @@ clean:
 }
 
 /********************************************************************************
- *                                                                              *
- * Function: DBsync_template_dependencies_for_triggers                          *
  *                                                                              *
  * Purpose: update trigger dependencies for specified host                      *
  *                                                                              *

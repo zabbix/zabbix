@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 	public $config_link = 'zabbix.php?action=housekeeping.edit';
 	public $form_selector = 'id:housekeeping';
 
-	public $default = [
+	public $default_values = [
 		// Events and alerts.
 		'id:hk_events_mode' => true,
 		'id:hk_events_trigger' => '365d',
@@ -51,7 +51,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 		'id:hk_trends' => '365d'
 	];
 
-	public $db_default = [
+	public $db_default_values = [
 		'hk_events_mode' => 1,
 		'hk_events_trigger' => '365d',
 		'hk_events_internal' => '1d',
@@ -69,7 +69,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 		'hk_trends' => '365d'
 	];
 
-	public $custom = [
+	public $custom_values = [
 		// Events and alerts.
 		'id:hk_events_mode' => true,
 		'id:hk_events_trigger' => '43d',

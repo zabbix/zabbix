@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,23 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
-#include "log.h"
-#include "zbxserver.h"
-#include "zbxregexp.h"
-#include "valuecache.h"
-#include "zbxtrends.h"
-#include "../zbxalgo/vectorimpl.h"
-
 #include "anomalystl.h"
+
+#include "common.h"
+#include "log.h"
+#include "zbxeval.h"
+#include "../zbxalgo/vectorimpl.h"
 
 ZBX_PTR_VECTOR_DECL(VV, zbx_vector_history_record_t *)
 ZBX_PTR_VECTOR_IMPL(VV, zbx_vector_history_record_t *)
 
 /*******************************************************************************
- *                                                                             *
- * Function: zbx_get_percentage_of_deviations_in_remainder                     *
  *                                                                             *
  * Purpose: finds how many values in stl remainder are outliers                *
  *                                                                             *

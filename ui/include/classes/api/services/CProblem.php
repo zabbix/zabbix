@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ class CProblem extends CApiService {
 			'acknowledged'				=> null,
 			'suppressed'				=> null,
 			'recent'					=> null,
-			'any'						=> null,	// (internal) true if need not filtred by r_eventid
+			'any'						=> null,	// (internal) true if need not filtered by r_eventid
 			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
 			'tags'						=> null,
 			'filter'					=> null,

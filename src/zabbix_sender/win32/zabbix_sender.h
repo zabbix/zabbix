@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,8 +50,6 @@ zabbix_sender_info_t;
 
 /******************************************************************************
  *                                                                            *
- * Function: zabbix_sender_send_values                                        *
- *                                                                            *
  * Purpose: send values to Zabbix server/proxy                                *
  *                                                                            *
  * Parameters: address   - [IN] zabbix server/proxy address                   *
@@ -74,8 +72,6 @@ ZBX_API int	zabbix_sender_send_values(const char *address, unsigned short port, 
 
 /******************************************************************************
  *                                                                            *
- * Function: zabbix_sender_parse_result                                       *
- *                                                                            *
  * Purpose: parses the result returned from zabbix_sender_send_values()       *
  *          function                                                          *
  *                                                                            *
@@ -96,8 +92,6 @@ ZBX_API int	zabbix_sender_send_values(const char *address, unsigned short port, 
 ZBX_API int	zabbix_sender_parse_result(const char *result, int *response, zabbix_sender_info_t *info);
 
 /******************************************************************************
- *                                                                            *
- * Function: zabbix_sender_free_result                                        *
  *                                                                            *
  * Purpose: free data allocated by zabbix_sender_send_values() function       *
  *                                                                            *

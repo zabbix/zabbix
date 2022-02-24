@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,10 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "dbcache.h"
+#include "audit_trigger.h"
 
 #include "log.h"
-#include "audit_trigger.h"
+#include "db.h"
+#include "zbxdb.h"
+#include "audit.h"
 
 static int	trigger_flag_to_resource_type(int flag)
 {
@@ -206,6 +208,7 @@ PREPARE_AUDIT_TRIGGER_UPDATE(priority, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(comments, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(url, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(type, int, int)
+PREPARE_AUDIT_TRIGGER_UPDATE(status, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(templateid, zbx_uint64_t, uint64)
 PREPARE_AUDIT_TRIGGER_UPDATE(description, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(expression, const char*, string)
@@ -215,8 +218,6 @@ PREPARE_AUDIT_TRIGGER_UPDATE(recovery_expression, const char*, string)
 #undef TR_OR_TRP
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_audit_DBselect_delete_for_trigger                            *
  *                                                                            *
  * Parameters: sql - [IN] sql statement                                       *
  *             ids - [OUT] sorted list of selected uint64 values              *

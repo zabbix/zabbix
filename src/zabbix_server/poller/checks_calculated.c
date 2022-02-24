@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 
 	zbx_expression_eval_init(&eval, ZBX_EXPRESSION_AGGREGATE, &ctx);
 	zbx_expression_eval_resolve_item_hosts(&eval, dc_item);
+	zbx_expression_eval_resolve_filter_macros(&eval, dc_item);
 
 	if (SUCCEED != zbx_expression_eval_execute(&eval, &ts, &value, &error))
 	{

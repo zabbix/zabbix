@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -624,7 +624,7 @@ while(0)
 			Re(z) = Re(ZBX_MATRIX_ROW(roots, i));
 			Im(z) = Im(ZBX_MATRIX_ROW(roots, i));
 
-			/* subtract from z every one of denominator_multiplicands and multiplicate them */
+			/* subtract from z every one of denominator_multiplicands and multiply them */
 			Re(denominator) = highest_degree_coefficient;
 			Im(denominator) = 0.0;
 
@@ -670,7 +670,7 @@ while(0)
 				Im(ZBX_MATRIX_ROW(updates, i)) = (Im(polynomial) * Re(denominator) -
 						Re(polynomial) * Im(denominator)) / temp;
 			}
-			else	/* Denominator is zero iff two or more root approximations are equal. */
+			else	/* Denominator is zero if two or more root approximations are equal. */
 				/* Since root approximations are initially different their equality means that they */
 				/* converged to a multiple root (hopefully) and no updates are required in this case. */
 			{

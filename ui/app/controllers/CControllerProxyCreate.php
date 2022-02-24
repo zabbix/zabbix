@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,8 +78,9 @@ class CControllerProxyCreate extends CController {
 			'tls_subject', 'tls_psk_identity', 'tls_psk'
 		]);
 
-		if ($this->hasInput('clone_proxyid') && (array_key_exists('tls_connect', $proxy)
-					&& $proxy['tls_connect'] == HOST_ENCRYPTION_PSK)) {
+		if ($this->hasInput('clone_proxyid')
+				&& ((array_key_exists('tls_connect', $proxy) && $proxy['tls_connect'] == HOST_ENCRYPTION_PSK)
+					|| (array_key_exists('tls_accept', $proxy) && $proxy['tls_accept'] & HOST_ENCRYPTION_PSK))) {
 			$clone_proxies = API::Proxy()->get([
 				'output' => ['tls_psk_identity', 'tls_psk'],
 				'proxyids' => $this->getInput('clone_proxyid'),

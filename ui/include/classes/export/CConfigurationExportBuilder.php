@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -839,14 +839,14 @@ class CConfigurationExportBuilder {
 	 *
 	 * @return array
 	 */
-	protected function formatGroupLinks(array $groupLinks) {
+	protected function formatGroupLinks(array $group_links) {
 		$result = [];
 
-		CArrayHelper::sort($groupLinks, ['name']);
+		CArrayHelper::sort($group_links, ['name']);
 
-		foreach ($groupLinks as $groupLink) {
+		foreach ($group_links as $group_link) {
 			$result[] = [
-				'group' => $groupLink['groupid']
+				'group' => $group_link
 			];
 		}
 

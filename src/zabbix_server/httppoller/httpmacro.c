@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-#include "db.h"
 #include "log.h"
 #include "zbxregexp.h"
 #include "zbxhttp.h"
@@ -30,8 +29,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: httpmacro_cmp_func                                               *
- *                                                                            *
  * Purpose: compare two macros by name                                        *
  *                                                                            *
  * Parameters: d1 - [IN] the first macro                                      *
@@ -40,8 +37,6 @@
  * Return value: <0 - the first macro name is 'less' than second              *
  *                0 - the macro names are equal                               *
  *               >0 - the first macro name is 'greater' than second           *
- *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 static int 	httpmacro_cmp_func(const void *d1, const void *d2)
@@ -53,8 +48,6 @@ static int 	httpmacro_cmp_func(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: httpmacro_append_pair                                            *
  *                                                                            *
  * Purpose: appends key/value pair to the http test macro cache.              *
  *          If the value format is 'regex:<pattern>', then regular expression *
@@ -74,8 +67,6 @@ static int 	httpmacro_cmp_func(const void *d1, const void *d2)
  *                          The failure reason can be either empty key/value, *
  *                          wrong key format or failed regular expression     *
  *                          match.                                            *
- *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, size_t nkey,
@@ -168,15 +159,11 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: http_substitute_variables                                        *
- *                                                                            *
  * Purpose: substitute variables in input string with their values from http  *
  *          test config                                                       *
  *                                                                            *
  * Parameters: httptest - [IN]     the http test data                         *
  *             data     - [IN/OUT] string to substitute macros in             *
- *                                                                            *
- * Author: Alexei Vladishev, Andris Zeila                                     *
  *                                                                            *
  ******************************************************************************/
 int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
@@ -266,8 +253,6 @@ int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
 
 /******************************************************************************
  *                                                                            *
- * Function: http_process_variables                                           *
- *                                                                            *
  * Purpose: parses http test/step variable string and stores results into     *
  *          httptest macro cache.                                             *
  *          The variables are specified as {<key>}=><value> pairs             *
@@ -284,8 +269,6 @@ int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
  * Return value: SUCCEED - the variables were processed successfully          *
  *               FAIL    - the variable processing failed (regexp match       *
  *                         failed).                                           *
- *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 int	http_process_variables(zbx_httptest_t *httptest, zbx_vector_ptr_pair_t *variables, const char *data,

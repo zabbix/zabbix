@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -450,10 +450,7 @@ static void	zbx_thread_handle_pipe_response(ZBX_THREAD_SENDVAL_ARGS *sendval_arg
 }
 #endif
 
-
 /******************************************************************************
- *                                                                            *
- * Function: sender_threads_wait                                              *
  *                                                                            *
  * Purpose: waits until the "threads" are in the signalled state and manages  *
  *          exit status updates                                               *
@@ -530,8 +527,6 @@ static int	sender_threads_wait(ZBX_THREAD_HANDLE *threads, zbx_thread_args_t *th
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_string                                                       *
  *                                                                            *
  * Purpose: get current string from the quoted or unquoted string list,       *
  *          delimited by blanks                                               *
@@ -631,8 +626,6 @@ static const char	*get_string(const char *p, char *buf, size_t bufsize)
 
 /******************************************************************************
  *                                                                            *
- * Function: check_response                                                   *
- *                                                                            *
  * Purpose: Check whether JSON response is SUCCEED                            *
  *                                                                            *
  * Parameters: JSON response from Zabbix trapper                              *
@@ -641,8 +634,6 @@ static const char	*get_string(const char *p, char *buf, size_t bufsize)
  *                FAIL - an error occurred                                    *
  *                SUCCEED_PARTIAL - the sending operation was completed       *
  *                successfully, but processing of at least one value failed   *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: active agent has almost the same function!                       *
  *                                                                            *
@@ -796,8 +787,6 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 
 /******************************************************************************
  *                                                                            *
- * Function: perform_data_sending                                             *
- *                                                                            *
  * Purpose: Send data to all destinations each in a separate thread and wait  *
  *          till threads have completed their task                            *
  *                                                                            *
@@ -860,8 +849,6 @@ static int	perform_data_sending(ZBX_THREAD_SENDVAL_ARGS *sendval_args, int old_s
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: sender_add_serveractive_host_cb                                  *
  *                                                                            *
  * Purpose: add server or proxy to the list of destinations                   *
  *                                                                            *
@@ -1462,8 +1449,6 @@ static void	parse_commandline(int argc, char **argv)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_fgets_alloc                                                  *
  *                                                                            *
  * Purpose: reads a line from file                                            *
  *                                                                            *

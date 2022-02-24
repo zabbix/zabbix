@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ class CControllerUserTokenList extends CController {
 		$fields = [
 			'sort'                   => 'in name,expires_at,lastaccess,status',
 			'sortorder'              => 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'uncheck'                => 'in 1',
 			'filter_set'             => 'in 1',
 			'filter_rst'             => 'in 1',
 			'filter_name'            => 'string',
@@ -88,7 +87,6 @@ class CControllerUserTokenList extends CController {
 		];
 
 		$data = [
-			'uncheck' => $this->hasInput('uncheck'),
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,
 			'filter' => $filter,

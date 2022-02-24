@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ class testFormSetup extends CWebTest {
 		$this->page->login()->open('setup.php')->waitUntilReady();
 
 		// Check Welcome section.
-		$this->assertEquals("Welcome to\nZabbix 6.0", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
+		$this->assertEquals("Welcome to\nZabbix 6.2", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 		$this->checkSections('Welcome');
 		$form = $this->query('xpath://form')->asForm()->one();
 		$language_field = $form->getField('Default language');
@@ -64,7 +64,7 @@ class testFormSetup extends CWebTest {
 		// Check that default language can be changed.
 		$language_field->fill('Russian (ru_RU)');
 		$this->page->refresh()->waitUntilReady();
-		$this->assertEquals("Добро пожаловать в\nZabbix 6.0", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
+		$this->assertEquals("Добро пожаловать в\nZabbix 6.2", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 
 		$this->checkButtons('russian');
 		$this->assertScreenshotExcept($form, $this->query('id:default-lang')->one(), 'Welcome_Rus');
@@ -271,7 +271,7 @@ class testFormSetup extends CWebTest {
 		// Check layout via screenshot for dark theme.
 		$this->assertScreenshotExcept($form, $this->query('id:label-default-timezone')->one(), 'GUISettings_Dark');
 
-		// Complite the setup and check in DB that the default timezone was applied.
+		// Complete the setup and check in DB that the default timezone was applied.
 		$this->query('button:Next step')->one()->click();
 		$this->query('button:Next step')->one()->click();
 		$this->query('button:Finish')->one()->click();
@@ -282,7 +282,7 @@ class testFormSetup extends CWebTest {
 	public function testFormSetup_summarySection() {
 		$this->openSpecifiedSection('Pre-installation summary');
 
-		// Check that Zabbix server name sield is not displayed if its not populated.
+		// Check that Zabbix server name field is not displayed if it is not populated.
 		$this->assertFalse($this->query('xpath://span[text()="Zabbix server name"]')->one(false)->isValid());
 		$this->query('button:Back')->one()->click();
 		// Fill in the Zabbix server name field and proceed with checking Pre-installation summary.
@@ -316,7 +316,7 @@ class testFormSetup extends CWebTest {
 			$xpath = 'xpath://span[text()='.CXPathHelper::escapeQuotes($field_name).']/../../div[@class="table-forms-td-right"]';
 			// Assert contains is used as Password length can differ.
 			if ($field_name === 'Database password') {
-				$this->assertContains($value, $this->query($xpath)->one()->getText());
+				$this->assertStringContainsString($value, $this->query($xpath)->one()->getText());
 			}
 			else {
 				$this->assertEquals($value, $this->query($xpath)->one()->getText());
@@ -335,7 +335,7 @@ class testFormSetup extends CWebTest {
 
 	public function testFormSetup_installSection() {
 		$this->openSpecifiedSection('Install');
-		$this->checkPageTextElements('Install', '/conf/zabbix.conf.php" created.');
+		$this->checkPageTextElements('Install', 'Configuration file "conf/zabbix.conf.php" created.');
 		$this->assertEquals('Congratulations! You have successfully installed Zabbix frontend.',
 				$this->query('class:green')->one()->getText());
 		$this->checkButtons('last section');
@@ -344,7 +344,7 @@ class testFormSetup extends CWebTest {
 		// Check that Dashboard view is opened after completing the form.
 		$this->query('button:Finish')->one()->click();
 		$this->page->waitUntilReady();
-		$this->assertContains('index.php', $this->page->getCurrentURL());
+		$this->assertStringContainsString('index.php', $this->page->getCurrentURL());
 	}
 
 	public function getDbConnectionDetails() {
@@ -798,13 +798,13 @@ class testFormSetup extends CWebTest {
 		$this->query('button:Back')->one()->click();
 		$this->assertEquals('Check of pre-requisites', $this->query('xpath://h1')->one()->getText());
 		$this->query('button:Back')->one()->click();
-		$this->assertEquals("Welcome to\nZabbix 6.0", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
+		$this->assertEquals("Welcome to\nZabbix 6.2", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 		$this->checkSections('Welcome');
 		$this->checkButtons('first section');
 
 		// Cancel setup form update.
 		$this->query('button:Cancel')->one()->click();
-		$this->assertContains('zabbix.php?action=dashboard.view', $this->page->getCurrentURL());
+		$this->assertStringContainsString('zabbix.php?action=dashboard.view', $this->page->getCurrentURL());
 	}
 
 	/**
@@ -817,7 +817,7 @@ class testFormSetup extends CWebTest {
 		$this->assertTrue($this->query('xpath://h1[text()='.CXPathHelper::escapeQuotes($title).']')->one()->isValid());
 		$this->checkSections($title);
 		if ($text) {
-			$this->assertContains($text, $this->query('xpath:.//p')->one()->getText());
+			$this->assertStringContainsString($text, $this->query('xpath:.//p')->one()->getText());
 		}
 	}
 

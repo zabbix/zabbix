@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2021 Zabbix SIA
+ ** Copyright (C) 2001-2022 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -473,10 +473,10 @@ jQuery(function ($) {
 						);
 					});
 
-					html = $('<div></div>')
+					html = $('<div>')
 							.addClass('svg-graph-hintbox')
 							.append(
-								$('<table></table>')
+								$('<table>')
 									.addClass('list-table compact-view')
 									.append(tbody)
 							)
@@ -521,7 +521,7 @@ jQuery(function ($) {
 
 				// Make html for hintbox.
 				if (show_hint) {
-					html = $('<ul></ul>');
+					html = $('<ul>');
 				}
 				var rows_added = 0;
 				points.forEach(function(point) {
@@ -536,10 +536,10 @@ jQuery(function ($) {
 						}
 
 						if (show_hint && data.hintMaxRows > rows_added) {
-							$('<li></li>')
+							$('<li>')
 								.text(point.g.getAttribute('data-metric') + ': ' + point.v)
 								.append(
-									$('<span></span>')
+									$('<span>')
 										.css('background-color', point.g.getAttribute('data-color'))
 										.addClass('svg-graph-hintbox-item-color')
 								)
@@ -557,10 +557,10 @@ jQuery(function ($) {
 					// Calculate time at mouse position.
 					var time = parseInt(data.timeFrom) + parseInt((offsetX - data.dimX) * data.spp);
 
-					html = $('<div></div>')
+					html = $('<div>')
 							.addClass('svg-graph-hintbox')
 							.append(
-								$('<div></div>')
+								$('<div>')
 									.addClass('header')
 									.html(time2str(time))
 							)
@@ -602,13 +602,13 @@ jQuery(function ($) {
 
 	// Function creates hintbox footer.
 	function makeHintBoxFooter(num_displayed, num_total) {
-		return $('<div></div>')
+		return $('<div>')
 			.addClass('table-paging')
 			.append(
-				$('<div></div>')
+				$('<div>')
 					.addClass('paging-btn-container')
 					.append(
-						$('<div></div>')
+						$('<div>')
 							.text(sprintf(t('S_DISPLAYING_FOUND'), num_displayed, num_total))
 							.addClass('table-stats')
 					)

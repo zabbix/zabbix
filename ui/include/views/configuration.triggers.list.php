@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -248,7 +248,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			$dep_trigger = $data['dep_triggers'][$dependency['triggerid']];
 
 			$dep_trigger_desc = CHtml::encode(
-				implode(', ', zbx_objectValues($dep_trigger['hosts'], 'name')).NAME_DELIMITER.$dep_trigger['description']
+				implode(', ', array_column($dep_trigger['hosts'], 'name')).NAME_DELIMITER.$dep_trigger['description']
 			);
 
 			$trigger_deps[] = (new CLink($dep_trigger_desc,
@@ -349,7 +349,11 @@ $triggers_form->addItem([
 			'trigger.masscopyto' => ['name' => _('Copy')],
 			'popup.massupdate.trigger' => [
 				'content' => (new CButton('', _('Mass update')))
-					->onClick("return openMassupdatePopup(this, 'popup.massupdate.trigger');")
+					->onClick(
+						"return openMassupdatePopup('popup.massupdate.trigger', {}, {
+							dialogue_class: 'modal-popup-static'
+						});"
+					)
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],
@@ -363,3 +367,7 @@ $triggers_form->addItem([
 $widget->addItem($triggers_form);
 
 $widget->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
+	->show();

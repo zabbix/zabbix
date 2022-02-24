@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,13 +60,15 @@ class CDiscoveryRuleManager {
 		}
 
 		// Delete host prototypes.
-		$host_prototypeids = DBfetchColumn(DBselect(
-			'SELECT hd.hostid'.
-			' FROM host_discovery hd'.
-			' WHERE '.dbConditionInt('hd.parent_itemid', $ruleids)
+		$db_host_prototypes = DBfetchArrayAssoc(DBselect(
+			'SELECT hd.hostid,h.host'.
+			' FROM host_discovery hd,hosts h'.
+			' WHERE hd.hostid=h.hostid'.
+				' AND '.dbConditionInt('hd.parent_itemid', $ruleids)
 		), 'hostid');
-		if ($host_prototypeids) {
-			API::HostPrototype()->delete($host_prototypeids, true);
+
+		if ($db_host_prototypes) {
+			CHostPrototype::deleteForce($db_host_prototypes);
 		}
 
 		// Delete LLD rules.

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "trends.h"
+
 #include "common.h"
 #include "db.h"
 #include "log.h"
-#include "zbxtrends.h"
-#include "trends.h"
 
 static char	*trends_errors[ZBX_TREND_STATE_COUNT] = {
 		"unknown error",
@@ -31,8 +31,6 @@ static char	*trends_errors[ZBX_TREND_STATE_COUNT] = {
 };
 
 /******************************************************************************
- *                                                                            *
- * Function: trends_parse_base                                                *
  *                                                                            *
  * Purpose: parse largest period base from function parameters                *
  *                                                                            *
@@ -76,8 +74,6 @@ static int	trends_parse_base(const char *period_shift, zbx_time_unit_t *base, ch
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_trends_parse_base                                            *
- *                                                                            *
  * Purpose: parse largest period base from function parameters                *
  *                                                                            *
  * Parameters: params - [IN] the function parameters                          *
@@ -102,8 +98,6 @@ int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **erro
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: trends_parse_timeshift                                           *
  *                                                                            *
  * Purpose: parse timeshift                                                   *
  *                                                                            *
@@ -198,8 +192,6 @@ static int	trends_parse_timeshift(time_t from, const char *timeshift, zbx_time_u
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_parse_timeshift                                              *
- *                                                                            *
  * Purpose: parse timeshift                                                   *
  *                                                                            *
  * Parameters: from          - [IN] the start time                            *
@@ -217,8 +209,6 @@ int	zbx_parse_timeshift(time_t from, const char *timeshift, struct tm *tm, char 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_trends_parse_range                                           *
  *                                                                            *
  * Purpose: parse trend function period arguments into time range             *
  *                                                                            *
@@ -268,6 +258,12 @@ int	zbx_trends_parse_range(time_t from, const char *param, int *start, int *end,
 		return FAIL;
 	}
 
+	if (0 == period_num)
+	{
+		*error = zbx_strdup(*error, "period cannot be zero");
+		return FAIL;
+	}
+
 	if (period_hours[period_unit] * period_num > 24 * 366)
 	{
 		*error = zbx_strdup(*error, "period is too large");
@@ -310,8 +306,6 @@ int	zbx_trends_parse_range(time_t from, const char *param, int *start, int *end,
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_trends_parse_nextcheck                                       *
  *                                                                            *
  * Purpose: calculate possible nextcheck based on trend function parameters   *
  *                                                                            *
@@ -414,8 +408,6 @@ int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *ne
 
 /******************************************************************************
  *                                                                            *
- * Function: trends_eval                                                      *
- *                                                                            *
  * Purpose: evaluate expression with trends data                              *
  *                                                                            *
  * Parameters: table       - [IN] the trends table name                       *
@@ -478,8 +470,6 @@ static zbx_trend_state_t	trends_eval(const char *table, zbx_uint64_t itemid, int
 
 /******************************************************************************
  *                                                                            *
- * Function: trends_eval_avg                                                  *
- *                                                                            *
  * Purpose: evaluate avg function with trends data                            *
  *                                                                            *
  * Parameters: table       - [IN] the trends table name                       *
@@ -538,8 +528,6 @@ static zbx_trend_state_t	trends_eval_avg(const char *table, zbx_uint64_t itemid,
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: trends_eval_sum                                                  *
  *                                                                            *
  * Purpose: evaluate sum function with trends data                            *
  *                                                                            *
@@ -705,4 +693,3 @@ const char	*zbx_trends_error(zbx_trend_state_t state)
 
 	return trends_errors[state];
 }
-

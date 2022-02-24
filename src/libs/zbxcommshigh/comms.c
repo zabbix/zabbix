@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "comms.h"
+
+#include "common.h"
 #include "zbxjson.h"
 #include "log.h"
 #if !defined(_WINDOWS) && !defined(__MINGW32)
@@ -137,8 +138,6 @@ void	disconnect_server(zbx_socket_t *sock)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_data_from_server                                             *
- *                                                                            *
  * Purpose: get configuration and other data from server                      *
  *                                                                            *
  * Return value: SUCCEED - processed successfully                             *
@@ -176,8 +175,6 @@ exit:
 
 /******************************************************************************
  *                                                                            *
- * Function: put_data_to_server                                               *
- *                                                                            *
  * Purpose: send data to server                                               *
  *                                                                            *
  * Return value: SUCCEED - processed successfully                             *
@@ -210,8 +207,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_send_response                                                *
- *                                                                            *
  * Purpose: send json SUCCEED or FAIL to socket along with an info message    *
  *                                                                            *
  * Parameters: sock     - [IN] socket descriptor                              *
@@ -223,10 +218,6 @@ out:
  *                                                                            *
  * Return value: SUCCEED - data successfully transmitted                      *
  *               NETWORK_ERROR - network related error occurred               *
- *                                                                            *
- * Author: Alexander Vladishev, Alexei Vladishev                              *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, const char *version, int protocol,
@@ -267,8 +258,6 @@ int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, cons
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_recv_response                                                *
  *                                                                            *
  * Purpose: read a response message (in JSON format) from socket, optionally  *
  *          extract "info" value.                                             *

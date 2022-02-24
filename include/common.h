@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -569,8 +569,9 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_REPORTMANAGER		33
 #define ZBX_PROCESS_TYPE_REPORTWRITER		34
 #define ZBX_PROCESS_TYPE_SERVICEMAN		35
-#define ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER	36
-#define ZBX_PROCESS_TYPE_COUNT			37	/* number of process types */
+#define ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER	36
+#define ZBX_PROCESS_TYPE_ODBCPOLLER		37
+#define ZBX_PROCESS_TYPE_COUNT			38	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126
@@ -797,7 +798,7 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_TRIGGER_CORRELATION_NONE	0
 #define ZBX_TRIGGER_CORRELATION_TAG	1
 
-/* acknowledgement actions (flags) */
+/* acknowledgment actions (flags) */
 #define ZBX_PROBLEM_UPDATE_CLOSE		0x0001
 #define ZBX_PROBLEM_UPDATE_ACKNOWLEDGE		0x0002
 #define ZBX_PROBLEM_UPDATE_MESSAGE		0x0004
@@ -982,6 +983,8 @@ typedef enum
 }
 zbx_task_t;
 
+/* runtime control commands */
+#define ZBX_RTC_UNKNOWN				0
 #define ZBX_RTC_LOG_LEVEL_INCREASE		1
 #define ZBX_RTC_LOG_LEVEL_DECREASE		2
 #define ZBX_RTC_HOUSEKEEPER_EXECUTE		3
@@ -995,6 +998,16 @@ zbx_task_t;
 #define ZBX_RTC_HA_REMOVE_NODE			15
 #define ZBX_RTC_HA_SET_FAILOVER_DELAY		16
 #define ZBX_RTC_USER_PARAMETERS_RELOAD		17
+
+/* internal rtc messages */
+#define ZBX_RTC_SUBSCRIBE			100
+#define ZBX_RTC_SHUTDOWN			101
+#define ZBX_RTC_CONFIG_CACHE_RELOAD_WAIT	102
+
+/* runtime control notifications, must be less than 10000 */
+#define ZBX_RTC_CONFIG_SYNC_NOTIFY		9999
+
+#define ZBX_IPC_RTC_MAX				9999
 
 typedef enum
 {
@@ -1014,6 +1027,7 @@ typedef struct
 	zbx_task_t	task;
 	unsigned int	flags;
 	int		data;
+	char		*opts;
 }
 ZBX_TASK_EX;
 
@@ -1679,7 +1693,7 @@ int	zbx_validate_value_dbl(double value, int dbl_precision);
 
 void	zbx_update_env(double time_now);
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
-		int *nextcheck, char **error);
+		int *nextcheck, int *scheduling, char **error);
 #define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
 char	*zbx_create_token(zbx_uint64_t seed);
 
@@ -1690,7 +1704,7 @@ char	*zbx_create_token(zbx_uint64_t seed);
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-#define ZBX_PCRE_RECURSION_LIMIT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */
+#define ZBX_REGEXP_RECURSION_LIMIT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */
 #endif
 
 int	zbx_str_extract(const char *text, size_t len, char **value);

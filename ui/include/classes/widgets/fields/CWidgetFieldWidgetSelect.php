@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ class CWidgetFieldWidgetSelect extends CWidgetField {
 	private $search_by_value;
 
 	/**
-	 * Field that creates a select of widgets in current dashboard, filtered by given key of widget array.
+	 * Field that creates a selection of widgets in current dashboard, filtered by given key of widget array.
 	 *
 	 * @param string $name         Name of field in config form and widget['fields'] array.
 	 * @param string $label        Field label in config form.

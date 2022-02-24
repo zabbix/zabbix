@@ -17157,7 +17157,6 @@ DUK_EXTERNAL duk_bool_t duk_put_prop_heapptr(duk_hthread *thr, duk_idx_t obj_idx
 	return duk__put_prop_shared(thr, obj_idx, -1);
 }
 
-
 DUK_INTERNAL duk_bool_t duk_put_prop_stridx(duk_hthread *thr, duk_idx_t obj_idx, duk_small_uint_t stridx) {
 	DUK_ASSERT_API_ENTRY(thr);
 	DUK_ASSERT_STRIDX_VALID(stridx);
@@ -17733,7 +17732,6 @@ DUK_EXTERNAL duk_bool_t duk_get_global_heapptr(duk_hthread *thr, void *ptr) {
 	duk_remove_m2(thr);
 	return ret;
 }
-
 
 DUK_EXTERNAL duk_bool_t duk_put_global_string(duk_hthread *thr, const char *key) {
 	duk_bool_t ret;
@@ -27737,7 +27735,6 @@ DUK_INTERNAL duk_ret_t duk_bi_arraybuffer_constructor(duk_hthread *thr) {
 	DUK_DCERROR_RANGE_INVALID_LENGTH(thr);
 }
 #endif  /* DUK_USE_BUFFEROBJECT_SUPPORT */
-
 
 /* Format of magic, bits:
  *   0...1: elem size shift (0-3)
@@ -44824,7 +44821,6 @@ DUK_LOCAL void duk__print_catcher(duk__dprint_state *st, duk_catcher *cat) {
 		       (long) cat->idx_base, (unsigned long) cat->flags);
 }
 
-
 DUK_LOCAL void duk__print_activation(duk__dprint_state *st, duk_activation *act) {
 	duk_fixedbuffer *fb = st->fb;
 
@@ -53356,7 +53352,6 @@ DUK_INTERNAL void duk_hobject_refcount_finalize_norz(duk_heap *heap, duk_hobject
 			}
 #endif
 		}
-
 
 		for (i = 0; i < DUK_NUM_BUILTINS; i++) {
 			DUK_HOBJECT_DECREF_NORZ_ALLOWNULL(thr, (duk_hobject *) t->builtins[i]);
@@ -64442,7 +64437,6 @@ DUK_INTERNAL duk_activation *duk_hthread_activation_alloc(duk_hthread *thr) {
 }
 #endif  /* DUK_USE_CACHE_ACTIVATION */
 
-
 DUK_INTERNAL void duk_hthread_activation_free(duk_hthread *thr, duk_activation *act) {
 	DUK_ASSERT(thr != NULL);
 	DUK_ASSERT(act != NULL);
@@ -66512,7 +66506,6 @@ DUK_LOCAL duk_small_uint_t duk__call_setup_act_attempt_tailcall(duk_hthread *thr
 	DUK_ASSERT(*out_nregs >= 0);
 	DUK_ASSERT(*out_nregs >= *out_nargs);
 	*out_vs_min_bytes = entry_valstack_bottom_byteoff + sizeof(duk_tval) * ((duk_size_t) *out_nregs + DUK_VALSTACK_INTERNAL_EXTRA);
-
 
 #if defined(DUK_USE_NONSTD_FUNC_CALLER_PROPERTY)
 #if defined(DUK_USE_TAILCALL)
@@ -80636,7 +80629,6 @@ DUK_LOCAL DUK_NOINLINE DUK_HOT void duk__js_execute_bytecode_inner(duk_hthread *
 			break;
 		}
 
-
 		/* XXX: in some cases it's faster NOT to reuse the value
 		 * stack but rather copy the arguments on top of the stack
 		 * (mainly when the calling value stack is large and the value
@@ -81531,7 +81523,6 @@ DUK_INTERNAL duk_int32_t duk_js_toint32(duk_hthread *thr, duk_tval *tv) {
 	DUK_ASSERT(duk_double_equals(d, (duk_double_t) ((duk_int32_t) d)));  /* whole, won't clip */
 	return (duk_int32_t) d;
 }
-
 
 DUK_INTERNAL duk_uint32_t duk_js_touint32(duk_hthread *thr, duk_tval *tv) {
 	duk_double_t d;
@@ -89087,7 +89078,6 @@ DUK_LOCAL DUK_NOINLINE void duk__numconv_parse_raw(duk_hthread *thr, duk_small_i
 		res = 0.0;
 		goto negcheck_and_ret;
 	}
-
 
 	/* Quick reject of too large or too small exponents.  This check
 	 * would be incorrect for zero (e.g. "0e1000" is zero, not Infinity)

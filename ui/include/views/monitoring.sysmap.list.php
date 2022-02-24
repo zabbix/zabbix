@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,11 @@ $widget = (new CWidget())
 				->addItem((new CSubmit('form', _('Create map')))->setEnabled($data['allowed_edit']))
 				->addItem(
 					(new CButton('form', _('Import')))
-						->onClick('return PopUp("popup.import", {rules_preset: "map"}, null, this);')
+						->onClick(
+							'return PopUp("popup.import", {rules_preset: "map"},
+								{dialogue_class: "modal-popup-generic"}
+							);'
+						)
 						->setEnabled($data['allowed_edit'])
 						->removeId()
 				)

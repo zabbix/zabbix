@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
  *
  * Icon maps work only with map elements that represent hosts, and used for automatic changing
  * icons based on host inventory data.
- * Icon maps has read access for everyone and write access only for superamins
+ * Icon maps has read access for everyone and write access only for superadmins
  */
 class CIconMap extends CApiService {
 

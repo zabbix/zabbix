@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,17 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "zbxembed.h"
-#include "embed.h"
 #include "global.h"
+
+#include "common.h"
+#include "embed.h"
 #include "duktape.h"
 #include "base64.h"
 #include "sha256crypt.h"
 
 /******************************************************************************
- *                                                                            *
- * Function: es_btoa                                                          *
  *                                                                            *
  * Purpose: encodes parameter to base64 string                                *
  *                                                                            *
@@ -53,8 +51,6 @@ static duk_ret_t	es_btoa(duk_context *ctx)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: es_atob                                                          *
  *                                                                            *
  * Purpose: decodes base64 string                                             *
  *                                                                            *
@@ -83,8 +79,6 @@ static duk_ret_t	es_atob(duk_context *ctx)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: es_md5                                                           *
  *                                                                            *
  * Purpose: compute a md5 checksum                                            *
  *                                                                            *
@@ -128,8 +122,6 @@ static duk_ret_t	es_md5(duk_context *ctx)
 
 /******************************************************************************
  *                                                                            *
- * Function: es_sha256                                                        *
- *                                                                            *
  * Purpose: compute a sha256 checksum                                         *
  *                                                                            *
  * Parameters: ctx - [IN] pointer to duk_context                              *
@@ -166,8 +158,6 @@ static duk_ret_t	es_sha256(duk_context *ctx)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: es_init_global_functions                                         *
  *                                                                            *
  * Purpose: initializes additional global functions                           *
  *                                                                            *

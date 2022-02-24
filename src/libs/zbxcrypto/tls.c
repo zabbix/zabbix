@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,15 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "sysinc.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
+#include "tls.h"
 #include "comms.h"
 #include "threads.h"
 #include "log.h"
 #include "zbxcrypto.h"
-#include "tls.h"
 #include "tls_tcp.h"
 #include "tls_tcp_active.h"
 
@@ -214,8 +214,6 @@ ZBX_THREAD_LOCAL char				info_buf[256];
 #if defined(HAVE_GNUTLS)
 /******************************************************************************
  *                                                                            *
- * Function: zbx_gnutls_debug_cb                                              *
- *                                                                            *
  * Purpose: write a GnuTLS debug message into Zabbix log                      *
  *                                                                            *
  * Comments:                                                                  *
@@ -233,8 +231,6 @@ static void	zbx_gnutls_debug_cb(int level, const char *str)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_gnutls_audit_cb                                              *
  *                                                                            *
  * Purpose: write a GnuTLS audit message into Zabbix log                      *
  *                                                                            *
@@ -258,8 +254,6 @@ static void	zbx_gnutls_audit_cb(gnutls_session_t session, const char *str)
 
 #if defined(HAVE_OPENSSL)
 /******************************************************************************
- *                                                                            *
- * Function: zbx_openssl_info_cb                                              *
  *                                                                            *
  * Purpose: get state, alert, error information on TLS connection             *
  *                                                                            *
@@ -313,8 +307,6 @@ static void	zbx_openssl_info_cb(const SSL *ssl, int where, int ret)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tls_error_msg                                                *
- *                                                                            *
  * Purpose: compose a TLS error message                                       *
  *                                                                            *
  ******************************************************************************/
@@ -341,8 +333,6 @@ void	zbx_tls_error_msg(char **error, size_t *error_alloc, size_t *error_offset)
 #endif
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_tls_parameter_name                                           *
  *                                                                            *
  * Purpose:                                                                   *
  *     return the name of a configuration file or command line parameter that *
@@ -435,8 +425,6 @@ static const char	*zbx_tls_parameter_name(int type, char **param)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tls_parameter_not_empty                                      *
- *                                                                            *
  * Purpose:                                                                   *
  *     Helper function: check if a configuration parameter is defined it must *
  *     not be empty. Otherwise log error and exit.                            *
@@ -492,8 +480,6 @@ static void	zbx_tls_parameter_not_empty(char **param)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_tls_validation_error                                         *
  *                                                                            *
  * Purpose:                                                                   *
  *     Helper function: log error message depending on program type and exit. *
@@ -628,8 +614,6 @@ static void	zbx_tls_validation_error(int type, char **param1, char **param2)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tls_validation_error2                                        *
- *                                                                            *
  * Purpose:                                                                   *
  *     Helper function: log error message depending on program type and exit  *
  *                                                                            *
@@ -679,8 +663,6 @@ static void	zbx_tls_validation_error2(int type, char **param1, char **param2, ch
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_tls_validate_config                                          *
  *                                                                            *
  * Purpose: check for allowed combinations of TLS configuration parameters    *
  *                                                                            *
@@ -988,8 +970,6 @@ static void	zbx_psk_warn_misconfig(const char *psk_identity)
 #if defined(HAVE_GNUTLS)
 /******************************************************************************
  *                                                                            *
- * Function: zbx_psk_cb                                                       *
- *                                                                            *
  * Purpose:                                                                   *
  *     find and set the requested pre-shared key upon GnuTLS request          *
  *                                                                            *
@@ -1101,8 +1081,6 @@ static int	zbx_psk_cb(gnutls_session_t session, const char *psk_identity, gnutls
 #elif defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK)
 /******************************************************************************
  *                                                                            *
- * Function: zbx_psk_client_cb                                                *
- *                                                                            *
  * Purpose:                                                                   *
  *     set pre-shared key for outgoing TLS connection upon OpenSSL request    *
  *                                                                            *
@@ -1156,8 +1134,6 @@ static unsigned int	zbx_psk_client_cb(SSL *ssl, const char *hint, char *identity
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_psk_server_cb                                                *
  *                                                                            *
  * Purpose:                                                                   *
  *     set pre-shared key for incoming TLS connection upon OpenSSL request    *
@@ -1274,8 +1250,6 @@ fail:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_check_psk_identity_len                                       *
- *                                                                            *
  * Purpose: Check PSK identity length. Exit if length exceeds the maximum.    *
  *                                                                            *
  ******************************************************************************/
@@ -1291,8 +1265,6 @@ static void	zbx_check_psk_identity_len(size_t psk_identity_len)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_read_psk_file                                                *
  *                                                                            *
  * Purpose:                                                                   *
  *     read a pre-shared key from a configured file and convert it from       *
@@ -1379,8 +1351,6 @@ out:
 #if defined(HAVE_GNUTLS)
 /******************************************************************************
  *                                                                            *
- * Function: zbx_log_ciphersuites                                             *
- *                                                                            *
  * Purpose: write names of enabled GnuTLS ciphersuites into Zabbix log for    *
  *          debugging                                                         *
  *                                                                            *
@@ -1425,8 +1395,6 @@ static void	zbx_log_ciphersuites(const char *title1, const char *title2, gnutls_
 #elif defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
- * Function: zbx_log_ciphersuites                                             *
- *                                                                            *
  * Purpose: write names of enabled OpenSSL ciphersuites into Zabbix log for   *
  *          debugging                                                         *
  *                                                                            *
@@ -1464,8 +1432,6 @@ static void	zbx_log_ciphersuites(const char *title1, const char *title2, SSL_CTX
 
 #if defined(HAVE_GNUTLS)
 /******************************************************************************
- *                                                                            *
- * Function: zbx_print_rdn_value                                              *
  *                                                                            *
  * Purpose:                                                                   *
  *     print an RDN (relative distinguished name) value into buffer           *
@@ -1590,8 +1556,6 @@ small_buf:
 
 #if defined(HAVE_GNUTLS)
 /******************************************************************************
- *                                                                            *
- * Function: zbx_x509_dn_gets                                                 *
  *                                                                            *
  * Purpose:                                                                   *
  *     Print distinguished name (i.e. issuer, subject) into buffer. Intended  *
@@ -1740,8 +1704,6 @@ small_buf:
 #elif defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
- * Function: zbx_x509_dn_gets                                                 *
- *                                                                            *
  * Purpose:                                                                   *
  *     Print distinguished name (i.e. issuer, subject) into buffer. Intended  *
  *     to use as an alternative to OpenSSL X509_NAME_oneline() and to meet    *
@@ -1808,8 +1770,6 @@ out:
 #if defined(HAVE_GNUTLS)
 /******************************************************************************
  *                                                                            *
- * Function: zbx_get_peer_cert                                                *
- *                                                                            *
  * Purpose: get peer certificate from session                                 *
  *                                                                            *
  * Parameters:                                                                *
@@ -1875,8 +1835,6 @@ static gnutls_x509_crt_t	zbx_get_peer_cert(const gnutls_session_t session, char 
 #endif
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_log_peer_cert                                                *
  *                                                                            *
  * Purpose: write peer certificate information into Zabbix log for debugging  *
  *                                                                            *
@@ -1945,8 +1903,6 @@ static void	zbx_log_peer_cert(const char *function_name, const zbx_tls_context_t
 #if defined(HAVE_GNUTLS)
 /******************************************************************************
  *                                                                            *
- * Function: zbx_verify_peer_cert                                             *
- *                                                                            *
  * Purpose: basic verification of peer certificate                            *
  *                                                                            *
  * Return value:                                                              *
@@ -1988,8 +1944,6 @@ static int	zbx_verify_peer_cert(const gnutls_session_t session, char **error)
 #endif
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_verify_issuer_subject                                        *
  *                                                                            *
  * Purpose:                                                                   *
  *     verify peer certificate issuer and subject of the given TLS context    *
@@ -2107,8 +2061,6 @@ static int	zbx_verify_issuer_subject(const zbx_tls_context_t *tls_ctx, const cha
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_check_server_issuer_subject                                  *
- *                                                                            *
  * Purpose:                                                                   *
  *     check server certificate issuer and subject (for passive proxies and   *
  *     agent passive checks)                                                  *
@@ -2152,8 +2104,6 @@ int	zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tls_library_init                                             *
- *                                                                            *
  * Purpose: initialize TLS library, log library version                       *
  *                                                                            *
  * Comments:                                                                  *
@@ -2194,8 +2144,6 @@ static void	zbx_tls_library_init(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tls_library_deinit                                           *
- *                                                                            *
  * Purpose: deinitialize TLS library                                          *
  *                                                                            *
  ******************************************************************************/
@@ -2218,8 +2166,6 @@ void	zbx_tls_library_deinit(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tls_init_parent                                              *
- *                                                                            *
  * Purpose: initialize TLS library in a parent process                        *
  *                                                                            *
  ******************************************************************************/
@@ -2231,8 +2177,6 @@ void	zbx_tls_init_parent(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_tls_init_child                                               *
  *                                                                            *
  * Purpose: read available configuration parameters and initialize TLS        *
  *          library in a child process                                        *
@@ -3118,8 +3062,6 @@ out1:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tls_free_on_signal                                           *
- *                                                                            *
  * Purpose: TLS cleanup for using in signal handlers                          *
  *                                                                            *
  ******************************************************************************/
@@ -3130,8 +3072,6 @@ void	zbx_tls_free_on_signal(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_tls_free                                                     *
  *                                                                            *
  * Purpose: release TLS library resources allocated in zbx_tls_init_parent()  *
  *          and zbx_tls_init_child()                                          *
@@ -3205,8 +3145,6 @@ void	zbx_tls_free(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tls_connect                                                  *
- *                                                                            *
  * Purpose: establish a TLS connection over an established TCP connection     *
  *                                                                            *
  * Parameters:                                                                *
@@ -3222,6 +3160,7 @@ void	zbx_tls_free(void)
  *                        or empty string if not important) or PSK            *
  *                        (in hex-string) to connect with depending on value  *
  *                        of 'tls_connect'.                                   *
+ *     server_name - [IN] optional server name indication for TLS             *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - successful TLS handshake with a valid certificate or PSK     *
@@ -3230,7 +3169,7 @@ void	zbx_tls_free(void)
  ******************************************************************************/
 #if defined(HAVE_GNUTLS)
 int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
-		char **error)
+		const char *server_name, char **error)
 {
 	int	ret = FAIL, res;
 #if defined(_WINDOWS)
@@ -3363,6 +3302,12 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 				goto out;
 			}
 		}
+	}
+
+	if (NULL != server_name && ZBX_TCP_SEC_UNENCRYPTED != tls_connect && GNUTLS_E_SUCCESS != gnutls_server_name_set(
+			s->tls_ctx->ctx, GNUTLS_NAME_DNS, server_name, strlen(server_name)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set %s tls host name", server_name);
 	}
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
@@ -3498,8 +3443,68 @@ out1:
 	return ret;
 }
 #elif defined(HAVE_OPENSSL)
-int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
+static int	zbx_tls_get_error(const SSL *s, int res, const char *func, size_t *error_alloc, size_t *error_offset,
 		char **error)
+{
+	int	result_code;
+
+	result_code = SSL_get_error(s, res);
+
+	switch (result_code)
+	{
+		case SSL_ERROR_NONE:		/* handshake successful */
+			return SUCCEED;
+		case SSL_ERROR_ZERO_RETURN:
+			zbx_snprintf_alloc(error, error_alloc, error_offset,
+					"%s() TLS connection has been closed during read", func);
+			return FAIL;
+		case SSL_ERROR_SYSCALL:
+			if (0 == ERR_peek_error())
+			{
+				if (0 == res)
+				{
+					zbx_snprintf_alloc(error, error_alloc, error_offset,
+							"%s() connection closed by peer", func);
+				}
+				else if (-1 == res)
+				{
+					zbx_snprintf_alloc(error, error_alloc, error_offset, "%s()"
+							" I/O error: %s", func,
+							strerror_from_system(zbx_socket_last_error()));
+				}
+				else
+				{
+					/* "man SSL_get_error" describes only res == 0 and res == -1 for */
+					/* SSL_ERROR_SYSCALL case */
+					zbx_snprintf_alloc(error, error_alloc, error_offset, "%s()"
+							" returned undocumented code %d", func, res);
+				}
+			}
+			else
+			{
+				zbx_snprintf_alloc(error, error_alloc, error_offset, "%s() set"
+						" result code to SSL_ERROR_SYSCALL:", func);
+				zbx_tls_error_msg(error, error_alloc, error_offset);
+				zbx_snprintf_alloc(error, error_alloc, error_offset, "%s", info_buf);
+			}
+			return FAIL;
+		case SSL_ERROR_SSL:
+			zbx_snprintf_alloc(error, error_alloc, error_offset, "%s() set"
+					" result code to SSL_ERROR_SSL:", func);
+			zbx_tls_error_msg(error, error_alloc, error_offset);
+			zbx_snprintf_alloc(error, error_alloc, error_offset, "%s", info_buf);
+			return FAIL;
+		default:
+			zbx_snprintf_alloc(error, error_alloc, error_offset, "%s() set result code"
+					" to %d", func, result_code);
+			zbx_tls_error_msg(error, error_alloc, error_offset);
+			zbx_snprintf_alloc(error, error_alloc, error_offset, "%s", info_buf);
+			return FAIL;
+	}
+}
+
+int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
+		const char *server_name, char **error)
 {
 	int	ret = FAIL, res;
 	size_t	error_alloc = 0, error_offset = 0;
@@ -3598,6 +3603,12 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 		goto out1;
 	}
 
+	if (NULL != server_name && ZBX_TCP_SEC_UNENCRYPTED != tls_connect && 1 != SSL_set_tlsext_host_name(
+			s->tls_ctx->ctx, server_name))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set %s tls host name", server_name);
+	}
+
 	/* set our connected TCP socket to TLS context */
 	if (1 != SSL_set_fd(s->tls_ctx->ctx, s->socket))
 	{
@@ -3614,8 +3625,6 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 #endif
 	if (1 != (res = SSL_connect(s->tls_ctx->ctx)))
 	{
-		int	result_code;
-
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
 			zbx_alarm_flag_set();
@@ -3639,59 +3648,8 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 			}
 		}
 
-		result_code = SSL_get_error(s->tls_ctx->ctx, res);
-
-		switch (result_code)
-		{
-			case SSL_ERROR_NONE:		/* handshake successful */
-				break;
-			case SSL_ERROR_ZERO_RETURN:
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset,
-						"TLS connection has been closed during handshake");
-				goto out;
-			case SSL_ERROR_SYSCALL:
-				if (0 == ERR_peek_error())
-				{
-					if (0 == res)
-					{
-						zbx_snprintf_alloc(error, &error_alloc, &error_offset,
-								"connection closed by peer");
-					}
-					else if (-1 == res)
-					{
-						zbx_snprintf_alloc(error, &error_alloc, &error_offset, "SSL_connect()"
-								" I/O error: %s",
-								strerror_from_system(zbx_socket_last_error()));
-					}
-					else
-					{
-						/* "man SSL_get_error" describes only res == 0 and res == -1 for */
-						/* SSL_ERROR_SYSCALL case */
-						zbx_snprintf_alloc(error, &error_alloc, &error_offset, "SSL_connect()"
-								" returned undocumented code %d", res);
-					}
-				}
-				else
-				{
-					zbx_snprintf_alloc(error, &error_alloc, &error_offset, "SSL_connect() set"
-							" result code to SSL_ERROR_SYSCALL:");
-					zbx_tls_error_msg(error, &error_alloc, &error_offset);
-					zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s", info_buf);
-				}
-				goto out;
-			case SSL_ERROR_SSL:
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "SSL_connect() set"
-						" result code to SSL_ERROR_SSL:");
-				zbx_tls_error_msg(error, &error_alloc, &error_offset);
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s", info_buf);
-				goto out;
-			default:
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "SSL_connect() set result code"
-						" to %d", result_code);
-				zbx_tls_error_msg(error, &error_alloc, &error_offset);
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s", info_buf);
-				goto out;
-		}
+		if (FAIL == zbx_tls_get_error(s->tls_ctx->ctx, res, "SSL_connect", &error_alloc, &error_offset, error))
+			goto out;
 	}
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
@@ -3738,8 +3696,6 @@ out1:
 #endif
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_tls_accept                                                   *
  *                                                                            *
  * Purpose: establish a TLS connection over an accepted TCP connection        *
  *                                                                            *
@@ -4289,34 +4245,25 @@ out1:
 
 ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error)
 {
-#if defined(_WINDOWS)
-	double	sec;
-#endif
 #if defined(HAVE_GNUTLS)
 	ssize_t	res;
 #elif defined(HAVE_OPENSSL)
 	int	res;
 #endif
 
-#if defined(_WINDOWS)
-	zbx_alarm_flag_clear();
-	sec = zbx_time();
-#endif
 #if defined(HAVE_OPENSSL)
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 #endif
 	do
 	{
 		res = ZBX_TLS_WRITE(s->tls_ctx->ctx, buf, len);
-#if defined(_WINDOWS)
-		if (s->timeout < zbx_time() - sec)
-			zbx_alarm_flag_set();
-#endif
+#if !defined(_WINDOWS)
 		if (SUCCEED == zbx_alarm_timed_out())
 		{
 			*error = zbx_strdup(*error, ZBX_TLS_WRITE_FUNC_NAME "() timed out");
 			return ZBX_PROTO_ERROR;
 		}
+#endif
 	}
 	while (SUCCEED == ZBX_TLS_WANT_WRITE(res));
 
@@ -4331,24 +4278,12 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 #elif defined(HAVE_OPENSSL)
 	if (0 >= res)
 	{
-		int	result_code;
+		size_t	error_alloc = 0, error_offset = 0;
 
-		result_code = SSL_get_error(s->tls_ctx->ctx, res);
-
-		if (0 == res && SSL_ERROR_ZERO_RETURN == result_code)
+		if (SUCCEED == zbx_tls_get_error(s->tls_ctx->ctx, res, ZBX_TLS_WRITE_FUNC_NAME, &error_alloc,
+				&error_offset, error))
 		{
-			*error = zbx_strdup(*error, "connection closed during write");
-		}
-		else
-		{
-			char	*err = NULL;
-			size_t	error_alloc = 0, error_offset = 0;
-
-			zbx_snprintf_alloc(&err, &error_alloc, &error_offset, "TLS write set result code to"
-					" %d:", result_code);
-			zbx_tls_error_msg(&err, &error_alloc, &error_offset);
-			*error = zbx_dsprintf(*error, "%s%s", err, info_buf);
-			zbx_free(err);
+			*error = zbx_strdup(*error, ZBX_TLS_WRITE_FUNC_NAME "() unexpected result code");
 		}
 
 		return ZBX_PROTO_ERROR;
@@ -4360,34 +4295,25 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 
 ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 {
-#if defined(_WINDOWS)
-	double	sec;
-#endif
 #if defined(HAVE_GNUTLS)
 	ssize_t	res;
 #elif defined(HAVE_OPENSSL)
 	int	res;
 #endif
 
-#if defined(_WINDOWS)
-	zbx_alarm_flag_clear();
-	sec = zbx_time();
-#endif
 #if defined(HAVE_OPENSSL)
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 #endif
 	do
 	{
 		res = ZBX_TLS_READ(s->tls_ctx->ctx, buf, len);
-#if defined(_WINDOWS)
-		if (s->timeout < zbx_time() - sec)
-			zbx_alarm_flag_set();
-#endif
+#if !defined(_WINDOWS)
 		if (SUCCEED == zbx_alarm_timed_out())
 		{
 			*error = zbx_strdup(*error, ZBX_TLS_READ_FUNC_NAME "() timed out");
 			return ZBX_PROTO_ERROR;
 		}
+#endif
 	}
 	while (SUCCEED == ZBX_TLS_WANT_READ(res));
 
@@ -4403,24 +4329,12 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 #elif defined(HAVE_OPENSSL)
 	if (0 >= res)
 	{
-		int	result_code;
+		size_t	error_alloc = 0, error_offset = 0;
 
-		result_code = SSL_get_error(s->tls_ctx->ctx, res);
-
-		if (0 == res && SSL_ERROR_ZERO_RETURN == result_code)
+		if (SUCCEED == zbx_tls_get_error(s->tls_ctx->ctx, res, ZBX_TLS_READ_FUNC_NAME, &error_alloc,
+				&error_offset, error))
 		{
-			*error = zbx_strdup(*error, "connection closed during read");
-		}
-		else
-		{
-			char	*err = NULL;
-			size_t	error_alloc = 0, error_offset = 0;
-
-			zbx_snprintf_alloc(&err, &error_alloc, &error_offset, "TLS read set result code to"
-					" %d:", result_code);
-			zbx_tls_error_msg(&err, &error_alloc, &error_offset);
-			*error = zbx_dsprintf(*error, "%s%s", err, info_buf);
-			zbx_free(err);
+			*error = zbx_strdup(*error, ZBX_TLS_READ_FUNC_NAME "() unexpected result code");
 		}
 
 		return ZBX_PROTO_ERROR;
@@ -4431,8 +4345,6 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_tls_close                                                    *
  *                                                                            *
  * Purpose: close a TLS connection before closing a TCP socket                *
  *                                                                            *
@@ -4508,8 +4420,6 @@ void	zbx_tls_close(zbx_socket_t *s)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_tls_get_attr_cert                                            *
  *                                                                            *
  * Purpose: get certificate attributes from the context of established        *
  *          connection                                                        *
@@ -4600,8 +4510,6 @@ int	zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tls_get_attr_psk                                             *
- *                                                                            *
  * Purpose: get PSK attributes from the context of established connection     *
  *                                                                            *
  * Comments:                                                                  *
@@ -4640,8 +4548,6 @@ int	zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 #if defined(_WINDOWS)
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tls_pass_vars                                                *
- *                                                                            *
  * Purpose: pass some TLS variables from one thread to other                  *
  *                                                                            *
  * Comments: used in Zabbix sender on MS Windows                              *
@@ -4667,8 +4573,6 @@ void	zbx_tls_pass_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_tls_take_vars                                                *
  *                                                                            *
  * Purpose: pass some TLS variables from one thread to other                  *
  *                                                                            *

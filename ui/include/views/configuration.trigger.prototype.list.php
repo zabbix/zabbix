@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@
 /**
  * @var CView $this
  */
+
+require_once dirname(__FILE__).'/js/configuration.trigger.prototype.list.js.php';
 
 $widget = (new CWidget())
 	->setTitle(_('Trigger prototypes'))
@@ -200,7 +202,11 @@ $triggersForm->addItem([
 			],
 			'popup.massupdate.triggerprototype' => [
 				'content' => (new CButton('', _('Mass update')))
-					->onClick("return openMassupdatePopup(this, 'popup.massupdate.triggerprototype');")
+					->onClick(
+						"return openMassupdatePopup('popup.massupdate.triggerprototype', {}, {
+							dialogue_class: 'modal-popup-static'
+						});"
+					)
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],

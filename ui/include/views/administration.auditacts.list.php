@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,17 +92,17 @@ foreach ($this->data['alerts'] as $alert) {
 		? [
 			bold(_('Subject').':'),
 			BR(),
-			$alert['subject'],
+			(new CDiv($alert['subject']))->addClass(ZBX_STYLE_WORDBREAK),
 			BR(),
 			BR(),
 			bold(_('Message').':'),
 			BR(),
-			zbx_nl2br($alert['message'])
+			(new CDiv(zbx_nl2br($alert['message'])))->addClass(ZBX_STYLE_WORDBREAK)
 		]
 		: [
 			bold(_('Command').':'),
 			BR(),
-			zbx_nl2br($alert['message'])
+			(new CDiv(zbx_nl2br($alert['message'])))->addClass(ZBX_STYLE_WORDBREAK)
 		];
 
 	$info_icons = [];
