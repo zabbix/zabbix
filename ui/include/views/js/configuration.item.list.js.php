@@ -89,8 +89,6 @@
 			})
 				.then((response) => response.json())
 				.then((response) => {
-					const keepids = ('keepids' in response) ? response.keepids : [];
-
 					clearMessages();
 
 					/*
@@ -113,7 +111,7 @@
 						uncheckids = Object.values(uncheckids);
 
 						// This will only unset checkboxes from session storage, but not physically deselect them.
-						uncheckTableRows('items_' + this.checkbox_hash, keepids, false);
+						uncheckTableRows('items_' + this.checkbox_hash, [], false);
 
 						// Deselect the previous checkboxes.
 						chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
@@ -130,10 +128,14 @@
 					addMessage(message_box);
 				})
 				.finally(() => {
+					console.log('A');
 					button.classList.remove('is-loading');
 
 					// Deselect the "Execute now" button in both success and error cases, since there is no page reload.
 					button.blur();
+
+					// Scroll to top to see the success or error message.
+					document.querySelector('header').scrollIntoView();
 				});
 		},
 

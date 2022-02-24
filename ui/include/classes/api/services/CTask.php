@@ -497,37 +497,37 @@ class CTask extends CApiService {
 		// Put already collected items in cache.
 		if ($master_itemids) {
 			$this->item_cache = $items;
-		}
 
-		// Get master items.
-		while ($master_itemids) {
-			// Get already know items from cache or DB.
-			$master_items = $this->getMasterItems(array_keys($master_itemids));
-			$master_itemids = [];
+			// Get master items.
+			while ($master_itemids) {
+				// Get already known items from cache or DB.
+				$master_items = $this->getMasterItems(array_keys($master_itemids));
+				$master_itemids = [];
 
-			// Check the master item type and status.
-			foreach ($master_items as $itemid => $item) {
-				if (!in_array($item['type'], $allowed_types)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Cannot send request: %1$s.', _('wrong master item type'))
-					);
-				}
+				// Check the master item type and status.
+				foreach ($master_items as $itemid => $item) {
+					if (!in_array($item['type'], $allowed_types)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Cannot send request: %1$s.', _('wrong master item type'))
+						);
+					}
 
-				if ($item['status'] != ITEM_STATUS_ACTIVE || $item['hosts'][0]['status'] != HOST_STATUS_MONITORED) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot send request: %1$s.',
-						_s('item "%1$s" on host "%2$s" is not monitored', $item['name'], $item['hosts'][0]['name'])
-					));
-				}
+					if ($item['status'] != ITEM_STATUS_ACTIVE || $item['hosts'][0]['status'] != HOST_STATUS_MONITORED) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot send request: %1$s.',
+							_s('item "%1$s" on host "%2$s" is not monitored', $item['name'], $item['hosts'][0]['name'])
+						));
+					}
 
-				/*
-				 * If the master item was also another dependent item, add master item IDs for next loop, otherwise
-				 * store the item ID. This will replace the original item ID from request.
-				 */
-				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-					$master_itemids[$item['master_itemid']] = true;
-				}
-				else {
-					$itemids[$itemid] = true;
+					/*
+					 * If the master item was also another dependent item, add master item IDs for next loop, otherwise
+					 * store the item ID. This will replace the original item ID from request.
+					 */
+					if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+						$master_itemids[$item['master_itemid']] = true;
+					}
+					else {
+						$itemids[$itemid] = true;
+					}
 				}
 			}
 		}
@@ -560,7 +560,7 @@ class CTask extends CApiService {
 		// If some items were not found in cache, select them from DB.
 		if ($itemids) {
 			$items = API::Item()->get([
-				'output' => ['type', 'name', 'status', 'master_itemid'],
+				'output' => ['type', 'name', 'status', 'flags', 'master_itemid'],
 				'selectHosts' => ['name', 'status'],
 				'itemids' => $itemids,
 				'editable' => !self::checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW),
