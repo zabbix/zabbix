@@ -1,3 +1,9 @@
+Changes for 6.0.1rc3
+
+Bug fixes:
+..F....... [ZBX-20619] fixed massupdate button form in Safari browser (ashubin)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.1rc2
 
 Bug fixes:
