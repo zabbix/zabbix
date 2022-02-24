@@ -82,6 +82,7 @@ class CAudit {
 	public const RESOURCE_SCHEDULED_REPORT = 46;
 	public const RESOURCE_HA_NODE = 47;
 	public const RESOURCE_SLA = 48;
+	public const RESOURCE_TEMPLATE_GROUP = 49;
 
 	/**
 	 * Audit details actions.
@@ -132,6 +133,7 @@ class CAudit {
 		self::RESOURCE_SLA => 'sla',
 		self::RESOURCE_TEMPLATE => 'hosts',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'dashboard',
+		self::RESOURCE_TEMPLATE_GROUP => 'tplgrp',
 		self::RESOURCE_USER => 'users',
 		self::RESOURCE_USER_GROUP => 'usrgrp'
 	];
@@ -180,6 +182,7 @@ class CAudit {
 		self::RESOURCE_SLA => 'name',
 		self::RESOURCE_TEMPLATE => 'host',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'name',
+		self::RESOURCE_TEMPLATE_GROUP => 'name',
 		self::RESOURCE_USER => 'username',
 		self::RESOURCE_USER_GROUP => 'name'
 	];
@@ -217,6 +220,7 @@ class CAudit {
 		self::RESOURCE_SLA => 'sla',
 		self::RESOURCE_TEMPLATE => 'template',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'templatedashboard',
+		self::RESOURCE_TEMPLATE_GROUP => 'templategroup',
 		self::RESOURCE_USER => 'user',
 		self::RESOURCE_USER_GROUP => 'usergroup'
 	];
@@ -330,6 +334,7 @@ class CAudit {
 		'templatedashboard.pages' => 'dashboard_page',
 		'templatedashboard.pages.widgets' => 'widget',
 		'templatedashboard.pages.widgets.fields' => 'widget_field',
+		'templategroup.templates' => 'templates_groups',
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups',
 		'usergroup.rights' => 'rights',
@@ -406,6 +411,7 @@ class CAudit {
 		'templatedashboard.pages' => 'dashboard_pageid',
 		'templatedashboard.pages.widgets' => 'widgetid',
 		'templatedashboard.pages.widgets.fields' => 'widget_fieldid',
+		'templategroup.templates' => 'templategroupid',
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
 		'usergroup.rights' => 'rightid',

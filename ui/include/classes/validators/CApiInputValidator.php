@@ -227,6 +227,9 @@ class CApiInputValidator {
 
 			case API_TIMESTAMP:
 				return self::validateTimestamp($rule, $data, $path, $error);
+
+			case API_TG_NAME:
+				return self::validateTemplateGroupName($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -294,6 +297,7 @@ class CApiInputValidator {
 			case API_UNEXPECTED:
 			case API_LAT_LNG_ZOOM:
 			case API_TIMESTAMP:
+			case API_TG_NAME:
 				return true;
 
 			case API_OBJECT:
@@ -2956,6 +2960,40 @@ class CApiInputValidator {
 		}
 
 		return $valid;
+	}
+
+	/**
+	 * Template group name validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_REQUIRED_LLD_MACRO
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateTemplateGroupName($rule, &$data, $path, &$error) {
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+
+			return false;
+		}
+
+		$template_group_name_parser = new CHostGroupNameParser();
+
+		if ($template_group_name_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid template group name'));
+
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

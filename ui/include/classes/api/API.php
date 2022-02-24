@@ -410,6 +410,13 @@ class API {
 	}
 
 	/**
+	 * @return CTemplateGroup
+	 */
+	public static function TemplateGroup() {
+		return self::getApi('templategroup');
+	}
+
+	/**
 	 * @return CToken
 	 */
 	public static function Token() {
