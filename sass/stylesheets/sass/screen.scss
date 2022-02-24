@@ -325,10 +325,14 @@ form {
 	}
 
 	td {
-		.icon-maintenance,
-		.icon-depend-up,
-		.icon-depend-down {
+		.icon-maintenance {
 			margin: 0 0 -3px 4px;
+		}
+
+		.icon-depend-up,
+		.icon-depend-down,
+		.icon-ackn {
+			margin: 0 4px -3px 0;
 		}
 	}
 
@@ -460,9 +464,17 @@ form {
 				}
 			}
 
-			[class*='icon-depend-'] {
+			.icon-depend-up,
+			.icon-depend-down {
 				width: 12px;
-				margin-right: 0;
+			}
+
+			.icon-depend-up::before {
+				background-position: -49px -731px;
+			}
+
+			.icon-depend-down::before {
+				background-position: -49px -767px;
 			}
 
 			.rel-container {
@@ -494,7 +506,7 @@ form {
 			.icon-maintenance {
 				height: 12px;
 				width: 12px;
-				margin: 3px 1px 2px 2px;
+				margin: 3px 1px 2px 4px;
 
 				&::before {
 					height: 12px;
@@ -2539,12 +2551,14 @@ button[disabled] {
 }
 
 $var-icons: (
-	depend-up: url($sprite-path) no-repeat -49px -729px,
-	depend-down: url($sprite-path) no-repeat -49px -765px,
-	ackn: url($sprite-path) no-repeat -45px -693px
+	maintenance: url($sprite-path) no-repeat -47px -803px,
+	depend-up: url($sprite-path) no-repeat -47px -731px,
+	depend-down: url($sprite-path) no-repeat -47px -767px,
+	ackn: url($sprite-path) no-repeat -47px -694px
 );
 
 // Dynamically generated classes:
+//  .icon-maintenance
 //  .icon-depend-up
 //  .icon-depend-down
 //  .icon-ackn
@@ -2555,15 +2569,14 @@ $var-icons: (
 		width: 16px;
 		height: 16px;
 		border-radius: 2px;
-		right: 5px;
 
 		&::before {
-			background: $bgimage;
 			@extend %var-icons;
+			background: $bgimage;
 			width: 14px;
 			height: 14px;
-			left: 3px;
-			top: -1px;
+			left: 1px;
+			top: 1px;
 		}
 
 		&:link,
@@ -2576,34 +2589,6 @@ $var-icons: (
 			box-shadow: 0 0 0 2px $btn-border-focus-color;
 		}
 	}
-}
-
-.icon-maintenance {
-	position: relative;
-	display: inline-block;
-	width: 16px;
-	height: 16px;
-	border-radius: 2px;
-
-	&::before {
-		@extend %var-icons;
-		background: url($sprite-path) no-repeat -47px -803px;
-		width: 14px;
-		height: 14px;
-		left: 1px;
-		top: 1px;
-	}
-
-	&:link,
-	&:hover,
-	&:focus {
-		border-bottom: none;
-	}
-
-	&:focus {
-		box-shadow: 0 0 0 2px $btn-border-focus-color;
-	}
-
 }
 
 $trigger-expression-tree-icons: (
