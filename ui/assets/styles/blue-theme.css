@@ -2821,7 +2821,9 @@ form.is-loading {
     .list-table .action-container .separator {
       flex-shrink: 0;
       margin-right: 4px; }
-  .list-table td .icon-maintenance {
+  .list-table td .icon-maintenance,
+  .list-table td .icon-depend-up,
+  .list-table td .icon-depend-down {
     margin: 0 0 -3px 4px; }
   .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td {
     color: #1f2c33; }
@@ -2872,7 +2874,8 @@ form.is-loading {
       vertical-align: middle; }
       .list-table.compact-view td [class*='icon-']::after {
         margin: 0;
-        line-height: 14px; }
+        line-height: 14px;
+        top: 0; }
       .list-table.compact-view td [class*='icon-']:last-of-type {
         margin-right: 0; }
     .list-table.compact-view td [class*='icon-depend-'] {
@@ -4189,19 +4192,58 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   margin: 0 14px 0 0; }
 
 .icon-depend-up {
-  margin: 0 18px 0 0; }
+  position: relative;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  right: 5px; }
   .icon-depend-up::before {
-    background: url("../img/icon-sprite.svg?20211222") no-repeat -49px -729px; }
+    background: url("../img/icon-sprite.svg?20211222") no-repeat -49px -729px;
+    width: 14px;
+    height: 14px;
+    left: 3px;
+    top: -1px; }
+  .icon-depend-up:link, .icon-depend-up:hover, .icon-depend-up:focus {
+    border-bottom: none; }
+  .icon-depend-up:focus {
+    box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
 
 .icon-depend-down {
-  margin: 0 18px 0 0; }
+  position: relative;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  right: 5px; }
   .icon-depend-down::before {
-    background: url("../img/icon-sprite.svg?20211222") no-repeat -49px -765px; }
+    background: url("../img/icon-sprite.svg?20211222") no-repeat -49px -765px;
+    width: 14px;
+    height: 14px;
+    left: 3px;
+    top: -1px; }
+  .icon-depend-down:link, .icon-depend-down:hover, .icon-depend-down:focus {
+    border-bottom: none; }
+  .icon-depend-down:focus {
+    box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
 
 .icon-ackn {
-  margin: 0 18px 0 0; }
+  position: relative;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  right: 5px; }
   .icon-ackn::before {
-    background: url("../img/icon-sprite.svg?20211222") no-repeat -45px -693px; }
+    background: url("../img/icon-sprite.svg?20211222") no-repeat -45px -693px;
+    width: 14px;
+    height: 14px;
+    left: 3px;
+    top: -1px; }
+  .icon-ackn:link, .icon-ackn:hover, .icon-ackn:focus {
+    border-bottom: none; }
+  .icon-ackn:focus {
+    box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
 
 .icon-maintenance {
   position: relative;
