@@ -26,6 +26,7 @@ import (
 	"math"
 	"net"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -144,7 +145,8 @@ func (p *Plugin) validateSmtp(buf []byte) int {
 }
 
 func (p *Plugin) validateFtp(buf []byte) int {
-	if string(buf[:4]) == "220 " {
+	re := regexp.MustCompile(`(?m:^220 .*)`)
+	if re.Match(buf) {
 		return tcpExpectOk
 	}
 	return tcpExpectIgnore
