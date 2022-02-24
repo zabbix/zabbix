@@ -115,7 +115,7 @@ class CControllerPopupTabFilterEdit extends CController {
 
 		$data += [
 			'title' => _('Filter properties'),
-			'errors' => hasErrorMesssages() ? getMessages() : null,
+			'errors' => hasErrorMessages() ? getMessages() : null,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

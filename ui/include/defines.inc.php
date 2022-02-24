@@ -20,7 +20,7 @@
 
 define('ZABBIX_VERSION',		'6.2.0alpha1');
 define('ZABBIX_API_VERSION',	'6.2.0');
-define('ZABBIX_EXPORT_VERSION',	'6.0');
+define('ZABBIX_EXPORT_VERSION',	'6.2');
 
 define('ZABBIX_DB_VERSION',		6000000);
 
@@ -1434,6 +1434,10 @@ define('ZBX_API_ERROR_PERMISSIONS',	120);
 define('ZBX_API_ERROR_NO_AUTH',		200);
 define('ZBX_API_ERROR_NO_METHOD',	300);
 
+// Error types of unexpected API parameter.
+define('API_ERR_INHERITED', 0);
+define('API_ERR_DISCOVERED', 1);
+
 define('API_OUTPUT_EXTEND',		'extend');
 define('API_OUTPUT_COUNT',		'count');
 
@@ -1711,6 +1715,7 @@ define('TAB_INDICATOR_VALUEMAPS', 'valuemaps');
 
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
+define('ZBX_STYLE_ACTION_CONTAINER', 'action-container');
 define('ZBX_STYLE_ADM_IMG', 'adm-img');
 define('ZBX_STYLE_AVERAGE_BG', 'average-bg');
 define('ZBX_STYLE_ARROW_DOWN', 'arrow-down');
@@ -1859,7 +1864,7 @@ define('ZBX_STYLE_ICON_INFO', 'icon-info');
 define('ZBX_STYLE_ICON_INVISIBLE', 'icon-invisible');
 define('ZBX_STYLE_ICON_USER', 'icon-user');
 define('ZBX_STYLE_ICON_USER_GROUP', 'icon-user-group');
-define('ZBX_STYLE_ICON_MAINT', 'icon-maint');
+define('ZBX_STYLE_ICON_MAINTENANCE', 'icon-maintenance');
 define('ZBX_STYLE_ICON_WZRD_ACTION', 'icon-wzrd-action');
 define('ZBX_STYLE_ACTION_COMMAND', 'icon-action-command');
 define('ZBX_STYLE_ACTION_ICON_CLOSE', 'icon-action-close');

@@ -236,7 +236,7 @@ class testFormHost extends CWebTest {
 
 		foreach ($interfaces_form->getRows() as $i => $row) {
 			$enabled = ($i !== 0 && $i !== 2);
-			// "Remove" button is disabled (in the 7th column) for Agent (in 0th row) and JMX (in 2th row) interfaces.
+			// "Remove" button is disabled (in the 7th column) for Agent (in 0th row) and JMX (in 2nd row) interfaces.
 			$this->assertTrue($row->getColumn(7)->query('tag:button')->one()->isEnabled($enabled));
 		}
 		// Interface fields maxlength attribute.
@@ -246,7 +246,7 @@ class testFormHost extends CWebTest {
 			);
 		}
 
-		// Click the "expand" icon (in the 0th column) for the SNMP interface (1th row).
+		// Click the "expand" icon (in the 0th column) for the SNMP interface (1st row).
 		$interfaces_form->getRow(1)->getColumn(0)->query('tag:button')->one()->click();
 		$snmp_form = $interfaces_form->getRow(1)->query('xpath:.//div[@class="form-grid"]')->one()->parents()
 				->asForm(['normalized' => true])->one();
@@ -1829,7 +1829,7 @@ class testFormHost extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Host for suppression',
-					'error' => 'Cannot delete host because maintenance "Maintenance for suppression test"'.
+					'error' => 'Cannot delete host "Host for suppression" because maintenance "Maintenance for suppression test"'.
 							' must contain at least one host or host group.'
 				]
 			]
