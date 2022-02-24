@@ -255,17 +255,12 @@ class testGeomapWidgetScreenshots extends CWebTest {
 
 	public static function getZoomWidgetData() {
 		return [
+			// These providers are commented, because images on screenshots are not stable even after 20 seconds sleep.
 //			[
 //				[
-//					'Tile provider' => 'default'
+//					'Tile provider' => 'OpenTopoMap'
 //				]
 //			],
-			[
-				[
-					'Tile provider' => 'OpenTopoMap'
-				]
-			],
-			// This provider is commented, because images on screenshots are not stable even after 20 seconds sleep.
 //			[
 //				[
 //					'Tile provider' => 'OpenStreetMap Mapnik'
@@ -348,72 +343,60 @@ class testGeomapWidgetScreenshots extends CWebTest {
 	 * @dataProvider getZoomWidgetData
 	 */
 	public function testGeomapWidgetScreenshots_Zoom($data) {
-		$this->page->login();
+		$this->page->login()->open('zabbix.php?action=geomaps.edit');
+		$this->page->waitUntilReady();
 
-		if ($data['Tile provider'] === 'default') {
-			$this->assertWidgetScreenshot($data);
-		}
-		else {
-			$this->page->open('zabbix.php?action=geomaps.edit');
-			$this->page->waitUntilReady();
+		$form = $this->query('id:geomaps-form')->asForm()->one();
+		$form->fill($data);
+		$form->submit();
 
-			$form = $this->query('id:geomaps-form')->asForm()->one();
-			$form->fill($data);
-			$form->submit();
-
-			$this->assertWidgetScreenshot($data);
-		}
-	}
-
-	/**
-	 *  Function for asserting screenshots of every widget depending on Tile provider.
-	 *
-	 * @param array $data    data with tile providers
-	 */
-	private function assertWidgetScreenshot($data) {
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
 		$this->page->waitUntilReady();
+
 		$widgets = [
-				'Geomap for screenshots, 5',
-				'Geomap for screenshots, 10',
-				'Geomap for screenshots, 30',
-				'Geomap for screenshots, no zoom',
-				'Geomap for screenshots, 3'
+			'Geomap for screenshots, 5',
+			'Geomap for screenshots, 10',
+			'Geomap for screenshots, 30',
+			'Geomap for screenshots, no zoom',
+			'Geomap for screenshots, 3'
 		];
 		foreach ($widgets as $widget) {
-				// Wait until loader disappears.
-				$this->query("xpath://h4[text()=".CXPathHelper::escapeQuotes($widget).
-								"]/../../div[not(contains(@class,\"is-loading\"))]")->waitUntilPresent()->one();
+			// Wait until loader disappears.
+			$this->query("xpath://h4[text()=".CXPathHelper::escapeQuotes($widget).
+					"]/../../div[not(contains(@class,\"is-loading\"))]")->waitUntilPresent()->one();
 		}
+
 		// Additional 2 seconds for loading sequence to settle.
-		sleep(20);
-		CElementQuery::wait(90)->until(function () {
-				return CElementQuery::getDriver()->executeScript(
-						'var widgets = ZABBIX.Dashboard._dashboard_pages.keys().next().value._widgets;'.
-						'var result = true;'.
-						'widgets.forEach(function(_, widget) {'.
-						'   var layers = widget._map._layers;'.
-						'   var keys = Object.keys(layers);'.
-						'   for (var i = 0; i < keys.length; i++) {'.
-						'       if (typeof layers[keys[i]]._url === "undefined") {'.
-						'           continue;'.
-						'       }'.
-						'       result &= !layers[keys[i]]._loading;'.
-						'   }'.
-						'});'.
-						'return result;'
-				);
+		sleep(2);
+		CElementQuery::wait(40)->until(function () {
+			return CElementQuery::getDriver()->executeScript(
+					'var widgets = ZABBIX.Dashboard._dashboard_pages.keys().next().value._widgets;'.
+					'var result = true;'.
+					'widgets.forEach(function(_, widget) {'.
+					'   var layers = widget._map._layers;'.
+					'   var keys = Object.keys(layers);'.
+					'   for (var i = 0; i < keys.length; i++) {'.
+					'       if (typeof layers[keys[i]]._url === "undefined") {'.
+					'           continue;'.
+					'       }'.
+					'       result &= !layers[keys[i]]._loading;'.
+					'   }'.
+					'});'.
+					'return result;'
+			);
 		});
+
 		foreach ($widgets as $widget) {
 			$id = $widget.' '.$data['Tile provider'];
 			$element = $this->query("xpath://div[@class=\"dashboard-grid-widget\"]//h4[text()=".
-									CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one();
+					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one();
+
 			try {
-					$this->assertScreenshot($element, $id);
+				$this->assertScreenshot($element, $id);
 			}
 			catch (Exception $e) {
-					sleep(3);
-					$this->assertScreenshot($element, $id);
+				sleep(3);
+				$this->assertScreenshot($element, $id);
 			}
 		}
 	}
