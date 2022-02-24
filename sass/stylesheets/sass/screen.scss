@@ -377,7 +377,9 @@ form {
 		}
 	}
 	td {
-		.icon-maintenance {
+		.icon-maintenance,
+		.icon-depend-up,
+		.icon-depend-down {
 			margin: 0 0 -3px 4px;
 		}
 	}
@@ -501,6 +503,7 @@ form {
 				&::after {
 					margin: 0;
 					line-height: 14px;
+					top: 0;
 				}
 
 				&:last-of-type {
@@ -2650,10 +2653,29 @@ $var-icons: (
 @each $var-icons, $bgimage in $var-icons {
 	.icon-#{$var-icons} {
 		margin: 0 18px 0 0;
+		position: relative;
+		display: inline-block;
+		width: 16px;
+		height: 16px;
+		border-radius: 2px;
+		right: 5px;
 
 		&::before {
 			background: $bgimage;
 			@extend %var-icons;
+			width: 14px;
+			height: 14px;
+			left: 3px;
+			top: -1px;
+		}
+		&:link,
+		&:hover,
+		&:focus {
+			border-bottom: none;
+		}
+
+		&:focus {
+			box-shadow: 0 0 0 2px $btn-border-focus-color;
 		}
 	}
 }
