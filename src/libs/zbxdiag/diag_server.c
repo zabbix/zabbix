@@ -20,8 +20,6 @@
 #include "diag.h"
 
 #include "common.h"
-#include "zbxalgo.h"
-#include "memalloc.h"
 #include "../../libs/zbxdbcache/valuecache.h"
 #include "zbxlld.h"
 #include "zbxalert.h"

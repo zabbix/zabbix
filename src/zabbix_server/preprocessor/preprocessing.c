@@ -22,8 +22,6 @@
 #include "common.h"
 #include "log.h"
 #include "zbxserialize.h"
-#include "zbxipcservice.h"
-#include "preproc.h"
 #include "preproc_history.h"
 #include "item_preproc.h"
 #include "../../libs/zbxalgo/vectorimpl.h"

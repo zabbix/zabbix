@@ -21,10 +21,6 @@
 
 #include "log.h"
 
-#ifndef _WINDOWS
-#	include "diskdevices.h"
-#endif
-
 #include "mutexs.h"
 
 #ifdef _WINDOWS
@@ -34,11 +30,6 @@
 extern int get_cpu_num_win32(void);
 #else
 #	include "daemon.h"
-#	include "ipc.h"
-#endif
-
-#if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
-#	include "zbxkstat.h"
 #endif
 
 ZBX_COLLECTOR_DATA	*collector = NULL;

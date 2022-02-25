@@ -22,9 +22,7 @@
 #include "common.h"
 
 #ifdef HAVE_ZLIB
-
 #include "zlib.h"
-
 #include "log.h"
 
 #define ZBX_COMPRESS_STRERROR_LEN	512
