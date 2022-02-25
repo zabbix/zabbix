@@ -232,7 +232,6 @@ $fields = [
 	'copy' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'delete' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>						[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'check_now' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'form' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>				[T_ZBX_INT, O_OPT, null,	null,		null],
 	'tags' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -883,16 +882,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
 		uncheckTableRows(getRequest('checkbox_hash'));
 	}
-}
-elseif (hasRequest('check_now') && hasRequest('itemid')) {
-	$result = (bool) API::Task()->create([
-		'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
-		'request' => [
-			'itemid' => getRequest('itemid')
-		]
-	]);
-
-	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
 }
 // cleaning history for one item
 elseif (hasRequest('del_history') && hasRequest('itemid')) {

@@ -334,7 +334,6 @@ if ($data['context'] === 'host') {
 				->addClass('no-chkbxrange')
 				->setEnabled(!$data['is_template'])
 				->setAttribute('data-disabled', $data['is_template'])
-				->removeAttribute('id')
 		],
 	];
 }
