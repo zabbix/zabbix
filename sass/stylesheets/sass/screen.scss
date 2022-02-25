@@ -6732,8 +6732,7 @@ $range-input-width: 31px;
 			opacity: 0;
 		}
 
-		&::-webkit-slider-runnable-track,
-		&::-moz-range-track	{
+		&::-webkit-slider-runnable-track {
 			height: $range-thumb-size;
 			opacity: 0;
 		}
