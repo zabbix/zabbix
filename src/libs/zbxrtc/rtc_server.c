@@ -137,6 +137,7 @@ int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char 
 			if ('\0' == *(param + 1))
 			{
 				*error = zbx_strdup(NULL, "missing proxy name(s)");
+				zbx_json_free(&j);
 				return FAIL;
 			}
 

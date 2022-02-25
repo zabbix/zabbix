@@ -21,7 +21,6 @@
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "db.h"
-#include "log.h"
 
 #include "zbxtasks.h"
 
@@ -58,7 +57,8 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 			" where t.status=%d"
 				" and t.type in (%d,%d)"
 			" order by t.taskid",
-			ZBX_TM_STATUS_NEW, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_PROXYDATA);
+			ZBX_TM_STATUS_NEW, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_TASK_DATA_RESULT,
+			ZBX_TM_PROXYDATA);
 
 	while (NULL != (row = DBfetch(result)))
 	{

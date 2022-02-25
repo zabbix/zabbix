@@ -655,11 +655,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 			last_stat_time = time(NULL);
 		}
 
-		if (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
-		{
-			if (rtc_cmd == ZBX_RTC_PROXYPOLLER_PROCESS)
-				continue;
-		}
+		zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, sleeptime);
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
