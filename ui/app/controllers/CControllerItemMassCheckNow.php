@@ -220,11 +220,10 @@ class CControllerItemMassCheckNow extends CController {
 					$host_name = $item['hosts'][0]['name'];
 
 					// Set the error message details.
-					$details = [
-						($item['flags'] == ZBX_FLAG_DISCOVERY_RULE)
-							? _s('discovery rule "%1$s" on host "%2$s" is not monitored', $item['name'], $host_name)
-							: _s('item "%1$s" on host "%2$s" is not monitored', $item['name'], $host_name)
-					];
+					$msg_part = ($item['flags'] == ZBX_FLAG_DISCOVERY_RULE)
+						? _s('discovery rule "%1$s" on host "%2$s" is not monitored', $item['name'], $host_name)
+						: _s('item "%1$s" on host "%2$s" is not monitored', $item['name'], $host_name);
+					$details = [_s('Cannot send request: %1$s.', $msg_part)];
 				}
 				elseif ($items_cnt == count($non_allowed_items_type)) {
 					// All found items are not allowed by type, but all are monitored. Shows different error message.
@@ -236,11 +235,10 @@ class CControllerItemMassCheckNow extends CController {
 					$item = reset($non_allowed_items_type);
 
 					// Set the error message details.
-					$details = [
-						($item['flags'] == ZBX_FLAG_DISCOVERY_RULE)
-							? _('wrong discovery rule type')
-							: ($item['master'] ? _('wrong master item type') : _('wrong item type'))
-					];
+					$msg_part = ($item['flags'] == ZBX_FLAG_DISCOVERY_RULE)
+						? _('wrong discovery rule type')
+						: ($item['master'] ? _('wrong master item type') : _('wrong item type'));
+					$details = [_s('Cannot send request: %1$s.', $msg_part)];
 				}
 				else {
 					// Some items found are not allowed or some are not monitored. Some are allowed and monitored.
@@ -259,11 +257,10 @@ class CControllerItemMassCheckNow extends CController {
 					$item = reset($non_allowed_items_type);
 
 					// Set the error message details.
-					$details = [
-						($item['flags'] == ZBX_FLAG_DISCOVERY_RULE)
-							? _('wrong discovery rule type')
-							: ($item['master'] ? _('wrong master item type') : _('wrong item type'))
-					];
+					$msg_part = ($item['flags'] == ZBX_FLAG_DISCOVERY_RULE)
+						? _('wrong discovery rule type')
+						: ($item['master'] ? _('wrong master item type') : _('wrong item type'));
+					$details = [_s('Cannot send request: %1$s.', $msg_part)];
 				}
 				else {
 					// Some found items are not allowed.
@@ -309,7 +306,7 @@ class CControllerItemMassCheckNow extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _('Cannot send request'),
+				'title' => _('Cannot execute operation'),
 				'messages' => $details
 			];
 		}

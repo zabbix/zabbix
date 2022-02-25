@@ -107,7 +107,7 @@
 					else if('success' in response) {
 						addMessage(makeMessageBox('good', [], response.success.title, true, false));
 
-						uncheckids = chkbxRange.getSelectedIds();
+						let uncheckids = chkbxRange.getSelectedIds();
 						uncheckids = Object.values(uncheckids);
 
 						// This will only unset checkboxes from session storage, but not physically deselect them.
@@ -128,7 +128,6 @@
 					addMessage(message_box);
 				})
 				.finally(() => {
-					console.log('A');
 					button.classList.remove('is-loading');
 
 					// Deselect the "Execute now" button in both success and error cases, since there is no page reload.
