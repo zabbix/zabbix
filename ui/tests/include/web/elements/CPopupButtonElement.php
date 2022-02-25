@@ -71,18 +71,19 @@ class CPopupButtonElement extends CElement {
 
 		// Sometimes menu is not summoning from the first time.
 		for ($i = 0; $i < 2; $i++) {
-		try {
-			$this->waitUntilClickable()->click(true);
+			try {
+				$this->click(true);
 
-			$menu = $query->waitUntilVisible()->one(false);
-			if ($menu->isValid()) {
-				return $menu;
+				$menu = $query->waitUntilVisible()->one(false);
+				if ($menu->isValid()) {
+					return $menu;
+				}
+			}
+			catch (Exception $e) {
+				sleep(1);
+				// Code is not missing here.
 			}
 		}
-		catch (Exception $e) {
-			// Code is not missing here.
-		}
-	}
 
 		throw new Exception('Failed to wait for menu to be visible!');
 	}
