@@ -56,11 +56,11 @@ INSERT INTO usrgrp (usrgrpid, name) VALUES (19, 'API user group delete3');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (20, 'API user group in actions');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (21, 'API user group in scripts');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (22, 'API user group in configuration');
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'zabbix-admin', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'zabbix-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_US', '30s', 1, 'default', 0, 0, 50);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (6, 'user-in-one-group', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (7, 'user-in-two-groups', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (8, 'api-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'zabbix-admin', '$2a$10$PmEcvov/w84R3sShOV4rX.xJd81bwgaK4o0SfoiSxop2ol7PPGsOi', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'zabbix-user', '$2a$10$w8oiYEgP3Fy4XuPIE5VCiO2j5snJEopKfTCYa3DC7bNL83ldKlPRS', 0, 0, 'en_US', '30s', 1, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (6, 'user-in-one-group', '$2a$10$mTYvfZskz3369zQaYLogHuSUMQ11YSEOZtua2NFSL3/.T6kQ/bNaG', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (7, 'user-in-two-groups', '$2a$10$GiBCQXAPeTCPR9rEQ/YodOmE7mqvXjYwbEkZLGP7iWU/fzKcB9yF6', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (8, 'api-user', '$2a$10$NyZQvuelvUVqpCDYb7cOy.pEewNe9U0MK0ZIdjJeupYbgHU6G7Iea', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (6, 8, 4);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (8, 14, 4);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (9, 15, 6);
@@ -75,13 +75,13 @@ INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, de
 UPDATE config SET alert_usrgrpid = 22 WHERE configid = 1;
 
 -- users
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (9, 'api-user-for-update', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_US', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (10, 'api-user-delete', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_US', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (11, 'api-user-delete1', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_US', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (12, 'api-user-delete2', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_US', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (13, 'api-user-action', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_US', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (14, 'api-user-map', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_US', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (15, 'api-user-for-unblock', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_US', '30s', 2, 'default', 5, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (9, 'api-user-for-update', '$2a$10$dP76CSji4ozQxSxLQeUGc.sJgSPuwN8b4pjnKIoOeQXts2Wm86ige', 0, '15m', 'en_US', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (10, 'api-user-delete', '$2a$10$8ioYyO/Xkyhx64W.z0B3YONQ7.s2zqMRqhkYt/z6S9.MkqEYsWCOq', 0, '15m', 'en_US', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (11, 'api-user-delete1', '$2a$10$NU0MhxghxIbvCen5pBY.WuC9eYpqYS2mE8P6dQIMC00yhlalXhUWO', 0, '15m', 'en_US', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (12, 'api-user-delete2', '$2a$10$t.cDXioxmkgwEigzPU0aQejc8rAfjt6ZxY6WIllrN0IpEH4pp3I/K', 0, '15m', 'en_US', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (13, 'api-user-action', '$2a$10$w6u3jruB673s5A/Qrg7VZOFof/yuARrPQYpZk7xbSTw7O/wgSw9Sq', 0, '15m', 'en_US', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (14, 'api-user-map', '$2a$10$1uCgmg.SoVtN98NTt/815./E/mFIdJH2r3aF1RFY1QwmFVlnbCXTK', 0, '15m', 'en_US', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (15, 'api-user-for-unblock', '$2a$10$/a5lFsoEm56b01q1uAoM8ecSmazNhrYbidYeBibtRzUxbIgmIAvR.', 0, '15m', 'en_US', '30s', 2, 'default', 5, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (12, 14, 9);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (13, 14, 10);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (14, 14, 11);
@@ -202,7 +202,7 @@ INSERT INTO opcommand (operationid, scriptid) VALUES (33, 11);
 
 -- scripts / inherited hostgroups
 INSERT INTO usrgrp (usrgrpid,name) VALUES (90000,'90000 Eur group write except one');
-INSERT INTO users (userid,username,passwd,roleid) VALUES (90000,'90000','5fce1b3e34b520afeffb37ce08c7cd66',2);
+INSERT INTO users (userid,username,passwd,roleid) VALUES (90000,'90000','$2a$10$Hr7Z1FX/x9OPhdUu9.5CL.XyL9IKPiVcoxJgGbtIHc3.Svk/awB5q',2);
 INSERT INTO users_groups (id,usrgrpid,userid) VALUES (90000,90000,90000);
 INSERT INTO hosts (hostid,host,name,status,description) VALUES (90020,'90020','90020',0,'');
 INSERT INTO hosts (hostid,host,name,status,description) VALUES (90021,'90021','90021',0,'');
@@ -345,8 +345,8 @@ INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (99004
 
 -- autoregistration action
 INSERT INTO usrgrp (usrgrpid, name) VALUES (47, 'User group for action delete');
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (53, 'action-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_US', '30s', 1, 'default', 0, 0, 50);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (54, 'action-admin', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (53, 'action-user', '$2a$10$gFL5ORa/Ml0VBDGraHI3tuE1WuiKOX8ef497bAfzNiSXUx4Vrrn.y', 0, 0, 'en_US', '30s', 1, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (54, 'action-admin', '$2a$10$P8CZ/rs94pLp177hh27KheWKAKa6GXZLFhOE8ymd/QlEKT2FDngZe', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (87, 47, 53);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (88, 47, 54);
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (91, 'API Autoregistration action', 2, 0, 0, '1h');
@@ -1516,7 +1516,7 @@ INSERT INTO token (tokenid, userid, name, description) VALUES (19, 5, 'update-us
 INSERT INTO token (tokenid, userid, name, description) VALUES (20, 5, 'update-user-4', '');
 INSERT INTO token (tokenid, userid, name, description) VALUES (21, 5, 'update-user-5', '');
 INSERT INTO token (tokenid, userid, name, description) VALUES (22, 5, 'update-user-6', '');
-INSERT INTO users (userid,username,passwd,roleid) VALUES (20,'token-creator','5fce1b3e34b520afeffb37ce08c7cd66',2);
+INSERT INTO users (userid,username,passwd,roleid) VALUES (20,'token-creator','$2a$10$tskhDKjeMa8h8zRCHkVSk.CPbZg./ERPgxsuwbFFP8HVh3oIbUo42',2);
 INSERT INTO users_groups (id,usrgrpid,userid) VALUES (90020,90000,20);
 INSERT INTO token (tokenid, userid, creator_userid, name, description) VALUES (23, 5, 20, 'delete-user-6', '');
 
