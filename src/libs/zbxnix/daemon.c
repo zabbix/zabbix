@@ -378,15 +378,16 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 
 	if (0 == (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
-		int		pid_file_timeout = ZBX_PID_FILE_TIMEOUT;
-		int		child_pid = -1;
-		zbx_stat_t	stat_buff;
+		int	child_pid;
 
 		if(0 != (child_pid = zbx_fork()))
 		{
 			if (0 < child_pid)
 			{
-				/* wait for the forked child to create pid file*/
+				int		pid_file_timeout = ZBX_PID_FILE_TIMEOUT;
+				zbx_stat_t	stat_buff;
+
+				/* wait for the forked child to create pid file */
 				while (0 < pid_file_timeout && 0 == kill(child_pid, 0) &&
 						0 != zbx_stat(CONFIG_PID_FILE, &stat_buff))
 				{
