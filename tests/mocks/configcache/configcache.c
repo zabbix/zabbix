@@ -32,6 +32,13 @@ void	*__wrap_zbx_hashset_search(zbx_hashset_t *hs, const void *data)
 {
 	int	i;
 
+	if (&mock_config.dc.items == hs)
+	{
+		static ZBX_DC_ITEM	item = {.hostid = 1};
+
+		return &item;
+	}
+
 	if (0 != (mock_config.initialized & ZBX_MOCK_CONFIG_USERMACROS))
 	{
 		if (hs == &mock_config.dc.hmacros_hm)

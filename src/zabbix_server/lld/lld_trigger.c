@@ -2234,7 +2234,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select t.triggerid,t.description,t.expression,t.recovery_expression"
 				" from triggers t"
-				" where t.triggerid in (select distinct t.triggerid"
+				" where t.triggerid in (select distinct tg.triggerid"
 					" from triggers tg,functions f,items i"
 					" where tg.triggerid=f.triggerid"
 						" and f.itemid=i.itemid"
@@ -2243,15 +2243,16 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 				hostid);
 		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "tg.description",
 				(const char **)descriptions.values, descriptions.values_num);
-		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
 
 		if (0 != triggerids.values_num)
 		{
 			zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and not");
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid",
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "tg.triggerid",
 					triggerids.values, triggerids.values_num);
 		}
+
+		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
 
 		result = DBselect("%s", sql);
 
