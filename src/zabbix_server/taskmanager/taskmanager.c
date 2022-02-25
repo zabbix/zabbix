@@ -609,7 +609,7 @@ static void	tm_create_active_proxy_reload_task(zbx_uint64_t proxyid)
 
 	task = zbx_tm_task_create(taskid, ZBX_TM_TASK_DATA, ZBX_TM_STATUS_NEW, time(NULL), 0, proxyid);
 
-	task->data = zbx_tm_data_create(taskid, "", 1, ZBX_TM_DATA_TYPE_PROXY_CONFIG_RELOAD);
+	task->data = zbx_tm_data_create(taskid, "", 1, ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD);
 
 	if (FAIL == zbx_tm_save_task(task))
 		taskid = 0;

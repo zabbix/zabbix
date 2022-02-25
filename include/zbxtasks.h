@@ -47,11 +47,11 @@
 #define ZBX_TM_STATUS_EXPIRED			4
 
 /* task data type */
-#define ZBX_TM_DATA_TYPE_TEST_ITEM		0
-#define ZBX_TM_DATA_TYPE_DIAGINFO		1
-#define ZBX_TM_DATA_TYPE_PROXY_HOSTNAME		2
-#define ZBX_TM_DATA_TYPE_PROXY_HOSTIDS		3
-#define ZBX_TM_DATA_TYPE_PROXY_CONFIG_RELOAD	4
+#define ZBX_TM_DATA_TYPE_TEST_ITEM			0
+#define ZBX_TM_DATA_TYPE_DIAGINFO			1
+#define ZBX_TM_DATA_TYPE_PROXY_HOSTNAME			2
+#define ZBX_TM_DATA_TYPE_PROXY_HOSTIDS			3
+#define ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD	4
 
 /* the time period after which finished (done/expired) tasks are removed */
 #define ZBX_TM_CLEANUP_TASK_AGE			SEC_PER_DAY

@@ -285,7 +285,7 @@ static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int
 		case ZBX_TM_DATA_TYPE_DIAGINFO:
 			ret = tm_execute_data_json(data_type, row[1], &info);
 			break;
-		case ZBX_TM_DATA_TYPE_PROXY_CONFIG_RELOAD:
+		case ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD:
 			zbx_ipc_async_socket_send(rtc, ZBX_RTC_CONFIG_CACHE_RELOAD, NULL, 0);
 			ret = SUCCEED;
 			break;
