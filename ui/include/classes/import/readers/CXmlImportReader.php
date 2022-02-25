@@ -36,7 +36,10 @@ class CXmlImportReader extends CImportReader {
 		}
 
 		libxml_use_internal_errors(true);
-		libxml_disable_entity_loader(true);
+		libxml_set_external_entity_loader(function () {
+			return null;
+		});
+
 		$result = simplexml_load_string($string, null, LIBXML_IMPORT_FLAGS);
 		if (!$result) {
 			$errors = libxml_get_errors();
