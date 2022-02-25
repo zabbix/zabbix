@@ -323,9 +323,6 @@ static void	set_daemon_signal_handlers(void)
 int	daemon_start(int allow_root, const char *user, unsigned int flags)
 {
 	struct passwd	*pwd;
-	int		pid_file_timeout = ZBX_PID_FILE_TIMEOUT;
-	int		child_pid = -1;
-	zbx_stat_t	stat_buff;
 
 	if (0 == allow_root && 0 == getuid())	/* running as root? */
 	{
@@ -381,6 +378,10 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 
 	if (0 == (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
+		int		pid_file_timeout = ZBX_PID_FILE_TIMEOUT;
+		int		child_pid = -1;
+		zbx_stat_t	stat_buff;
+
 		if(0 != (child_pid = zbx_fork()))
 		{
 			if (0 < child_pid)
