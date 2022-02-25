@@ -529,8 +529,9 @@ class testFormGeomapWidget extends CWebTest {
 	/**
 	 * Function for checking canceling form or submitting without any changes.
 	 *
-	 * @param boolean $cancel    true if cancel scenario, false if form is submitted
-	 * @param boolean $create    true if create scenario, false if update
+	 * @param boolean $cancel            true if cancel scenario, false if form is submitted
+	 * @param boolean $create            true if create scenario, false if update
+	 * @param boolean $save_dashboard    true if dashboard will be saved, false if not
 	 */
 	private function checkNoChanges($cancel = false, $create = false, $save_dashboard = true) {
 		$old_hash = CDBHelper::getHash($this->sql);
