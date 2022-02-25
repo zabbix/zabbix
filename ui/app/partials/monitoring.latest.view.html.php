@@ -275,13 +275,17 @@ foreach ($data['items'] as $itemid => $item) {
 	$table->addRow($table_row);
 }
 
-$form->addItem([
-	$table,
-	$data['paging'],
-	new CActionButtonList('graphtype', 'itemids', [
-		GRAPH_TYPE_STACKED => ['name' => _('Display stacked graph')],
-		GRAPH_TYPE_NORMAL => ['name' => _('Display graph')]
-	], 'latest')
-]);
+$button_list = [
+	GRAPH_TYPE_STACKED => ['name' => _('Display stacked graph')],
+	GRAPH_TYPE_NORMAL => ['name' => _('Display graph')],
+	'item.masscheck_now' => [
+		'content' => (new CSimpleButton(_('Execute now')))
+			->onClick('view.massCheckNow(this);')
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass('no-chkbxrange')
+	]
+];
+
+$form->addItem([$table, $data['paging'], new CActionButtonList('graphtype', 'itemids', $button_list, 'latest')]);
 
 echo $form;

@@ -26,6 +26,9 @@
 
 <script>
 	const view = {
+		checkbox_object: null,
+		checkbox_hash: null,
+
 		init({checkbox_hash, checkbox_object}) {
 			this.checkbox_hash = checkbox_hash;
 			this.checkbox_object = checkbox_object;

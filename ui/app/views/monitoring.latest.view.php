@@ -74,7 +74,8 @@ $widget->show();
 		'filter_options' => $data['filter_options'],
 		'refresh_url' => $data['refresh_url'],
 		'refresh_data' => $data['refresh_data'],
-		'refresh_interval' => $data['refresh_interval']
+		'refresh_interval' => $data['refresh_interval'],
+		'checkbox_object' => 'itemids'
 	]).');
 '))
 	->setOnDocumentReady()

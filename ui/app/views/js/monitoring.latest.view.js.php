@@ -38,10 +38,13 @@
 		_refresh_message_box: null,
 		_popup_message_box: null,
 
-		init({refresh_url, refresh_data, refresh_interval, filter_options}) {
+		checkbox_object: null,
+
+		init({refresh_url, refresh_data, refresh_interval, filter_options, checkbox_object}) {
 			this.refresh_url = new Curl(refresh_url, false);
 			this.refresh_data = refresh_data;
 			this.refresh_interval = refresh_interval;
+			this.checkbox_object = checkbox_object;
 
 			const url = new Curl('zabbix.php', false);
 			url.setArgument('action', 'latest.view.refresh');
@@ -265,6 +268,68 @@
 			if (this.deferred) {
 				this.deferred.abort();
 			}
+		},
+
+		massCheckNow(button) {
+			button.classList.add('is-loading');
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'item.masscheck_now');
+
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+				body: urlEncodeData({itemids: chkbxRange.getSelectedIds()})
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					clearMessages();
+
+					/*
+					 * Using postMessageError or postMessageOk would mean that those messages are stored in session
+					 * messages and that would mean to reload the page and show them. Also postMessageError would be
+					 * displayed right after header is loaded. Meaning message is not inside the page form like that is
+					 * in postMessageOk case. Instead show message directly that comes from controller. Checkboxes
+					 * use uncheckTableRows which only unsets checkboxes from session storage, but not physically
+					 * deselects them. Another reason for need for page reload. Instead of page reload, manually
+					 * deselect the checkboxes that were selected previously in session storage, but only in case of
+					 * success message. In case of error message leave checkboxes checked.
+					 */
+					if ('error' in response) {
+						addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true, true));
+					}
+					else if('success' in response) {
+						addMessage(makeMessageBox('good', [], response.success.title, true, false));
+
+						let uncheckids = chkbxRange.getSelectedIds();
+						uncheckids = Object.values(uncheckids);
+
+						// This will only unset checkboxes from session storage, but not physically deselect them.
+						uncheckTableRows('latest', []);
+
+						// Deselect the previous checkboxes.
+						chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
+
+						// Reset the buttons in footer and update main checkbox.
+						chkbxRange.update(this.checkbox_object);
+					}
+				})
+				.catch(() => {
+					const title = <?= json_encode(_('Unexpected server error.')) ?>;
+					const message_box = makeMessageBox('bad', [], title)[0];
+
+					clearMessages();
+					addMessage(message_box);
+				})
+				.finally(() => {
+					button.classList.remove('is-loading');
+
+					// Deselect the "Execute now" button in both success and error cases, since there is no page reload.
+					button.blur();
+
+					// Scroll to top to see the success or error message.
+					document.querySelector('header').scrollIntoView();
+				});
 		},
 
 		editHost(hostid) {
