@@ -510,20 +510,48 @@ class testFormGeomapWidget extends CWebTest {
 		$this->checkNoChanges();
 	}
 
-	public function testFormGeomapWidget_CancelCreate() {
-		$this->checkNoChanges(true, true);
+	public static function getCancelData() {
+		return [
+			// Cancel creating widget with saving the dashboard.
+			[
+				[
+					'cancel_form' => true,
+					'create_widget' => true,
+					'save_dashboard' => true
+				]
+			],
+			// Cancel updating widget with saving the dashboard.
+			[
+				[
+					'cancel_form' => true,
+					'create_widget' => false,
+					'save_dashboard' => true
+				]
+			],
+			// Create widget without saving the dashboard.
+			[
+				[
+					'cancel_form' => false,
+					'create_widget' => false,
+					'save_dashboard' => false
+				]
+			],
+			// Update widget without saving the dashboard.
+			[
+				[
+					'cancel_form' => false,
+					'create_widget' => false,
+					'save_dashboard' => false
+				]
+			]
+		];
 	}
 
-	public function testFormGeomapWidget_CancelUpdate() {
-		$this->checkNoChanges(true);
-	}
-
-	public function testFormGeomapWidget_SaveCreateCancelDashboard() {
-		$this->checkNoChanges(false, true, false);
-	}
-
-	public function testFormGeomapWidget_SaveUpdateCancelDashboard() {
-		$this->checkNoChanges(false, false, false);
+	/**
+	 * @dataProvider getCancelData
+	 */
+	public function testFormGeomapWidget_Cancel($data) {
+		$this->checkNoChanges($data['cancel_form'], $data['create_widget'], $data['save_dashboard']);
 	}
 
 	/**
@@ -548,6 +576,9 @@ class testFormGeomapWidget extends CWebTest {
 
 		if (!$create) {
 			$values = $form->getFields()->asValues();
+		}
+		else {
+			$form->fill(['Type' => 'Geomap']);
 		}
 
 		if ($cancel || !$save_dashboard) {

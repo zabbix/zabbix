@@ -400,7 +400,7 @@ class testFormGeographicalMaps extends CWebTest {
 					'geomaps_tile_provider' => $data['db'],
 					'geomaps_tile_url' => '',
 					'geomaps_attribution' => '',
-					'geomaps_max_zoom' => '0'
+					'geomaps_max_zoom' => 0
 				];
 			}
 
