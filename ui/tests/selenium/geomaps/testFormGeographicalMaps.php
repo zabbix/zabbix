@@ -140,7 +140,7 @@ class testFormGeographicalMaps extends CWebTest {
 
 			foreach ($hintboxes as $field => $text) {
 				$form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($field).']//span')->one()->click();
-				$hint = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->one();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->one();
 				$this->assertEquals($text, $hint->getText());
 				$hint->asOverlayDialog()->close();
 			}
@@ -237,7 +237,7 @@ class testFormGeographicalMaps extends CWebTest {
 					'fields' => [
 						'Tile provider' => 'Other',
 						'Tile URL' => 'bbb',
-						'Max zoom level' => '0'
+						'Max zoom level' => 0
 					],
 					'error' => 'Incorrect value for field "geomaps_max_zoom": value must be no less than "1".'
 				]
@@ -248,7 +248,7 @@ class testFormGeographicalMaps extends CWebTest {
 					'fields' => [
 						'Tile provider' => 'Other',
 						'Tile URL' => 'bbb',
-						'Max zoom level' => '31'
+						'Max zoom level' => 31
 					],
 					'error' => 'Incorrect value for field "geomaps_max_zoom": value must be no greater than "30".'
 				]
@@ -281,7 +281,7 @@ class testFormGeographicalMaps extends CWebTest {
 					'fields' => [
 						'Tile provider' => 'Other',
 						'Tile URL' => 'bbb',
-						'Max zoom level' => '-1'
+						'Max zoom level' => -1
 					],
 					'error' => 'Incorrect value for field "geomaps_max_zoom": value must be no less than "1".'
 				]
@@ -291,7 +291,7 @@ class testFormGeographicalMaps extends CWebTest {
 					'fields' => [
 						'Tile provider' => 'Other',
 						'Tile URL' => 'bbb',
-						'Max zoom level' => '29'
+						'Max zoom level' => 29
 					]
 				]
 			],
@@ -301,7 +301,7 @@ class testFormGeographicalMaps extends CWebTest {
 						'Tile provider' => 'Other',
 						'Tile URL' => 'bbb',
 						'Attribution' => 'aaa',
-						'Max zoom level' => '20'
+						'Max zoom level' => 20
 					]
 				]
 			],
@@ -311,7 +311,7 @@ class testFormGeographicalMaps extends CWebTest {
 						'Tile provider' => 'Other',
 						'Tile URL' => '111',
 						'Attribution' => '222',
-						'Max zoom level' => '1'
+						'Max zoom level' => 1
 					]
 				]
 			],
@@ -321,7 +321,7 @@ class testFormGeographicalMaps extends CWebTest {
 						'Tile provider' => 'Other',
 						'Tile URL' => 'йцу',
 						'Attribution' => 'кен',
-						'Max zoom level' => '7'
+						'Max zoom level' => 7
 					]
 				]
 			],
@@ -334,7 +334,7 @@ class testFormGeographicalMaps extends CWebTest {
 								'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, '.
 								'map data &copy; <a href="https://www.openstreetmap.org/copyright">'.
 								'OpenStreetMap</a> contributors',
-						'Max zoom level' => '13'
+						'Max zoom level' => 13
 					]
 				]
 			],
@@ -344,7 +344,7 @@ class testFormGeographicalMaps extends CWebTest {
 //					'fields' => [
 //						'Tile provider' => 'Other',
 //						'Tile URL' => '     bbb           ',
-//						'Max zoom level' => '29'
+//						'Max zoom level' => 29
 //					],
 //					'trim' => true
 //				]
