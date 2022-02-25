@@ -155,7 +155,7 @@ static int	eval_execute_op_unary(const zbx_eval_context_t *ctx, const zbx_eval_t
  *             value  - [IN] the other operand                                *
  *             result - [OUT] the resulting value                             *
  *                                                                            *
- * Return value: SUCCEED - the oeprator was evaluated successfully            *
+ * Return value: SUCCEED - the operator was evaluated successfully            *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/

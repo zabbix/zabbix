@@ -556,8 +556,8 @@ static void	procstat_try_compress(void *base)
 {
 	static int	collector_iteration = 0;
 
-	/* The iteration counter ~ the number seconds collector has been running */
-	/* because collector data gathering is done once per second.             */
+	/* The iteration counter ~ the number of seconds collector has been      */
+	/* running because collector data gathering is done once per second.     */
 	/* This approximation is done to avoid calling time() function if there  */
 	/* are no defined queries.                                               */
 	if (0 == (++collector_iteration % PROCSTAT_COMPRESS_PERIOD))

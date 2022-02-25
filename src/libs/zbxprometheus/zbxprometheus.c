@@ -996,8 +996,8 @@ static int	prometheus_metric_parse_labels(const char *data, size_t pos, zbx_vect
  * Return value: SUCCEED - the row was parsed successfully                    *
  *               FAIL    - otherwise                                          *
  *                                                                            *
- * Comments: If there was no parsing errors, but the row does not match filter*
- *           conditions then success with NULL prow is be returned.           *
+ * Comments: If there were no parsing errors, but the row does not match      *
+ *           filter conditions then success with NULL prow is returned.       *
  *                                                                            *
  ******************************************************************************/
 static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *data, size_t pos,

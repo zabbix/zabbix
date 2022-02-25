@@ -683,7 +683,7 @@ char	*strerror_from_module(unsigned long error, const wchar_t *module)
  *                                                                            *
  * Purpose: log the message optionally appending to a string buffer           *
  *                                                                            *
- * Parameters: lebel      - [IN] the log level                                *
+ * Parameters: level      - [IN] the log level                                *
  *             out        - [OUT] the output buffer (optional)                *
  *             out_alloc  - [OUT] the output buffer size                      *
  *             out_offset - [OUT] the output buffer offset                    *

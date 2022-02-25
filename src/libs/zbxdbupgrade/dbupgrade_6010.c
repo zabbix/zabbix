@@ -1,4 +1,3 @@
-<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -18,33 +17,37 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "common.h"
+#include "db.h"
+#include "dbupgrade.h"
 
-/**
- * @var CView $this
+extern unsigned char	program_type;
+
+/*
+ * 6.2 development database patches
  */
-?>
 
-<script type="text/javascript">
-	$(() => {
-		const $expires_row = $('#expires-at-row');
-		const $expires_at = $expires_row.find('#expires_at');
-		const $form = $(document.forms['token']);
+#ifndef HAVE_SQLITE3
 
-		$form.on('submit', () => $form.trimValues(['#name', '#description']));
+static int	DBpatch_6010001(void)
+{
+#define ZBX_MD5_SIZE	32
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
 
-		$('#expires_state')
-			.on('change', ({target: {checked}}) => {
-				$expires_row.toggle(checked);
-				$expires_at.prop('disabled', !checked);
-			})
-			.trigger('change');
+	if (ZBX_DB_OK > DBexecute("update users set passwd='' where length(passwd)=%d", ZBX_MD5_SIZE))
+		return FAIL;
 
-		$('#regenerate').on('click', ({target}) => {
-			if (confirm($(target).data('confirmation'))) {
-				$form.append($('<input>', {type: 'hidden', name: 'regenerate', value: '1'}));
-				$form.find('#action_dst').val('user.token.view');
-				$form.submit();
-			}
-		});
-	});
-</script>
+	return SUCCEED;
+#undef ZBX_MD5_SIZE
+}
+
+#endif
+
+DBPATCH_START(6010)
+
+/* version, duplicates flag, mandatory flag */
+
+DBPATCH_ADD(6010001, 0, 1)
+
+DBPATCH_END()

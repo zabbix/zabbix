@@ -174,7 +174,7 @@ class CControllerPopupAcknowledgeEdit extends CController {
 
 		$output = [
 			'title' => _('Update problem'),
-			'errors' => hasErrorMesssages() ? getMessages() : null,
+			'errors' => hasErrorMessages() ? getMessages() : null,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

@@ -505,7 +505,7 @@ static int	ha_is_available(const zbx_ha_info_t *info, int lastaccess, int db_tim
  * Return value: SUCCEED - server can be started in active mode               *
  *               FAIL    - server cannot be started based on node registry    *
  *                                                                            *
- * Comments: Sets error status on on configuration errors.                    *
+ * Comments: Sets error status on configuration errors.                       *
  *                                                                            *
  ******************************************************************************/
 static int	ha_check_standalone_config(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int db_time)
@@ -542,7 +542,7 @@ static int	ha_check_standalone_config(zbx_ha_info_t *info, zbx_vector_ha_node_t 
  * Return value: SUCCEED - server can be started in returned mode             *
  *               FAIL    - server cannot be started based on node registry    *
  *                                                                            *
- * Comments: Sets error status on on configuration errors.                    *
+ * Comments: Sets error status on configuration errors.                       *
  *                                                                            *
  ******************************************************************************/
 static int	ha_check_cluster_config(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int db_time, int *activate)
@@ -918,7 +918,7 @@ static int	ha_check_active_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes
 	}
 
 	/* 1) No active nodes - set this node as active.                */
-	/* 2) This node is active - update it's status as it might have */
+	/* 2) This node is active - update its status as it might have  */
 	/*    switched itself to standby mode in the case of prolonged  */
 	/*    database connection loss.                                 */
 	if (i == nodes->values_num || SUCCEED == zbx_cuid_compare(nodes->values[i]->ha_nodeid, info->ha_nodeid))

@@ -160,7 +160,14 @@ out:
 	if (SUCCEED == status)	/* moved the unpredictable long operation to the end */
 				/* we are trying to save info about lastaccess to detect communication problem */
 	{
-		zbx_update_proxy_data(&proxy, version, ts->sec,
+		int	lastaccess;
+
+		if (ZBX_PROXY_UPLOAD_DISABLED == upload_status)
+			lastaccess = time(NULL);
+		else
+			lastaccess = ts->sec;
+
+		zbx_update_proxy_data(&proxy, version, lastaccess,
 				(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0), 0);
 	}
 

@@ -1539,7 +1539,7 @@ class CUser extends CApiService {
 					break;
 
 				case ZBX_AUTH_INTERNAL:
-					if (!self::verifyPassword($user['password'], $db_user)) {
+					if (!password_verify($user['password'], $db_user['passwd'])) {
 						self::exception(ZBX_API_ERROR_PERMISSIONS,
 							_('Incorrect user name or password or account is temporarily blocked.')
 						);
@@ -1591,31 +1591,6 @@ class CUser extends CApiService {
 		self::addAuditLog(CAudit::ACTION_LOGIN_SUCCESS, CAudit::RESOURCE_USER);
 
 		return array_key_exists('userData', $user) && $user['userData'] ? $db_user : $db_user['sessionid'];
-	}
-
-	/**
-	 * @param string $password           User-specified password.
-	 * @param array  $db_user            Saved user profile.
-	 * @param string $db_user['passwd']  Saved password hash.
-	 * @param int    $db_user['userid']  User id.
-	 *
-	 * @return bool
-	 */
-	private static function verifyPassword($password, array $db_user) {
-		if (strlen($db_user['passwd']) > ZBX_MD5_SIZE) {
-			return password_verify($password, $db_user['passwd']);
-		}
-
-		if (hash_equals($db_user['passwd'], md5($password))) {
-			DB::update('users', [
-				'values' => ['passwd' => password_hash($password, PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST])],
-				'where' => ['userid' => $db_user['userid']]
-			]);
-
-			return true;
-		}
-
-		return false;
 	}
 
 	/**

@@ -273,7 +273,6 @@ class CMenuHelper {
 						(!CWebUser::isGuest() && CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS))
 							? (new CMenuItem(_('API tokens')))
 								->setAction('token.list')
-								->setAliases(['token.edit', 'token.view'])
 							: null,
 						(new CMenuItem(_('Other')))
 							->setAction('miscconfig.edit')
@@ -396,7 +395,6 @@ class CMenuHelper {
 							->setAction('userprofile.edit'),
 						(new CMenuItem(_('API tokens')))
 							->setAction('user.token.list')
-							->setAliases(['user.token.view', 'user.token.edit'])
 					]))
 			);
 		}

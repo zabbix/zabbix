@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"sync"
 
 	"zabbix.com/pkg/plugin"
@@ -51,6 +52,11 @@ type unit struct {
 	JobID       uint32
 	JobType     string
 	JobPath     string
+}
+
+type unitFile struct {
+	Name	        string
+	EnablementState string
 }
 
 type unitJson struct {
@@ -207,6 +213,11 @@ func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error
 		return nil, fmt.Errorf("Cannot retrieve list of units: %s", err)
 	}
 
+	var unitFiles []unitFile
+	if err = obj.Call("org.freedesktop.systemd1.Manager.ListUnitFiles", 0).Store(&unitFiles); err != nil {
+		return nil, fmt.Errorf("Cannot retrieve list of unit files: %s", err)
+	}
+
 	var array []unitJson
 	for _, u := range units {
 		if len(ext) != 0 && ext != filepath.Ext(u.Name) {
@@ -231,6 +242,28 @@ func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error
 		array = append(array, unitJson{u.Name, u.Description, u.LoadState, u.ActiveState,
 			u.SubState, u.Followed, u.Path, u.JobID, u.JobType, u.JobPath, state,
 		})
+	}
+
+	for _, f := range unitFiles {
+		unitFileExt := filepath.Ext(f.Name)
+		basePath := filepath.Base(f.Name)
+		if f.EnablementState != "disabled" || (len(ext) != 0 && ext != unitFileExt) ||
+			strings.HasSuffix(strings.TrimSuffix(f.Name, unitFileExt), "@") || /* skip unit templates */
+			isEnabledUnit(array, basePath) {
+			continue
+		}
+
+		unitPath := "/org/freedesktop/systemd1/unit/" + getName(basePath)
+
+		var details map[string]interface{}
+		obj = conn.Object("org.freedesktop.systemd1", dbus.ObjectPath(unitPath))
+		err = obj.Call("org.freedesktop.DBus.Properties.GetAll", 0, "org.freedesktop.systemd1.Unit").Store(&details)
+		if err != nil {
+			p.Debugf("Cannot get unit properties for disabled unit %s, err:", basePath, err.Error())
+			continue
+		}
+
+		array = append(array, unitJson{basePath, "", "", "inactive", "", "", unitPath, 0, "", "", f.EnablementState})
 	}
 
 	jsonArray, err := json.Marshal(array)
@@ -333,6 +366,15 @@ func (p *Plugin) createStateMapping(v map[string]interface{}, key string, names 
 		p.Debugf("cannot create mapping for '%s' unit state: unit state with information type string not found", key)
 	}
 
+}
+
+func isEnabledUnit(units []unitJson, p string) bool {
+	for _, u := range units {
+		if u.Name == p {
+			return true
+		}
+	}
+	return false
 }
 
 func init() {

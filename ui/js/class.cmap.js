@@ -4007,7 +4007,7 @@ jQuery(function ($) {
 	 * new top and left position must be calculated. If the overlay dialogue is opened for the first time, position is
 	 * set depending on map size and canvas top position. This makes map more visible at first. In case popup window is
 	 * dragged outside visible view port or window is resized, popup will again be repositioned so it doesn't go outside
-	 * the viewport. In case the popup is too large, position it with a small margin depenging on whether is too long
+	 * the viewport. In case the popup is too large, position it with a small margin depending on whether is too long
 	 * or too wide.
 	 */
 	$.fn.positionOverlayDialogue = function () {

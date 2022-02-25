@@ -75,7 +75,7 @@ static void	deactivate_perf_counter(zbx_perf_counter_data_t *counter)
 
 /******************************************************************************
  *                                                                            *
- * Comments: if the specified counter exists or a new is successfully         *
+ * Comments: if the specified counter exists or the new one is successfully   *
  *           added, a pointer to that counter is returned, NULL otherwise     *
  *                                                                            *
  ******************************************************************************/

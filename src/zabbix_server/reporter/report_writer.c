@@ -239,9 +239,9 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: begin report dispatch                                             *
+ * Purpose: to begin report dispatch                                          *
  *                                                                            *
- * Parameters: msg      - [IN] the begin report request message               *
+ * Parameters: msg      - [IN] the request message                            *
  *             dispatch - [IN] the alerter dispatch                           *
  *             error    - [OUT] the error message                             *
  *                                                                            *
@@ -302,7 +302,7 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
  *                                                                            *
  * Purpose: send report to the recipients using specified media type          *
  *                                                                            *
- * Parameters: msg      - [IN] the send report request message                *
+ * Parameters: msg      - [IN] the request message                            *
  *             dispatch - [IN] the alerter dispatch                           *
  *             error    - [OUT] the error message                             *
  *                                                                            *
