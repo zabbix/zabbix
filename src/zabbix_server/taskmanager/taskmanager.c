@@ -631,7 +631,7 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 {
 	struct zbx_json_parse	jp, jp_data;
 	const char		*ptr;
-	char			hostid[16];
+	char			hostid[MAX_ID_LEN];
 	int			passive_proxy_count = 0;
 
 	if (FAIL == zbx_json_open(data, &jp))
