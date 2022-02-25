@@ -311,7 +311,7 @@ static void	zbx_openssl_info_cb(const SSL *ssl, int where, int ret)
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_OPENSSL)
-void	zbx_tls_error_msg(char **error, size_t *error_alloc, size_t *error_offset)
+static void	zbx_tls_error_msg(char **error, size_t *error_alloc, size_t *error_offset)
 {
 	unsigned long	error_code;
 	const char	*file, *data;

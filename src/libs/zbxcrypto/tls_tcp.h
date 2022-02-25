@@ -29,8 +29,4 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error);
 void	zbx_tls_close(zbx_socket_t *s);
 #endif
 
-#if defined(HAVE_OPENSSL)
-void	zbx_tls_error_msg(char **error, size_t *error_alloc, size_t *error_offset);
-#endif
-
 #endif	/* ZABBIX_TLS_TCP_H */
