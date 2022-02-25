@@ -196,7 +196,7 @@ $fields = [
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"discoveryrule.massdelete","discoveryrule.massdisable",'.
-										'"discoveryrule.massenable","discoveryrule.masscheck_now"'
+										'"discoveryrule.massenable"'
 									),
 									null
 								],
@@ -778,26 +778,6 @@ elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.massdele
 		uncheckTableRows($checkbox_hash);
 	}
 	show_messages($result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
-}
-elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.masscheck_now' && hasRequest('g_hostdruleid')) {
-	$tasks = [];
-
-	foreach (getRequest('g_hostdruleid') as $taskid) {
-		$tasks[] = [
-			'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
-			'request' => [
-				'itemid' => $taskid
-			]
-		];
-	}
-
-	$result = (bool) API::Task()->create($tasks);
-
-	if ($result) {
-		uncheckTableRows($checkbox_hash);
-	}
-
-	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
 }
 
 if (hasRequest('action') && hasRequest('g_hostdruleid') && !$result) {

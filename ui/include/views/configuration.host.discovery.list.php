@@ -326,7 +326,17 @@ $button_list = [
 ];
 
 if ($data['context'] === 'host') {
-	$button_list += ['discoveryrule.masscheck_now' => ['name' => _('Execute now'), 'disabled' => $data['is_template']]];
+	$button_list += [
+		'discoveryrule.masscheck_now' => [
+			'content' => (new CSimpleButton(_('Execute now')))
+				->onClick('view.massCheckNow(this);')
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('no-chkbxrange')
+				->setEnabled(!$data['is_template'])
+				->setAttribute('data-disabled', $data['is_template'])
+				->removeAttribute('id')
+		],
+	];
 }
 
 $button_list += [
@@ -343,6 +353,11 @@ $widget->addItem($discoveryForm);
 
 $widget->show();
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('
+	view.init('.json_encode([
+		'checkbox_hash' => $data['checkbox_hash'],
+		'checkbox_object' => 'g_hostdruleid'
+	]).');
+'))
 	->setOnDocumentReady()
 	->show();
