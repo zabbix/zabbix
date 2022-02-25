@@ -29,6 +29,9 @@
 #include "sighandler.h"
 #include "sigcommon.h"
 
+#define ZBX_PID_FILE_TIMEOUT 20
+#define ZBX_PID_FILE_SLEEP_TIME 100000
+
 char		*CONFIG_PID_FILE = NULL;
 static int	parent_pid = -1;
 
@@ -320,7 +323,7 @@ static void	set_daemon_signal_handlers(void)
 int	daemon_start(int allow_root, const char *user, unsigned int flags)
 {
 	struct passwd	*pwd;
-	int		pid_file_timeout = 20;
+	int		pid_file_timeout = ZBX_PID_FILE_TIMEOUT;
 	int		child_pid = -1;
 	zbx_stat_t	stat_buff;
 
@@ -387,7 +390,7 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 						0 != zbx_stat(CONFIG_PID_FILE, &stat_buff))
 				{
 					pid_file_timeout--;
-					usleep(100000);
+					usleep(ZBX_PID_FILE_SLEEP_TIME);
 				}
 			}
 
