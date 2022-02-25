@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-20T07:15:10Z</date>
+   <date>2021-12-23T13:48:16Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -16,7 +16,7 @@
 MIBs used:&#13;
 F10-S-SERIES-CHASSIS-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module EtherLike-MIB SNMP</name>
@@ -103,7 +103,6 @@ The status of the fan tray {#SNMPVALUE}.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>CPU and Memory and Flash Discovery</name>
@@ -162,7 +161,6 @@ Total memory usage in percentage.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>#{#SNMPINDEX}: CPU utilization</name>
@@ -246,7 +244,6 @@ The status of the power supply {#SNMPVALUE}</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Stack Unit Discovery</name>
@@ -272,6 +269,15 @@ The temperature of the unit.</description>
                      </applications>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <name>Device {#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP_WARN:""}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
@@ -286,15 +292,6 @@ The temperature of the unit.</description>
                                  <recovery_expression>{Template Net Dell Force S-Series SNMP:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                               </dependency>
                            </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
-                           <name>Device {#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
@@ -417,7 +414,6 @@ Current code version of this unit.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>
@@ -462,19 +458,6 @@ Current code version of this unit.</description>
    </templates>
    <value_maps>
       <value_map>
-         <name>F10-S-SERIES-CHASSIS-MIB::extremeFanOperational</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>true - on</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>false - off</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
          <name>F10-S-SERIES-CHASSIS-MIB::chSysFanTrayOperStatus</name>
          <mappings>
             <mapping>
@@ -505,6 +488,19 @@ Current code version of this unit.</description>
             <mapping>
                <value>3</value>
                <newvalue>absent</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>F10-S-SERIES-CHASSIS-MIB::extremeFanOperational</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>true - on</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>false - off</newvalue>
             </mapping>
          </mappings>
       </value_map>

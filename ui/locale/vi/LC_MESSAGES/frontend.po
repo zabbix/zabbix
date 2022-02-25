@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 4.2\n"
+"Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-07 19:54+0200\n"
+"POT-Creation-Date: 2022-02-22 13:29+0200\n"
 "PO-Revision-Date: 2020-09-14 08:12+0300\n"
 "Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -281,7 +281,7 @@ msgstr "(Chỉ có nhóm super admins mới có thể tạo nhóm)"
 msgid "(no proxy)"
 msgstr "(không proxy)"
 
-#: include/classes/setup/CSetupWizard.php:250
+#: include/classes/setup/CSetupWizard.php:248
 msgid "0 - use default port"
 msgstr "0 - cổng sử dụng mặc định"
 
@@ -440,7 +440,7 @@ msgstr " Sự kiện được ghi nhận giải quyết"
 #: include/views/configuration.item.prototype.massupdate.php:254
 #: include/views/configuration.maintenance.edit.php:81
 #: include/views/configuration.services.edit.php:125
-#: include/views/configuration.services.edit.php:178
+#: include/views/configuration.services.edit.php:179
 #: include/views/configuration.template.edit.php:126
 #: include/views/configuration.template.massupdate.php:150
 #: include/views/configuration.trigger.prototype.edit.php:187
@@ -655,9 +655,9 @@ msgstr "Kích hoạt"
 #: include/views/configuration.maintenance.edit.php:121
 #: include/views/configuration.maintenance.edit.php:197
 #: include/views/configuration.maintenance.edit.php:268
-#: include/views/configuration.services.edit.php:163
-#: include/views/configuration.services.edit.php:338
-#: include/views/configuration.services.edit.php:375
+#: include/views/configuration.services.edit.php:164
+#: include/views/configuration.services.edit.php:339
+#: include/views/configuration.services.edit.php:376
 #: include/views/configuration.template.edit.php:238
 #: include/views/configuration.template.list.php:67
 #: include/views/configuration.template.massupdate.php:55
@@ -940,7 +940,7 @@ msgstr "Cho phép đóng bằng tay"
 msgid "Allowed hosts"
 msgstr "Những host được phép"
 
-#: include/classes/setup/CSetupWizard.php:489
+#: include/classes/setup/CSetupWizard.php:473
 msgid "Alternatively, you can install it manually:"
 msgstr "Ngoài ra, bạn có thể cài đặt thủ công:"
 
@@ -1389,8 +1389,8 @@ msgstr "Trung bình"
 msgid "Axes"
 msgstr "Trục"
 
-#: include/classes/setup/CSetupWizard.php:134
-#: include/classes/setup/CSetupWizard.php:423
+#: include/classes/setup/CSetupWizard.php:132
+#: include/classes/setup/CSetupWizard.php:421
 msgid "Back"
 msgstr "Quay lại"
 
@@ -1614,7 +1614,7 @@ msgstr "Không thể xóa"
 #: app/views/js/administration.trigseverity.edit.js.php:37
 #: app/views/monitoring.dashboard.view.php:114
 #: include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:116
+#: include/classes/setup/CSetupWizard.php:114
 #: include/views/conf.import.php:131 include/views/js/conf.import.js.php:42
 #: include/views/monitoring.slideconf.edit.php:281 jsLoader.php:122
 #: jsLoader.php:139 jsLoader.php:243 jsLoader.php:324 jsLoader.php:336
@@ -1866,7 +1866,7 @@ msgstr "Không thể đóng lại vấn đề: %1$s."
 msgid "Cannot connect to LDAP server."
 msgstr "Không thể kết nối đến máy chủ LDAP."
 
-#: include/classes/setup/CSetupWizard.php:323
+#: include/classes/setup/CSetupWizard.php:321
 msgid "Cannot connect to the database."
 msgstr "Không thể kết nối đến cơ sở dữ liệu."
 
@@ -1928,7 +1928,7 @@ msgstr "Không thể tạo biểu tượng sơ đồ"
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr "Không thể tạo ứng dụng mới, web scenario được sẵn sàng gán cho ứng dụng."
 
-#: include/classes/setup/CSetupWizard.php:485
+#: include/classes/setup/CSetupWizard.php:469
 msgid "Cannot create the configuration file."
 msgstr "Không thể tạo tập tin cấu hình."
 
@@ -3103,7 +3103,7 @@ msgid "Check for error using regular expression"
 msgstr "Kiểm tra lỗi trong việc sử dụng biểu thức"
 
 #: include/classes/setup/CSetupWizard.php:46
-#: include/classes/setup/CSetupWizard.php:217
+#: include/classes/setup/CSetupWizard.php:215
 msgid "Check of pre-requisites"
 msgstr "Kiểm tra điều kiện tiên quyết"
 
@@ -3455,7 +3455,7 @@ msgstr "Cấu hình"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Cấu hình thống kê cache. Cache - buffer (chế độ: pfree, total, used, free)."
 
-#: include/classes/setup/CSetupWizard.php:516
+#: include/classes/setup/CSetupWizard.php:488
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "Tập tin cấu hình \"%1$s\" đã tạo."
@@ -3628,7 +3628,7 @@ msgid "Configuration updated"
 msgstr "Cấu hình đã cập nhật"
 
 #: include/classes/setup/CSetupWizard.php:50
-#: include/classes/setup/CSetupWizard.php:332
+#: include/classes/setup/CSetupWizard.php:330
 msgid "Configure DB connection"
 msgstr "Cấu hình kết nối DB"
 
@@ -3636,7 +3636,7 @@ msgstr "Cấu hình kết nối DB"
 msgid "Confirmation text"
 msgstr "Xác nhận văn bản"
 
-#: include/classes/setup/CSetupWizard.php:514
+#: include/classes/setup/CSetupWizard.php:486
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "Chúc mừng! Bạn đã cài đặt thành công Zabbix frontend."
 
@@ -3699,7 +3699,7 @@ msgstr ""
 "1. Sai Ip hoặc tên miền trong tệp \"zabbix.conf.php\";\n"
 "2.Tường lửa đang khóa kết nối TCP.\n"
 
-#: include/classes/setup/CSetupWizard.php:275
+#: include/classes/setup/CSetupWizard.php:273
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
 msgstr ""
 
@@ -4131,7 +4131,7 @@ msgstr "Nghiêm trọng"
 msgid "Current host"
 msgstr "Host hiện tại"
 
-#: include/classes/setup/CSetupWizard.php:175
+#: include/classes/setup/CSetupWizard.php:173
 msgid "Current value"
 msgstr "Giá trị hiện tại"
 
@@ -4325,16 +4325,16 @@ msgstr "Đặt lại dữ liệu"
 msgid "Data storage period"
 msgstr "Chu kì lưu trữ dữ liệu"
 
-#: include/classes/setup/CSetupWizard.php:290
-#: include/classes/setup/CSetupWizard.php:391
-#: include/classes/setup/CSetupWizard.php:555
+#: include/classes/setup/CSetupWizard.php:288
+#: include/classes/setup/CSetupWizard.php:389
+#: include/classes/setup/CSetupWizard.php:528
 msgid "Database TLS CA file"
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:686
-#: include/classes/setup/CSetupWizard.php:302
-#: include/classes/setup/CSetupWizard.php:397
-#: include/classes/setup/CSetupWizard.php:563
+#: include/classes/setup/CSetupWizard.php:300
+#: include/classes/setup/CSetupWizard.php:395
+#: include/classes/setup/CSetupWizard.php:536
 msgid "Database TLS certificate file"
 msgstr ""
 
@@ -4342,19 +4342,19 @@ msgstr ""
 msgid "Database TLS certificate files must be read-only"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:314
-#: include/classes/setup/CSetupWizard.php:404
+#: include/classes/setup/CSetupWizard.php:312
+#: include/classes/setup/CSetupWizard.php:402
 msgid "Database TLS cipher list"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:272
-#: include/classes/setup/CSetupWizard.php:387
+#: include/classes/setup/CSetupWizard.php:270
+#: include/classes/setup/CSetupWizard.php:385
 msgid "Database TLS encryption"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:296
-#: include/classes/setup/CSetupWizard.php:394
-#: include/classes/setup/CSetupWizard.php:559
+#: include/classes/setup/CSetupWizard.php:294
+#: include/classes/setup/CSetupWizard.php:392
+#: include/classes/setup/CSetupWizard.php:532
 msgid "Database TLS key file"
 msgstr ""
 
@@ -4362,12 +4362,12 @@ msgstr ""
 msgid "Database history tables upgraded"
 msgstr "Bảng lịch sử nâng cấp cơ sở dữ liệu"
 
-#: include/classes/setup/CSetupWizard.php:240
+#: include/classes/setup/CSetupWizard.php:238
 msgid "Database host"
 msgstr "Cơ sở dữ liệu host"
 
-#: include/classes/setup/CSetupWizard.php:308
-#: include/classes/setup/CSetupWizard.php:400
+#: include/classes/setup/CSetupWizard.php:306
+#: include/classes/setup/CSetupWizard.php:398
 msgid "Database host verification"
 msgstr ""
 
@@ -4375,35 +4375,35 @@ msgstr ""
 msgid "Database monitor"
 msgstr "Cơ sở dữ liệu theo dõi"
 
-#: include/classes/setup/CSetupWizard.php:253
-#: include/classes/setup/CSetupWizard.php:381 setup.php:44
+#: include/classes/setup/CSetupWizard.php:251
+#: include/classes/setup/CSetupWizard.php:379 setup.php:44
 msgid "Database name"
 msgstr "Tên cơ sở dữ liệu"
 
-#: include/classes/setup/CSetupWizard.php:383
+#: include/classes/setup/CSetupWizard.php:381
 msgid "Database password"
 msgstr "Mật khẩu cơ sở dữ liệu"
 
-#: include/classes/setup/CSetupWizard.php:245
-#: include/classes/setup/CSetupWizard.php:380 setup.php:43
+#: include/classes/setup/CSetupWizard.php:243
+#: include/classes/setup/CSetupWizard.php:378 setup.php:43
 msgid "Database port"
 msgstr "Cổng sơ sở dữ liệu"
 
-#: include/classes/setup/CSetupWizard.php:258
-#: include/classes/setup/CSetupWizard.php:385
+#: include/classes/setup/CSetupWizard.php:256
+#: include/classes/setup/CSetupWizard.php:383
 msgid "Database schema"
 msgstr "Giản đồ cơ sở dữ liệu"
 
-#: include/classes/setup/CSetupWizard.php:379
+#: include/classes/setup/CSetupWizard.php:377
 msgid "Database server"
 msgstr "Máy chủ cơ sở dữ liệu"
 
-#: include/classes/setup/CSetupWizard.php:232
-#: include/classes/setup/CSetupWizard.php:374
+#: include/classes/setup/CSetupWizard.php:230
+#: include/classes/setup/CSetupWizard.php:372
 msgid "Database type"
 msgstr "Kiểu cơ sở dữ liệu"
 
-#: include/classes/setup/CSetupWizard.php:382
+#: include/classes/setup/CSetupWizard.php:380
 msgid "Database user"
 msgstr "Người dùng cơ sở dữ liệu"
 
@@ -4875,7 +4875,7 @@ msgstr "Bộ giới hạn"
 msgid "Deny"
 msgstr "Từ chối"
 
-#: include/views/configuration.services.edit.php:355
+#: include/views/configuration.services.edit.php:356
 #: include/views/configuration.trigger.prototype.edit.php:585
 #: include/views/configuration.trigger.prototype.edit.php:619
 #: include/views/configuration.trigger.prototype.massupdate.php:185
@@ -4894,7 +4894,7 @@ msgid "Dependent item"
 msgstr "Item phụ thuộc"
 
 #: app/views/popup.generic.php:313 include/triggers.inc.php:2554
-#: include/views/configuration.services.edit.php:160
+#: include/views/configuration.services.edit.php:161
 #: include/views/configuration.trigger.prototype.list.php:87
 #: include/views/configuration.triggers.list.php:241
 msgid "Depends on"
@@ -5386,15 +5386,15 @@ msgstr "Down"
 msgid "Download image"
 msgstr "Tải xuống hình ảnh"
 
-#: include/classes/setup/CSetupWizard.php:491
+#: include/classes/setup/CSetupWizard.php:475
 msgid "Download the configuration file"
 msgstr "Tải xuống tệp tin cấu hình"
 
 #: app/views/report.services.php:80 app/views/report.services.php:81
 #: app/views/report.services.php:82 app/views/report.services.php:83
 #: include/classes/screens/CScreenDiscovery.php:120
-#: include/views/configuration.services.edit.php:191
-#: include/views/configuration.services.edit.php:243
+#: include/views/configuration.services.edit.php:192
+#: include/views/configuration.services.edit.php:244
 msgid "Downtime"
 msgstr "Thời gian down"
 
@@ -6209,7 +6209,7 @@ msgstr "SAI"
 msgid "FTP"
 msgstr "FTP"
 
-#: include/classes/setup/CSetupWizard.php:191
+#: include/classes/setup/CSetupWizard.php:189
 msgid "Fail"
 msgstr "Thất bại"
 
@@ -6440,7 +6440,7 @@ msgstr "Tìm chuỗi trong một tập tin. Trả về dòng chứa chuỗi kh�
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
 msgstr "Tìm chuỗi trên một trang web. Trả về chuỗi khớp hoặc theo chỉ định của tham số đầu ra tùy chọn"
 
-#: include/classes/setup/CSetupWizard.php:131
+#: include/classes/setup/CSetupWizard.php:129
 msgid "Finish"
 msgstr "Hoàn thành"
 
@@ -6539,8 +6539,8 @@ msgstr "Thứ sáu"
 
 #: app/views/report.services.php:82 include/classes/html/CFilter.php:282
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:79
-#: include/views/configuration.services.edit.php:257
-#: include/views/configuration.services.edit.php:305
+#: include/views/configuration.services.edit.php:258
+#: include/views/configuration.services.edit.php:306
 #: include/views/js/monitoring.sysmaps.js.php:732 report4.php:191
 #: services.php:47 services.php:182
 msgid "From"
@@ -7239,7 +7239,7 @@ msgstr "Sắp xếp theo chiều ngang"
 #: include/classes/screens/CScreenProblem.php:893
 #: include/classes/screens/CScreenProblem.php:1142
 #: include/classes/screens/CScreenTriggersInfo.php:40
-#: include/classes/setup/CSetupWizard.php:344
+#: include/classes/setup/CSetupWizard.php:342
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/classes/widgets/forms/CWidgetFormProblems.php:207
 #: include/hostgroups.inc.php:249 include/maps.inc.php:24
@@ -8404,9 +8404,9 @@ msgstr "Trường có tên \"%1$s\" không chính xác hoặc giá trị �
 msgid "Incorrect fields for sysmap."
 msgstr "Các trường đối với sysmap không chính xác."
 
-#: include/classes/setup/CSetupWizard.php:555
-#: include/classes/setup/CSetupWizard.php:559
-#: include/classes/setup/CSetupWizard.php:563
+#: include/classes/setup/CSetupWizard.php:528
+#: include/classes/setup/CSetupWizard.php:532
+#: include/classes/setup/CSetupWizard.php:536
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr ""
@@ -9243,12 +9243,11 @@ msgid "Insert expression"
 msgstr "Chèn biểu thức"
 
 #: include/classes/setup/CSetupWizard.php:62
-#: include/classes/setup/CSetupWizard.php:497
-#: include/classes/setup/CSetupWizard.php:520
+#: include/classes/setup/CSetupWizard.php:493
 msgid "Install"
 msgstr "Cài đặt"
 
-#: setup.php:92
+#: setup.php:108
 msgid "Installation"
 msgstr "Cài đặt"
 
@@ -9361,7 +9360,7 @@ msgstr "Internet Explorer"
 #: include/views/configuration.item.prototype.edit.php:563
 #: include/views/configuration.item.prototype.list.php:58
 #: include/views/configuration.item.prototype.massupdate.php:252
-#: include/views/configuration.services.edit.php:178
+#: include/views/configuration.services.edit.php:179
 msgid "Interval"
 msgstr "Khoảng thời gian"
 
@@ -11694,7 +11693,7 @@ msgstr "Hoạt động mới"
 msgid "New regular expression"
 msgstr "Biểu thức chính quy mới"
 
-#: include/views/configuration.services.edit.php:335
+#: include/views/configuration.services.edit.php:336
 msgid "New service time"
 msgstr "Thời gian dịch vụ mới"
 
@@ -11710,9 +11709,9 @@ msgstr "Trigger mới"
 msgid "Next page"
 msgstr "Trang tiếp theo"
 
-#: include/classes/setup/CSetupWizard.php:128
-#: include/classes/setup/CSetupWizard.php:334
-#: include/classes/setup/CSetupWizard.php:423
+#: include/classes/setup/CSetupWizard.php:126
+#: include/classes/setup/CSetupWizard.php:332
+#: include/classes/setup/CSetupWizard.php:421
 msgid "Next step"
 msgstr "Bước tiếp theo"
 
@@ -12385,8 +12384,8 @@ msgid "Not supported"
 msgstr "Không được hỗ trợ"
 
 #: app/views/popup.services.php:71
-#: include/views/configuration.services.edit.php:178
-#: include/views/configuration.services.edit.php:251
+#: include/views/configuration.services.edit.php:179
+#: include/views/configuration.services.edit.php:252
 msgid "Note"
 msgstr "Ghi chú"
 
@@ -12721,8 +12720,8 @@ msgstr "Một trong các đối tượng rời khỏi một nhóm host."
 msgid "One time only"
 msgstr "Một lần duy nhất"
 
-#: include/views/configuration.services.edit.php:197
-#: include/views/configuration.services.edit.php:244
+#: include/views/configuration.services.edit.php:198
+#: include/views/configuration.services.edit.php:245
 msgid "One-time downtime"
 msgstr "Một lần downtime"
 
@@ -13399,7 +13398,7 @@ msgstr "Thụ động"
 #: app/views/administration.user.edit.php:111
 #: app/views/administration.user.edit.php:126 disc_prototypes.php:232
 #: host_discovery.php:184 httpconf.php:64
-#: include/classes/setup/CSetupWizard.php:268
+#: include/classes/setup/CSetupWizard.php:266
 #: include/views/configuration.host.discovery.edit.php:303
 #: include/views/configuration.host.discovery.edit.php:428
 #: include/views/configuration.host.discovery.edit.php:458
@@ -13485,7 +13484,7 @@ msgstr "Chu kỳ"
 
 #: app/views/popup.maintenance.period.php:69
 #: include/views/configuration.maintenance.edit.php:81
-#: include/views/configuration.services.edit.php:236
+#: include/views/configuration.services.edit.php:237
 msgid "Period type"
 msgstr "Loại chu kỳ"
 
@@ -13542,7 +13541,7 @@ msgstr "Phát"
 msgid "Play sound"
 msgstr "Phát âm thanh"
 
-#: include/classes/setup/CSetupWizard.php:423
+#: include/classes/setup/CSetupWizard.php:421
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "Vui lòng kiểm tra các thông số cấu hình. Nếu tất cả đều chính xác, nhấn nút \"%1$s\" hoặc nút \"%2$s\" để thay đổi các tham số cấu hình."
@@ -13551,12 +13550,12 @@ msgstr "Vui lòng kiểm tra các thông số cấu hình. Nếu tất cả đ�
 msgid "Please confirm that you want to remove all macros."
 msgstr "Vui lòng xác nhận rằng bạn muốn xóa tất cả các macro."
 
-#: include/classes/setup/CSetupWizard.php:334
+#: include/classes/setup/CSetupWizard.php:332
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "Vui lòng tạo cơ sở dữ liệu theo cách thủ công và đặt các tham số cấu hình để kết nối với cơ sở dữ liệu này. Nhấn nút \"%1$s\" khi hoàn tất."
 
-#: include/classes/setup/CSetupWizard.php:363
+#: include/classes/setup/CSetupWizard.php:361
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr "Vui lòng nhập tên máy chủ hoặc địa chỉ IP máy chủ và số cổng của máy chủ Zabbix, cũng như tên cài đặt (tùy chọn)."
 
@@ -13601,7 +13600,7 @@ msgstr "Gắn linh kiện vào trường host còn lại"
 #: app/views/administration.proxy.edit.php:47
 #: app/views/monitoring.host.view.php:131
 #: app/views/popup.itemtestedit.view.php:123
-#: include/classes/setup/CSetupWizard.php:349 include/hosts.inc.php:1444
+#: include/classes/setup/CSetupWizard.php:347 include/hosts.inc.php:1444
 #: include/views/configuration.host.list.php:141
 #: include/views/inventory.host.view.php:79 setup.php:57
 msgid "Port"
@@ -13632,7 +13631,7 @@ msgid "Post type"
 msgstr "Loại thư"
 
 #: include/classes/setup/CSetupWizard.php:58
-#: include/classes/setup/CSetupWizard.php:421
+#: include/classes/setup/CSetupWizard.php:419
 msgid "Pre-installation summary"
 msgstr "Tóm tắt chuẩn bị cài đặt"
 
@@ -14294,7 +14293,7 @@ msgstr "Lệnh từ xa"
 #: include/views/configuration.maintenance.edit.php:166
 #: include/views/configuration.maintenance.edit.php:186
 #: include/views/configuration.services.edit.php:142
-#: include/views/configuration.services.edit.php:216
+#: include/views/configuration.services.edit.php:217
 #: include/views/configuration.template.list.php:57
 #: include/views/configuration.template.massupdate.php:57
 #: include/views/configuration.template.massupdate.php:146
@@ -14333,8 +14332,8 @@ msgstr "Lệnh từ xa"
 #: include/views/js/configuration.host.prototype.edit.js.php:33
 #: include/views/js/configuration.httpconf.edit.js.php:52
 #: include/views/js/configuration.httpconf.edit.js.php:77
-#: include/views/js/configuration.item.list.js.php:51
-#: include/views/js/configuration.item.list.js.php:66
+#: include/views/js/configuration.item.list.js.php:54
+#: include/views/js/configuration.item.list.js.php:72
 #: include/views/js/configuration.item.massupdate.js.php:51
 #: include/views/js/configuration.maintenance.edit.js.php:40
 #: include/views/js/configuration.services.edit.js.php:112
@@ -14458,7 +14457,7 @@ msgstr "Yêu cầu gửi thành công"
 msgid "Request type"
 msgstr "Yêu cầu kiểu"
 
-#: include/classes/setup/CSetupWizard.php:175
+#: include/classes/setup/CSetupWizard.php:173
 #: include/views/configuration.httpconf.edit.php:221
 msgid "Required"
 msgstr "Yêu cầu"
@@ -15009,7 +15008,7 @@ msgstr "Thứ bảy"
 msgid "Save changes"
 msgstr "Lưu thay đổi"
 
-#: include/classes/setup/CSetupWizard.php:492
+#: include/classes/setup/CSetupWizard.php:476
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Lưu thành \"%1$s\""
@@ -15430,7 +15429,7 @@ msgstr "Thời gian máy chủ"
 
 #: app/controllers/CControllerAuditLogList.php:203
 #: app/views/popup.services.php:46 include/actions.inc.php:76
-#: include/views/configuration.services.edit.php:354 services.php:352
+#: include/views/configuration.services.edit.php:355 services.php:352
 #: srv_status.php:144
 msgid "Service"
 msgstr "Dịch vụ"
@@ -15493,7 +15492,7 @@ msgstr "Cổng dịch vụ"
 msgid "Service start time must be less than end time."
 msgstr "Thời gian bắt đầu dịch vụ phải ít hơn so với thời gian kết thúc."
 
-#: include/views/configuration.services.edit.php:227
+#: include/views/configuration.services.edit.php:228
 msgid "Service times"
 msgstr "Thời gian dịch vụ"
 
@@ -16892,8 +16891,8 @@ msgid "Thursday"
 msgstr "Thứ năm"
 
 #: app/views/report.services.php:82
-#: include/views/configuration.services.edit.php:264
-#: include/views/configuration.services.edit.php:319 report4.php:191
+#: include/views/configuration.services.edit.php:265
+#: include/views/configuration.services.edit.php:320 report4.php:191
 #: services.php:48 services.php:191
 msgid "Till"
 msgstr "Cho tới"
@@ -16918,9 +16917,9 @@ msgstr "Cho tới"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:201
 #: include/events.inc.php:168 include/events.inc.php:245
 #: include/views/administration.auditacts.list.php:62
-#: include/views/configuration.services.edit.php:309
-#: include/views/configuration.services.edit.php:323
-#: include/views/configuration.services.edit.php:356
+#: include/views/configuration.services.edit.php:310
+#: include/views/configuration.services.edit.php:324
+#: include/views/configuration.services.edit.php:357
 msgid "Time"
 msgstr "Thời gian"
 
@@ -17423,7 +17422,7 @@ msgstr "Hai phần tử sơ đồ nên được chọn"
 #: include/views/configuration.item.prototype.massupdate.php:41
 #: include/views/configuration.item.prototype.massupdate.php:251
 #: include/views/configuration.maintenance.list.php:83
-#: include/views/configuration.services.edit.php:178
+#: include/views/configuration.services.edit.php:179
 #: include/views/inventory.host.list.php:86
 #: include/views/js/monitoring.sysmaps.js.php:88
 #: include/views/js/monitoring.sysmaps.js.php:397
@@ -17844,7 +17843,7 @@ msgstr "Up"
 #: include/views/configuration.item.prototype.edit.php:743
 #: include/views/configuration.item.prototype.massupdate.php:543
 #: include/views/configuration.maintenance.edit.php:258
-#: include/views/configuration.services.edit.php:369
+#: include/views/configuration.services.edit.php:370
 #: include/views/configuration.template.edit.php:221
 #: include/views/configuration.template.massupdate.php:176
 #: include/views/configuration.trigger.prototype.edit.php:632
@@ -17917,8 +17916,8 @@ msgid "Upper level maps"
 msgstr "Các bản đồ ở mức cao hơn"
 
 #: include/classes/screens/CScreenDiscovery.php:120
-#: include/views/configuration.services.edit.php:185
-#: include/views/configuration.services.edit.php:242
+#: include/views/configuration.services.edit.php:186
+#: include/views/configuration.services.edit.php:243
 msgid "Uptime"
 msgstr "Thời gian chạy"
 
@@ -17955,7 +17954,7 @@ msgstr "Các mục đã được sử dụng"
 #: app/views/administration.user.edit.php:220
 #: app/views/reports.auditlog.list.php:87 httpconf.php:58
 #: include/actions.inc.php:1725 include/actions.inc.php:1780
-#: include/actions.inc.php:2001 include/classes/setup/CSetupWizard.php:265
+#: include/actions.inc.php:2001 include/classes/setup/CSetupWizard.php:263
 #: include/hosts.inc.php:61 include/views/configuration.httpconf.edit.php:181
 msgid "User"
 msgstr "Người dùng"
@@ -18631,7 +18630,7 @@ msgstr "Nhà sản xuất"
 msgid "Verbose"
 msgstr "Chi tiết"
 
-#: include/classes/setup/CSetupWizard.php:284
+#: include/classes/setup/CSetupWizard.php:282
 msgid "Verify database certificate"
 msgstr ""
 
@@ -18704,7 +18703,7 @@ msgstr "W"
 msgid "Warning"
 msgstr "Cảnh báo"
 
-#: include/classes/setup/CSetupWizard.php:187
+#: include/classes/setup/CSetupWizard.php:185
 msgctxt "setup"
 msgid "Warning"
 msgstr "Cảnh báo"
@@ -18813,7 +18812,7 @@ msgstr "Hàng tuần"
 msgid "Welcome"
 msgstr "Chào mừng"
 
-#: include/classes/setup/CSetupWizard.php:167
+#: include/classes/setup/CSetupWizard.php:165
 msgid "Welcome to"
 msgstr "Chào mừng đến với"
 
@@ -19053,8 +19052,8 @@ msgstr "Y2"
 #: app/views/popup.maintenance.period.php:150
 #: include/views/configuration.maintenance.edit.php:61
 #: include/views/configuration.maintenance.edit.php:67
-#: include/views/configuration.services.edit.php:260
-#: include/views/configuration.services.edit.php:267
+#: include/views/configuration.services.edit.php:261
+#: include/views/configuration.services.edit.php:268
 msgid "YYYY-MM-DD hh:mm"
 msgstr "YYYY-MM-DD hh:mm"
 
@@ -19257,7 +19256,7 @@ msgstr "Mẫu đăng nhập zabbix"
 
 #: app/partials/popup.operations.php:235
 #: app/views/administration.script.edit.php:57 include/actions.inc.php:880
-#: include/classes/setup/CSetupWizard.php:412
+#: include/classes/setup/CSetupWizard.php:410
 msgid "Zabbix server"
 msgstr "Máy chủ Zabbix"
 
@@ -19278,7 +19277,7 @@ msgid "Zabbix server (proxy)"
 msgstr "Máy chủ zabbix (proxy)"
 
 #: include/classes/setup/CSetupWizard.php:54
-#: include/classes/setup/CSetupWizard.php:361
+#: include/classes/setup/CSetupWizard.php:359
 msgid "Zabbix server details"
 msgstr "Chi tiết máy chủ zabbix"
 
@@ -19295,11 +19294,11 @@ msgstr "Máy chủ Zabbix đang hoạt động"
 msgid "Zabbix server is running check interval \"%1$s\"."
 msgstr "Máy chủ Zabbix đang hoạt động khoảng thời gian kiểm tra \"%1$s\"."
 
-#: include/classes/setup/CSetupWizard.php:416
+#: include/classes/setup/CSetupWizard.php:414
 msgid "Zabbix server name"
 msgstr "Tên máy chủ Zabbix"
 
-#: include/classes/setup/CSetupWizard.php:413
+#: include/classes/setup/CSetupWizard.php:411
 msgid "Zabbix server port"
 msgstr "Cổng máy chủ Zabbix"
 
@@ -19767,7 +19766,7 @@ msgid "days"
 msgstr "ngày"
 
 #: app/controllers/CControllerMapView.php:124
-#: include/classes/setup/CSetupWizard.php:376
+#: include/classes/setup/CSetupWizard.php:374
 #: include/classes/widgets/CWidgetHelper.php:70
 #: include/views/js/monitoring.slideconf.edit.js.php:40
 #: include/views/monitoring.slideconf.edit.php:136
@@ -19912,8 +19911,8 @@ msgctxt "hour short"
 msgid "h"
 msgstr "h"
 
-#: include/views/configuration.services.edit.php:286
-#: include/views/configuration.services.edit.php:296
+#: include/views/configuration.services.edit.php:287
+#: include/views/configuration.services.edit.php:297
 msgid "hh"
 msgstr "hh"
 
@@ -20209,8 +20208,8 @@ msgstr "min() - Giá trị tối thiểu cho giai đoạn T"
 msgid "minimum length is %1$s characters"
 msgstr "độ dài tối thiểu là ký tự %1$s"
 
-#: include/views/configuration.services.edit.php:291
-#: include/views/configuration.services.edit.php:301
+#: include/views/configuration.services.edit.php:292
+#: include/views/configuration.services.edit.php:302
 msgid "mm"
 msgstr "mm"
 
@@ -20455,7 +20454,7 @@ msgstr "giây"
 msgid "selected"
 msgstr "chọn"
 
-#: include/views/configuration.services.edit.php:254
+#: include/views/configuration.services.edit.php:255
 msgid "short description"
 msgstr "mô tả ngắn"
 

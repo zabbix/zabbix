@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-05-02T20:38:10Z</date>
+   <date>2021-12-21T18:00:07Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -17,7 +17,7 @@ Don't forget to change macros {$NGINX.API.ENDPOINT}.&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -38,7 +38,6 @@ Template tooling version used: 0.38</description>
                <key>nginx.connections</key>
                <history>0</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>Returns statistics of client connections.</description>
                <applications>
@@ -55,7 +54,6 @@ Template tooling version used: 0.38</description>
                <key>nginx.connections.accepted.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The total number of accepted client connections per second.</description>
                <applications>
                   <application>
@@ -82,7 +80,6 @@ Template tooling version used: 0.38</description>
                <key>nginx.connections.active</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The current number of active client connections.</description>
                <applications>
                   <application>
@@ -105,7 +102,6 @@ Template tooling version used: 0.38</description>
                <key>nginx.connections.dropped</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The total number of dropped client connections.</description>
                <applications>
                   <application>
@@ -136,7 +132,6 @@ Template tooling version used: 0.38</description>
                <key>nginx.connections.idle</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The current number of idle client connections.</description>
                <applications>
                   <application>
@@ -159,7 +154,6 @@ Template tooling version used: 0.38</description>
                <key>nginx.http.location_zones</key>
                <history>0</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>Returns status information for each HTTP location zone.</description>
                <applications>
@@ -176,7 +170,6 @@ Template tooling version used: 0.38</description>
                <key>nginx.http.server_zones</key>
                <history>0</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>Returns status information for each HTTP server zone.</description>
                <applications>
@@ -193,7 +186,6 @@ Template tooling version used: 0.38</description>
                <key>nginx.http.upstreams</key>
                <history>0</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>Returns status of each HTTP upstream server group and its servers.</description>
                <applications>
@@ -210,7 +202,6 @@ Template tooling version used: 0.38</description>
                <key>nginx.info</key>
                <history>0</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>Return status of nginx running instance.</description>
                <applications>
@@ -228,7 +219,6 @@ Template tooling version used: 0.38</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>The address of the server that accepted status request.</description>
                <applications>
@@ -257,7 +247,6 @@ Template tooling version used: 0.38</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>Nginx error description.</description>
                <applications>
@@ -293,7 +282,6 @@ Template tooling version used: 0.38</description>
                <key>nginx.info.generation</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The total number of configuration reloads.</description>
                <applications>
                   <application>
@@ -320,7 +308,6 @@ Template tooling version used: 0.38</description>
                <key>nginx.info.uptime</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>uptime</units>
                <description>Server uptime.</description>
                <applications>
@@ -344,17 +331,17 @@ Template tooling version used: 0.38</description>
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{last()}&lt;10m</expression>
-                     <name>Nginx: has been restarted (uptime &lt; 10m)</name>
-                     <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
-                     <manual_close>YES</manual_close>
-                  </trigger>
-                  <trigger>
                      <expression>{nodata(30m)}=1</expression>
                      <name>Nginx: Failed to fetch info data (or no data for 30m)</name>
                      <priority>WARNING</priority>
                      <description>Zabbix has not received data for metrics for the last 30 minutes</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>Nginx: has been restarted (uptime &lt; 10m)</name>
+                     <priority>INFO</priority>
+                     <description>Uptime is less than 10 minutes</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
@@ -366,7 +353,6 @@ Template tooling version used: 0.38</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>Version of nginx.</description>
                <applications>
@@ -403,7 +389,6 @@ Template tooling version used: 0.38</description>
                <key>nginx.requests</key>
                <history>0</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>Returns status of client HTTP requests.</description>
                <applications>
@@ -420,7 +405,6 @@ Template tooling version used: 0.38</description>
                <key>nginx.requests.current</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The current number of client requests.</description>
                <applications>
                   <application>
@@ -443,7 +427,6 @@ Template tooling version used: 0.38</description>
                <key>nginx.requests.total.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The total number of client requests per second.</description>
                <applications>
                   <application>
@@ -470,7 +453,6 @@ Template tooling version used: 0.38</description>
                <key>nginx.resolvers</key>
                <history>0</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>Returns status information for each resolver zone.</description>
                <applications>
@@ -487,7 +469,6 @@ Template tooling version used: 0.38</description>
                <key>nginx.ssl</key>
                <history>0</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>Returns SSL statistics.</description>
                <applications>
@@ -504,7 +485,6 @@ Template tooling version used: 0.38</description>
                <key>nginx.ssl.handshakes_failed.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The total number of failed SSL handshakes per second.</description>
                <applications>
                   <application>
@@ -531,7 +511,6 @@ Template tooling version used: 0.38</description>
                <key>nginx.ssl.handshakes.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The total number of successful SSL handshakes per second.</description>
                <applications>
                   <application>
@@ -558,7 +537,6 @@ Template tooling version used: 0.38</description>
                <key>nginx.ssl.session_reuses.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The total number of session reuses during SSL handshake per second.</description>
                <applications>
                   <application>
@@ -585,7 +563,6 @@ Template tooling version used: 0.38</description>
                <key>nginx.stream.server_zones</key>
                <history>0</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>Returns status information for each stream server zone.</description>
                <applications>
@@ -602,7 +579,6 @@ Template tooling version used: 0.38</description>
                <key>nginx.stream.upstreams</key>
                <history>0</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>Returns status of each stream upstream server group and its servers.</description>
                <applications>
@@ -643,7 +619,6 @@ Template tooling version used: 0.38</description>
                      <key>nginx.http.location_zones.discarded.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of requests completed without sending a response per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -670,7 +645,6 @@ Template tooling version used: 0.38</description>
                      <key>nginx.http.location_zones.received.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of bytes received from clients per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -697,7 +671,6 @@ Template tooling version used: 0.38</description>
                      <key>nginx.http.location_zones.requests.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of client requests received from clients per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -724,7 +697,6 @@ Template tooling version used: 0.38</description>
                      <key>nginx.http.location_zones.responses.1xx.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The number of responses with “1xx” status codes per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -751,7 +723,6 @@ Template tooling version used: 0.38</description>
                      <key>nginx.http.location_zones.responses.2xx.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The number of responses with “2xx” status codes per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -778,7 +749,6 @@ Template tooling version used: 0.38</description>
                      <key>nginx.http.location_zones.responses.3xx.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The number of responses with “3xx” status codes per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -805,7 +775,6 @@ Template tooling version used: 0.38</description>
                      <key>nginx.http.location_zones.responses.4xx.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The number of responses with “4xx” status codes per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -832,7 +801,6 @@ Template tooling version used: 0.38</description>
                      <key>nginx.http.location_zones.responses.5xx.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The number of responses with “5xx” status codes per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -859,7 +827,6 @@ Template tooling version used: 0.38</description>
                      <key>nginx.http.location_zones.responses.total.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of responses sent to clients per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -886,7 +853,6 @@ Template tooling version used: 0.38</description>
                      <key>nginx.http.location_zones.sent.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of bytes sent to clients per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -908,7 +874,6 @@ Template tooling version used: 0.38</description>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Nginx: HTTP location zone [{#NAME}]: Requests</name>
@@ -1022,7 +987,6 @@ return JSON.stringify(output);
                      <key>nginx.http.server_zones.discarded.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of requests completed without sending a response per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1049,7 +1013,6 @@ return JSON.stringify(output);
                      <key>nginx.http.server_zones.processing[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The number of client requests that are currently being processed.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1072,7 +1035,6 @@ return JSON.stringify(output);
                      <key>nginx.http.server_zones.received.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of bytes received from clients per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1099,7 +1061,6 @@ return JSON.stringify(output);
                      <key>nginx.http.server_zones.requests.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of client requests received from clients per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1126,7 +1087,6 @@ return JSON.stringify(output);
                      <key>nginx.http.server_zones.responses.1xx.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The number of responses with “1xx” status codes per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1153,7 +1113,6 @@ return JSON.stringify(output);
                      <key>nginx.http.server_zones.responses.2xx.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The number of responses with “2xx” status codes per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1180,7 +1139,6 @@ return JSON.stringify(output);
                      <key>nginx.http.server_zones.responses.3xx.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The number of responses with “3xx” status codes per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1207,7 +1165,6 @@ return JSON.stringify(output);
                      <key>nginx.http.server_zones.responses.4xx.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The number of responses with “4xx” status codes per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1234,7 +1191,6 @@ return JSON.stringify(output);
                      <key>nginx.http.server_zones.responses.5xx.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The number of responses with “5xx” status codes per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1261,7 +1217,6 @@ return JSON.stringify(output);
                      <key>nginx.http.server_zones.responses.total.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of responses sent to clients per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1288,7 +1243,6 @@ return JSON.stringify(output);
                      <key>nginx.http.server_zones.sent.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of bytes sent to clients per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1310,7 +1264,6 @@ return JSON.stringify(output);
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Nginx: HTTP server zone [{#NAME}]: Requests</name>
@@ -1424,7 +1377,6 @@ return JSON.stringify(output);
                      <key>nginx.http.upstream.peer.active[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The current number of active connections.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1447,7 +1399,6 @@ return JSON.stringify(output);
                      <key>nginx.http.upstream.peer.fails.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of unsuccessful attempts to communicate with the server per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1474,7 +1425,6 @@ return JSON.stringify(output);
                      <key>nginx.http.upstream.peer.header_time.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>!ms</units>
                      <description>The average time to get the response header from the server.</description>
                      <application_prototypes>
@@ -1499,7 +1449,6 @@ return JSON.stringify(output);
                      <key>nginx.http.upstream.peer.health_checks.checks[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of health check requests made.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1522,7 +1471,6 @@ return JSON.stringify(output);
                      <key>nginx.http.upstream.peer.health_checks.fails[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The number of failed health checks.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1545,7 +1493,6 @@ return JSON.stringify(output);
                      <key>nginx.http.upstream.peer.health_checks.unhealthy[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>How many times the server became unhealthy (state “unhealthy”).</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1568,7 +1515,6 @@ return JSON.stringify(output);
                      <key>nginx.http.upstream.peer.received.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of bytes received from this server per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1595,7 +1541,6 @@ return JSON.stringify(output);
                      <key>nginx.http.upstream.peer.requests.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of client requests forwarded to this server per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1622,7 +1567,6 @@ return JSON.stringify(output);
                      <key>nginx.http.upstream.peer.response_time.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>!ms</units>
                      <description>The average time to get the full response from the server.</description>
                      <application_prototypes>
@@ -1647,7 +1591,6 @@ return JSON.stringify(output);
                      <key>nginx.http.upstream.peer.responses.1xx.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The number of responses with “1xx” status codes per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1674,7 +1617,6 @@ return JSON.stringify(output);
                      <key>nginx.http.upstream.peer.responses.2xx.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The number of responses with “2xx” status codes per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1701,7 +1643,6 @@ return JSON.stringify(output);
                      <key>nginx.http.upstream.peer.responses.3xx.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The number of responses with “3xx” status codes per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1728,7 +1669,6 @@ return JSON.stringify(output);
                      <key>nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The number of responses with “4xx” status codes per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1755,7 +1695,6 @@ return JSON.stringify(output);
                      <key>nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The number of responses with “5xx” status codes per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1782,7 +1721,6 @@ return JSON.stringify(output);
                      <key>nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of responses obtained from this server.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1809,7 +1747,6 @@ return JSON.stringify(output);
                      <key>nginx.http.upstream.peer.sent.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of bytes sent to this server per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1837,7 +1774,6 @@ return JSON.stringify(output);
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>Current state, which may be one of “up”, “draining”, “down”, “unavail”, “checking”, and “unhealthy”.</description>
                      <application_prototypes>
@@ -1873,7 +1809,6 @@ return JSON.stringify(output);
                      <key>nginx.http.upstream.peer.unavail.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>How many times the server became unavailable for client requests (state “unavail”) due to the number of unsuccessful attempts reaching the max_fails threshold.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1891,7 +1826,6 @@ return JSON.stringify(output);
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template App Nginx Plus by HTTP:nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}].sum(5m)} &gt; ({Template App Nginx Plus by HTTP:nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}].sum(5m)}*({$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}/100))</expression>
@@ -2039,7 +1973,6 @@ return JSON.stringify(output);
                      <key>nginx.http.upstreams.keepalive[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The current number of idle keepalive connections.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2062,7 +1995,6 @@ return JSON.stringify(output);
                      <key>nginx.http.upstreams.zombies[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The current number of servers removed from the group but still processing active client requests.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2086,9 +2018,8 @@ return JSON.stringify(output);
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
-                     <description>The name of the shared memory zone that keeps the group’s configuration and run-time state.</description>
+                     <description>The name of the shared memory zone that keeps the group's configuration and run-time state.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Nginx: HTTP upstream [{#NAME}]</name>
@@ -2109,7 +2040,6 @@ return JSON.stringify(output);
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <master_item>
                   <key>nginx.http.upstreams</key>
                </master_item>
@@ -2159,7 +2089,6 @@ return JSON.stringify(output);
                      <key>nginx.resolvers.requests.addr.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of requests to resolve addresses to names per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2186,7 +2115,6 @@ return JSON.stringify(output);
                      <key>nginx.resolvers.requests.name.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of requests to resolve names to addresses per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2213,7 +2141,6 @@ return JSON.stringify(output);
                      <key>nginx.resolvers.requests.srv.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of requests to resolve SRV records per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2240,7 +2167,6 @@ return JSON.stringify(output);
                      <key>nginx.resolvers.responses.formerr.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of FORMERR (Format error) responses per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2267,7 +2193,6 @@ return JSON.stringify(output);
                      <key>nginx.resolvers.responses.noerror.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of successful responses per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2294,7 +2219,6 @@ return JSON.stringify(output);
                      <key>nginx.resolvers.responses.notimp.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of NOTIMP (Unimplemented) responses per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2321,7 +2245,6 @@ return JSON.stringify(output);
                      <key>nginx.resolvers.responses.nxdomain.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of NXDOMAIN (Host not found) responses per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2348,7 +2271,6 @@ return JSON.stringify(output);
                      <key>nginx.resolvers.responses.refused.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of REFUSED (Operation refused) responses per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2375,7 +2297,6 @@ return JSON.stringify(output);
                      <key>nginx.resolvers.responses.servfail.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of SERVFAIL (Server failure) responses per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2402,7 +2323,6 @@ return JSON.stringify(output);
                      <key>nginx.resolvers.responses.timedout.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of timed out requests per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2429,7 +2349,6 @@ return JSON.stringify(output);
                      <key>nginx.resolvers.responses.unknown.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of requests completed with an unknown error per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2451,7 +2370,6 @@ return JSON.stringify(output);
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Nginx: Resolver [{#NAME}]: Requests</name>
@@ -2610,7 +2528,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.server_zones.connections.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of connections accepted from clients per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2637,7 +2554,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.server_zones.discarded.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of connections completed without creating a session per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2664,7 +2580,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.server_zones.processing[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The number of client connections that are currently being processed.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2687,7 +2602,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.server_zones.received.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of bytes received from clients per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2714,7 +2628,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.server_zones.sent.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of bytes sent to clients per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2741,7 +2654,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.server_zones.sessions.2xx.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of sessions completed with status codes “2xx” per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2768,7 +2680,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.server_zones.sessions.4xx.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of sessions completed with status codes “4xx” per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2795,7 +2706,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.server_zones.sessions.5xx.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of sessions completed with status codes “5xx” per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2822,7 +2732,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.server_zones.sessions.total.rate[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of completed client sessions per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2844,7 +2753,6 @@ return JSON.stringify(output);
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Nginx: Stream server zone [{#NAME}]: Sessions</name>
@@ -2927,7 +2835,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.upstream.peer.active[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The current number of connections.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2950,7 +2857,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.upstream.peer.connect_time.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>!ms</units>
                      <description>The average time to connect to the upstream server.</description>
                      <application_prototypes>
@@ -2975,7 +2881,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.upstream.peer.connections.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of client connections forwarded to this server.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2998,7 +2903,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.upstream.peer.fails.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of unsuccessful attempts to communicate with the server per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -3025,7 +2929,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.upstream.peer.first_byte_time.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>!ms</units>
                      <description>The average time to receive the first byte of data.</description>
                      <application_prototypes>
@@ -3050,7 +2953,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.upstream.peer.health_checks.checks[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of health check requests made.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -3073,7 +2975,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.upstream.peer.health_checks.fails[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The number of failed health checks.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -3096,7 +2997,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.upstream.peer.health_checks.unhealthy[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>How many times the server became unhealthy (state “unhealthy”).</description>
                      <application_prototypes>
                         <application_prototype>
@@ -3119,7 +3019,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.upstream.peer.received.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of bytes received from this server per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -3146,7 +3045,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.upstream.peer.response_time.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>!ms</units>
                      <description>The average time to receive the last byte of data.</description>
                      <application_prototypes>
@@ -3171,7 +3069,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.upstream.peer.sent.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The total number of bytes sent to this server per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -3199,7 +3096,6 @@ return JSON.stringify(output);
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>Current state, which may be one of “up”, “draining”, “down”, “unavail”, “checking”, and “unhealthy”.</description>
                      <application_prototypes>
@@ -3235,7 +3131,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.upstream.peer.unavail.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>How many times the server became unavailable for client requests (state “unavail”) due to the number of unsuccessful attempts reaching the max_fails threshold.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -3253,7 +3148,6 @@ return JSON.stringify(output);
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks</name>
@@ -3340,7 +3234,6 @@ return JSON.stringify(output);
                      <key>nginx.stream.upstreams.zombies[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <application_prototypes>
                         <application_prototype>
                            <name>Nginx: Stream upstream [{#NAME}]</name>
@@ -3363,7 +3256,6 @@ return JSON.stringify(output);
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <application_prototypes>
                         <application_prototype>
@@ -3385,7 +3277,6 @@ return JSON.stringify(output);
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <master_item>
                   <key>nginx.stream.upstreams</key>
                </master_item>

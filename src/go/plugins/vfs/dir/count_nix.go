@@ -1,6 +1,9 @@
+//go:build !windows
+// +build !windows
+
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,25 +20,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package zabbixsync
+package dir
 
-import (
-	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/zbxlib"
-)
+import "io/fs"
 
-// Plugin -
-type Plugin struct {
-	plugin.Base
-}
+func (cp *countParams) skipType(path string, d fs.DirEntry) bool {
+	if len(cp.typesInclude) > 0 && !isTypeMatch(cp.typesInclude, d.Type()) {
+		return true
+	}
 
-var impl Plugin
+	if len(cp.typesExclude) > 0 && isTypeMatch(cp.typesExclude, d.Type()) {
+		return true
+	}
 
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	return zbxlib.ExecuteCheck(key, params)
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "ZabbixSync", getMetrics()...)
-	impl.SetCapacity(1)
+	return false
 }

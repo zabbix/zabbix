@@ -1,5 +1,5 @@
 
-# Microsoft Exchange Server 2016 by Zabbix agent active
+# Template App Microsoft Exchange Server 2016 by Zabbix agent active
 
 ## Overview
 
@@ -60,7 +60,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Databases discovery |<p>Discovery of Exchange databases.</p> |ZABBIX_ACTIVE |perf_instance.discovery["MSExchange Active Manager"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Databases discovery |<p>Discovery of Exchange databases.</p> |ZABBIX_ACTIVE |perf_instance.discovery["MSExchange Active Manager"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Web services discovery |<p>Discovery of Exchange web services.</p> |ZABBIX_ACTIVE |perf_instance_en.discovery["Web Service"] |
 |LDAP discovery |<p>Discovery of domain controller.</p> |ZABBIX_ACTIVE |perf_instance_en.discovery["MSExchange ADAccess Domain Controllers"] |
 
@@ -107,7 +107,7 @@ There are no template links in this template.
 |Database Counters [{#INSTANCE}]: Average read time latency is too high (>{$MS.EXCHANGE.DB.ACTIVE.READ.WARN}s for {$MS.EXCHANGE.DB.ACTIVE.READ.TIME}) |<p>Should be less than 20ms on average.</p> |`{TEMPLATE_NAME:perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Attached) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}].min({$MS.EXCHANGE.DB.ACTIVE.READ.TIME})}>{$MS.EXCHANGE.DB.ACTIVE.READ.WARN}` |WARNING | |
 |Database Counters [{#INSTANCE}]: Average read time latency is too high (>{$MS.EXCHANGE.DB.PASSIVE.READ.WARN}s for {$MS.EXCHANGE.DB.PASSIVE.READ.TIME}) |<p>Should be less than 200ms on average.</p> |`{TEMPLATE_NAME:perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}].min({$MS.EXCHANGE.DB.PASSIVE.READ.TIME})}>{$MS.EXCHANGE.DB.PASSIVE.READ.WARN}` |WARNING | |
 |Database Counters [{#INSTANCE}]: Average write time latency is too high for {$MS.EXCHANGE.DB.ACTIVE.WRITE.TIME} |<p>Should be less than 50ms on average.</p> |`{TEMPLATE_NAME:perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Writes (Attached) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}].min({$MS.EXCHANGE.DB.ACTIVE.WRITE.TIME})}>{$MS.EXCHANGE.DB.ACTIVE.WRITE.WARN}` |WARNING | |
-|Database Counters [{#INSTANCE}]: Average write time latency is higher than read time latency for {$MS.EXCHANGE.DB.PASSIVE.WRITE.TIME} |<p>Should be less than the read latency for the same instance, as measured by the MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Recovery) Average Latency counter.</p> |`{TEMPLATE_NAME:perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Writes (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}].avg({$MS.EXCHANGE.DB.PASSIVE.WRITE.TIME})}>{Microsoft Exchange Server 2016 by Zabbix agent active:perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}].avg({$MS.EXCHANGE.DB.PASSIVE.WRITE.TIME})}` |WARNING | |
+|Database Counters [{#INSTANCE}]: Average write time latency is higher than read time latency for {$MS.EXCHANGE.DB.PASSIVE.WRITE.TIME} |<p>Should be less than the read latency for the same instance, as measured by the MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Recovery) Average Latency counter.</p> |`{TEMPLATE_NAME:perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Writes (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}].avg({$MS.EXCHANGE.DB.PASSIVE.WRITE.TIME})}>{TEMPLATE_NAME:perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}].avg({$MS.EXCHANGE.DB.PASSIVE.WRITE.TIME})}` |WARNING | |
 |Domain Controller [{#INSTANCE}]: LDAP read time is too high (>{$MS.EXCHANGE.LDAP.WARN}s for {$MS.EXCHANGE.LDAP.TIME}) |<p>Should be less than 50ms at all times, with spikes less than 100ms.</p> |`{TEMPLATE_NAME:perf_counter_en["\MSExchange ADAccess Domain Controllers({#INSTANCE})\LDAP Read Time", {$MS.EXCHANGE.PERF.INTERVAL}].min({$MS.EXCHANGE.LDAP.TIME})}>{$MS.EXCHANGE.LDAP.WARN}` |AVERAGE | |
 |Domain Controller [{#INSTANCE}]: LDAP search time is too high (>{$MS.EXCHANGE.LDAP.WARN}s for {$MS.EXCHANGE.LDAP.TIME}) |<p>Should be less than 50ms at all times, with spikes less than 100ms.</p> |`{TEMPLATE_NAME:perf_counter_en["\MSExchange ADAccess Domain Controllers({#INSTANCE})\LDAP Search Time", {$MS.EXCHANGE.PERF.INTERVAL}].min({$MS.EXCHANGE.LDAP.TIME})}>{$MS.EXCHANGE.LDAP.WARN}` |AVERAGE | |
 

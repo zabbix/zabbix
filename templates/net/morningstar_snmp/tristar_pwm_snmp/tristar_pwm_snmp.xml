@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-09T12:44:49Z</date>
+   <date>2021-12-23T20:31:11Z</date>
    <groups>
       <group>
-         <name>Templates/Modules</name>
+         <name>Templates/Network devices</name>
       </group>
    </groups>
    <templates>
@@ -14,10 +14,10 @@
          <description>MIBs used:&#13;
 TRISTAR&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
-               <name>Templates/Modules</name>
+               <name>Templates/Network devices</name>
             </group>
          </groups>
          <applications>
@@ -211,32 +211,14 @@ return result.length ? result.join('\n') : 'No alarms';
                </preprocessing>
                <triggers>
                   <trigger>
-                     <expression>{count(#3,"rtsShorted","like")}=2</expression>
-                     <name>Status: Device has "rtsShorted" alarm flag</name>
+                     <expression>{count(#3,"batterySense","like")}=2</expression>
+                     <name>Status: Device has "batterySense" alarm flag</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                   </trigger>
                   <trigger>
-                     <expression>{count(#3,"rtsDisconnected","like")}=2</expression>
-                     <name>Status: Device has "rtsDisconnected" alarm flag</name>
-                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>WARNING</priority>
-                  </trigger>
-                  <trigger>
-                     <expression>{count(#3,"heatsinkTempSensorOpen","like")}=2</expression>
-                     <name>Status: Device has "heatsinkTempSensorOpen" alarm flag</name>
-                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>WARNING</priority>
-                  </trigger>
-                  <trigger>
-                     <expression>{count(#3,"heatsinkTempSensorShorted","like")}=2</expression>
-                     <name>Status: Device has "heatsinkTempSensorShorted" alarm flag</name>
-                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>WARNING</priority>
-                  </trigger>
-                  <trigger>
-                     <expression>{count(#3,"tristarHot","like")}=2</expression>
-                     <name>Status: Device has "tristarHot" alarm flag</name>
+                     <expression>{count(#3,"batterySenseDisconnected","like")}=2</expression>
+                     <name>Status: Device has "batterySenseDisconnected" alarm flag</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                   </trigger>
@@ -253,26 +235,20 @@ return result.length ? result.join('\n') : 'No alarms';
                      <priority>WARNING</priority>
                   </trigger>
                   <trigger>
-                     <expression>{count(#3,"batterySense","like")}=2</expression>
-                     <name>Status: Device has "batterySense" alarm flag</name>
+                     <expression>{count(#3,"diversionLoadNearMax","like")}=2</expression>
+                     <name>Status: Device has "diversionLoadNearMax" alarm flag</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                   </trigger>
                   <trigger>
-                     <expression>{count(#3,"batterySenseDisconnected","like")}=2</expression>
-                     <name>Status: Device has "batterySenseDisconnected" alarm flag</name>
+                     <expression>{count(#3,"heatsinkTempSensorOpen","like")}=2</expression>
+                     <name>Status: Device has "heatsinkTempSensorOpen" alarm flag</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                   </trigger>
                   <trigger>
-                     <expression>{count(#3,"uncalibrated","like")}=2</expression>
-                     <name>Status: Device has "uncalibrated" alarm flag</name>
-                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>WARNING</priority>
-                  </trigger>
-                  <trigger>
-                     <expression>{count(#3,"rtsMiswire","like")}=2</expression>
-                     <name>Status: Device has "rtsMiswire" alarm flag</name>
+                     <expression>{count(#3,"heatsinkTempSensorShorted","like")}=2</expression>
+                     <name>Status: Device has "heatsinkTempSensorShorted" alarm flag</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                   </trigger>
@@ -283,14 +259,8 @@ return result.length ? result.join('\n') : 'No alarms';
                      <priority>WARNING</priority>
                   </trigger>
                   <trigger>
-                     <expression>{count(#3,"diversionLoadNearMax","like")}=2</expression>
-                     <name>Status: Device has "diversionLoadNearMax" alarm flag</name>
-                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>WARNING</priority>
-                  </trigger>
-                  <trigger>
-                     <expression>{count(#3,"systemMiswire","like")}=2</expression>
-                     <name>Status: Device has "systemMiswire" alarm flag</name>
+                     <expression>{count(#3,"loadDisconnectState","like")}=2</expression>
+                     <name>Status: Device has "loadDisconnectState" alarm flag</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                   </trigger>
@@ -307,8 +277,38 @@ return result.length ? result.join('\n') : 'No alarms';
                      <priority>WARNING</priority>
                   </trigger>
                   <trigger>
-                     <expression>{count(#3,"loadDisconnectState","like")}=2</expression>
-                     <name>Status: Device has "loadDisconnectState" alarm flag</name>
+                     <expression>{count(#3,"rtsDisconnected","like")}=2</expression>
+                     <name>Status: Device has "rtsDisconnected" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"rtsMiswire","like")}=2</expression>
+                     <name>Status: Device has "rtsMiswire" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"rtsShorted","like")}=2</expression>
+                     <name>Status: Device has "rtsShorted" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"systemMiswire","like")}=2</expression>
+                     <name>Status: Device has "systemMiswire" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"tristarHot","like")}=2</expression>
+                     <name>Status: Device has "tristarHot" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"uncalibrated","like")}=2</expression>
+                     <name>Status: Device has "uncalibrated" alarm flag</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                   </trigger>
@@ -370,38 +370,8 @@ return result.length ? result.join('\n') : 'No faults';
                </preprocessing>
                <triggers>
                   <trigger>
-                     <expression>{count(#3,"externalShort","like")}=2</expression>
-                     <name>Status: Device has "externalShort" faults flag</name>
-                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>HIGH</priority>
-                  </trigger>
-                  <trigger>
-                     <expression>{count(#3,"overcurrent","like")}=2</expression>
-                     <name>Status: Device has "overcurrent" faults flag</name>
-                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>HIGH</priority>
-                  </trigger>
-                  <trigger>
-                     <expression>{count(#3,"mosfetSShorted","like")}=2</expression>
-                     <name>Status: Device has "mosfetSShorted" faults flag</name>
-                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>HIGH</priority>
-                  </trigger>
-                  <trigger>
-                     <expression>{count(#3,"softwareFault","like")}=2</expression>
-                     <name>Status: Device has "softwareFault" faults flag</name>
-                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>HIGH</priority>
-                  </trigger>
-                  <trigger>
-                     <expression>{count(#3,"highVoltageDisconnect","like")}=2</expression>
-                     <name>Status: Device has "highVoltageDisconnect" faults flag</name>
-                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>HIGH</priority>
-                  </trigger>
-                  <trigger>
-                     <expression>{count(#3,"tristarHot","like")}=2</expression>
-                     <name>Status: Device has "tristarHot" faults flag</name>
+                     <expression>{count(#3,"customSettingsEdit","like")}=2</expression>
+                     <name>Status: Device has "customSettingsEdit" faults flag</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>HIGH</priority>
                   </trigger>
@@ -412,8 +382,26 @@ return result.length ? result.join('\n') : 'No faults';
                      <priority>HIGH</priority>
                   </trigger>
                   <trigger>
-                     <expression>{count(#3,"customSettingsEdit","like")}=2</expression>
-                     <name>Status: Device has "customSettingsEdit" faults flag</name>
+                     <expression>{count(#3,"externalShort","like")}=2</expression>
+                     <name>Status: Device has "externalShort" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"highVoltageDisconnect","like")}=2</expression>
+                     <name>Status: Device has "highVoltageDisconnect" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"mosfetSShorted","like")}=2</expression>
+                     <name>Status: Device has "mosfetSShorted" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"overcurrent","like")}=2</expression>
+                     <name>Status: Device has "overcurrent" faults flag</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>HIGH</priority>
                   </trigger>
@@ -424,8 +412,8 @@ return result.length ? result.join('\n') : 'No faults';
                      <priority>HIGH</priority>
                   </trigger>
                   <trigger>
-                     <expression>{count(#3,"systemMiswire","like")}=2</expression>
-                     <name>Status: Device has "systemMiswire" faults flag</name>
+                     <expression>{count(#3,"rtsDisconnected","like")}=2</expression>
+                     <name>Status: Device has "rtsDisconnected" faults flag</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>HIGH</priority>
                   </trigger>
@@ -436,8 +424,20 @@ return result.length ? result.join('\n') : 'No faults';
                      <priority>HIGH</priority>
                   </trigger>
                   <trigger>
-                     <expression>{count(#3,"rtsDisconnected","like")}=2</expression>
-                     <name>Status: Device has "rtsDisconnected" faults flag</name>
+                     <expression>{count(#3,"softwareFault","like")}=2</expression>
+                     <name>Status: Device has "softwareFault" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"systemMiswire","like")}=2</expression>
+                     <name>Status: Device has "systemMiswire" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"tristarHot","like")}=2</expression>
+                     <name>Status: Device has "tristarHot" faults flag</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>HIGH</priority>
                   </trigger>
@@ -500,16 +500,10 @@ Modbus address:0x000F</description>
                </applications>
                <triggers>
                   <trigger>
-                     <expression>{max(5m)}&lt;{$BATTERY.TEMP.MIN.WARN}</expression>
-                     <name>Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)</name>
+                     <expression>{min(5m)}&gt;{$BATTERY.TEMP.MAX.CRIT}</expression>
+                     <name>Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>WARNING</priority>
-                     <dependencies>
-                        <dependency>
-                           <name>Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)</name>
-                           <expression>{Template Net Morningstar TriStar PWM SNMP:temp.battery[batteryTemperature.0].max(5m)}&lt;{$BATTERY.TEMP.MIN.CRIT}</expression>
-                        </dependency>
-                     </dependencies>
+                     <priority>HIGH</priority>
                   </trigger>
                   <trigger>
                      <expression>{max(5m)}&lt;{$BATTERY.TEMP.MIN.CRIT}</expression>
@@ -530,10 +524,16 @@ Modbus address:0x000F</description>
                      </dependencies>
                   </trigger>
                   <trigger>
-                     <expression>{min(5m)}&gt;{$BATTERY.TEMP.MAX.CRIT}</expression>
-                     <name>Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)</name>
+                     <expression>{max(5m)}&lt;{$BATTERY.TEMP.MIN.WARN}</expression>
+                     <name>Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>HIGH</priority>
+                     <priority>WARNING</priority>
+                     <dependencies>
+                        <dependency>
+                           <name>Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)</name>
+                           <expression>{Template Net Morningstar TriStar PWM SNMP:temp.battery[batteryTemperature.0].max(5m)}&lt;{$BATTERY.TEMP.MIN.CRIT}</expression>
+                        </dependency>
+                     </dependencies>
                   </trigger>
                </triggers>
             </item>
@@ -598,16 +598,10 @@ Modbus address:0x0008</description>
                      </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{max(5m)}&lt;{#VOLTAGE.MIN.WARN}</expression>
-                           <name>Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)</name>
+                           <expression>{min(5m)}&gt;{#VOLTAGE.MAX.CRIT}</expression>
+                           <name>Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)</name>
                            <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>WARNING</priority>
-                           <dependencies>
-                              <dependency>
-                                 <name>Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)</name>
-                                 <expression>{Template Net Morningstar TriStar PWM SNMP:battery.voltage[batteryVoltage.0{#SINGLETON}].max(5m)}&lt;{#VOLTAGE.MIN.CRIT}</expression>
-                              </dependency>
-                           </dependencies>
+                           <priority>HIGH</priority>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{max(5m)}&lt;{#VOLTAGE.MIN.CRIT}</expression>
@@ -628,15 +622,20 @@ Modbus address:0x0008</description>
                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{min(5m)}&gt;{#VOLTAGE.MAX.CRIT}</expression>
-                           <name>Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)</name>
+                           <expression>{max(5m)}&lt;{#VOLTAGE.MIN.WARN}</expression>
+                           <name>Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)</name>
                            <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
+                           <priority>WARNING</priority>
+                           <dependencies>
+                              <dependency>
+                                 <name>Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)</name>
+                                 <expression>{Template Net Morningstar TriStar PWM SNMP:battery.voltage[batteryVoltage.0{#SINGLETON}].max(5m)}&lt;{#VOLTAGE.MIN.CRIT}</expression>
+                              </dependency>
+                           </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Battery: Voltage{#SINGLETON}</name>
@@ -716,6 +715,12 @@ Modbus address:0x001B</description>
                      </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{last()}={$CHARGE.STATE.CRIT}</expression>
+                           <name>Battery: Device charge in critical state</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{last()}={$CHARGE.STATE.WARN}</expression>
                            <name>Battery: Device charge in warning state</name>
                            <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
@@ -726,12 +731,6 @@ Modbus address:0x001B</description>
                                  <expression>{Template Net Morningstar TriStar PWM SNMP:charge.state[controlState.0{#SINGLETON}].last()}={$CHARGE.STATE.CRIT}</expression>
                               </dependency>
                            </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{last()}={$CHARGE.STATE.CRIT}</expression>
-                           <name>Battery: Device charge in critical state</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -767,7 +766,6 @@ Modbus address:0x0010</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <master_item>
                   <key>control.mode[controlMode.0]</key>
                </master_item>
@@ -850,7 +848,6 @@ Modbus address:0x000B</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Array: Voltage{#SINGLETON}</name>
@@ -928,7 +925,6 @@ Modbus address:0x001C</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <master_item>
                   <key>control.mode[controlMode.0]</key>
                </master_item>
@@ -1010,7 +1006,6 @@ Modbus address:0x000A</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Load: Current{#SINGLETON}</name>
@@ -1094,6 +1089,12 @@ Modbus address:0x001B&#13;
                      </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{last()}={$LOAD.STATE.CRIT:"lvd"} or {last()}={$LOAD.STATE.CRIT:"fault"}</expression>
+                           <name>Load: Device load in critical state</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{last()}={$LOAD.STATE.WARN:"lvdWarning"}  or {last()}={$LOAD.STATE.WARN:"override"}</expression>
                            <name>Load: Device load in warning state</name>
                            <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
@@ -1105,16 +1106,9 @@ Modbus address:0x001B&#13;
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{last()}={$LOAD.STATE.CRIT:"lvd"} or {last()}={$LOAD.STATE.CRIT:"fault"}</expression>
-                           <name>Load: Device load in critical state</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <master_item>
                   <key>control.mode[controlMode.0]</key>
                </master_item>
@@ -1264,6 +1258,27 @@ Modbus address:0x001B&#13;
          </mappings>
       </value_map>
       <value_map>
+         <name>TriStar PWM control mode</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Charge</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>LoadControl</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Diversion</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Lighting</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
          <name>TriStar PWM load state</name>
          <mappings>
             <mapping>
@@ -1301,27 +1316,6 @@ Modbus address:0x001B&#13;
             <mapping>
                <value>8</value>
                <newvalue>Equalize</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>TriStar PWM control mode</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>Charge</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>LoadControl</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Diversion</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>Lighting</newvalue>
             </mapping>
          </mappings>
       </value_map>

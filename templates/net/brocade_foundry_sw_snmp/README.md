@@ -1,5 +1,5 @@
 
-# Brocade_Foundry Performance SNMP
+# Template Module Brocade_Foundry Performance SNMP
 
 ## Overview
 
@@ -45,7 +45,7 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Brocade_Foundry Nonstackable SNMP
+# Template Net Brocade_Foundry Nonstackable SNMP
 
 ## Overview
 
@@ -132,7 +132,7 @@ No specific Zabbix configuration is required.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Brocade_Foundry Stackable SNMP
+# Template Net Brocade_Foundry Stackable SNMP
 
 ## Overview
 

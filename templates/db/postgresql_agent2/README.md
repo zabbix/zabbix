@@ -74,7 +74,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|PostgreSQL |PostgreSQL: Custom queries |<p>Execute custom queries from file *.sql</p> |ZABBIX_PASSIVE |pgsql.custom.query["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}",""] |
+|PostgreSQL |PostgreSQL: Custom queries |<p>Execute custom queries from file *.sql (check for option Plugins.Postgres.CustomQueriesPath at agent configuration)</p> |ZABBIX_PASSIVE |pgsql.custom.query["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}",""] |
 |PostgreSQL |WAL: Bytes written |<p>WAL write in bytes</p> |DEPENDENT |pgsql.wal.write<p>**Preprocessing**:</p><p>- JSONPATH: `$.write`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |WAL: Bytes received |<p>WAL receive in bytes</p> |DEPENDENT |pgsql.wal.receive<p>**Preprocessing**:</p><p>- JSONPATH: `$.receive`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |WAL: Segments count |<p>Number of WAL segments</p> |DEPENDENT |pgsql.wal.count<p>**Preprocessing**:</p><p>- JSONPATH: `$.count`</p> |

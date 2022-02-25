@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-10-26T15:23:48Z</date>
+   <date>2021-12-23T06:23:22Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -1387,24 +1387,9 @@ Cisco UCS compute:RackUnitMbTempStats:ioh1Temp managed object property</descript
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                            <dependencies>
                               <dependency>
-                                 <name>{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
-                                 <expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
-                                 <recovery_expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
-                              </dependency>
-                              <dependency>
-                                 <name>{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
-                                 <expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
-                                 <recovery_expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
-                              </dependency>
-                              <dependency>
                                  <name>{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
                                  <expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
                                  <recovery_expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
-                              </dependency>
-                              <dependency>
-                                 <name>{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
-                                 <expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
-                                 <recovery_expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -1455,21 +1440,6 @@ Temperature readings of testpoint: {#SENSOR_LOCATION}.Ambient</description>
                                  <expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
                                  <recovery_expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
                               </dependency>
-                              <dependency>
-                                 <name>{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
-                                 <expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
-                                 <recovery_expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
-                              </dependency>
-                              <dependency>
-                                 <name>{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
-                                 <expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
-                                 <recovery_expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
-                              </dependency>
-                              <dependency>
-                                 <name>{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
-                                 <expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
-                                 <recovery_expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
-                              </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -1515,24 +1485,9 @@ Cisco UCS compute:RackUnitMbTempStats:frontTemp managed object property</descrip
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                            <dependencies>
                               <dependency>
-                                 <name>{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
-                                 <expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
-                                 <recovery_expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
-                              </dependency>
-                              <dependency>
                                  <name>{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
                                  <expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
                                  <recovery_expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
-                              </dependency>
-                              <dependency>
-                                 <name>{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
-                                 <expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
-                                 <recovery_expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
-                              </dependency>
-                              <dependency>
-                                 <name>{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
-                                 <expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
-                                 <recovery_expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -1578,21 +1533,6 @@ Cisco UCS compute:RackUnitMbTempStats:rearTemp managed object property</descript
                            <priority>WARNING</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                            <dependencies>
-                              <dependency>
-                                 <name>{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
-                                 <expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
-                                 <recovery_expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
-                              </dependency>
-                              <dependency>
-                                 <name>{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
-                                 <expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
-                                 <recovery_expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
-                              </dependency>
-                              <dependency>
-                                 <name>{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
-                                 <expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
-                                 <recovery_expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
-                              </dependency>
                               <dependency>
                                  <name>{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
                                  <expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>

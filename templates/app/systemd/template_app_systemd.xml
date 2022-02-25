@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-07-08T14:45:55Z</date>
+   <date>2021-12-21T18:00:08Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -17,7 +17,7 @@
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -34,7 +34,6 @@ Template tooling version used: 0.38</description>
          <discovery_rules>
             <discovery_rule>
                <name>Service units discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>systemd.unit.discovery[service]</key>
                <delay>30m</delay>
                <filter>
@@ -83,7 +82,6 @@ Template tooling version used: 0.38</description>
                      <key>systemd.service.active_state["{#UNIT.NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>State value that reflects whether the unit is currently active or not. The following states are currently defined: "active", "reloading", "inactive", "failed", "activating", and "deactivating".</description>
                      <application_prototypes>
                         <application_prototype>
@@ -121,7 +119,6 @@ Template tooling version used: 0.38</description>
                      <key>systemd.service.load_state["{#UNIT.NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>State value that reflects whether the configuration file of this unit has been loaded. The following states are currently defined: "loaded", "error", and "masked".</description>
                      <application_prototypes>
                         <application_prototype>
@@ -151,7 +148,6 @@ Template tooling version used: 0.38</description>
                      <key>systemd.service.unitfile_state["{#UNIT.NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Encodes the install state of the unit file of FragmentPath. It currently knows the following states: "enabled", "enabled-runtime", "linked", "linked-runtime", "masked", "masked-runtime", "static", "disabled", and "invalid".</description>
                      <application_prototypes>
                         <application_prototype>
@@ -181,7 +177,6 @@ Template tooling version used: 0.38</description>
                      <key>systemd.service.uptime["{#UNIT.NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>s</units>
                      <description>Number of seconds since unit entered the active state.</description>
@@ -219,7 +214,6 @@ Template tooling version used: 0.38</description>
                      <key>systemd.unit.get["{#UNIT.NAME}"]</key>
                      <history>0</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>TEXT</value_type>
                      <description>Returns all properties of a systemd service unit.&#13;
  Unit description: {#UNIT.DESCRIPTION}.</description>
@@ -230,11 +224,9 @@ Template tooling version used: 0.38</description>
                      </applications>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Socket units discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>systemd.unit.discovery[socket]</key>
                <delay>30m</delay>
                <filter>
@@ -283,7 +275,6 @@ Template tooling version used: 0.38</description>
                      <key>systemd.socket.conn_accepted.rate["{#UNIT.NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The number of accepted socket connections (NAccepted) per second.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -310,7 +301,6 @@ Template tooling version used: 0.38</description>
                      <key>systemd.socket.conn_count["{#UNIT.NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The current number of socket connections (NConnections).</description>
                      <application_prototypes>
                         <application_prototype>
@@ -332,7 +322,6 @@ Template tooling version used: 0.38</description>
                      <key>systemd.unit.get["{#UNIT.NAME}",Socket]</key>
                      <history>0</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>TEXT</value_type>
                      <description>Returns all properties of a systemd socket unit.&#13;
  Unit description: {#UNIT.DESCRIPTION}.</description>
@@ -343,7 +332,6 @@ Template tooling version used: 0.38</description>
                      </applications>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>
@@ -411,27 +399,6 @@ Template tooling version used: 0.38</description>
       </template>
    </templates>
    <value_maps>
-      <value_map>
-         <name>Unit Load State</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>loaded</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>error</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>masked</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
       <value_map>
          <name>Unit Active State</name>
          <mappings>
@@ -507,6 +474,27 @@ Template tooling version used: 0.38</description>
             <mapping>
                <value>9</value>
                <newvalue>invalid</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Unit Load State</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>loaded</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>error</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>masked</newvalue>
             </mapping>
          </mappings>
       </value_map>
