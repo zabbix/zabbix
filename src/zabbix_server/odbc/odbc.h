@@ -20,8 +20,6 @@
 #ifndef ZABBIX_ZBXODBC_H
 #define ZABBIX_ZBXODBC_H
 
-#include "config.h"
-
 #ifdef HAVE_UNIXODBC
 
 typedef struct zbx_odbc_data_source	zbx_odbc_data_source_t;
