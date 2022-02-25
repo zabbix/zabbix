@@ -146,7 +146,6 @@ func (p *Plugin) validateSmtp(buf []byte) int {
 func (p *Plugin) validateFtp(buf []byte) int {
 	sc := bufio.NewScanner(strings.NewReader(string(buf)))
 	for sc.Scan() {
-		p.Critf(sc.Text())
 		if sc.Text()[:4] == "220 " {
 			return tcpExpectOk
 		}
