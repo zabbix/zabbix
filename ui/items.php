@@ -222,7 +222,7 @@ $fields = [
 	// actions
 	'action' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 										IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
-											'"item.massdisable","item.massenable","item.masscheck_now"'
+											'"item.massdisable","item.massenable"'
 										),
 										null
 									],
@@ -989,26 +989,6 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && ha
 		uncheckTableRows(getRequest('checkbox_hash'));
 	}
 	show_messages($result, _('Items deleted'), _('Cannot delete items'));
-}
-elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' && hasRequest('group_itemid')) {
-	$tasks = [];
-
-	foreach (getRequest('group_itemid') as $itemid) {
-		$tasks[] = [
-			'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
-			'request' => [
-				'itemid' => $itemid
-			]
-		];
-	}
-
-	$result = (bool) API::Task()->create($tasks);
-
-	if ($result) {
-		uncheckTableRows(getRequest('checkbox_hash'));
-	}
-
-	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
 }
 
 if (hasRequest('action') && hasRequest('group_itemid') && !$result) {
