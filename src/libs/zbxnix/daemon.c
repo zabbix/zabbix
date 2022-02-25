@@ -378,7 +378,7 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 
 	if (0 == (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
-		int	child_pid;
+		pid_t	child_pid;
 
 		if(0 != (child_pid = zbx_fork()))
 		{
