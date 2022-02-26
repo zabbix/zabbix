@@ -20,7 +20,6 @@
 #include "eventlog.h"
 
 #include "log.h"
-#include "logfiles/logfiles.h"
 #include "sysinfo.h"
 #include "zbxregexp.h"
 #include "winmeta.h"
