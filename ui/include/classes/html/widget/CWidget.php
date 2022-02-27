@@ -20,15 +20,16 @@
 
 
 class CWidget {
+
 	private const ZBX_STYLE_HEADER_TITLE = 'header-title';
-	private const ZBX_STYLE_HEADER_DOC_URL = 'header-doc-url';
+	private const ZBX_STYLE_HEADER_DOC_LINK = 'header-doc-link';
 	private const ZBX_STYLE_HEADER_NAVIGATION = 'header-navigation';
 	private const ZBX_STYLE_HEADER_CONTROLS = 'header-controls';
 	private const ZBX_STYLE_HEADER_KIOSKMODE_CONTROLS = 'header-kioskmode-controls';
 
 	private $title;
 	private $title_submenu;
-	private $url;
+	private $doc_url;
 	private $controls;
 	private $kiosk_mode_controls;
 
@@ -65,8 +66,8 @@ class CWidget {
 		return $this;
 	}
 
-	public function setDocUrl($url) {
-		$this->url = $url;
+	public function setDocUrl($doc_url) {
+		$this->doc_url = $doc_url;
 
 		return $this;
 	}
@@ -137,7 +138,7 @@ class CWidget {
 					)
 			);
 		}
-		elseif ($this->title !== null || $this->controls !== null || $this->url !== null) {
+		elseif ($this->title !== null || $this->controls !== null || $this->doc_url !== null) {
 			$items[] = $this->createTopHeader();
 		}
 
@@ -156,7 +157,7 @@ class CWidget {
 		return unpack_object($items);
 	}
 
-	private function createTopHeader() {
+	private function createTopHeader(): CTag {
 		$divs = [
 			(new CTag('nav', true, (new CButton(null, _('Show sidebar')))
 				->setId('sidebar-button-toggle')
@@ -188,13 +189,13 @@ class CWidget {
 			$divs[] = new CDiv($title_tag);
 		}
 
-		if ($this->url !== null) {
+		if ($this->doc_url !== null) {
 			$divs[] = (new CDiv(
-				(new CLink(null, $this->url))
+				(new CLink(null, $this->doc_url))
 					->setTitle(_('Help'))
 					->setTarget('_blank')
-					->addClass(ZBX_STYLE_ICON_DOC)
-				))->addClass(self::ZBX_STYLE_HEADER_DOC_URL);
+					->addClass(ZBX_STYLE_ICON_DOC_LINK)
+			))->addClass(self::ZBX_STYLE_HEADER_DOC_LINK);
 		}
 
 		if ($this->controls !== null) {

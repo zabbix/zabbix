@@ -2080,7 +2080,7 @@ define('ZBX_STYLE_CHECKBOX_BLOCK', 'checkbox-block');
 define('ZBX_STYLE_ICON_TEXT', 'icon-text');
 define('ZBX_STYLE_ICON_SECRET_TEXT', 'icon-secret');
 define('ZBX_STYLE_ICON_HELP_HINT', 'icon-help-hint');
-define('ZBX_STYLE_ICON_DOC', 'icon-doc-url');
+define('ZBX_STYLE_ICON_DOC_LINK', 'icon-doc-link');
 
 // Host interface styles.
 define('ZBX_STYLE_HOST_INTERFACE_CONTAINER', 'interface-container');

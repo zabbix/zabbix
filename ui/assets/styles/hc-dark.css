@@ -406,10 +406,11 @@ header {
     line-height: 24px;
     text-overflow: ellipsis;
     white-space: nowrap; }
-  header .header-doc-url {
+  header .header-doc-link {
     flex-shrink: 0;
-    margin-left: auto; }
-    header .header-doc-url + .header-controls {
+    margin: 0 -2px 0 auto;
+    padding: 2px; }
+    header .header-doc-link + .header-controls {
       margin-left: 0; }
   header .header-controls {
     flex-shrink: 0;
@@ -1401,25 +1402,14 @@ footer {
   padding-right: 10px; }
 
 .dashboard-widget-head {
-  position: relative;
-  padding: 8px 60px 8px 10px; }
+  display: flex;
+  margin: 8px 10px; }
   .dashboard-widget-head h4 {
     color: #ebebeb;
-    font-weight: bold; }
-  .dashboard-widget-head ul {
-    position: absolute;
-    top: 0;
-    right: 0; }
-    .dashboard-widget-head ul li {
-      display: block;
-      float: left;
-      padding: 0; }
-      .dashboard-widget-head ul li select {
-        margin: 4px 0; }
-  .dashboard-widget-head z-select .list li {
-    float: none;
-    line-height: normal;
-    padding: 5px; }
+    font-weight: bold;
+    margin-right: auto; }
+  .dashboard-widget-head > ul {
+    margin: -8px -10px -10px 10px; }
 
 .dashboard-widget-foot {
   text-align: right;
@@ -4522,7 +4512,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   display: table;
   position: absolute;
   z-index: 1000;
-  padding: 15px 10px 10px;
+  padding: 13px 10px 10px;
   background-color: #000000;
   border: 1px solid #666666;
   border-bottom-color: #636363;
@@ -4531,6 +4521,19 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     position: fixed;
     overflow: hidden;
     margin: 0 10px; }
+    .overlay-dialogue.modal .dashboard-widget-head {
+      margin: 0 0 14px; }
+      .overlay-dialogue.modal .dashboard-widget-head .icon-doc-link {
+        width: 18px;
+        height: 18px;
+        margin: -9px -26px 0 38px;
+        line-height: 18px; }
+        .overlay-dialogue.modal .dashboard-widget-head .icon-doc-link::after {
+          font-size: 15px; }
+      .overlay-dialogue.modal .dashboard-widget-head .overlay-close-btn {
+        position: static;
+        margin: -9px -6px 0 38px;
+        font-size: 24px; }
     .overlay-dialogue.modal .overlay-dialogue-body {
       overflow: auto;
       overflow-x: hidden;
@@ -4561,16 +4564,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
           padding-left: 5px; }
       .overlay-dialogue.modal .overlay-dialogue-controls .inline-filter li {
         padding-left: 0; }
-    .overlay-dialogue.modal > .overlay-close-btn {
-      position: relative;
-      float: right;
-      top: -11px;
-      right: -6px;
-      font-size: 2em; }
-    .overlay-dialogue.modal .overlay-dialogue-doc-url {
-      position: absolute;
-      right: 32px;
-      top: -3px; }
   .overlay-dialogue.modal-popup {
     top: 50px;
     max-width: 1024px; }
@@ -4621,8 +4614,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     vertical-align: middle; }
     .overlay-dialogue .table-forms-td-right td label {
       display: block; }
-  .overlay-dialogue .dashboard-widget-head {
-    margin: -10px -10px 6px; }
   .overlay-dialogue .maps-container {
     max-height: 128px;
     overflow-y: auto;
@@ -4866,13 +4857,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .notif {
   width: 250px; }
   .notif .dashboard-widget-head {
-    margin: -11px 0 7px -9px;
-    padding: 0; }
+    margin: -13px -10px 7px; }
     .notif .dashboard-widget-head ul {
-      position: relative;
-      display: inline-block; }
+      margin: 4px 0 0 1px; }
       .notif .dashboard-widget-head ul li {
-        float: none;
         display: inline-block; }
 
 .notif-body {
@@ -6326,39 +6314,27 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
   .icon-help-hint:focus {
     box-shadow: 0 0 0 2px #ffffff; }
 
-.icon-doc-url, .overlay-icon-doc {
-  display: block;
-  margin: 2px;
-  height: 24px;
+.icon-doc-link {
+  display: inline-block;
   width: 24px;
+  height: 24px;
   text-align: center;
   line-height: 24px;
-  background-color: transparent;
-  border-radius: 2px;
-  border-bottom: none !important; }
-  .icon-doc-url:focus, .overlay-icon-doc:focus {
-    opacity: 1;
-    box-shadow: 0 0 0 2px #ffffff; }
-  .icon-doc-url::after, .overlay-icon-doc::after {
+  border-radius: 2px; }
+  .icon-doc-link::after {
     content: '?';
     position: relative;
-    opacity: 0.5;
     font-size: 18px;
     font-weight: bold;
-    color: #ffffff; }
-  .icon-doc-url:hover::after, .overlay-icon-doc:hover::after {
-    opacity: 1;
+    color: #cacaca;
+    opacity: 0.5;
     transition: opacity .2s ease-out; }
-  .icon-doc-url:focus::after, .overlay-icon-doc:focus::after, .icon-doc-url:visited::after, .overlay-icon-doc:visited::after {
+  .icon-doc-link:active, .icon-doc-link:hover, .icon-doc-link:link, .icon-doc-link:visited {
+    border-bottom: 0; }
+  .icon-doc-link:hover::after, .icon-doc-link:focus::after {
     opacity: 1; }
-
-.overlay-icon-doc {
-  width: 18px;
-  height: 18px;
-  line-height: 18px; }
-  .overlay-icon-doc::after {
-    font-size: 15px;
-    color: #cacaca; }
+  .icon-doc-link:focus {
+    box-shadow: 0 0 0 2px #ffffff; }
 
 #expressions_list .ui-sortable-helper {
   display: table; }
