@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  *
  * @onBefore prepareDashboardData
  */
-class testFormGeomapWidget extends CWebTest {
+class testDashboardGeomapWidget extends CWebTest {
 
 	/**
 	 * Id of the dashboard where geomap widget is created and updated.
@@ -137,7 +137,7 @@ class testFormGeomapWidget extends CWebTest {
 		self::$dashboardid = $response['dashboardids'][0];
 	}
 
-	public function testFormGeomapWidget_Layout() {
+	public function testDashboardGeomapWidget_Layout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$form = CDashboardElement::find()->one()->edit()->addWidget()->asForm();
 
@@ -390,7 +390,7 @@ class testFormGeomapWidget extends CWebTest {
 	 * @dataProvider getWidgetCreateData
 	 * @dataProvider getWidgetCommonData
 	 */
-	public function testFormGeomapWidget_Create($data) {
+	public function testDashboardGeomapWidget_Create($data) {
 		$this->checkFormGeomapWidget($data);
 	}
 
@@ -398,7 +398,7 @@ class testFormGeomapWidget extends CWebTest {
 	 * @dataProvider getWidgetCommonData
 	 * @dataProvider getWidgetUpdateData
 	 */
-	public function testFormGeomapWidget_Update($data) {
+	public function testDashboardGeomapWidget_Update($data) {
 		$this->checkFormGeomapWidget($data, true);
 	}
 
@@ -506,7 +506,7 @@ class testFormGeomapWidget extends CWebTest {
 		}
 	}
 
-	public function testFormGeomapWidget_SimpleUpdate() {
+	public function testDashboardGeomapWidget_SimpleUpdate() {
 		$this->checkNoChanges();
 	}
 
@@ -550,7 +550,7 @@ class testFormGeomapWidget extends CWebTest {
 	/**
 	 * @dataProvider getCancelData
 	 */
-	public function testFormGeomapWidget_Cancel($data) {
+	public function testDashboardGeomapWidget_Cancel($data) {
 		$this->checkNoChanges($data['cancel_form'], $data['create_widget'], $data['save_dashboard']);
 	}
 
@@ -635,7 +635,7 @@ class testFormGeomapWidget extends CWebTest {
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
 
-	public function testFormGeomapWidget_Delete() {
+	public function testDashboardGeomapWidget_Delete() {
 		$name = 'Geomap for delete';
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);

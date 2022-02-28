@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 /**
  * @backup config
  */
-class testFormGeographicalMaps extends CWebTest {
+class testFormAdministrationGeneralGeomaps extends CWebTest {
 
 	private $sql = 'SELECT * FROM config';
 
@@ -108,7 +108,7 @@ class testFormGeographicalMaps extends CWebTest {
 	/**
 	 * @dataProvider getLayoutData
 	 */
-	public function testFormGeographicalMaps_Layout($data) {
+	public function testFormAdministrationGeneralGeomaps_Layout($data) {
 		$this->page->login()->open('zabbix.php?action=geomaps.edit');
 		$form = $this->query('id:geomaps-form')->asForm()->one();
 
@@ -355,7 +355,7 @@ class testFormGeographicalMaps extends CWebTest {
 	/**
 	 * @dataProvider getFormData
 	 */
-	public function testFormGeographicalMaps_Form($data) {
+	public function testFormAdministrationGeneralGeomaps_Form($data) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash($this->sql);
 		}
