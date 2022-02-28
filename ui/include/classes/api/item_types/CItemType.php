@@ -18,36 +18,36 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-abstract class CItemType {
+interface CItemType {
 
 	/**
-	 * @param string $class_name
+	 * @param array $item
 	 *
 	 * @return array
 	 */
-	abstract public static function getCreateValidationRules(string $class_name): array;
+	public static function getCreateValidationRules(array &$item): array;
 
 	/**
-	 * @param string $class_name
-	 * @param array  $db_item
+	 * @param array $item
+	 * @param array $db_item
 	 *
 	 * @return array
 	 */
-	abstract public static function getUpdateValidationRules(string $class_name, array $db_item): array;
+	public static function getUpdateValidationRules(array &$item, array $db_item): array;
 
 	/**
-	 * @param string $class_name
-	 * @param array  $db_item
+	 * @param array $item
+	 * @param array $db_item
 	 *
 	 * @return array
 	 */
-	abstract public static function getUpdateValidationRulesInherited(string $class_name, array $db_item): array;
+	public static function getUpdateValidationRulesInherited(array &$item, array $db_item): array;
 
 	/**
-	 * @param string $class_name
-	 * @param array  $db_item
+	 * @param array $item
+	 * @param array $db_item
 	 *
 	 * @return array
 	 */
-	abstract public static function getUpdateValidationRulesDiscovered(string $class_name, array $db_item): array;
+	public static function getUpdateValidationRulesDiscovered(array &$item, array $db_item): array;
 }

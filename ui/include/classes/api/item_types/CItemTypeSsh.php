@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CItemTypeSsh extends CItemType {
+class CItemTypeSsh implements CItemType {
 
 	/**
 	 * @inheritDoc
 	 */
-	public static function getCreateValidationRules(string $class_name): array {
+	public static function getCreateValidationRules(array &$item): array {
 		return [
 			'interfaceid' =>	['type' => API_ID],
 			'authtype' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]), 'default' => DB::getDefault('items', 'authtype')],
@@ -45,25 +45,22 @@ class CItemTypeSsh extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRules(string $class_name, array $db_item): array {
+	public static function getUpdateValidationRules(array &$item, array $db_item): array {
+		$item += array_intersect_key($db_item, array_flip(['authtype']));
+
 		return [
 			'interfaceid' =>	['type' => API_ID],
-			'authtype' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function (array $data) use ($db_item): bool {
-										return $data['type'] != $db_item['type'];
-									}, 'type' => API_INT32, 'in' => implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]), 'default' => DB::getDefault('items', 'authtype')],
-									['else' => true, 'type' => API_INT32, 'in' => implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]), 'default' => $db_item['authtype']]
-			]],
+			'authtype' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY])],
 			'username' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function (array $data) use ($db_item): bool {
-										return $data['type'] != $db_item['type'];
+									['if' => static function () use ($db_item): bool {
+										return $db_item['type'] != ITEM_TYPE_SSH;
 									}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'username')],
 									['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'username')]
 			]],
 			'publickey' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => static function (array $data) use ($db_item): bool {
 										return $data['authtype'] == ITEM_AUTHTYPE_PUBLICKEY
-											&& ($data['type'] != $db_item['type'] || $data['authtype'] != $db_item['authtype']);
+											&& ($db_item['type'] != ITEM_TYPE_SSH || $db_item['authtype'] != ITEM_AUTHTYPE_PUBLICKEY);
 									}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'publickey')],
 									['if' => ['field' => 'authtype', 'in' => ITEM_AUTHTYPE_PUBLICKEY], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'publickey')],
 									['else' => true, 'type' => API_UNEXPECTED]
@@ -71,20 +68,24 @@ class CItemTypeSsh extends CItemType {
 			'privatekey' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => static function (array $data) use ($db_item): bool {
 										return $data['authtype'] == ITEM_AUTHTYPE_PUBLICKEY
-											&& ($data['type'] != $db_item['type'] || $data['authtype'] != $db_item['authtype']);
+											&& ($db_item['type'] != ITEM_TYPE_SSH || $db_item['authtype'] != ITEM_AUTHTYPE_PUBLICKEY);
 									}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'privatekey')],
 									['if' => ['field' => 'authtype', 'in' => ITEM_AUTHTYPE_PUBLICKEY], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'privatekey')],
 									['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
 			'params' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function (array $data) use ($db_item): bool {
-										return $data['type'] != $db_item['type'];
+									['if' => static function () use ($db_item): bool {
+										return in_array($db_item['type'], [
+											ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
+											ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT,
+											ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
+										]);
 									}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')],
 									['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')]
 			]],
 			'delay' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function (array $data) use ($db_item): bool {
+									['if' => static function () use ($db_item): bool {
 										return in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
 											|| ($db_item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($db_item['key_'], 'mqtt.get', 8) === 0);
 									}, 'type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')],
@@ -96,21 +97,23 @@ class CItemTypeSsh extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesInherited(string $class_name, array $db_item): array {
+	public static function getUpdateValidationRulesInherited(array &$item, array $db_item): array {
+		$item += array_intersect_key($db_item, array_flip(['authtype']));
+
 		return [
 			'interfaceid' =>	['type' => API_ID],
-			'authtype' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]), 'default' => $db_item['authtype']],
+			'authtype' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY])],
 			'username' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'username')],
 			'publickey' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => static function (array $data) use ($db_item): bool {
-										return $data['authtype'] == ITEM_AUTHTYPE_PUBLICKEY && $data['authtype'] != $db_item['authtype'];
+										return $data['authtype'] == ITEM_AUTHTYPE_PUBLICKEY && $db_item['authtype'] != ITEM_AUTHTYPE_PUBLICKEY;
 									}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'publickey')],
 									['if' => ['field' => 'authtype', 'in' => ITEM_AUTHTYPE_PUBLICKEY], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'publickey')],
 									['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'privatekey' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => static function (array $data) use ($db_item): bool {
-										return $data['authtype'] == ITEM_AUTHTYPE_PUBLICKEY && $data['authtype'] != $db_item['authtype'];
+										return $data['authtype'] == ITEM_AUTHTYPE_PUBLICKEY && $db_item['authtype'] != ITEM_AUTHTYPE_PUBLICKEY;
 									}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'privatekey')],
 									['if' => ['field' => 'authtype', 'in' => ITEM_AUTHTYPE_PUBLICKEY], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'privatekey')],
 									['else' => true, 'type' => API_UNEXPECTED]
@@ -124,23 +127,13 @@ class CItemTypeSsh extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesDiscovered(string $class_name, array $db_item): array {
+	public static function getUpdateValidationRulesDiscovered(array &$item, array $db_item): array {
 		return [
 			'interfaceid' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'authtype' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'username' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'publickey' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function (array $data) use ($db_item): bool {
-										return $db_item['authtype'] == ITEM_AUTHTYPE_PUBLICKEY;
-									}, 'type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-									['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'privatekey' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function (array $data) use ($db_item): bool {
-										return $db_item['authtype'] == ITEM_AUTHTYPE_PUBLICKEY;
-									}, 'type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-									['else' => true, 'type' => API_UNEXPECTED]
-			]],
+			'publickey' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
+			'privatekey' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'password' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'params' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'delay' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]

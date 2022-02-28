@@ -394,12 +394,12 @@ class CItemPrototype extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->validateCreateByType($api_input_rules, $items);
-
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 		unset($item);
+
+		$this->validateByType(array_keys($api_input_rules['fields']), $items);
 
 		parent::validateCreate($items);
 
@@ -555,12 +555,7 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	protected function validateUpdate(array &$items, ?array &$db_items): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['itemid']], 'fields' => [
-			'itemid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
-			'uuid' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_READONLY],
-			'hostid' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_READONLY],
-			'templateid' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_READONLY],
-			'ruleid' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_READONLY],
-			'flags' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_READONLY]
+			'itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
@@ -582,9 +577,22 @@ class CItemPrototype extends CItemGeneral {
 		foreach ($items as $i => &$item) {
 			$db_item = $db_items[$item['itemid']];
 
-			$api_input_rules = $db_item['templateid'] != 0
-				? self::getInheritedValidationRules($db_item)
-				: self::getValidationRules();
+			if ($db_item['templateid'] != 0) {
+				$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+					'value_type' => ['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED]
+				]];
+
+				if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($i + 1), $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
+				$item += array_intersect_key($db_item, array_flip(['value_type']));
+
+				$api_input_rules = self::getInheritedValidationRules();
+			}
+			else {
+				$api_input_rules = self::getValidationRules();
+			}
 
 			if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($i + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -592,7 +600,11 @@ class CItemPrototype extends CItemGeneral {
 		}
 		unset($item);
 
-		$this->validateUpdateByType($api_input_rules, $items, $db_items);
+		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
+
+		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'key_']);
+
+		self::validateUniqueness($items);
 
 		parent::validateUpdate($items, $db_items);
 
@@ -635,42 +647,23 @@ class CItemPrototype extends CItemGeneral {
 	}
 
 	/**
-	 * @param array $db_item
-	 *
 	 * @return array
 	 */
-	private static function getInheritedValidationRules(array $db_item): array {
+	private static function getInheritedValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'itemid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'type' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'key_' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'value_type' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'units' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function (array $data) use ($db_item): bool {
-										return $db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64;
-									}, 'type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-									['else' => true, 'type' => API_UNEXPECTED]
-			]],
+			'value_type' =>		['type' => API_ANY],
+			'units' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'history' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'history')],
 			'trends' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function (array $data) use ($db_item): bool {
-										return $db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64;
-									}, 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends')],
+									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends')],
 									['else' => true, 'type' => API_UNEXPECTED]
 			]],
-			'valuemapid' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function (array $data) use ($db_item): bool {
-										return in_array($db_item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64]);
-									}, 'type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-									['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'logtimefmt' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function (array $data) use ($db_item): bool {
-										return $db_item['value_type'] == ITEM_VALUE_TYPE_LOG;
-									}, 'type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-									['else' => true, 'type' => API_UNEXPECTED]
-			]],
+			'valuemapid' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'logtimefmt' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
 			'status' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
 			'discover' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])],

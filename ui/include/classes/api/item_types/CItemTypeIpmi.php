@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CItemTypeIpmi extends CItemType {
+class CItemTypeIpmi implements CItemType {
 
 	/**
 	 * @inheritDoc
 	 */
-	public static function getCreateValidationRules(string $class_name): array {
+	public static function getCreateValidationRules(array &$item): array {
 		return [
 			'interfaceid' =>	['type' => API_ID],
 			'ipmi_sensor' =>	['type' => API_MULTIPLE, 'rules' => [
@@ -37,18 +37,18 @@ class CItemTypeIpmi extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRules(string $class_name, array $db_item): array {
+	public static function getUpdateValidationRules(array &$item, array $db_item): array {
 		return [
 			'interfaceid' =>	['type' => API_ID],
 			'ipmi_sensor' =>	['type' => API_MULTIPLE, 'rules' => [
 									['if' => static function (array $data) use ($db_item): bool {
-										return $data['type'] != $db_item['type'] && $data['key_'] !== 'ipmi.get';
+										return $db_item['type'] != ITEM_TYPE_IPMI && $data['key_'] !== 'ipmi.get';
 									}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'ipmi_sensor')],
 									['if' => ['field' => 'key_', 'in' => 'ipmi.get'], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ipmi_sensor')],
 									['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'ipmi_sensor')]
 			]],
 			'delay' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function (array $data) use ($db_item): bool {
+									['if' => static function () use ($db_item): bool {
 										return in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
 											|| ($db_item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($db_item['key_'], 'mqtt.get', 8) === 0);
 									}, 'type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')],
@@ -60,15 +60,10 @@ class CItemTypeIpmi extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesInherited(string $class_name, array $db_item): array {
+	public static function getUpdateValidationRulesInherited(array &$item, array $db_item): array {
 		return [
 			'interfaceid' =>	['type' => API_ID],
-			'ipmi_sensor' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function (array $data) use ($db_item): bool {
-										return $db_item['key_'] !== 'ipmi.get';
-									}, 'type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-									['else' => true, 'type' => API_UNEXPECTED]
-			]],
+			'ipmi_sensor' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'delay' =>			['type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')]
 		];
 	}
@@ -76,15 +71,10 @@ class CItemTypeIpmi extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesDiscovered(string $class_name, array $db_item): array {
+	public static function getUpdateValidationRulesDiscovered(array &$item, array $db_item): array {
 		return [
 			'interfaceid' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'ipmi_sensor' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function (array $data) use ($db_item): bool {
-										return $db_item['key_'] !== 'ipmi.get';
-									}, 'type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-									['else' => true, 'type' => API_UNEXPECTED]
-			]],
+			'ipmi_sensor' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'delay' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
 		];
 	}

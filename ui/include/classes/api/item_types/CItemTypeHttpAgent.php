@@ -18,13 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CItemTypeHttpAgent extends CItemType {
+class CItemTypeHttpAgent implements CItemType {
 
 	/**
 	 * @inheritDoc
 	 */
-	public static function getCreateValidationRules(string $class_name): array {
-		$is_item_prototype = $class_name === 'CItemPrototype';
+	public static function getCreateValidationRules(array &$item): array {
+		$is_item_prototype = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE;
 
 		return [
 			'url' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'url')],
@@ -73,35 +73,27 @@ class CItemTypeHttpAgent extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRules(string $class_name, array $db_item): array {
-		$is_item_prototype = $class_name === 'CItemPrototype';
+	public static function getUpdateValidationRules(array &$item, array $db_item): array {
+		$is_item_prototype = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE;
+
+		$item += array_intersect_key($db_item, array_flip(['request_method', 'post_type', 'authtype', 'allow_traps']));
 
 		return [
 			'url' =>				['type' => API_MULTIPLE, 'rules' => [
-										['if' => static function (array $data) use ($db_item): bool {
-											return $data['type'] != $db_item['type'];
+										['if' => static function () use ($db_item): bool {
+											return $db_item['type'] != ITEM_TYPE_HTTPAGENT;
 										}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'url')],
 										['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'url')]
 			]],
 			'query_fields' =>		['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []],
-			'request_method' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => static function (array $data) use ($db_item): bool {
-											return $data['type'] != $db_item['type'];
-										}, 'type' => API_INT32, 'in' => implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD]), 'default' => DB::getDefault('items', 'request_method')],
-										['else' => true, 'type' => API_INT32, 'in' => implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD]), 'default' => $db_item['request_method']]
-			]],
+			'request_method' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD])],
 			'timeout' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => static function (array $data) use ($db_item): bool {
-											return $data['type'] != $db_item['type'];
+										['if' => static function () use ($db_item): bool {
+											return $db_item['type'] != ITEM_TYPE_HTTPAGENT;
 										}, 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | $is_item_prototype ? API_ALLOW_LLD_MACRO : 0, 'in' => '1:'.SEC_PER_MIN, 'length' => DB::getFieldLength('items', 'timeout')],
 										['else' => true, 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | $is_item_prototype ? API_ALLOW_LLD_MACRO : 0, 'in' => '1:'.SEC_PER_MIN, 'length' => DB::getFieldLength('items', 'timeout')]
 			]],
-			'post_type' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => static function (array $data) use ($db_item): bool {
-											return $data['type'] != $db_item['type'];
-										}, 'type' => API_INT32, 'in' => implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]), 'default' => DB::getDefault('items', 'post_type')],
-										['else' => true, 'type' => API_INT32, 'in' => implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]), 'default' => $db_item['post_type']]
-			]],
+			'post_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML])],
 			'posts' =>				['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_RAW], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'posts')],
 										['if' => static function (array $data) use ($db_item): bool {
@@ -122,12 +114,7 @@ class CItemTypeHttpAgent extends CItemType {
 			]],
 			'output_format' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON])],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'http_proxy')],
-			'authtype' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => static function (array $data) use ($db_item): bool {
-											return $data['type'] != $db_item['type'];
-										}, 'type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST]), 'default' => DB::getDefault('items', 'authtype')],
-										['else' => true, 'type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST]), 'default' => $db_item['authtype']]
-			]],
+			'authtype' =>			['type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])],
 			'username' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
 			'password' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
 			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])],
@@ -137,18 +124,13 @@ class CItemTypeHttpAgent extends CItemType {
 			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_password')],
 			'interfaceid' =>		['type' => API_ID],
 			'delay' =>				['type' => API_MULTIPLE, 'rules' => [
-										['if' => static function (array $data) use ($db_item): bool {
+										['if' => static function () use ($db_item): bool {
 											return in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
 												|| ($db_item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($db_item['key_'], 'mqtt.get', 8) === 0);
 										}, 'type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')],
 										['else' => true, 'type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')]
 			]],
-			'allow_traps' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => static function (array $data) use ($db_item): bool {
-											return $data['type'] != $db_item['type'];
-										}, 'type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON]), 'default' => DB::getDefault('items', 'allow_traps')],
-										['else' => true, 'type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON]), 'default' => $db_item['allow_traps']]
-			]],
+			'allow_traps' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON])],
 			'trapper_hosts' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
 										['else' => true, 'type' => API_UNEXPECTED]
@@ -159,7 +141,9 @@ class CItemTypeHttpAgent extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesInherited(string $class_name, array $db_item): array {
+	public static function getUpdateValidationRulesInherited(array &$item, array $db_item): array {
+		$item += array_intersect_key($db_item, array_flip(['allow_traps']));
+
 		return [
 			'url' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'query_fields' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
@@ -183,7 +167,7 @@ class CItemTypeHttpAgent extends CItemType {
 			'ssl_key_password' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'interfaceid' =>		['type' => API_ID],
 			'delay' =>				['type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')],
-			'allow_traps' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON]), 'default' => $db_item['allow_traps']],
+			'allow_traps' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON])],
 			'trapper_hosts' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
 										['else' => true, 'type' => API_UNEXPECTED]
@@ -194,7 +178,7 @@ class CItemTypeHttpAgent extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesDiscovered(string $class_name, array $db_item): array {
+	public static function getUpdateValidationRulesDiscovered(array &$item, array $db_item): array {
 		return [
 			'url' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'query_fields' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],

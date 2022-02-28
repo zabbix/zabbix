@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CItemTypeInternal extends CItemType {
+class CItemTypeInternal implements CItemType {
 
 	/**
 	 * @inheritDoc
 	 */
-	public static function getCreateValidationRules(string $class_name): array {
+	public static function getCreateValidationRules(array &$item): array {
 		return [
 			'delay' =>	['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')]
 		];
@@ -32,10 +32,10 @@ class CItemTypeInternal extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRules(string $class_name, array $db_item): array {
+	public static function getUpdateValidationRules(array &$item, array $db_item): array {
 		return [
 			'delay' =>	['type' => API_MULTIPLE, 'rules' => [
-							['if' => static function (array $data) use ($db_item): bool {
+							['if' => static function () use ($db_item): bool {
 								return in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
 									|| ($db_item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($db_item['key_'], 'mqtt.get', 8) === 0);
 							}, 'type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')],
@@ -47,7 +47,7 @@ class CItemTypeInternal extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesInherited(string $class_name, array $db_item): array {
+	public static function getUpdateValidationRulesInherited(array &$item, array $db_item): array {
 		return [
 			'delay' =>	['type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')]
 		];
@@ -56,7 +56,7 @@ class CItemTypeInternal extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesDiscovered(string $class_name, array $db_item): array {
+	public static function getUpdateValidationRulesDiscovered(array &$item, array $db_item): array {
 		return [
 			'delay' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
 		];

@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CItemTypeSnmpTrap extends CItemType {
+class CItemTypeSnmpTrap implements CItemType {
 
 	/**
 	 * @inheritDoc
 	 */
-	public static function getCreateValidationRules(string $class_name): array {
+	public static function getCreateValidationRules(array &$item): array {
 		return [
 			'interfaceid' =>	['type' => API_ID]
 		];
@@ -32,21 +32,21 @@ class CItemTypeSnmpTrap extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRules(string $class_name, array $db_item): array {
-		return self::getCreateValidationRules($class_name);
+	public static function getUpdateValidationRules(array &$item, array $db_item): array {
+		return self::getCreateValidationRules($item);
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesInherited(string $class_name, array $db_item): array {
-		return self::getCreateValidationRules($class_name);
+	public static function getUpdateValidationRulesInherited(array &$item, array $db_item): array {
+		return self::getCreateValidationRules($item);
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesDiscovered(string $class_name, array $db_item): array {
+	public static function getUpdateValidationRulesDiscovered(array &$item, array $db_item): array {
 		return [
 			'interfaceid' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
 		];

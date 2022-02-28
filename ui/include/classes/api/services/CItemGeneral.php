@@ -150,83 +150,31 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * @param array $api_input_rules
-	 * @param array $items
+	 * @param array      $field_names
+	 * @param array      $items
+	 * @param array|null $db_items
 	 *
 	 * @throws APIException
 	 */
-	protected function validateCreateByType(array $api_input_rules, array &$items): void {
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => array_fill_keys(array_keys($api_input_rules['fields']), ['type' => API_ANY])];
+	protected static function validateByType(array $field_names, array &$items, array $db_items = null): void {
+		$checked_fields = array_fill_keys($field_names, ['type' => API_ANY]);
 
 		foreach ($items as $i => &$item) {
-			switch ($item['type']) {
-				case ITEM_TYPE_ZABBIX:
-					$api_input_rules['fields'] += CItemTypeZabbix::getCreateValidationRules(static::class);
-					break;
+			$api_input_rules = ['type' => API_OBJECT, 'fields' => $checked_fields];
+			$db_item = ($db_items === null) ? null : $db_items[$item['itemid']];
+			$item_type = CItemTypeFactory::getObject($item['type']);
 
-				case ITEM_TYPE_TRAPPER:
-					$api_input_rules['fields'] += CItemTypeTrapper::getCreateValidationRules(static::class);
-					break;
-
-				case ITEM_TYPE_SIMPLE:
-					$api_input_rules['fields'] += CItemTypeSimple::getCreateValidationRules(static::class);
-					break;
-
-				case ITEM_TYPE_INTERNAL:
-					$api_input_rules['fields'] += CItemTypeInternal::getCreateValidationRules(static::class);
-					break;
-
-				case ITEM_TYPE_ZABBIX_ACTIVE:
-					$api_input_rules['fields'] += CItemTypeZabbixActive::getCreateValidationRules(static::class);
-					break;
-
-				case ITEM_TYPE_EXTERNAL:
-					$api_input_rules['fields'] += CItemTypeExternal::getCreateValidationRules(static::class);
-					break;
-
-				case ITEM_TYPE_DB_MONITOR:
-					$api_input_rules['fields'] += CItemTypeDbMonitor::getCreateValidationRules(static::class);
-					break;
-
-				case ITEM_TYPE_IPMI:
-					$api_input_rules['fields'] += CItemTypeIpmi::getCreateValidationRules(static::class);
-					break;
-
-				case ITEM_TYPE_SSH:
-					$api_input_rules['fields'] += CItemTypeSsh::getCreateValidationRules(static::class);
-					break;
-
-				case ITEM_TYPE_TELNET:
-					$api_input_rules['fields'] += CItemTypeTelnet::getCreateValidationRules(static::class);
-					break;
-
-				case ITEM_TYPE_CALCULATED:
-					$api_input_rules['fields'] += CItemTypeCalculated::getCreateValidationRules(static::class);
-					break;
-
-				case ITEM_TYPE_JMX:
-					$api_input_rules['fields'] += CItemTypeJmx::getCreateValidationRules(static::class);
-					break;
-
-				case ITEM_TYPE_SNMPTRAP:
-					$api_input_rules['fields'] += CItemTypeSnmpTrap::getCreateValidationRules(static::class);
-					break;
-
-				case ITEM_TYPE_DEPENDENT:
-					$api_input_rules['fields'] += CItemTypeDependent::getCreateValidationRules(static::class);
-					break;
-
-				case ITEM_TYPE_HTTPAGENT:
-					$api_input_rules['fields'] += CItemTypeHttpAgent::getCreateValidationRules(static::class);
-					break;
-
-				case ITEM_TYPE_SNMP:
-					$api_input_rules['fields'] += CItemTypeSnmp::getCreateValidationRules(static::class);
-					break;
-
-				case ITEM_TYPE_SCRIPT:
-					$api_input_rules['fields'] += CItemTypeScript::getCreateValidationRules(static::class);
-					break;
+			if ($db_item === null) {
+				$api_input_rules['fields'] += $item_type::getCreateValidationRules($item);
+			}
+			elseif ($db_item['templateid'] != 0) {
+				$api_input_rules['fields'] += $item_type::getUpdateValidationRulesInherited($item, $db_item);
+			}
+			elseif ($db_item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				$api_input_rules['fields'] += $item_type::getUpdateValidationRulesDiscovered($item, $db_item);
+			}
+			else {
+				$api_input_rules['fields'] += $item_type::getUpdateValidationRules($item, $db_item);
 			}
 
 			if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($i + 1), $error)) {
@@ -234,6 +182,20 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 		unset($item);
+	}
+
+	/**
+	 * @param array $items
+	 */
+	protected static function validateUniqueness(array &$items): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['hostid', 'key_']], 'fields' => [
+			'hostid' =>	['type' => API_ANY],
+			'key_' =>	['type' => API_ANY]
+		]];
+
+		if (!CApiInputValidator::validateUniqueness($api_input_rules, $items, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 	}
 
 	/**
@@ -262,107 +224,6 @@ abstract class CItemGeneral extends CApiService {
 		$this->checkSpecificFields($items);
 		$this->validatePreprocessing($items);
 		$this->validateDependentItems($items);
-	}
-
-	/**
-	 * @param array $api_input_rules
-	 * @param array $items
-	 * @param array $db_items
-	 *
-	 * @throws APIException
-	 */
-	protected function validateUpdateByType(array $api_input_rules, array &$items, array $db_items): void {
-		$checked_fields = array_fill_keys(array_keys($api_input_rules['fields']), ['type' => API_ANY]);
-
-		foreach ($items as $i => &$item) {
-			$api_input_rules = ['type' => API_OBJECT, 'fields' => $checked_fields];
-			$db_item = $db_items[$item['itemid']];
-
-			if ($db_item['templateid'] != 0) {
-				$method = 'getUpdateValidationRulesInherited';
-			}
-			elseif ($db_item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-				$method = 'getUpdateValidationRulesDiscovered';
-			}
-			else {
-				$method = 'getUpdateValidationRules';
-			}
-
-			switch ($item['type']) {
-				case ITEM_TYPE_ZABBIX:
-					$api_input_rules['fields'] += CItemTypeZabbix::$method(static::class, $db_item);
-					break;
-
-				case ITEM_TYPE_TRAPPER:
-					$api_input_rules['fields'] += CItemTypeTrapper::$method(static::class, $db_item);
-					break;
-
-				case ITEM_TYPE_SIMPLE:
-					$api_input_rules['fields'] += CItemTypeSimple::$method(static::class, $db_item);
-					break;
-
-				case ITEM_TYPE_INTERNAL:
-					$api_input_rules['fields'] += CItemTypeInternal::$method(static::class, $db_item);
-					break;
-
-				case ITEM_TYPE_ZABBIX_ACTIVE:
-					$api_input_rules['fields'] += CItemTypeZabbixActive::$method(static::class, $db_item);
-					break;
-
-				case ITEM_TYPE_EXTERNAL:
-					$api_input_rules['fields'] += CItemTypeExternal::$method(static::class, $db_item);
-					break;
-
-				case ITEM_TYPE_DB_MONITOR:
-					$api_input_rules['fields'] += CItemTypeDbMonitor::$method(static::class, $db_item);
-					break;
-
-				case ITEM_TYPE_IPMI:
-					$api_input_rules['fields'] += CItemTypeIpmi::$method(static::class, $db_item);
-					break;
-
-				case ITEM_TYPE_SSH:
-					$api_input_rules['fields'] += CItemTypeSsh::$method(static::class, $db_item);
-					break;
-
-				case ITEM_TYPE_TELNET:
-					$api_input_rules['fields'] += CItemTypeTelnet::$method(static::class, $db_item);
-					break;
-
-				case ITEM_TYPE_CALCULATED:
-					$api_input_rules['fields'] += CItemTypeCalculated::$method(static::class, $db_item);
-					break;
-
-				case ITEM_TYPE_JMX:
-					$api_input_rules['fields'] += CItemTypeJmx::$method(static::class, $db_item);
-					break;
-
-				case ITEM_TYPE_SNMPTRAP:
-					$api_input_rules['fields'] += CItemTypeSnmpTrap::$method(static::class, $db_item);
-					break;
-
-				case ITEM_TYPE_DEPENDENT:
-					$api_input_rules['fields'] += CItemTypeDependent::$method(static::class, $db_item);
-					break;
-
-				case ITEM_TYPE_HTTPAGENT:
-					$api_input_rules['fields'] += CItemTypeHttpAgent::$method(static::class, $db_item);
-					break;
-
-				case ITEM_TYPE_SNMP:
-					$api_input_rules['fields'] += CItemTypeSnmp::$method(static::class, $db_item);
-					break;
-
-				case ITEM_TYPE_SCRIPT:
-					$api_input_rules['fields'] += CItemTypeScript::$method(static::class, $db_item);
-					break;
-			}
-
-			if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($i + 1), $error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-		}
-		unset($item);
 	}
 
 	/**

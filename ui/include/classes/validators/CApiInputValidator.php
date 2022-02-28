@@ -3103,7 +3103,7 @@ class CApiInputValidator {
 	 *
 	 * @param string $field_name
 	 * @param array  $field_rule
-	 * @param string $field_rule['error_type']  (optional) API_ERR_READONLY, API_ERR_INHERITED, API_ERR_DISCOVERED
+	 * @param string $field_rule['error_type']  (optional) API_ERR_INHERITED, API_ERR_DISCOVERED
 	 * @param array  $object
 	 * @param string $path
 	 * @param string $error
@@ -3123,12 +3123,6 @@ class CApiInputValidator {
 		}
 
 		switch ($field_rule['error_type']) {
-			case API_ERR_READONLY:
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-					_s('cannot update readonly parameter "%1$s"', $field_name)
-				);
-				break;
-
 			case API_ERR_INHERITED:
 				$error = _s('Invalid parameter "%1$s": %2$s.', $path,
 					_s('cannot update readonly parameter "%1$s" of inherited object', $field_name)
