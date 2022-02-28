@@ -46,6 +46,8 @@
 
 			document.querySelector('[name="geomaps_tile_provider"]')
 				.addEventListener('change', this.events.tileProviderChange);
+
+			document.getElementById('geomaps-form').addEventListener('submit', this.events.submit);
 		},
 
 		events: {
@@ -71,6 +73,11 @@
 				view.tile_url.value = data.geomaps_tile_url;
 				view.attribution.value = data.geomaps_attribution;
 				view.max_zoom.value = data.geomaps_max_zoom;
+			},
+
+			submit() {
+				view.tile_url.value = view.tile_url.value.trim();
+				view.attribution.value = view.attribution.value.trim();
 			}
 		}
 	};
