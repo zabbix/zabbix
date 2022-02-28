@@ -1,3 +1,8 @@
+Changes for 5.0.21
+
+5.0.21rc1 was released as 5.0.21 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.21rc1
 
 New features:
@@ -25,6 +30,7 @@ Bug fixes:
 .........T [ZBX-20396] fixed expression for "Calculated value of innodb_log_file_size" item in MySQL templates (mchudinov)
 .........T [ZBX-20509] changed host group in Squid, Morningstar templates (mchudinov)
 ........S. [ZBX-19789] added SourceIP support to ldap simple checks (dgoloscapov)
+..F....... [ZBX-20680] fixed reflected XSS issues (averza)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.20
@@ -2412,10 +2418,16 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
+Changes for 4.0.39
+
+4.0.39rc1 was released as 4.0.39 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.39rc1
 
 Bug fixes:
 ........S. [ZBX-19789] added SourceIP support to ldap simple checks (dgoloscapov)
+..F....... [ZBX-20680] fixed reflected XSS issues (averza)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.38
