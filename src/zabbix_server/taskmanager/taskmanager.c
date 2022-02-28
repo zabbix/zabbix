@@ -607,9 +607,9 @@ static void	tm_create_active_proxy_reload_task(zbx_uint64_t proxyid)
 
 	DBbegin();
 
-	task = zbx_tm_task_create(taskid, ZBX_TM_TASK_DATA, ZBX_TM_STATUS_NEW, time(NULL), 0, proxyid);
+	task = zbx_tm_task_create(taskid, ZBX_TM_TASK_DATA, ZBX_TM_STATUS_NEW, time(NULL), ZBX_DATA_TTL, proxyid);
 
-	task->data = zbx_tm_data_create(taskid, "", 1, ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD);
+	task->data = zbx_tm_data_create(taskid, "", 0, ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD);
 
 	zbx_tm_save_task(task);
 
@@ -686,7 +686,7 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 static void	tm_process_passive_proxy_cache_reload_request(zbx_ipc_async_socket_t *rtc, const char *data)
 {
 	struct zbx_json_parse	jp;
-	char			hostname[HOST_NAME_LEN + 1];
+	char			hostname[HOST_NAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	zbx_uint64_t		proxyid;
 
 	if (FAIL == zbx_json_open(data, &jp))
@@ -971,7 +971,7 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const ch
 {
 	struct zbx_json_parse	jp, jp_data;
 	const char		*ptr;
-	char			name[HOST_NAME_LEN + 1];
+	char			name[HOST_NAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	int			passive_proxy_count = 0;
 
 	if (FAIL == zbx_json_open(data, &jp))

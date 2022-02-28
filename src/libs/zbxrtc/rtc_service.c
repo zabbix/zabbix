@@ -379,12 +379,12 @@ void	zbx_rtc_dispatch(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_ipc_message_
 			else
 				rtc_process(rtc, client, (int)message->code, message->data);
 			break;
-		case ZBX_RTC_PROXYPOLLER_PROCESS:
-			rtc_notify(rtc, ZBX_PROCESS_TYPE_PROXYPOLLER, 0, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
-			break;
 		case ZBX_RTC_CONFIG_CACHE_RELOAD_WAIT:
 			rtc_add_control_hook(rtc, client, ZBX_RTC_CONFIG_SYNC_NOTIFY);
 			rtc_notify(rtc, ZBX_PROCESS_TYPE_CONFSYNCER, 0, ZBX_RTC_CONFIG_CACHE_RELOAD, NULL, 0);
+			break;
+		case ZBX_RTC_PROXYPOLLER_PROCESS:
+			rtc_notify(rtc, ZBX_PROCESS_TYPE_PROXYPOLLER, 0, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
 			break;
 		case ZBX_RTC_CONFIG_SYNC_NOTIFY:
 			rtc_notify_hooks(rtc, message->code, message->data, message->size);
