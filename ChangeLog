@@ -50,6 +50,12 @@ Bug fixes:
 ...G...... [ZBX-20487] fixed agent handling of invalid time intervals (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.1rc4
+
+Bug fixes:
+...G...... [ZBX-20672] fixed compilation on HP-UX due to missing zbxtypes.h include (arimdjonoks)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.1rc3
 
 Bug fixes:
