@@ -28,6 +28,10 @@ $this->includeJsFile('configuration.graph.list.js.php');
 if (!empty($this->data['parent_discoveryid'])) {
 	$widget = (new CWidget())
 		->setTitle(_('Graph prototypes'))
+		->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
+			? CDocHelper::CONFIGURATION_HOST_GRAPH_PROTOTYPE_LIST
+			: CDocHelper::CONFIGURATION_TEMPLATES_GRAPH_PROTOTYPE_LIST
+		))
 		->setControls(
 			(new CTag('nav', true,
 				(new CList())->addItem(new CRedirectButton(_('Create graph prototype'),
