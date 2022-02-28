@@ -12,7 +12,7 @@ A.F....... [ZBXNEXT-6470,ZBXNEXT-6959] implemented audit logging of host prototy
 .........T [ZBXNEXT-6624] added triggers, macros, changed filters and overrides in LLD rules (mchudinov)
 
 Bug fixes:
-..F....... [ZBX-20619] fixed massupdate button form on Safari browser (ashubin)
+..F....... [ZBX-20619] fixed massupdate button form in Safari browser (ashubin)
 ..F....... [ZBX-20465] fixed marking username entry mandatory for SSH and Telnet agent items (jfreibergs)
 ........S. [ZBX-20649] fixed crash when server attempted to use trigger after it was removed from cache (wiper)
 ....I..... [ZBX-20617] fixed default geomap provider on clean install (Sasha)
