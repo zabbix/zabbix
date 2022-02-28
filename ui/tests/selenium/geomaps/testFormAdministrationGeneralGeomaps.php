@@ -337,7 +337,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 						'Max zoom level' => 13
 					]
 				]
-			],
+			]
 			// TODO: uncomment after ZBX-20621 is fixed.
 //			[
 //				[
