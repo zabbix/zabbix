@@ -39,6 +39,18 @@ INSERT INTO host_discovery (hostid,parent_hostid,parent_itemid) VALUES (50015,NU
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (50112, 50015, '', 50014, NULL);
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50028,50015,1,2,1,'127.0.0.1','','10050');
 INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (50028, 2, 1, '{$SNMP_COMMUNITY}');
+-- template groups
+INSERT INTO tplgrp (groupid,name) VALUES (52001,'API template group 1');
+INSERT INTO tplgrp (groupid,name) VALUES (52002,'API template group 2');
+INSERT INTO tplgrp (groupid,name) VALUES (52003,'API template group 3');
+INSERT INTO tplgrp (groupid,name) VALUES (52004,'API template group to delete');
+INSERT INTO tplgrp (groupid,name) VALUES (52005,'API template group with template 1');
+INSERT INTO tplgrp (groupid,name) VALUES (52006,'API template group with template 2');
+INSERT INTO tplgrp (groupid,name) VALUES (52007,'API template group to delete 2');
+INSERT INTO tplgrp (groupid,name) VALUES (52008,'API template group to delete 3');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (50010, 'API Template', 'API Template', 3, '');
+INSERT INTO templates_groups (templategroupid, templateid, groupid) VALUES (55001, 50010, 52005);
+INSERT INTO templates_groups (templategroupid, templateid, groupid) VALUES (55002, 50010, 52006);
 
 
 -- host tags

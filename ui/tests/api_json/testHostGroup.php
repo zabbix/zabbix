@@ -51,9 +51,9 @@ class testHostGroup extends CAPITest {
 			// Check for duplicated host groups names.
 			[
 				'hostgroup' => [
-					'name' => 'Templates'
+					'name' => 'Zabbix servers'
 				],
-				'expected_error' => 'Host group "Templates" already exists.'
+				'expected_error' => 'Host group "Zabbix servers" already exists.'
 			],
 			[
 				'hostgroup' => [
@@ -61,21 +61,21 @@ class testHostGroup extends CAPITest {
 						'name' => 'One host group with existing name'
 					],
 					[
-						'name' => 'Templates'
+						'name' => 'Zabbix servers'
 					]
 				],
-				'expected_error' => 'Host group "Templates" already exists.'
+				'expected_error' => 'Host group "Zabbix servers" already exists.'
 			],
 			[
 				'hostgroup' => [
 					[
-						'name' => 'Host groups with two identical name'
+						'name' => 'Host groups with two identical names'
 					],
 					[
-						'name' => 'Host groups with two identical name'
+						'name' => 'Host groups with two identical names'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/2": value (name)=(Host groups with two identical name) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (name)=(Host groups with two identical names) already exists.'
 			],
 			// Check successfully create.
 			[
@@ -216,10 +216,10 @@ class testHostGroup extends CAPITest {
 				'hostgroup' => [
 					[
 					'groupid' => '50005',
-					'name' => 'Templates'
+					'name' => 'Zabbix servers'
 					]
 				],
-				'expected_error' => 'Host group "Templates" already exists.'
+				'expected_error' => 'Host group "Zabbix servers" already exists.'
 			],
 			[
 				'hostgroup' => [
@@ -298,7 +298,7 @@ class testHostGroup extends CAPITest {
 		}
 		else {
 			foreach ($hostgroups as $hostgroup) {
-				if (array_key_exists('name', $hostgroup) && $hostgroup['name'] !== 'Templates'){
+				if (array_key_exists('name', $hostgroup) && $hostgroup['name'] !== 'Zabbix servers'){
 					$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM hstgrp WHERE name='.zbx_dbstr($hostgroup['name'])));
 				}
 			}
@@ -347,7 +347,7 @@ class testHostGroup extends CAPITest {
 			],
 			[
 				'hostgroup' => [
-					'5008',
+					'50008',
 					''
 				],
 				'expected_error' => 'Invalid parameter "/2": a number is expected.'
@@ -361,21 +361,9 @@ class testHostGroup extends CAPITest {
 			],
 			[
 				'hostgroup' => [
-					'50007'
-				],
-				'expected_error' => 'Host group "API host group delete internal" is internal and cannot be deleted.'
-			],
-			[
-				'hostgroup' => [
 					'50014'
 				],
 				'expected_error' => 'Group "API group for host prototype" cannot be deleted, because it is used by a host prototype.'
-			],
-			[
-				'hostgroup' => [
-					'50013'
-				],
-				'expected_error' => 'Template "API Template" cannot be without host group.'
 			],
 			[
 				'hostgroup' => [

@@ -530,7 +530,7 @@ class CTemplateGroup extends CApiService {
 		$groupids = array_keys($db_groups);
 
 		$db_templates = API::Template()->get([
-			'output' => ['template'],
+			'output' => ['host'],
 			'groupids' => $groupids,
 			'nopermissions' => true,
 			'preservekeys' => true

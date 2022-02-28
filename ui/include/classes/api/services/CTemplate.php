@@ -101,12 +101,12 @@ class CTemplate extends CHostGeneral {
 
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
-					' FROM hosts_groups hgg'.
+					' FROM templates_groups tgg'.
 						' JOIN rights r'.
-							' ON r.id=hgg.groupid'.
+							' ON r.id=tgg.groupid'.
 								' AND '.dbConditionInt('r.groupid', $userGroups).
-					' WHERE h.hostid=hgg.hostid'.
-					' GROUP BY hgg.hostid'.
+					' WHERE h.hostid=tgg.hostid'.
+					' GROUP BY tgg.hostid'.
 					' HAVING MIN(r.permission)>'.PERM_DENY.
 						' AND MAX(r.permission)>='.zbx_dbstr($permission).
 					')';
@@ -116,12 +116,12 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
-			$sqlParts['where']['hgh'] = 'hg.hostid=h.hostid';
+			$sqlParts['from']['templates_groups'] = 'templates_groups tg';
+			$sqlParts['where'][] = dbConditionInt('tg.groupid', $options['groupids']);
+			$sqlParts['where']['tgh'] = 'tg.templateid=h.hostid';
 
 			if ($options['groupCount']) {
-				$sqlParts['group']['hg'] = 'hg.groupid';
+				$sqlParts['group']['tg'] = 'tg.groupid';
 			}
 		}
 
