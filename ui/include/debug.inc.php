@@ -20,7 +20,7 @@
 
 
 function sdb($return = false) {
-	$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+	$backtrace = debug_backtrace();
 	array_shift($backtrace);
 	$result = 'DEBUG BACKTRACE: <br/>';
 	foreach ($backtrace as $n => $bt) {
