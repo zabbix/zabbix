@@ -258,19 +258,50 @@ var chkbxRange = {
 	 * Update the state of the "Go" controls.
 	 */
 	updateGoButton: function() {
-		var count = 0;
+		let selected_count = 0;
+		const execute_btn_exists = (document.querySelectorAll('.js-check-now').length > 0);
+		const graph_btn_exists = (document.querySelectorAll('.js-display-graph').length > 0);
+
+		if (execute_btn_exists || graph_btn_exists) {
+			var object = this.pageGoName;
+		}
+
+		if (execute_btn_exists) {
+			var execute_count = 0;
+		}
+
+		if (graph_btn_exists) {
+			var graph_count = 0;
+		}
+
 		jQuery.each(this.getSelectedIds(), function() {
-			count++;
+			selected_count++;
+
+			if (execute_btn_exists && document.getElementById(object + '_' + this).getAttribute('data-execute')) {
+				execute_count++;
+			}
+
+			if (execute_btn_exists && document.getElementById(object + '_' + this).getAttribute('data-graph')) {
+				graph_count++;
+			}
 		});
 
-		var selectedCountSpan = jQuery('#selected_count');
-		selectedCountSpan.text(count + ' ' + selectedCountSpan.text().split(' ')[1]);
+		const selectedCountSpan = jQuery('#selected_count');
+		selectedCountSpan.text(selected_count + ' ' + selectedCountSpan.text().split(' ')[1]);
 
 		jQuery('#action_buttons button').each((_, val) => {
 			const $val = jQuery(val);
 
 			if (!$val.data('disabled')) {
-				$val.prop('disabled', count == 0);
+				if ($val.hasClass('js-check-now')) {
+					$val.prop('disabled', execute_count == 0);
+				}
+				else if ($val.hasClass('js-display-graph')) {
+					$val.prop('disabled', graph_count == 0);
+				}
+				else {
+					$val.prop('disabled', selected_count == 0);
+				}
 			}
 		});
 	},

@@ -98,8 +98,16 @@ else {
 
 // Latest data rows.
 foreach ($data['items'] as $itemid => $item) {
+	$host = $data['hosts'][$item['hostid']];
+
 	$is_graph = ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64);
-	$checkbox = (new CCheckBox('itemids['.$itemid.']', $itemid))->setEnabled($is_graph);
+
+	$checkbox = (new CCheckBox('itemids['.$itemid.']', $itemid))
+		->setAttribute('data-execute', in_array($item['type'], checkNowAllowedTypes())
+			&& $item['status'] == ITEM_STATUS_ACTIVE && $host['status'] == HOST_STATUS_MONITORED
+		)
+		->setAttribute('data-graph', $is_graph);
+
 	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
 	$item_name = (new CDiv([
@@ -194,8 +202,6 @@ foreach ($data['items'] as $itemid => $item) {
 		$actions = '';
 	}
 
-	$host = $data['hosts'][$item['hostid']];
-
 	$maintenance_icon = '';
 
 	if ($host['status'] == HOST_STATUS_MONITORED && $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
@@ -276,13 +282,14 @@ foreach ($data['items'] as $itemid => $item) {
 }
 
 $button_list = [
-	GRAPH_TYPE_STACKED => ['name' => _('Display stacked graph')],
-	GRAPH_TYPE_NORMAL => ['name' => _('Display graph')],
+	GRAPH_TYPE_STACKED => ['name' => _('Display stacked graph'), 'class' => 'js-display-graph'],
+	GRAPH_TYPE_NORMAL => ['name' => _('Display graph'), 'class' => 'js-display-graph'],
 	'item.masscheck_now' => [
 		'content' => (new CSimpleButton(_('Execute now')))
 			->onClick('view.massCheckNow(this);')
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('no-chkbxrange')
+			->addClass('js-check-now')
 	]
 ];
 

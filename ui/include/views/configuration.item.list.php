@@ -271,7 +271,10 @@ foreach ($data['items'] as $item) {
 	}
 
 	$itemTable->addRow([
-		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
+		(new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']))
+			->setAttribute('data-execute', in_array($item['type'], checkNowAllowedTypes())
+				&& $item['status'] == ITEM_STATUS_ACTIVE && $item['hosts'][0]['status'] == HOST_STATUS_MONITORED
+			),
 		$wizard,
 		($data['hostid'] == 0) ? $item['host'] : null,
 		$description,
@@ -309,6 +312,7 @@ if ($data['context'] === 'host') {
 				->onClick('view.massCheckNow(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('no-chkbxrange')
+				->addClass('js-check-now')
 				->setEnabled(!$data['is_template'])
 				->setAttribute('data-disabled', $data['is_template'])
 		],

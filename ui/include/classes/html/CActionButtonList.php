@@ -62,6 +62,8 @@ class CActionButtonList extends CObject {
 	 * @param string       $buttons_data[]['confirm']   Confirmation text (optional).
 	 * @param string       $buttons_data[]['redirect']  Redirect URL (optional).
 	 * @param bool         $buttons_data[]['disabled']  Set button state disabled (optional).
+	 * @param string       $buttons_data[]['class']     Additional button CSS class or JS class. Multiple classes
+	 *                                                  are separated by spaces.
 	 * @param CTag         $buttons_data[]['content']   A HTML tag. For example a CButton wrapped in CList object.
 	 * @param string|null  $name_prefix                 Prefix for sessionStorage used for storing currently selected
 	 *                                                  checkboxes.
@@ -78,6 +80,10 @@ class CActionButtonList extends CObject {
 				$button = (new CSubmit($action_name, $button_data['name']))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id');
+
+				if (array_key_exists('class', $button_data) && $button_data['class'] !== '') {
+					$button->addClass($button_data['class']);
+				}
 
 				if (array_key_exists('redirect', $button_data)) {
 					$button
