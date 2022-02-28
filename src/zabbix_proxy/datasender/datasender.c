@@ -236,7 +236,10 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 				}
 
 				if (0 != (flags & ZBX_DATASENDER_HISTORY))
+				{
+					change_proxy_history_count(-history_records);
 					proxy_set_hist_lastid(history_lastid);
+				}
 
 				if (0 != (flags & ZBX_DATASENDER_DISCOVERY))
 					proxy_set_dhis_lastid(discovery_lastid);
