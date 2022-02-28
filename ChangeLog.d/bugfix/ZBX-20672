@@ -1,0 +1,1 @@
+...G...... [ZBX-20672] fixed hp-ux build failure due to missing zbxtypes.h include (arimdjonoks)
