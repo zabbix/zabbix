@@ -138,7 +138,7 @@ class testFormApiTokens extends CWebTest {
 		$this->checkAuthToken($auth_token, null);
 
 		// Check the hintbox text in the Auth token field.
-		$auth_token->query('xpath:./span[@data-hintbox]')->one()->click();
+		$auth_token->query('xpath:./a[@data-hintbox]')->one()->click();
 		$this->assertEquals('Make sure to copy the auth token as you won\'t be able to view it after the page is closed.',
 				$this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible()->getText()
 		);
