@@ -12,7 +12,7 @@ A.F....... [ZBXNEXT-6470,ZBXNEXT-6959] implemented audit logging of host prototy
 .........T [ZBXNEXT-6624] added triggers, macros, changed filters and overrides in LLD rules (mchudinov)
 
 Bug fixes:
-..F....... [ZBX-20619] fixed massupdate button form on Safari browser (ashubin)
+..F....... [ZBX-20619] fixed massupdate button form in Safari browser (ashubin)
 ..F....... [ZBX-20465] fixed marking username entry mandatory for SSH and Telnet agent items (jfreibergs)
 ........S. [ZBX-20649] fixed crash when server attempted to use trigger after it was removed from cache (wiper)
 ....I..... [ZBX-20617] fixed default geomap provider on clean install (Sasha)
@@ -495,6 +495,11 @@ Bug fixes:
 .........T [ZBX-19395] changed version in links of the templates and the media (mchudinov)
 
 --------------------------------------------------------------------------------
+Changes for 5.4.11
+
+5.4.11rc2 was released as 5.4.11 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.4.11rc2
 
 Bug fixes:
@@ -538,6 +543,7 @@ Bug fixes:
 ..F....... [ZBX-20494] fixed multiple hintbox issue upon widget updates (averza)
 ..F....... [ZBX-20432] fixed impossibility to import templates with triggers mapping to hosts with numeric names (averza)
 ........S. [ZBX-19789] added SourceIP support to ldap simple checks (dgoloscapov)
+..F....... [ZBX-20680] fixed reflected XSS issues (averza)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.10
@@ -1755,6 +1761,11 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.21
+
+5.0.21rc1 was released as 5.0.21 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.21rc1
 
 New features:
@@ -1782,6 +1793,7 @@ Bug fixes:
 .........T [ZBX-20396] fixed expression for "Calculated value of innodb_log_file_size" item in MySQL templates (mchudinov)
 .........T [ZBX-20509] changed host group in Squid, Morningstar templates (mchudinov)
 ........S. [ZBX-19789] added SourceIP support to ldap simple checks (dgoloscapov)
+..F....... [ZBX-20680] fixed reflected XSS issues (averza)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.20
@@ -4169,10 +4181,16 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
+Changes for 4.0.39
+
+4.0.39rc1 was released as 4.0.39 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.39rc1
 
 Bug fixes:
 ........S. [ZBX-19789] added SourceIP support to ldap simple checks (dgoloscapov)
+..F....... [ZBX-20680] fixed reflected XSS issues (averza)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.38
