@@ -121,8 +121,7 @@ $menu-main-icons: (
 				}
 
 				@if $ui-transitions {
-					transition: transform $ui-transition-duration,
-					opacity $ui-transition-duration;
+					transition: transform $ui-transition-duration, opacity $ui-transition-duration;
 				}
 			}
 

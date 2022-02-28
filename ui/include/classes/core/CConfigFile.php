@@ -142,8 +142,8 @@ class CConfigFile {
 			$this->config['DB']['DOUBLE_IEEE754'] = $DB['DOUBLE_IEEE754'];
 		}
 
-		if (isset($DB['VAULT_PROVIDER'])) {
-			$this->config['DB']['VAULT_PROVIDER'] = $DB['VAULT_PROVIDER'];
+		if (isset($DB['VAULT'])) {
+			$this->config['DB']['VAULT'] = $DB['VAULT'];
 		}
 
 		if (isset($DB['VAULT_URL'])) {
@@ -254,11 +254,11 @@ class CConfigFile {
 '<?php
 // Zabbix GUI configuration file.
 
-$DB[\'TYPE\']				= \''.addcslashes($this->config['DB']['TYPE'], "'\\").'\';
+$DB[\'TYPE\']			= \''.addcslashes($this->config['DB']['TYPE'], "'\\").'\';
 $DB[\'SERVER\']			= \''.addcslashes($this->config['DB']['SERVER'], "'\\").'\';
-$DB[\'PORT\']				= \''.addcslashes($this->config['DB']['PORT'], "'\\").'\';
+$DB[\'PORT\']			= \''.addcslashes($this->config['DB']['PORT'], "'\\").'\';
 $DB[\'DATABASE\']			= \''.addcslashes($this->config['DB']['DATABASE'], "'\\").'\';
-$DB[\'USER\']				= \''.addcslashes($this->config['DB']['USER'], "'\\").'\';
+$DB[\'USER\']			= \''.addcslashes($this->config['DB']['USER'], "'\\").'\';
 $DB[\'PASSWORD\']			= \''.addcslashes($this->config['DB']['PASSWORD'], "'\\").'\';
 
 // Schema name. Used for PostgreSQL.
@@ -273,18 +273,19 @@ $DB[\'VERIFY_HOST\']		= '.($this->config['DB']['VERIFY_HOST'] ? 'true' : 'false'
 $DB[\'CIPHER_LIST\']		= \''.addcslashes($this->config['DB']['CIPHER_LIST'], "'\\").'\';
 
 // Vault configuration. Used if database credentials are stored in Vault secrets manager.
-$DB[\'VAULT\']		= \''.addcslashes($this->config['DB']['VAULT'], "'\\").'\';
+$DB[\'VAULT\']			= \''.addcslashes($this->config['DB']['VAULT'], "'\\").'\';
 $DB[\'VAULT_URL\']		= \''.addcslashes($this->config['DB']['VAULT_URL'], "'\\").'\';
-$DB[\'VAULT_DB_PATH\']			= \''.addcslashes($this->config['DB']['VAULT_DB_PATH'], "'\\").'\';
+$DB[\'VAULT_DB_PATH\']		= \''.addcslashes($this->config['DB']['VAULT_DB_PATH'], "'\\").'\';
 $DB[\'VAULT_TOKEN\']		= \''.addcslashes($this->config['DB']['VAULT_TOKEN'], "'\\").'\';
 $DB[\'VAULT_CERT_FILE\']		= \''.addcslashes($this->config['DB']['VAULT_CERT_FILE'], "'\\").'\';
 $DB[\'VAULT_KEY_FILE\']		= \''.addcslashes($this->config['DB']['VAULT_KEY_FILE'], "'\\").'\';
-// $DB[\'VAULT_CACHE\']		= \'false\';
+// Uncomment to bypass local caching of credentials.
+// $DB[\'VAULT_CACHE\']		= \'true\';
 
 // Use IEEE754 compatible value range for 64-bit Numeric (float) history values.
 // This option is enabled by default for new Zabbix installations.
 // For upgraded installations, please read database upgrade notes before enabling this option.
-$DB[\'DOUBLE_IEEE754\']	= '.($this->config['DB']['DOUBLE_IEEE754'] ? 'true' : 'false').';
+$DB[\'DOUBLE_IEEE754\']		= '.($this->config['DB']['DOUBLE_IEEE754'] ? 'true' : 'false').';
 
 // Uncomment and set to desired values to override Zabbix hostname/IP and port.
 // $ZBX_SERVER			= \'\';

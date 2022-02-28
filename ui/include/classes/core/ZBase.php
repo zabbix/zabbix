@@ -110,15 +110,6 @@ class ZBase {
 	}
 
 	/**
-	 * Get module manager.
-	 *
-	 * @return CVault
-	 */
-	public static function VaultProvider() {
-		return self::getInstance()->vault;
-	}
-
-	/**
 	 * Init modules required to run frontend.
 	 */
 	protected function init() {
@@ -423,11 +414,11 @@ class ZBase {
 	 * Vault provider initialisation if it exists in configuration file.
 	 */
 	protected function initVault(): void {
-		if (!array_key_exists('VAULT_PROVIDER', $this->config['DB'])) {
+		if (!array_key_exists('VAULT', $this->config['DB'])) {
 			return;
 		}
 
-		switch ($this->config['DB']['VAULT_PROVIDER']) {
+		switch ($this->config['DB']['VAULT']) {
 			case CVaultCyberArk::NAME:
 				$this->vault = new CVaultCyberArk($this->config['DB']['VAULT_URL'],
 					$this->config['DB']['VAULT_DB_PATH'], $this->config['DB']['VAULT_CERT_FILE'],
@@ -446,6 +437,8 @@ class ZBase {
 	 * @throws DBException
 	 */
 	protected function initDB(): void {
+		global $DB;
+
 		$error = null;
 
 		if ($this->vault !== null) {
@@ -475,9 +468,7 @@ class ZBase {
 			$this->config['DB']['USER'] = $db_user;
 			$this->config['DB']['PASSWORD'] = $db_password;
 
-			global $DB; // TODO: 7402
-
-			$DB = $this->config['DB']; // TODO: 7402
+			$DB = $this->config['DB'];
 		}
 
 		if (!DBconnect($error)) {

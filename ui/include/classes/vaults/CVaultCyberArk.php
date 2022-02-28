@@ -24,9 +24,10 @@
  */
 class CVaultCyberArk extends CVault {
 
-	public const NAME = 'CyberArk';
-	public const API_ENDPOINT_DEFAULT = 'https://localhost:1858';
-	public const DB_PATH_PLACEHOLDER = 'AppID=foo&Query=Safe=bar;Object=buzz';
+	public const NAME					= 'CyberArk';
+	public const API_ENDPOINT_DEFAULT	= 'https://localhost:1858';
+	public const DB_PATH_PLACEHOLDER	= 'AppID=foo&Query=Safe=bar;Object=buzz';
+	public const MACRO_PLACEHOLDER		= 'AppID=foo&Query=Safe=bar;Object=buzz:key';
 
 	/**
 	 * @var string
@@ -57,13 +58,13 @@ class CVaultCyberArk extends CVault {
 
 	public function validateParameters(): bool {
 		if (parse_url($this->api_endpoint, PHP_URL_HOST) === null) {
-			$this->addError(_s('Provided API endpoint "%1$s" is invalid.', $this->api_endpoint)); // TODO: 7402 - translation string
+			$this->addError(_s('Provided API endpoint "%1$s" is invalid.', $this->api_endpoint));
 		}
 
 		$secret_parser = new CVaultSecretParser(['provider' => ZBX_VAULT_TYPE_CYBERARK, 'with_key' => false]);
 
 		if ($secret_parser->parse($this->db_path) != CParser::PARSE_SUCCESS) {
-			$this->addError(_s('Provided secret query string "%1$s" is invalid.', $this->db_path)); // TODO: 7402 - translation string
+			$this->addError(_s('Provided secret query string "%1$s" is invalid.', $this->db_path));
 		}
 
 		return !$this->getErrors();
@@ -86,12 +87,11 @@ class CVaultCyberArk extends CVault {
 			];
 		}
 
-		try {
-			$secret = file_get_contents($this->api_endpoint.'?'.$this->db_path, false,
-				stream_context_create(['http' => $http_context])
-			);
-		}
-		catch (Exception $e) {
+		$secret = @file_get_contents($this->api_endpoint.'?'.$this->db_path, false,
+			stream_context_create(['http' => $http_context])
+		);
+
+		if ($secret === false) {
 			$this->addError(_('Vault connection failed.'));
 
 			return null;
@@ -100,13 +100,13 @@ class CVaultCyberArk extends CVault {
 		$db_credentials = $secret ? json_decode($secret, true) : null;
 
 		if ($db_credentials === null) {
-			$this->addError(_('Unable to load database credentials from Vault.')); // TODO: 7402 - translation
+			$this->addError(_('Unable to load database credentials from Vault.'));
 
 			return null;
 		}
 
 		if (!array_key_exists('UserName', $db_credentials) || !array_key_exists('Content', $db_credentials)) {
-			$this->addError(_('Username and password must be stored in Vault secret keys "UserName" and "Content".')); // TODO: 7402 - translation
+			$this->addError(_('Username and password must be stored in Vault secret keys "UserName" and "Content".'));
 
 			return null;
 		}

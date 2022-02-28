@@ -152,7 +152,6 @@
 				.attr({
 					id: $input.attr('id'),
 					name: $input.attr('name'),
-					placeholder: (value_type == ZBX_MACRO_TYPE_VAULT) ? t('path/to/secret:key') : t('value'),
 					maxlength: $input.attr('maxlength')
 				})
 				.text($input.is(':disabled') ? '' : $input.val())

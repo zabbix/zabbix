@@ -24,9 +24,10 @@
  */
 class CVaultHashiCorp extends CVault {
 
-	public const NAME = 'HashiCorp';
-	public const API_ENDPOINT_DEFAULT = 'https://localhost:8200';
-	public const DB_PATH_PLACEHOLDER = 'path/to/secret';
+	public const NAME					= 'HashiCorp';
+	public const API_ENDPOINT_DEFAULT	= 'https://localhost:8200';
+	public const DB_PATH_PLACEHOLDER	= 'path/to/secret';
+	public const MACRO_PLACEHOLDER		= 'path/to/secret:key';
 
 	/**
 	 * @var string
@@ -51,16 +52,16 @@ class CVaultHashiCorp extends CVault {
 
 	public function validateParameters(): bool {
 		if (parse_url($this->api_endpoint, PHP_URL_HOST) === null) {
-			$this->addError(_s('Provided API endpoint "%1$s" is invalid.', $this->api_endpoint)); // TODO: 7402 - translation string
+			$this->addError(_s('Provided API endpoint "%1$s" is invalid.', $this->api_endpoint));
 		}
 
 		$secret_parser = new CVaultSecretParser(['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_key' => false]);
 		if ($secret_parser->parse($this->db_path) != CParser::PARSE_SUCCESS) {
-			$this->addError(_s('Provided secret path "%1$s" is invalid.', $this->db_path)); // TODO: 7402 - translation string
+			$this->addError(_s('Provided secret path "%1$s" is invalid.', $this->db_path));
 		}
 
 		if ($this->token === '') {
-			$this->addError(_s('Provided authentication token "%1$s" is empty.', $this->token)); // TODO: 7402 - translation string
+			$this->addError(_s('Provided authentication token "%1$s" is empty.', $this->token));
 		}
 
 		return !$this->getErrors();
@@ -72,16 +73,15 @@ class CVaultHashiCorp extends CVault {
 
 		$url = $this->api_endpoint.'/v1/'.implode('/', $path_parts);
 
-		try {
-			$secret = file_get_contents($url, false, stream_context_create([
-				'http' => [
-					'method' => 'GET',
-					'header' => "X-Vault-Token: $this->token\r\n",
-					'ignore_errors' => true
-				]
-			]));
-		}
-		catch (Exception $e) {
+		$secret = @file_get_contents($url, false, stream_context_create([
+			'http' => [
+				'method' => 'GET',
+				'header' => "X-Vault-Token: $this->token\r\n",
+				'ignore_errors' => true
+			]
+		]));
+
+		if ($secret === false) {
 			$this->addError(_('Vault connection failed.'));
 
 			return null;
@@ -90,7 +90,7 @@ class CVaultHashiCorp extends CVault {
 		$secret = $secret ? json_decode($secret, true) : null;
 
 		if ($secret === null || !isset($secret['data']['data']) || !is_array($secret['data']['data'])) {
-			$this->addError(_('Unable to load database credentials from Vault.')); // TODO: 7402 - translation
+			$this->addError(_('Unable to load database credentials from Vault.'));
 
 			return null;
 		}
