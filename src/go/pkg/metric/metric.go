@@ -331,25 +331,9 @@ func mergeWithSessionData(out map[string]string, metricParams []*Param, session 
 // * value validation is failed.
 func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params map[string]string, extraParams []string,
 	err error) {
-	var (
-		session interface{}
-		val     *string
-	)
-
-	var nonsessionParams int
-
-	for _, p := range m.params {
-		if p.kind != kindSessionOnly {
-			nonsessionParams++
-		}
-	}
-
-	if !m.varParam && len(rawParams) > nonsessionParams {
-		return nil, nil, zbxerr.ErrorTooManyParameters
-	}
-
-	if len(rawParams) > 0 && m.params[0].kind == kindSession {
-		session = findSession(rawParams[0], sessions)
+	session, err := m.parseRawParams(rawParams, sessions)
+	if err != nil {
+		return
 	}
 
 	params = make(map[string]string)
@@ -369,7 +353,7 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params ma
 			continue
 		}
 
-		val = nil
+		var val *string
 		skipConnIfSessionIsSet := !(session != nil && kind == kindConn)
 		ordNum := ordinalize(i + 1)
 
@@ -430,6 +414,26 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params ma
 	}
 
 	return params, extraParams, nil
+}
+
+func (m *Metric) parseRawParams(rawParams []string, sessions interface{}) (interface{}, error) {
+	var nonsessionParams int
+
+	for _, p := range m.params {
+		if p.kind != kindSessionOnly {
+			nonsessionParams++
+		}
+	}
+
+	if !m.varParam && len(rawParams) > nonsessionParams {
+		return nil, zbxerr.ErrorTooManyParameters
+	}
+
+	if len(rawParams) > 0 && m.params[0].kind == kindSession {
+		return findSession(rawParams[0], sessions), nil
+	}
+
+	return nil, nil
 }
 
 // MetricSet stores a mapping of keys to metrics.

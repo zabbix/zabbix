@@ -97,8 +97,9 @@ func TestMetric_EvalParams(t *testing.T) {
 			wantPanic: false,
 		},
 		{
-			name: "Must not fail if passed more parameters than described, but the metric has the varParam enabled (with session)",
-			m:    metricSet["metric.query"],
+			name: "Must not fail if passed more parameters than described, " +
+				"but the metric has the varParam enabled (with session)",
+			m: metricSet["metric.query"],
 			args: args{
 				rawParams: []string{"Session1", "", "", "queryName", "queryParam1", "queryParam2"},
 				sessions: map[string]conf.Session{
