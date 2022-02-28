@@ -1,6 +1,8 @@
 Changes for 6.2.0alpha1
 
 New features:
+..F.I..... [ZBXNEXT-7397] removed support for md5 user passwords (asestakovs, mkrisjanis)
+........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 .D.G...... [ZBXNEXT-7116] added ability to force active checks after restart on Zabbix agent2 (vso)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 ...G...... [ZBXNEXT-7408] added native support for the net.dns and net.dns.record keys in Zabbix agent 2, fixed Zabbix agent 1 SOA response formatting (esneiders, ssimonenko)
@@ -12,6 +14,7 @@ A.F....... [ZBXNEXT-6470,ZBXNEXT-6959] implemented audit logging of host prototy
 .........T [ZBXNEXT-6624] added triggers, macros, changed filters and overrides in LLD rules (mchudinov)
 
 Bug fixes:
+...G...... [ZBX-20672] fixed compilation on HP-UX due to missing zbxtypes.h include (arimdjonoks)
 ..F....... [ZBX-20619] fixed massupdate button form in Safari browser (ashubin)
 ..F....... [ZBX-20465] fixed marking username entry mandatory for SSH and Telnet agent items (jfreibergs)
 ........S. [ZBX-20649] fixed crash when server attempted to use trigger after it was removed from cache (wiper)
