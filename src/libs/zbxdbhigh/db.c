@@ -500,25 +500,6 @@ DB_RESULT	DBselectN(const char *query, int n)
 	return rc;
 }
 
-int	DBget_row_count(const char *table_name)
-{
-	int		count = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table_name:'%s'", __func__, table_name);
-
-	result = DBselect("select count(*) from %s", table_name);
-
-	if (NULL != (row = DBfetch(result)))
-		count = atoi(row[0]);
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, count);
-
-	return count;
-}
-
 #ifdef HAVE_MYSQL
 static size_t	get_string_field_size(unsigned char type)
 {

@@ -1,4 +1,3 @@
-<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -18,33 +17,25 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+package zabbixsync
 
-/**
- * @var CView $this
- */
-?>
+import (
+	"zabbix.com/pkg/plugin"
+	"zabbix.com/pkg/zbxlib"
+)
 
-<script type="text/javascript">
-	$(() => {
-		const $expires_row = $('#expires-at-row');
-		const $expires_at = $expires_row.find('#expires_at');
-		const $form = $(document.forms['token']);
+// Plugin -
+type Plugin struct {
+	plugin.Base
+}
 
-		$form.on('submit', () => $form.trimValues(['#name', '#description']));
+var impl Plugin
 
-		$('#expires_state')
-			.on('change', ({target: {checked}}) => {
-				$expires_row.toggle(checked);
-				$expires_at.prop('disabled', !checked);
-			})
-			.trigger('change');
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	return zbxlib.ExecuteCheck(key, params)
+}
 
-		$('#regenerate').on('click', ({target}) => {
-			if (confirm($(target).data('confirmation'))) {
-				$form.append($('<input>', {type: 'hidden', name: 'regenerate', value: '1'}));
-				$form.find('#action_dst').val('user.token.view');
-				$form.submit();
-			}
-		});
-	});
-</script>
+func init() {
+	plugin.RegisterMetrics(&impl, "ZabbixSync", getMetrics()...)
+	impl.SetCapacity(1)
+}
