@@ -26,7 +26,7 @@ class CVaultHashiCorp extends CVault {
 
 	public const NAME = 'HashiCorp';
 	public const API_ENDPOINT_DEFAULT = 'https://localhost:8200';
-	public const DB_PATH_PLACEHOLDER = 'path/to/secret:key';
+	public const DB_PATH_PLACEHOLDER = 'path/to/secret';
 
 	/**
 	 * @var string
@@ -45,7 +45,7 @@ class CVaultHashiCorp extends CVault {
 
 	public function __construct(string $api_endpoint, string $db_path, string $token) {
 		$this->api_endpoint = rtrim(trim($api_endpoint), '/');
-		$this->db_path = $db_path;
+		$this->db_path = trim($db_path);
 		$this->token = trim($token);
 	}
 
@@ -54,13 +54,12 @@ class CVaultHashiCorp extends CVault {
 			$this->addError(_s('Provided API endpoint "%1$s" is invalid.', $this->api_endpoint)); // TODO: 7402 - translation string
 		}
 
-		$secret_parser = new CVaultSecretParser(['with_key' => false]);
+		$secret_parser = new CVaultSecretParser(['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_key' => false]);
 		if ($secret_parser->parse($this->db_path) != CParser::PARSE_SUCCESS) {
 			$this->addError(_s('Provided secret path "%1$s" is invalid.', $this->db_path)); // TODO: 7402 - translation string
 		}
 
 		if ($this->token === '') {
-			// Function validates if token is not empty string
 			$this->addError(_s('Provided authentication token "%1$s" is empty.', $this->token)); // TODO: 7402 - translation string
 		}
 
@@ -68,9 +67,6 @@ class CVaultHashiCorp extends CVault {
 	}
 
 	public function getCredentials(): ?array {
-//		$this->addError(_('Unable to load database credentials from Vault.')); // TODO: 7402 - translation
-//		return null;
-
 		$path_parts = explode('/', $this->db_path);
 		array_splice($path_parts, 1, 0, 'data');
 
@@ -87,12 +83,11 @@ class CVaultHashiCorp extends CVault {
 		}
 		catch (Exception $e) {
 			$this->addError(_('Vault connection failed.'));
-			$this->addError($e->getMessage());
 
 			return null;
 		}
 
-		$secret ? $secret = json_decode($secret, true) : $secret = null;
+		$secret = $secret ? json_decode($secret, true) : null;
 
 		if ($secret === null || !isset($secret['data']['data']) || !is_array($secret['data']['data'])) {
 			$this->addError(_('Unable to load database credentials from Vault.')); // TODO: 7402 - translation
@@ -112,10 +107,5 @@ class CVaultHashiCorp extends CVault {
 			'user' => $db_credentials['username'],
 			'password' => $db_credentials['password']
 		];
-	}
-
-	// TODO: 7402
-	public function validateMacroValue(string $value): bool {
-		return false;
 	}
 }

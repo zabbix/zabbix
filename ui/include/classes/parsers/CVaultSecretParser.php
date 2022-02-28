@@ -110,6 +110,6 @@ class CVaultSecretParser extends CParser {
 	}
 
 	private function parseCyberArk($source, $pos) {
-		return self::PARSE_FAIL;
+		return self::PARSE_SUCCESS;
 	}
 }

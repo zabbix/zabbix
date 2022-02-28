@@ -273,9 +273,13 @@ $DB[\'VERIFY_HOST\']		= '.($this->config['DB']['VERIFY_HOST'] ? 'true' : 'false'
 $DB[\'CIPHER_LIST\']		= \''.addcslashes($this->config['DB']['CIPHER_LIST'], "'\\").'\';
 
 // Vault configuration. Used if database credentials are stored in Vault secrets manager.
+$DB[\'VAULT\']		= \''.addcslashes($this->config['DB']['VAULT'], "'\\").'\';
 $DB[\'VAULT_URL\']		= \''.addcslashes($this->config['DB']['VAULT_URL'], "'\\").'\';
-$DB[\'VAULT_DB_PATH\']	= \''.addcslashes($this->config['DB']['VAULT_DB_PATH'], "'\\").'\';
+$DB[\'VAULT_DB_PATH\']			= \''.addcslashes($this->config['DB']['VAULT_DB_PATH'], "'\\").'\';
 $DB[\'VAULT_TOKEN\']		= \''.addcslashes($this->config['DB']['VAULT_TOKEN'], "'\\").'\';
+$DB[\'VAULT_CERT_FILE\']		= \''.addcslashes($this->config['DB']['VAULT_CERT_FILE'], "'\\").'\';
+$DB[\'VAULT_KEY_FILE\']		= \''.addcslashes($this->config['DB']['VAULT_KEY_FILE'], "'\\").'\';
+// $DB[\'VAULT_CACHE\']		= \'false\';
 
 // Use IEEE754 compatible value range for 64-bit Numeric (float) history values.
 // This option is enabled by default for new Zabbix installations.

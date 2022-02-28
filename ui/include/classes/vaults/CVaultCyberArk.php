@@ -26,7 +26,7 @@ class CVaultCyberArk extends CVault {
 
 	public const NAME = 'CyberArk';
 	public const API_ENDPOINT_DEFAULT = 'https://localhost:1858';
-	public const DB_PATH_PLACEHOLDER = 'AppID=foo&Query=Safe=bar;Object=buzz:key';
+	public const DB_PATH_PLACEHOLDER = 'AppID=foo&Query=Safe=bar;Object=buzz';
 
 	/**
 	 * @var string
@@ -48,11 +48,11 @@ class CVaultCyberArk extends CVault {
 	 */
 	protected $key_file;
 
-	public function __construct($api_endpoint, $db_path, $cert_file, $key_file) {
-		$this->api_endpoint = rtrim(trim($api_endpoint), '/');
-		$this->db_path = $db_path;
-		$this->cert_file = $cert_file;
-		$this->key_file = $key_file;
+	public function __construct(string $api_endpoint, string $db_path, ?string $cert_file, ?string $key_file) {
+		$this->api_endpoint = rtrim(trim($api_endpoint), '/').'/AIMWebService/api/Accounts';
+		$this->db_path = trim($db_path);
+		$this->cert_file = $cert_file !== null ? trim($cert_file) : null;
+		$this->key_file = $key_file !== null ? trim($key_file) : null;
 	}
 
 	public function validateParameters(): bool {
@@ -60,62 +60,60 @@ class CVaultCyberArk extends CVault {
 			$this->addError(_s('Provided API endpoint "%1$s" is invalid.', $this->api_endpoint)); // TODO: 7402 - translation string
 		}
 
-		$secret_parser = new CVaultSecretParser(['with_key' => false]);
+		$secret_parser = new CVaultSecretParser(['provider' => ZBX_VAULT_TYPE_CYBERARK, 'with_key' => false]);
+
 		if ($secret_parser->parse($this->db_path) != CParser::PARSE_SUCCESS) {
-			$this->addError(_s('Provided secret path "%1$s" is invalid.', $this->db_path)); // TODO: 7402 - translation string
+			$this->addError(_s('Provided secret query string "%1$s" is invalid.', $this->db_path)); // TODO: 7402 - translation string
 		}
 
 		return !$this->getErrors();
 	}
 
 	public function getCredentials(): ?array {
-		$this->addError(_('Unable to load database credentials from Vault.')); // TODO: 7402 - translation
-		return null;
+		$http_context = [
+			'method' => 'GET',
+//			'header' => 'Content type: application/json', // TODO: 7402 - debug
+			'ignore_errors' => true
+		];
 
-		$path_parts = explode('/', $this->db_path); // TODO: db_path validator and parser needs to be implemented
-		array_splice($path_parts, 1, 0, 'data');
-
-		$url = $this->api_endpoint.'/v1/'.implode('/', $path_parts);
+		if ($this->cert_file !== null && $this->key_file !== null) {
+			$http_context['ssl'] = [
+				'local_cert'		=> $this->cert_file,
+				'local_pk'			=> $this->key_file,
+				'verify_peer'		=> false,
+				'verify_peer_name'	=> false,
+				'allow_self_signed'	=> true
+			];
+		}
 
 		try {
-			$secret = file_get_contents($url, false, stream_context_create([
-				'http' => [
-					'method' => 'GET',
-					'header' => "X-Vault-Cert-File: $this->cert_file\r\n", // TODO: Modify the request for CyberArk
-					'ignore_errors' => true
-				]
-			]));
+			$secret = file_get_contents($this->api_endpoint.'?'.$this->db_path, false,
+				stream_context_create(['http' => $http_context])
+			);
 		}
 		catch (Exception $e) {
 			$this->addError(_('Vault connection failed.'));
-			$this->addError($e->getMessage());
 
 			return null;
 		}
 
-		$secret ? $secret = json_decode($secret, true) : $secret = null;
+		$db_credentials = $secret ? json_decode($secret, true) : null;
 
-		if ($secret === null || !isset($secret['data']['data']) || !is_array($secret['data']['data'])) {
+		if ($db_credentials === null) {
 			$this->addError(_('Unable to load database credentials from Vault.')); // TODO: 7402 - translation
 
 			return null;
 		}
 
-		$db_credentials = $secret['data']['data'];
-
-		if (!array_key_exists('username', $db_credentials) || !array_key_exists('password', $db_credentials)) {
-			$this->addError(_('Username and password must be stored in Vault secret keys "username" and "password".'));
+		if (!array_key_exists('UserName', $db_credentials) || !array_key_exists('Content', $db_credentials)) {
+			$this->addError(_('Username and password must be stored in Vault secret keys "UserName" and "Content".')); // TODO: 7402 - translation
 
 			return null;
 		}
 
 		return [
-			'user' => $db_credentials['username'],
-			'password' => $db_credentials['password']
+			'user' => $db_credentials['UserName'],
+			'password' => $db_credentials['Content']
 		];
-	}
-
-	public function validateMacroValue(string $value): bool {
-		return false;
 	}
 }

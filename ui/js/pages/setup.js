@@ -34,25 +34,26 @@ function updateElementsAvailability() {
 	const encryption_customizable = (encryption_supported && encryption_allowed && encryption_enabled
 		&& document.querySelector('#verify_certificate').checked);
 	const vault_selected = document.querySelector('input[name="creds_storage"]:checked').value;
+	const vault_certificates_enabled = document.querySelector('#vault_certificates_toggle').checked;
 	const rows = {
-			'#db_schema_row': (db_type === ZBX_DB_POSTGRESQL),
-			'#db_encryption_row': encryption_supported,
-			'#db_verify_host': (encryption_supported && encryption_allowed && encryption_enabled),
-			'#db_keyfile_row': encryption_customizable,
-			'#db_certfile_row': encryption_customizable,
-			'#db_cafile_row': encryption_customizable,
-			'#db_verify_host_row': encryption_customizable,
-			'#db_cipher_row': (encryption_customizable && (db_type === ZBX_DB_MYSQL)),
-			'#vault_url_row': (vault_selected != 0),
-			'#vault_db_path_row': (vault_selected == DB_STORE_CREDS_VAULT_HASHICORP),
-			'#vault_token_row': (vault_selected == DB_STORE_CREDS_VAULT_HASHICORP),
-			'#db_user': (vault_selected == 0),
-			'#db_password': (vault_selected == 0),
-			'#vault_query_string_row': (vault_selected == DB_STORE_CREDS_VAULT_CYBERARK),
-			'#vault_certificates': (vault_selected == DB_STORE_CREDS_VAULT_CYBERARK),
-			'#vault_cert_file': (vault_selected == DB_STORE_CREDS_VAULT_CYBERARK),
-			'#vault_key_file': (vault_selected == DB_STORE_CREDS_VAULT_CYBERARK)
-		};
+		'#db_schema_row': (db_type === ZBX_DB_POSTGRESQL),
+		'#db_encryption_row': encryption_supported,
+		'#db_verify_host': (encryption_supported && encryption_allowed && encryption_enabled),
+		'#db_keyfile_row': encryption_customizable,
+		'#db_certfile_row': encryption_customizable,
+		'#db_cafile_row': encryption_customizable,
+		'#db_verify_host_row': encryption_customizable,
+		'#db_cipher_row': (encryption_customizable && (db_type === ZBX_DB_MYSQL)),
+		'#vault_url_row': (vault_selected != 0),
+		'#vault_db_path_row': (vault_selected == DB_STORE_CREDS_VAULT_HASHICORP),
+		'#vault_token_row': (vault_selected == DB_STORE_CREDS_VAULT_HASHICORP),
+		'#db_user': (vault_selected == 0),
+		'#db_password': (vault_selected == 0),
+		'#vault_query_string_row': (vault_selected == DB_STORE_CREDS_VAULT_CYBERARK),
+		'#vault_certificates': (vault_selected == DB_STORE_CREDS_VAULT_CYBERARK),
+		'#vault_cert_file': vault_selected == DB_STORE_CREDS_VAULT_CYBERARK && vault_certificates_enabled,
+		'#vault_key_file': vault_selected == DB_STORE_CREDS_VAULT_CYBERARK && vault_certificates_enabled
+	};
 
 	for (let selector in rows) {
 		const elem = document.querySelector(selector);
@@ -129,9 +130,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// Stage 2, database configuration.
 	if (document.querySelector('[name=type]')) {
-		document.querySelectorAll('#type, #server, #tls_encryption, #verify_certificate, #creds_storage').forEach(
-			(elem) => elem.addEventListener('change', updateElementsAvailability)
-		);
+		for (const id of ['type', 'server', 'tls_encryption', 'verify_certificate', 'creds_storage', 'vault_certificates_toggle']) {
+			document.getElementById(id).addEventListener('change', updateElementsAvailability);
+		}
 
 		updateElementsAvailability();
 	}
@@ -141,11 +142,4 @@ document.addEventListener('DOMContentLoaded', () => {
 	if (theme) {
 		theme.addEventListener('change', () => document.forms['setup-form'].submit());
 	}
-
-	document.getElementById('vault_certificates_toggle').addEventListener('change', (e) => {
-		for (const input of document.querySelectorAll('#vault_cert_file, #vault_key_file')) {
-			input.disabled = !e.target.checked;
-			input.style.display = e.target.checked ? '' : 'none';
-		}
-	});
 });
