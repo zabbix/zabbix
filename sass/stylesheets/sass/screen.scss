@@ -4050,6 +4050,9 @@ $form-icon-btn: (
 			@extend %webkit-scrollbar;
 
 			.table-forms {
+
+				align-self: start;
+
 				.table-forms-td-right {
 					padding-right: 8px;
 				}

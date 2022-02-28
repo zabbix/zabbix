@@ -3472,14 +3472,16 @@ z-select[disabled] button,
       max-width: inherit;
       margin: 0 -10px 10px;
       padding: 0 10px; }
-      .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
-        padding-right: 8px; }
-      .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-row-with-second-field {
-        position: relative; }
-        .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-row-with-second-field .table-forms-second-column {
-          position: absolute;
-          top: 5px;
-          right: 8px; }
+      .overlay-dialogue.modal .overlay-dialogue-body .table-forms {
+        align-self: start; }
+        .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
+          padding-right: 8px; }
+        .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-row-with-second-field {
+          position: relative; }
+          .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-row-with-second-field .table-forms-second-column {
+            position: absolute;
+            top: 5px;
+            right: 8px; }
       .overlay-dialogue.modal .overlay-dialogue-body .columns-wrapper .column-50:last-of-type {
         margin-left: 10px; }
     .overlay-dialogue.modal .overlay-dialogue-controls {
