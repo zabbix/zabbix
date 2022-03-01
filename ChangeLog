@@ -50,6 +50,11 @@ Bug fixes:
 ...G...... [ZBX-20487] fixed agent handling of invalid time intervals (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.1
+
+6.0.1rc4 was released as 6.0.1 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.1rc4
 
 Bug fixes:
@@ -110,6 +115,7 @@ Bug fixes:
 ..F....... [ZBX-20426] fixed maintenance icon with host name in latest data table (acikuns)
 ...G...... [ZBX-20487] fixed agent handling of invalid time intervals (wiper)
 ........S. [ZBX-19789] added SourceIP support to ldap simple checks (dgoloscapov)
+..F....... [ZBX-20680] fixed reflected XSS issues (averza)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.0
