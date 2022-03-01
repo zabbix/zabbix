@@ -53,7 +53,10 @@ class CItemTypeSsh implements CItemType {
 			'authtype' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY])],
 			'username' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => static function () use ($db_item): bool {
-										return $db_item['type'] != ITEM_TYPE_SSH;
+										return in_array($db_item['type'], [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL,
+											ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_CALCULATED,
+											ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+										]) || (in_array($db_item['type'], [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT]) && $db_item['username'] === '');
 									}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'username')],
 									['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'username')]
 			]],

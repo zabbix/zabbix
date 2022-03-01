@@ -1647,18 +1647,6 @@ class CApiInputValidatorTest extends TestCase {
 			[
 				['type' => API_OBJECT, 'fields' => [
 					'hostid' =>	['type' => API_ID],
-					'host' =>	['type'=> API_UNEXPECTED, 'error_type' => API_ERR_READONLY]
-				]],
-				[
-					'hostid' => '10428',
-					'host' => 'Abcd host'
-				],
-				'/',
-				'Invalid parameter "/": cannot update readonly parameter "host".'
-			],
-			[
-				['type' => API_OBJECT, 'fields' => [
-					'hostid' =>	['type' => API_ID],
 					'host' =>	['type'=> API_UNEXPECTED, 'error_type' => API_ERR_INHERITED]
 				]],
 				[
@@ -1717,23 +1705,6 @@ class CApiInputValidatorTest extends TestCase {
 				],
 				'/',
 				'Invalid parameter "/": unexpected parameter "interface_ip".'
-			],
-			[
-				['type' => API_OBJECT, 'fields' => [
-					'hostid' =>				['type' => API_ID],
-					'custom_interface' =>	['type'=> API_INT32, 'flags' => API_REQUIRED, 'in' => '0,1'],
-					'interface_ip' =>		['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'custom_interface', 'in' => '1'], 'type' => API_IP],
-												['else' => true, 'type' => API_UNEXPECTED, 'error_type' => API_ERR_READONLY]
-					]]
-				]],
-				[
-					'hostid' => '10428',
-					'custom_interface' => '0',
-					'interface_ip' => '127.0.0.1'
-				],
-				'/',
-				'Invalid parameter "/": cannot update readonly parameter "interface_ip".'
 			],
 			[
 				['type' => API_OBJECT, 'fields' => [
