@@ -1988,7 +1988,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @return string
 	 */
-	public function validateDateTime($data, array $parent_data = null, $path) {
+	public function validateDateTime($data, array $parent_data, $path) {
 		if (!preg_match('/^20[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01])T(2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]Z$/', $data)) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('YYYY-MM-DDThh:mm:ssZ', 'XML date and time format'))));
 		}
@@ -2005,7 +2005,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @return bool
 	 */
-	public function requiredMapElement(array $parent_data = null) {
+	public function requiredMapElement(array $parent_data) {
 		if (zbx_is_int($parent_data['elementtype'])) {
 			switch ($parent_data['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_HOST:
@@ -2030,7 +2030,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @return array|string
 	 */
-	public function validateMapElements($data, array $parent_data = null, $path) {
+	public function validateMapElements($data, array $parent_data, $path) {
 		$rules = $this->getMapElementsExtendedRules($parent_data);
 
 		return $this->doValidate($rules, $data, $path);
@@ -2062,7 +2062,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @return array
 	 */
-	public function validateYMinItem($data, array $parent_data = null, $path) {
+	public function validateYMinItem($data, array $parent_data, $path) {
 		if (array_key_exists('ymin_type_1', $parent_data)) {
 			if (($parent_data['ymin_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE || $parent_data['ymin_type_1'] == CXmlConstantName::ITEM)) {
 				$rules = ['type' => XML_ARRAY, 'rules' => [
@@ -2092,7 +2092,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @return array
 	 */
-	public function validateYMaxItem($data, array $parent_data = null, $path) {
+	public function validateYMaxItem($data, array $parent_data, $path) {
 		if (array_key_exists('ymax_type_1', $parent_data)) {
 			if (($parent_data['ymax_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE || $parent_data['ymax_type_1'] == CXmlConstantName::ITEM)) {
 				$rules = ['type' => XML_ARRAY, 'rules' => [
@@ -2150,7 +2150,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @return array
 	 */
-	public function validateHttpPosts($data, array $parent_data = null, $path) {
+	public function validateHttpPosts($data, array $parent_data, $path) {
 		if (is_array($data)) {
 			// Posts can be an HTTP pair array.
 			$rules = ['type' => XML_INDEXED_ARRAY, 'prefix' => 'post_field', 'rules' => [
@@ -2179,7 +2179,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @return array
 	 */
-	public function validateMasterItem($data, array $parent_data = null, $path) {
+	public function validateMasterItem($data, array $parent_data, $path) {
 		$prefix = substr(strrchr($path, '/'), 1);
 		$rules = ['type' => XML_ARRAY | XML_REQUIRED, 'prefix' => $prefix, 'rules' => ['key' => ['type' => XML_STRING]]];
 
@@ -2201,7 +2201,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @return array
 	 */
-	public function validateAuthType($data, array $parent_data = null, $path) {
+	public function validateAuthType($data, array $parent_data, $path) {
 		$rules = $this->getAuthTypeExtendedRules($parent_data);
 
 		return $this->doValidate($rules, $data, $path);
@@ -2218,7 +2218,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @return array
 	 */
-	public function validateGraphItems(array $data, array $parent_data = null, $path) {
+	public function validateGraphItems(array $data, array $parent_data, $path) {
 		if (!$data) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('the tag "%1$s" is missing', 'graph_item')));
 		}
@@ -2260,7 +2260,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @return string|array
 	 */
-	public function validateWidgetFieldValue($data, array $parent_data = null, string $path) {
+	public function validateWidgetFieldValue($data, array $parent_data, string $path) {
 		$rules = $this->getWidgetFieldValueExtendedRules($parent_data);
 
 		return $this->doValidate($rules, $data, $path);

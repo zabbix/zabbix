@@ -859,7 +859,7 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @throws Exception			if the date or time is invalid
 	 */
-	public function validateDateTime($data, array $parent_data = null, $path) {
+	public function validateDateTime($data, array $parent_data, $path) {
 		if (!preg_match('/^20[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01])T(2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]Z$/', $data)) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('YYYY-MM-DDThh:mm:ssZ', 'XML date and time format'))));
 		}
@@ -897,7 +897,7 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @throws Exception			if the map element is invalid
 	 */
-	public function validateMapElement($data, array $parent_data = null, $path) {
+	public function validateMapElement($data, array $parent_data, $path) {
 		if (zbx_is_int($parent_data['elementtype'])) {
 			switch ($parent_data['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_HOST:
@@ -944,7 +944,7 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @throws Exception			if the map element is invalid
 	 */
-	public function validateScreenItemResource($data, array $parent_data = null, $path) {
+	public function validateScreenItemResource($data, array $parent_data, $path) {
 		if (zbx_is_int($parent_data['resourcetype'])) {
 			switch ($parent_data['resourcetype']) {
 				case self::SCREEN_RESOURCE_TYPE_GRAPH:
@@ -989,7 +989,7 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @throws Exception			if the element is invalid
 	 */
-	public function validateYMinItem($data, array $parent_data = null, $path) {
+	public function validateYMinItem($data, array $parent_data, $path) {
 		if (zbx_is_int($parent_data['ymin_type_1']) && $parent_data['ymin_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			$rules = ['type' => XML_ARRAY, 'rules' => [
 				'host' =>	['type' => XML_STRING | XML_REQUIRED],
@@ -1012,7 +1012,7 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @throws Exception			if the element is invalid
 	 */
-	public function validateYMaxItem($data, array $parent_data = null, $path) {
+	public function validateYMaxItem($data, array $parent_data, $path) {
 		if (zbx_is_int($parent_data['ymax_type_1']) && $parent_data['ymax_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			$rules = ['type' => XML_ARRAY, 'rules' => [
 				'host' =>	['type' => XML_STRING | XML_REQUIRED],

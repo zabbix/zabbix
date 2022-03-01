@@ -1117,8 +1117,7 @@ class DB {
 	 *
 	 * @return array
 	 */
-	private static function applyQueryOutputOptions($table_name, array $options, $table_alias = null,
-			array $sql_parts) {
+	private static function applyQueryOutputOptions($table_name, array $options, $table_alias, array $sql_parts) {
 		if ($options['countOutput']) {
 			$sql_parts['select'][] = 'COUNT('.self::fieldId('*', $table_alias).') AS rowscount';
 		}
@@ -1153,7 +1152,7 @@ class DB {
 	 *
 	 * @return array
 	 */
-	private static function applyQueryFilterOptions($table_name, array $options, $table_alias = null,
+	private static function applyQueryFilterOptions($table_name, array $options, $table_alias,
 			array $sql_parts) {
 		$table_schema = self::getSchema($table_name);
 		$pk = self::getPk($table_name);
@@ -1204,8 +1203,7 @@ class DB {
 	 *
 	 * @return array
 	 */
-	private static function applyQuerySearchOptions($table_name, array $options, $table_alias = null,
-			array $sql_parts) {
+	private static function applyQuerySearchOptions($table_name, array $options, $table_alias, array $sql_parts) {
 		global $DB;
 
 		$table_schema = DB::getSchema($table_name);
@@ -1274,7 +1272,7 @@ class DB {
 	 *
 	 * @return bool
 	 */
-	private static function dbFilter($table_name, $options, $table_alias = null, $sql_parts) {
+	private static function dbFilter($table_name, $options, $table_alias, $sql_parts) {
 		$table_schema = self::getSchema($table_name);
 		$filter = [];
 
@@ -1333,7 +1331,7 @@ class DB {
 	 *
 	 * @return array
 	 */
-	private static function applyQuerySortOptions($table_name, array $options, $table_alias = null, array $sql_parts) {
+	private static function applyQuerySortOptions($table_name, array $options, $table_alias, array $sql_parts) {
 		$table_schema = self::getSchema($table_name);
 
 		foreach ($options['sortfield'] as $index => $field_name) {
