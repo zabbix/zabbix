@@ -538,20 +538,10 @@ func NewManager(options *agent.AgentOptions) (mannager *Manager, err error) {
 }
 
 func getPluginOptions(optsRaw interface{}, name string) (capacity int, forceActiveChecksOnStart int) {
-	pluginCap, pluginSystemCap, pluginForceActiveChecksOnStart := getPluginOpts(optsRaw, name)
+	pluginSystemCap, pluginForceActiveChecksOnStart := getPluginOpts(optsRaw, name)
 
 	if pluginSystemCap > 0 {
-		if pluginCap > 0 {
-			log.Warningf("both Plugins.%s.Capacity and Plugins.%s.System.Capacity configuration parameters are set, using System.Capacity: %d",
-				name, name, pluginSystemCap)
-		}
 		capacity = pluginSystemCap
-	} else if pluginCap > 0 {
-		log.Warningf(
-			"plugin %s configuration parameter Plugins.%s.Capacity is deprecated, use Plugins.%s.System.Capacity instead",
-			name, name, name,
-		)
-		capacity = pluginCap
 	} else {
 		capacity = plugin.DefaultCapacity
 	}
@@ -571,7 +561,7 @@ func getPluginOptions(optsRaw interface{}, name string) (capacity int, forceActi
 	return
 }
 
-func getPluginOpts(optsRaw interface{}, name string) (pluginCap, pluginSystemCap int, forceActiveChecksOnStart *int) {
+func getPluginOpts(optsRaw interface{}, name string) (pluginSystemCap int, forceActiveChecksOnStart *int) {
 	var opt pluginOptions
 
 	if optsRaw == nil {
@@ -584,7 +574,6 @@ func getPluginOpts(optsRaw interface{}, name string) (pluginCap, pluginSystemCap
 		return
 	}
 
-	pluginCap = opt.Capacity
 	pluginSystemCap = opt.Capacity
 	forceActiveChecksOnStart = opt.ForceActiveChecksOnStart
 
