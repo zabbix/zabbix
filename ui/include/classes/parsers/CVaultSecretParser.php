@@ -110,6 +110,47 @@ class CVaultSecretParser extends CParser {
 	}
 
 	private function parseCyberArk($source, $pos) {
+
+		$source = 'AppId=&Query=Safe=Object=buzz';
+//		$source = 'AppID=3&Query=';
+
+
+		$this->start = $pos;
+		$this->errorClear();
+
+//		preg_match('/appid=(?<appid>[^&:]+)(?:&query=(?<query>[^:]+))?:*(?<key>.*)/i', $source, $matches, PREG_UNMATCHED_AS_NULL);
+		preg_match('/appid=(?<appid>[^&:]+)?(?:&query=(?<query>[^&:]+))?(?::*(?<key>.*))?/i', $source, $matches, PREG_UNMATCHED_AS_NULL);
+
+		sdii($matches);
+
+		if (!$matches) {
+			sdii('no matches');
+
+//			return self::PARSE_FAIL;
+		}
+
+		if (array_key_exists('appid', $matches) && $matches['appid'] === null) {
+			sdii('empty appid');
+
+//			return self::PARSE_FAIL;
+		}
+
+		if (array_key_exists('query', $matches)) {
+			preg_match_all('/(?<key>[^=]+)=(?<value>[^;]*);?/', $matches['query'][0], $query);
+			if (!array_combine($query['key'], $query['value'])) {
+				sdii('Wrong query format');
+
+//				return self::PARSE_FAIL;
+			}
+		}
+
+		if ($this->options['with_key'] && array_key_exists('key', $matches)) {
+			sdii('key error');
+//			return self::PARSE_FAIL;
+		}
+
+		die('as');
+
 		return self::PARSE_SUCCESS;
 	}
 }
