@@ -749,6 +749,21 @@ function getMenuPopupItem(options) {
 		items.push(config);
 	}
 
+	const execute = {
+		label: t('Execute now'),
+		disabled: !options.isExecutable
+	};
+
+	if (options.isExecutable) {
+		execute.clickCallback = function () {
+			jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+			view.checkNow(options.itemid);
+		};
+	}
+
+	items.push(execute);
+
 	return [{
 		label: t('Item'),
 		items: items
