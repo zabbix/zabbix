@@ -367,10 +367,6 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params ma
 				val = p.defaultValue
 			}
 		} else {
-			if p.kind == kindSessionOnly {
-				return nil, nil, zbxerr.ErrorInvalidParams.Wrap(
-					fmt.Errorf("%q cannot be passed as a key parameter", p.name))
-			}
 			val = &rawParams[i]
 		}
 
