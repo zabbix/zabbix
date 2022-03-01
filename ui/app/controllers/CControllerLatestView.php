@@ -117,7 +117,6 @@ class CControllerLatestView extends CControllerLatest {
 	}
 
 	protected function doAction(): void {
-
 		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))
 			->read()
 			->setInput($this->cleanInput($this->getInputAll()));

@@ -105,6 +105,7 @@ foreach ($data['items'] as $itemid => $item) {
 	$checkbox = (new CCheckBox('itemids['.$itemid.']', $itemid))
 		->setAttribute('data-execute', in_array($item['type'], checkNowAllowedTypes())
 			&& $item['status'] == ITEM_STATUS_ACTIVE && $host['status'] == HOST_STATUS_MONITORED
+			&& array_key_exists($itemid, $data['items_rw'])
 		)
 		->setAttribute('data-graph', $is_graph);
 
