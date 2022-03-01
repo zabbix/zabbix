@@ -2893,7 +2893,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
             <macro>
                <macro>{$PG.SLOW_QUERIES.MAX.WARN}</macro>
                <value>5</value>
-               <description>Slow queries count treshold for a trigger.</description>
+               <description>Slow queries count threshold for a trigger.</description>
             </macro>
             <macro>
                <macro>{$PG.URI}</macro>
