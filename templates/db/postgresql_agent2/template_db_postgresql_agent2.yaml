@@ -2487,7 +2487,7 @@ zabbix_export:
         -
           macro: '{$PG.SLOW_QUERIES.MAX.WARN}'
           value: '5'
-          description: 'Slow queries count treshold for a trigger.'
+          description: 'Slow queries count threshold for a trigger.'
         -
           macro: '{$PG.URI}'
           value: 'tcp://localhost:5432'
