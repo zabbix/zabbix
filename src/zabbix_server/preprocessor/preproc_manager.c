@@ -553,6 +553,26 @@ static void	preprocessor_flush_value(const zbx_preproc_item_value_t *value)
 
 /******************************************************************************
  *                                                                            *
+ * Function: preprocessing_flush_request                                      *
+ *                                                                            *
+ * Purpose: flush preprocessing request and all requests waiting on it        *
+ *                                                                            *
+ ******************************************************************************/
+static void	preprocessing_flush_request(zbx_preprocessing_manager_t *manager, zbx_preprocessing_request_t *request)
+{
+	int	i;
+
+	preprocessor_flush_value(&request->value);
+
+	manager->processed_num++;
+	manager->queued_num--;
+
+	for (i = 0; i < request->flush_queue.values_num; i++)
+		preprocessing_flush_request(manager, (zbx_preprocessing_request_t *)request->flush_queue.values[i]);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: preprocessing_flush_queue                                        *
  *                                                                            *
  * Purpose: add all sequential processed values from beginning of the queue   *
@@ -569,32 +589,18 @@ static void	preprocessing_flush_queue(zbx_preprocessing_manager_t *manager)
 	zbx_list_iterator_init(&manager->queue, &iterator);
 	while (SUCCEED == zbx_list_iterator_next(&iterator))
 	{
-		int	i;
-
 		zbx_list_iterator_peek(&iterator, (void **)&request);
 
 		if (REQUEST_STATE_DONE != request->state)
 			break;
 
-		preprocessor_flush_value(&request->value);
-
-		for (i = 0; i < request->flush_queue.values_num; i++)
-		{
-			zbx_preprocessing_request_t	*pending_request;
-
-			pending_request = (zbx_preprocessing_request_t *)request->flush_queue.values[i];
-			preprocessor_flush_value(&pending_request->value);
-		}
-
+		preprocessing_flush_request(manager, request);
 		preprocessor_free_request(request);
 
 		if (SUCCEED == zbx_list_iterator_equal(&iterator, &manager->priority_tail))
 			zbx_list_iterator_clear(&manager->priority_tail);
 
 		zbx_list_pop(&manager->queue, NULL);
-
-		manager->processed_num++;
-		manager->queued_num--;
 	}
 }
 
