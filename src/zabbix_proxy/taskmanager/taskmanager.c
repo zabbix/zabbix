@@ -286,8 +286,11 @@ static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int
 			ret = tm_execute_data_json(data_type, row[1], &info);
 			break;
 		case ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD:
-			zbx_ipc_async_socket_send(rtc, ZBX_RTC_CONFIG_CACHE_RELOAD, NULL, 0);
-			ret = SUCCEED;
+			if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
+			{
+				zbx_ipc_async_socket_send(rtc, ZBX_RTC_CONFIG_CACHE_RELOAD, NULL, 0);
+				ret = SUCCEED;
+			}
 			break;
 		default:
 			task->data = zbx_tm_data_result_create(parent_taskid, FAIL, "Unknown task.");

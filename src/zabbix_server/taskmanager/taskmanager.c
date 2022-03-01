@@ -630,7 +630,7 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 {
 	struct zbx_json_parse	jp, jp_data;
 	const char		*ptr;
-	char			hostid[MAX_ID_LEN];
+	char			hostid[MAX_ID_LEN + 1];
 	int			passive_proxy_count = 0;
 
 	if (FAIL == zbx_json_open(data, &jp))
@@ -642,7 +642,7 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 	if (FAIL == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_PROXYIDS_LIST, &jp_data))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to parse proxy config cache reload task data: field "
-				ZBX_PROTO_TAG_PROXYIDS_LIST "not found");
+				ZBX_PROTO_TAG_PROXYIDS_LIST " not found");
 		return;
 	}
 
@@ -653,9 +653,14 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 			zbx_uint64_t	proxyid;
 			int		type;
 
-			ZBX_STR2UINT64(proxyid, ptr);
+			ZBX_STR2UINT64(proxyid, hostid);
 
-			zbx_dc_get_proxy_type_by_id(proxyid, &type);
+			if (FAIL == zbx_dc_get_proxy_type_by_id(proxyid, &type))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "failed to reload configuration cache "
+						"for proxyid " ZBX_FS_UI64 ": proxy is not in cache", proxyid);
+				continue;
+			}
 
 			if (HOST_STATUS_PROXY_ACTIVE == type)
 			{
@@ -999,6 +1004,7 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const ch
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "failed to reload configuration cache "
 						"on proxy '%s': proxy is not in cache", name);
+				continue;
 			}
 
 			zabbix_log(LOG_LEVEL_WARNING, "sending request to reload the configuration cache on proxy '%s'",

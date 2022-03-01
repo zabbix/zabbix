@@ -12923,12 +12923,11 @@ void	zbx_dc_get_all_proxies(zbx_vector_uint64_t *active_proxyids, zbx_vector_uin
 
 int	zbx_dc_get_proxy_type_by_id(zbx_uint64_t proxyid, int *status)
 {
-	int		found = 0;
 	ZBX_DC_HOST	*dc_host;
 
 	RDLOCK_CACHE;
 
-	dc_host = (ZBX_DC_HOST *)DCfind_id(&config->hosts, proxyid, sizeof(ZBX_DC_HOST), &found);
+	dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &proxyid);
 
 	if (NULL == dc_host)
 		return FAIL;

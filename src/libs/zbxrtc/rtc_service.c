@@ -373,12 +373,6 @@ void	zbx_rtc_dispatch(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_ipc_message_
 		case ZBX_RTC_SUBSCRIBE:
 			rtc_subscribe(rtc, client, message->data);
 			break;
-		case ZBX_RTC_CONFIG_CACHE_RELOAD:
-			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-				rtc_notify(rtc, ZBX_PROCESS_TYPE_CONFSYNCER, 0, ZBX_RTC_CONFIG_CACHE_RELOAD, NULL, 0);
-			else
-				rtc_process(rtc, client, (int)message->code, message->data);
-			break;
 		case ZBX_RTC_CONFIG_CACHE_RELOAD_WAIT:
 			rtc_add_control_hook(rtc, client, ZBX_RTC_CONFIG_SYNC_NOTIFY);
 			rtc_notify(rtc, ZBX_PROCESS_TYPE_CONFSYNCER, 0, ZBX_RTC_CONFIG_CACHE_RELOAD, NULL, 0);
