@@ -1152,8 +1152,7 @@ class DB {
 	 *
 	 * @return array
 	 */
-	private static function applyQueryFilterOptions($table_name, array $options, $table_alias,
-			array $sql_parts) {
+	private static function applyQueryFilterOptions($table_name, array $options, $table_alias, array $sql_parts) {
 		$table_schema = self::getSchema($table_name);
 		$pk = self::getPk($table_name);
 		$pk_option = $pk.'s';

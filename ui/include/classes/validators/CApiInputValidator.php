@@ -1962,7 +1962,7 @@ class CApiInputValidator {
 	 *
 	 * @return bool
 	 */
-	private static function validateStringsUniqueness($rule, array $data = null, $path = '', &$error = '') {
+	private static function validateStringsUniqueness($rule, ?array $data, $path, &$error) {
 		// $data can be NULL when API_ALLOW_NULL is set
 		if ($data === null) {
 			return true;
@@ -2036,7 +2036,7 @@ class CApiInputValidator {
 	 *
 	 * @return bool
 	 */
-	private static function validateObjectsUniqueness($rule, array $data = null, $path = '', &$error = '') {
+	private static function validateObjectsUniqueness($rule, ?array $data, $path, &$error) {
 		// $data can be NULL when API_ALLOW_NULL is set
 		if ($data === null) {
 			return true;
