@@ -18,7 +18,7 @@
 **/
 
 #include "common.h"
-#include "proxy.h"
+#include "dbcache.h"
 #include "checks_internal.h"
 
 /******************************************************************************
