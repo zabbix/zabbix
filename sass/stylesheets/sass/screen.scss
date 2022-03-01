@@ -4050,9 +4050,6 @@ $form-icon-btn: (
 			@extend %webkit-scrollbar;
 
 			.table-forms {
-
-				align-self: start;
-
 				.table-forms-td-right {
 					padding-right: 8px;
 				}
@@ -6063,6 +6060,7 @@ svg {
 
 	display: flex;
 	flex-wrap: wrap;
+	align-items: start;
 
 	&.columns-nowrap {
 		flex-wrap: nowrap;
