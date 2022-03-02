@@ -143,7 +143,7 @@ int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char 
 
 			p = zbx_strdup(NULL, param + 1);
 
-			zbx_json_addarray(&j, ZBX_PROTO_TAG_PROXY_LIST);
+			zbx_json_addarray(&j, ZBX_PROTO_TAG_PROXY_NAMES);
 
 			token = strtok(p, ",");
 

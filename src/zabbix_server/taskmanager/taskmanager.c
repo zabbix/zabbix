@@ -634,10 +634,10 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 		return;
 	}
 
-	if (FAIL == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_PROXYIDS_LIST, &jp_data))
+	if (FAIL == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_PROXY_HOSTIDS, &jp_data))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to parse proxy config cache reload task data: field "
-				ZBX_PROTO_TAG_PROXYIDS_LIST " not found");
+				ZBX_PROTO_TAG_PROXY_HOSTIDS " not found");
 		return;
 	}
 
@@ -695,7 +695,7 @@ static void	tm_process_passive_proxy_cache_reload_request(zbx_ipc_async_socket_t
 		return;
 	}
 
-	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROXY_LIST, hostname, sizeof(hostname), NULL))
+	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROXY_NAMES, hostname, sizeof(hostname), NULL))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "broken passive proxy config cache reload request was received");
 		return;
@@ -980,7 +980,7 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const ch
 		return;
 	}
 
-	if (FAIL == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_PROXY_LIST, &jp_data))
+	if (FAIL == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_PROXY_NAMES, &jp_data))
 	{
 		tm_reload_each_proxy_cache(rtc);
 		return;
