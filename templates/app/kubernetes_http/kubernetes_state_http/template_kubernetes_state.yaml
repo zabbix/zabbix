@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-02T21:36:39Z'
+  date: '2022-03-02T21:56:29Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1882,7 +1882,7 @@ zabbix_export:
             -
               type: PROMETHEUS_TO_JSON
               parameters:
-                - kube_job_created
+                - 'kube_job_owner{owner_is_controller="<none>"}'
             -
               type: JAVASCRIPT
               parameters:
@@ -1892,7 +1892,7 @@ zabbix_export:
                   
                   input.forEach(function (metric) {
                       output.push({
-                          '{#NAME}': metric.labels.job,
+                          '{#NAME}': metric.labels.job_name,
                           '{#NAMESPACE}': metric.labels.namespace
                       });
                   });
