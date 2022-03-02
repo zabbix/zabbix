@@ -288,8 +288,7 @@ static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int
 		case ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD:
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
 			{
-				zbx_ipc_async_socket_send(rtc, ZBX_RTC_CONFIG_CACHE_RELOAD, NULL, 0);
-				ret = SUCCEED;
+				ret = zbx_ipc_async_socket_send(rtc, ZBX_RTC_CONFIG_CACHE_RELOAD, NULL, 0);
 			}
 			break;
 		default:
@@ -360,7 +359,6 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 				zbx_vector_uint64_append(&check_now_taskids, taskid);
 				break;
 			case ZBX_TM_TASK_DATA:
-			case ZBX_TM_PROXYDATA:
 				if (SUCCEED == tm_execute_data(rtc, taskid, clock, ttl, now))
 					processed_num++;
 				break;

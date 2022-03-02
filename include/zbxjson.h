@@ -186,7 +186,7 @@
 #define ZBX_PROTO_TAG_PID			"pid"
 #define ZBX_PROTO_TAG_PROCESS_NAME		"process_name"
 #define ZBX_PROTO_TAG_PROCESS_NUM		"process_num"
-#define ZBX_PROTO_TAG_PROXY_LIST		"proxy"
+#define ZBX_PROTO_TAG_PROXY_LIST		"proxy_names"
 #define ZBX_PROTO_TAG_PROXYIDS_LIST		"proxy_hostids"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"

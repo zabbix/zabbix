@@ -92,7 +92,6 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 
 				task->data = zbx_tm_data_result_create(parent_taskid, atoi(row[7]), row[9]);
 				break;
-			case ZBX_TM_TASK_DATA:
 			case ZBX_TM_PROXYDATA:
 				if (SUCCEED == DBis_null(row[10]))
 				{
