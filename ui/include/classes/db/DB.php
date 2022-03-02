@@ -1110,11 +1110,13 @@ class DB {
 	/**
 	 * Modifies the SQL parts to implement all of the output related options.
 	 *
-	 * @param string $table_name
-	 * @param array  $options
-	 * @param string $table_alias
-	 * @param array  $sql_parts
+	 * @param string      $table_name
+	 * @param array       $options
+	 * @param string|null $table_alias
+	 * @param array       $sql_parts
 	 *
+	 * @throws APIException
+	 * @throws DBException
 	 * @return array
 	 */
 	private static function applyQueryOutputOptions($table_name, array $options, $table_alias, array $sql_parts) {
@@ -1143,13 +1145,14 @@ class DB {
 	}
 
 	/**
-	 * Modifies the SQL parts to implement all of the filter related options.
+	 * Modifies the SQL parts to implement all the filter related options.
 	 *
-	 * @param string $table_name
-	 * @param array  $options
-	 * @param string $table_alias
-	 * @param array  $sql_parts
+	 * @param string      $table_name
+	 * @param array       $options
+	 * @param string|null $table_alias
+	 * @param array       $sql_parts
 	 *
+	 * @throws APIException
 	 * @return array
 	 */
 	private static function applyQueryFilterOptions($table_name, array $options, $table_alias, array $sql_parts) {
@@ -1192,14 +1195,16 @@ class DB {
 	/**
 	 * Modifies the SQL parts to implement all of the search related options.
 	 *
-	 * @param string $table_name
-	 * @param array  $options
-	 * @param array  $options['search']
-	 * @param bool   $options['startSearch']
-	 * @param bool   $options['searchByAny']
-	 * @param string $table_alias
-	 * @param array  $sql_parts
+	 * @param string      $table_name
+	 * @param array       $options
+	 * @param array       $options['search']
+	 * @param bool        $options['startSearch']
+	 * @param bool        $options['searchByAny']
+	 * @param string|null $table_alias
+	 * @param array       $sql_parts
 	 *
+	 * @throws APIException
+	 * @throws DBException
 	 * @return array
 	 */
 	private static function applyQuerySearchOptions($table_name, array $options, $table_alias, array $sql_parts) {
@@ -1264,12 +1269,14 @@ class DB {
 	/**
 	 * Apply filter conditions to sql built query.
 	 *
-	 * @param string $table_name
-	 * @param array  $options
-	 * @param string $table_alias
-	 * @param array  $sql_parts
+	 * @param string      $table_name
+	 * @param array       $options
+	 * @param string|null $table_alias
+	 * @param array       $sql_parts
 	 *
-	 * @return bool
+	 * @throws APIException
+	 * @throws DBException
+	 * @return array
 	 */
 	private static function dbFilter($table_name, $options, $table_alias, $sql_parts) {
 		$table_schema = self::getSchema($table_name);
@@ -1323,11 +1330,13 @@ class DB {
 	/**
 	 * Modifies the SQL parts to implement all of the sorting related options.
 	 *
-	 * @param string $table_name
-	 * @param array  $options
-	 * @param string $table_alias
-	 * @param array  $sql_parts
+	 * @param string      $table_name
+	 * @param array       $options
+	 * @param string|null $table_alias
+	 * @param array       $sql_parts
 	 *
+	 * @throws APIException
+	 * @throws DBException
 	 * @return array
 	 */
 	private static function applyQuerySortOptions($table_name, array $options, $table_alias, array $sql_parts) {
