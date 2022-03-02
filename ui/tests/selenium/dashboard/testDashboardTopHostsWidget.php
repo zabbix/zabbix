@@ -488,6 +488,329 @@ class testDashboardTopHostsWidget extends CWebTest {
 						]
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Widget without columns'
+					],
+					'main_error' => [
+						'Invalid parameter "Columns": an array is expected.',
+						'Invalid parameter "Order column": an integer is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Widget without item column'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Host name'
+						]
+					],
+					'main_error' => [
+						'Invalid parameter "Order column": an integer is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Host count error with item column',
+						'Host count' => 'zzz'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory'
+						]
+					],
+					'main_error' => [
+						'Invalid parameter "Host count": value must be one of 1-100.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Host count error without item column',
+						'Host count' => '333'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Host name'
+						]
+					],
+					'main_error' => [
+						'Invalid parameter "Order column": an integer is expected.',
+						'Invalid parameter "Host count": value must be one of 1-100.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Color error in Host name column'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Host name',
+							'Base color' => [
+								'id:lbl_base_color' => '!@#$%^'
+							]
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/base_color": a hexadecimal color code (6 symbols) is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Error in empty text column'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Text'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/text": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Error in text column color'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Text',
+							'Text' => 'Here is some text',
+							'Base color' => [
+								'id:lbl_base_color' => '!@#$%^'
+							]
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/base_color": a hexadecimal color code (6 symbols) is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Error in text column color'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Text',
+							'Text' => 'Here is some text',
+							'Base color' => [
+								'id:lbl_base_color' => '!@#$%^'
+							]
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/base_color": a hexadecimal color code (6 symbols) is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Error without item in item column'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1": the parameter "item" is missing.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Incorrect time shift'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Time shift' => 'zzz'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/timeshift": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Incorrect aggregation function'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Aggregation function' => 'count',
+							'Aggregation interval' => 'zzz'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/aggregate_interval": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Incorrect min value'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Display' => 'Bar',
+							'Min' => 'zzz'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/min": a number is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Incorrect max value'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Display' => 'Bar',
+							'Max' => 'zzz'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/max": a number is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Error in item column color'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Base color' => [
+								'id:lbl_base_color' => '!@#$%^'
+							]
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/base_color": a hexadecimal color code (6 symbols) is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Error in item column threshold color'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Thresholds' => [
+								[
+									'value' => '1',
+									'color' => '!@#$%^'
+								]
+							]
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/thresholds/1/color": a hexadecimal color code (6 symbols) is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Error in item column second threshold color'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Thresholds' => [
+								[
+									'value' => '1',
+									'color' => '4000FF'
+								],
+								[
+									'value' => '2',
+									'color' => '!@#$%^'
+								]
+							]
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/thresholds/2/color": a hexadecimal color code (6 symbols) is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Name' => 'Error in item column second threshold color'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Thresholds' => [
+								[
+									'value' => 'zzz',
+									'color' => '4000FF'
+								]
+							]
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/thresholds/1/threshold": a number is expected.'
+					]
+				]
 			]
 		];
 	}
@@ -523,6 +846,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 				if (array_key_exists('Thresholds', $values)) {
 					$threshold_amount = count($values['Thresholds'])-1;
 					$threshold_order = 0;
+
 					foreach ($values['Thresholds'] as $threshold) {
 						$column_form->query('button:Add')->one()->click();
 						$column_form->query('id:thresholds_'.$threshold_order.'_threshold')->one()->fill($threshold['value']);
@@ -544,34 +868,47 @@ class testDashboardTopHostsWidget extends CWebTest {
 
 				$column_form->fill($values);
 				$column_form->submit();
+
+				if (array_key_exists('column_error', $data)) {
+					$message = CMessageElement::find()->waitUntilVisible()->one();
+					$this->assertEquals($data['column_error'], $message->getLines()->asText());
+				}
+
 				sleep(1);
 			}
 		}
 
-//		sleep(1);
 		$form->fill($data['main_fields']);
 		COverlayDialogElement::find()->waitUntilReady()->one();
 
 		$form->submit();
+
+		if (array_key_exists('main_error', $data)) {
+			$message = CMessageElement::find()->waitUntilVisible()->one();
+			$this->assertEquals($data['main_error'], $message->getLines()->asText());
+		}
+
 		$this->page->waitUntilReady();
 
-		// Make sure that the widget is present before saving the dashboard.
-		$header = CTestArrayHelper::get($data['main_fields'], 'Name', 'Top hosts');
-		$dashboard->getWidget($header);
-		$dashboard->save();
+		if ($data['expected'] === TEST_GOOD) {
+			// Make sure that the widget is present before saving the dashboard.
+			$header = CTestArrayHelper::get($data['main_fields'], 'Name', 'Top hosts');
+			$dashboard->getWidget($header);
+			$dashboard->save();
 
-		$this->checkDashboardMessage();
-		$this->assertEquals($old_widget_count + 1, $dashboard->getWidgets()->count());
-		$this->checkWidget($header, $data);
-	}
+			// Check message that widget added.
+			$message = CMessageElement::find()->waitUntilVisible()->one();
+			$this->assertTrue($message->isGood());
+			$this->assertEquals('Dashboard updated', $message->getTitle());
 
-	/*
-	 * Check dashboard update message.
-	 */
-	private function checkDashboardMessage() {
-		$message = CMessageElement::find()->waitUntilVisible()->one();
-		$this->assertTrue($message->isGood());
-		$this->assertEquals('Dashboard updated', $message->getTitle());
+			// Check widget amount that it is added.
+			$this->assertEquals($old_widget_count + 1, $dashboard->getWidgets()->count());
+			$this->checkWidget($header, $data);
+		}
+		else {
+			$dashboard->save();
+			$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
+		}
 	}
 
 	private function checkWidget($header, $data) {
@@ -654,6 +991,3 @@ class testDashboardTopHostsWidget extends CWebTest {
 		}
 	}
 }
-
-
-
