@@ -2682,6 +2682,11 @@ $form-icon-btn: (
 	.drag-icon,
 	.dashboard-widget-head {
 		@extend %cursor-dragging;
+
+		.popup-sysmap-doc-link {
+			margin-right: -15px;
+			margin-top:	-15px;
+		}
 	}
 }
 
