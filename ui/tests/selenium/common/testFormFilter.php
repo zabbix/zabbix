@@ -94,7 +94,9 @@ class testFormFilter extends CWebTest {
 	/**
 	 * Change data in filter form.
 	 *
-	 * @param string $user  test user with saved filters
+	 * @param string $user              test user with saved filters
+	 * @param string $password          password for user with saved filters
+	 * @param string $table_selector    selector of a table with filtered data
 	 */
 	public function updateFilterForm($user, $password, $table_selector) {
 		$this->page->userLogin($user, $password);
@@ -152,7 +154,8 @@ class testFormFilter extends CWebTest {
 	/**
 	 * Update filter properties.
 	 *
-	 * @param string $user  test user with saved filters
+	 * @param string $user        test user with saved filters
+	 * @param string $password    password for user with saved filters
 	 */
 	public function updateFilterProperties($user, $password) {
 		$this->page->userLogin($user, $password);
@@ -185,7 +188,8 @@ class testFormFilter extends CWebTest {
 	/**
 	 * Delete existing filters.
 	 *
-	 * @param string $user  test user with saved filters
+	 * @param string $user        test user with saved filters
+	 * @param string $password    password for user with saved filters
 	 */
 	public function deleteFilter($user, $password) {
 		$this->page->userLogin($user, $password);
@@ -217,8 +221,9 @@ class testFormFilter extends CWebTest {
 	/**
 	 * Create filter.
 	 *
-	 * @param array $data   given data provider
-	 * @param string $user  test user with saved filters
+	 * @param array  $data        given data provider
+	 * @param string $user        test user with saved filters
+	 * @param string $password    password for user with saved filters
 	 */
 	public function createFilter($data, $user, $password) {
 		$this->page->userLogin($user, $password);
@@ -246,6 +251,10 @@ class testFormFilter extends CWebTest {
 
 	/**
 	 * Return result amount from table.
+	 *
+	 * @param string $table_selector    selector of a table with filtered data
+	 *
+	 * @return int
 	 */
 	public function getTableResults($table_selector) {
 		$table = $this->query($table_selector)->asTable()->waitUntilReady()->one();
@@ -257,6 +266,8 @@ class testFormFilter extends CWebTest {
 
 	/**
 	 * Return filter names from droplist.
+	 *
+	 * @return array
 	 */
 	public function getDropdownFilterNames() {
 		$this->query('xpath://button[@data-action="toggleTabsList"]')->one()->click();
