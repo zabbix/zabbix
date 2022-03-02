@@ -316,7 +316,7 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @throws Exception			if the date is invalid
 	 */
-	public function validateDate($data, array $parent_data, $path) {
+	public function validateDate($data, ?array $parent_data, $path) {
 		if (!preg_match('/^(0[1-9]|[1-2][0-9]|3[01])\.(0[1-9]|1[0-2])\.[0-9]{2}$/', $data)) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('DD.MM.YY', 'XML date format'))));
 		}
@@ -333,7 +333,7 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @throws Exception			if the time is invalid
 	 */
-	public function validateTime($data, array $parent_data, $path) {
+	public function validateTime($data, ?array $parent_data, $path) {
 		if (!preg_match('/^(2[0-3]|[01][0-9])\.[0-5][0-9]$/', $data)) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('hh.mm', 'XML time format'))));
 		}
@@ -350,7 +350,7 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @throws Exception			if tag is invalid
 	 */
-	public function validateYMinItem($data, array $parent_data, $path) {
+	public function validateYMinItem($data, ?array $parent_data, $path) {
 		if (zbx_is_int($parent_data['ymin_type']) && $parent_data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			if (strpos($data, ':') === false) {
 				throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _('"host:key" pair is expected')));
@@ -372,7 +372,7 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @throws Exception			if tag is invalid
 	 */
-	public function validateYMaxItem($data, array $parent_data, $path) {
+	public function validateYMaxItem($data, ?array $parent_data, $path) {
 		if (zbx_is_int($parent_data['ymax_type']) && $parent_data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			if (strpos($data, ':') === false) {
 				throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _('"host:key" pair is expected')));
@@ -394,7 +394,7 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @throws Exception			if tag is invalid
 	 */
-	public function validateGraphItem($data, array $parent_data, $path) {
+	public function validateGraphItem($data, ?array $parent_data, $path) {
 		if (strpos($data, ':') === false) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _('"host:key" pair is expected')));
 		}
@@ -432,7 +432,7 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @throws Exception			if the map element is invalid
 	 */
-	public function validateMapElement($data, array $parent_data, $path) {
+	public function validateMapElement($data, ?array $parent_data, $path) {
 		if (zbx_is_int($parent_data['elementtype'])) {
 			switch ($parent_data['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_HOST:
