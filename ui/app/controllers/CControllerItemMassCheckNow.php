@@ -54,22 +54,15 @@ class CControllerItemMassCheckNow extends CController {
 
 	protected function doAction(): void {
 		$output = [];
-		$itemids = $this->getInput('itemids');
 
-		// Item intial count from the input IDs.
-		$items_cnt = count($itemids);
+		// List of item IDs that are coming from input (later overwritten).
+		$itemids = $this->getInput('itemids');
 
 		// True if request comes from LLD rule list view.
 		$is_discovery_rule = (bool) $this->getInput('discovery_rule', 0);
 
 		// Error message details.
-		$details = [];
-
-		// True if result was successful or partially successful.
-		$result = true;
-
-		// True no errors occurred and result was only partially successful.
-		$partial_success = false;
+		$errors = [];
 
 		// Find items or LLD rules.
 		if ($is_discovery_rule) {
@@ -92,15 +85,14 @@ class CControllerItemMassCheckNow extends CController {
 		}
 
 		if ($items) {
-			// Some or all items are found and user has permissions to some of the items.
-
-			// Not all given item IDs exist. Some non-existent items are filtered out already.
-			if ($items_cnt != count($items)) {
-				$partial_success = true;
+			/*
+			 * If some items were not found (deleted or web items) or user may not have permissions, set error message.
+			 * In case of partial success, error message will not be visible, but in case there are no items to create
+			 * tasks for, error message will be visible.
+			 */
+			if (count($itemids) != count($items)) {
+				$errors = [_('No permissions to referred object or it does not exist!')];
 			}
-
-			// Reset item count to only items that are found.
-			$items_cnt = count($items);
 
 			// Get all allowed item types including dependent items, which will be processed separately.
 			$allowed_types = checkNowAllowedTypes();
@@ -111,42 +103,51 @@ class CControllerItemMassCheckNow extends CController {
 			// Item IDs that are given to task.create API method. These are all top level item IDs.
 			$itemids = [];
 
-			// List if items that are not allowed by type. This does not include dependent items.
-			$non_allowed_items_type = [];
-
-			// List if items that are allowed by type, but are not monitored.
-			$non_monitored_items = [];
-
-			// Structure the initial top level items and collect master item IDs.
 			foreach ($items as $itemid => $item) {
+				if (!in_array($item['type'], $allowed_types)) {
+					// In case items (dependent or master) are not allowed, store the error message.
+					if (!$errors) {
+						// If no errors exist yet, set the first error message.
+						$msg_part = ($item['flags'] == ZBX_FLAG_DISCOVERY_RULE)
+							? _('wrong discovery rule type')
+							: _('wrong item type');
+						$errors = [_s('Cannot send request: %1$s.', $msg_part)];
+					}
+
+					// Stop processing this item, since it is not valid.
+					continue;
+				}
+
+				if ($item['status'] != ITEM_STATUS_ACTIVE || $item['hosts'][0]['status'] != HOST_STATUS_MONITORED) {
+					// In case items (dependent or master) or host is not monitored, store the error message.
+					$host_name = $item['hosts'][0]['name'];
+
+					if (!$errors) {
+						// If no errors exist yet, set the first error message.
+						$msg_part = ($item['flags'] == ZBX_FLAG_DISCOVERY_RULE)
+							? _s('discovery rule "%1$s" on host "%2$s" is not monitored', $item['name'], $host_name)
+							: _s('item "%1$s" on host "%2$s" is not monitored', $item['name'], $host_name);
+						$errors = [_s('Cannot send request: %1$s.', $msg_part)];
+					}
+
+					// Stop processing this item, since it is not valid.
+					continue;
+				}
+
 				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 					// So far it is not known if master items are allowed or not. Collect IDs to process them later.
 					$master_itemids[$item['master_itemid']] = true;
 				}
 				else {
-					// Gather all other non-dependent items.
-					if (in_array($item['type'], $allowed_types)) {
-						if ($item['status'] == ITEM_STATUS_ACTIVE
-								&& $item['hosts'][0]['status'] == HOST_STATUS_MONITORED) {
-							// Collect allowed and monitored item IDs.
-							$itemids[$itemid] = true;
-						}
-						else {
-							// If top level item is not monitored, store it to later show error message.
-							$non_monitored_items[$itemid] = $item;
-						}
-					}
-					else {
-						// Add a custom flag to pass on for error message. Will show non-master item error message.
-						$item['master'] = false;
-
-						// If top level item is not allowed by type, store it to later show error message.
-						$non_allowed_items_type[$itemid] = $item;
-					}
+					// These item IDs are top level IDs and will be passed to task.create method.
+					$itemids[$itemid] = true;
 				}
 			}
 
-			// If all or some dependent items are found.
+			/*
+			 * If all or some dependent items are found, find master items. Keep looping till all dependent items are
+			 * processed.
+			 */
 			if ($master_itemids) {
 				// Store already found items in item cache.
 				$this->item_cache = $items;
@@ -154,130 +155,57 @@ class CControllerItemMassCheckNow extends CController {
 				while ($master_itemids) {
 					// Get already known items from cache or DB.
 					$master_items = $this->getMasterItems(array_keys($master_itemids));
-					/*
-					 * There is no need for additional check to see if master items exist. Master items must exist.
-					 * If they do not exist, so does the dependent. In that case this code block will not execute,
-					 * because the dependet item IDs, that do not exist, cannot be here in the first place.
-					 */
 
 					// Reset master item IDs, so this loop will eventually end.
 					$master_itemids = [];
 
-					// Now check the master items if they are allowed and monitored.
 					foreach ($master_items as $itemid => $item) {
+						if (!in_array($item['type'], $allowed_types)) {
+							// In case parent item (dependent or master) is not allowed, store the error message.
+
+							if (!$errors) {
+								// If no errors exist yet, set the first error message.
+								$errors = [_s('Cannot send request: %1$s.', _('wrong master item type'))];
+							}
+
+							// Stop processing this item, since it is not valid.
+							continue;
+						}
+
+						if ($item['status'] != ITEM_STATUS_ACTIVE
+								|| $item['hosts'][0]['status'] != HOST_STATUS_MONITORED) {
+							// In case items (dependent or master) or host is not monitored, store the error message.
+							if (!$errors) {
+								// If no errors exist yet, set the first error message.
+								$errors = [_s('Cannot send request: %1$s.', _s(
+									'item "%1$s" on host "%2$s" is not monitored', $item['name'],
+									$item['hosts'][0]['name']
+								))];
+							}
+
+							// Stop processing this item, since it is not valid.
+							continue;
+						}
+
 						if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 							// Again some dependent items found. Keep looping.
 							$master_itemids[$item['master_itemid']] = true;
 						}
 						else {
-							// Check non-dependent master items.
-							if (in_array($item['type'], $allowed_types)) {
-								if ($item['status'] == ITEM_STATUS_ACTIVE
-										&& $item['hosts'][0]['status'] == HOST_STATUS_MONITORED) {
-									// Collect allowed and monitored item IDs.
-									$itemids[$itemid] = true;
-								}
-								else {
-									// If master item is not monitored, store it to later show error message.
-									$non_monitored_items[$itemid] = $item;
-								}
-							}
-							else {
-								// Add a custom flag to pass on for error message. Will show master item error message.
-								$item['master'] = true;
-
-								// If master item is not allowed by type, store it to later show error message.
-								$non_allowed_items_type[$itemid] = $item;
-							}
+							// These item IDs are top level IDs and will be passed to task.create method.
+							$itemids[$itemid] = true;
 						}
 					}
 				}
 			}
-
-			// Reset item count to only master items that are found. All allowed and non-allowed.
-			if ($this->item_cache) {
-				// If there are dependent items, include these as well.
-				$items = array_filter($this->item_cache, function($item) {
-					if ($item['type'] != ITEM_TYPE_DEPENDENT) {
-						return $item;
-					}
-				});
-			}
-			$items_cnt = count($items);
-
-			if ($non_monitored_items) {
-				// Some or all non-monitored items found.
-
-				if ($items_cnt == count($non_monitored_items)
-						|| count($non_allowed_items_type) + count($non_monitored_items) == $items_cnt) {
-					// Either all of the found items are not monitored or they are both not monitored and not allowed.
-
-					// This case will result in error.
-					$result = false;
-
-					// Get first non-monitored item. All of them are not monitored. So it does not matter which one.
-					$item = reset($non_monitored_items);
-					$host_name = $item['hosts'][0]['name'];
-
-					// Set the error message details.
-					$msg_part = ($item['flags'] == ZBX_FLAG_DISCOVERY_RULE)
-						? _s('discovery rule "%1$s" on host "%2$s" is not monitored', $item['name'], $host_name)
-						: _s('item "%1$s" on host "%2$s" is not monitored', $item['name'], $host_name);
-					$details = [_s('Cannot send request: %1$s.', $msg_part)];
-				}
-				elseif ($items_cnt == count($non_allowed_items_type)) {
-					// All found items are not allowed by type, but all are monitored. Shows different error message.
-
-					// This case will result in error.
-					$result = false;
-
-					// Get first non-allowed item. All of them are not allowed. So it does not matter which one.
-					$item = reset($non_allowed_items_type);
-
-					// Set the error message details.
-					$msg_part = ($item['flags'] == ZBX_FLAG_DISCOVERY_RULE)
-						? _('wrong discovery rule type')
-						: ($item['master'] ? _('wrong master item type') : _('wrong item type'));
-					$details = [_s('Cannot send request: %1$s.', $msg_part)];
-				}
-				else {
-					// Some items found are not allowed or some are not monitored. Some are allowed and monitored.
-
-					$partial_success = true;
-				}
-			}
-			elseif ($non_allowed_items_type) {
-				if ($items_cnt == count($non_allowed_items_type)) {
-					// All found items are not allowed by type, but all of them are monitored.
-
-					// This case will result in error.
-					$result = false;
-
-					// Get first non-allowed item. All of them are not allowed. So it does not matter which one.
-					$item = reset($non_allowed_items_type);
-
-					// Set the error message details.
-					$msg_part = ($item['flags'] == ZBX_FLAG_DISCOVERY_RULE)
-						? _('wrong discovery rule type')
-						: ($item['master'] ? _('wrong master item type') : _('wrong item type'));
-					$details = [_s('Cannot send request: %1$s.', $msg_part)];
-				}
-				else {
-					// Some found items are not allowed.
-
-					$partial_success = true;
-				}
-			}
 		}
 		else {
-			// User has no permissions to any of the selected items or they are deleted.
-
-			$result = false;
-			$details = [_('No permissions to referred object or it does not exist!')];
+			// User has no permissions to any of the selected items or they are deleted or web items.
+			$errors = [_('No permissions to referred object or it does not exist!')];
 		}
 
-		if ($result && $itemids) {
-			// If ther are no errors, create tasks for these item IDs. These items exist are all valid.
+		if ($itemids) {
+			// If all or some items were valid, create tasks.
 			$create_tasks = [];
 			$itemids = array_keys($itemids);
 
@@ -291,23 +219,27 @@ class CControllerItemMassCheckNow extends CController {
 			}
 
 			$result = (bool) API::Task()->create($create_tasks);
-			if (!$result) {
-				// In case something still goes wrong in API, get the error message and store it in details.
-				$details = array_column(get_and_clear_messages(), 'message');
+
+			if ($result) {
+				// If tasks were created, return either partial success result or full success result.
+				$output['success'] = ['title' => $errors
+					? _('Request sent successfully. Some items are filtered due to access permissions or type.')
+					: _('Request sent successfully')
+				];
+			}
+			else {
+				// If task API failed, return will full error message from API.
+				$output['error'] = [
+					'title' => _('Cannot execute operation'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				];
 			}
 		}
-
-		// Prepare the output message.
-		if ($result) {
-			$output['success'] = ['title' => $partial_success
-				? _('Request sent successfully. Some items are filtered due to access permissions or type.')
-				: _('Request sent successfully')
-			];
-		}
 		else {
+			// No items left to send to task.create. Returns a full error message that was set before.
 			$output['error'] = [
 				'title' => _('Cannot execute operation'),
-				'messages' => $details
+				'messages' => $errors
 			];
 		}
 
@@ -337,7 +269,7 @@ class CControllerItemMassCheckNow extends CController {
 		// If some items were not found in cache, select them from DB.
 		if ($itemids) {
 			$items = API::Item()->get([
-				'output' => ['type', 'name', 'status', 'flags', 'master_itemid'],
+				'output' => ['type', 'name', 'status', 'master_itemid'],
 				'selectHosts' => ['name', 'status'],
 				'itemids' => $itemids,
 				'editable' => !$this->checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW),
