@@ -1847,7 +1847,6 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 	 * @param string $path  XML path (for error reporting).
 	 *
 	 * @throws Exception if $data does not correspond to validation rules.
-	 *
 	 * @return array  Validator does some manipulations for the incoming data. For example, converts empty tags to an
 	 *                array, if desired. Converted array is returned.
 	 */
@@ -1858,12 +1857,11 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate date and time format.
 	 *
-	 * @param string $data         Import data.
-	 * @param array  $parent_data  Data's parent array.
-	 * @param string $path         XML path (for error reporting).
+	 * @param string     $data         Import data.
+	 * @param array|null $parent_data  Data's parent array.
+	 * @param string     $path         XML path (for error reporting).
 	 *
 	 * @throws Exception if the date or time is invalid.
-	 *
 	 * @return string
 	 */
 	public function validateDateTime($data, ?array $parent_data, $path) {
@@ -1879,11 +1877,9 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @param array $parent_data  Data's parent array.
 	 *
-	 * @throws Exception if the check is failed.
-	 *
 	 * @return bool
 	 */
-	public function requiredMapElement(array $parent_data) {
+	public function requiredMapElement(array $parent_data = null) {
 		if (zbx_is_int($parent_data['elementtype'])) {
 			switch ($parent_data['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_HOST:
@@ -1901,11 +1897,10 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 	 * Validate map elements.
 	 *
 	 * @param array|string $data         Import data.
-	 * @param array        $parent_data  Data's parent array.
+	 * @param array|null   $parent_data  Data's parent array.
 	 * @param string       $path         XML path.
 	 *
 	 * @throws Exception if the map elements are invalid.
-	 *
 	 * @return array|string
 	 */
 	public function validateMapElements($data, ?array $parent_data, $path) {
@@ -1918,11 +1913,10 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 	 * Validate "screen_item/resource" tag.
 	 *
 	 * @param array|string $data         Import data.
-	 * @param array        $parent_data  Data's parent array.
+	 * @param array|null   $parent_data  Data's parent array.
 	 * @param string       $path         XML path.
 	 *
 	 * @throws Exception if the map element is invalid.
-	 *
 	 * @return array|string
 	 */
 	public function validateScreenItemResource($data, ?array $parent_data, $path) {
@@ -1964,12 +1958,11 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate "ymin_item_1" tag.
 	 *
-	 * @param string $data         Import data.
-	 * @param array  $parent_data  Data's parent array.
-	 * @param string $path         XML path.
+	 * @param string     $data         Import data.
+	 * @param array|null $parent_data  Data's parent array.
+	 * @param string     $path         XML path.
 	 *
 	 * @throws Exception if the element is invalid.
-	 *
 	 * @return array
 	 */
 	public function validateYMinItem($data, ?array $parent_data, $path) {
@@ -1994,12 +1987,11 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate "ymax_item_1" tag.
 	 *
-	 * @param string $data         Import data.
-	 * @param array  $parent_data  Data's parent array.
-	 * @param string $path         XML path.
+	 * @param string     $data         Import data.
+	 * @param array|null $parent_data  Data's parent array.
+	 * @param string     $path         XML path.
 	 *
 	 * @throws Exception if the element is invalid.
-	 *
 	 * @return array
 	 */
 	public function validateYMaxItem($data, ?array $parent_data, $path) {
@@ -2024,12 +2016,11 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate media type "parameters" tag.
 	 *
-	 * @param string $data         Import data.
-	 * @param array  $parent_data  Data's parent array.
-	 * @param string $path         XML path.
+	 * @param string     $data         Import data.
+	 * @param array|null $parent_data  Data's parent array.
+	 * @param string     $path         XML path.
 	 *
 	 * @throws Exception if the element is invalid.
-	 *
 	 * @return array
 	 */
 	public function validateMediaTypeParameters($data, ?array $parent_data, $path) {
@@ -2043,7 +2034,7 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @param mixed $value
 	 *
-	 * @return mixed  Converted value.
+	 * @return mixed
 	 */
 	public function transformZero2Array($value) {
 		return ($value === '0') ? [] : $value;
@@ -2053,11 +2044,10 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 	 * Validate "posts" tag of http test step.
 	 *
 	 * @param array|string $data         Import data.
-	 * @param array        $parent_data  Data's parent array.
+	 * @param array|null   $parent_data  Data's parent array.
 	 * @param string       $path         XML path.
 	 *
 	 * @throws Exception if the element is invalid.
-	 *
 	 * @return array
 	 */
 	public function validateHttpPosts($data, ?array $parent_data, $path) {
@@ -2081,12 +2071,11 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate master item.
 	 *
-	 * @param string $data         Import data.
-	 * @param array  $parent_data  Data's parent array.
-	 * @param string $path         XML path.
+	 * @param string     $data         Import data.
+	 * @param array|null $parent_data  Data's parent array.
+	 * @param string     $path         XML path.
 	 *
 	 * @throws Exception if the element is invalid.
-	 *
 	 * @return array
 	 */
 	public function validateMasterItem($data, ?array $parent_data, $path) {
@@ -2103,12 +2092,11 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate authtype.
 	 *
-	 * @param string $data         Import data.
-	 * @param array  $parent_data  Data's parent array.
-	 * @param string $path         XML path.
+	 * @param string     $data         Import data.
+	 * @param array|null $parent_data  Data's parent array.
+	 * @param string     $path         XML path.
 	 *
 	 * @throws Exception if the element is invalid.
-	 *
 	 * @return array
 	 */
 	public function validateAuthType($data, ?array $parent_data, $path) {
@@ -2120,12 +2108,11 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate graph_items tag.
 	 *
-	 * @param array  $data         Import data.
-	 * @param array  $parent_data  Data's parent array.
-	 * @param string $path         XML path.
+	 * @param array      $data         Import data.
+	 * @param array|null $parent_data  Data's parent array.
+	 * @param string     $path         XML path.
 	 *
 	 * @throws Exception if the element is invalid.
-	 *
 	 * @return array
 	 */
 	public function validateGraphItems(array $data, ?array $parent_data, $path) {
@@ -2234,7 +2221,6 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 	 * @param array $data  Export data.
 	 *
 	 * @throws Exception if the element is invalid.
-	 *
 	 * @return array
 	 */
 	public function graphMaxItemExport(array $data) {
@@ -2254,7 +2240,6 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 	 * @param array $data  Export data.
 	 *
 	 * @throws Exception if the element is invalid.
-	 *
 	 * @return array
 	 */
 	public function graphMinItemExport(array $data) {
@@ -2274,7 +2259,6 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 	 * @param array $data  Export data.
 	 *
 	 * @throws Exception if the element is invalid.
-	 *
 	 * @return string Tag constant.
 	 */
 	public function itemAuthtypeExport(array $data) {
@@ -2300,7 +2284,6 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 	 * @param array $data  Export data.
 	 *
 	 * @throws Exception if the element is invalid.
-	 *
 	 * @return array
 	 */
 	public function hostTlsAcceptExport(array $data) {
@@ -2342,7 +2325,6 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 	 * @param array $data  Export data.
 	 *
 	 * @throws Exception if the element is invalid.
-	 *
 	 * @return array
 	 */
 	public function mediaTypeParametersExport(array $data) {
