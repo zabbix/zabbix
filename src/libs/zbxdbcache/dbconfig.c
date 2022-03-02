@@ -89,7 +89,7 @@ extern int		CONFIG_TIMER_FORKS;
 ZBX_MEM_FUNC_IMPL(__config, config_mem)
 
 static void	dc_maintenance_precache_nested_groups(void);
-static void	dc_item_reset_triggers(ZBX_DC_ITEM *item);
+static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_exclude);
 
 /* by default the macro environment is non-secure and all secret macros are masked with ****** */
 static unsigned char	macro_env = ZBX_MACRO_ENV_NONSECURE;
@@ -3727,7 +3727,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 						if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
 								itemid)))
 						{
-							dc_item_reset_triggers(item);
+							dc_item_reset_triggers(item, trigger);
 						}
 					}
 				}
@@ -4233,7 +4233,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 				ZBX_DC_ITEM	*item_last;
 
 				if (NULL != (item_last = zbx_hashset_search(&config->items, &function->itemid)))
-					dc_item_reset_triggers(item_last);
+					dc_item_reset_triggers(item_last, NULL);
 			}
 		}
 		else
@@ -4247,7 +4247,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 		function->type = zbx_get_function_type(function->function);
 		function->revision = config->sync_start_ts;
 
-		dc_item_reset_triggers(item);
+		dc_item_reset_triggers(item, NULL);
 	}
 
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
@@ -4256,7 +4256,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 			continue;
 
 		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &function->itemid)))
-			dc_item_reset_triggers(item);
+			dc_item_reset_triggers(item, NULL);
 
 		zbx_strpool_release(function->function);
 		zbx_strpool_release(function->parameter);
@@ -5733,8 +5733,11 @@ static void	dc_trigger_add_itemids(ZBX_DC_TRIGGER *trigger, const zbx_vector_uin
  * Purpose: reset item trigger links and remove corresponding itemids from    *
  *          affected triggers                                                 *
  *                                                                            *
+ * Parameters: item    - the item to reset                                    *
+ *             trigger - the trigger to exclude                               *
+ *                                                                            *
  ******************************************************************************/
-static void	dc_item_reset_triggers(ZBX_DC_ITEM *item)
+static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_exclude)
 {
 	ZBX_DC_TRIGGER	**trigger;
 
@@ -5747,18 +5750,17 @@ static void	dc_item_reset_triggers(ZBX_DC_ITEM *item)
 	{
 		zbx_uint64_t	*itemid;
 
+		if (*trigger == trigger_exclude)
+			continue;
+
 		if (NULL != (*trigger)->itemids)
 		{
 			for (itemid = (*trigger)->itemids; 0 != *itemid; itemid++)
 			{
 				if (item->itemid == *itemid)
 				{
-					do
-					{
-						*itemid = itemid[1];
+					while (0 != (*itemid = itemid[1]))
 						itemid++;
-					}
-					while (0 != *itemid);
 
 					break;
 				}
