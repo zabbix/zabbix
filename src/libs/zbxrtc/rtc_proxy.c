@@ -38,6 +38,7 @@ int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, 
 {
 	ZBX_UNUSED(rtc);
 	ZBX_UNUSED(data);
+	ZBX_UNUSED(result);
 
 	switch (code)
 	{

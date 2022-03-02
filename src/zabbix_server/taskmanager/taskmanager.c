@@ -663,8 +663,13 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 			}
 			else if (HOST_STATUS_PROXY_PASSIVE == type)
 			{
-				zbx_dc_update_passive_proxy_nextcheck(proxyid);
-				passive_proxy_count++;
+				if (FAIL == zbx_dc_update_passive_proxy_nextcheck(proxyid))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "failed to reload configuration cache on proxy "
+							"with id " ZBX_FS_UI64 ": failed to update nextcheck", proxyid);
+				}
+				else
+					passive_proxy_count++;
 			}
 		}
 	}
@@ -708,8 +713,13 @@ static void	tm_process_passive_proxy_cache_reload_request(zbx_ipc_async_socket_t
 		return;
 	}
 
-	zbx_dc_update_passive_proxy_nextcheck(proxyid);
-	zbx_ipc_async_socket_send(rtc, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
+	if (FAIL == zbx_dc_update_passive_proxy_nextcheck(proxyid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to reload configuration cache on proxy "
+				"with id " ZBX_FS_UI64 ": failed to update nextcheck", proxyid);
+	}
+	else
+		zbx_ipc_async_socket_send(rtc, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
 }
 
 /******************************************************************************
@@ -950,7 +960,13 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 	if (pas.values_num > 0)
 	{
 		for (i = 0; i < pas.values_num; i++)
-			zbx_dc_update_passive_proxy_nextcheck(pas.values[i]);
+		{
+			if (FAIL == zbx_dc_update_passive_proxy_nextcheck(pas.values[i]))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "failed to reload configuration cache on proxy "
+						"with id " ZBX_FS_UI64 ": failed to update nextcheck", pas.values[i]);
+			}
+		}
 
 		zbx_ipc_async_socket_send(rtc, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
 	}
@@ -1011,8 +1027,13 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const ch
 			}
 			else if (HOST_STATUS_PROXY_PASSIVE == type)
 			{
-				zbx_dc_update_passive_proxy_nextcheck(proxyid);
-				passive_proxy_count++;
+				if (FAIL == zbx_dc_update_passive_proxy_nextcheck(proxyid))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "failed to reload configuration cache on proxy "
+							"with id " ZBX_FS_UI64 ": failed to update nextcheck", proxyid);
+				}
+				else
+					passive_proxy_count++;
 			}
 		}
 	}

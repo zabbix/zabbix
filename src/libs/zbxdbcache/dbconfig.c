@@ -12849,7 +12849,7 @@ out:
  * Parameters:                                                                *
  *     name    - [IN] the proxy name                                          *
  *     proxyid - [OUT] the proxyid                                            *
- *     type    - [IN/OUT] the type of a proxy                                 *
+ *     type    - [OUT] the type of a proxy                                    *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - id/type were retrieved successfully                          *
@@ -12879,21 +12879,23 @@ out:
 	return ret;
 }
 
-void	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid)
+int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid)
 {
+	int		ret = SUCCEED;
 	ZBX_DC_PROXY	*dc_proxy;
 
 	WRLOCK_CACHE;
 
 	if (NULL == (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxyid)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to reload configuration cache on proxy with id " ZBX_FS_UI64
-				": failed to update nextcheck", proxyid);
+		ret = FAIL;
 	}
 	else
-		dc_proxy->proxy_config_nextcheck = time(NULL);
+		dc_proxy->proxy_config_nextcheck = (int)time(NULL);
 
 	UNLOCK_CACHE;
+
+	return ret;
 }
 
 /******************************************************************************
