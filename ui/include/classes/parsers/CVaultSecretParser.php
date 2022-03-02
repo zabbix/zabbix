@@ -31,13 +31,16 @@
 class CVaultSecretParser extends CParser {
 
 	private $options = [
-		'provider' => null,
+		'provider' => ZBX_VAULT_TYPE_UNKNOWN,
 		'with_key' => true
 	];
 
+	private $cyberark_has_appid = true;
+	private $cyberark_has_key = true;
+
 	/**
 	 * @param array $options
-	 * @param int   $options['provider']  (optional) Vault provider.
+	 * @param int   $options['provider']  Vault provider.
 	 * @param bool  $options['with_key']  (optional) Validated string must contain key.
 	 */
 	public function __construct(array $options = []) {
@@ -110,47 +113,72 @@ class CVaultSecretParser extends CParser {
 	}
 
 	private function parseCyberArk($source, $pos) {
-
-		$source = 'AppId=&Query=Safe=Object=buzz';
-//		$source = 'AppID=3&Query=';
-
-
 		$this->start = $pos;
 		$this->errorClear();
+		$this->cyberark_has_appid = true;
+		$this->cyberark_has_key = true;
+		$has_appid = false;
 
-//		preg_match('/appid=(?<appid>[^&:]+)(?:&query=(?<query>[^:]+))?:*(?<key>.*)/i', $source, $matches, PREG_UNMATCHED_AS_NULL);
-		preg_match('/appid=(?<appid>[^&:]+)?(?:&query=(?<query>[^&:]+))?(?::*(?<key>.*))?/i', $source, $matches, PREG_UNMATCHED_AS_NULL);
+		while (preg_match('/^(?<parameter>[A-Za-z ]+)=(?<value>[^+&%:]*)/', substr($source, $pos), $matches) == 1) {
+			if ($matches['parameter'] === 'AppID') {
+				$has_appid = true;
+			}
 
-		sdii($matches);
+			$pos += strlen($matches[0]);
 
-		if (!$matches) {
-			sdii('no matches');
+			if (!isset($source[$pos]) || $source[$pos] !== '&') {
+				break;
+			}
 
-//			return self::PARSE_FAIL;
+			$pos++;
 		}
 
-		if (array_key_exists('appid', $matches) && $matches['appid'] === null) {
-			sdii('empty appid');
+		if ($this->start == $pos) {
+			$this->errorPos($source, $pos);
 
-//			return self::PARSE_FAIL;
+			return self::PARSE_FAIL;
 		}
 
-		if (array_key_exists('query', $matches)) {
-			preg_match_all('/(?<key>[^=]+)=(?<value>[^;]*);?/', $matches['query'][0], $query);
-			if (!array_combine($query['key'], $query['value'])) {
-				sdii('Wrong query format');
+		if ($this->options['with_key']) {
+			if (!isset($source[$pos]) || $source[$pos] !== ':' || !isset($source[++$pos])) {
+				$this->errorPos($source, $pos);
+				$this->cyberark_has_key = false;
 
-//				return self::PARSE_FAIL;
+				return self::PARSE_FAIL;
+			}
+
+			$pos += strlen(substr($source, $pos));
+		}
+
+		if (isset($source[$pos])) {
+			$this->errorPos($source, $pos);
+
+			return self::PARSE_FAIL;
+		}
+
+		if (!$has_appid) {
+			$this->cyberark_has_appid = false;
+			$this->errorPos($source, $pos);
+
+			return self::PARSE_FAIL;
+		}
+
+		return self::PARSE_SUCCESS;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function getError(): string {
+		if ($this->options['provider'] == ZBX_VAULT_TYPE_CYBERARK) {
+			if (!$this->cyberark_has_appid) {
+				return _s('mandatory parameter "%1$s" is missing', 'AppID');
+			}
+			elseif (!$this->cyberark_has_key) {
+				return _('mandatory key is missing');
 			}
 		}
 
-		if ($this->options['with_key'] && array_key_exists('key', $matches)) {
-			sdii('key error');
-//			return self::PARSE_FAIL;
-		}
-
-		die('as');
-
-		return self::PARSE_SUCCESS;
+		return parent::getError();
 	}
 }
