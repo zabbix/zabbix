@@ -181,6 +181,7 @@ require_once dirname(__FILE__).'/roles/testPageUserRoles.php';
 require_once dirname(__FILE__).'/roles/testUserRolesPermissions.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardCopyWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphPrototypeWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardGeomapWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
@@ -189,6 +190,8 @@ require_once dirname(__FILE__).'/dashboard/testDashboardSystemInformationWidget.
 require_once dirname(__FILE__).'/dashboard/testDashboardPages.php';
 require_once dirname(__FILE__).'/dashboard/testFormTemplateDashboards.php';
 require_once dirname(__FILE__).'/dashboard/testPageTemplateDashboards.php';
+require_once dirname(__FILE__).'/geomaps/testFormAdministrationGeneralGeomaps.php';
+require_once dirname(__FILE__).'/geomaps/testGeomapWidgetScreenshots.php';
 require_once dirname(__FILE__).'/reports/testPageReportsActionLog.php';
 require_once dirname(__FILE__).'/reports/testPageReportsAudit.php';
 require_once dirname(__FILE__).'/reports/testPageReportsNotifications.php';
@@ -289,6 +292,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormFilterHosts');
 		$suite->addTestSuite('testFormFilterLatestData');
 		$suite->addTestSuite('testFormFilterProblems');
+		$suite->addTestSuite('testFormAdministrationGeneralGeomaps');
+		$suite->addTestSuite('testGeomapWidgetScreenshots');
 		$suite->addTestSuite('testFormGraph');
 		$suite->addTestSuite('testFormGraphPrototype');
 		$suite->addTestSuite('testFormHostConfiguration');
@@ -373,6 +378,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testUserRolesPermissions');
 		$suite->addTestSuite('testDashboardCopyWidgets');
 		$suite->addTestSuite('testDashboardGraphPrototypeWidget');
+		$suite->addTestSuite('testDashboardGeomapWidget');
 		$suite->addTestSuite('testDashboardDynamicItemWidgets');
 		$suite->addTestSuite('testDashboardGraphWidget');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');

@@ -62,8 +62,9 @@ func (m *Manager) getStatus() (result string) {
 			ext := info.ref.impl.(*external.Plugin)
 			extInfo = fmt.Sprintf("path: %s\n", ext.Path)
 		}
-		status.WriteString(fmt.Sprintf("[%s]\nactive: %t\n%scapacity: %d/%d\ntasks: %d\n",
-			info.ref.name(), info.ref.active(), extInfo, info.ref.usedCapacity, info.ref.maxCapacity, len(info.ref.tasks)))
+		status.WriteString(fmt.Sprintf("[%s]\nactive: %t\n%scapacity: %d/%d\ncheck on start: %d\ntasks: %d\n",
+			info.ref.name(), info.ref.active(), extInfo, info.ref.usedCapacity, info.ref.maxCapacity,
+			info.ref.forceActiveChecksOnStart, len(info.ref.tasks)))
 		sort.Slice(info.metrics, func(l, r int) bool { return info.metrics[l].Key < info.metrics[r].Key })
 		for _, metric := range info.metrics {
 			status.WriteString(metric.Key)
