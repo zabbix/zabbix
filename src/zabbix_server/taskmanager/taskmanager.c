@@ -605,7 +605,7 @@ static void	tm_create_active_proxy_reload_task(zbx_uint64_t proxyid)
 
 	taskid = DBget_maxid("task");
 
-	task = zbx_tm_task_create(taskid, ZBX_TM_TASK_DATA, ZBX_TM_STATUS_NEW, time(NULL), ZBX_DATA_TTL, proxyid);
+	task = zbx_tm_task_create(taskid, ZBX_TM_TASK_DATA, ZBX_TM_STATUS_NEW, (int)time(NULL), ZBX_DATA_TTL, proxyid);
 
 	task->data = zbx_tm_data_create(taskid, "", 0, ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD);
 
