@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-15T14:24:06Z'
+  date: '2022-02-24T14:53:17Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -724,7 +724,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
         -
           uuid: 45ad0dd7331d4b9391d26b78838b0433
           name: 'Authentication requests discovery'
@@ -788,7 +788,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
         -
           uuid: ca23c310c71f4e88891ceae883527389
           name: 'Authentication attempts discovery'
@@ -852,7 +852,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
         -
           uuid: 0821009ea3be43e089247e843723577f
           name: 'Client certificate expiration histogram'
@@ -960,7 +960,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
           overrides:
             -
               name: 'bucket item'
@@ -1053,7 +1053,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
         -
           uuid: 099e6ff46075457cba6b669a5880ceef
           name: 'gRPC completed requests discovery'
@@ -1117,7 +1117,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
         -
           uuid: 948e1d84d44642a78f59c92271a21a68
           name: 'Requests inflight discovery'
@@ -1177,7 +1177,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
         -
           uuid: 7cd3ef5e2c874db18088b3531c944b25
           name: 'Long-running requests'
@@ -1248,7 +1248,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
         -
           uuid: 7c5ffdbafc5e4e349cc62ed0d0c0f20f
           name: 'Request duration histogram'
@@ -1432,7 +1432,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
           overrides:
             -
               name: 'bucket item'
@@ -1555,7 +1555,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
       tags:
         -
           tag: class

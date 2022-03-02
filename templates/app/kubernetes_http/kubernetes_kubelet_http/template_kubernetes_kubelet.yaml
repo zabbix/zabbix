@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-22T16:38:34Z'
+  date: '2022-02-24T14:52:33Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -28,7 +28,6 @@ zabbix_export:
           name: 'Kubernetes: Get cadvisor metrics'
           type: HTTP_AGENT
           key: kube.cadvisor.metrics
-          delay: 0;s00
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -134,7 +133,6 @@ zabbix_export:
           name: 'Kubernetes: Get kubelet metrics'
           type: HTTP_AGENT
           key: kube.kubelet.metrics
-          delay: 0;s00
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -262,7 +260,6 @@ zabbix_export:
           name: 'Kubernetes: Get pods'
           type: HTTP_AGENT
           key: kube.pods
-          delay: 0;s00
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -306,7 +303,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 3h
               master_item:
                 key: kube.cadvisor.metrics
               tags:
@@ -342,7 +339,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 3h
               master_item:
                 key: kube.cadvisor.metrics
               tags:
@@ -378,7 +375,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 3h
               master_item:
                 key: kube.cadvisor.metrics
               tags:
@@ -414,7 +411,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 3h
               master_item:
                 key: kube.cadvisor.metrics
               tags:
@@ -450,7 +447,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 3h
               master_item:
                 key: kube.cadvisor.metrics
               tags:
@@ -486,7 +483,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 3h
               master_item:
                 key: kube.cadvisor.metrics
               tags:
@@ -528,6 +525,10 @@ zabbix_export:
                       }
                   })
                   return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
         -
           uuid: b98223fcf0ee4a558035ed23de0d2616
           name: 'Pods discovery'
@@ -633,6 +634,10 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(output);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
         -
           uuid: cb42f71e6bfb4661861e3601e31eeaa6
           name: 'REST client requests discovery'
@@ -659,7 +664,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 3h
               master_item:
                 key: kube.kubelet.metrics
               tags:
@@ -701,6 +706,10 @@ zabbix_export:
                       }
                   })
                   return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
         -
           uuid: 6feb0006bb364a8f9295495c92741c16
           name: 'Runtime operations discovery'
@@ -896,7 +905,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
           overrides:
             -
               name: 'bucket item'

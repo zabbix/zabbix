@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-15T14:51:48Z'
+  date: '2022-02-28T14:29:13Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -630,7 +630,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
           overrides:
             -
               name: 'bucket item'
@@ -818,7 +818,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
           overrides:
             -
               name: 'bucket item'
@@ -1006,7 +1006,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
           overrides:
             -
               name: 'bucket item'
@@ -1112,7 +1112,7 @@ zabbix_export:
             key: kubernetes.scheduler.client_http_requests_200.rate
     -
       uuid: 4ee3ca9852a2440ea100e21291ac9103
-      name: 'Kubernetes Scheduler: Schedulling attempts rate'
+      name: 'Kubernetes Scheduler: Scheduling attempts rate'
       graph_items:
         -
           color: 1A7C11

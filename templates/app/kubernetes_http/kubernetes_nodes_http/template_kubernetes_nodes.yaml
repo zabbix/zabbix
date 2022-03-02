@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-22T17:06:38Z'
+  date: '2022-02-24T14:52:20Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -423,7 +423,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
           master_item:
             key: kube.nodes
           tags:
@@ -478,7 +478,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 3h
               master_item:
                 key: kube.nodes
               tags:
@@ -507,7 +507,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 3h
               master_item:
                 key: kube.nodes
               tags:
@@ -1852,7 +1852,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
       tags:
         -
           tag: class
@@ -1917,7 +1917,7 @@ zabbix_export:
         -
           macro: '{$KUBE.NODES.ENDPOINT.NAME}'
           value: zabbix-zabbix-helm-chrt-agent
-          description: 'Kubenetes nodes endpoint name. See kubectl -n monitoring get ep'
+          description: 'Kubernetes nodes endpoint name. See kubectl -n monitoring get ep'
         -
           macro: '{$KUBE.POD.FILTER.ANNOTATIONS}'
           description: 'Annotations to filter pods (regex in values are supported)'
