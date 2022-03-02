@@ -12924,6 +12924,7 @@ void	zbx_dc_get_all_proxies(zbx_vector_uint64_t *active_proxyids, zbx_vector_uin
 
 int	zbx_dc_get_proxy_type_by_id(zbx_uint64_t proxyid, int *status)
 {
+	int		ret = SUCCEED;
 	ZBX_DC_HOST	*dc_host;
 
 	RDLOCK_CACHE;
@@ -12931,13 +12932,16 @@ int	zbx_dc_get_proxy_type_by_id(zbx_uint64_t proxyid, int *status)
 	dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &proxyid);
 
 	if (NULL == dc_host)
-		return FAIL;
+	{
+		ret = FAIL;
+		goto out;
+	}
 
 	*status = dc_host->status;
-
+out:
 	UNLOCK_CACHE;
 
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
