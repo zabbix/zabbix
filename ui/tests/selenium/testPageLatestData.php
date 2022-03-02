@@ -59,7 +59,6 @@ class testPageLatestData extends CWebTest {
 		$this->assertArrayHasKey('groupids', $hostgroups);
 		self::$data['hostgroupid'] = $hostgroups['groupids'][0];
 
-
 		// Create host for items.
 		$hosts = CDataHelper::call('host.create', [
 			'host' => self::HOSTNAME,
@@ -110,7 +109,7 @@ class testPageLatestData extends CWebTest {
 	}
 
 	public function testPageLatestData_CheckLayout() {
-		$this->page->login()->open('zabbix.php?action=latest.view');
+		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$this->page->assertTitle('Latest data');
 		$this->page->assertHeader('Latest data');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
@@ -179,8 +178,8 @@ class testPageLatestData extends CWebTest {
 
 	public static function getFilterData() {
 		return [
+			// Host gropus and Show details.
 			[
-				// Host gropus and Show details.
 				[
 					'filter' => [
 						'Host groups' => 'Another group to check Overview',
@@ -457,28 +456,30 @@ class testPageLatestData extends CWebTest {
 	}
 
 	/**
+	 * Test for checking filtered results by values in main filter.
+	 *
 	 * @dataProvider getFilterData
 	 */
 	public function testPageLatestData_Filter($data) {
-		$this->page->login()->open('zabbix.php?action=latest.view');
-		$filter_form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
+		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 
 		// Reset filter in case if some filtering remained before ongoing test case.
 		$this->query('button:Reset')->one()->click();
 
 		// Fill filter form with data.
-		$filter_form->fill(CTestArrayHelper::get($data, 'filter'));
+		$form->fill(CTestArrayHelper::get($data, 'filter'));
 
 		// If data contains Tags and their settings, fill them separataly, because tags form is more complicated.
 		if (CTestArrayHelper::get($data, 'Tags')) {
-			$filter_form->getField('id:evaltype_0')->asSegmentedRadio()->fill(CTestArrayHelper::get($data, 'Tags.Evaluation', 'And/Or'));
-			$filter_form->getField('id:tags_0')->asMultifieldTable()->fill(CTestArrayHelper::get($data, 'Tags.tags', []));
+			$form->getField('id:evaltype_0')->asSegmentedRadio()->fill(CTestArrayHelper::get($data, 'Tags.Evaluation', 'And/Or'));
+			$form->getField('id:tags_0')->asMultifieldTable()->fill(CTestArrayHelper::get($data, 'Tags.tags', []));
 		}
 
-		$filter_form->getField('id:show_tags_0')->asSegmentedRadio()->fill(CTestArrayHelper::get($data, 'Show tags', '3'));
-		$filter_form->getField('id:tag_name_format_0')->asSegmentedRadio()->fill(CTestArrayHelper::get($data, 'Tags name', 'Full'));
+		$form->getField('id:show_tags_0')->asSegmentedRadio()->fill(CTestArrayHelper::get($data, 'Show tags', '3'));
+		$form->getField('id:tag_name_format_0')->asSegmentedRadio()->fill(CTestArrayHelper::get($data, 'Tags name', 'Full'));
 
-		$this->query('button:Apply')->one()->click();
+		$form->submit();
 		$this->page->waitUntilReady();
 
 		// Check filtered result.
@@ -550,6 +551,8 @@ class testPageLatestData extends CWebTest {
 	}
 
 	/**
+	 * Test for checking filtered results clicking on subfilter.
+	 *
 	 * @dataProvider getSubfilterData
 	 */
 	public function testPageLatestData_Subfilter($data) {
@@ -564,11 +567,12 @@ class testPageLatestData extends CWebTest {
 		foreach ($data['subfilter'] as $header => $values) {
 			foreach ($values as $value) {
 				$this->query("xpath://h3[text()=".CXPathHelper::escapeQuotes($header)."]/..//a[text()=".
-					CXPathHelper::escapeQuotes($value)."]")->waitUntilClickable()->one()->click();
+						CXPathHelper::escapeQuotes($value)."]")->waitUntilClickable()->one()->click();
 				$this->page->waitUntilReady();
 			}
 		}
 
+		// Check that page remained the same.
 		$this->page->assertTitle('Latest data');
 		$this->page->assertHeader('Latest data');
 
@@ -576,15 +580,28 @@ class testPageLatestData extends CWebTest {
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 	}
 
+	/**
+	 * Test for clicking on particular item tag in table and checking that items are filtered by this tag.
+	 */
 	public function testPageLatestData_ClickTag() {
+		$tag = ['tag' => 'component: ', 'value' => 'storage'];
+
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('ЗАББИКС Сервер'));
 		$this->page->login()->open('zabbix.php?action=latest.view&hostids%5B%5D='.$hostid)->waitUntilReady();
 
-		$this->getTable()->query('link:component: storage')->waitUntilClickable()->one()->click();
+		$this->getTable()->query('link', $tag['tag'].$tag['value'])->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 
+		// Check that page remained the same.
 		$this->page->assertTitle('Latest data');
 		$this->page->assertHeader('Latest data');
+
+		// Check that tag value is selected in subfilter under correct header.
+		$this->assertTrue($this->query("xpath://td/h3[text()='Tag values']/..//label[text()=".
+				CXPathHelper::escapeQuotes($tag['tag'])."]/../..//span[@class=".
+				CXPathHelper::fromClass('subfilter-enabled')."]/a[text()=".
+				CXPathHelper::escapeQuotes($tag['value'])."]")->exists()
+		);
 
 		$this->assertTableData([
 				['Name' => 'Free swap space'],
@@ -592,6 +609,22 @@ class testPageLatestData extends CWebTest {
 				['Name' => 'Total swap space'],
 			], $this->getTableSelector()
 		);
+	}
+
+	public function testPageLatestData_SavedFilter() {
+		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
+		$filter_form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+
+		// Reset filter in case if some filtering remained before ongoing test case.
+		$this->query('button:Reset')->one()->click();
+
+		// Fill filter form with data.
+		$filter_form->fill(['Name' => 'idle time']);
+		$filter_form->submit();
+		$this->assertTableData([['Name' => 'CPU idle time']], $this->getTableSelector());
+
+		$this->query('button:Save as')->waitUntilClickable()->one()->click();
+		$dialog = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
 	}
 
 	/**
@@ -622,6 +655,7 @@ class testPageLatestData extends CWebTest {
 		];
 
 		$this->page->login()->open('zabbix.php?action=latest.view');
+		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 
 		foreach ($result as $hosts) {
 			foreach ($hosts as $host) {
@@ -737,7 +771,8 @@ class testPageLatestData extends CWebTest {
 	 */
 	public function testPageLatestData_checkItemDescription($data) {
 		// Open Latest data for host 'testPageHistory_CheckLayout'
-		$this->page->login()->open('zabbix.php?&action=latest.view&show_details=0&hostids%5B%5D='.$data['hostid']);
+		$this->page->login()->open('zabbix.php?&action=latest.view&show_details=0&hostids%5B%5D='.$data['hostid'])
+				->waitUntilReady();
 
 		// Find rows from the data provider and click on the description icon if such should persist.
 		$row = $this->getTable()->findRow('Name', $data['Item name'], true);
@@ -771,7 +806,7 @@ class testPageLatestData extends CWebTest {
 	 * Maintenance icon hintbox.
 	 */
 	public function testPageLatestData_checkMaintenanceIcon() {
-		$this->page->login()->open('zabbix.php?action=latest.view');
+		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->fill(['Hosts' => 'Available host in maintenance']);
 		$form->submit();
@@ -790,10 +825,13 @@ class testPageLatestData extends CWebTest {
 		$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr('4_item'));
 		$time = time();
 		$value = '15';
-		DBexecute('INSERT INTO history_uint (itemid, clock, value, ns) VALUES ('.zbx_dbstr($itemid).
-				', '.zbx_dbstr($time).', '.zbx_dbstr($value).', 0)');
 		$true_time = date("Y-m-d H:i:s", $time);
-		$this->page->login()->open('zabbix.php?action=latest.view');
+
+		DBexecute('INSERT INTO history_uint (itemid, clock, value, ns) VALUES ('.zbx_dbstr($itemid).
+				', '.zbx_dbstr($time).', '.zbx_dbstr($value).', 0)'
+		);
+
+		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$this->query('button:Reset')->one()->click();
 		$form->fill(['Name' => '4_item'])->submit();
@@ -803,6 +841,7 @@ class testPageLatestData extends CWebTest {
 			if ($column === 'Last value') {
 				$this->assertEquals('15 UNIT', $this->getTable()->getRow(0)->getColumn($column)->getText());
 			}
+
 			$this->getTable()->getRow(0)->getColumn($column)->query('class:cursor-pointer')->one()->click();
 			$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
 			$compare_hint = ($column === 'Last check') ? $true_time : $value;
