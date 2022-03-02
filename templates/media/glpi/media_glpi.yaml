@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-24T22:14:14Z'
+  date: '2022-03-02T13:46:26Z'
   media_types:
     -
       name: GLPi
@@ -21,9 +21,6 @@ zabbix_export:
         -
           name: event_recovery_value
           value: '{EVENT.RECOVERY.VALUE}'
-        -
-          name: event_severity
-          value: '{EVENT.SEVERITY}'
         -
           name: event_source
           value: '{EVENT.SOURCE}'
@@ -48,7 +45,7 @@ zabbix_export:
         -
           name: zabbix_url
           value: '{$ZABBIX.URL}'
-      attempts: '3'
+      attempts: '1'
       script: |
         var GLPi = {
             params: {},
@@ -65,15 +62,12 @@ zabbix_export:
             },
         
             urlCheckFormat: function (url) {
-        
                 if (typeof url === 'string' && !url.endsWith('/')) {
                     url += '/';
                 }
-        
                 if (url.indexOf('http://') === -1 && url.indexOf('https://') === -1) {
                     url = 'https://' + url;
                 }
-        
                 return url;
             },
         
@@ -91,13 +85,17 @@ zabbix_export:
                         response = JSON.parse(response);
                     }
                     catch (error) {
-                        Zabbix.log(4, '[ GLPi Webhook ] Failed to parse response received from getting GLPi authentication token');
+                        Zabbix.log(4, '[ GLPi Webhook ] Failed to receive authentication token from GLPi.');
                         response = null;
                     }
                 }
         
                 if (Array.isArray(response)) {
-                    throw response.join(" - ");
+                    if (response[1]) {
+                        throw 'Error received from GLPi: ' + response[1];
+                    } else {
+                        throw 'Failed to receive authentication token from GLPi.';
+                    }
                 }
         
                 if (typeof response !== 'object' || !response.session_token) {
@@ -105,10 +103,9 @@ zabbix_export:
                 }
         
                 return response.session_token;
-        
             },
         
-            createProblemURL: function (zabbix_url, triggerid, eventid, event_source) {
+            getProblemUrl: function (zabbix_url, triggerid, eventid, event_source) {
                 var problem_url = zabbix_url;
         
                 if (event_source === '0') {
@@ -119,11 +116,9 @@ zabbix_export:
             },
         
             request: function (method, url, data) {
-                ['authToken'].forEach(function (field) {
-                    if (typeof GLPi.params !== 'object' || typeof GLPi.params[field] === 'undefined' || GLPi.params[field] === '') {
-                        throw 'Required GLPi param is not set: "' + field + '".';
-                    }
-                });
+                if (typeof GLPi.params !== 'object' || typeof GLPi.params.authToken === 'undefined' || GLPi.params.authToken === '') {
+                    throw 'Required GLPi param authToken is not set.';
+                }
         
                 var response,
                     request = new HttpRequest();
@@ -169,7 +164,7 @@ zabbix_export:
                     }
                 }
         
-                if (typeof response !== 'object') {
+                if (typeof response !== 'object' || typeof response === 'undefined') {
                     throw 'Failed to process response received from GLPi. Check debug log for more information.';
                 }
         
@@ -196,7 +191,7 @@ zabbix_export:
                 result = { tags: {} },
                 required_params = [
                     'alert_subject', 'alert_message', 'event_source', 'event_value',
-                    'event_update_status', 'event_recovery_value', 'event_severity',
+                    'event_update_status', 'event_recovery_value',
                     'event_id', 'trigger_id', 'zabbix_url',
                     'glpi_token', 'glpi_url'
                 ],
@@ -244,11 +239,10 @@ zabbix_export:
             glpi.authToken = GLPi.getAuthToken(glpi.url, glpi.token);
             GLPi.setParams(glpi);
         
-        
             data = {
                 'input': {
                     'name': params.alert_subject,
-                    'content': params.alert_message + '\n<a href=' + GLPi.createProblemURL(params.zabbix_url, params.trigger_id, params.event_id, params.event_source) + ">Link to problem in zabbix</a>",
+                    'content': params.alert_message + '\n<a href=' + GLPi.getProblemUrl(params.zabbix_url, params.trigger_id, params.event_id, params.event_source) + '>Link to problem in Zabbix</a>',
                     'status': 1,  // Set status "New"
                     'urgency': params.event_nseverity
                 }
@@ -261,7 +255,7 @@ zabbix_export:
                     'input': {
                         'items_id': glpi.problem_id,
                         'itemtype': 'Problem',
-                        'content': params.alert_message + '\n<a href=' + GLPi.createProblemURL(params.zabbix_url, params.trigger_id, params.event_id, params.event_source) + ">Link to problem in zabbix</a>"
+                        'content': params.alert_message + '\n<a href=' + GLPi.getProblemUrl(params.zabbix_url, params.trigger_id, params.event_id, params.event_source) + '>Link to problem in Zabbix</a>'
                     }
                 };
                 dataProblem = {
@@ -272,8 +266,8 @@ zabbix_export:
                     }
                 };
         
-                GLPi.request("put", glpi.url + "apirest.php/Problem/" + glpi.problem_id, dataProblem);
-                GLPi.request("post", glpi.url + "apirest.php/Problem/" + glpi.problem_id + "/ITILFollowup", dataFollowup);
+                GLPi.request('put', glpi.url + 'apirest.php/Problem/' + glpi.problem_id, dataProblem);
+                GLPi.request('post', glpi.url + 'apirest.php/Problem/' + glpi.problem_id + '/ITILFollowup', dataFollowup);
             }
         
             // In case of update
@@ -283,7 +277,7 @@ zabbix_export:
                     'input': {
                         'items_id': glpi.problem_id,
                         'itemtype': 'Problem',
-                        'content': params.alert_message + '\n<a href=' + GLPi.createProblemURL(params.zabbix_url, params.trigger_id, params.event_id, params.event_source) + ">Link to problem in zabbix</a>"
+                        'content': params.alert_message + '\n<a href=' + GLPi.getProblemUrl(params.zabbix_url, params.trigger_id, params.event_id, params.event_source) + '>Link to problem in Zabbix</a>'
                     }
                 };
                 dataProblem = {
@@ -294,19 +288,18 @@ zabbix_export:
                     }
                 };
         
-                GLPi.request("put", glpi.url + "apirest.php/Problem/" + glpi.problem_id, dataProblem);
-                GLPi.request("post", glpi.url + "apirest.php/Problem/" + glpi.problem_id + "/ITILFollowup", dataFollowup);
-        
+                GLPi.request('put', glpi.url + 'apirest.php/Problem/' + glpi.problem_id, dataProblem);
+                GLPi.request('post', glpi.url + 'apirest.php/Problem/' + glpi.problem_id + '/ITILFollowup', dataFollowup);
             }
         
             // In case of problem
             else {
-                response = GLPi.request("post", glpi.url + "apirest.php/Problem/", data);
+                response = GLPi.request('post', glpi.url + 'apirest.php/Problem/', data);
             }
         
             if (process_tags) {
                 result.tags.__zbx_glpi_problem_id = response.id;
-                result.tags.__zbx_glpi_link = glpi.url + "front/problem.form.php?id=" + response.id;
+                result.tags.__zbx_glpi_link = glpi.url + 'front/problem.form.php?id=' + response.id;
             }
         
             Zabbix.log(4, '[ GLPi Webhook ] Result: ' + JSON.stringify(result));

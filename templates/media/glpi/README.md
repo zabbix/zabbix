@@ -14,15 +14,17 @@ This webhook creates problems in GLPi Assistance section. Created problems have 
 4 - High| High|
 5 - Disaster| Very High|
 
-On Update action in zabbix, webhook updates created problem's title, severity and create followup with update comment.
+On Update action in zabbix, webhook updates created problem's title, severity and creates followup with update comment.
 
-On resolve action, webhook updates created problem title and create followup with resolve information.
+On resolve action, webhook updates created problem title and creates followup with resolve information.
 
 Created problems have "New" status, and resolved - "Solved" status.
 
+Due to the specifics of the webhook, the number of retries is set to 1 by default. We recommend that you do not change this setting, because in case of a transaction error, additional duplicate objects (problems, followups) may be created during the retry.
+
 ## Installation guide
 
-This guide describes how to integrate your Zabbix installation with GLPi problems using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
+This guide describes how to integrate your Zabbix installation with GLPi problems using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.
 <br/><br/>
 ## In GLPi
 
