@@ -178,7 +178,7 @@ class testPageLatestData extends CWebTest {
 
 	public static function getFilterData() {
 		return [
-			// Host gropus and Show details.
+			// Host groups and Show details.
 			[
 				[
 					'filter' => [
@@ -492,7 +492,7 @@ class testPageLatestData extends CWebTest {
 			);
 		}
 
-		// Reset filer not to impact the results of next tests.
+		// Reset filter not to impact the results of next tests.
 		$this->query('button:Reset')->one()->click();
 	}
 
