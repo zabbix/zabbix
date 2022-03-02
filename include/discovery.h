@@ -21,7 +21,7 @@
 #ifndef ZABBIX_DISCOVERY_H
 #define ZABBIX_DISCOVERY_H
 
-#include "comms.h"
+#include "db.h"
 
 typedef struct
 {

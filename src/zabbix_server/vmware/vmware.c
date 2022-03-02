@@ -17,7 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "vmware.h"
+
+#include "mutexs.h"
 
 /* LIBXML2 is used */
 #ifdef HAVE_LIBXML2
@@ -28,11 +30,8 @@
 
 #include "memalloc.h"
 #include "log.h"
-#include "zbxalgo.h"
 #include "daemon.h"
 #include "zbxself.h"
-
-#include "vmware.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 
 /*
@@ -271,10 +270,8 @@ static zbx_uint64_t	evt_req_chunk_size;
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.instanceUuid']]"	\
 		"/*[local-name()='val']"
 
-#define ZBX_XPATH_HV_SENSOR_STATUS(sensor)								\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name']"					\
-		"[text()='runtime.healthSystemRuntime.systemHealthInfo']]"				\
-		"/*[local-name()='val']/*[local-name()='numericSensorInfo']"				\
+#define ZBX_XPATH_HV_SENSOR_STATUS(node, sensor)							\
+	ZBX_XPATH_PROP_NAME(node) "/*[local-name()='HostNumericSensorInfo']"				\
 		"[*[local-name()='name'][text()='" sensor "']]"						\
 		"/*[local-name()='healthState']/*[local-name()='key']"
 
@@ -363,8 +360,8 @@ static zbx_vmware_propmap_t	hv_propmap[] = {
 	ZBX_HVPROPMAP("summary.hardware.uuid"), 		/* ZBX_VMWARE_HVPROP_HW_UUID */
 	ZBX_HVPROPMAP("summary.hardware.vendor"), 		/* ZBX_VMWARE_HVPROP_HW_VENDOR */
 	ZBX_HVPROPMAP("summary.quickStats.overallMemoryUsage"),	/* ZBX_VMWARE_HVPROP_MEMORY_USED */
-	{"runtime.healthSystemRuntime.systemHealthInfo", 	/* ZBX_VMWARE_HVPROP_HEALTH_STATE */
-			ZBX_XPATH_HV_SENSOR_STATUS("VMware Rollup Health State"), NULL},
+	{NULL, ZBX_XPATH_HV_SENSOR_STATUS("runtime.healthSystemRuntime.systemHealthInfo.numericSensorInfo",
+			"VMware Rollup Health State"), NULL},	/* ZBX_VMWARE_HVPROP_HEALTH_STATE */
 	ZBX_HVPROPMAP("summary.quickStats.uptime"),		/* ZBX_VMWARE_HVPROP_UPTIME */
 	ZBX_HVPROPMAP("summary.config.product.version"),		/* ZBX_VMWARE_HVPROP_VERSION */
 	ZBX_HVPROPMAP("summary.config.name"),			/* ZBX_VMWARE_HVPROP_NAME */
@@ -3151,6 +3148,9 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 
 	for (i = 0; i < props_num; i++)
 	{
+		if (NULL == propmap[i].name)
+			continue;
+
 		zbx_strlcat(props, "<ns0:pathSet>", sizeof(props));
 		zbx_strlcat(props, propmap[i].name, sizeof(props));
 		zbx_strlcat(props, "</ns0:pathSet>", sizeof(props));
@@ -3516,7 +3516,6 @@ clean:
 }
 
 /******************************************************************************
- * Function: vmware_v4mask2pefix                                              *
  *                                                                            *
  * Purpose: Convert ipv4 netmask to cidr prefix                               *
  *                                                                            *
@@ -3547,7 +3546,6 @@ static int	vmware_v4mask2pefix(const char *mask)
 }
 
 /******************************************************************************
- * Function: vmware_hv_ip_search                                              *
  *                                                                            *
  * Purpose: Search HV management interface ip value from a xml data           *
  *                                                                            *
@@ -6928,8 +6926,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_xml_node_read_value                                          *
- *                                                                            *
  * Purpose: retrieve a value from xml data relative to the specified node     *
  *                                                                            *
  * Parameters: doc    - [IN] the XML document                                 *
@@ -6999,8 +6995,6 @@ static char	*zbx_xml_doc_read_value(xmlDoc *xdoc, const char *xpath)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_xml_doc_read_num                                             *
- *                                                                            *
  * Purpose: retrieves numeric xpath value                                     *
  *                                                                            *
  * Parameters: xdoc  - [IN] xml document                                      *
@@ -7037,8 +7031,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_xml_read_values                                              *
- *                                                                            *
  * Purpose: populate array of values from an xml data                         *
  *                                                                            *
  * Parameters: xdoc   - [IN] XML document                                     *
@@ -7055,8 +7047,6 @@ static int	zbx_xml_read_values(xmlDoc *xdoc, const char *xpath, zbx_vector_str_t
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_xml_node_read_values                                         *
  *                                                                            *
  * Purpose: populate array of values from an xml data                         *
  *                                                                            *

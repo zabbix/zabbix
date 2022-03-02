@@ -43,7 +43,7 @@ $fields = [
 	'name' =>				[T_ZBX_STR, O_OPT, null,		NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
 	'width' =>				[T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({add}) || isset({update})', _('Width')],
 	'height' =>				[T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({add}) || isset({update})', _('Height')],
-	'graphtype' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1,2,3'),	'isset({add}) || isset({update})'],
+	'graphtype' =>			[T_ZBX_INT, O_OPT, P_SYS,		IN('0,1,2,3'),	'isset({add}) || isset({update})'],
 	'show_3d' =>			[T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null],
 	'show_legend' =>		[T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null],
 	'ymin_type' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1,2'),	null],
@@ -370,7 +370,9 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && h
 		DBstart();
 		foreach (getRequest('group_graphid') as $graphid) {
 			foreach ($dbHosts as $host) {
-				$result &= (bool) copyGraphToHost($graphid, $host['hostid']);
+				if (!copyGraphToHost($graphid, $host['hostid'])) {
+					$result = false;
+				}
 			}
 		}
 		$result = DBend($result);

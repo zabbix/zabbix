@@ -63,8 +63,8 @@ $c{"before"} = "/*
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include \"common.h\"
 #include \"dbschema.h\"
+#include \"common.h\"
 
 const ZBX_TABLE\ttables[] = {
 

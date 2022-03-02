@@ -17,12 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "proc.h"
+
 #include "common.h"
 #include "sysinfo.h"
 #include "zbxregexp.h"
 #include "log.h"
 #include "stats.h"
-#include "proc.h"
 
 extern int	CONFIG_TIMEOUT;
 

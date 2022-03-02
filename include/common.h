@@ -798,7 +798,7 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_TRIGGER_CORRELATION_NONE	0
 #define ZBX_TRIGGER_CORRELATION_TAG	1
 
-/* acknowledgement actions (flags) */
+/* acknowledgment actions (flags) */
 #define ZBX_PROBLEM_UPDATE_CLOSE		0x0001
 #define ZBX_PROBLEM_UPDATE_ACKNOWLEDGE		0x0002
 #define ZBX_PROBLEM_UPDATE_MESSAGE		0x0004
@@ -1693,7 +1693,7 @@ int	zbx_validate_value_dbl(double value, int dbl_precision);
 
 void	zbx_update_env(double time_now);
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
-		int *nextcheck, char **error);
+		int *nextcheck, int *scheduling, char **error);
 #define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
 char	*zbx_create_token(zbx_uint64_t seed);
 
