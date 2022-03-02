@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-03-02 20:18+0000\n"
+"PO-Revision-Date: 2022-03-02 20:59+0000\n"
 "Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -16439,7 +16439,7 @@ msgstr "Оперативные данные"
 
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:49
 msgid "Show periods"
-msgstr "Показать интепвалы"
+msgstr "Показать интервалы"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:305
 msgid "Show problems"
