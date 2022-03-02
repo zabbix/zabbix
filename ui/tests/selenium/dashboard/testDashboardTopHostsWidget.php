@@ -152,227 +152,227 @@ class testDashboardTopHostsWidget extends CWebTest {
 	public static function getCreateTopHostsData() {
 		return [
 			// #0 minimum needed values to create and submit widget.
-//			[
-//				[
-//					'expected' => TEST_GOOD,
-//					'main_fields' =>  [],
-//					'column_fields' => [
-//						[
-//							'Data' => 'Item value',
-//							'Item' => 'Available memory'
-//						]
-//					]
-//				]
-//			],
-//			// #1 all fields filled for main form.
-//			[
-//				[
-//					'expected' => TEST_GOOD,
-//					'main_fields' =>  [
-//						'Name' => 'Name of Top hosts widget',
-//						'Refresh interval' => 'Default (1 minute)',
-//						'Host groups' => 'Zabbix servers',
-//						'Hosts' => 'ЗАББИКС Сервер',
-//						'Order' => 'Bottom N',
-//						'Host count' => '99'
-//					],
-//					'column_fields' => [
-//						[
-//							'Data' => 'Item value',
-//							'Item' => 'Available memory'
-//						]
-//					]
-//				]
-//			],
-//			// #2 change order column for several items.
-//			[
-//				[
-//					'expected' => TEST_GOOD,
-//					'main_fields' =>  [
-//						'Name' => 'Several item columns',
-//						'Order column' => 'Available memory in %'
-//					],
-//					'column_fields' => [
-//						[
-//							'Data' => 'Item value',
-//							'Item' => 'Available memory'
-//						],
-//						[
-//							'Data' => 'Item value',
-//							'Item' => 'Available memory in %'
-//						]
-//					]
-//				]
-//			],
-//			// #3 several item columns with different Aggregation function
-//			[
-//				[
-//					'expected' => TEST_GOOD,
-//					'main_fields' =>  [
-//						'Name' => 'All available aggregatino function'
-//					],
-//					'column_fields' => [
-//						[
-//							'Data' => 'Item value',
-//							'Name' => 'min',
-//							'Aggregation function' => 'min',
-//							'Aggregation interval' => '20s',
-//							'Item' => 'Available memory'
-//						],
-//						[
-//							'Data' => 'Item value',
-//							'Name' => 'max',
-//							'Aggregation function' => 'max',
-//							'Aggregation interval' => '20m',
-//							'Item' => 'Available memory'
-//						],
-//						[
-//							'Data' => 'Item value',
-//							'Name' => 'avg',
-//							'Aggregation function' => 'avg',
-//							'Aggregation interval' => '20h',
-//							'Item' => 'Available memory'
-//						],
-//						[
-//							'Data' => 'Item value',
-//							'Name' => 'count',
-//							'Aggregation function' => 'count',
-//							'Aggregation interval' => '20d',
-//							'Item' => 'Available memory'
-//						],
-//						[
-//							'Data' => 'Item value',
-//							'Name' => 'sum',
-//							'Aggregation function' => 'sum',
-//							'Aggregation interval' => '20w',
-//							'Item' => 'Available memory'
-//						],
-//						[
-//							'Data' => 'Item value',
-//							'Name' => 'first',
-//							'Aggregation function' => 'first',
-//							'Aggregation interval' => '20M',
-//							'Item' => 'Available memory'
-//						],
-//						[
-//							'Data' => 'Item value',
-//							'Name' => 'last',
-//							'Aggregation function' => 'last',
-//							'Aggregation interval' => '20y',
-//							'Item' => 'Available memory'
-//						]
-//					]
-//				]
-//			],
-//			// #4 several item columns with different display, time shift, min/max and history data.
-//			[
-//				[
-//					'expected' => TEST_GOOD,
-//					'main_fields' =>  [
-//						'Name' => 'Different display and history data fields',
-//					],
-//					'column_fields' => [
-//						[
-//							'Data' => 'Item value',
-//							'Item' => 'Available memory',
-//							'Display' => 'As is',
-//							'History data' => 'History'
-//						],
-//						[
-//							'Data' => 'Item value',
-//							'Item' => 'Available memory',
-//							'Display' => 'As is',
-//							'History data' => 'Trends'
-//						],
-//						[
-//							'Data' => 'Item value',
-//							'Item' => 'Available memory',
-//							'Display' => 'Bar',
-//							'History data' => 'Auto',
-//							'Min' => '2',
-//							'Max' => ''
-//						],
-//						[
-//							'Data' => 'Item value',
-//							'Item' => 'Available memory',
-//							'Display' => 'Bar',
-//							'History data' => 'History',
-//							'Min' => '',
-//							'Max' => '100'
-//						],
-//						[
-//							'Data' => 'Item value',
-//							'Item' => 'Available memory',
-//							'Display' => 'Bar',
-//							'History data' => 'Trends',
-//							'Min' => '50',
-//							'Max' => '100'
-//						],
-//						[
-//							'Data' => 'Item value',
-//							'Item' => 'Available memory',
-//							'Display' => 'Indicators',
-//							'History data' => 'Auto',
-//							'Min' => '2',
-//							'Max' => ''
-//						],
-//						[
-//							'Data' => 'Item value',
-//							'Item' => 'Available memory',
-//							'Display' => 'Indicators',
-//							'History data' => 'History',
-//							'Min' => '',
-//							'Max' => '100'
-//						],
-//						[
-//							'Data' => 'Item value',
-//							'Item' => 'Available memory',
-//							'Display' => 'Indicators',
-//							'History data' => 'Trends',
-//							'Min' => '50',
-//							'Max' => '100'
-//						]
-//					]
-//				]
-//			],
-//			// #5 add column with different Base color.
-//			[
-//				[
-//					'expected' => TEST_GOOD,
-//					'main_fields' =>  [
-//						'Name' => 'Another base color'
-//					],
-//					'column_fields' => [
-//						[
-//							'Data' => 'Item value',
-//							'Item' => 'Available memory',
-//							'Base color' => [
-//								'id:lbl_base_color' => '039BE5'
-//							]
-//						]
-//					]
-//				]
-//			],
-//			// #6 add column with Threshold without color change.
-//			[
-//				[
-//					'expected' => TEST_GOOD,
-//					'main_fields' =>  [
-//						'Name' => 'One Threshold'
-//					],
-//					'column_fields' => [
-//						[
-//							'Data' => 'Item value',
-//							'Item' => 'Available memory',
-//							'Thresholds' => [
-//								[
-//									'value' => '5'
-//								]
-//							]
-//						]
-//					]
-//				]
-//			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'main_fields' =>  [],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory'
+						]
+					]
+				]
+			],
+			// #1 all fields filled for main form.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'main_fields' =>  [
+						'Name' => 'Name of Top hosts widget',
+						'Refresh interval' => 'Default (1 minute)',
+						'Host groups' => 'Zabbix servers',
+						'Hosts' => 'ЗАББИКС Сервер',
+						'Order' => 'Bottom N',
+						'Host count' => '99'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory'
+						]
+					]
+				]
+			],
+			// #2 change order column for several items.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'main_fields' =>  [
+						'Name' => 'Several item columns',
+						'Order column' => 'Available memory in %'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory'
+						],
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory in %'
+						]
+					]
+				]
+			],
+			// #3 several item columns with different Aggregation function
+			[
+				[
+					'expected' => TEST_GOOD,
+					'main_fields' =>  [
+						'Name' => 'All available aggregatino function'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Name' => 'min',
+							'Aggregation function' => 'min',
+							'Aggregation interval' => '20s',
+							'Item' => 'Available memory'
+						],
+						[
+							'Data' => 'Item value',
+							'Name' => 'max',
+							'Aggregation function' => 'max',
+							'Aggregation interval' => '20m',
+							'Item' => 'Available memory'
+						],
+						[
+							'Data' => 'Item value',
+							'Name' => 'avg',
+							'Aggregation function' => 'avg',
+							'Aggregation interval' => '20h',
+							'Item' => 'Available memory'
+						],
+						[
+							'Data' => 'Item value',
+							'Name' => 'count',
+							'Aggregation function' => 'count',
+							'Aggregation interval' => '20d',
+							'Item' => 'Available memory'
+						],
+						[
+							'Data' => 'Item value',
+							'Name' => 'sum',
+							'Aggregation function' => 'sum',
+							'Aggregation interval' => '20w',
+							'Item' => 'Available memory'
+						],
+						[
+							'Data' => 'Item value',
+							'Name' => 'first',
+							'Aggregation function' => 'first',
+							'Aggregation interval' => '20M',
+							'Item' => 'Available memory'
+						],
+						[
+							'Data' => 'Item value',
+							'Name' => 'last',
+							'Aggregation function' => 'last',
+							'Aggregation interval' => '20y',
+							'Item' => 'Available memory'
+						]
+					]
+				]
+			],
+			// #4 several item columns with different display, time shift, min/max and history data.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'main_fields' =>  [
+						'Name' => 'Different display and history data fields',
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Display' => 'As is',
+							'History data' => 'History'
+						],
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Display' => 'As is',
+							'History data' => 'Trends'
+						],
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Display' => 'Bar',
+							'History data' => 'Auto',
+							'Min' => '2',
+							'Max' => ''
+						],
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Display' => 'Bar',
+							'History data' => 'History',
+							'Min' => '',
+							'Max' => '100'
+						],
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Display' => 'Bar',
+							'History data' => 'Trends',
+							'Min' => '50',
+							'Max' => '100'
+						],
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Display' => 'Indicators',
+							'History data' => 'Auto',
+							'Min' => '2',
+							'Max' => ''
+						],
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Display' => 'Indicators',
+							'History data' => 'History',
+							'Min' => '',
+							'Max' => '100'
+						],
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Display' => 'Indicators',
+							'History data' => 'Trends',
+							'Min' => '50',
+							'Max' => '100'
+						]
+					]
+				]
+			],
+			// #5 add column with different Base color.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'main_fields' =>  [
+						'Name' => 'Another base color'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Base color' => [
+								'id:lbl_base_color' => '039BE5'
+							]
+						]
+					]
+				]
+			],
+			// #6 add column with Threshold without color change.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'main_fields' =>  [
+						'Name' => 'One Threshold'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Thresholds' => [
+								[
+									'value' => '5'
+								]
+							]
+						]
+					]
+				]
+			],
 			// #7 add several columns with Threshold without color change.
 			[
 				[
@@ -431,6 +431,63 @@ class testDashboardTopHostsWidget extends CWebTest {
 						]
 					]
 				]
+			],
+			// #9 add Host name columns.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'main_fields' =>  [
+						'Name' => 'Host name columns'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Host name',
+							'Name' => 'This is host name',
+							'Base color' => [
+								'id:lbl_base_color' => '039BE5'
+							]
+						],
+						[
+							'Data' => 'Host name'
+						],
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory'
+						]
+					]
+				]
+			],
+			// #10 add Text columns.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'main_fields' =>  [
+						'Name' => 'Text columns'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Text',
+							'Text' => 'Here is some text'
+						],
+						[
+							'Data' => 'Text',
+							'Text' => 'Here is some text 2',
+							'Name' => 'Text column name'
+						],
+						[
+							'Data' => 'Text',
+							'Text' => 'Here is some text 3',
+							'Name' => 'Text column name 2',
+							'Base color' => [
+								'id:lbl_base_color' => '039BE5'
+							]
+						],
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory'
+						]
+					]
+				]
 			]
 		];
 	}
@@ -468,17 +525,17 @@ class testDashboardTopHostsWidget extends CWebTest {
 					$threshold_order = 0;
 					foreach ($values['Thresholds'] as $threshold) {
 						$column_form->query('button:Add')->one()->click();
-						$column_form->query('id:thresholds_'.$threshhold_order.'_threshold')->one()->fill($threshold['value']);
+						$column_form->query('id:thresholds_'.$threshold_order.'_threshold')->one()->fill($threshold['value']);
 
 						// Fill Threshold colors.
 						if (array_key_exists('color', $threshold)) {
-							$column_form->query('id:lbl_thresholds_'.$threshhold_order.'_color')->one()->click();
+							$column_form->query('id:lbl_thresholds_'.$threshold_order.'_color')->one()->click();
 							$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($threshold['color']);
 						}
 
 						// Id number of threshold.
-						if ($threshhold_order < $threshold_amount) {
-							$threshhold_order++;
+						if ($threshold_order < $threshold_amount) {
+							$threshold_order++;
 						}
 					}
 
@@ -563,6 +620,29 @@ class testDashboardTopHostsWidget extends CWebTest {
 				unset($values['Base color']);
 			}
 
+			// Check Thresholds values.
+			if (array_key_exists('Thresholds', $values)) {
+				$threshold_amount = count($values['Thresholds'])-1;
+				$threshold_order = 0;
+				foreach ($values['Thresholds'] as $threshold) {
+					$this->assertEquals($threshold['value'], $column_form->query('id:thresholds_'.$threshold_order.'_threshold')
+							->one()->getAttribute('value'));
+
+					// Check color in Thresholds.
+					if (array_key_exists('color', $threshold)) {
+						$color_hex = ($threshold['color'] !== '') ? '#'.$threshold['color'] : 'Use default';
+						$this->assertEquals($color_hex, $column_form->query('id:lbl_thresholds_'.$threshold_order.'_color')
+								->one()->getAttribute('title'));
+					}
+
+					// Id number of threshold.
+					if ($threshold_order < $threshold_amount) {
+						$threshold_order++;
+					}
+				}
+
+				unset($values['Thresholds']);
+			}
 
 			$column_form->checkValue($values);
 			$column_form->query('xpath:(//button[text()="Cancel"])[2]')->one()->click();
