@@ -983,14 +983,14 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
  *             data   - [IN] the JSON with request                            *
  *                                                                            *
  ******************************************************************************/
-static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const char *data)
+static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const unsigned char *data)
 {
 	struct zbx_json_parse	jp, jp_data;
 	const char		*ptr;
 	char			name[HOST_NAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	int			passive_proxy_count = 0;
 
-	if (FAIL == zbx_json_open(data, &jp))
+	if (FAIL == zbx_json_open((const char *)data, &jp))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to parse proxy config cache reload data");
 		return;

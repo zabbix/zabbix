@@ -12860,7 +12860,6 @@ int	zbx_dc_get_proxyid_by_name(const char *name, zbx_uint64_t *proxyid, unsigned
 {
 	int			ret = FAIL;
 	const ZBX_DC_HOST	*dc_host;
-	const ZBX_DC_PROXY	*dc_proxy;
 
 	RDLOCK_CACHE;
 
