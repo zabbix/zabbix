@@ -23,6 +23,15 @@ class CItemTypeHttpAgent implements CItemType {
 	/**
 	 * @inheritDoc
 	 */
+	const FIELD_NAMES = ['url', 'query_fields', 'request_method', 'timeout', 'post_type', 'posts', 'headers',
+		'status_codes', 'follow_redirects', 'retrieve_mode', 'output_format', 'http_proxy', 'authtype', 'username',
+		'password', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'interfaceid',
+		'delay', 'allow_traps', 'trapper_hosts'
+	];
+
+	/**
+	 * @inheritDoc
+	 */
 	public static function getCreateValidationRules(array &$item): array {
 		$is_item_prototype = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE;
 
@@ -60,7 +69,10 @@ class CItemTypeHttpAgent implements CItemType {
 			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_cert_file')],
 			'ssl_key_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_file')],
 			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_password')],
-			'interfaceid' =>		['type' => API_ID],
+			'interfaceid' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID, 'flags' => API_REQUIRED],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
 			'delay' =>				['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')],
 			'allow_traps' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON]), 'default' => DB::getDefault('items', 'allow_traps')],
 			'trapper_hosts' =>		['type' => API_MULTIPLE, 'rules' => [
@@ -74,7 +86,7 @@ class CItemTypeHttpAgent implements CItemType {
 	 * @inheritDoc
 	 */
 	public static function getUpdateValidationRules(array &$item, array $db_item): array {
-		$is_item_prototype = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE;
+		$is_item_prototype = $db_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE;
 
 		$item += array_intersect_key($db_item, array_flip(['request_method', 'post_type', 'authtype', 'allow_traps']));
 
@@ -126,7 +138,16 @@ class CItemTypeHttpAgent implements CItemType {
 			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_cert_file')],
 			'ssl_key_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_file')],
 			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_password')],
-			'interfaceid' =>		['type' => API_ID],
+			'interfaceid' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => static function () use ($db_item): bool {
+											return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
+												&& in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
+													ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT, ITEM_TYPE_SCRIPT
+												]);
+										}, 'type' => API_ID, 'flags' => API_REQUIRED],
+										['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
 			'delay' =>				['type' => API_MULTIPLE, 'rules' => [
 										['if' => static function () use ($db_item): bool {
 											return in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
@@ -169,7 +190,12 @@ class CItemTypeHttpAgent implements CItemType {
 			'ssl_cert_file' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'ssl_key_file' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'ssl_key_password' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'interfaceid' =>		['type' => API_ID],
+			'interfaceid' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => static function () use ($db_item): bool {
+											return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
+										}, 'type' => API_ID],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
 			'delay' =>				['type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')],
 			'allow_traps' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON])],
 			'trapper_hosts' =>		['type' => API_MULTIPLE, 'rules' => [

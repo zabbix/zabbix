@@ -23,6 +23,11 @@ class CItemTypeDependent implements CItemType {
 	/**
 	 * @inheritDoc
 	 */
+	const FIELD_NAMES = ['master_itemid'];
+
+	/**
+	 * @inheritDoc
+	 */
 	public static function getCreateValidationRules(array &$item): array {
 		return [
 			'master_itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY]

@@ -23,6 +23,11 @@ class CItemTypeDbMonitor implements CItemType {
 	/**
 	 * @inheritDoc
 	 */
+	const FIELD_NAMES = ['username', 'password', 'params', 'delay'];
+
+	/**
+	 * @inheritDoc
+	 */
 	public static function getCreateValidationRules(array &$item): array {
 		return [
 			'username' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],

@@ -21,6 +21,11 @@
 interface CItemType {
 
 	/**
+	 * Field names of specific type.
+	 */
+	const FIELD_NAMES = [];
+
+	/**
 	 * @param array $item
 	 *
 	 * @return array

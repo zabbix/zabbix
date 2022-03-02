@@ -23,9 +23,17 @@ class CItemTypeSimple implements CItemType {
 	/**
 	 * @inheritDoc
 	 */
+	const FIELD_NAMES = ['interfaceid', 'username', 'password', 'delay'];
+
+	/**
+	 * @inheritDoc
+	 */
 	public static function getCreateValidationRules(array &$item): array {
 		return [
-			'interfaceid' =>	['type' => API_ID],
+			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID, 'flags' => API_REQUIRED],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
 			'username' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
 			'password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
 			'delay' =>			['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')]
@@ -37,7 +45,16 @@ class CItemTypeSimple implements CItemType {
 	 */
 	public static function getUpdateValidationRules(array &$item, array $db_item): array {
 		return [
-			'interfaceid' =>	['type' => API_ID],
+			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => static function () use ($db_item): bool {
+										return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
+											&& in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
+												ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT, ITEM_TYPE_SCRIPT
+											]);
+									}, 'type' => API_ID, 'flags' => API_REQUIRED],
+									['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
 			'username' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
 			'password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
 			'delay' =>			['type' => API_MULTIPLE, 'rules' => [
@@ -55,7 +72,12 @@ class CItemTypeSimple implements CItemType {
 	 */
 	public static function getUpdateValidationRulesInherited(array &$item, array $db_item): array {
 		return [
-			'interfaceid' =>	['type' => API_ID],
+			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => static function () use ($db_item): bool {
+										return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
+									}, 'type' => API_ID],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
 			'username' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
 			'password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
 			'delay' =>			['type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')]

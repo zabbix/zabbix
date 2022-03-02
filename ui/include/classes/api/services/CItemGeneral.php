@@ -36,11 +36,6 @@ abstract class CItemGeneral extends CApiService {
 	protected const ERROR_NO_INTERFACE = 'noInterface';
 
 	/**
-	 * @var array
-	 */
-	protected $field_rules;
-
-	/**
 	 * @abstract
 	 *
 	 * @param array $options
@@ -52,101 +47,9 @@ abstract class CItemGeneral extends CApiService {
 	public function __construct() {
 		parent::__construct();
 
-		// template - if templated item, value is taken from template item, cannot be changed on host
-		// system - values should not be updated
-		// host - value should be null for template items
-		$this->field_rules = [
-			'type'					=> ['template' => 1],
-			'snmp_oid'				=> ['template' => 1],
-			'hostid'				=> [],
-			'name'					=> ['template' => 1],
-			'description'			=> [],
-			'key_'					=> ['template' => 1],
-			'master_itemid'			=> ['template' => 1],
-			'delay'					=> [],
-			'history'				=> [],
-			'trends'				=> [],
-			'status'				=> [],
-			'discover'				=> [],
-			'value_type'			=> ['template' => 1],
-			'trapper_hosts'			=> [],
-			'units'					=> ['template' => 1],
-			'formula'				=> ['template' => 1],
-			'error'					=> ['system' => 1],
-			'lastlogsize'			=> ['system' => 1],
-			'logtimefmt'			=> [],
-			'templateid'			=> ['system' => 1],
-			'valuemapid'			=> ['template' => 1],
-			'params'				=> [],
-			'ipmi_sensor'			=> ['template' => 1],
-			'authtype'				=> [],
-			'username'				=> [],
-			'password'				=> [],
-			'publickey'				=> [],
-			'privatekey'			=> [],
-			'mtime'					=> ['system' => 1],
-			'flags'					=> [],
-			'filter'				=> [],
-			'interfaceid'			=> ['host' => 1],
-			'inventory_link'		=> [],
-			'lifetime'				=> [],
-			'preprocessing'			=> ['template' => 1],
-			'overrides'				=> ['template' => 1],
-			'jmx_endpoint'			=> [],
-			'url'					=> ['template' => 1],
-			'timeout'				=> ['template' => 1],
-			'query_fields'			=> ['template' => 1],
-			'parameters'			=> ['template' => 1],
-			'posts'					=> ['template' => 1],
-			'status_codes'			=> ['template' => 1],
-			'follow_redirects'		=> ['template' => 1],
-			'post_type'				=> ['template' => 1],
-			'http_proxy'			=> ['template' => 1],
-			'headers'				=> ['template' => 1],
-			'retrieve_mode'			=> ['template' => 1],
-			'request_method'		=> ['template' => 1],
-			'output_format'			=> ['template' => 1],
-			'allow_traps'			=> [],
-			'ssl_cert_file'			=> ['template' => 1],
-			'ssl_key_file'			=> ['template' => 1],
-			'ssl_key_password'		=> ['template' => 1],
-			'verify_peer'			=> ['template' => 1],
-			'verify_host'			=> ['template' => 1]
-		];
-
 		$this->errorMessages = array_merge($this->errorMessages, [
 			self::ERROR_NO_INTERFACE => _('Cannot find host interface on "%1$s" for item key "%2$s".')
 		]);
-	}
-
-	/**
-	 * @param array $items
-	 *
-	 * @throws APIException
-	 */
-	protected function validateCreate(array &$items): void {
-		self::checkItemKey($items);
-
-		$hostids = array_unique(array_column($items, 'hostid'));
-
-		$db_hosts = API::Host()->get([
-			'output' => ['hostid', 'status'],
-			'hostids' => $hostids,
-			'templated_hosts' => true,
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		if (count($hostids) != count($db_hosts)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		self::checkAndAddUuid($items, $db_hosts);
-		self::checkDuplicates($items);
-		self::checkHostInterface($items, $db_hosts);
-		$this->checkSpecificFields($items);
-		$this->validatePreprocessing($items);
-		$this->validateDependentItems($items);
 	}
 
 	/**
@@ -196,34 +99,6 @@ abstract class CItemGeneral extends CApiService {
 		if (!CApiInputValidator::validateUniqueness($api_input_rules, $items, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-	}
-
-	/**
-	 * @param array      $items
-	 * @param array|null $db_items
-	 *
-	 * @throws APIException
-	 */
-	protected function validateUpdate(array &$items, ?array &$db_items): void {
-		static::addAffectedObjects($items, $db_items);
-
-		self::checkItemKey($items, $db_items);
-
-		$hostids = array_unique(array_column($items, 'hostid'));
-
-		$db_hosts = API::Host()->get([
-			'output' => ['hostid', 'status'],
-			'hostids' => $hostids,
-			'templated_hosts' => true,
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		self::checkDuplicates($items, $db_items);
-		self::checkHostInterface($items, $db_hosts, $db_items);
-		$this->checkSpecificFields($items);
-		$this->validatePreprocessing($items);
-		$this->validateDependentItems($items);
 	}
 
 	/**
@@ -515,36 +390,6 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * @param array      $items
-	 * @param array|null $db_items
-	 *
-	 * @throws APIException
-	 */
-	protected static function checkItemKey(array $items, array $db_items = null): void {
-		$item_key_parser = new CItemKey();
-
-		foreach ($items as $i => $item) {
-			if ($db_items !== null && $item['type'] == $db_items[$item['itemid']]['type']
-					&& $item['key_'] === $db_items[$item['itemid']]['key_']) {
-				continue;
-			}
-
-			if ($item_key_parser->parse($item['key_']) != CParser::PARSE_SUCCESS) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/key_',
-					$item_key_parser->getError()
-				));
-			}
-
-			if ($item['type'] == ITEM_TYPE_SNMPTRAP && $item['key_'] !== 'snmptrap.fallback'
-					&& $item_key_parser->getKey() !== 'snmptrap') {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/key_',
-					_('invalid SNMP trap key')
-				));
-			}
-		}
-	}
-
-	/**
 	 * @param array $items
 	 *
 	 * @throws APIException
@@ -605,37 +450,108 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Check that only items on templates have UUID. Add UUID to all host prototypes on templates,
-	 *   if it doesn't exist.
+	 * Check that host IDs of given items are valid.
+	 * If host IDs are valid, $db_hosts and $db_templates parameters will be filled with found hosts and templates.
 	 *
-	 * @param array $items
-	 * @param array $db_hosts
+	 * @param array      $items
+	 * @param array|null $db_hosts
+	 * @param array|null $db_templates
 	 *
 	 * @throws APIException
 	 */
-	protected static function checkAndAddUuid(array &$items, array $db_hosts): void {
-		foreach ($items as $i => &$item) {
-			if ($db_hosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE && array_key_exists('uuid', $item)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1), _s('unexpected parameter "%1$s"', 'uuid'))
-				);
+	protected static function checkHostsAndTemplates(array $items, array &$db_hosts = null,
+			array &$db_templates = null): void {
+		$hostids = array_unique(array_column($items, 'hostid'));
+
+		$db_templates = API::Template()->get([
+			'output' => [],
+			'templateids' => $hostids,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		$_hostids = array_diff($hostids, array_keys($db_templates));
+
+		$db_hosts = $_hostids
+			? API::Host()->get([
+				'output' => ['status'],
+				'hostids' => $_hostids,
+				'editable' => true,
+				'preservekeys' => true
+			])
+			: [];
+
+		if (count($db_templates) + count($db_hosts) != count($hostids)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
+
+	/**
+	 * Add host_status property to given items in accordance of given hosts and templates statuses.
+	 *
+	 * @param array $items
+	 * @param array $db_hosts
+	 * @param array $db_templates
+	 */
+	protected static function addHostStatus(array &$items, array $db_hosts, array $db_templates): void {
+		foreach ($items as &$item) {
+			if (array_key_exists($item['hostid'], $db_templates)) {
+				$item['host_status'] = HOST_STATUS_TEMPLATE;
+			}
+			else {
+				$item['host_status'] = $db_hosts[$item['hostid']]['status'];
+			}
+		}
+		unset($item);
+	}
+
+	/**
+	 * Add flags property to given items with the given flags value.
+	 *
+	 * @param array $items
+	 * @param int   $flags
+	 */
+	protected static function addFlags(array &$items, int $flags): void {
+		foreach ($items as &$item) {
+			$item['flags'] = $flags;
+		}
+		unset($item);
+	}
+
+	/**
+	 * Check and add UUID to all item prototypes on templates, if it doesn't exist.
+	 *
+	 * @param array $items
+	 *
+	 * @throws APIException
+	 */
+	protected static function checkAndAddUuid(array &$items): void {
+		foreach ($items as &$item) {
+			if ($item['host_status'] != HOST_STATUS_TEMPLATE) {
+				continue;
 			}
 
-			if ($db_hosts[$item['hostid']]['status'] == HOST_STATUS_TEMPLATE && !array_key_exists('uuid', $item)) {
+			if (!array_key_exists('uuid', $item)) {
 				$item['uuid'] = generateUuidV4();
 			}
 		}
 		unset($item);
 
-		$db_uuid = DB::select('items', [
+		$uuids = array_column($items, 'uuid');
+
+		if (!$uuids) {
+			return;
+		}
+
+		$duplicates = DB::select('items', [
 			'output' => ['uuid'],
-			'filter' => ['uuid' => array_column($items, 'uuid')],
+			'filter' => ['uuid' => $uuids],
 			'limit' => 1
 		]);
 
-		if ($db_uuid) {
+		if ($duplicates) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+				_s('Entry with UUID "%1$s" already exists.', $duplicates[0]['uuid'])
 			);
 		}
 	}
@@ -769,9 +685,9 @@ abstract class CItemGeneral extends CApiService {
 				static::validateInventoryLinks($upd_items, true);
 			}
 
-			$db_items = $this->getDbObjects($upd_items);
+			// $db_items = $this->getDbObjects($upd_items);
 
-			$this->updateForce($upd_items, $db_items);
+			// $this->updateForce($upd_items, $db_items);
 		}
 
 		$new_items = array_merge($upd_items, $ins_items);
@@ -1400,55 +1316,55 @@ abstract class CItemGeneral extends CApiService {
 
 	/**
 	 * @param array      $items
-	 * @param array      $db_hosts
 	 * @param array|null $db_items
 	 *
 	 * @throws APIException
 	 */
-	protected static function checkHostInterface(array $items, array $db_hosts, array $db_items = null): void {
-		$db_interfaces = DBfetchArrayAssoc(DBselect(
-			'SELECT i.interfaceid,i.hostid,i.type'.
-				' FROM interface i'.
-				' WHERE '.dbConditionInt('i.hostid', array_column($db_hosts, 'hostid'))
-		), 'interfaceid');
-
-		$item_types_with_interfaces = [
-			ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-			ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_SNMP
-		];
-
+	protected static function checkHostInterfaces(array $items, array $db_items = null): void {
 		foreach ($items as $i => $item) {
-			if ($db_items !== null && !array_key_exists('interfaceid', $item)
-					&& ($item['type'] == $db_items[$item['itemid']]['type']
-						|| in_array($item['type'], $item_types_with_interfaces))) {
-				continue;
+			if (($db_items === null && !array_key_exists('interfaceid', $item))
+					|| ($db_items !== null
+						&& ($item['type'] == $db_items[$item['itemid']]['type']
+							|| $db_items[$item['itemid']]['host_status'] == HOST_STATUS_TEMPLATE)
+						&& (!array_key_exists('interfaceid', $item)
+							|| bccomp($item['interfaceid'], $db_items[$item['itemid']]['interfaceid']) == 0))) {
+				unset($items[$i]);
+			}
+			elseif (!array_key_exists('interfaceid', $item)) {
+				$item['interfaceid'] = $db_items[$item['itemid']]['interfaceid'];
+			}
+		}
+
+		if (!$items) {
+			return;
+		}
+
+		$interfaceids = array_unique(array_column($items, 'interfaceid'));
+
+		$db_interfaces = DB::select('interface', [
+			'output' => ['interfaceid', 'hostid', 'type'],
+			'interfaceids' => $interfaceids,
+			'preservekeys' => true
+		]);
+
+		if (count($db_interfaces) != count($interfaceids)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		foreach ($items as $item) {
+			$hostid = ($db_items === null) ? $item['hostid'] : $db_items[$item['itemid']]['hostid'];
+
+			if (bccomp($db_interfaces[$item['interfaceid']]['hostid'], $hostid) != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses host interface from non-parent host.'));
 			}
 
-			$host = $db_hosts[$item['hostid']];
+			$interface_type = itemTypeInterface(
+				array_key_exists('type', $item) ? $item['type'] : $db_items[$item['itemid']]['type']
+			);
 
-			if ($host['status'] == HOST_STATUS_TEMPLATE) {
-				if (array_key_exists('interfaceid', $item)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
-						_s('unexpected parameter "%1$s"', 'interfaceid')
-					));
-				}
-			}
-			else {
-				$interface_type = itemTypeInterface($item['type']);
-
-				if ($interface_type !== false) {
-					if (!array_key_exists('interfaceid', $item) || !$item['interfaceid']) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface found.'));
-					}
-					elseif (!array_key_exists($item['interfaceid'], $db_interfaces)
-							|| bccomp($db_interfaces[$item['interfaceid']]['hostid'], $item['hostid']) != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses host interface from non-parent host.'));
-					}
-					elseif ($interface_type !== INTERFACE_TYPE_ANY
-							&& $db_interfaces[$item['interfaceid']]['type'] != $interface_type) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses incorrect interface type.'));
-					}
-				}
+			if ($interface_type !== INTERFACE_TYPE_ANY
+					&& $db_interfaces[$item['interfaceid']]['type'] != $interface_type) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses incorrect interface type.'));
 			}
 		}
 	}
@@ -1987,46 +1903,71 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * @param array $items
+	 * Add the specific fields of item types with its values into $db_items.
+	 * In case when item type is changed, fields of existing type and new type are added.
 	 *
-	 * @return array
+	 * @param array $items
+	 * @param array $db_items
 	 */
-	protected function getDbObjects(array $items): array {
-		$output = ['itemid', 'templateid'];
+	protected static function addDbFieldsByType(array $items, array &$db_items): void {
+		$types = [];
+		$item_indexes = [];
+		$only_template_items = true;
 
-		foreach ($this->field_rules as $field => $rules) {
-			if (!array_key_exists('system', $rules)) {
-				$output[] = $field;
+		foreach ($items as $i => $item) {
+			$db_item = $db_items[$item['itemid']];
+
+			$types += [$db_item['type'] => true];
+
+			if ($item['type'] != $db_item['type']) {
+				$types += [$item['type'] => true];
+				$item_indexes[$item['itemid']] = $i;
 			}
+
+			if ($db_item['host_status'] != HOST_STATUS_TEMPLATE) {
+				$only_template_items = false;
+			}
+		}
+
+		$output = array_flip(['itemid']);
+		$type_field_names = [];
+
+		foreach ($types as $type => $foo) {
+			$field_names = array_flip(CItemTypeFactory::getObject($type)::FIELD_NAMES);
+
+			if ($only_template_items && array_key_exists('interfaceid', $field_names)) {
+				unset($field_names['interfaceid']);
+			}
+
+			if ($type == ITEM_TYPE_SCRIPT) {
+				unset($field_names['parameters']);
+			}
+
+			$output += $field_names;
+			$type_field_names[$type] = $field_names;
 		}
 
 		$options = [
-			'output' => $output,
-			'itemids' => array_column($items, 'itemid'),
-			'editable' => true,
-			'nopermissions' => true,
-			'preservekeys' => true
+			'output' => array_keys($output),
+			'itemids' => array_keys($db_items)
 		];
+		$_db_items = DBselect(DB::makeSql('items', $options));
 
-		if ($this instanceof CItemPrototype) {
-			$options['selectDiscoveryRule'] = ['itemid'];
-		}
+		while ($_db_item = DBfetch($_db_items)) {
+			$item = array_key_exists($_db_item['itemid'], $item_indexes)
+				? $items[$item_indexes[$_db_item['itemid']]]
+				: null;
+			$field_names = ($item !== null) ? $type_field_names[$item['type']] : [];
 
-		$db_items = $this->get($options);
+			$db_item = $db_items[$_db_item['itemid']];
+			$field_names += $type_field_names[$db_item['type']];
 
-		foreach ($db_items as &$db_item) {
-			if ($db_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$db_item['ruleid'] = $db_item['discoveryRule']['itemid'];
-				unset($db_item['discoveryRule']);
+			if ($db_item['host_status'] == HOST_STATUS_TEMPLATE && array_key_exists('interfaceid', $field_names)) {
+				unset($field_names['interfaceid']);
 			}
 
-			// Fix for audit log, because field type in object is different from field type in DB object.
-			$db_item['query_fields'] = $db_item['query_fields'] ? json_encode($db_item['query_fields']) : '';
-			$db_item['headers'] = self::headersArrayToString($db_item['headers']);
+			$db_items[$_db_item['itemid']] += array_intersect_key($_db_item, $field_names);
 		}
-		unset($db_item);
-
-		return $db_items;
 	}
 
 	/**

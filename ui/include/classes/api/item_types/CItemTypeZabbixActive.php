@@ -23,6 +23,11 @@ class CItemTypeZabbixActive implements CItemType {
 	/**
 	 * @inheritDoc
 	 */
+	const FIELD_NAMES = ['delay'];
+
+	/**
+	 * @inheritDoc
+	 */
 	public static function getCreateValidationRules(array &$item): array {
 		return [
 			'delay' =>	['type' => API_MULTIPLE, 'rules' => [

@@ -23,9 +23,17 @@ class CItemTypeSnmp implements CItemType {
 	/**
 	 * @inheritDoc
 	 */
+	const FIELD_NAMES = ['interfaceid', 'snmp_oid', 'delay'];
+
+	/**
+	 * @inheritDoc
+	 */
 	public static function getCreateValidationRules(array &$item): array {
 		return [
-			'interfaceid' =>	['type' => API_ID],
+			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID, 'flags' => API_REQUIRED],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
 			'snmp_oid' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'snmp_oid')],
 			'delay' =>			['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')]
 		];
@@ -36,7 +44,16 @@ class CItemTypeSnmp implements CItemType {
 	 */
 	public static function getUpdateValidationRules(array &$item, array $db_item): array {
 		return [
-			'interfaceid' =>	['type' => API_ID],
+			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => static function () use ($db_item): bool {
+										return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
+											&& in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
+												ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT, ITEM_TYPE_SCRIPT
+											]);
+									}, 'type' => API_ID, 'flags' => API_REQUIRED],
+									['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
 			'snmp_oid' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => static function () use ($db_item): bool {
 										return $db_item['type'] != ITEM_TYPE_SNMP;
@@ -58,7 +75,12 @@ class CItemTypeSnmp implements CItemType {
 	 */
 	public static function getUpdateValidationRulesInherited(array &$item, array $db_item): array {
 		return [
-			'interfaceid' =>	['type' => API_ID],
+			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => static function () use ($db_item): bool {
+										return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
+									}, 'type' => API_ID],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
 			'snmp_oid' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'delay' =>			['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')]
 		];

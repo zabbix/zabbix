@@ -358,9 +358,26 @@ class CItemPrototype extends CItemGeneral {
 	 * @throws APIException
 	 */
 	protected function validateCreate(array &$items): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['uuid'], ['hostid', 'key_']], 'fields' => [
-			'uuid' =>			['type' => API_UUID],
-			'hostid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
+			'hostid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		self::checkHostsAndTemplates($items, $db_hosts, $db_templates);
+		self::addHostStatus($items, $db_hosts, $db_templates);
+		self::addFlags($items, ZBX_FLAG_DISCOVERY_PROTOTYPE);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid'], ['hostid', 'key_']], 'fields' => [
+			'host_status' =>	['type' => API_ANY],
+			'flags' =>			['type' => API_ANY],
+			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'hostid' =>			['type' => API_ANY],
 			'ruleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
@@ -394,17 +411,16 @@ class CItemPrototype extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		foreach ($items as &$item) {
-			$item['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
-		}
-		unset($item);
-
 		$this->validateByType(array_keys($api_input_rules['fields']), $items);
 
-		parent::validateCreate($items);
-
-		self::checkDiscoveryRulePermissions($items);
+		self::checkAndAddUuid($items);
+		self::checkDuplicates($items);
+		self::checkDiscoveryRules($items);
 		self::checkValueMaps($items);
+		self::checkHostInterfaces($items);
+		$this->checkSpecificFields($items);
+		$this->validatePreprocessing($items);
+		$this->validateDependentItems($items);
 	}
 
 	/**
@@ -413,16 +429,21 @@ class CItemPrototype extends CItemGeneral {
 	protected function createForce(array &$items): void {
 		$itemids = DB::insert('items', $items);
 
-		$ins_item_discovery = [];
-		foreach ($items as $key => $item) {
-			$items[$key]['itemid'] = $itemids[$key];
+		$ins_items_discovery = [];
 
-			$ins_item_discovery[] = [
-				'itemid' => $items[$key]['itemid'],
+		foreach ($items as &$item) {
+			$item['itemid'] = array_shift($itemids);
+
+			unset($item['host_status']);
+
+			$ins_items_discovery[] = [
+				'itemid' => $item['itemid'],
 				'parent_itemid' => $item['ruleid']
 			];
 		}
-		DB::insertBatch('item_discovery', $ins_item_discovery);
+		unset($item);
+
+		DB::insertBatch('item_discovery', $ins_items_discovery);
 
 		self::updateParameters($items);
 		self::updatePreprocessing($items);
@@ -562,17 +583,25 @@ class CItemPrototype extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_count = $this->get([
+		$count = $this->get([
 			'countOutput' => true,
 			'itemids' => array_column($items, 'itemid'),
 			'editable' => true
 		]);
 
-		if (count($items) != $db_count) {
+		if ($count != count($items)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$db_items = $this->getDbObjects($items);
+		$db_items = DBfetchArrayAssoc(DBselect(
+			'SELECT i.itemid,i.name,i.type,i.key_,i.value_type,i.units,i.history,i.trends,i.valuemapid,i.logtimefmt,'.
+				'i.description,i.status,i.discover,i.hostid,i.templateid,i.flags,h.status AS host_status,'.
+				'id.parent_itemid AS ruleid'.
+			' FROM items i,hosts h,item_discovery id'.
+			' WHERE i.hostid=h.hostid'.
+				' AND i.itemid=id.itemid'.
+				' AND '.dbConditionId('i.itemid', array_column($items, 'itemid'))
+		), 'itemid');
 
 		foreach ($items as $i => &$item) {
 			$db_item = $db_items[$item['itemid']];
@@ -591,14 +620,20 @@ class CItemPrototype extends CItemGeneral {
 				$api_input_rules = self::getInheritedValidationRules();
 			}
 			else {
+				$item += array_intersect_key($db_item, array_flip(['key_', 'value_type']));
+
 				$api_input_rules = self::getValidationRules();
 			}
 
 			if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($i + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
+
+			$item += array_intersect_key($db_item, array_flip(['type']));
 		}
 		unset($item);
+
+		self::addDbFieldsByType($items, $db_items);
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
 
@@ -606,9 +641,14 @@ class CItemPrototype extends CItemGeneral {
 
 		self::validateUniqueness($items);
 
-		parent::validateUpdate($items, $db_items);
+		self::addAffectedObjects($items, $db_items);
 
+		self::checkDuplicates($items, $db_items);
 		self::checkValueMaps($items);
+		self::checkHostInterfaces($items, $db_items);
+		$this->checkSpecificFields($items);
+		$this->validatePreprocessing($items);
+		$this->validateDependentItems($items);
 	}
 
 	/**
@@ -619,7 +659,7 @@ class CItemPrototype extends CItemGeneral {
 			'itemid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
-			'key_' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'key_')],
+			'key_' =>			['type' => API_ITEM_KEY, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'key_')],
 			'value_type' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])],
 			'units' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
@@ -752,68 +792,85 @@ class CItemPrototype extends CItemGeneral {
 		}
 	}
 
-	public function syncTemplates($data) {
-		$data['templateids'] = zbx_toArray($data['templateids']);
-		$data['hostids'] = zbx_toArray($data['hostids']);
+	/**
+	 * @param array $templateids
+	 * @param array $hostids
+	 */
+	public function syncTemplates(array $templateids, array $hostids): void {
+		$db_item_prototypes = DBfetchArrayAssoc(DBselect(
+			'SELECT i.itemid,i.name,i.type,i.key_,i.value_type,i.units,i.history,i.trends,i.valuemapid,i.logtimefmt,'.
+				'i.description,i.status,i.discover,i.hostid,i.templateid,i.flags,h.status AS host_status,'.
+				'id.parent_itemid AS ruleid'.
+			' FROM items i,hosts h,item_discovery id'.
+			' WHERE i.hostid=h.hostid'.
+				' AND i.itemid=id.itemid'.
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]).
+				' AND '.dbConditionId('i.hostid', $templateids)
+		), 'itemid');
 
-		$output = [];
-		foreach ($this->field_rules as $field_name => $rules) {
-			if (!array_key_exists('system', $rules) && !array_key_exists('host', $rules)) {
-				$output[] = $field_name;
-			}
+		if (!$db_item_prototypes) {
+			return;
 		}
 
-		$tpl_items = $this->get([
-			'output' => $output,
-			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
-			'selectTags' => ['tag', 'value'],
-			'hostids' => $data['templateids'],
-			'preservekeys' => true,
-			'nopermissions' => true
-		]);
+		$item_prototypes = [];
 
-		foreach ($tpl_items as &$tpl_item) {
-			if ($tpl_item['type'] == ITEM_TYPE_HTTPAGENT) {
-				if (array_key_exists('query_fields', $tpl_item) && is_array($tpl_item['query_fields'])) {
-					$tpl_item['query_fields'] = $tpl_item['query_fields']
-						? json_encode($tpl_item['query_fields'])
-						: '';
-				}
+		foreach ($db_item_prototypes as $db_item_prototype) {
+			$item_prototype = array_intersect_key($db_item_prototype, array_flip(['itemid', 'type']));
 
-				if (array_key_exists('headers', $tpl_item) && is_array($tpl_item['headers'])) {
-					$tpl_item['headers'] = self::headersArrayToString($tpl_item['headers']);
-				}
+			if ($db_item_prototype['type'] == ITEM_TYPE_SCRIPT) {
+				$item_prototype += ['parameters' => []];
 			}
-			else {
-				$tpl_item['query_fields'] = '';
-				$tpl_item['headers'] = '';
-			}
+
+			$item_prototypes[] = $item_prototype + [
+				'preprocessing' => [],
+				'tags' => []
+			];
 		}
-		unset($tpl_item);
 
-		$this->inherit($tpl_items, $data['hostids']);
+		self::addDbFieldsByType($item_prototypes, $db_item_prototypes);
+		self::addAffectedObjects($item_prototypes, $db_item_prototypes);
 
-		return true;
+		$item_prototypes = array_values($db_item_prototypes);
+
+		foreach ($item_prototypes as &$item_prototype) {
+			if (array_key_exists('parameters', $item_prototype)) {
+				$item_prototype['parameters'] = array_values($item_prototype['parameters']);
+			}
+
+			$item_prototype['preprocessing'] = array_values($item_prototype['preprocessing']);
+			$item_prototype['tags'] = array_values($item_prototype['tags']);
+		}
+		unset($item_prototype);
+
+		$this->inherit($item_prototypes, $hostids);
 	}
 
 	/**
+	 * Check that discovery rule IDs of given items are valid.
+	 *
 	 * @param array $items
 	 *
 	 * @throws APIException
 	 */
-	private static function checkDiscoveryRulePermissions(array $items): void {
-		$db_discovery_rules = API::DiscoveryRule()->get([
+	private static function checkDiscoveryRules(array $items): void {
+		$ruleids = array_unique(array_column($items, 'ruleid'));
+
+		$db_discovery_rules = DB::select('items', [
 			'output' => ['hostid'],
-			'itemids' => array_column($items, 'ruleid'),
+			'filter' => [
+				'flags' => ZBX_FLAG_DISCOVERY_RULE,
+				'itemid' => $ruleids
+			],
 			'preservekeys' => true
 		]);
 
+		if (count($db_discovery_rules) != count($ruleids)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		}
+
 		foreach ($items as $item) {
-			if (!array_key_exists($item['ruleid'], $db_discovery_rules)
-					|| bccomp($db_discovery_rules[$item['ruleid']]['hostid'], $item['hostid']) != 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_('No permissions to referred object or it does not exist!')
-				);
+			if (bccomp($db_discovery_rules[$item['ruleid']]['hostid'], $item['hostid']) != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 	}

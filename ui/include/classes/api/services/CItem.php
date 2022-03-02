@@ -472,19 +472,6 @@ class CItem extends CItemGeneral {
 	public function create(array $items): array {
 		$this->validateCreate($items);
 
-		// Get only hosts from items, not templates.
-		$hosts = API::Host()->get([
-			'output' => [],
-			'hostids' => array_column($items, 'hostid'),
-			'preservekeys' => true
-		]);
-		foreach ($items as &$item) {
-			if (array_key_exists($item['hostid'], $hosts)) {
-				$item['rtdata'] = true;
-			}
-		}
-		unset($item);
-
 		$this->createForce($items);
 		$this->inherit($items);
 
@@ -497,9 +484,26 @@ class CItem extends CItemGeneral {
 	 * @throws APIException
 	 */
 	protected function validateCreate(array &$items): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['uuid'], ['hostid', 'key_']], 'fields' => [
-			'uuid' =>			['type' => API_UUID],
-			'hostid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
+			'hostid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		self::checkHostsAndTemplates($items, $db_hosts, $db_templates);
+		self::addHostStatus($items, $db_hosts, $db_templates);
+		self::addFlags($items, ZBX_FLAG_DISCOVERY_NORMAL);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid'], ['hostid', 'key_']], 'fields' => [
+			'host_status' =>	['type' => API_ANY],
+			'flags' =>			['type' => API_ANY],
+			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'hostid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
 			'key_' =>			['type' => API_ITEM_KEY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'key_')],
@@ -528,52 +532,46 @@ class CItem extends CItemGeneral {
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
 			'status' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
 			'tags' =>			self::getTagsValidationRules(),
-			'preprocessing' =>	['type' => API_ANY],
-			'flags' =>			['type' => API_UNEXPECTED]
+			'preprocessing' =>	['type' => API_ANY]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		foreach ($items as &$item) {
-			$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
-		}
-		unset($item);
-
 		$this->validateByType(array_keys($api_input_rules['fields']), $items);
 
-		parent::validateCreate($items);
-
+		self::checkAndAddUuid($items);
+		self::checkDuplicates($items);
 		self::checkValueMaps($items);
 		self::validateInventoryLinks($items);
+		self::checkHostInterfaces($items);
+		$this->checkSpecificFields($items);
+		$this->validatePreprocessing($items);
+		$this->validateDependentItems($items);
 	}
 
 	/**
 	 * @param array $items
 	 */
 	protected function createForce(array &$items): void {
-		$items_rtdata = [];
+		$itemids = DB::insert('items', $items);
 
-		foreach ($items as $key => &$item) {
-			if (array_key_exists('rtdata', $item)) {
-				$items_rtdata[$key] = [];
-				unset($item['rtdata']);
+		$ins_items_rtdata = [];
+
+		foreach ($items as &$item) {
+			$item['itemid'] = array_shift($itemids);
+
+			if (in_array($item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])) {
+				$ins_items_rtdata[] = ['itemid' => $item['itemid']];
 			}
+
+			unset($item['host_status']);
 		}
 		unset($item);
 
-		$itemids = DB::insert('items', $items);
-
-		foreach ($items_rtdata as $key => &$value) {
-			$value['itemid'] = $itemids[$key];
-		}
-		unset($value);
-
-		DB::insert('item_rtdata', $items_rtdata, false);
-
-		foreach ($items as $key => $item) {
-			$items[$key]['itemid'] = $itemids[$key];
+		if ($ins_items_rtdata) {
+			DB::insert('item_rtdata', $ins_items_rtdata, false);
 		}
 
 		self::updateParameters($items);
@@ -716,17 +714,24 @@ class CItem extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_count = $this->get([
+		$count = $this->get([
 			'countOutput' => true,
 			'itemids' => array_column($items, 'itemid'),
 			'editable' => true
 		]);
 
-		if (count($items) != $db_count) {
+		if ($count != count($items)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$db_items = $this->getDbObjects($items);
+		$db_items = DBfetchArrayAssoc(DBselect(
+			'SELECT i.itemid,i.name,i.type,i.key_,i.value_type,i.units,i.history,i.trends,i.valuemapid,',
+				'i.inventory_link,i.logtimefmt,i.description,i.status,i.hostid,i.templateid,i.flags,'.
+				'h.status AS host_status'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND '.dbConditionId('i.itemid', array_column($items, 'itemid'))
+		), 'itemid');
 
 		foreach ($items as $i => &$item) {
 			$db_item = $db_items[$item['itemid']];
@@ -761,16 +766,23 @@ class CItem extends CItemGeneral {
 		}
 		unset($item);
 
+		self::addDbFieldsByType($items, $db_items);
+
 		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
 
 		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'key_']);
 
 		self::validateUniqueness($items);
 
-		parent::validateUpdate($items, $db_items);
+		self::addAffectedObjects($items, $db_items);
 
+		self::checkDuplicates($items, $db_items);
 		self::checkValueMaps($items);
 		self::validateInventoryLinks($items, true);
+		self::checkHostInterfaces($items, $db_items);
+		$this->checkSpecificFields($items);
+		$this->validatePreprocessing($items);
+		$this->validateDependentItems($items);
 	}
 
 	/**
@@ -781,7 +793,7 @@ class CItem extends CItemGeneral {
 			'itemid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
-			'key_' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'key_')],
+			'key_' =>			['type' => API_ITEM_KEY, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'key_')],
 			'value_type' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])],
 			'units' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
@@ -944,47 +956,40 @@ class CItem extends CItemGeneral {
 	}
 
 	/**
-	 * @param array $data
-	 * @param array $data['templateids']
-	 * @param array $data['hostids']
+	 * @param array $templateids
+	 * @param array $hostids
 	 */
-	public function syncTemplates(array $data): void {
-		$output = [];
-		foreach ($this->field_rules as $field_name => $rules) {
-			if (!array_key_exists('system', $rules) && !array_key_exists('host', $rules)) {
-				$output[] = $field_name;
-			}
-		}
-
-		$db_items = $this->get([
-			'output' => $output,
-			'hostids' => $data['templateids'],
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-			'preservekeys' => true,
-			'nopermissions' => true
-		]);
+	public function syncTemplates(array $templateids, array $hostids): void {
+		$db_items = DBfetchArrayAssoc(DBselect(
+			'SELECT i.itemid,i.name,i.type,i.key_,i.value_type,i.units,i.history,i.trends,i.valuemapid,',
+				'i.inventory_link,i.logtimefmt,i.description,i.status,i.hostid,i.templateid,i.flags,'.
+				'h.status AS host_status'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL]).
+				' AND '.dbConditionId('i.hostid', $templateids)
+		), 'itemid');
 
 		if (!$db_items) {
 			return;
 		}
 
 		$items = [];
+
 		foreach ($db_items as $db_item) {
-			$item = [
-				'itemid' => $db_item['itemid'],
-				'type' => $db_item['type']
-			];
+			$item = array_intersect_key($db_item, array_flip(['itemid', 'type']));
 
 			if ($db_item['type'] == ITEM_TYPE_SCRIPT) {
-				$item['parameters'] = [];
+				$item += ['parameters' => []];
 			}
 
 			$items[] = $item + [
-				'tags' => [],
-				'preprocessing' => []
+				'preprocessing' => [],
+				'tags' => []
 			];
 		}
 
+		self::addDbFieldsByType($items, $db_items);
 		self::addAffectedObjects($items, $db_items);
 
 		$items = array_values($db_items);
@@ -994,12 +999,12 @@ class CItem extends CItemGeneral {
 				$item['parameters'] = array_values($item['parameters']);
 			}
 
-			$item['tags'] = array_values($item['tags']);
 			$item['preprocessing'] = array_values($item['preprocessing']);
+			$item['tags'] = array_values($item['tags']);
 		}
 		unset($item);
 
-		$this->inherit($items, $data['hostids']);
+		$this->inherit($items, $hostids);
 	}
 
 	/**

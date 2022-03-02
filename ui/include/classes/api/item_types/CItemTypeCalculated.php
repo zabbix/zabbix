@@ -23,6 +23,11 @@ class CItemTypeCalculated implements CItemType {
 	/**
 	 * @inheritDoc
 	 */
+	const FIELD_NAMES = ['params', 'delay'];
+
+	/**
+	 * @inheritDoc
+	 */
 	public static function getCreateValidationRules(array &$item): array {
 		return [
 			'params' =>	['type' => API_CALC_FORMULA, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'params')],
