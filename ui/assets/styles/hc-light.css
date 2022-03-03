@@ -5784,7 +5784,8 @@ svg {
 
 .columns-wrapper {
   display: flex;
-  flex-wrap: wrap; }
+  flex-wrap: wrap;
+  align-items: start; }
   .columns-wrapper.columns-nowrap {
     flex-wrap: nowrap; }
   .columns-wrapper.columns-2 > div,

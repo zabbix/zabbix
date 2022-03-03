@@ -4890,6 +4890,7 @@ svg {
 
 	display: flex;
 	flex-wrap: wrap;
+	align-items: start;
 
 	&.columns-nowrap {
 		flex-wrap: nowrap;
