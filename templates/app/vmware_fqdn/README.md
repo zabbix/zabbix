@@ -233,7 +233,7 @@ There are no template links in this template.
 |VMware |VMware: Average write latency of the datastore {#DATASTORE} |<p>Average amount of time for a write operation to the datastore (milliseconds).</p> |SIMPLE |vmware.hv.datastore.write[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency] |
 |VMware |VMware: Multipath count for datastore {#DATASTORE} |<p>Number of available datastore paths.</p> |SIMPLE |vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}] |
 |VMware |VMware: Health state rollup |<p>The host health state rollup sensor value: gray - unknown, green - ok, red - it has a problem, yellow - it might have a problem.</p> |DEPENDENT |vmware.hv.sensor.health.state[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..HostNumericSensorInfo[?(@.name=="VMware Rollup Health State")].healthState.label.first()`</p> |
-|Zabbix raw items |VMware: Get sensors |<p>Master item for sensors data.</p> |SIMPLE |vmware.hv.sensors.get[{$VMWARE.URL},{HOST.HOST}] |
+|Zabbix raw items |VMware: Get sensors |<p>Master item for sensors data.</p> |SIMPLE |vmware.hv.sensors.get[{$VMWARE.URL},{$VMWARE.HV.UUID}] |
 
 ## Triggers
 

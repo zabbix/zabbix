@@ -386,7 +386,10 @@ abstract class CControllerLatest extends CController {
 				if ($filter_name === 'hostids') {
 					continue;
 				}
-				$item_matches &= $match;
+				if (!$match) {
+					$item_matches = false;
+					break;
+				}
 			}
 
 			if ($item_matches) {
@@ -399,7 +402,10 @@ abstract class CControllerLatest extends CController {
 				if ($filter_name === 'tagnames') {
 					continue;
 				}
-				$item_matches &= $match;
+				if (!$match) {
+					$item_matches = false;
+					break;
+				}
 			}
 
 			if ($item_matches) {
@@ -419,7 +425,10 @@ abstract class CControllerLatest extends CController {
 				if ($filter_name === 'tags') {
 					continue;
 				}
-				$item_matches &= $match;
+				if (!$match) {
+					$item_matches = false;
+					break;
+				}
 			}
 
 			if ($item_matches) {
