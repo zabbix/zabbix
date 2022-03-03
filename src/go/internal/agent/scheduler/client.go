@@ -99,7 +99,8 @@ func (c *client) Output() plugin.ResultWriter {
 
 // addRequest requests client to start monitoring/update item described by request 'r' using plugin 'p' (*pluginAgent)
 // with output writer 'sink'
-func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.ResultWriter, now time.Time) (err error) {
+func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.ResultWriter, now time.Time,
+	firstActiveChecksRefreshed bool) (err error) {
 	var info *pluginInfo
 	var ok bool
 
@@ -136,8 +137,9 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 
 		if c.id > agent.MaxBuiltinClientID {
 			var task *exporterTask
+			var scheduling bool
 
-			if _, err = zbxlib.GetNextcheck(r.Itemid, r.Delay, now); err != nil {
+			if _, scheduling, err = zbxlib.GetNextcheck(r.Itemid, r.Delay, now); err != nil {
 				return err
 			}
 			if tacc, ok = c.exporters[r.Itemid]; ok {
@@ -162,7 +164,10 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 					client:   c,
 					output:   sink,
 				}
-				if err = task.reschedule(now); err != nil {
+
+				if scheduling == false && firstActiveChecksRefreshed == false && p.forceActiveChecksOnStart != 0 {
+					task.scheduled = time.Unix(now.Unix(), priorityExporterTaskNs)
+				} else if err = task.reschedule(now); err != nil {
 					return
 				}
 				c.exporters[r.Itemid] = task

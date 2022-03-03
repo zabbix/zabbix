@@ -154,14 +154,13 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 
 			$('#type').change(() => {
 				const type = parseInt($('#type').val());
-				const asterisk = '<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>';
 
 				if (type == <?= ITEM_TYPE_SSH ?> || type == <?= ITEM_TYPE_TELNET ?>) {
-					$('label[for=username]').addClass(asterisk);
+					$('label[for=username]').addClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 					$('input[name=username]').attr('aria-required', 'true');
 				}
 				else {
-					$('label[for=username]').removeClass(asterisk);
+					$('label[for=username]').removeClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 					$('input[name=username]').removeAttr('aria-required');
 				}
 			}).trigger('change');
