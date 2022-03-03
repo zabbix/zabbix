@@ -5762,13 +5762,19 @@ svg {
 .visibility-hidden {
   visibility: hidden; }
 
-.checkbox-list li {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 20px; }
-  .checkbox-list li label {
-    line-height: 16px;
-    vertical-align: bottom; }
+.checkbox-list {
+  display: grid;
+  grid-template-columns: repeat(var(--columns), 1fr); }
+  .checkbox-list.vertical {
+    grid-template-rows: repeat(var(--rows), 1fr);
+    grid-auto-flow: column; }
+  .checkbox-list li {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 20px; }
+    .checkbox-list li label {
+      line-height: 16px;
+      vertical-align: bottom; }
 
 .columns-wrapper {
   display: flex;

@@ -60,6 +60,7 @@ class CCheckBoxList extends CList {
 		$this->addClass(ZBX_STYLE_CHECKBOX_LIST);
 		$this->name = $name;
 		$this->values = [];
+		$this->columns = 1;
 	}
 
 	/**
@@ -152,44 +153,8 @@ class CCheckBoxList extends CList {
 	 */
 	public function setColumns(int $columns): CCheckBoxList {
 		$this->columns = $columns;
-		$classes = [
-			1 => null,
-			2 => ZBX_STYLE_COLUMNS_2,
-			3 => ZBX_STYLE_COLUMNS_3
-		];
-		if (array_key_exists($columns, $classes)) {
-			$this->addClass(ZBX_STYLE_COLUMNS);
-			$this->addClass($classes[$columns]);
-		}
 
 		return $this;
-	}
-
-	/**
-	 * Change order of values for them to appear vertically aligned.
-	 *
-	 * @return array
-	 */
-	protected function orderValuesVertical(): array {
-		$ordered = [];
-		$values_count = count($this->values);
-		$max_rows = (int) ceil($values_count / $this->columns);
-		$values_last_row = $values_count % $this->columns;
-		if ($values_count < $this->columns) {
-			$values_last_row = 0;
-		}
-
-		for ($row = 0; $row < $max_rows; $row++) {
-			for ($i = 0; $i < $values_count; $i += $max_rows) {
-				if ($values_last_row !== 0 && $i >= $values_count - ($this->columns - $values_last_row)) {
-					$i -= $values_last_row;
-				}
-				if (array_key_exists($row + $i, $this->values)) {
-					$ordered[$row + $i] = $this->values[$row + $i];
-				}
-			}
-		}
-		return $ordered;
 	}
 
 	/*
@@ -198,10 +163,14 @@ class CCheckBoxList extends CList {
 	 * @return string
 	 */
 	public function toString($destroy = true) {
-		$uniqid = ($this->uniqid === '') ? '' : '_'.$this->uniqid;
+		$this->addStyle('--columns:'.$this->columns.';');
 
 		if ($this->vertical) {
-			$this->values = $this->orderValuesVertical();
+			$values_count = count($this->values);
+			$max_rows = (int) ceil($values_count / $this->columns);
+
+			$this->addClass(ZBX_STYLE_VERTICAL);
+			$this->addStyle('--rows:'.$max_rows.';');
 		}
 
 		foreach ($this->values as $value) {
@@ -211,7 +180,13 @@ class CCheckBoxList extends CList {
 				->setLabel($value['label'])
 				->setChecked($value['checked'])
 				->setEnabled($this->enabled);
-			$checkbox->setId($checkbox->getId().$uniqid);
+
+			if (array_key_exists('id', $value) || $this->uniqid === '') {
+				$checkbox->setId(array_key_exists('id', $value)
+					? $value['id']
+					: $checkbox->getId().'_'.$this->uniqid
+				);
+			}
 
 			if (array_key_exists('unchecked_value', $value)) {
 				$checkbox->setUncheckedValue($value['unchecked_value']);
