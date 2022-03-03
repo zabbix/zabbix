@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-01-10T13:43:08Z</date>
+   <date>2022-03-03T15:04:54Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -1561,7 +1561,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Number of SQL compilations per second. Indicates the number of times the compile code path is entered. Includes compiles caused by statement-level recompilations in SQL Server. After SQL Server user activity is stable, this value reaches a steady state.</description>
+               <description>Number of SQL compilations per second. Indicates the number of times the compile code path is entered. Includes runs caused by statement-level recompilations in SQL Server. After SQL Server user activity is stable, this value reaches a steady state.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
