@@ -101,7 +101,7 @@ class CTemplate extends CHostGeneral {
 
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
-					' FROM templates_groups tgg'.
+					' FROM template_group tgg'.
 						' JOIN rights r'.
 							' ON r.id=tgg.groupid'.
 								' AND '.dbConditionInt('r.groupid', $userGroups).
@@ -116,9 +116,9 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			$sqlParts['from']['templates_groups'] = 'templates_groups tg';
+			$sqlParts['from']['template_group'] = 'template_group tg';
 			$sqlParts['where'][] = dbConditionInt('tg.groupid', $options['groupids']);
-			$sqlParts['where']['tgh'] = 'tg.templateid=h.hostid';
+			$sqlParts['where']['tgh'] = 'tg.hostid=h.hostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['tg'] = 'tg.groupid';

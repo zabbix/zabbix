@@ -159,7 +159,7 @@ $js_action_onclick = 'popup_generic.closePopup(event);';
 // Output table rows.
 switch ($data['popup_type']) {
 	case 'hosts':
-	case 'template_groups':
+	case 'template_group':
 	case 'host_groups':
 	case 'proxies':
 	case 'host_templates':
@@ -687,7 +687,7 @@ $types = [
 	'hosts',
 	'host_templates',
 	'host_groups',
-	'template_groups',
+	'template_group',
 	'items',
 	'item_prototypes',
 	'proxies',

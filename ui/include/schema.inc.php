@@ -8921,7 +8921,7 @@ return [
 			]
 		]
 	],
-	'templates_groups' => [
+	'template_group' => [
 		'key' => 'templategroupid',
 		'fields' => [
 			'templategroupid' => [
@@ -8929,7 +8929,7 @@ return [
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
-			'templateid' => [
+			'hostid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,

@@ -153,7 +153,7 @@ class CControllerPopupGeneric extends CController {
 					_('Name')
 				]
 			],
-			'template_groups' => [
+			'template_group' => [
 				'title' => _('template groups'),
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
 				'allowed_src_fields' => 'groupid,name',
@@ -1083,7 +1083,7 @@ class CControllerPopupGeneric extends CController {
 				$records = CArrayHelper::renameObjectsKeys($records, ['groupid' => 'id']);
 				break;
 
-			case 'template_groups':
+			case 'template_group':
 				$options += [
 					'output' => ['groupid', 'name'],
 					'with_triggers' => $this->hasInput('with_triggers') ? true : null

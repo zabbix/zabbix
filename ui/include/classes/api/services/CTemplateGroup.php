@@ -104,7 +104,7 @@ class CTemplateGroup extends CApiService {
 
 			$sqlParts['where'][] = 'EXISTS ('.
 				'SELECT NULL' .
-				' FROM rights r' .
+				' FROM right_tplgrp r' .
 				' WHERE g.groupid=r.id' .
 				' AND ' . dbConditionInt('r.groupid', $userGroups) .
 				' GROUP BY r.id' .
@@ -123,8 +123,8 @@ class CTemplateGroup extends CApiService {
 		if (!is_null($options['templateids'])) {
 			zbx_value2array($options['templateids']);
 
-			$sqlParts['from']['templates_groups'] = 'templates_groups tg';
-			$sqlParts['where'][] = dbConditionInt('tg.templateid', $options['templateids']);
+			$sqlParts['from']['template_group'] = 'template_group tg';
+			$sqlParts['where'][] = dbConditionInt('tg.hostid', $options['templateids']);
 			$sqlParts['where']['tgg'] = 'tg.groupid=g.groupid';
 		}
 
@@ -132,12 +132,12 @@ class CTemplateGroup extends CApiService {
 		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
 
-			$sqlParts['from']['templates_groups'] = 'templates_groups tg';
+			$sqlParts['from']['template_group'] = 'template_group tg';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-			$sqlParts['where']['tgi'] = 'tg.templateid=i.hostid';
+			$sqlParts['where']['tgi'] = 'tg.hostid=i.hostid';
 			$sqlParts['where']['tgg'] = 'tg.groupid=g.groupid';
 		}
 
@@ -147,11 +147,11 @@ class CTemplateGroup extends CApiService {
 
 			$sqlParts['from']['gi'] = 'graphs_items gi';
 			$sqlParts['from']['i'] = 'items i';
-			$sqlParts['from']['tg'] = 'templates_groups tg';
+			$sqlParts['from']['tg'] = 'template_group tg';
 			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
 			$sqlParts['where']['tgg'] = 'tg.groupid=g.groupid';
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
-			$sqlParts['where']['tgi'] = 'tg.templateid=i.hostid';
+			$sqlParts['where']['tgi'] = 'tg.hostid=i.hostid';
 		}
 
 		$sub_sql_common = [];
@@ -159,7 +159,7 @@ class CTemplateGroup extends CApiService {
 		// templated_hosts
 		if ($options['templated_hosts'] !== null) {
 			$sub_sql_common['from']['h'] = 'hosts h';
-			$sub_sql_common['where']['tg-h'] = 'tg.templateid=h.hostid';
+			$sub_sql_common['where']['tg-h'] = 'tg.hostid=h.hostid';
 			$sub_sql_common['where'][] = dbConditionInt('h.status', [HOST_STATUS_TEMPLATE]);
 		}
 
@@ -168,7 +168,7 @@ class CTemplateGroup extends CApiService {
 		// with_items, with_monitored_items, with_simple_graph_items
 		if ($options['with_items'] !== null) {
 			$sub_sql_parts['from']['i'] = 'items i';
-			$sub_sql_parts['where']['tg-i'] = 'tg.templateid=i.hostid';
+			$sub_sql_parts['where']['tg-i'] = 'tg.hostid=i.hostid';
 			$sub_sql_parts['where'][] = dbConditionInt('i.flags',
 				[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
 			);
@@ -176,8 +176,8 @@ class CTemplateGroup extends CApiService {
 		elseif ($options['with_monitored_items'] !== null) {
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['from']['h'] = 'hosts h';
-			$sub_sql_parts['where']['tg-i'] = 'tg.templateid=i.hostid';
-			$sub_sql_parts['where']['tg-h'] = 'tg.templateid=h.hostid';
+			$sub_sql_parts['where']['tg-i'] = 'tg.hostid=i.hostid';
+			$sub_sql_parts['where']['tg-h'] = 'tg.hostid=h.hostid';
 			$sub_sql_parts['where'][] = dbConditionInt('h.status', [HOST_STATUS_MONITORED]);
 			$sub_sql_parts['where'][] = dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]);
 			$sub_sql_parts['where'][] = dbConditionInt('i.flags',
@@ -186,7 +186,7 @@ class CTemplateGroup extends CApiService {
 		}
 		elseif ($options['with_simple_graph_items'] !== null) {
 			$sub_sql_parts['from']['i'] = 'items i';
-			$sub_sql_parts['where']['tg-i'] = 'tg.templateid=i.hostid';
+			$sub_sql_parts['where']['tg-i'] = 'tg.hostid=i.hostid';
 			$sub_sql_parts['where'][] = dbConditionInt('i.value_type', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
 			$sub_sql_parts['where'][] = dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]);
 			$sub_sql_parts['where'][] = dbConditionInt('i.flags',
@@ -199,7 +199,7 @@ class CTemplateGroup extends CApiService {
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['from']['f'] = 'functions f';
 			$sub_sql_parts['from']['t'] = 'triggers t';
-			$sub_sql_parts['where']['tg-i'] = 'tg.templateid=i.hostid';
+			$sub_sql_parts['where']['tg-i'] = 'tg.hostid=i.hostid';
 			$sub_sql_parts['where']['i-f'] = 'i.itemid=f.itemid';
 			$sub_sql_parts['where']['f-t'] = 'f.triggerid=t.triggerid';
 			$sub_sql_parts['where'][] = dbConditionInt('t.flags',
@@ -211,8 +211,8 @@ class CTemplateGroup extends CApiService {
 			$sub_sql_parts['from']['h'] = 'hosts h';
 			$sub_sql_parts['from']['f'] = 'functions f';
 			$sub_sql_parts['from']['t'] = 'triggers t';
-			$sub_sql_parts['where']['tg-i'] = 'tg.templateid=i.hostid';
-			$sub_sql_parts['where']['tg-h'] = 'tg.templateid=h.hostid';
+			$sub_sql_parts['where']['tg-i'] = 'tg.hostid=i.hostid';
+			$sub_sql_parts['where']['tg-h'] = 'tg.hostid=h.hostid';
 			$sub_sql_parts['where']['i-f'] = 'i.itemid=f.itemid';
 			$sub_sql_parts['where']['f-t'] = 'f.triggerid=t.triggerid';
 			$sub_sql_parts['where'][] = dbConditionInt('h.status', [HOST_STATUS_MONITORED]);
@@ -226,11 +226,11 @@ class CTemplateGroup extends CApiService {
 		// with_httptests, with_monitored_httptests
 		if ($options['with_httptests'] !== null) {
 			$sub_sql_parts['from']['ht'] = 'httptest ht';
-			$sub_sql_parts['where']['tg-ht'] = 'tg.templateid=ht.hostid';
+			$sub_sql_parts['where']['tg-ht'] = 'tg.hostid=ht.hostid';
 		}
 		elseif ($options['with_monitored_httptests'] !== null) {
 			$sub_sql_parts['from']['ht'] = 'httptest ht';
-			$sub_sql_parts['where']['tg-ht'] = 'tg.templateid=ht.hostid';
+			$sub_sql_parts['where']['tg-ht'] = 'tg.hostid=ht.hostid';
 			$sub_sql_parts['where'][] = dbConditionInt('ht.status', [HTTPTEST_STATUS_ACTIVE]);
 		}
 
@@ -239,7 +239,7 @@ class CTemplateGroup extends CApiService {
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['from']['gi'] = 'graphs_items gi';
 			$sub_sql_parts['from']['gr'] = 'graphs gr';
-			$sub_sql_parts['where']['tg-i'] = 'tg.templateid=i.hostid';
+			$sub_sql_parts['where']['tg-i'] = 'tg.hostid=i.hostid';
 			$sub_sql_parts['where']['i-gi'] = 'i.itemid=gi.itemid';
 			$sub_sql_parts['where']['gi-gr'] = 'gi.graphid=gr.graphid';
 			$sub_sql_parts['where'][] = dbConditionInt('gr.flags',
@@ -248,7 +248,7 @@ class CTemplateGroup extends CApiService {
 		}
 
 		if ($sub_sql_parts) {
-			$sub_sql_parts['from']['tg'] = 'templates_groups tg';
+			$sub_sql_parts['from']['tg'] = 'template_group tg';
 			$sub_sql_parts['where']['g-tg'] = 'g.groupid=tg.groupid';
 
 			$sqlParts['where'][] = 'EXISTS ('.
@@ -263,12 +263,12 @@ class CTemplateGroup extends CApiService {
 		// with_item_prototypes, with_simple_graph_item_prototypes
 		if ($options['with_item_prototypes'] !== null) {
 			$sub_sql_parts['from']['i'] = 'items i';
-			$sub_sql_parts['where']['tg-i'] = 'tg.templateid=i.hostid';
+			$sub_sql_parts['where']['tg-i'] = 'tg.hostid=i.hostid';
 			$sub_sql_parts['where'][] = dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 		}
 		elseif ($options['with_simple_graph_item_prototypes'] !== null) {
 			$sub_sql_parts['from']['i'] = 'items i';
-			$sub_sql_parts['where']['tg-i'] = 'tg.templateid=i.hostid';
+			$sub_sql_parts['where']['tg-i'] = 'tg.hostid=i.hostid';
 			$sub_sql_parts['where'][] = dbConditionInt('i.value_type', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
 			$sub_sql_parts['where'][] = dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]);
 			$sub_sql_parts['where'][] = dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]);
@@ -279,14 +279,14 @@ class CTemplateGroup extends CApiService {
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['from']['gi'] = 'graphs_items gi';
 			$sub_sql_parts['from']['gr'] = 'graphs gr';
-			$sub_sql_parts['where']['tg-i'] = 'tg.templateid=i.hostid';
+			$sub_sql_parts['where']['tg-i'] = 'tg.hostid=i.hostid';
 			$sub_sql_parts['where']['i-gi'] = 'i.itemid=gi.itemid';
 			$sub_sql_parts['where']['gi-gr'] = 'gi.graphid=gr.graphid';
 			$sub_sql_parts['where'][] = dbConditionInt('gr.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 		}
 
 		if ($sub_sql_parts) {
-			$sub_sql_parts['from']['tg'] = 'templates_groups tg';
+			$sub_sql_parts['from']['tg'] = 'template_group tg';
 			$sub_sql_parts['where']['g-tg'] = 'g.groupid=tg.groupid';
 
 			$sqlParts['where'][] = 'EXISTS ('.
@@ -464,7 +464,7 @@ class CTemplateGroup extends CApiService {
 		}
 
 		$db_groups = $this->get([
-			'output' => ['groupid', 'name', 'flags'],
+			'output' => ['groupid', 'name'],
 			'groupids' => array_column($groups, 'groupid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -768,7 +768,7 @@ class CTemplateGroup extends CApiService {
 		$ins_templates_groups = self::getInsTemplatesGroups($groups, __FUNCTION__);
 
 		if ($ins_templates_groups) {
-			$ids = DB::insertBatch('templates_groups', $ins_templates_groups);
+			$ids = DB::insertBatch('template_group', $ins_templates_groups);
 			self::addTemplategroupids($groups, $ids);
 		}
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE_GROUP, $groups, $db_groups);
@@ -791,12 +791,12 @@ class CTemplateGroup extends CApiService {
 		$del_templategroupids = self::getDelTemplategroupids($db_groups, $db_templategroupids);
 
 		if ($ins_template_groups) {
-			$ids = DB::insertBatch('templates_groups', $ins_template_groups);
+			$ids = DB::insertBatch('template_group', $ins_template_groups);
 			self::addTemplategroupids($groups, $ids);
 		}
 
 		if ($del_templategroupids) {
-			DB::delete('templates_groups', ['templategroupid' => $del_templategroupids]);
+			DB::delete('template_group', ['templategroupid' => $del_templategroupids]);
 		}
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE_GROUP, $groups, $db_groups);
@@ -818,7 +818,7 @@ class CTemplateGroup extends CApiService {
 		$del_templategroupids = self::getDelTemplategroupids($db_groups);
 
 		if ($del_templategroupids) {
-			DB::delete('templates_groups', ['templategroupid' => $del_templategroupids]);
+			DB::delete('template_group', ['templategroupid' => $del_templategroupids]);
 		}
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE_GROUP, $groups, $db_groups);
@@ -998,11 +998,11 @@ class CTemplateGroup extends CApiService {
 		$templateids = array_keys($db_objects);
 
 		$objectids_with_groups = DBfetchColumn(DBselect(
-			'SELECT DISTINCT tg.templateid'.
-			' FROM templates_groups tg'.
+			'SELECT DISTINCT tg.hostid'.
+			' FROM template_group tg'.
 			' WHERE '.dbConditionInt('tg.groupid', $groupids, true).
-			' AND '.dbConditionInt('tg.templateid', $templateids)
-		), 'templateid');
+			' AND '.dbConditionInt('tg.hostid', $templateids)
+		), 'hostid');
 
 		$objectids_without_groups = array_diff($templateids, $objectids_with_groups);
 
@@ -1041,19 +1041,19 @@ class CTemplateGroup extends CApiService {
 
 		if ($objectids) {
 			$options = [
-				'output' => ['templategroupid', 'templateid', 'groupid'],
+				'output' => ['templategroupid', 'hostid', 'groupid'],
 				'filter' => [
-					'templateid' => $objectids,
+					'hostid' => $objectids,
 					'groupid' => array_keys($db_groups)
 				]
 			];
-			$db_template_groups = DBselect(DB::makeSql('templates_groups', $options));
+			$db_template_groups = DBselect(DB::makeSql('template_group', $options));
 		}
 		else {
 			$db_template_groups = DBselect(
-				'SELECT tg.templategroupid,tg.templateid,tg.groupid'.
-				' FROM templates_groups tg,hosts h'.
-				' WHERE tg.templateid=h.hostid'.
+				'SELECT tg.templategroupid,tg.hostid,tg.groupid'.
+				' FROM template_group tg,hosts h'.
+				' WHERE tg.hostid=h.hostid'.
 				' AND '.dbConditionInt('tg.groupid', array_keys($db_groups)).
 				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE], $objects === 'hosts').
 				' AND h.flags='.ZBX_FLAG_DISCOVERY_NORMAL
@@ -1063,11 +1063,11 @@ class CTemplateGroup extends CApiService {
 		while ($link = DBfetch($db_template_groups)) {
 			$db_groups[$link['groupid']][$objects][$link['templategroupid']] = [
 				'templategroupid' => $link['templategroupid'],
-				$id_field_name => $link['templateid']
+				$id_field_name => $link['hostid']
 			];
 
 			if (!$objectids) {
-				$db_objectids[$link['templateid']] = true;
+				$db_objectids[$link['hostid']] = true;
 			}
 		}
 
@@ -1159,7 +1159,7 @@ class CTemplateGroup extends CApiService {
 			foreach ($group['templates'] as $template) {
 				if (!array_key_exists('templategroupid', $template)) {
 					$ins_templates_groups[] = [
-						'templateid' => $template['templateid'],
+						'hostid' => $template['templateid'],
 						'groupid' => $group['groupid']
 					];
 				}
@@ -1222,7 +1222,7 @@ class CTemplateGroup extends CApiService {
 		if ($options['selectTemplates'] !== null) {
 			if ($options['selectTemplates'] !== API_OUTPUT_COUNT) {
 				$templates = [];
-				$relationMap = $this->createRelationMap($result, 'groupid', 'templateid', 'templates_groups');
+				$relationMap = $this->createRelationMap($result, 'groupid', 'hostid', 'template_group');
 				$related_ids = $relationMap->getRelatedIds();
 
 				if ($related_ids) {
