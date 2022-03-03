@@ -5815,7 +5815,10 @@ static void	dc_trigger_update_cache(void)
 		}
 
 		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+		{
+			trigger->functional = TRIGGER_FUNCTIONAL_FALSE;
 			continue;
+		}
 
 		/* cache item - trigger link */
 		if (0 != item->update_triggers)
