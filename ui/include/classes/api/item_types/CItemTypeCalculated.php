@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CItemTypeCalculated implements CItemType {
+class CItemTypeCalculated extends CItemType {
 
 	/**
 	 * @inheritDoc
@@ -50,13 +50,7 @@ class CItemTypeCalculated implements CItemType {
 							}, 'type' => API_CALC_FORMULA, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'params')],
 							['else' => true, 'type' => API_CALC_FORMULA, 'length' => DB::getFieldLength('items', 'params')]
 			]],
-			'delay' =>	['type' => API_MULTIPLE, 'rules' => [
-							['if' => static function () use ($db_item): bool {
-								return in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
-									|| ($db_item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($db_item['key_'], 'mqtt.get', 8) === 0);
-							}, 'type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')],
-							['else' => true, 'type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')]
-			]]
+			'delay' =>	self::getUpdateFieldRule('delay', $db_item)
 		];
 	}
 

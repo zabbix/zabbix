@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CItemTypeIpmi implements CItemType {
+class CItemTypeIpmi extends CItemType {
 
 	/**
 	 * @inheritDoc
@@ -30,10 +30,7 @@ class CItemTypeIpmi implements CItemType {
 	 */
 	public static function getCreateValidationRules(array &$item): array {
 		return [
-			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID, 'flags' => API_REQUIRED],
-									['else' => true, 'type' => API_UNEXPECTED]
-			]],
+			'interfaceid' =>	self::getCreateFieldRule('interfaceid'),
 			'ipmi_sensor' =>	['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'key_', 'in' => 'ipmi.get'], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ipmi_sensor')],
 									['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'ipmi_sensor')]
@@ -47,16 +44,7 @@ class CItemTypeIpmi implements CItemType {
 	 */
 	public static function getUpdateValidationRules(array &$item, array $db_item): array {
 		return [
-			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function () use ($db_item): bool {
-										return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
-											&& in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
-												ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT, ITEM_TYPE_SCRIPT
-											]);
-									}, 'type' => API_ID, 'flags' => API_REQUIRED],
-									['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
-									['else' => true, 'type' => API_UNEXPECTED]
-			]],
+			'interfaceid' =>	self::getUpdateFieldRule('interfaceid', $db_item),
 			'ipmi_sensor' =>	['type' => API_MULTIPLE, 'rules' => [
 									['if' => static function (array $data) use ($db_item): bool {
 										return $db_item['type'] != ITEM_TYPE_IPMI && $data['key_'] !== 'ipmi.get';
@@ -64,13 +52,7 @@ class CItemTypeIpmi implements CItemType {
 									['if' => ['field' => 'key_', 'in' => 'ipmi.get'], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ipmi_sensor')],
 									['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'ipmi_sensor')]
 			]],
-			'delay' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function () use ($db_item): bool {
-										return in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
-											|| ($db_item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($db_item['key_'], 'mqtt.get', 8) === 0);
-									}, 'type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')],
-									['else' => true, 'type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')]
-			]]
+			'delay' =>			self::getUpdateFieldRule('delay', $db_item)
 		];
 	}
 
@@ -79,12 +61,7 @@ class CItemTypeIpmi implements CItemType {
 	 */
 	public static function getUpdateValidationRulesInherited(array &$item, array $db_item): array {
 		return [
-			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function () use ($db_item): bool {
-										return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
-									}, 'type' => API_ID],
-									['else' => true, 'type' => API_UNEXPECTED]
-			]],
+			'interfaceid' =>	self::getUpdateFieldRuleInherited('interfaceid', $db_item),
 			'ipmi_sensor' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'delay' =>			['type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')]
 		];

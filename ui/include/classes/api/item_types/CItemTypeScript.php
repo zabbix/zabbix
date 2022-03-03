@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CItemTypeScript implements CItemType {
+class CItemTypeScript extends CItemType {
 
 	/**
 	 * @inheritDoc
@@ -46,40 +46,14 @@ class CItemTypeScript implements CItemType {
 	 * @inheritDoc
 	 */
 	public static function getUpdateValidationRules(array &$item, array $db_item): array {
-		$is_item_prototype = $db_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE;
-
 		return [
 			'parameters' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 								'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_parameter', 'name')],
 								'value' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('item_parameter', 'value')]
 			]],
-			'params' =>		['type' => API_MULTIPLE, 'rules' => [
-								['if' => static function () use ($db_item): bool {
-									return in_array($db_item['type'], [
-										ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
-										ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT,
-										ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
-									]);
-								}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')],
-								['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')]
-			]],
-			'timeout' =>	['type' => API_MULTIPLE, 'rules' => [
-								['if' => static function () use ($db_item): bool {
-									return in_array($db_item['type'], [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
-										ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
-										ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX,
-										ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_SNMP
-									]);
-								}, 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | $is_item_prototype ? API_ALLOW_LLD_MACRO : 0, 'in' => '1:'.SEC_PER_MIN, 'length' => DB::getFieldLength('items', 'timeout')],
-								['else' => true, 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | $is_item_prototype ? API_ALLOW_LLD_MACRO : 0, 'in' => '1:'.SEC_PER_MIN, 'length' => DB::getFieldLength('items', 'timeout')]
-			]],
-			'delay' =>		['type' => API_MULTIPLE, 'rules' => [
-								['if' => static function () use ($db_item): bool {
-									return in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
-										|| ($db_item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($db_item['key_'], 'mqtt.get', 8) === 0);
-								}, 'type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')],
-								['else' => true, 'type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')]
-			]]
+			'params' =>		self::getUpdateFieldRule('params', $db_item),
+			'timeout' =>	self::getUpdateFieldRule('timeout', $db_item),
+			'delay' =>		self::getUpdateFieldRule('delay', $db_item)
 		];
 	}
 

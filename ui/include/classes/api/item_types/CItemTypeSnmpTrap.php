@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CItemTypeSnmpTrap implements CItemType {
+class CItemTypeSnmpTrap extends CItemType {
 
 	/**
 	 * @inheritDoc
@@ -30,10 +30,7 @@ class CItemTypeSnmpTrap implements CItemType {
 	 */
 	public static function getCreateValidationRules(array &$item): array {
 		return [
-			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID, 'flags' => API_REQUIRED],
-									['else' => true, 'type' => API_UNEXPECTED]
-			]]
+			'interfaceid' =>	self::getCreateFieldRule('interfaceid')
 		];
 	}
 
@@ -42,16 +39,7 @@ class CItemTypeSnmpTrap implements CItemType {
 	 */
 	public static function getUpdateValidationRules(array &$item, array $db_item): array {
 		return [
-			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function () use ($db_item): bool {
-										return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
-											&& in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
-												ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT, ITEM_TYPE_SCRIPT
-											]);
-									}, 'type' => API_ID, 'flags' => API_REQUIRED],
-									['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
-									['else' => true, 'type' => API_UNEXPECTED]
-			]]
+			'interfaceid' =>	self::getUpdateFieldRule('interfaceid', $db_item)
 		];
 	}
 
@@ -60,12 +48,7 @@ class CItemTypeSnmpTrap implements CItemType {
 	 */
 	public static function getUpdateValidationRulesInherited(array &$item, array $db_item): array {
 		return [
-			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function () use ($db_item): bool {
-										return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
-									}, 'type' => API_ID],
-									['else' => true, 'type' => API_UNEXPECTED]
-			]]
+			'interfaceid' =>	self::getUpdateFieldRuleInherited('interfaceid', $db_item)
 		];
 	}
 

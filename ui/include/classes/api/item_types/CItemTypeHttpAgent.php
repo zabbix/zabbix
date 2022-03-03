@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CItemTypeHttpAgent implements CItemType {
+class CItemTypeHttpAgent extends CItemType {
 
 	/**
 	 * @inheritDoc
@@ -69,10 +69,7 @@ class CItemTypeHttpAgent implements CItemType {
 			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_cert_file')],
 			'ssl_key_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_file')],
 			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_password')],
-			'interfaceid' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID, 'flags' => API_REQUIRED],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
+			'interfaceid' =>		self::getCreateFieldRule('interfaceid'),
 			'delay' =>				['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')],
 			'allow_traps' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON]), 'default' => DB::getDefault('items', 'allow_traps')],
 			'trapper_hosts' =>		['type' => API_MULTIPLE, 'rules' => [
@@ -99,16 +96,7 @@ class CItemTypeHttpAgent implements CItemType {
 			]],
 			'query_fields' =>		['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []],
 			'request_method' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD])],
-			'timeout' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => static function () use ($db_item): bool {
-											return in_array($db_item['type'], [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
-												ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
-												ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX,
-												ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_SNMP
-											]);
-										}, 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | $is_item_prototype ? API_ALLOW_LLD_MACRO : 0, 'in' => '1:'.SEC_PER_MIN, 'length' => DB::getFieldLength('items', 'timeout')],
-										['else' => true, 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | $is_item_prototype ? API_ALLOW_LLD_MACRO : 0, 'in' => '1:'.SEC_PER_MIN, 'length' => DB::getFieldLength('items', 'timeout')]
-			]],
+			'timeout' =>			self::getUpdateFieldRule('timeout', $db_item),
 			'post_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML])],
 			'posts' =>				['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_RAW], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'posts')],
@@ -138,23 +126,8 @@ class CItemTypeHttpAgent implements CItemType {
 			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_cert_file')],
 			'ssl_key_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_file')],
 			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_password')],
-			'interfaceid' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => static function () use ($db_item): bool {
-											return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
-												&& in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
-													ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT, ITEM_TYPE_SCRIPT
-												]);
-										}, 'type' => API_ID, 'flags' => API_REQUIRED],
-										['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'delay' =>				['type' => API_MULTIPLE, 'rules' => [
-										['if' => static function () use ($db_item): bool {
-											return in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
-												|| ($db_item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($db_item['key_'], 'mqtt.get', 8) === 0);
-										}, 'type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')],
-										['else' => true, 'type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')]
-			]],
+			'interfaceid' =>		self::getUpdateFieldRule('interfaceid', $db_item),
+			'delay' =>				self::getUpdateFieldRule('delay', $db_item),
 			'allow_traps' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON])],
 			'trapper_hosts' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
@@ -190,12 +163,7 @@ class CItemTypeHttpAgent implements CItemType {
 			'ssl_cert_file' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'ssl_key_file' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'ssl_key_password' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'interfaceid' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => static function () use ($db_item): bool {
-											return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
-										}, 'type' => API_ID],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
+			'interfaceid' =>		self::getUpdateFieldRuleInherited('interfaceid', $db_item),
 			'delay' =>				['type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')],
 			'allow_traps' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON])],
 			'trapper_hosts' =>		['type' => API_MULTIPLE, 'rules' => [
