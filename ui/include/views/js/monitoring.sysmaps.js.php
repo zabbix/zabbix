@@ -76,13 +76,10 @@ function createFontSelect(string $name): CSelect {
 <script type="text/x-jquery-tmpl" id="mapElementFormTpl">
 	<?= (new CDiv([
 			(new CTag('h4', true, _('Map element'))),
-			(new CDiv(
-				(new CLink(null, CDocHelper::getUrl(CDocHelper::POPUP_MAP_ELEMENT)))
-					->setTitle(_('Help'))
-					->addClass(ZBX_STYLE_ICON_DOC_LINK)
-					->setTarget('_blank')
-			))
-				->addClass('popup-sysmap-doc-link')
+			(new CLink(null, CDocHelper::getUrl(CDocHelper::POPUP_MAP_ELEMENT)))
+				->setTitle(_('Help'))
+				->addClass(ZBX_STYLE_ICON_DOC_LINK)
+				->setTarget('_blank')
 		]))
 			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
 			->setId('formDragHandler')
@@ -354,13 +351,10 @@ function createFontSelect(string $name): CSelect {
 <script type="text/x-jquery-tmpl" id="mapShapeFormTpl">
 	<?= (new CDiv([
 			(new CTag('h4', true, _('Map shape'))),
-			(new CDiv(
-				(new CLink(null, CDocHelper::getUrl(CDocHelper::POPUP_MAP_SHAPE)))
-					->setTitle(_('Help'))
-					->addClass(ZBX_STYLE_ICON_DOC_LINK)
-					->setTarget('_blank')
-			))
-				->addClass('popup-sysmap-doc-link')
+			(new CLink(null, CDocHelper::getUrl(CDocHelper::POPUP_MAP_SHAPE)))
+				->setTitle(_('Help'))
+				->addClass(ZBX_STYLE_ICON_DOC_LINK)
+				->setTarget('_blank')
 		]))
 			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
 			->setId('shapeDragHandler')
@@ -516,13 +510,10 @@ function createFontSelect(string $name): CSelect {
 <script type="text/x-jquery-tmpl" id="mapMassShapeFormTpl">
 	<?= (new CDiv([
 			(new CTag('h4', true, _('Mass update shapes'))),
-			(new CDiv(
-				(new CLink(null, CDocHelper::getUrl(CDocHelper::POPUP_MAP_MASSUPDATE_SHAPES)))
-					->setTitle(_('Help'))
-					->addClass(ZBX_STYLE_ICON_DOC_LINK)
-					->setTarget('_blank')
-			))
-				->addClass('popup-sysmap-doc-link')
+			(new CLink(null, CDocHelper::getUrl(CDocHelper::POPUP_MAP_MASSUPDATE_SHAPES)))
+				->setTitle(_('Help'))
+				->addClass(ZBX_STYLE_ICON_DOC_LINK)
+				->setTarget('_blank')
 		]))
 			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
 			->setId('massShapeDragHandler')
@@ -649,13 +640,10 @@ function createFontSelect(string $name): CSelect {
 <script type="text/x-jquery-tmpl" id="mapMassFormTpl">
 	<?= (new CDiv([
 			(new CTag('h4', true, _('Mass update elements'))),
-			(new CDiv(
-				(new CLink(null, CDocHelper::getUrl(CDocHelper::POPUP_MAP_MASSUPDATE_ELEMENTS)))
-					->setTitle(_('Help'))
-					->addClass(ZBX_STYLE_ICON_DOC_LINK)
-					->setTarget('_blank')
-			))
-				->addClass('popup-sysmap-doc-link')
+			(new CLink(null, CDocHelper::getUrl(CDocHelper::POPUP_MAP_MASSUPDATE_ELEMENTS)))
+				->setTitle(_('Help'))
+				->addClass(ZBX_STYLE_ICON_DOC_LINK)
+				->setTarget('_blank')
 		]))
 			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
 			->setId('massDragHandler')

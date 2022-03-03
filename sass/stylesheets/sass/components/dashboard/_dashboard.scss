@@ -938,6 +938,10 @@
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
 
+	.dashboard-widget-head {
+		margin: 8px 10px;
+	}
+
 	.list-table {
 		border: 0;
 
@@ -979,7 +983,7 @@
 
 .dashboard-widget-head {
 	display: flex;
-	margin: 8px 10px;
+	margin-bottom: 8px;
 
 	h4 {
 		color: widget-head-font-color($font-color);

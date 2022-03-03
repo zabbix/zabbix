@@ -2682,11 +2682,6 @@ $form-icon-btn: (
 	.drag-icon,
 	.dashboard-widget-head {
 		@extend %cursor-dragging;
-
-		.popup-sysmap-doc-link {
-			margin-right: -15px;
-			margin-top:	-15px;
-		}
 	}
 }
 
@@ -3041,24 +3036,29 @@ $form-icon-btn: (
 	border-bottom-color: darken($action-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
 
+	.dashboard-widget-head {
+		margin: -8px -10px 6px -10px;
+		padding: 8px 10px;
+
+		.icon-doc-link {
+			width: 18px;
+			height: 18px;
+			margin: -9px -6px 0 38px;
+			line-height: 18px;
+
+			&::after {
+				font-size: 15px;
+			}
+		}
+	}
+
 	&.modal {
 		position: fixed;
 		overflow: hidden;
 		margin: 0 10px;
 
 		.dashboard-widget-head {
-			margin: 0 0 14px;
-
-			.icon-doc-link {
-				width: 18px;
-				height: 18px;
-				margin: -9px -26px 0 38px;
-				line-height: 18px;
-
-				&::after {
-					font-size: 15px;
-				}
-			}
+			margin-bottom: 14px;
 
 			.overlay-close-btn {
 				position: static;
