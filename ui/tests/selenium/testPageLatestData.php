@@ -247,7 +247,7 @@ class testPageLatestData extends CWebTest {
 		$form->fill(['Hosts' => 'Available host in maintenance']);
 		$form->submit();
 
-		$this->query('xpath://span['.CXPathHelper::fromClass('icon-maintenance').']')->waitUntilClickable()->one()->click();
+		$this->query('xpath://a['.CXPathHelper::fromClass('icon-maintenance').']')->waitUntilClickable()->one()->click();
 		$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
 		$hint_text = "Maintenance for Host availability widget [Maintenance with data collection]\n".
 				"Maintenance for checking Show hosts in maintenance option in Host availability widget";
