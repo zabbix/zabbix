@@ -6073,6 +6073,14 @@ svg {
     background-color: #ebeef0;
     animation: fadein .5s; }
 
+.icon-count {
+  font-size: 12px;
+  padding: 3px 5px 2px;
+  color: #ffffff;
+  background-color: #768d99;
+  border-radius: 3px;
+  margin: 1px 5px; }
+
 .problem-icon-link,
 .problem-icon-list {
   display: inline-flex;

@@ -104,7 +104,8 @@ $form_list->addRow(_('Debug mode'),
 $permissions_form_list = new CFormList('permissions_form_list');
 $permissions_form_list->addRow(_('Permissions'),
 	(new CDiv(new CPartial('administration.usergroup.grouprights.html', [
-		'group_rights' => $data['group_rights']
+		'group_rights' => $data['group_rights'],
+		'templategroup_rights' => $data['templategroup_rights']
 	])))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -145,11 +146,52 @@ $new_group_right_table = (new CTable())
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]);
 
-$permissions_form_list->addRow(null,
-	(new CDiv($new_group_right_table))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-);
+$new_templategroup_right_table = (new CTable())
+	->setId('new-templategroup-right-table')
+	->addRow([
+		(new CMultiSelect([
+			'name' => 'new_templategroup_right[groupids][]',
+			'object_name' => 'templateGroup',
+			'data' => array_intersect_key($data['template_groups_ms'], array_flip($data['new_templategroup_right']['groupids'])),
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'template_groups',
+					'srcfld1' => 'groupid',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'new_templategroup_right_groupids_'
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		(new CCol(
+			(new CRadioButtonList('new_templategroup_right[permission]', (int) $data['new_templategroup_right']['permission']))
+				->addValue(_('Read-write'), PERM_READ_WRITE)
+				->addValue(_('Read'), PERM_READ)
+				->addValue(_('Deny'), PERM_DENY)
+				->addValue(_('None'), PERM_NONE)
+				->setModern(true)
+		))->setAttribute('style', 'vertical-align: top')
+	])
+	->addRow((new CCheckBox('new_templategroup_right[include_subgroups]'))
+		->setChecked((bool) $data['new_templategroup_right']['include_subgroups'])
+		->setLabel(_('Include subgroups'))
+	)
+	->addRow([
+		(new CSimpleButton(_('Add')))
+			->onClick('javascript: usergroups.submitNewGroupRight("usergroup.groupright.add");')
+			->addClass(ZBX_STYLE_BTN_LINK)
+	]);
+
+$permissions_form_list
+	->addRow(_('Host groups'),
+		(new CDiv($new_group_right_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	)
+	->addRow(_('Template groups'),
+		(new CDiv($new_templategroup_right_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	);
 
 $tag_filter_form_list = new CFormList('tagFilterFormList');
 
@@ -205,7 +247,7 @@ $tag_filter_form_list->addRow(null,
 $tabs = (new CTabView())
 	->addTab('user_group_tab', _('User group'), $form_list)
 	->addTab('permissions_tab', _('Permissions'), $permissions_form_list, TAB_INDICATOR_PERMISSIONS)
-	->addTab('tag_filter_tab', _('Tag filter'), $tag_filter_form_list, TAB_INDICATOR_TAG_FILTER);
+	->addTab('tag_filter_tab', _('Problem tag filter'), $tag_filter_form_list, TAB_INDICATOR_TAG_FILTER);
 if (!$data['form_refresh']) {
 	$tabs->setSelected(0);
 }

@@ -27,13 +27,15 @@
 <script type="text/javascript">
 
 	jQuery(function($) {
-		var $form                        = $('form[name="user_group_form"]'),
-			$new_group_right_table       = $form.find('table#new-group-right-table'),
-			$group_right_table_container = $form.find('table#group-right-table').parent(),
-			$new_tag_filter_table        = $form.find('table#new-tag-filter-table'),
-			$tag_filter_table_container  = $form.find('table#tag-filter-table').parent(),
-			$ms_tag_filter_groups        = $new_tag_filter_table.find('.multiselect'),
-			$ms_group_right_groups       = $new_group_right_table.find('.multiselect'),
+		var $form                                = $('form[name="user_group_form"]'),
+			$new_group_right_table               = $form.find('table#new-group-right-table'),
+			$new_templategroup_right_table       = $form.find('table#new-templategroup-right-table'),
+			$group_right_table_container         = $form.find('table#group-right-table').parent(),
+			$new_tag_filter_table                = $form.find('table#new-tag-filter-table'),
+			$tag_filter_table_container          = $form.find('table#tag-filter-table').parent(),
+			$ms_tag_filter_groups                = $new_tag_filter_table.find('.multiselect'),
+			$ms_group_right_groups               = $new_group_right_table.find('.multiselect'),
+			$ms_templategroup_right_groups       = $new_templategroup_right_table.find('.multiselect'),
 			timeoutid_new_group_right,
 			timeoutid_new_tag_filter,
 			xhr_new_group_right,
@@ -108,13 +110,52 @@
 		}
 
 		/**
+		 * Collects data.
+		 *
+		 * @return {object}
+		 */
+		function collectTemplategroupRightFormData() {
+			let data = {
+				new_templategroup_right: {groupids: []},
+				templategroup_rights: {}
+			};
+
+			$ms_templategroup_right_groups.multiSelect('getData').forEach(function(ms_item) {
+				data.new_templategroup_right.groupids.push(ms_item.id);
+			});
+
+			data.new_templategroup_right.include_subgroups = $new_templategroup_right_table
+				.find('[name="new_templategroup_right[include_subgroups]"]').prop('checked') ? '1' : '0';
+
+			data.new_templategroup_right.permission = $new_templategroup_right_table
+				.find('[name="new_templategroup_right[permission]"]').filter(':checked').val();
+
+			data.templategroup_rights = $.extend.apply({},
+				$group_right_table_container.find('[name="templategroup_right"]').map(function(i, node) {
+					var obj = JSON.parse(node.value),
+						permission = jQuery(node).parent().find('input[type="radio"]').filter(':checked').val();
+
+					if (typeof permission !== 'undefined') {
+						obj[Object.keys(obj)[0]].permission = permission;
+					}
+					return obj;
+				})
+			);
+
+			return data;
+		}
+
+		/**
 		 * During long request, shows indicator and disables form elements.
 		 */
 		function disableNewGroupRightForm() {
 			timeoutid_new_group_right = setTimeout(function() {
 				$ms_group_right_groups.multiSelect('disable');
+				$ms_templategroup_right_groups.multiSelect('disable');
 				$new_group_right_table.find('button, [name^="new_group_right"]').prop('disabled', true);
+				$new_templategroup_right_table.find('button, [name^="new_templategroup_right"]').prop('disabled', true);
 				$group_right_table_container.find('input[type="radio"]').prop('disabled', true);
+				$templategroup_right_table_container.find('input[type="radio"]').prop('disabled', true);
 			}, 150);
 		}
 
@@ -135,7 +176,9 @@
 		function enableNewGroupRightForm() {
 			clearTimeout(timeoutid_new_group_right);
 			$ms_group_right_groups.multiSelect('enable');
+			$ms_templategroup_right_groups.multiSelect('enable');
 			$new_group_right_table.find('button, [name^="new_group_right"]').prop('disabled', false);
+			$new_templategroup_right_table.find('button, [name^="new_templategroup_right"]').prop('disabled', false);
 			$group_right_table_container.find('input[type="radio"]').prop('disabled', false);
 		}
 
@@ -234,8 +277,8 @@
 		 * @param {string} action
 		 */
 		function submitNewGroupRight(action) {
-			var url = new Curl('zabbix.php'),
-				data = collectGroupRightFormData();
+			let url = new Curl('zabbix.php'),
+				data = {...collectGroupRightFormData(), ...collectTemplategroupRightFormData()};
 
 			url.setArgument('action', action);
 

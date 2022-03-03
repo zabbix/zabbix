@@ -26,7 +26,7 @@
 $group_rights_table = (new CTable())
 	->setId('group-right-table')
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Host group'), _('Permissions')]);
+	->setHeader([_('Group'), _('Type'), _('Permissions')]);
 
 foreach ($data['group_rights'] as $groupid => $group_right) {
 	$form_vars = [];
@@ -44,6 +44,7 @@ foreach ($data['group_rights'] as $groupid => $group_right) {
 
 		$row = [
 			italic(_('All groups')),
+			_('Hosts'),
 			[
 				permissionText($group_right['permission']),
 				$form_vars,
@@ -76,7 +77,62 @@ foreach ($data['group_rights'] as $groupid => $group_right) {
 				->removeId()
 				->setEnabled(false)
 		];
-		$row = [$group_name, $permissions];
+		$row = [$group_name, _('Hosts'), $permissions];
+	}
+
+	$group_rights_table->addRow($row);
+}
+
+foreach ($data['templategroup_rights'] as $groupid => $templategroup_right) {
+	$form_vars = [];
+	$form_data_json = [];
+
+	$form_vars[] = (new CVar('templategroup_rights['.$groupid.'][name]', $templategroup_right['name']))->removeId();
+	$form_data_json[$groupid] = ['name' => $templategroup_right['name']];
+
+	if ($groupid == 0) {
+		$form_vars[] = (new CVar('templategroup_rights['.$groupid.'][grouped]', $templategroup_right['grouped']))->removeId();
+		$form_vars[] = (new CVar('templategroup_rights['.$groupid.'][permission]', $templategroup_right['permission']))->removeId();
+
+		$form_data_json[$groupid]['grouped'] = $templategroup_right['grouped'];
+		$form_data_json[$groupid]['permission'] = $templategroup_right['permission'];
+
+		$row = [
+			italic(_('All groups')),
+			_('Templates'),
+			[
+				permissionText($templategroup_right['permission']),
+				$form_vars,
+				(new CVar('templategroup_right', json_encode($form_data_json, JSON_FORCE_OBJECT)))
+					->removeId()
+					->setEnabled(false)
+			]
+		];
+	}
+	else {
+		if (array_key_exists('grouped', $templategroup_right) && $templategroup_right['grouped']) {
+			$form_vars[] = (new CVar('templategroup_rights['.$groupid.'][grouped]', $templategroup_right['grouped']))->removeId();
+			$form_data_json[$groupid]['grouped'] = $templategroup_right['grouped'];
+
+			$group_name = [$templategroup_right['name'], SPACE, italic('('._('including subgroups').')')];
+		}
+		else {
+			$group_name = $templategroup_right['name'];
+		}
+
+		$permissions = [
+			(new CRadioButtonList('templategroup_rights['.$groupid.'][permission]', (int) $templategroup_right['permission']))
+				->addValue(_('Read-write'), PERM_READ_WRITE)
+				->addValue(_('Read'), PERM_READ)
+				->addValue(_('Deny'), PERM_DENY)
+				->addValue(_('None'), PERM_NONE)
+				->setModern(true),
+			$form_vars,
+			(new CVar('templategroup_right', json_encode($form_data_json, JSON_FORCE_OBJECT)))
+				->removeId()
+				->setEnabled(false)
+		];
+		$row = [$group_name, _('Templates'), $permissions];
 	}
 
 	$group_rights_table->addRow($row);

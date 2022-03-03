@@ -197,6 +197,48 @@ function getHostGroupsRights(array $usrgrpids = []) {
 }
 
 /**
+ * Returns the list of permissions to the template groups for selected user groups.
+ *
+ * @param array $usrgrpids		An array of user group IDs.
+ *
+ * @return array
+ */
+function getTemplateGroupsRights(array $usrgrpids = []) {
+	$groups_rights = [
+		'0' => [
+			'permission' => PERM_NONE,
+			'name' => '',
+			'grouped' => '1'
+		]
+	];
+
+	$template_groups = API::TemplateGroup()->get(['output' => ['groupid', 'name']]);
+
+	foreach ($template_groups as $template_group) {
+		$groups_rights[$template_group['groupid']] = [
+			'permission' => PERM_NONE,
+			'name' => $template_group['name']
+		];
+	}
+
+	if ($usrgrpids) {
+		$db_rights = DBselect(
+			'SELECT r.id AS groupid,'.
+			'CASE WHEN MIN(r.permission)='.PERM_DENY.' THEN '.PERM_DENY.' ELSE MAX(r.permission) END AS permission'.
+			' FROM right_tplgrp r'.
+			' WHERE '.dbConditionInt('r.groupid', $usrgrpids).
+			' GROUP BY r.id'
+		);
+
+		while ($db_right = DBfetch($db_rights)) {
+			$groups_rights[$db_right['groupid']]['permission'] = $db_right['permission'];
+		}
+	}
+
+	return $groups_rights;
+}
+
+/**
  * Returns the sorted list of permissions to the host groups in collapsed form.
  *
  * @param array  $groups_rights
@@ -387,6 +429,88 @@ function applyHostGroupRights(array $groups_rights, array $groupids = [], array 
 
 			if (array_key_exists($parent_group_name, $ex_groups)
 					&& array_key_exists($ex_groups[$parent_group_name], $groups_rights)) {
+				$parent_group_rights = $groups_rights[$ex_groups[$parent_group_name]];
+
+				if (array_key_exists('grouped', $parent_group_rights) && $parent_group_rights['grouped']) {
+					$ex_group_rights['permission'] = $parent_group_rights['permission'];
+					break;
+				}
+			}
+		}
+		while ($parent_group_name !== '');
+	}
+	unset($ex_group_rights);
+
+	CArrayHelper::sort($ex_groups_rights, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
+
+	return $ex_groups_rights;
+}
+
+/**
+ * Applies new permissions to the template groups.
+ *
+ * @param array  $groups_rights
+ * @param string $groups_rights[<groupid>]['name']
+ * @param int    $groups_rights[<groupid>]['permission']
+ * @param int    $groups_rights[<groupid>]['grouped']    (optional)
+ * @param array  $groupids
+ * @param array  $groupids_subgroupids
+ * @param int    $new_permission
+ *
+ * @return array
+ */
+function applyTemplateGroupRights(array $groups_rights, array $groupids = [], array $groupids_subgroupids = [],
+									$new_permission = PERM_NONE) {
+	// get list of host groups
+	$ex_groups_rights = getTemplateGroupsRights();
+	$ex_groups = [];
+
+	foreach ($ex_groups_rights as $groupid => $ex_group_rights) {
+		$ex_groups[$ex_group_rights['name']] = $groupid;
+	}
+
+	// convert $groupids_subgroupids into $groupids
+	foreach ($groupids_subgroupids as $groupid) {
+		if (!array_key_exists($groupid, $ex_groups_rights)) {
+			continue;
+		}
+
+		$groupids[] = $groupid;
+
+		$parent_group_name = $ex_groups_rights[$groupid]['name'].'/';
+		$parent_group_name_len = strlen($parent_group_name);
+
+		foreach ($ex_groups_rights as $groupid => $ex_group_rights) {
+			if (substr($ex_group_rights['name'], 0, $parent_group_name_len) === $parent_group_name) {
+				$groupids[] = $groupid;
+			}
+		}
+	}
+
+	$groupids = array_fill_keys($groupids, true);
+
+	// apply new permissions to all groups
+	foreach ($ex_groups_rights as $groupid => &$ex_group_rights) {
+		if ($groupid == 0) {
+			continue;
+		}
+		if (array_key_exists($groupid, $groupids)) {
+			$ex_group_rights['permission'] = $new_permission;
+			continue;
+		}
+		if (array_key_exists($groupid, $groups_rights)) {
+			$ex_group_rights['permission'] = $groups_rights[$groupid]['permission'];
+			continue;
+		}
+
+		$parent_group_name = $ex_group_rights['name'];
+
+		do {
+			$pos = strrpos($parent_group_name, '/');
+			$parent_group_name = ($pos === false) ? '' : substr($parent_group_name, 0, $pos);
+
+			if (array_key_exists($parent_group_name, $ex_groups)
+				&& array_key_exists($ex_groups[$parent_group_name], $groups_rights)) {
 				$parent_group_rights = $groups_rights[$ex_groups[$parent_group_name]];
 
 				if (array_key_exists('grouped', $parent_group_rights) && $parent_group_rights['grouped']) {

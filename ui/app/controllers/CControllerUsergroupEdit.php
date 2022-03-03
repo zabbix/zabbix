@@ -32,20 +32,21 @@ class CControllerUsergroupEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'usrgrpid'        => 'db usrgrp.usrgrpid',
-			'name'            => 'db usrgrp.name',
-			'userids'         => 'array_db users.userid',
-			'gui_access'      => 'db usrgrp.gui_access|in '.implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED]),
-			'users_status'    => 'db usrgrp.users_status|in '.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
-			'debug_mode'      => 'db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED,
+			'usrgrpid'                => 'db usrgrp.usrgrpid',
+			'name'                    => 'db usrgrp.name',
+			'userids'                 => 'array_db users.userid',
+			'gui_access'              => 'db usrgrp.gui_access|in '.implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED]),
+			'users_status'            => 'db usrgrp.users_status|in '.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
+			'debug_mode'              => 'db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED,
 
-			'group_rights'    => 'array',
-			'tag_filters'     => 'array',
+			'group_rights'            => 'array',
+			'templategroup_rights'    => 'array',
+			'tag_filters'             => 'array',
 
-			'new_group_right' => 'array',
-			'new_tag_filter'  => 'array',
+			'new_group_right'         => 'array',
+			'new_tag_filter'          => 'array',
 
-			'form_refresh'    => 'int32'
+			'form_refresh'            => 'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -105,10 +106,16 @@ class CControllerUsergroupEdit extends CController {
 		$this->getInputs($data, ['name', 'gui_access', 'users_status', 'debug_mode', 'form_refresh']);
 
 		$data['group_rights'] = $this->getGroupRights();
+		$data['templategroup_rights'] = $this->getTemplategroupRights();
 		$data['new_group_right'] = $this->getInput('new_group_right', []) + [
 			'groupids' => [],
 			'permission' => PERM_NONE,
 			'include_subgroups' => '0'
+		];
+		$data['new_templategroup_right'] = $this->getInput('new_templategroup_right', []) + [
+				'groupids' => [],
+				'permission' => PERM_NONE,
+				'include_subgroups' => '0'
 		];
 
 		$data['tag_filters'] = $this->getTagFilters();
@@ -121,6 +128,9 @@ class CControllerUsergroupEdit extends CController {
 
 		$data['host_groups_ms'] = self::getHostGroupsMs(
 			array_merge($data['new_group_right']['groupids'], $data['new_tag_filter']['groupids'])
+		);
+		$data['template_groups_ms'] = self::getTemplateGroupsMs(
+			$data['new_templategroup_right']['groupids']
 		);
 		$data['users_ms'] = $this->getUsersMs();
 
@@ -141,6 +151,19 @@ class CControllerUsergroupEdit extends CController {
 
 		return collapseHostGroupRights(
 			getHostGroupsRights($this->hasInput('usrgrpid') ? [$this->user_group['usrgrpid']] : [])
+		);
+	}
+
+	/**
+	 * @return array
+	 */
+	private function getTemplategroupRights() {
+		if ($this->hasInput('templategroup_rights')) {
+			return $this->getInput('templategroup_rights');
+		}
+
+		return collapseHostGroupRights(
+			getTemplateGroupsRights($this->hasInput('usrgrpid') ? [$this->user_group['usrgrpid']] : [])
 		);
 	}
 
@@ -175,6 +198,28 @@ class CControllerUsergroupEdit extends CController {
 		CArrayHelper::sort($host_groups, ['name']);
 
 		return CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']);
+	}
+
+	/**
+	 * Returns all needed template groups formatted for multiselector.
+	 *
+	 * @param array $groupids
+	 *
+	 * @return array
+	 */
+	private static function getTemplateGroupsMs(array $groupids) {
+		if (!$groupids) {
+			return [];
+		}
+
+		$template_groups = API::TemplateGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $groupids,
+			'preservekeys' => true
+		]);
+		CArrayHelper::sort($template_groups, ['name']);
+
+		return CArrayHelper::renameObjectsKeys($template_groups, ['groupid' => 'id']);
 	}
 
 	/**

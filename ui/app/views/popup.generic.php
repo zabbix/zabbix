@@ -70,6 +70,17 @@ if (array_key_exists('groups', $data['filter'])) {
 	$script_inline .= $hostgroup_ms->getPostJS(). 'popup_generic.initGroupsFilter();';
 }
 
+// Add template group multiselect control.
+if (array_key_exists('templategroups', $data['filter'])) {
+	$multiselect_options = $data['filter']['templategroups'];
+	$multiselect_options['popup']['parameters']['dstfrm'] = $header_form->getId();
+
+	$templategroup_ms = (new CMultiSelect($multiselect_options))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
+	$controls[] = (new CFormList())->addRow(new CLabel(_('Template group'), 'popup_template_group_ms'), $templategroup_ms);
+
+	$script_inline .= $templategroup_ms->getPostJS(). 'popup_generic.initTemplategroupsFilter();';
+}
+
 // Add host multiselect.
 if (array_key_exists('hosts', $data['filter'])) {
 	$multiselect_options = $data['filter']['hosts'];
@@ -148,6 +159,7 @@ $js_action_onclick = 'popup_generic.closePopup(event);';
 // Output table rows.
 switch ($data['popup_type']) {
 	case 'hosts':
+	case 'template_groups':
 	case 'host_groups':
 	case 'proxies':
 	case 'host_templates':
@@ -675,6 +687,7 @@ $types = [
 	'hosts',
 	'host_templates',
 	'host_groups',
+	'template_groups',
 	'items',
 	'item_prototypes',
 	'proxies',

@@ -509,6 +509,13 @@
 			}
 		}
 
+		if (typeof preselect_options.filter_preselect_fields.templategroups !== 'undefined') {
+			var template_groups = $('#' + preselect_options.filter_preselect_fields.templategroups).multiSelect('getData');
+			if (template_groups.length != 0) {
+				ret.groupid = template_groups[0].id;
+			}
+		}
+
 		return ret;
 	}
 

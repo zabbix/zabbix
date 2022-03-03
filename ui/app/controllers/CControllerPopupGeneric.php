@@ -153,6 +153,18 @@ class CControllerPopupGeneric extends CController {
 					_('Name')
 				]
 			],
+			'template_groups' => [
+				'title' => _('template groups'),
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
+				'allowed_src_fields' => 'groupid,name',
+				'form' => [
+					'name' => 'templateGroupsform',
+					'id' => 'templateGroups'
+				],
+				'table_columns' => [
+					_('Name')
+				]
+			],
 			'proxies' => [
 				'title' => _('Proxies'),
 				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
@@ -1065,6 +1077,40 @@ class CControllerPopupGeneric extends CController {
 				$records = API::HostGroup()->get($options);
 				if ($this->hasInput('enrich_parent_groups')) {
 					$records = enrichParentGroups($records);
+				}
+
+				CArrayHelper::sort($records, ['name']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['groupid' => 'id']);
+				break;
+
+			case 'template_groups':
+				$options += [
+					'output' => ['groupid', 'name'],
+					'with_triggers' => $this->hasInput('with_triggers') ? true : null
+				];
+
+				if (array_key_exists('real_hosts', $this->page_options)) {
+					$options['real_hosts'] = 1;
+				}
+				elseif ($this->hasInput('templated_hosts')) {
+					$options['templated_hosts'] = 1;
+				}
+
+				if ($this->hasInput('with_httptests')) {
+					$options['with_httptests'] = 1;
+				}
+
+				if ($this->hasInput('with_items')) {
+					$options['with_items'] = true;
+				}
+
+				if ($this->hasInput('with_monitored_triggers')) {
+					$options['with_monitored_triggers'] = true;
+				}
+
+				$records = API::TemplateGroup()->get($options);
+				if ($this->hasInput('enrich_parent_groups')) {
+					$records = enrichParentTemplateGroups($records);
 				}
 
 				CArrayHelper::sort($records, ['name']);

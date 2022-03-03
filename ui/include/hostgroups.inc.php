@@ -359,3 +359,42 @@ function enrichParentGroups(array $groups) {
 
 	return $groups;
 }
+
+/**
+ * Enriches template groups array by parent groups.
+ *
+ * @param array  $groups
+ * @param string $groups[<groupid>]['groupid']
+ * @param string $groups[<groupid>]['name']
+ *
+ * @return array
+ */
+function enrichParentTemplateGroups(array $groups) {
+	$parents = [];
+	foreach ($groups as $group) {
+		$parent = explode('/', $group['name']);
+		while (array_pop($parent) && $parent) {
+			$parents[implode('/', $parent)] = true;
+		}
+	}
+
+	if ($parents) {
+		foreach ($groups as $group) {
+			if (array_key_exists($group['name'], $parents)) {
+				unset($parents[$group['name']]);
+			}
+		}
+	}
+
+	if ($parents) {
+		$groups += API::TemplateGroup()->get([
+			'output' => ['groupid', 'name'],
+			'filter' => [
+				'name' => array_keys($parents)
+			],
+			'preservekeys' => true
+		]);
+	}
+
+	return $groups;
+}

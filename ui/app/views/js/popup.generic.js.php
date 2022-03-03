@@ -55,6 +55,21 @@ window.popup_generic = {
 		});
 	},
 
+	initTemplategroupsFilter() {
+		var overlay = overlays_stack.end();
+
+		jQuery('.multiselect', overlay.$dialogue).each(function (i, ms) {
+			jQuery(ms).on('change', {overlay: overlay}, function (e) {
+				const groups = jQuery(this).multiSelect('getData').map((item) => item.id);
+				const parameters = groups.length ? {groupid: groups[0]} : {filter_groupid_rst: 1, groupid: []};
+
+				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...parameters}, {
+					dialogueid: e.data.overlay.dialogueid
+				});
+			});
+		});
+	},
+
 	initHostsFilter() {
 		var overlay = overlays_stack.end();
 

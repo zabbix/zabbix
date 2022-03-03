@@ -30,6 +30,7 @@ class CControllerUsergroupCreate extends CController {
 			'debug_mode'      => 'db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED,
 
 			'group_rights'    => 'array',
+			'templategroup_rights'    => 'array',
 			'tag_filters'     => 'array',
 
 			'new_group_right' => 'array',
@@ -76,6 +77,17 @@ class CControllerUsergroupCreate extends CController {
 		$group_rights = applyHostGroupRights($this->getInput('group_rights', []));
 
 		foreach ($group_rights as $groupid => $group_right) {
+			if ($groupid != 0 && $group_right['permission'] != PERM_NONE) {
+				$user_group['rights'][] = [
+					'id' => (string) $groupid,
+					'permission' => $group_right['permission']
+				];
+			}
+		}
+
+		$templategroup_rights = applyTemplateGroupRights($this->getInput('templategroup_rights', []));
+
+		foreach ($templategroup_rights as $groupid => $group_right) {
 			if ($groupid != 0 && $group_right['permission'] != PERM_NONE) {
 				$user_group['rights'][] = [
 					'id' => (string) $groupid,

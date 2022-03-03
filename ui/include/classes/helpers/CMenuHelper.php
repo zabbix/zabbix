@@ -166,6 +166,9 @@ class CMenuHelper {
 		}
 
 		$submenu_configuration = [
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATE_GROUPS)
+				? (new CMenuItem(_('Template groups')))->setAction('templategroups.list')
+				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOST_GROUPS)
 				? (new CMenuItem(_('Host groups')))->setUrl(new CUrl('hostgroups.php'), 'hostgroups.php')
 				: null,

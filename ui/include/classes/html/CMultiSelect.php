@@ -35,7 +35,7 @@ class CMultiSelect extends CTag {
 	 *
 	 * @param array
 	 */
-	protected $preselect_fields = ['hosts', 'hostgroups'];
+	protected $preselect_fields = ['hosts', 'hostgroups', 'templategroups'];
 
 	/**
 	 * @param array $options['objectOptions']  An array of parameters to be added to the request URL.
