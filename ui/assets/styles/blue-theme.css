@@ -668,6 +668,11 @@ footer {
     grid-column-start: 4 !important; }
   .form-grid .form-field table {
     width: 100%; }
+  .form-grid .form-field th {
+    padding: 0 5px 0 0;
+    color: #768d99; }
+    .form-grid .form-field th:last-child {
+      padding: 0; }
   .form-grid .form-field td {
     padding: 0 5px 5px 0; }
   .form-grid .form-field .list-check-radio {
