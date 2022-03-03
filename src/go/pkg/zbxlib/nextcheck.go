@@ -25,7 +25,7 @@ package zbxlib
 #include "common.h"
 
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
-		int *nextcheck, char **error);
+		int *nextcheck, int *scheduling, char **error);
 */
 import "C"
 
@@ -35,20 +35,23 @@ import (
 	"unsafe"
 )
 
-func GetNextcheck(itemid uint64, delay string, from time.Time) (nextcheck time.Time, err error) {
-	var cnextcheck C.int
+func GetNextcheck(itemid uint64, delay string, from time.Time) (nextcheck time.Time, scheduling bool, err error) {
+	var cnextcheck, cscheduling C.int
 	var cerr *C.char
 	cdelay := C.CString(delay)
 
 	now := from.Unix()
 	ret := C.zbx_get_agent_item_nextcheck(C.zbx_uint64_t(itemid), cdelay, C.int(now),
-		&cnextcheck, &cerr)
+		&cnextcheck, &cscheduling, &cerr)
 
 	if ret != Succeed {
 		err = errors.New(C.GoString(cerr))
 		C.free(unsafe.Pointer(cerr))
 	} else {
 		nextcheck = time.Unix(int64(cnextcheck), 0)
+		if Succeed == cscheduling {
+			scheduling = true
+		}
 	}
 	C.free(unsafe.Pointer(cdelay))
 
