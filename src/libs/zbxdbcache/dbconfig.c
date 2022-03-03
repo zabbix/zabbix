@@ -5662,7 +5662,12 @@ static void	dc_trigger_update_topology(void)
 
 	zbx_hashset_iter_reset(&config->triggers, &iter);
 	while (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
+	{
+		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+			continue;
+
 		trigger->topoindex = 1;
+	}
 
 	DCconfig_sort_triggers_topologically();
 }
