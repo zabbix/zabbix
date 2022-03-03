@@ -1027,7 +1027,7 @@ int	check_vcenter_hv_power(AGENT_REQUEST *request, const char *username, const c
 	const char		*path, *url, *uuid, *max;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
-	int 			ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1530,15 +1530,15 @@ out:
 	return ret;
 }
 
-int	check_vcenter_hv_network_in(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result)
+static int	check_vcenter_hv_network_common(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result, const char *counter_name, const char *func_parent)
 {
 	const char		*url, *mode, *uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	int			ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), func_parent:'%s'", __func__, func_parent);
 
 	if (2 > request->nparam || request->nparam > 3)
 	{
@@ -1567,61 +1567,29 @@ int	check_vcenter_hv_network_in(AGENT_REQUEST *request, const char *username, co
 		goto unlock;
 	}
 
-	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id, "net/received[average]", "",
+	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id, counter_name, "",
 			ZBX_KIBIBYTE, result);
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), func_parent:'%s', ret: %s", __func__, func_parent,
+			zbx_sysinfo_ret_string(ret));
 
 	return ret;
+}
+
+int	check_vcenter_hv_network_in(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	return	check_vcenter_hv_network_common(request, username, password, result, "net/received[average]",
+			__func__);
 }
 
 int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*url, *mode, *uuid;
-	zbx_vmware_service_t	*service;
-	zbx_vmware_hv_t		*hv;
-	int			ret = SYSINFO_RET_FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (2 > request->nparam || request->nparam > 3)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		goto out;
-	}
-
-	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
-	mode = get_rparam(request, 2);
-
-	if (NULL != mode && '\0' != *mode && 0 != strcmp(mode, "bps"))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		goto out;
-	}
-
-	zbx_vmware_lock();
-
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
-		goto unlock;
-
-	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
-		goto unlock;
-	}
-
-	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id, "net/transmitted[average]", "",
-			ZBX_KIBIBYTE, result);
-unlock:
-	zbx_vmware_unlock();
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
-
-	return ret;
+	return	check_vcenter_hv_network_common(request, username, password, result, "net/transmitted[average]",
+			__func__);
 }
 
 int	check_vcenter_hv_datacenter_name(AGENT_REQUEST *request, const char *username, const char *password,
@@ -3118,8 +3086,9 @@ int	check_vcenter_vm_powerstate(AGENT_REQUEST *request, const char *username, co
 	return ret;
 }
 
-int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result)
+static int	check_vcenter_vm_discovery_common(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result, int dev_type, const char *json_name, const char *json_desc,
+		const char *func_parent)
 {
 	struct zbx_json		json_data;
 	zbx_vmware_service_t	*service;
@@ -3128,7 +3097,7 @@ int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *userna
 	const char		*url, *uuid;
 	int			i, ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), func_parent:'%s'", __func__, func_parent);
 
 	if (2 != request->nparam)
 	{
@@ -3162,13 +3131,13 @@ int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *userna
 	{
 		dev = (zbx_vmware_dev_t *)vm->devs.values[i];
 
-		if (ZBX_VMWARE_DEV_TYPE_NIC != dev->type)
+		if (dev_type != dev->type)
 			continue;
 
 		zbx_json_addobject(&json_data, NULL);
-		zbx_json_addstring(&json_data, "{#IFNAME}", dev->instance, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, json_name, dev->instance, ZBX_JSON_TYPE_STRING);
 		if (NULL != dev->label)
-			zbx_json_addstring(&json_data, "{#IFDESC}", dev->label, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, json_desc, dev->label, ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&json_data);
 	}
@@ -3183,7 +3152,80 @@ int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *userna
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), func_parent:'%s', ret: %s", __func__, func_parent,
+			zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	return check_vcenter_vm_discovery_common(request, username, password, result, ZBX_VMWARE_DEV_TYPE_NIC,
+			"{#IFNAME}", "{#IFDESC}", __func__);
+}
+
+static int	check_vcenter_vm_common(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result, const char *mode_in, const char *countername_mode, const char *countername_def,
+		const char *func_parent)
+{
+	zbx_vmware_service_t	*service;
+	const char		*path, *url, *uuid, *instance, *mode;
+	unsigned int		coeff;
+	int			ret = SYSINFO_RET_FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), func_parent:'%s'", __func__, func_parent);
+
+	if (3 > request->nparam || request->nparam > 4)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+	instance = get_rparam(request, 2);
+	mode = get_rparam(request, 3);
+
+	if ('\0' == *uuid)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
+	if ('\0' == *instance)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		goto out;
+	}
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bps"))
+	{
+		path = countername_def;
+		coeff = ZBX_KIBIBYTE;
+	}
+	else if (0 == strcmp(mode, mode_in))
+	{
+		path = countername_mode;
+		coeff = 1;
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
+		goto unlock;
+	}
+
+	ret = vmware_service_get_vm_counter(service, uuid, instance, path, coeff, result);
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), func_parent:'%s', ret: %s", __func__, func_parent,
+			zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -3191,127 +3233,15 @@ out:
 int	check_vcenter_vm_net_if_in(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	zbx_vmware_service_t	*service;
-	const char		*path, *url, *uuid, *instance, *mode;
-	unsigned int 		coeff;
-	int 			ret = SYSINFO_RET_FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (3 > request->nparam || request->nparam > 4)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		goto out;
-	}
-
-	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
-	instance = get_rparam(request, 2);
-	mode = get_rparam(request, 3);
-
-	if ('\0' == *uuid)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		goto out;
-	}
-
-	if ('\0' == *instance)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		goto out;
-	}
-
-	zbx_vmware_lock();
-
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
-		goto unlock;
-
-	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bps"))
-	{
-		path = "net/received[average]";
-		coeff = ZBX_KIBIBYTE;
-	}
-	else if (0 == strcmp(mode, "pps"))
-	{
-		path = "net/packetsRx[summation]";
-		coeff = 1;
-	}
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
-		goto unlock;
-	}
-
-	ret = vmware_service_get_vm_counter(service, uuid, instance, path, coeff, result);
-unlock:
-	zbx_vmware_unlock();
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
-
-	return ret;
+	return check_vcenter_vm_common(request, username, password, result, "pps", "net/packetsRx[summation]",
+			"net/received[average]", __func__);
 }
 
 int	check_vcenter_vm_net_if_out(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	zbx_vmware_service_t	*service;
-	const char		*path, *url, *uuid, *instance, *mode;
-	unsigned int 		coeff;
-	int 			ret = SYSINFO_RET_FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (3 > request->nparam || request->nparam > 4)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		goto out;
-	}
-
-	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
-	instance = get_rparam(request, 2);
-	mode = get_rparam(request, 3);
-
-	if ('\0' == *uuid)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		goto out;
-	}
-
-	if ('\0' == *instance)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		goto out;
-	}
-
-	zbx_vmware_lock();
-
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
-		goto unlock;
-
-	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bps"))
-	{
-		path = "net/transmitted[average]";
-		coeff = ZBX_KIBIBYTE;
-	}
-	else if (0 == strcmp(mode, "pps"))
-	{
-		path = "net/packetsTx[summation]";
-		coeff = 1;
-	}
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
-		goto unlock;
-	}
-
-	ret = vmware_service_get_vm_counter(service, uuid, instance, path, coeff, result);
-unlock:
-	zbx_vmware_unlock();
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
-
-	return ret;
+	return check_vcenter_vm_common(request, username, password, result, "pps", "net/packetsTx[summation]",
+			"net/transmitted[average]",  __func__);
 }
 
 int	check_vcenter_vm_storage_committed(AGENT_REQUEST *request, const char *username, const char *password,
@@ -3373,196 +3303,22 @@ int	check_vcenter_vm_uptime(AGENT_REQUEST *request, const char *username, const 
 int	check_vcenter_vm_vfs_dev_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	struct zbx_json		json_data;
-	zbx_vmware_service_t	*service;
-	zbx_vmware_vm_t		*vm = NULL;
-	zbx_vmware_dev_t	*dev;
-	const char		*url, *uuid;
-	int			i, ret = SYSINFO_RET_FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (2 != request->nparam)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		goto out;
-	}
-
-	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
-
-	if ('\0' == *uuid)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		goto out;
-	}
-
-	zbx_vmware_lock();
-
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
-		goto unlock;
-
-	if (NULL == (vm = service_vm_get(service, uuid)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown virtual machine uuid."));
-		goto unlock;
-	}
-
-	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
-
-	for (i = 0; i < vm->devs.values_num; i++)
-	{
-		dev = (zbx_vmware_dev_t *)vm->devs.values[i];
-
-		if (ZBX_VMWARE_DEV_TYPE_DISK != dev->type)
-			continue;
-
-		zbx_json_addobject(&json_data, NULL);
-		zbx_json_addstring(&json_data, "{#DISKNAME}", dev->instance, ZBX_JSON_TYPE_STRING);
-		if (NULL != dev->label)
-			zbx_json_addstring(&json_data, "{#DISKDESC}", dev->label, ZBX_JSON_TYPE_STRING);
-		zbx_json_close(&json_data);
-	}
-
-	zbx_json_close(&json_data);
-
-	SET_STR_RESULT(result, zbx_strdup(NULL, json_data.buffer));
-
-	zbx_json_free(&json_data);
-
-	ret = SYSINFO_RET_OK;
-unlock:
-	zbx_vmware_unlock();
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
-
-	return ret;
+	return check_vcenter_vm_discovery_common(request, username, password, result, ZBX_VMWARE_DEV_TYPE_DISK,
+			"{#DISKNAME}", "{#DISKDESC}", __func__);
 }
 
 int	check_vcenter_vm_vfs_dev_read(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	zbx_vmware_service_t	*service;
-	const char		*path, *url, *uuid, *instance, *mode;
-	unsigned int 		coeff;
-	int 			ret = SYSINFO_RET_FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (3 > request->nparam || request->nparam > 4)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		goto out;
-	}
-
-	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
-	instance = get_rparam(request, 2);
-	mode = get_rparam(request, 3);
-
-	if ('\0' == *uuid)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		goto out;
-	}
-
-	if ('\0' == *instance)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		goto out;
-	}
-
-	zbx_vmware_lock();
-
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
-		goto unlock;
-
-	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bps"))
-	{
-		path = "virtualDisk/read[average]";
-		coeff = ZBX_KIBIBYTE;
-	}
-	else if (0 == strcmp(mode, "ops"))
-	{
-		path = "virtualDisk/numberReadAveraged[average]";
-		coeff = 1;
-	}
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
-		goto unlock;
-	}
-
-	ret =  vmware_service_get_vm_counter(service, uuid, instance, path, coeff, result);
-unlock:
-	zbx_vmware_unlock();
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
-
-	return ret;
+	return check_vcenter_vm_common(request, username, password, result, "ops",
+			"virtualDisk/numberReadAveraged[average]", "virtualDisk/read[average]", __func__);
 }
 
 int	check_vcenter_vm_vfs_dev_write(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	zbx_vmware_service_t	*service;
-	const char		*path, *url, *uuid, *instance, *mode;
-	unsigned int 		coeff;
-	int 			ret = SYSINFO_RET_FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (3 > request->nparam || request->nparam > 4)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		goto out;
-	}
-
-	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
-	instance = get_rparam(request, 2);
-	mode = get_rparam(request, 3);
-
-	if ('\0' == *uuid)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		goto out;
-	}
-
-	if ('\0' == *instance)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		goto out;
-	}
-
-	zbx_vmware_lock();
-
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
-		goto unlock;
-
-	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bps"))
-	{
-		path = "virtualDisk/write[average]";
-		coeff = ZBX_KIBIBYTE;
-	}
-	else if (0 == strcmp(mode, "ops"))
-	{
-		path = "virtualDisk/numberWriteAveraged[average]";
-		coeff = 1;
-	}
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
-		goto unlock;
-	}
-
-	ret =  vmware_service_get_vm_counter(service, uuid, instance, path, coeff, result);
-unlock:
-	zbx_vmware_unlock();
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
-
-	return ret;
+	return check_vcenter_vm_common(request, username, password, result, "ops",
+			"virtualDisk/numberWriteAveraged[average]", "virtualDisk/write[average]", __func__);
 }
 
 int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *username, const char *password,
@@ -3709,7 +3465,7 @@ out:
 int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char 		*instance, *url, *uuid, *path;
+	const char		*instance, *url, *uuid, *path;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_vm_t		*vm;
 	zbx_uint64_t		counterid;
@@ -4132,14 +3888,14 @@ out:
 	return ret;
 }
 
-int	check_vcenter_vm_storage_readoio(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result)
+static int	check_vcenter_vm_storage_common(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result, const char *counter_name,  const char *func_parent)
 {
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
 	const char		*url, *uuid, *instance;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), func_parent:'%s'", __func__, func_parent);
 
 	if (3 != request->nparam)
 	{
@@ -4168,150 +3924,42 @@ int	check_vcenter_vm_storage_readoio(AGENT_REQUEST *request, const char *usernam
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	ret = vmware_service_get_vm_counter(service, uuid, instance, "virtualDisk/readOIO[latest]", 1, result);
+	ret = vmware_service_get_vm_counter(service, uuid, instance, counter_name, 1, result);
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), func_parent:'%s', ret: %s", __func__, func_parent,
+			zbx_sysinfo_ret_string(ret));
 
 	return ret;
+}
+
+int	check_vcenter_vm_storage_readoio(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	return check_vcenter_vm_storage_common(request, username, password, result, "virtualDisk/readOIO[latest]",
+			__func__);
 }
 
 int	check_vcenter_vm_storage_writeoio(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	zbx_vmware_service_t	*service;
-	int			ret = SYSINFO_RET_FAIL;
-	const char		*url, *uuid, *instance;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (3 != request->nparam)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		goto out;
-	}
-
-	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
-	instance = get_rparam(request, 2);
-
-	if ('\0' == *uuid)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		goto out;
-	}
-
-	if ('\0' == *instance)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		goto out;
-	}
-
-	zbx_vmware_lock();
-
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
-		goto unlock;
-
-	ret = vmware_service_get_vm_counter(service, uuid, instance, "virtualDisk/writeOIO[latest]", 1, result);
-unlock:
-	zbx_vmware_unlock();
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
-
-	return ret;
+	return check_vcenter_vm_storage_common(request, username, password, result, "virtualDisk/writeOIO[latest]",
+			__func__);
 }
 
 int	check_vcenter_vm_storage_totalwritelatency(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	zbx_vmware_service_t	*service;
-	int			ret = SYSINFO_RET_FAIL;
-	const char		*url, *uuid, *instance;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (3 != request->nparam)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		goto out;
-	}
-
-	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
-	instance = get_rparam(request, 2);
-
-	if ('\0' == *uuid)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		goto out;
-	}
-
-	if ('\0' == *instance)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		goto out;
-	}
-
-	zbx_vmware_lock();
-
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
-		goto unlock;
-
-	ret = vmware_service_get_vm_counter(service, uuid, instance,
-			"virtualDisk/totalWriteLatency[average]", 1, result);
-unlock:
-	zbx_vmware_unlock();
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
-
-	return ret;
+	return check_vcenter_vm_storage_common(request, username, password, result,
+			"virtualDisk/totalWriteLatency[average]", __func__);
 }
 
 int	check_vcenter_vm_storage_totalreadlatency(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	zbx_vmware_service_t	*service;
-	int			ret = SYSINFO_RET_FAIL;
-	const char		*url, *uuid, *instance;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (3 != request->nparam)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		goto out;
-	}
-
-	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
-	instance = get_rparam(request, 2);
-
-	if ('\0' == *uuid)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		goto out;
-	}
-
-	if ('\0' == *instance)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		goto out;
-	}
-
-	zbx_vmware_lock();
-
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
-		goto unlock;
-
-	ret = vmware_service_get_vm_counter(service, uuid, instance,
-			"virtualDisk/totalReadLatency[average]", 1, result);
-unlock:
-	zbx_vmware_unlock();
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
-
-	return ret;
+	return check_vcenter_vm_storage_common(request, username, password, result,
+			"virtualDisk/totalReadLatency[average]", __func__);
 }
 
 int	check_vcenter_vm_guest_uptime(AGENT_REQUEST *request, const char *username, const char *password,
