@@ -51,7 +51,7 @@ $scripts[] = '
 		if (jQuery("#svg-graph-preview").length) {
 			var $dialogue_body = jQuery(this),
 			$preview_container = jQuery(".'.ZBX_STYLE_SVG_GRAPH_PREVIEW.'");
-			if ($preview_container.offset().top < $dialogue_body.offset().top && $dialogue_body.height() > 400) {
+			if ($preview_container.offset().top < $dialogue_body.offset().top && $dialogue_body.height() > 500) {
 				jQuery("#svg-graph-preview").css("top", $dialogue_body.offset().top - $preview_container.offset().top);
 				jQuery(".graph-widget-config-tabs .ui-tabs-nav").css("top", $preview_container.height());
 			}
