@@ -911,6 +911,25 @@ class testDashboardTopHostsWidget extends CWebTest {
 		}
 	}
 
+	public function testDashboardTopHostsWidget_SimpleUpdate() {
+		$widgetid = CDBHelper::getValue('SELECT widgetid FROM widget WHERE dashboard_pageid='.zbx_dbstr(self::$update_pageid));
+
+		// Hash before simple update.
+		$old_hash = CDBHelper::getHash('SELECT * FROM widget_field WHERE widgetid='.zbx_dbstr($widgetid)
+				.' ORDER BY widget_fieldid');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$updateid);
+		$dashboard = CDashboardElement::find()->one();
+		$form = $dashboard->edit()->getWidget('Top hosts update')->edit();
+		$form->submit();
+		$dashboard->save();
+		$this->page->waitUntilReady();
+
+		// Hash after simple update.
+		$new_hash = CDBHelper::getHash('SELECT * FROM widget_field WHERE widgetid='.zbx_dbstr($widgetid)
+				.' ORDER BY widget_fieldid');
+		$this->assertEquals($old_hash, $new_hash);
+	}
+
 	private function checkWidget($header, $data) {
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->getWidget($header)->edit();
