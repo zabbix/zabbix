@@ -73,7 +73,7 @@ class CVaultCyberArk extends CVault {
 	public function getCredentials(): ?array {
 		$http_context = [
 			'method' => 'GET',
-//			'header' => 'Content type: application/json', // TODO: 7402 - debug
+			'header' => 'Content type: application/json',
 			'ignore_errors' => true
 		];
 
@@ -87,7 +87,7 @@ class CVaultCyberArk extends CVault {
 			];
 		}
 
-		$secret = @file_get_contents($this->api_endpoint.'?'.$this->db_path, false,
+		$secret = @file_get_contents(urlencode($this->api_endpoint.'?'.$this->db_path), false,
 			stream_context_create(['http' => $http_context])
 		);
 
