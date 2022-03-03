@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -76,7 +76,6 @@ class CControllerProxyList extends CController {
 			'sort' => $sortField,
 			'sortorder' => $sortOrder,
 			'filter' => $filter,
-			'profileIdx' => 'web.proxies.filter',
 			'active_tab' => CProfile::get('web.proxies.filter.active', 1),
 			'allowed_ui_conf_hosts' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 		];

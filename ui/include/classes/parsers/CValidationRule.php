@@ -42,7 +42,6 @@ class CValidationRule {
 		$pos = 0;
 		$state = self::STATE_BEGIN;
 		$rules = [];
-		$is_empty = true;
 
 		while (isset($buffer[$pos])) {
 			switch ($state) {
@@ -53,7 +52,6 @@ class CValidationRule {
 							break;
 
 						default:
-							$is_empty = false;
 							$rule = [];
 
 							if (!$this->parseString($buffer, $pos, $rule)				// string
@@ -75,6 +73,7 @@ class CValidationRule {
 									&& !$this->parseArrayDB($buffer, $pos, $rule)		// array_db
 									&& !$this->parseArray($buffer, $pos, $rule)			// array
 									&& !$this->parseFlags($buffer, $pos, $rule) 		// flags
+									&& !$this->parseBool($buffer, $pos, $rule)			// bool
 									&& !$this->parseCuid($buffer, $pos, $rule)) {		// cuid
 								// incorrect validation rule
 								break 3;
@@ -630,6 +629,22 @@ class CValidationRule {
 
 		$value = substr($buffer, $pos, $i - $pos);
 		$pos = $i;
+
+		return true;
+	}
+
+	/**
+	 * bool
+	 *
+	 * 'bool' => true
+	 */
+	private function parseBool($buffer, &$pos, &$rules) {
+		if (strncmp(substr($buffer, $pos), 'bool', 4) != 0) {
+			return false;
+		}
+
+		$pos += 4;
+		$rules['bool'] = true;
 
 		return true;
 	}
