@@ -287,9 +287,7 @@ static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int
 			break;
 		case ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD:
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
-			{
 				ret = zbx_ipc_async_socket_send(rtc, ZBX_RTC_CONFIG_CACHE_RELOAD, NULL, 0);
-			}
 			break;
 		default:
 			task->data = zbx_tm_data_result_create(parent_taskid, FAIL, "Unknown task.");
@@ -390,7 +388,6 @@ static void	tm_remove_old_tasks(int now)
 	DBcommit();
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: create config cache reload request to be sent to the server       *
@@ -466,10 +463,9 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 				zbx_clear_cache_snmp(process_type, process_num);
 #endif
 			if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd && ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
-			{
 				force_config_sync();
-				zbx_free(rtc_data);
-			}
+
+			zbx_free(rtc_data);
 			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				break;
 		}

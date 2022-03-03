@@ -605,11 +605,15 @@ static void	tm_create_active_proxy_reload_task(zbx_uint64_t proxyid)
 
 	taskid = DBget_maxid("task");
 
-	task = zbx_tm_task_create(taskid, ZBX_TM_TASK_DATA, ZBX_TM_STATUS_NEW, (int)time(NULL), ZBX_DATA_TTL, proxyid);
+	task = zbx_tm_task_create(taskid, ZBX_TM_TASK_DATA, ZBX_TM_STATUS_NEW, (int)time(NULL),
+			ZBX_DATA_ACTIVE_PROXY_CONFIG_RELOAD_TTL, proxyid);
 
 	task->data = zbx_tm_data_create(taskid, "", 0, ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD);
 
+	DBbegin();
 	zbx_tm_save_task(task);
+	DBcommit();
+
 	zbx_tm_task_free(task);
 }
 
@@ -625,7 +629,7 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 {
 	struct zbx_json_parse	jp, jp_data;
 	const char		*ptr;
-	char			hostid[MAX_ID_LEN + 1];
+	char			buffer[MAX_ID_LEN + 1];
 	int			passive_proxy_count = 0;
 
 	if (FAIL == zbx_json_open(data, &jp))
@@ -643,12 +647,12 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 
 	for (ptr = NULL; NULL != (ptr = zbx_json_next(&jp_data, ptr));)
 	{
-		if (NULL != zbx_json_decodevalue(ptr, hostid, sizeof(hostid), NULL))
+		if (NULL != zbx_json_decodevalue(ptr, buffer, sizeof(buffer), NULL))
 		{
 			zbx_uint64_t	proxyid;
 			int		type;
 
-			ZBX_STR2UINT64(proxyid, hostid);
+			ZBX_STR2UINT64(proxyid, buffer);
 
 			if (FAIL == zbx_dc_get_proxy_type_by_id(proxyid, &type))
 			{
