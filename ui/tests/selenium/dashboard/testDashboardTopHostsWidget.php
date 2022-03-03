@@ -489,6 +489,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
+			// #11 error message adding widget without any column.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -501,6 +502,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
+			// #12 error message adding widget without item column.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -517,6 +519,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
+			// #13 add characters in host count field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -535,6 +538,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
+			// #14 add incorrect value to host count field without item column.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -553,6 +557,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
+			// #15 color error in host name column.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -572,6 +577,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
+			// #16 check error adding text column without any value.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -588,6 +594,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
+			// #17 color error in text column.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -608,26 +615,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' =>  [
-						'Name' => 'Error in text column color'
-					],
-					'column_fields' => [
-						[
-							'Data' => 'Text',
-							'Text' => 'Here is some text',
-							'Base color' => [
-								'id:lbl_base_color' => '!@#$%^'
-							]
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/base_color": a hexadecimal color code (6 symbols) is expected.'
-					]
-				]
-			],
+			// #18 error when there is no item in item column.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -644,6 +632,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
+			// #19 error when incorrect time shift added.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -662,6 +651,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
+			// #20 error when incorrect aggregation function added.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -681,6 +671,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
+			// #21 error when incorrect min value added.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -700,6 +691,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
+			// #22 error when incorrect max value added.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -719,6 +711,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
+			// #23 color error in item column.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -739,6 +732,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
+			// #24 color error when incorrect hexadecimal added in first threshold.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -762,6 +756,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
+			// #25 color error when incorrect hexadecimal added in second threshold.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -789,6 +784,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
+			// #26 error message when incorrect value added to threshold.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -869,6 +865,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 				$column_form->fill($values);
 				$column_form->submit();
 
+				// Check error message in column form.
 				if (array_key_exists('column_error', $data)) {
 					$message = CMessageElement::find()->waitUntilVisible()->one();
 					$this->assertEquals($data['column_error'], $message->getLines()->asText());
@@ -883,6 +880,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 
 		$form->submit();
 
+		// Check error message in main widget form.
 		if (array_key_exists('main_error', $data)) {
 			$message = CMessageElement::find()->waitUntilVisible()->one();
 			$this->assertEquals($data['main_error'], $message->getLines()->asText());
@@ -927,6 +925,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 		// Hash after simple update.
 		$new_hash = CDBHelper::getHash('SELECT * FROM widget_field WHERE widgetid='.zbx_dbstr($widgetid)
 				.' ORDER BY widget_fieldid');
+
+		// Compare old hash and new one.
 		$this->assertEquals($old_hash, $new_hash);
 	}
 
