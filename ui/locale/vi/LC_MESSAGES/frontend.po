@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-22 13:29+0200\n"
+"POT-Creation-Date: 2022-03-04 19:52+0200\n"
 "PO-Revision-Date: 2020-09-14 08:12+0300\n"
 "Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -10799,7 +10799,7 @@ msgstr "Bảo trì với tập hợp dữ liệu"
 msgid "Maintenance without data collection"
 msgstr "Bảo trì mà không thu thập dữ liệu"
 
-#: include/html.inc.php:987
+#: include/html.inc.php:985
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "Báo trì: %1$s"
@@ -16291,7 +16291,7 @@ msgstr "Chủ nhật"
 msgid "Support"
 msgstr "Hỗ trợ"
 
-#: include/html.inc.php:982
+#: include/html.inc.php:980
 #, c-format
 msgid "Suppressed till: %1$s"
 msgstr "Bị nén cho đến khi: %1$s"

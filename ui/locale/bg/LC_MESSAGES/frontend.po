@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-22 13:29+0200\n"
+"POT-Creation-Date: 2022-03-04 19:52+0200\n"
 "PO-Revision-Date: 2021-03-19 17:58+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: \n"
@@ -10895,7 +10895,7 @@ msgstr "Поддръжка и събиране на данни"
 msgid "Maintenance without data collection"
 msgstr "Поддръжка без събиране на данни"
 
-#: include/html.inc.php:987
+#: include/html.inc.php:985
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr ""
@@ -16404,7 +16404,7 @@ msgstr "Неделя"
 msgid "Support"
 msgstr "Поддръжка"
 
-#: include/html.inc.php:982
+#: include/html.inc.php:980
 #, c-format
 msgid "Suppressed till: %1$s"
 msgstr ""

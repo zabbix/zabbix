@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-22 13:29+0200\n"
+"POT-Creation-Date: 2022-03-04 19:52+0200\n"
 "PO-Revision-Date: 2020-06-04 05:05+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -10789,7 +10789,7 @@ msgstr "데이터수집을 하는 메인터넌스"
 msgid "Maintenance without data collection"
 msgstr "데이터수집을 하지 않는 메인터넌스"
 
-#: include/html.inc.php:987
+#: include/html.inc.php:985
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "메인테넌스 : %1$s"
@@ -16281,7 +16281,7 @@ msgstr "일"
 msgid "Support"
 msgstr "지원"
 
-#: include/html.inc.php:982
+#: include/html.inc.php:980
 #, c-format
 msgid "Suppressed till: %1$s"
 msgstr "억제기한: %1$s"
