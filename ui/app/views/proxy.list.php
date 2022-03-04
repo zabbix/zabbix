@@ -174,6 +174,12 @@ $form->addItem([$proxy_list, $data['paging']]);
 
 $form->addItem(
 	new CActionButtonList('action', 'proxyids', [
+		'proxy.config.refresh' => [
+			'content' => (new CSimpleButton(_('Refresh configuration')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-refresh-proxy-config')
+				->addClass('no-chkbxrange')
+		],
 		'proxy.host.massenable' => [
 			'content' => (new CSimpleButton(_('Enable hosts')))
 				->addClass(ZBX_STYLE_BTN_ALT)
@@ -209,6 +215,10 @@ $form->addItem(
 
 (new CScriptTag('
 	view.init('.json_encode([
+		'refresh_config_url' => (new CUrl('zabbix.php'))
+			->setArgument('action', 'proxy.config.refresh')
+			->setArgumentSID()
+			->getUrl(),
 		'enable_hosts_url' => (new CUrl('zabbix.php'))
 			->setArgument('action', 'proxy.host.enable')
 			->setArgumentSID()

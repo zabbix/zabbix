@@ -210,6 +210,7 @@ class CRouter {
 		'problem.view.refresh'						=> ['CControllerProblemViewRefresh',					'layout.json',			null],
 		'problem.view.csv'							=> ['CControllerProblemView',							'layout.csv',			'monitoring.problem.view'],
 		'profile.update'							=> ['CControllerProfileUpdate',							'layout.json',			null],
+		'proxy.config.refresh'						=> ['CControllerProxyConfigRefresh',					'layout.json',			null],
 		'proxy.create'								=> ['CControllerProxyCreate',							'layout.json',			null],
 		'proxy.delete'								=> ['CControllerProxyDelete',							'layout.json',			null],
 		'proxy.host.disable'						=> ['CControllerProxyHostDisable',						'layout.json',			null],

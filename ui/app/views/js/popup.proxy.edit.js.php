@@ -27,6 +27,7 @@ window.proxy_edit_popup = new class {
 
 		this.create_url = null;
 		this.update_url = null;
+		this.refresh_config_url = null;
 		this.delete_url = null;
 
 		this.overlay = null;
@@ -39,11 +40,12 @@ window.proxy_edit_popup = new class {
 		this.clone_proxyid = null;
 	}
 
-	init({proxyid, create_url, update_url, delete_url}) {
+	init({proxyid, create_url, update_url, refresh_config_url, delete_url}) {
 		this.proxyid = proxyid;
 
 		this.create_url = create_url;
 		this.update_url = update_url;
+		this.refresh_config_url = refresh_config_url;
 		this.delete_url = delete_url;
 
 		this.overlay = overlays_stack.getById('proxy_edit');
@@ -78,6 +80,7 @@ window.proxy_edit_popup = new class {
 		this.update();
 
 		document.getElementById('proxy-form').style.display = '';
+		document.getElementById('host').focus();
 	}
 
 	updateInterface() {
@@ -166,6 +169,10 @@ window.proxy_edit_popup = new class {
 		}
 	}
 
+	refreshConfig() {
+		this.post(this.refresh_config_url, {proxyids: [this.proxyid]}, 'dialogue.configRefresh');
+	}
+
 	clone({title, buttons}) {
 		this.clone_proxyid = this.proxyid;
 		this.proxyid = null;
@@ -175,54 +182,7 @@ window.proxy_edit_popup = new class {
 	}
 
 	delete() {
-		for (const el of this.form.parentNode.children) {
-			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
-				el.parentNode.removeChild(el);
-			}
-		}
-
-		this.overlay.setLoading();
-
-		const curl = new Curl(this.delete_url);
-
-		fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({proxyids: [this.proxyid]})
-		})
-			.then((response) => response.json())
-			.then((response) => {
-				if ('error' in response) {
-					throw {response_error: response.error};
-				}
-
-				if ('success' in response) {
-					this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {
-						detail: {
-							title: response.success.title,
-							messages: ('messages' in response.success) ? response.success.messages : null
-						}
-					}));
-				}
-			})
-			.catch((error) => {
-				this.overlay.unsetLoading();
-
-				let title, messages;
-
-				if (typeof error === 'object' && 'response_error' in error) {
-					title = error.response_error.title;
-					messages = error.response_error.messages;
-				}
-				else {
-					title = <?= json_encode(_('Unexpected server error.')) ?>;
-					messages = [];
-				}
-
-				const message_box = makeMessageBox('bad', messages, title, true, false)[0];
-
-				this.form.parentNode.insertBefore(message_box, this.form);
-			})
+		this.post(this.delete_url, {proxyids: [this.proxyid]}, 'dialogue.delete');
 	}
 
 	submit() {
@@ -247,20 +207,14 @@ window.proxy_edit_popup = new class {
 			}
 		}
 
-		for (const el of this.form.parentNode.children) {
-			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
-				el.parentNode.removeChild(el);
-			}
-		}
+		this.post(this.proxyid !== null ? this.update_url : this.create_url, fields, 'dialogue.submit');
+	}
 
-		this.overlay.setLoading();
-
-		const curl = new Curl(this.proxyid !== null ? this.update_url : this.create_url);
-
-		fetch(curl.getUrl(), {
+	post(url, data, event_name) {
+		return fetch(new Curl(url).getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(fields)
+			body: JSON.stringify(data)
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -270,12 +224,7 @@ window.proxy_edit_popup = new class {
 
 				overlayDialogueDestroy(this.overlay.dialogueid);
 
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {
-					detail: {
-						title: response.title,
-						messages: ('messages' in response) ? response.messages : null
-					}
-				}));
+				this.dialogue.dispatchEvent(new CustomEvent(event_name, {detail: response.success}));
 			})
 			.catch((error) => {
 				let message_box;

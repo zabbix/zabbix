@@ -108,9 +108,11 @@ class CControllerProxyUpdate extends CController {
 
 		if (!$ret) {
 			$this->setResponse(
-				(new CControllerResponseData([
-					'main_block' => json_encode(['errors' => getMessages()->toString()])
-				]))->disableView()
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
 			);
 		}
 
@@ -157,15 +159,16 @@ class CControllerProxyUpdate extends CController {
 		$result = API::Proxy()->update($proxy);
 
 		if ($result) {
-			$output = ['title' => _('Proxy updated')];
+			$output['success']['title'] = _('Proxy updated');
 
-			if ($messages = CMessageHelper::getMessages()) {
-				$output['messages'] = array_column($messages, 'message');
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
 			}
 		}
 		else {
-			$output = [
-				'errors' => makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())->toString()
+			$output['error'] = [
+				'title' => _('Cannot update proxy'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}
 

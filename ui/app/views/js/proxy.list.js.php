@@ -24,17 +24,17 @@
 	const view = new class {
 
 		constructor() {
+			this.refresh_config_url = null;
 			this.enable_hosts_url = null;
 			this.disable_hosts_url = null;
 			this.delete_url = null;
 		}
 
-		init({enable_hosts_url, disable_hosts_url, delete_url}) {
+		init({refresh_config_url, enable_hosts_url, disable_hosts_url, delete_url}) {
+			this.refresh_config_url = refresh_config_url;
 			this.enable_hosts_url = enable_hosts_url;
 			this.disable_hosts_url = disable_hosts_url;
 			this.delete_url = delete_url;
-
-			this.registerEvents();
 
 			this.initActionButtons();
 		}
@@ -49,6 +49,9 @@
 				}
 				else if (e.target.classList.contains('js-edit-host')) {
 					this.editHost(e.target.dataset.hostid);
+				}
+				else if (e.target.classList.contains('js-refresh-proxy-config')) {
+					this.refreshConfig(e.target, Object.values(chkbxRange.getSelectedIds()));
 				}
 				else if (e.target.classList.contains('js-massenable-proxy-host')) {
 					this.enableHosts(e.target, Object.values(chkbxRange.getSelectedIds()));
@@ -68,26 +71,12 @@
 				dialogue_class: 'modal-popup-medium'
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				postMessageOk(e.detail.title);
-
-				if (e.detail.messages !== null) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				location.href = location.href;
-			});
-
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.reload(e.detail));
+			overlay.$dialogue[0].addEventListener('dialogue.configRefresh', (e) => this.reload(e.detail));
 			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
-				uncheckTableRows('service');
+				uncheckTableRows('proxy');
 
-				postMessageOk(e.detail.title);
-
-				if (e.detail.messages !== null) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				location.href = location.href;
+				this.reload(e.detail);
 			});
 		}
 
@@ -99,12 +88,24 @@
 				dialogue_class: 'modal-popup-large'
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.editHostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.editHostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.editHostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.create', (e) => this.reload(e.detail.success));
+			overlay.$dialogue[0].addEventListener('dialogue.update', (e) => this.reload(e.detail.success));
+			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => this.reload(e.detail.success));
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
-			}, {once: true});
+			});
+		}
+
+		refreshConfig(target, proxyids) {
+			const confirmation = proxyids.length > 1
+				? <?= json_encode(_('Refresh configuration of the selected proxies?')) ?>
+				: <?= json_encode(_('Refresh configuration of the selected proxy?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return;
+			}
+
+			this.post(target, proxyids, this.refresh_config_url);
 		}
 
 		enableHosts(target, proxyids) {
@@ -178,22 +179,14 @@
 				});
 		}
 
-		registerEvents() {
-			this.events = {
-				editHostSuccess(e) {
-					const data = e.detail;
+		reload(success) {
+			postMessageOk(success.title);
 
-					if ('success' in data) {
-						postMessageOk(data.success.title);
+			if ('messages' in success) {
+				postMessageDetails('success', success.messages);
+			}
 
-						if ('messages' in data.success) {
-							postMessageDetails('success', data.success.messages);
-						}
-					}
-
-					location.href = location.href;
-				}
-			};
+			location.href = location.href;
 		}
 	};
 </script>

@@ -58,7 +58,6 @@ $proxy_tab = (new CFormGrid())
 			(new CTextBox('host', $data['form']['host'], false, DB::getFieldLength('hosts', 'host')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
-				->setAttribute('autofocus', 'autofocus')
 		)
 	])
 	->addItem([
@@ -203,6 +202,9 @@ $form
 				'update_url' => (new CUrl('zabbix.php'))
 					->setArgument('action', 'proxy.update')
 					->getUrl(),
+				'refresh_config_url' => (new CUrl('zabbix.php'))
+					->setArgument('action', 'proxy.config.refresh')
+					->getUrl(),
 				'delete_url' => (new CUrl('zabbix.php'))
 					->setArgument('action', 'proxy.delete')
 					->getUrl()
@@ -219,6 +221,14 @@ if ($data['proxyid'] !== null) {
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'proxy_edit_popup.submit();'
+		],
+		[
+			'title' => _('Refresh configuration'),
+			'confirmation' => _('Refresh configuration of the selected proxy?'),
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-refresh-config']),
+			'keepOpen' => true,
+			'isSubmit' => false,
+			'action' => 'proxy_edit_popup.refreshConfig();'
 		],
 		[
 			'title' => _('Clone'),
