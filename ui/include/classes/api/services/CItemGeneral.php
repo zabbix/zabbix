@@ -36,6 +36,34 @@ abstract class CItemGeneral extends CApiService {
 	protected const ERROR_NO_INTERFACE = 'noInterface';
 
 	/**
+	 * A list of supported pre-processing types.
+	 *
+	 * @var array
+	 */
+	public const SUPPORTED_PREPROCESSING_TYPES = [];
+
+	/**
+	 * A list of supported item types.
+	 *
+	 * @var array
+	 */
+	protected const SUPPORTED_ITEM_TYPES = [];
+
+	/**
+	 * A list of field names for each of value types.
+	 *
+	 * @var array
+	 */
+	protected const VALUE_TYPE_FIELD_NAMES = [];
+
+	/**
+	 * Value of audit log resource.
+	 *
+	 * @var int
+	 */
+	protected const AUDIT_RESOURCE = -1;
+
+	/**
 	 * @abstract
 	 *
 	 * @param array $options
@@ -677,7 +705,7 @@ abstract class CItemGeneral extends CApiService {
 				static::validateInventoryLinks($ins_items);
 			}
 
-			$this->createForce($ins_items);
+			self::createForce($ins_items);
 		}
 
 		if ($upd_items) {
@@ -687,7 +715,7 @@ abstract class CItemGeneral extends CApiService {
 
 			// $db_items = $this->getDbObjects($upd_items);
 
-			// $this->updateForce($upd_items, $db_items);
+			// self::updateForce($upd_items, $db_items);
 		}
 
 		$new_items = array_merge($upd_items, $ins_items);
@@ -1062,6 +1090,146 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
+	 * @param array $items
+	 */
+	protected static function createForce(array &$items): void {
+		$itemids = DB::insert('items', $items);
+
+		$ins_items_rtdata = [];
+		$ins_items_discovery = [];
+
+		foreach ($items as &$item) {
+			$item['itemid'] = array_shift($itemids);
+
+			if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL
+					&& in_array($item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])) {
+				$ins_items_rtdata[] = ['itemid' => $item['itemid']];
+			}
+
+			unset($item['host_status']);
+
+			if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$ins_items_discovery[] = [
+					'itemid' => $item['itemid'],
+					'parent_itemid' => $item['ruleid']
+				];
+			}
+		}
+		unset($item);
+
+		if ($ins_items_rtdata) {
+			DB::insertBatch('item_rtdata', $ins_items_rtdata, false);
+		}
+
+		if ($ins_items_discovery) {
+			DB::insertBatch('item_discovery', $ins_items_discovery);
+		}
+
+		self::updateParameters($items);
+		self::updatePreprocessing($items);
+		self::updateTags($items);
+
+		self::addAuditLog(CAudit::ACTION_ADD, static::AUDIT_RESOURCE, $items);
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $db_items
+	 */
+	protected static function updateForce(array $items, array $db_items): void {
+		CArrayHelper::sort($items, ['itemid']);
+
+		self::addDefaultFields($items, $db_items);
+
+		$upd_items = [];
+
+		foreach ($items as &$item) {
+			$upd_item = DB::getUpdatedValues('items', $item, $db_items[$item['itemid']]);
+
+			if ($upd_item) {
+				$upd_items[] = [
+					'values' => $upd_item,
+					'where' => ['itemid' => $item['itemid']]
+				];
+			}
+		}
+		unset($item);
+
+		if ($upd_items) {
+			DB::update('items', $upd_items);
+		}
+
+		self::updateParameters($items, $db_items);
+		self::updatePreprocessing($items, $db_items);
+		self::updateTags($items, $db_items);
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, static::AUDIT_RESOURCE, $items, $db_items);
+	}
+
+	/**
+	 * Add default values for a fields that became unnecessary as the result of the change of the type fields.
+	 *
+	 * @param array $items
+	 * @param array $db_items
+	 */
+	protected static function addDefaultFields(array &$items, array $db_items): void {
+		$defaults = DB::getDefaults('items') + array_fill_keys(['valuemapid', 'interfaceid', 'master_itemid'], 0);
+
+		foreach ($items as &$item) {
+			$db_item = $db_items[$item['itemid']];
+
+			if ($item['type'] != $db_item['type']) {
+				$type_field_names = CItemTypeFactory::getObject($item['type'])::FIELD_NAMES;
+				$db_type_field_names = CItemTypeFactory::getObject($db_item['type'])::FIELD_NAMES;
+
+				$field_names = array_flip(array_diff($db_type_field_names, $type_field_names));
+
+				if (array_intersect([$item['type'], $db_item['type']], [ITEM_TYPE_SSH, ITEM_TYPE_HTTPAGENT])) {
+					$field_names += array_flip(['authtype']);
+				}
+
+				if ($db_item['host_status'] == HOST_STATUS_TEMPLATE && array_key_exists('interfaceid', $field_names)) {
+					unset($field_names['interfaceid']);
+				}
+
+				$item += array_intersect_key($defaults, $field_names);
+			}
+			elseif ($item['type'] == ITEM_TYPE_SSH) {
+				if (array_key_exists('authtype', $item) && $item['authtype'] !== $db_item['authtype']
+						&& $item['authtype'] == ITEM_AUTHTYPE_PASSWORD) {
+					$item += array_intersect_key($defaults, array_flip(['publickey', 'privatekey']));
+				}
+			}
+			elseif ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+				if (array_key_exists('request_method', $item) && $item['request_method'] != $db_item['request_method']
+						&& $item['request_method'] == HTTPCHECK_REQUEST_HEAD) {
+					$item += ['retrieve_mode' => HTTPCHECK_REQUEST_HEAD];
+				}
+
+				if (array_key_exists('authtype', $item) && $item['authtype'] != $db_item['authtype']
+						&& $item['authtype'] == HTTPTEST_AUTH_NONE) {
+					$item += array_intersect_key($defaults, array_flip(['username', 'password']));
+				}
+
+				if (array_key_exists('allow_traps', $item) && $item['allow_traps'] != $db_item['allow_traps']
+						&& $item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF) {
+					$item += array_intersect_key($defaults, array_flip(['trapper_hosts']));
+				}
+			}
+
+			if (array_key_exists('value_type', $item) && $item['value_type'] != $db_item['value_type']) {
+				$type_field_names = static::VALUE_TYPE_FIELD_NAMES[$item['value_type']];
+				$db_type_field_names = static::VALUE_TYPE_FIELD_NAMES[$db_item['value_type']];
+
+				$field_names = array_flip(array_diff($db_type_field_names, $type_field_names));
+
+				$item += array_intersect_key($defaults, $field_names);
+			}
+		}
+		unset($item);
+	}
+
+	/**
 	 * @param array      $items
 	 * @param array|null $db_items
 	 */
@@ -1071,8 +1239,13 @@ abstract class CItemGeneral extends CApiService {
 		$del_item_parameterids = [];
 
 		foreach ($items as &$item) {
-			if (!array_key_exists('parameters', $item)) {
+			if (($db_items === null && !array_key_exists('parameters', $item))
+					|| ($db_items !== null && !array_key_exists('parameters', $db_items[$item['itemid']]))) {
 				continue;
+			}
+
+			if ($db_items !== null && !array_key_exists('parameters', $item)) {
+				$item['parameters'] = [];
 			}
 
 			$db_item_parameters = ($db_items !== null)
@@ -1987,7 +2160,9 @@ abstract class CItemGeneral extends CApiService {
 		$itemids = [];
 
 		foreach ($items as $item) {
-			if (array_key_exists('parameters', $item)) {
+			$db_type = $db_items[$item['itemid']]['type'];
+
+			if (array_key_exists('parameters', $item) || ($item['type'] != $db_type && $db_type == ITEM_TYPE_SCRIPT)) {
 				$itemids[] = $item['itemid'];
 				$db_items[$item['itemid']]['parameters'] = [];
 			}

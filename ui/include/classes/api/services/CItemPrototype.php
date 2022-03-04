@@ -29,9 +29,7 @@ class CItemPrototype extends CItemGeneral {
 	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status', 'discover'];
 
 	/**
-	 * A set of supported pre-processing rules.
-	 *
-	 * @var array
+	 * @inheritDoc
 	 */
 	public const SUPPORTED_PREPROCESSING_TYPES = [
 		ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_RTRIM, ZBX_PREPROC_LTRIM, ZBX_PREPROC_TRIM, ZBX_PREPROC_REGSUB,
@@ -45,15 +43,29 @@ class CItemPrototype extends CItemGeneral {
 	];
 
 	/**
-	 * A set of supported item types.
-	 *
-	 * @var array
+	 * @inheritDoc
 	 */
 	protected const SUPPORTED_ITEM_TYPES = [
 		ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 		ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED,
 		ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
 	];
+
+	/**
+	 * @inheritDoc
+	 */
+	protected const VALUE_TYPE_FIELD_NAMES = [
+		ITEM_VALUE_TYPE_FLOAT => ['units', 'trends', 'valuemapid'],
+		ITEM_VALUE_TYPE_STR => ['valuemapid'],
+		ITEM_VALUE_TYPE_LOG => ['logtimefmt'],
+		ITEM_VALUE_TYPE_UINT64 => ['units', 'trends', 'valuemapid'],
+		ITEM_VALUE_TYPE_TEXT => []
+	];
+
+	/**
+	 * @inheritDoc
+	 */
+	protected const AUDIT_RESOURCE = CAudit::RESOURCE_ITEM_PROTOTYPE;
 
 	public function __construct() {
 		parent::__construct();
@@ -425,35 +437,6 @@ class CItemPrototype extends CItemGeneral {
 
 	/**
 	 * @param array $items
-	 */
-	protected function createForce(array &$items): void {
-		$itemids = DB::insert('items', $items);
-
-		$ins_items_discovery = [];
-
-		foreach ($items as &$item) {
-			$item['itemid'] = array_shift($itemids);
-
-			unset($item['host_status']);
-
-			$ins_items_discovery[] = [
-				'itemid' => $item['itemid'],
-				'parent_itemid' => $item['ruleid']
-			];
-		}
-		unset($item);
-
-		DB::insertBatch('item_discovery', $ins_items_discovery);
-
-		self::updateParameters($items);
-		self::updatePreprocessing($items);
-		self::updateTags($items);
-
-		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_ITEM_PROTOTYPE, $items);
-	}
-
-	/**
-	 * @param array $items
 	 *
 	 * @throws APIException
 	 *
@@ -462,107 +445,7 @@ class CItemPrototype extends CItemGeneral {
 	public function update(array $items): array {
 		$this->validateUpdate($items, $db_items);
 
-		$defaults = DB::getDefaults('items');
-		$clean = [
-			ITEM_TYPE_HTTPAGENT => [
-				'url' => '',
-				'query_fields' => '',
-				'timeout' => $defaults['timeout'],
-				'status_codes' => $defaults['status_codes'],
-				'follow_redirects' => $defaults['follow_redirects'],
-				'request_method' => $defaults['request_method'],
-				'allow_traps' => $defaults['allow_traps'],
-				'post_type' => $defaults['post_type'],
-				'http_proxy' => '',
-				'headers' => '',
-				'retrieve_mode' => $defaults['retrieve_mode'],
-				'output_format' => $defaults['output_format'],
-				'ssl_key_password' => '',
-				'verify_peer' => $defaults['verify_peer'],
-				'verify_host' => $defaults['verify_host'],
-				'ssl_cert_file' => '',
-				'ssl_key_file' => '',
-				'posts' => ''
-			]
-		];
-
-		foreach ($items as &$item) {
-			$type_change = ($item['type'] != $db_items[$item['itemid']]['type']);
-
-			if ($item['type'] != ITEM_TYPE_DEPENDENT && $db_items[$item['itemid']]['master_itemid'] != 0) {
-				$item['master_itemid'] = null;
-			}
-
-			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPAGENT) {
-				$item = array_merge($item, $clean[ITEM_TYPE_HTTPAGENT]);
-
-				if ($item['type'] != ITEM_TYPE_SSH) {
-					$item['authtype'] = $defaults['authtype'];
-					$item['username'] = '';
-					$item['password'] = '';
-				}
-
-				if ($item['type'] != ITEM_TYPE_TRAPPER) {
-					$item['trapper_hosts'] = '';
-				}
-			}
-
-			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-				$authtype = array_key_exists('authtype', $item)
-					? $item['authtype']
-					: $db_items[$item['itemid']]['authtype'];
-
-				// Clean username and password when authtype is set to HTTPTEST_AUTH_NONE.
-				if ($authtype == HTTPTEST_AUTH_NONE) {
-					$item['username'] = '';
-					$item['password'] = '';
-				}
-
-				if (array_key_exists('allow_traps', $item) && $item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF
-						&& $item['allow_traps'] != $db_items[$item['itemid']]['allow_traps']) {
-					$item['trapper_hosts'] = '';
-				}
-
-				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {
-					$item['query_fields'] = $item['query_fields'] ? json_encode($item['query_fields']) : '';
-				}
-
-				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
-					$item['headers'] = self::headersArrayToString($item['headers']);
-				}
-
-				if (array_key_exists('request_method', $item) && $item['request_method'] == HTTPCHECK_REQUEST_HEAD
-						&& !array_key_exists('retrieve_mode', $item)
-						&& $db_items[$item['itemid']]['retrieve_mode'] != HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {
-					$item['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
-				}
-			}
-			else {
-				$item['query_fields'] = '';
-				$item['headers'] = '';
-			}
-
-			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_SCRIPT) {
-				if ($item['type'] != ITEM_TYPE_SSH && $item['type'] != ITEM_TYPE_DB_MONITOR
-						&& $item['type'] != ITEM_TYPE_TELNET && $item['type'] != ITEM_TYPE_CALCULATED) {
-					$item['params'] = '';
-				}
-
-				if ($item['type'] != ITEM_TYPE_HTTPAGENT) {
-					$item['timeout'] = $defaults['timeout'];
-				}
-			}
-
-			if ($item['value_type'] == ITEM_VALUE_TYPE_LOG || $item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
-				if ($item['value_type'] != $db_items[$item['itemid']]['value_type']) {
-					// Reset valuemapid when value_type is LOG or TEXT.
-					$item['valuemapid'] = 0;
-				}
-			}
-		}
-		unset($item);
-
-		$this->updateForce($items, $db_items);
+		self::updateForce($items, $db_items);
 		$this->inherit($items);
 
 		return ['itemids' => array_column($items, 'itemid')];
@@ -710,38 +593,6 @@ class CItemPrototype extends CItemGeneral {
 			'tags' =>			self::getTagsValidationRules(),
 			'preprocessing' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED]
 		]];
-	}
-
-	/**
-	 * @param array $items
-	 * @param array $db_items
-	 */
-	protected function updateForce(array $items, array $db_items): void {
-		CArrayHelper::sort($items, ['itemid']);
-
-		$upd_items = [];
-
-		foreach ($items as &$item) {
-			$upd_item = DB::getUpdatedValues('items', $item, $db_items[$item['itemid']]);
-
-			if ($upd_item) {
-				$upd_items[] = [
-					'values' => $upd_item,
-					'where' => ['itemid' => $item['itemid']]
-				];
-			}
-		}
-		unset($item);
-
-		if ($upd_items) {
-			DB::update('items', $upd_items);
-		}
-
-		self::updateParameters($items, $db_items);
-		self::updatePreprocessing($items, $db_items);
-		self::updateTags($items, $db_items);
-
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_ITEM_PROTOTYPE, $items, $db_items);
 	}
 
 	/**
