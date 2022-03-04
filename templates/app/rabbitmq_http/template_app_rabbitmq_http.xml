@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-02-17T20:45:20Z</date>
+   <date>2022-03-03T14:24:25Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -1944,7 +1944,7 @@ default: 2}</params>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Healthcheck: local alarms in effect on the this node{#SINGLETON}</name>
+                     <name>RabbitMQ: Healthcheck: local alarms in effect on this node{#SINGLETON}</name>
                      <type>HTTP_AGENT</type>
                      <key>rabbitmq.healthcheck.local_alarms[{#SINGLETON}]</key>
                      <history>7d</history>
@@ -2032,7 +2032,7 @@ default: 2}</params>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}=0</expression>
-                           <name>RabbitMQ: There are queues that could potentially lose data if the this node goes offline.</name>
+                           <name>RabbitMQ: There are queues that could potentially lose data if this node goes offline.</name>
                            <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                            <description>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</description>
@@ -2080,7 +2080,7 @@ default: 2}</params>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}=0</expression>
-                           <name>RabbitMQ: There are queues that would lose their quorum and availability if the this node is shut down.</name>
+                           <name>RabbitMQ: There are queues that would lose their quorum and availability if this node is shut down.</name>
                            <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                            <description>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</description>
@@ -2088,7 +2088,7 @@ default: 2}</params>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Healthcheck: virtual hosts on the this node{#SINGLETON}</name>
+                     <name>RabbitMQ: Healthcheck: virtual hosts on this node{#SINGLETON}</name>
                      <type>HTTP_AGENT</type>
                      <key>rabbitmq.healthcheck.virtual_hosts[{#SINGLETON}]</key>
                      <history>7d</history>

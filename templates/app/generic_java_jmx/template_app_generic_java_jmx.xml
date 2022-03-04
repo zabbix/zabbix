@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-02-24T15:53:47Z</date>
+   <date>2022-03-03T14:31:32Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -321,7 +321,7 @@
                <history>7d</history>
                <username>{$JMX.USER}</username>
                <password>{$JMX.PASSWORD}</password>
-               <description>This is the number of opened file descriptors at the moment, if this reaches the MaxFileDescriptorCount, the application will throw an IOException: Too many open files. This could mean you're are opening file descriptors and never closing them.</description>
+               <description>This is the number of opened file descriptors at the moment, if this reaches the MaxFileDescriptorCount, the application will throw an IOException: Too many open files. This could mean you are opening file descriptors and never closing them.</description>
                <applications>
                   <application>
                      <name>JMX</name>

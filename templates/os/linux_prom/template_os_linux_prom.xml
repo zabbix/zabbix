@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-24T12:45:10Z</date>
+   <date>2022-03-03T14:05:37Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -118,7 +118,7 @@ version</params>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.</description>
+               <description>It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.</description>
                <applications>
                   <application>
                      <name>General</name>

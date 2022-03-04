@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-21T18:04:13Z</date>
+   <date>2022-03-03T14:34:47Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -217,7 +217,7 @@ Template tooling version used: 0.39</description>
                      <expression>{min(5m)}&gt;{$MEMCACHED.CONN.QUEUED.MAX.WARN}</expression>
                      <name>Memcached: Too many queued connections (over {$MEMCACHED.CONN.QUEUED.MAX.WARN} in 5m)</name>
                      <priority>WARNING</priority>
-                     <description>The max number of connections is reachedand and a new connection had to wait in the queue as a result.</description>
+                     <description>The max number of connections is reached and and a new connection had to wait in the queue as a result.</description>
                   </trigger>
                </triggers>
             </item>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-02-11T01:07:24Z</date>
+   <date>2022-03-03T14:12:11Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -1992,7 +1992,7 @@ The current operational state of the interface.&#13;
                      <history>7d</history>
                      <description>MIB: IF-MIB&#13;
 The type of interface.&#13;
-Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),&#13;
+Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),&#13;
 through updating the syntax of the IANAifType textual convention.</description>
                      <applications>
                         <application>
