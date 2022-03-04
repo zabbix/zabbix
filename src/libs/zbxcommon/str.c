@@ -1694,12 +1694,6 @@ static int	get_codepage(const char *encoding, unsigned int *codepage)
 			{57006, "X-ISCII-AS"}, {57007, "X-ISCII-OR"}, {57008, "X-ISCII-KA"}, {57009, "X-ISCII-MA"},
 			{57010, "X-ISCII-GU"}, {57011, "X-ISCII-PA"}, {65000, "UTF-7"}, {65001, "UTF-8"}, {0, NULL}};
 
-	if ('\0' == *encoding)
-	{
-		*codepage = 0;	/* ANSI */
-		return SUCCEED;
-	}
-
 	/* by name */
 	for (i = 0; 0 != cp[i].codepage || NULL != cp[i].name; i++)
 	{
