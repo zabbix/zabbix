@@ -218,26 +218,27 @@ window.proxy_edit_popup = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				if ('errors' in response) {
-					throw {html_string: response.errors};
+				if ('error' in response) {
+					throw {error: response.error};
 				}
 
 				overlayDialogueDestroy(this.overlay.dialogueid);
 
 				this.dialogue.dispatchEvent(new CustomEvent(event_name, {detail: response.success}));
 			})
-			.catch((error) => {
-				let message_box;
+			.catch((exception) => {
+				let title;
+				let messages = [];
 
-				if (typeof error === 'object' && 'html_string' in error) {
-					message_box =
-						new DOMParser().parseFromString(error.html_string, 'text/html').body.firstElementChild;
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
 				}
 				else {
-					const error = <?= json_encode(_('Unexpected server error.')) ?>;
-
-					message_box = makeMessageBox('bad', [], error, true, false)[0];
+					title = <?= json_encode(_('Unexpected server error.')) ?>;
 				}
+
+				const message_box = makeMessageBox('bad', messages, title, true, true)[0];
 
 				this.form.parentNode.insertBefore(message_box, this.form);
 			})
