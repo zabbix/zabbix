@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:40:25Z'
+  date: '2022-03-01T09:00:20Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -72,7 +72,7 @@ zabbix_export:
           key: kernel.maxfiles
           delay: 1h
           history: 7d
-          description: 'It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.'
+          description: 'It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.'
           tags:
             -
               tag: component
@@ -96,7 +96,7 @@ zabbix_export:
           key: kernel.maxproc
           delay: 1h
           history: 7d
-          description: 'It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.'
+          description: 'It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.'
           tags:
             -
               tag: component

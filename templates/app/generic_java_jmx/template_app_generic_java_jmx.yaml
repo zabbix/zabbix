@@ -292,7 +292,7 @@ zabbix_export:
           history: 7d
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
-          description: 'This is the number of opened file descriptors at the moment, if this reaches the MaxFileDescriptorCount, the application will throw an IOException: Too many open files. This could mean you''re are opening file descriptors and never closing them.'
+          description: 'This is the number of opened file descriptors at the moment, if this reaches the MaxFileDescriptorCount, the application will throw an IOException: Too many open files. This could mean you are opening file descriptors and never closing them.'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
