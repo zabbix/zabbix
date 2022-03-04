@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "log.h"
-
 #include "zbxcompress.h"
+
+#include "common.h"
 
 #ifdef HAVE_ZLIB
 #include "zlib.h"
+#include "log.h"
 
 #define ZBX_COMPRESS_STRERROR_LEN	512
 
@@ -123,7 +123,7 @@ int	zbx_uncompress(const char *in, size_t size_in, char *out, size_t *size_out)
 
 #else
 
-int zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out)
+int	zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out)
 {
 	ZBX_UNUSED(in);
 	ZBX_UNUSED(size_in);
@@ -132,7 +132,7 @@ int zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out)
 	return FAIL;
 }
 
-int zbx_uncompress(const char *in, size_t size_in, char *out, size_t *size_out)
+int	zbx_uncompress(const char *in, size_t size_in, char *out, size_t *size_out)
 {
 	ZBX_UNUSED(in);
 	ZBX_UNUSED(size_in);

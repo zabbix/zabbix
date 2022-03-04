@@ -20,7 +20,6 @@
 #ifndef ZABBIX_DB_H
 #define ZABBIX_DB_H
 
-#include "common.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "dbschema.h"

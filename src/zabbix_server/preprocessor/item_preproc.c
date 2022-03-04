@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "item_preproc.h"
+
 #include "zbxregexp.h"
 #include "log.h"
 #include "zbxembed.h"
@@ -25,13 +27,10 @@
 /* LIBXML2 is used */
 #ifdef HAVE_LIBXML2
 #	include <libxml/parser.h>
-#	include <libxml/tree.h>
 #	include <libxml/xpath.h>
 #endif
 
 #include "preproc_history.h"
-
-#include "item_preproc.h"
 
 extern zbx_es_t	es_engine;
 /******************************************************************************

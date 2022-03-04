@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "trapper_item_test.h"
+
 #include "log.h"
-#include "zbxjson.h"
-#include "dbcache.h"
 #include "zbxserver.h"
 #include "../poller/poller.h"
 #include "zbxtasks.h"
@@ -28,7 +28,6 @@
 #endif
 
 #include "trapper_auth.h"
-#include "trapper_item_test.h"
 
 static void	dump_item(const DC_ITEM *item)
 {
