@@ -60,9 +60,12 @@ class CControllerProxyConfigRefresh extends CController {
 	}
 
 	protected function doAction() {
-		// TODO
-
-		$result = true;
+		$result = (bool) API::Task()->create([
+			'type' => ZBX_TM_DATA_TYPE_PROXY_HOSTIDS,
+			'request' => [
+				'proxy_hostids' => $this->getInput('proxyids')
+			]
+		]);
 
 		if ($result) {
 			$output['success']['title'] = _('Request sent successfully');
