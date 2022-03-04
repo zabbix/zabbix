@@ -468,8 +468,13 @@ Bug fixes:
 Changes for 5.4.12rc1
 
 New features:
+A.F....... [ZBXNEXT-7485] fixed debug_backtrace function usage for php8 (acikuns)
+.D.G...... [ZBXNEXT-7116] added ability to force active checks after restart on Zabbix agent2 (vso)
 
 Bug fixes:
+..F....... [ZBX-20640] fixed X-axis field placement in different rows in Axis tab in Graph widget (acikuns)
+..F....... [ZBX-20049] implemented keyboard control for info icons (acikuns, ashubin)
+........S. [ZBX-19965] fixed database upgrade for SNMP interfaces (akozlovs)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.11
