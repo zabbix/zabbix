@@ -611,22 +611,6 @@ class testPageLatestData extends CWebTest {
 		);
 	}
 
-	public function testPageLatestData_SavedFilter() {
-		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
-		$filter_form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-
-		// Reset filter in case if some filtering remained before ongoing test case.
-		$this->query('button:Reset')->one()->click();
-
-		// Fill filter form with data.
-		$filter_form->fill(['Name' => 'idle time']);
-		$filter_form->submit();
-		$this->assertTableData([['Name' => 'CPU idle time']], $this->getTableSelector());
-
-		$this->query('button:Save as')->waitUntilClickable()->one()->click();
-		$dialog = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
-	}
-
 	/**
 	 * Test that checks if host has visible name, it cannot be found by host name on Latest Data page.
 	 */
@@ -665,7 +649,7 @@ class testPageLatestData extends CWebTest {
 				 */
 				for ($i = 1; $i < 3; $i++) {
 					$this->assertFalse($this->query('link', $host['host'])->one(false)->isValid());
-					$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
+					$this->query('class:arrow-right')->waitUntilClickable()->one()->click();
 					$this->page->waitUntilReady();
 				}
 

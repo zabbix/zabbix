@@ -106,7 +106,7 @@ class testFormFilterHosts extends testFormFilter {
 						'Host groups' => ['Group to check Overview']
 					],
 					'filter' => [
-						'Name' => 'кирилица'
+						'Name' => 'кириллица'
 					],
 					'tab_id' => '4'
 				]

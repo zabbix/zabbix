@@ -109,7 +109,7 @@ class testFormFilter extends CWebTest {
 		$result_before = $this->getTableResults($table_selector);
 
 		for ($i = 0; $i < 2; ++$i) {
-			$form->fill(['Host groups' => ['Group to check Overview','Another group to check Overview']]);
+			$form->fill(['Host groups' => ['Group to check Overview', 'Another group to check Overview']]);
 
 			if ($i === 0) {
 				$this->query('name:filter_apply')->one()->click();
