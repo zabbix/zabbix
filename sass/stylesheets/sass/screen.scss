@@ -3060,6 +3060,10 @@ $form-icon-btn: (
 		.dashboard-widget-head {
 			margin-bottom: 14px;
 
+			.icon-doc-link {
+				margin-right: -26px;
+			}
+
 			.overlay-close-btn {
 				position: static;
 				margin: -9px -6px 0 38px;
