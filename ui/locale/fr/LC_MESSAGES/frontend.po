@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 5.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-22 13:30+0200\n"
+"POT-Creation-Date: 2022-03-04 19:53+0200\n"
 "PO-Revision-Date: 2018-01-15 09:21+0300\n"
 "Last-Translator: Christophe <ctr@pmspos.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -10975,7 +10975,7 @@ msgstr "Maintenance avec collecte de données"
 msgid "Maintenance without data collection"
 msgstr "Maintenance sans collecte de données"
 
-#: include/html.inc.php:967
+#: include/html.inc.php:965
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "Maintenance: %1$s"
@@ -16532,7 +16532,7 @@ msgstr ""
 msgid "Support"
 msgstr "Support"
 
-#: include/html.inc.php:962
+#: include/html.inc.php:960
 #, c-format
 msgid "Suppressed till: %1$s"
 msgstr "Supprimé jusqu'à: %1$s"
