@@ -1274,8 +1274,14 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.22rc1
 
 New features:
+A.F....... [ZBXNEXT-7485] fixed debug_backtrace function usage for php8 (acikuns)
+.........T [ZBXNEXT-7493] added garbage collector and memory pool discovery to generic Java template (vkhaliev)
 
 Bug fixes:
+.........T [ZBX-20521] corrected typos in templates, README and media types (drasihov)
+..F....... [ZBX-20640] fixed X-axis field placement in different rows in Axis tab in Graph widget (acikuns)
+..F....... [ZBX-20049] implemented keyboard control for info icons (acikuns, ashubin)
+........S. [ZBX-19965] fixed database upgrade for SNMP interfaces (akozlovs)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.21
