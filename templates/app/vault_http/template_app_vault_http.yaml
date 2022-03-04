@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T19:13:15Z'
+  date: '2022-03-01T13:12:13Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1020,7 +1020,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of token checks handled by Vault corecore.'
+          description: 'Number of token checks handled by Vault core.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN

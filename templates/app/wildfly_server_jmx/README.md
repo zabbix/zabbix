@@ -112,7 +112,7 @@ There are no template links in this template.
 |WildFly |WildFly {#JMX_DATA_SOURCE}: XA: Prepare time, avg |<p>The average time for a XAResource prepare invocation.</p> |JMX |jmx["{#JMXOBJ}",XAPrepareAverageTime] |
 |WildFly |WildFly {#JMX_DATA_SOURCE}: XA: Prepare, rate |<p>The number of XAResource prepare invocations per second.</p> |JMX |jmx["{#JMXOBJ}",XAPrepareCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |WildFly |WildFly {#JMX_DATA_SOURCE}: XA: Recover time, avg |<p>The average time for a XAResource recover invocation.</p> |JMX |jmx["{#JMXOBJ}",XARecoverAverageTime] |
-|WildFly |WildFly {#JMX_DATA_SOURCE}: XA: Recover, rate |<p>The number of XAResource recover invocationsper second.</p> |JMX |jmx["{#JMXOBJ}",XARecoverCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|WildFly |WildFly {#JMX_DATA_SOURCE}: XA: Recover, rate |<p>The number of XAResource recover invocations per second.</p> |JMX |jmx["{#JMXOBJ}",XARecoverCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |WildFly |WildFly {#JMX_DATA_SOURCE}: XA: Rollback time, avg |<p>The average time for a XAResource rollback invocation.</p> |JMX |jmx["{#JMXOBJ}",XARollbackAverageTime] |
 |WildFly |WildFly {#JMX_DATA_SOURCE}: XA: Rollback, rate |<p>The number of XAResource rollback invocations per second.</p> |JMX |jmx["{#JMXOBJ}",XARollbackCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |WildFly |WildFly {#JMX_DATA_SOURCE}: XA: Start time, avg |<p>The average time for a XAResource start invocation.</p> |JMX |jmx["{#JMXOBJ}",XAStartAverageTime] |
