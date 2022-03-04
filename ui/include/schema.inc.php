@@ -3522,6 +3522,36 @@ return [
 			]
 		]
 	],
+	'right_tplgrp' => [
+		'key' => 'rightid',
+		'fields' => [
+			'rightid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'groupid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'usrgrp',
+				'ref_field' => 'usrgrpid'
+			],
+			'permission' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'id' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'tplgrp',
+				'ref_field' => 'groupid'
+			]
+		]
+	],
 	'services' => [
 		'key' => 'serviceid',
 		'fields' => [

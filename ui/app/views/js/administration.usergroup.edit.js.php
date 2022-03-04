@@ -155,7 +155,6 @@
 				$new_group_right_table.find('button, [name^="new_group_right"]').prop('disabled', true);
 				$new_templategroup_right_table.find('button, [name^="new_templategroup_right"]').prop('disabled', true);
 				$group_right_table_container.find('input[type="radio"]').prop('disabled', true);
-				$templategroup_right_table_container.find('input[type="radio"]').prop('disabled', true);
 			}, 150);
 		}
 
@@ -199,8 +198,11 @@
 		 */
 		function respNewGroupRight(html) {
 			$ms_group_right_groups.multiSelect('clean');
+			$ms_templategroup_right_groups.multiSelect('clean');
 			$new_group_right_table.find('[name="new_group_right[tag]"]').val('');
+			$new_templategroup_right_table.find('[name="new_group_right[tag]"]').val('');
 			$new_group_right_table.find('[name="new_group_right[value]"]').val('');
+			$new_templategroup_right_table.find('[name="new_group_right[value]"]').val('');
 			$group_right_table_container.html(html);
 
 			// Trigger event to update tab indicator.
