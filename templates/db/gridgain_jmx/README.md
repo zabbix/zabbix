@@ -4,7 +4,7 @@
 ## Overview
 
 For Zabbix version: 6.0 and higher  
-Official JMX Template for GridGain In-Memory Computing Platform computing platform.
+Official JMX Template for GridGain In-Memory Computing Platform.
 This template is based on the original template developed by Igor Akkuratov, Senior Engineer at GridGain Systems and GridGain In-Memory Computing Platform Contributor.
 
 

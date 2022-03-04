@@ -1,3 +1,10 @@
+Changes for 6.0.2rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 6.0.1
 
 6.0.1rc4 was released as 6.0.1 without any changes
@@ -456,6 +463,13 @@ A.F....... [ZBXNEXT-6528,ZBXNEXT-6669] moved auditlog calls from frontend sectio
 
 Bug fixes:
 .........T [ZBX-19395] changed version in links of the templates and the media (mchudinov)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.12rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 5.4.11
@@ -1722,6 +1736,13 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.22rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 5.0.21
@@ -4142,6 +4163,13 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.40rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 4.0.39

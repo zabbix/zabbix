@@ -318,7 +318,7 @@ INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (17, 3, 11, 'ifInOut0', 'private1', '162', '', 0, '', '', 0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (18, 3, 13, 'ifIn0', '', '161', 'private2', 0, '', '', 0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (19, 3, 0, '', '', '22', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (20, 3, 8, '', '', '10000-20000', '', 0, '', '', 0);
+INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (20, 3, 8, '', '', '101100-20000', '', 0, '', '', 0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (21, 3, 15, '', '', '23', '', 0, '', '', 0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (22, 3, 9, 'agent.uname', '', '10050', '', 0, '', '', 0);
 
@@ -1542,7 +1542,7 @@ INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90011, 90003);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1000, 90002, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1001, 90003, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1019, 90003, '{#FSNAME}', NULL, NULL);
-INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1020, 90012, '', 5, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (10220, 90012, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1002, 90004, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1003, 90005, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1004, 90006, '', 5, NULL);
@@ -1685,8 +1685,8 @@ INSERT INTO hosts (hostid, host, name, flags, templateid, description) VALUES (9
 INSERT INTO hosts (hostid, host, name, flags, templateid, description) VALUES (99001, 'testInheritanceHostPrototype {#TEST}', 'testInheritanceHostPrototype {#TEST}', 2, 99000, '');
 INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99000, NULL, 15011, '', 0, 0);
 INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99001, NULL, 15016, '', 0, 0);
-INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1010, 99000, '', 50019, NULL);
-INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1011, 99001, '', 50019, 1010);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (10110, 99000, '', 50019, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1011, 99001, '', 50019, 10110);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99006, 'Inheritance test template with host prototype', 'Inheritance test template with host prototype', 3, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99006, 99006, 50019);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, posts, headers, flags) VALUES (99083, 99006, 2, 'Discovery rule for host prototype test', 'key_test', '30s', 4, '', '', '', '', '', 1);
@@ -2026,9 +2026,9 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99911, 99053, 4)
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99912, 99054, 4);
 
 -- Dashboard for problem hosts widget
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1000, 'Dashboard for Problem hosts widget', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1000, 1000);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10000, 1000, 'problemhosts', '', 0, 0, 8, 8);
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (100100, 'Dashboard for Problem hosts widget', 1, 1);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (100100, 100100);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (101100, 100100, 'problemhosts', '', 0, 0, 8, 8);
 INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (4, 1, 'web.dashboard.dashboardid', 1,'','', 1);
 
 -- testPageAvailabilityReport SLA reports
@@ -2104,10 +2104,10 @@ INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refres
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (92, 7, 91);
 
 -- testHostAvailabilityWidget
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1010, 'Dashboard for Host availability widget', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1010, 1010);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10001, 1010, 'hostavail', 'Reference HA widget', 0, 0, 6, 3);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10002, 1010, 'hostavail', 'Reference HA widget to delete', 0, 3, 6, 3);
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (10110, 'Dashboard for Host availability widget', 1, 1);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (10110, 10110);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10001, 10110, 'hostavail', 'Reference HA widget', 0, 0, 6, 3);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10002, 10110, 'hostavail', 'Reference HA widget to delete', 0, 3, 6, 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (8900, 10002, 2, 'groupids', 0, 4);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (8901, 10002, 0, 'layout', 1);
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50015,'Group for Host availability widget',0);
@@ -2175,9 +2175,9 @@ INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (9
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (90107, 99016, '{$TEMPLATE_MACRO_FOR_REMOVE2}', '', '');
 
 -- testPageTriggerUrl
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1020, 'Dashboard for Trigger overview widget', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1020, 1020);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10003, 1020, 'trigover', 'Group to check Overview', 0, 0, 12, 7);
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (10220, 'Dashboard for Trigger overview widget', 1, 1);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (10220, 10220);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10003, 10220, 'trigover', 'Group to check Overview', 0, 0, 12, 7);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (8902, 10003, 0, 'style', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (8903, 10003, 2, 'groupids', 0, 50011);
 
@@ -2189,10 +2189,10 @@ INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1220, 1220);
 INSERT INTO dashboard_user (dashboard_userid, dashboardid, userid, permission) VALUES (1, 1220, 9, 2);
 
 -- Dashboard for graph widget
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1030, 'Dashboard for graph widgets', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1030, 1030);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10004, 1030, 'svggraph', 'Test cases for update', 0, 0, 6, 5);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10005, 1030, 'svggraph', 'Test cases for simple update and deletion', 6, 0, 6, 5);
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (10330, 'Dashboard for graph widgets', 1, 1);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (10330, 10330);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10004, 10330, 'svggraph', 'Test cases for update', 0, 0, 6, 5);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10005, 10330, 'svggraph', 'Test cases for simple update and deletion', 6, 0, 6, 5);
 -- widget "Test cases for simple update and deletion"
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90006, 10005, 0, 'righty', 0, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90008, 10005, 1, 'ds.hosts.0.0', 0, 'Host*');
@@ -2223,13 +2223,13 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90034, 10004, 1, 'time_to', 0, 'now-5m');
 
 -- testProblemsBySeverityWidget
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1040, 'Dashboard for Problems by severity', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1040, 1040);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10006, 1040, 'problemsbysv', 'Reference widget', 0, 0, 12, 5);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10007, 1040, 'problemsbysv', 'Reference PBS widget to delete', 12, 0, 6, 3);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10009, 1040, 'problemsbysv', 'Totals reference PBS widget to delete',18, 0, 6, 3);
-INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUES (10009, 8137, 0, 'show_type', 1);
-INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUES (10009, 8138, 0, 'layout', 1);
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (10440, 'Dashboard for Problems by severity', 1, 1);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (10440, 10440);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10006, 10440, 'problemsbysv', 'Reference widget', 0, 0, 12, 5);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10007, 10440, 'problemsbysv', 'Reference PBS widget to delete', 12, 0, 6, 3);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10009, 10440, 'problemsbysv', 'Totals reference PBS widget to delete',18, 0, 6, 3);
+INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUES (10009, 81337, 0, 'show_type', 1);
+INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUES (10009, 81338, 0, 'layout', 1);
 
 -- testFormItemTest
 INSERT INTO hosts (hostid, proxy_hostid, host, name, status, description) VALUES (99136, 20000, 'Test item host', 'Test item host', 0, 'Test item host for testing items');
@@ -2299,7 +2299,7 @@ INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUE
 INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1008, 102, 'Message', '{ALERT.MESSAGE}');
 INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1009, 102, 'HTTPProxy', '');
 INSERT INTO media_type (mediatypeid, type, name, status, script, show_event_menu, event_menu_name, event_menu_url, description) VALUES (103, 4, 'Webhook to delete', 0, 'return 0;', 1, 'Unique webhook url', 'zabbix.php?action=mediatype.list&ddreset={EVENT.TAGS.webhook}', 'Webhook media type to be deleted');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1010, 103, 'Parameter name to be deleted', 'Parameter value to be deleted');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (10110, 103, 'Parameter name to be deleted', 'Parameter value to be deleted');
 INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1011, 103, '2nd parameter name to be deleted', '2nd parameter value to be deleted');
 
 -- testPageProblems_ProblemLinks
