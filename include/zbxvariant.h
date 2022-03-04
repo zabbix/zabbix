@@ -20,7 +20,6 @@
 #ifndef ZABBIX_ZBXVARIANT_H
 #define ZABBIX_ZBXVARIANT_H
 
-#include "common.h"
 #include "zbxalgo.h"
 
 typedef union

@@ -20,7 +20,6 @@
 #ifndef ZABBIX_ZBXRTC_H
 #define ZABBIX_ZBXRTC_H
 
-#include "zbxalgo.h"
 #include "zbxipcservice.h"
 
 typedef struct

@@ -20,8 +20,6 @@
 #ifndef ZABBIX_ZBXEVAL_H
 #define ZABBIX_ZBXEVAL_H
 
-#include "common.h"
-#include "zbxalgo.h"
 #include "zbxvariant.h"
 
 /*

@@ -17,18 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "trapper_request.h"
+
 #include "log.h"
 #include "cfg.h"
-#include "comms.h"
 #include "trapper_auth.h"
 #include "zbxreport.h"
-#include "zbxjson.h"
 #include "db.h"
 #include "../alerter/alerter_protocol.h"
 #include "zbxipcservice.h"
-
-#include "trapper_request.h"
 
 extern int	CONFIG_REPORTMANAGER_FORKS;
 

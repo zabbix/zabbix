@@ -17,20 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "datasender.h"
+
 #include "comms.h"
 #include "db.h"
 #include "log.h"
 #include "daemon.h"
-#include "zbxjson.h"
 #include "proxy.h"
 #include "zbxself.h"
-#include "dbcache.h"
 #include "zbxtasks.h"
 #include "zbxcrypto.h"
 #include "zbxcompress.h"
-
-#include "datasender.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;

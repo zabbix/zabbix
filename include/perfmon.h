@@ -20,11 +20,11 @@
 #ifndef ZABBIX_PERFMON_H
 #define ZABBIX_PERFMON_H
 
+#include "sysinc.h"
+
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 #	error "This module is only available for Windows OS"
 #endif
-
-#include "sysinc.h"
 
 /* this struct must be only modified along with mapping builtin_counter_ref[] in perfmon.c */
 typedef enum

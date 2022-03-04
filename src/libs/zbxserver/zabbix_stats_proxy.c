@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "zbxjson.h"
 #include "zabbix_stats.h"
+
+#include "common.h"
 
 /******************************************************************************
  *                                                                            *
@@ -34,5 +34,6 @@
 void	zbx_get_zabbix_stats_ext(struct zbx_json *json)
 {
 	ZBX_UNUSED(json);
+
 	return;
 }
