@@ -603,12 +603,10 @@ static zbx_tm_task_t	*tm_create_active_proxy_reload_task(zbx_uint64_t proxyid)
 	zbx_tm_task_t	*task;
 	zbx_uint64_t	taskid;
 
-	taskid = DBget_maxid("task");
-
-	task = zbx_tm_task_create(taskid, ZBX_TM_TASK_DATA, ZBX_TM_STATUS_NEW, (int)time(NULL),
+	task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA, ZBX_TM_STATUS_NEW, (int)time(NULL),
 			ZBX_DATA_ACTIVE_PROXY_CONFIG_RELOAD_TTL, proxyid);
 
-	task->data = zbx_tm_data_create(taskid, "", 0, ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD);
+	task->data = zbx_tm_data_create(0, "", 0, ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD);
 
 	return task;
 }
