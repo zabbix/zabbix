@@ -70,7 +70,7 @@ static int	trapper_expression_evaluate(const char *expression, const zbx_timespe
 	int			ret;
 	zbx_variant_t		value;
 
-	if (SUCCEED != zbx_eval_parse_expression(&ctx, expression, ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION, error))
+	if (SUCCEED != zbx_eval_parse_expression(&ctx, expression, ZBX_EVAL_PARSE_TRIGGER_EXPRESSION, error))
 		return FAIL;
 
 	if (SUCCEED == (ret = zbx_eval_execute(&ctx, ts, &value, error)))
