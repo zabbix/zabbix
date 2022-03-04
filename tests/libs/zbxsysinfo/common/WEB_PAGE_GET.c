@@ -128,7 +128,7 @@ CURLcode	__wrap_curl_easy_setopt(CURL *easyhandle, int opt, void *val)
 			req_url = zbx_strdup(req_url, (char*)val);
 			break;
 		case CURLOPT_WRITEFUNCTION:
-			cb_ptr = val;
+			*(void **)(&cb_ptr) = val;
 			break;
 		case CURLOPT_WRITEDATA:
 			page_data = val;
