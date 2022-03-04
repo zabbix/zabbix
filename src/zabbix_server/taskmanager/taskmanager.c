@@ -598,7 +598,7 @@ static void	tm_process_diaginfo(zbx_uint64_t taskid, const char *data)
  * Purpose: create config cache reload task to be sent to active proxy        *
  *                                                                            *
  ******************************************************************************/
-static void	tm_create_active_proxy_reload_task(zbx_uint64_t proxyid)
+static zbx_tm_task_t	*tm_create_active_proxy_reload_task(zbx_uint64_t proxyid)
 {
 	zbx_tm_task_t	*task;
 	zbx_uint64_t	taskid;
@@ -610,11 +610,7 @@ static void	tm_create_active_proxy_reload_task(zbx_uint64_t proxyid)
 
 	task->data = zbx_tm_data_create(taskid, "", 0, ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD);
 
-	DBbegin();
-	zbx_tm_save_task(task);
-	DBcommit();
-
-	zbx_tm_task_free(task);
+	return task;
 }
 
 /******************************************************************************
@@ -631,6 +627,7 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 	const char		*ptr;
 	char			buffer[MAX_ID_LEN + 1];
 	int			passive_proxy_count = 0;
+	zbx_vector_ptr_t	tasks_active;
 
 	if (FAIL == zbx_json_open(data, &jp))
 	{
@@ -644,6 +641,8 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 				ZBX_PROTO_TAG_PROXY_HOSTIDS " not found");
 		return;
 	}
+
+	zbx_vector_ptr_create(&tasks_active);
 
 	for (ptr = NULL; NULL != (ptr = zbx_json_next(&jp_data, ptr));)
 	{
@@ -663,7 +662,10 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 
 			if (HOST_STATUS_PROXY_ACTIVE == type)
 			{
-				tm_create_active_proxy_reload_task(proxyid);
+				zbx_tm_task_t	*task;
+
+				task = tm_create_active_proxy_reload_task(proxyid);
+				zbx_vector_ptr_append(&tasks_active, task);
 			}
 			else if (HOST_STATUS_PROXY_PASSIVE == type)
 			{
@@ -677,6 +679,14 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 			}
 		}
 	}
+
+	if (0 < tasks_active.values_num)
+	{
+		zbx_tm_save_tasks(&tasks_active);
+		zbx_vector_ptr_clear_ext(&tasks_active, (zbx_clean_func_t)zbx_tm_task_free);
+	}
+
+	zbx_vector_ptr_destroy(&tasks_active);
 
 	if (passive_proxy_count > 0)
 		zbx_ipc_async_socket_send(rtc, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
@@ -704,7 +714,7 @@ static void	tm_process_passive_proxy_cache_reload_request(zbx_ipc_async_socket_t
 		return;
 	}
 
-	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROXY_NAMES, hostname, sizeof(hostname), NULL))
+	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROXY_NAME, hostname, sizeof(hostname), NULL))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "broken passive proxy config cache reload request was received");
 		return;
@@ -950,15 +960,20 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 {
 	int			i;
 	zbx_vector_uint64_t	act, pas;
+	zbx_vector_ptr_t	tasks_active;
 
 	zbx_vector_uint64_create(&act);
 	zbx_vector_uint64_create(&pas);
+	zbx_vector_ptr_create(&tasks_active);
 
 	zbx_dc_get_all_proxies(&act, &pas);
 
 	for (i = 0; i < act.values_num; i++)
 	{
-		tm_create_active_proxy_reload_task(act.values[i]);
+		zbx_tm_task_t	*task;
+
+		task = tm_create_active_proxy_reload_task(act.values[i]);
+		zbx_vector_ptr_append(&tasks_active, task);
 	}
 
 	if (pas.values_num > 0)
@@ -974,6 +989,16 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 
 		zbx_ipc_async_socket_send(rtc, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
 	}
+
+	if (0 < tasks_active.values_num)
+	{
+		DBbegin();
+		zbx_tm_save_tasks(&tasks_active);
+		DBcommit();
+		zbx_vector_ptr_clear_ext(&tasks_active, (zbx_clean_func_t)zbx_tm_task_free);
+	}
+
+	zbx_vector_ptr_destroy(&tasks_active);
 
 	zbx_vector_uint64_destroy(&act);
 	zbx_vector_uint64_destroy(&pas);
@@ -993,6 +1018,7 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 	const char		*ptr;
 	char			name[HOST_NAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	int			passive_proxy_count = 0;
+	zbx_vector_ptr_t	tasks_active;
 
 	if (FAIL == zbx_json_open((const char *)data, &jp))
 	{
@@ -1005,6 +1031,8 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 		tm_reload_each_proxy_cache(rtc);
 		return;
 	}
+
+	zbx_vector_ptr_create(&tasks_active);
 
 	for (ptr = NULL; NULL != (ptr = zbx_json_next(&jp_data, ptr));)
 	{
@@ -1027,7 +1055,10 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 
 			if (HOST_STATUS_PROXY_ACTIVE == type)
 			{
-				tm_create_active_proxy_reload_task(proxyid);
+				zbx_tm_task_t	*task;
+
+				task = tm_create_active_proxy_reload_task(proxyid);
+				zbx_vector_ptr_append(&tasks_active, task);
 			}
 			else if (HOST_STATUS_PROXY_PASSIVE == type)
 			{
@@ -1041,6 +1072,16 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 			}
 		}
 	}
+
+	if (0 < tasks_active.values_num)
+	{
+		DBbegin();
+		zbx_tm_save_tasks(&tasks_active);
+		DBcommit();
+		zbx_vector_ptr_clear_ext(&tasks_active, (zbx_clean_func_t)zbx_tm_task_free);
+	}
+
+	zbx_vector_ptr_destroy(&tasks_active);
 
 	if (passive_proxy_count > 0)
 		zbx_ipc_async_socket_send(rtc, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
@@ -1085,7 +1126,10 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		{
 			if (ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD == rtc_cmd)
 				tm_reload_proxy_cache_by_names(&rtc, rtc_data);
-			else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
+
+			zbx_free(rtc_data);
+
+			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				goto out;
 		}
 

@@ -407,7 +407,7 @@ static void	force_config_sync(void)
 	task = zbx_tm_task_create(taskid, ZBX_TM_PROXYDATA, ZBX_TM_STATUS_NEW, (int)time(NULL), 0, 0);
 
 	zbx_json_init(&j, 1024);
-	zbx_json_addstring(&j, ZBX_PROTO_TAG_PROXY_NAMES, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_PROXY_NAME, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&j);
 
 	task->data = zbx_tm_data_create(taskid, j.buffer, (int)strlen(j.buffer), ZBX_TM_DATA_TYPE_PROXY_HOSTNAME);
@@ -466,6 +466,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 				force_config_sync();
 
 			zbx_free(rtc_data);
+
 			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				break;
 		}
