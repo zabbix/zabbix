@@ -504,8 +504,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			function parameters_equal(array $stored_parameters, array $input_parameters): bool {
 				return (array_column($stored_parameters, 'value') == array_column($input_parameters, 'value')
-					&& array_column($stored_parameters, 'name') == array_column($input_parameters, 'name'));
-			};
+						&& array_column($stored_parameters, 'name') == array_column($input_parameters, 'name'));
+			}
 
 			if (getRequest('type') == ITEM_TYPE_SCRIPT && $db_item['type'] == getRequest('type')
 					&& parameters_equal($db_item['parameters'], $item['parameters'])) {
