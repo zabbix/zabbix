@@ -448,7 +448,10 @@ static int	tm_save_data_tasks(zbx_tm_task_t **tasks, int tasks_num)
 			case ZBX_TM_TASK_DATA:
 			case ZBX_TM_PROXYDATA:
 				data = (zbx_tm_data_t *)task->data;
-				data->parent_taskid = task->taskid;
+
+				if (ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD == data->type)
+					data->parent_taskid = task->taskid;
+
 				zbx_db_insert_add_values(&db_insert, task->taskid, data->type, data->data,
 						data->parent_taskid);
 		}
