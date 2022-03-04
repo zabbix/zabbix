@@ -389,6 +389,7 @@ class CTask extends CApiService {
 	protected function createTasksProxyHostids(array $tasks): array {
 		$task_rows = [];
 		$task_data_rows = [];
+		$proxy_hostids = [];
 		$return = [];
 		$taskid = DB::reserveIds('task', count($tasks));
 
@@ -411,12 +412,31 @@ class CTask extends CApiService {
 				'parent_taskid' => $taskid
 			];
 
+			$proxy_hostids += array_flip($task['request']['proxy_hostids']);
+
 			$return[$index] = $taskid;
 			$taskid = bcadd($taskid, 1, 0);
 		}
 
 		DB::insertBatch('task', $task_rows, false);
 		DB::insertBatch('task_data', $task_data_rows, false);
+
+		if ($proxy_hostids) {
+			$proxies = API::Proxy()->get([
+				'output' => ['host'],
+				'proxyids' => array_keys($proxy_hostids),
+				'preservekeys' => true
+			]);
+
+			foreach ($proxies as $proxyid => $proxy) {
+				self::addAuditLog(CAudit::ACTION_CONFIG_REFRESH, CAudit::RESOURCE_PROXY, [
+					$proxyid => [
+						'proxyid' => $proxyid,
+						'host' => $proxy['host']
+					]
+				]);
+			}
+		}
 
 		return $return;
 	}

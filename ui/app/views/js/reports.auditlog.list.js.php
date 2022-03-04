@@ -118,7 +118,8 @@
 				CAudit::ACTION_EXECUTE => [CAudit::RESOURCE_SCRIPT],
 				CAudit::ACTION_LOGIN_SUCCESS => [CAudit::RESOURCE_USER],
 				CAudit::ACTION_LOGIN_FAILED => [CAudit::RESOURCE_USER],
-				CAudit::ACTION_HISTORY_CLEAR => [CAudit::RESOURCE_ITEM]
+				CAudit::ACTION_HISTORY_CLEAR => [CAudit::RESOURCE_ITEM],
+				CAudit::ACTION_CONFIG_REFRESH => [CAudit::RESOURCE_PROXY]
 			]); ?>
 
 			// Add action "All" to every resource.
