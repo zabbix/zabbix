@@ -1233,6 +1233,7 @@ void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const c
 void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str);
 
 void	zbx_strsplit(const char *src, char delimiter, char **left, char **right);
+void	zbx_strrsplit(const char *src, char delimiter, char **left, char **right);
 
 /* secure string copy */
 #define strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
