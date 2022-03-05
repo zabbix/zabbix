@@ -1,3 +1,4 @@
+//go:build (windows && 386) || darwin
 // +build windows,386 darwin
 
 /*
