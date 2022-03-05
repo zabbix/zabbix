@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-01T10:37:04Z'
+  date: '2022-03-05T06:43:31Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -2108,7 +2108,7 @@ zabbix_export:
                 -
                   uuid: cfaba160cc0441c09010de05316596bd
                   expression: 'last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.quorum[{#SINGLETON}])=0'
-                  name: 'RabbitMQ: There are queues that would lose their quorum and availability if the this node is shut down.'
+                  name: 'RabbitMQ: There are queues that would lose their quorum and availability if this node is shut down.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
@@ -2804,14 +2804,14 @@ zabbix_export:
             key: rabbitmq.get_queues
           lld_macro_paths:
             -
+              lld_macro: '{#NODE}'
+              path: $.node
+            -
               lld_macro: '{#QUEUE}'
               path: $.name
             -
               lld_macro: '{#VHOST}'
               path: $.vhost
-            -
-              lld_macro: '{#NODE}'
-              path: $.node
       tags:
         -
           tag: class

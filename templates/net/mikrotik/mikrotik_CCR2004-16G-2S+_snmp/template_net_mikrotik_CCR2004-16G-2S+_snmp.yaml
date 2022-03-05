@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-27T08:27:03Z'
+  date: '2022-03-04T11:44:56Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -1559,7 +1559,7 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 The type of interface.
-                Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),
+                Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),
                 through updating the syntax of the IANAifType textual convention.
               valuemap:
                 name: 'IF-MIB::ifType'
