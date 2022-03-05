@@ -45,7 +45,7 @@ The following parameters should be filled:<br>
 Note, that "Send to" field cannot be empty. If the channel ID is already specified in the **express_send_to** parameter, you can put any symbol in this field to comply with frontend requirements.
 Make sure this user has access to all hosts, for which you would like problem notifications to be converted into Express tasks.
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/6.0/manual/config/notifications) and [Express.ms](https://express.ms/docs) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/6.2/manual/config/notifications) and [Express.ms](https://express.ms/docs) documentations.
 
 ## Supported versions
-Zabbix 6.0 and higher
+Zabbix 6.2 and higher

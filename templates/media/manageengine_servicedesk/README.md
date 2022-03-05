@@ -83,7 +83,7 @@ Examples:<br>
 `udf_field_string:udf_char1`
 
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/6.0/manual/config/notifications) and [ManageEngine ServiceDesk](https://www.manageengine.com/products/service-desk/support.html) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/6.2/manual/config/notifications) and [ManageEngine ServiceDesk](https://www.manageengine.com/products/service-desk/support.html) documentations.
 
 ## Supported versions
-Zabbix 6.0 and higher
+Zabbix 6.2 and higher
