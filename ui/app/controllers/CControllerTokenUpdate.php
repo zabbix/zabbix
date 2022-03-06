@@ -27,7 +27,7 @@ class CControllerTokenUpdate extends CController {
 			'name'          => 'db token.name|required|not_empty',
 			'description'   => 'db token.description',
 			'expires_state' => 'in 0,1|required',
-			'expires_at'    => 'range_time',
+			'expires_at'    => 'abs_time',
 			'status'        => 'db token.status|required|in '.ZBX_AUTH_TOKEN_ENABLED.','.ZBX_AUTH_TOKEN_DISABLED,
 			'action_src'    => 'fatal|required|in token.edit,user.token.edit',
 			'action_dst'    => 'fatal|required|in token.list,user.token.list,token.view,user.token.view',
@@ -67,9 +67,17 @@ class CControllerTokenUpdate extends CController {
 	protected function doAction() {
 		$this->getInputs($token, ['tokenid', 'name', 'description', 'expires_at', 'status']);
 
-		$token['expires_at'] = $this->getInput('expires_state')
-			? (new DateTime($token['expires_at']))->getTimestamp()
-			: 0;
+		if ($this->getInput('expires_state')) {
+			$parser = new CAbsoluteTimeParser();
+			$parser->parse($token['expires_at']);
+
+			$token['expires_at'] = $parser
+				->getDateTime(true)
+				->getTimestamp();
+		}
+		else {
+			$token['expires_at'] = 0;
+		}
 
 		$result = API::Token()->update($token);
 

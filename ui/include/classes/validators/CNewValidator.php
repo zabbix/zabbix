@@ -242,6 +242,36 @@ class CNewValidator {
 					}
 					break;
 
+				case 'abs_date':
+					$absolute_time_parser = new CAbsoluteTimeParser();
+
+					$has_errors = !is_string($value)
+						|| $absolute_time_parser->parse($value) != CParser::PARSE_SUCCESS
+						|| $absolute_time_parser->getDateTime(true)->format('H:i:s') !== '00:00:00';
+
+					if ($has_errors) {
+						$this->addError($fatal,
+							_s('Incorrect value for field "%1$s": %2$s.', $field, _('a date is expected'))
+						);
+
+						return false;
+					}
+					break;
+
+				case 'abs_time':
+					$absolute_time_parser = new CAbsoluteTimeParser();
+
+					$has_errors = !is_string($value) || $absolute_time_parser->parse($value) != CParser::PARSE_SUCCESS;
+
+					if ($has_errors) {
+						$this->addError($fatal,
+							_s('Incorrect value for field "%1$s": %2$s.', $field, _('a time is expected'))
+						);
+
+						return false;
+					}
+					break;
+
 				case 'time_periods':
 					if ($this->time_periods_parser === null) {
 						$this->time_periods_parser = new CTimePeriodsParser(['usermacros' => true]);

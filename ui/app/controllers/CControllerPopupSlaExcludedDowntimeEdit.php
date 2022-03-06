@@ -74,7 +74,7 @@ class CControllerPopupSlaExcludedDowntimeEdit extends CController {
 
 			$form = [
 				'name' => $this->getInput('name'),
-				'start_time' => $datetime_from->format(DATE_TIME_FORMAT),
+				'start_time' => $datetime_from->format(ZBX_DATE_TIME),
 				'duration_days' => $interval->days,
 				'duration_hours' => $interval->h,
 				'duration_minutes' => $interval->i
@@ -83,7 +83,7 @@ class CControllerPopupSlaExcludedDowntimeEdit extends CController {
 		else {
 			$form = [
 				'name' => '',
-				'start_time' => date(DATE_TIME_FORMAT, strtotime('tomorrow')),
+				'start_time' => date(ZBX_DATE_TIME, strtotime('tomorrow')),
 				'duration_days' => 0,
 				'duration_hours' => 1,
 				'duration_minutes' => 0
