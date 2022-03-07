@@ -3,4 +3,5 @@
 noinst_LIBRARIES = libzbxkvs.a
 
 libzbxkvs_a_SOURCES = \
-	kvs.c
+	kvs.c \
+	kvs.h

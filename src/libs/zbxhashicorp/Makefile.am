@@ -3,4 +3,5 @@
 noinst_LIBRARIES = libzbxhashicorp.a
 
 libzbxhashicorp_a_SOURCES = \
-	hashicorp.c
+	hashicorp.c \
+	hashicorp.h

@@ -3,4 +3,5 @@
 noinst_LIBRARIES = libzbxcyberark.a
 
 libzbxcyberark_a_SOURCES = \
-	cyberark.c
+	cyberark.c \
+	cyberark.h
