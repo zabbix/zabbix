@@ -1037,8 +1037,17 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 		{
 			zbx_uint64_t	proxyid;
 			unsigned char	type;
+			char		*error;
 
 			zabbix_log(LOG_LEVEL_WARNING, "reloading configuration cache on proxy '%s'", name);
+
+			if (FAIL == zbx_check_hostname(name, &error))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "failed to reload configuration cache on proxy: invalid "
+						"host name [%s]: %s ", name, error);
+				zbx_free(error);
+				continue;
+			}
 
 			if (FAIL == zbx_dc_get_proxyid_by_name(name, &proxyid, &type))
 			{
