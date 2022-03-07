@@ -52,7 +52,7 @@ class CControllerTokenCreate extends CController {
 				}
 
 				if ($validator->isErrorFatal()) {
-					$validation_result = $validator->isErrorFatal();
+					$validation_result = self::VALIDATION_FATAL_ERROR;
 				}
 				elseif ($validator->isError()) {
 					$validation_result = self::VALIDATION_ERROR;
