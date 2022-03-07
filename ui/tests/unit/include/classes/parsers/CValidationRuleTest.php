@@ -65,6 +65,11 @@ class CValidationRuleTest extends TestCase {
 					'int32' => true
 				]
 			],
+			['uint64', '',
+				[
+					'uint64' => true
+				]
+			],
 			['db hosts.name', '',
 				[
 					'db' => [
