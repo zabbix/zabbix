@@ -4615,7 +4615,7 @@ void	change_proxy_history_count(int change_count, int reset)
 	if (0 != change_count)
 		cache->proxy_history_count += change_count;
 	else
-		cache->proxy_history_count += reset;
+		cache->proxy_history_count = reset;
 
 	UNLOCK_CACHE;
 }
