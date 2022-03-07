@@ -43,6 +43,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 	protected static $createid;
 
 	/**
+	 * Id of dashboard for Top Hosts widget delete.
+	 *
+	 * @var integer
+	 */
+	protected static $deleteid;
+
+	/**
 	 * Id of dashboard page for Top Hosts widget update.
 	 *
 	 * @var integer
@@ -136,17 +143,86 @@ class testDashboardTopHostsWidget extends CWebTest {
 				'pages' => [
 					[]
 				]
+			],
+			[
+				'name' => 'Dashboard for Top Hosts widget delete',
+				'display_period' => 30,
+				'auto_start' => 1,
+				'pages' => [
+					[
+						'name' => '',
+						'widgets' => [
+							[
+								'type' => 'tophosts',
+								'name' => 'Top hosts delete',
+								'x' => 0,
+								'y' => 0,
+								'width' => 12,
+								'height' => 8,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'columns.name.0',
+										'value' => ''
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.data.0',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'columns.item.0',
+										'value' => 'Available memory'
+									],
+									[
+										'type' => 1,
+										'name' => 'columns.timeshift.0',
+										'value' => ''
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.aggregate_function.0',
+										'value' => 0
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.display.0',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.history.0',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'columns.base_color.0',
+										'value' => ''
+									],
+									[
+										'type' => 0,
+										'name' => 'column',
+										'value' => 0
+									]
+								]
+							]
+						]
+					]
+				]
 			]
 		]);
 
 		$this->assertArrayHasKey('dashboardids', $response);
 		self::$updateid = $response['dashboardids'][0];
 		self::$createid = $response['dashboardids'][1];
+		self::$deleteid = $response['dashboardids'][2];
 
-		self::$create_pageid = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid='
-				.zbx_dbstr(self::$createid));
 		self::$update_pageid = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid='
 				.zbx_dbstr(self::$updateid));
+		self::$create_pageid = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid='
+				.zbx_dbstr(self::$createid));
 	}
 
 	public static function getCreateTopHostsData() {
@@ -895,9 +971,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$dashboard->save();
 
 			// Check message that widget added.
-			$message = CMessageElement::find()->waitUntilVisible()->one();
-			$this->assertTrue($message->isGood());
-			$this->assertEquals('Dashboard updated', $message->getTitle());
+			$this->checkDashboardUpdateMessage();
 
 			// Check widget amount that it is added.
 			$this->assertEquals($old_widget_count + 1, $dashboard->getWidgets()->count());
@@ -928,6 +1002,26 @@ class testDashboardTopHostsWidget extends CWebTest {
 
 		// Compare old hash and new one.
 		$this->assertEquals($old_hash, $new_hash);
+	}
+
+	public function testDashboardTopHostsWidget_Delete() {
+		$name = 'Top hosts delete';
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$deleteid);
+		$dashboard = CDashboardElement::find()->one()->edit();
+		$dashboard->deleteWidget($name);
+		$this->page->waitUntilReady();
+		$dashboard->save();
+
+		// Check that Dashboard has been saved
+		$this->checkDashboardUpdateMessage();
+
+		// Confirm that widget is not present on dashboard
+		$this->assertFalse($dashboard->getWidget($name, false)->isValid());
+
+		// Check that widget is removed from DB.
+		$widget_sql = 'SELECT * FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid WHERE w.name='.zbx_dbstr($name);
+		$this->assertEquals(0, CDBHelper::getCount($widget_sql));
 	}
 
 	private function checkWidget($header, $data) {
@@ -1008,5 +1102,11 @@ class testDashboardTopHostsWidget extends CWebTest {
 				$row_number++;
 			}
 		}
+	}
+
+	private function checkDashboardUpdateMessage() {
+		$message = CMessageElement::find()->waitUntilVisible()->one();
+		$this->assertTrue($message->isGood());
+		$this->assertEquals('Dashboard updated', $message->getTitle());
 	}
 }
