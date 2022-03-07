@@ -2,7 +2,7 @@
 
 SUBDIRS = \
 	logfiles
-	
+
 EXTRA_DIST = \
 	eventlog.c \
 	eventlog.h \

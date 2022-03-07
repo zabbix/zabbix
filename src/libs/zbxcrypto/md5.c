@@ -51,7 +51,7 @@
   1999-05-03 lpd Original version.
  */
 
-#include "md5.h"
+#include "zbxcrypto.h"
 
 #include "string.h"
 
