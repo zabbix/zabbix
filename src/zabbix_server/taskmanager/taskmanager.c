@@ -780,12 +780,12 @@ static int	tm_process_data(zbx_ipc_async_socket_t *rtc, zbx_vector_uint64_t *tas
 
 		switch (data_type)
 		{
-			case ZBX_TM_DATA_TYPE_PROXY_HOSTIDS:
-				tm_process_proxy_config_reload_task(rtc, row[2]);
-				zbx_vector_uint64_append(&done_taskids, taskid);
-				break;
 			case ZBX_TM_DATA_TYPE_DIAGINFO:
 				tm_process_diaginfo(taskid, row[2]);
+				zbx_vector_uint64_append(&done_taskids, taskid);
+				break;
+			case ZBX_TM_DATA_TYPE_PROXY_HOSTIDS:
+				tm_process_proxy_config_reload_task(rtc, row[2]);
 				zbx_vector_uint64_append(&done_taskids, taskid);
 				break;
 			case ZBX_TM_DATA_TYPE_PROXY_HOSTNAME:

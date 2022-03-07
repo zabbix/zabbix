@@ -50,8 +50,8 @@
 /* task data type */
 #define ZBX_TM_DATA_TYPE_TEST_ITEM			0
 #define ZBX_TM_DATA_TYPE_DIAGINFO			1
-#define ZBX_TM_DATA_TYPE_PROXY_HOSTNAME			2
-#define ZBX_TM_DATA_TYPE_PROXY_HOSTIDS			3
+#define ZBX_TM_DATA_TYPE_PROXY_HOSTIDS			2
+#define ZBX_TM_DATA_TYPE_PROXY_HOSTNAME			3
 #define ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD	4
 
 /* the time period after which finished (done/expired) tasks are removed */
