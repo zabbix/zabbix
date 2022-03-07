@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-04 19:55+0200\n"
+"POT-Creation-Date: 2022-03-07 15:19+0200\n"
 "PO-Revision-Date: 2013-08-25 22:42+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -19838,7 +19838,7 @@ msgstr ""
 msgid "Width"
 msgstr "Šírka"
 
-#: app/controllers/CControllerLatest.php:530
+#: app/controllers/CControllerLatest.php:529
 msgid "With data"
 msgstr ""
 
@@ -19869,7 +19869,7 @@ msgstr "S problémami"
 msgid "With triggers"
 msgstr "So spúšťačmi"
 
-#: app/controllers/CControllerLatest.php:535
+#: app/controllers/CControllerLatest.php:534
 msgid "Without data"
 msgstr ""
 

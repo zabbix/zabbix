@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-04 19:55+0200\n"
+"POT-Creation-Date: 2022-03-07 15:19+0200\n"
 "PO-Revision-Date: 2021-03-19 18:15+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -19695,7 +19695,7 @@ msgstr ""
 msgid "Width"
 msgstr "Bredd"
 
-#: app/controllers/CControllerLatest.php:530
+#: app/controllers/CControllerLatest.php:529
 msgid "With data"
 msgstr ""
 
@@ -19726,7 +19726,7 @@ msgstr ""
 msgid "With triggers"
 msgstr ""
 
-#: app/controllers/CControllerLatest.php:535
+#: app/controllers/CControllerLatest.php:534
 msgid "Without data"
 msgstr ""
 

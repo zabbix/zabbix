@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-04 19:55+0200\n"
+"POT-Creation-Date: 2022-03-07 15:19+0200\n"
 "PO-Revision-Date: 2022-02-25 13:35+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -19566,7 +19566,7 @@ msgstr "指定された列と行の数に対してウィジェットが小さす
 msgid "Width"
 msgstr "幅"
 
-#: app/controllers/CControllerLatest.php:530
+#: app/controllers/CControllerLatest.php:529
 msgid "With data"
 msgstr "データあり"
 
@@ -19597,7 +19597,7 @@ msgstr "障害あり"
 msgid "With triggers"
 msgstr "トリガーあり"
 
-#: app/controllers/CControllerLatest.php:535
+#: app/controllers/CControllerLatest.php:534
 msgid "Without data"
 msgstr "データなし"
 

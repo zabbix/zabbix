@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-04 19:55+0200\n"
+"POT-Creation-Date: 2022-03-07 15:19+0200\n"
 "PO-Revision-Date: 2022-03-02 20:16+0300\n"
 "Last-Translator: Robert <r.szulist+zabbix@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -19842,7 +19842,7 @@ msgstr "Widżet jest za mały dla okreśłonej liczby kolumn i wierszy."
 msgid "Width"
 msgstr "Szerokość"
 
-#: app/controllers/CControllerLatest.php:530
+#: app/controllers/CControllerLatest.php:529
 msgid "With data"
 msgstr "Z danymi"
 
@@ -19873,7 +19873,7 @@ msgstr "Z problemami"
 msgid "With triggers"
 msgstr "Z wyzwalaczami"
 
-#: app/controllers/CControllerLatest.php:535
+#: app/controllers/CControllerLatest.php:534
 msgid "Without data"
 msgstr "Bez danych"
 
