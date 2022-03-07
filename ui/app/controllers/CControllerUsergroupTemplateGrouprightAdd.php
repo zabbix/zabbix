@@ -19,21 +19,21 @@
 **/
 
 
-class CControllerUsergroupGrouprightAdd extends CController {
+class CControllerUsergroupTemplateGrouprightAdd extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'group_rights'            => 'required|array',
-			'new_group_right'         => 'required|array'
+			'templategroup_rights' => 'required|array',
+			'new_templategroup_right' => 'required|array'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$new_group_right = $this->getInput('new_group_right') + ['groupids' => []];
+			$new_templategroup_right = $this->getInput('new_templategroup_right') + ['groupids' => []];
 
-			if (!$new_group_right['groupids']) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('Host groups'), _('cannot be empty')));
+			if (!$new_templategroup_right['groupids']) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Template groups'), _('cannot be empty')));
 
 				$ret = false;
 			}
@@ -53,19 +53,19 @@ class CControllerUsergroupGrouprightAdd extends CController {
 	}
 
 	protected function doAction() {
-		$new_group_right = $this->getInput('new_group_right') + [
-			'groupids' => [],
-			'permission' => PERM_NONE,
-			'include_subgroups' => '0'
-		];
+		$new_templategroup_right = $this->getInput('new_templategroup_right') + [
+				'groupids' => [],
+				'permission' => PERM_NONE,
+				'include_subgroups' => '0'
+			];
 
-		list($groupids, $subgroupids) = $new_group_right['include_subgroups']
-			? [[], $new_group_right['groupids']]
-			: [$new_group_right['groupids'], []];
+		list($templategroup_groupids, $templategroup_subgroupids) = $new_templategroup_right['include_subgroups']
+			? [[], $new_templategroup_right['groupids']]
+			: [$new_templategroup_right['groupids'], []];
 
 		$this->setResponse(new CControllerResponseData([
-			'group_rights' => collapseHostGroupRights(applyHostGroupRights(
-				$this->getInput('group_rights'), $groupids, $subgroupids, $new_group_right['permission']
+			'templategroup_rights' => collapseHostGroupRights(applyTemplateGroupRights(
+				$this->getInput('templategroup_rights'), $templategroup_groupids, $templategroup_subgroupids, $new_templategroup_right['permission']
 			)),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
@@ -73,3 +73,4 @@ class CControllerUsergroupGrouprightAdd extends CController {
 		]));
 	}
 }
+

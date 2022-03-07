@@ -31,14 +31,17 @@
 			$new_group_right_table               = $form.find('table#new-group-right-table'),
 			$new_templategroup_right_table       = $form.find('table#new-templategroup-right-table'),
 			$group_right_table_container         = $form.find('table#group-right-table').parent(),
+			$templategroup_right_table_container = $form.find('table#templategroup-right-table').parent(),
 			$new_tag_filter_table                = $form.find('table#new-tag-filter-table'),
 			$tag_filter_table_container          = $form.find('table#tag-filter-table').parent(),
 			$ms_tag_filter_groups                = $new_tag_filter_table.find('.multiselect'),
 			$ms_group_right_groups               = $new_group_right_table.find('.multiselect'),
 			$ms_templategroup_right_groups       = $new_templategroup_right_table.find('.multiselect'),
 			timeoutid_new_group_right,
+			timeoutid_new_templategroup_right,
 			timeoutid_new_tag_filter,
 			xhr_new_group_right,
+			xhr_new_templategroup_right,
 			xhr_new_tag_filter;
 
 		$form.submit(function() {
@@ -131,7 +134,7 @@
 				.find('[name="new_templategroup_right[permission]"]').filter(':checked').val();
 
 			data.templategroup_rights = $.extend.apply({},
-				$group_right_table_container.find('[name="templategroup_right"]').map(function(i, node) {
+				$templategroup_right_table_container.find('[name="templategroup_right"]').map(function(i, node) {
 					var obj = JSON.parse(node.value),
 						permission = jQuery(node).parent().find('input[type="radio"]').filter(':checked').val();
 
@@ -151,10 +154,19 @@
 		function disableNewGroupRightForm() {
 			timeoutid_new_group_right = setTimeout(function() {
 				$ms_group_right_groups.multiSelect('disable');
-				$ms_templategroup_right_groups.multiSelect('disable');
 				$new_group_right_table.find('button, [name^="new_group_right"]').prop('disabled', true);
-				$new_templategroup_right_table.find('button, [name^="new_templategroup_right"]').prop('disabled', true);
 				$group_right_table_container.find('input[type="radio"]').prop('disabled', true);
+			}, 150);
+		}
+
+		/**
+		 * During long request, shows indicator and disables form elements.
+		 */
+		function disableNewTemplateGroupRightForm() {
+			timeoutid_new_templategroup_right = setTimeout(function() {
+				$ms_templategroup_right_groups.multiSelect('disable');
+				$new_templategroup_right_table.find('button, [name^="new_templategroup_right"]').prop('disabled', true);
+				$templategroup_right_table_container.find('input[type="radio"]').prop('disabled', true);
 			}, 150);
 		}
 
@@ -175,10 +187,18 @@
 		function enableNewGroupRightForm() {
 			clearTimeout(timeoutid_new_group_right);
 			$ms_group_right_groups.multiSelect('enable');
-			$ms_templategroup_right_groups.multiSelect('enable');
 			$new_group_right_table.find('button, [name^="new_group_right"]').prop('disabled', false);
-			$new_templategroup_right_table.find('button, [name^="new_templategroup_right"]').prop('disabled', false);
 			$group_right_table_container.find('input[type="radio"]').prop('disabled', false);
+		}
+
+		/**
+		 * Removes loading indicator and enables form elements.
+		 */
+		function enableNewTemplateGroupRightForm() {
+			clearTimeout(timeoutid_new_templategroup_right);
+			$ms_templategroup_right_groups.multiSelect('enable');
+			$new_templategroup_right_table.find('button, [name^="new_templategroup_right"]').prop('disabled', false);
+			$templategroup_right_table_container.find('input[type="radio"]').prop('disabled', false);
 		}
 
 		/**
@@ -198,12 +218,24 @@
 		 */
 		function respNewGroupRight(html) {
 			$ms_group_right_groups.multiSelect('clean');
-			$ms_templategroup_right_groups.multiSelect('clean');
 			$new_group_right_table.find('[name="new_group_right[tag]"]').val('');
-			$new_templategroup_right_table.find('[name="new_group_right[tag]"]').val('');
 			$new_group_right_table.find('[name="new_group_right[value]"]').val('');
-			$new_templategroup_right_table.find('[name="new_group_right[value]"]').val('');
 			$group_right_table_container.html(html);
+
+			// Trigger event to update tab indicator.
+			document.dispatchEvent(new Event('tab-indicator-update'));
+		}
+
+		/**
+		 * Successful response handler.
+		 *
+		 * @param {string} html
+		 */
+		function respNewTemplateGroupRight(html) {
+			$ms_templategroup_right_groups.multiSelect('clean');
+			$new_templategroup_right_table.find('[name="new_group_right[tag]"]').val('');
+			$new_templategroup_right_table.find('[name="new_group_right[value]"]').val('');
+			$templategroup_right_table_container.html(html);
 
 			// Trigger event to update tab indicator.
 			document.dispatchEvent(new Event('tab-indicator-update'));
@@ -273,14 +305,35 @@
 		}
 
 		/**
-		 * Collects data, sends to controller for processing. On success, permissions table is updated and form objects
+		 * Collects template data, sends to controller for processing. On success, permissions table is updated and form objects
+		 * are removed from DOM. On failure error message is displayed. During request, loader is displayed.
+		 *
+		 * @param {string} action
+		 */
+		function submitNewTemplateGroupRight(action) {
+			let url = new Curl('zabbix.php'),
+				data = collectTemplategroupRightFormData();
+
+			url.setArgument('action', action);
+
+			disableNewTemplateGroupRightForm();
+
+			xhr_new_templategroup_right && xhr_new_templategroup_right.abort();
+			xhr_new_templategroup_right = $.post(url.getUrl(), data)
+				.always(enableNewTemplateGroupRightForm)
+				.done(respHandler(respNewTemplateGroupRight))
+				.fail(function() {});
+		}
+
+		/**
+		 * Collects host data, sends to controller for processing. On success, permissions table is updated and form objects
 		 * are removed from DOM. On failure error message is displayed. During request, loader is displayed.
 		 *
 		 * @param {string} action
 		 */
 		function submitNewGroupRight(action) {
 			let url = new Curl('zabbix.php'),
-				data = {...collectGroupRightFormData(), ...collectTemplategroupRightFormData()};
+				data = collectGroupRightFormData();
 
 			url.setArgument('action', action);
 
@@ -307,6 +360,7 @@
 		 */
 		window.usergroups = {
 			submitNewGroupRight: submitNewGroupRight,
+			submitNewTemplateGroupRight: submitNewTemplateGroupRight,
 			submitNewTagFilter: submitNewTagFilter,
 			removeTagFilterRow: removeTagFilterRow
 		};

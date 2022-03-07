@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerTemplateGroupsDelete extends CController {
+class CControllerTemplateGroupDelete extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
@@ -36,7 +36,7 @@ class CControllerTemplateGroupsDelete extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOST_GROUPS); // TODO change to templategroups
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATE_GROUPS);
 	}
 
 	protected function doAction(): void {
@@ -47,8 +47,8 @@ class CControllerTemplateGroupsDelete extends CController {
 		$deleted = count($groupids);
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'templategroups.list')
-			->setArgument('page', CPagerHelper::loadPage('templategroups.list', null))
+			->setArgument('action', 'templategroup.list')
+			->setArgument('page', CPagerHelper::loadPage('templategroup.list', null))
 		);
 
 		if ($result) {

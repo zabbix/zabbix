@@ -1656,9 +1656,10 @@ define('QUEUE_OVERVIEW_BY_PROXY', 1);
 define('QUEUE_DETAILS', 2);
 
 // target types to copy items/triggers/graphs
-define('COPY_TYPE_TO_HOST_GROUP',	0);
-define('COPY_TYPE_TO_HOST',			1);
-define('COPY_TYPE_TO_TEMPLATE',		2);
+define('COPY_TYPE_TO_HOST_GROUP',		0);
+define('COPY_TYPE_TO_HOST',				1);
+define('COPY_TYPE_TO_TEMPLATE',			2);
+define('COPY_TYPE_TO_TEMPLATE_GROUP',	3);
 
 define('HISTORY_GRAPH', 'showgraph');
 define('HISTORY_BATCH_GRAPH', 'batchgraph');

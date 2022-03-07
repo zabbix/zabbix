@@ -23,7 +23,7 @@
  * @var CView $this
  */
 
-$this->includeJsFile('configuration.templategroups.edit.js.php');
+$this->includeJsFile('configuration.templategroup.edit.js.php');
 
 $widget = (new CWidget())->setTitle(_('Template groups'));
 
@@ -53,25 +53,25 @@ if ($data['groupid'] != 0 && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 $tab = (new CTabView())->addTab('templategroupTab', _('Template group'), $form_grid);
 
 $cancelButton = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
-	->setArgument('action', 'templategroups.list')
-	->setArgument('page', CPagerHelper::loadPage('templategroups.list', null))
+	->setArgument('action', 'templategroup.list')
+	->setArgument('page', CPagerHelper::loadPage('templategroup.list', null))
 ))->setId('cancel');
 
 if ($data['groupid'] == 0) {
 	$tab->setFooter(makeFormFooter(
-		new CSubmitButton( _('Add'),'action', 'templategroups.create'),
+		new CSubmitButton( _('Add'),'action', 'templategroup.create'),
 		[$cancelButton]
 	));
 }
 else {
 	$tab->setFooter(makeFormFooter(
-		new CSubmitButton(_('Update'),'action', 'templategroups.update'), [
+		new CSubmitButton(_('Update'),'action', 'templategroup.update'), [
 			(new CSimpleButton(_('Clone')))
 				->setId('clone')
 				->setEnabled(CWebUser::getType() == USER_TYPE_SUPER_ADMIN)
 				->addClass('js-clone-templategroup'),
 			new CRedirectButton(_('Delete'),
-				'zabbix.php?action=templategroups.delete&sid='.$data['sid'].'&groupids[]='.$data['groupid'],
+				'zabbix.php?action=templategroup.delete&sid='.$data['sid'].'&groupids[]='.$data['groupid'],
 				_('Delete template group?')
 			),
 			$cancelButton

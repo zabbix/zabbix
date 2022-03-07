@@ -37,7 +37,7 @@ $fields = [
 	'hostid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form}) && !isset({itemid})'],
 	'interfaceid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')],
 	'copy_type' =>					[T_ZBX_INT, O_OPT, P_SYS,
-										IN([COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE]),
+										IN([COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_TEMPLATE_GROUP]),
 										'isset({copy})'
 									],
 	'copy_mode' =>					[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null],
@@ -932,6 +932,22 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && ha
 		// hosts or templates
 		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
 			$hosts_ids = getRequest('copy_targetids');
+		}
+		// template groups
+		elseif (getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE_GROUP) {
+			$hosts_ids = [];
+			$templategroup_ids = getRequest('copy_targetids');
+
+			$db_templates = DBselect(
+				'SELECT DISTINCT h.hostid'.
+				' FROM hosts h,template_group tg'.
+				' WHERE h.hostid=tg.hostid'.
+				' AND '.dbConditionInt('tg.groupid', $templategroup_ids)
+			);
+
+			while ($db_template = DBfetch($db_templates)) {
+				$hosts_ids[] = $db_template['hostid'];
+			}
 		}
 		// host groups
 		else {

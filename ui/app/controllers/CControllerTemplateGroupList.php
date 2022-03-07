@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerTemplateGroupsList extends CController {
+class CControllerTemplateGroupList extends CController {
 
 	protected function init(): void {
 		$this->disableSIDValidation();
@@ -97,10 +97,10 @@ class CControllerTemplateGroupsList extends CController {
 			$page_num = getRequest('page', 1);
 		}
 		else {
-			$page_num = CPagerHelper::loadPage('templategroups.list');
+			$page_num = CPagerHelper::loadPage('templategroup.list');
 		}
 
-		CPagerHelper::savePage('templategroups.list', $page_num);
+		CPagerHelper::savePage('templategroup.list', $page_num);
 		$data['paging'] = CPagerHelper::paginate($page_num, $groups, $sort_order,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);

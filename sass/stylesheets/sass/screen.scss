@@ -5224,6 +5224,12 @@ svg {
 	background-color: $indicator-count-color;
 	border-radius: 3px;
 	margin: 1px 5px;
+
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
 }
 
 .problem-icon-link,

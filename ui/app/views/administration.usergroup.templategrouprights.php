@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -22,27 +22,20 @@
 /**
  * @var CView $this
  */
-?>
 
-<script type="text/javascript">
-	view = {
-		clone_button: null,
+$output = [
+	'body' => (new CPartial('administration.usergroup.templategrouprights.html', [
+		'templategroup_rights' => $data['templategroup_rights']
+	]))->getOutput()
+];
+sdff($output);
+if (($messages = getMessages()) !== null) {
+	$output['messages'] = $messages->toString();
+}
 
-		init(name) {
-			this.clone_button = document.getElementById('clone');
-			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-clone-templategroup')) {
-					this.clone(name);
-				}
-			});
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
 
-		},
-
-		clone(name) {
-			let url = new Curl('zabbix.php');
-			url.setArgument('action', 'templategroups.edit');
-			url.setArgument('name', name);
-			redirect(url.getUrl(), 'post', 'action');
-		}
-	}
-</script>
+echo json_encode($output);

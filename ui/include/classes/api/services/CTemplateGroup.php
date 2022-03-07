@@ -98,7 +98,7 @@ class CTemplateGroup extends CApiService {
 		$options = zbx_array_merge($defOptions, $params);
 
 		// editable + PERMISSION CHECK
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermisions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 

@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerTemplateGroupsUpdate extends CController {
+class CControllerTemplateGroupUpdate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
@@ -33,7 +33,7 @@ class CControllerTemplateGroupsUpdate extends CController {
 		if (!$ret) {
 			switch ($this->GetValidationError()) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('zabbix.php?action=templategroups.edit');
+					$response = new CControllerResponseRedirect('zabbix.php?action=templategroup.edit');
 					$response->setFormData($this->getInputAll());
 					CMessageHelper::setErrorTitle(_('Cannot update template group'));
 					$this->setResponse($response);
@@ -79,15 +79,15 @@ class CControllerTemplateGroupsUpdate extends CController {
 
 		if ($result) {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'templategroups.list')
-				->setArgument('page', CPagerHelper::loadPage('templategroups.list', null))
+				->setArgument('action', 'templategroup.list')
+				->setArgument('page', CPagerHelper::loadPage('templategroup.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
 			CMessageHelper::setSuccessTitle(_('Template gropu updated'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'templategroups.edit')
+				->setArgument('action', 'templategroup.edit')
 				->setArgument('groupid', $groupid)
 			);
 			$response->setFormData($this->getInputAll());

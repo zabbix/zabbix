@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerTemplateGroupsEdit extends CController{
+class CControllerTemplateGroupEdit extends CController{
 
 	protected function init(): void {
 		$this->disableSIDValidation();

@@ -59,6 +59,7 @@ $form_list = new CFormList('elements_form_list');
 // append copy types to form list
 $form_list->addRow(new CLabel(_('Target type'), 'copy_type'),
 	(new CRadioButtonList('copy_type', (int) $data['copy_type']))
+		->addValue(_('Template groups'), COPY_TYPE_TO_TEMPLATE_GROUP)
 		->addValue(_('Host groups'), COPY_TYPE_TO_HOST_GROUP)
 		->addValue(_('Hosts'), COPY_TYPE_TO_HOST)
 		->addValue(_('Templates'), COPY_TYPE_TO_TEMPLATE)

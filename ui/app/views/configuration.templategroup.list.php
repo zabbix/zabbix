@@ -33,7 +33,7 @@ $widget = (new CWidget())
 	->setControls((new CTag('nav', true, (new CList())
 		->addItem(CWebUser::getType() == USER_TYPE_SUPER_ADMIN
 			? new CRedirectButton(_('Create template group'), (new CUrl('zabbix.php'))
-				->setArgument('action', 'templategroups.edit')
+				->setArgument('action', 'templategroup.edit')
 				->getUrl()
 			)
 			: (new CSubmit('form', _('Create template group').' '._('(Only super admins can create groups)')))
@@ -43,7 +43,7 @@ $widget = (new CWidget())
 	);
 
 $filter = (new CFilter())
-		->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'templategroups.list'))
+		->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'templategroup.list'))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
@@ -57,7 +57,7 @@ $filter = (new CFilter())
 					)
 				])
 		])
-		->addVar('action', 'templategroups.list');
+		->addVar('action', 'templategroup.list');
 
 // create form
 $form = (new CForm())
@@ -65,7 +65,7 @@ $form = (new CForm())
 	->setName('templategroup_list');
 
 $view_url = (new CUrl('zabbix.php'))
-	->setArgument('action', 'templategroups.list')
+	->setArgument('action', 'templategroup.list')
 	->getUrl();
 
 // create table
@@ -104,7 +104,7 @@ foreach ($this->data['groups'] as $group) {
 				->setArgument('form', 'update')
 				->setArgument('templateid', $template['templateid'])))
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREEN);
+				->addClass(ZBX_STYLE_GREY);
 		}
 		else {
 			$templatesOutput[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
@@ -117,12 +117,15 @@ foreach ($this->data['groups'] as $group) {
 	$name = [];
 
 	$name[] = (new CLink($group['name'], (new CUrl('zabbix.php'))
-		->setArgument('action', 'templategroups.edit')
+		->setArgument('action', 'templategroup.edit')
 		->setArgument('groupid', $group['groupid'])
 	));
 
 	if ($templateCount > 0) {
-		$count = (new CSpan($templateCount))->addClass(ZBX_STYLE_ICON_COUNT);
+		$count = new CLink($templateCount, (new CUrl('templates.php'))
+			->setArgument('filter_set', '1')
+			->setArgument('filter_groups', [$group['groupid']]));
+		$count->addClass(ZBX_STYLE_ICON_COUNT);
 	}
 	else {
 		$count = (new CSpan(''));
@@ -144,7 +147,7 @@ $form->addItem([
 	$table,
 	$this->data['paging'],
 	new CActionButtonList('action', 'groupids', [
-		'templategroups.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected template groups?'), 'templategroup']
+		'templategroup.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected template groups?'), 'templategroup']
 	])
 ]);
 
