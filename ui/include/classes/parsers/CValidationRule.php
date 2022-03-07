@@ -66,6 +66,7 @@ class CValidationRule {
 									&& !$this->parseLE($buffer, $pos, $rule)
 									&& !$this->parseJson($buffer, $pos, $rule)
 									&& !$this->parseInt32($buffer, $pos, $rule)
+									&& !$this->parseUInt64($buffer, $pos, $rule)
 									&& !$this->parseIn($buffer, $pos, $rule)
 									&& !$this->parseId($buffer, $pos, $rule)
 									&& !$this->parseGE($buffer, $pos, $rule)
@@ -384,6 +385,22 @@ class CValidationRule {
 
 		$pos += 5;
 		$rules['int32'] = true;
+
+		return true;
+	}
+
+	/**
+	 * uint64
+	 *
+	 * 'uint64' => true
+	 */
+	private function parseUInt64($buffer, &$pos, &$rules) {
+		if (strncmp(substr($buffer, $pos), 'uint64', 6) != 0) {
+			return false;
+		}
+
+		$pos += 6;
+		$rules['uint64'] = true;
 
 		return true;
 	}

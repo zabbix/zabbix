@@ -26,8 +26,8 @@ class CControllerPopupSlaExcludedDowntimeEdit extends CController {
 			'edit' => 			'in 1',
 			'row_index' =>		'required|int32',
 			'name' =>			'string',
-			'period_from' =>	'int32',
-			'period_to' =>		'int32'
+			'period_from' =>	'uint64',
+			'period_to' =>		'uint64'
 		];
 
 		$ret = $this->validateInput($fields);

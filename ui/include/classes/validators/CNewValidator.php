@@ -141,6 +141,18 @@ class CNewValidator {
 					}
 					break;
 
+				case 'uint64':
+					if ((!is_string($value) && !is_numeric($value)) || !self::is_uint64($value)) {
+						$this->addError($fatal,
+							is_scalar($value)
+								? _s('Incorrect value "%1$s" for "%2$s" field.', $value, $field)
+								: _s('Incorrect value for "%1$s" field.', $field)
+						);
+
+						return false;
+					}
+					break;
+
 				case 'id':
 					if ((!is_string($value) && !is_numeric($value)) || !self::is_id($value)) {
 						$this->addError($fatal,
