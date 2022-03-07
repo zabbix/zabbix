@@ -20,6 +20,7 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "zbxalgo.h"
 
 extern unsigned char	program_type;
 
@@ -134,16 +135,220 @@ static int	DBpatch_60100012(void)
 {
 	const ZBX_FIELD	field = {"groupid", NULL, "usrgrp", "usrgrpid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
-	return DBadd_foreign_key("template_group", 1, &field);
+	return DBadd_foreign_key("right_tplgrp", 1, &field);
 }
 
 static int	DBpatch_60100013(void)
 {
-	const ZBX_FIELD	field = {"groupid", NULL, "tplgrp", "groupid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"id", NULL, "tplgrp", "groupid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
-	return DBadd_foreign_key("template_group", 2, &field);
+	return DBadd_foreign_key("right_tplgrp", 2, &field);
 }
 
+#define DBPATCH_HOST_STATUS_TEMPLATE	"3"
+#define DBPATCH_TPLGRP_GROUPIDS(cmp)									\
+		"select distinct g.groupid FROM zabbix.hosts h,zabbix.hosts_groups hg,zabbix.hstgrp g"	\
+		" where g.groupid=hg.groupid and"							\
+		" hg.hostid=h.hostid and"								\
+		" h.status" cmp DBPATCH_HOST_STATUS_TEMPLATE " and length(g.name)>0"
+
+static int	DBpatch_hstgrp2tplgrp_copy()
+{
+
+	zbx_db_insert_t	db_insert;
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret;
+
+	zbx_db_insert_prepare(&db_insert, "tplgrp", "groupid", "name", "uuid", NULL);
+
+	result = DBselect(
+			"select o.name,o.uuid from hstgrp o"
+			" where o.groupid in (" DBPATCH_TPLGRP_GROUPIDS("=")
+			") order by o.groupid asc");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), row[0], row[1]);
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "groupid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_hosts_groups2template_group_move()
+{
+
+	zbx_db_insert_t		db_insert;
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			ret;
+	zbx_vector_uint64_t	del_ids;
+
+	zbx_vector_uint64_create(&del_ids);
+	zbx_db_insert_prepare(&db_insert, "template_group", "templategroupid", "hostid", "groupid", NULL);
+
+	result = DBselect(
+			"select o.hostgroupid,o.hostid,o.groupid from hosts_groups o,hosts h2"
+			" where o.groupid in (" DBPATCH_TPLGRP_GROUPIDS("=") ") and"
+			" o.hostid=h2.hostid and"
+			" h2.status=" DBPATCH_HOST_STATUS_TEMPLATE
+			" order by o.groupid asc,o.hostid asc");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), row[1], row[2]);
+		zbx_vector_uint64_append(&del_ids, 0);
+		ZBX_STR2UINT64(del_ids.values[del_ids.values_num - 1], row[0]);
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "templategroupid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	if (SUCCEED == ret && 0 != del_ids.values_num)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
+
+		zbx_vector_uint64_sort(&del_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts_groups where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostgroupid",del_ids.values, del_ids.values_num);
+		ret = DBexecute("%s", sql);
+		zbx_free(sql);
+	}
+
+	zbx_vector_uint64_destroy(&del_ids);
+	return ret;
+}
+
+static int	DBpatch_rights2right_tplgrp_move()
+{
+
+	zbx_db_insert_t		db_insert;
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			ret;
+	zbx_vector_uint64_t	del_ids;
+
+	zbx_vector_uint64_create(&del_ids);
+	zbx_db_insert_prepare(&db_insert, "right_tplgrp", "rightid", "groupid", "permission", "id", NULL);
+
+	result = DBselect(
+			"select o.rightid,o.groupid,o.permission,o.id from rights o"
+			" where o.id in (" DBPATCH_TPLGRP_GROUPIDS("=")
+			") order by o.groupid asc");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), row[1], row[2], row[3]);
+		zbx_vector_uint64_append(&del_ids, 0);
+		ZBX_STR2UINT64(del_ids.values[del_ids.values_num - 1], row[0]);
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "rightid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	if (SUCCEED == ret && 0 != del_ids.values_num)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
+
+		zbx_vector_uint64_sort(&del_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from rights where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "rightid", del_ids.values, del_ids.values_num);
+		ret = DBexecute("%s", sql);
+		zbx_free(sql);
+	}
+
+	zbx_vector_uint64_destroy(&del_ids);
+	return ret;
+}
+
+static int	DBpatch_hstgrp_del()
+{
+
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			ret;
+	zbx_vector_uint64_t	del_ids;
+
+	zbx_vector_uint64_create(&del_ids);
+
+	result = DBselect(
+			"select o.groupid from hstgrp o"
+			" where o.id in (" DBPATCH_TPLGRP_GROUPIDS("=")
+			") and o.groupid not in (" DBPATCH_TPLGRP_GROUPIDS("<>")
+			") order by o.groupid asc");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_vector_uint64_append(&del_ids, 0);
+		ZBX_STR2UINT64(del_ids.values[del_ids.values_num - 1], row[0]);
+	}
+	DBfree_result(result);
+
+	if (0 != del_ids.values_num)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
+
+		zbx_vector_uint64_sort(&del_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hstgrp where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", del_ids.values, del_ids.values_num);
+		ret = DBexecute("%s", sql);
+		zbx_free(sql);
+	}
+	else
+		ret = SUCCEED;
+
+	zbx_vector_uint64_destroy(&del_ids);
+	return ret;
+}
+
+static int	DBpatch_60100014(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBpatch_hstgrp2tplgrp_copy();
+}
+
+static int	DBpatch_60100015(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBpatch_hosts_groups2template_group_move();
+}
+
+static int	DBpatch_60100016(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBpatch_rights2right_tplgrp_move();
+}
+
+static int	DBpatch_60100017(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBpatch_hstgrp_del();
+}
+
+static int	DBpatch_60100018(void)
+{
+	return DBdrop_field("hstgrp", "internal");
+}
 
 #endif
 
@@ -164,5 +369,10 @@ DBPATCH_ADD(60100010, 0, 1)
 DBPATCH_ADD(60100011, 0, 1)
 DBPATCH_ADD(60100012, 0, 1)
 DBPATCH_ADD(60100013, 0, 1)
+DBPATCH_ADD(60100014, 0, 1)
+DBPATCH_ADD(60100015, 0, 1)
+DBPATCH_ADD(60100016, 0, 1)
+DBPATCH_ADD(60100017, 0, 1)
+DBPATCH_ADD(60100018, 0, 1)
 
 DBPATCH_END()
