@@ -19,6 +19,8 @@
 
 #include "checks_simple_vmware.h"
 
+#include "config.h"
+
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #include "log.h"
