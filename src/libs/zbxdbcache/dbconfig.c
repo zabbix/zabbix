@@ -846,7 +846,7 @@ static void	config_kvs_path_remove(const char *value, zbx_dc_kv_t *kv)
 	if (0 != --kv->refcount)
 		return;
 
-	zbx_strrsplit(value, ':', &path, &key);
+	zbx_strsplit_last(value, ':', &path, &key);
 	zbx_free(key);
 
 	zbx_strpool_release(kv->key);
@@ -1825,7 +1825,7 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 		{
 			zbx_free(path);
 			zbx_free(key);
-			zbx_strrsplit(row[2], ':', &path, &key);
+			zbx_strsplit_last(row[2], ':', &path, &key);
 			if (NULL == key)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot parse user macro \"%s\" Vault location \"%s\":"
@@ -1982,7 +1982,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 		{
 			zbx_free(path);
 			zbx_free(key);
-			zbx_strrsplit(row[3], ':', &path, &key);
+			zbx_strsplit_last(row[3], ':', &path, &key);
 			if (NULL == key)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\" Vault location"

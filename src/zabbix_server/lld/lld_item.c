@@ -2613,7 +2613,7 @@ static void	substitute_lld_macros_in_preproc_params(int type, const zbx_lld_row_
 		char	*param1, *param2;
 		size_t	params_alloc, params_offset = 0;
 
-		zbx_strsplit(*sub_params, '\n', &param1, &param2);
+		zbx_strsplit_first(*sub_params, '\n', &param1, &param2);
 
 		if (NULL == param2)
 		{

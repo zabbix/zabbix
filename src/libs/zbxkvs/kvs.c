@@ -74,7 +74,7 @@ void	zbx_kvs_from_json_get(const struct zbx_json_parse *jp_kvs, zbx_kvs_t *kvs)
 		kv_local.key = key;
 		if (NULL != (zbx_hashset_search(kvs, &kv_local)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "key '%s' is multiply defined", key);
+			zabbix_log(LOG_LEVEL_DEBUG, "key '%s' is defined multiple times", key);
 			continue;
 		}
 

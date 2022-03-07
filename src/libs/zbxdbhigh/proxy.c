@@ -894,7 +894,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 			if (ZBX_MACRO_VALUE_VAULT != type)
 				continue;
 
-			zbx_strrsplit(row[2 + offset], ':', &path, &key);
+			zbx_strsplit_last(row[2 + offset], ':', &path, &key);
 
 			if (NULL == key)
 			{

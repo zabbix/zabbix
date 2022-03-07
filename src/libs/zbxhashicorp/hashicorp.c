@@ -48,7 +48,7 @@ int	zbx_hashicorp_kvs_get(const char *vault_url, const char *token, const char *
 		return FAIL;
 	}
 
-	zbx_strsplit(path, '/', &left, &right);
+	zbx_strsplit_first(path, '/', &left, &right);
 	if (NULL == right)
 	{
 		*error = zbx_dsprintf(*error, "cannot find separator \"\\\" in path");

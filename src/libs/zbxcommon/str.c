@@ -5412,16 +5412,17 @@ int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_
  *                                                                            *
  * Parameters: src       - [IN] source string                                 *
  *             delimiter - [IN] delimiter                                     *
+ *             last      - [IN] split after last delimiter                    *
  *             left      - [IN/OUT] first part of the string                  *
  *             right     - [IN/OUT] second part of the string or NULL, if     *
  *                                  delimiter was not found                   *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_string_split(const char *src, char delimiter, unsigned char backwards, char **left, char **right)
+static void	zbx_string_split(const char *src, char delimiter, unsigned char last, char **left, char **right)
 {
 	char	*delimiter_ptr;
 
-	if (NULL == (delimiter_ptr = (0 == backwards ? strchr(src, delimiter) : strrchr(src, delimiter))))
+	if (NULL == (delimiter_ptr = (0 == last ? strchr(src, delimiter) : strrchr(src, delimiter))))
 	{
 		*left = zbx_strdup(NULL, src);
 		*right = NULL;
@@ -5443,12 +5444,12 @@ static void	zbx_string_split(const char *src, char delimiter, unsigned char back
 	}
 }
 
-void	zbx_strsplit(const char *src, char delimiter, char **left, char **right)
+void	zbx_strsplit_first(const char *src, char delimiter, char **left, char **right)
 {
 	zbx_string_split(src, delimiter, 0, left, right);
 }
 
-void	zbx_strrsplit(const char *src, char delimiter, char **left, char **right)
+void	zbx_strsplit_last(const char *src, char delimiter, char **left, char **right)
 {
 	zbx_string_split(src, delimiter, 1, left, right);
 }
