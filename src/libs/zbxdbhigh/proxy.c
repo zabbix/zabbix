@@ -2421,7 +2421,6 @@ static int	proxy_get_history_data(zbx_uint64_t lastid, zbx_history_data_t **data
 	zbx_history_data_t	*hd;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
-
 try_again:
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select id,itemid,clock,ns,timestamp,source,severity,"
@@ -2625,10 +2624,10 @@ static int	proxy_add_hist_data(struct zbx_json *j, int records_num, const DC_ITE
 	return records_num;
 }
 
-int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, zbx_uint64_t *maxid, int *more)
 {
 	int			records_num = 0, data_num, i, *errcodes = NULL, items_alloc = 0;
-	zbx_uint64_t		id;
+	zbx_uint64_t		id, min = 0, max = ZBX_DB_MAX_ID;
 	zbx_hashset_t		itemids_added;
 	zbx_history_data_t	*data;
 	char			*string_buffer;
@@ -2636,6 +2635,8 @@ int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 	zbx_vector_uint64_t	itemids;
 	zbx_vector_ptr_t	records;
 	DC_ITEM			*dc_items = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2711,6 +2712,15 @@ int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 	zbx_free(string_buffer);
 	zbx_vector_ptr_destroy(&records);
 	zbx_vector_uint64_destroy(&itemids);
+
+	result = DBselect("select max(id) from proxy_history where id between " ZBX_FS_UI64 " and " ZBX_FS_UI64, min,
+				max);
+	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+		*maxid = min;
+	else
+		ZBX_STR2UINT64(*maxid, row[0]);
+
+	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() lastid:" ZBX_FS_UI64 " records_num:%d size:~" ZBX_FS_SIZE_T " more:%d",
 			__func__, *lastid, records_num, j->buffer_offset, *more);

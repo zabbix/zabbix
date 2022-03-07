@@ -98,17 +98,6 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 			MIN(now - CONFIG_PROXY_LOCAL_BUFFER * SEC_PER_HOUR,
 					minclock + HK_MAX_DELETE_PERIODS * hk_period));
 
-	result = DBselect(
-			"select count(*)"
-			" from %s"
-			" where id>" ZBX_FS_UI64,
-			table, lastid);
-
-	if (NULL != (row = DBfetch(result)))
-		change_proxy_history_count(0, atoi(row[0]));
-
-	DBfree_result(result);
-
 	DBcommit();
 
 	return records;

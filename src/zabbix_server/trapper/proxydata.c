@@ -225,7 +225,7 @@ static int	send_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_
 void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 {
 	struct zbx_json		j;
-	zbx_uint64_t		areg_lastid = 0, history_lastid = 0, discovery_lastid = 0;
+	zbx_uint64_t		areg_lastid = 0, history_lastid = 0, history_maxid = 0, discovery_lastid = 0;
 	char			*error = NULL, *buffer = NULL;
 	int			availability_ts, more_history, more_discovery, more_areg, proxy_delay, history_records;
 	zbx_vector_ptr_t	tasks;
@@ -245,7 +245,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
 	get_interface_availability_data(&j, &availability_ts);
-	history_records = proxy_get_hist_data(&j, &history_lastid, &more_history);
+	history_records = proxy_get_hist_data(&j, &history_lastid, &history_maxid, &more_history);
 	proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
 	proxy_get_areg_data(&j, &areg_lastid, &more_areg);
 
@@ -283,9 +283,9 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 
 		DBbegin();
 
-		if (0 != history_lastid)
+		if (0 != history_lastid && 0 != history_maxid)
 		{
-			change_proxy_history_count(-history_records, 0);
+			reset_proxy_history_count(history_maxid - history_lastid);
 			proxy_set_hist_lastid(history_lastid);
 		}
 

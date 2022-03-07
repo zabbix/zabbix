@@ -2370,7 +2370,7 @@ static void	dc_add_proxy_history(ZBX_DC_HISTORY *history, int history_num)
 		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, pvalue, flags, now);
 	}
 
-	change_proxy_history_count(history_count, 0);
+	change_proxy_history_count(history_count);
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 }
@@ -2440,7 +2440,7 @@ static void	dc_add_proxy_history_meta(ZBX_DC_HISTORY *history, int history_num)
 				flags, now);
 	}
 
-	change_proxy_history_count(history_count, 0);
+	change_proxy_history_count(history_count);
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 }
@@ -2511,7 +2511,7 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 		history_count++;
 	}
 
-	change_proxy_history_count(history_count, 0);
+	change_proxy_history_count(history_count);
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 }
@@ -2542,7 +2542,7 @@ static void	dc_add_proxy_history_notsupported(ZBX_DC_HISTORY *history, int histo
 				(int)h->state, now);
 	}
 
-	change_proxy_history_count(history_count, 0);
+	change_proxy_history_count(history_count);
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 }
@@ -4608,14 +4608,25 @@ out:
  * Purpose: change proxy_history_count by count                               *
  *                                                                            *
  ******************************************************************************/
-void	change_proxy_history_count(int change_count, int reset)
+void	change_proxy_history_count(int change_count)
 {
 	LOCK_CACHE;
 
-	if (0 != change_count)
-		cache->proxy_history_count += change_count;
-	else
-		cache->proxy_history_count = reset;
+	cache->proxy_history_count += change_count;
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: change proxy_history_count by count                               *
+ *                                                                            *
+ ******************************************************************************/
+void	reset_proxy_history_count(int reset)
+{
+	LOCK_CACHE;
+
+	cache->proxy_history_count = reset;
 
 	UNLOCK_CACHE;
 }
