@@ -19,6 +19,8 @@
 
 #include "ipmi.h"
 
+#include "config.h"
+
 #ifdef HAVE_OPENIPMI
 
 #include "log.h"
