@@ -601,7 +601,6 @@ static void	tm_process_diaginfo(zbx_uint64_t taskid, const char *data)
 static zbx_tm_task_t	*tm_create_active_proxy_reload_task(zbx_uint64_t proxyid)
 {
 	zbx_tm_task_t	*task;
-	zbx_uint64_t	taskid;
 
 	task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA, ZBX_TM_STATUS_NEW, (int)time(NULL),
 			ZBX_DATA_ACTIVE_PROXY_CONFIG_RELOAD_TTL, proxyid);
