@@ -620,7 +620,7 @@ void	zbx_log_sync_history_cache_progress(void);
 int	init_database_cache(char **error);
 void	free_database_cache(int);
 
-void	change_proxy_history_count(int count);
+void	change_proxy_history_count(int change_count, int reset);
 int	get_proxy_history_count(void);
 
 #define ZBX_STATS_HISTORY_COUNTER	0

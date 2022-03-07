@@ -285,7 +285,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 
 		if (0 != history_lastid)
 		{
-			change_proxy_history_count(-history_records);
+			change_proxy_history_count(-history_records, 0);
 			proxy_set_hist_lastid(history_lastid);
 		}
 
