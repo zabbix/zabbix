@@ -138,11 +138,11 @@ class CAbsoluteTimeParser extends CParser {
 		}
 
 		if (!array_key_exists('i', $this->tokens)) {
-			return new DateTime($date->format('Y-m-d H:59:59'));
+			return new DateTime($date->format('Y-m-d H:59:59'), $timezone);
 		}
 
 		if (!array_key_exists('s', $this->tokens)) {
-			return new DateTime($date->format('Y-m-d H:i:59'));
+			return new DateTime($date->format('Y-m-d H:i:59'), $timezone);
 		}
 
 		return $date;
