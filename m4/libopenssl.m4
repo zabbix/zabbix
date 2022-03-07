@@ -134,7 +134,13 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
      else						# search in the specified OpenSSL directory
        if test -f $_libopenssl_dir/include/openssl/ssl.h -a -f $_libopenssl_dir/include/openssl/crypto.h; then
          OPENSSL_CFLAGS=-I$_libopenssl_dir/include
-         OPENSSL_LDFLAGS=-L$_libopenssl_dir/lib
+
+         if test -d $_libopenssl_dir/lib64; then
+           OPENSSL_LDFLAGS=-L$_libopenssl_dir/lib64
+         else
+           OPENSSL_LDFLAGS=-L$_libopenssl_dir/lib
+         fi
+
          OPENSSL_LIBS="-lssl -lcrypto"
          found_openssl="yes"
          LIBOPENSSL_ACCEPT_VERSION([$_libopenssl_dir/include/openssl/opensslv.h])
