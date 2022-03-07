@@ -407,7 +407,7 @@ class CTask extends CApiService {
 				'taskid' => $taskid,
 				'type' => ZBX_TM_DATA_TYPE_PROXY_HOSTIDS,
 				'data' => json_encode([
-					'proxy_hostid' => $task['request']['proxy_hostids']
+					'proxy_hostids' => $task['request']['proxy_hostids']
 				]),
 				'parent_taskid' => $taskid
 			];
