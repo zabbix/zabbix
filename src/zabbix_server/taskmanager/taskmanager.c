@@ -592,7 +592,6 @@ static void	tm_process_diaginfo(zbx_uint64_t taskid, const char *data)
 	zbx_tm_task_free(task);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: create config cache reload task to be sent to active proxy        *
@@ -1128,7 +1127,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 			zbx_free(rtc_data);
 
 			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
-				goto out;
+				break;
 		}
 
 		sec1 = zbx_time();
@@ -1153,7 +1152,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		zbx_setproctitle("%s [processed %d task(s) in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), tasks_num, sec2 - sec1, sleeptime);
 	}
-out:
+
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)
