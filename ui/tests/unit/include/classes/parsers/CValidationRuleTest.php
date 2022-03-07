@@ -141,6 +141,16 @@ class CValidationRuleTest extends TestCase {
 					'range_time' => true
 				]
 			],
+			['abs_date', '',
+				[
+					'abs_date' => true
+				]
+			],
+			['abs_time', '',
+				[
+					'abs_time' => true
+				]
+			],
 			['time_unit', '',
 				[
 					'time_unit' => []
