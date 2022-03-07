@@ -140,20 +140,6 @@ class CNewValidator {
 					}
 					break;
 
-				case 'uint64':
-					if (array_key_exists($field, $this->input)) {
-						if (!is_string($this->input[$field]) || !self::is_uint64($this->input[$field])) {
-							$this->addError($fatal,
-								is_scalar($this->input[$field])
-									? _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
-									: _s('Incorrect value for "%1$s" field.', $field)
-							);
-
-							return false;
-						}
-					}
-					break;
-
 				case 'id':
 					if (array_key_exists($field, $this->input)) {
 						if (!is_string($this->input[$field]) || !self::is_id($this->input[$field])) {
@@ -287,41 +273,6 @@ class CNewValidator {
 							_s('Incorrect value for field "%1$s": %2$s.', $field, _('a time is expected'))
 						);
 						return false;
-					}
-					break;
-
-				case 'abs_date':
-					if (array_key_exists($field, $this->input)) {
-						$absolute_time_parser = new CAbsoluteTimeParser();
-
-						$has_errors = !is_string($this->input[$field])
-							|| $absolute_time_parser->parse($this->input[$field]) != CParser::PARSE_SUCCESS
-							|| $absolute_time_parser->getDateTime(true)->format('H:i:s') !== '00:00:00';
-
-						if ($has_errors) {
-							$this->addError($fatal,
-								_s('Incorrect value for field "%1$s": %2$s.', $field, _('a date is expected'))
-							);
-
-							return false;
-						}
-					}
-					break;
-
-				case 'abs_time':
-					if (array_key_exists($field, $this->input)) {
-						$absolute_time_parser = new CAbsoluteTimeParser();
-
-						$has_errors = !is_string($this->input[$field])
-							|| $absolute_time_parser->parse($this->input[$field]) != CParser::PARSE_SUCCESS;
-
-						if ($has_errors) {
-							$this->addError($fatal,
-								_s('Incorrect value for field "%1$s": %2$s.', $field, _('a time is expected'))
-							);
-
-							return false;
-						}
 					}
 					break;
 
