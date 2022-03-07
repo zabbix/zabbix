@@ -25,10 +25,18 @@ window.tophosts_column_edit_form = new class {
 	init({form_name, thresholds, thresholds_colors}) {
 		this._$widget_form = $(`form[name="${form_name}"]`);
 		this._$thresholds_table = this._$widget_form.find('#thresholds_table');
+		this.warning_message_box = null;
 
-		$('[name="display"],[name="data"],[name="aggregate_function"]', this._$widget_form).on('change', () => {
-			this.updateAccessibility();
-		});
+		for (const id of ['data', 'aggregate_function', 'display']) {
+			document
+				.getElementById(id)
+				.addEventListener('change', () => {
+					this.updateAccessibility();
+					this.checkItemColumnSettings();
+				});
+		}
+
+		document.getElementById('history').addEventListener('change', () => this.checkItemColumnSettings());
 
 		colorPalette.setThemeColors(thresholds_colors);
 
@@ -46,11 +54,15 @@ window.tophosts_column_edit_form = new class {
 			$(colorpicker).colorpicker({appendTo: $(colorpicker).closest('.input-color-picker')});
 		});
 
-		this._$thresholds_table.on('afteradd.dynamicRows', e => {
-			const $colorpicker = $('tr.form_row:last input[name$="[color]"]', e.target);
+		this._$thresholds_table
+			.on('afteradd.dynamicRows', e => {
+				const $colorpicker = $('tr.form_row:last input[name$="[color]"]', e.target);
 
-			$colorpicker.colorpicker({appendTo: $colorpicker.closest('.input-color-picker')});
-		});
+				$colorpicker.colorpicker({appendTo: $colorpicker.closest('.input-color-picker')});
+
+				this.checkItemColumnSettings();
+			})
+			.on('afterremove.dynamicRows', () => this.checkItemColumnSettings());
 
 		this._$widget_form.on('process.form', (e, overlay) => {
 			this.handleFormSubmit(e, overlay);
@@ -58,6 +70,8 @@ window.tophosts_column_edit_form = new class {
 
 		// Initialize form elements accessibility.
 		this.updateAccessibility();
+
+		this.checkItemColumnSettings();
 	}
 
 	updateAccessibility() {
@@ -120,5 +134,34 @@ window.tophosts_column_edit_form = new class {
 			.finally(() => {
 				overlay.unsetLoading();
 			});
+	}
+
+	checkItemColumnSettings() {
+		const data_item_value = $('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_ITEM_VALUE ?>;
+		const no_aggregate_function = $('[name="aggregate_function"]').val() == <?= AGGREGATE_NONE ?>;
+		const display_as_is = $('[name="display"]:checked').val() == <?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>;
+		const history_data_trends = $('[name="history"]:checked').val() == <?= CWidgetFieldColumnsList::HISTORY_DATA_TRENDS ?>;
+		const has_thresholds = this._$thresholds_table.find('tbody tr').length > 1;
+
+		this.clearWarnings();
+
+		if (data_item_value && (!no_aggregate_function || !display_as_is || history_data_trends || has_thresholds)) {
+			this.warnNumericOnlyItemSettings();
+		}
+	}
+
+	clearWarnings() {
+		if (this.warning_message_box !== null) {
+			this.warning_message_box.remove();
+			this.warning_message_box = null;
+		}
+	}
+
+	warnNumericOnlyItemSettings() {
+		this.warning_message_box = makeMessageBox('warning',
+			<?= json_encode(_('Only numeric items will be displayed in this column.')) ?>, null, true, false
+		)[0];
+
+		this._$widget_form.before(this.warning_message_box);
 	}
 }();

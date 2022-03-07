@@ -58,6 +58,7 @@ $form_grid->addItem([
 	new CLabel(_('Data'), 'data'),
 	new CFormField(
 		(new CSelect('data'))
+			->setId('data')
 			->setValue($data['data'])
 			->addOptions(CSelect::createOptionsFromArray([
 				CWidgetFieldColumnsList::DATA_ITEM_VALUE => _('Item value'),
@@ -87,10 +88,9 @@ $item_select = (new CPatternSelect([
 		'parameters' => [
 			'srctbl' => 'items',
 			'srcfld1' => 'itemid',
+			'normal_only' => 1,
 			'real_hosts' => 1,
-			'numeric' => 1,
 			'webitems' => 1,
-			'orig_names' => 1,
 			'dstfrm' => $form->getName(),
 			'dstfld1' => 'item'
 		]
@@ -101,7 +101,12 @@ $item_select = (new CPatternSelect([
 $scripts[] = $item_select->getPostJS();
 
 $form_grid->addItem([
-	(new CLabel(_('Item'), 'item'))->setAsteriskMark(),
+	(new CLabel([
+		_('Item'),
+		makeHelpIcon(
+			_('For items with non-numeric type of information all parameters except "Time shift" and "Base color" are ignored.')
+		)
+	], 'item'))->setAsteriskMark(),
 	new CFormField($item_select)
 ]);
 
@@ -120,6 +125,7 @@ $form_grid->addItem([
 	new CLabel(_('Aggregation function'), 'aggregate_function'),
 	new CFormField(
 		(new CSelect('aggregate_function'))
+			->setId('aggregate_function')
 			->setValue($data['aggregate_function'])
 			->addOptions(CSelect::createOptionsFromArray([
 				AGGREGATE_NONE => _('none'),

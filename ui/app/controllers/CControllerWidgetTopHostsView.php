@@ -76,8 +76,11 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 
 		$time_now = time();
 
-		$master_items = self::getItems($configuration[$fields['column']]['item'], $groupids, $hostids);
-		$master_item_values = self::getItemValues($master_items, $configuration[$fields['column']], $time_now);
+		$master_column = $configuration[$fields['column']];
+		$is_numeric_only_column = self::isNumericOnlyColumn($master_column);
+
+		$master_items = self::getItems($master_column['item'], $is_numeric_only_column, $groupids, $hostids);
+		$master_item_values = self::getItemValues($master_items, $master_column, $time_now);
 
 		if (!$master_item_values) {
 			return [
@@ -86,17 +89,31 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			];
 		}
 
-		if ($fields['order'] == CWidgetFormTopHosts::ORDER_TOPN) {
-			arsort($master_item_values, SORT_NUMERIC);
+		$is_numeric_only_column = $is_numeric_only_column && !array_filter($master_items,
+			static function(array $item): bool {
+				return in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]);
+			}
+		);
 
-			$master_items_min = end($master_item_values);
-			$master_items_max = reset($master_item_values);
+		if ($fields['order'] == CWidgetFormTopHosts::ORDER_TOPN) {
+			if ($is_numeric_only_column) {
+				arsort($master_item_values, SORT_NUMERIC);
+
+				$master_items_min = end($master_item_values);
+				$master_items_max = reset($master_item_values);
+			}
+			else {
+				asort($master_item_values, SORT_NATURAL);
+			}
 		}
-		else {
+		elseif ($is_numeric_only_column) {
 			asort($master_item_values, SORT_NUMERIC);
 
 			$master_items_min = reset($master_item_values);
 			$master_items_max = end($master_item_values);
+		}
+		else {
+			arsort($master_item_values, SORT_NATURAL);
 		}
 
 		$master_item_values = array_slice($master_item_values, 0, $fields['count'], true);
@@ -154,9 +171,10 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 				}
 			}
 			else {
+				$numeric_only = self::isNumericOnlyColumn($column);
 				$column_items = !$calc_extremes || $column['min'] !== '' && $column['max'] !== ''
-					? self::getItems($column['item'], $groupids, array_keys($master_hostids))
-					: self::getItems($column['item'], $groupids, $hostids);
+					? self::getItems($column['item'], $numeric_only, $groupids, array_keys($master_hostids))
+					: self::getItems($column['item'], $numeric_only, $groupids, $hostids);
 
 				$column_item_values = self::getItemValues($column_items, $column, $time_now);
 
@@ -250,13 +268,26 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 	}
 
 	/**
+	 * @param array $column
+	 *
+	 * @return bool
+	 */
+	private static function isNumericOnlyColumn(array $column): bool {
+		return $column['aggregate_function'] != AGGREGATE_NONE
+			|| $column['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS
+			|| $column['history'] == CWidgetFieldColumnsList::HISTORY_DATA_TRENDS
+			|| array_key_exists('thresholds', $column);
+	}
+
+	/**
 	 * @param string     $name
+	 * @param bool       $numeric_only
 	 * @param array|null $groupids
 	 * @param array|null $hostids
 	 *
 	 * @return array
 	 */
-	private static function getItems(string $name, ?array $groupids, ?array $hostids): array {
+	private static function getItems(string $name, bool $numeric_only, ?array $groupids, ?array $hostids): array {
 		$items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'key_', 'history', 'trends', 'value_type', 'units'],
 			'selectValueMap' => ['mappings'],
@@ -267,7 +298,7 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			'filter' => [
 				'name' => $name,
 				'status' => ITEM_STATUS_ACTIVE,
-				'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
+				'value_type' => $numeric_only ? [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] : null
 			],
 			'sortfield' => 'key_',
 			'preservekeys' => true
@@ -318,19 +349,39 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 
 		$result = [];
 
-		if ($timeshift == 0 && $column['aggregate_function'] == AGGREGATE_NONE) {
-			$items_by_source = ['history' => [], 'trends' => []];
+		if ($column['aggregate_function'] == AGGREGATE_NONE) {
+			if ($timeshift != 0) {
+				$values = [];
 
-			foreach ($items as $itemid => $item) {
-				$items_by_source[$item['source']][$itemid] = $item;
+				foreach ($items as $index => $item) {
+					if (in_array($item['value_type'],
+							[ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
+						$history = Manager::History()->getValueAt($item, $time_to, 0);
+
+						if (is_array($history) && array_key_exists('itemid', $history)) {
+							$values[$history['itemid']] = $history['value'];
+						}
+
+						unset($items[$index]);
+					}
+				}
+
+				$result += $values;
 			}
+			else {
+				$items_by_source = ['history' => [], 'trends' => []];
 
-			$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period);
-			$values = array_column(array_column($values, 0), 'value', 'itemid');
+				foreach ($items as $index => $item) {
+					$items_by_source[$item['source']][$index] = $item;
+				}
 
-			$result += $values;
+				$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period);
+				$values = array_column(array_column($values, 0), 'value', 'itemid');
 
-			$items = $items_by_source['trends'];
+				$result += $values;
+
+				$items = $items_by_source['trends'];
+			}
 		}
 
 		$values = Manager::History()->getAggregationByInterval($items, $time_from, $time_to, $function, $interval);

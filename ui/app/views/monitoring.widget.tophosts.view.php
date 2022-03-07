@@ -25,14 +25,18 @@
  */
 
 $headers = [];
+$nodata_column_count = 0;
 
 foreach ($data['configuration'] as $column_config) {
+	$nodata_column_count++;
+
 	if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE) {
 		if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
 			$headers[] = (new CColHeader($column_config['name']))->addClass(ZBX_STYLE_CENTER);
 		}
 		else {
 			$headers[] = (new CColHeader($column_config['name']))->setColSpan(2);
+			$nodata_column_count++;
 		}
 	}
 	else {
@@ -40,7 +44,9 @@ foreach ($data['configuration'] as $column_config) {
 	}
 }
 
-$table = (new CTableInfo())->setHeader($headers);
+$table = (new CTableInfo())
+	->setNodataColspan($nodata_column_count)
+	->setHeader($headers);
 
 foreach ($data['rows'] as $columns) {
 	$row = [];
