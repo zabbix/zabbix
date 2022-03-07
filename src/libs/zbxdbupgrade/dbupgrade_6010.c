@@ -193,17 +193,23 @@ static int	DBpatch_hosts_groups2template_group_move()
 	zbx_db_insert_prepare(&db_insert, "template_group", "templategroupid", "hostid", "groupid", NULL);
 
 	result = DBselect(
-			"select o.hostgroupid,o.hostid,o.groupid from hosts_groups o,hosts h2"
+			"select o.hostgroupid,o.hostid,t.groupid from hosts_groups o,hosts h2,hstgrp hg2,tplgrp t"
 			" where o.groupid in (" DBPATCH_TPLGRP_GROUPIDS("=") ") and"
 			" o.hostid=h2.hostid and"
-			" h2.status=" DBPATCH_HOST_STATUS_TEMPLATE
-			" order by o.groupid asc,o.hostid asc");
+			" h2.status=" DBPATCH_HOST_STATUS_TEMPLATE " and"
+			" o.groupid=hg2.groupid and"
+			" hg2.uuid=t.uuid"
+			" order by t.groupid asc,o.hostid asc");
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), row[1], row[2]);
-		zbx_vector_uint64_append(&del_ids, 0);
-		ZBX_STR2UINT64(del_ids.values[del_ids.values_num - 1], row[0]);
+		zbx_uint64_t	hostgroupid, hostid, groupid;
+
+		ZBX_STR2UINT64(hostgroupid, row[0]);
+		ZBX_STR2UINT64(hostid, row[1]);
+		ZBX_STR2UINT64(groupid, row[2]);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), hostid, groupid);
+		zbx_vector_uint64_append(&del_ids, hostgroupid);
 	}
 	DBfree_result(result);
 
@@ -219,7 +225,10 @@ static int	DBpatch_hosts_groups2template_group_move()
 		zbx_vector_uint64_sort(&del_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts_groups where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostgroupid",del_ids.values, del_ids.values_num);
-		ret = DBexecute("%s", sql);
+
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+
 		zbx_free(sql);
 	}
 
@@ -240,15 +249,22 @@ static int	DBpatch_rights2right_tplgrp_move()
 	zbx_db_insert_prepare(&db_insert, "right_tplgrp", "rightid", "groupid", "permission", "id", NULL);
 
 	result = DBselect(
-			"select o.rightid,o.groupid,o.permission,o.id from rights o"
-			" where o.id in (" DBPATCH_TPLGRP_GROUPIDS("=")
-			") order by o.groupid asc");
+			"select o.rightid,o.groupid,o.permission,t.groupid from rights o,hstgrp hg2,tplgrp t"
+			" where o.id in (" DBPATCH_TPLGRP_GROUPIDS("=") ") and"
+			" o.id=hg2.groupid and"
+			" hg2.uuid=t.uuid"
+			" order by o.groupid asc,t.groupid asc");
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), row[1], row[2], row[3]);
-		zbx_vector_uint64_append(&del_ids, 0);
-		ZBX_STR2UINT64(del_ids.values[del_ids.values_num - 1], row[0]);
+		zbx_uint64_t	rightid, groupid, permission, id;
+
+		ZBX_STR2UINT64(rightid, row[0]);
+		ZBX_STR2UINT64(groupid, row[1]);
+		permission = atoi(row[2]);
+		ZBX_STR2UINT64(id, row[3]);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), groupid, permission, id);
+		zbx_vector_uint64_append(&del_ids, rightid);
 	}
 	DBfree_result(result);
 
@@ -264,7 +280,10 @@ static int	DBpatch_rights2right_tplgrp_move()
 		zbx_vector_uint64_sort(&del_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from rights where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "rightid", del_ids.values, del_ids.values_num);
-		ret = DBexecute("%s", sql);
+
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+
 		zbx_free(sql);
 	}
 
@@ -284,7 +303,7 @@ static int	DBpatch_hstgrp_del()
 
 	result = DBselect(
 			"select o.groupid from hstgrp o"
-			" where o.id in (" DBPATCH_TPLGRP_GROUPIDS("=")
+			" where o.groupid in (" DBPATCH_TPLGRP_GROUPIDS("=")
 			") and o.groupid not in (" DBPATCH_TPLGRP_GROUPIDS("<>")
 			") order by o.groupid asc");
 
