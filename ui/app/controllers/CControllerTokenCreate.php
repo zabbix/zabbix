@@ -33,10 +33,40 @@ class CControllerTokenCreate extends CController {
 			'action_dst'    => 'fatal|required|in token.view,user.token.view'
 		];
 
+		$validation_result = self::VALIDATION_OK;
+
 		$ret = $this->validateInput($fields);
 
+		if ($ret) {
+			$fields = [];
+
+			if ($this->getInput('expires_state') == 1) {
+				$fields['expires_at'] = 'required';
+			}
+
+			if ($fields) {
+				$validator = new CNewValidator($this->getInputAll(), $fields);
+
+				foreach ($validator->getAllErrors() as $error) {
+					info($error);
+				}
+
+				if ($validator->isErrorFatal()) {
+					$validation_result = $validator->isErrorFatal();
+				}
+				elseif ($validator->isError()) {
+					$validation_result = self::VALIDATION_ERROR;
+				}
+
+				$ret = $validation_result == self::VALIDATION_OK;
+			}
+		}
+		else {
+			$validation_result = $this->getValidationError();
+		}
+
 		if (!$ret) {
-			switch ($this->getValidationError()) {
+			switch ($validation_result) {
 				case self::VALIDATION_ERROR:
 					$location = (new CUrl('zabbix.php'))->setArgument('action', $this->getInput('action_src'));
 					$response = new CControllerResponseRedirect($location);

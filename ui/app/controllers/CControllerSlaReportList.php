@@ -45,6 +45,8 @@ class CControllerSlaReportList extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
+			$fields = [];
+
 			if ($this->getInput('filter_date_from', '') !== '') {
 				$fields['filter_date_from'] = 'abs_date';
 			}
