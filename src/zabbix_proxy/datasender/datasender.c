@@ -95,7 +95,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 	struct zbx_json_parse	jp, jp_tasks;
 	int			availability_ts, history_records = 0, discovery_records = 0,
 				areg_records = 0, more_history = 0, more_discovery = 0, more_areg = 0, proxy_delay;
-	zbx_uint64_t		history_lastid = 0, history_maxid = 0, discovery_lastid = 0, areg_lastid = 0, flags = 0;
+	zbx_uint64_t		history_lastid = 0, discovery_lastid = 0, areg_lastid = 0, flags = 0;
 	zbx_timespec_t		ts;
 	char			*error = NULL, *buffer = NULL;
 	zbx_vector_ptr_t	tasks;
@@ -115,8 +115,8 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 		if (SUCCEED == get_interface_availability_data(&j, &availability_ts))
 			flags |= ZBX_DATASENDER_AVAILABILITY;
 
-		history_records = proxy_get_hist_data(&j, &history_lastid, &history_maxid, &more_history);
-		if (0 != history_lastid && 0 != history_maxid)
+		history_records = proxy_get_hist_data(&j, &history_lastid, &more_history);
+		if (0 != history_lastid)
 			flags |= ZBX_DATASENDER_HISTORY;
 
 		discovery_records = proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
@@ -237,6 +237,19 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 
 				if (0 != (flags & ZBX_DATASENDER_HISTORY))
 				{
+					zbx_uint64_t		history_maxid = 0;
+					DB_RESULT		result;
+					DB_ROW			row;
+
+					result = DBselect("select max(id) from proxy_history");
+
+					if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+						history_maxid = history_lastid;
+					else
+						ZBX_STR2UINT64(history_maxid, row[0]);
+
+					DBfree_result(result);
+
 					reset_proxy_history_count(history_maxid - history_lastid);
 					proxy_set_hist_lastid(history_lastid);
 				}
