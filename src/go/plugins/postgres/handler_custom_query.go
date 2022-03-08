@@ -108,7 +108,6 @@ func setResult(results map[string]interface{}, values []interface{}, columns []s
 		default:
 			results[columns[i]] = value
 		}
-
 	}
 
 	return nil
