@@ -1,0 +1,669 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-03-08T19:02:46Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: 8098b3c157ab456abd55d3840eef79c1
+      template: 'OpenWeatherMap by HTTP'
+      name: 'OpenWeatherMap by HTTP'
+      description: |
+        Get weather metrics from OpenWeatherMap current weather API by HTTP.
+        It works without any external scripts and uses the Script item.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: 7db240f752294b2eb86537d6c06cac5e
+          name: 'Openweathermap: Get data'
+          type: SCRIPT
+          key: openweathermap.get.data
+          delay: 10m
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var params = JSON.parse(value);
+            
+            var request = new HttpRequest();
+            
+            var data = [],
+              errorMsg = '',
+              measurement,
+              temp_unit,
+              wind_unit;
+            
+            function getHttpData(query) {
+              url = params.api_endpoint + query + '&appid=' + params.apikey + '&units=' + params.units + '&lang=' + params.lang;
+              response = request.get(url);
+              Zabbix.log(4, '[ Openweathermap ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+              if (response !== null) {
+                try {
+                  response = JSON.parse(response);
+                }
+                catch (error) {
+                  throw 'Failed to parse response.';
+                }
+              }
+            
+              if (request.getStatus() !== 200) {
+                if (response.error && response.error.message) {
+                  throw response.error.message;
+                } 
+                else {
+                  throw 'Failed to receive data: invalid response status code.';
+                }
+              }
+              return response;
+            };
+            
+            if (params.units === 'metric') {
+              measurement = "metric";
+              temp_unit = "C";
+              wind_unit = "meter/sec";
+            }
+            else if (params.units === 'imperial'){
+              measurement = "imperial";
+              temp_unit = "F";
+              wind_unit = "miles/hour";
+            }
+            else {
+              measurement = "standard";
+              temp_unit = "K";
+              wind_unit = "meter/sec";
+            };
+            
+            try {
+            
+              locations = params.location.split('|');
+              for (var i in locations) {
+                if (/^[0-9]+$/g.test(locations[i])) {
+                  result = getHttpData('id=' + locations[i]);
+                  result.measurement = measurement;
+                  result.temp_unit = temp_unit;
+                  result.wind_unit = wind_unit;
+                  data.push(result);
+                } 
+                else if (/^.*,[\w]+$/g.test(locations[i])) {
+                  result = getHttpData('zip=' + locations[i]);
+                  result.measurement = measurement;
+                  result.temp_unit = temp_unit;
+                  result.wind_unit = wind_unit;
+                  data.push(result);
+                }
+                else if (/^[0-9]{1,2}(\.[0-9]+)?,[0-9]{1,2}(\.[0-9]+)?/g.test(locations[i])) {
+                  coordinates = locations[i].split(',');
+                  result = getHttpData('lat=' + coordinates[0] + '&lon=' + coordinates[1]);
+                  result.measurement = measurement;
+                  result.temp_unit = temp_unit;
+                  result.wind_unit = wind_unit;
+                  data.push(result);
+                }
+                else {
+                  result = getHttpData('q=' + encodeURIComponent(locations[i]));
+                  result.measurement = measurement;
+                  result.temp_unit = temp_unit;
+                  result.wind_unit = wind_unit;
+                  data.push(result);
+                };
+              };
+            
+            } catch (error) {
+              errorMsg = error;
+            };
+            
+            return JSON.stringify(data);
+          description: 'JSON array with result of OpenWeatherMap API requests.'
+          timeout: '{$OPENWEATHERMAP.DATA.TIMEOUT}'
+          parameters:
+            -
+              name: apikey
+              value: '{$OPENWEATHERMAP.API.TOKEN}'
+            -
+              name: api_endpoint
+              value: '{$OPENWEATHERMAP.API.ENDPOINT}'
+            -
+              name: lang
+              value: '{$LANG}'
+            -
+              name: location
+              value: '{$LOCATION}'
+            -
+              name: units
+              value: '{$UNITS}'
+          tags:
+            -
+              tag: component
+              value: raw
+          triggers:
+            -
+              uuid: 416d88c67ef940fb868f3985af4d88bf
+              expression: 'nodata(/OpenWeatherMap by HTTP/openweathermap.get.data,{$OPENWEATHERMAP.NODATA.PERIOD})=1 or (last(/OpenWeatherMap by HTTP/openweathermap.get.data)="[]" and changecount(/OpenWeatherMap by HTTP/openweathermap.get.data,{$OPENWEATHERMAP.NODATA.PERIOD})=0)'
+              name: 'Openweathermap: Failed to fetch aggregate data (or no data for {$OPENWEATHERMAP.NODATA.PERIOD})'
+              priority: AVERAGE
+              description: 'Zabbix has not received data from OpenWeatherMap API for the last few times.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+      discovery_rules:
+        -
+          uuid: 8d3f96f4a23c43a2a28b75f078cc1ff2
+          name: 'Locations discovery'
+          type: DEPENDENT
+          key: openweathermap.locations.discovery
+          delay: '0'
+          description: 'Weather metrics discovery by location.'
+          item_prototypes:
+            -
+              uuid: 8d19b2e691a440dcb014a6518b7bb0d6
+              name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Cloudiness'
+              type: DEPENDENT
+              key: 'openweathermap.clouds[{#LOCATION},{#COUNTRY}]'
+              delay: '0'
+              history: 7d
+              units: '%'
+              description: 'Cloudiness in %.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name==''{#LOCATION}'' && @.sys.country==''{#COUNTRY}'')].clouds.all.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: openweathermap.get.data
+              tags:
+                -
+                  tag: component
+                  value: environment
+                -
+                  tag: country
+                  value: '{#COUNTRY}'
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+            -
+              uuid: 02463505cab64ae0bbc4554531372818
+              name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Short weather status'
+              type: DEPENDENT
+              key: 'openweathermap.description[{#LOCATION},{#COUNTRY}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Short weather status description.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name==''{#LOCATION}'' && @.sys.country==''{#COUNTRY}'')].weather..description.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: openweathermap.get.data
+              tags:
+                -
+                  tag: component
+                  value: environment
+                -
+                  tag: country
+                  value: '{#COUNTRY}'
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+            -
+              uuid: 5f8fa36c0be5475bad5c5c9074afa7e4
+              name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Humidity'
+              type: DEPENDENT
+              key: 'openweathermap.humidity[{#LOCATION},{#COUNTRY}]'
+              delay: '0'
+              history: 7d
+              units: '%'
+              description: 'Humidity in %.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name==''{#LOCATION}'' && @.sys.country==''{#COUNTRY}'')].main.humidity.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: openweathermap.get.data
+              tags:
+                -
+                  tag: component
+                  value: environment
+                -
+                  tag: country
+                  value: '{#COUNTRY}'
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+            -
+              uuid: a9ef27e9702c4f41bfbb95579ff2014e
+              name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Atmospheric pressure'
+              type: DEPENDENT
+              key: 'openweathermap.pressure[{#LOCATION},{#COUNTRY}]'
+              delay: '0'
+              history: 7d
+              units: Pa
+              description: 'Atmospheric pressure in Pa.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name==''{#LOCATION}'' && @.sys.country==''{#COUNTRY}'')].main.pressure.first()'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '100'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: openweathermap.get.data
+              tags:
+                -
+                  tag: component
+                  value: environment
+                -
+                  tag: country
+                  value: '{#COUNTRY}'
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+            -
+              uuid: 6a0f10ae39a347319026ff147f1dc470
+              name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Rain volume for the lat one hour'
+              type: DEPENDENT
+              key: 'openweathermap.rain[{#LOCATION},{#COUNTRY}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: m
+              description: 'Rain volume for the lat one hour in m.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name==''{#LOCATION}'' && @.sys.country==''{#COUNTRY}'')].rain.1h.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: openweathermap.get.data
+              tags:
+                -
+                  tag: component
+                  value: environment
+                -
+                  tag: country
+                  value: '{#COUNTRY}'
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+            -
+              uuid: 8310f65dceeb4b348f1a769b806d5239
+              name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Snow volume for the lat one hour'
+              type: DEPENDENT
+              key: 'openweathermap.snow[{#LOCATION},{#COUNTRY}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: m
+              description: 'Snow volume for the lat one hour in m.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name==''{#LOCATION}'' && @.sys.country==''{#COUNTRY}'')].snow.1h.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: openweathermap.get.data
+              tags:
+                -
+                  tag: component
+                  value: environment
+                -
+                  tag: country
+                  value: '{#COUNTRY}'
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+            -
+              uuid: d30b8a4a56344ddd830d0bd633507b78
+              name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Temperature'
+              type: DEPENDENT
+              key: 'openweathermap.temp[{#LOCATION},{#COUNTRY}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '{#TEMP.UNIT}'
+              description: 'Atmospheric temperature value.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name==''{#LOCATION}'' && @.sys.country==''{#COUNTRY}'')].main.temp.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: openweathermap.get.data
+              tags:
+                -
+                  tag: component
+                  value: environment
+                -
+                  tag: country
+                  value: '{#COUNTRY}'
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+              trigger_prototypes:
+                -
+                  uuid: 3b7e55f13c6a4ba2930709d5c51c8a09
+                  expression: 'min(/OpenWeatherMap by HTTP/openweathermap.temp[{#LOCATION},{#COUNTRY}],#3)>{$TEMP.CRIT.HIGH}'
+                  name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Temperature is too high (over {$TEMP.CRIT.HIGH} for 30m)'
+                  priority: AVERAGE
+                  description: 'Temperature value is too high.'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+                -
+                  uuid: 7c98d2784a2e42faa76e67348a0df7ff
+                  expression: 'max(/OpenWeatherMap by HTTP/openweathermap.temp[{#LOCATION},{#COUNTRY}],#3)<{$TEMP.CRIT.LOW}'
+                  name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Temperature is too low (below {$TEMP.CRIT.LOW} for 30m)'
+                  priority: AVERAGE
+                  description: 'Temperature value is too low.'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+            -
+              uuid: 23d4152f794d46f6af705749b9443100
+              name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Visibility'
+              type: DEPENDENT
+              key: 'openweathermap.visibility[{#LOCATION},{#COUNTRY}]'
+              delay: '0'
+              history: 7d
+              units: m
+              description: 'Visibility in m.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name==''{#LOCATION}'' && @.sys.country==''{#COUNTRY}'')].visibility.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: openweathermap.get.data
+              tags:
+                -
+                  tag: component
+                  value: environment
+                -
+                  tag: country
+                  value: '{#COUNTRY}'
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+            -
+              uuid: f3350dcbd4f247e7878c06b8695beddd
+              name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Wind direction'
+              type: DEPENDENT
+              key: 'openweathermap.wind.direction[{#LOCATION},{#COUNTRY}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: deg
+              description: 'Wind direction in degrees.'
+              valuemap:
+                name: 'Wind direction'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name==''{#LOCATION}'' && @.sys.country==''{#COUNTRY}'')].wind.deg.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: openweathermap.get.data
+              tags:
+                -
+                  tag: component
+                  value: environment
+                -
+                  tag: country
+                  value: '{#COUNTRY}'
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+            -
+              uuid: 67decabd27774e9fb6d9212621c43a54
+              name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Wind speed'
+              type: DEPENDENT
+              key: 'openweathermap.wind.speed[{#LOCATION},{#COUNTRY}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '{#WIND.UNIT}'
+              description: 'Wind speed value.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name==''{#LOCATION}'' && @.sys.country==''{#COUNTRY}'')].wind.speed.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: openweathermap.get.data
+              tags:
+                -
+                  tag: component
+                  value: environment
+                -
+                  tag: country
+                  value: '{#COUNTRY}'
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+          graph_prototypes:
+            -
+              uuid: 3561e247237548f3a26c702924d05894
+              name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Temperature'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'OpenWeatherMap by HTTP'
+                    key: 'openweathermap.temp[{#LOCATION},{#COUNTRY}]'
+          master_item:
+            key: openweathermap.get.data
+          lld_macro_paths:
+            -
+              lld_macro: '{#COUNTRY}'
+              path: $..sys.country.first()
+            -
+              lld_macro: '{#LOCATION}'
+              path: $..name.first()
+            -
+              lld_macro: '{#TEMP.UNIT}'
+              path: $..temp_unit.first()
+            -
+              lld_macro: '{#WIND.UNIT}'
+              path: $..wind_unit.first()
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+      tags:
+        -
+          tag: class
+          value: service
+        -
+          tag: target
+          value: openweathermap
+      macros:
+        -
+          macro: '{$LANG}'
+          value: en
+          description: 'List of available languages https://openweathermap.org/current#multi.'
+        -
+          macro: '{$LOCATION}'
+          value: Riga
+          description: |
+            Locations can be set by few ways:
+            1. by geo coordinates (for example: 56.95,24.0833)
+            2. by location name (for example: Riga)
+            3. by location ID. Link to the list of city ID: http://bulk.openweathermap.org/sample/city.list.json.gz
+            4. by zip/post code with a country code (for example: 94040,us)
+            A few locations can be added to the macro at the same time by "|" delimeter. 
+            For example: 43.81821,7.76115|Riga|2643743|94040,us.
+            Please note that API requests by city name, zip-codes and city id will be deprecated soon.
+        -
+          macro: '{$OPENWEATHERMAP.API.ENDPOINT}'
+          value: 'api.openweathermap.org/data/2.5/weather?'
+          description: 'OpenWeatherMap API endpoint.'
+        -
+          macro: '{$OPENWEATHERMAP.API.TOKEN}'
+          type: SECRET_TEXT
+          description: 'Specify openweathermap API key.'
+        -
+          macro: '{$OPENWEATHERMAP.DATA.TIMEOUT}'
+          value: 3s
+          description: 'Response timeout for OpenWeatherMap API.'
+        -
+          macro: '{$OPENWEATHERMAP.NODATA.PERIOD}'
+          value: 30m
+          description: 'Time limit period for nodata trigger.'
+        -
+          macro: '{$TEMP.CRIT.HIGH}'
+          value: '30'
+          description: 'Threshold for high temperature trigger.'
+        -
+          macro: '{$TEMP.CRIT.LOW}'
+          value: '-20'
+          description: 'Threshold for low temperature trigger.'
+        -
+          macro: '{$UNITS}'
+          value: metric
+          description: 'Available units of measurement are standard, metric and imperial https://openweathermap.org/current#data.'
+      valuemaps:
+        -
+          uuid: 9a8fdac997914722acfea90f1f9d45e9
+          name: 'Wind direction'
+          mappings:
+            -
+              type: IN_RANGE
+              value: '0 - 11.24'
+              newvalue: 'N'
+            -
+              type: IN_RANGE
+              value: '11.25 - 33.74'
+              newvalue: NNE
+            -
+              type: IN_RANGE
+              value: '33.75 - 56.24'
+              newvalue: NE
+            -
+              type: IN_RANGE
+              value: '56.25 - 78.74'
+              newvalue: ENE
+            -
+              type: IN_RANGE
+              value: '78.75 - 101.24'
+              newvalue: E
+            -
+              type: IN_RANGE
+              value: '101.25 - 123.74'
+              newvalue: ESE
+            -
+              type: IN_RANGE
+              value: '123.75 - 146.24'
+              newvalue: SE
+            -
+              type: IN_RANGE
+              value: '146.25 - 168.74'
+              newvalue: SSE
+            -
+              type: IN_RANGE
+              value: '168.75 - 191.24'
+              newvalue: S
+            -
+              type: IN_RANGE
+              value: '191.25 - 213.74'
+              newvalue: SSW
+            -
+              type: IN_RANGE
+              value: '213.75 - 236.24'
+              newvalue: SW
+            -
+              type: IN_RANGE
+              value: '236.25 - 258.74'
+              newvalue: WSW
+            -
+              type: IN_RANGE
+              value: '258.75 - 281.24'
+              newvalue: W
+            -
+              type: IN_RANGE
+              value: '281.25 - 303.74'
+              newvalue: WNW
+            -
+              type: IN_RANGE
+              value: '303.75 - 326.24'
+              newvalue: NW
+            -
+              type: IN_RANGE
+              value: '326.25 - 348.74'
+              newvalue: NNW
+            -
+              type: IN_RANGE
+              value: '348.75 - 379.99'
+              newvalue: 'N'
