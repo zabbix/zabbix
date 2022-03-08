@@ -63,6 +63,10 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 */
 	protected static $create_pageid;
 
+	const WIDGET_UPDATE_NAME = 'Top hosts update';
+
+	private static $updated_name = self::WIDGET_UPDATE_NAME;
+
 	/**
 	 * Create new dashboards for autotest.
 	 */
@@ -129,6 +133,66 @@ class testDashboardTopHostsWidget extends CWebTest {
 										'type' => 0,
 										'name' => 'column',
 										'value' => 0
+									],
+									[
+										'type' => 1,
+										'name' => 'columns.name.1',
+										'value' => ''
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.data.1',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'columns.item.1',
+										'value' => 'Available memory in %'
+									],
+									[
+										'type' => 1,
+										'name' => 'columns.timeshift.1',
+										'value' => ''
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.aggregate_function.1',
+										'value' => 0
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.display.1',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.history.1',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'columns.base_color.1',
+										'value' => ''
+									],
+									[
+										'type' => 1,
+										'name' => 'columnsthresholds.color.1.0',
+										'value' => 'FF465C'
+									],
+									[
+										'type' => 1,
+										'name' => 'columnsthresholds.threshold.1.0',
+										'value' => '100'
+									],
+									[
+										'type' => 1,
+										'name' => 'columnsthresholds.color.1.1',
+										'value' => 'B0AF07'
+									],
+									[
+										'type' => 1,
+										'name' => 'columnsthresholds.threshold.1.1',
+										'value' => '600'
 									]
 								]
 							]
@@ -352,7 +416,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Data' => 'Item value',
 							'Item' => 'Available memory',
 							'Display' => 'As is',
-							'History data' => 'History'
+							'History data' => 'History',
+							'Time shift' => '1'
 						],
 						[
 							'Data' => 'Item value',
@@ -900,55 +965,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 
 		// Add new column.
 		if (array_key_exists('column_fields', $data)) {
-			foreach ($data['column_fields'] as $values) {
-				$form->query('id:add')->one()->waitUntilVisible()->click();
-				$column_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
-
-				// Fill Base color.
-				if (array_key_exists('Base color', $values)) {
-					foreach ($values['Base color'] as $selector => $color) {
-						$column_form->query($selector)->one()->click();
-						$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($color);
-					}
-
-					unset($values['Base color']);
-				}
-
-				// Fill Thresholds values.
-				if (array_key_exists('Thresholds', $values)) {
-					$threshold_amount = count($values['Thresholds'])-1;
-					$threshold_order = 0;
-
-					foreach ($values['Thresholds'] as $threshold) {
-						$column_form->query('button:Add')->one()->click();
-						$column_form->query('id:thresholds_'.$threshold_order.'_threshold')->one()->fill($threshold['value']);
-
-						// Fill Threshold colors.
-						if (array_key_exists('color', $threshold)) {
-							$column_form->query('id:lbl_thresholds_'.$threshold_order.'_color')->one()->click();
-							$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($threshold['color']);
-						}
-
-						// Id number of threshold.
-						if ($threshold_order < $threshold_amount) {
-							$threshold_order++;
-						}
-					}
-
-					unset($values['Thresholds']);
-				}
-
-				$column_form->fill($values);
-				$column_form->submit();
-
-				// Check error message in column form.
-				if (array_key_exists('column_error', $data)) {
-					$message = CMessageElement::find()->waitUntilVisible()->one();
-					$this->assertEquals($data['column_error'], $message->getLines()->asText());
-				}
-
-				sleep(1);
-			}
+			$this->columnCreateUpdate($data, 'create');
 		}
 
 		$form->fill($data['main_fields']);
@@ -989,9 +1006,10 @@ class testDashboardTopHostsWidget extends CWebTest {
 		// Hash before simple update.
 		$old_hash = CDBHelper::getHash('SELECT * FROM widget_field WHERE widgetid='.zbx_dbstr($widgetid)
 				.' ORDER BY widget_fieldid');
+
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$updateid);
 		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->edit()->getWidget('Top hosts update')->edit();
+		$form = $dashboard->edit()->getWidget(self::$updated_name)->edit();
 		$form->submit();
 		$dashboard->save();
 		$this->page->waitUntilReady();
@@ -1002,6 +1020,144 @@ class testDashboardTopHostsWidget extends CWebTest {
 
 		// Compare old hash and new one.
 		$this->assertEquals($old_hash, $new_hash);
+	}
+
+	public static function getUpdateTopHostsData() {
+		return [
+			// #0 update all main fields.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'main_fields' =>  [
+						'Name' => 'Updated main fields',
+						'Refresh interval' => '2 minutes',
+						'Host groups' => 'Zabbix servers',
+						'Hosts' => 'ЗАББИКС Сервер',
+						'Order' => 'Bottom N',
+						'Order column' => 'Available memory in %',
+						'Host count' => '2'
+					]
+				]
+			],
+			// #1 update first item column to Text column and add some values.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'main_fields' =>  [
+						'Name' => 'Updated column type to text'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'Text column changed',
+							'Data' => 'Text',
+							'Text' => 'some text',
+							'Base color' => [
+								'id:lbl_base_color' => '039BE5'
+							]
+						]
+					]
+				]
+			],
+			// #2 update first column to Host name column and add some values.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'main_fields' =>  [
+						'Name' => 'Updated column type to host name'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'Host name column update',
+							'Data' => 'Host name',
+							'Base color' => [
+								'id:lbl_base_color' => 'FF8F00'
+							]
+						]
+					]
+				]
+			],
+			// #3 update item column adding new values and fields.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'main_fields' =>  [
+						'Name' => 'Updated values for item column'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'Only name changed'
+						],
+						[
+							'Item' => 'Available memory',
+							'Time shift' => '1',
+							'Display' => 'Indicators',
+							'History data' => 'Trends',
+							'Min' => '50',
+							'Max' => '100',
+							'Aggregation function' => 'avg',
+							'Aggregation interval' => '20h',
+							'Base color' => [
+								'id:lbl_base_color' => '039BE5'
+							],
+							'Thresholds' => [
+								[
+									'value' => '1',
+									'color' => 'FFEB3B'
+								],
+								[
+									'value' => '100',
+									'color' => 'AAAAAA'
+								]
+							]
+						]
+					]
+				]
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider getUpdateTopHostsData
+	 */
+	public function testDashboardTopHostsWidget_Update($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$updateid);
+		$dashboard = CDashboardElement::find()->one();
+		$form = $dashboard->edit()->getWidget(self::$updated_name)->edit();
+
+		// Add new column.
+		if (array_key_exists('column_fields', $data)) {
+			$this->columnCreateUpdate($data, 'update');
+		}
+
+		$form->fill($data['main_fields']);
+		COverlayDialogElement::find()->waitUntilReady()->one();
+
+		$form->submit();
+
+		// Check error message in main widget form.
+		if (array_key_exists('main_error', $data)) {
+			$message = CMessageElement::find()->waitUntilVisible()->one();
+			$this->assertEquals($data['main_error'], $message->getLines()->asText());
+		}
+
+		$this->page->waitUntilReady();
+
+		if ($data['expected'] === TEST_GOOD) {
+			self::$updated_name = (array_key_exists('Name', $data['main_fields']))
+					? $data['main_fields']['Name']
+					: self::$updated_name;
+
+			// Make sure that the widget is present before saving the dashboard.
+			$header = CTestArrayHelper::get($data['main_fields'], 'Name', self::$updated_name);
+			$dashboard->getWidget($header);
+			$dashboard->save();
+
+			// Check message that widget added.
+			$this->checkDashboardUpdateMessage();
+		}
+		else {
+			$dashboard->save();
+		}
 	}
 
 	public function testDashboardTopHostsWidget_Delete() {
@@ -1029,60 +1185,129 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$form = $dashboard->edit()->getWidget($header)->edit();
 		$form->checkValue($data['main_fields']);
 
-		// Count column amount from data provider.
-		$column_amount = count($data['column_fields']);
-		$table = $form->query('id:list_columns')->one()->asTable();
+		if (array_key_exists('column_fields', $data)) {
+			// Count column amount from data provider.
+			$column_amount = count($data['column_fields']);
+			$table = $form->query('id:list_columns')->one()->asTable();
 
-		// Count row amount from column table and compare with column amount from data provider.
-		$row_amount = $table->getRows()->count()-1;
-		$this->assertEquals($column_amount, $row_amount);
+			// Count row amount from column table and compare with column amount from data provider.
+			$row_amount = $table->getRows()->count()-1;
+			$this->assertEquals($column_amount, $row_amount);
 
-		// Check values from column form.
-		$row_number = 1;
+			// Check values from column form.
+			$row_number = 1;
+			foreach ($data['column_fields'] as $values) {
+				// check that column table has correct names for added columns.
+				$table_name = (array_key_exists('Name', $values)) ? $values['Name'] : '';
+				$table->getRow($row_number-1)->getColumnData('Name', $table_name);
+
+				// Check that column table has correct data.
+				if ($values['Data'] === 'Item value') {
+					$table_name = $values['Item'];
+				}
+				elseif ($values['Data'] === 'Host name') {
+					$table_name = $values['Data'];
+				}
+				elseif ($values['Data'] === 'Text') {
+					$table_name = $values['Text'];
+				}
+				$table->getRow($row_number-1)->getColumnData('Data', $table_name);
+
+				$form->query('xpath:(//button[@name="edit"])['.$row_number.']')->one()->click();
+				$column_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
+				$form_header = $this->query('xpath://div[@class="overlay-dialogue modal modal-popup"]//h4')->one()->getText();
+				$this->assertEquals('Update column', $form_header);
+
+				// Check base color
+				if (array_key_exists('Base color', $values)) {
+					foreach ($values['Base color'] as $selector => $color) {
+						$this->assertEquals('#'.$color, $this->query($selector)->one()->getAttribute('title'));
+					}
+
+					unset($values['Base color']);
+				}
+
+				// Check Thresholds values.
+				if (array_key_exists('Thresholds', $values)) {
+					$threshold_amount = count($values['Thresholds'])-1;
+					$threshold_order = 0;
+					foreach ($values['Thresholds'] as $threshold) {
+						$this->assertEquals($threshold['value'], $column_form->query('id:thresholds_'.$threshold_order.'_threshold')
+								->one()->getAttribute('value'));
+
+						// Check color in Thresholds.
+						if (array_key_exists('color', $threshold)) {
+							$color_hex = ($threshold['color'] !== '') ? '#'.$threshold['color'] : 'Use default';
+							$this->assertEquals($color_hex, $column_form->query('id:lbl_thresholds_'.$threshold_order.'_color')
+									->one()->getAttribute('title'));
+						}
+
+						// Id number of threshold.
+						if ($threshold_order < $threshold_amount) {
+							$threshold_order++;
+						}
+					}
+
+					unset($values['Thresholds']);
+				}
+
+				$column_form->checkValue($values);
+				$column_form->query('xpath:(//button[text()="Cancel"])[2]')->one()->click();
+
+				// Check next row in a column table.
+				if ($row_number < $row_amount) {
+					$row_number++;
+				}
+			}
+		}
+	}
+
+	private function checkDashboardUpdateMessage() {
+		$message = CMessageElement::find()->waitUntilVisible()->one();
+		$this->assertTrue($message->isGood());
+		$this->assertEquals('Dashboard updated', $message->getTitle());
+	}
+
+	private function columnCreateUpdate($data, $action){
+		// Starting counting column amount from 1 for xpath.
+		if ($action === 'update') {
+			$column_count = 1;
+		}
+
 		foreach ($data['column_fields'] as $values) {
-			// check that column table has correct names for added columns.
-			$table_name = (array_key_exists('Name', $values)) ? $values['Name'] : '';
-			$table->getRow($row_number-1)->getColumnData('Name', $table_name);
+			$form = $this->query('id:widget-dialogue-form')->one()->asForm();
 
-			// Check that column table has correct data.
-			if ($values['Data'] === 'Item value') {
-				$table_name = $values['Item'];
-			}
-			elseif ($values['Data'] === 'Host name') {
-				$table_name = $values['Data'];
-			}
-			elseif ($values['Data'] === 'Text') {
-				$table_name = $values['Text'];
-			}
-			$table->getRow($row_number-1)->getColumnData('Data', $table_name);
-
-			$form->query('xpath:(//button[@name="edit"])['.$row_number.']')->one()->click();
+			// What should be pressed - Add or Edit.
+			$selector = ($action === 'create') ? 'id:add' : 'xpath:(//button[@name="edit"])['.$column_count.']';
+			$form->query($selector)->one()->waitUntilVisible()->click();
 			$column_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
-			$form_header = $this->query('xpath://div[@class="overlay-dialogue modal modal-popup"]//h4')->one()->getText();
-			$this->assertEquals('Update column', $form_header);
 
-			// Check base color
+			// Fill Base color.
 			if (array_key_exists('Base color', $values)) {
 				foreach ($values['Base color'] as $selector => $color) {
-					$this->assertEquals('#'.$color, $this->query($selector)->one()->getAttribute('title'));
+					$column_form->query($selector)->one()->click();
+					$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($color);
 				}
 
 				unset($values['Base color']);
 			}
 
-			// Check Thresholds values.
+			// Fill Thresholds values.
 			if (array_key_exists('Thresholds', $values)) {
 				$threshold_amount = count($values['Thresholds'])-1;
 				$threshold_order = 0;
-				foreach ($values['Thresholds'] as $threshold) {
-					$this->assertEquals($threshold['value'], $column_form->query('id:thresholds_'.$threshold_order.'_threshold')
-							->one()->getAttribute('value'));
 
-					// Check color in Thresholds.
+				foreach ($values['Thresholds'] as $threshold) {
+					if ($action === 'create') {
+						$column_form->query('button:Add')->one()->click();
+					}
+
+					$column_form->query('id:thresholds_'.$threshold_order.'_threshold')->one()->fill($threshold['value']);
+
+					// Fill Threshold colors.
 					if (array_key_exists('color', $threshold)) {
-						$color_hex = ($threshold['color'] !== '') ? '#'.$threshold['color'] : 'Use default';
-						$this->assertEquals($color_hex, $column_form->query('id:lbl_thresholds_'.$threshold_order.'_color')
-								->one()->getAttribute('title'));
+						$column_form->query('id:lbl_thresholds_'.$threshold_order.'_color')->one()->click();
+						$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($threshold['color']);
 					}
 
 					// Id number of threshold.
@@ -1094,19 +1319,21 @@ class testDashboardTopHostsWidget extends CWebTest {
 				unset($values['Thresholds']);
 			}
 
-			$column_form->checkValue($values);
-			$column_form->query('xpath:(//button[text()="Cancel"])[2]')->one()->click();
+			$column_form->fill($values);
+			$column_form->submit();
 
-			// Check next row in a column table.
-			if ($row_number < $row_amount) {
-				$row_number++;
+			// updating top host several columns, change it order number.
+			if ($action === 'update') {
+				$column_count++;
 			}
-		}
-	}
 
-	private function checkDashboardUpdateMessage() {
-		$message = CMessageElement::find()->waitUntilVisible()->one();
-		$this->assertTrue($message->isGood());
-		$this->assertEquals('Dashboard updated', $message->getTitle());
+			// Check error message in column form.
+			if (array_key_exists('column_error', $data)) {
+				$message = CMessageElement::find()->waitUntilVisible()->one();
+				$this->assertEquals($data['column_error'], $message->getLines()->asText());
+			}
+
+			sleep(1);
+		}
 	}
 }
