@@ -25,7 +25,9 @@
 
 require_once dirname(__FILE__).'/js/configuration.action.edit.js.php';
 
-$widget = (new CWidget())->setTitle(_('Actions'));
+$widget = (new CWidget())
+	->setTitle(_('Actions'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_ACTION_EDIT));
 
 // create form
 $actionForm = (new CForm())

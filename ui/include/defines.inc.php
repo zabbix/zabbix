@@ -34,6 +34,8 @@ define('DB_VERSION_NOT_SUPPORTED_WARNING',	5);
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2022');
 
+define('ZBX_DOCUMENTATION_URL', 'https://www.zabbix.com/documentation');
+
 define('ZBX_BCRYPT_COST',		10);
 
 define('ZBX_SESSION_NAME', 'zbx_session'); // Session cookie name for Zabbix front-end.
@@ -2078,6 +2080,7 @@ define('ZBX_STYLE_CHECKBOX_BLOCK', 'checkbox-block');
 define('ZBX_STYLE_ICON_TEXT', 'icon-text');
 define('ZBX_STYLE_ICON_SECRET_TEXT', 'icon-secret');
 define('ZBX_STYLE_ICON_HELP_HINT', 'icon-help-hint');
+define('ZBX_STYLE_ICON_DOC_LINK', 'icon-doc-link');
 
 // Host interface styles.
 define('ZBX_STYLE_HOST_INTERFACE_CONTAINER', 'interface-container');

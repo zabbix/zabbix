@@ -25,7 +25,9 @@
 
 require_once dirname(__FILE__).'/js/configuration.discovery.edit.js.php';
 
-$widget = (new CWidget())->setTitle(_('Discovery rules'));
+$widget = (new CWidget())
+	->setTitle(_('Discovery rules'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_DISCOVERY_EDIT));
 
 // Create form.
 $discoveryForm = (new CForm())

@@ -48,6 +48,7 @@ $nav_items->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]));
 $widget = (new CWidget())
 	->setTitle(_('Hosts'))
 	->setWebLayoutMode($web_layout_mode)
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_HOST_VIEW))
 	->setControls((new CTag('nav', true, $nav_items))
 		->setAttribute('aria-label', _('Content controls'))
 	);

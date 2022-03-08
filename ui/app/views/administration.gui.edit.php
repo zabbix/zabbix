@@ -27,7 +27,8 @@ $this->includeJsFile('administration.gui.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('GUI'))
-	->setTitleSubmenu(getAdministrationGeneralSubmenu());
+	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_GUI_EDIT));
 
 // Append languages to form list.
 $lang_select = (new CSelect('default_lang'))

@@ -121,6 +121,7 @@ $filter->addFilterTab(_('Filter'), [
 
 (new CWidget())
 	->setTitle(_('Services'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::SERVICE_LIST_EDIT))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())
