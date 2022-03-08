@@ -17,9 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "checks_ipmi.h"
+#include "common.h"
 
 #ifdef HAVE_OPENIPMI
+
+#include "checks_ipmi.h"
 
 /* Theoretically it should be enough max 16 bytes for sensor ID and terminating '\0' (see SDR record format in IPMI */
 /* v2 spec). OpenIPMI author Corey Minyard explained at	*/

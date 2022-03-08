@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-10T07:41:30Z'
+  date: '2022-03-01T13:25:00Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -19,7 +19,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Databases
@@ -59,8 +59,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+                  tag: component
+                  value: data_region
             -
               uuid: 3425f6775e9e4a979d876becddec46d2
               name: 'Data region {#JMXNAME}: Checkpoint buffer size'
@@ -75,8 +75,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+                  tag: component
+                  value: data_region
             -
               uuid: 6e44ce63725a46b486175e34697776ee
               name: 'Data region {#JMXNAME}: Dirty pages'
@@ -90,8 +90,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+                  tag: component
+                  value: data_region
             -
               uuid: 5396db6809ca44c480f123e1e63430b4
               name: 'Data region {#JMXNAME}: Eviction, rate'
@@ -106,8 +106,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+                  tag: component
+                  value: data_region
               trigger_prototypes:
                 -
                   uuid: 7e2fc41d632240b3869080d41ef5e639
@@ -116,6 +116,10 @@ zabbix_export:
                   priority: INFO
                   description: 'You store more data than region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 9f7d683cf3ca47c681eef43e4dd9a471
               name: 'Data region {#JMXNAME}: Size, max'
@@ -130,8 +134,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+                  tag: component
+                  value: data_region
             -
               uuid: 16170e6c8007492984c367892a7393aa
               name: 'Data region {#JMXNAME}: Offheap size'
@@ -146,8 +150,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+                  tag: component
+                  value: data_region
             -
               uuid: 982c738bdd4f4802917d3f5d63cc489f
               name: 'Data region {#JMXNAME}: Offheap used size'
@@ -162,8 +166,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+                  tag: component
+                  value: data_region
             -
               uuid: 03c923d00e5a486faece1f37b3a2863d
               name: 'Data region {#JMXNAME}: Pages fill factor'
@@ -178,8 +182,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+                  tag: component
+                  value: data_region
             -
               uuid: 9094f5992c514be6abaee490b211774e
               name: 'Data region {#JMXNAME}: Pages replace, rate'
@@ -194,8 +198,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+                  tag: component
+                  value: data_region
               trigger_prototypes:
                 -
                   uuid: d2b012fdfe634526bb583d4ad18abe4d
@@ -203,6 +207,10 @@ zabbix_export:
                   name: 'Data region {#JMXNAME}: Pages replace rate more than 0'
                   priority: WARNING
                   description: 'There is more data than DataRegionMaxSize. Cluster started to replace pages in memory. Page replacement can slow down operations.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 390107f411e24581a61043000b42152f
               name: 'Data region {#JMXNAME}: Allocated, bytes'
@@ -217,8 +225,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+                  tag: component
+                  value: data_region
             -
               uuid: 8e0e7a96f0a6424b88829fab78cce2ba
               name: 'Data region {#JMXNAME}: Used checkpoint buffer size'
@@ -233,8 +241,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+                  tag: component
+                  value: data_region
           trigger_prototypes:
             -
               uuid: 9a7d7c745faa4f1fa4ffd1ca8c1ac602
@@ -242,6 +250,10 @@ zabbix_export:
               name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$GRIDGAIN.CHECKPOINT.PUSED.MAX.HIGH} in 5m)'
               priority: HIGH
               description: 'Checkpoint buffer utilization is high. Threads will be throttled to avoid buffer overflow. It can be caused by high disk utilization.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 02ce52a2067147238969a4fd24f85bdc
               expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",UsedCheckpointBufferSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",CheckpointBufferSize])*100>{$GRIDGAIN.CHECKPOINT.PUSED.MAX.WARN}'
@@ -252,12 +264,20 @@ zabbix_export:
                 -
                   name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$GRIDGAIN.CHECKPOINT.PUSED.MAX.HIGH} in 5m)'
                   expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",UsedCheckpointBufferSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",CheckpointBufferSize])*100>{$GRIDGAIN.CHECKPOINT.PUSED.MAX.HIGH}'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 92c2772aa8d7425e8bee5d760ba5b607
               expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH}'
               name: 'Data region {#JMXNAME}: Data region utilization is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
               priority: HIGH
               description: 'Data region utilization is high. Increase data region size or delete any data.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 3694e6d813b04b51a77c842de617503c
               expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$GRIDGAIN.DATA.REGION.PUSED.MAX.WARN}'
@@ -268,6 +288,10 @@ zabbix_export:
                 -
                   name: 'Data region {#JMXNAME}: Data region utilization is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
                   expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH}'
+              tags:
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: f9410067b582451aa0b2675391504a65
@@ -343,8 +367,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: job
+                -
+                  tag: component
+                  value: node
             -
               uuid: c254bc19bccb44de821c51b0882b78b4
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Jobs cancelled, current'
@@ -357,8 +384,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: job
+                -
+                  tag: component
+                  value: node
             -
               uuid: 63916bbee7604c3e9610f5989bc5bb7a
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration, current'
@@ -372,8 +402,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: node
               trigger_prototypes:
                 -
                   uuid: a2672171fa374810b95b72f6014f3998
@@ -381,6 +411,10 @@ zabbix_export:
                   name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$GRIDGAIN.PME.DURATION.MAX.HIGH} for 5 min)'
                   priority: HIGH
                   description: 'PME duration is over {$GRIDGAIN.PME.DURATION.MAX.HIGH}ms. Looks like PME is hung.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: f21e1cee28354fcd945d58955831641b
                   expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$GRIDGAIN.PME.DURATION.MAX.WARN}'
@@ -391,6 +425,10 @@ zabbix_export:
                     -
                       name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$GRIDGAIN.PME.DURATION.MAX.HIGH} for 5 min)'
                       expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$GRIDGAIN.PME.DURATION.MAX.HIGH}'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 790e8c300f7c4c82b640fb6025bb9eef
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Jobs rejected, current'
@@ -403,8 +441,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: job
+                -
+                  tag: component
+                  value: node
             -
               uuid: a5c1ece74c914620b9ce70c00c7d5377
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Threads count, current'
@@ -417,8 +458,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: node
+                -
+                  tag: component
+                  value: threads
               trigger_prototypes:
                 -
                   uuid: 124c9738a384481fb39f5e8078cca0e4
@@ -430,6 +474,10 @@ zabbix_export:
                     -
                       name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$GRIDGAIN.PME.DURATION.MAX.HIGH} for 5 min)'
                       expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$GRIDGAIN.PME.DURATION.MAX.HIGH}'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: df386b29e8f74ec9a8f1825cb3094c0e
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Jobs waiting, current'
@@ -442,8 +490,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: job
+                -
+                  tag: component
+                  value: node
               trigger_prototypes:
                 -
                   uuid: 71d259fbdcd74888a4bedc646fc4bc54
@@ -451,6 +502,10 @@ zabbix_export:
                   name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Number of queued jobs is too high (over {$GRIDGAIN.JOBS.QUEUE.MAX.WARN} for 15 min)'
                   priority: WARNING
                   description: 'Number of queued jobs is over {$GRIDGAIN.JOBS.QUEUE.MAX.WARN}.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: ec0c25c202ff4b1ea47422b51c24d3b4
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Heap memory used'
@@ -464,8 +519,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: memory
+                -
+                  tag: component
+                  value: node
             -
               uuid: a698da07a1794c479db9948a5ffb4123
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Jobs cancelled, rate'
@@ -484,8 +542,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: job
+                -
+                  tag: component
+                  value: node
             -
               uuid: 5a60a71ecd2d40af8ca2ca81712c287e
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Jobs executed, rate'
@@ -504,8 +565,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: job
+                -
+                  tag: component
+                  value: node
             -
               uuid: 7673741944094af9a6bc05bd630fd055
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Jobs rejects, rate'
@@ -524,8 +588,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: job
+                -
+                  tag: component
+                  value: node
           graph_prototypes:
             -
               uuid: ca84e5c7fc76473392a30a3073e9cb25
@@ -618,8 +685,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: node
             -
               uuid: 16ca4ca8efa04874902a619bce1f0071
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes, Baseline'
@@ -637,8 +704,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: node
             -
               uuid: cf66620eeb6b4c9d88c2bd69ed05685a
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes, Client'
@@ -656,8 +723,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: node
             -
               uuid: d74b4324fb5a446a92e6fcf89162eff5
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes, total'
@@ -675,8 +742,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: node
             -
               uuid: b64a4ce1266b4806a554967d2fd24fa5
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes, Server'
@@ -694,8 +761,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: node
               trigger_prototypes:
                 -
                   uuid: bf1fbe1ea3754da59bd8a510fbcc6f54
@@ -704,6 +771,10 @@ zabbix_export:
                   priority: INFO
                   description: 'One or more server node added to the topology. Ack to close.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
                 -
                   uuid: db4cd7173ead4e878b79d55067d81300
                   expression: 'change(/GridGain by JMX/jmx["{#JMXOBJ}",TotalServerNodes])<0'
@@ -711,6 +782,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'One or more server node left the topology. Ack to close.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
           trigger_prototypes:
             -
               uuid: ea93cb34b6434f2e94095c28087fc18e
@@ -719,6 +794,10 @@ zabbix_export:
               priority: INFO
               description: 'One or more server node left the topology. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           preprocessing:
             -
@@ -769,8 +848,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: kernal
               trigger_prototypes:
                 -
                   uuid: 4cc201fb67664fc49d36bbec95b574ce
@@ -779,6 +858,10 @@ zabbix_export:
                   priority: INFO
                   description: 'GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 18f518b41e804f7cb3eeaaf92fef40e7
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Local node ID'
@@ -798,8 +881,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: kernal
             -
               uuid: 4b3c99a88fbf4485a3dbf5efa2723ca7
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Uptime'
@@ -818,8 +901,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: kernal
               trigger_prototypes:
                 -
                   uuid: d7b2be3a707f49d2897e7cce356cafa5
@@ -828,6 +911,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'Zabbix has not received data for items for the last 10 minutes.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 23cd9dbb498f4bb095ec8be1693fccf0
                   expression: 'last(/GridGain by JMX/jmx["{#JMXOBJ}",UpTime])<10m'
@@ -835,6 +922,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           preprocessing:
             -
@@ -873,8 +964,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: messages
+                -
+                  tag: component
+                  value: network
             -
               uuid: 2a01c4dc23b34df6801be0901bf10ab0
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Communication messages received, rate'
@@ -894,8 +988,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: messages
+                -
+                  tag: component
+                  value: network
             -
               uuid: 613114b7abb94bd5bbabc2d1d19975b7
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Communication reconnect rate'
@@ -914,8 +1011,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: network
             -
               uuid: e015293ddbb540e4b6b59ba6e28ed91e
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Communication messages sent, rate'
@@ -935,8 +1032,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: messages
+                -
+                  tag: component
+                  value: network
           graph_prototypes:
             -
               uuid: ca090aa6d7e449e880b43cdbbd80d991
@@ -998,8 +1098,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: network
               trigger_prototypes:
                 -
                   uuid: 40641263a3d840e89e46ba6f57076a0a
@@ -1008,6 +1108,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 29d85d09951346c1a7c30acc83f404fc
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Discovery message worker queue'
@@ -1020,8 +1124,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: messages
+                -
+                  tag: component
+                  value: network
             -
               uuid: 0aed9a4269ff4718aa443d1b053fa31b
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes failed'
@@ -1034,8 +1141,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: nodes
             -
               uuid: 43ea840b621e4f2a8643ca38479eb73e
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes joined'
@@ -1048,8 +1158,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: nodes
             -
               uuid: 0164664362e446209b4399081d807ca7
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes left'
@@ -1062,8 +1175,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: nodes
             -
               uuid: e03329689c674ea997d55d11e1a0c2be
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Discovery reconnect, rate'
@@ -1082,8 +1198,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: nodes
             -
               uuid: e344575b799a4f69b79b45ef6590a649
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: TotalProcessedMessages'
@@ -1103,8 +1222,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: messages
+                -
+                  tag: component
+                  value: network
             -
               uuid: adcf2c5981004c8da658122cc50a6518
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Discovery messages received, rate'
@@ -1124,8 +1246,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: messages
+                -
+                  tag: component
+                  value: network
           graph_prototypes:
             -
               uuid: a44983a855934d3ea5d2eaa1421df147
@@ -1180,8 +1305,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: transactions
             -
               uuid: 446cbb708d354b2a9282e973d562527f
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Transactions owner, current'
@@ -1194,8 +1319,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: transactions
             -
               uuid: 21971cbf540c48df93fde079ce917a26
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Transactions committed, rate'
@@ -1209,8 +1334,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: transactions
             -
               uuid: d8d3e05c6e7e4874b3149edb74774e6d
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Transactions holding lock, current'
@@ -1223,8 +1348,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: transactions
             -
               uuid: 2d1def1d4f414ce992cf5a6ff1bc4204
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Transactions rolledback, rate'
@@ -1238,8 +1363,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain instance [{#JMXIGNITEINSTANCENAME}]'
+                  tag: component
+                  value: transactions
           graph_prototypes:
             -
               uuid: 82d772972cec4454b95d69343040b2b5
@@ -1321,8 +1446,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
+                  tag: component
+                  value: cache_group
             -
               uuid: a535d161527b4821b717f114aaeb8b0b
               name: 'Cache group [{#JMXNAME}]: Caches'
@@ -1342,8 +1467,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
+                  tag: component
+                  value: cache_group
               trigger_prototypes:
                 -
                   uuid: 94d82f9db4f449e491782e14f6973f9b
@@ -1352,6 +1477,10 @@ zabbix_export:
                   priority: INFO
                   description: 'List of caches has changed. Significant changes have occurred in the cluster. Ack to close.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 0a09c18adfd5477098684c47927f967b
               name: 'Cache group [{#JMXNAME}]: Local node partitions, moving'
@@ -1364,8 +1493,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
+                  tag: component
+                  value: cache_group
               trigger_prototypes:
                 -
                   uuid: 84e1402b3ae64960ad997d2610137927
@@ -1374,6 +1503,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Ack to close.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: c2a38de3743549e0850e678d1f91e2de
               name: 'Cache group [{#JMXNAME}]: Local node partitions, owning'
@@ -1386,8 +1519,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
+                  tag: component
+                  value: cache_group
             -
               uuid: be9b2cbf210e4e27a5887d77f2dafaad
               name: 'Cache group [{#JMXNAME}]: Local node entries, renting'
@@ -1400,8 +1533,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
+                  tag: component
+                  value: cache_group
             -
               uuid: 582acb454ffa4b129f5786e814df234f
               name: 'Cache group [{#JMXNAME}]: Local node partitions, renting'
@@ -1414,8 +1547,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
+                  tag: component
+                  value: cache_group
             -
               uuid: e026169754954bbe85afcef2534b4d0e
               name: 'Cache group [{#JMXNAME}]: Partition copies, max'
@@ -1428,8 +1561,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
+                  tag: component
+                  value: cache_group
             -
               uuid: b93a9ff86a2048bfbf8743b7a1c5ec06
               name: 'Cache group [{#JMXNAME}]: Partition copies, min'
@@ -1442,14 +1575,18 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
+                  tag: component
+                  value: cache_group
               trigger_prototypes:
                 -
                   uuid: 63c244c02ace4ac4a8d6f60e5c533890
                   expression: 'max(/GridGain by JMX/jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies],30m)=0'
                   name: 'Cache group [{#JMXNAME}]: There is no copy for partitions'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: 8dac4ccaad0f4736b2065e2f1200e3ff
               name: 'Cache group [{#JMXNAME}]: Partitions'
@@ -1462,14 +1599,18 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
+                  tag: component
+                  value: cache_group
           trigger_prototypes:
             -
               uuid: 3ded54fcdad74c83b47543410a7d9b3c
               expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",Backups],5m)>=max(/GridGain by JMX/jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies],5m)'
               name: 'Cache group [{#JMXNAME}]: One or more backups are unavailable'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: capacity
           graph_prototypes:
             -
               uuid: da32480debef4e2baec58a7cf1131357
@@ -1553,8 +1694,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Thread pool [{#JMXNAME}]'
+                  tag: component
+                  value: thread_pool
             -
               uuid: 3ffebf40ed154a7eb7050e16d30f9f53
               name: 'Thread pool [{#JMXNAME}]: Pool size, max'
@@ -1568,8 +1709,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Thread pool [{#JMXNAME}]'
+                  tag: component
+                  value: thread_pool
             -
               uuid: 1f7f5e0d19f6400fa8803eba2fb14f85
               name: 'Thread pool [{#JMXNAME}]: Pool size'
@@ -1583,8 +1724,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Thread pool [{#JMXNAME}]'
+                  tag: component
+                  value: thread_pool
             -
               uuid: c4a5e348590341b29af96b57bf92240b
               name: 'Thread pool [{#JMXNAME}]: Queue size'
@@ -1598,8 +1739,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Thread pool [{#JMXNAME}]'
+                  tag: component
+                  value: thread_pool
               trigger_prototypes:
                 -
                   uuid: f2a7aa098ed245f48b455ed747ee42c3
@@ -1607,6 +1748,10 @@ zabbix_export:
                   name: 'Thread pool [{#JMXNAME}]: Too many messages in queue (over {$GRIDGAIN.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"} for 5 min)'
                   priority: AVERAGE
                   description: 'Number of messages in queue more than {$GRIDGAIN.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"}.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: d3db21cd80664dc4b6847456e15b2b3e
@@ -1690,8 +1835,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
+                  tag: component
+                  value: cache
             -
               uuid: 632a331fe886428fa7b2c8845a02b57a
               name: 'Cache group [{#JMXGROUP}]: Cache hits, pct'
@@ -1706,8 +1851,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
+                  tag: component
+                  value: cache
             -
               uuid: 843b31df2e4d430082731b44e2653f13
               name: 'Cache group [{#JMXGROUP}]: Cache misses, pct'
@@ -1722,8 +1867,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
+                  tag: component
+                  value: cache
             -
               uuid: 96616d8c2b9c46b0bbd7350679476c36
               name: 'Cache group [{#JMXGROUP}]: Cache puts, rate'
@@ -1743,8 +1888,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
+                  tag: component
+                  value: cache
             -
               uuid: 308b3e27d35b439bbb2c1cf96f6d92fe
               name: 'Cache group [{#JMXGROUP}]: Cache removals, rate'
@@ -1764,8 +1909,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
+                  tag: component
+                  value: cache
             -
               uuid: e4886d5b699e432c8e6bb47b23b9c314
               name: 'Cache group [{#JMXGROUP}]: Cache size'
@@ -1779,8 +1924,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
+                  tag: component
+                  value: cache
             -
               uuid: 304ff6af92c0473aab8216d16509d28f
               name: 'Cache group [{#JMXGROUP}]: Cache transaction commits, rate'
@@ -1800,8 +1945,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
+                  tag: component
+                  value: cache
             -
               uuid: bd5b517d5a384c70a070658bc41734bf
               name: 'Cache group [{#JMXGROUP}]: Cache transaction rollbacks, rate'
@@ -1821,8 +1966,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
+                  tag: component
+                  value: cache
             -
               uuid: a0d3a73939564dc39267ccdca06d524b
               name: 'Cache group [{#JMXGROUP}]: Cache heap entries'
@@ -1841,8 +1986,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
+                  tag: component
+                  value: cache
           trigger_prototypes:
             -
               uuid: cfe03901890a4377ad8d5dcc7be3e0c5
@@ -1851,6 +1996,10 @@ zabbix_export:
               priority: INFO
               description: 'All entries are in heap. Possibly you use eager queries it may cause out of memory exceptions for big caches. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
             -
               uuid: 1c990b38154340a3aab678ac1365cf7e
               expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxRollbacks],5m) > max(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxCommits],5m)'
@@ -1860,11 +2009,19 @@ zabbix_export:
                 -
                   name: 'Cache group [{#JMXGROUP}]: There are no success transactions for cache for 5m'
                   expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxRollbacks],5m)>0 and max(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxCommits],5m)=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 2caa406da4cf4d089705e5506fd589f1
               expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxRollbacks],5m)>0 and max(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxCommits],5m)=0'
               name: 'Cache group [{#JMXGROUP}]: There are no success transactions for cache for 5m'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 8c453a6631b34c96b39375aff2e51ac3
@@ -1938,6 +2095,13 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: gridgain
       macros:
         -
           macro: '{$GRIDGAIN.CHECKPOINT.PUSED.MAX.HIGH}'

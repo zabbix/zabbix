@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T06:58:37Z'
+  date: '2022-03-01T12:59:26Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -18,7 +18,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -41,8 +41,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: application
           triggers:
             -
               uuid: 8a4fab49eb1e4ebbb1459d9b0f848771
@@ -50,6 +50,10 @@ zabbix_export:
               name: 'WildFly: Failed to fetch info data (or no data for 15m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 15 minutes'
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: 71db189440ec4355aa06262e3200d47e
               expression: 'last(/WildFly Server by JMX/jmx["java.lang:type=Runtime","Uptime"])<10m'
@@ -57,6 +61,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: daf104c5cafe4879b79fb30fca99c838
           name: 'WildFly: Launch type'
@@ -76,8 +84,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: application
         -
           uuid: b3c30ba00ac54677a944cda7ec8536af
           name: 'WildFly: Name'
@@ -99,8 +107,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: application
         -
           uuid: 98dd8a8de5f240998bebaf28c8d1bbe2
           name: 'WildFly: Process type'
@@ -120,8 +128,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: application
         -
           uuid: 0238c33ca0f045a7b1376cd5b3048bf0
           name: 'WildFly: Version'
@@ -141,8 +149,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: application
           triggers:
             -
               uuid: 2923ab6f81d64579b6ba778bc0467042
@@ -151,6 +159,10 @@ zabbix_export:
               priority: INFO
               description: 'WildFly version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 855c96cf1b3d4ef691f7693ba5f8357f
           name: 'WildFly: Runtime configuration state'
@@ -170,14 +182,18 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: application
           triggers:
             -
               uuid: c5702304641748e4bb04be89f3a38326
               expression: 'find(/WildFly Server by JMX/jmx["jboss.as:management-root=server","runtimeConfigurationState"],,"like","ok")=0'
               name: 'WildFly: Server needs to restart for configuration change.'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: cd57068c6e18440a8e14c0b4fc5c6c78
           name: 'WildFly: Server controller state'
@@ -197,8 +213,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: application
           triggers:
             -
               uuid: 81de7058e3b64f73a14e03728dcf1c9b
@@ -209,6 +225,10 @@ zabbix_export:
                 -
                   name: 'WildFly: Server needs to restart for configuration change.'
                   expression: 'find(/WildFly Server by JMX/jmx["jboss.as:management-root=server","runtimeConfigurationState"],,"like","ok")=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 2986d57975334b0bbf6bd687df457c26
           name: 'WildFly: Transactions: Aborted, rate'
@@ -227,8 +247,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: transactions
         -
           uuid: 035752468405481a9e0c4c60e662eadc
           name: 'WildFly: Transactions: Application rollbacks, rate'
@@ -247,8 +267,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: transactions
         -
           uuid: 2c157932072e416baed45a2350a3bd66
           name: 'WildFly: Transactions: Committed, rate'
@@ -267,8 +287,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: transactions
         -
           uuid: 82958fc3169c42d2bb0c9dc29e341b8f
           name: 'WildFly: Transactions: Heuristics, rate'
@@ -287,8 +307,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: transactions
         -
           uuid: 50ba79375dbf48c8b86c3d8654576186
           name: 'WildFly: Transactions: Current'
@@ -302,8 +322,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: transactions
         -
           uuid: 6ca1501ec2904b7b875d2f9bfa127e10
           name: 'WildFly: Transactions: Nested, rate'
@@ -322,8 +342,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: transactions
         -
           uuid: b1f782b6d71b4cc698a3f0d3b9d03a8d
           name: 'WildFly: Transactions: ResourceRollbacks, rate'
@@ -342,8 +362,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: transactions
         -
           uuid: 6ca6b59da5da4d7cb6fbacd2bdd37996
           name: 'WildFly: Transactions: System rollbacks, rate'
@@ -362,8 +382,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: transactions
         -
           uuid: 90f1a21c335b42928455d31635bfd11d
           name: 'WildFly: Transactions: Timed out, rate'
@@ -382,8 +402,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: transactions
         -
           uuid: a0c40292c62e4d51a96db3e07967b17c
           name: 'WildFly: Transactions: Total, rate'
@@ -402,8 +422,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: transactions
       discovery_rules:
         -
           uuid: 9dbbe152925245f8a1f3bf5c32ae49c0
@@ -449,8 +469,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly deployment [{#DEPLOYMENT}]'
+                  tag: component
+                  value: deployments
+                -
+                  tag: deployment
+                  value: '{#DEPLOYMENT}'
             -
               uuid: 8942cf5bc803401cac2f4d9ea943f1fe
               name: 'WildFly deployment [{#DEPLOYMENT}]: Enabled'
@@ -474,8 +497,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly deployment [{#DEPLOYMENT}]'
+                  tag: component
+                  value: deployments
+                -
+                  tag: deployment
+                  value: '{#DEPLOYMENT}'
             -
               uuid: f633e596ddcc4620a193243c80a6633b
               name: 'WildFly deployment [{#DEPLOYMENT}]: Managed'
@@ -499,8 +525,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly deployment [{#DEPLOYMENT}]'
+                  tag: component
+                  value: deployments
+                -
+                  tag: deployment
+                  value: '{#DEPLOYMENT}'
             -
               uuid: 498f0d31a5044b91b4aa8af621011919
               name: 'WildFly deployment [{#DEPLOYMENT}]: Persistent'
@@ -524,8 +553,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly deployment [{#DEPLOYMENT}]'
+                  tag: component
+                  value: deployments
+                -
+                  tag: deployment
+                  value: '{#DEPLOYMENT}'
             -
               uuid: d5dd67dc20c54ef1921da9c9a068ad29
               name: 'WildFly deployment [{#DEPLOYMENT}]: Status'
@@ -549,8 +581,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly deployment [{#DEPLOYMENT}]'
+                  tag: component
+                  value: deployments
+                -
+                  tag: deployment
+                  value: '{#DEPLOYMENT}'
               trigger_prototypes:
                 -
                   uuid: 6b432b25debe4277a971bc8a906e07b1
@@ -559,6 +594,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'Deployment status has changed. Ack to close.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           lld_macro_paths:
             -
@@ -593,8 +632,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: cache
+                -
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: 0857fb4d2d2447a0b0dede21bb4b4bd5
               name: 'WildFly {#JMX_DATA_SOURCE}: Cache add, rate'
@@ -613,8 +658,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: cache
+                -
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: bf368224ed444311ae1af4098c4bdb1f
               name: 'WildFly {#JMX_DATA_SOURCE}: Cache current size'
@@ -627,8 +678,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: cache
+                -
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: 9c08f05299774a538a52be2c11e62cda
               name: 'WildFly {#JMX_DATA_SOURCE}: Cache delete, rate'
@@ -647,8 +704,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: cache
+                -
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: dbe7bc3d9a8a46c6a84b956f0a9e33be
               name: 'WildFly {#JMX_DATA_SOURCE}: Cache hit, rate'
@@ -667,8 +730,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: cache
+                -
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: 0e81a30b802941c4bc0e34a10a8d0573
               name: 'WildFly {#JMX_DATA_SOURCE}: Cache miss, rate'
@@ -687,8 +756,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: cache
+                -
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: 81dbce02ad4d492ebebd1a205bea1b43
               name: 'WildFly {#JMX_DATA_SOURCE}: Statistics enabled'
@@ -712,8 +787,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
           graph_prototypes:
             -
               uuid: 322b26787ab444db90a1be3da2717dd2
@@ -778,14 +856,24 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: connections
+                -
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
               trigger_prototypes:
                 -
                   uuid: ea551068ebd04d349eba3f45a72f2610
                   expression: 'max(/WildFly Server by JMX/jmx["{#JMXOBJ}",ActiveCount],5m)=0'
                   name: 'WildFly {#JMX_DATA_SOURCE}: There are no active connections for 5m'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: 64565b71c26b463d8ea83ee5ee18284f
               name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Available'
@@ -799,8 +887,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: connections
+                -
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: adf534b46aba4f28acea58ea46197edd
               name: 'WildFly {#JMX_DATA_SOURCE}: Blocking time, avg'
@@ -815,8 +909,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: 788691ba487e422a913d408361f99e4d
               name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Creating time, avg'
@@ -831,8 +928,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: connections
+                -
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: 52320ebbe70244e3ad52b0766cd03d8d
               name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Get time, avg'
@@ -847,8 +950,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: connections
+                -
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: c3a313b3d1c34e6b99ae73d5195e7fac
               name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Pool time, avg'
@@ -863,8 +972,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: connections
+                -
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: a76602ba784a4d40a3672a80487c878a
               name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Usage time, avg'
@@ -879,8 +994,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: connections
+                -
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: ba111d0ad76848c39c54ffc37d04e561
               name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Blocking failure, rate'
@@ -899,8 +1020,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: connections
+                -
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: c01eb89708224899a9ac8e90ee79bcca
               name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Created, rate'
@@ -919,8 +1046,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: connections
+                -
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: 606ed51ce8e549c7af20d7c1c5f78e6e
               name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Destroyed, rate'
@@ -939,8 +1072,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: connections
+                -
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: a02eb0060fbb4f598d654d93c286c543
               name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Idle'
@@ -954,8 +1093,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: connections
+                -
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: a5eed78c02274f6180eb667091087ce0
               name: 'WildFly {#JMX_DATA_SOURCE}: Connections: In use'
@@ -969,8 +1114,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: connections
+                -
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: 2f3e82a1c2f2472f95e4a85e3b182739
               name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Used, max'
@@ -984,8 +1135,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: connections
+                -
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: fb9a55168c8a4082a19f846ca10adc85
               name: 'WildFly {#JMX_DATA_SOURCE}: Statistics enabled'
@@ -1010,20 +1167,31 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
               trigger_prototypes:
                 -
                   uuid: 2996a48892a640d69154de332c673755
                   expression: 'last(/WildFly Server by JMX/jmx["{#JMXOBJ}",statisticsEnabled])=0'
                   name: 'WildFly {#JMX_DATA_SOURCE}: JDBC monitoring statistic is not enabled'
                   priority: INFO
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: 4ea71ba3572647b29a60077bc511052a
                   expression: 'last(/WildFly Server by JMX/jmx["{#JMXOBJ}",statisticsEnabled])=0'
                   name: 'WildFly {#JMX_DATA_SOURCE}: Pools monitoring statistic is not enabled'
                   priority: INFO
                   description: 'Zabbix has not received data for items for the last 15 minutes'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 727ff33cec8e4223bc5054c53d0de88b
               name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Timed out, rate'
@@ -1042,14 +1210,24 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: connections
+                -
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
               trigger_prototypes:
                 -
                   uuid: d70d1703fdc64926abe602324814ea4c
                   expression: 'last(/WildFly Server by JMX/jmx["{#JMXOBJ}",TimedOut])>0'
-                  name: 'WildFly {#JMX_DATA_SOURCE}: There are timeout  connections'
+                  name: 'WildFly {#JMX_DATA_SOURCE}: There are timeout connections'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 4832c8d39e0d4329af6876c594a3d741
               name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Wait'
@@ -1063,14 +1241,24 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: connections
+                -
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
               trigger_prototypes:
                 -
                   uuid: 2e38504216d84f3b9fe43b0bea86e388
                   expression: 'min(/WildFly Server by JMX/jmx["{#JMXOBJ}",WaitCount],5m)>{$WILDFLY.CONN.WAIT.MAX.WARN}'
                   name: 'WildFly {#JMX_DATA_SOURCE}: Too many waiting connections (over {$WILDFLY.CONN.WAIT.MAX.WARN} for 5m)'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: c22389aa983a4cdca504e3cc41126f03
               name: 'WildFly {#JMX_DATA_SOURCE}: XA: Commit time, avg'
@@ -1085,8 +1273,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: datasources
+                -
+                  tag: component
+                  value: xa
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: 2510b507e62c4574af32bb0a283995e8
               name: 'WildFly {#JMX_DATA_SOURCE}: XA: Commit, rate'
@@ -1105,8 +1299,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: datasources
+                -
+                  tag: component
+                  value: xa
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: 6f15c885d49e4c1a89bd52b0b4ff0035
               name: 'WildFly {#JMX_DATA_SOURCE}: XA: End time, avg'
@@ -1121,8 +1321,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: datasources
+                -
+                  tag: component
+                  value: xa
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: c51dd8821ace4724ae965d7ca6f3ebdd
               name: 'WildFly {#JMX_DATA_SOURCE}: XA: End, rate'
@@ -1141,8 +1347,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: datasources
+                -
+                  tag: component
+                  value: xa
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: b5028a44fa2b4347abe11177d61567e2
               name: 'WildFly {#JMX_DATA_SOURCE}: XA: Forget time, avg'
@@ -1157,8 +1369,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: datasources
+                -
+                  tag: component
+                  value: xa
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: 685173455b424a5aa5463670c1718314
               name: 'WildFly {#JMX_DATA_SOURCE}: XA: Forget, rate'
@@ -1177,8 +1395,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: datasources
+                -
+                  tag: component
+                  value: xa
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: 4513aff93c8a404389aaf58b28aab5b1
               name: 'WildFly {#JMX_DATA_SOURCE}: XA: Prepare time, avg'
@@ -1192,8 +1416,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: datasources
+                -
+                  tag: component
+                  value: xa
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: 96c723883cfa416b9e030e5d42836de3
               name: 'WildFly {#JMX_DATA_SOURCE}: XA: Prepare, rate'
@@ -1212,8 +1442,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: datasources
+                -
+                  tag: component
+                  value: xa
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: 30f0474a666547c39e0d793decd0be57
               name: 'WildFly {#JMX_DATA_SOURCE}: XA: Recover time, avg'
@@ -1228,8 +1464,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: datasources
+                -
+                  tag: component
+                  value: xa
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: d7a3de25f6a74c75b65bc9c83decc1ac
               name: 'WildFly {#JMX_DATA_SOURCE}: XA: Recover, rate'
@@ -1239,7 +1481,7 @@ zabbix_export:
               value_type: FLOAT
               username: '{$WILDFLY.USER}'
               password: '{$WILDFLY.PASSWORD}'
-              description: 'The number of XAResource recover invocationsper second.'
+              description: 'The number of XAResource recover invocations per second.'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -1248,8 +1490,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: datasources
+                -
+                  tag: component
+                  value: xa
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: bd64f91e953249e993c3c388f3382ff4
               name: 'WildFly {#JMX_DATA_SOURCE}: XA: Rollback time, avg'
@@ -1264,8 +1512,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: datasources
+                -
+                  tag: component
+                  value: xa
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: 0c0749b041124e1ebb11396344517c01
               name: 'WildFly {#JMX_DATA_SOURCE}: XA: Rollback, rate'
@@ -1284,8 +1538,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: datasources
+                -
+                  tag: component
+                  value: xa
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: ab9c32db31d84a46967c1f601f11f610
               name: 'WildFly {#JMX_DATA_SOURCE}: XA: Start time, avg'
@@ -1300,8 +1560,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: datasources
+                -
+                  tag: component
+                  value: xa
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
             -
               uuid: ef5b00e1dcab4addbc72a0c191e3728b
               name: 'WildFly {#JMX_DATA_SOURCE}: XA: Start rate'
@@ -1320,14 +1586,24 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+                  tag: component
+                  value: datasources
+                -
+                  tag: component
+                  value: xa
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
           trigger_prototypes:
             -
               uuid: 6a40b3e94cc0441abc95fe3bc94397bf
               expression: 'min(/WildFly Server by JMX/jmx["{#JMXOBJ}",InUseCount],5m)/last(/WildFly Server by JMX/jmx["{#JMXOBJ}",AvailableCount])*100>{$WILDFLY.CONN.USAGE.WARN.MAX}'
               name: 'WildFly {#JMX_DATA_SOURCE}: Connection usage is too high (over {$WILDFLY.CONN.USAGE.WARN.MAX} in 5m)'
               priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: capacity
           graph_prototypes:
             -
               uuid: 65db851d241b4fe4b6a5d9796d475e55
@@ -1404,8 +1680,17 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly listener [{#SERVER}.{#HTTP_LISTENER}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: undertow
+                -
+                  tag: http_listener
+                  value: '{#HTTP_LISTENER}'
+                -
+                  tag: server
+                  value: '{#SERVER}'
             -
               uuid: 36451d29d7074b8ebdb3f366eeaa84df
               name: 'WildFly listener {#HTTP_LISTENER}: Bytes sent, rate'
@@ -1425,8 +1710,17 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly listener [{#SERVER}.{#HTTP_LISTENER}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: undertow
+                -
+                  tag: http_listener
+                  value: '{#HTTP_LISTENER}'
+                -
+                  tag: server
+                  value: '{#SERVER}'
             -
               uuid: a34cb42c703a4996ab9a4c7a08e71eeb
               name: 'WildFly listener {#HTTP_LISTENER}: Errors, rate'
@@ -1445,14 +1739,24 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly listener [{#SERVER}.{#HTTP_LISTENER}]'
+                  tag: component
+                  value: undertow
+                -
+                  tag: http_listener
+                  value: '{#HTTP_LISTENER}'
+                -
+                  tag: server
+                  value: '{#SERVER}'
               trigger_prototypes:
                 -
                   uuid: 504b88b04a204335a10f56cc3d852ba5
                   expression: 'last(/WildFly Server by JMX/jmx["{#JMXOBJ}",errorCount])>0'
                   name: 'WildFly listener {#HTTP_LISTENER}: There are 500 responses by this listener.'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 2e7a581b104a4d4a8a0d9235b899635a
               name: 'WildFly listener {#HTTP_LISTENER}: Requests, rate'
@@ -1472,8 +1776,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly listener [{#SERVER}.{#HTTP_LISTENER}]'
+                  tag: component
+                  value: undertow
+                -
+                  tag: http_listener
+                  value: '{#HTTP_LISTENER}'
+                -
+                  tag: server
+                  value: '{#SERVER}'
           graph_prototypes:
             -
               uuid: 980c07db8fc5450db560a94df1250bf5
@@ -1516,6 +1826,13 @@ zabbix_export:
             -
               lld_macro: '{#SERVER}'
               path: '$.properties.["server"]'
+      tags:
+        -
+          tag: class
+          value: application
+        -
+          tag: target
+          value: wildfly-server
       macros:
         -
           macro: '{$WILDFLY.CONN.USAGE.WARN.MAX}'

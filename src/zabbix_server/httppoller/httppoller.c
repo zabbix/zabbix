@@ -17,15 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "httppoller.h"
 
+#include "common.h"
 #include "db.h"
 #include "log.h"
 #include "daemon.h"
 #include "zbxself.h"
-
 #include "httptest.h"
-#include "httppoller.h"
 
 extern int		CONFIG_HTTPPOLLER_FORKS;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

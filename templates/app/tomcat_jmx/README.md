@@ -46,10 +46,10 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Global request processors discovery |<p>Discovery for GlobalRequesProcessor</p> |JMX |jmx.discovery[beans,"Catalina:type=GlobalRequestProcessor,name=*"]<p>**Filter**:</p>AND <p>- {#JMXNAME} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"GlobalRequesProcessor"}`</p><p>- {#JMXNAME} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"GlobalRequesProcessor"}`</p> |
+|Contexts discovery |<p>Discovery for contexts</p> |JMX |jmx.discovery[beans,"Catalina:type=Manager,host=*,context=*"]<p>**Filter**:</p>AND <p>- {#JMXHOST} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"Manager"}`</p><p>- {#JMXHOST} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"Manager"}`</p> |
+|Global request processors discovery |<p>Discovery for GlobalRequestProcessor</p> |JMX |jmx.discovery[beans,"Catalina:type=GlobalRequestProcessor,name=*"]<p>**Filter**:</p>AND <p>- {#JMXNAME} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"GlobalRequestProcessor"}`</p><p>- {#JMXNAME} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"GlobalRequestProcessor"}`</p> |
 |Protocol handlers discovery |<p>Discovery for ProtocolHandler</p> |JMX |jmx.discovery[attributes,"Catalina:type=ProtocolHandler,port=*"]<p>**Filter**:</p>AND <p>- {#JMXATTR} MATCHES_REGEX `^name$`</p> |
 |Thread pools discovery |<p>Discovery for ThreadPool</p> |JMX |jmx.discovery[beans,"Catalina:type=ThreadPool,name=*"]<p>**Filter**:</p>AND <p>- {#JMXNAME} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"ThreadPool"}`</p><p>- {#JMXNAME} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"ThreadPool"}`</p> |
-|Contexts discovery |<p>Discovery for contexts</p> |JMX |jmx.discovery[beans,"Catalina:type=Manager,host=*,context=*"]<p>**Filter**:</p>AND <p>- {#JMXHOST} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"Manager"}`</p><p>- {#JMXHOST} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"Manager"}`</p> |
 
 ## Items collected
 
@@ -60,7 +60,7 @@ There are no template links in this template.
 |Tomcat |{#JMXNAME}: Bytes sent per second |<p>Bytes sent rate by processor {#JMXNAME}</p> |JMX |jmx[{#JMXOBJ},bytesSent]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |Tomcat |{#JMXNAME}: Errors per second |<p>Error rate of request processor {#JMXNAME}</p> |JMX |jmx[{#JMXOBJ},errorCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |Tomcat |{#JMXNAME}: Requests per second |<p>Rate of requests served by request processor {#JMXNAME}</p> |JMX |jmx[{#JMXOBJ},requestCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
-|Tomcat |{#JMXNAME}: Requests processing time |<p>The total time to process all incoming requests of request processor {#JMXNAME}</p> |JMX |jmx[{#JMXOBJ},processingTime]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
+|Tomcat |{#JMXNAME}: Requests processing time |<p>The total time to process all incoming requests of request processor</p><p>{#JMXNAME}</p> |JMX |jmx[{#JMXOBJ},processingTime]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
 |Tomcat |{#JMXVALUE}: Gzip compression status |<p>Gzip compression status on {#JMXNAME}. Enabling gzip compression may save server bandwidth.</p> |JMX |jmx[{#JMXOBJ},compression]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Tomcat |{#JMXNAME}: Threads count |<p>Amount of threads the thread pool has right now, both busy and free.</p> |JMX |jmx[{#JMXOBJ},currentThreadCount]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |Tomcat |{#JMXNAME}: Threads limit |<p>Limit of the threads count. When currentThreadsBusy counter reaches the maxThreads limit, no more requests could be handled, and the application chokes.</p> |JMX |jmx[{#JMXOBJ},maxThreads]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
@@ -83,5 +83,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/411862-discussion-thread-for-official-zabbix-template-tomcat).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/411862-discussion-thread-for-official-zabbix-template-tomcat).
 

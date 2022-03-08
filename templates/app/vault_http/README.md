@@ -53,11 +53,11 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Storage metrics discovery |<p>Storage backend metrics discovery.</p> |DEPENDENT |vault.storage.discovery<p>**Filter**:</p>AND <p>- {#STORAGE} MATCHES_REGEX `{$VAULT.LLD.FILTER.STORAGE.MATCHES}`</p> |
 |Mountpoint metrics discovery |<p>Mountpoint metrics discovery.</p> |DEPENDENT |vault.mountpoint.discovery |
-|WAL metrics discovery |<p>Discovery for WAL metrics.</p> |DEPENDENT |vault.wal.discovery |
 |Replication metrics discovery |<p>Discovery for replication metrics.</p> |DEPENDENT |vault.replication.discovery |
+|Storage metrics discovery |<p>Storage backend metrics discovery.</p> |DEPENDENT |vault.storage.discovery<p>**Filter**:</p>AND <p>- {#STORAGE} MATCHES_REGEX `{$VAULT.LLD.FILTER.STORAGE.MATCHES}`</p> |
 |Token metrics discovery |<p>Tokens metrics discovery.</p> |DEPENDENT |vault.tokens.discovery |
+|WAL metrics discovery |<p>Discovery for WAL metrics.</p> |DEPENDENT |vault.wal.discovery |
 
 ## Items collected
 
@@ -92,7 +92,7 @@ There are no template links in this template.
 |Vault |Vault: Cache hit, rate |<p>Number of times a value was retrieved from the LRU cache.</p> |DEPENDENT |vault.metrics.cache.hit.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `vault_cache_hit`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Vault |Vault: Cache miss, rate |<p>Number of times a value was not in the LRU cache. The results in a read from the configured storage.</p> |DEPENDENT |vault.metrics.cache.miss.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `vault_cache_miss`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Vault |Vault: Cache write, rate |<p>Number of times a value was written to the LRU cache.</p> |DEPENDENT |vault.metrics.cache.write.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `vault_cache_write`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
-|Vault |Vault: Check token, rate |<p>Number of token checks handled by Vault corecore.</p> |DEPENDENT |vault.metrics.core.check.token.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `vault_core_check_token_count`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
+|Vault |Vault: Check token, rate |<p>Number of token checks handled by Vault core.</p> |DEPENDENT |vault.metrics.core.check.token.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `vault_core_check_token_count`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Vault |Vault: Fetch ACL and token, rate |<p>Number of ACL and corresponding token entry fetches handled by Vault core.</p> |DEPENDENT |vault.metrics.core.fetch.acl_and_token<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `vault_core_fetch_acl_and_token_count`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Vault |Vault: Requests, rate |<p>Number of requests handled by Vault core.</p> |DEPENDENT |vault.metrics.core.handle.request<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `vault_core_handle_request_count`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Vault |Vault: Leadership setup failed, counter |<p>Cluster leadership setup failures which have occurred in a highly available Vault cluster.</p> |DEPENDENT |vault.metrics.core.leadership.setup_failed<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `vault_core_leadership_setup_failed`</p><p>- JSONPATH: `$[?(@.name=="vault_core_leadership_setup_failed")].value.sum()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
@@ -159,15 +159,15 @@ There are no template links in this template.
 |Vault |Vault: Token [{#TOKEN_NAME}] error |<p>Token lookup error text.</p> |DEPENDENT |vault.token_via_accessor.error["{#ACCESSOR}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.accessor == "{#ACCESSOR}")].error.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Vault |Vault: Token [{#TOKEN_NAME}] has TTL |<p>The Token has TTL.</p> |DEPENDENT |vault.token_via_accessor.has_ttl["{#ACCESSOR}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.accessor == "{#ACCESSOR}")].has_ttl.first()`</p><p>- BOOL_TO_DECIMAL</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Vault |Vault: Token [{#TOKEN_NAME}] TTL |<p>The TTL period of the token.</p> |DEPENDENT |vault.token_via_accessor.ttl["{#ACCESSOR}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.accessor == "{#ACCESSOR}")].ttl.first()`</p> |
-|Zabbix_raw_items |Vault: Get health |<p>-</p> |HTTP_AGENT |vault.get_health<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> {"healthcheck": 0}`</p> |
-|Zabbix_raw_items |Vault: Get leader |<p>-</p> |HTTP_AGENT |vault.get_leader<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p> |
-|Zabbix_raw_items |Vault: Get metrics |<p>-</p> |HTTP_AGENT |vault.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p> |
-|Zabbix_raw_items |Vault: Clear metrics |<p>-</p> |DEPENDENT |vault.clear_metrics<p>**Preprocessing**:</p><p>- CHECK_JSON_ERROR: `$.errors`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Zabbix_raw_items |Vault: Get tokens |<p>Get information about tokens via their accessors. Accessors are defined in the macro "{$VAULT.TOKEN.ACCESSORS}".</p> |SCRIPT |vault.get_tokens<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Zabbix_raw_items |Vault: Check WAL discovery |<p>-</p> |DEPENDENT |vault.check_wal_discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~"^vault_wal_(?:.+)$"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return JSON.stringify(value !== "[]" ? [{'{#SINGLETON}': ''}] : []);`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
-|Zabbix_raw_items |Vault: Check replication discovery |<p>-</p> |DEPENDENT |vault.check_replication_discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~"^replication_(?:.+)$"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return JSON.stringify(value !== "[]" ? [{'{#SINGLETON}': ''}] : []);`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
-|Zabbix_raw_items |Vault: Check storage discovery |<p>-</p> |DEPENDENT |vault.check_storage_discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~"^vault_(?:.+)_(?:get|put|list|delete)_count$"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
-|Zabbix_raw_items |Vault: Check mountpoint discovery |<p>-</p> |DEPENDENT |vault.check_mountpoint_discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~"^vault_rollback_attempt_(?:.+?)_count$"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
+|Zabbix raw items |Vault: Get health |<p>-</p> |HTTP_AGENT |vault.get_health<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> {"healthcheck": 0}`</p> |
+|Zabbix raw items |Vault: Get leader |<p>-</p> |HTTP_AGENT |vault.get_leader<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p> |
+|Zabbix raw items |Vault: Get metrics |<p>-</p> |HTTP_AGENT |vault.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p> |
+|Zabbix raw items |Vault: Clear metrics |<p>-</p> |DEPENDENT |vault.clear_metrics<p>**Preprocessing**:</p><p>- CHECK_JSON_ERROR: `$.errors`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Zabbix raw items |Vault: Get tokens |<p>Get information about tokens via their accessors. Accessors are defined in the macro "{$VAULT.TOKEN.ACCESSORS}".</p> |SCRIPT |vault.get_tokens<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Zabbix raw items |Vault: Check WAL discovery |<p>-</p> |DEPENDENT |vault.check_wal_discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~"^vault_wal_(?:.+)$"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return JSON.stringify(value !== "[]" ? [{'{#SINGLETON}': ''}] : []);`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
+|Zabbix raw items |Vault: Check replication discovery |<p>-</p> |DEPENDENT |vault.check_replication_discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~"^replication_(?:.+)$"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return JSON.stringify(value !== "[]" ? [{'{#SINGLETON}': ''}] : []);`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
+|Zabbix raw items |Vault: Check storage discovery |<p>-</p> |DEPENDENT |vault.check_storage_discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~"^vault_(?:.+)_(?:get|put|list|delete)_count$"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
+|Zabbix raw items |Vault: Check mountpoint discovery |<p>-</p> |DEPENDENT |vault.check_mountpoint_discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~"^vault_rollback_attempt_(?:.+?)_count$"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
 
 ## Triggers
 
@@ -190,5 +190,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 

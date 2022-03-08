@@ -17,24 +17,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "trapper.h"
 
 #include "log.h"
-#include "zbxjson.h"
-#include "dbcache.h"
 #include "proxy.h"
 #include "zbxself.h"
-
 #include "active.h"
 #include "nodecommand.h"
 #include "proxyconfig.h"
 #include "proxydata.h"
-
 #include "daemon.h"
 #include "zbxcrypto.h"
 #include "../../libs/zbxserver/zabbix_stats.h"
 #include "../poller/checks_snmp.h"
-
 #include "trapper_auth.h"
 #include "trapper_preproc.h"
 #include "trapper_expressions_evaluate.h"
@@ -44,8 +39,6 @@
 #ifdef HAVE_NETSNMP
 #	include "zbxrtc.h"
 #endif
-
-#include "trapper.h"
 
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3

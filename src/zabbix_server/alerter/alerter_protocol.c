@@ -17,15 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "alerter_protocol.h"
+
 #include "log.h"
 #include "zbxserialize.h"
-#include "zbxalgo.h"
-#include "zbxipcservice.h"
-#include "zbxalert.h"
-#include "db.h"
-
-#include "alerter_protocol.h"
 
 void	zbx_am_db_mediatype_clear(zbx_am_db_mediatype_t *mediatype)
 {
@@ -897,7 +892,7 @@ static void	zbx_alerter_deserialize_top_sources_result(const unsigned char *data
 
 		for (i = 0; i < sources_num; i++)
 		{
-			zbx_am_source_stats_t	*source;;
+			zbx_am_source_stats_t	*source;
 
 			source = (zbx_am_source_stats_t *)zbx_malloc(NULL, sizeof(zbx_am_source_stats_t));
 			data += zbx_deserialize_value(data, &source->source);

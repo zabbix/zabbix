@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T06:56:45Z'
+  date: '2022-03-01T08:29:43Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         The template to monitor Cloudflare to see your web traffic and DNS metrics. It works without any external scripts and uses Script item.
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -36,14 +36,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: bandwidth
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: gauge
         -
           uuid: 7f5900d6c707405789624f84f502b042
           name: 'Cloudflare: Cached bandwidth'
@@ -62,14 +56,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: bandwidth
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: gauge
         -
           uuid: c5ab8cc281ff4f75bd4ada79d2c0d1e8
           name: 'Cloudflare: Cache hit ratio of bandwidth'
@@ -89,14 +77,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: bandwidth
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: ratio
           triggers:
             -
               uuid: acf573785c394924aae8ef74b2683fd1
@@ -104,6 +86,10 @@ zabbix_export:
               name: 'Cloudflare: Cached bandwidth is too low (less than {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}% for 3 last measurements)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 901db6b121c7473485c91b0f27e7cf50
           name: 'Cloudflare: SSL encrypted bandwidth'
@@ -122,14 +108,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: bandwidth
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: gauge
         -
           uuid: 4637d88e62204f9d8fb9fc0f179c5319
           name: 'Cloudflare: Unencrypted bandwidth'
@@ -148,14 +128,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: bandwidth
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: gauge
         -
           uuid: 96e88a64df014997b8c675cbc4bb97a1
           name: 'Cloudflare: Uncached bandwidth'
@@ -174,14 +148,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: bandwidth
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: gauge
         -
           uuid: 6eff62f2786d42a7925bd516a1c2a958
           name: 'Cloudflare: DNS queries'
@@ -200,14 +168,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: dns
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: gauge
         -
           uuid: 4612a834ef054740ba5fea529a08e220
           name: 'Cloudflare: Stale DNS queries'
@@ -226,14 +188,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: dns
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: gauge
         -
           uuid: 4aeb289b631a402390a833e3c5227d38
           name: 'Cloudflare: Uncached DNS queries'
@@ -252,14 +208,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: dns
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: gauge
         -
           uuid: 9450a68208fd4cb8bde009296d722064
           name: 'Cloudflare: Get data'
@@ -497,14 +447,8 @@ zabbix_export:
               value: '{$CLOUDFLARE.API.URL}'
           tags:
             -
-              tag: data
+              tag: component
               value: raw
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: transport
-              value: Script
         -
           uuid: 71efacd9f1dc46a7aa29876c8bf7906c
           name: 'Cloudflare: Total page views'
@@ -523,14 +467,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: pageviews
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: gauge
         -
           uuid: d4a7431b1f6a4d3ab11551a36c98fbf7
           name: 'Cloudflare: Total requests'
@@ -549,14 +487,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: requests
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: gauge
         -
           uuid: cc9d651cdec94afeb12ead87b3c3e8f3
           name: 'Cloudflare: Cached requests'
@@ -574,14 +506,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: requests
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: gauge
         -
           uuid: e1c2a1280d25439f8020b3ebc451d892
           name: 'Cloudflare: Cache hit ratio % over time'
@@ -601,14 +527,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: requests
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: ratio
         -
           uuid: 228912bdae724d70b1abe79510b69082
           name: 'Cloudflare: Non-2xx responses ratio'
@@ -628,14 +548,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: requests
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: ratio
           triggers:
             -
               uuid: e76f4a61dd094419b6e0af706758e545
@@ -644,6 +558,10 @@ zabbix_export:
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'A large number of errors can indicate a malfunction of the site.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 0f427419265a4ef09f052a03c539125d
           name: 'Cloudflare: Response codes 1xx'
@@ -662,14 +580,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: requests
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: gauge
         -
           uuid: 3ade3e726d314382a3e841b3d5cb5834
           name: 'Cloudflare: Response codes 2xx'
@@ -688,14 +600,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: requests
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: gauge
         -
           uuid: 2caff86e7ca5400889f3b2bd4b6ba986
           name: 'Cloudflare: Response codes 3xx'
@@ -714,14 +620,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: requests
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: gauge
         -
           uuid: b3510ec2adc74e10824365012c13250f
           name: 'Cloudflare: Response codes 4xx'
@@ -740,14 +640,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: requests
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: gauge
         -
           uuid: 714ef2cbecbe4a93b20988a0bc6863a7
           name: 'Cloudflare: Response codes 5xx'
@@ -766,14 +660,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: requests
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: gauge
         -
           uuid: d39fcd4fdc594257bea91de0890d326b
           name: 'Cloudflare: SSL encrypted requests'
@@ -792,14 +680,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: requests
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: gauge
         -
           uuid: acbbc431dfc3431583123380edb6da38
           name: 'Cloudflare: Unencrypted requests'
@@ -818,14 +700,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: requests
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: gauge
         -
           uuid: 6100ff50001543ae83e84ab2c47260f3
           name: 'Cloudflare: 2xx responses ratio'
@@ -845,14 +721,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: requests
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: ratio
         -
           uuid: 7907f68e795b40fca1bd520556ea1fff
           name: 'Cloudflare: Uncached requests'
@@ -871,14 +741,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: requests
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: gauge
         -
           uuid: 328051a78529494e943edda567aa0e24
           name: 'Cloudflare: Total threats'
@@ -896,14 +760,8 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: threats
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: gauge
         -
           uuid: d1a2ec213b084701805f3f974af25a21
           name: 'Cloudflare: Unique visitors'
@@ -922,14 +780,15 @@ zabbix_export:
             key: cloudflare.get
           tags:
             -
-              tag: resource
+              tag: component
               value: uniques
-            -
-              tag: target
-              value: cloudflare
-            -
-              tag: type
-              value: gauge
+      tags:
+        -
+          tag: class
+          value: service
+        -
+          tag: target
+          value: cloudflare
       macros:
         -
           macro: '{$CLOUDFLARE.API.TOKEN}'

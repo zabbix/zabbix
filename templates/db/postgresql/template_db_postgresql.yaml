@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-12T12:00:46Z'
+  date: '2022-01-26T10:51:40Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384190-%C2%A0discussion-thread-for-official-zabbix-template-db-postgresql
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Databases
@@ -41,8 +41,8 @@ zabbix_export:
             key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: bgwriter
         -
           uuid: 2c3ee691d4a54fb6b566739a3a648df4
           name: 'Bgwriter: Buffers written directly by a backend per second'
@@ -66,8 +66,8 @@ zabbix_export:
             key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: bgwriter
         -
           uuid: 77e1eb202a6346ce9df0f1bb2c078688
           name: 'Bgwriter: Buffers backend fsync per second'
@@ -90,8 +90,8 @@ zabbix_export:
             key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: bgwriter
         -
           uuid: e29d26a48d0143579bf3acc6655cd659
           name: 'Bgwriter: Buffers written during checkpoints per second'
@@ -115,8 +115,8 @@ zabbix_export:
             key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: bgwriter
         -
           uuid: 5151183461a54d2bbfaad04b8cab3798
           name: 'Bgwriter: Buffers written by the background writer per second'
@@ -140,8 +140,8 @@ zabbix_export:
             key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: bgwriter
         -
           uuid: ff290c0602b9447e87240c1ecf467050
           name: 'Bgwriter: Requested checkpoints per second'
@@ -164,8 +164,8 @@ zabbix_export:
             key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: bgwriter
           triggers:
             -
               uuid: 65e7954489854ad3ad1698dead7c4c02
@@ -175,6 +175,10 @@ zabbix_export:
               description: |
                 Checkpoints are points in the sequence of transactions at which it is guaranteed that the heap and index data files have been updated with all information written before that checkpoint. At checkpoint time, all dirty data pages are flushed to disk and a special checkpoint record is written to the log file.
                 https://www.postgresql.org/docs/current/wal-configuration.html
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: a5271230be8b431cb96580180e099b98
           name: 'Bgwriter: Scheduled checkpoints per second'
@@ -197,8 +201,8 @@ zabbix_export:
             key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: bgwriter
         -
           uuid: 782d2368763b48ad8663aa9fb75c3326
           name: 'Bgwriter: Checkpoint sync time'
@@ -226,8 +230,8 @@ zabbix_export:
             key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: bgwriter
         -
           uuid: b5e5f463978c46dd9401963f48ea72eb
           name: 'Bgwriter: Checkpoint write time'
@@ -255,8 +259,8 @@ zabbix_export:
             key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: bgwriter
         -
           uuid: f273c71f92bf4ac0b6ec5a0a88d1239c
           name: 'Bgwriter: Max written per second'
@@ -279,8 +283,8 @@ zabbix_export:
             key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: bgwriter
         -
           uuid: 1fc5ba48a0974bd7bf965b5f130deded
           name: 'PostgreSQL: Get bgwriter'
@@ -291,8 +295,8 @@ zabbix_export:
           description: 'Statistics about the background writer process''s activity'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
           triggers:
             -
               uuid: 768d28b9360b46cda3065f5082ba97ac
@@ -304,6 +308,10 @@ zabbix_export:
                 -
                   name: 'PostgreSQL: Service is down'
                   expression: 'last(/PostgreSQL by Zabbix agent/pgsql.ping["{$PG.HOST}","{$PG.PORT}"]) = 0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 70a7581fabd14e05bda762b79811187c
           name: 'Status: Cache hit ratio %'
@@ -314,14 +322,18 @@ zabbix_export:
           description: 'Cache hit ratio'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: cache
           triggers:
             -
               uuid: 4d87cc71b40f4b59ad27f30f33b15a69
               expression: 'max(/PostgreSQL by Zabbix agent/pgsql.cache.hit["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"],5m) < {$PG.CACHE_HITRATIO.MIN.WARN}'
               name: 'PostgreSQL: Cache hit ratio too low (under {$PG.CACHE_HITRATIO.MIN.WARN} in 5m)'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 248cbe5067324b9ca435f2aced5e2a5f
           name: 'Status: Config hash'
@@ -338,14 +350,18 @@ zabbix_export:
                 - 1h
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: application
           triggers:
             -
               uuid: b727cfa6d3de4063b6a2dcb6cc84e27b
               expression: 'last(/PostgreSQL by Zabbix agent/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"],#1)<>last(/PostgreSQL by Zabbix agent/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"],#2) and length(last(/PostgreSQL by Zabbix agent/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]))>0'
               name: 'PostgreSQL: Configuration has changed'
               priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: c78116d3acf24e6990ed27ba8008728c
           name: 'Connections sum: Active'
@@ -363,8 +379,8 @@ zabbix_export:
             key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: connections
         -
           uuid: be6eb6ecbfad420b889c58d1f1550b23
           name: 'Connections sum: Idle'
@@ -382,8 +398,8 @@ zabbix_export:
             key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: connections
         -
           uuid: 6471d014722c4072ae045df4c69578e3
           name: 'Connections sum: Idle in transaction'
@@ -401,8 +417,8 @@ zabbix_export:
             key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: connections
         -
           uuid: 197cc14f55db485b891614c7b7ee2a51
           name: 'Connections sum: Prepared'
@@ -422,8 +438,8 @@ zabbix_export:
             key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: connections
         -
           uuid: 24d23377c7cd4cc5b63f98a261c2501c
           name: 'Connections sum: Total'
@@ -441,8 +457,8 @@ zabbix_export:
             key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: connections
         -
           uuid: 488050d9aa8e4c2ea5b3e991ec5ddacc
           name: 'Connections sum: Total %'
@@ -461,14 +477,18 @@ zabbix_export:
             key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: connections
           triggers:
             -
               uuid: 54ef12b8ff1e4383a3097c71478ceefa
               expression: 'min(/PostgreSQL by Zabbix agent/pgsql.connections.sum.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}'
               name: 'PostgreSQL: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m)'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: fadd1333189c4ed29db57cf2acd158d0
           name: 'Connections sum: Waiting'
@@ -488,8 +508,8 @@ zabbix_export:
             key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: connections
         -
           uuid: b0da0c4856a645ca8ef03405d2d8d4a5
           name: 'PostgreSQL: Get connections sum'
@@ -502,8 +522,8 @@ zabbix_export:
             https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: b44f263fb33e461e8c3d700fb7688c7b
           name: 'PostgreSQL: Get dbstat'
@@ -516,8 +536,8 @@ zabbix_export:
             https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 7cee21f6225340ef80e9cdef7ce20b10
           name: 'PostgreSQL: Get locks'
@@ -530,8 +550,8 @@ zabbix_export:
             https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: f42bd73b3af6451b8a3a6113dcc1b675
           name: 'Status: Ping time'
@@ -551,8 +571,11 @@ zabbix_export:
                 - '0.001'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: application
+            -
+              tag: component
+              value: health
           triggers:
             -
               uuid: e19b5630737b4c63886b5df77a3c748c
@@ -563,6 +586,13 @@ zabbix_export:
                 -
                   name: 'PostgreSQL: Service is down'
                   expression: 'last(/PostgreSQL by Zabbix agent/pgsql.ping["{$PG.HOST}","{$PG.PORT}"]) = 0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: f5bd615243b344cb88dac1e83436cc85
           name: 'Status: Ping'
@@ -581,14 +611,21 @@ zabbix_export:
                 - 1h
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: application
+            -
+              tag: component
+              value: health
           triggers:
             -
               uuid: 6d9c2b5353ce4f6baeeb0f254fb7d1e2
               expression: 'last(/PostgreSQL by Zabbix agent/pgsql.ping["{$PG.HOST}","{$PG.PORT}"]) = 0'
               name: 'PostgreSQL: Service is down'
               priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 47bf580e1e4e48cf9c0e94fcf90288ac
           name: 'PostgreSQL: Get queries'
@@ -599,8 +636,8 @@ zabbix_export:
           description: 'Collect all metrics by query execution time'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: d8a509bd011a4ecda5d439295e257e9d
           name: 'Replication: standby count'
@@ -609,8 +646,8 @@ zabbix_export:
           description: 'Number of standby servers'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: replication
         -
           uuid: 21f8bea1141249c7a4dfafad5bc3ef41
           name: 'Replication: lag in seconds'
@@ -620,14 +657,21 @@ zabbix_export:
           description: 'Replication lag with Master in seconds'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: replication
           triggers:
             -
               uuid: 11831c52e86445498eed42de6a629b65
               expression: 'min(/PostgreSQL by Zabbix agent/pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"],5m) > {$PG.REPL_LAG.MAX.WARN}'
               name: 'PostgreSQL: Streaming lag with {#MASTER} is too high (over {$PG.REPL_LAG.MAX.WARN} in 5m)'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 09f696124fca4c5b844bf66c9c912b87
           name: 'Replication: recovery role'
@@ -638,8 +682,8 @@ zabbix_export:
             name: 'PostgreSQL recovery role'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: replication
         -
           uuid: d449017462704508a4aad51a6b45fb30
           name: 'Replication: status'
@@ -650,14 +694,18 @@ zabbix_export:
             name: 'PostgreSQL replication status'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: replication
           triggers:
             -
               uuid: aef1e1d2bab540f8ab738b4a3fad863c
               expression: 'max(/PostgreSQL by Zabbix agent/pgsql.replication.status["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"],5m)=0'
               name: 'PostgreSQL: Replication is down'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 4883717865c84c19b48d46f009317de2
           name: 'Transactions: Max active transaction time'
@@ -677,8 +725,8 @@ zabbix_export:
             key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: transactions
         -
           uuid: 4c89121d71a14c15b6169417ea69d0a3
           name: 'Transactions: Max idle transaction time'
@@ -698,8 +746,8 @@ zabbix_export:
             key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: transactions
         -
           uuid: 0ee43ddd9da246d19097107b45e4c8e8
           name: 'Transactions: Max prepared transaction time'
@@ -719,8 +767,8 @@ zabbix_export:
             key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: transactions
         -
           uuid: da341b2011714a1f994ecbe96bd52155
           name: 'Transactions: Max waiting transaction time'
@@ -740,8 +788,8 @@ zabbix_export:
             key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: transactions
         -
           uuid: ff26a1c256bd40978f49a7a025538aa1
           name: 'PostgreSQL: Get transactions'
@@ -752,8 +800,8 @@ zabbix_export:
           description: 'Collect metrics by transaction execution time'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 6418a2f286e64ecabf2295fca063f8af
           name: 'Status: Uptime'
@@ -762,8 +810,8 @@ zabbix_export:
           units: uptime
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: application
           triggers:
             -
               uuid: 85565aba402740868a16c0e4639a98fc
@@ -771,6 +819,10 @@ zabbix_export:
               name: 'PostgreSQL: Service has been restarted (uptime < 10m)'
               priority: INFO
               description: 'PostgreSQL uptime is less than 10 minutes'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 321525ebcea44396922e96deec2e8ad1
           name: 'Status: Version'
@@ -787,14 +839,18 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: application
           triggers:
             -
               uuid: 8111eb42b0e74fffb43da474677ebc2f
               expression: 'last(/PostgreSQL by Zabbix agent/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"],#1)<>last(/PostgreSQL by Zabbix agent/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"],#2) and length(last(/PostgreSQL by Zabbix agent/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]))>0'
               name: 'PostgreSQL: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 5385ec7d39514039a641d18cba335ddc
           name: 'WAL: Segments count'
@@ -812,8 +868,8 @@ zabbix_export:
             key: 'pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: wal
         -
           uuid: 7cd6c524ecab41f9a22489866d503361
           name: 'PostgreSQL: Get WAL'
@@ -825,8 +881,8 @@ zabbix_export:
           description: 'Master item to collect WAL metrics'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 5cc9c67621cc46e0a42b1eb79bda83b3
           name: 'WAL: Bytes written'
@@ -849,8 +905,8 @@ zabbix_export:
             key: 'pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
-              tag: Application
-              value: PostgreSQL
+              tag: component
+              value: wal
       discovery_rules:
         -
           uuid: 5c4c658507394f5bb362e601f7c59d63
@@ -874,8 +930,11 @@ zabbix_export:
               description: 'Database size'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 615e6567a85e421bb06ab8cac0eaba69
               name: 'DB {#DBNAME}: Blocks hit per second'
@@ -898,8 +957,11 @@ zabbix_export:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: cache
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 9136517d08b447869e5b8f5fd684c3b9
               name: 'DB {#DBNAME}: Disk blocks read per second'
@@ -922,8 +984,11 @@ zabbix_export:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: a76f6d28995441ff9fe28bbc09445e64
               name: 'DB {#DBNAME}: Detected conflicts per second'
@@ -946,8 +1011,11 @@ zabbix_export:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
               trigger_prototypes:
                 -
                   uuid: 3b51f02258bd4e02829f04ca016dd01d
@@ -957,6 +1025,10 @@ zabbix_export:
                   description: |
                     The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.
                     https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: b874cc2dd80643208c2479ad25fae0ac
               name: 'DB {#DBNAME}: Detected deadlocks per second'
@@ -979,14 +1051,21 @@ zabbix_export:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: deadlocks
+                -
+                  tag: database
+                  value: '{#DBNAME}'
               trigger_prototypes:
                 -
                   uuid: 3bee63fa04d94586937e22aafab9bdd8
                   expression: 'min(/PostgreSQL by Zabbix agent/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}'
                   name: 'DB {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: d235ead54c8b41f9a91398c75383e5d7
               name: 'DB {#DBNAME}: Temp_bytes written per second'
@@ -1009,8 +1088,11 @@ zabbix_export:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: af4e35eee1764d3f97d9c1218867f885
               name: 'DB {#DBNAME}: Temp_files created per second'
@@ -1032,8 +1114,11 @@ zabbix_export:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 35c6f93aefe4439bbc36f2f358440b16
               name: 'DB {#DBNAME}: Tuples deleted per second'
@@ -1056,8 +1141,11 @@ zabbix_export:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 92f33d96f8a348088cdba593c0e66929
               name: 'DB {#DBNAME}: Tuples fetched per second'
@@ -1080,8 +1168,11 @@ zabbix_export:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 8c03c87a44fe43928c32087ca7561e88
               name: 'DB {#DBNAME}: Tuples inserted per second'
@@ -1104,8 +1195,11 @@ zabbix_export:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: f6d378f4e38e455fa5a12467fe977657
               name: 'DB {#DBNAME}: Tuples returned per second'
@@ -1128,8 +1222,11 @@ zabbix_export:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 4c8de8c1064d43ffa18c4f37fead37f7
               name: 'DB {#DBNAME}: Tuples updated per second'
@@ -1152,8 +1249,11 @@ zabbix_export:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 81c33f5b3c31475fa5f28f4ad149a328
               name: 'DB {#DBNAME}: Commits per second'
@@ -1176,8 +1276,11 @@ zabbix_export:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: transactions
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 8e5080186d034323be21473099b0b0ce
               name: 'DB {#DBNAME}: Rollbacks per second'
@@ -1200,8 +1303,11 @@ zabbix_export:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: transactions
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: df9dd9bac2a54f1085b29fb22b394a1f
               name: 'DB {#DBNAME}: Frozen XID before avtovacuum %'
@@ -1223,8 +1329,11 @@ zabbix_export:
                 key: 'pgsql.frozenxid["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: transactions
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 44ddd66ea37449cb8fab6979b98dfd3c
               name: 'DB {#DBNAME}: Frozen XID before stop %'
@@ -1246,8 +1355,11 @@ zabbix_export:
                 key: 'pgsql.frozenxid["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: transactions
+                -
+                  tag: database
+                  value: '{#DBNAME}'
               trigger_prototypes:
                 -
                   uuid: 709df9c1e29a4ff68a3de9423ff7ae58
@@ -1257,6 +1369,10 @@ zabbix_export:
                   description: |
                     Preventing Transaction ID Wraparound Failures
                     https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAROUND
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: ddf6d0b7b5fe4cbbb540687051b8e5f5
               name: 'DB {#DBNAME}: Get frozen XID'
@@ -1266,8 +1382,11 @@ zabbix_export:
               value_type: TEXT
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: raw
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 3d0acf4b45fc4a72bb2a214222f93f2a
               name: 'DB {#DBNAME}: Locks total'
@@ -1285,14 +1404,21 @@ zabbix_export:
                 key: 'pgsql.locks["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: locks
+                -
+                  tag: database
+                  value: '{#DBNAME}'
               trigger_prototypes:
                 -
                   uuid: ef7d3c9866df44aa9b378e7f125a34de
                   expression: 'min(/PostgreSQL by Zabbix agent/pgsql.locks.total["{#DBNAME}"],5m)>{$PG.LOCKS.MAX.WARN:"{#DBNAME}"}'
                   name: 'DB {#DBNAME}: Number of locks is too high (over {$PG.LOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 939ab05c71ed4be9979662203ebba980
               name: 'DB {#DBNAME}: Queries slow maintenance count'
@@ -1310,8 +1436,11 @@ zabbix_export:
                 key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: bbc8f9bf86394cf28e0c2db44ee4711d
               name: 'DB {#DBNAME}: Queries max maintenance time'
@@ -1330,8 +1459,11 @@ zabbix_export:
                 key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: f1427228bfa14ad3b7bb9d63bcfaec59
               name: 'DB {#DBNAME}: Queries sum maintenance time'
@@ -1350,8 +1482,11 @@ zabbix_export:
                 key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 5d937f46f4684f1e8253ec62e0f75379
               name: 'DB {#DBNAME}: Queries slow query count'
@@ -1369,14 +1504,21 @@ zabbix_export:
                 key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
               trigger_prototypes:
                 -
                   uuid: facc8f6976664da4ad5567d270f0f311
                   expression: 'min(/PostgreSQL by Zabbix agent/pgsql.queries.query.slow_count["{#DBNAME}"],5m)>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}'
                   name: 'DB {#DBNAME}: Too many slow queries (over {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 044cc16d0a2f46b28d88eff86c33b30b
               name: 'DB {#DBNAME}: Queries max query time'
@@ -1395,8 +1537,11 @@ zabbix_export:
                 key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: c6232400b39c4564a30a403859ffb4ee
               name: 'DB {#DBNAME}: Queries sum query time'
@@ -1415,8 +1560,11 @@ zabbix_export:
                 key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: f7099043ea6345f0a5531f70f9573a3e
               name: 'DB {#DBNAME}: Queries slow transaction count'
@@ -1434,8 +1582,11 @@ zabbix_export:
                 key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: c6800ca30a564766ba745e875cb4e929
               name: 'DB {#DBNAME}: Queries max transaction time'
@@ -1454,8 +1605,11 @@ zabbix_export:
                 key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 0eda974576794768ac9ddc592ff27e19
               name: 'DB {#DBNAME}: Queries sum transaction time'
@@ -1474,8 +1628,11 @@ zabbix_export:
                 key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: cafcc00cce824c33a321da0e9ecc7f6e
               name: 'DB {#DBNAME}: Index scans per second'
@@ -1497,8 +1654,11 @@ zabbix_export:
                 key: 'pgsql.scans["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: scans
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: f07396ca9d224e1b819f22efe6c4259d
               name: 'DB {#DBNAME}: Sequential scans per second'
@@ -1521,8 +1681,11 @@ zabbix_export:
                 key: 'pgsql.scans["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'PostgreSQL: DB {#DBNAME}'
+                  tag: component
+                  value: scans
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 4bf92e4b0fed4d32b808b299d9e1fb0c
               name: 'DB {#DBNAME}: Get scans'
@@ -1533,8 +1696,11 @@ zabbix_export:
               description: 'Number of scans done for table/index in the database'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: raw
+                -
+                  tag: database
+                  value: '{#DBNAME}'
           graph_prototypes:
             -
               uuid: 3f8124b817f2437096c620d62ec2e055
@@ -1720,6 +1886,13 @@ zabbix_export:
                   item:
                     host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.dbstat.tup_updated.rate["{#DBNAME}"]'
+      tags:
+        -
+          tag: class
+          value: database
+        -
+          tag: target
+          value: postgresql
       macros:
         -
           macro: '{$PG.CACHE_HITRATIO.MIN.WARN}'

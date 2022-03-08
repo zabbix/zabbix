@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "punycode.h"
+
 #include "zbxhttp.h"
 
 /******************************************************************************
@@ -70,7 +70,7 @@ static char	punycode_encode_digit(int digit)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: encodes array of unicode codepoints into into punycode (RFC 3492) *
+ * Purpose: encodes array of unicode codepoints into punycode (RFC 3492)      *
  *                                                                            *
  * Parameters: codepoints      - [IN] codepoints to encode                    *
  *             count           - [IN] codepoint count                         *

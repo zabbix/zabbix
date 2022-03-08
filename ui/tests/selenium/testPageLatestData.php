@@ -21,7 +21,7 @@
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 
 /**
- * @backup history_uint
+ * @backup history_uint, profiles
  */
 class testPageLatestData extends CWebTest {
 
@@ -32,6 +32,19 @@ class testPageLatestData extends CWebTest {
 	}
 
 	public function testPageLatestData_CheckLayout() {
+		$time = time() - 100;
+		$hostname = 'ЗАББИКС Сервер';
+
+		$id = CDBHelper::getValue('SELECT itemid'.
+			' FROM items WHERE hostid in ('.
+				'SELECT hostid FROM hosts'.
+				' WHERE name='.zbx_dbstr($hostname).
+			') AND name='.zbx_dbstr('Zabbix agent ping')
+		);
+
+		// Add data to item agent.ping to see "With data"/"Without data" subfilter.
+		DBexecute("INSERT INTO history_uint (itemid, clock, value, ns) VALUES (".zbx_dbstr($id).", ".zbx_dbstr($time).", 1, 0)");
+
 		$this->page->login()->open('zabbix.php?action=latest.view');
 		$this->page->assertTitle('Latest data');
 		$this->page->assertHeader('Latest data');
@@ -39,26 +52,35 @@ class testPageLatestData extends CWebTest {
 		$this->assertEquals(['Host groups', 'Hosts', 'Name', 'Tags', 'Show tags', 'Tag display priority', 'Show details'],
 				$form->getLabels()->asText()
 		);
-		$this->assertTrue($form->query('xpath:.//label[text()="Show items without data"]')->one()->isValid());
 
-		// Show item without data is checked/disabled without Hosts in filter and checked/enabled with Hosts in filter.
+		// With data/Without data subfilter shows only when some host is filtered.
 		foreach ([false, true] as $status) {
-			$form->query('name:show_without_data')->one()->isEnabled($status);
-			$form->query('name:show_without_data')->one()->isAttributePresent('checked');
+			$this->assertEquals($status, $this->query('link:With data')->one(false)->isValid());
+			$this->assertEquals($status, $this->query('link:Without data')->one(false)->isValid());
 			if (!$status) {
-				$form->fill(['Hosts' => 'Host 1 from first group']);
+				$form->fill(['Hosts' => $hostname]);
+				$form->submit();
+				$this->page->waitUntilReady();
 			}
 		}
 
-		// Check filter buttons.
-		foreach (['Apply', 'Reset'] as $button) {
-			$this->assertTrue($this->query('button', $button)->one()->isClickable());
-		}
+		$this->assertTrue($this->query('button:Apply')->one()->isClickable());
+		$this->query('button:Reset')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
 
 		// Check table headers.
-		$this->assertEquals(['', 'Host', 'Name', 'Interval', 'History', 'Trends', 'Type', 'Last check', 'Last value',
-				'Change', 'Tags', '', 'Info'], $this->getTable()->getHeadersText()
-		);
+		$details_headers = [
+			true => ['', 'Host', 'Name', 'Interval', 'History', 'Trends', 'Type', 'Last check', 'Last value',
+				'Change', 'Tags', '', 'Info'],
+			false => ['', 'Host', 'Name', 'Last check', 'Last value', 'Change', 'Tags', '', 'Info']
+		];
+
+		foreach ($details_headers as $status => $headers) {
+			$this->query('name:show_details')->one()->asCheckbox()->set($status);
+			$form->submit();
+			$this->page->waitUntilReady();
+			$this->assertEquals($headers, $this->getTable()->getHeadersText());
+		}
 
 		// Check that sortable headers are clickable.
 		foreach (['Host', 'Name'] as $header) {
@@ -225,8 +247,7 @@ class testPageLatestData extends CWebTest {
 		$form->fill(['Hosts' => 'Available host in maintenance']);
 		$form->submit();
 
-		// TODO: change forceClick after ZBX-20426 merge.
-		$this->query('xpath://span[contains(@class, "icon-maint")]')->one()->forceClick();
+		$this->query('xpath://a['.CXPathHelper::fromClass('icon-maintenance').']')->waitUntilClickable()->one()->click();
 		$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
 		$hint_text = "Maintenance for Host availability widget [Maintenance with data collection]\n".
 				"Maintenance for checking Show hosts in maintenance option in Host availability widget";
@@ -247,6 +268,7 @@ class testPageLatestData extends CWebTest {
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$this->query('button:Reset')->one()->click();
 		$form->fill(['Name' => '4_item'])->submit();
+		$this->page->waitUntilReady();
 
 		foreach (['Last check', 'Last value'] as $column) {
 			if ($column === 'Last value') {

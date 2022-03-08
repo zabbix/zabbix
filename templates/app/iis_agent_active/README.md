@@ -15,7 +15,7 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
-You have to enable the following Windows Features (Control Panel > Programs and Features > Turn Windows features on or off) on you server
+You have to enable the following Windows Features (Control Panel > Programs and Features > Turn Windows features on or off) on your server
 ```text
 Web Server (IIS)
 Web Server (IIS)\Management Tools\IIS Management Scripts and Tools
@@ -26,7 +26,7 @@ Optionally, it is possible to customize the template:
 - If you use a non-standard port for the IIS, don't forget to update the macros {$IIS.SERVICE} and {$IIS.PORT}.
 - Change the value of macro {$IIS.APPPOOL.MONITORED} to "0", if you want to disable all notifications about application pools state.<br>
 You can also add additional context macro {$IIS.APPPOOL.MONITORED:<AppPoolName>} for excluding specific application pools from monitoring.
-- Change regexp in the marcos {$IIS.APPPOOL.MATCHES} and {$IIS.APPPOOL.NOT_MATCHES} used for filtering application pools discovery results.
+- Change regexp in the macros {$IIS.APPPOOL.MATCHES} and {$IIS.APPPOOL.NOT_MATCHES} used for filtering application pools discovery results.
 
 
 ## Zabbix configuration
@@ -71,7 +71,7 @@ There are no template links in this template.
 |IIS |IIS: Connection attempts per second |<p>The average rate per minute that connections using the Web service are being attempted. The count is the average for all Web sites combined.</p> |ZABBIX_ACTIVE |perf_counter_en["\Web Service(_Total)\Connection Attempts/Sec", 60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |IIS |IIS: Anonymous users per second |<p>The number of requests from users over an anonymous connection per second. Average per minute.</p> |ZABBIX_ACTIVE |perf_counter_en["\Web Service(_Total)\Anonymous Users/sec", 60] |
 |IIS |IIS: NonAnonymous users per second |<p>The number of requests from users over a non-anonymous connection per second. Average per minute.</p> |ZABBIX_ACTIVE |perf_counter_en["\Web Service(_Total)\NonAnonymous Users/sec", 60] |
-|IIS |IIS: Method Method GET requests per second |<p>The rate of HTTP requests made using the GET method. GET requests are generally used for basic file retrievals or image maps, though they can be used with forms. Average per minute.</p> |ZABBIX_ACTIVE |perf_counter_en["\Web Service(_Total)\Get Requests/Sec", 60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: Method GET requests per second |<p>The rate of HTTP requests made using the GET method. GET requests are generally used for basic file retrievals or image maps, though they can be used with forms. Average per minute.</p> |ZABBIX_ACTIVE |perf_counter_en["\Web Service(_Total)\Get Requests/Sec", 60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |IIS |IIS: Method COPY requests per second |<p>The rate of HTTP requests made using the COPY method. Copy requests are used for copying files and directories. Average per minute.</p> |ZABBIX_ACTIVE |perf_counter_en["\Web Service(_Total)\Copy Requests/Sec", 60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |IIS |IIS: Method CGI requests per second |<p>The rate of CGI requests that are simultaneously being processed by the Web service. Average per minute.</p> |ZABBIX_ACTIVE |perf_counter_en["\Web Service(_Total)\CGI Requests/Sec", 60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |IIS |IIS: Method DELETE requests per second |<p>The rate of HTTP requests using the DELETE method made. Average per minute.</p> |ZABBIX_ACTIVE |perf_counter_en["\Web Service(_Total)\Delete Requests/Sec", 60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
@@ -118,5 +118,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/401862-discussion-thread-for-official-zabbix-template-internet-information-services).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/401862-discussion-thread-for-official-zabbix-template-internet-information-services).
 

@@ -48,7 +48,7 @@ No specific Zabbix configuration is required.
 |{$ETCD.GRPC.ERRORS.MAX.WARN} |<p>Maximum number of gRPC requests failures.</p> |`1` |
 |{$ETCD.GRPC_CODE.MATCHES} |<p>Filter of discoverable gRPC codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md.</p> |`.*` |
 |{$ETCD.GRPC_CODE.NOT_MATCHES} |<p>Filter to exclude discovered gRPC codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md.</p> |`CHANGE_IF_NEEDED` |
-|{$ETCD.GRPC_CODE.TRIGGER.MATCHES} |<p>Filter of discoverable gRPC codes which will be create triggers.</p> |`Aborted|Unavailable` |
+|{$ETCD.GRPC_CODE.TRIGGER.MATCHES} |<p>Filter of discoverable gRPC codes which will create triggers.</p> |`Aborted|Unavailable` |
 |{$ETCD.HTTP.FAIL.MAX.WARN} |<p>Maximum number of HTTP requests failures.</p> |`2` |
 |{$ETCD.LEADER.CHANGES.MAX.WARN} |<p>Maximum number of leader changes.</p> |`5` |
 |{$ETCD.OPEN.FDS.MAX.WARN} |<p>Maximum percentage of used file descriptors.</p> |`90` |
@@ -78,7 +78,7 @@ There are no template links in this template.
 |Etcd |Etcd: Node health |<p>-</p> |HTTP_AGENT |etcd.health<p>**Preprocessing**:</p><p>- JSONPATH: `$.health`</p><p>- BOOL_TO_DECIMAL</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |Etcd |Etcd: Server is a leader |<p>Whether or not this member is a leader. 1 if is, 0 otherwise.</p> |DEPENDENT |etcd.is.leader<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_is_leader`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |Etcd |Etcd: Server has a leader |<p>Whether or not a leader exists. 1 is existence, 0 is not.</p> |DEPENDENT |etcd.has.leader<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_has_leader`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
-|Etcd |Etcd: Leader changes |<p>The the number of leader changes the member has seen since its start.</p> |DEPENDENT |etcd.leader.changes<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_leader_changes_seen_total`</p> |
+|Etcd |Etcd: Leader changes |<p>The number of leader changes the member has seen since its start.</p> |DEPENDENT |etcd.leader.changes<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_leader_changes_seen_total`</p> |
 |Etcd |Etcd: Proposals committed per second |<p>The number of consensus proposals committed.</p> |DEPENDENT |etcd.proposals.committed.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_proposals_committed_total`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Proposals applied per second |<p>The number of consensus proposals applied.</p> |DEPENDENT |etcd.proposals.applied.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_proposals_applied_total`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Proposals failed per second |<p>The number of failed proposals seen.</p> |DEPENDENT |etcd.proposals.failed.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_proposals_failed_total`</p><p>- CHANGE_PER_SECOND</p> |
@@ -115,8 +115,8 @@ There are no template links in this template.
 |Etcd |Etcd: Etcd peer {#ETCD.PEER}: Bytes received |<p>The number of bytes received from peer with ID {#ETCD.PEER}.</p> |DEPENDENT |etcd.bytes.received.rate[{#ETCD.PEER}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_network_peer_received_bytes_total{From="{#ETCD.PEER}"}`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Etcd peer {#ETCD.PEER}: Send failures |<p>The number of send failures from peer with ID {#ETCD.PEER}.</p> |DEPENDENT |etcd.sent.fail.rate[{#ETCD.PEER}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_network_peer_sent_failures_total{To="{#ETCD.PEER}"}`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Etcd peer {#ETCD.PEER}: Receive failures failures |<p>The number of receive failures from the peer with ID {#ETCD.PEER}.</p> |DEPENDENT |etcd.received.fail.rate[{#ETCD.PEER}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_network_peer_received_failures_total{To="{#ETCD.PEER}"}`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
-|Zabbix_raw_items |Etcd: Get node metrics |<p>-</p> |HTTP_AGENT |etcd.get_metrics |
-|Zabbix_raw_items |Etcd: Get version |<p>-</p> |HTTP_AGENT |etcd.get_version |
+|Zabbix raw items |Etcd: Get node metrics |<p>-</p> |HTTP_AGENT |etcd.get_metrics |
+|Zabbix raw items |Etcd: Get version |<p>-</p> |HTTP_AGENT |etcd.get_version |
 
 ## Triggers
 

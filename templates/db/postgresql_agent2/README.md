@@ -66,8 +66,8 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Replication Discovery |<p>-</p> |ZABBIX_PASSIVE |pgsql.replication.process.discovery["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]<p>**Filter**:</p>AND <p>- {#APPLICATION_NAME} MATCHES_REGEX `{$PG.LLD.FILTER.APPLICATION}`</p> |
 |Database discovery |<p>-</p> |ZABBIX_PASSIVE |pgsql.db.discovery["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]<p>**Filter**:</p>AND <p>- {#DBNAME} MATCHES_REGEX `{$PG.LLD.FILTER.DBNAME}`</p> |
+|Replication Discovery |<p>-</p> |ZABBIX_PASSIVE |pgsql.replication.process.discovery["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]<p>**Filter**:</p>AND <p>- {#APPLICATION_NAME} MATCHES_REGEX `{$PG.LLD.FILTER.APPLICATION}`</p> |
 
 ## Items collected
 
@@ -161,14 +161,14 @@ There are no template links in this template.
 |PostgreSQL |DB {#DBNAME}: Num of shareupdateexclusive locks |<p>Number of shareupdateexclusive locks for each database</p> |DEPENDENT |pgsql.locks.shareupdateexclusive["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].shareupdateexclusive`</p> |
 |PostgreSQL |DB {#DBNAME}: Num of share locks |<p>Number of share locks for each database</p> |DEPENDENT |pgsql.locks.share["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].share`</p> |
 |PostgreSQL |DB {#DBNAME}: Num of total locks |<p>Number of total locks for each database</p> |DEPENDENT |pgsql.locks.total["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].total`</p> |
-|Zabbix_raw_items |PostgreSQL: Get bgwriter |<p>https://www.postgresql.org/docs/12/monitoring-stats.html#PG-STAT-BGWRITER-VIEW</p> |ZABBIX_PASSIVE |pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
-|Zabbix_raw_items |PostgreSQL: Get archive |<p>Collect archive status metrics</p> |ZABBIX_PASSIVE |pgsql.archive["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
-|Zabbix_raw_items |PostgreSQL: Get dbstat |<p>Collect all metrics from pg_stat_database per database</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p> |ZABBIX_PASSIVE |pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
-|Zabbix_raw_items |PostgreSQL: Get dbstat sum |<p>Collect all metrics from pg_stat_database per database</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p> |ZABBIX_PASSIVE |pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
-|Zabbix_raw_items |PostgreSQL: Get connections |<p>Collect all metrics from pg_stat_activity</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW</p> |ZABBIX_PASSIVE |pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
-|Zabbix_raw_items |PostgreSQL: Get WAL |<p>Collect WAL metrics</p> |ZABBIX_PASSIVE |pgsql.wal.stat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
-|Zabbix_raw_items |PostgreSQL: Get locks |<p>Collect all metrics from pg_locks per database</p><p>https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</p> |ZABBIX_PASSIVE |pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
-|Zabbix_raw_items |PostgreSQL: Get replication |<p>Collect metrics from the pg_stat_replication, which contains information about the WAL sender process, showing statistics about replication to that sender's connected standby server.</p> |ZABBIX_PASSIVE |pgsql.replication.process["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|Zabbix raw items |PostgreSQL: Get bgwriter |<p>https://www.postgresql.org/docs/12/monitoring-stats.html#PG-STAT-BGWRITER-VIEW</p> |ZABBIX_PASSIVE |pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|Zabbix raw items |PostgreSQL: Get archive |<p>Collect archive status metrics</p> |ZABBIX_PASSIVE |pgsql.archive["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|Zabbix raw items |PostgreSQL: Get dbstat |<p>Collect all metrics from pg_stat_database per database</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p> |ZABBIX_PASSIVE |pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|Zabbix raw items |PostgreSQL: Get dbstat sum |<p>Collect all metrics from pg_stat_database per database</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p> |ZABBIX_PASSIVE |pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|Zabbix raw items |PostgreSQL: Get connections |<p>Collect all metrics from pg_stat_activity</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW</p> |ZABBIX_PASSIVE |pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|Zabbix raw items |PostgreSQL: Get WAL |<p>Collect WAL metrics</p> |ZABBIX_PASSIVE |pgsql.wal.stat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|Zabbix raw items |PostgreSQL: Get locks |<p>Collect all metrics from pg_locks per database</p><p>https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</p> |ZABBIX_PASSIVE |pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|Zabbix raw items |PostgreSQL: Get replication |<p>Collect metrics from the pg_stat_replication, which contains information about the WAL sender process, showing statistics about replication to that sender's connected standby server.</p> |ZABBIX_PASSIVE |pgsql.replication.process["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
 
 ## Triggers
 
@@ -185,5 +185,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384190-%C2%A0discussion-thread-for-official-zabbix-template-db-postgresql).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384190-%C2%A0discussion-thread-for-official-zabbix-template-db-postgresql).
 

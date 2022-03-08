@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T06:57:35Z'
+  date: '2022-03-01T10:42:41Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -15,7 +15,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/398623-discussion-thread-for-official-zabbix-template-memcached
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -28,7 +28,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The flush_all command invalidates all items in the database. This operation incurs a performance penalty and shouldn’t take place in production, so check your debug scripts.'
+          description: 'The flush_all command invalidates all items in the database. This operation incurs a performance penalty and shouldn''t take place in production, so check your debug scripts.'
           preprocessing:
             -
               type: JSONPATH
@@ -42,8 +42,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: commands
         -
           uuid: 1f636f46889e41cda9abf80df4ae53a7
           name: 'Memcached: Commands: GET per second'
@@ -66,8 +66,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: commands
         -
           uuid: 82988c3b793841c4b99a7cbf18f9ac5f
           name: 'Memcached: Commands: SET per second'
@@ -90,8 +90,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: commands
         -
           uuid: d19885f5dc5b4afaa68ae180c60117ca
           name: 'Memcached: Maximum number of bytes'
@@ -114,8 +114,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: cache
         -
           uuid: 4ac11cc6469346aa88ad804c8af749a8
           name: 'Memcached: Open connections'
@@ -133,8 +133,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: connections
         -
           uuid: 2d9fee94ab6e458b953bf6f4808e9300
           name: 'Memcached: Max connections'
@@ -156,8 +156,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: connections
         -
           uuid: 166f2d677f0d4d31bdd5313fa7755d56
           name: 'Memcached: Queued connections per second'
@@ -180,15 +180,19 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: connections
           triggers:
             -
               uuid: 922a59008cd94e0688db8528be296f89
               expression: 'min(/Memcached by Zabbix agent 2/memcached.connections.queued.rate,5m)>{$MEMCACHED.CONN.QUEUED.MAX.WARN}'
               name: 'Memcached: Too many queued connections (over {$MEMCACHED.CONN.QUEUED.MAX.WARN} in 5m)'
               priority: WARNING
-              description: 'The max number of connections is reachedand and a new connection had to wait in the queue as a result.'
+              description: 'The max number of connections is reached and a new connection had to wait in the queue as a result.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
         -
           uuid: 7ecc849f54be41dcbc6c037d89a6c240
           name: 'Memcached: New connections per second'
@@ -211,8 +215,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: connections
         -
           uuid: 8c224388b06b417fbf89dd25631b10ad
           name: 'Memcached: Connection structures'
@@ -230,8 +234,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: connections
         -
           uuid: 891b3347dac6440caef69c9dd7ec0a18
           name: 'Memcached: Throttled connections'
@@ -254,8 +258,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: connections
           triggers:
             -
               uuid: 33c9b918d21343dea3bcd2c3e3505fc5
@@ -265,6 +269,10 @@ zabbix_export:
               description: |
                 Number of times a client connection was throttled is too high.
                 When sending GETs in batch mode and the connection contains too many requests (limited by -R parameter) the connection might be throttled to prevent starvation.
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: f67cae24aa3d4b56b00ef7a3e3a45432
           name: 'Memcached: CPU sys'
@@ -284,8 +292,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: a30bb4344e714b7f984e86046797b9b1
@@ -298,6 +306,10 @@ zabbix_export:
                 -
                   name: 'Memcached: Service is down'
                   expression: 'last(/Memcached by Zabbix agent 2/memcached.ping["{$MEMCACHED.CONN.URI}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: d7b2094d846243e59a092dc42bbe30c3
           name: 'Memcached: CPU user'
@@ -317,8 +329,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: cpu
         -
           uuid: 57a4c2e763c3430daacd4495b91c3e74
           name: 'Memcached: Ping'
@@ -333,8 +345,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: health
           triggers:
             -
               uuid: c6184e4c3cc54e199244dc8efb3cacf8
@@ -342,6 +354,10 @@ zabbix_export:
               name: 'Memcached: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 7ecd604d8f1143d6b3cf02c4d0ef22dc
           name: 'Memcached: Process id'
@@ -363,8 +379,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: application
         -
           uuid: ce294455f98a4c8c98a4ec70abb2b996
           name: 'Memcached: Bytes used'
@@ -384,8 +400,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: memory
         -
           uuid: 7977b28169a9411d98549d0c85ffb78b
           name: 'Memcached: Read bytes per second'
@@ -409,8 +425,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: network
         -
           uuid: e81a3fa33a124cdfba36e40d1be6edd8
           name: 'Memcached: Written bytes per second'
@@ -434,8 +450,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: network
         -
           uuid: efc05c70a56d4be4a6ad59fa1c2915a3
           name: 'Memcached: Current number of items stored'
@@ -453,8 +469,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: keyspace
         -
           uuid: ce47a49ce6af46b7bc9757ed1b5cd02e
           name: 'Memcached: Evictions per second'
@@ -479,8 +495,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: keyspace
         -
           uuid: 07acbb8eb36049258ca414d9e314ed79
           name: 'Memcached: Hits per second'
@@ -502,8 +518,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: requests
         -
           uuid: 3988a6c751814573869ed3533039faac
           name: 'Memcached: Misses per second'
@@ -525,8 +541,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: requests
         -
           uuid: 7c28164178fc493c9f202df0c7103bb5
           name: 'Memcached: Threads'
@@ -544,8 +560,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: threads
         -
           uuid: 6bbc3deb32f947b2bc966c15f6e76726
           name: 'Memcached: New items per second'
@@ -567,8 +583,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: keyspace
         -
           uuid: 3a096b6d7d9945fe9a25d1fb5c835f1a
           name: 'Memcached: Get status'
@@ -578,8 +594,8 @@ zabbix_export:
           value_type: TEXT
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 4e90d731c49447cf9bb6a72cb9675586
           name: 'Memcached: Uptime'
@@ -598,8 +614,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: application
           triggers:
             -
               uuid: c53a2d7b861b41458976bfa03ab1a105
@@ -608,6 +624,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 64986809298145ebbf8f6ded1c41f2df
           name: 'Memcached: Memcached version'
@@ -631,8 +651,8 @@ zabbix_export:
             key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           tags:
             -
-              tag: Application
-              value: Memcached
+              tag: component
+              value: application
           triggers:
             -
               uuid: 086e757b4a2048eabd5e91b4a0ccc07b
@@ -641,6 +661,17 @@ zabbix_export:
               priority: INFO
               description: 'Memcached version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+      tags:
+        -
+          tag: class
+          value: application
+        -
+          tag: target
+          value: memcached
       macros:
         -
           macro: '{$MEMCACHED.CONN.PRC.MAX.WARN}'
@@ -679,12 +710,20 @@ zabbix_export:
       expression: 'min(/Memcached by Zabbix agent 2/memcached.stats.bytes,5m)/last(/Memcached by Zabbix agent 2/memcached.config.limit_maxbytes)*100>{$MEMCACHED.MEM.PUSED.MAX.WARN}'
       name: 'Memcached: Memory usage is too high (over {$MEMCACHED.MEM.PUSED.MAX.WARN} in 5m)'
       priority: WARNING
+      tags:
+        -
+          tag: scope
+          value: capacity
     -
       uuid: 61021d383c9f41b990292bab2738356d
       expression: 'min(/Memcached by Zabbix agent 2/memcached.connections.current,5m)/last(/Memcached by Zabbix agent 2/memcached.connections.max)*100>{$MEMCACHED.CONN.PRC.MAX.WARN}'
       name: 'Memcached: Total number of connected clients is too high (over {$MEMCACHED.CONN.PRC.MAX.WARN}% in 5m)'
       priority: WARNING
       description: 'When the number of connections reaches the value of the "max_connections" parameter, new connections will be rejected.'
+      tags:
+        -
+          tag: scope
+          value: capacity
   graphs:
     -
       uuid: 72cf2b87802c4eeca5411946e6b1a29b

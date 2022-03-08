@@ -44,9 +44,9 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Topic Metrics (write) |<p>-</p> |JMX |jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic=*"]<p>**Filter**:</p>AND <p>- {#JMXTOPIC} MATCHES_REGEX `{$KAFKA.TOPIC.MATCHES}`</p><p>- {#JMXTOPIC} NOT_MATCHES_REGEX `{$KAFKA.TOPIC.NOT_MATCHES}`</p> |
-|Topic Metrics  (read) |<p>-</p> |JMX |jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic=*"]<p>**Filter**:</p>AND <p>- {#JMXTOPIC} MATCHES_REGEX `{$KAFKA.TOPIC.MATCHES}`</p><p>- {#JMXTOPIC} NOT_MATCHES_REGEX `{$KAFKA.TOPIC.NOT_MATCHES}`</p> |
 |Topic Metrics (errors) |<p>-</p> |JMX |jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=BytesRejectedPerSec,topic=*"]<p>**Filter**:</p>AND <p>- {#JMXTOPIC} MATCHES_REGEX `{$KAFKA.TOPIC.MATCHES}`</p><p>- {#JMXTOPIC} NOT_MATCHES_REGEX `{$KAFKA.TOPIC.NOT_MATCHES}`</p> |
+|Topic Metrics (read) |<p>-</p> |JMX |jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic=*"]<p>**Filter**:</p>AND <p>- {#JMXTOPIC} MATCHES_REGEX `{$KAFKA.TOPIC.MATCHES}`</p><p>- {#JMXTOPIC} NOT_MATCHES_REGEX `{$KAFKA.TOPIC.NOT_MATCHES}`</p> |
+|Topic Metrics (write) |<p>-</p> |JMX |jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic=*"]<p>**Filter**:</p>AND <p>- {#JMXTOPIC} MATCHES_REGEX `{$KAFKA.TOPIC.MATCHES}`</p><p>- {#JMXTOPIC} NOT_MATCHES_REGEX `{$KAFKA.TOPIC.NOT_MATCHES}`</p> |
 
 ## Items collected
 
@@ -111,9 +111,9 @@ There are no template links in this template.
 |Kafka |Kafka: ZooKeeper client request latency |<p>Latency in milliseconds for ZooKeeper requests from broker.</p> |JMX |jmx["kafka.server:type=ZooKeeperClientMetrics,name=ZooKeeperRequestLatencyMs","Count"] |
 |Kafka |Kafka: ZooKeeper connection status |<p>Connection status of broker's ZooKeeper session.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=SessionState","Value"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Kafka |Kafka: ZooKeeper disconnect rate |<p>ZooKeeper client disconnect per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperDisconnectsPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
-|Kafka |Kafka: ZooKeeper session expiration rate |<p>ZooKeeper client session expiration  per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperExpiresPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
-|Kafka |Kafka: ZooKeeper readonly rate |<p>ZooKeeper client readonly  per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperReadOnlyConnectsPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
-|Kafka |Kafka: ZooKeeper sync rate |<p>ZooKeeper client sync  per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperSyncConnectsPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|Kafka |Kafka: ZooKeeper session expiration rate |<p>ZooKeeper client session expiration per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperExpiresPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|Kafka |Kafka: ZooKeeper readonly rate |<p>ZooKeeper client readonly per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperReadOnlyConnectsPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|Kafka |Kafka: ZooKeeper sync rate |<p>ZooKeeper client sync per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperSyncConnectsPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |Kafka |Kafka {#JMXTOPIC}: Messages in per second |<p>The rate at which individual messages are consumed by topic.</p> |JMX |jmx["kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic={#JMXTOPIC}","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |Kafka |Kafka {#JMXTOPIC}: Bytes in per second |<p>The rate at which data sent from producers is consumed by topic.</p> |JMX |jmx["kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec,topic={#JMXTOPIC}","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |Kafka |Kafka {#JMXTOPIC}: Bytes out per second |<p>The rate at which data is fetched and read from the broker by consumers (by topic).</p> |JMX |jmx["kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic={#JMXTOPIC}","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
@@ -124,7 +124,7 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Kafka: Unclean leader election detected |<p>Unclean leader elections occur when there is no qualified partition leader among Kafka brokers. If Kafka is configured to allow an unclean leader election, a leader is chosen from the out-of-sync replicas, and any messages that were not synced prior to the loss of the former leader are lost forever. Essentially, unclean leader elections sacrifice consistency for availability.</p> |`last(/Apache Kafka by JMX/jmx["kafka.controller:type=ControllerStats,name=UncleanLeaderElectionsPerSec","Count"])>0` |AVERAGE | |
-|Kafka: There are offline log directories |<p>The offline log directory count metric indicate the number of log directories which are offline (due to an hardware failure for example) so that the broker cannot store incoming messages anymore.</p> |`last(/Apache Kafka by JMX/jmx["kafka.log:type=LogManager,name=OfflineLogDirectoryCount","Value"]) > 0` |WARNING | |
+|Kafka: There are offline log directories |<p>The offline log directory count metric indicate the number of log directories which are offline (due to a hardware failure for example) so that the broker cannot store incoming messages anymore.</p> |`last(/Apache Kafka by JMX/jmx["kafka.log:type=LogManager,name=OfflineLogDirectoryCount","Value"]) > 0` |WARNING | |
 |Kafka: One or more partitions have no leader |<p>Any partition without an active leader will be completely inaccessible, and both consumers and producers of that partition will be blocked until a leader becomes available.</p> |`last(/Apache Kafka by JMX/jmx["kafka.controller:type=KafkaController,name=OfflinePartitionsCount","Value"]) > 0` |WARNING | |
 |Kafka: Request handler average idle percent is too low (under {$KAFKA.REQUEST_HANDLER_AVG_IDLE.MIN.WARN} for 15m) |<p>The request handler idle ratio metric indicates the percentage of time the request handlers are not in use. The lower this number, the more loaded the broker is.</p> |`max(/Apache Kafka by JMX/jmx["kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent","OneMinuteRate"],15m)<{$KAFKA.REQUEST_HANDLER_AVG_IDLE.MIN.WARN}` |AVERAGE | |
 |Kafka: Network processor average idle percent is too low (under {$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN} for 15m) |<p>The network processor idle ratio metric indicates the percentage of time the network processor are not in use. The lower this number, the more loaded the broker is.</p> |`max(/Apache Kafka by JMX/jmx["kafka.network:type=SocketServer,name=NetworkProcessorAvgIdlePercent","Value"],15m)<{$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN}` |AVERAGE | |
@@ -139,5 +139,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 

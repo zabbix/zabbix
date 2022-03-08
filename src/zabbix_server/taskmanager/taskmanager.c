@@ -17,17 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "taskmanager.h"
+
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
-#include "db.h"
 #include "dbcache.h"
 #include "zbxtasks.h"
 #include "../events.h"
 #include "../actions.h"
 #include "export.h"
-#include "taskmanager.h"
 #include "zbxdiag.h"
 #include "service_protocol.h"
 #include "zbxjson.h"
@@ -73,7 +72,7 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 
 /******************************************************************************
  *                                                                            *
- * Purpose: try to close problem by event acknowledgement action              *
+ * Purpose: try to close problem by event acknowledgment action               *
  *                                                                            *
  * Parameters: taskid - [IN] the task identifier                              *
  *                                                                            *
@@ -343,12 +342,12 @@ static void	notify_service_manager(const zbx_vector_ptr_t *ack_tasks)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process acknowledgements for alerts sending                       *
+ * Purpose: process acknowledgments for alerts sending                        *
  *                                                                            *
  * Return value: The number of successfully processed tasks                   *
  *                                                                            *
  ******************************************************************************/
-static int	tm_process_acknowledgements(zbx_vector_uint64_t *ack_taskids)
+static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -401,7 +400,7 @@ static int	tm_process_acknowledgements(zbx_vector_uint64_t *ack_taskids)
 	if (0 < ack_tasks.values_num)
 	{
 		zbx_vector_ptr_sort(&ack_tasks, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-		processed_num = process_actions_by_acknowledgements(&ack_tasks);
+		processed_num = process_actions_by_acknowledgments(&ack_tasks);
 
 		notify_service_manager(&ack_tasks);
 	}
@@ -920,7 +919,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 	DBfree_result(result);
 
 	if (0 < ack_taskids.values_num)
-		processed_num += tm_process_acknowledgements(&ack_taskids);
+		processed_num += tm_process_acknowledgments(&ack_taskids);
 
 	if (0 < check_now_taskids.values_num)
 		processed_num += tm_process_check_now(&check_now_taskids);

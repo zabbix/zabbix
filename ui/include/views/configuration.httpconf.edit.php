@@ -23,7 +23,9 @@
  * @var CView $this
  */
 
-$widget = (new CWidget())->setTitle(_('Web monitoring'));
+$widget = (new CWidget())
+	->setTitle(_('Web monitoring'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HTTPCONF_EDIT));
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {

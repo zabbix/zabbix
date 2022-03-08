@@ -93,9 +93,9 @@ class CControllerProxyCreate extends CController {
 			}
 
 			if (!$this->getInput('clone_psk')) {
-				if ($this->getInput('status') == HOST_STATUS_PROXY_ACTIVE && $this->hasInput('tls_accept_psk')
-						|| $this->getInput('status') == HOST_STATUS_PROXY_PASSIVE
-							&& $this->getInput('tls_connect', 0) == HOST_ENCRYPTION_PSK) {
+				if (($this->getInput('status') == HOST_STATUS_PROXY_ACTIVE && $this->hasInput('tls_accept_psk'))
+						|| ($this->getInput('status') == HOST_STATUS_PROXY_PASSIVE
+							&& $this->getInput('tls_connect', 0) == HOST_ENCRYPTION_PSK)) {
 					if ($this->getInput('tls_psk_identity', '') === '') {
 						info(_s('Incorrect value for field "%1$s": %2$s.', _('PSK identity'), _('cannot be empty')));
 

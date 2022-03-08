@@ -17,20 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "datasender.h"
+
 #include "comms.h"
 #include "db.h"
 #include "log.h"
 #include "daemon.h"
-#include "zbxjson.h"
 #include "proxy.h"
 #include "zbxself.h"
-#include "dbcache.h"
 #include "zbxtasks.h"
 #include "zbxcrypto.h"
 #include "zbxcompress.h"
-
-#include "datasender.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -183,12 +180,17 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 		reserved = j.buffer_size;
 		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
 
+		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+
 		/* retry till have a connection */
 		if (FAIL == connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
 				configured_tls_connect_mode, CONFIG_PROXYDATA_FREQUENCY, LOG_LEVEL_WARNING))
 		{
+			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 			goto clean;
 		}
+
+		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 		upload_state = put_data_to_server(&sock, &buffer, buffer_size, reserved, &error);
 		get_hist_upload_state(sock.buffer, hist_upload_state);

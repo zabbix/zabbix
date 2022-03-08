@@ -33,6 +33,7 @@ $web_layout_mode = $this->getLayoutMode();
 $widget = (new CWidget())
 	->setTitle(_('Status of discovery'))
 	->setWebLayoutMode($web_layout_mode)
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_DISCOVERY_VIEW))
 	->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))

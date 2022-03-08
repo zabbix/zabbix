@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
+#include "evalfunc.h"
+
 #include "log.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
@@ -28,7 +28,6 @@
 #include "anomalystl.h"
 
 #include "evalfunc_common.h"
-#include "evalfunc.h"
 
 #define ZBX_VALUEMAP_STRING_LEN	64
 
@@ -602,7 +601,7 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check is function to be evaluated for NOTSUPPORTED items          *
+ * Purpose: check if function is to be evaluated for NOTSUPPORTED items       *
  *                                                                            *
  * Parameters: fn - [IN] function name                                        *
  *                                                                            *

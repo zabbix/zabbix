@@ -1,1068 +1,11 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:36:59Z'
+  date: '2022-02-04T08:32:06Z'
   groups:
-    -
-      uuid: 57b7ae836ca64446ba2c296389c009b7
-      name: Templates/Modules
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
   templates:
-    -
-      uuid: 8278f5e79ef2420cab500a147cc72009
-      template: 'Linux block devices SNMP'
-      name: 'Linux block devices SNMP'
-      description: |
-        MIBs used:
-        UCD-DISKIO-MIB
-        
-        Template tooling version used: 0.41
-      groups:
-        -
-          name: Templates/Modules
-      discovery_rules:
-        -
-          uuid: a85f20bbf86045438460bf439422aaec
-          name: 'Block devices discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#DEVNAME},1.3.6.1.4.1.2021.13.15.1.1.2]'
-          key: 'vfs.dev.discovery[snmp]'
-          delay: 1h
-          filter:
-            evaltype: AND
-            conditions:
-              -
-                macro: '{#DEVNAME}'
-                value: '{$VFS.DEV.DEVNAME.MATCHES}'
-                formulaid: A
-              -
-                macro: '{#DEVNAME}'
-                value: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: B
-          description: 'Block devices are discovered from UCD-DISKIO-MIB::diskIOTable (http://net-snmp.sourceforge.net/docs/mibs/ucdDiskIOMIB.html#diskIOTable)'
-          item_prototypes:
-            -
-              uuid: ed71e7a243594c3bb0c2055b5cfb6f62
-              name: '{#DEVNAME}: Disk read rate'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.2021.13.15.1.1.5.{#SNMPINDEX}'
-              key: 'vfs.dev.read.rate[diskIOReads.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '!r/s'
-              description: |
-                MIB: UCD-DISKIO-MIB
-                The number of read accesses from this device since boot.
-              preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-              tags:
-                -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
-            -
-              uuid: 5e96a297e7e54c0ba4607949c854edc8
-              name: '{#DEVNAME}: Disk utilization'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.2021.13.15.1.1.9.{#SNMPINDEX}'
-              key: 'vfs.dev.util[diskIOLA1.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                MIB: UCD-DISKIO-MIB
-                The 1 minute average load of disk (%)
-              tags:
-                -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
-            -
-              uuid: a060b61ad4f24be299c0a9b2582dda87
-              name: '{#DEVNAME}: Disk write rate'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.2021.13.15.1.1.6.{#SNMPINDEX}'
-              key: 'vfs.dev.write.rate[diskIOWrites.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '!w/s'
-              description: |
-                MIB: UCD-DISKIO-MIB
-                The number of write accesses from this device since boot.
-              preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-              tags:
-                -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
-          graph_prototypes:
-            -
-              uuid: 15f4080e061d4b86a253709d56f444a5
-              name: '{#DEVNAME}: Disk read/write rates'
-              graph_items:
-                -
-                  color: 1A7C11
-                  item:
-                    host: 'Linux block devices SNMP'
-                    key: 'vfs.dev.read.rate[diskIOReads.{#SNMPINDEX}]'
-                -
-                  sortorder: '1'
-                  drawtype: GRADIENT_LINE
-                  color: 2774A4
-                  item:
-                    host: 'Linux block devices SNMP'
-                    key: 'vfs.dev.write.rate[diskIOWrites.{#SNMPINDEX}]'
-      macros:
-        -
-          macro: '{$VFS.DEV.DEVNAME.MATCHES}'
-          value: .+
-          description: 'This macro is used in block devices discovery. Can be overridden on the host or linked template level'
-        -
-          macro: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
-          value: '^(loop[0-9]*|sd[a-z][0-9]+|nbd[0-9]+|sr[0-9]+|fd[0-9]+|dm-[0-9]+|ram[0-9]+|ploop[a-z0-9]+|md[0-9]*|hcp[0-9]*|zram[0-9]*)'
-          description: 'This macro is used in block devices discovery. Can be overridden on the host or linked template level'
-    -
-      uuid: f55b1b1c10a44fe8aef0631f6f41b86d
-      template: 'Linux CPU SNMP'
-      name: 'Linux CPU SNMP'
-      description: |
-        MIBs used:
-        HOST-RESOURCES-MIB
-        UCD-SNMP-MIB
-        
-        Template tooling version used: 0.41
-      groups:
-        -
-          name: Templates/Modules
-      items:
-        -
-          uuid: cf935e4e2f224ce5a9d09662df90e5b2
-          name: 'Interrupts per second'
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.2021.11.59.0
-          key: 'system.cpu.intr[ssRawInterrupts.0]'
-          history: 7d
-          value_type: FLOAT
-          preprocessing:
-            -
-              type: CHANGE_PER_SECOND
-              parameters:
-                - ''
-          tags:
-            -
-              tag: Application
-              value: CPU
-        -
-          uuid: 335279fa524d48089d99ffba47017a0f
-          name: 'Load average (1m avg)'
-          type: SNMP_AGENT
-          snmp_oid: '1.3.6.1.4.1.2021.10.1.3["index","1.3.6.1.4.1.2021.10.1.2", "Load-1"]'
-          key: 'system.cpu.load.avg1[laLoad.1]'
-          history: 7d
-          value_type: FLOAT
-          description: 'MIB: UCD-SNMP-MIB'
-          tags:
-            -
-              tag: Application
-              value: CPU
-        -
-          uuid: 74a03675fdba49969d7286d718edc4e8
-          name: 'Load average (5m avg)'
-          type: SNMP_AGENT
-          snmp_oid: '1.3.6.1.4.1.2021.10.1.3["index","1.3.6.1.4.1.2021.10.1.2", "Load-5"]'
-          key: 'system.cpu.load.avg5[laLoad.2]'
-          history: 7d
-          value_type: FLOAT
-          description: 'MIB: UCD-SNMP-MIB'
-          tags:
-            -
-              tag: Application
-              value: CPU
-        -
-          uuid: d774c8d00aab4158b856feda354fcef6
-          name: 'Load average (15m avg)'
-          type: SNMP_AGENT
-          snmp_oid: '1.3.6.1.4.1.2021.10.1.3["index","1.3.6.1.4.1.2021.10.1.2", "Load-15"]'
-          key: 'system.cpu.load.avg15[laLoad.3]'
-          history: 7d
-          value_type: FLOAT
-          description: 'MIB: UCD-SNMP-MIB'
-          tags:
-            -
-              tag: Application
-              value: CPU
-        -
-          uuid: 20dbc1d9ed25400983eadb6e9d6f1f04
-          name: 'Number of CPUs'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.25.3.3.1.1]'
-          key: 'system.cpu.num[snmp]'
-          history: 7d
-          description: |
-            MIB: HOST-RESOURCES-MIB
-            Count the number of CPU cores by counting number of cores discovered in hrProcessorTable using LLD
-          preprocessing:
-            -
-              type: JAVASCRIPT
-              parameters:
-                - |
-                  //count the number of cores
-                  return JSON.parse(value).length;
-          tags:
-            -
-              tag: Application
-              value: CPU
-        -
-          uuid: 2e52405bed144bd392ba386d8d8fa752
-          name: 'Context switches per second'
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.2021.11.60.0
-          key: 'system.cpu.switches[ssRawContexts.0]'
-          history: 7d
-          value_type: FLOAT
-          preprocessing:
-            -
-              type: CHANGE_PER_SECOND
-              parameters:
-                - ''
-          tags:
-            -
-              tag: Application
-              value: CPU
-      discovery_rules:
-        -
-          uuid: bb04cfa331214963b311d7b397cb3c12
-          name: 'CPU discovery'
-          type: DEPENDENT
-          key: 'cpu.discovery[snmp]'
-          delay: '0'
-          description: 'This discovery will create set of per core CPU metrics from UCD-SNMP-MIB, using {#CPU.COUNT} in preprocessing. That''s the only reason why LLD is used.'
-          item_prototypes:
-            -
-              uuid: 7cb1bdc138a041039b229804e5f55676
-              name: 'CPU guest time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.65.0
-              key: 'system.cpu.guest[ssCpuRawGuest.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                MIB: UCD-SNMP-MIB
-                Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system)
-              preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
-              tags:
-                -
-                  tag: Application
-                  value: CPU
-            -
-              uuid: 47939519397147e7be84d1d3223e8111
-              name: 'CPU guest nice time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.66.0
-              key: 'system.cpu.guest_nice[ssCpuRawGuestNice.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                MIB: UCD-SNMP-MIB
-                Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel)
-              preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
-              tags:
-                -
-                  tag: Application
-                  value: CPU
-            -
-              uuid: b20769f44f8247e1a6a5908ff084ff81
-              name: 'CPU idle time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.53.0
-              key: 'system.cpu.idle[ssCpuRawIdle.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                MIB: UCD-SNMP-MIB
-                The time the CPU has spent doing nothing.
-              preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
-              tags:
-                -
-                  tag: Application
-                  value: CPU
-            -
-              uuid: 7da67bc8887a4d36abba6b041a72f221
-              name: 'CPU interrupt time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.56.0
-              key: 'system.cpu.interrupt[ssCpuRawInterrupt.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                MIB: UCD-SNMP-MIB
-                The amount of time the CPU has been servicing hardware interrupts.
-              preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
-              tags:
-                -
-                  tag: Application
-                  value: CPU
-            -
-              uuid: ce41593112f1497884643f7f99075f4b
-              name: 'CPU iowait time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.54.0
-              key: 'system.cpu.iowait[ssCpuRawWait.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                MIB: UCD-SNMP-MIB
-                Amount of time the CPU has been waiting for I/O to complete.
-              preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
-              tags:
-                -
-                  tag: Application
-                  value: CPU
-            -
-              uuid: 80c42f533f3d40529a1451ecdbaf3d62
-              name: 'CPU nice time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.51.0
-              key: 'system.cpu.nice[ssCpuRawNice.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                MIB: UCD-SNMP-MIB
-                The time the CPU has spent running users' processes that have been niced.
-              preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
-              tags:
-                -
-                  tag: Application
-                  value: CPU
-            -
-              uuid: 1c121eeb3f864dd68569efff6ab79ac8
-              name: 'CPU softirq time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.61.0
-              key: 'system.cpu.softirq[ssCpuRawSoftIRQ.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                MIB: UCD-SNMP-MIB
-                The amount of time the CPU has been servicing software interrupts.
-              preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
-              tags:
-                -
-                  tag: Application
-                  value: CPU
-            -
-              uuid: b98feceb5d1b4dafbbbbc80d3f9598f9
-              name: 'CPU steal time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.64.0
-              key: 'system.cpu.steal[ssCpuRawSteal.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                MIB: UCD-SNMP-MIB
-                The amount of CPU 'stolen' from this virtual machine by the hypervisor for other tasks (such as running another virtual machine).
-              preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
-              tags:
-                -
-                  tag: Application
-                  value: CPU
-            -
-              uuid: 0b45abb043f14f23bd8d71f0bca70c06
-              name: 'CPU system time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.52.0
-              key: 'system.cpu.system[ssCpuRawSystem.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                MIB: UCD-SNMP-MIB
-                The time the CPU has spent running the kernel and its processes.
-              preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
-              tags:
-                -
-                  tag: Application
-                  value: CPU
-            -
-              uuid: 295af9e607aa46c4886a49905137b7ad
-              name: 'CPU user time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.50.0
-              key: 'system.cpu.user[ssCpuRawUser.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                MIB: UCD-SNMP-MIB
-                The time the CPU has spent running users' processes that are not niced.
-              preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
-              tags:
-                -
-                  tag: Application
-                  value: CPU
-            -
-              uuid: aa01918c9d864f498cc211772103ba27
-              name: 'CPU utilization'
-              type: DEPENDENT
-              key: 'system.cpu.util[snmp,{#SNMPINDEX}]'
-              delay: '0'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: 'CPU utilization in %'
-              preprocessing:
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - |
-                      //Calculate utilization
-                      return (100 - value)
-              master_item:
-                key: 'system.cpu.idle[ssCpuRawIdle.{#SNMPINDEX}]'
-              tags:
-                -
-                  tag: Application
-                  value: CPU
-              trigger_prototypes:
-                -
-                  uuid: 305450aac4ce4170a3a7942f6b092593
-                  expression: 'min(/Linux CPU SNMP/system.cpu.util[snmp,{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
-                  name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
-                  opdata: 'Current utilization: {ITEM.LASTVALUE1}'
-                  priority: WARNING
-                  description: 'CPU utilization is too high. The system might be slow to respond.'
-          graph_prototypes:
-            -
-              uuid: 1ed285cca7774aad9335101f373eb642
-              name: 'CPU usage{#SINGLETON}'
-              type: STACKED
-              ymin_type_1: FIXED
-              ymax_type_1: FIXED
-              graph_items:
-                -
-                  color: 1A7C11
-                  item:
-                    host: 'Linux CPU SNMP'
-                    key: 'system.cpu.system[ssCpuRawSystem.{#SNMPINDEX}]'
-                -
-                  sortorder: '1'
-                  color: 2774A4
-                  item:
-                    host: 'Linux CPU SNMP'
-                    key: 'system.cpu.user[ssCpuRawUser.{#SNMPINDEX}]'
-                -
-                  sortorder: '2'
-                  color: F63100
-                  item:
-                    host: 'Linux CPU SNMP'
-                    key: 'system.cpu.nice[ssCpuRawNice.{#SNMPINDEX}]'
-                -
-                  sortorder: '3'
-                  color: A54F10
-                  item:
-                    host: 'Linux CPU SNMP'
-                    key: 'system.cpu.iowait[ssCpuRawWait.{#SNMPINDEX}]'
-                -
-                  sortorder: '4'
-                  color: FC6EA3
-                  item:
-                    host: 'Linux CPU SNMP'
-                    key: 'system.cpu.steal[ssCpuRawSteal.{#SNMPINDEX}]'
-                -
-                  sortorder: '5'
-                  color: 6C59DC
-                  item:
-                    host: 'Linux CPU SNMP'
-                    key: 'system.cpu.interrupt[ssCpuRawInterrupt.{#SNMPINDEX}]'
-                -
-                  sortorder: '6'
-                  color: AC8C14
-                  item:
-                    host: 'Linux CPU SNMP'
-                    key: 'system.cpu.softirq[ssCpuRawSoftIRQ.{#SNMPINDEX}]'
-                -
-                  sortorder: '7'
-                  color: 611F27
-                  item:
-                    host: 'Linux CPU SNMP'
-                    key: 'system.cpu.guest[ssCpuRawGuest.{#SNMPINDEX}]'
-                -
-                  sortorder: '8'
-                  color: F230E0
-                  item:
-                    host: 'Linux CPU SNMP'
-                    key: 'system.cpu.guest_nice[ssCpuRawGuestNice.{#SNMPINDEX}]'
-            -
-              uuid: 27556abf8985458f9d300ab5981f6e96
-              name: 'CPU utilization{#SINGLETON}'
-              ymin_type_1: FIXED
-              ymax_type_1: FIXED
-              graph_items:
-                -
-                  drawtype: GRADIENT_LINE
-                  color: 1A7C11
-                  item:
-                    host: 'Linux CPU SNMP'
-                    key: 'system.cpu.util[snmp,{#SNMPINDEX}]'
-          master_item:
-            key: 'system.cpu.num[snmp]'
-          preprocessing:
-            -
-              type: JAVASCRIPT
-              parameters:
-                - |
-                  //count the number of CPU cores
-                  return JSON.stringify([{"{#CPU.COUNT}": value, "{#SNMPINDEX}": 0, "{#SINGLETON}":""}])
-      macros:
-        -
-          macro: '{$CPU.UTIL.CRIT}'
-          value: '90'
-        -
-          macro: '{$LOAD_AVG_PER_CPU.MAX.WARN}'
-          value: '1.5'
-          description: 'Load per CPU considered sustainable. Tune if needed.'
-    -
-      uuid: cbaf0383cb934294ac53a28ddfd49434
-      template: 'Linux filesystems SNMP'
-      name: 'Linux filesystems SNMP'
-      description: |
-        MIBs used:
-        HOST-RESOURCES-MIB
-        UCD-SNMP-MIB
-        
-        Template tooling version used: 0.41
-      groups:
-        -
-          name: Templates/Modules
-      discovery_rules:
-        -
-          uuid: c55b2f96bd50421482dfcc230e6de01e
-          name: 'Mounted filesystem discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#FSNAME},1.3.6.1.2.1.25.2.3.1.3,{#FSTYPE},1.3.6.1.2.1.25.2.3.1.2,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4]'
-          key: 'vfs.fs.discovery[snmp]'
-          delay: 1h
-          filter:
-            evaltype: AND
-            conditions:
-              -
-                macro: '{#FSTYPE}'
-                value: '{$VFS.FS.FSTYPE.MATCHES}'
-                formulaid: C
-              -
-                macro: '{#FSTYPE}'
-                value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
-              -
-                macro: '{#FSNAME}'
-                value: '{$VFS.FS.FSNAME.MATCHES}'
-                formulaid: A
-              -
-                macro: '{#FSNAME}'
-                value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: B
-          description: 'HOST-RESOURCES-MIB::hrStorage discovery with storage filter'
-          item_prototypes:
-            -
-              uuid: 5c0b2605afe84c288207c04b9946dfbf
-              name: '{#FSNAME}: Free inodes in %'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.2021.9.1.10["index","1.3.6.1.4.1.2021.9.1.2", "{#FSNAME}"]'
-              key: 'vfs.fs.inode.pfree[dskPercentNode.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                MIB: UCD-SNMP-MIB
-                If having problems collecting this item make sure access to UCD-SNMP-MIB is allowed.
-              preprocessing:
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - 'return (100-value);'
-              tags:
-                -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
-              trigger_prototypes:
-                -
-                  uuid: 377f4ffa529f4b0690a11228f4021294
-                  expression: 'min(/Linux filesystems SNMP/vfs.fs.inode.pfree[dskPercentNode.{#SNMPINDEX}],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
-                  name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
-                  opdata: 'Free inodes: {ITEM.LASTVALUE1}'
-                  priority: AVERAGE
-                  description: |
-                    It may become impossible to write to disk if there are no index nodes left.
-                    As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.
-                -
-                  uuid: 5f80199affa44ed7a6b875c49ca00aa7
-                  expression: 'min(/Linux filesystems SNMP/vfs.fs.inode.pfree[dskPercentNode.{#SNMPINDEX}],5m)<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}'
-                  name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)'
-                  opdata: 'Free inodes: {ITEM.LASTVALUE1}'
-                  priority: WARNING
-                  description: |
-                    It may become impossible to write to disk if there are no index nodes left.
-                    As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.
-                  dependencies:
-                    -
-                      name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
-                      expression: 'min(/Linux filesystems SNMP/vfs.fs.inode.pfree[dskPercentNode.{#SNMPINDEX}],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
-            -
-              uuid: 3cc99f32a3a44b2a94c2bab5f2765c8e
-              name: '{#FSNAME}: Space utilization'
-              type: CALCULATED
-              key: 'vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              params: '(last(//vfs.fs.used[hrStorageUsed.{#SNMPINDEX}])/last(//vfs.fs.total[hrStorageSize.{#SNMPINDEX}]))*100'
-              description: 'Space utilization in % for {#FSNAME}'
-              tags:
-                -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
-            -
-              uuid: 9e9b2eb864164eebb4825ba0331b0b95
-              name: '{#FSNAME}: Total space'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}'
-              key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
-              history: 7d
-              units: B
-              description: |
-                MIB: HOST-RESOURCES-MIB
-                The size of the storage represented by this entry, in units of hrStorageAllocationUnits.
-                This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system.
-                For example, the amount of main storage allocated to a buffer pool might be modified or the amount of disk space allocated to virtual storage might be modified.
-              preprocessing:
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '{#ALLOC_UNITS}'
-              tags:
-                -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
-            -
-              uuid: 2cfbdae09907476ea6d73af86338f279
-              name: '{#FSNAME}: Used space'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}'
-              key: 'vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]'
-              history: 7d
-              units: B
-              description: |
-                MIB: HOST-RESOURCES-MIB
-                The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
-              preprocessing:
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '{#ALLOC_UNITS}'
-              tags:
-                -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
-          trigger_prototypes:
-            -
-              uuid: ae3535ef3f674dccb6c809dc7d01172c
-              expression: |
-                last(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Linux filesystems SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Linux filesystems SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<5G or timeleft(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
-              opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
-              priority: AVERAGE
-              description: |
-                Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.
-                 Second condition should be one of the following:
-                 - The disk free space is less than 5G.
-                 - The disk will be full in less than 24 hours.
-              manual_close: 'YES'
-            -
-              uuid: 3bef4897bcd549288203241c5ca9f017
-              expression: |
-                last(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Linux filesystems SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Linux filesystems SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<10G or timeleft(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
-              opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
-              priority: WARNING
-              description: |
-                Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.
-                 Second condition should be one of the following:
-                 - The disk free space is less than 10G.
-                 - The disk will be full in less than 24 hours.
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
-                  expression: |
-                    last(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Linux filesystems SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Linux filesystems SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<5G or timeleft(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
-          graph_prototypes:
-            -
-              uuid: f1000d7a017f4954a32103b345ae4fdf
-              name: '{#FSNAME}: Disk space usage'
-              width: '600'
-              height: '340'
-              type: PIE
-              show_3d: 'YES'
-              graph_items:
-                -
-                  color: '969696'
-                  calc_fnc: LAST
-                  type: GRAPH_SUM
-                  item:
-                    host: 'Linux filesystems SNMP'
-                    key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
-                -
-                  sortorder: '1'
-                  color: C80000
-                  calc_fnc: LAST
-                  item:
-                    host: 'Linux filesystems SNMP'
-                    key: 'vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]'
-      macros:
-        -
-          macro: '{$VFS.FS.FSNAME.MATCHES}'
-          value: .+
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
-        -
-          macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
-          value: ^(/dev|/sys|/run|/proc|.+/shm$)
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
-        -
-          macro: '{$VFS.FS.FSTYPE.MATCHES}'
-          value: '.*(\.4|\.9|hrStorageFixedDisk|hrStorageFlashMemory)$'
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
-        -
-          macro: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
-          value: ^\s$
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
-        -
-          macro: '{$VFS.FS.INODE.PFREE.MIN.CRIT}'
-          value: '10'
-        -
-          macro: '{$VFS.FS.INODE.PFREE.MIN.WARN}'
-          value: '20'
-        -
-          macro: '{$VFS.FS.PUSED.MAX.CRIT}'
-          value: '90'
-        -
-          macro: '{$VFS.FS.PUSED.MAX.WARN}'
-          value: '80'
-    -
-      uuid: 443e4897fb0a4eef9d4624a3baa8f174
-      template: 'Linux memory SNMP'
-      name: 'Linux memory SNMP'
-      description: |
-        MIBs used:
-        UCD-SNMP-MIB
-        
-        Known Issues:
-        
-          Description: Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.
-        
-        Template tooling version used: 0.41
-      groups:
-        -
-          name: Templates/Modules
-      items:
-        -
-          uuid: 286b7a7da5bc46349d98d40e0fa87bb3
-          name: 'Free swap space'
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.2021.4.4.0
-          key: 'system.swap.free[memAvailSwap.0]'
-          history: 7d
-          units: B
-          description: |
-            MIB: UCD-SNMP-MIB
-            The amount of swap space currently unused or available.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '1024'
-          tags:
-            -
-              tag: Application
-              value: Memory
-        -
-          uuid: 95b96317790d467c8f2c3acbe4f508a2
-          name: 'Free swap space in %'
-          type: CALCULATED
-          key: 'system.swap.pfree[snmp]'
-          history: 7d
-          value_type: FLOAT
-          units: '%'
-          params: 'last(//system.swap.free[memAvailSwap.0])/last(//system.swap.total[memTotalSwap.0])*100'
-          description: 'The free space of swap volume/file in percent.'
-          tags:
-            -
-              tag: Application
-              value: Memory
-        -
-          uuid: 7e3c9bc424684af8b16852548145d240
-          name: 'Total swap space'
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.2021.4.3.0
-          key: 'system.swap.total[memTotalSwap.0]'
-          history: 7d
-          units: B
-          description: |
-            MIB: UCD-SNMP-MIB
-            The total amount of swap space configured for this host.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '1024'
-          tags:
-            -
-              tag: Application
-              value: Memory
-        -
-          uuid: d2f2a3127c83459696bb7496de04830b
-          name: 'Available memory'
-          type: CALCULATED
-          key: 'vm.memory.available[snmp]'
-          history: 7d
-          units: B
-          params: 'last(//vm.memory.free[memAvailReal.0])+last(//vm.memory.buffers[memBuffer.0])+last(//vm.memory.cached[memCached.0])'
-          description: 'Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.'
-          tags:
-            -
-              tag: Application
-              value: Memory
-        -
-          uuid: 81c8a8aa72144ec99c0723bd1c7efde0
-          name: 'Memory (buffers)'
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.2021.4.14.0
-          key: 'vm.memory.buffers[memBuffer.0]'
-          history: 7d
-          units: B
-          description: |
-            MIB: UCD-SNMP-MIB
-            Memory used by kernel buffers (Buffers in /proc/meminfo)
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '1024'
-          tags:
-            -
-              tag: Application
-              value: Memory
-        -
-          uuid: a74e6bc72c8c45f2b01ee1b50ce64fdc
-          name: 'Memory (cached)'
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.2021.4.15.0
-          key: 'vm.memory.cached[memCached.0]'
-          history: 7d
-          units: B
-          description: |
-            MIB: UCD-SNMP-MIB
-            Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo)
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '1024'
-          tags:
-            -
-              tag: Application
-              value: Memory
-        -
-          uuid: b13aae9bb13c432998688f8c3230ddb2
-          name: 'Free memory'
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.2021.4.6.0
-          key: 'vm.memory.free[memAvailReal.0]'
-          history: 7d
-          units: B
-          description: 'MIB: UCD-SNMP-MIB'
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '1024'
-          tags:
-            -
-              tag: Application
-              value: Memory
-        -
-          uuid: 849c5cd7aec94ed48c6a0a321b54d801
-          name: 'Total memory'
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.2021.4.5.0
-          key: 'vm.memory.total[memTotalReal.0]'
-          history: 7d
-          units: B
-          description: |
-            MIB: UCD-SNMP-MIB
-            Total memory in Bytes
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '1024'
-          tags:
-            -
-              tag: Application
-              value: Memory
-        -
-          uuid: ac10ac53a99e464bbf0c5894d4297cfc
-          name: 'Memory utilization'
-          type: CALCULATED
-          key: 'vm.memory.util[snmp]'
-          history: 7d
-          value_type: FLOAT
-          units: '%'
-          params: '(last(//vm.memory.total[memTotalReal.0])-(last(//vm.memory.free[memAvailReal.0])+last(//vm.memory.buffers[memBuffer.0])+last(//vm.memory.cached[memCached.0])))/last(//vm.memory.total[memTotalReal.0])*100'
-          description: 'Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.'
-          tags:
-            -
-              tag: Application
-              value: Memory
-          triggers:
-            -
-              uuid: 38e4d31ccb594ba1a041c47633887ef6
-              expression: 'min(/Linux memory SNMP/vm.memory.util[snmp],5m)>{$MEMORY.UTIL.MAX}'
-              name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
-              priority: AVERAGE
-              description: 'The system is running out of free memory.'
-              dependencies:
-                -
-                  name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
-                  expression: 'min(/Linux memory SNMP/vm.memory.available[snmp],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux memory SNMP/vm.memory.total[memTotalReal.0])>0'
-      macros:
-        -
-          macro: '{$MEMORY.AVAILABLE.MIN}'
-          value: 20M
-        -
-          macro: '{$MEMORY.UTIL.MAX}'
-          value: '90'
-        -
-          macro: '{$SWAP.PFREE.MIN.WARN}'
-          value: '50'
     -
       uuid: 4d3a7adbb6964bd08f2b9d28e0da6496
       template: 'Linux SNMP'
@@ -1095,8 +38,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 28927c3715714a77a259d48943ddb8fe
@@ -1104,6 +50,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: bc5a3fbab2834f8bb012325071c5b2e0
           name: 'ICMP loss'
@@ -1114,8 +64,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: f6d63c03e6f34888897464102fa369ec
@@ -1127,6 +80,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Linux SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: b1e02fd733c14d71935e24fbe8786d40
           name: 'ICMP response time'
@@ -1137,8 +97,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 1c1b86790d6442e59f50d94f9844c337
@@ -1153,6 +116,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Linux SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 85a597b741bb4e6e8fa9806e8737caf4
           name: 'SNMP traps (fallback)'
@@ -1165,8 +135,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: e45c4b2df4a640a1a36154cb2b717e9d
           name: 'System contact details'
@@ -1188,8 +158,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: fdb0807c4a9a452f8a3cbab01a4ddb2e
           name: 'Interrupts per second'
@@ -1205,8 +175,8 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: eeaba506dee342518660c03d422faa2a
           name: 'Load average (1m avg)'
@@ -1218,8 +188,8 @@ zabbix_export:
           description: 'MIB: UCD-SNMP-MIB'
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: e0c8a351d59f42b78e6db4a0c50aa5d2
           name: 'Load average (5m avg)'
@@ -1231,8 +201,8 @@ zabbix_export:
           description: 'MIB: UCD-SNMP-MIB'
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: 0a5c406d4e434dbba248a18318f6a869
           name: 'Load average (15m avg)'
@@ -1244,8 +214,8 @@ zabbix_export:
           description: 'MIB: UCD-SNMP-MIB'
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: f835f2d2e65c4efc8934a61870d907ca
           name: 'Number of CPUs'
@@ -1265,8 +235,8 @@ zabbix_export:
                   return JSON.parse(value).length;
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: e10a890dc6724cbda96f7c40c49cd730
           name: 'Context switches per second'
@@ -1282,8 +252,8 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: abd4d4b7097644478329b578dfa7bf09
           name: 'System description'
@@ -1306,8 +276,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 9f2b3de3245e4ffea5aefc636e0f3da1
           name: 'System location'
@@ -1329,8 +299,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 3ee68ecd1edc4f5d9cddefa78f8d502e
           name: 'System name'
@@ -1352,8 +322,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: eeb0355174d74892a4e3a078e6ac7952
@@ -1362,6 +332,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: 5b17833c4646423d8fd4115fa19d2ffe
           name: 'System object ID'
@@ -1382,8 +359,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: a8ad10709a6e457187f58695de20b027
           name: 'Free swap space'
@@ -1402,8 +379,11 @@ zabbix_export:
                 - '1024'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
         -
           uuid: 52ae3f1d7b3d4b669b40f0fddbb0e326
           name: 'Free swap space in %'
@@ -1416,8 +396,11 @@ zabbix_export:
           description: 'The free space of swap volume/file in percent.'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
         -
           uuid: 7db5193027794961840c228c6280fe5b
           name: 'Total swap space'
@@ -1436,8 +419,11 @@ zabbix_export:
                 - '1024'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
         -
           uuid: d3fba18851db4be08df04ab85536bb14
           name: Uptime
@@ -1458,8 +444,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: e129fb90ec084a83806aec27141cd6eb
@@ -1472,6 +458,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/Linux SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: ad8a3857e8b04dffbc0c052a0d36fe08
           name: 'Available memory'
@@ -1483,8 +473,8 @@ zabbix_export:
           description: 'Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: c071dae605b64cce886df7d2865e77e0
           name: 'Memory (buffers)'
@@ -1503,8 +493,8 @@ zabbix_export:
                 - '1024'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: d5e0a99bfd9844108c3d26d53d1a3d0c
           name: 'Memory (cached)'
@@ -1523,8 +513,8 @@ zabbix_export:
                 - '1024'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: fc3fb5310e8f4af7a093b9df9eede403
           name: 'Free memory'
@@ -1541,8 +531,8 @@ zabbix_export:
                 - '1024'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: de35484e53b24894aa050f15e1941106
           name: 'Total memory'
@@ -1561,8 +551,8 @@ zabbix_export:
                 - '1024'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 640d893d48d44f2ebe2c9e9bb0158f76
           name: 'Memory utilization'
@@ -1575,8 +565,8 @@ zabbix_export:
           description: 'Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
           triggers:
             -
               uuid: 063b87d246b04e74a439114a05f00fe5
@@ -1587,7 +577,14 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
-                  expression: 'min(/Linux SNMP/vm.memory.available[snmp],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux SNMP/vm.memory.total[memTotalReal.0])>0'
+                  expression: 'max(/Linux SNMP/vm.memory.available[snmp],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux SNMP/vm.memory.total[memTotalReal.0])>0'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 03491bb9b98f4267bf1ff56cc226d819
           name: 'SNMP agent availability'
@@ -1604,8 +601,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 63d99e49b3584fb2bf61a7d56725fb3c
@@ -1618,6 +618,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Linux SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 4089ef5360ec4b2a98b7742e8e4e9dd6
@@ -1652,8 +656,8 @@ zabbix_export:
                       return value/{#CPU.COUNT}
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
             -
               uuid: ce514c83afb345b2b0f3b85d6ec89dc3
               name: 'CPU guest nice time'
@@ -1679,8 +683,8 @@ zabbix_export:
                       return value/{#CPU.COUNT}
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
             -
               uuid: 394bffd2086545af806f4ad990f853a1
               name: 'CPU idle time'
@@ -1706,8 +710,8 @@ zabbix_export:
                       return value/{#CPU.COUNT}
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
             -
               uuid: 88e9044abe71483a8670b572517ff4ad
               name: 'CPU interrupt time'
@@ -1733,8 +737,8 @@ zabbix_export:
                       return value/{#CPU.COUNT}
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
             -
               uuid: 87d1467c79cc4a3d8e5caf3b35de7e17
               name: 'CPU iowait time'
@@ -1760,8 +764,8 @@ zabbix_export:
                       return value/{#CPU.COUNT}
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
             -
               uuid: d35896698d2a459fb682eb170e7005de
               name: 'CPU nice time'
@@ -1787,8 +791,8 @@ zabbix_export:
                       return value/{#CPU.COUNT}
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
             -
               uuid: b48b79d7c2464bd996776477e55ce724
               name: 'CPU softirq time'
@@ -1814,8 +818,8 @@ zabbix_export:
                       return value/{#CPU.COUNT}
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
             -
               uuid: f0e15f783b434cc49c97681e15def25c
               name: 'CPU steal time'
@@ -1841,8 +845,8 @@ zabbix_export:
                       return value/{#CPU.COUNT}
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
             -
               uuid: 9f063ab6a217459e9e1ae95cc77071ff
               name: 'CPU system time'
@@ -1868,8 +872,8 @@ zabbix_export:
                       return value/{#CPU.COUNT}
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
             -
               uuid: e07c1afe5f8c4db0bae364933df3e571
               name: 'CPU user time'
@@ -1895,8 +899,8 @@ zabbix_export:
                       return value/{#CPU.COUNT}
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
             -
               uuid: dfd150b9966c49e6b8bf08570438f17c
               name: 'CPU utilization'
@@ -1918,8 +922,8 @@ zabbix_export:
                 key: 'system.cpu.idle[ssCpuRawIdle.{#SNMPINDEX}]'
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
               trigger_prototypes:
                 -
                   uuid: 34b29a2e43b347d0ada6b80a472a659e
@@ -1928,6 +932,10 @@ zabbix_export:
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: fe9835f96dfd4912933e1c3db7943fdf
@@ -2098,8 +1106,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 23d5c37a8a66495c81babc76085dd0d0
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -2118,8 +1132,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 229e36fe673e43c0a69f942c086fea97
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -2143,8 +1163,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: bbaad86407a349ed81b3b329e0754cdb
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -2167,8 +1193,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 184b63fa8f184915a8bd365afebae00f
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -2187,8 +1219,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: ad64f09ccd88467f811499ef17096c0a
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -2212,8 +1250,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 54b1b171187b44c2a0b8dfadf06f9b00
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -2238,8 +1282,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 4aaabfdfeeac4c779255fd8b5a4550f4
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -2261,8 +1311,14 @@ zabbix_export:
                 name: 'IF-MIB::ifOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 038c4ebc6bdf48f69b60fca856318638
@@ -2280,6 +1336,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: ce0a2b8f62ff4591b5e3bc8b348bf946
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -2303,8 +1363,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: 02387536c92f449384c23a0744e71ee3
@@ -2334,6 +1400,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Linux SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Linux SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Linux SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: efe5516d1c164a8cb243c4806b9684a2
               expression: |
@@ -2354,6 +1424,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Linux SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Linux SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Linux SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: dbbd6222837345b891dd613f6d40f98f
               expression: |
@@ -2373,6 +1447,13 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Linux SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Linux SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Linux SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: c09b8ad9356741fcb9560446b50d8cf0
@@ -2476,8 +1557,14 @@ zabbix_export:
                 name: 'EtherLike-MIB::dot3StatsDuplexStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 1e1f12c0cf744fd3aaac6570325bd661
@@ -2486,6 +1573,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           preprocessing:
             -
               type: JAVASCRIPT
@@ -2544,8 +1635,11 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
             -
               uuid: b1fb6665c96b4c9f999b3803d45eea3e
               name: '{#DEVNAME}: Disk utilization'
@@ -2560,8 +1654,11 @@ zabbix_export:
                 The 1 minute average load of disk (%)
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
             -
               uuid: 147ad615fd544ab39494ce829da0bb14
               name: '{#DEVNAME}: Disk write rate'
@@ -2581,8 +1678,11 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
           graph_prototypes:
             -
               uuid: 76f7583a5256463a82d60c0fef3c6a7f
@@ -2649,8 +1749,11 @@ zabbix_export:
                     - 'return (100-value);'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
               trigger_prototypes:
                 -
                   uuid: c2a464a9d8f24b1f96251feabeec8b6a
@@ -2661,6 +1764,13 @@ zabbix_export:
                   description: |
                     It may become impossible to write to disk if there are no index nodes left.
                     As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 396da67ae447497781d9f37215490b71
                   expression: 'min(/Linux SNMP/vfs.fs.inode.pfree[dskPercentNode.{#SNMPINDEX}],5m)<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}'
@@ -2674,6 +1784,13 @@ zabbix_export:
                     -
                       name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
                       expression: 'min(/Linux SNMP/vfs.fs.inode.pfree[dskPercentNode.{#SNMPINDEX}],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 0cb84e1611e944e68caf677492d169e5
               name: '{#FSNAME}: Space utilization'
@@ -2686,8 +1803,11 @@ zabbix_export:
               description: 'Space utilization in % for {#FSNAME}'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: 9117a148b85c4593a3df470a1e023573
               name: '{#FSNAME}: Total space'
@@ -2708,8 +1828,11 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: 04168e44dd0f4d3c96496c3fadd13fde
               name: '{#FSNAME}: Used space'
@@ -2728,8 +1851,11 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
           trigger_prototypes:
             -
               uuid: 4e84d5b0e3bb4729a6eabd5882d2d603
@@ -2745,6 +1871,13 @@ zabbix_export:
                  - The disk free space is less than 5G.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: capacity
             -
               uuid: 210ae86feef14fa0a82c97331e522937
               expression: |
@@ -2765,6 +1898,13 @@ zabbix_export:
                   expression: |
                     last(/Linux SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                     ((last(/Linux SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Linux SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<5G or timeleft(/Linux SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: capacity
           graph_prototypes:
             -
               uuid: 10878869ac0641bc96b9898820a4f3ea
@@ -2788,6 +1928,13 @@ zabbix_export:
                   item:
                     host: 'Linux SNMP'
                     key: 'vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]'
+      tags:
+        -
+          tag: class
+          value: os
+        -
+          tag: target
+          value: linux
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'
@@ -4026,22 +3173,8 @@ zabbix_export:
               newvalue: unknown
   triggers:
     -
-      uuid: 12324c6e7b564c858406702148b43bc4
-      expression: 'min(/Linux memory SNMP/system.swap.pfree[snmp],5m)<{$SWAP.PFREE.MIN.WARN} and last(/Linux memory SNMP/system.swap.total[memTotalSwap.0])>0'
-      name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
-      opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
-      priority: WARNING
-      description: 'This trigger is ignored, if there is no swap configured'
-      dependencies:
-        -
-          name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
-          expression: 'min(/Linux memory SNMP/vm.memory.util[snmp],5m)>{$MEMORY.UTIL.MAX}'
-        -
-          name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
-          expression: 'min(/Linux memory SNMP/vm.memory.available[snmp],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux memory SNMP/vm.memory.total[memTotalReal.0])>0'
-    -
       uuid: 8d66563ff7744cd6847325d473eaacfe
-      expression: 'min(/Linux SNMP/system.swap.pfree[snmp],5m)<{$SWAP.PFREE.MIN.WARN} and last(/Linux SNMP/system.swap.total[memTotalSwap.0])>0'
+      expression: 'max(/Linux SNMP/system.swap.pfree[snmp],5m)<{$SWAP.PFREE.MIN.WARN} and last(/Linux SNMP/system.swap.total[memTotalSwap.0])>0'
       name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: WARNING
@@ -4052,29 +3185,24 @@ zabbix_export:
           expression: 'min(/Linux SNMP/vm.memory.util[snmp],5m)>{$MEMORY.UTIL.MAX}'
         -
           name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
-          expression: 'min(/Linux SNMP/vm.memory.available[snmp],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux SNMP/vm.memory.total[memTotalReal.0])>0'
-    -
-      uuid: 687586e62f4b4191aa95ba1ba74c7787
-      expression: 'min(/Linux memory SNMP/vm.memory.available[snmp],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux memory SNMP/vm.memory.total[memTotalReal.0])>0'
-      name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
-      opdata: 'Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
-      priority: AVERAGE
+          expression: 'max(/Linux SNMP/vm.memory.available[snmp],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux SNMP/vm.memory.total[memTotalReal.0])>0'
+      tags:
+        -
+          tag: scope
+          value: capacity
     -
       uuid: b0a04a6a01854d0eb6f9f225c1108261
-      expression: 'min(/Linux SNMP/vm.memory.available[snmp],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux SNMP/vm.memory.total[memTotalReal.0])>0'
+      expression: 'max(/Linux SNMP/vm.memory.available[snmp],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux SNMP/vm.memory.total[memTotalReal.0])>0'
       name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
       opdata: 'Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: AVERAGE
-    -
-      uuid: 4e08b6e41268476292ac92da123bd8d7
-      expression: |
-        min(/Linux CPU SNMP/system.cpu.load.avg1[laLoad.1],5m)/last(/Linux CPU SNMP/system.cpu.num[snmp])>{$LOAD_AVG_PER_CPU.MAX.WARN}
-        and last(/Linux CPU SNMP/system.cpu.load.avg5[laLoad.2])>0
-        and last(/Linux CPU SNMP/system.cpu.load.avg15[laLoad.3])>0
-      name: 'Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
-      opdata: 'Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}'
-      priority: AVERAGE
-      description: 'Per CPU load average is too high. Your system may be slow to respond.'
+      tags:
+        -
+          tag: scope
+          value: capacity
+        -
+          tag: scope
+          value: performance
     -
       uuid: 33df3354161047f0b47ad7736b70a302
       expression: |
@@ -4085,22 +3213,14 @@ zabbix_export:
       opdata: 'Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}'
       priority: AVERAGE
       description: 'Per CPU load average is too high. Your system may be slow to respond.'
+      tags:
+        -
+          tag: scope
+          value: capacity
+        -
+          tag: scope
+          value: performance
   graphs:
-    -
-      uuid: 1b06aa0505e94191bce3bf15d41ad113
-      name: 'CPU jumps'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Linux CPU SNMP'
-            key: 'system.cpu.switches[ssRawContexts.0]'
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Linux CPU SNMP'
-            key: 'system.cpu.intr[ssRawInterrupts.0]'
     -
       uuid: ff743a3e32e7497b9b98173b3611687f
       name: 'CPU jumps'
@@ -4116,24 +3236,6 @@ zabbix_export:
           item:
             host: 'Linux SNMP'
             key: 'system.cpu.intr[ssRawInterrupts.0]'
-    -
-      uuid: 6af175b5899946c5bae1e7ab4e8f0635
-      name: 'Memory usage'
-      ymin_type_1: FIXED
-      graph_items:
-        -
-          drawtype: BOLD_LINE
-          color: 1A7C11
-          item:
-            host: 'Linux memory SNMP'
-            key: 'vm.memory.total[memTotalReal.0]'
-        -
-          sortorder: '1'
-          drawtype: GRADIENT_LINE
-          color: 2774A4
-          item:
-            host: 'Linux memory SNMP'
-            key: 'vm.memory.available[snmp]'
     -
       uuid: 16b11e6079864c71a7d068276a8e8650
       name: 'Memory usage'
@@ -4153,18 +3255,6 @@ zabbix_export:
             host: 'Linux SNMP'
             key: 'vm.memory.available[snmp]'
     -
-      uuid: edd17c68085b4a328c24ebd8d37fd30c
-      name: 'Memory utilization'
-      ymin_type_1: FIXED
-      ymax_type_1: FIXED
-      graph_items:
-        -
-          drawtype: GRADIENT_LINE
-          color: 1A7C11
-          item:
-            host: 'Linux memory SNMP'
-            key: 'vm.memory.util[snmp]'
-    -
       uuid: 5cd95425d8fe4705833995ccfb484c66
       name: 'Memory utilization'
       ymin_type_1: FIXED
@@ -4176,21 +3266,6 @@ zabbix_export:
           item:
             host: 'Linux SNMP'
             key: 'vm.memory.util[snmp]'
-    -
-      uuid: 24bd0481e30a49a78410fef4e1470546
-      name: 'Swap usage'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Linux memory SNMP'
-            key: 'system.swap.free[memAvailSwap.0]'
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Linux memory SNMP'
-            key: 'system.swap.total[memTotalSwap.0]'
     -
       uuid: 421c99e9076c4f24931206255577c988
       name: 'Swap usage'
@@ -4206,35 +3281,6 @@ zabbix_export:
           item:
             host: 'Linux SNMP'
             key: 'system.swap.total[memTotalSwap.0]'
-    -
-      uuid: 1ec155ff28e14859b26e9804e96c7fb8
-      name: 'System load'
-      ymin_type_1: FIXED
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Linux CPU SNMP'
-            key: 'system.cpu.load.avg1[laLoad.1]'
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Linux CPU SNMP'
-            key: 'system.cpu.load.avg5[laLoad.2]'
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Linux CPU SNMP'
-            key: 'system.cpu.load.avg15[laLoad.3]'
-        -
-          sortorder: '3'
-          color: A54F10
-          yaxisside: RIGHT
-          item:
-            host: 'Linux CPU SNMP'
-            key: 'system.cpu.num[snmp]'
     -
       uuid: feff7234e6cc420e94acc3c0dab0a61e
       name: 'System load'

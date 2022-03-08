@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T06:57:57Z'
+  date: '2022-03-01T08:23:53Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         Get PHP-FPM metrics using the Zabbix HTTP agent.
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -40,8 +40,8 @@ zabbix_export:
             key: php-fpm.get_status
           tags:
             -
-              tag: Application
-              value: PHP-FPM
+              tag: component
+              value: connections
         -
           uuid: a9ae24915703483ea95a346c625ed70e
           name: 'PHP-FPM: Get ping page'
@@ -54,8 +54,8 @@ zabbix_export:
           retrieve_mode: BOTH
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: health
         -
           uuid: b91063d42d4b454089b58e29ee3bdb38
           name: 'PHP-FPM: Get status page'
@@ -67,8 +67,8 @@ zabbix_export:
           url: '{$PHP_FPM.SCHEME}://{$PHP_FPM.HOST}:{$PHP_FPM.PORT}/{$PHP_FPM.STATUS.PAGE}?json'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: cf2fe31db5084bc5b363ef7d0d691c25
           name: 'PHP-FPM: Listen queue'
@@ -86,8 +86,8 @@ zabbix_export:
             key: php-fpm.get_status
           tags:
             -
-              tag: Application
-              value: PHP-FPM
+              tag: component
+              value: listen-queue
         -
           uuid: 56876a76bd3a4c6c90b033c19a59f6d1
           name: 'PHP-FPM: Listen queue, len'
@@ -105,8 +105,8 @@ zabbix_export:
             key: php-fpm.get_status
           tags:
             -
-              tag: Application
-              value: PHP-FPM
+              tag: component
+              value: listen-queue
         -
           uuid: a8829ff906e847c2b97a32b1ded60523
           name: 'PHP-FPM: Listen queue, max'
@@ -124,8 +124,8 @@ zabbix_export:
             key: php-fpm.get_status
           tags:
             -
-              tag: Application
-              value: PHP-FPM
+              tag: component
+              value: listen-queue
         -
           uuid: 314c3f19311f47acb93b046ab2625c75
           name: 'PHP-FPM: Queue usage'
@@ -138,8 +138,8 @@ zabbix_export:
           description: 'Queue utilization'
           tags:
             -
-              tag: Application
-              value: PHP-FPM
+              tag: component
+              value: listen-queue
           triggers:
             -
               uuid: 1ad5018fb19d4a9cb9e627f964bfd627
@@ -147,6 +147,10 @@ zabbix_export:
               name: 'PHP-FPM: Queue utilization is high (over {$PHP_FPM.QUEUE.WARN.MAX}% for 15m)'
               priority: WARNING
               description: 'The queue for this pool reached {$PHP_FPM.QUEUE.WARN.MAX}% of its maximum capacity. Items in queue represent the current number of connections that have been initiated on this pool, but not yet accepted.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: dcb11355c5ae4c6ab5f1326aa1c7bbd6
           name: 'PHP-FPM: Max children reached'
@@ -168,8 +172,8 @@ zabbix_export:
             key: php-fpm.get_status
           tags:
             -
-              tag: Application
-              value: PHP-FPM
+              tag: component
+              value: application
         -
           uuid: 226939bd485a4381a5c0a6d4511acbc3
           name: 'PHP-FPM: Pool name'
@@ -193,8 +197,8 @@ zabbix_export:
             key: php-fpm.get_status
           tags:
             -
-              tag: Application
-              value: PHP-FPM
+              tag: component
+              value: application
         -
           uuid: 6a090c078ace46bd958b42225c63f5ca
           name: 'PHP-FPM: Ping'
@@ -216,8 +220,8 @@ zabbix_export:
             key: php-fpm.get_ping
           tags:
             -
-              tag: Application
-              value: PHP-FPM
+              tag: component
+              value: health
           triggers:
             -
               uuid: 5dcc607026d24e63b2f099540a5d8e9b
@@ -225,6 +229,10 @@ zabbix_export:
               name: 'PHP-FPM: Service is down'
               priority: HIGH
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 923243cbb4b647389a38b4788aad3141
           name: 'PHP-FPM: Processes, active'
@@ -242,8 +250,8 @@ zabbix_export:
             key: php-fpm.get_status
           tags:
             -
-              tag: Application
-              value: PHP-FPM
+              tag: component
+              value: memory
         -
           uuid: 79402b0cac4d4a409b39db4bf71557d2
           name: 'PHP-FPM: Processes, idle'
@@ -261,8 +269,8 @@ zabbix_export:
             key: php-fpm.get_status
           tags:
             -
-              tag: Application
-              value: PHP-FPM
+              tag: component
+              value: system
         -
           uuid: 9632f44f9b2648f299e9f61a39daf92f
           name: 'PHP-FPM: Processes, max active'
@@ -280,8 +288,8 @@ zabbix_export:
             key: php-fpm.get_status
           tags:
             -
-              tag: Application
-              value: PHP-FPM
+              tag: component
+              value: application
         -
           uuid: e69faadd7a9d457e8f56d283871b946a
           name: 'PHP-FPM: Processes, total'
@@ -299,8 +307,8 @@ zabbix_export:
             key: php-fpm.get_status
           tags:
             -
-              tag: Application
-              value: PHP-FPM
+              tag: component
+              value: system
         -
           uuid: 084848b2d6bd4b8a88424b1ec9055b0f
           name: 'PHP-FPM: Process manager'
@@ -324,8 +332,8 @@ zabbix_export:
             key: php-fpm.get_status
           tags:
             -
-              tag: Application
-              value: PHP-FPM
+              tag: component
+              value: application
           triggers:
             -
               uuid: 8cfa50bcea744075954d0a9c8a132330
@@ -334,6 +342,10 @@ zabbix_export:
               priority: INFO
               description: 'PHP-FPM manager changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 0dd9e388e2584e0090ed65bab39183f9
           name: 'PHP-FPM: Slow requests'
@@ -355,8 +367,8 @@ zabbix_export:
             key: php-fpm.get_status
           tags:
             -
-              tag: Application
-              value: PHP-FPM
+              tag: component
+              value: application
           triggers:
             -
               uuid: 63bd00ee25af4b42a37dad1d742c66c0
@@ -364,6 +376,10 @@ zabbix_export:
               name: 'PHP-FPM: Detected slow requests'
               priority: WARNING
               description: 'PHP-FPM detected slow request. A slow request means that it took more time to execute than expected (defined in the configuration of your pool).'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 9a625629fc0a4222acfefa0409ec1c72
           name: 'PHP-FPM: Start time'
@@ -382,8 +398,8 @@ zabbix_export:
             key: php-fpm.get_status
           tags:
             -
-              tag: Application
-              value: PHP-FPM
+              tag: component
+              value: application
         -
           uuid: 093024c740b946a0bd6637ba9e3e0dad
           name: 'PHP-FPM: Uptime'
@@ -402,8 +418,8 @@ zabbix_export:
             key: php-fpm.get_status
           tags:
             -
-              tag: Application
-              value: PHP-FPM
+              tag: component
+              value: application
           triggers:
             -
               uuid: b44815446b3b464f883f4d0e799b020e
@@ -416,6 +432,10 @@ zabbix_export:
                 -
                   name: 'PHP-FPM: Service is down'
                   expression: 'last(/PHP-FPM by HTTP/php-fpm.ping)=0 or nodata(/PHP-FPM by HTTP/php-fpm.ping,3m)=1'
+              tags:
+                -
+                  tag: scope
+                  value: notice
             -
               uuid: 9ed4047bdcd74e649814c5d004ba78c7
               expression: 'last(/PHP-FPM by HTTP/php-fpm.uptime)<10m'
@@ -423,6 +443,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: d49adb58e8bb4453911270e5dce1e03e
           name: 'PHP-FPM: Version'
@@ -448,8 +472,8 @@ zabbix_export:
             key: php-fpm.get_ping
           tags:
             -
-              tag: Application
-              value: PHP-FPM
+              tag: component
+              value: application
           triggers:
             -
               uuid: d6c891de92c34bdba80a2ba88f975271
@@ -458,6 +482,17 @@ zabbix_export:
               priority: INFO
               description: 'PHP-FPM version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+      tags:
+        -
+          tag: class
+          value: application
+        -
+          tag: target
+          value: php-fpm
       macros:
         -
           macro: '{$PHP_FPM.HOST}'

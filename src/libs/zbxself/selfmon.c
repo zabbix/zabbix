@@ -17,9 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "selfmon.h"
+
 #include "zbxself.h"
 #include "common.h"
-#include "selfmon.h"
 
 #ifndef _WINDOWS
 #	include "mutexs.h"

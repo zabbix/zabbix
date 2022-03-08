@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T06:57:23Z'
+  date: '2022-03-01T10:30:17Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -16,7 +16,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/401862-discussion-thread-for-official-zabbix-template-internet-information-services
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -36,8 +36,11 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 2b73bb4c09404d748e019ef2257a9e20
@@ -49,6 +52,10 @@ zabbix_export:
                 -
                   name: 'IIS: The World Wide Web Publishing Service (W3SVC) is not running'
                   expression: 'last(/IIS by Zabbix agent active/service_state[W3SVC])<>0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: e70f872ed9184757b8a62c732658faa5
           name: 'IIS: Anonymous users per second'
@@ -59,8 +66,8 @@ zabbix_export:
           description: 'The number of requests from users over an anonymous connection per second. Average per minute.'
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: users
         -
           uuid: 64816de795864c8fae879e670dfe9e93
           name: 'IIS: Bytes Received per second'
@@ -72,8 +79,8 @@ zabbix_export:
           description: 'The average rate per minute at which data bytes are received by the service at the Application Layer. Does not include protocol headers or control bytes.'
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: network
         -
           uuid: 1b0b636e0bbd4948b3047071a4b964fc
           name: 'IIS: Bytes Sent per second'
@@ -85,8 +92,8 @@ zabbix_export:
           description: 'The average rate per minute at which data bytes are sent by the service.'
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: network
         -
           uuid: 5abf01f6e7a7419d9a1de9803ccf1060
           name: 'IIS: Bytes Total per second'
@@ -98,8 +105,8 @@ zabbix_export:
           description: 'The average rate per minute of total bytes/sec transferred by the Web service (sum of bytes sent/sec and bytes received/sec).'
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: network
         -
           uuid: 37b23949ca94466eb552c6fd8239b650
           name: 'IIS: Method CGI requests per second'
@@ -115,8 +122,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: requests
         -
           uuid: d32eb1398fa7454eb91329aa39d1e90e
           name: 'IIS: Connection attempts per second'
@@ -132,8 +139,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: connections
         -
           uuid: 182bceaa31194bdd8c906cf226039b0b
           name: 'IIS: Method COPY requests per second'
@@ -149,8 +156,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: requests
         -
           uuid: 8b316e2896f041dca9b4adc601093b5c
           name: 'IIS: Current connections'
@@ -161,8 +168,8 @@ zabbix_export:
           description: 'The number of active connections.'
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: connections
         -
           uuid: 7da6cf8a65b94b6f8d89dc53c7de38eb
           name: 'IIS: Method DELETE requests per second'
@@ -178,11 +185,11 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: requests
         -
           uuid: 5381bfc071524f32bb5290379d2e978d
-          name: 'IIS: Method Method GET requests per second'
+          name: 'IIS: Method GET requests per second'
           type: ZABBIX_ACTIVE
           key: 'perf_counter_en["\Web Service(_Total)\Get Requests/Sec", 60]'
           history: 7d
@@ -195,8 +202,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: requests
         -
           uuid: 414b17c9eb11460cb55d35aeb7b8c071
           name: 'IIS: Method HEAD requests per second'
@@ -212,8 +219,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: requests
         -
           uuid: d5b38b5472214d629e832d2709c64b3c
           name: 'IIS: Method ISAPI requests per second'
@@ -229,8 +236,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: requests
         -
           uuid: 74fed9efa0ae4301aab2f73d76fd8357
           name: 'IIS: Locked errors per second'
@@ -246,8 +253,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: errors
         -
           uuid: cdf63d485cd1419385caabc050eb533c
           name: 'IIS: Method LOCK requests per second'
@@ -263,8 +270,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: requests
         -
           uuid: edbe50383897434cb33378b973628061
           name: 'IIS: Method MKCOL requests per second'
@@ -280,8 +287,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: requests
         -
           uuid: 51a74530b894484a9ba101eb1176a982
           name: 'IIS: Method MOVE requests per second'
@@ -297,8 +304,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: requests
         -
           uuid: 6dfe3dbde2544c5080c3845d54c83219
           name: 'IIS: NonAnonymous users per second'
@@ -309,8 +316,8 @@ zabbix_export:
           description: 'The number of requests from users over a non-anonymous connection per second. Average per minute.'
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: users
         -
           uuid: 13e65fdff0704e6f87133b8efe34704f
           name: 'IIS: Not Found errors per second'
@@ -326,8 +333,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: errors
         -
           uuid: dcb0338dc59d4c95b9f712fed84a3aa2
           name: 'IIS: Method OPTIONS requests per second'
@@ -343,8 +350,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: requests
         -
           uuid: eb6a098fef824b2e9abe80b4331190f4
           name: 'IIS: Method Total Other requests per second'
@@ -360,8 +367,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: requests
         -
           uuid: 222bb49332214781bc48a0eb610035c2
           name: 'IIS: Method POST requests per second'
@@ -377,8 +384,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: requests
         -
           uuid: 011fff85fb0440b78ca7857454577c08
           name: 'IIS: Method PROPFIND requests per second'
@@ -394,8 +401,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: requests
         -
           uuid: 3b8a1eea86034a268ac37031c08d3740
           name: 'IIS: Method PROPPATCH requests per second'
@@ -411,8 +418,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: requests
         -
           uuid: c4615d7155d14f98b76705df1a5778e4
           name: 'IIS: Method PUT requests per second'
@@ -428,8 +435,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: requests
         -
           uuid: a1cfef3952c346ccb39e85038e49ae63
           name: 'IIS: Method MS-SEARCH requests per second'
@@ -445,8 +452,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: requests
         -
           uuid: d53040c921324b2195045dacb3738d6f
           name: 'IIS: Uptime'
@@ -458,8 +465,8 @@ zabbix_export:
           description: 'Service uptime in seconds.'
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: application
           triggers:
             -
               uuid: f68768567f334d369d52797309f95c41
@@ -468,6 +475,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: f181123b522946018d9ac90599693cfe
           name: 'IIS: Total connection attempts'
@@ -483,8 +494,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: connections
         -
           uuid: ff70ce9edf1c45ba8263d33847992baf
           name: 'IIS: Method Total requests per second'
@@ -500,8 +511,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: requests
         -
           uuid: fff9e968d5474adfbfd4ae9e19d836d9
           name: 'IIS: Method TRACE requests per second'
@@ -517,8 +528,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: requests
         -
           uuid: 0b6b770a6b014b8c857277e1d9cf6ffe
           name: 'IIS: Method TRACE requests per second'
@@ -534,8 +545,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: requests
         -
           uuid: 5ef9aec68d5b4fe79b17453ab8988b59
           name: 'IIS: Files cache hits percentage'
@@ -551,8 +562,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: cache
         -
           uuid: a041713a95e746f5b4797a7aecaed9a5
           name: 'IIS: File cache misses'
@@ -568,8 +579,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: cache
         -
           uuid: 5488881cba254b6b8f49ebacae2bc4c4
           name: 'IIS: URIs cache hits percentage'
@@ -585,8 +596,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: cache
         -
           uuid: ffd18aef119f4c7c845c6a3e76fb747d
           name: 'IIS: URI cache misses'
@@ -602,8 +613,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: cache
         -
           uuid: 31d4f21ce4c6412b912ca65fe9aee83c
           name: 'IIS: World Wide Web Publishing Service (W3SVC) state'
@@ -620,8 +631,11 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: application
+            -
+              tag: component
+              value: health
           triggers:
             -
               uuid: ca139b8b27c44f7fb22938fd3419cff5
@@ -633,6 +647,10 @@ zabbix_export:
                 -
                   name: 'IIS: Windows process Activation Service (WAS) is not the running'
                   expression: 'last(/IIS by Zabbix agent active/service_state[WAS])<>0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 7f016ce3ab3941b78741dfb72c6d7693
           name: 'IIS: Windows Process Activation Service (WAS) state'
@@ -649,8 +667,11 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: IIS
+              tag: component
+              value: application
+            -
+              tag: component
+              value: health
           triggers:
             -
               uuid: d7a16291f196424ca9c39af4271ab78f
@@ -658,6 +679,10 @@ zabbix_export:
               name: 'IIS: Windows process Activation Service (WAS) is not the running'
               priority: HIGH
               description: 'Windows Process Activation Service (WAS) is not in the running state. IIS cannot start.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 1dfb7339b81b4237a4e90b29328de297
@@ -694,8 +719,11 @@ zabbix_export:
                     - 10m
               tags:
                 -
-                  tag: Application
+                  tag: application-pool
                   value: '{#APPPOOL}'
+                -
+                  tag: component
+                  value: application
               trigger_prototypes:
                 -
                   uuid: a7184495eb684293ada387292c812b0f
@@ -706,6 +734,10 @@ zabbix_export:
                     -
                       name: 'IIS: The World Wide Web Publishing Service (W3SVC) is not running'
                       expression: 'last(/IIS by Zabbix agent active/service_state[W3SVC])<>0'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: f0a6fe8a4cc44582a3048f1a00442736
               name: 'IIS: {#APPPOOL} Uptime'
@@ -717,8 +749,11 @@ zabbix_export:
               description: 'The web application uptime period since the last restart.'
               tags:
                 -
-                  tag: Application
+                  tag: application-pool
                   value: '{#APPPOOL}'
+                -
+                  tag: component
+                  value: application
               trigger_prototypes:
                 -
                   uuid: d2a9854722a44253a39c8eaab67f7677
@@ -727,6 +762,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: e2cfc77aebab4b14bf6a690dbdd0c2b1
               name: 'IIS: AppPool {#APPPOOL} recycles'
@@ -741,14 +780,21 @@ zabbix_export:
                     - 10m
               tags:
                 -
-                  tag: Application
+                  tag: application-pool
                   value: '{#APPPOOL}'
+                -
+                  tag: component
+                  value: application
               trigger_prototypes:
                 -
                   uuid: 27a93967a29849f3aef833db136e1b8e
                   expression: 'last(/IIS by Zabbix agent active/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"],#1)<>last(/IIS by Zabbix agent active/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"],#2) and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1'
                   name: 'IIS: Application pool {#APPPOOL} has been recycled'
                   priority: INFO
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: d525c1c47ee2402d9635ae276a5e58ec
               name: 'IIS: AppPool {#APPPOOL} current queue size'
@@ -764,8 +810,11 @@ zabbix_export:
                     - 10m
               tags:
                 -
-                  tag: Application
+                  tag: application-pool
                   value: '{#APPPOOL}'
+                -
+                  tag: component
+                  value: application
               trigger_prototypes:
                 -
                   uuid: 68499a4737d24ee6846aaea2a37b7b4f
@@ -776,10 +825,21 @@ zabbix_export:
                     -
                       name: 'IIS: Application pool {#APPPOOL} is not in Running state'
                       expression: 'last(/IIS by Zabbix agent active/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"])<>3 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           lld_macro_paths:
             -
               lld_macro: '{#APPPOOL}'
               path: $.Name
+      tags:
+        -
+          tag: class
+          value: application
+        -
+          tag: target
+          value: iis
       macros:
         -
           macro: '{$IIS.APPPOOL.MATCHES}'

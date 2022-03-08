@@ -53,8 +53,8 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Unicorn metrics discovery |<p>DiscoveryUnicorn specific metrics, when Unicorn is used.</p> |HTTP_AGENT |gitlab.unicorn.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `unicorn_workers`</p><p>- JAVASCRIPT: `return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);`</p> |
 |Puma metrics discovery |<p>Discovery Puma specific metrics, when Puma is used.</p> |HTTP_AGENT |gitlab.puma.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `puma_workers`</p><p>- JAVASCRIPT: `return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);`</p> |
+|Unicorn metrics discovery |<p>DiscoveryUnicorn specific metrics, when Unicorn is used.</p> |HTTP_AGENT |gitlab.unicorn.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `unicorn_workers`</p><p>- JAVASCRIPT: `return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);`</p> |
 
 ## Items collected
 
@@ -115,7 +115,7 @@ There are no template links in this template.
 |GitLab: Unicorn stats |GitLab: Unicorn: Workers |<p>The number of Unicorn workers</p> |DEPENDENT |gitlab.unicorn.unicorn_workers[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=='unicorn_workers')].value.sum()`</p> |
 |GitLab: Unicorn stats |GitLab: Unicorn: Active connections |<p>The number of active Unicorn connections.</p> |DEPENDENT |gitlab.unicorn.active_connections[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=='unicorn_active_connections')].value.sum()`</p> |
 |GitLab: Unicorn stats |GitLab: Unicorn: Queued connections |<p>The number of queued Unicorn connections.</p> |DEPENDENT |gitlab.unicorn.queued_connections[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=='unicorn_queued_connections')].value.sum()`</p> |
-|Zabbix_raw_items |GitLab: Get instance metrics |<p>-</p> |HTTP_AGENT |gitlab.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- PROMETHEUS_TO_JSON</p> |
+|Zabbix raw items |GitLab: Get instance metrics |<p>-</p> |HTTP_AGENT |gitlab.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- PROMETHEUS_TO_JSON</p> |
 
 ## Triggers
 
@@ -124,9 +124,9 @@ There are no template links in this template.
 |GitLab: Gitlab instance is not able to accept traffic |<p>-</p> |`last(/GitLab by HTTP/gitlab.readiness)=0` |HIGH |<p>**Depends on**:</p><p>- GitLab: Liveness check was failed</p> |
 |GitLab: Liveness check was failed |<p>The application server is not running or Rails Controllers are deadlocked.</p> |`last(/GitLab by HTTP/gitlab.liveness)=0` |HIGH | |
 |GitLab: Version has changed (new version: {ITEM.VALUE}) |<p>GitLab version has changed. Ack to close.</p> |`last(/GitLab by HTTP/gitlab.deployments.version,#1)<>last(/GitLab by HTTP/gitlab.deployments.version,#2) and length(last(/GitLab by HTTP/gitlab.deployments.version))>0` |INFO |<p>Manual close: YES</p> |
-|GitLab: Too many Redis queues client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m) |<p>"Too many  Redis client exceptions during  to requests to  Redis instance queues."</p> |`min(/GitLab by HTTP/gitlab.redis.client_exceptions.queues.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}` |WARNING | |
-|GitLab: Too many Redis cache client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m) |<p>"Too many  Redis client exceptions during  to requests to  Redis instance cache."</p> |`min(/GitLab by HTTP/gitlab.redis.client_exceptions.cache.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}` |WARNING | |
-|GitLab: Too many Redis shared_state client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m) |<p>"Too many  Redis client exceptions during  to requests to  Redis instance shared_state."</p> |`min(/GitLab by HTTP/gitlab.redis.client_exceptions.shared_state.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}` |WARNING | |
+|GitLab: Too many Redis queues client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m) |<p>"Too many  Redis client exceptions during the requests to  Redis instance queues."</p> |`min(/GitLab by HTTP/gitlab.redis.client_exceptions.queues.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}` |WARNING | |
+|GitLab: Too many Redis cache client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m) |<p>"Too many  Redis client exceptions during the requests to  Redis instance cache."</p> |`min(/GitLab by HTTP/gitlab.redis.client_exceptions.cache.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}` |WARNING | |
+|GitLab: Too many Redis shared_state client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m) |<p>"Too many  Redis client exceptions during the requests to  Redis instance shared_state."</p> |`min(/GitLab by HTTP/gitlab.redis.client_exceptions.shared_state.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}` |WARNING | |
 |GitLab: Failed to fetch info data (or no data for 30m) |<p>Zabbix has not received data for metrics for the last 30 minutes</p> |`nodata(/GitLab by HTTP/gitlab.ruby.threads_running,30m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- GitLab: Liveness check was failed</p> |
 |GitLab: Current number of open files is too high (over {$GITLAB.OPEN.FDS.MAX.WARN}% for 5m) |<p>-</p> |`min(/GitLab by HTTP/gitlab.ruby.file_descriptors.max,5m)/last(/GitLab by HTTP/gitlab.ruby.process_max_fds)*100>{$GITLAB.OPEN.FDS.MAX.WARN}` |WARNING | |
 |GitLab: Too many HTTP requests failures (over {$GITLAB.HTTP.FAIL.MAX.WARN} for 5m)' |<p>"Too many requests failed on GitLab instance with 5xx HTTP code"</p> |`min(/GitLab by HTTP/gitlab.http.requests.5xx.rate,5m)>{$GITLAB.HTTP.FAIL.MAX.WARN}` |WARNING | |
@@ -139,5 +139,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 

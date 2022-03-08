@@ -33,6 +33,7 @@ $widget = new CWidget();
 
 if ($data['action'] === 'user.edit') {
 	$widget_name = _('Users');
+	$doc_url = CDocHelper::ADMINISTRATION_USER_EDIT;
 }
 else {
 	$widget_name = _('User profile').NAME_DELIMITER;
@@ -40,9 +41,12 @@ else {
 		? $data['name'].' '.$data['surname']
 		: $data['username'];
 	$widget->setTitleSubmenu(getUserSettingsSubmenu());
+	$doc_url = CDocHelper::ADMINISTRATION_USERPROFILE_EDIT;
 }
 
-$widget->setTitle($widget_name);
+$widget
+	->setTitle($widget_name)
+	->setDocUrl(CDocHelper::getUrl($doc_url));
 $tabs = new CTabView();
 
 if ($data['form_refresh'] == 0) {
@@ -204,7 +208,7 @@ if ($data['action'] === 'user.edit' && $data['db_user']['username'] === ZBX_GUES
 		->setReadonly();
 }
 else {
-	$has_unavailable_locale = false;
+	$all_locales_available = true;
 
 	foreach (getLocales() as $localeid => $locale) {
 		if (!$locale['display']) {
@@ -219,7 +223,9 @@ else {
 
 		$lang_select->addOption((new CSelectOption($localeid, $locale['name']))->setDisabled(!$locale_available));
 
-		$has_unavailable_locale |= !$locale_available;
+		if (!$locale_available) {
+			$all_locales_available = false;
+		}
 	}
 
 	// Restoring original locale.
@@ -229,7 +235,7 @@ else {
 		$language_error = 'Translations are unavailable because the PHP gettext module is missing.';
 		$lang_select->setReadonly();
 	}
-	elseif ($has_unavailable_locale) {
+	elseif (!$all_locales_available) {
 		$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
 	}
 

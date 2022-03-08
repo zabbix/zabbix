@@ -27,7 +27,9 @@ $this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('administration.mediatype.edit.js.php');
 
-$widget = (new CWidget())->setTitle(_('Media types'));
+$widget = (new CWidget())
+	->setTitle(_('Media types'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_MEDIATYPE_EDIT));
 
 $tabs = new CTabView();
 

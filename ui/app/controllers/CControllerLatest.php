@@ -27,6 +27,12 @@ abstract class CControllerLatest extends CController {
 	// Filter idx prefix.
 	const FILTER_IDX = 'web.monitoring.latest';
 
+	// Number of subfilter values per row.
+	const SUBFILTERS_VALUES_PER_ROW = 100;
+
+	// Number of tag value rows allowed to be included in subfilter.
+	const SUBFILTERS_TAG_VALUE_ROWS = 20;
+
 	// Filter fields default values.
 	const FILTER_FIELDS_DEFAULT = [
 		'groupids' => [],
@@ -37,8 +43,7 @@ abstract class CControllerLatest extends CController {
 		'show_tags' => SHOW_TAGS_3,
 		'tag_name_format' => TAG_NAME_FULL,
 		'tag_priority' => '',
-		'show_without_data' => 1,
-		'show_details' => 1,
+		'show_details' => 0,
 		'page' => null,
 		'sort' => 'name',
 		'sortorder' => ZBX_SORT_UP,
@@ -60,7 +65,6 @@ abstract class CControllerLatest extends CController {
 	 * @param string $filter['tags'][]['tag']
 	 * @param string $filter['tags'][]['value']
 	 * @param int    $filter['tags'][]['operator']
-	 * @param int    $filter['show_without_data']  Include items with empty history.
 	 * @param string $sort_field                   Sorting field.
 	 * @param string $sort_order                   Sorting order.
 	 *
@@ -75,7 +79,6 @@ abstract class CControllerLatest extends CController {
 			'output' => ['hostid', 'name', 'status', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
 			'groupids' => $groupids,
 			'hostids' => $filter['hostids'] ? $filter['hostids'] : null,
-			'monitored_hosts' => true,
 			'preservekeys' => true
 		]);
 
@@ -90,7 +93,7 @@ abstract class CControllerLatest extends CController {
 				continue;
 			}
 
-			$host_items = API::Item()->get([
+			$select_items += API::Item()->get([
 				'output' => ['itemid', 'hostid', 'value_type'],
 				'hostids' => [$hostid],
 				'webitems' => true,
@@ -104,10 +107,6 @@ abstract class CControllerLatest extends CController {
 				],
 				'preservekeys' => true
 			]);
-
-			$select_items += $filter['show_without_data']
-				? $host_items
-				: Manager::History()->getItemsHavingValues($host_items, $history_period);
 
 			$select_items_cnt = count($select_items);
 		}
@@ -243,10 +242,18 @@ abstract class CControllerLatest extends CController {
 		}
 
 		if (array_key_exists('tags', $input) && $input['tags']) {
-			$input['tags'] = array_filter($input['tags'], function($tag) {
+			$input['tags'] = array_filter($input['tags'], function ($tag) {
 				return !($tag['tag'] === '' && $tag['value'] === '');
 			});
 			$input['tags'] = array_values($input['tags']);
+		}
+
+		if (array_key_exists('subfilter_tags', $input) && $input['subfilter_tags']) {
+			$subfilter_tags_tmp = [];
+			foreach ($input['subfilter_tags'] as $k => $v) {
+				$subfilter_tags_tmp[urldecode($k)] = $v;
+			}
+			$input['subfilter_tags'] = $subfilter_tags_tmp;
 		}
 
 		return $input;
@@ -256,12 +263,13 @@ abstract class CControllerLatest extends CController {
 	 * Get items count for passed filter.
 	 *
 	 * @param array  $filter                        Filter options.
+	 * @param string $filter['sort']                Sort name.
+	 * @param string $filter['sortorder']           Sort order.
 	 * @param string $filter['name']                Filter items by name.
 	 * @param array  $filter['groupids']            Filter items by host groups.
 	 * @param array  $filter['hostids']             Filter items by host groups.
 	 * @param string $filter['evaltype']            Filter items by tags.
 	 * @param string $filter['tags']                Filter items by tag names and values.
-	 * @param int    $filter['show_without_data']   Filter items with/without data.
 	 * @param array  $filter['subfilter_hostids']	Host subfilter.
 	 * @param array  $filter['subfilter_tagnames']	Tagname subfilter.
 	 * @param array  $filter['subfilter_tags']      Tags subfilter.
@@ -270,97 +278,12 @@ abstract class CControllerLatest extends CController {
 	 * @return int
 	 */
 	protected function getCount(array $filter): int {
-		$groupids = $filter['groupids'] ? getSubGroups($filter['groupids']) : null;
+		$prepared_data = $this->prepareData($filter, $filter['sort'], $filter['sortorder']);
+		$subfilters_fields = self::getSubfilterFields($filter, (count($filter['hostids']) == 1));
+		$subfilters = self::getSubfilters($subfilters_fields, $prepared_data);
+		$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
 
-		$hosts = API::Host()->get([
-			'output' => [],
-			'groupids' => $groupids,
-			'hostids' => $filter['hostids'] ? $filter['hostids'] : null,
-			'monitored_hosts' => true,
-			'preservekeys' => true
-		]);
-
-		if (array_key_exists('subfilter_hostids', $filter) && $filter['subfilter_hostids']) {
-			$hosts = array_intersect_key($hosts, array_flip($filter['subfilter_hostids']));
-		}
-
-		if (array_key_exists('subfilter_tagnames', $filter) && $filter['subfilter_tagnames']
-				|| array_key_exists('subfilter_tags', $filter) && $filter['subfilter_tags']) {
-			$filter['evaltype'] = TAG_EVAL_TYPE_AND_OR;
-
-			$filter['tags'] = [];
-			if (array_key_exists('subfilter_tagnames', $filter)) {
-				foreach ($filter['subfilter_tagnames'] as $tagname) {
-					$filter['tags'][] = [
-						'tag' => $tagname,
-						'operator' => TAG_OPERATOR_EXISTS
-					];
-				}
-			}
-			if (array_key_exists('subfilter_tags', $filter)) {
-				foreach ($filter['subfilter_tags'] as $tagname => $values) {
-					foreach ($values as $value) {
-						$filter['tags'][] = [
-							'tag' => $tagname,
-							'value' => $value,
-							'operator' => TAG_OPERATOR_EQUAL
-						];
-					}
-				}
-			}
-		}
-
-		$subfilter_data = -1;
-		if ($filter['show_without_data']
-				&& array_key_exists('subfilter_data', $filter)
-				&& $filter['subfilter_data'] && count($filter['subfilter_data']) != 2) {
-			$subfilter_data = reset($filter['subfilter_data']);
-		}
-
-		$search_limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
-		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
-		$select_items_cnt = 0;
-
-		foreach (array_keys($hosts) as $hostid) {
-			if ($select_items_cnt >= $search_limit) {
-				break;
-			}
-
-			$host_items = API::Item()->get([
-				'output' => ['itemid', 'value_type'],
-				'hostids' => [$hostid],
-				'webitems' => true,
-				'evaltype' => $filter['evaltype'],
-				'tags' => $filter['tags'] ? $filter['tags'] : null,
-				'filter' => [
-					'status' => [ITEM_STATUS_ACTIVE]
-				],
-				'search' => ($filter['name'] === '') ? null : [
-					'name' => $filter['name']
-				],
-				'preservekeys' => true
-			]);
-
-			if ($subfilter_data != -1) {
-				$items_having_values = Manager::History()->getItemsHavingValues($host_items, $history_period);
-
-				switch ($subfilter_data) {
-					// Items without data only.
-					case 0:
-						$host_items = array_diff_key($host_items, $items_having_values);
-						break;
-
-					// Items having data only.
-					case 1:
-						$host_items = $items_having_values;
-						break;
-				}
-			}
-
-			$select_items_cnt += count($host_items);
-		}
-
-		return min($select_items_cnt, $search_limit);
+		return count($prepared_data['items']);
 	}
 
 	/**
@@ -371,27 +294,33 @@ abstract class CControllerLatest extends CController {
 	 * @param array  $filter['subfilter_tagnames']  Selected tagname subfilter parameters.
 	 * @param array  $filter['subfilter_tags']      Selected tags subfilter parameters.
 	 * @param array  $filter['subfilter_data']      Selected data subfilter parameters.
+	 * @param bool   $show_data_subfilter           Whether the data subfilter should be included.
 	 *
 	 * @return array
 	 */
-	protected static function getSubfilterFields(array $filter): array {
+	protected static function getSubfilterFields(array $filter, bool $show_data_subfilter): array {
 		$subfilters = [];
 
-		foreach (['subfilter_hostids', 'subfilter_tagnames', 'subfilter_tags', 'subfilter_data'] as $subfilter_key) {
-			if (!array_key_exists($subfilter_key, $filter)) {
+		$subfilter_keys = ['subfilter_hostids', 'subfilter_tagnames', 'subfilter_tags'];
+		if ($show_data_subfilter) {
+			$subfilter_keys[] = 'subfilter_data';
+		}
+
+		foreach ($subfilter_keys as $key) {
+			if (!array_key_exists($key, $filter)) {
 				continue;
 			}
 
-			if ($subfilter_key === 'subfilter_tags') {
+			if ($key === 'subfilter_tags') {
 				$tmp_tags = [];
-				foreach ($filter[$subfilter_key] as $tag => $tag_values) {
+				foreach ($filter[$key] as $tag => $tag_values) {
 					$tmp_tags[urldecode($tag)] = array_flip($tag_values);
 				}
-				$subfilters[$subfilter_key] = $tmp_tags;
+				$subfilters[$key] = $tmp_tags;
 				unset($tmp_tags);
 			}
 			else {
-				$subfilters[$subfilter_key] = array_flip($filter[$subfilter_key]);
+				$subfilters[$key] = array_flip($filter[$key]);
 			}
 		}
 
@@ -419,12 +348,10 @@ abstract class CControllerLatest extends CController {
 	 * @param array  $prepared_data['items'][]['matching_subfilters']  [OUT] Flag for each of subfilter group showing
 	 *                                                                 either item fits its subfilter requirements.
 	 * @param bool   $prepared_data['items'][]['has_data']             [OUT] Flag either item has data.
-	 * @param array  $filter                                           Filter parameters.
-	 * @param int    $filter['show_without_data']                      "Show items without data" filter checkbox value.
 	 *
 	 * @return array
 	 */
-	protected static function getSubfilters(array $subfilters, array &$prepared_data, array $filter): array {
+	protected static function getSubfilters(array $subfilters, array &$prepared_data): array {
 		$subfilter_options = self::getSubfilterOptions($prepared_data, $subfilters);
 		$prepared_data['items'] = self::getItemMatchings($prepared_data['items'], $subfilters);
 
@@ -432,6 +359,9 @@ abstract class CControllerLatest extends CController {
 		 * Calculate how many additional items would match the filtering results after selecting each of provided host
 		 * subfilters. So item MUST match all subfilters except the tested one.
 		 */
+		$matching_items_by_tagnames = [];
+		$matching_items_by_tags = [];
+
 		foreach ($prepared_data['items'] as $item) {
 			// Hosts subfilter.
 			$item_matches = true;
@@ -439,7 +369,10 @@ abstract class CControllerLatest extends CController {
 				if ($filter_name === 'hostids') {
 					continue;
 				}
-				$item_matches &= $match;
+				if (!$match) {
+					$item_matches = false;
+					break;
+				}
 			}
 
 			if ($item_matches) {
@@ -447,46 +380,88 @@ abstract class CControllerLatest extends CController {
 			}
 
 			// Calculate the counters of tag existence subfilter options.
-			foreach ($item['tags'] as $tag) {
-				$item_matches = true;
-				foreach ($item['matching_subfilters'] as $filter_name => $match) {
-					if ($filter_name === 'tagnames') {
-						continue;
-					}
-					$item_matches &= $match;
+			$item_matches = true;
+			foreach ($item['matching_subfilters'] as $filter_name => $match) {
+				if ($filter_name === 'tagnames') {
+					continue;
 				}
+				if (!$match) {
+					$item_matches = false;
+					break;
+				}
+			}
 
-				if ($item_matches) {
-					$subfilter_options['tagnames'][$tag['tag']]['count']++;
+			if ($item_matches) {
+				foreach ($item['tags'] as $tag) {
+					if (is_array($item['matching_subfilters']['tagnames'])
+							&& array_key_exists($tag['tag'], $item['matching_subfilters']['tagnames'])) {
+						$matching_items_by_tagnames[$item['itemid']] = true;
+					}
+
+					$subfilter_options['tagnames'][$tag['tag']]['items'][$item['itemid']] = true;
 				}
 			}
 
 			// Calculate the same for the tag/value pair subfilter options.
-			foreach ($item['tags'] as $tag) {
-				$item_matches = true;
-				foreach ($item['matching_subfilters'] as $filter_name => $match) {
-					if ($filter_name === 'tags') {
-						continue;
-					}
-					$item_matches &= $match;
+			$item_matches = true;
+			foreach ($item['matching_subfilters'] as $filter_name => $match) {
+				if ($filter_name === 'tags') {
+					continue;
 				}
-
-				if ($item_matches) {
-					$subfilter_options['tags'][$tag['tag']][$tag['value']]['count']++;
+				if (!$match) {
+					$item_matches = false;
+					break;
 				}
 			}
 
-			// Data subfilter. Enabled only when 'Show without data' checkbox is on.
-			if ($filter['show_without_data']) {
+			if ($item_matches) {
+				foreach ($item['tags'] as $tag) {
+					if (is_array($item['matching_subfilters']['tags'])
+							&& array_key_exists($tag['tag'], $item['matching_subfilters']['tags'])
+							&& array_key_exists($tag['value'], $item['matching_subfilters']['tags'][$tag['tag']])) {
+						$matching_items_by_tags[$item['itemid']] = true;
+					}
+
+					$subfilter_options['tags'][$tag['tag']][$tag['value']]['items'][$item['itemid']] = true;
+				}
+			}
+
+			// Data subfilter.
+			if (array_key_exists('data', $subfilter_options)) {
 				$data_key = (int) $item['has_data'];
 				$subfilter_options['data'][$data_key]['count']++;
 			}
 		}
 
-		// No need to show data subfilter if all selected items fits into same group.
-		if (!$subfilter_options['data'][0]['count'] || !$subfilter_options['data'][1]['count']) {
+		// Data subfilter is not shown if all selected items fit into same group.
+		if (array_key_exists('data', $subfilter_options)
+				&& (!$subfilter_options['data'][0]['count'] || !$subfilter_options['data'][1]['count'])) {
 			$subfilter_options['data'] = [];
 		}
+
+		array_walk($subfilter_options['tagnames'], function (&$tag) use ($matching_items_by_tagnames) {
+			if (!$tag['selected'] && $tag['items']) {
+				$tag['count'] = count(array_diff_key($tag['items'], $matching_items_by_tagnames));
+			}
+			else {
+				$tag['count'] = count($tag['items']);
+			}
+
+			unset($tag['items']);
+		});
+
+		array_walk($subfilter_options['tags'], function (&$tag_values) use ($matching_items_by_tags) {
+			array_walk($tag_values, function (&$tag) use ($matching_items_by_tags) {
+				if (!$tag['selected'] && $tag['items']) {
+					$tag['count'] = count(array_diff_key($tag['items'], $matching_items_by_tags));
+				}
+				else {
+					$tag['count'] = count($tag['items']);
+				}
+
+				unset($tag['items']);
+			});
+		});
 
 		return $subfilter_options;
 	}
@@ -513,8 +488,7 @@ abstract class CControllerLatest extends CController {
 		$subfilter_options = [
 			'hostids' => [],
 			'tagnames' => [],
-			'tags' => [],
-			'data' => []
+			'tags' => []
 		];
 
 		foreach ($data['hosts'] as $hostid => $host) {
@@ -531,6 +505,7 @@ abstract class CControllerLatest extends CController {
 					$subfilter_options['tagnames'][$tag['tag']] = [
 						'name' => $tag['tag'],
 						'selected' => array_key_exists($tag['tag'], $subfilter['tagnames']),
+						'items' => [],
 						'count' => 0
 					];
 
@@ -542,31 +517,26 @@ abstract class CControllerLatest extends CController {
 					'selected' => (array_key_exists($tag['tag'], $subfilter['tags'])
 						&& array_key_exists($tag['value'], $subfilter['tags'][$tag['tag']])
 					),
+					'items' => [],
 					'count' => 0
 				];
 			}
 		}
 
-		$subfilter_options['data'] = [
-			1 => [
-				'name' => _('With data'),
-				'selected' => array_key_exists(1, $subfilter['data']),
-				'count' => 0
-			],
-			0 => [
-				'name' => _('Without data'),
-				'selected' => array_key_exists(0, $subfilter['data']),
-				'count' => 0
-			]
-		];
-
-		// Sort subfilters by values.
-		CArrayHelper::sort($subfilter_options['hostids'], ['name']);
-		CArrayHelper::sort($subfilter_options['tagnames'], ['name']);
-		uksort($subfilter_options['tags'], 'strnatcmp');
-		array_walk($subfilter_options['tags'], function (&$tag_values) {
-			CArrayHelper::sort($tag_values, ['name']);
-		});
+		if (array_key_exists('data', $subfilter)) {
+			$subfilter_options['data'] = [
+				1 => [
+					'name' => _('With data'),
+					'selected' => array_key_exists(1, $subfilter['data']),
+					'count' => 0
+				],
+				0 => [
+					'name' => _('Without data'),
+					'selected' => array_key_exists(0, $subfilter['data']),
+					'count' => 0
+				]
+			];
+		}
 
 		return $subfilter_options;
 	}
@@ -591,23 +561,24 @@ abstract class CControllerLatest extends CController {
 	 * @return array
 	 */
 	protected static function getItemMatchings(array $items, array $subfilter): array {
-		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
-		$with_data = Manager::History()->getItemsHavingValues($items, $history_period);
-		$with_data = array_flip(array_keys($with_data));
+		if (array_key_exists('data', $subfilter)) {
+			$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
+			$with_data = Manager::History()->getItemsHavingValues($items, $history_period);
+			$with_data = array_flip(array_keys($with_data));
+		}
 
 		foreach ($items as &$item) {
 			$match_hosts = (!$subfilter['hostids'] || array_key_exists($item['hostid'], $subfilter['hostids']));
-			$match_tagnames = (!$subfilter['tagnames']
-				|| (bool) array_intersect_key($subfilter['tagnames'], array_flip(array_column($item['tags'], 'tag')))
-			);
+			$match_tagnames = $subfilter['tagnames']
+				? array_intersect_key($subfilter['tagnames'], array_flip(array_column($item['tags'], 'tag')))
+				: true;
 
 			if ($subfilter['tags']) {
-				$match_tags = false;
+				$match_tags = [];
 				foreach ($item['tags'] as $tag) {
 					if (array_key_exists($tag['tag'], $subfilter['tags'])
 							&& array_key_exists($tag['value'], $subfilter['tags'][$tag['tag']])) {
-						$match_tags = true;
-						break;
+						$match_tags[$tag['tag']][$tag['value']] = true;
 					}
 				}
 			}
@@ -615,18 +586,21 @@ abstract class CControllerLatest extends CController {
 				$match_tags = true;
 			}
 
-			$item['has_data'] = array_key_exists($item['itemid'], $with_data);
-			$match_data = (!$subfilter['data']
-				|| array_key_exists(0, $subfilter['data']) && !$item['has_data']
-				|| array_key_exists(1, $subfilter['data']) && $item['has_data']
-			);
-
 			$item['matching_subfilters'] = [
 				'hostids' => $match_hosts,
 				'tagnames' => $match_tagnames,
-				'tags' => $match_tags,
-				'data' => $match_data
+				'tags' => $match_tags
 			];
+
+			if (array_key_exists('data', $subfilter)) {
+				$item['has_data'] = array_key_exists($item['itemid'], $with_data);
+
+				if ($subfilter['data']) {
+					$item['matching_subfilters']['data'] = (array_key_exists(0, $subfilter['data']) && !$item['has_data']
+						|| array_key_exists(1, $subfilter['data']) && $item['has_data']
+					);
+				}
+			}
 		}
 		unset($item);
 
@@ -634,16 +608,126 @@ abstract class CControllerLatest extends CController {
 	}
 
 	/**
-	 * Unset items not matching selected subfilters.
+	 * Returns array of items matching selected subfilters.
 	 *
-	 * @param array $items
-	 * @param array $items['matching_subfilters']    Contains flags either items matches all selected subfilters.
+	 * @param array      $items
+	 * @param array      $items[]['matching_subfilters']
+	 * @param bool       $items[]['matching_subfilters']['hostids']   (optional) TRUE if item matches host subfilter.
+	 * @param array|bool $items[]['matching_subfilters']['tagnames']  (optional) TRUE if item matches tagname subfilter
+	 *                                                                or array of exactly matching tagnames.
+	 * @param array|bool $items[]['matching_subfilters']['tags']      (optional) TRUE if item matches tagname/value
+	 *                                                                subfilter or array of exactly matching
+	 *                                                                tagname/value pairs.
+	 * @param bool       $items[]['matching_subfilters']['data']      (optional) TRUE if item matches data subfilter.
 	 *
 	 * @return array
 	 */
 	protected static function applySubfilters(array $items): array {
 		return array_filter($items, function ($item) {
-			return array_sum($item['matching_subfilters']) == count($item['matching_subfilters']);
+			$matches = array_intersect_key($item['matching_subfilters'],
+				array_flip(['hostids', 'tagnames', 'tags', 'data'])
+			);
+
+			if (array_key_exists('tagnames', $matches)) {
+				$matches['tagnames'] = (bool) $matches['tagnames'];
+			}
+
+			if (array_key_exists('tags', $matches)) {
+				$matches['tags'] = (bool) $matches['tags'];
+			}
+
+			return (count(array_unique($matches)) == 1)
+				? current($matches)
+				: false;
 		});
+	}
+
+	/**
+	 * Make subset of most severe subfilters to reduce the space used by subfilter.
+	 *
+	 * @param array  $subfilters
+	 * @param string $subfilters[<subfilter option>]['name']      Option name.
+	 * @param bool   $subfilters[<subfilter option>]['selected']  Flag indicating if option is selected.
+	 *
+	 * @return array
+	 */
+	public static function getTopPrioritySubfilters(array $subfilters): array {
+		$top_priority_fields = [];
+
+		if (self::SUBFILTERS_VALUES_PER_ROW < count($subfilters)) {
+			// All selected subfilters must always be included.
+			$top_priority_fields = array_filter($subfilters, function ($field) {
+				return $field['selected'];
+			});
+
+			// Add first non-selected subfilter values in case limit is not exceeded.
+			$remaining = self::SUBFILTERS_VALUES_PER_ROW - count($top_priority_fields);
+			if ($remaining > 0) {
+				$subfilters = array_diff_key($subfilters, $top_priority_fields);
+				CArrayHelper::sort($subfilters, ['name']);
+				$top_priority_fields += array_slice($subfilters, 0, $remaining, true);
+			}
+		}
+		else {
+			$top_priority_fields = $subfilters;
+		}
+
+		CArrayHelper::sort($top_priority_fields, ['name']);
+
+		return $top_priority_fields;
+	}
+
+	/**
+	 * Make subset of most severe tag value subfilters to reduce the space used by subfilter.
+	 *
+	 * @param array $tags
+	 * @param bool  $tags[<tagname>][<tagvalue>]['selected']  Flag indicating if tag value is selected.
+	 *
+	 * @return array
+	 */
+	public static function getTopPriorityTagValueSubfilters(array $tags): array {
+		$top_priority_fields = [];
+
+		// All selected subfilters must always be included.
+		foreach ($tags as $tag => $values) {
+			if ((bool) array_sum(array_column($values, 'selected'))) {
+				$values = array_filter($values, function ($field) {
+					return ($field['selected'] || $field['count'] != 0);
+				});
+
+				$top_priority_fields[] = [
+					'name' => $tag,
+					'values' => self::getTopPrioritySubfilters($values)
+				];
+				unset($tags[$tag]);
+			}
+		}
+
+		// Add first non-selected subfilter values in case limit is not exceeded.
+		if (self::SUBFILTERS_TAG_VALUE_ROWS > count($top_priority_fields)) {
+			$tags_names = array_keys($tags);
+			uasort($tags_names, 'strnatcasecmp');
+
+			do {
+				if (($tag_name = array_shift($tags_names)) === null) {
+					break;
+				}
+
+				$tag_values = array_filter($tags[$tag_name], function ($field) {
+					return ($field['selected'] || $field['count'] != 0);
+				});
+
+				if ($tag_values) {
+					$top_priority_fields[] = [
+						'name' => $tag_name,
+						'values' => self::getTopPrioritySubfilters($tag_values)
+					];
+				}
+			} while (self::SUBFILTERS_TAG_VALUE_ROWS > count($top_priority_fields));
+		}
+
+		CArrayHelper::sort($top_priority_fields, ['name']);
+
+		return $top_priority_fields;
 	}
 }

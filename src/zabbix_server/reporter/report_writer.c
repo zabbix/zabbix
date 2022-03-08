@@ -17,17 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "report_writer.h"
+
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
-#include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxalert.h"
-#include "db.h"
 #include "report_protocol.h"
-
-#include "report_writer.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -242,9 +239,9 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: begin report dispatch                                             *
+ * Purpose: to begin report dispatch                                          *
  *                                                                            *
- * Parameters: msg      - [IN] the begin report request message               *
+ * Parameters: msg      - [IN] the request message                            *
  *             dispatch - [IN] the alerter dispatch                           *
  *             error    - [OUT] the error message                             *
  *                                                                            *
@@ -305,7 +302,7 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
  *                                                                            *
  * Purpose: send report to the recipients using specified media type          *
  *                                                                            *
- * Parameters: msg      - [IN] the send report request message                *
+ * Parameters: msg      - [IN] the request message                            *
  *             dispatch - [IN] the alerter dispatch                           *
  *             error    - [OUT] the error message                             *
  *                                                                            *

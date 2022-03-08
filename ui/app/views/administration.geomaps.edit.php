@@ -126,6 +126,7 @@ $form = (new CForm())
 (new CWidget())
 	->setTitle(_('Geographical maps'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_GEOMAPS_EDIT))
 	->addItem($form)
 	->show();
 

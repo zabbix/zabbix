@@ -22,17 +22,16 @@
 #include "modbtype.h"
 
 #ifdef HAVE_LIBMODBUS
-
 #include "mutexs.h"
 
+/* this block must be defined before <modbus.h> include */
 #ifdef _WINDOWS
 #	include "inttypes.h"
 #	ifdef HAVE_LIBMODBUS_STATIC
 #		define DLLBUILD
 #	endif
 #endif
-
-#include "modbus.h"
+#include <modbus.h>
 
 zbx_mutex_t	modbus_lock = ZBX_MUTEX_NULL;
 

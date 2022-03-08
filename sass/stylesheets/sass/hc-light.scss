@@ -374,23 +374,21 @@ $arrow-fill-up-down: #000000;
 }
 
 $var-icons: (
-	maint: url($sprite-path) no-repeat -203px -802px,
-	depend-up: url($sprite-path) no-repeat -208px -729px,
-	depend-down: url($sprite-path) no-repeat -208px -765px,
-	ackn: url($sprite-path) no-repeat -203px -693px
+	maintenance: -205px -803px,
+	depend-up: -206px -731px,
+	depend-down: -206px -766px,
+	ackn: -203px -693px
 );
 
 // Dynamically generated classes:
-//  .icon-maint
+//  .icon-maintenance
 //  .icon-depend-up
 //  .icon-depend-down
 //  .icon-ackn
 @each $var-icons, $bgimage in $var-icons {
 	.icon-#{$var-icons} {
-		margin: 0 18px 0 0;
 		&::before {
-			background: $bgimage;
-			@extend %var-icons;
+			background-position: $bgimage;
 		}
 	}
 }
@@ -819,8 +817,16 @@ a.link-action {
 
 			box-shadow: inset 0 -1px 0 0 $table-border-color;
 
-			.icon-maint::before {
-				background-position: -206px -804px;
+			.icon-depend-up::before {
+				background-position: -208px -731px;
+			}
+
+			.icon-depend-down::before {
+				background-position: -208px -767px;
+			}
+
+			.icon-wzrd-action {
+				background: transparent url($sprite-path) no-repeat -318px -624px;
 			}
 
 			.icon-wzrd-action {

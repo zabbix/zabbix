@@ -1330,7 +1330,7 @@ class CMacrosResolverGeneral {
 						$value = date('Y.m.d', $history[$function['itemid']][0]['timestamp']);
 						break;
 					case 'ITEM.LOG.TIME':
-						$value = date('H:i:s', $history[$function['itemid']][0]['timestamp']);;
+						$value = date('H:i:s', $history[$function['itemid']][0]['timestamp']);
 						break;
 					case 'ITEM.LOG.AGE':
 						$value = zbx_date2age($history[$function['itemid']][0]['timestamp']);

@@ -17,13 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "checks_simple.h"
+
 #include "checks_simple_vmware.h"
 #include "simple.h"
 #include "log.h"
 #include "zbxself.h"
-
-#include "checks_simple.h"
 
 typedef int	(*vmfunc_t)(AGENT_REQUEST *, const char *, const char *, AGENT_RESULT *);
 

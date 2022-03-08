@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-16T20:03:25Z'
+  date: '2022-01-27T18:35:44Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -19,7 +19,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/426752-discussion-thread-for-official-zabbix-dell-templates
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Server hardware'
@@ -45,8 +45,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 683f8893691545e196fe29271c1891a8
           name: 'Dell R820: System description'
@@ -69,8 +69,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 13dd8f4372454b37a20944930ce6576b
           name: 'Dell R820: Firmware version'
@@ -91,8 +91,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: db34a06be1bc43e2a244148cb742bcea
@@ -102,6 +102,10 @@ zabbix_export:
               priority: INFO
               description: 'Firmware version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 5d5c17d601b844bdb15cbc416f2ef51f
           name: 'Dell R820: Hardware model name'
@@ -122,8 +126,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: 16a277126bd743b4927ab1ffec1eba49
           name: 'Dell R820: Hardware serial number'
@@ -144,8 +148,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 07b08a664af94a889e000aaf4d137bbb
@@ -154,6 +158,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 6f4584e8a6c844c8aeae104acd7bd183
           name: 'Dell R820: System location'
@@ -175,8 +183,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 55f5f0b14f0946a38675576e432b8b9a
           name: 'Dell R820: System name'
@@ -198,8 +206,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 57624ace90564129926aadc7019452ff
@@ -208,6 +216,10 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 0261571f73a04d9497414e5f0426cf40
           name: 'Dell R820: System object ID'
@@ -228,8 +240,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 25d3060aadfd471f8b7f41ad5a9e32de
           name: 'Dell R820: Overall system health status'
@@ -250,8 +262,11 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: system
           triggers:
             -
               uuid: ba4a8d9fc5ef43af959456a10c8f7daf
@@ -260,6 +275,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: DISASTER
               description: 'Please check the device for faults.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: 6626cc1193d04c48be02de9b261d0d4e
               expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.CRIT}'
@@ -267,6 +286,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for errors.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: 535ea4f1ed6a44ebacbc94c899f60965
               expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.WARN}'
@@ -278,6 +301,10 @@ zabbix_export:
                 -
                   name: 'Dell R820: System status is in critical state'
                   expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.CRIT}'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 4b628614ee35470caec5847c027d859a
           name: 'Dell R820: Operating system'
@@ -299,8 +326,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: f0331e24079347d58f3e5df328cfbd0c
@@ -309,6 +336,10 @@ zabbix_export:
               priority: INFO
               description: 'Operating system description has changed. Possibly, the system has been updated or replaced. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 090f33ba9d0740f9a2c1709d6a4c2a75
           name: 'Dell R820: Uptime'
@@ -328,8 +359,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 97c232039b0e441997642bb39cc7bf2b
@@ -338,6 +369,10 @@ zabbix_export:
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: d8d796228d244407b9863ee4304b029a
           name: 'Dell R820: SNMP traps (fallback)'
@@ -350,8 +385,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: c783af10c24e415b84774f74af6da797
           name: 'Dell R820: SNMP agent availability'
@@ -367,8 +402,11 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: system
           triggers:
             -
               uuid: 85492273336d43219fa7e2eef4208359
@@ -377,6 +415,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 73377d2d3eb2404799dc1b0f9e749404
@@ -415,8 +457,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Disk arrays'
+                  tag: component
+                  value: battery
+                -
+                  tag: component
+                  value: diskarray
               trigger_prototypes:
                 -
                   uuid: e6e2bd66c55744b0854d95669c0aa626
@@ -425,6 +470,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 3a7bfd13ad224bb6b0d4a3d38aa0a319
                   expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}'
@@ -436,6 +485,10 @@ zabbix_export:
                     -
                       name: 'Dell R820: {#BATTERY_NAME} is in critical state'
                       expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: e7d512abbd204adc81e2f5a59f0e761b
                   expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.BATTERY.STATUS.OK}'
@@ -450,6 +503,10 @@ zabbix_export:
                     -
                       name: 'Dell R820: {#BATTERY_NAME} is in warning state'
                       expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -483,8 +540,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Disk arrays'
+                  tag: component
+                  value: diskarray
+                -
+                  tag: component
+                  value: storage
             -
               uuid: f79dda7db0e547b8997c79c336d9d02e
               name: 'Dell R820: {#CNTLR_NAME} Status'
@@ -512,8 +572,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Disk arrays'
+                  tag: component
+                  value: diskarray
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 70087ca390524853bd80dd6906ed038d
@@ -526,6 +589,10 @@ zabbix_export:
                     -
                       name: 'Dell R820: {#CNTLR_NAME} is in unrecoverable state'
                       expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.FAIL}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: b516a87aac0d48c285cf23c8a2d5e9be
                   expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.FAIL}'
@@ -533,6 +600,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: DISASTER
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: a53035ca17604f69b2d878c50b69bbc1
                   expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.WARN}'
@@ -547,6 +618,10 @@ zabbix_export:
                     -
                       name: 'Dell R820: {#CNTLR_NAME} is in unrecoverable state'
                       expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.FAIL}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -585,8 +660,8 @@ zabbix_export:
                 coolingDeviceSubTypeIsDiscrete, a value is not returned for this attribute.
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
             -
               uuid: f93dd5111b2048cca8e6e8f56de08bdb
               name: 'Dell R820: {#FAN_DESCR} Status'
@@ -607,8 +682,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: faf3982240ea4424af8b3c9135d240ca
@@ -617,6 +692,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 6f80cea251574ed7895694de10f0742c
                   expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.WARN:"nonCriticalLower"}'
@@ -628,6 +707,10 @@ zabbix_export:
                     -
                       name: 'Dell R820: {#FAN_DESCR} is in critical state'
                       expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"nonRecoverableLower"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"failed"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -665,8 +748,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 4835203bcd3c4593b5ea7eeb305d5113
               name: 'Dell R820: {#DISK_NAME} Model name'
@@ -686,8 +772,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 1e9bdf7d87154337bee56afdc90f8bb8
               name: 'Dell R820: {#DISK_NAME} Serial number'
@@ -707,8 +796,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 2c5ca847d2ca41e199740645c74a2fd7
@@ -717,6 +809,10 @@ zabbix_export:
                   priority: INFO
                   description: '{#DISK_NAME} serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: ce1d44085834444b9626aa4a2860f6ba
               name: 'Dell R820: {#DISK_NAME} Size'
@@ -740,8 +836,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 03a477755abd4e7d953ecd73c7aded5d
               name: 'Dell R820: {#DISK_NAME} S.M.A.R.T. Status'
@@ -762,8 +861,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: b2b1013ff96243d48b468213c56bf51f
@@ -776,6 +878,10 @@ zabbix_export:
                     -
                       name: 'Dell R820: {#DISK_NAME} failed'
                       expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R820 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"nonRecoverable"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 558251231b9d45d692d12cea9a29f56a
               name: 'Dell R820: {#DISK_NAME} Status'
@@ -803,8 +909,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: a78f3f6171e748e695d464adefe1978c
@@ -813,6 +922,10 @@ zabbix_export:
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check physical disk for warnings or errors.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: f62e8c34700e4b668af71da9a8d0c973
                   expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.WARN:"nonCritical"}'
@@ -824,6 +937,10 @@ zabbix_export:
                     -
                       name: 'Dell R820: {#DISK_NAME} failed'
                       expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R820 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"nonRecoverable"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -858,8 +975,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: psu
               trigger_prototypes:
                 -
                   uuid: 8e28009ef16c441d93bc0fa794232b4c
@@ -868,6 +985,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 1de5a20506d04b3a84deaa70b232101b
                   expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.WARN:"nonCritical"}'
@@ -879,6 +1000,10 @@ zabbix_export:
                     -
                       name: 'Dell R820: Power supply {#PSU_DESCR} is in critical state'
                       expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"critical"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"nonRecoverable"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -925,8 +1050,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 9a082c7fc18641fe8e2d42d9c2acc607
@@ -935,6 +1060,10 @@ zabbix_export:
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: fdf4ccc98a894cabbdf4cbd4d32b2270
                   expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}'
@@ -946,6 +1075,10 @@ zabbix_export:
                     -
                       name: 'Dell R820: Probe {#SENSOR_LOCALE} is in critical status'
                       expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: c26c12068ec2429694491c3c74380091
                   expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])<>{$SENSOR.TEMP.STATUS.OK}'
@@ -961,6 +1094,10 @@ zabbix_export:
                     -
                       name: 'Dell R820: Probe {#SENSOR_LOCALE} is in warning status'
                       expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 3b9e0ab38ca04a0fb398b1b8d1b8ea1f
               name: 'Dell R820: {#SENSOR_LOCALE} Value'
@@ -984,8 +1121,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1030,8 +1167,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: 66a948daf88b4df990062176b47a158b
               name: 'Dell R820: {#DISK_NAME} Read policy'
@@ -1051,8 +1191,11 @@ zabbix_export:
                 name: 'IDRAC-MIB-SMIv2::virtualDiskReadPolicy'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: c0c4bb68166544af806b7658902f63c9
               name: 'Dell R820: {#DISK_NAME} Size'
@@ -1076,8 +1219,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: 30695b02e4454b30933f12819180a9b0
               name: 'Dell R820: {#DISK_NAME} Current state'
@@ -1099,8 +1245,11 @@ zabbix_export:
                 name: 'IDRAC-MIB-SMIv2::virtualDiskOperationalState'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: dc25467bcd3c43bb93ccab52d51f5dee
               name: 'Dell R820: {#DISK_NAME} Status'
@@ -1126,8 +1275,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
               trigger_prototypes:
                 -
                   uuid: 1c5a5635d0b548839e19d8272642f0aa
@@ -1136,6 +1288,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the virtual disk for warnings or errors.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 6d35cf89f9a44498b25303811609ccdb
                   expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$VDISK.STATUS.WARN:"degraded"}'
@@ -1147,6 +1303,10 @@ zabbix_export:
                     -
                       name: 'Dell R820: {#DISK_NAME} failed'
                       expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$VDISK.STATUS.CRIT:"failed"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: fba006c757214d84ac9efedeecadf302
               name: 'Dell R820: {#DISK_NAME} Write policy'
@@ -1166,13 +1326,26 @@ zabbix_export:
                 name: 'IDRAC-MIB-SMIv2::virtualDiskWritePolicy'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+      tags:
+        -
+          tag: class
+          value: hardware
+        -
+          tag: target
+          value: dell
+        -
+          tag: target
+          value: 'dell poweredge'
       macros:
         -
           macro: '{$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'

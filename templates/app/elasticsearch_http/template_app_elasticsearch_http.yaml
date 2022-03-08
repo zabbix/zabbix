@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T06:56:53Z'
+  date: '2022-02-10T10:31:15Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -21,7 +21,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/399473-discussion-thread-for-official-zabbix-template-for-elasticsearch
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -43,8 +43,8 @@ zabbix_export:
             key: es.cluster.get_health
           tags:
             -
-              tag: Application
-              value: 'ES cluster'
+              tag: component
+              value: shards
         -
           uuid: 7f587fd270be4eb68d81ae1de2a3ca1f
           name: 'ES: Get cluster health'
@@ -61,8 +61,8 @@ zabbix_export:
           url: '{$ELASTICSEARCH.SCHEME}://{HOST.CONN}:{$ELASTICSEARCH.PORT}/_cluster/health?timeout=5s'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 7066a66f352e4d79ba4aec11c0c5c611
           name: 'ES: Get cluster stats'
@@ -79,8 +79,8 @@ zabbix_export:
           url: '{$ELASTICSEARCH.SCHEME}://{HOST.CONN}:{$ELASTICSEARCH.PORT}/_cluster/stats'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 500a763b9bfd4044b2d3bc95d3a0586c
           name: 'ES: Inactive shards percentage'
@@ -104,8 +104,8 @@ zabbix_export:
             key: es.cluster.get_health
           tags:
             -
-              tag: Application
-              value: 'ES cluster'
+              tag: component
+              value: shards
         -
           uuid: e0b684d5992a496981cf6fb9bb85be62
           name: 'ES: Number of initializing shards'
@@ -123,8 +123,8 @@ zabbix_export:
             key: es.cluster.get_health
           tags:
             -
-              tag: Application
-              value: 'ES cluster'
+              tag: component
+              value: shards
           triggers:
             -
               uuid: ee59684bb2044540ad0306a5b6deb408
@@ -132,6 +132,10 @@ zabbix_export:
               name: 'ES: Cluster has the initializing shards'
               priority: AVERAGE
               description: 'The cluster has the initializing shards longer than 10 minutes.'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 7d3c87e2fcae49438a14380f7d5faa81
           name: 'ES: Number of data nodes'
@@ -153,8 +157,8 @@ zabbix_export:
             key: es.cluster.get_health
           tags:
             -
-              tag: Application
-              value: 'ES cluster'
+              tag: component
+              value: nodes
         -
           uuid: 4ec7496b441643f39df3e25c0225e6ec
           name: 'ES: Number of nodes'
@@ -176,8 +180,8 @@ zabbix_export:
             key: es.cluster.get_health
           tags:
             -
-              tag: Application
-              value: 'ES cluster'
+              tag: component
+              value: nodes
           triggers:
             -
               uuid: 5be4cb40e72442aca18ea014adbead23
@@ -185,12 +189,20 @@ zabbix_export:
               name: 'ES: The number of nodes within the cluster has decreased'
               priority: INFO
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
             -
               uuid: 2fba2b29425b4ff9a4008db9bde49d7f
               expression: 'change(/Elasticsearch Cluster by HTTP/es.cluster.number_of_nodes)>0'
               name: 'ES: The number of nodes within the cluster has increased'
               priority: INFO
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 2c84eea7f4a642f8892cb7f50febb562
           name: 'ES: Number of pending tasks'
@@ -208,8 +220,8 @@ zabbix_export:
             key: es.cluster.get_health
           tags:
             -
-              tag: Application
-              value: 'ES cluster'
+              tag: component
+              value: tasks
         -
           uuid: 981818f43a3c4b36b36e4b3c4e3468e9
           name: 'ES: Number of relocating shards'
@@ -227,8 +239,8 @@ zabbix_export:
             key: es.cluster.get_health
           tags:
             -
-              tag: Application
-              value: 'ES cluster'
+              tag: component
+              value: shards
         -
           uuid: b9568a6370dc40efae45ac1e0b719dd7
           name: 'ES: Cluster health status'
@@ -266,8 +278,8 @@ zabbix_export:
             key: es.cluster.get_health
           tags:
             -
-              tag: Application
-              value: 'ES cluster'
+              tag: component
+              value: health
           triggers:
             -
               uuid: f3bb7e96f6074063bad76521e1dce24f
@@ -277,12 +289,20 @@ zabbix_export:
               description: |
                 One or more primary shards are unassigned, so some data is unavailable.
                 This can occur briefly during cluster startup as primary shards are assigned.
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: 33a6ef13f7b240768841919482709411
               expression: 'last(/Elasticsearch Cluster by HTTP/es.cluster.status)=255'
               name: 'ES: Health is UNKNOWN'
               priority: HIGH
               description: 'The health status of the cluster is unknown or cannot be obtained.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: 99f36c2aa5d64248b96d1fc97c3b3065
               expression: 'last(/Elasticsearch Cluster by HTTP/es.cluster.status)=1'
@@ -291,6 +311,10 @@ zabbix_export:
               description: |
                 All primary shards are assigned, but one or more replica shards are unassigned.
                 If a node in the cluster fails, some data could be unavailable until that node is repaired.
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 2295e2ba3d4949feb3519ac85ba6ff86
           name: 'ES: Task max waiting in queue'
@@ -314,8 +338,8 @@ zabbix_export:
             key: es.cluster.get_health
           tags:
             -
-              tag: Application
-              value: 'ES cluster'
+              tag: component
+              value: tasks
         -
           uuid: 85e82cba1e5c479caede2a94c58239be
           name: 'ES: Number of unassigned shards'
@@ -333,8 +357,8 @@ zabbix_export:
             key: es.cluster.get_health
           tags:
             -
-              tag: Application
-              value: 'ES cluster'
+              tag: component
+              value: shards
           triggers:
             -
               uuid: 35bdd54f27a64009b96a06a12508f99c
@@ -342,6 +366,10 @@ zabbix_export:
               name: 'ES: Cluster has the unassigned shards'
               priority: AVERAGE
               description: 'The cluster has the unassigned shards longer than 10 minutes.'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: db2f3161eaff4eb0b25d4191b423c733
           name: 'ES: Indices with shards assigned to nodes'
@@ -363,8 +391,8 @@ zabbix_export:
             key: es.cluster.get_stats
           tags:
             -
-              tag: Application
-              value: 'ES cluster'
+              tag: component
+              value: indices
         -
           uuid: 25cb1e0203334efd96d3e626f81b4670
           name: 'ES: Number of non-deleted documents'
@@ -388,8 +416,8 @@ zabbix_export:
             key: es.cluster.get_stats
           tags:
             -
-              tag: Application
-              value: 'ES cluster'
+              tag: component
+              value: documents
         -
           uuid: 54f51a653e014290aa3f91deaca44e47
           name: 'ES: Nodes with the data role'
@@ -411,8 +439,8 @@ zabbix_export:
             key: es.cluster.get_stats
           tags:
             -
-              tag: Application
-              value: 'ES cluster'
+              tag: component
+              value: nodes
         -
           uuid: 613ab3469f234e278af99d61e57b46bd
           name: 'ES: Nodes with the ingest role'
@@ -434,8 +462,8 @@ zabbix_export:
             key: es.cluster.get_stats
           tags:
             -
-              tag: Application
-              value: 'ES cluster'
+              tag: component
+              value: nodes
         -
           uuid: e7b36f37b86845339a306dacf874164a
           name: 'ES: Nodes with the master role'
@@ -457,8 +485,8 @@ zabbix_export:
             key: es.cluster.get_stats
           tags:
             -
-              tag: Application
-              value: 'ES cluster'
+              tag: component
+              value: nodes
           triggers:
             -
               uuid: 8011883baef04aa0bed343d1bb0df288
@@ -466,6 +494,10 @@ zabbix_export:
               name: 'ES: Cluster has only two master nodes'
               priority: DISASTER
               description: 'The cluster has only two nodes with a master role and will be unavailable if one of them breaks.'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: c3ea99e5897b4663a3239d0edd66f1f0
           name: 'ES: Total available size to JVM in all file stores'
@@ -491,8 +523,8 @@ zabbix_export:
             key: es.cluster.get_stats
           tags:
             -
-              tag: Application
-              value: 'ES cluster'
+              tag: component
+              value: storage
         -
           uuid: b8c3c5d8866d4a6b9c6847b5c8da0631
           name: 'ES: Total size of all file stores'
@@ -515,8 +547,8 @@ zabbix_export:
             key: es.cluster.get_stats
           tags:
             -
-              tag: Application
-              value: 'ES cluster'
+              tag: component
+              value: storage
         -
           uuid: 66c22b8b2b8b40fda7ac6f0ae472befd
           name: 'ES: Get nodes stats'
@@ -533,13 +565,13 @@ zabbix_export:
           url: '{$ELASTICSEARCH.SCHEME}://{HOST.CONN}:{$ELASTICSEARCH.PORT}/_nodes/stats'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 2dcf54f21cbd4af9a7931e3a2522685c
           name: 'ES: Cluster uptime'
           type: DEPENDENT
-          key: 'es.nodes.jvm.max_uptime[{#ES.NODE}]'
+          key: es.nodes.jvm.max_uptime
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -558,16 +590,20 @@ zabbix_export:
             key: es.cluster.get_stats
           tags:
             -
-              tag: Application
-              value: 'ES cluster'
+              tag: component
+              value: system
           triggers:
             -
               uuid: d28aa18c85cb4f48a9e7b8ba55d65400
-              expression: 'last(/Elasticsearch Cluster by HTTP/es.nodes.jvm.max_uptime[{#ES.NODE}])<10m'
+              expression: 'last(/Elasticsearch Cluster by HTTP/es.nodes.jvm.max_uptime)<10m'
               name: 'ES: Cluster has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 671888d47c724e54aca78fbe1b3ecaed
           name: 'ES: Service response time'
@@ -579,8 +615,8 @@ zabbix_export:
           description: 'Checks performance of the TCP service.'
           tags:
             -
-              tag: Application
-              value: 'ES cluster'
+              tag: component
+              value: network
           triggers:
             -
               uuid: 2a3f3b96e5dd47de998ccc17f109e149
@@ -593,6 +629,10 @@ zabbix_export:
                 -
                   name: 'ES: Service is down'
                   expression: 'last(/Elasticsearch Cluster by HTTP/net.tcp.service["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: d0d38ce55f844a51a0f2131c86bec1ae
           name: 'ES: Service status'
@@ -609,8 +649,11 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: 'ES cluster'
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: b4d76f68ce94492f96bbfbb778d1f144
@@ -619,6 +662,10 @@ zabbix_export:
               priority: AVERAGE
               description: 'The service is unavailable or does not accept TCP connections.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 5105173f24d941b2969fe3d190d22e82
@@ -656,8 +703,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: storage
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: 4f315fdf62884b0284bf04f1a85aeb98
               name: 'ES {#ES.NODE}: Total size'
@@ -680,8 +730,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: storage
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: 2ba1fc7e2dad4d0ab1807221fb1e4fca
               name: 'ES {#ES.NODE}: Number of open HTTP connections'
@@ -703,8 +756,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: connections
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: fcf163d5db9b455fa38823e8ad16e578
               name: 'ES {#ES.NODE}: Rate of HTTP connections opened'
@@ -728,8 +784,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: connections
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: c530311329e348cca74c38fa2260236b
               name: 'ES {#ES.NODE}: Flush latency'
@@ -742,8 +801,11 @@ zabbix_export:
               description: 'The average flush latency calculated from the available flush.total and flush.total_time_in_millis metrics.'
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: operations
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
               trigger_prototypes:
                 -
                   uuid: 6c2ea291374b4de1ab06ddeccba635b1
@@ -753,6 +815,10 @@ zabbix_export:
                   description: |
                     If you see this metric increasing steadily, it may indicate a problem with slow disks; this problem may escalate
                     and eventually prevent you from being able to add new information to your index.
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 8e270dfff9c84d2a96a134dd6d86533b
               name: 'ES {#ES.NODE}: Total number of index flushes to disk'
@@ -774,8 +840,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: operations
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: 7e18149dcaee47748e4073f4ce814c03
               name: 'ES {#ES.NODE}: Total time spent on flushing indices to disk'
@@ -798,8 +867,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: operations
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: e91cc33c088a4f56a9176fd6a09f2411
               name: 'ES {#ES.NODE}: Current indexing operations'
@@ -821,8 +893,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: operations
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: 23f54c51c30a4dbdbef48611a7907db6
               name: 'ES {#ES.NODE}: Indexing latency'
@@ -835,8 +910,11 @@ zabbix_export:
               description: 'The average indexing latency calculated from the available index_total and index_time_in_millis metrics.'
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: operations
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
               trigger_prototypes:
                 -
                   uuid: 2755b3f8811a45fba7c48347707ceaf8
@@ -844,8 +922,12 @@ zabbix_export:
                   name: 'ES {#ES.NODE}: Indexing latency is too high (over {$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}ms for 5m)'
                   priority: WARNING
                   description: |
-                    If the latency is increasing, it may indicate that you are indexing too many documents at the same time (Elasticsearch’s documentation
+                    If the latency is increasing, it may indicate that you are indexing too many documents at the same time (Elasticsearch's documentation
                     recommends starting with a bulk indexing size of 5 to 15 megabytes and increasing slowly from there).
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: f471dad45ff149b09a479963cb616fc2
               name: 'ES {#ES.NODE}: Total time spent performing indexing'
@@ -868,8 +950,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: operations
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: ad36b8495eca49c48e7d8a7877a325c2
               name: 'ES {#ES.NODE}: Total number of indexing'
@@ -891,8 +976,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: operations
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: bb0cb2196b14483f8807a855f2f531a7
               name: 'ES {#ES.NODE}: Time spent throttling operations'
@@ -920,8 +1008,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: operations
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: 5f3b7dca802343cd905d54e66ac0e113
               name: 'ES {#ES.NODE}: Time spent throttling merge operations'
@@ -949,8 +1040,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: operations
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: 9c82da45a63947dd91a4e19e6f2d121d
               name: 'ES {#ES.NODE}: Time spent throttling recovery operations'
@@ -978,8 +1072,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: operations
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: e27361fdce5a4635854960066ac050ca
               name: 'ES {#ES.NODE}: Rate of index refreshes'
@@ -1003,8 +1100,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: operations
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: fd20bbc5012d4c5693710b321e252193
               name: 'ES {#ES.NODE}: Time spent performing refresh'
@@ -1032,8 +1132,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: operations
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: 6d3b074aecb44a08a3573aba0ff006f9
               name: 'ES {#ES.NODE}: Rate of fetch'
@@ -1057,8 +1160,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: fetches
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: 36b2ffa3ed9f4c9781ccded273c395d7
               name: 'ES {#ES.NODE}: Current fetch operations'
@@ -1076,8 +1182,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: fetches
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: 79b5fd5e04e249da9f73fbe68915fdb1
               name: 'ES {#ES.NODE}: Fetch latency'
@@ -1090,8 +1199,11 @@ zabbix_export:
               description: 'The average fetch latency calculated by sampling the total number of fetches and the total elapsed time at regular intervals.'
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: fetches
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
               trigger_prototypes:
                 -
                   uuid: 6edd6851f31842659a57e29c444a9b32
@@ -1102,6 +1214,10 @@ zabbix_export:
                     The fetch phase should typically take much less time than the query phase. If you notice this metric consistently increasing,
                     this could indicate a problem with slow disks, enriching of documents (highlighting the relevant text in search results, etc.),
                     or requesting too many results.
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: a10e7dca72c8411a9b7fdcbeb676017e
               name: 'ES {#ES.NODE}: Time spent performing fetch'
@@ -1129,8 +1245,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: fetches
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: f35e3e9773394632b422dbc4e4442171
               name: 'ES {#ES.NODE}: Total time spent performing fetch'
@@ -1153,8 +1272,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: fetches
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: b3ac68f3531f478b9ad28fb1988df257
               name: 'ES {#ES.NODE}: Total number of fetch'
@@ -1176,8 +1298,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: fetches
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: d347df9c9eee4aa89ccfb9147143b5d5
               name: 'ES {#ES.NODE}: Rate of queries'
@@ -1201,8 +1326,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: queries
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: 20fb738abf7a4aa1bf3ccb84790a26c9
               name: 'ES {#ES.NODE}: Current query operations'
@@ -1220,8 +1348,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: queries
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: fadb6fe530ab4b1296d4c17728667b12
               name: 'ES {#ES.NODE}: Query latency'
@@ -1236,8 +1367,11 @@ zabbix_export:
               description: 'The average query latency calculated by sampling the total number of queries and the total elapsed time at regular intervals.'
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: queries
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
               trigger_prototypes:
                 -
                   uuid: 1892000290c843e887d128bf9f97c869
@@ -1245,6 +1379,10 @@ zabbix_export:
                   name: 'ES {#ES.NODE}: Query latency is too high (over {$ELASTICSEARCH.QUERY_LATENCY.MAX.WARN}ms for 5m)'
                   priority: WARNING
                   description: 'If latency exceeds a threshold, look for potential resource bottlenecks, or investigate whether you need to optimize your queries.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: ce807b641b0b4501b6a8e253d8403ce4
               name: 'ES {#ES.NODE}: Time spent performing query'
@@ -1272,8 +1410,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: queries
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: 7afc767463c64bbb9290975a8cef3cec
               name: 'ES {#ES.NODE}: Total time spent performing query'
@@ -1296,8 +1437,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: queries
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: 7279b682fa3e4661a1600d6da25e0fc7
               name: 'ES {#ES.NODE}: Total number of query'
@@ -1319,8 +1463,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: queries
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: 269cc21be4c94ba58a52b9fca9590632
               name: 'ES {#ES.NODE}: Amount of JVM heap committed'
@@ -1343,8 +1490,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: memory
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: 7f205e21644a4f629e4a419c42670158
               name: 'ES {#ES.NODE}: Maximum JVM memory available for use'
@@ -1367,8 +1517,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: memory
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: bb55c78c2aca49e49f6200e14c25dee8
               name: 'ES {#ES.NODE}: Amount of JVM heap currently in use'
@@ -1391,8 +1544,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: memory
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: 71fca039cad847da9623aaeb722168f1
               name: 'ES {#ES.NODE}: Percent of JVM heap currently in use'
@@ -1416,8 +1572,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: memory
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
               trigger_prototypes:
                 -
                   uuid: 9d199607ddda48eebe9f93cae6d6575d
@@ -1425,22 +1584,30 @@ zabbix_export:
                   name: 'ES {#ES.NODE}: Percent of JVM heap in use is critical (over {$ELASTICSEARCH.HEAP_USED.MAX.CRIT}% for 1h)'
                   priority: HIGH
                   description: |
-                    This indicates that the rate of garbage collection isn’t keeping up with the rate of garbage creation.
+                    This indicates that the rate of garbage collection isn't keeping up with the rate of garbage creation.
                     To address this problem, you can either increase your heap size (as long as it remains below the recommended
                     guidelines stated above), or scale out the cluster by adding more nodes.
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: bbba4a577a2c4328b2392fdeb1ff9bb4
                   expression: 'min(/Elasticsearch Cluster by HTTP/es.node.jvm.mem.heap_used_percent[{#ES.NODE}],1h)>{$ELASTICSEARCH.HEAP_USED.MAX.WARN}'
                   name: 'ES {#ES.NODE}: Percent of JVM heap in use is high (over {$ELASTICSEARCH.HEAP_USED.MAX.WARN}% for 1h)'
                   priority: WARNING
                   description: |
-                    This indicates that the rate of garbage collection isn’t keeping up with the rate of garbage creation.
+                    This indicates that the rate of garbage collection isn't keeping up with the rate of garbage creation.
                     To address this problem, you can either increase your heap size (as long as it remains below the recommended
                     guidelines stated above), or scale out the cluster by adding more nodes.
                   dependencies:
                     -
                       name: 'ES {#ES.NODE}: Percent of JVM heap in use is critical (over {$ELASTICSEARCH.HEAP_USED.MAX.CRIT}% for 1h)'
                       expression: 'min(/Elasticsearch Cluster by HTTP/es.node.jvm.mem.heap_used_percent[{#ES.NODE}],1h)>{$ELASTICSEARCH.HEAP_USED.MAX.CRIT}'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 3c2f512ae6ff4221a7de4e5dbff2ed48
               name: 'ES {#ES.NODE}: Node uptime'
@@ -1464,8 +1631,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: system
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
               trigger_prototypes:
                 -
                   uuid: 580ae8aadf994fbcb34c9c8ad7cd5fad
@@ -1474,6 +1644,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 14ea2732fbfc40ceaafadfff1830ac4d
               name: 'ES {#ES.NODE}: Refresh thread pool active threads'
@@ -1491,8 +1665,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: refresh-thread-pool
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: b6496d2878914b06bf6301630b4609a8
               name: 'ES {#ES.NODE}: Refresh thread pool executor tasks completed'
@@ -1516,8 +1693,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: refresh-thread-pool
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: 4b748eeb937e45308e58d699b713cf01
               name: 'ES {#ES.NODE}: Refresh thread pool tasks in queue'
@@ -1535,8 +1715,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: refresh-thread-pool
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: 593514af005044ce8e6207a5616270f2
               name: 'ES {#ES.NODE}: Refresh thread pool executor tasks rejected'
@@ -1560,8 +1743,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: refresh-thread-pool
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
               trigger_prototypes:
                 -
                   uuid: b416941e8e0141c6af27c62f052ac860
@@ -1569,6 +1755,10 @@ zabbix_export:
                   name: 'ES {#ES.NODE}: Refresh thread pool executor has the rejected tasks (for 5m)'
                   priority: WARNING
                   description: 'The number of tasks rejected by the refresh thread pool executor is over 0 for 5m.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 63875f40cf7c4f8f842562be2adfb7c7
               name: 'ES {#ES.NODE}: Search thread pool active threads'
@@ -1586,8 +1776,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: search-thread-pool
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: dc67ab311d4945aaae3347464785abb1
               name: 'ES {#ES.NODE}: Search thread pool executor tasks completed'
@@ -1611,8 +1804,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: search-thread-pool
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: d11933b62131425d83ab09c6d5fd5e85
               name: 'ES {#ES.NODE}: Search thread pool tasks in queue'
@@ -1630,8 +1826,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: search-thread-pool
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: 820ed330abc845919b1dada3cfa81387
               name: 'ES {#ES.NODE}: Search thread pool executor tasks rejected'
@@ -1655,8 +1854,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: search-thread-pool
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
               trigger_prototypes:
                 -
                   uuid: 5cfd3f9924614a4283f1255752b672f0
@@ -1664,6 +1866,10 @@ zabbix_export:
                   name: 'ES {#ES.NODE}: Search thread pool executor has the rejected tasks (for 5m)'
                   priority: WARNING
                   description: 'The number of tasks rejected by the search thread pool executor is over 0 for 5m.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 4b7dc34d78a64b24a8fd19af95e0f0bd
               name: 'ES {#ES.NODE}: Write thread pool active threads'
@@ -1681,8 +1887,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: write-thread-pool
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: 5b5ac74702564bd490c7378adcf75c28
               name: 'ES {#ES.NODE}: Write thread pool executor tasks completed'
@@ -1706,8 +1915,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: write-thread-pool
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: a0d8f8d896a546d1ade07c355992308d
               name: 'ES {#ES.NODE}: Write thread pool tasks in queue'
@@ -1725,8 +1937,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: write-thread-pool
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
             -
               uuid: a21213815a30485a88b183e7b40a4e7e
               name: 'ES {#ES.NODE}: Write thread pool executor tasks rejected'
@@ -1750,8 +1965,11 @@ zabbix_export:
                 key: es.nodes.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'ES {#ES.NODE}'
+                  tag: component
+                  value: write-thread-pool
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
               trigger_prototypes:
                 -
                   uuid: 1f5e30a34bb84cef831670974ec7c3e8
@@ -1759,6 +1977,10 @@ zabbix_export:
                   name: 'ES {#ES.NODE}: Write thread pool executor has the rejected tasks (for 5m)'
                   priority: WARNING
                   description: 'The number of tasks rejected by the write thread pool executor is over 0 for 5m.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: 0725d91f63b64346bbef2c20d2901e9b
@@ -1898,6 +2120,13 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: elasticsearch
       macros:
         -
           macro: '{$ELASTICSEARCH.FETCH_LATENCY.MAX.WARN}'
@@ -1975,6 +2204,10 @@ zabbix_export:
       name: 'ES: Cluster does not have enough space for resharding'
       priority: HIGH
       description: 'There is not enough disk space for index resharding.'
+      tags:
+        -
+          tag: scope
+          value: capacity
   graphs:
     -
       uuid: 50f90b092fa24658b83b131fa7a3f2ce

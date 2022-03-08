@@ -1,4 +1,3 @@
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,7 +20,7 @@
 #ifndef ZABBIX_DISCOVERY_H
 #define ZABBIX_DISCOVERY_H
 
-#include "comms.h"
+#include "db.h"
 
 typedef struct
 {

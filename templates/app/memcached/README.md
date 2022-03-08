@@ -59,7 +59,7 @@ There are no template links in this template.
 |Memcached |Memcached: Throttled connections |<p>Number of times a client connection was throttled. When sending GETs in batch mode and the connection contains too many requests (limited by -R parameter) the connection might be throttled to prevent starvation.</p> |DEPENDENT |memcached.connections.throttled.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.conn_yields`</p><p>- CHANGE_PER_SECOND</p> |
 |Memcached |Memcached: Connection structures |<p>Number of  connection structures allocated by the server</p> |DEPENDENT |memcached.connections.structures<p>**Preprocessing**:</p><p>- JSONPATH: `$.connection_structures`</p> |
 |Memcached |Memcached: Open connections |<p>The number of clients presently connected</p> |DEPENDENT |memcached.connections.current<p>**Preprocessing**:</p><p>- JSONPATH: `$.curr_connections`</p> |
-|Memcached |Memcached: Commands: FLUSH per second |<p>The flush_all command invalidates all items in the database. This operation incurs a performance penalty and shouldn’t take place in production, so check your debug scripts.</p> |DEPENDENT |memcached.commands.flush.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.cmd_flush`</p><p>- CHANGE_PER_SECOND</p> |
+|Memcached |Memcached: Commands: FLUSH per second |<p>The flush_all command invalidates all items in the database. This operation incurs a performance penalty and shouldn't take place in production, so check your debug scripts.</p> |DEPENDENT |memcached.commands.flush.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.cmd_flush`</p><p>- CHANGE_PER_SECOND</p> |
 |Memcached |Memcached: Commands: GET per second |<p>Number of GET requests received by server per second.</p> |DEPENDENT |memcached.commands.get.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.cmd_get`</p><p>- CHANGE_PER_SECOND</p> |
 |Memcached |Memcached: Commands: SET per second |<p>Number of SET requests received by server per second.</p> |DEPENDENT |memcached.commands.set.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.cmd_set`</p><p>- CHANGE_PER_SECOND</p> |
 |Memcached |Memcached: Process id |<p>PID of the server process</p> |DEPENDENT |memcached.process_id<p>**Preprocessing**:</p><p>- JSONPATH: `$.pid`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
@@ -74,7 +74,7 @@ There are no template links in this template.
 |Memcached |Memcached: New items per second |<p>Number of new items stored per second.</p> |DEPENDENT |memcached.stats.total_items.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.total_items`</p><p>- CHANGE_PER_SECOND</p> |
 |Memcached |Memcached: Current number of items stored |<p>Current number of items stored by this instance.</p> |DEPENDENT |memcached.stats.curr_items<p>**Preprocessing**:</p><p>- JSONPATH: `$.curr_items`</p> |
 |Memcached |Memcached: Threads |<p>Number of worker threads requested</p> |DEPENDENT |memcached.stats.threads<p>**Preprocessing**:</p><p>- JSONPATH: `$.threads`</p> |
-|Zabbix_raw_items |Memcached: Get status | |ZABBIX_PASSIVE |memcached.stats["{$MEMCACHED.CONN.URI}"] |
+|Zabbix raw items |Memcached: Get status | |ZABBIX_PASSIVE |memcached.stats["{$MEMCACHED.CONN.URI}"] |
 
 ## Triggers
 
@@ -82,7 +82,7 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |Memcached: Service is down |<p>-</p> |`last(/Memcached by Zabbix agent 2/memcached.ping["{$MEMCACHED.CONN.URI}"])=0` |AVERAGE |<p>Manual close: YES</p> |
 |Memcached: Failed to fetch info data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes</p> |`nodata(/Memcached by Zabbix agent 2/memcached.cpu.sys,30m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Memcached: Service is down</p> |
-|Memcached: Too many queued connections (over {$MEMCACHED.CONN.QUEUED.MAX.WARN} in 5m) |<p>The max number of connections is reachedand and a new connection had to wait in the queue as a result.</p> |`min(/Memcached by Zabbix agent 2/memcached.connections.queued.rate,5m)>{$MEMCACHED.CONN.QUEUED.MAX.WARN}` |WARNING | |
+|Memcached: Too many queued connections (over {$MEMCACHED.CONN.QUEUED.MAX.WARN} in 5m) |<p>The max number of connections is reached and a new connection had to wait in the queue as a result.</p> |`min(/Memcached by Zabbix agent 2/memcached.connections.queued.rate,5m)>{$MEMCACHED.CONN.QUEUED.MAX.WARN}` |WARNING | |
 |Memcached: Too many throttled connections (over {$MEMCACHED.CONN.THROTTLED.MAX.WARN} in 5m) |<p>Number of times a client connection was throttled is too high.</p><p>When sending GETs in batch mode and the connection contains too many requests (limited by -R parameter) the connection might be throttled to prevent starvation.</p> |`min(/Memcached by Zabbix agent 2/memcached.connections.throttled.rate,5m)>{$MEMCACHED.CONN.THROTTLED.MAX.WARN}` |WARNING | |
 |Memcached: Total number of connected clients is too high (over {$MEMCACHED.CONN.PRC.MAX.WARN}% in 5m) |<p>When the number of connections reaches the value of the "max_connections" parameter, new connections will be rejected.</p> |`min(/Memcached by Zabbix agent 2/memcached.connections.current,5m)/last(/Memcached by Zabbix agent 2/memcached.connections.max)*100>{$MEMCACHED.CONN.PRC.MAX.WARN}` |WARNING | |
 |Memcached: Version has changed (new version: {ITEM.VALUE}) |<p>Memcached version has changed. Ack to close.</p> |`last(/Memcached by Zabbix agent 2/memcached.version,#1)<>last(/Memcached by Zabbix agent 2/memcached.version,#2) and length(last(/Memcached by Zabbix agent 2/memcached.version))>0` |INFO |<p>Manual close: YES</p> |
@@ -93,5 +93,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/398623-discussion-thread-for-official-zabbix-template-memcached).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/398623-discussion-thread-for-official-zabbix-template-memcached).
 

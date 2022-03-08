@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "graph_linking.h"
+
 #include "db.h"
 #include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_graph.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
-
-#include "graph_linking.h"
 
 typedef struct
 {

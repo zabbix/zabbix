@@ -40,16 +40,6 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		}
 	}
 
-	.subfilter-option-grid {
-		grid-template-columns: minmax(75px, max-content) auto;
-		display: grid;
-		margin: 5px 0;
-
-		.subfilter-options {
-			grid-column: 2 / -1;
-		}
-	}
-
 	/* Top navigation labels */
 	nav > ul {
 		display: flex;
