@@ -442,7 +442,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		// Following checks should be performed only in first case, because form is the same in all cases.
 		if (CTestArrayHelper::get($data, 'check_layout')) {
 			if ($data['mode'] === 'Active') {
-				// Check fileds lengths.
+				// Check fields lengths.
 				foreach (['Proxy name' => 128, 'Proxy address' => 255,
 //					'Description' => 65535,
 					'PSK identity' => 128, 'PSK' => 512, 'Issuer' => 1024, 'Subject' => 1024] as $field_name => $maxlength) {
@@ -474,7 +474,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 				}
 				$this->assertEquals('IP', $dialog->query('id:useip')->one()->asSegmentedRadio()->getValue());
 
-				// Check interface fields lenghts.
+				// Check interface fields lengths.
 				foreach (['ip' => 64, 'dns' => 255, 'port' => 64] as $id => $length) {
 					$this->assertEquals($length, $dialog->query('id', $id)->one()->getAttribute('maxlength'));
 				}
@@ -532,12 +532,12 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 	 *
 	 * @param array           $data            given data provider
 	 * @param CFormElement    $form            proxy configuration form
-	 * @param boolean         $codition        defines if opposite proxy needs to be selected
+	 * @param boolean         $condition        defines if opposite proxy needs to be selected
 	 * @param string          $checked_proxy   name of proxy which layout is checked
 	 * @param string          $opposite_proxy  name of proxy which is opposite to checked proxy
 	 */
-	private function switchAndAssertEncryption($data, $form, $codition, $checked_proxy, $opposite_proxy) {
-		if ($codition) {
+	private function switchAndAssertEncryption($data, $form, $condition, $checked_proxy, $opposite_proxy) {
+		if ($condition) {
 			$form->selectTab('Proxy');
 			$form->fill(['Proxy mode' => $opposite_proxy]);
 			$form->selectTab('Encryption');
