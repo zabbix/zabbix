@@ -285,9 +285,9 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 
 		if (0 != history_lastid)
 		{
-			zbx_uint64_t		history_maxid = 0;
-			DB_RESULT		result;
-			DB_ROW			row;
+			zbx_uint64_t	history_maxid;
+			DB_RESULT	result;
+			DB_ROW		row;
 
 			result = DBselect("select max(id) from proxy_history");
 
