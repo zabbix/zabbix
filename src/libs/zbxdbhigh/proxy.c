@@ -2421,6 +2421,7 @@ static int	proxy_get_history_data(zbx_uint64_t lastid, zbx_history_data_t **data
 	zbx_history_data_t	*hd;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
+
 try_again:
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select id,itemid,clock,ns,timestamp,source,severity,"
