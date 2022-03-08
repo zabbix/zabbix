@@ -257,8 +257,8 @@ class C44ImportConverter extends CConverter {
 		$interface = ['interface_ref' => 'if'.$maxid] + $parent_interface;
 
 		if ($item['type'] == CXmlConstantName::SNMP_TRAP) {
-			$interface['details']['version'] = CXmlConstantName::SNMPV2;
-			$interface['details']['community'] = '{$SNMP_COMMUNITY}';
+			$interface['details']['version'] = CXmlConstantName::SNMPV1;
+			$interface['details']['community'] = 'public';
 		}
 		else {
 			$interface['details']['version'] = $item['type'];
@@ -374,22 +374,6 @@ class C44ImportConverter extends CConverter {
 								// Set SNMP version from first item.
 								foreach ($new_interfaces[$interfaceid] as &$iface) {
 									if (array_key_exists('new', $iface)) {
-										if ($item['type'] === CXmlConstantName::SNMP_TRAP) {
-											// Use default SNMP V2 interface for SNMP traps.
-											$iface['details']['version'] = CXmlConstantName::SNMPV2;
-											$iface['details']['community'] = '{$SNMP_COMMUNITY}';
-										}
-										else {
-											$iface['details']['version'] = $item['type'];
-										}
-
-										// Item port not set here because we will find it in next steps.
-
-										// And set other SNMP fields.
-										if ($item['type'] === CXmlConstantName::SNMPV1
-												|| $item['type'] === CXmlConstantName::SNMPV2) {
-											$iface['details']['community'] = $item['community'];
-										}
 
 										if ($item['type'] === CXmlConstantName::SNMPV3) {
 											$iface['details']['contextname'] = $item['contextname'];
@@ -399,6 +383,10 @@ class C44ImportConverter extends CConverter {
 											$iface['details']['authpassphrase'] = $item['authpassphrase'];
 											$iface['details']['privprotocol'] = $item['privprotocol'];
 											$iface['details']['privpassphrase'] = $item['privpassphrase'];
+										}
+										else {
+											$iface['details']['version'] = CXmlConstantName::SNMPV1;
+											$iface['details']['community'] = $item['community'];
 										}
 
 										unset($iface['new']);
@@ -410,10 +398,10 @@ class C44ImportConverter extends CConverter {
 								// Find interfaces having same SNMP version.
 								$same_ver_interfaces = array_filter($new_interfaces[$interfaceid],
 									function (array $iface) use (&$item): bool {
-										// Use default SNMP V2 interface for SNMP traps.
+										// Use default SNMP V1 interface for SNMP traps.
 										if ($item['type'] === CXmlConstantName::SNMP_TRAP) {
-											$item['community'] = '{$SNMP_COMMUNITY}';
-											$item['type'] = CXmlConstantName::SNMPV2;
+											$iface['details']['version'] = CXmlConstantName::SNMPV1;
+											$iface['details']['community'] = $item['community'];
 										}
 
 										return ($iface['details']['version'] === $item['type']);
@@ -484,7 +472,7 @@ class C44ImportConverter extends CConverter {
 						else {
 							// Interface not used in items. Create with default values.
 							$new_interfaces[$interfaceid][] = ['details' => $parent_interface['details']
-									+ ['version' => CXmlConstantName::SNMPV2, 'community' => '{$SNMP_COMMUNITY}']
+									+ ['version' => CXmlConstantName::SNMPV2, 'community' => 'public']
 								] + $parent_interface;
 						}
 
