@@ -237,7 +237,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 
 				if (0 != (flags & ZBX_DATASENDER_HISTORY))
 				{
-					zbx_uint64_t	history_maxid = 0;
+					zbx_uint64_t	history_maxid;
 					DB_RESULT	result;
 					DB_ROW		row;
 
