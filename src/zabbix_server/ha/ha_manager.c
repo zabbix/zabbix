@@ -1513,7 +1513,6 @@ int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, int *ha_
 
 				if (ZBX_NODE_STATUS_ERROR == *ha_status)
 				{
-					zbx_ipc_message_free(message);
 					ret = FAIL;
 					goto out;
 				}
