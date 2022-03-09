@@ -66,7 +66,7 @@ class CControllerUserTokenEdit extends CController {
 			$data = $tokens[0];
 
 			if ($data['expires_at'] != 0) {
-				$data['expires_at'] = date(DATE_TIME_FORMAT_SECONDS, (int) $data['expires_at']);
+				$data['expires_at'] = date(ZBX_FULL_DATE_TIME, (int) $data['expires_at']);
 				$data['expires_state'] = '1';
 			}
 			else {
