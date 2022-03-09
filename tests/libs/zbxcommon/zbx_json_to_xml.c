@@ -20,6 +20,8 @@
 #include "zbxmocktest.h"
 #include "zbxmockutil.h"
 
+#include "zbxxml.h"
+
 #define ZBX_XML_HEADER_SIZE	22
 
 void	zbx_mock_test_entry(void **state)

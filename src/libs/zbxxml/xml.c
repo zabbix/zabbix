@@ -60,7 +60,7 @@ static char	data_static[ZBX_MAX_B64_LEN];
  ******************************************************************************/
 int	zbx_xml_get_data_dyn(const char *xml, const char *tag, char **data)
 {
-	size_t	len, sz;
+	size_t		len, sz;
 	const char	*start, *end;
 
 	sz = sizeof(data_static);
