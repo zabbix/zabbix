@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-24T12:45:10Z</date>
+   <date>2022-03-03T14:05:38Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -950,7 +950,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <key>kernel.maxfiles</key>
                <delay>1h</delay>
                <history>7d</history>
-               <description>It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.</description>
+               <description>It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.</description>
                <applications>
                   <application>
                      <name>General</name>
@@ -976,7 +976,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <key>kernel.maxproc</key>
                <delay>1h</delay>
                <history>7d</history>
-               <description>It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.</description>
+               <description>It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.</description>
                <applications>
                   <application>
                      <name>General</name>
@@ -1438,11 +1438,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
       <template>
          <template>Template Module Linux network interfaces by Zabbix agent active</template>
          <name>Template Module Linux network interfaces by Zabbix agent active</name>
-         <description>Known Issues:&#13;
-&#13;
-  Description: High interface utilization trigger is removed since currently it is not possible to retrieve interface speed to determine the max bandwidth.&#13;
-&#13;
-Template tooling version used: 0.39</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1660,6 +1656,33 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
+                     <name>Interface {#IFNAME}: Speed</name>
+                     <type>ZABBIX_ACTIVE</type>
+                     <key>vfs.file.contents["/sys/class/net/{#IFNAME}/speed"]</key>
+                     <delay>5m</delay>
+                     <history>7d</history>
+                     <trends>0d</trends>
+                     <units>bps</units>
+                     <description>Indicates the interface latest or current speed value. Value is an integer representing the link speed in bits/sec.&#13;
+This attribute is only valid for interfaces that implement the ethtool get_link_ksettings method (mostly Ethernet).&#13;
+Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>1000000</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
                      <name>Interface {#IFNAME}: Interface type</name>
                      <type>ZABBIX_ACTIVE</type>
                      <key>vfs.file.contents["/sys/class/net/{#IFNAME}/type"]</key>
@@ -1687,19 +1710,39 @@ Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net<
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].change()}&lt;0 and {Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}&gt;0&#13;
+                     <expression>{Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/speed"].change()}&lt;0 and {Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/speed"].last()}&gt;0&#13;
 and&#13;
 ({Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}=6&#13;
 or {Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}=1)&#13;
 and&#13;
 ({Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}&lt;&gt;2)</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>({Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].change()}&gt;0 and {Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].prev()}&gt;0) or&#13;
+                     <recovery_expression>({Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/speed"].change()}&gt;0 and {Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/speed"].prev()}&gt;0) or&#13;
 ({Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}=2)</recovery_expression>
                      <name>Interface {#IFNAME}: Ethernet has changed to lower speed than it was before</name>
                      <opdata>Current reported speed: {ITEM.LASTVALUE1}</opdata>
                      <priority>INFO</priority>
                      <description>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>Interface {#IFNAME}: Link down</name>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}=2 and {Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].diff()}=1)</expression>
+                           <recovery_expression>{Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>({Template Module Linux network interfaces by Zabbix agent active:net.if.in["{#IFNAME}"].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/speed"].last()} or&#13;
+{Template Module Linux network interfaces by Zabbix agent active:net.if.out["{#IFNAME}"].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/speed"].last()}) and&#13;
+{Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/speed"].last()}&gt;0</expression>
+                     <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                     <recovery_expression>{Template Module Linux network interfaces by Zabbix agent active:net.if.in["{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/speed"].last()} and&#13;
+{Template Module Linux network interfaces by Zabbix agent active:net.if.out["{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/speed"].last()}</recovery_expression>
+                     <name>Interface {#IFNAME}: High bandwidth usage (&gt;{$IF.UTIL.MAX:"{#IFNAME}"}%)</name>
+                     <opdata>In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}</opdata>
+                     <priority>WARNING</priority>
+                     <description>The network interface utilization is close to its estimated maximum bandwidth.</description>
                      <manual_close>YES</manual_close>
                      <dependencies>
                         <dependency>
@@ -1795,6 +1838,11 @@ and {Template Module Linux network interfaces by Zabbix agent active:net.if.out[
             <macro>
                <macro>{$IF.ERRORS.WARN}</macro>
                <value>2</value>
+            </macro>
+            <macro>
+               <macro>{$IF.UTIL.MAX}</macro>
+               <value>90</value>
+               <description>This macro is used as a threshold in interface utilization trigger.</description>
             </macro>
             <macro>
                <macro>{$IFCONTROL}</macro>

@@ -4,7 +4,7 @@
    <date>2021-12-23T20:31:10Z</date>
    <groups>
       <group>
-         <name>Templates/Modules</name>
+         <name>Templates/Network devices</name>
       </group>
    </groups>
    <templates>
@@ -17,7 +17,7 @@ SURESINE&#13;
 Template tooling version used: 0.39</description>
          <groups>
             <group>
-               <name>Templates/Modules</name>
+               <name>Templates/Network devices</name>
             </group>
          </groups>
          <applications>

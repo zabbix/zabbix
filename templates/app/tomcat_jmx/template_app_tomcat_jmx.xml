@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-21T18:46:23Z</date>
+   <date>2022-03-03T14:38:56Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -130,18 +130,18 @@ Template tooling version used: 0.39</description>
                   <conditions>
                      <condition>
                         <macro>{#JMXNAME}</macro>
-                        <value>{$TOMCAT.LLD.FILTER.MATCHES:"GlobalRequesProcessor"}</value>
+                        <value>{$TOMCAT.LLD.FILTER.MATCHES:"GlobalRequestProcessor"}</value>
                         <formulaid>A</formulaid>
                      </condition>
                      <condition>
                         <macro>{#JMXNAME}</macro>
-                        <value>{$TOMCAT.LLD.FILTER.NOT_MATCHES:"GlobalRequesProcessor"}</value>
+                        <value>{$TOMCAT.LLD.FILTER.NOT_MATCHES:"GlobalRequestProcessor"}</value>
                         <operator>NOT_MATCHES_REGEX</operator>
                         <formulaid>B</formulaid>
                      </condition>
                   </conditions>
                </filter>
-               <description>Discovery for GlobalRequesProcessor</description>
+               <description>Discovery for GlobalRequestProcessor</description>
                <item_prototypes>
                   <item_prototype>
                      <name>{#JMXNAME}: Bytes received per second</name>
