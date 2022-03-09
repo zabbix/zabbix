@@ -183,7 +183,7 @@ class CUserGroup extends CApiService {
 		$ins_usrgrps = [];
 
 		foreach ($usrgrps as $usrgrp) {
-			unset($usrgrp['rights'], $usrgrp['rights_tplgrp'],$usrgrp['tag_filters'], $usrgrp['users']);
+			unset($usrgrp['rights'], $usrgrp['right_tplgrp'],$usrgrp['tag_filters'], $usrgrp['users']);
 			$ins_usrgrps[] = $usrgrp;
 		}
 		$usrgrpids = DB::insert('usrgrp', $ins_usrgrps);
@@ -218,7 +218,7 @@ class CUserGroup extends CApiService {
 				'id' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 				'permission' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_DENY, PERM_READ, PERM_READ_WRITE])]
 			]],
-			'rights_tplgrp' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['id']], 'fields' => [
+			'right_tplgrp' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['id']], 'fields' => [
 				'id' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 				'permission' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_DENY, PERM_READ, PERM_READ_WRITE])]
 			]],
@@ -292,7 +292,7 @@ class CUserGroup extends CApiService {
 				'id' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 				'permission' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_DENY, PERM_READ, PERM_READ_WRITE])]
 			]],
-			'rights_tplgrp' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['id']], 'fields' => [
+			'right_tplgrp' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['id']], 'fields' => [
 				'id' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 				'permission' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_DENY, PERM_READ, PERM_READ_WRITE])]
 			]],
@@ -462,7 +462,7 @@ class CUserGroup extends CApiService {
 	 * Check for valid template groups.
 	 *
 	 * @param array  $usrgrps
-	 * @param array  $usrgrps[]['rights_tplgrp']   (optional)
+	 * @param array  $usrgrps[]['right_tplgrp']   (optional)
 	 *
 	 * @throws APIException
 	 */
@@ -470,8 +470,8 @@ class CUserGroup extends CApiService {
 		$groupids = [];
 
 		foreach ($usrgrps as $usrgrp) {
-			if (array_key_exists('rights_tplgrp', $usrgrp)) {
-				foreach ($usrgrp['rights_tplgrp'] as $right) {
+			if (array_key_exists('right_tplgrp', $usrgrp)) {
+				foreach ($usrgrp['right_tplgrp'] as $right) {
 					$groupids[$right['id']] = true;
 				}
 			}
@@ -794,15 +794,15 @@ class CUserGroup extends CApiService {
 		$del_rightids = [];
 
 		foreach ($usrgrps as &$usrgrp) {
-			if (!array_key_exists('rights_tplgrp', $usrgrp)) {
+			if (!array_key_exists('right_tplgrp', $usrgrp)) {
 				continue;
 			}
 
 			$db_rights = ($method === 'update')
-				? array_column($db_usrgrps[$usrgrp['usrgrpid']]['rights_tplgrp'], null, 'id')
+				? array_column($db_usrgrps[$usrgrp['usrgrpid']]['right_tplgrp'], null, 'id')
 				: [];
 
-			foreach ($usrgrp['rights_tplgrp'] as &$right) {
+			foreach ($usrgrp['right_tplgrp'] as &$right) {
 				if (array_key_exists($right['id'], $db_rights)) {
 					$db_right = $db_rights[$right['id']];
 					unset($db_rights[$right['id']]);
@@ -845,11 +845,11 @@ class CUserGroup extends CApiService {
 		}
 
 		foreach ($usrgrps as &$usrgrp) {
-			if (!array_key_exists('rights_tplgrp', $usrgrp)) {
+			if (!array_key_exists('right_tplgrp', $usrgrp)) {
 				continue;
 			}
 
-			foreach ($usrgrp['rights_tplgrp'] as &$right) {
+			foreach ($usrgrp['right_tplgrp'] as &$right) {
 				if (!array_key_exists('rightid', $right)) {
 					$right['rightid'] = array_shift($rightids);
 				}
@@ -1182,7 +1182,7 @@ class CUserGroup extends CApiService {
 			$result = $relationMap->mapMany($result, $db_rights, 'rights');
 		}
 
-		// adding usergroup rights_tplgrp
+		// adding usergroup right_tplgrp
 		if ($options['selectRightsTplgrp'] !== null && $options['selectRightsTplgrp'] != API_OUTPUT_COUNT) {
 			$db_rights = [];
 			$relationMap = $this->createRelationMap($result, 'groupid', 'rightid', 'right_tplgrp');
@@ -1222,7 +1222,7 @@ class CUserGroup extends CApiService {
 				unset($db_right);
 			}
 
-			$result = $relationMap->mapMany($result, $db_rights, 'rights_tplgrp');
+			$result = $relationMap->mapMany($result, $db_rights, 'right_tplgrp');
 		}
 
 		// Adding usergroup tag filters.
@@ -1265,7 +1265,7 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Add the existing rights, rights_tplgrp, tag_filters and userids to $db_usrgrps whether these are affected by the update.
+	 * Add the existing rights, right_tplgrp, tag_filters and userids to $db_usrgrps whether these are affected by the update.
 	 *
 	 * @static
 	 *
@@ -1273,7 +1273,7 @@ class CUserGroup extends CApiService {
 	 * @param array $db_usrgrps
 	 */
 	private static function addAffectedObjects(array $usrgrps, array &$db_usrgrps): void {
-		$usrgrpids = ['rights' => [], 'rights_tplgrp' => [],'tag_filters' => [], 'users' => []];
+		$usrgrpids = ['rights' => [], 'right_tplgrp' => [],'tag_filters' => [], 'users' => []];
 
 		foreach ($usrgrps as $usrgrp) {
 			if (array_key_exists('rights', $usrgrp)) {
@@ -1281,9 +1281,9 @@ class CUserGroup extends CApiService {
 				$db_usrgrps[$usrgrp['usrgrpid']]['rights'] = [];
 			}
 
-			if (array_key_exists('rights_tplgrp', $usrgrp)) {
-				$usrgrpids['rights_tplgrp'][] = $usrgrp['usrgrpid'];
-				$db_usrgrps[$usrgrp['usrgrpid']]['rights_tplgrp'] = [];
+			if (array_key_exists('right_tplgrp', $usrgrp)) {
+				$usrgrpids['right_tplgrp'][] = $usrgrp['usrgrpid'];
+				$db_usrgrps[$usrgrp['usrgrpid']]['right_tplgrp'] = [];
 			}
 
 			if (array_key_exists('tag_filters', $usrgrp)) {
@@ -1310,7 +1310,7 @@ class CUserGroup extends CApiService {
 			}
 		}
 
-		if ($usrgrpids['rights_tplgrp']) {
+		if ($usrgrpids['right_tplgrp']) {
 			$options = [
 				'output' => ['rightid', 'groupid', 'permission', 'id'],
 				'filter' => ['groupid' => $usrgrpids['rights']]
@@ -1318,7 +1318,7 @@ class CUserGroup extends CApiService {
 			$db_rights = DBselect(DB::makeSql('right_tplgrp', $options));
 
 			while ($db_right = DBfetch($db_rights)) {
-				$db_usrgrps[$db_right['groupid']]['rights_tplgrp'][$db_right['rightid']] =
+				$db_usrgrps[$db_right['groupid']]['right_tplgrp'][$db_right['rightid']] =
 					array_diff_key($db_right, array_flip(['groupid']));
 			}
 		}

@@ -83,7 +83,7 @@ if (hasRequest('form')) {
 			$oldGroups = API::HostGroup()->get([
 				'output' => ['name', 'flags'],
 				'selectHosts' => ['hostid'],
-				'selectTemplates' => ['templateid'],
+//				'selectTemplates' => ['templateid'],
 				'groupids' => [$groupId]
 			]);
 			if (!$oldGroups) {
@@ -97,17 +97,18 @@ if (hasRequest('form')) {
 			if ($oldGroup['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 				$result = API::HostGroup()->update([
 					'groupid' => $groupId,
-					'name' => $name
+					'name' => $name,
+					'propagate_permissions' => (bool) getRequest('subgroups', 0)
 				]);
 			}
 
-			if ($result) {
-				// Apply permissions and tag filters to all subgroups.
-				if (getRequest('subgroups', 0) == 1 && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-					inheritPermissions($groupId, $name);
-					inheritTagFilters($groupId, $name);
-				}
-			}
+//			if ($result) {
+//				// Apply permissions and tag filters to all subgroups.
+//				if (getRequest('subgroups', 0) == 1 && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+//					inheritPermissions($groupId, $name);
+//					inheritTagFilters($groupId, $name);
+//				}
+//			}
 		}
 		else {
 			$messageSuccess = _('Group added');
@@ -311,7 +312,7 @@ else {
 		'output' => ['groupid'],
 		'groupids' => $groupIds,
 		'selectHosts' => API_OUTPUT_COUNT,
-		'selectTemplates' => API_OUTPUT_COUNT,
+//		'selectTemplates' => API_OUTPUT_COUNT,
 		'preservekeys' => true
 	]);
 
@@ -321,7 +322,7 @@ else {
 		'output' => ['groupid', 'name', 'flags'],
 		'groupids' => $groupIds,
 		'selectHosts' => ['hostid', 'name', 'status'],
-		'selectTemplates' => ['templateid', 'name'],
+//		'selectTemplates' => ['templateid', 'name'],
 		'selectGroupDiscovery' => ['ts_delete'],
 		'selectDiscoveryRule' => ['itemid', 'name'],
 		'limitSelects' => $limit

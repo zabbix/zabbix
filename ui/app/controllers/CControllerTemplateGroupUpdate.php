@@ -66,16 +66,10 @@ class CControllerTemplateGroupUpdate extends CController {
 		DBstart();
 		$result = API::TemplateGroup()->update([
 			'groupid' => $groupid,
-			'name' => $name
+			'name' => $name,
+			'propagate_permissions' => (bool) $this->getInput('subgroups', 0)
 		]);
 		$result = DBend($result);
-
-		if ($result) {
-			// Apply permissions to all subgroups.
-			if ($this->getInput('subgroups', 0) == 1 && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-				inheritPermissions($groupid, $name);
-			}
-		}
 
 		if ($result) {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
@@ -83,7 +77,7 @@ class CControllerTemplateGroupUpdate extends CController {
 				->setArgument('page', CPagerHelper::loadPage('templategroup.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_('Template gropu updated'));
+			CMessageHelper::setSuccessTitle(_('Template group updated'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
