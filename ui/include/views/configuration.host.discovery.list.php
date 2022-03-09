@@ -27,6 +27,10 @@ require_once dirname(__FILE__).'/js/configuration.host.discovery.list.js.php';
 
 $widget = (new CWidget())
 	->setTitle(_('Discovery rules'))
+	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
+		? CDocHelper::CONFIGURATION_HOST_DISCOVERY_LIST
+		: CDocHelper::CONFIGURATION_TEMPLATES_DISCOVERY_LIST
+	))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())->addItem(

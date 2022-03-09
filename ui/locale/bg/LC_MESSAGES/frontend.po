@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-25 19:55+0200\n"
+"POT-Creation-Date: 2022-03-07 15:19+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0300\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -11115,7 +11115,7 @@ msgstr "Поддръжка и събиране на данни"
 msgid "Maintenance without data collection"
 msgstr "Поддръжка без събиране на данни"
 
-#: include/html.inc.php:980
+#: include/html.inc.php:978
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr ""
@@ -13018,7 +13018,7 @@ msgstr "OEM"
 #: include/classes/helpers/CSeverityHelper.php:34
 #: include/classes/screens/CScreenHttpTestDetails.php:100
 #: include/classes/screens/CScreenHttpTestDetails.php:186
-#: include/classes/screens/CScreenHttpTest.php:140 include/maps.inc.php:422
+#: include/classes/screens/CScreenHttpTest.php:142 include/maps.inc.php:422
 #: include/triggers.inc.php:72
 msgid "OK"
 msgstr "ОК"
@@ -16784,7 +16784,7 @@ msgstr ""
 msgid "Step"
 msgstr "Стъпка"
 
-#: include/classes/screens/CScreenHttpTest.php:129
+#: include/classes/screens/CScreenHttpTest.php:131
 #: include/views/configuration.httpconf.list.php:168
 #, c-format
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
@@ -16939,7 +16939,7 @@ msgstr ""
 msgid "Supported macros:"
 msgstr ""
 
-#: include/html.inc.php:975
+#: include/html.inc.php:973
 #, c-format
 msgid "Suppressed till: %1$s"
 msgstr ""
@@ -18407,7 +18407,7 @@ msgstr "Неизвестно действие"
 #: include/classes/helpers/CElasticsearchHelper.php:193
 #: include/classes/screens/CScreenHttpTestDetails.php:110
 #: include/classes/screens/CScreenHttpTestDetails.php:182
-#: include/classes/screens/CScreenHttpTest.php:126
+#: include/classes/screens/CScreenHttpTest.php:128
 #: include/views/configuration.httpconf.list.php:172
 msgid "Unknown error"
 msgstr ""
@@ -18431,7 +18431,7 @@ msgstr "Неизвестен тип интерфейс."
 msgid "Unknown resource"
 msgstr "Неизвестен ресурс"
 
-#: include/classes/screens/CScreenHttpTest.php:134
+#: include/classes/screens/CScreenHttpTest.php:136
 #: include/views/configuration.httpconf.list.php:174
 #, c-format
 msgid "Unknown step failed: %1$s"
@@ -19719,7 +19719,7 @@ msgstr ""
 msgid "Width"
 msgstr "Ширина"
 
-#: app/controllers/CControllerLatest.php:530
+#: app/controllers/CControllerLatest.php:529
 msgid "With data"
 msgstr ""
 
@@ -19750,7 +19750,7 @@ msgstr "С проблеми"
 msgid "With triggers"
 msgstr "С тригери"
 
-#: app/controllers/CControllerLatest.php:535
+#: app/controllers/CControllerLatest.php:534
 msgid "Without data"
 msgstr ""
 

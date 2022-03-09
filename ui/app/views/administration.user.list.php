@@ -31,6 +31,7 @@ if ($data['uncheck']) {
 
 $widget = (new CWidget())
 	->setTitle(_('Users'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_USER_LIST))
 	->setControls((new CList([
 		(new CForm('get'))
 			->cleanItems()

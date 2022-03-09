@@ -157,6 +157,14 @@ class CAbsoluteTimeParserTest extends TestCase {
 				'datetime' => ['values' => ['2018-04-01 00:00:00', '2018-04-30 23:59:59']]
 			],
 			[
+				'2018-04-15 12:45', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '2018-04-15 12:45'
+				],
+				'datetime' => ['values' => ['2018-04-15 12:45:00', '2018-04-15 12:45:59'], 'tz' => 'UTC']
+			],
+			[
 				'text', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
@@ -256,9 +264,14 @@ class CAbsoluteTimeParserTest extends TestCase {
 		]);
 		$this->assertSame(strlen($expected['match']), $parser->getLength());
 
-		$ts_from = $parser->getDateTime(true);
-		$ts_to = $parser->getDateTime(false);
+		$tz = array_key_exists('tz', $datetime) ? new DateTimeZone($datetime['tz']) : null;
+		$ts_from = $parser->getDateTime(true, $tz);
+		$ts_to = $parser->getDateTime(false, $tz);
 		$this->assertSame($datetime['values'][0], $ts_from !== null ? $ts_from->format('Y-m-d H:i:s') : null);
 		$this->assertSame($datetime['values'][1], $ts_to !== null ? $ts_to->format('Y-m-d H:i:s') : null);
+		if ($tz !== null) {
+			$this->assertSame($datetime['tz'], $ts_from->getTimeZone()->getName());
+			$this->assertSame($datetime['tz'], $ts_to->getTimeZone()->getName());
+		}
 	}
 }

@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 for HP iLO adapters that support SNMP get. Or via operating system, using SNMP HP subagent
 
 This template was tested on:

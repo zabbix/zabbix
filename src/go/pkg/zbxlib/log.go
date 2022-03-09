@@ -82,4 +82,3 @@ func SetLogLevel(level int) {
 func init() {
 	C.zbx_agent_pid = C.getpid()
 }
-

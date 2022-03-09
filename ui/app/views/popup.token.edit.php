@@ -160,6 +160,7 @@ else {
 
 $output = [
 	'header' =>($data['tokenid'] == 0) ? _('New API token') : ('API token'),
+	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_TOKEN_EDIT),
 	'body' => $token_form->toString(),
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('popup.token.edit.js.php').
@@ -173,4 +174,3 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 }
 
 echo json_encode($output);
-

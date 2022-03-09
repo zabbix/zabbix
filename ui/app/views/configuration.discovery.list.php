@@ -29,6 +29,7 @@ if ($data['uncheck']) {
 
 $widget = (new CWidget())
 	->setTitle(_('Discovery rules'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_DISCOVERY_LIST))
 	->setControls((new CTag('nav', true,
 		(new CForm('get'))
 			->cleanItems()

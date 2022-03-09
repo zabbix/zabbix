@@ -31,6 +31,7 @@ $parent_host = $data['parent_host'];
 
 $widget = (new CWidget())
 	->setTitle(_('Host prototypes'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOST_PROTOTYPE_EDIT))
 	->setNavigation(getHostNavigation('hosts', $data['discovery_rule']['hostid'], $data['discovery_rule']['itemid']));
 
 $tabs = new CTabView();

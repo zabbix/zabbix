@@ -34,6 +34,7 @@ $web_layout_mode = $this->getLayoutMode();
 $widget = (new CWidget())
 	->setTitle(_('Dashboards'))
 	->setWebLayoutMode($web_layout_mode)
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_DASHBOARD_LIST))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())

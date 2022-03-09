@@ -25,6 +25,7 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Maps'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_SYSMAP_LIST))
 	->setControls((new CTag('nav', true,
 		(new CForm('get'))
 			->cleanItems()

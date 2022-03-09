@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 ![Product picture](images/pic.png?raw=true)
 > Courtesy of Cisco Systems, Inc. Unauthorized use not permitted.
 
@@ -13,7 +13,7 @@ https://www.cisco.com/c/en/us/support/switches/catalyst-3750v2-24fs-switch/model
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
 
 Refer to the vendor documentation.
 
