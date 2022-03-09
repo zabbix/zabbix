@@ -1968,6 +1968,7 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
 		\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
 		\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
+		\${abs_top_builddir}/src/libs/zbxxml/libzbxxml.a \
 		\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
 		\${abs_top_builddir}/src/libs/zbxsys/libzbxsys.a \
 		\${abs_top_builddir}/src/libs/zbxnix/libzbxnix.a \

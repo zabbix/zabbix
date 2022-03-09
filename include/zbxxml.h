@@ -20,8 +20,20 @@
 #ifndef ZABBIX_XML_H
 #define ZABBIX_XML_H
 
-#include "zbxembed.h"
+#include "config.h"
 
-int	zbx_es_init_xml(zbx_es_t *es, char **error);
+int	zbx_xml_get_data_dyn(const char *xml, const char *tag, char **data);
+void	zbx_xml_free_data_dyn(char **data);
+char	*zbx_xml_escape_dyn(const char *data);
+void	zbx_xml_escape_xpath(char **data);
 
+#ifdef HAVE_LIBXML2
+int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **root_node, char **errmsg);
+int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
 #endif
+
+int	zbx_xmlnode_to_json(void *xml_node, char **jstr);
+int	zbx_xml_to_json(char *xml_data, char **jstr, char **errmsg);
+int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg);
+
+#endif  /* ZABBIX_XML_H */

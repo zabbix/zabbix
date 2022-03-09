@@ -43,6 +43,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\libs\zbxlog}.c{..\..\..\src\libs\zbxlog}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
+{..\..\..\src\libs\zbxxml}.c{..\..\..\src\libs\zbxxml}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
 {..\..\..\src\libs\zbxregexp}.c{..\..\..\src\libs\zbxregexp}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 

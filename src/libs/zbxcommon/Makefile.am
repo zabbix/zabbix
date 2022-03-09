@@ -12,7 +12,6 @@ libzbxcommon_a_SOURCES = \
 	str.c \
 	variant.c \
 	variant_misc.c \
-	xml.c \
 	zbxgetopt.c \
 	time.c \
 	cuid.c

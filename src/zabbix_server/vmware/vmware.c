@@ -19,14 +19,14 @@
 
 #include "vmware.h"
 
-#include "mutexs.h"
-
+#include "zbxxml.h"
 /* LIBXML2 is used */
 #ifdef HAVE_LIBXML2
 #	include <libxml/parser.h>
 #	include <libxml/xpath.h>
 #endif
 
+#include "mutexs.h"
 #include "memalloc.h"
 #include "log.h"
 #include "daemon.h"
@@ -1948,8 +1948,8 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 		}
 	}
 
-	username_esc = xml_escape_dyn(service->username);
-	password_esc = xml_escape_dyn(service->password);
+	username_esc = zbx_xml_escape_dyn(service->username);
+	password_esc = zbx_xml_escape_dyn(service->password);
 
 	if (ZBX_VMWARE_TYPE_UNKNOWN == service->type)
 	{
@@ -2076,7 +2076,7 @@ static int	zbx_property_collection_next(zbx_property_collection_iter *iter, xmlD
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() continue retrieving properties with token: '%s'", __func__,
 			iter->token);
 
-	token_esc = xml_escape_dyn(iter->token);
+	token_esc = zbx_xml_escape_dyn(iter->token);
 	zbx_snprintf(post, sizeof(post), ZBX_POST_CONTINUE_RETRIEVE_PROPERTIES, iter->property_collector, token_esc);
 	zbx_free(token_esc);
 
@@ -2177,7 +2177,7 @@ static int	vmware_service_get_perf_counter_refreshrate(zbx_vmware_service_t *ser
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type: %s id: %s", __func__, type, id);
 
-	id_esc = xml_escape_dyn(id);
+	id_esc = zbx_xml_escape_dyn(id);
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VCENTER_PERF_COUNTERS_REFRESH_RATE,
 			vmware_service_objects[service->type].performance_manager, type, id_esc);
 	zbx_free(id_esc);
@@ -2713,7 +2713,7 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 		zbx_strlcat(props, "</ns0:pathSet>", sizeof(props));
 	}
 
-	vmid_esc = xml_escape_dyn(vmid);
+	vmid_esc = zbx_xml_escape_dyn(vmid);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_VM_STATUS_EX,
 			vmware_service_objects[service->type].property_collector, props, vmid_esc);
@@ -2752,7 +2752,7 @@ static int	vmware_service_get_vm_folder(xmlDoc *xdoc, char **vm_folder)
 	{
 		char	*id_esc;
 
-		id_esc = xml_escape_dyn(id);
+		id_esc = zbx_xml_escape_dyn(id);
 		zbx_free(id);
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_GET_FOLDER_NAME("%s"), id_esc);
 
@@ -2998,7 +2998,7 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datastore:'%s'", __func__, id);
 
-	id_esc = xml_escape_dyn(id);
+	id_esc = zbx_xml_escape_dyn(id);
 
 	if (ZBX_VMWARE_TYPE_VSPHERE == service->type && NULL != service->version &&
 			ZBX_VMWARE_DS_REFRESH_VERSION > service->major_version && SUCCEED !=
@@ -3155,7 +3155,7 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 		zbx_strlcat(props, "</ns0:pathSet>", sizeof(props));
 	}
 
-	hvid_esc = xml_escape_dyn(hvid);
+	hvid_esc = zbx_xml_escape_dyn(hvid);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_HV_DETAILS, vmware_service_objects[service->type].property_collector,
 			props, hvid_esc, hvid_esc, hvid_esc, hvid_esc);
@@ -3375,7 +3375,7 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 		char	*tmp, *hvid_esc;
 
 		zbx_vector_str_clear_ext(&scsi_luns, zbx_str_free);
-		hvid_esc = xml_escape_dyn(hvid);
+		hvid_esc = zbx_xml_escape_dyn(hvid);
 		tmp = zbx_dsprintf(NULL, ZBX_POST_HV_MP_DETAILS,
 				vmware_service_objects[service->type].property_collector, scsi_req, hvid_esc);
 		zbx_free(hvid_esc);
@@ -4238,7 +4238,7 @@ static int	vmware_service_reset_event_history_collector(CURL *easyhandle, const 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	event_session_esc = xml_escape_dyn(event_session);
+	event_session_esc = zbx_xml_escape_dyn(event_session);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_RESET_EVENT_COLLECTOR, event_session_esc);
 
@@ -4287,7 +4287,7 @@ static int	vmware_service_read_previous_events(CURL *easyhandle, const char *eve
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() soap_count: %d", __func__, soap_count);
 
-	event_session_esc = xml_escape_dyn(event_session);
+	event_session_esc = zbx_xml_escape_dyn(event_session);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_READ_PREVIOUS_EVENTS, event_session_esc, soap_count);
 
@@ -4343,7 +4343,7 @@ static int	vmware_service_get_event_latestpage(const zbx_vmware_service_t *servi
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	event_session_esc = xml_escape_dyn(event_session);
+	event_session_esc = zbx_xml_escape_dyn(event_session);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_READ_EVENT_LATEST_PAGE,
 			vmware_service_objects[service->type].property_collector, event_session_esc);
@@ -4389,7 +4389,7 @@ static int	vmware_service_destroy_event_session(CURL *easyhandle, const char *ev
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	event_session_esc = xml_escape_dyn(event_session);
+	event_session_esc = zbx_xml_escape_dyn(event_session);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_DESTROY_EVENT_COLLECTOR, event_session_esc);
 
@@ -5064,7 +5064,7 @@ static int	vmware_service_get_cluster_status(CURL *easyhandle, const char *clust
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() clusterid:'%s'", __func__, clusterid);
 
-	clusterid_esc = xml_escape_dyn(clusterid);
+	clusterid_esc = zbx_xml_escape_dyn(clusterid);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_CLUSTER_STATUS, clusterid_esc);
 
@@ -6072,7 +6072,7 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
 
 			entity = (zbx_vmware_perf_entity_t *)entities->values[i];
 
-			id_esc = xml_escape_dyn(entity->id);
+			id_esc = zbx_xml_escape_dyn(entity->id);
 
 			/* add entity performance counter request */
 			zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:querySpec>"

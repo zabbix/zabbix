@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxxml.h"
+
 #include "zbxalgo.h"
 #include "log.h"
 #include "zbxjson.h"
@@ -49,6 +51,52 @@ struct _zbx_xml_node_t
 
 ZBX_PTR_VECTOR_IMPL(xml_node_ptr, zbx_xml_node_t *)
 
+static char	data_static[ZBX_MAX_B64_LEN];
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get DATA from <tag>DATA</tag>                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_xml_get_data_dyn(const char *xml, const char *tag, char **data)
+{
+	size_t	len, sz;
+	const char	*start, *end;
+
+	sz = sizeof(data_static);
+
+	len = zbx_snprintf(data_static, sz, "<%s>", tag);
+	if (NULL == (start = strstr(xml, data_static)))
+		return FAIL;
+
+	zbx_snprintf(data_static, sz, "</%s>", tag);
+	if (NULL == (end = strstr(xml, data_static)))
+		return FAIL;
+
+	if (end < start)
+		return FAIL;
+
+	start += len;
+	len = end - start;
+
+	if (len > sz - 1)
+		*data = (char *)zbx_malloc(*data, len + 1);
+	else
+		*data = data_static;
+
+	zbx_strlcpy(*data, start, len + 1);
+
+	return SUCCEED;
+}
+
+void	zbx_xml_free_data_dyn(char **data)
+{
+	if (*data == data_static)
+		*data = NULL;
+	else
+		zbx_free(*data);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: replace <> symbols in string with &lt;&gt; so the resulting       *
@@ -61,7 +109,7 @@ ZBX_PTR_VECTOR_IMPL(xml_node_ptr, zbx_xml_node_t *)
  * Comments: The caller must free the returned string after it has been used. *
  *                                                                            *
  ******************************************************************************/
-char	*xml_escape_dyn(const char *data)
+char	*zbx_xml_escape_dyn(const char *data)
 {
 	char		*out, *ptr_out;
 	const char	*ptr_in;
@@ -151,7 +199,7 @@ char	*xml_escape_dyn(const char *data)
  * Return value: new size of the string                                           *
  *                                                                                *
  **********************************************************************************/
-static size_t	xml_escape_xpath_stringsize(const char *string)
+static size_t	zbx_xml_escape_xpath_stringsize(const char *string)
 {
 	size_t		len = 0;
 	const char	*sptr;
@@ -173,7 +221,7 @@ static size_t	xml_escape_xpath_stringsize(const char *string)
  *             p      - [OUT] the result string                                   *
  *                                                                                *
  **********************************************************************************/
-static void xml_escape_xpath_string(char *p, const char *string)
+static void zbx_xml_escape_xpath_string(char *p, const char *string)
 {
 	const char	*sptr = string;
 
@@ -193,17 +241,17 @@ static void xml_escape_xpath_string(char *p, const char *string)
  * Parameters: data - [IN/OUT] the string to update                               *
  *                                                                                *
  **********************************************************************************/
-void xml_escape_xpath(char **data)
+void zbx_xml_escape_xpath(char **data)
 {
 	size_t	size;
 	char	*buffer;
 
-	if (0 == (size = xml_escape_xpath_stringsize(*data)))
+	if (0 == (size = zbx_xml_escape_xpath_stringsize(*data)))
 		return;
 
 	buffer = zbx_malloc(NULL, size + 1);
 	buffer[size] = '\0';
-	xml_escape_xpath_string(buffer, *data);
+	zbx_xml_escape_xpath_string(buffer, *data);
 	zbx_free(*data);
 	*data = buffer;
 }
@@ -780,7 +828,7 @@ static void	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep,
 			if (NULL == zbx_json_decodevalue(json_string_ptr, value, sizeof(value), &type))
 				type = zbx_json_valuetype(json_string_ptr);
 			else
-				pvalue = xml_escape_dyn(value);
+				pvalue = zbx_xml_escape_dyn(value);
 			if ('@' == name[0])
 				set_attr = 1;
 			else if (0 == strcmp(name, XML_TEXT_TAG))
@@ -792,7 +840,7 @@ static void	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep,
 			if (NULL != (json_string_ptr = zbx_json_next_value(jp, json_string_ptr, value, sizeof(value),
 					&type)))
 			{
-				pvalue = xml_escape_dyn(value);
+				pvalue = zbx_xml_escape_dyn(value);
 			}
 			else
 			{

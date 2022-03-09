@@ -28,6 +28,7 @@
 #include "valuecache.h"
 #include "macrofunc.h"
 #include "../zbxalgo/vectorimpl.h"
+#include "zbxxml.h"
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/parser.h>
@@ -5570,7 +5571,7 @@ static void	process_lld_macro_token(char **data, zbx_token_t *token, int flags, 
 	}
 	else if (0 != (flags & ZBX_TOKEN_XPATH))
 	{
-		xml_escape_xpath(&replace_to);
+		zbx_xml_escape_xpath(&replace_to);
 	}
 	else if (0 != (flags & ZBX_TOKEN_PROMETHEUS))
 	{

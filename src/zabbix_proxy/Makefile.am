@@ -87,6 +87,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_builddir)/src/libs/zbxvault/libzbxvault.a \
 	$(top_builddir)/src/libs/zbxavailability/libzbxavailability.a \
+	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
 	libzbxproxy.a
 
 zabbix_proxy_LDADD += $(top_builddir)/src/libs/zbxalgo/libzbxalgo.a
