@@ -571,25 +571,6 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		}
 	}
 
-//	public function getCreateData() {
-//		return [
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'proxy_fields' => [],
-//					'error' => 'Incorrect value for field "host": cannot be empty.'
-//				]
-//			],
-//			[
-//				[
-//					'proxy_fields' => [
-//						'Proxy name' => 'Minimal fields proxy 123'
-//					]
-//				]
-//			]
-//		];
-//	}
-
 	public function getProxyData() {
 		return [
 			[
@@ -1031,6 +1012,12 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		$this->checkForm($data, true);
 	}
 
+	/**
+	 * Function for testing create or update proxy form.
+	 *
+	 * @param array      $data      gived data provider
+	 * @param boolean    $update    true if update scenaro, false if create
+	 */
 	private function checkForm($data, $update = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash($this->sql);
