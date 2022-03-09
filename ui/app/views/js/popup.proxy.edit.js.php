@@ -23,20 +23,6 @@
 window.proxy_edit_popup = new class {
 
 	constructor() {
-		this.proxyid = null;
-
-		this.create_url = null;
-		this.update_url = null;
-		this.refresh_config_url = null;
-		this.delete_url = null;
-
-		this.overlay = null;
-		this.dialogue = null;
-		this.form = null;
-		this.footer = null;
-
-		this.display_change_psk = false;
-
 		this.clone_proxyid = null;
 	}
 

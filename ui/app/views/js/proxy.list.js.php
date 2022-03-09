@@ -23,46 +23,54 @@
 <script>
 	const view = new class {
 
-		constructor() {
-			this.refresh_config_url = null;
-			this.enable_hosts_url = null;
-			this.disable_hosts_url = null;
-			this.delete_url = null;
-		}
-
 		init({refresh_config_url, enable_hosts_url, disable_hosts_url, delete_url}) {
 			this.refresh_config_url = refresh_config_url;
 			this.enable_hosts_url = enable_hosts_url;
 			this.disable_hosts_url = disable_hosts_url;
 			this.delete_url = delete_url;
 
-			this.initActionButtons();
+			this.initActions();
 		}
 
-		initActionButtons() {
-			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-create-proxy')) {
-					this.edit();
-				}
-				else if (e.target.classList.contains('js-edit-proxy')) {
+		initActions() {
+			document
+				.querySelector('.js-create-proxy')
+				.addEventListener('click', () => this.edit());
+
+			const form = document.getElementById('proxy-list');
+
+			form.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-edit-proxy')) {
 					this.edit({proxyid: e.target.dataset.proxyid});
 				}
 				else if (e.target.classList.contains('js-edit-host')) {
 					this.editHost(e.target.dataset.hostid);
 				}
-				else if (e.target.classList.contains('js-refresh-proxy-config')) {
-					this.refreshConfig(e.target, Object.values(chkbxRange.getSelectedIds()));
-				}
-				else if (e.target.classList.contains('js-massenable-proxy-host')) {
-					this.enableHosts(e.target, Object.values(chkbxRange.getSelectedIds()));
-				}
-				else if (e.target.classList.contains('js-massdisable-proxy-host')) {
-					this.disableHosts(e.target, Object.values(chkbxRange.getSelectedIds()));
-				}
-				else if (e.target.classList.contains('js-massdelete-proxy')) {
-					this.delete(e.target, Object.values(chkbxRange.getSelectedIds()));
-				}
 			});
+
+			form
+				.querySelector('.js-refresh-proxy-config')
+				.addEventListener('click', (e) => {
+					this.refreshConfig(e.target, Object.values(chkbxRange.getSelectedIds()));
+				});
+
+			form
+				.querySelector('.js-massenable-proxy-host')
+				.addEventListener('click', (e) => {
+					this.enableHosts(e.target, Object.values(chkbxRange.getSelectedIds()));
+				});
+
+			form
+				.querySelector('.js-massdisable-proxy-host')
+				.addEventListener('click', (e) => {
+					this.disableHosts(e.target, Object.values(chkbxRange.getSelectedIds()));
+				});
+
+			form
+				.querySelector('.js-massdelete-proxy')
+				.addEventListener('click', (e) => {
+					this.delete(e.target, Object.values(chkbxRange.getSelectedIds()));
+				});
 		}
 
 		edit(parameters = {}) {
