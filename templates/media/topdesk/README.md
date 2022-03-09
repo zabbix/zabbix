@@ -39,4 +39,4 @@ For more information, please see [Zabbix](https://www.zabbix.com/documentation/6
 
 ## Supported Versions
 
-Zabbix 5.0, TOPdesk RestApi 3.1.4.
+Zabbix 6.2, TOPdesk RestApi 3.1.4.

@@ -1,6 +1,6 @@
 # Rocket.Chat webhook
 
-This guide describes how to integrate Zabbix 5.4 installation with Rocket.Chat using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.<br>
+This guide describes how to integrate Zabbix 6.2 installation with Rocket.Chat using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.<br>
 By default, all new alerts will be posted as messages with an attachment card. Event updates and resolve messages will be added to the thread of the first message.
 
 ## Setting up Rocket.Chat

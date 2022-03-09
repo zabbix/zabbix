@@ -50,4 +50,4 @@ For more information, use the [Zabbix](https://www.zabbix.com/documentation/6.2/
 
 ## Supported Versions
 
-Zabbix 5.4
+Zabbix 6.2

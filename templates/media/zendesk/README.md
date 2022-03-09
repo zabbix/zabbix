@@ -99,4 +99,4 @@ For more information, use the [Zabbix](https://www.zabbix.com/documentation/6.2/
 
 # Supported Versions
 
-Zabbix 5.0, Zendesk API.
+Zabbix 6.2, Zendesk API.

@@ -1,6 +1,6 @@
 # SolarWinds Service Desk webhook
 
-This guide describes how to integrate Zabbix 5.0 installation with SolarWinds Service Desk using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.<br>
+This guide describes how to integrate Zabbix 6.2 installation with SolarWinds Service Desk using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.<br>
 Please note that recovery and update operations and SolarWinds Service Desk's custom fields are supported only for trigger-based events.
 
 
@@ -47,4 +47,4 @@ Make sure this user has access to all hosts for which you would like problem not
 For more information see [Zabbix](https://www.zabbix.com/documentation/6.2/manual/config/notifications) and [SOLARWINDS](https://documentation.solarwinds.com/en/Success_Center/swsd/Content/SWSD_Getting_Started_Guide.htm) documentations.
 
 ## Supported Versions
-Zabbix 5.0
+Zabbix 6.2

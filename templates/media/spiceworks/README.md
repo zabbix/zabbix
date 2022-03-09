@@ -1,6 +1,6 @@
 # Spiceworks integration guide
 
-This guide describes how to integrate Zabbix 5.0 installation with Spiceworks using the Zabbix email mediatype. This guide provides instructions on setting up a user and an action in Zabbix.<br>
+This guide describes how to integrate Zabbix 6.2 installation with Spiceworks using the Zabbix email mediatype. This guide provides instructions on setting up a user and an action in Zabbix.<br>
 Please note that recovery and update operations are unavailable for Spiceworks.
 
 ## Setting up Zabbix

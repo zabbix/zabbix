@@ -39,4 +39,4 @@ For more information, please see [Zabbix](https://www.zabbix.com/documentation/6
 
 ## Supported Versions
 
-Zabbix 5.0+, SysAid.
+Zabbix 6.2+, SysAid.

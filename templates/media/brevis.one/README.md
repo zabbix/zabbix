@@ -1,6 +1,6 @@
 # Brevis.one webhook
 
-This guide describes how to integrate Zabbix 5.4 installation with Brevis.one SMS Gateway using HTTP API and Zabbix webhook feature. This guide provides instructions on setting up a media type, a user, and an action in Zabbix.<br>
+This guide describes how to integrate Zabbix 6.2 installation with Brevis.one SMS Gateway using HTTP API and Zabbix webhook feature. This guide provides instructions on setting up a media type, a user, and an action in Zabbix.<br>
 
 ## Setting up Brevis.one
 1\. Create a user for HTTP API or use an existing one.<br>

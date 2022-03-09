@@ -41,4 +41,4 @@ For more information, please see [Zabbix](https://www.zabbix.com/documentation/6
 
 ## Supported Versions
 
-Zabbix 5.0, Opsgenie Alert API.
+Zabbix 6.2, Opsgenie Alert API.

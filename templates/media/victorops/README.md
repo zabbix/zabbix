@@ -1,6 +1,6 @@
 # VictorOps webhook
 
-This guide describes how to integrate Zabbix 5.4 installation with VictorOps using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.<br>
+This guide describes how to integrate Zabbix 6.2 installation with VictorOps using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.<br>
 
 
 ## Setting up VictorOps
