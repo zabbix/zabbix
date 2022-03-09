@@ -275,7 +275,6 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 	private static function isNumericOnlyColumn(array $column): bool {
 		return $column['aggregate_function'] != AGGREGATE_NONE
 			|| $column['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS
-			|| $column['history'] == CWidgetFieldColumnsList::HISTORY_DATA_TRENDS
 			|| array_key_exists('thresholds', $column);
 	}
 
@@ -353,16 +352,16 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			if ($timeshift != 0) {
 				$values = [];
 
-				foreach ($items as $index => $item) {
+				foreach ($items as $itemid => $item) {
 					if (in_array($item['value_type'],
 							[ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 						$history = Manager::History()->getValueAt($item, $time_to, 0);
 
-						if (is_array($history) && array_key_exists('itemid', $history)) {
-							$values[$history['itemid']] = $history['value'];
+						if (is_array($history)) {
+							$values[$itemid] = $history['value'];
 						}
 
-						unset($items[$index]);
+						unset($items[$itemid]);
 					}
 				}
 
@@ -371,8 +370,8 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			else {
 				$items_by_source = ['history' => [], 'trends' => []];
 
-				foreach ($items as $index => $item) {
-					$items_by_source[$item['source']][$index] = $item;
+				foreach ($items as $itemid => $item) {
+					$items_by_source[$item['source']][$itemid] = $item;
 				}
 
 				$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period);
@@ -406,7 +405,11 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 		if ($data_source == CWidgetFieldColumnsList::HISTORY_DATA_HISTORY
 				|| $data_source == CWidgetFieldColumnsList::HISTORY_DATA_TRENDS) {
 			foreach ($items as &$item) {
-				$item['source'] = $data_source == CWidgetFieldColumnsList::HISTORY_DATA_HISTORY ? 'history' : 'trends';
+				$item['source'] = ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT
+						|| $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
+					&& $data_source == CWidgetFieldColumnsList::HISTORY_DATA_TRENDS
+						? 'trends'
+						: 'history';
 			}
 			unset($item);
 
@@ -452,7 +455,7 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 
 			$processed_items = [];
 
-			foreach ($items as $item) {
+			foreach ($items as $itemid => $item) {
 				if (!$global_trends_time) {
 					$item['history'] = timeUnitToSeconds($item['history']);
 
@@ -477,7 +480,7 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 					}
 				}
 
-				$processed_items[] = $item;
+				$processed_items[$itemid] = $item;
 			}
 
 			$items = $processed_items;

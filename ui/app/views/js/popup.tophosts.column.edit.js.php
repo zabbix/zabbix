@@ -36,8 +36,6 @@ window.tophosts_column_edit_form = new class {
 				});
 		}
 
-		document.getElementById('history').addEventListener('change', () => this.checkItemColumnSettings());
-
 		colorPalette.setThemeColors(thresholds_colors);
 
 		this._$thresholds_table.dynamicRows({
@@ -137,31 +135,12 @@ window.tophosts_column_edit_form = new class {
 	}
 
 	checkItemColumnSettings() {
-		const data_item_value = $('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_ITEM_VALUE ?>;
-		const no_aggregate_function = $('[name="aggregate_function"]').val() == <?= AGGREGATE_NONE ?>;
-		const display_as_is = $('[name="display"]:checked').val() == <?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>;
-		const history_data_trends = $('[name="history"]:checked').val() == <?= CWidgetFieldColumnsList::HISTORY_DATA_TRENDS ?>;
-		const has_thresholds = this._$thresholds_table.find('tbody tr').length > 1;
-
-		this.clearWarnings();
-
-		if (data_item_value && (!no_aggregate_function || !display_as_is || history_data_trends || has_thresholds)) {
-			this.warnNumericOnlyItemSettings();
-		}
-	}
-
-	clearWarnings() {
-		if (this.warning_message_box !== null) {
-			this.warning_message_box.remove();
-			this.warning_message_box = null;
-		}
-	}
-
-	warnNumericOnlyItemSettings() {
-		this.warning_message_box = makeMessageBox('warning',
-			<?= json_encode(_('Only numeric items will be displayed in this column.')) ?>, null, true, false
-		)[0];
-
-		this._$widget_form.before(this.warning_message_box);
+		document.getElementById('aggregate_function_warning').style.display =
+			document.getElementById('aggregate_function').value == <?= AGGREGATE_NONE ?> ? 'none' : '';
+		document.getElementById('display_warning').style.display =
+			document.querySelector('#display input:checked').value == <?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>
+				? 'none' : '';
+		document.getElementById('thresholds_warning').style.display =
+			document.querySelector('#thresholds_table tbody').rows.length == 1 ? 'none' : '';
 	}
 }();

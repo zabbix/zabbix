@@ -101,12 +101,7 @@ $item_select = (new CPatternSelect([
 $scripts[] = $item_select->getPostJS();
 
 $form_grid->addItem([
-	(new CLabel([
-		_('Item'),
-		makeHelpIcon(
-			_('For items with non-numeric type of information all parameters except "Time shift" and "Base color" are ignored.')
-		)
-	], 'item'))->setAsteriskMark(),
+	(new CLabel(_('Item'), 'item'))->setAsteriskMark(),
 	new CFormField($item_select)
 ]);
 
@@ -120,9 +115,19 @@ $form_grid->addItem([
 	)
 ]);
 
+$numeric_only_warning = new CSpan([
+	' ',
+	makeWarningIcon(_('With this setting only numeric items will be displayed in this column.'))
+]);
+
 // Aggregation function.
 $form_grid->addItem([
-	new CLabel(_('Aggregation function'), 'aggregate_function'),
+	new CLabel([
+		_('Aggregation function'),
+		$numeric_only_warning
+			->setId('aggregate_function_warning')
+			->addStyle($data['aggregate_function'] == AGGREGATE_NONE ? 'display: none' : '')
+	], 'aggregate_function'),
 	new CFormField(
 		(new CSelect('aggregate_function'))
 			->setId('aggregate_function')
@@ -150,7 +155,12 @@ $form_grid->addItem([
 
 // Display.
 $form_grid->addItem([
-	new CLabel(_('Display'), 'display'),
+	new CLabel([
+		_('Display'),
+		$numeric_only_warning
+			->setId('display_warning')
+			->addStyle($data['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS ? 'display: none' : '')
+	], 'display'),
 	new CFormField(
 		(new CRadioButtonList('display', (int) $data['display']))
 			->addValue(_('As is'), CWidgetFieldColumnsList::DISPLAY_AS_IS)
@@ -162,7 +172,12 @@ $form_grid->addItem([
 
 // History data.
 $form_grid->addItem([
-	new CLabel(_('History data'), 'history'),
+	new CLabel([
+		_('History data'),
+		makeHelpIcon(
+			_('This setting applies only to numeric data. Non-numeric data will always be taken from history.')
+		)
+	], 'history'),
 	new CFormField(
 		(new CRadioButtonList('history', (int) $data['history']))
 			->addValue(_('Auto'), CWidgetFieldColumnsList::HISTORY_DATA_AUTO)
@@ -235,7 +250,12 @@ $thresholds->addItem(
 );
 
 $form_grid->addItem([
-	new CLabel(_('Thresholds'), 'thresholds_table'),
+	new CLabel([
+		_('Thresholds'),
+		$numeric_only_warning
+			->setId('thresholds_warning')
+			->addStyle(!$data['thresholds'] ? 'display: none' : '')
+	], 'thresholds_table'),
 	new CFormField($thresholds)
 ]);
 
