@@ -25,12 +25,14 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 /**
  * Test for checking Proxy host form.
  *
+ * @onBefore prepareProxyData
+ *
  * @backup hosts
  */
 class testFormAdministrationGeneralProxies extends CWebTest {
 
 	private $sql = 'SELECT * FROM hosts ORDER BY hostid';
-	private static $update_proxy = '_Active proxy for update';
+	private static $update_proxy = 'Active proxy for update';
 
 	use TableTrait;
 
@@ -41,6 +43,21 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 	 */
 	public function getBehaviors() {
 		return [CMessageBehavior::class];
+	}
+
+	/**
+	 * Function used to create roles.
+	 */
+	public function prepareProxyData() {
+		CDataHelper::call('proxy.create', [
+			[
+				'host' => 'Active proxy for update',
+				'status' => 5,
+				'description' => 'Description for update',
+				'tls_connect' => 1,
+				'tls_accept'=> 1
+			]
+		]);
 	}
 
 	public function getLayoutData() {
@@ -571,7 +588,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		}
 	}
 
-	public function getProxyData() {
+	public function getCreateProxyData() {
 		return [
 			[
 				[
@@ -586,7 +603,12 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 						'Proxy name' => 'Minimal fields proxy 123'
 					]
 				]
-			],
+			]
+		];
+	}
+
+	public function getUpdateProxyData() {
+		return [
 			[
 				[
 					'expected' => TEST_BAD,
@@ -970,7 +992,8 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 						'Connections to proxy' => 'Certificate',
 						'Issuer' => 'test',
 						'Subject' => '💫test'
-					]
+					],
+					'check_PSK_button' => true
 				]
 			],
 			[
@@ -994,8 +1017,8 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 	}
 
 	/**
-	 * dataProvider getCreateData
-	 * @dataProvider getProxyData
+	 * @dataProvider getCreateProxyData
+	 * @dataProvider getUpdateProxyData
 	 *
 	 * @backupOnce hosts
 	 */
@@ -1004,7 +1027,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getUpdateData
+	 * @dataProvider getUpdateProxyData
 	 *
 	 * @backupOnce hosts
 	 */
@@ -1015,8 +1038,8 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 	/**
 	 * Function for testing create or update proxy form.
 	 *
-	 * @param array      $data      gived data provider
-	 * @param boolean    $update    true if update scenaro, false if create
+	 * @param array      $data      given data provider
+	 * @param boolean    $update    true if update scenario, false if create
 	 */
 	private function checkForm($data, $update = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
@@ -1048,14 +1071,16 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 			$button = $form->query('button:Change PSK')->one(false);
 			if ($update && $button->isEnabled()) {
 				$button->click();
+				$form->fill($data['encryption_fields']);
 			}
-
-			$form->fill($data['encryption_fields']);
-
-//			if ($update && $form->getField('Connections to proxy')->getText() !== 'PSK' &&
-//					$form->getField('id:tls_accept_psk')->isChecked()) {
-//				$this->assertFalse($button->isEnabled());
-//			}
+			elseif (CTestArrayHelper::get($data, 'check_PSK_button')) {
+				$this->assertFalse($button->isEnabled());
+				$form->fill($data['encryption_fields']);
+				$this->assertFalse($button->isEnabled());
+			}
+			else {
+				$form->fill($data['encryption_fields']);
+			}
 		}
 
 		$form->submit();
