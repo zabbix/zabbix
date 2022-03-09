@@ -342,12 +342,12 @@ static int	DBget_trigger_template_name(zbx_uint64_t triggerid, const zbx_uint64_
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				" and exists("
 					"select null"
-					" from hosts_groups hg,rights r,users_groups ug"
-					" where h.hostid=hg.hostid"
-						" and hg.groupid=r.id"
+					" from template_group tg,right_tplgrp r,users_groups ug"
+					" where h.hostid=tg.hostid"
+						" and tg.groupid=r.id"
 						" and r.groupid=ug.usrgrpid"
 						" and ug.userid=" ZBX_FS_UI64
-					" group by hg.hostid"
+					" group by tg.hostid"
 					" having min(r.permission)>=%d"
 				")",
 				*userid, PERM_READ);
