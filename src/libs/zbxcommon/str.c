@@ -1646,6 +1646,16 @@ const char	*zbx_event_value_string(unsigned char source, unsigned char object, u
 }
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
+/******************************************************************************
+ *                                                                            *
+ * Parameters: encoding - [IN] non-empty string, code page identifier         *
+ *                        (as in libiconv or Windows SDK docs)                *
+ *             codepage - [OUT] code page number                              *
+ *                                                                            *
+ * Return value: SUCCEED on success                                           *
+ *               FAIL on failure                                              *
+ *                                                                            *
+ ******************************************************************************/
 static int	get_codepage(const char *encoding, unsigned int *codepage)
 {
 	typedef struct
