@@ -57,13 +57,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 	protected static $update_pageid;
 
 	/**
-	 * Id of dashboard page for Top Hosts widget creation.
-	 *
-	 * @var integer
-	 */
-	protected static $create_pageid;
-
-	/**
 	 * Id widget for update.
 	 *
 	 * @var integer
@@ -312,8 +305,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 
 		self::$update_pageid = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid='
 				.zbx_dbstr(self::$updateid));
-		self::$create_pageid = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid='
-				.zbx_dbstr(self::$createid));
 
 		self::$update_widgetid = CDBHelper::getValue('SELECT widgetid FROM widget WHERE dashboard_pageid='
 				.zbx_dbstr(self::$update_pageid));
@@ -983,6 +974,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 	}
 
 	/**
+	 * Create Top Hosts widget.
+	 *
 	 * @dataProvider getCreateTopHostsData
 	 */
 	public function testDashboardTopHostsWidget_Create($data) {
@@ -1030,6 +1023,9 @@ class testDashboardTopHostsWidget extends CWebTest {
 		}
 	}
 
+	/**
+	 * Top Hosts widget simple update without any field change.
+	 */
 	public function testDashboardTopHostsWidget_SimpleUpdate() {
 		// Hash before simple update.
 		$old_hash = CDBHelper::getHash('SELECT * FROM widget_field WHERE widgetid='.zbx_dbstr(self::$update_widgetid)
@@ -1286,6 +1282,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 	}
 
 	/**
+	 * Update Top Hosts widget.
+	 *
 	 * @dataProvider getUpdateTopHostsData
 	 */
 	public function testDashboardTopHostsWidget_Update($data) {
@@ -1341,6 +1339,9 @@ class testDashboardTopHostsWidget extends CWebTest {
 		}
 	}
 
+	/**
+	 * Delete top hosts widget.
+	 */
 	public function testDashboardTopHostsWidget_Delete() {
 		$name = 'Top hosts delete';
 
@@ -1361,6 +1362,12 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$this->assertEquals(0, CDBHelper::getCount($widget_sql));
 	}
 
+	/**
+	 * Check widget after creation.
+	 *
+	 * @param string $header		widget name
+	 * @param array	 $data			values from dataprovider
+	 */
 	private function checkWidget($header, $data) {
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->getWidget($header)->edit();
@@ -1443,12 +1450,21 @@ class testDashboardTopHostsWidget extends CWebTest {
 		}
 	}
 
+	/**
+	 * Check success message after dashboard update.
+	 */
 	private function checkDashboardUpdateMessage() {
 		$message = CMessageElement::find()->waitUntilVisible()->one();
 		$this->assertTrue($message->isGood());
 		$this->assertEquals('Dashboard updated', $message->getTitle());
 	}
 
+	/**
+	 * Create or update top hosts widget.
+	 *
+	 * @param array  $data			values from dataprovider
+	 * @param string $action		create or update action
+	 */
 	private function columnCreateUpdate($data, $action){
 		// Starting counting column amount from 1 for xpath.
 		if ($action === 'update') {
@@ -1513,7 +1529,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 				$message = CMessageElement::find()->waitUntilVisible()->one();
 				$this->assertEquals($data['column_error'], $message->getLines()->asText());
 				$selector = ($action === 'update') ? 'Update column' : 'New column';
-				$column_form->query('xpath://div/h4[text()="'.$selector.'"]/../preceding-sibling::button[@title="Close"]')->one()->click();
+				$column_form->query('xpath://div/h4[text()="'.$selector.'"]/../preceding-sibling::button[@title="Close"]')
+						->one()->click();
 			}
 
 			sleep(1);
