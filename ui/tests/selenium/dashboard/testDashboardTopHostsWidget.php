@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
+require_once dirname(__FILE__). '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
@@ -29,25 +29,11 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 class testDashboardTopHostsWidget extends CWebTest {
 
 	/**
-	 * Id of dashboard for Top Hosts widget update.
+	 * Id of dashboard by name.
 	 *
 	 * @var integer
 	 */
-	protected static $updateid;
-
-	/**
-	 * Id of dashboard for Top Hosts widget creation.
-	 *
-	 * @var integer
-	 */
-	protected static $createid;
-
-	/**
-	 * Id of dashboard for Top Hosts widget delete.
-	 *
-	 * @var integer
-	 */
-	protected static $deleteid;
+	protected static $ids;
 
 	/**
 	 * Id of dashboard page for Top Hosts widget update.
@@ -73,7 +59,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 	public function prepareDashboardPageData() {
 		$response = CDataHelper::call('dashboard.create', [
 			[
-				'name' => 'Dashboard for Top Hosts widget update',
+				'name' => 'top_host_update',
 				'display_period' => 30,
 				'auto_start' => 1,
 				'pages' => [
@@ -221,7 +207,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 				]
 			],
 			[
-				'name' => 'Dashboard for Top Hosts widget creation',
+				'name' => 'top_host_create',
 				'display_period' => 30,
 				'auto_start' => 1,
 				'pages' => [
@@ -229,7 +215,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 				]
 			],
 			[
-				'name' => 'Dashboard for Top Hosts widget delete',
+				'name' => 'top_host_delete',
 				'display_period' => 30,
 				'auto_start' => 1,
 				'pages' => [
@@ -295,16 +281,152 @@ class testDashboardTopHostsWidget extends CWebTest {
 						]
 					]
 				]
+			],
+			[
+				'name' => 'top_host_remove',
+				'display_period' => 30,
+				'auto_start' => 1,
+				'pages' => [
+					[
+						'name' => '',
+						'widgets' => [
+							[
+								'type' => 'tophosts',
+								'name' => 'Top hosts for remove',
+								'x' => 0,
+								'y' => 0,
+								'width' => 12,
+								'height' => 8,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'columns.name.0',
+										'value' => ''
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.data.0',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'columns.item.0',
+										'value' => 'Available memory'
+									],
+									[
+										'type' => 1,
+										'name' => 'columns.timeshift.0',
+										'value' => ''
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.aggregate_function.0',
+										'value' => 0
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.display.0',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.history.0',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'columns.base_color.0',
+										'value' => ''
+									],
+									[
+										'type' => 0,
+										'name' => 'column',
+										'value' => 0
+									],
+									[
+										'type' => 1,
+										'name' => 'columns.name.1',
+										'value' => ''
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.data.1',
+										'value' => 2
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.aggregate_function.1',
+										'value' => 0
+									],
+									[
+										'type' => 1,
+										'name' => 'columns.base_color.1',
+										'value' => ''
+									],
+									[
+										'type' => 1,
+										'name' => 'columnsthresholds.color.0.0',
+										'value' => 'FF465C'
+									],
+									[
+										'type' => 1,
+										'name' => 'columnsthresholds.threshold.0.0',
+										'value' => '100'
+									],
+									[
+										'type' => 1,
+										'name' => 'columnsthresholds.color.0.1',
+										'value' => '4000FF'
+									],
+									[
+										'type' => 1,
+										'name' => 'columnsthresholds.threshold.0.1',
+										'value' => '1000'
+									],
+									[
+										'type' => 1,
+										'name' => 'tags.tag.0',
+										'value' => 'tag1'
+									],
+									[
+										'type' => 0,
+										'name' => 'tags.operator.0',
+										'value' => 0
+									],
+									[
+										'type' => 1,
+										'name' => 'tags.value.0',
+										'value' => 'val1'
+									],
+									[
+										'type' => 1,
+										'name' => 'tags.tag.1',
+										'value' => 'tag2'
+									],
+									[
+										'type' => 0,
+										'name' => 'tags.operator.1',
+										'value' => 0
+									],
+									[
+										'type' => 1,
+										'name' => 'tags.value.1',
+										'value' => 'val2'
+									]
+								]
+							]
+						]
+					]
+				]
 			]
 		]);
 
 		$this->assertArrayHasKey('dashboardids', $response);
-		self::$updateid = $response['dashboardids'][0];
-		self::$createid = $response['dashboardids'][1];
-		self::$deleteid = $response['dashboardids'][2];
+		self::$ids = CDataHelper::getIds('name');
 
 		self::$update_pageid = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid='
-				.zbx_dbstr(self::$updateid));
+				.zbx_dbstr(self::$ids['top_host_update']));
 
 		self::$update_widgetid = CDBHelper::getValue('SELECT widgetid FROM widget WHERE dashboard_pageid='
 				.zbx_dbstr(self::$update_pageid));
@@ -979,7 +1101,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 * @dataProvider getCreateTopHostsData
 	 */
 	public function testDashboardTopHostsWidget_Create($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$createid);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['top_host_create']);
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 		$form = $dashboard->edit()->addWidget()->asForm();
@@ -1031,7 +1153,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$old_hash = CDBHelper::getHash('SELECT * FROM widget_field WHERE widgetid='.zbx_dbstr(self::$update_widgetid)
 				.' ORDER BY widget_fieldid');
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$updateid);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['top_host_update']);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->getWidget(self::$updated_name)->edit();
 		$form->submit();
@@ -1292,7 +1414,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$old_hash = CDBHelper::getHash('SELECT * FROM widget_field WHERE widgetid='.zbx_dbstr(self::$update_widgetid)
 					.' ORDER BY widget_fieldid');
 		}
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$updateid);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['top_host_update']);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->getWidget(self::$updated_name)->edit();
 
@@ -1345,7 +1467,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 	public function testDashboardTopHostsWidget_Delete() {
 		$name = 'Top hosts delete';
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$deleteid);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['top_host_delete']);
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$dashboard->deleteWidget($name);
 		$this->page->waitUntilReady();
@@ -1360,6 +1482,54 @@ class testDashboardTopHostsWidget extends CWebTest {
 		// Check that widget is removed from DB.
 		$widget_sql = 'SELECT * FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid WHERE w.name='.zbx_dbstr($name);
 		$this->assertEquals(0, CDBHelper::getCount($widget_sql));
+	}
+
+	public function testDashboardTopHostsWidget_Remove() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['top_host_remove']);
+		$dashboard = CDashboardElement::find()->one();
+		$form = $dashboard->edit()->getWidget('Top hosts for remove')->edit();
+
+		// column table and rows before remove.
+		$column_table = $form->query('id:list_columns')->one()->asTable();
+		$column_row_amount_before = $column_table->getRows()->count()-1;
+
+		// tag table and rows before remove.
+		$tag_table = $form->query('id:tags_table_tags')->one()->asTable();
+		$tag_row_amount_before = $tag_table->getRows()->count();
+
+		$form->query('xpath:(//button[@name="edit"])[1]')->one()->waitUntilVisible()->click();
+		$column_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
+
+		// threshodl tale and rows before remove
+		$threshold_table = $column_form->query('id:thresholds_table')->one()->asTable();
+		$threshold_amount_before = $threshold_table->getRows()->count()-1;
+
+		// remove 1 threshold
+		$threshold_table->query('id:thresholds_0_remove')->one()->click();
+		$column_form->submit();
+
+		// remove 1 tag
+		$form->query('id:tags_0_remove')->one()->click();
+
+		// remove 1 column
+		$column_table->query('xpath:(//button[@name="remove"])[2]')->one()->waitUntilVisible()->click();
+		COverlayDialogElement::find()->waitUntilReady()->one();
+		$form->submit();
+		$dashboard->save();
+
+		// Check that Dashboard has been saved.
+		$this->checkDashboardUpdateMessage();
+
+		$dashboard->edit()->getWidget('Top hosts for remove')->edit();
+		$this->assertEquals($column_row_amount_before-1, $column_table->getRows()->count()-1);
+		$this->assertEquals($tag_row_amount_before-1, $tag_table->getRows()->count());
+
+		$form->query('xpath:(//button[@name="edit"])[1]')->one()->waitUntilVisible()->click();
+
+		$column_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
+		$threshold_table = $column_form->query('id:thresholds_table')->one()->asTable();
+
+		$this->assertEquals($threshold_amount_before-1, $threshold_table->getRows()->count()-1);
 	}
 
 	/**
