@@ -568,10 +568,9 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 //		var_dump($this->page->getAlertText());
 //		$this->assertEquals('', $this->page->getAlertText());
 //		$this->page->acceptAlert();
-
-		// Check that after accepting alert user remained on Proxies page.
-		$this->page->assertTitle('Configuration of proxies');
-		$this->page->assertHeader('Proxies');
+//		// Check that after accepting alert user remained on Proxies page.
+//		$this->page->assertTitle('Configuration of proxies');
+//		$this->page->assertHeader('Proxies');
 	}
 
 	/**
@@ -1182,7 +1181,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 				[
 					'proxy' => self::$refresh_passive_proxy,
 				]
-			],
+			]
 		];
 	}
 
