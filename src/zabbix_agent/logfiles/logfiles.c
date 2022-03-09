@@ -2863,7 +2863,7 @@ static int	adjust_position_after_jump(struct st_logfile *logfile, zbx_uint64_t *
 	const char	*cr, *lf, *p_end;
 	char		*p, *p_next;
 	zbx_uint64_t	lastlogsize_tmp, lastlogsize_aligned, lastlogsize_org, seek_pos, remainder;
-	char   		buf[32 * ZBX_KIBIBYTE];		/* buffer must be of size multiple of 4 as some character */
+	char		buf[32 * ZBX_KIBIBYTE];		/* buffer must be of size multiple of 4 as some character */
 							/* encodings use 4 bytes for every character */
 
 	if (-1 == (fd = open_file_helper(logfile->filename, err_msg)))
