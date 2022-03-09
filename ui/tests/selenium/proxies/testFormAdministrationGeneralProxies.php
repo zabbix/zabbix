@@ -33,6 +33,8 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 
 	private $sql = 'SELECT * FROM hosts ORDER BY hostid';
 	private static $update_proxy = 'Active proxy for update';
+	private static $refresh_active_proxy = '_Active proxy for refresh';
+	private static $refresh_passive_proxy = '_Passive proxy for refresh';
 
 	use TableTrait;
 
@@ -51,11 +53,39 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 	public function prepareProxyData() {
 		CDataHelper::call('proxy.create', [
 			[
-				'host' => 'Active proxy for update',
+				'host' => self::$update_proxy,
 				'status' => 5,
 				'description' => 'Description for update',
 				'tls_connect' => 1,
 				'tls_accept'=> 1
+			],
+			[
+				'host' => self::$refresh_active_proxy,
+				'status' => 5,
+				'description' => 'Active description for refresh',
+				'tls_connect' => 1,
+				'tls_accept'=> 7,
+				'tls_psk_identity' => 'activerefreshpsk',
+				'tls_psk' => '41b4d07b27a8efdcc15d4742e03857eba377fe010853a1499b0522df171282cb',
+				'tls_issuer' => 'activerefreshpsk',
+				'tls_subject' => 'activerefreshpsk',
+				'proxy_address' => '127.0.1.2',
+
+			],
+			[
+				'host' => self::$refresh_passive_proxy,
+				'status' => 6,
+				'description' => '_Passive description for refresh',
+				'tls_connect' => 4,
+				'tls_accept'=> 1,
+				'tls_issuer' => 'passiverefreshpsk',
+				'tls_subject' => 'passiverefreshpsk',
+				'interface' => [
+					'ip' => '127.9.9.9',
+					'dns' => 'refreshdns',
+					'useip' => '0',
+					'port' => '220'
+				]
 			]
 		]);
 	}
@@ -991,7 +1021,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 					'encryption_fields' => [
 						'Connections to proxy' => 'Certificate',
 						'Issuer' => 'test',
-						'Subject' => '💫test'
+						'Subject' => 'test'
 					],
 					'check_PSK_button' => true
 				]
@@ -1139,5 +1169,50 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 				self::$update_proxy = $data['proxy_fields']['Proxy name'];
 			}
 		}
+	}
+
+	public function getRefreshData() {
+		return [
+			[
+				[
+					'proxy' => self::$refresh_active_proxy,
+				]
+			],
+			[
+				[
+					'proxy' => self::$refresh_passive_proxy,
+				]
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider getRefreshData
+	 */
+	public function testFormAdministrationGeneralProxies_RefreshConfiguration($data) {
+		$old_hash = CDBHelper::getHash($this->sql);
+		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
+		$this->query('link', $data['proxy'])->one()->waitUntilClickable()->click();
+
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $this->query('id:proxy-form')->asForm()->one();
+		$old_fields = $form->getFields()->asValues();
+
+		// Check alert when trying to refresh configuration.
+		$dialog->query('button:Refresh configuration')->waitUntilClickable()->one()->click();
+		$this->assertTrue($this->page->isAlertPresent());
+		$this->assertEquals('Refresh configuration of the selected proxy?', $this->page->getAlertText());
+		$this->page->acceptAlert();
+		$this->assertMessage(TEST_GOOD, 'Request sent successfully');
+
+		// Check that form fields did not change.
+		$this->query('link', $data['proxy'])->one()->waitUntilClickable()->click();
+		COverlayDialogElement::find()->one()->waitUntilReady();
+		$form->invalidate();
+		$this->assertEquals($old_fields, $form->getFields()->asValues());
+
+		// Check that DB hash did not change.
+		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$dialog->close();
 	}
 }
