@@ -63,6 +63,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 */
 	protected static $create_pageid;
 
+	/**
+	 * Id widget for update.
+	 *
+	 * @var integer
+	 */
+	protected static $update_widgetid;
+
 	const WIDGET_UPDATE_NAME = 'Top hosts update';
 
 	private static $updated_name = self::WIDGET_UPDATE_NAME;
@@ -193,6 +200,26 @@ class testDashboardTopHostsWidget extends CWebTest {
 										'type' => 1,
 										'name' => 'columnsthresholds.threshold.1.1',
 										'value' => '600'
+									],
+									[
+										'type' => 1,
+										'name' => 'columnsthresholds.color.0.0',
+										'value' => 'FF465C'
+									],
+									[
+										'type' => 1,
+										'name' => 'columnsthresholds.threshold.0.0',
+										'value' => '100'
+									],
+									[
+										'type' => 1,
+										'name' => 'columnsthresholds.color.0.1',
+										'value' => 'B0AF07'
+									],
+									[
+										'type' => 1,
+										'name' => 'columnsthresholds.threshold.0.1',
+										'value' => '600'
 									]
 								]
 							]
@@ -287,6 +314,9 @@ class testDashboardTopHostsWidget extends CWebTest {
 				.zbx_dbstr(self::$updateid));
 		self::$create_pageid = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid='
 				.zbx_dbstr(self::$createid));
+
+		self::$update_widgetid = CDBHelper::getValue('SELECT widgetid FROM widget WHERE dashboard_pageid='
+				.zbx_dbstr(self::$update_pageid));
 	}
 
 	public static function getCreateTopHostsData() {
@@ -1001,10 +1031,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 	}
 
 	public function testDashboardTopHostsWidget_SimpleUpdate() {
-		$widgetid = CDBHelper::getValue('SELECT widgetid FROM widget WHERE dashboard_pageid='.zbx_dbstr(self::$update_pageid));
-
 		// Hash before simple update.
-		$old_hash = CDBHelper::getHash('SELECT * FROM widget_field WHERE widgetid='.zbx_dbstr($widgetid)
+		$old_hash = CDBHelper::getHash('SELECT * FROM widget_field WHERE widgetid='.zbx_dbstr(self::$update_widgetid)
 				.' ORDER BY widget_fieldid');
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$updateid);
@@ -1015,7 +1043,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$this->page->waitUntilReady();
 
 		// Hash after simple update.
-		$new_hash = CDBHelper::getHash('SELECT * FROM widget_field WHERE widgetid='.zbx_dbstr($widgetid)
+		$new_hash = CDBHelper::getHash('SELECT * FROM widget_field WHERE widgetid='.zbx_dbstr(self::$update_widgetid)
 				.' ORDER BY widget_fieldid');
 
 		// Compare old hash and new one.
@@ -1024,7 +1052,148 @@ class testDashboardTopHostsWidget extends CWebTest {
 
 	public static function getUpdateTopHostsData() {
 		return [
-			// #0 update all main fields.
+			// #0 incorrecct threshold color.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Thresholds' => [
+								[
+									'value' => '100',
+									'color' => '#$@#$@'
+								]
+							]
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/thresholds/1/color": a hexadecimal color code (6 symbols) is expected.'
+					]
+				]
+			],
+			// #1 incorrecct threshold value.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Thresholds' => [
+								[
+									'value' => '     '
+								]
+							]
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/thresholds/1/threshold": a number is expected.'
+					]
+				]
+			],
+			// #2 error message when update Host count incorrectly.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [
+						'Host count' => '0'
+					],
+					'main_error' => [
+						'Invalid parameter "Host count": value must be one of 1-100.'
+					]
+				]
+			],
+			// #3 error message when there is no item column.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [],
+					'column_fields' => [
+						[
+							'Data' => 'Host name'
+						],
+						[
+							'Data' => 'Host name'
+						]
+					],
+					'main_error' => [
+						'Invalid parameter "Order column": an integer is expected.'
+					]
+				]
+			],
+			// #4 time shift error in column.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Time shift' => 'zzz'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/timeshift": a time unit is expected.'
+					]
+				]
+			],
+			// #5 aggregation interval error in column.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Aggregation function' => 'max',
+							'Aggregation interval' => 'zzz'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/aggregate_interval": a time unit is expected.'
+					]
+				]
+			],
+			// #6 no item error in column.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => ''
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1": the parameter "item" is missing.'
+					]
+				]
+			],
+			// #7 incorrecct base color.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' =>  [],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Base color' => [
+								'id:lbl_base_color' => '#$%$@@'
+							]
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/base_color": a hexadecimal color code (6 symbols) is expected.'
+					]
+				]
+			],
+			// #8 update all main fields.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1039,7 +1208,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #1 update first item column to Text column and add some values.
+			// #9 update first item column to Text column and add some values.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1058,7 +1227,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #2 update first column to Host name column and add some values.
+			// #10 update first column to Host name column and add some values.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1076,7 +1245,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #3 update item column adding new values and fields.
+			// #11 update item column adding new values and fields.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1112,7 +1281,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						]
 					]
 				]
-			],
+			]
 		];
 	}
 
@@ -1120,6 +1289,11 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 * @dataProvider getUpdateTopHostsData
 	 */
 	public function testDashboardTopHostsWidget_Update($data) {
+		if ($data['expected'] === TEST_BAD) {
+			// Hash before update.
+			$old_hash = CDBHelper::getHash('SELECT * FROM widget_field WHERE widgetid='.zbx_dbstr(self::$update_widgetid)
+					.' ORDER BY widget_fieldid');
+		}
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$updateid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->getWidget(self::$updated_name)->edit();
@@ -1157,6 +1331,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 		}
 		else {
 			$dashboard->save();
+
+			// Hash after update.
+			$new_hash = CDBHelper::getHash('SELECT * FROM widget_field WHERE widgetid='.zbx_dbstr(self::$update_widgetid)
+					.' ORDER BY widget_fieldid');
+
+			// Compare old hash and new one.
+			$this->assertEquals($old_hash, $new_hash);
 		}
 	}
 
@@ -1169,10 +1350,10 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$this->page->waitUntilReady();
 		$dashboard->save();
 
-		// Check that Dashboard has been saved
+		// Check that Dashboard has been saved.
 		$this->checkDashboardUpdateMessage();
 
-		// Confirm that widget is not present on dashboard
+		// Confirm that widget is not present on dashboard.
 		$this->assertFalse($dashboard->getWidget($name, false)->isValid());
 
 		// Check that widget is removed from DB.
@@ -1218,7 +1399,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 				$form_header = $this->query('xpath://div[@class="overlay-dialogue modal modal-popup"]//h4')->one()->getText();
 				$this->assertEquals('Update column', $form_header);
 
-				// Check base color
+				// Check base color.
 				if (array_key_exists('Base color', $values)) {
 					foreach ($values['Base color'] as $selector => $color) {
 						$this->assertEquals('#'.$color, $this->query($selector)->one()->getAttribute('title'));
@@ -1331,6 +1512,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 			if (array_key_exists('column_error', $data)) {
 				$message = CMessageElement::find()->waitUntilVisible()->one();
 				$this->assertEquals($data['column_error'], $message->getLines()->asText());
+				$selector = ($action === 'update') ? 'Update column' : 'New column';
+				$column_form->query('xpath://div/h4[text()="'.$selector.'"]/../preceding-sibling::button[@title="Close"]')->one()->click();
 			}
 
 			sleep(1);
