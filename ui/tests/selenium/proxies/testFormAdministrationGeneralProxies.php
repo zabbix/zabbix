@@ -30,6 +30,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 class testFormAdministrationGeneralProxies extends CWebTest {
 
 	private $sql = 'SELECT * FROM hosts ORDER BY hostid';
+	private static $update_proxy = '_Active proxy for update';
 
 	use TableTrait;
 
@@ -570,13 +571,39 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		}
 	}
 
-	public function getCreateData() {
+//	public function getCreateData() {
+//		return [
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'proxy_fields' => [],
+//					'error' => 'Incorrect value for field "host": cannot be empty.'
+//				]
+//			],
+//			[
+//				[
+//					'proxy_fields' => [
+//						'Proxy name' => 'Minimal fields proxy 123'
+//					]
+//				]
+//			]
+//		];
+//	}
+
+	public function getProxyData() {
 		return [
 			[
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [],
 					'error' => 'Incorrect value for field "host": cannot be empty.'
+				]
+			],
+			[
+				[
+					'proxy_fields' => [
+						'Proxy name' => 'Minimal fields proxy 123'
+					]
 				]
 			],
 			[
@@ -595,51 +622,6 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 						'Proxy name' => ''
 					],
 					'error' => 'Incorrect value for field "host": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'proxy_fields' => [
-						'Proxy name' => 'Empty IP address',
-						'Proxy mode' => 'Passive',
-						'id:ip' => ''
-					],
-					'error' => 'Incorrect value for field "IP address": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'proxy_fields' => [
-						'Proxy name' => 'Empty port',
-						'Proxy mode' => 'Passive',
-						'id:port' => ''
-					],
-					'error' => 'Incorrect value for field "Port": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'proxy_fields' => [
-						'Proxy name' => 'Empty DNS',
-						'Proxy mode' => 'Passive',
-						'id:dns' => '',
-						'id:useip' => 'DNS'
-					],
-					'error' => 'Incorrect value for field "DNS name": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'proxy_fields' => [
-						'Proxy name' => 'Wrong IP',
-						'Proxy mode' => 'Passive',
-						'id:ip' => 'test'
-					],
-					'error' => 'Invalid parameter "/1/interface/ip": an IP address is expected.'
 				]
 			],
 			[
@@ -691,8 +673,68 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
-						'Proxy name' => 'Active empty PSK identity',
-						'Proxy mode' => 'Active',
+						'Proxy name' => 'Empty IP address',
+						'Proxy mode' => 'Passive',
+						'id:ip' => ''
+					],
+					'error' => 'Incorrect value for field "IP address": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Empty port',
+						'Proxy mode' => 'Passive',
+						'id:port' => ''
+					],
+					'error' => 'Incorrect value for field "Port": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Empty DNS',
+						'Proxy mode' => 'Passive',
+						'id:dns' => '',
+						'id:useip' => 'DNS'
+					],
+					'error' => 'Incorrect value for field "DNS name": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Wrong IP',
+						'Proxy mode' => 'Passive',
+						'id:ip' => 'test'
+					],
+					'error' => 'Invalid parameter "/1/interface/ip": an IP address is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Active empty Encryption',
+						'Proxy mode' => 'Active'
+					],
+					'encryption_fields' => [
+						'id:tls_accept_none' => false,
+						'id:tls_accept_psk' => false,
+						'id:tls_accept_certificate' => false,
+					],
+					'error' => 'Incorrect value for field "Connections from proxy": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Active empty PSK',
+						'Proxy mode' => 'Active'
 					],
 					'encryption_fields' => [
 						'id:tls_accept_psk' => true,
@@ -706,7 +748,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
 						'Proxy name' => 'Active empty PSK identity',
-						'Proxy mode' => 'Active',
+						'Proxy mode' => 'Active'
 					],
 					'encryption_fields' => [
 						'id:tls_accept_psk' => true,
@@ -719,7 +761,8 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
-						'Proxy name' => 'Wrong PSK',
+						'Proxy name' => 'Wrong PSK Active',
+						'Proxy mode' => 'Active'
 					],
 					'encryption_fields' => [
 						'id:tls_accept_psk' => true,
@@ -734,6 +777,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
 						'Proxy name' => 'Short PSK',
+						'Proxy mode' => 'Active'
 					],
 					'encryption_fields' => [
 						'id:tls_accept_psk' => true,
@@ -747,7 +791,23 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
+						'Proxy name' => 'Long PSK',
+						'Proxy mode' => 'Active'
+					],
+					'encryption_fields' => [
+						'id:tls_accept_psk' => true,
+						'PSK identity' => 'test',
+						'PSK' => '41b4d07b27a8efdcc15d4742e03857eba377fe010853a1499b0522df1712828888888888888888888'
+					],
+					'error' => 'Invalid parameter "/1/tls_psk": an even number of hexadecimal characters is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
 						'Proxy name' => 'Short letters PSK',
+						'Proxy mode' => 'Active'
 					],
 					'encryption_fields' => [
 						'id:tls_accept_psk' => true,
@@ -762,6 +822,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
 						'Proxy name' => 'Wrong letters PSK',
+						'Proxy mode' => 'Active'
 					],
 					'encryption_fields' => [
 						'id:tls_accept_psk' => true,
@@ -774,32 +835,18 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 			[
 				[
 					'proxy_fields' => [
-						'Proxy name' => 'Minimal fields proxy 123'
+						'Proxy name' => 'All fields Passive proxy No encryption',
+						'Proxy mode' => 'Passive'
+					],
+					'encryption_fields' => [
+						'Connections to proxy' => 'No encryption',
 					]
 				]
 			],
 			[
 				[
 					'proxy_fields' => [
-						'Proxy name' => 'IPv6',
-						'Proxy mode' => 'Passive',
-						'id:ip' => '::1'
-					]
-				]
-			],
-			[
-				[
-					'proxy_fields' => [
-						'Proxy name' => 'IPv6 _2',
-						'Proxy mode' => 'Passive',
-						'id:ip' => 'fe80::1ff:fe23:4567:890a'
-					]
-				]
-			],
-			[
-				[
-					'proxy_fields' => [
-						'Proxy name' => '-All fields Active proxy',
+						'Proxy name' => '-All fields Active proxy 123',
 						'Proxy mode' => 'Active',
 						'Proxy address' => '120.9.9.9',
 						'Description' => "~`!@#$%^&*()_+-=”№;:?Х[]{}|\\|//"
@@ -818,10 +865,22 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 			[
 				[
 					'proxy_fields' => [
+						'Proxy name' => 'IPv6',
+						'Proxy mode' => 'Passive',
+						'id:ip' => '::1',
+						'id:useip' => 'IP'
+					]
+				]
+			],
+			[
+				[
+					'proxy_fields' => [
 						'Proxy name' => 'Utf8 mb4',
+						'Proxy mode' => 'Active',
 						'Description' => '😊️❤️❤️😉'
 					],
 					'encryption_fields' => [
+						'id:tls_accept_none' => false,
 						'id:tls_accept_psk' => true,
 						'id:tls_accept_certificate' => true,
 						'PSK identity' => '🙂🙂🙂😀😀😀',
@@ -850,24 +909,9 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 			[
 				[
 					'proxy_fields' => [
-						'Proxy name' => 'All fields Passive proxy Certificate',
-						'Proxy mode' => 'Passive',
-						'id:ip' => '192.168.3.99',
-						'id:dns' => 'mytesthost',
-						'id:useip' => 'IP',
-					],
-					'encryption_fields' => [
-						'Connections to proxy' => 'Certificate',
-						'Issuer' => 'test',
-						'Subject' => '💫test'
-					]
-				]
-			],
-			[
-				[
-					'proxy_fields' => [
 						'Proxy name' => '      Selenium test proxy with spaces    ',
-						'Description' => '       Test description with trailling spaces        '
+						'Description' => '       Test description with trailling spaces        ',
+						'Proxy mode' => 'Active',
 					],
 					'encryption_fields' => [
 						'id:tls_accept_certificate' => true,
@@ -880,7 +924,18 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 			[
 				[
 					'proxy_fields' => [
+						'Proxy name' => 'IPv6 _2',
+						'Proxy mode' => 'Passive',
+						'id:ip' => 'fe80::1ff:fe23:4567:890a',
+						'id:useip' => 'IP'
+					]
+				]
+			],
+			[
+				[
+					'proxy_fields' => [
 						'Proxy name' => 'Proxy with multiline description',
+						'Proxy mode' => 'Active',
 						'Description' => "Test multiline description".
 							"\n".
 							"next line ~`!@#$%^&*()_+-=”№;:?Х[]{}|\\|//"
@@ -924,6 +979,22 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 			[
 				[
 					'proxy_fields' => [
+						'Proxy name' => 'All fields Passive proxy Certificate',
+						'Proxy mode' => 'Passive',
+						'id:ip' => '192.168.3.99',
+						'id:dns' => 'mytesthost',
+						'id:useip' => 'IP',
+					],
+					'encryption_fields' => [
+						'Connections to proxy' => 'Certificate',
+						'Issuer' => 'test',
+						'Subject' => '💫test'
+					]
+				]
+			],
+			[
+				[
+					'proxy_fields' => [
 						'Proxy name' => 'Special symbos in encryption fields',
 						'Proxy mode' => 'Active'
 					],
@@ -942,15 +1013,38 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getCreateData
+	 * dataProvider getCreateData
+	 * @dataProvider getProxyData
+	 *
+	 * @backupOnce hosts
 	 */
 	public function testFormAdministrationGeneralProxies_Create($data) {
+		$this->checkForm($data);
+	}
+
+	/**
+	 * @dataProvider getUpdateData
+	 *
+	 * @backupOnce hosts
+	 */
+	public function testFormAdministrationGeneralProxies_Update($data) {
+		$this->checkForm($data, true);
+	}
+
+	private function checkForm($data, $update = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash($this->sql);
 		}
 
 		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
-		$this->query('button:Create proxy')->one()->waitUntilClickable()->click();
+
+		if ($update) {
+			$this->query('link', self::$update_proxy)->one()->waitUntilClickable()->click();
+		}
+		else {
+			$this->query('button:Create proxy')->one()->waitUntilClickable()->click();
+		}
+
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $this->query('id:proxy-form')->asForm()->one();
 		$form->fill($data['proxy_fields']);
@@ -958,7 +1052,23 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		if (CTestArrayHelper::get($data, 'encryption_fields')) {
 			$form->selectTab('Encryption');
 			$form->invalidate();
+
+			// Fill PSK to get 'Change PSK' button enabled.
+			if (CTestArrayHelper::get($data, 'encryption_fields.Connections to proxy') === 'PSK') {
+				$form->fill(['Connections to proxy' => 'PSK']);
+			}
+
+			$button = $form->query('button:Change PSK')->one(false);
+			if ($update && $button->isEnabled()) {
+				$button->click();
+			}
+
 			$form->fill($data['encryption_fields']);
+
+//			if ($update && $form->getField('Connections to proxy')->getText() !== 'PSK' &&
+//					$form->getField('id:tls_accept_psk')->isChecked()) {
+//				$this->assertFalse($button->isEnabled());
+//			}
 		}
 
 		$form->submit();
@@ -973,7 +1083,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		}
 		else {
 			$dialog->ensureNotPresent();
-			$this->assertMessage(TEST_GOOD, 'Proxy created');
+			$this->assertMessage(TEST_GOOD, $update ? 'Proxy updated' : 'Proxy created');
 
 			// Remove leading and trailing spaces from data for assertion.
 			if (CTestArrayHelper::get($data, 'trim', false)) {
@@ -997,10 +1107,8 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 			if (CTestArrayHelper::get($data, 'encryption_fields.PSK identity')) {
 				unset($data['encryption_fields']['PSK identity']);
 				unset($data['encryption_fields']['PSK']);
-			}
 
-			// Check change PSK button if PSK fields were filled.
-			if (CTestArrayHelper::get($data, 'encryption_fields.PSK identity')) {
+				// Check change PSK button if PSK fields were filled.
 				$form->selectTab('Encryption');
 				$form->query('button:Change PSK')->waitUntilClickable()->one()->click();
 
@@ -1014,6 +1122,10 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 
 			// Check DB.
 			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM hosts WHERE host='.zbx_dbstr($data['proxy_fields']['Proxy name'])));
+
+			if ($update) {
+				self::$update_proxy = $data['proxy_fields']['Proxy name'];
+			}
 		}
 	}
 }
