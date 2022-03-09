@@ -1214,4 +1214,77 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 		$dialog->close();
 	}
+
+	public function getCloneData() {
+		return [
+			[
+				[
+					'proxy' => self::$refresh_active_proxy,
+				]
+			],
+			[
+				[
+					'proxy' => self::$refresh_passive_proxy,
+					'passive' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCloneData
+	 */
+	public function testFormAdministrationGeneralProxies_Clone($data) {
+		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
+		$this->query('link', $data['proxy'])->one()->waitUntilClickable()->click();
+
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $this->query('id:proxy-form')->asForm()->one();
+		$original_fields = $form->getFields()->asValues();
+
+		// Get original passive proxy interface fields.
+		if (CTestArrayHelper::get($data, 'passive')) {
+			$original_fields = $this->getInterfaceValues($dialog, $original_fields);
+		}
+
+		$new_name = 'Cloned proxy '.microtime();
+
+		// Clone proxy.
+		$dialog->query('button:Clone')->waitUntilClickable()->one()->click();
+		$form->invalidate();
+		$form->fill(['Proxy name' => $new_name]);
+		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Proxy created');
+
+		// Check cloned proxy form fields.
+		$this->query('link', $new_name)->one()->waitUntilClickable()->click();
+		COverlayDialogElement::find()->one()->waitUntilReady();
+		$form->invalidate();
+		$original_fields['Proxy name'] = $new_name;
+		$cloned_fields = $form->getFields()->asValues();
+
+		// Get cloned passive proxy interface fields.
+		if (CTestArrayHelper::get($data, 'passive')) {
+			$cloned_fields = $this->getInterfaceValues($dialog, $cloned_fields);
+		}
+
+		$this->assertEquals($original_fields, $cloned_fields);
+		$dialog->close();
+	}
+
+	/**
+	 *
+	 * @param COverlayDialogElement    $dialog    proxy form overlay dialog
+	 * @param array                    $fields	  passive proxy interface fields
+	 *
+	 * @return array
+	 */
+	private function getInterfaceValues($dialog, $fields) {
+		foreach (['ip', 'dns', 'port'] as $id) {
+			$fields[$id] = $dialog->query('id', $id)->one()->getValue();
+		}
+		$fields['useip'] = $dialog->query('id:useip')->one()->asSegmentedRadio()->getValue();
+
+		return $fields;
+	}
 }
