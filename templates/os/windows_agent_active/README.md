@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 New official Windows template. Requires agent of Zabbix 4.4 and newer.
 
 
