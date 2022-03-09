@@ -22,7 +22,7 @@
 
 #include "sysinfo.h" //included for convenience
 #include "db.h"
-#include "comms.h"
+#include "zbxcomms.h"
 #include "memalloc.h"
 #include "zbxeval.h"
 

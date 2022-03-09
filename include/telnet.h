@@ -21,7 +21,7 @@
 #define ZABBIX_TELNET_H
 
 #include "module.h"
-#include "comms.h"
+#include "zbxcomms.h"
 
 #define WAIT_READ	0
 #define WAIT_WRITE	1

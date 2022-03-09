@@ -29,7 +29,7 @@
 #endif
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
-#include "comms.h"
+#include "zbxcomms.h"
 #include "log.h"
 
 #define SSH_RUN_KEY	"ssh.run"

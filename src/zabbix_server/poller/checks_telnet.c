@@ -20,7 +20,7 @@
 #include "checks_telnet.h"
 
 #include "telnet.h"
-#include "comms.h"
+#include "zbxcomms.h"
 #include "log.h"
 
 #define TELNET_RUN_KEY	"telnet.run"

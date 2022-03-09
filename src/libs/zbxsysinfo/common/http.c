@@ -22,7 +22,7 @@
 #include "common.h"
 #include "zbxregexp.h"
 #include "zbxhttp.h"
-#include "comms.h"
+#include "zbxcomms.h"
 
 extern int	CONFIG_TIMEOUT;
 

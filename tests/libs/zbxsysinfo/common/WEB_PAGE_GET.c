@@ -21,7 +21,7 @@
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
 
-#include "comms.h"
+#include "zbxcomms.h"
 #include "sysinfo.h"
 #include "../../../../src/libs/zbxsysinfo/common/http.h"
 

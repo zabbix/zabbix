@@ -23,6 +23,7 @@
 #include "log.h"
 #include "proxy.h"
 #include "zbxrtc.h"
+#include "zbxcommshigh.h"
 
 #include "zbxcompress.h"
 

@@ -23,6 +23,7 @@
 #include "zbxserver.h"
 #include "../poller/poller.h"
 #include "zbxtasks.h"
+#include "zbxcommshigh.h"
 #ifdef HAVE_OPENIPMI
 #include "../ipmi/ipmi.h"
 #endif

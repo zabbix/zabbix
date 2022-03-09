@@ -26,7 +26,7 @@
 #include <net-snmp/net-snmp-includes.h>
 
 #include "log.h"
-#include "comms.h"
+#include "zbxcomms.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
 

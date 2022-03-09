@@ -20,7 +20,7 @@
 #include "zabbix_sender.h"
 
 #include "zbxjson.h"
-#include "comms.h"
+#include "zbxcomms.h"
 #include "cfg.h"
 
 const char	*progname = NULL;

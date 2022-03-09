@@ -20,7 +20,7 @@
 #ifndef ZABBIX_NODECOMMAND_H
 #define ZABBIX_NODECOMMAND_H
 
-#include "comms.h"
+#include "zbxcomms.h"
 #include "zbxjson.h"
 
 extern int	CONFIG_TIMEOUT;

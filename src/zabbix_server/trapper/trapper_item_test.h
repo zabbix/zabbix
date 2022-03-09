@@ -20,7 +20,7 @@
 #ifndef ZABBIX_TRAPPER_ITEM_TEST_H
 #define ZABBIX_TRAPPER_ITEM_TEST_H
 
-#include "comms.h"
+#include "zbxcomms.h"
 #include "zbxjson.h"
 
 void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp);

@@ -20,7 +20,7 @@
 #ifndef ZABBIX_TRAPPER_PREPROC_H
 #define ZABBIX_TRAPPER_PREPROC_H
 
-#include "comms.h"
+#include "zbxcomms.h"
 #include "zbxjson.h"
 
 int	zbx_trapper_preproc_test(zbx_socket_t *sock, const struct zbx_json_parse *jp);

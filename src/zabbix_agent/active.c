@@ -23,7 +23,8 @@
 #include "log.h"
 #include "sysinfo.h"
 #include "logfiles/logfiles.h"
-#include "comms.h"
+#include "zbxcomms.h"
+#include "zbxcommshigh.h"
 #include "threads.h"
 #include "zbxjson.h"
 #include "alias.h"
@@ -526,7 +527,7 @@ out:
  *             proto  - configuration parameter prototype                        *
  *                                                                               *
  ********************************************************************************/
-static void process_config_item(struct zbx_json *json, char *config, size_t length, const char *proto)
+static void	process_config_item(struct zbx_json *json, char *config, size_t length, const char *proto)
 {
 	char		**value;
 	AGENT_RESULT	result;

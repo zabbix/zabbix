@@ -18,7 +18,8 @@
 **/
 
 #include "threads.h"
-#include "comms.h"
+#include "zbxcomms.h"
+#include "zbxcommshigh.h"
 #include "cfg.h"
 #include "log.h"
 #include "zbxgetopt.h"
