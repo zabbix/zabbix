@@ -7,7 +7,7 @@ This guide describes how to integrate your Zabbix 6.2 installation with Redmine 
 ## Requirements
 
 - Redmine with enabled REST API and Authentication
-- Zabbix version 6.0 or higher
+- Zabbix version 6.2 or higher
 
 ## Setting up a Redmine
 

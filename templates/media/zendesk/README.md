@@ -12,7 +12,7 @@ The {ALERT.MESSAGE} macro is used to fill in the ticket body for all actions.
 The {EVENT.NAME} macro is used as a subject of a ticket for trigger-based events, the {ALERT.SUBJECT} macro is used for non trigger-based events.  
 
 # Requirements
-Zendesk webhook integration works with Zabbix version 5.0 or higher.
+Zendesk webhook integration works with Zabbix version 6.2 or higher.
 # Support
 * If you need help, use [forum](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/) 
 * If you have encountered a bug, please report it using [Zabbix Jira bug tracker](https://support.zabbix.com/).

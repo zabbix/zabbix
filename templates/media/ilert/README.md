@@ -97,4 +97,4 @@ For more information use the [Zabbix](https://www.zabbix.com/documentation/6.2/m
 ## Supported Versions
 
 ​
-Zabbix >=4.4, iLert API v1.
+Zabbix >=6.2, iLert API v1.

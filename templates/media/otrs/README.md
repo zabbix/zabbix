@@ -7,7 +7,7 @@ This guide describes how to integrate your Zabbix 6.2 installation with OTRS usi
 ## Requirements
 
 - OTRS version 6
-- Zabbix version 5.0 or higher
+- Zabbix version 6.2 or higher
 
 ## Setting up a OTRS
 

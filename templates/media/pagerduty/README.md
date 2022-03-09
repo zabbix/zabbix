@@ -10,7 +10,7 @@
 * ***Once the trigger is resolved, a resolving event will be sent to the PagerDuty service to resolve the alert and associated incident on that service.***
 # Requirements
 1. PagerDuty integrations with Zabbix require Events API v2 key. If you do not have permission to create Event API v2 key, please reach out to an Admin or Account Owner within your organization to help you configure the integration.
-2. PagerDuty webhook integration works with Zabbix version 6.0 or higher.
+2. PagerDuty webhook integration works with Zabbix version 6.2 or higher.
 # Support
 * If you need help use [forum](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/393216-discussion-thread-for-official-integration-with-pagerduty) 
 * If you have encountered a bug, please report it using [Zabbix Jira bug tracker](https://support.zabbix.com/).
