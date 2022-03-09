@@ -197,6 +197,12 @@ window.proxy_edit_popup = new class {
 	}
 
 	post(url, data, event_name) {
+		for (const el of this.form.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+
 		return fetch(new Curl(url).getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
