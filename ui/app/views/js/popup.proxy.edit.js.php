@@ -197,9 +197,9 @@ window.proxy_edit_popup = new class {
 	}
 
 	post(url, data, event_name) {
-		for (const el of this.form.parentNode.children) {
-			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
-				el.parentNode.removeChild(el);
+		for (const element of this.form.parentNode.children) {
+			if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+				element.parentNode.removeChild(element);
 			}
 		}
 
