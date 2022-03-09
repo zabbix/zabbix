@@ -239,6 +239,7 @@ static int	DBpatch_hosts_groups2template_group_move()
 	}
 
 	zbx_vector_uint64_destroy(&del_ids);
+
 	return ret;
 }
 
@@ -324,6 +325,7 @@ static int	DBpatch_hstgrp_del()
 		ret = SUCCEED;
 
 	zbx_vector_uint64_destroy(&del_ids);
+
 	return ret;
 }
 
