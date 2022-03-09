@@ -1,3 +1,4 @@
+//go:build linux || (windows && amd64)
 // +build linux windows,amd64
 
 /*
