@@ -21,6 +21,10 @@
 
 class CControllerTemplateGroupUpdate extends CController {
 
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'groupid' => 			'fatal|required|db tplgrp.groupid',
@@ -72,22 +76,18 @@ class CControllerTemplateGroupUpdate extends CController {
 		$result = DBend($result);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'templategroup.list')
-				->setArgument('page', CPagerHelper::loadPage('templategroup.list', null))
-			);
-			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_('Template group updated'));
+			$output = ['title' => _('Template group updated')];
+
+			if ($messages = CMessageHelper::getMessages()) {
+				$output['messages'] = array_column($messages, 'message');
+			}
 		}
 		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'templategroup.edit')
-				->setArgument('groupid', $groupid)
-			);
-			$response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot update template group'));
+			$output = [
+				'errors' => makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())->toString()
+			];
 		}
-		$this->setResponse($response);
+		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
 	}
 }
 

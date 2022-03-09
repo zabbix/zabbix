@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerTemplateGroupEdit extends CController{
+class CControllerPopupTemplateGroupEdit extends CController{
 
 	protected function init(): void {
 		$this->disableSIDValidation();
@@ -34,7 +34,11 @@ class CControllerTemplateGroupEdit extends CController{
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				(new CControllerResponseData([
+					'main_block' => json_encode(['errors' => getMessages()->toString()])
+				]))->disableView()
+			);
 		}
 
 		return $ret;
@@ -59,7 +63,7 @@ class CControllerTemplateGroupEdit extends CController{
 	protected function doAction(): void {
 		$data = [
 			'sid' => $this->getUserSID(),
-			'groupid' => 0,
+			'groupid' => null,
 			'name' => '',
 			'subgroups' => 0
 		];
@@ -80,9 +84,8 @@ class CControllerTemplateGroupEdit extends CController{
 			$data['name'] = getRequest('name');
 		}
 
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Configuration of template groups'));
-		$this->setResponse($response);
+		$data['user'] = ['debug_mode' => $this->getDebugMode()];
+
+		$this->setResponse(new CControllerResponseData($data));
 	}
 }
-

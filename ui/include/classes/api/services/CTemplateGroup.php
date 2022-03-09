@@ -519,7 +519,7 @@ class CTemplateGroup extends CApiService {
 		}
 
 		$db_groups = $this->get([
-			'output' => ['groupid', 'name', 'internal'],
+			'output' => ['groupid', 'name'],
 			'groupids' => $groupids,
 			'editable' => true,
 			'preservekeys' => true

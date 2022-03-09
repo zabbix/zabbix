@@ -28,14 +28,14 @@ if ($data['uncheck']) {
 	uncheckTableRows('templategroup');
 }
 
+$this->includeJsFile('configuration.templategroup.list.js.php');
+
 $widget = (new CWidget())
 	->setTitle(_('Template groups'))
 	->setControls((new CTag('nav', true, (new CList())
 		->addItem(CWebUser::getType() == USER_TYPE_SUPER_ADMIN
-			? new CRedirectButton(_('Create template group'), (new CUrl('zabbix.php'))
-				->setArgument('action', 'templategroup.edit')
-				->getUrl()
-			)
+			? (new CSimpleButton(_('Create template group')))
+				->addClass('js-create-templategroup')
 			: (new CSubmit('form', _('Create template group').' '._('(Only super admins can create groups)')))
 				->setEnabled(false)
 		)
@@ -116,10 +116,9 @@ foreach ($this->data['groups'] as $group) {
 	// name
 	$name = [];
 
-	$name[] = (new CLink($group['name'], (new CUrl('zabbix.php'))
-		->setArgument('action', 'templategroup.edit')
-		->setArgument('groupid', $group['groupid'])
-	));
+	$name[] = (new CLink($group['name']))
+		->addClass('js-edit-templategroup')
+		->setAttribute('data-groupid', $group['groupid']);
 
 	if ($templateCount > 0) {
 		$count = new CLink($templateCount, (new CUrl('templates.php'))
@@ -147,13 +146,27 @@ $form->addItem([
 	$table,
 	$this->data['paging'],
 	new CActionButtonList('action', 'groupids', [
-		'templategroup.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected template groups?'), 'templategroup']
-	])
+		'templategroup.massdelete' => [
+			'content' => (new CSimpleButton(_('Delete')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdelete-templategroup')
+				->addClass('no-chkbxrange')
+		]
+	], 'templategroup')
 ]);
 
 // append filter and form to widget
 $widget
 	->addItem($filter)
 	->addItem($form);
-
 $widget->show();
+
+(new CScriptTag('view.init('.json_encode([
+		'delete_url' => (new CUrl('zabbix.php'))
+			->setArgument('action', 'templategroup.delete')
+			->setArgumentSID()
+			->getUrl()
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

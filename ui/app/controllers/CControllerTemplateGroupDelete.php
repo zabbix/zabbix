@@ -21,6 +21,10 @@
 
 class CControllerTemplateGroupDelete extends CController {
 
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'groupids' => 'required|array_db tplgrp.groupid'
@@ -46,19 +50,36 @@ class CControllerTemplateGroupDelete extends CController {
 
 		$deleted = count($groupids);
 
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'templategroup.list')
-			->setArgument('page', CPagerHelper::loadPage('templategroup.list', null))
-		);
-
 		if ($result) {
-			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_n('Template group deleted', 'Template groups deleted', $deleted));
+			$output['success']['title'] = _n(
+				'Template group deleted',
+				'Template groups deleted',
+				$deleted
+			);
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
 		}
 		else {
-			CMessageHelper::setErrorTitle(_n('Cannot delete template group', 'Cannot delete template group', $deleted));
+			$groups = API::TemplateGroup()->get([
+				'output' => ['groupid'],
+				'groupids' => $groupids,
+				'editable' => true,
+				'preservekeys' => true
+			]);
+
+			$output['error'] = [
+				'title' => _n(
+					'Cannot delete template group',
+					'Cannot delete template groups',
+					$deleted
+				),
+				'messages' => array_column(get_and_clear_messages(), 'message'),
+				'keepids' => array_keys($groups)
+			];
 		}
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }
 
