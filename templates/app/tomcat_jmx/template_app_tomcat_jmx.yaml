@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:02:46Z'
+  date: '2022-03-01T13:07:23Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -123,14 +123,14 @@ zabbix_export:
             conditions:
               -
                 macro: '{#JMXNAME}'
-                value: '{$TOMCAT.LLD.FILTER.MATCHES:"GlobalRequesProcessor"}'
+                value: '{$TOMCAT.LLD.FILTER.MATCHES:"GlobalRequestProcessor"}'
                 formulaid: A
               -
                 macro: '{#JMXNAME}'
-                value: '{$TOMCAT.LLD.FILTER.NOT_MATCHES:"GlobalRequesProcessor"}'
+                value: '{$TOMCAT.LLD.FILTER.NOT_MATCHES:"GlobalRequestProcessor"}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovery for GlobalRequesProcessor'
+          description: 'Discovery for GlobalRequestProcessor'
           item_prototypes:
             -
               uuid: d7cb07f3f5e04792850332c416284dd9

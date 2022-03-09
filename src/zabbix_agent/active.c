@@ -17,10 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "zbxconf.h"
+#include "active.h"
 
-#include "cfg.h"
+#include "zbxconf.h"
 #include "log.h"
 #include "sysinfo.h"
 #include "logfiles/logfiles.h"
@@ -28,10 +27,7 @@
 #include "threads.h"
 #include "zbxjson.h"
 #include "alias.h"
-#include "metrics.h"
 #include "zbxregexp.h"
-
-#include "active.h"
 
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

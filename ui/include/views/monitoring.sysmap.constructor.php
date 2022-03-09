@@ -89,6 +89,7 @@ zbx_add_post_js('ZABBIX.apps.map.run("'.ZBX_STYLE_MAP_AREA.'", '.json_encode([
 
 (new CWidget())
 	->setTitle(_('Network maps'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_SYSMAP_CONSTRUCTOR))
 	->setNavigation($menu)
 	->addItem(
 		(new CDiv(

@@ -20,10 +20,8 @@
 #ifndef ZABBIX_PREPROC_H
 #define ZABBIX_PREPROC_H
 
-#include "common.h"
 #include "module.h"
 #include "dbcache.h"
-#include "zbxvariant.h"
 
 /* preprocessing step execution result */
 typedef struct

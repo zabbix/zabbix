@@ -19,7 +19,6 @@
 
 #include "dbsync.h"
 
-#include "zbxtypes.h"
 #include "log.h"
 #include "dbcache.h"
 #include "zbxserialize.h"
@@ -1814,7 +1813,7 @@ static char	**dbsync_item_preproc_row(char **row)
 		zbx_eval_context_t	ctx;
 		char			*error = NULL;
 
-		if (FAIL == zbx_eval_parse_expression(&ctx, row[11], ZBX_EVAL_PARSE_CALC_EXPRESSSION, &error))
+		if (FAIL == zbx_eval_parse_expression(&ctx, row[11], ZBX_EVAL_PARSE_CALC_EXPRESSION, &error))
 		{
 			zbx_eval_set_exception(&ctx, zbx_dsprintf(NULL, "Cannot parse formula: %s", error));
 			zbx_free(error);

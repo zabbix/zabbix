@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-25 19:55+0200\n"
+"POT-Creation-Date: 2022-03-07 15:19+0200\n"
 "PO-Revision-Date: 2016-05-11 02:08+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -11007,7 +11007,7 @@ msgstr "进行数据收集的维护"
 msgid "Maintenance without data collection"
 msgstr "不进行数据收集的维护"
 
-#: include/html.inc.php:980
+#: include/html.inc.php:978
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "维护：%1$s"
@@ -12898,7 +12898,7 @@ msgstr "OEM"
 #: include/classes/helpers/CSeverityHelper.php:34
 #: include/classes/screens/CScreenHttpTestDetails.php:100
 #: include/classes/screens/CScreenHttpTestDetails.php:186
-#: include/classes/screens/CScreenHttpTest.php:140 include/maps.inc.php:422
+#: include/classes/screens/CScreenHttpTest.php:142 include/maps.inc.php:422
 #: include/triggers.inc.php:72
 msgid "OK"
 msgstr "正常"
@@ -16656,7 +16656,7 @@ msgstr ""
 msgid "Step"
 msgstr "步骤"
 
-#: include/classes/screens/CScreenHttpTest.php:129
+#: include/classes/screens/CScreenHttpTest.php:131
 #: include/views/configuration.httpconf.list.php:168
 #, c-format
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
@@ -16811,7 +16811,7 @@ msgstr ""
 msgid "Supported macros:"
 msgstr ""
 
-#: include/html.inc.php:975
+#: include/html.inc.php:973
 #, c-format
 msgid "Suppressed till: %1$s"
 msgstr "制止到：%1$s"
@@ -18274,7 +18274,7 @@ msgstr "未知的操作"
 #: include/classes/helpers/CElasticsearchHelper.php:193
 #: include/classes/screens/CScreenHttpTestDetails.php:110
 #: include/classes/screens/CScreenHttpTestDetails.php:182
-#: include/classes/screens/CScreenHttpTest.php:126
+#: include/classes/screens/CScreenHttpTest.php:128
 #: include/views/configuration.httpconf.list.php:172
 msgid "Unknown error"
 msgstr "未知错误"
@@ -18298,7 +18298,7 @@ msgstr "未知的接口类型."
 msgid "Unknown resource"
 msgstr "未知的资源"
 
-#: include/classes/screens/CScreenHttpTest.php:134
+#: include/classes/screens/CScreenHttpTest.php:136
 #: include/views/configuration.httpconf.list.php:174
 #, c-format
 msgid "Unknown step failed: %1$s"
@@ -19576,7 +19576,7 @@ msgstr ""
 msgid "Width"
 msgstr "宽"
 
-#: app/controllers/CControllerLatest.php:530
+#: app/controllers/CControllerLatest.php:529
 msgid "With data"
 msgstr ""
 
@@ -19607,7 +19607,7 @@ msgstr "异常设备"
 msgid "With triggers"
 msgstr "有触发器"
 
-#: app/controllers/CControllerLatest.php:535
+#: app/controllers/CControllerLatest.php:534
 msgid "Without data"
 msgstr ""
 

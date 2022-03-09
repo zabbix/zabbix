@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 for BMC ATEN IPMI controllers of Supermicro servers
 https://www.supermicro.com/solutions/IPMI.cfm
 

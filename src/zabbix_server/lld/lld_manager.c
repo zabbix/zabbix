@@ -17,13 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "daemon.h"
+#include "lld_manager.h"
 
+#include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
 #include "zbxipcservice.h"
-#include "lld_manager.h"
 #include "lld_protocol.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

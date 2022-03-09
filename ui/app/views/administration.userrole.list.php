@@ -29,6 +29,7 @@ if ($data['uncheck']) {
 
 $widget = (new CWidget())
 	->setTitle(_('User roles'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_USERROLE_LIST))
 	->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(new CRedirectButton(_('Create user role'),

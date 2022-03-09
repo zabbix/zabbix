@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:47:39Z'
+  date: '2022-03-01T10:42:41Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -188,7 +188,7 @@ zabbix_export:
               expression: 'min(/Memcached by Zabbix agent 2/memcached.connections.queued.rate,5m)>{$MEMCACHED.CONN.QUEUED.MAX.WARN}'
               name: 'Memcached: Too many queued connections (over {$MEMCACHED.CONN.QUEUED.MAX.WARN} in 5m)'
               priority: WARNING
-              description: 'The max number of connections is reachedand and a new connection had to wait in the queue as a result.'
+              description: 'The max number of connections is reached and a new connection had to wait in the queue as a result.'
               tags:
                 -
                   tag: scope

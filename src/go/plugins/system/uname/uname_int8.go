@@ -1,3 +1,4 @@
+//go:build (linux && 386) || (linux && amd64) || (linux && arm64)
 // +build linux,386 linux,amd64 linux,arm64
 
 /*
@@ -32,4 +33,3 @@ func arrayToString(unameArray *[65]int8) string {
 	}
 	return string(byteString[:indexLength])
 }
-

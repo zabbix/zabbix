@@ -10,12 +10,12 @@
 * ***Once the trigger is resolved, a resolving event will be sent to the PagerDuty service to resolve the alert and associated incident on that service.***
 # Requirements
 1. PagerDuty integrations with Zabbix require Events API v2 key. If you do not have permission to create Event API v2 key, please reach out to an Admin or Account Owner within your organization to help you configure the integration.
-2. PagerDuty webhook integration works with Zabbix version 6.0 or higher.
+2. PagerDuty webhook integration works with Zabbix version 6.2 or higher.
 # Support
 * If you need help use [forum](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/393216-discussion-thread-for-official-integration-with-pagerduty) 
 * If you have encountered a bug, please report it using [Zabbix Jira bug tracker](https://support.zabbix.com/).
 # Description
-This guide describes how to integrate your Zabbix 6.0 installation with PagerDuty using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
+This guide describes how to integrate your Zabbix 6.2 installation with PagerDuty using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
 
 ## In PagerDuty
 
@@ -95,7 +95,7 @@ The configuration consists of a _media type_ in Zabbix, which will invoke webhoo
 
 [![](images/tn_10.png?raw=true)](images/10.png)
 
-* Please note, that in order to notify on problems with host this user must has at least read permissions for such host.
+* Please note, that in order to notify on problems with host this user must have at least read permissions for such host.
 
 5\. Click on the **Media** tab and, inside of the **Media** box, click the **Add** button.
 
@@ -114,8 +114,8 @@ The configuration consists of a _media type_ in Zabbix, which will invoke webhoo
 
 8\. Use the PagerDuty User in any Actions of your choice.
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/6.0/manual/config/notifications) and [PagerDuty](https://v2.developer.pagerduty.com/docs/send-an-event-events-api-v2) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/6.2/manual/config/notifications) and [PagerDuty](https://v2.developer.pagerduty.com/docs/send-an-event-events-api-v2) documentations.
 
 # Supported Versions
 
-Zabbix 6.0, PagerDuty Events API v2.
+Zabbix 6.2, PagerDuty Events API v2.
