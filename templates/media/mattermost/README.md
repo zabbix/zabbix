@@ -2,7 +2,7 @@
 # Mattermost webhook
 ![](images/logoHorizontal.png?raw=true)
 
-This guide describes how to integrate your Zabbix 4.4 installation with Mattermost using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
+This guide describes how to integrate your Zabbix 6.2 installation with Mattermost using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
 
 ## Setting up a Mattermost bot
 
@@ -85,4 +85,4 @@ For more information, use the [Zabbix](https://www.zabbix.com/documentation/6.2/
 
 ## Supported Versions
 
-Zabbix 4.4
+Zabbix 6.2
