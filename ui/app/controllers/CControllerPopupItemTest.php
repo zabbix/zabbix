@@ -929,7 +929,7 @@ abstract class CControllerPopupItemTest extends CController {
 					foreach ($token['data']['functionParams'] as $param) {
 						$expression[] = ',';
 						$string = strtr($param, $macros_posted) ? : $param;
-						$expression[] = CTriggerExpression::quoteString($string,false,true);
+						$expression[] = CTriggerExpression::quoteString(trim($string),false,true);
 					}
 
 					$expression[] = ')' ;
