@@ -62,7 +62,7 @@ class testPageLatestData extends CWebTest {
 		// Create host for items.
 		$hosts = CDataHelper::call('host.create', [
 			'host' => self::HOSTNAME,
-			'groups' => [['groupid' => self::$data['hostgroupid']]],
+			'groups' => [['groupid' => self::$data['hostgroupid']]]
 		]);
 		$this->assertArrayHasKey('hostids', $hosts);
 
@@ -606,7 +606,7 @@ class testPageLatestData extends CWebTest {
 		$this->assertTableData([
 				['Name' => 'Free swap space'],
 				['Name' => 'Free swap space in %'],
-				['Name' => 'Total swap space'],
+				['Name' => 'Total swap space']
 			], $this->getTableSelector()
 		);
 	}
