@@ -563,7 +563,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'main_fields' =>  [
-						'Name' => 'Different display and history data fields',
+						'Name' => 'Different display and history data fields'
 					],
 					'column_fields' => [
 						[
