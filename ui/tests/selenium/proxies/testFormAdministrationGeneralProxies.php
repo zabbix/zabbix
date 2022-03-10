@@ -69,7 +69,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 				'tls_psk' => '41b4d07b27a8efdcc15d4742e03857eba377fe010853a1499b0522df171282cb',
 				'tls_issuer' => 'activerefreshpsk',
 				'tls_subject' => 'activerefreshpsk',
-				'proxy_address' => '127.0.1.2',
+				'proxy_address' => '127.0.1.2'
 
 			],
 			[
@@ -767,7 +767,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 					'encryption_fields' => [
 						'id:tls_accept_none' => false,
 						'id:tls_accept_psk' => false,
-						'id:tls_accept_certificate' => false,
+						'id:tls_accept_certificate' => false
 					],
 					'error' => 'Incorrect value for field "Connections from proxy": cannot be empty.'
 				]
@@ -795,7 +795,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 					],
 					'encryption_fields' => [
 						'id:tls_accept_psk' => true,
-						'PSK' => '41b4d07b27a8efdcc15d4742e03857eba377fe010853a1499b0522df171282cb',
+						'PSK' => '41b4d07b27a8efdcc15d4742e03857eba377fe010853a1499b0522df171282cb'
 					],
 					'error' => 'Incorrect value for field "PSK identity": cannot be empty.'
 				]
@@ -882,7 +882,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 						'Proxy mode' => 'Passive'
 					],
 					'encryption_fields' => [
-						'Connections to proxy' => 'No encryption',
+						'Connections to proxy' => 'No encryption'
 					]
 				]
 			],
@@ -942,7 +942,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 						'id:ip' => '192.168.2.3',
 						'id:dns' => 'mytesthost',
 						'id:useip' => 'DNS',
-						'id:port' => 65535,
+						'id:port' => 65535
 					],
 					'encryption_fields' => [
 						'Connections to proxy' => 'PSK',
@@ -956,7 +956,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => '      Selenium test proxy with spaces    ',
 						'Description' => '       Test description with trailling spaces        ',
-						'Proxy mode' => 'Active',
+						'Proxy mode' => 'Active'
 					],
 					'encryption_fields' => [
 						'id:tls_accept_certificate' => true,
@@ -1029,7 +1029,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 						'Proxy mode' => 'Passive',
 						'id:ip' => '192.168.3.99',
 						'id:dns' => 'mytesthost',
-						'id:useip' => 'IP',
+						'id:useip' => 'IP'
 					],
 					'encryption_fields' => [
 						'Connections to proxy' => 'Certificate',
