@@ -33,10 +33,8 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 
 	private $sql = 'SELECT * FROM hosts ORDER BY hostid';
 	private static $update_proxy = 'Active proxy for update';
-	private static $refresh_active_proxy = 'Active proxy for refresh';
-	private static $refresh_passive_proxy = 'Passive proxy for refresh';
-	private static $delete_active_proxy = 'Active proxy for delete';
-	private static $delete_passive_proxy = 'Passive proxy for delete';
+	private static $change_active_proxy = 'Active proxy for refresh cancel simple update delete';
+	private static $change_passive_proxy = 'Passive proxy for refresh cancel simple update delete';
 
 	use TableTrait;
 
@@ -62,7 +60,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 				'tls_accept'=> 1
 			],
 			[
-				'host' => self::$refresh_active_proxy,
+				'host' => self::$change_active_proxy,
 				'status' => 5,
 				'description' => 'Active description for refresh',
 				'tls_connect' => 1,
@@ -75,7 +73,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 
 			],
 			[
-				'host' => self::$refresh_passive_proxy,
+				'host' => self::$change_passive_proxy,
 				'status' => 6,
 				'description' => '_Passive description for refresh',
 				'tls_connect' => 4,
@@ -88,35 +86,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 					'useip' => '0',
 					'port' => '220'
 				]
-			],
-			[
-				'host' => self::$delete_active_proxy,
-				'status' => 5,
-				'description' => 'Active description for delete',
-				'tls_connect' => 1,
-				'tls_accept'=> 7,
-				'tls_psk_identity' => 'activedeletepsk',
-				'tls_psk' => '41b4d07b27a8efdcc15d4742e03857eba377fe010853a1499b0522df171282cb',
-				'tls_issuer' => 'activedeletepsk',
-				'tls_subject' => 'activedeletepsk',
-				'proxy_address' => '127.0.1.2',
-
-			],
-			[
-				'host' => self::$delete_passive_proxy,
-				'status' => 6,
-				'description' => '_Passive description for delete',
-				'tls_connect' => 4,
-				'tls_accept'=> 1,
-				'tls_issuer' => 'passivedeletepsk',
-				'tls_subject' => 'passivedeletepsk',
-				'interface' => [
-					'ip' => '127.9.9.9',
-					'dns' => 'deletedns',
-					'useip' => '0',
-					'port' => '220'
-				]
-			],
+			]
 		]);
 	}
 
@@ -1101,8 +1071,6 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 
 	/**
 	 * @dataProvider getUpdateProxyData
-	 *
-	 * @backupOnce hosts
 	 */
 	public function testFormAdministrationGeneralProxies_Update($data) {
 		$this->checkForm($data, true);
@@ -1214,23 +1182,23 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		}
 	}
 
-	public function getRefreshData() {
+	public function getActivePassiveProxyData() {
 		return [
 			[
 				[
-					'proxy' => self::$refresh_active_proxy
+					'proxy' => self::$change_active_proxy
 				]
 			],
 			[
 				[
-					'proxy' => self::$refresh_passive_proxy
+					'proxy' => self::$change_passive_proxy
 				]
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider getRefreshData
+	 * @dataProvider getActivePassiveProxyData
 	 */
 	public function testFormAdministrationGeneralProxies_RefreshConfiguration($data) {
 		$old_hash = CDBHelper::getHash($this->sql);
@@ -1259,24 +1227,8 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		$dialog->close();
 	}
 
-	public function getCloneData() {
-		return [
-			[
-				[
-					'proxy' => self::$refresh_active_proxy
-				]
-			],
-			[
-				[
-					'proxy' => self::$refresh_passive_proxy,
-					'passive' => true
-				]
-			]
-		];
-	}
-
 	/**
-	 * @dataProvider getCloneData
+	 * @dataProvider getActivePassiveProxyData
 	 */
 	public function testFormAdministrationGeneralProxies_Clone($data) {
 		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
@@ -1287,7 +1239,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		$original_fields = $form->getFields()->asValues();
 
 		// Get original passive proxy interface fields.
-		if (CTestArrayHelper::get($data, 'passive')) {
+		if (strpos($data['proxy'], 'passive')) {
 			$original_fields = $this->getInterfaceValues($dialog, $original_fields);
 		}
 
@@ -1308,7 +1260,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		$cloned_fields = $form->getFields()->asValues();
 
 		// Get cloned passive proxy interface fields.
-		if (CTestArrayHelper::get($data, 'passive')) {
+		if (strpos($data['proxy'], 'passive')) {
 			$cloned_fields = $this->getInterfaceValues($dialog, $cloned_fields);
 		}
 
@@ -1332,48 +1284,32 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		return $fields;
 	}
 
-	public function getDeleteData() {
-		return [
-			[
-				[
-					'proxy' => self::$delete_active_proxy
-				]
-			],
-			[
-				[
-					'proxy' => self::$delete_passive_proxy
-				]
-			]
-		];
-	}
-
 	/**
-	 * @dataProvider getDeleteData
+	 * @dataProvider getActivePassiveProxyData
 	 */
-	public function testFormAdministrationGeneralProxies_Delete($data) {
+	public function testFormAdministrationGeneralProxies_SimpleUpdate($data) {
+		$old_hash = CDBHelper::getHash($this->sql);
 		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
 		$this->query('link', $data['proxy'])->one()->waitUntilClickable()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-		$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
-
-		// Check alert.
-		$this->assertTrue($this->page->isAlertPresent());
-		$this->assertEquals('Delete selected proxy?', $this->page->getAlertText());
-		$this->page->acceptAlert();
+		$dialog->query('button:Update')->waitUntilClickable()->one()->click();
 		$dialog->ensureNotPresent();
-		$this->assertMessage(TEST_GOOD, 'Proxy deleted');
 
-		// Check name disappeared from frontend table.
-		$this->assertFalse($this->query('link', $data['proxy'])->exists());
+		// Check that user remained on Proxies page.
+		$this->page->waitUntilReady();
+		$this->page->assertTitle('Configuration of proxies');
+		$this->page->assertHeader('Proxies');
+		$this->assertMessage(TEST_GOOD, 'Proxy updated');
+
+		// Check name remained in frontend table.
+		$this->assertTrue($this->query('link', $data['proxy'])->exists());
 
 		// Check DB.
-		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM hosts WHERE host='.zbx_dbstr($data['proxy'])));
-	}
+		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM hosts WHERE host='.zbx_dbstr($data['proxy'])));
 
-	public function testFormAdministrationGeneralProxies_SimpleUpdate() {
-		$this->checkTokenSimpleUpdate();
+		// Check that DB hash is not changed.
+		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
-
 
 	public function getCancelData() {
 		return [
@@ -1396,12 +1332,12 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 				[
 					'action' => 'Refresh configuration'
 				]
-			],
-			[
-				[
-					'action' => 'Clone'
-				]
 			]
+//			[
+//				[
+//					'action' => 'Clone'
+//				]
+//			]
 		];
 	}
 
@@ -1465,5 +1401,32 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 
 		// Check that DB hash is not changed.
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+	}
+
+	/**
+	 * @dataProvider getActivePassiveProxyData
+	 */
+	public function testFormAdministrationGeneralProxies_Delete($data) {
+		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
+		$this->query('link', $data['proxy'])->one()->waitUntilClickable()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
+
+		// Check alert.
+		$this->assertTrue($this->page->isAlertPresent());
+		$this->assertEquals('Delete selected proxy?', $this->page->getAlertText());
+		$this->page->acceptAlert();
+		$dialog->ensureNotPresent();
+		$this->assertMessage(TEST_GOOD, 'Proxy deleted');
+
+		// Check that user remained on Proxies page.
+		$this->page->assertTitle('Configuration of proxies');
+		$this->page->assertHeader('Proxies');
+
+		// Check name disappeared from frontend table.
+		$this->assertFalse($this->query('link', $data['proxy'])->exists());
+
+		// Check DB.
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM hosts WHERE host='.zbx_dbstr($data['proxy'])));
 	}
 }
