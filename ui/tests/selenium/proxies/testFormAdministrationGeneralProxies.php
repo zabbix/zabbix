@@ -479,9 +479,6 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 	 */
 	public function testFormAdministrationGeneralProxies_Layout($data) {
 		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
-		$this->page->assertTitle('Configuration of proxies');
-		$this->page->assertHeader('Proxies');
-
 		$this->query('button:Create proxy')->one()->waitUntilClickable()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->assertEquals('New proxy', $dialog->getTitle());
