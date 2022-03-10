@@ -28,10 +28,8 @@
 
 	class resourceInputManage {
 		constructor() {
-			this.action_elem = document.getElementById('action-select');
-			this.action_options = this.action_elem.getOptions();
+			this.action_options = document.getElementById('action_options').getElementsByTagName('input');
 			this.resource_elem = document.getElementById('resourcetype-select');
-
 			this
 				.resource_elem
 				.addEventListener('change', this.updateHandler.bind(this));
@@ -40,9 +38,6 @@
 		}
 
 		updateHandler(event) {
-			// Reset select to first element.
-			this.action_elem.selectedIndex = 0;
-
 			this.update(event.currentTarget.value);
 		}
 
@@ -64,7 +59,10 @@
 
 		disableOptionsByActions(actions) {
 			[...this.action_options].map((elem) => {
-				elem.disabled = !actions.includes(elem.value);
+				if (!actions.includes(elem.value)) {
+					elem.disabled = true;
+					elem.checked = false;
+				}
 			});
 		}
 

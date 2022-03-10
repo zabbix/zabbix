@@ -37,11 +37,17 @@ $select_filter_resourcetype = (new CSelect('filter_resourcetype'))
 	->setFocusableElementId('filter-resourcetype')
 	->addOptions(CSelect::createOptionsFromArray($data['resources']));
 
-$select_filter_action = (new CSelect('filter_action'))
-	->setId('action-select')
-	->setValue($data['auditlog_action'])
-	->setFocusableElementId('filter-action')
-	->addOptions(CSelect::createOptionsFromArray($data['actions']));
+$actions = (new CCheckBoxList('Actions'))
+	->addClass(ZBX_STYLE_COLUMNS)
+	->addClass(ZBX_STYLE_COLUMNS_3)
+	->setId('action_options');
+
+foreach ($data['actions'] as $value => $name) {
+	$actions->addItem((new CCheckBox("filter_actions[$value]", $value))
+		->setLabel($name)
+		->setChecked(in_array($value, $data['auditlog_actions']))
+	);
+}
 
 $filter_form = (new CFormList())
 	->addRow(new CLabel(_('Users'), 'filter_userids__ms'), [
@@ -67,12 +73,10 @@ $filter_form = (new CFormList())
 	->addRow(_('Resource ID'), (new CTextBox('filter_resourceid', $data['resourceid']))
 		->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
-	->addRow(new CLabel(_('Action'), $select_filter_action->getFocusableElementId()),
-		$select_filter_action
-	)
 	->addRow(_('Recordset ID'), (new CTextBox('filter_recordsetid', $data['recordsetid']))
 		->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-	);
+	)
+	->addRow(_('Actions'), $actions);
 
 $widget = (new CWidget())
 	->setTitle(_('Audit log'))
