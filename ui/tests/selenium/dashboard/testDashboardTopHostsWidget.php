@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__). '/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../traits/FilterTrait.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
@@ -27,6 +28,8 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  * @onBefore prepareDashboardPageData
  */
 class testDashboardTopHostsWidget extends CWebTest {
+
+	use FilterTrait;
 
 	/**
 	 * Id of dashboard by name.
@@ -447,7 +450,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #1 all fields filled for main form.
+			// #1 all fields filled for main form with all tags.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -458,6 +461,14 @@ class testDashboardTopHostsWidget extends CWebTest {
 						'Hosts' => 'ЗАББИКС Сервер',
 						'Order' => 'Bottom N',
 						'Host count' => '99'
+					],
+					'tags' => [
+						['name' => 'aaa1', 'value' => 'bbb1', 'operator' => 'Contains'],
+						['name' => 'aaa2', 'value' => 'bbb2', 'operator' => 'Equals'],
+						['name' => 'aaa3', 'operator' => 'Exists'],
+						['name' => 'aaa4', 'operator' => 'Does not exist'],
+						['name' => 'aaa5', 'value' => 'bbb5', 'operator' => 'Does not equal'],
+						['name' => 'aaa6', 'value' => 'bbb6', 'operator' => 'Does not contain']
 					],
 					'column_fields' => [
 						[
@@ -1113,9 +1124,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$this->columnCreateUpdate($data, 'create');
 		}
 
-		$form->fill($data['main_fields']);
-		COverlayDialogElement::find()->waitUntilReady()->one();
 
+		if (array_key_exists('tags', $data)) {
+			$this->setFilterSelector('id:tags_table_tags');
+			$this->setTags($data['tags']);
+		}
+
+		$form->fill($data['main_fields']);
 		$form->submit();
 
 		// Check error message in main widget form.
@@ -1424,8 +1439,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 		}
 
 		$form->fill($data['main_fields']);
-		COverlayDialogElement::find()->waitUntilReady()->one();
-
 		$form->submit();
 
 		// Check error message in main widget form.
@@ -1564,6 +1577,10 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->getWidget($header)->edit();
 		$form->checkValue($data['main_fields']);
+
+		if (array_key_exists('tags', $data)) {
+			$this->assertTags($data['tags']);
+		}
 
 		if (array_key_exists('column_fields', $data)) {
 			// Count column amount from data provider.
