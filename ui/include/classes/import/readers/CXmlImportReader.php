@@ -36,9 +36,10 @@ class CXmlImportReader extends CImportReader {
 		}
 
 		libxml_use_internal_errors(true);
-		libxml_set_external_entity_loader(function () {
-			return null;
-		});
+		if (PHP_VERSION_ID < 80000) {
+   			// Deprecated and disabled by default since PHP 8.0.
+  			libxml_disable_entity_loader();
+		}
 
 		$result = simplexml_load_string($string, null, LIBXML_IMPORT_FLAGS);
 		if (!$result) {
