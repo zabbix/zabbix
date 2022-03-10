@@ -204,7 +204,7 @@ zbx_json_to_xml_LDADD += @SERVER_LIBS@
 
 zbx_json_to_xml_LDFLAGS = @SERVER_LDFLAGS@
 
-zbx_json_to_xml_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_json_to_xml_CFLAGS = $(COMMON_COMPILER_FLAGS) @LIBXML2_CFLAGS@
 
 
 zbx_xml_to_json_SOURCES = \
@@ -218,7 +218,7 @@ zbx_xml_to_json_LDADD += @SERVER_LIBS@
 
 zbx_xml_to_json_LDFLAGS = @SERVER_LDFLAGS@
 
-zbx_xml_to_json_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_xml_to_json_CFLAGS = $(COMMON_COMPILER_FLAGS) @LIBXML2_CFLAGS@
 
 
 zbx_token_find_SOURCES = \

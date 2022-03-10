@@ -138,7 +138,6 @@ int	substitute_macros_xml_unmasked(char **data, const DC_ITEM *item, const struc
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
 int	substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
-int	xml_xpath_check(const char *xpath, char *error, size_t errlen);
 
 int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char **error);

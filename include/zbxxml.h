@@ -21,6 +21,12 @@
 #define ZABBIX_XML_H
 
 #include "config.h"
+#include "zbxtypes.h"
+#include "zbxalgo.h"
+
+#ifdef HAVE_LIBXML2
+#	include <libxml/tree.h>
+#endif
 
 int	zbx_xml_get_data_dyn(const char *xml, const char *tag, char **data);
 void	zbx_xml_free_data_dyn(char **data);
@@ -35,5 +41,17 @@ int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
 int	zbx_xmlnode_to_json(void *xml_node, char **jstr);
 int	zbx_xml_to_json(char *xml_data, char **jstr, char **errmsg);
 int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg);
+
+int	zbx_xml_xpath_check(const char *xpath, char *error, size_t errlen);
+
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+int	zbx_xml_read_values(xmlDoc *xdoc, const char *xpath, zbx_vector_str_t *values);
+int	zbx_xml_node_read_values(xmlDoc *xdoc, xmlNode *node, const char *xpath, zbx_vector_str_t *values);
+int	zbx_xml_try_read_value(const char *data, size_t len, const char *xpath, xmlDoc **xdoc, char **value,
+		char **error);
+int	zbx_xml_doc_read_num(xmlDoc *xdoc, const char *xpath, int *num);
+char	*zbx_xml_node_read_value(xmlDoc *doc, xmlNode *node, const char *xpath);
+char	*zbx_xml_doc_read_value(xmlDoc *xdoc, const char *xpath);
+#endif /* HAVE_LIBXML2 && HAVE_LIBCURL */
 
 #endif  /* ZABBIX_XML_H */

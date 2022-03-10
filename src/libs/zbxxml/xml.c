@@ -981,3 +981,364 @@ exit:
 	return ret;
 #endif /* HAVE_LIBXML2 */
 }
+
+#ifdef HAVE_LIBXML2
+
+typedef struct
+{
+	char	*buf;
+	size_t	len;
+}
+zbx_libxml_error_t;
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: libxml2 callback function for error handle                        *
+ *                                                                            *
+ * Parameters: user_data - [IN/OUT] the user context                          *
+ *             err       - [IN] the libxml2 error message                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	libxml_handle_error_xpath_check(void *user_data, xmlErrorPtr err)
+{
+	zbx_libxml_error_t	*err_ctx;
+
+	if (NULL == user_data)
+		return;
+
+	err_ctx = (zbx_libxml_error_t *)user_data;
+	zbx_strlcat(err_ctx->buf, err->message, err_ctx->len);
+
+	if (NULL != err->str1)
+		zbx_strlcat(err_ctx->buf, err->str1, err_ctx->len);
+
+	if (NULL != err->str2)
+		zbx_strlcat(err_ctx->buf, err->str2, err_ctx->len);
+
+	if (NULL != err->str3)
+		zbx_strlcat(err_ctx->buf, err->str3, err_ctx->len);
+}
+#endif
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate xpath string                                             *
+ *                                                                            *
+ * Parameters: xpath  - [IN] the xpath value                                  *
+ *             error  - [OUT] the error message buffer                        *
+ *             errlen - [IN] the size of error message buffer                 *
+ *                                                                            *
+ * Return value: SUCCEED - the xpath component was parsed successfully        *
+ *               FAIL    - xpath parsing error                                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_xml_xpath_check(const char *xpath, char *error, size_t errlen)
+{
+#ifndef HAVE_LIBXML2
+	ZBX_UNUSED(xpath);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(errlen);
+	return FAIL;
+#else
+	zbx_libxml_error_t	err;
+	xmlXPathContextPtr	ctx;
+	xmlXPathCompExprPtr	p;
+
+	err.buf = error;
+	err.len = errlen;
+
+	ctx = xmlXPathNewContext(NULL);
+	xmlSetStructuredErrorFunc(&err, &libxml_handle_error_xpath_check);
+
+	p = xmlXPathCtxtCompile(ctx, (xmlChar *)xpath);
+	xmlSetStructuredErrorFunc(NULL, NULL);
+
+	if (NULL == p)
+	{
+		xmlXPathFreeContext(ctx);
+		return FAIL;
+	}
+
+	xmlXPathFreeCompExpr(p);
+	xmlXPathFreeContext(ctx);
+
+	return SUCCEED;
+#endif
+}
+
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: populate array of values from an xml data                         *
+ *                                                                            *
+ * Parameters: xdoc   - [IN] XML document                                     *
+ *             xpath  - [IN] XML XPath                                        *
+ *             values - [OUT] list of requested values                        *
+ *                                                                            *
+ * Return: Upon successful completion the function return SUCCEED.            *
+ *         Otherwise, FAIL is returned.                                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_xml_read_values(xmlDoc *xdoc, const char *xpath, zbx_vector_str_t *values)
+{
+	return zbx_xml_node_read_values(xdoc, NULL, xpath, values);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: populate array of values from an xml data                         *
+ *                                                                            *
+ * Parameters: xdoc   - [IN] XML document                                     *
+ *             node   - [IN] the XML node                                     *
+ *             xpath  - [IN] XML XPath                                        *
+ *             values - [OUT] list of requested values                        *
+ *                                                                            *
+ * Return: Upon successful completion the function return SUCCEED.            *
+ *         Otherwise, FAIL is returned.                                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_xml_node_read_values(xmlDoc *xdoc, xmlNode *node, const char *xpath, zbx_vector_str_t *values)
+{
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+	xmlChar		*val;
+	int		i, ret = FAIL;
+
+	if (NULL == xdoc)
+		goto out;
+
+	xpathCtx = xmlXPathNewContext(xdoc);
+
+	if (NULL != node)
+		xpathCtx->node = node;
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
+		goto clean;
+
+	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+		goto clean;
+
+	nodeset = xpathObj->nodesetval;
+
+	for (i = 0; i < nodeset->nodeNr; i++)
+	{
+		if (NULL != (val = xmlNodeListGetString(xdoc, nodeset->nodeTab[i]->xmlChildrenNode, 1)))
+		{
+			zbx_vector_str_append(values, zbx_strdup(NULL, (const char *)val));
+			xmlFree(val);
+		}
+	}
+
+	ret = SUCCEED;
+clean:
+	xmlXPathFreeObject(xpathObj);
+	xmlXPathFreeContext(xpathCtx);
+out:
+	return ret;
+}
+
+/*
+ * XML support
+ */
+/******************************************************************************
+ *                                                                            *
+ * Purpose: libxml2 callback function for error handle                        *
+ *                                                                            *
+ * Parameters: user_data - [IN/OUT] the user context                          *
+ *             err       - [IN] the libxml2 error message                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	libxml_handle_error_try_read_value(void *user_data, xmlErrorPtr err)
+{
+	ZBX_UNUSED(user_data);
+	ZBX_UNUSED(err);
+}
+
+/* according to libxml2 changelog XML_PARSE_HUGE option was introduced in version 2.7.0 */
+#if 20700 <= LIBXML_VERSION	/* version 2.7.0 */
+#	define ZBX_XML_PARSE_OPTS	XML_PARSE_HUGE
+#else
+#	define ZBX_XML_PARSE_OPTS	0
+#endif
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve a value from xml data and return status of operation     *
+ *                                                                            *
+ * Parameters: data   - [IN] XML data                                         *
+ *             len    - [IN] XML data length (optional)                       *
+ *             xpath  - [IN] XML XPath                                        *
+ *             xdoc   - [OUT] parsed xml document                             *
+ *             value  - [OUT] selected xml node value                         *
+ *             error  - [OUT] error of xml or xpath formats                   *
+ *                                                                            *
+ * Return: SUCCEED - select xpath successfully, result stored in 'value'      *
+ *         FAIL - failed select xpath expression                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_xml_try_read_value(const char *data, size_t len, const char *xpath, xmlDoc **xdoc, char **value,
+		char **error)
+{
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+	xmlChar		*val;
+	int		ret = FAIL;
+
+	if (NULL == data)
+		goto out;
+
+	xmlSetStructuredErrorFunc(NULL, &libxml_handle_error_try_read_value);
+
+#define ZBX_NONAME_XML	"noname.xml"
+	if (NULL == (*xdoc = xmlReadMemory(data, (0 == len ? strlen(data) : len), ZBX_NONAME_XML, NULL,
+			ZBX_XML_PARSE_OPTS)))
+	{
+		if (NULL != error)
+			*error = zbx_dsprintf(*error, "Received response has no valid XML data.");
+
+		xmlSetStructuredErrorFunc(NULL, NULL);
+		goto out;
+	}
+#undef ZBX_NONAME_XML
+
+	xpathCtx = xmlXPathNewContext(*xdoc);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
+	{
+		if (NULL != error)
+			*error = zbx_dsprintf(*error, "Invalid xpath expression: \"%s\".", xpath);
+
+		goto clean;
+	}
+
+	ret = SUCCEED;
+
+	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+		goto clean;
+
+	nodeset = xpathObj->nodesetval;
+
+	if (NULL != (val = xmlNodeListGetString(*xdoc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
+	{
+		*value = zbx_strdup(*value, (const char *)val);
+		xmlFree(val);
+	}
+clean:
+	xmlXPathFreeObject(xpathObj);
+	xmlSetStructuredErrorFunc(NULL, NULL);
+	xmlXPathFreeContext(xpathCtx);
+	xmlResetLastError();
+out:
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieves numeric xpath value                                     *
+ *                                                                            *
+ * Parameters: xdoc  - [IN] xml document                                      *
+ *             xpath - [IN] xpath                                             *
+ *             num   - [OUT] numeric value                                    *
+ *                                                                            *
+ * Return value: SUCCEED - the count was retrieved successfully               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_xml_doc_read_num(xmlDoc *xdoc, const char *xpath, int *num)
+{
+	int		ret = FAIL;
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+
+	xpathCtx = xmlXPathNewContext(xdoc);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
+		goto out;
+
+	if (XPATH_NUMBER == xpathObj->type)
+	{
+		*num = (int)xpathObj->floatval;
+		ret = SUCCEED;
+	}
+
+	xmlXPathFreeObject(xpathObj);
+out:
+	xmlXPathFreeContext(xpathCtx);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve a value from xml data relative to the specified node     *
+ *                                                                            *
+ * Parameters: doc    - [IN] the XML document                                 *
+ *             node   - [IN] the XML node                                     *
+ *             xpath  - [IN] the XML XPath                                    *
+ *                                                                            *
+ * Return: The allocated value string or NULL if the xml data does not        *
+ *         contain the value specified by xpath.                              *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_xml_node_read_value(xmlDoc *doc, xmlNode *node, const char *xpath)
+{
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+	xmlChar		*val;
+	char		*value = NULL;
+
+	xpathCtx = xmlXPathNewContext(doc);
+
+	xpathCtx->node = node;
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
+		goto clean;
+
+	if (XPATH_STRING == xpathObj->type)
+	{
+		value = zbx_strdup(NULL, (const char *)xpathObj->stringval);
+		goto clean;
+	}
+
+	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+		goto clean;
+
+	nodeset = xpathObj->nodesetval;
+
+	if (NULL != (val = xmlNodeListGetString(doc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
+	{
+		value = zbx_strdup(NULL, (const char *)val);
+		xmlFree(val);
+	}
+clean:
+	xmlXPathFreeObject(xpathObj);
+	xmlXPathFreeContext(xpathCtx);
+
+	return value;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve a value from xml document relative to the root node      *
+ *                                                                            *
+ * Parameters: xdoc   - [IN] the XML document                                 *
+ *             xpath  - [IN] the XML XPath                                    *
+ *                                                                            *
+ * Return: The allocated value string or NULL if the xml data does not        *
+ *         contain the value specified by xpath.                              *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_xml_doc_read_value(xmlDoc *xdoc, const char *xpath)
+{
+	xmlNode	*root_element;
+
+	root_element = xmlDocGetRootElement(xdoc);
+
+	return zbx_xml_node_read_value(xdoc, root_element, xpath);
+}
+
+#endif // HAVE_LIBXML2 && HAVE_LIBCURL

@@ -19,3 +19,4 @@ libzbxembed_a_SOURCES = \
 	zabbix.c \
 	zabbix.h
 
+libzbxembed_a_CFLAGS = $(LIBXML2_CFLAGS)
