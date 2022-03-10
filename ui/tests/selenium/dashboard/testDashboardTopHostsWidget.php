@@ -1152,7 +1152,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 
 			// Check widget amount that it is added.
 			$this->assertEquals($old_widget_count + 1, $dashboard->getWidgets()->count());
-			$this->checkWidget($header, $data);
+			$this->checkWidget($header, $data, 'create');
 		}
 		else {
 			$dashboard->save();
@@ -1387,9 +1387,11 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Data' => 'Host name',
 							'Name' => 'Only name changed'
 						],
 						[
+							'Data' => 'Item value',
 							'Item' => 'Available memory',
 							'Time shift' => '1',
 							'Display' => 'Indicators',
@@ -1461,6 +1463,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 
 			// Check message that widget added.
 			$this->checkDashboardUpdateMessage();
+
+			$this->checkWidget(self::$updated_name, $data, 'update');
 		}
 		else {
 			$dashboard->save();
@@ -1573,7 +1577,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 * @param string $header		widget name
 	 * @param array	 $data			values from dataprovider
 	 */
-	private function checkWidget($header, $data) {
+	private function checkWidget($header, $data, $action) {
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->getWidget($header)->edit();
 		$form->checkValue($data['main_fields']);
@@ -1586,10 +1590,12 @@ class testDashboardTopHostsWidget extends CWebTest {
 			// Count column amount from data provider.
 			$column_amount = count($data['column_fields']);
 			$table = $form->query('id:list_columns')->one()->asTable();
-
-			// Count row amount from column table and compare with column amount from data provider.
 			$row_amount = $table->getRows()->count()-1;
-			$this->assertEquals($column_amount, $row_amount);
+
+			if ($action === 'create') {
+				// Count row amount from column table and compare with column amount from data provider.
+				$this->assertEquals($column_amount, $row_amount);
+			}
 
 			// Check values from column form.
 			$row_number = 1;
