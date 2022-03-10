@@ -432,7 +432,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 				.zbx_dbstr(self::$update_pageid));
 	}
 
-	public static function getCreateTopHostsData() {
+	public static function getCreateData() {
 		return [
 			// #0 minimum needed values to create and submit widget.
 			[
@@ -1098,7 +1098,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 	/**
 	 * Create Top Hosts widget.
 	 *
-	 * @dataProvider getCreateTopHostsData
+	 * @dataProvider getCreateData
 	 */
 	public function testDashboardTopHostsWidget_Create($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['top_host_create']);
@@ -1168,7 +1168,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$this->assertEquals($old_hash, $new_hash);
 	}
 
-	public static function getUpdateTopHostsData() {
+	public static function getUpdateData() {
 		return [
 			// #0 incorrecct threshold color.
 			[
@@ -1406,7 +1406,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 	/**
 	 * Update Top Hosts widget.
 	 *
-	 * @dataProvider getUpdateTopHostsData
+	 * @dataProvider getUpdateData
 	 */
 	public function testDashboardTopHostsWidget_Update($data) {
 		if ($data['expected'] === TEST_BAD) {
@@ -1484,52 +1484,74 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$this->assertEquals(0, CDBHelper::getCount($widget_sql));
 	}
 
-	public function testDashboardTopHostsWidget_Remove() {
+
+	public static function getRemoveData() {
+		return [
+			// #0 remove column.
+			[
+				[
+					'table_id' => 'id:list_columns',
+					'remove_selector' => 'xpath:(//button[@name="remove"])[2]'
+				]
+			],
+			// #1 remove tag.
+			[
+				[
+					'table_id' => 'id:tags_table_tags',
+					'remove_selector' => 'id:tags_0_remove'
+				]
+			],
+			// #2 remove threshold.
+			[
+				[
+					'table_id' => 'id:thresholds_table',
+					'remove_selector' => 'id:thresholds_0_remove'
+				]
+			]
+		];
+	}
+
+	/**
+	 * Remove tag, column, threshold.
+	 *
+	 * @dataProvider getRemoveData
+	 */
+	public function testDashboardTopHostsWidget_Remove($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['top_host_remove']);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->getWidget('Top hosts for remove')->edit();
 
-		// column table and rows before remove.
-		$column_table = $form->query('id:list_columns')->one()->asTable();
-		$column_row_amount_before = $column_table->getRows()->count()-1;
+		// Find and count tag/column/threshold before remove.
+		if ($data['table_id'] !== 'id:thresholds_table') {
+			$table = $form->query($data['table_id'])->one()->asTable();
+			$amount_before = $table->getRows()->count();
+			$table->query($data['remove_selector'])->one()->click();
+		}
+		else {
+			$form->query('xpath:(//button[@name="edit"])[1]')->one()->waitUntilVisible()->click();
+			$column_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
+			$table = $column_form->query($data['table_id'])->one()->asTable();
+			$amount_before = $table->getRows()->count();
+			$table->query($data['remove_selector'])->one()->click();
+			$column_form->submit();
+		}
 
-		// tag table and rows before remove.
-		$tag_table = $form->query('id:tags_table_tags')->one()->asTable();
-		$tag_row_amount_before = $tag_table->getRows()->count();
-
-		$form->query('xpath:(//button[@name="edit"])[1]')->one()->waitUntilVisible()->click();
-		$column_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
-
-		// threshodl tale and rows before remove
-		$threshold_table = $column_form->query('id:thresholds_table')->one()->asTable();
-		$threshold_amount_before = $threshold_table->getRows()->count()-1;
-
-		// remove 1 threshold
-		$threshold_table->query('id:thresholds_0_remove')->one()->click();
-		$column_form->submit();
-
-		// remove 1 tag
-		$form->query('id:tags_0_remove')->one()->click();
-
-		// remove 1 column
-		$column_table->query('xpath:(//button[@name="remove"])[2]')->one()->waitUntilVisible()->click();
-		COverlayDialogElement::find()->waitUntilReady()->one();
-		$form->submit();
+		// Submit changes after remove.
+		$form->waitUntilReady()->submit();
 		$dashboard->save();
 
 		// Check that Dashboard has been saved.
 		$this->checkDashboardUpdateMessage();
-
 		$dashboard->edit()->getWidget('Top hosts for remove')->edit();
-		$this->assertEquals($column_row_amount_before-1, $column_table->getRows()->count()-1);
-		$this->assertEquals($tag_row_amount_before-1, $tag_table->getRows()->count());
 
-		$form->query('xpath:(//button[@name="edit"])[1]')->one()->waitUntilVisible()->click();
+		if ($data['table_id'] === 'id:thresholds_table') {
+			$form->query('xpath:(//button[@name="edit"])[1]')->one()->waitUntilVisible()->click();
+			$column_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
+			$table = $column_form->query($data['table_id'])->one()->asTable();
+		}
 
-		$column_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
-		$threshold_table = $column_form->query('id:thresholds_table')->one()->asTable();
-
-		$this->assertEquals($threshold_amount_before-1, $threshold_table->getRows()->count()-1);
+		// Check that tag/column/threshold removed.
+		$this->assertEquals($amount_before-1, $table->getRows()->count());
 	}
 
 	/**
