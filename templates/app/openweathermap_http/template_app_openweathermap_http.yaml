@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-08T19:02:46Z'
+  date: '2022-03-10T12:12:08Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -14,6 +14,26 @@ zabbix_export:
         Get weather metrics from OpenWeatherMap current weather API by HTTP.
         It works without any external scripts and uses the Script item.
         
+        Setup:
+          1. Create a host.
+        
+          2. Link the template to the host.
+        
+          3. Customize the values of {$OPENWEATHERMAP.API.TOKEN} and {$LOCATION} macros.  
+              OpenWeatherMap API Tokens are available in your OpenWeatherMap account https://home.openweathermap.org/api_keys.  
+              Locations can be set by few ways:
+                - by geo coordinates (for example: 56.95,24.0833)
+                - by location name (for example: Riga)
+                - by location ID. Link to the list of city ID: http://bulk.openweathermap.org/sample/city.list.json.gz
+                - by zip/post code with a country code (for example: 94040,us)
+              A few locations can be added to the macro at the same time by "|" delimiter. 
+              For example: 43.81821,7.76115|Riga|2643743|94040,us.
+              Please note that API requests by city name, zip-codes and city id will be deprecated soon.
+              
+              Language and units macros can be customized too if necessary.
+              List of available languages: https://openweathermap.org/current#multi.
+              Available units of measurement are: standard, metric and imperial https://openweathermap.org/current#data.
+        
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/
         
         Template tooling version used: 0.41
@@ -21,6 +41,27 @@ zabbix_export:
         -
           name: Templates/Applications
       items:
+        -
+          uuid: 3908d009a13146f28e3856c3bff63ad6
+          name: 'Openweathermap: Clean data'
+          type: DEPENDENT
+          key: openweathermap.clean.data
+          delay: '0'
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          description: 'JSON array with result of OpenWeatherMap API requests without errors.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data
+          master_item:
+            key: openweathermap.get.data
+          tags:
+            -
+              tag: component
+              value: raw
         -
           uuid: 7db240f752294b2eb86537d6c06cac5e
           name: 'Openweathermap: Get data'
@@ -36,92 +77,101 @@ zabbix_export:
             var request = new HttpRequest();
             
             var data = [],
-              errorMsg = '',
-              measurement,
-              temp_unit,
-              wind_unit;
+                errorMsg = [],
+                measurement,
+                tempUnit,
+                windUnit;
             
             function getHttpData(query) {
-              url = params.api_endpoint + query + '&appid=' + params.apikey + '&units=' + params.units + '&lang=' + params.lang;
-              response = request.get(url);
-              Zabbix.log(4, '[ Openweathermap ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+                url = params.api_endpoint + query + '&appid=' + params.apikey + '&units=' + params.units + '&lang=' + params.lang;
+                response = request.get(url);
+                Zabbix.log(4, '[ Openweathermap ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-              if (response !== null) {
-                try {
-                  response = JSON.parse(response);
+                if (response !== null) {
+                    try {
+                        response = JSON.parse(response);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse response.';
+                    }
                 }
-                catch (error) {
-                  throw 'Failed to parse response.';
-                }
-              }
             
-              if (request.getStatus() !== 200) {
-                if (response.error && response.error.message) {
-                  throw response.error.message;
-                } 
-                else {
-                  throw 'Failed to receive data: invalid response status code.';
+                if (request.getStatus() !== 200) {
+                    if (response.error && response.error.message) {
+                        throw response.error.message;
+                    } 
+                    else {
+                        throw 'Failed to receive data. Invalid response status code: ' + request.getStatus();
+                    }
                 }
-              }
-              return response;
+                return response;
             };
             
             if (params.units === 'metric') {
-              measurement = "metric";
-              temp_unit = "C";
-              wind_unit = "meter/sec";
+                measurement = "metric";
+                tempUnit = "C";
+                windUnit = "meter/sec";
             }
             else if (params.units === 'imperial'){
-              measurement = "imperial";
-              temp_unit = "F";
-              wind_unit = "miles/hour";
+                measurement = "imperial";
+                tempUnit = "F";
+                windUnit = "miles/hour";
             }
             else {
-              measurement = "standard";
-              temp_unit = "K";
-              wind_unit = "meter/sec";
+                measurement = "standard";
+                tempUnit = "K";
+                windUnit = "meter/sec";
             };
             
-            try {
-            
-              locations = params.location.split('|');
-              for (var i in locations) {
-                if (/^[0-9]+$/g.test(locations[i])) {
-                  result = getHttpData('id=' + locations[i]);
-                  result.measurement = measurement;
-                  result.temp_unit = temp_unit;
-                  result.wind_unit = wind_unit;
-                  data.push(result);
-                } 
-                else if (/^.*,[\w]+$/g.test(locations[i])) {
-                  result = getHttpData('zip=' + locations[i]);
-                  result.measurement = measurement;
-                  result.temp_unit = temp_unit;
-                  result.wind_unit = wind_unit;
-                  data.push(result);
-                }
-                else if (/^[0-9]{1,2}(\.[0-9]+)?,[0-9]{1,2}(\.[0-9]+)?/g.test(locations[i])) {
-                  coordinates = locations[i].split(',');
-                  result = getHttpData('lat=' + coordinates[0] + '&lon=' + coordinates[1]);
-                  result.measurement = measurement;
-                  result.temp_unit = temp_unit;
-                  result.wind_unit = wind_unit;
-                  data.push(result);
-                }
-                else {
-                  result = getHttpData('q=' + encodeURIComponent(locations[i]));
-                  result.measurement = measurement;
-                  result.temp_unit = temp_unit;
-                  result.wind_unit = wind_unit;
-                  data.push(result);
+            locations = params.location.split('|');
+            for (var i in locations) {
+                try {
+                    if (/^[0-9]+$/g.test(locations[i])) {
+                        result = getHttpData('id=' + locations[i]);
+                        result.measurement = measurement;
+                        result.temp_unit = tempUnit;
+                        result.wind_unit = windUnit;
+                        data.push(result);
+                    } 
+                    else if (/^.*,[\w]+$/g.test(locations[i])) {
+                        result = getHttpData('zip=' + locations[i]);
+                        result.measurement = measurement;
+                        result.temp_unit = tempUnit;
+                        result.wind_unit = windUnit;
+                        data.push(result);
+                    }
+                    else if (/^[0-9]{1,2}(\.[0-9]+)?,[0-9]{1,2}(\.[0-9]+)?/g.test(locations[i])) {
+                        coordinates = locations[i].split(',');
+                        result = getHttpData('lat=' + coordinates[0] + '&lon=' + coordinates[1]);
+                        result.measurement = measurement;
+                        result.temp_unit = tempUnit;
+                        result.wind_unit = windUnit;
+                        data.push(result);
+                    }
+                    else {
+                        result = getHttpData('q=' + encodeURIComponent(locations[i]));
+                        result.measurement = measurement;
+                        result.temp_unit = tempUnit;
+                        result.wind_unit = windUnit;
+                        data.push(result);
+                    };
+                } catch (error) {
+                    if (errorMsg.length === 0) {
+                        errorMsg.push('Failed to retrieve data for the following locations: ' + locations[i]);
+                    } else {
+                        errorMsg.push(' ' + locations[i]);
+                    };
                 };
-              };
-            
-            } catch (error) {
-              errorMsg = error;
             };
             
-            return JSON.stringify(data);
+            if (errorMsg.length !== 0) {
+                errorMsg = errorMsg + '. Check debug log for more information.';
+            };
+            
+            return JSON.stringify({
+                'data': data,
+                'error': errorMsg.toString()
+            });
           description: 'JSON array with result of OpenWeatherMap API requests.'
           timeout: '{$OPENWEATHERMAP.DATA.TIMEOUT}'
           parameters:
@@ -144,13 +194,35 @@ zabbix_export:
             -
               tag: component
               value: raw
+        -
+          uuid: 2eb0520627084f2596743f53552c3744
+          name: 'Openweathermap: Get data collection errors'
+          type: DEPENDENT
+          key: openweathermap.get.errors
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          description: 'Errors from get data requests by script item.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.error
+          master_item:
+            key: openweathermap.get.data
+          tags:
+            -
+              tag: component
+              value: raw
           triggers:
             -
-              uuid: 416d88c67ef940fb868f3985af4d88bf
-              expression: 'nodata(/OpenWeatherMap by HTTP/openweathermap.get.data,{$OPENWEATHERMAP.NODATA.PERIOD})=1 or (last(/OpenWeatherMap by HTTP/openweathermap.get.data)="[]" and changecount(/OpenWeatherMap by HTTP/openweathermap.get.data,{$OPENWEATHERMAP.NODATA.PERIOD})=0)'
-              name: 'Openweathermap: Failed to fetch aggregate data (or no data for {$OPENWEATHERMAP.NODATA.PERIOD})'
+              uuid: 8c2c6f81e1e74f97a28538e714eee474
+              expression: 'length(last(/OpenWeatherMap by HTTP/openweathermap.get.errors))>0'
+              name: 'Openweathermap: There are errors in requests to OpenWeatherMap API'
+              opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Zabbix has not received data from OpenWeatherMap API for the last few times.'
+              description: 'Zabbix has received errors in requests to OpenWeatherMap API.'
               manual_close: 'YES'
               tags:
                 -
@@ -184,7 +256,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: openweathermap.get.data
+                key: openweathermap.clean.data
               tags:
                 -
                   tag: component
@@ -215,7 +287,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: openweathermap.get.data
+                key: openweathermap.clean.data
               tags:
                 -
                   tag: component
@@ -245,7 +317,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: openweathermap.get.data
+                key: openweathermap.clean.data
               tags:
                 -
                   tag: component
@@ -279,7 +351,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: openweathermap.get.data
+                key: openweathermap.clean.data
               tags:
                 -
                   tag: component
@@ -292,7 +364,7 @@ zabbix_export:
                   value: '{#LOCATION}'
             -
               uuid: 6a0f10ae39a347319026ff147f1dc470
-              name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Rain volume for the lat one hour'
+              name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Rain volume for the last one hour'
               type: DEPENDENT
               key: 'openweathermap.rain[{#LOCATION},{#COUNTRY}]'
               delay: '0'
@@ -316,7 +388,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: openweathermap.get.data
+                key: openweathermap.clean.data
               tags:
                 -
                   tag: component
@@ -329,7 +401,7 @@ zabbix_export:
                   value: '{#LOCATION}'
             -
               uuid: 8310f65dceeb4b348f1a769b806d5239
-              name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Snow volume for the lat one hour'
+              name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Snow volume for the last one hour'
               type: DEPENDENT
               key: 'openweathermap.snow[{#LOCATION},{#COUNTRY}]'
               delay: '0'
@@ -353,7 +425,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: openweathermap.get.data
+                key: openweathermap.clean.data
               tags:
                 -
                   tag: component
@@ -384,7 +456,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: openweathermap.get.data
+                key: openweathermap.clean.data
               tags:
                 -
                   tag: component
@@ -400,6 +472,7 @@ zabbix_export:
                   uuid: 3b7e55f13c6a4ba2930709d5c51c8a09
                   expression: 'min(/OpenWeatherMap by HTTP/openweathermap.temp[{#LOCATION},{#COUNTRY}],#3)>{$TEMP.CRIT.HIGH}'
                   name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Temperature is too high (over {$TEMP.CRIT.HIGH} for 30m)'
+                  opdata: 'Current temp: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Temperature value is too high.'
                   manual_close: 'YES'
@@ -411,6 +484,7 @@ zabbix_export:
                   uuid: 7c98d2784a2e42faa76e67348a0df7ff
                   expression: 'max(/OpenWeatherMap by HTTP/openweathermap.temp[{#LOCATION},{#COUNTRY}],#3)<{$TEMP.CRIT.LOW}'
                   name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Temperature is too low (below {$TEMP.CRIT.LOW} for 30m)'
+                  opdata: 'Current temp: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Temperature value is too low.'
                   manual_close: 'YES'
@@ -437,7 +511,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: openweathermap.get.data
+                key: openweathermap.clean.data
               tags:
                 -
                   tag: component
@@ -470,7 +544,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: openweathermap.get.data
+                key: openweathermap.clean.data
               tags:
                 -
                   tag: component
@@ -501,7 +575,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: openweathermap.get.data
+                key: openweathermap.clean.data
               tags:
                 -
                   tag: component
@@ -514,6 +588,33 @@ zabbix_export:
                   value: '{#LOCATION}'
           graph_prototypes:
             -
+              uuid: 62ba0562f77d46e0b04a387d82c1a51e
+              name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Atmospheric pressure'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'OpenWeatherMap by HTTP'
+                    key: 'openweathermap.pressure[{#LOCATION},{#COUNTRY}]'
+            -
+              uuid: 6196267a6d974ef2acbebdb9b33f6b71
+              name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Rain volume'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'OpenWeatherMap by HTTP'
+                    key: 'openweathermap.rain[{#LOCATION},{#COUNTRY}]'
+            -
+              uuid: 27b47b89606e43f5a4180e9dde29d7d6
+              name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Snow volume'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'OpenWeatherMap by HTTP'
+                    key: 'openweathermap.snow[{#LOCATION},{#COUNTRY}]'
+            -
               uuid: 3561e247237548f3a26c702924d05894
               name: 'OpenWeatherMap: {#LOCATION},{#COUNTRY}: Temperature'
               graph_items:
@@ -523,7 +624,7 @@ zabbix_export:
                     host: 'OpenWeatherMap by HTTP'
                     key: 'openweathermap.temp[{#LOCATION},{#COUNTRY}]'
           master_item:
-            key: openweathermap.get.data
+            key: openweathermap.clean.data
           lld_macro_paths:
             -
               lld_macro: '{#COUNTRY}'
@@ -578,10 +679,6 @@ zabbix_export:
           macro: '{$OPENWEATHERMAP.DATA.TIMEOUT}'
           value: 3s
           description: 'Response timeout for OpenWeatherMap API.'
-        -
-          macro: '{$OPENWEATHERMAP.NODATA.PERIOD}'
-          value: 30m
-          description: 'Time limit period for nodata trigger.'
         -
           macro: '{$TEMP.CRIT.HIGH}'
           value: '30'
