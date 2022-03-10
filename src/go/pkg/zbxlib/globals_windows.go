@@ -22,7 +22,7 @@ package zbxlib
 /*
 #include "common.h"
 #include "sysinfo.h"
-#include "comms.h"
+#include "zbxcomms.h"
 #include "perfmon.h"
 #include "../src/zabbix_agent/metrics.h"
 
