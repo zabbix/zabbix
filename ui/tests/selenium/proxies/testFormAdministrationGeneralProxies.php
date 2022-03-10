@@ -33,8 +33,10 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 
 	private $sql = 'SELECT * FROM hosts ORDER BY hostid';
 	private static $update_proxy = 'Active proxy for update';
-	private static $refresh_active_proxy = '_Active proxy for refresh';
-	private static $refresh_passive_proxy = '_Passive proxy for refresh';
+	private static $refresh_active_proxy = 'Active proxy for refresh';
+	private static $refresh_passive_proxy = 'Passive proxy for refresh';
+	private static $delete_active_proxy = 'Active proxy for delete';
+	private static $delete_passive_proxy = 'Passive proxy for delete';
 
 	use TableTrait;
 
@@ -86,7 +88,35 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 					'useip' => '0',
 					'port' => '220'
 				]
-			]
+			],
+			[
+				'host' => self::$delete_active_proxy,
+				'status' => 5,
+				'description' => 'Active description for delete',
+				'tls_connect' => 1,
+				'tls_accept'=> 7,
+				'tls_psk_identity' => 'activedeletepsk',
+				'tls_psk' => '41b4d07b27a8efdcc15d4742e03857eba377fe010853a1499b0522df171282cb',
+				'tls_issuer' => 'activedeletepsk',
+				'tls_subject' => 'activedeletepsk',
+				'proxy_address' => '127.0.1.2',
+
+			],
+			[
+				'host' => self::$delete_passive_proxy,
+				'status' => 6,
+				'description' => '_Passive description for delete',
+				'tls_connect' => 4,
+				'tls_accept'=> 1,
+				'tls_issuer' => 'passivedeletepsk',
+				'tls_subject' => 'passivedeletepsk',
+				'interface' => [
+					'ip' => '127.9.9.9',
+					'dns' => 'deletedns',
+					'useip' => '0',
+					'port' => '220'
+				]
+			],
 		]);
 	}
 
@@ -750,6 +780,17 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
+						'Proxy name' => 'Wrong Port',
+						'Proxy mode' => 'Passive',
+						'id:port' => 65536
+					],
+					'error' => 'Invalid parameter "/1/interface/port": value must be one of 0-65535.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
 						'Proxy name' => 'Active empty Encryption',
 						'Proxy mode' => 'Active'
 					],
@@ -887,10 +928,10 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 						'id:tls_accept_none' => true,
 						'id:tls_accept_psk' => true,
 						'id:tls_accept_certificate' => true,
-						'PSK identity' => 'test',
+						'PSK identity' => 'test test',
 						'PSK' => '41b4d07b27a8efdcc15d4742e03857eba377fe010853a1499b0522df171282cb',
-						'Issuer' => 'test',
-						'Subject' => 'test'
+						'Issuer' => 'test test',
+						'Subject' => 'test test'
 					]
 				]
 			],
@@ -900,7 +941,8 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 						'Proxy name' => 'IPv6',
 						'Proxy mode' => 'Passive',
 						'id:ip' => '::1',
-						'id:useip' => 'IP'
+						'id:useip' => 'IP',
+						'id:port' => 999
 					]
 				]
 			],
@@ -930,6 +972,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 						'id:ip' => '192.168.2.3',
 						'id:dns' => 'mytesthost',
 						'id:useip' => 'DNS',
+						'id:port' => 65535,
 					],
 					'encryption_fields' => [
 						'Connections to proxy' => 'PSK',
@@ -959,7 +1002,8 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 						'Proxy name' => 'IPv6 _2',
 						'Proxy mode' => 'Passive',
 						'id:ip' => 'fe80::1ff:fe23:4567:890a',
-						'id:useip' => 'IP'
+						'id:useip' => 'IP',
+						'id:port' => 0
 					]
 				]
 			],
@@ -1174,12 +1218,12 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		return [
 			[
 				[
-					'proxy' => self::$refresh_active_proxy,
+					'proxy' => self::$refresh_active_proxy
 				]
 			],
 			[
 				[
-					'proxy' => self::$refresh_passive_proxy,
+					'proxy' => self::$refresh_passive_proxy
 				]
 			]
 		];
@@ -1219,7 +1263,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		return [
 			[
 				[
-					'proxy' => self::$refresh_active_proxy,
+					'proxy' => self::$refresh_active_proxy
 				]
 			],
 			[
@@ -1286,5 +1330,140 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		$fields['useip'] = $dialog->query('id:useip')->one()->asSegmentedRadio()->getValue();
 
 		return $fields;
+	}
+
+	public function getDeleteData() {
+		return [
+			[
+				[
+					'proxy' => self::$delete_active_proxy
+				]
+			],
+			[
+				[
+					'proxy' => self::$delete_passive_proxy
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getDeleteData
+	 */
+	public function testFormAdministrationGeneralProxies_Delete($data) {
+		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
+		$this->query('link', $data['proxy'])->one()->waitUntilClickable()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
+
+		// Check alert.
+		$this->assertTrue($this->page->isAlertPresent());
+		$this->assertEquals('Delete selected proxy?', $this->page->getAlertText());
+		$this->page->acceptAlert();
+		$dialog->ensureNotPresent();
+		$this->assertMessage(TEST_GOOD, 'Proxy deleted');
+
+		// Check name disappeared from frontend table.
+		$this->assertFalse($this->query('link', $data['proxy'])->exists());
+
+		// Check DB.
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM hosts WHERE host='.zbx_dbstr($data['proxy'])));
+	}
+
+	public function testFormAdministrationGeneralProxies_SimpleUpdate() {
+		$this->checkTokenSimpleUpdate();
+	}
+
+
+	public function getCancelData() {
+		return [
+			[
+				[
+					'action' => 'Create'
+				]
+			],
+			[
+				[
+					'action' => 'Update'
+				]
+			],
+			[
+				[
+					'action' => 'Delete'
+				]
+			],
+			[
+				[
+					'action' => 'Refresh configuration'
+				]
+			],
+			[
+				[
+					'action' => 'Clone'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCancelData
+	 */
+	public function testFormAdministrationGeneralProxies_Cancel($data) {
+		$old_hash = CDBHelper::getHash($this->sql);
+
+		$fields = [
+			'proxy_fields' => [
+				'Proxy name' => 'Proxy for cancel',
+				'Proxy mode' => 'Passive',
+				'id:ip' => '192.8.8.8',
+				'id:dns' => 'canceldns',
+				'id:useip' => 'DNS',
+				'id:port' => 222,
+				'Description' => 'Description for cancel'
+			],
+			'encryption_fields' => [
+				'Connections to proxy' => 'Certificate',
+				'Issuer' => 'Issuer for cancel',
+				'Subject' => 'Subject for cancel'
+			]
+		];
+
+		$this->page->login()->open('zabbix.php?action=proxy.list');
+
+		if ($data['action'] === 'Create') {
+			$this->query('button:Create proxy')->one()->waitUntilClickable()->click();
+		}
+		else {
+			$this->query('link', self::$update_proxy)->one()->waitUntilClickable()->click();
+		}
+
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+
+		if ($data['action'] === 'Delete' || $data['action'] === 'Refresh configuration') {
+			$dialog->query('button', $data['action'])->waitUntilClickable()->one()->click();
+			$this->assertTrue($this->page->isAlertPresent());
+			$this->page->dismissAlert();
+			$dialog->close();
+		}
+		else {
+			if ($data['action'] === 'Clone') {
+				$dialog->query('button:Clone')->waitUntilClickable()->one()->click();
+				$dialog->invalidate();
+			}
+
+			$form = $dialog->asForm();
+			$form->fill($fields['proxy_fields']);
+			$form->selectTab('Encryption');
+			$form->fill($fields['encryption_fields']);
+			$dialog->query('button:Cancel')->one()->waitUntilClickable()->click();
+			$dialog->ensureNotPresent();
+		}
+
+		// Check that user remained on Proxies page.
+		$this->page->assertTitle('Configuration of proxies');
+		$this->page->assertHeader('Proxies');
+
+		// Check that DB hash is not changed.
+		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
 }
