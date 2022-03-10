@@ -170,7 +170,7 @@ class CMenuHelper {
 				? (new CMenuItem(_('Template groups')))->setAction('templategroup.list')
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOST_GROUPS)
-				? (new CMenuItem(_('Host groups')))->setUrl(new CUrl('hostgroups.php'), 'hostgroups.php')
+				? (new CMenuItem(_('Host groups')))->setAction('hostgroup.list')
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 				? (new CMenuItem(_('Templates')))

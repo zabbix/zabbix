@@ -24,7 +24,7 @@
  */
 ?>
 
-window.templategroup_edit_popup = {
+window.hostgroup_edit_popup = {
 	groupid: null,
 	subgroups: null,
 
@@ -44,7 +44,7 @@ window.templategroup_edit_popup = {
 		this.update_url = update_url;
 		this.delete_url = delete_url;
 
-		this.overlay = overlays_stack.getById('templategroup_edit');
+		this.overlay = overlays_stack.getById('hostgroup_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
@@ -68,7 +68,7 @@ window.templategroup_edit_popup = {
 		this.overlay.setLoading();
 
 		const curl = new Curl(this.groupid !== null ? this.update_url : this.create_url);
-
+console.log(curl);
 		fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -149,7 +149,7 @@ window.templategroup_edit_popup = {
 						postMessageDetails('success', response.success.messages);
 					}
 
-					uncheckTableRows('templategroup');
+					uncheckTableRows('hostgroup');
 				}
 
 				location.href = location.href;

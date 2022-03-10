@@ -66,6 +66,7 @@ class CHostGroup extends CApiService {
 			'monitored_hosts'						=> ['type' => API_FLAG, 'flags' => API_DEPRECATED],
 			'with_hosts'							=> ['type' => API_FLAG, 'default' => false],
 			'real_hosts'							=> ['type' => API_FLAG, 'flags' => API_DEPRECATED],
+			'with_host_and_templates'				=> ['type' => API_FLAG, 'flags' => API_DEPRECATED],
 			'with_items'							=> ['type' => API_FLAG, 'default' => false],
 			'with_item_prototypes'					=> ['type' => API_FLAG, 'default' => false],
 			'with_simple_graph_items'				=> ['type' => API_FLAG, 'default' => false],
@@ -122,6 +123,10 @@ class CHostGroup extends CApiService {
 			}
 
 			$params['with_monitored_hosts'] = $params['monitored_hosts'];
+		}
+
+		if (array_key_exists('with_host_and_templates', $params)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'with_host_and_templates'));
 		}
 
 		// editable + PERMISSION CHECK
@@ -633,7 +638,7 @@ class CHostGroup extends CApiService {
 		}
 
 		$db_groups = $this->get([
-			'output' => ['groupid', 'name', 'internal'],
+			'output' => ['groupid', 'name'],
 			'groupids' => $groupids,
 			'editable' => true,
 			'preservekeys' => true

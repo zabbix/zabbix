@@ -26,27 +26,41 @@
 
 <script>
 	const view = {
+		enable_url: null,
+		disable_url: null,
 		delete_url: null,
 
-		init({delete_url}) {
+		init({enable_url, disable_url, delete_url}) {
+			this.enable_url = enable_url;
+			this.disable_url = disable_url;
 			this.delete_url = delete_url;
 
+			this.initActionButtons();
+		},
+
+		initActionButtons() {
 			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-create-templategroup')) {
+				if (e.target.classList.contains('js-create-hostgroup')) {
 					this.edit();
 				}
-				else if (e.target.classList.contains('js-edit-templategroup')) {
+				else if (e.target.classList.contains('js-edit-hostgroup')) {
 					this.edit({groupid: e.target.dataset.groupid});
 				}
-				else if (e.target.classList.contains('js-massdelete-templategroup')) {
+				else if (e.target.classList.contains('js-massenable-hostgroup')) {
+					this.enable(e.target, Object.values(chkbxRange.getSelectedIds()));
+				}
+				else if (e.target.classList.contains('js-massdisable-hostgroup')) {
+					this.disable(e.target, Object.values(chkbxRange.getSelectedIds()));
+				}
+				else if (e.target.classList.contains('js-massdelete-hostgroup')) {
 					this.delete(e.target, Object.values(chkbxRange.getSelectedIds()));
 				}
 			});
 		},
 
 		edit(parameters = {}) {
-			const overlay = PopUp('popup.templategroup.edit', parameters, {
-				dialogueid: 'templategroup_edit',
+			const overlay = PopUp('popup.hostgroup.edit', parameters, {
+				dialogueid: 'hostgroup_edit',
 				dialogue_class: 'modal-popup-static'
 			});
 
@@ -61,10 +75,30 @@
 			});
 		},
 
+		enable(target, groupids) {
+			const confirmation =  <?= json_encode(_('Enable selected hosts?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return;
+			}
+
+			this.post(target, groupids, this.enable_url);
+		},
+
+		disable(target, groupids) {
+			const confirmation = <?= json_encode(_('Disable hosts in the selected host groups?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return;
+			}
+
+			this.post(target, groupids, this.disable_url);
+		},
+
 		delete(target, groupids) {
 			const confirmation = groupids.length > 1
-				? <?= json_encode(_('Delete selected template groups?')) ?>
-				: <?= json_encode(_('Delete selected template group?')) ?>;
+				? <?= json_encode(_('Delete selected host groups?')) ?>
+				: <?= json_encode(_('Delete selected host group?')) ?>;
 
 			if (!window.confirm(confirmation)) {
 				return;
@@ -90,7 +124,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						uncheckTableRows('templategroup', response.error.keepids);
+						uncheckTableRows('hostgroup', response.error.keepids);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
@@ -99,7 +133,7 @@
 							postMessageDetails('success', response.success.messages);
 						}
 
-						uncheckTableRows('templategroup');
+						uncheckTableRows('hostgroup');
 					}
 
 					location.href = location.href;
@@ -114,7 +148,45 @@
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
+		},
 
+		editHost(e, hostid) {
+			e.preventDefault();
+			const host_data = {hostid};
+
+			this.openHostPopup(host_data);
+		},
+
+		openHostPopup(host_data) {
+			const original_url = location.href;
+			const overlay = PopUp('popup.host.edit', host_data, {
+				dialogueid: 'host_edit',
+				dialogue_class: 'modal-popup-large'
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', original_url);
+			}, {once: true});
+		},
+
+		events: {
+			hostSuccess(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				location.href = location.href;
+			}
 		}
-	}
+	};
 </script>
+

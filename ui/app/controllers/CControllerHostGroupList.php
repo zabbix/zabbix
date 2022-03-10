@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerTemplateGroupList extends CController {
+class CControllerHostGroupList extends CController {
 
 	protected function init(): void {
 		$this->disableSIDValidation();
@@ -44,42 +44,42 @@ class CControllerTemplateGroupList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATE_GROUPS);
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOST_GROUPS);
 	}
 
 	protected function doAction(): void {
-		$sort_field = $this->getInput('sort', CProfile::get('web.templategroups.php.sort', 'name'));
-		$sort_order = $this->getInput('sortorder', CProfile::get('web.templategroups.php.sortorder', ZBX_SORT_UP));
+		$sort_field = $this->getInput('sort', CProfile::get('web.hostgroups.php.sort', 'name'));
+		$sort_order = $this->getInput('sortorder', CProfile::get('web.hostgroups.php.sortorder', ZBX_SORT_UP));
 
-		CProfile::update('web.templategroups.php.sort', $sort_field, PROFILE_TYPE_STR);
-		CProfile::update('web.templategroups.php.sortorder', $sort_order, PROFILE_TYPE_STR);
+		CProfile::update('web.hostgroups.php.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.hostgroups.php.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		// filter
 		if ($this->hasInput('filter_set')) {
-			CProfile::update('web.templategroups.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.groups.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 		}
 		elseif ($this->hasInput('filter_rst')) {
-			CProfile::delete('web.templategroups.filter_name');
+			CProfile::delete('web.groups.filter_name');
 		}
 
 		$filter = [
-			'name' => CProfile::get('web.templategroups.filter_name', '')
+			'name' => CProfile::get('web.groups.filter_name', '')
 		];
 
 		$data = [
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,
 			'filter' => $filter,
-			'profileIdx' => 'web.templategroups.filter',
-			'active_tab' => CProfile::get('web.templategroups.filter.active', 1),
+			'profileIdx' => 'web.groups.filter',
+			'active_tab' => CProfile::get('web.groups.filter.active', 1),
 			'config' => [
 				'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
 			],
-			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 		];
 
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
-		$groups = API::TemplateGroup()->get([
+		$groups = API::HostGroup()->get([
 			'output' => ['groupid', $sort_field],
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name']
@@ -95,30 +95,30 @@ class CControllerTemplateGroupList extends CController {
 			$page_num = getRequest('page', 1);
 		}
 		else {
-			$page_num = CPagerHelper::loadPage('templategroup.list');
+			$page_num = CPagerHelper::loadPage('hostgroup.list');
 		}
 
-		CPagerHelper::savePage('templategroup.list', $page_num);
+		CPagerHelper::savePage('hostgroup.list', $page_num);
 		$data['paging'] = CPagerHelper::paginate($page_num, $groups, $sort_order,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
 		$groupIds = array_column($groups, 'groupid');
 
-		// get templates count
-		$data['groupCounts'] = API::TemplateGroup()->get([
+		// get host count
+		$data['groupCounts'] = API::HostGroup()->get([
 			'output' => ['groupid'],
 			'groupids' => $groupIds,
-			'selectTemplates' => API_OUTPUT_COUNT,
+			'selectHosts' => API_OUTPUT_COUNT,
 			'preservekeys' => true
 		]);
 
-		// get templates groups
+		// get host groups
 		$limit = CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE) + 1;
-		$data['groups'] = API::TemplateGroup()->get([
-			'output' => ['groupid', 'name'],
+		$data['groups'] = API::HostGroup()->get([
+			'output' => ['groupid', 'name', 'flags'],
 			'groupids' => $groupIds,
-			'selectTemplates' => ['templateid', 'name'],
+			'selectHosts' => ['hostid', 'name', 'status'],
 			'selectGroupDiscovery' => ['ts_delete'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
 			'limitSelects' => $limit
@@ -126,12 +126,13 @@ class CControllerTemplateGroupList extends CController {
 		order_result($data['groups'], $sort_field, $sort_order);
 
 		foreach ($data['groups'] as &$group) {
-			order_result($group['templates'], 'name');
+			order_result($group['hosts'], 'name');
 		}
 		unset($group);
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Template groups'));
+		$response->setTitle(_('Host groups'));
 		$this->setResponse($response);
 	}
 }
+

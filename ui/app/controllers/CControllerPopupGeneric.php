@@ -1044,22 +1044,22 @@ class CControllerPopupGeneric extends CController {
 			case 'host_groups':
 				$options += [
 					'output' => ['groupid', 'name'],
-					'with_triggers' => $this->hasInput('with_triggers') ? true : null
+					'with_triggers' => $this->hasInput('with_triggers')
 				];
 
 				if (array_key_exists('real_hosts', $this->page_options)) {
-					$options['real_hosts'] = 1;
+					$options['with_hosts'] = true;
 				}
 				elseif ($this->hasInput('templated_hosts')) {
-					$options['templated_hosts'] = 1;
+					$options['with_templates'] = true;
 				}
 
 				if ($this->hasInput('with_httptests')) {
-					$options['with_httptests'] = 1;
+					$options['with_httptests'] = true;
 				}
 
 				if ($this->hasInput('with_hosts_and_templates')) {
-					$options['with_hosts_and_templates'] = 1;
+					$options['with_hosts_and_templates'] = true;
 				}
 
 				if ($this->hasInput('with_items')) {

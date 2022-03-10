@@ -24,10 +24,6 @@
  * @var array $data
  */
 
-if ($data['uncheck']) {
-	uncheckTableRows('templategroup');
-}
-
 $this->includeJsFile('configuration.templategroup.list.js.php');
 
 $widget = (new CWidget())
@@ -73,7 +69,7 @@ $table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_groups'))
-				->onClick("checkAll('".$form->getName()."', 'all_groups', 'groups');")
+				->onClick("checkAll('".$form->getName()."', 'all_groups', 'groupids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder'], $view_url),
 		_('Templates'),
@@ -83,35 +79,35 @@ $table = (new CTableInfo())
 $current_time = time();
 
 foreach ($this->data['groups'] as $group) {
-	$templatesOutput = [];
+	$templates_output = [];
 	$n = 0;
 
 	foreach ($group['templates'] as $template) {
 		$n++;
 
 		if ($n > $data['config']['max_in_table']) {
-			$templatesOutput[] = ' &hellip;';
+			$templates_output[] = ' &hellip;';
 
 			break;
 		}
 
 		if ($n > 1) {
-			$templatesOutput[] = ', ';
+			$templates_output[] = ', ';
 		}
 
 		if ($data['allowed_ui_conf_templates']) {
-			$templatesOutput[] = (new CLink($template['name'], (new CUrl('templates.php'))
+			$templates_output[] = (new CLink($template['name'], (new CUrl('templates.php'))
 				->setArgument('form', 'update')
 				->setArgument('templateid', $template['templateid'])))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_GREY);
 		}
 		else {
-			$templatesOutput[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
+			$templates_output[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
 		}
 	}
 
-	$templateCount = $this->data['groupCounts'][$group['groupid']]['templates'];
+	$template_count = $this->data['groupCounts'][$group['groupid']]['templates'];
 
 	// name
 	$name = [];
@@ -120,8 +116,8 @@ foreach ($this->data['groups'] as $group) {
 		->addClass('js-edit-templategroup')
 		->setAttribute('data-groupid', $group['groupid']);
 
-	if ($templateCount > 0) {
-		$count = new CLink($templateCount, (new CUrl('templates.php'))
+	if ($template_count > 0) {
+		$count = new CLink($template_count, (new CUrl('templates.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_groups', [$group['groupid']]));
 		$count->addClass(ZBX_STYLE_ICON_COUNT);
@@ -134,8 +130,10 @@ foreach ($this->data['groups'] as $group) {
 		new CCheckBox('groupids['.$group['groupid'].']', $group['groupid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		[
-			$count,
-			empty($templatesOutput) ? '' : $templatesOutput
+			$data['allowed_ui_conf_templates']
+				? $count
+				: '',
+			empty($templates_output) ? '' : $templates_output
 		],
 		''
 	]);
