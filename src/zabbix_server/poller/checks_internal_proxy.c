@@ -18,7 +18,7 @@
 **/
 
 #include "common.h"
-#include "proxy.h"
+#include "dbcache.h"
 #include "checks_internal.h"
 
 /******************************************************************************
@@ -47,7 +47,7 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			return NOTSUPPORTED;
 		}
 
-		SET_UI64_RESULT(result, proxy_get_history_count());
+		SET_UI64_RESULT(result, get_proxy_history_count());
 	}
 	else
 		return FAIL;

@@ -75,15 +75,15 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 
 		if (0 == strcmp(param2, "lastaccess"))
 		{
-			res = DBget_proxy_lastaccess(get_rparam(request, 1), &value, &error);
+			res = DCget_proxy_lastaccess_by_name(get_rparam(request, 1), &value, &error);
 		}
 		else if (0 == strcmp(param2, "delay"))
 		{
 			int	lastaccess;
 
 			if (SUCCEED == (res = DCget_proxy_delay_by_name(get_rparam(request, 1), &value, &error)) &&
-					SUCCEED == (res = DBget_proxy_lastaccess(get_rparam(request, 1), &lastaccess,
-					&error)))
+					SUCCEED == (res = DCget_proxy_lastaccess_by_name(get_rparam(request, 1),
+					&lastaccess, &error)))
 			{
 				value += (int)time(NULL) - lastaccess;
 			}
