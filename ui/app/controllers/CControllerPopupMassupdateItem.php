@@ -22,6 +22,7 @@
 require_once dirname(__FILE__).'/../../include/forms.inc.php';
 
 class CControllerPopupMassupdateItem extends CController {
+
 	private $opt_interfaceid_expected = false;
 
 	protected function checkInput() {
@@ -76,16 +77,21 @@ class CControllerPopupMassupdateItem extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret && $this->opt_interfaceid_expected) {
-			$entity = ($this->getInput('prototype') == 1) ? API::ItemPrototype() : API::Item();
-			$types = $entity->get([
+			$options = [
 				'output' => ['type'],
 				'itemids' => $this->getInput('ids')
-			]);
-			$types = array_column($types, 'type', 'type');
+			];
+			$item_types = (bool) $this->getInput('prototype')
+				? API::ItemPrototype()->get($options)
+				: API::Item()->get($options);
 
-			foreach ($types as $type) {
-				if (itemTypeInterface($type) != INTERFACE_TYPE_OPT) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('Host interface'), interfaceType2str(INTERFACE_TYPE_OPT)));
+			$item_types = array_column($item_types, 'type', 'type');
+
+			foreach ($item_types as $item_type) {
+				if (itemTypeInterface($item_type) != INTERFACE_TYPE_OPT) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Host interface'),
+						interfaceType2str(INTERFACE_TYPE_OPT)
+					));
 					$ret = false;
 
 					break;
