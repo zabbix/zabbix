@@ -532,11 +532,12 @@ function getTriggersOverviewData(array $groupids, array $host_options = [], arra
 		'show_suppressed' => ZBX_PROBLEM_SUPPRESSED_FALSE
 	];
 
-	$limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
-
+	$limit = 0;
 	do {
+		$limit += (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
+
 		$db_hosts = API::Host()->get(['limit' => $limit + 1] + $host_options);
-		$fetch_hosts = (count($db_hosts) > $limit);
+		$fetch_more = (count($db_hosts) > $limit);
 
 		$db_triggers = getTriggersWithActualSeverity([
 			'hostids' => array_keys($db_hosts)
@@ -554,11 +555,7 @@ function getTriggersOverviewData(array $groupids, array $host_options = [], arra
 		}
 
 		$db_hosts = array_intersect_key($db_hosts, $represented_hosts);
-
-		$fetch_hosts &= (count($db_hosts) < $limit);
-		$limit += (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
-
-	} while ($fetch_hosts);
+	} while ($fetch_more && count($db_hosts) < $limit);
 
 	CArrayHelper::sort($db_hosts, [
 		['field' => 'name', 'order' => ZBX_SORT_UP]
@@ -2410,7 +2407,7 @@ function makeTriggerDependencies(array $dependencies, $freeze_on_click = true) {
 				$table->addRow($description);
 			}
 
-			$result[] = (new CSpan())
+			$result[] = (new CLink())
 				->addClass($class)
 				->addClass(ZBX_STYLE_CURSOR_POINTER)
 				->setHint($table, '', $freeze_on_click);

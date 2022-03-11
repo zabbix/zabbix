@@ -15,7 +15,7 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
-You have to enable the following Windows Features (Control Panel > Programs and Features > Turn Windows features on or off) on you server
+You have to enable the following Windows Features (Control Panel > Programs and Features > Turn Windows features on or off) on your server
 ```text
 Web Server (IIS)
 Web Server (IIS)\Management Tools\IIS Management Scripts and Tools
@@ -26,7 +26,7 @@ Optionally, it is possible to customize the template:
 - If you use a non-standard port for the IIS, don't forget to update the macros {$IIS.SERVICE} and {$IIS.PORT}.
 - Change the value of macro {$IIS.APPPOOL.MONITORED} to "0", if you want to disable all notifications about application pools state.<br>
 You can also add additional context macro {$IIS.APPPOOL.MONITORED:<AppPoolName>} for excluding specific application pools from monitoring.
-- Change regexp in the marcos {$IIS.APPPOOL.MATCHES} and {$IIS.APPPOOL.NOT_MATCHES} used for filtering application pools discovery results.
+- Change regexp in the macros {$IIS.APPPOOL.MATCHES} and {$IIS.APPPOOL.NOT_MATCHES} used for filtering application pools discovery results.
 
 
 ## Zabbix configuration

@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "trigger_linking.h"
+
 #include "db.h"
 #include "zbxeval.h"
 #include "log.h"
@@ -24,8 +26,6 @@
 #include "../../libs/zbxaudit/audit_trigger.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 #include "trigger_dep_linking.h"
-
-#include "trigger_linking.h"
 
 typedef struct
 {
@@ -90,6 +90,8 @@ typedef struct
 	char		*comments;
 	char		*url_orig;
 	char		*url;
+	unsigned char	status_orig;
+	unsigned char	status;
 	unsigned char	type_orig;
 	unsigned char	type;
 
@@ -106,6 +108,7 @@ typedef struct
 #define ZBX_FLAG_LINK_TRIGGER_UPDATE_URL		__UINT64_C(0x00000200)
 #define ZBX_FLAG_LINK_TRIGGER_UPDATE_TYPE		__UINT64_C(0x00000400)
 #define ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID		__UINT64_C(0x00000800)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_STATUS		__UINT64_C(0x00001000)
 
 #define ZBX_FLAG_LINK_TRIGGER_UPDATE									\
 	(ZBX_FLAG_LINK_TRIGGER_UPDATE_RECOVERY_MODE | ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE |	\
@@ -113,7 +116,8 @@ typedef struct
 	ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA | ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER |			\
 	ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME | ZBX_FLAG_LINK_TRIGGER_UPDATE_PRIORITY |		\
 	ZBX_FLAG_LINK_TRIGGER_UPDATE_COMMENTS | ZBX_FLAG_LINK_TRIGGER_UPDATE_URL |			\
-	ZBX_FLAG_LINK_TRIGGER_UPDATE_TYPE | ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID)
+	ZBX_FLAG_LINK_TRIGGER_UPDATE_TYPE | ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID |			\
+	ZBX_FLAG_LINK_TRIGGER_UPDATE_STATUS)
 
 	zbx_uint64_t	update_flags;
 }
@@ -608,7 +612,7 @@ static int	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *temp
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 		"select t.triggerid,t.description,t.expression,t.recovery_expression"
 			",t.flags,t.recovery_mode,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata"
-			",t.discover,t.event_name,t.priority,t.comments,t.url,t.templateid,t.type"
+			",t.discover,t.event_name,t.priority,t.comments,t.url,t.templateid,t.type,t.status"
 		" from triggers t"
 		" where t.triggerid in (select distinct tg.triggerid"
 			" from triggers tg,functions f,items i"
@@ -666,6 +670,8 @@ static int	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *temp
 		target_host_trigger_entry.url = NULL;
 		ZBX_STR2UCHAR(target_host_trigger_entry.type_orig, row[16]);
 		target_host_trigger_entry.type = 0;
+		ZBX_STR2UCHAR(target_host_trigger_entry.status_orig, row[17]);
+		target_host_trigger_entry.status = 0;
 
 		zbx_hashset_insert(zbx_host_triggers_main_data, &target_host_trigger_entry,
 				sizeof(target_host_trigger_entry));
@@ -827,6 +833,12 @@ static void	mark_updates_for_host_trigger(zbx_trigger_copy_t *trigger_copy,
 		main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_TYPE;
 	}
 
+	if (trigger_copy->status != main_found->status_orig)
+	{
+		main_found->status = trigger_copy->status;
+		main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_STATUS;
+	}
+
 	main_found->templateid = trigger_copy->triggerid;
 	main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID;
 }
@@ -978,6 +990,16 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 
 				zbx_audit_trigger_update_json_update_type(found->triggerid,
 						(int)found->flags, found->type_orig, found->type);
+			}
+
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_STATUS))
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sstatus='%d'", d,
+						found->status);
+				d = ",";
+
+				zbx_audit_trigger_update_json_update_status(found->triggerid,
+						(int)found->flags, found->status_orig, found->status);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%stemplateid=" ZBX_FS_UI64, d,
@@ -1161,7 +1183,7 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 	{
 		zbx_eval_context_t	ctx, ctx_r;
 		zbx_trigger_copy_t	*trigger_copy_template = trigger_copies_insert->values[i];
-		zbx_uint64_t            parse_rules = ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION | ZBX_EVAL_COMPOSE_FUNCTIONID;
+		zbx_uint64_t		parse_rules = ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION | ZBX_EVAL_COMPOSE_FUNCTIONID;
 
 		if (0 != (trigger_copy_template->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 			parse_rules |= ZBX_EVAL_PARSE_LLDMACRO | ZBX_EVAL_COMPOSE_LLD;

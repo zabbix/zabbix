@@ -28,7 +28,6 @@
 #include "dbcache.h"
 #include "log.h"
 
-#define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
 #include "dbconfig_maintenance_test.h"
 

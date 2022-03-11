@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "discovery.h"
+
 #include "common.h"
-#include "db.h"
 #include "log.h"
 #include "events.h"
-#include "discovery.h"
 
 static DB_RESULT	discovery_get_dhost_by_value(zbx_uint64_t dcheckid, const char *value)
 {

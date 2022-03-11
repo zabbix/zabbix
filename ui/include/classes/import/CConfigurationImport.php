@@ -1071,7 +1071,6 @@ class CConfigurationImport {
 		$item_prototypes_to_create = [];
 		$host_prototypes_to_update = [];
 		$host_prototypes_to_create = [];
-		$ex_group_prototypes_where = [];
 		$levels = [];
 
 		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
@@ -1252,14 +1251,6 @@ class CConfigurationImport {
 						);
 
 					if ($host_prototypeid !== null) {
-						if ($host_prototype['groupPrototypes']) {
-							$ex_group_prototypes_where[] = '('.dbConditionInt('hostid', [$host_prototypeid]).
-								' AND '.dbConditionString('name',
-									array_column($host_prototype['groupPrototypes'], 'name')
-								).
-							')';
-						}
-
 						if (array_key_exists('macros', $host_prototype)) {
 							foreach ($host_prototype['macros'] as &$macro) {
 								$hostmacroid = $this->referencer->findHostPrototypeMacroid($host_prototypeid,
@@ -1282,37 +1273,6 @@ class CConfigurationImport {
 						$host_prototypes_to_create[] = $host_prototype;
 					}
 				}
-			}
-		}
-
-		// Attach existing host group prototype ids.
-		if ($ex_group_prototypes_where) {
-			$db_group_prototypes = DBFetchArray(DBselect(
-				'SELECT group_prototypeid,name,hostid'.
-					' FROM group_prototype'.
-					' WHERE '.implode(' OR ', $ex_group_prototypes_where)
-			));
-
-			if ($db_group_prototypes) {
-				$groups_hash = [];
-				foreach ($db_group_prototypes as $group) {
-					$groups_hash[$group['hostid']][$group['name']] = $group['group_prototypeid'];
-				}
-
-				foreach ($host_prototypes_to_update as &$host_prototype) {
-					if (!array_key_exists($host_prototype['hostid'], $groups_hash)) {
-						continue;
-					}
-
-					$hash = $groups_hash[$host_prototype['hostid']];
-					foreach ($host_prototype['groupPrototypes'] as &$group_prototype) {
-						if (array_key_exists($group_prototype['name'], $hash)) {
-							$group_prototype['group_prototypeid'] = $hash[$group_prototype['name']];
-						}
-					}
-					unset($group_prototype, $hash);
-				}
-				unset($host_prototype, $groups_hash);
 			}
 		}
 

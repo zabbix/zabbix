@@ -324,6 +324,18 @@ form {
 		}
 	}
 
+	td {
+		.icon-maintenance {
+			margin: 0 0 -3px 4px;
+		}
+
+		.icon-depend-up,
+		.icon-depend-down,
+		.icon-ackn {
+			margin: 0 4px -3px 0;
+		}
+	}
+
 	&.compact-view {
 		tr {
 			&[class*='flh-'] {
@@ -444,16 +456,12 @@ form {
 				&::after {
 					margin: 0;
 					line-height: 14px;
+					top: 0;
 				}
 
 				&:last-of-type {
 					margin-right: 0;
 				}
-			}
-
-			[class*='icon-depend-'] {
-				width: 12px;
-				margin-right: 0;
 			}
 
 			.rel-container {
@@ -482,18 +490,29 @@ form {
 				}
 			}
 
-			.icon-maint {
-				position: relative;
-				display: inline-block;
+			.icon-maintenance {
 				height: 12px;
 				width: 12px;
-				margin: 3px 1px 2px 2px !important;
+				margin: 3px 1px 2px 4px;
 
 				&::before {
 					height: 12px;
 					width: 12px;
-					background-position: -48px -804px;
+					background-position: -49px -805px;
 				}
+			}
+
+			.icon-depend-up,
+			.icon-depend-down {
+				width: 12px;
+			}
+
+			.icon-depend-up::before {
+				background-position: -49px -731px;
+			}
+
+			.icon-depend-down::before {
+				background-position: -49px -767px;
 			}
 
 			.icon-wzrd-action {
@@ -2532,23 +2551,42 @@ button[disabled] {
 }
 
 $var-icons: (
-	maint: url($sprite-path) no-repeat -46px -802px,
-	depend-up: url($sprite-path) no-repeat -49px -729px,
-	depend-down: url($sprite-path) no-repeat -49px -765px,
-	ackn: url($sprite-path) no-repeat -45px -693px
+	maintenance: url($sprite-path) no-repeat -47px -803px,
+	depend-up: url($sprite-path) no-repeat -47px -731px,
+	depend-down: url($sprite-path) no-repeat -47px -767px,
+	ackn: url($sprite-path) no-repeat -47px -694px
 );
 
 // Dynamically generated classes:
-//  .icon-maint
+//  .icon-maintenance
 //  .icon-depend-up
 //  .icon-depend-down
 //  .icon-ackn
 @each $var-icons, $bgimage in $var-icons {
 	.icon-#{$var-icons} {
-		margin: 0 18px 0 0;
+		position: relative;
+		display: inline-block;
+		width: 16px;
+		height: 16px;
+		border-radius: 2px;
+
 		&::before {
-			background: $bgimage;
 			@extend %var-icons;
+			background: $bgimage;
+			width: 14px;
+			height: 14px;
+			left: 1px;
+			top: 1px;
+		}
+
+		&:link,
+		&:hover,
+		&:focus {
+			border-bottom: none;
+		}
+
+		&:focus {
+			box-shadow: 0 0 0 2px $btn-border-focus-color;
 		}
 	}
 }
@@ -2654,6 +2692,16 @@ $form-icon-btn: (
 	cursor: pointer;
 	margin: -12px 0 -4px;
 
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: 1px solid;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px $btn-border-focus-color;
+	}
+
 	&::before {
 		content: '';
 		display: inline-block;
@@ -2663,6 +2711,22 @@ $form-icon-btn: (
 		width: 14px;
 		height: 14px;
 		background: url($sprite-path) no-repeat -47px -659px;
+	}
+
+	&.status-red {
+		&:link,
+		&:hover,
+		&:focus {
+			border-color: darken(desaturate($alt-red, 10%), 9%);
+		}
+	}
+
+	&.status-yellow {
+		&:link,
+		&:hover,
+		&:focus {
+			border-color: darken(desaturate($alt-yellow, 9%), 20%);
+		}
 	}
 }
 
@@ -3018,14 +3082,7 @@ $form-icon-btn: (
 			z-select {
 				text-align: left;
 				padding: inherit;
-			}
 
-			li {
-				display: inline;
-				padding-left: 10px;
-			}
-
-			z-select {
 				li {
 					display: block;
 					padding-left: 5px;
@@ -4833,6 +4890,7 @@ svg {
 
 	display: flex;
 	flex-wrap: wrap;
+	align-items: start;
 
 	&.columns-nowrap {
 		flex-wrap: nowrap;
@@ -5305,6 +5363,19 @@ svg {
 	}
 }
 
+.icon-invisible {
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px $btn-border-focus-color;
+		border-radius: 2px;
+	}
+}
+
 button {
 	&.icon-action-command,
 	&.icon-action-close,
@@ -5434,7 +5505,19 @@ button {
 }
 
 .icon-description {
-	margin: 0 0 0 5px;
+	margin: 0 0 -5px 5px;
+	vertical-align: baseline;
+	border-radius: 2px;
+
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px $btn-border-focus-color;
+	}
 
 	&::after {
 		content: '?';
@@ -5488,6 +5571,16 @@ button {
 		font-size: 10px;
 		font-weight: bold;
 		color: $btn-font-color;
+	}
+
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px $btn-border-focus-color;
 	}
 }
 

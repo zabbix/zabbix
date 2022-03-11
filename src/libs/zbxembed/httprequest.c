@@ -17,15 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "httprequest.h"
+
 #include "common.h"
 #include "zbxjson.h"
 #include "zbxhttp.h"
-#include "zbxembed.h"
 #include "embed.h"
 #include "duktape.h"
 #include "zbxalgo.h"
-
-#include "httprequest.h"
 
 #ifdef HAVE_LIBCURL
 
