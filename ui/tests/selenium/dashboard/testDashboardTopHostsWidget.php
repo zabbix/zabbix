@@ -1553,8 +1553,14 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$column_form->submit();
 		}
 
-		// Submit changes after remove.
-		$form->waitUntilReady()->submit();
+		// After remove column and threshold, form is reloaded.
+		if ($data['table_id'] !== 'id:tags_table_tags') {
+			$form->waitUntilReloaded()->submit();
+		}
+		else {
+			$form->submit();
+		}
+
 		$dashboard->save();
 
 		// Check that Dashboard has been saved.
@@ -1686,8 +1692,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$column_count = 1;
 		}
 
+		$form = $this->query('id:widget-dialogue-form')->one()->asForm();
 		foreach ($data['column_fields'] as $values) {
-			$form = $this->query('id:widget-dialogue-form')->one()->asForm();
 
 			// What should be pressed - Add or Edit.
 			$selector = ($action === 'create') ? 'id:add' : 'xpath:(//button[@name="edit"])['.$column_count.']';
@@ -1734,7 +1740,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$column_form->fill($values);
 			$column_form->submit();
 
-			// updating top host several columns, change it order number.
+			// Updating top host several columns, change it count number.
 			if ($action === 'update') {
 				$column_count++;
 			}
@@ -1748,7 +1754,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						->one()->click();
 			}
 
-			sleep(1);
+			$column_form->waitUntilNotVisible();
 		}
 	}
 }
