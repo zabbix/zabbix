@@ -37,6 +37,7 @@
 		timeout: null,
 		_refresh_message_box: null,
 		_popup_message_box: null,
+		active_filter: null,
 
 		init({refresh_url, refresh_data, refresh_interval, filter_options}) {
 			this.refresh_url = new Curl(refresh_url, false);
@@ -63,9 +64,16 @@
 
 			this.refresh_counters = this.createCountersRefresh(1);
 			this.filter = new CTabFilter(document.getElementById('monitoring_latest_filter'), filter_options);
+			this.active_filter = this.filter._active_item;
 
 			this.filter.on(TABFILTER_EVENT_URLSET, () => {
 				this.reloadPartialAndTabCounters();
+
+				if (this.active_filter !== this.filter._active_item) {
+					this.active_filter = this.filter._active_item;
+					chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
+					chkbxRange.clearSelectedOnFilterChange();
+				}
 			});
 		},
 
