@@ -730,6 +730,7 @@ static void	tm_process_passive_proxy_cache_reload_request(zbx_ipc_async_socket_t
 	}
 	else
 	{
+		zabbix_log(LOG_LEVEL_WARNING, "reloading configuration cache on proxy '%s'", hostname);
 		zbx_ipc_async_socket_send(rtc, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
 		zbx_auditlog_proxy_config_reload(proxyid, hostname);
 	}
