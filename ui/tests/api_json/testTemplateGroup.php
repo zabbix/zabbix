@@ -50,9 +50,9 @@ class testTemplateGroup extends CAPITest {
 			// Check for duplicated template groups names.
 			[
 				'templategroup' => [
-					'name' => 'Templates'
+					'name' => 'API template group 1'
 				],
-				'expected_error' => 'Template group "Templates" already exists.'
+				'expected_error' => 'Template group "API template group 1" already exists.'
 			],
 			[
 				'templategroup' => [
@@ -60,10 +60,10 @@ class testTemplateGroup extends CAPITest {
 						'name' => 'One template group with existing name'
 					],
 					[
-						'name' => 'Templates'
+						'name' => 'API template group 1'
 					]
 				],
-				'expected_error' => 'Template group "Templates" already exists.'
+				'expected_error' => 'Template group "API template group 1" already exists.'
 			],
 			[
 				'templategroup' => [
@@ -129,7 +129,6 @@ class testTemplateGroup extends CAPITest {
 				$dbResult = DBSelect('select * from tplgrp where groupid='.zbx_dbstr($id));
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['name'], $templategroup[$key]['name']);
-				$this->assertEquals($dbRow['flags'], 0);
 			}
 		}
 	}
@@ -214,10 +213,10 @@ class testTemplateGroup extends CAPITest {
 				'templategroup' => [
 					[
 						'groupid' => '52001',
-						'name' => 'Templates'
+						'name' => 'API template group 2'
 					]
 				],
-				'expected_error' => 'Template group "Templates" already exists.'
+				'expected_error' => 'Template group "API template group 2" already exists.'
 			],
 			[
 				'templategroup' => [
@@ -282,7 +281,6 @@ class testTemplateGroup extends CAPITest {
 				$dbResult = DBSelect('select * from tplgrp where groupid='.zbx_dbstr($id));
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['name'], $templategroups[$key]['name']);
-				$this->assertEquals($dbRow['flags'], 0);
 			}
 		}
 		else {

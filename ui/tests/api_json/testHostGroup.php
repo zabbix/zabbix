@@ -131,7 +131,6 @@ class testHostGroup extends CAPITest {
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['name'], $hostgroup[$key]['name']);
 				$this->assertEquals($dbRow['flags'], 0);
-				$this->assertEquals($dbRow['internal'], 0);
 			}
 		}
 	}

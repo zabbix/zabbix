@@ -11,27 +11,27 @@ INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (5
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50030,50009,1,4,1,'127.0.0.1','','12345');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50031,50009,1,3,1,'127.0.0.1','','623');
 INSERT INTO interface_snmp (interfaceid, version, bulk, community, securityname, securitylevel, authpassphrase, privpassphrase, authprotocol, privprotocol, contextname) VALUES (50029, 2, 1, '{$SNMP_COMMUNITY}', '', 0, '', '', 0, 0, '');
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50012,'API group for hosts',0);
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50013,'API group for templates',0);
+INSERT INTO hstgrp (groupid,name) VALUES (50012,'API group for hosts');
+INSERT INTO hstgrp (groupid,name) VALUES (50013,'API group for templates');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50009, 50009, 50012);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50011, 50010, 50013);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50003, 50009, 50010);
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (400660, 50009, 50022, 0, 2,'API discovery rule','vfs.fs.discovery',30,90,0,'','',1,'','');
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50005,'API host group for update',0);
+INSERT INTO hstgrp (groupid,name) VALUES (50005,'API host group for update');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50010, 50009, 50005);
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50006,'API host group for update internal',1);
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50007,'API host group delete internal',1);
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50008,'API host group delete',0);
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50009,'API host group delete2',0);
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50010,'API host group delete3',0);
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50011,'API host group delete4',0);
+INSERT INTO hstgrp (groupid,name) VALUES (50006,'API host group for update internal');
+INSERT INTO hstgrp (groupid,name) VALUES (50007,'API host group delete internal');
+INSERT INTO hstgrp (groupid,name) VALUES (50008,'API host group delete');
+INSERT INTO hstgrp (groupid,name) VALUES (50009,'API host group delete2');
+INSERT INTO hstgrp (groupid,name) VALUES (50010,'API host group delete3');
+INSERT INTO hstgrp (groupid,name) VALUES (50011,'API host group delete4');
 -- discovered host groups
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (50011, 'API host prototype {#FSNAME}', 'API host prototype {#FSNAME}', 0, 2, '');
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50014,'API group for host prototype',0);
+INSERT INTO hstgrp (groupid,name) VALUES (50014,'API group for host prototype');
 INSERT INTO host_discovery (hostid,parent_hostid,parent_itemid) VALUES (50011,NULL,400660);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (50108, 50011, 'API discovery group {#HV.NAME}', NULL, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (50109, 50011, '', 50014, NULL);
-INSERT INTO hstgrp (groupid,name,internal,flags) VALUES (50015,'API discovery group {#HV.NAME}',0,4);
+INSERT INTO hstgrp (groupid,name,flags) VALUES (50015,'API discovery group {#HV.NAME}',4);
 INSERT INTO group_discovery (groupid, parent_group_prototypeid, name) VALUES (50015, 50108, 'API discovery group {#HV.NAME}');
 -- host prototype for delete
 INSERT INTO hosts (hostid, host, name, status, flags, description, custom_interfaces) VALUES (50015, 'API host prototype for delete {#FSNAME}', 'API host prototype for delete {#FSNAME}', 0, 2, '', 1);
@@ -48,9 +48,9 @@ INSERT INTO tplgrp (groupid,name) VALUES (52005,'API template group with templat
 INSERT INTO tplgrp (groupid,name) VALUES (52006,'API template group with template 2');
 INSERT INTO tplgrp (groupid,name) VALUES (52007,'API template group to delete 2');
 INSERT INTO tplgrp (groupid,name) VALUES (52008,'API template group to delete 3');
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50010, 'API Template', 'API Template', 3, '');
-INSERT INTO template_groups (templategroupid, hostid, groupid) VALUES (55001, 50010, 52005);
-INSERT INTO template_groups (templategroupid, hostid, groupid) VALUES (55002, 50010, 52006);
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (50020, 'API Template', 'API Template', 3, '');
+INSERT INTO template_group (templategroupid, hostid, groupid) VALUES (55001, 50020, 52005);
+INSERT INTO template_group (templategroupid, hostid, groupid) VALUES (55002, 50020, 52006);
 
 
 -- host tags
@@ -128,16 +128,16 @@ INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALU
 -- scripts
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50013, 'API disabled host', 'API disabled host', 1, '');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50024,50013,1,1,1,'127.0.0.1','','10050');
-INSERT INTO hstgrp (groupid,name,internal) VALUES (90000,'API group for disabled host',0);
+INSERT INTO hstgrp (groupid,name) VALUES (90000,'API group for disabled host');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50013, 50013, 90000);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50012, 'API Host for read permissions', 'API Host for read permissions', 0, '');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50023,50012,1,1,1,'127.0.0.1','','10050');
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50016,'API group with read permissions',0);
+INSERT INTO hstgrp (groupid,name) VALUES (50016,'API group with read permissions');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50012, 50012, 50016);
 INSERT INTO rights (rightid, groupid, permission, id) VALUES (3, 14, 2, 50016);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50014, 'API Host for deny permissions', 'API Host for deny permissions', 0, '');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50025,50014,1,1,1,'127.0.0.1','','10050');
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50017,'API group with deny permissions',0);
+INSERT INTO hstgrp (groupid,name) VALUES (50017,'API group with deny permissions');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50014, 50014, 50017);
 INSERT INTO rights (rightid, groupid, permission, id) VALUES (4, 14, 0, 50017);
 INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (6, 'API script for update one',                             '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     0, 2, '30s', 2, '',    0, '',     '', '',      '',       '');
@@ -220,10 +220,10 @@ INSERT INTO hosts (hostid,host,name,status,description) VALUES (90020,'90020','9
 INSERT INTO hosts (hostid,host,name,status,description) VALUES (90021,'90021','90021',0,'');
 INSERT INTO hosts (hostid,host,name,status,description) VALUES (90022,'90022','90022',0,'');
 INSERT INTO hosts (hostid,host,name,status,description) VALUES (90023,'90023','90023',0,'');
-INSERT INTO hstgrp (groupid,name,internal) VALUES (90020,'90000Eur',0);
-INSERT INTO hstgrp (groupid,name,internal) VALUES (90021,'90000Eur/LV',0);
-INSERT INTO hstgrp (groupid,name,internal) VALUES (90022,'90000Eur/LV/Rix',0);
-INSERT INTO hstgrp (groupid,name,internal) VALUES (90023,'90000Eur/LV/Skipped/Rix',0);
+INSERT INTO hstgrp (groupid,name) VALUES (90020,'90000Eur');
+INSERT INTO hstgrp (groupid,name) VALUES (90021,'90000Eur/LV');
+INSERT INTO hstgrp (groupid,name) VALUES (90022,'90000Eur/LV/Rix');
+INSERT INTO hstgrp (groupid,name) VALUES (90023,'90000Eur/LV/Skipped/Rix');
 INSERT INTO rights (rightid,groupid,permission,id) VALUES (90000,90000,3,90020);
 INSERT INTO rights (rightid,groupid,permission,id) VALUES (90001,90000,2,90021);
 INSERT INTO rights (rightid,groupid,permission,id) VALUES (90002,90000,3,90022);
@@ -923,7 +923,7 @@ INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,e
 123',3,'error');
 
 -- testtriggerfilter
-insert into hstgrp (groupid,name,internal) values (139000,'triggerstester',0);
+insert into hstgrp (groupid,name) values (139000,'triggerstester');
 insert into hosts (hostid,host,name,status,description) values (130000,'triggerstester','triggerstester',0,'');
 insert into hosts (hostid,host,name,status,description) values (131000,'triggerstestertmpl','triggerstestertmpl',3,'');
 insert into hosts_groups (hostgroupid, hostid, groupid) values (139100, 130000, 139000);
@@ -963,7 +963,7 @@ INSERT INTO trigger_depends (triggerdepid,triggerid_down,triggerid_up) VALUES (1
 INSERT INTO trigger_depends (triggerdepid,triggerid_down,triggerid_up) VALUES (138889,134005,134118);
 
 -- testDiscoveryRule
-INSERT INTO hstgrp (groupid, name, internal) values (1004, 'testDiscoveryRule', 0);
+INSERT INTO hstgrp (groupid, name) values (1004, 'testDiscoveryRule');
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (1017, 'test.discovery.rule.host.1', 'test.discovery.rule.host.1', 0, '');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (1010, 1017, 1, 1, 1, '127.0.0.1', '', '10050');
@@ -1153,7 +1153,7 @@ INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (1001
 
 -- LLD with overrides and template constraint
 INSERT INTO hosts (hostid,proxy_hostid,host,status,lastaccess,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,proxy_address,auto_compress,discover) VALUES (131001,NULL,'Overrides template constraint',3,0,-1,2,'','',NULL,0,0,0,'Overrides template constaint',0,NULL,'',1,1,'','','','','',1,0);
-INSERT INTO hstgrp (groupid,name,internal,flags) VALUES (139001,'Overrides',0,0);
+INSERT INTO hstgrp (groupid,name,flags) VALUES (139001,'Overrides',0);
 INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (139201,131001,139001);
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133766,0,'',50009,'Overrides (template constraint)','overrides.template.constraint','1m','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,50022,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
 INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10007,133766,'Only template operation',1,0,'',0);
@@ -1165,7 +1165,7 @@ INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_oper
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10011,10020,131001);
 
 -- graph portotype
-INSERT INTO hstgrp (groupid,name,internal,flags) VALUES (139002,'test_graph_prototype',0,0);
+INSERT INTO hstgrp (groupid,name,flags) VALUES (139002,'test_graph_prototype',0);
 INSERT INTO hosts (hostid,proxy_hostid,host,status,lastaccess,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,proxy_address,auto_compress,discover) VALUES (131002,NULL,'item',0,0,-1,2,'','',NULL,0,0,0,'item',0,NULL,'',1,1,'','','','','',1,0);
 INSERT INTO hosts (hostid,proxy_hostid,host,status,lastaccess,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,proxy_address,auto_compress,discover) VALUES (131003,NULL,'item_prototype',0,0,-1,2,'','',NULL,0,0,0,'item_prototype',0,NULL,'',1,1,'','','','','',1,0);
 INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (139203,131003,139002);
@@ -1486,8 +1486,8 @@ INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (5
 -- trigger permissions: END
 
 -- test discovered host groups after import parent host
-INSERT INTO hstgrp (groupid, name, internal, uuid) VALUES (50025, 'Master group', 0, '45d1ca90cd844dd98762e118ea3208fc');
-INSERT INTO hstgrp (groupid, name, internal, flags) VALUES (50026, 'host group discovered', 0, 4);
+INSERT INTO hstgrp (groupid, name, uuid) VALUES (50025, 'Master group', '45d1ca90cd844dd98762e118ea3208fc');
+INSERT INTO hstgrp (groupid, name, flags) VALUES (50026, 'host group discovered', 4);
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99010, 'Host having discovered hosts', 'Host having discovered hosts', 0, 0, '');
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99011, '{#VALUE}', '{#VALUE}', 0, 2, '');
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99012, 'discovered', 'discovered', 0, 4, '');
@@ -1533,7 +1533,7 @@ INSERT INTO users_groups (id,usrgrpid,userid) VALUES (90020,90000,20);
 INSERT INTO token (tokenid, userid, creator_userid, name, description) VALUES (23, 5, 20, 'delete-user-6', '');
 
 -- test filtering by tags
-INSERT INTO hstgrp (groupid, name, internal) VALUES (50027, 'Group of hosts with wide usage of tags', 0);
+INSERT INTO hstgrp (groupid, name) VALUES (50027, 'Group of hosts with wide usage of tags');
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99013, 'Host OS - Windows', 'Host OS - Windows', 0, 0, '');
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99014, 'Host Browser - Firefox', 'Host Browser - Firefox', 0, 0, '');
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99015, 'Host OS - Linux', 'Host OS - Linux', 0, 0, '');
@@ -1641,7 +1641,7 @@ INSERT INTO problem_tag (problemtagid, eventid, tag, value) VALUES (1016, 5003, 
 -- test trigger validation
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99028, 'Trigger validation test host', 'Trigger validation test host', 0, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99029, 'Trigger validation test template', 'Trigger validation test template', 3, '');
-INSERT INTO hstgrp (groupid, name, internal) VALUES (50028, 'Trigger validation test host group', 0);
+INSERT INTO hstgrp (groupid, name) VALUES (50028, 'Trigger validation test host group');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50038, 99028, 50028);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50039, 99029, 50028);
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, posts, headers) VALUES (58737, 99028, NULL, 2, 3, 'item', 'item', '1d', '90d', 0, '', '', '', '');
