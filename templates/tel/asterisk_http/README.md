@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 The template for monitoring Asterisk over HTTP that works without any external scripts.  
 It collects metrics by polling the Asterisk Manager API remotely using an HTTP agent and JS preprocessing.  
 All metrics are collected at once, thanks to Zabbix's bulk data collection.
@@ -15,7 +15,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 You should enable the mini-HTTP Server, add the option webenabled=yes in the general section of the manager.conf file and
  create Asterisk Manager user with system and command write permissions within your Asterisk instance. Disable the PJSIP driver

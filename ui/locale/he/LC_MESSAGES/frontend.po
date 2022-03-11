@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-25 19:55+0200\n"
-"PO-Revision-Date: 2022-02-22 14:36+0300\n"
+"POT-Creation-Date: 2022-03-07 15:19+0200\n"
+"PO-Revision-Date: 2022-03-06 11:14+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1645533405.000000\n"
+"X-POOTLE-MTIME: 1646558048.000000\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
@@ -2169,8 +2169,8 @@ msgstr[1] "לא ניתן למחוק אסימוני API"
 #: app/controllers/CControllerSlaDelete.php:79
 msgid "Cannot delete SLA"
 msgid_plural "Cannot delete SLAs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לא ניתן למחוק SLA"
+msgstr[1] "לא ניתן למחוק SLAs"
 
 #: include/classes/api/services/CUser.php:1257
 #, c-format
@@ -2448,8 +2448,8 @@ msgstr[1] "לא ניתן להשבית אסימוני API"
 #: app/controllers/CControllerSlaDisable.php:88
 msgid "Cannot disable SLA"
 msgid_plural "Cannot disable SLAs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לא ניתן להשבית SLA"
+msgstr[1] "לא ניתן להשבית SLAs"
 
 #: actionconf.php:499
 msgid "Cannot disable action"
@@ -2532,8 +2532,8 @@ msgstr[1] "לא ניתן להפעיל אסימוני API"
 #: app/controllers/CControllerSlaEnable.php:88
 msgid "Cannot enable SLA"
 msgid_plural "Cannot enable SLAs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לא ניתן להפעיל SLA"
+msgstr[1] "לא ניתן להפעיל SLAs"
 
 #: actionconf.php:498
 msgid "Cannot enable action"
@@ -4261,7 +4261,7 @@ msgstr "יצירת אסימון API"
 
 #: app/views/sla.list.php:188
 msgid "Create SLA"
-msgstr ""
+msgstr "יצירת SLA"
 
 #: include/views/configuration.action.list.php:61
 msgid "Create action"
@@ -4575,7 +4575,7 @@ msgstr "התאמה אישית עם כשל"
 
 #: include/classes/helpers/CSlaHelper.php:247
 msgid "Custom schedule"
-msgstr ""
+msgstr "תזמון מותאם אישית"
 
 #: include/items.inc.php:1860
 msgid "Custom scripts"
@@ -4720,7 +4720,7 @@ msgstr "קו מרוסק"
 #: app/views/popup.tophosts.column.edit.php:58
 #: include/classes/widgets/CWidgetHelper.php:587
 msgid "Data"
-msgstr ""
+msgstr "נתונים"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2214
 #: include/classes/graphdraw/CPieGraphDraw.php:770
@@ -4785,7 +4785,7 @@ msgstr "קובץ מפתח TLS של מסד הנתונים"
 
 #: app/partials/administration.system.info.php:121
 msgid "Database history tables upgraded"
-msgstr ""
+msgstr "טבלאות ההיסטוריה של מסד הנתונים שודרגו"
 
 #: app/partials/administration.system.info.php:129
 msgid "Database history tables use primary key"
@@ -4877,7 +4877,7 @@ msgstr "יום בחודש"
 
 #: include/classes/api/services/CMaintenance.php:689
 msgid "Day of the week and day of the month cannot be specified simultaneously."
-msgstr ""
+msgstr "לא ניתן לציין יום בשבוע ויום בחודש בו־זמנית."
 
 #: app/views/popup.maintenance.period.php:96
 #: app/views/popup.maintenance.period.php:115
@@ -5150,11 +5150,11 @@ msgstr "למחוק את אסימון ה־API הנבחר?"
 
 #: app/views/js/sla.list.js.php:130 app/views/popup.sla.edit.php:274
 msgid "Delete selected SLA?"
-msgstr ""
+msgstr "למחוק את ה־SLA הנבחר?"
 
 #: app/views/js/sla.list.js.php:129
 msgid "Delete selected SLAs?"
-msgstr ""
+msgstr "למחוק את ה־SLAs הנבחרים?"
 
 #: include/views/configuration.action.list.php:169
 msgid "Delete selected actions?"
@@ -5383,7 +5383,7 @@ msgstr "מצב הטמעה"
 
 #: include/classes/widgets/CWidgetHelper.php:62
 msgid "Deprecated"
-msgstr ""
+msgstr "השימוש הופסק"
 
 #: app/controllers/CControllerAuditLogList.php:287
 #: app/partials/configuration.host.edit.html.php:261
@@ -5519,11 +5519,11 @@ msgstr "למחוק את אסימוני ה־API הנבחרים?"
 
 #: app/views/js/sla.list.js.php:118
 msgid "Disable selected SLA?"
-msgstr ""
+msgstr "להשבית את ה־SLA הנבחר?"
 
 #: app/views/js/sla.list.js.php:117
 msgid "Disable selected SLAs?"
-msgstr ""
+msgstr "להשבית את ה־SLAs הנבחרים?"
 
 #: include/views/configuration.action.list.php:168
 msgid "Disable selected actions?"
@@ -6263,11 +6263,11 @@ msgstr "להפעיל את אסימוני ה־API הנבחרים?"
 
 #: app/views/js/sla.list.js.php:106
 msgid "Enable selected SLA?"
-msgstr ""
+msgstr "להפעיל את ה־SLA הנבחר?"
 
 #: app/views/js/sla.list.js.php:105
 msgid "Enable selected SLAs?"
-msgstr ""
+msgstr "להפעיל את ה־SLAs הנבחרים?"
 
 #: include/views/configuration.action.list.php:167
 msgid "Enable selected actions?"
@@ -7000,7 +7000,7 @@ msgstr "מסנן"
 
 #: app/views/js/popup.tabfilter.edit.js.php:57
 msgid "Filter deleted"
-msgstr ""
+msgstr "מסנן נמחק"
 
 #: app/controllers/CControllerPopupTabFilterEdit.php:117
 msgid "Filter properties"
@@ -8568,7 +8568,7 @@ msgstr "בטווח"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:363
 msgid "Inaccessible SLA"
-msgstr ""
+msgstr "SLA בלתי נגיש"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:121
 #: app/controllers/CControllerScheduledReportEdit.php:303
@@ -8621,7 +8621,7 @@ msgstr "מפה בלתי נגישה"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:362
 msgid "Inaccessible service"
-msgstr ""
+msgstr "שירות בלתי נגיש"
 
 #: httpconf.php:661 include/graphs.inc.php:274 include/hosts.inc.php:649
 #: include/httptest.inc.php:222 include/items.inc.php:916
@@ -9078,7 +9078,7 @@ msgstr "התקבלה תגובה שגויה משרת ה־Zabbix‏ „%1$s”."
 #: app/controllers/CControllerSlaCreateUpdate.php:111
 #, c-format
 msgid "Incorrect schedule: %1$s."
-msgstr ""
+msgstr "תזמון שגוי: %1$s."
 
 #: include/classes/api/services/CEvent.php:491
 #: include/classes/api/services/CProblem.php:356
@@ -11106,7 +11106,7 @@ msgstr "תחזוקה עם איסוף נתונים"
 msgid "Maintenance without data collection"
 msgstr "תחזוקה ללא איסוף נתונים"
 
-#: include/html.inc.php:980
+#: include/html.inc.php:978
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "תחזוקה: %1$s"
@@ -11121,7 +11121,7 @@ msgstr "ניהול אסימוני API"
 
 #: include/classes/helpers/CRoleHelper.php:472
 msgid "Manage SLA"
-msgstr ""
+msgstr "ניהול SLA"
 
 #: include/classes/helpers/CRoleHelper.php:471
 msgid "Manage scheduled reports"
@@ -11846,7 +11846,7 @@ msgstr "כ%"
 
 #: include/classes/helpers/CSlaHelper.php:183
 msgid "N/A"
-msgstr ""
+msgstr "לא זמין"
 
 #: include/discovery.inc.php:53
 msgid "NNTP"
@@ -12114,11 +12114,11 @@ msgstr "מעולם לא"
 
 #: app/views/popup.token.edit.php:162
 msgid "New API token"
-msgstr ""
+msgstr "אסימון API חדש"
 
 #: app/views/popup.sla.edit.php:255 app/views/popup.sla.edit.php:283
 msgid "New SLA"
-msgstr ""
+msgstr "SLA חדש"
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "New additional rule"
@@ -12159,7 +12159,7 @@ msgstr "ערך חדש לתגית אירועים"
 
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:94
 msgid "New excluded downtime"
-msgstr ""
+msgstr "זמן השבתה חדש מוחרג"
 
 #: app/views/configuration.host.edit.php:65 app/views/popup.host.edit.php:97
 msgid "New host"
@@ -13006,7 +13006,7 @@ msgstr "יצרן"
 #: include/classes/helpers/CSeverityHelper.php:34
 #: include/classes/screens/CScreenHttpTestDetails.php:100
 #: include/classes/screens/CScreenHttpTestDetails.php:186
-#: include/classes/screens/CScreenHttpTest.php:140 include/maps.inc.php:422
+#: include/classes/screens/CScreenHttpTest.php:142 include/maps.inc.php:422
 #: include/triggers.inc.php:72
 msgid "OK"
 msgstr "תקין"
@@ -14925,7 +14925,7 @@ msgstr "הדוח נשלח בהצלחה אל: %1$s."
 #: app/partials/service.info.php:61 app/views/popup.sla.edit.php:71
 #: app/views/sla.list.php:90
 msgid "Reporting period"
-msgstr ""
+msgstr "תקופת דיווח"
 
 #: include/classes/helpers/CMenuHelper.php:161
 #: include/classes/helpers/CRoleHelper.php:308
@@ -15309,59 +15309,59 @@ msgstr ""
 #: include/classes/api/services/CSla.php:539
 #, c-format
 msgid "SLA \"%1$s\" already exists."
-msgstr ""
+msgstr "ה־SLA‏ „%1$s” כבר קיים."
 
 #: app/controllers/CControllerSlaReportList.php:229
 msgid "SLA Report"
-msgstr ""
+msgstr "דוח SLA"
 
 #: app/controllers/CControllerSlaCreate.php:123
 msgid "SLA created"
-msgstr ""
+msgstr "SLA נוצר"
 
 #: app/controllers/CControllerSlaDelete.php:64
 msgid "SLA deleted"
 msgid_plural "SLAs deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "SLA נמחק"
+msgstr[1] "SLAs נמחקו"
 
 #: app/controllers/CControllerSlaDisable.php:73
 msgid "SLA disabled"
 msgid_plural "SLAs disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "SLA הושבת"
+msgstr[1] "SLAs הושבתו"
 
 #: app/controllers/CControllerSlaEnable.php:73
 msgid "SLA enabled"
 msgid_plural "SLAs enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "SLA הופעל"
+msgstr[1] "SLAs הופעלו"
 
 #: app/views/monitoring.widget.slareport.view.php:33
 msgid "SLA is disabled."
-msgstr ""
+msgstr "SLA מושבת."
 
 #: app/views/sla.list.php:93 app/views/sla.list.php:121
 #: app/views/slareport.list.php:92 include/classes/helpers/CMenuHelper.php:94
 #: include/classes/helpers/CRoleHelper.php:359
 #: include/classes/widgets/CWidgetConfig.php:69
 msgid "SLA report"
-msgstr ""
+msgstr "דוח SLA"
 
 #: app/controllers/CControllerSlaUpdate.php:134
 msgid "SLA updated"
-msgstr ""
+msgstr "ה־SLA עודכן"
 
 #: include/classes/api/services/CDashboardGeneral.php:630
 #, c-format
 msgid "SLA with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "ה־SLA עם המזהה „%1$s” אינו זמין."
 
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:98
 #: app/views/slareport.list.php:163
 msgid "SLI"
-msgstr ""
+msgstr "SLI"
 
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:38
@@ -15369,7 +15369,7 @@ msgstr ""
 #: app/views/popup.sla.edit.php:61 app/views/sla.list.php:88
 #: app/views/slareport.list.php:115 app/views/slareport.list.php:162
 msgid "SLO"
-msgstr ""
+msgstr "SLO"
 
 #: app/views/administration.authentication.edit.php:236
 msgid "SLO service URL"
@@ -15836,7 +15836,7 @@ msgstr "בחירה"
 
 #: app/views/slareport.list.php:103
 msgid "Select SLA to display SLA report."
-msgstr ""
+msgstr "נא לבחור SLA כדי להציג דוח SLA."
 
 #: app/views/popup.massupdate.item.php:438 app/views/popup.triggerexpr.php:83
 #: include/views/configuration.graph.edit.php:217
@@ -16414,7 +16414,7 @@ msgstr "אבטיפוס תרשים פשוט"
 
 #: app/views/monitoring.charts.view.php:84
 msgid "Simple graphs"
-msgstr ""
+msgstr "תרשימים פשוטים"
 
 #: include/views/configuration.trigger.prototype.edit.php:506
 #: include/views/configuration.triggers.edit.php:534
@@ -16770,7 +16770,7 @@ msgstr "כלל הפצת מצב"
 msgid "Step"
 msgstr "שלב"
 
-#: include/classes/screens/CScreenHttpTest.php:129
+#: include/classes/screens/CScreenHttpTest.php:131
 #: include/views/configuration.httpconf.list.php:168
 #, c-format
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
@@ -16925,7 +16925,7 @@ msgstr ""
 msgid "Supported macros:"
 msgstr ""
 
-#: include/html.inc.php:975
+#: include/html.inc.php:973
 #, c-format
 msgid "Suppressed till: %1$s"
 msgstr "מוסתרת עד: %1$s"
@@ -17391,7 +17391,7 @@ msgstr "טקסט"
 
 #: app/views/popup.tophosts.column.edit.php:75
 msgid "Text, supports {INVENTORY.*}, {HOST.*} macros"
-msgstr ""
+msgstr "טקסט, תומך בתצורות המאקרו {INVENTORY.*‎}, {HOST.*‎}"
 
 #: include/classes/api/clients/CLocalApiClient.php:89
 #, c-format
@@ -17484,7 +17484,7 @@ msgstr "הפריט לא יתגלה עוד ויימחק בפעם הבאה שית�
 #: include/classes/widgets/views/widget.geomap.form.view.php:76
 #, c-format
 msgid "The maximum zoom level is \"%1$s\"."
-msgstr ""
+msgstr "רמת התקריב המרבית היא „%1$s”."
 
 #: include/classes/data/CItemData.php:1002
 msgid "The number of processes. Returns integer"
@@ -17569,7 +17569,7 @@ msgstr "סף"
 
 #: app/views/popup.tophosts.column.edit.php:232
 msgid "Thresholds"
-msgstr ""
+msgstr "ספים"
 
 #: include/items.inc.php:1892 include/items.inc.php:1896
 msgid "Throttling"
@@ -17687,7 +17687,7 @@ msgstr "חותמת זמן"
 
 #: app/views/sla.list.php:91
 msgid "Timezone"
-msgstr ""
+msgstr "אזור זמן"
 
 #: app/controllers/CControllerSlaReportList.php:162
 #: app/controllers/CControllerSlaReportList.php:170
@@ -17730,11 +17730,11 @@ msgstr "למעלה"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
-msgstr ""
+msgstr "N העליונים"
 
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
-msgstr ""
+msgstr "מארחים מובילים"
 
 #: app/views/administration.queue.overview.proxy.php:97
 #: app/views/monitoring.widget.hostavail.view.php:34
@@ -18085,7 +18085,7 @@ msgstr "יש לבחור בשני רכיבים במפה"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:442
 msgid "Two or more fields cannot occupy same space."
-msgstr ""
+msgstr "שני שדות ומעלה לא יכולים לתפוס את אותו המקום."
 
 #: app/controllers/CControllerPopupGeneric.php:233
 #: app/controllers/CControllerPopupGeneric.php:284
@@ -18393,7 +18393,7 @@ msgstr "פעולה לא ידועה"
 #: include/classes/helpers/CElasticsearchHelper.php:193
 #: include/classes/screens/CScreenHttpTestDetails.php:110
 #: include/classes/screens/CScreenHttpTestDetails.php:182
-#: include/classes/screens/CScreenHttpTest.php:126
+#: include/classes/screens/CScreenHttpTest.php:128
 #: include/views/configuration.httpconf.list.php:172
 msgid "Unknown error"
 msgstr "שגיאה לא ידועה"
@@ -18417,7 +18417,7 @@ msgstr "סוג המנשק לא ידוע."
 msgid "Unknown resource"
 msgstr "משאב לא ידוע"
 
-#: include/classes/screens/CScreenHttpTest.php:134
+#: include/classes/screens/CScreenHttpTest.php:136
 #: include/views/configuration.httpconf.list.php:174
 #, c-format
 msgid "Unknown step failed: %1$s"
@@ -19674,7 +19674,7 @@ msgstr "הווידג׳ט בנקודה X:%3$d,‏ Y:%4$d בעמוד מס׳ %2$d �
 
 #: include/classes/widgets/CWidgetHelper.php:68
 msgid "Widget is deprecated."
-msgstr ""
+msgstr "השימוש בווידג׳ט הופסק."
 
 #: jsLoader.php:196
 msgid "Widget is too small for the specified number of columns and rows."
@@ -19703,7 +19703,7 @@ msgstr "הווידג׳ט קטן לעומת גודל העמודות והשורו�
 msgid "Width"
 msgstr "רוחב"
 
-#: app/controllers/CControllerLatest.php:530
+#: app/controllers/CControllerLatest.php:529
 msgid "With data"
 msgstr "עם נתונים"
 
@@ -19734,7 +19734,7 @@ msgstr "עם תקלות"
 msgid "With triggers"
 msgstr "עם הקפצות"
 
-#: app/controllers/CControllerLatest.php:535
+#: app/controllers/CControllerLatest.php:534
 msgid "Without data"
 msgstr "ללא נתונים"
 
@@ -20150,7 +20150,7 @@ msgstr "אמור להיות תאריך"
 #: app/controllers/CControllerSlaReportList.php:171
 #, c-format
 msgid "a date not later than %1$s is expected"
-msgstr ""
+msgstr "אמור להיות תאריך לא יאוחר מ־%1$s"
 
 #: app/views/administration.authentication.edit.php:79
 msgid "a digit"
@@ -20223,7 +20223,7 @@ msgstr "אמור להיות זמן"
 #: app/controllers/CControllerSlaExcludedDowntimeValidate.php:95
 #, c-format
 msgid "a time not later than %1$s is expected"
-msgstr ""
+msgstr "אמורה להיות שעה שלא תאוחר מ־%1$s"
 
 #: include/classes/validators/CApiInputValidator.php:1846
 #: include/classes/validators/CNewValidator.php:252
@@ -20245,7 +20245,7 @@ msgstr "אמור להיות יחידת זמן"
 
 #: include/classes/validators/CApiInputValidator.php:2888
 msgid "a timestamp is too large"
-msgstr ""
+msgstr "חותמת הזמן גדולה מדי"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:333
 msgid "abs() - Absolute value"
@@ -20616,7 +20616,7 @@ msgstr "לא יכול להישאר ריק"
 #: include/classes/validators/CApiInputValidator.php:2982
 #, c-format
 msgid "cannot be less than or equal to the value of parameter \"%1$s\""
-msgstr ""
+msgstr "לא יכול להיות קטן או שווה לערך המשתנה „%1$s”"
 
 #: include/classes/api/services/CHostBase.php:57
 #: include/classes/api/services/CTemplate.php:1019
@@ -21470,7 +21470,7 @@ msgstr "אין נתונים"
 #: include/classes/api/services/CHostPrototype.php:1205
 #, c-format
 msgid "no default interface for \"%1$s\" type."
-msgstr ""
+msgstr "אין מנשק ברירת מחדל לסוג „%1$s”."
 
 #: include/classes/api/services/CEvent.php:773
 msgid "no permissions to acknowledge problems"

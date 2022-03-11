@@ -1,6 +1,6 @@
 # User guide to setting up Zabbix monitoring of the Kubernetes
 
-A template set for monitoring your Kubernetes cluster via Zabbix 6.0 and higher. Zabbix provides a powerful automated solution for monitoring the Kubernetes cluster components.
+A template set for monitoring your Kubernetes cluster via Zabbix 6.2 and higher. Zabbix provides a powerful automated solution for monitoring the Kubernetes cluster components.
 You need to deploy [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F6.0) with Zabbix Proxy and Zabbix agents to monitor the cluster.
 
 ## Pre-requisites and installation

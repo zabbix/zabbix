@@ -27,6 +27,10 @@ require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
 
 $widget = (new CWidget())
 	->setTitle(_('Items'))
+	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
+		? CDocHelper::CONFIGURATION_HOST_ITEM_LIST
+		: CDocHelper::CONFIGURATION_TEMPLATE_ITEM_LIST
+	))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())->addItem(

@@ -60,6 +60,7 @@ $form->addItem($tags_form_grid);
 
 $output = [
 	'header' => $data['title'],
+	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_MASSUPDATE_SERVICE),
 	'body' => $form->toString(),
 	'buttons' => [
 		[

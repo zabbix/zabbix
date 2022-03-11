@@ -25,7 +25,9 @@
 
 $this->includeJsFile('administration.usergroup.edit.js.php');
 
-$widget = (new CWidget())->setTitle(_('User groups'));
+$widget = (new CWidget())
+	->setTitle(_('User groups'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_USERGROUP_EDIT));
 
 $form = (new CForm())
 	->setId('user-group-form')

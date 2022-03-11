@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 The template to monitor HashiCorp Vault by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -18,7 +18,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 Configure Vault API. See [Vault Configuration](https://www.vaultproject.io/docs/configuration).
 Create a Vault service token and set it to the macro `{$VAULT.TOKEN}`.
@@ -92,7 +92,7 @@ There are no template links in this template.
 |Vault |Vault: Cache hit, rate |<p>Number of times a value was retrieved from the LRU cache.</p> |DEPENDENT |vault.metrics.cache.hit.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `vault_cache_hit`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Vault |Vault: Cache miss, rate |<p>Number of times a value was not in the LRU cache. The results in a read from the configured storage.</p> |DEPENDENT |vault.metrics.cache.miss.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `vault_cache_miss`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Vault |Vault: Cache write, rate |<p>Number of times a value was written to the LRU cache.</p> |DEPENDENT |vault.metrics.cache.write.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `vault_cache_write`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
-|Vault |Vault: Check token, rate |<p>Number of token checks handled by Vault corecore.</p> |DEPENDENT |vault.metrics.core.check.token.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `vault_core_check_token_count`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
+|Vault |Vault: Check token, rate |<p>Number of token checks handled by Vault core.</p> |DEPENDENT |vault.metrics.core.check.token.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `vault_core_check_token_count`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Vault |Vault: Fetch ACL and token, rate |<p>Number of ACL and corresponding token entry fetches handled by Vault core.</p> |DEPENDENT |vault.metrics.core.fetch.acl_and_token<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `vault_core_fetch_acl_and_token_count`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Vault |Vault: Requests, rate |<p>Number of requests handled by Vault core.</p> |DEPENDENT |vault.metrics.core.handle.request<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `vault_core_handle_request_count`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Vault |Vault: Leadership setup failed, counter |<p>Cluster leadership setup failures which have occurred in a highly available Vault cluster.</p> |DEPENDENT |vault.metrics.core.leadership.setup_failed<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `vault_core_leadership_setup_failed`</p><p>- JSONPATH: `$[?(@.name=="vault_core_leadership_setup_failed")].value.sum()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |

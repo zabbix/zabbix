@@ -17,19 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "ha.h"
+#include "zbxha.h"
+
 #include "db.h"
-#include "log.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "threads.h"
-#include "zbxjson.h"
 #include "mutexs.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 #include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_ha.h"
 #include "../../libs/zbxaudit/audit_settings.h"
-#include "zbxha.h"
-#include "ha.h"
 
 #define ZBX_HA_POLL_PERIOD	5
 

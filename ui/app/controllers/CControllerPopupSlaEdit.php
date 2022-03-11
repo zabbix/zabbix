@@ -107,7 +107,7 @@ class CControllerPopupSlaEdit extends CController {
 						? CSlaHelper::SCHEDULE_MODE_CUSTOM
 						: CSlaHelper::SCHEDULE_MODE_24X7,
 					'schedule_periods' => $schedule_periods,
-					'effective_date' => zbx_date2str(DATE_FORMAT, $this->sla['effective_date'], 'UTC'),
+					'effective_date' => zbx_date2str(ZBX_DATE, $this->sla['effective_date'], 'UTC'),
 					'service_tags' => $this->sla['service_tags'],
 					'description' => $this->sla['description'],
 					'status' => $this->sla['status'],
@@ -125,7 +125,7 @@ class CControllerPopupSlaEdit extends CController {
 					'timezone' => ZBX_DEFAULT_TIMEZONE,
 					'schedule_mode' => CSlaHelper::SCHEDULE_MODE_24X7,
 					'schedule_periods' => [0 => ''] + array_fill(1, 5, '8:00-17:00') + [6 => ''],
-					'effective_date' => zbx_date2str(DATE_FORMAT, null, CTimezoneHelper::getSystemTimezone()),
+					'effective_date' => zbx_date2str(ZBX_DATE, null, CTimezoneHelper::getSystemTimezone()),
 					'service_tags' => [
 						['tag' => '', 'operator' => ZBX_SLA_SERVICE_TAG_OPERATOR_EQUAL, 'value' => '']
 					],

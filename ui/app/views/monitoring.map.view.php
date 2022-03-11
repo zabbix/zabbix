@@ -35,6 +35,7 @@ $web_layout_mode = $this->getLayoutMode();
 
 (new CWidget())
 	->setTitle(_('Maps'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_MAP_VIEW))
 	->setWebLayoutMode($web_layout_mode)
 	->setControls(new CList([
 		(new CForm('get'))

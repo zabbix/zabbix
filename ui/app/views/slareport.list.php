@@ -76,20 +76,21 @@ $filter = (new CFilter())
 				new CLabel(_('From'), 'filter_date_from'),
 				new CFormField(
 					(new CDateSelector('filter_date_from', $data['filter']['date_from']))
-						->setDateFormat(DATE_FORMAT)
-						->setPlaceholder(DATE_FORMAT_PLACEHOLDER)
+						->setDateFormat(ZBX_DATE)
+						->setPlaceholder(_('YYYY-MM-DD'))
 				),
 				new CLabel(_('To'), 'filter_date_to'),
 				new CFormField(
 					(new CDateSelector('filter_date_to', $data['filter']['date_to']))
-						->setDateFormat(DATE_FORMAT)
-						->setPlaceholder(DATE_FORMAT_PLACEHOLDER)
+						->setDateFormat(ZBX_DATE)
+						->setPlaceholder(_('YYYY-MM-DD'))
 				)
 			])
 	]);
 
 $widget = (new CWidget())
 	->setTitle(_('SLA report'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::SLAREPORT_LIST))
 	->addItem($filter);
 
 $report = new CTableInfo();

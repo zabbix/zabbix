@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:51:51Z'
+  date: '2022-03-01T08:26:39Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -363,7 +363,7 @@ zabbix_export:
               tags:
                 -
                   tag: scope
-                  value: perfomance
+                  value: performance
         -
           uuid: 110685e463e141ca800b2638e3532d51
           name: 'MongoDB cluster: Jumbo chunks'
