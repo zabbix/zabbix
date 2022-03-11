@@ -22,7 +22,6 @@
 class CTableInfo extends CTable {
 
 	protected $message;
-	protected $nodata_colspan;
 
 	public function __construct() {
 		parent::__construct();
@@ -64,35 +63,6 @@ class CTableInfo extends CTable {
 
 	public function setNoDataMessage($message) {
 		$this->message = $message;
-
-		return $this;
-	}
-
-	/**
-	 * @param int $value
-	 *
-	 * @return $this
-	 */
-	public function setNodataColspan(int $value): CTableInfo {
-		$this->nodata_colspan = $value;
-
-		return $this;
-	}
-
-	/**
-	 * @param mixed $value
-	 *
-	 * @return $this
-	 */
-	public function setHeader($value = null): CTableInfo {
-		if (!($value instanceof CRow)) {
-			$value = new CRowHeader($value);
-		}
-
-		$this->colnum = $this->nodata_colspan !== null ? $this->nodata_colspan : $value->itemsCount();
-
-		$value = new CTag('thead', true, $value);
-		$this->header = $value->toString();
 
 		return $this;
 	}

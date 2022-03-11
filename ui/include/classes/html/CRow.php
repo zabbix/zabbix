@@ -22,6 +22,7 @@
 class CRow extends CTag {
 
 	protected $heading_column;
+	protected $colspan_count = 0;
 
 	/**
 	 * @param CTag|array|null $item
@@ -42,20 +43,26 @@ class CRow extends CTag {
 	 */
 	public function addItem($item) {
 		if ($item instanceof CCol) {
+			$this->colspan_count += $item->getColspan();
 			parent::addItem($item);
 		}
 		elseif (is_array($item)) {
 			foreach ($item as $el) {
 				if ($el instanceof CCol) {
+					$this->colspan_count += $el->getColspan();
 					parent::addItem($el);
 				}
 				elseif ($el !== null) {
-					parent::addItem($this->createCell($el));
+					$col = $this->createCell($el);
+					$this->colspan_count += $col->getColspan();
+					parent::addItem($col);
 				}
 			}
 		}
 		elseif ($item !== null) {
-			parent::addItem($this->createCell($item));
+			$col = $this->createCell($item);
+			$this->colspan_count += $col->getColspan();
+			parent::addItem($col);
 		}
 
 		return $this;
@@ -72,5 +79,14 @@ class CRow extends CTag {
 		return ($this->heading_column !== null && $this->itemsCount() == $this->heading_column)
 			? (new CColHeader($el))
 			: (new CCol($el));
+	}
+
+	/**
+	 * Get total colspan count across all cells.
+	 *
+	 * @return int
+	 */
+	public function getColspan(): int {
+		return $this->colspan_count;
 	}
 }
