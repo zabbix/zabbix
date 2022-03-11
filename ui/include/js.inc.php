@@ -75,49 +75,6 @@ function zbx_jsvalue($value, $as_object = false, $addQuotes = true) {
 	return $is_object ? '{'.implode(',', $value).'}' : '['.implode(',', $value).']';
 }
 
-function insert_javascript_for_visibilitybox() {
-	if (defined('CVISIBILITYBOX_JAVASCRIPT_INSERTED')) {
-		return null;
-	}
-	define('CVISIBILITYBOX_JAVASCRIPT_INSERTED', 1);
-
-	$js = '
-		function visibility_status_changeds(value, obj_id, replace_to) {
-			var obj = document.getElementById(obj_id);
-			if (is_null(obj)) {
-				throw "Cannot find objects with name [" + obj_id +"]";
-			}
-
-			if (replace_to && replace_to != "") {
-				if (obj.originalObject) {
-					var old_obj = obj.originalObject;
-					old_obj.originalObject = obj;
-					obj.parentNode.replaceChild(old_obj, obj);
-				}
-				else if (!value) {
-					try {
-						var new_obj = document.createElement("span");
-						new_obj.setAttribute("name", obj.name);
-						new_obj.setAttribute("id", obj.id);
-					}
-					catch(e) {
-						throw "Cannot create new element";
-					}
-					new_obj.innerHTML = replace_to;
-					new_obj.originalObject = obj;
-					obj.parentNode.replaceChild(new_obj, obj);
-				}
-				else {
-					throw "Missing originalObject for restoring";
-				}
-			}
-			else {
-				obj.style.visibility = value ? "visible" : "hidden";
-			}
-		}';
-	insert_js($js);
-}
-
 function insert_js($script, $jQueryDocumentReady = false) {
 	echo get_js($script, $jQueryDocumentReady);
 }

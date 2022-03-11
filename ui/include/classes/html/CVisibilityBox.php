@@ -28,7 +28,6 @@ class CVisibilityBox extends CCheckBox {
 		parent::__construct($name);
 		$this->onClick('visibility_status_changeds(this.checked, '.zbx_jsvalue($this->object_id).', '.
 			zbx_jsvalue($this->replace_to).');');
-		insert_javascript_for_visibilitybox();
 	}
 
 	/**

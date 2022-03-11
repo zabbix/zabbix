@@ -1031,6 +1031,40 @@ function openMassupdatePopup(action, parameters = {}, {
 	return PopUp(action, parameters, {dialogue_class, trigger_element});
 }
 
+function visibility_status_changeds(value, obj_id, replace_to) {
+	var obj = document.getElementById(obj_id);
+	if (is_null(obj)) {
+		throw "Cannot find objects with name [" + obj_id +"]";
+	}
+
+	if (replace_to && replace_to != "") {
+		if (obj.originalObject) {
+			var old_obj = obj.originalObject;
+			old_obj.originalObject = obj;
+			obj.parentNode.replaceChild(old_obj, obj);
+		}
+		else if (!value) {
+			try {
+				var new_obj = document.createElement("span");
+				new_obj.setAttribute("name", obj.name);
+				new_obj.setAttribute("id", obj.id);
+			}
+			catch(e) {
+				throw "Cannot create new element";
+			}
+			new_obj.innerHTML = replace_to;
+			new_obj.originalObject = obj;
+			obj.parentNode.replaceChild(new_obj, obj);
+		}
+		else {
+			throw "Missing originalObject for restoring";
+		}
+	}
+	else {
+		obj.style.visibility = value ? "visible" : "hidden";
+	}
+}
+
 /**
  * Clears session storage from markers of checked table rows.
  * Or keeps only accessible IDs in the list of checked rows.
