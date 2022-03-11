@@ -1,1 +1,0 @@
-...G...... [ZBX-19407] removed redundant encoding check in get_codepage() for Windows (arimdjonoks)
