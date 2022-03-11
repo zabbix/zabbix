@@ -52,6 +52,9 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 */
 	protected static $update_widgetid;
 
+	/**
+	 * Widget name for update.
+	 */
 	const WIDGET_UPDATE_NAME = 'Top hosts update';
 
 	private static $updated_name = self::WIDGET_UPDATE_NAME;
