@@ -1284,6 +1284,7 @@ A.F....... [ZBXNEXT-7485] fixed debug_backtrace function usage for php8 (acikuns
 .........T [ZBXNEXT-7493] added garbage collector and memory pool discovery to generic Java template (vkhaliev)
 
 Bug fixes:
+...G...... [ZBX-20390] fixed Oracle Solaris vm.memory.size[available] item kstats memory read (arimdjonoks)
 ..F....... [ZBX-19223] fixed disabled hosts not listed in latest data view (averza)
 .........T [ZBX-20521] corrected typos in templates, README and media types (drasihov)
 ..F....... [ZBX-20640] fixed X-axis field placement in different rows in Axis tab in Graph widget (acikuns)
