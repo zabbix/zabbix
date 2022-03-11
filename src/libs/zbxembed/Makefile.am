@@ -18,4 +18,3 @@ libzbxembed_a_SOURCES = \
 	xml.h \
 	zabbix.c \
 	zabbix.h
-

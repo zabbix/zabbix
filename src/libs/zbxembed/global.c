@@ -25,6 +25,7 @@
 #include "base64.h"
 #include "sha256crypt.h"
 #include "zbxcrypto.h"
+#include "zbxhash.h"
 
 /******************************************************************************
  *                                                                            *

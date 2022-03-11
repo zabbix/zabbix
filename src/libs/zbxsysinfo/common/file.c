@@ -22,6 +22,7 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "zbxcrypto.h"
+#include "zbxhash.h"
 #include "zbxregexp.h"
 #include "log.h"
 #include "dir.h"

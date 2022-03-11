@@ -1968,6 +1968,7 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
 		\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
 		\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
+		\${abs_top_builddir}/src/libs/zbxhash/libzbxhash.a \
 		\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
 		\${abs_top_builddir}/src/libs/zbxsys/libzbxsys.a \
 		\${abs_top_builddir}/src/libs/zbxnix/libzbxnix.a \
@@ -2068,6 +2069,7 @@ AC_OUTPUT([
 	src/libs/zbxlog/Makefile
 	src/libs/zbxalgo/Makefile
 	src/libs/zbxmemory/Makefile
+	src/libs/zbxhash/Makefile
 	src/libs/zbxcrypto/Makefile
 	src/libs/zbxconf/Makefile
 	src/libs/zbxdbcache/Makefile

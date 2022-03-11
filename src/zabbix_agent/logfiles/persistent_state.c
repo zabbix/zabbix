@@ -22,6 +22,7 @@
 #include "log.h"
 #include "logfiles.h"
 #include "zbxjson.h"
+#include "zbxcrypto.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 
 /* tags for agent persistent storage files */
