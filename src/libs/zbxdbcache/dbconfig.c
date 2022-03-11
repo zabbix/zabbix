@@ -12988,10 +12988,11 @@ int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid)
  * Purpose: retrieve proxyids for all cached proxies                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_all_proxies(zbx_vector_uint64_t *active_proxyids, zbx_vector_uint64_t *passive_proxyids)
+void	zbx_dc_get_all_proxies(zbx_vector_ptr_pair_t *active_proxies, zbx_vector_ptr_pair_t *passive_proxies)
 {
 	ZBX_DC_HOST_H		*dc_host;
 	zbx_hashset_iter_t	iter;
+	zbx_ptr_pair_t		pair;
 
 	RDLOCK_CACHE;
 
@@ -13000,9 +13001,23 @@ void	zbx_dc_get_all_proxies(zbx_vector_uint64_t *active_proxyids, zbx_vector_uin
 	while (NULL != (dc_host = (ZBX_DC_HOST_H *)zbx_hashset_iter_next(&iter)))
 	{
 		if (dc_host->host_ptr->status == HOST_STATUS_PROXY_ACTIVE)
-			zbx_vector_uint64_append(active_proxyids, dc_host->host_ptr->hostid);
+		{
+			pair.first = &dc_host->host_ptr->hostid;
+			pair.second = dc_host->host_ptr->host;
+			zabbix_log(3, "DBG %s, host_ptr->host = %s", __func__, dc_host->host_ptr->host);
+			zabbix_log(3, "DBG %s, added pair %p = %p", __func__, pair.first, (char*)pair.second);
+			zabbix_log(3, "DBG %s,  added pair %i = %s", __func__, *(int*)(pair.first), (char*)pair.second);
+			zbx_vector_ptr_pair_append(active_proxies, pair);
+		}
 		else if (dc_host->host_ptr->status == HOST_STATUS_PROXY_PASSIVE)
-			zbx_vector_uint64_append(passive_proxyids, dc_host->host_ptr->hostid);
+		{
+			pair.first = &dc_host->host_ptr->hostid;
+			pair.second = dc_host->host_ptr->host;
+			zabbix_log(3, "DBG %s, host_ptr->host = %s", __func__, dc_host->host_ptr->host);
+			zabbix_log(3, "DBG %s, added pair %p = %p", __func__, pair.first, (char*)pair.second);
+			zabbix_log(3, "DBG %s,  added pair %i = %s", __func__, *(int*)(pair.first), (char*)pair.second);
+			zbx_vector_ptr_pair_append(passive_proxies, pair);
+		}
 	}
 
 	UNLOCK_CACHE;

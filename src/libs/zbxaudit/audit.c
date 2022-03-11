@@ -663,3 +663,91 @@ void	zbx_audit_entry_append_string(zbx_audit_entry_t *entry, int audit_op, const
 
 	va_end(args);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: record manual proxy configuration refresh into audit log          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_auditlog_proxy_config_reload(zbx_uint64_t proxy_hostid, const char *proxy_name)
+{
+	int		ret = SUCCEED;
+	char		auditid_cuid[CUID_LEN];
+	zbx_config_t	cfg;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED);
+
+	if (ZBX_AUDITLOG_ENABLED != cfg.auditlog_enabled)
+		goto out;
+
+	zbx_new_cuid(auditid_cuid);
+
+	if (ZBX_DB_OK > DBexecute("insert into auditlog (auditid,userid,username,clock,action,ip,resourceid,"
+			"resourcename,resourcetype,recordsetid,details) values ('%s',%i,'%s',%d,'%d','%s',"
+			ZBX_FS_UI64 ",'%s',%d,'%s','')", auditid_cuid, AUDIT_USERID, AUDIT_USERNAME, (int)time(NULL),
+			AUDIT_ACTION_CONFIG_REFRESH, AUDIT_IP, proxy_hostid, proxy_name, AUDIT_RESOURCE_PROXY, auditid_cuid))
+	{
+		ret = FAIL;
+	}
+
+out:
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: record mass proxy configuration refresh into audit log            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_auditlog_mass_proxy_config_reload(zbx_vector_ptr_pair_t *active_proxies, zbx_vector_ptr_pair_t *passive_proxies)
+{
+	int		i, ret = SUCCEED;
+	char		auditid_cuid[CUID_LEN];
+	zbx_config_t	cfg;
+	zbx_db_insert_t	insert;
+	zbx_ptr_pair_t	pair;
+	zbx_uint64_t	proxy_hostid;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED);
+
+	if (ZBX_AUDITLOG_ENABLED != cfg.auditlog_enabled)
+		goto out;
+
+	zbx_db_insert_prepare(&insert, "auditlog", "auditid", "userid", "username", "clock", "action", "ip",
+			"resourceid", "resourcename", "resourcetype", "recordsetid", "details", NULL);
+
+	for (i = 0; i < active_proxies->values_num; i++)
+	{
+		zbx_new_cuid(auditid_cuid);
+
+		pair = active_proxies->values[i];
+		proxy_hostid = *((zbx_uint64_t *)pair.first);
+
+		zbx_db_insert_add_values(&insert, auditid_cuid, AUDIT_USERID, AUDIT_USERNAME, (int)time(NULL),
+			AUDIT_ACTION_CONFIG_REFRESH, AUDIT_IP, proxy_hostid, pair.second, AUDIT_RESOURCE_PROXY, auditid_cuid, "");
+	}
+
+	for (i = 0; i < passive_proxies->values_num; i++)
+	{
+		zbx_new_cuid(auditid_cuid);
+
+		pair = passive_proxies->values[i];
+		proxy_hostid = *((zbx_uint64_t *)pair.first);
+
+		zbx_db_insert_add_values(&insert, auditid_cuid, AUDIT_USERID, AUDIT_USERNAME, (int)time(NULL),
+			AUDIT_ACTION_CONFIG_REFRESH, AUDIT_IP, proxy_hostid, pair.second, AUDIT_RESOURCE_PROXY, auditid_cuid, "");
+	}
+
+	zbx_db_insert_execute(&insert);
+	zbx_db_insert_clean(&insert);
+out:
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
