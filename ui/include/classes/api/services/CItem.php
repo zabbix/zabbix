@@ -556,11 +556,11 @@ class CItem extends CItemGeneral {
 		self::checkAndAddUuid($items);
 		self::checkDuplicates($items);
 		self::checkValueMaps($items);
-		self::validateInventoryLinks($items);
+		self::checkInventoryLinks($items);
 		self::checkHostInterfaces($items);
 		$this->checkSpecificFields($items);
 		$this->validatePreprocessing($items);
-		$this->validateDependentItems($items);
+		self::checkDependentItems($items);
 	}
 
 	/**
@@ -657,12 +657,12 @@ class CItem extends CItemGeneral {
 		self::addAffectedObjects($items, $db_items);
 
 		self::checkDuplicates($items, $db_items);
-		self::checkValueMaps($items);
-		self::validateInventoryLinks($items, true);
+		self::checkValueMaps($items, $db_items);
+		self::checkInventoryLinks($items, $db_items);
 		self::checkHostInterfaces($items, $db_items);
 		$this->checkSpecificFields($items);
 		$this->validatePreprocessing($items);
-		$this->validateDependentItems($items);
+		self::checkDependentItems($items, $db_items);
 	}
 
 	/**
@@ -856,180 +856,73 @@ class CItem extends CItemGeneral {
 	}
 
 	/**
-	 * Check, if items that are about to be inserted or updated violate the rule:
-	 * only one item can be linked to a inventory filed.
-	 * If everything is ok, function return true or throws Exception otherwise
-	 *
-	 * @static
-	 *
 	 * @param array $items
-	 * @param bool $update whether this is update operation
+	 * @param array $db_items
 	 *
-	 * @return bool
+	 * @throws APIException
 	 */
-	public static function validateInventoryLinks(array $items, $update = false) {
-		// inventory link field is not being updated, or being updated to 0, no need to validate anything then
+	private static function checkInventoryLinks(array $items, array $db_items = []): void {
+		$item_indexes = [];
+		$del_links = [];
+
 		foreach ($items as $i => $item) {
-			if (!isset($item['inventory_link']) || $item['inventory_link'] == 0) {
+			if (!array_key_exists('inventory_link', $item) || $item['inventory_link'] == 0
+					|| (array_key_exists('itemid', $item) && $item['inventory_link'] == $db_items[$item['itemid']])) {
 				unset($items[$i]);
 			}
-		}
+			else {
+				$item_indexes[$item['hostid']][] = $i;
 
-		if (zbx_empty($items)) {
-			return true;
-		}
-
-		$possibleHostInventories = getHostInventories();
-		if ($update) {
-			// for successful validation we need three fields for each item: inventory_link, hostid and key_
-			// problem is, that when we are updating an item, we might not have them, because they are not changed
-			// so, we need to find out what is missing and use API to get the lacking info
-			$itemsWithNoHostId = [];
-			$itemsWithNoInventoryLink = [];
-			$itemsWithNoKeys = [];
-			foreach ($items as $item) {
-				if (!isset($item['inventory_link'])) {
-					$itemsWithNoInventoryLink[$item['itemid']] = $item['itemid'];
-				}
-				if (!isset($item['hostid'])) {
-					$itemsWithNoHostId[$item['itemid']] = $item['itemid'];
-				}
-				if (!isset($item['key_'])) {
-					$itemsWithNoKeys[$item['itemid']] = $item['itemid'];
-				}
-			}
-			$itemsToFind = array_merge($itemsWithNoHostId, $itemsWithNoInventoryLink, $itemsWithNoKeys);
-
-			// are there any items with lacking info?
-			if (!zbx_empty($itemsToFind)) {
-				$missingInfo = API::Item()->get([
-					'output' => ['hostid', 'inventory_link', 'key_'],
-					'filter' => ['itemid' => $itemsToFind],
-					'nopermissions' => true
-				]);
-				$missingInfo = zbx_toHash($missingInfo, 'itemid');
-
-				// appending host ids, inventory_links and keys where they are needed
-				foreach ($items as $i => $item) {
-					if (isset($missingInfo[$item['itemid']])) {
-						if (!isset($items[$i]['hostid'])) {
-							$items[$i]['hostid'] = $missingInfo[$item['itemid']]['hostid'];
-						}
-						if (!isset($items[$i]['inventory_link'])) {
-							$items[$i]['inventory_link'] = $missingInfo[$item['itemid']]['inventory_link'];
-						}
-						if (!isset($items[$i]['key_'])) {
-							$items[$i]['key_'] = $missingInfo[$item['itemid']]['key_'];
-						}
+				if (array_key_exists('itemid', $item)) {
+					if ($db_items[$item['itemid']]['inventory_link'] != 0) {
+						$del_links[$item['hostid']][] = $db_items[$item['itemid']]['inventory_link'];
 					}
 				}
 			}
 		}
 
-		$hostids = zbx_objectValues($items, 'hostid');
+		if (!$items) {
+			return;
+		}
 
-		// getting all inventory links on every affected host
-		$itemsOnHostsInfo = API::Item()->get([
-			'output' => ['key_', 'inventory_link', 'hostid'],
-			'filter' => ['hostid' => $hostids],
-			'nopermissions' => true
-		]);
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['hostid', 'inventory_link']], 'fields' => [
+			'hostid' =>			['type' => API_ANY],
+			'inventory_link' =>	['type' => API_ANY]
+		]];
 
-		// now, changing array to: 'hostid' => array('key_'=>'inventory_link')
-		$linksOnHostsCurr = [];
-		foreach ($itemsOnHostsInfo as $info) {
-			// 0 means no link - we are not interested in those ones
-			if ($info['inventory_link'] != 0) {
-				if (!isset($linksOnHostsCurr[$info['hostid']])) {
-					$linksOnHostsCurr[$info['hostid']] = [$info['key_'] => $info['inventory_link']];
-				}
-				else{
-					$linksOnHostsCurr[$info['hostid']][$info['key_']] = $info['inventory_link'];
+		if (!CApiInputValidator::validateUniqueness($api_input_rules, $items, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$result = DBselect(
+			'SELECT i.hostid,i.inventory_link,h.status,h.host,i.key_'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND '.dbConditionId('i.hostid', array_unique(array_column($items, 'hostid'))).
+				' AND '.dbConditionInt('i.inventory_link', array_unique(array_column($items, 'inventory_link')))
+		);
+
+		while ($row = DBfetch($result)) {
+			if (array_key_exists($row['hostid'], $del_links)
+					&& in_array($row['inventory_link'], $del_links[$row['hostid']])) {
+				continue;
+			}
+
+			foreach ($item_indexes[$row['hostid']] as $i) {
+				if ($row['inventory_link'] == $items[$i]['inventory_link']) {
+					$error = ($row['status'] == HOST_STATUS_TEMPLATE)
+						? _('Cannot set the host inventory field "%1$s" to the item "%2$s" on the template "%3$s": %4$s.')
+						: _('Cannot set the host inventory field "%1$s" to the item "%2$s" on the host "%3$s": %4$s.');
+
+					$inventory_fields = getHostInventories();
+
+					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error,
+						$inventory_fields[$row['inventory_link']]['title'], $items[$i]['key_'], $row['host'],
+						_s('it is already set for the item "%1$s"', $row['key_'])
+					));
 				}
 			}
 		}
-
-		$linksOnHostsFuture = [];
-
-		foreach ($items as $item) {
-			// checking if inventory_link value is a valid number
-			if ($update || $item['value_type'] != ITEM_VALUE_TYPE_LOG) {
-				// does inventory field with provided number exists?
-				if (!isset($possibleHostInventories[$item['inventory_link']])) {
-					$maxVar = max(array_keys($possibleHostInventories));
-					self::exception(
-						ZBX_API_ERROR_PARAMETERS,
-						_s('Item "%1$s" cannot populate a missing host inventory field number "%2$d". Choices are: from 0 (do not populate) to %3$d.', $item['name'], $item['inventory_link'], $maxVar)
-					);
-				}
-			}
-
-			if (!isset($linksOnHostsFuture[$item['hostid']])) {
-				$linksOnHostsFuture[$item['hostid']] = [$item['key_'] => $item['inventory_link']];
-			}
-			else {
-				$linksOnHostsFuture[$item['hostid']][$item['key_']] = $item['inventory_link'];
-			}
-		}
-
-		foreach ($linksOnHostsFuture as $hostId => $linkFuture) {
-			if (isset($linksOnHostsCurr[$hostId])) {
-				$futureSituation = array_merge($linksOnHostsCurr[$hostId], $linksOnHostsFuture[$hostId]);
-			}
-			else {
-				$futureSituation = $linksOnHostsFuture[$hostId];
-			}
-			$valuesCount = array_count_values($futureSituation);
-
-			// if we have a duplicate inventory links after merging - we are in trouble
-			if (max($valuesCount) > 1) {
-				// what inventory field caused this conflict?
-				$conflictedLink = array_keys($valuesCount, 2);
-				$conflictedLink = reset($conflictedLink);
-
-				// which of updated items populates this link?
-				$beingSavedItemName = '';
-				foreach ($items as $item) {
-					if ($item['inventory_link'] == $conflictedLink) {
-						if (isset($item['name'])) {
-							$beingSavedItemName = $item['name'];
-						}
-						else {
-							$thisItem = API::Item()->get([
-								'output' => ['name'],
-								'filter' => ['itemid' => $item['itemid']],
-								'nopermissions' => true
-							]);
-							$beingSavedItemName = $thisItem[0]['name'];
-						}
-						break;
-					}
-				}
-
-				// name of the original item that already populates the field
-				$originalItem = API::Item()->get([
-					'output' => ['name'],
-					'filter' => [
-						'hostid' => $hostId,
-						'inventory_link' => $conflictedLink
-					],
-					'nopermissions' => true
-				]);
-				$originalItemName = $originalItem[0]['name'];
-
-				self::exception(
-					ZBX_API_ERROR_PARAMETERS,
-					_s(
-						'Two items ("%1$s" and "%2$s") cannot populate one host inventory field "%3$s", this would lead to a conflict.',
-						$beingSavedItemName,
-						$originalItemName,
-						$possibleHostInventories[$conflictedLink]['title']
-					)
-				);
-			}
-		}
-
-		return true;
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {

@@ -432,7 +432,7 @@ class CItemPrototype extends CItemGeneral {
 		self::checkHostInterfaces($items);
 		$this->checkSpecificFields($items);
 		$this->validatePreprocessing($items);
-		$this->validateDependentItems($items);
+		self::checkDependentItems($items);
 	}
 
 	/**
@@ -527,11 +527,11 @@ class CItemPrototype extends CItemGeneral {
 		self::addAffectedObjects($items, $db_items);
 
 		self::checkDuplicates($items, $db_items);
-		self::checkValueMaps($items);
+		self::checkValueMaps($items, $db_items);
 		self::checkHostInterfaces($items, $db_items);
 		$this->checkSpecificFields($items);
 		$this->validatePreprocessing($items);
-		$this->validateDependentItems($items);
+		self::checkDependentItems($items, $db_items);
 	}
 
 	/**
