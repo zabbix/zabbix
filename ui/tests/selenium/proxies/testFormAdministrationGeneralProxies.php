@@ -32,9 +32,12 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 class testFormAdministrationGeneralProxies extends CWebTest {
 
 	private $sql = 'SELECT * FROM hosts ORDER BY hostid';
+
 	private static $update_proxy = 'Active proxy for update';
-	private static $change_active_proxy = 'Active proxy for refresh cancel simple update delete';
-	private static $change_passive_proxy = 'Passive proxy for refresh cancel simple update delete';
+	private static $change_active_proxy = 'Active proxy for refresh cancel simple update';
+	private static $change_passive_proxy = 'Passive proxy for refresh cancel simple update';
+	private static $delete_proxy_with_hosts = 'Proxy_2 for filter';
+	private static $delete_proxy_with_discovery_rule = 'Passive proxy 1';
 
 	use TableTrait;
 
@@ -1400,10 +1403,33 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
 
+	public function getProxyDeleteData() {
+		return array_merge($this->getActivePassiveProxyData(), [
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy' => self::$delete_proxy_with_hosts,
+					'error' => "Host \"Host_2 with proxy\" is monitored by proxy \"Proxy_2 for filter\"."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy' => self::$delete_proxy_with_discovery_rule,
+					'error' => "Proxy \"Passive proxy 1\" is used by discovery rule \"Discovery rule for update\"."
+				]
+			]
+		]);
+	}
+
 	/**
-	 * @dataProvider getActivePassiveProxyData
+	 * @dataProvider getProxyDeleteData
 	 */
 	public function testFormAdministrationGeneralProxies_Delete($data) {
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$old_hash = CDBHelper::getHash($this->sql);
+		}
+
 		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
 		$this->query('link', $data['proxy'])->one()->waitUntilClickable()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
@@ -1413,17 +1439,30 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		$this->assertTrue($this->page->isAlertPresent());
 		$this->assertEquals('Delete selected proxy?', $this->page->getAlertText());
 		$this->page->acceptAlert();
-		$dialog->ensureNotPresent();
-		$this->assertMessage(TEST_GOOD, 'Proxy deleted');
 
-		// Check that user remained on Proxies page.
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, 'Cannot delete proxy', $data['error']);
+
+			// Check that DB hash is not changed.
+			$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+
+			// Close dialog.
+			$dialog->close();
+			$dialog->ensureNotPresent();
+		}
+		else {
+			$dialog->ensureNotPresent();
+			$this->assertMessage(TEST_GOOD, 'Proxy deleted');
+
+			// Check DB.
+			$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM hosts WHERE host='.zbx_dbstr($data['proxy'])));
+		}
+
+		// Check frontend table.
+		$this->assertEquals(array_key_exists('expected', $data), $this->query('link', $data['proxy'])->exists());
+
+		// Check that user redirected on Proxies page.
 		$this->page->assertTitle('Configuration of proxies');
 		$this->page->assertHeader('Proxies');
-
-		// Check name disappeared from frontend table.
-		$this->assertFalse($this->query('link', $data['proxy'])->exists());
-
-		// Check DB.
-		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM hosts WHERE host='.zbx_dbstr($data['proxy'])));
 	}
 }

@@ -23,13 +23,55 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
- * Test for checking Proxy host form.
+ * Test for checking Proxies page.
  *
- * onBefore prepareProxyData
- *
- * backup hosts
+ * @backup hosts
  */
 class testPageAdministrationGeneralProxies extends CWebTest {
+
+	private $sql = 'SELECT * FROM hosts ORDER BY hostid';
+
+	private static $enabled_hosts = [
+			'enabled_host1' => null,
+			'enabled_host2' => null,
+			'enabled_host3' => null,
+			'enabled_host4' => null,
+			'enabled_host5' => null,
+			'enabled_host6' => null,
+			'enabled_host7' => null,
+			'enabled_host8' => null
+	];
+
+	private static $disabled_hosts = [
+			'disabled_host1' => null,
+			'disabled_host2' => null,
+			'disabled_host3' => null,
+			'disabled_host4' => null,
+			'disabled_host5' => null,
+			'disabled_host6' => null,
+			'disabled_host7' => null,
+			'disabled_host8' => null
+	];
+
+	private static $active_proxies = [
+			'active_proxy1' => null,
+			'active_proxy2' => null,
+			'active_proxy3' => null,
+			'active_proxy4' => null,
+			'active_proxy5' => null,
+			'active_proxy6' => null,
+			'active_proxy7' => null
+	];
+
+	private static $passive_proxies = [
+			'passive_proxy1' => null,
+			'passive_proxy2' => null,
+			'passive_proxy3' => null,
+			'passive_proxy4' => null,
+			'passive_proxy5' => null,
+			'passive_proxy6' => null,
+			'passive_proxy7' => null
+	];
 
 	use TableTrait;
 
@@ -40,6 +82,159 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 	 */
 	public function getBehaviors() {
 		return [CMessageBehavior::class];
+	}
+
+	/**
+	 * Preparing proxies and hosts for test.
+	 */
+	public function prepareProxyHostsData() {
+		// Create enabled hosts.
+		$enabled_hosts_data = [];
+		foreach (self::$enabled_hosts as $host => $id) {
+			$enabled_hosts_data[] = [
+				'host' => $host,
+				'groups' => [['groupid' => 4]],
+				'status' => 0
+			];
+		}
+
+		$enabled_hosts = CDataHelper::call('host.create', $enabled_hosts_data);
+		$this->assertArrayHasKey('hostids', $enabled_hosts);
+
+		$enabled_hostids = CDataHelper::getIds('host');
+		self::$enabled_hosts['enabled_host1'] = $enabled_hostids['enabled_host1'];
+		self::$enabled_hosts['enabled_host2'] = $enabled_hostids['enabled_host2'];
+		self::$enabled_hosts['enabled_host3'] = $enabled_hostids['enabled_host3'];
+		self::$enabled_hosts['enabled_host4'] = $enabled_hostids['enabled_host4'];
+		self::$enabled_hosts['enabled_host5'] = $enabled_hostids['enabled_host5'];
+		self::$enabled_hosts['enabled_host6'] = $enabled_hostids['enabled_host6'];
+		self::$enabled_hosts['enabled_host7'] = $enabled_hostids['enabled_host7'];
+		self::$enabled_hosts['enabled_host8'] = $enabled_hostids['enabled_host8'];
+
+		// Disabled hosts data.
+		$disabled_hosts_data = [];
+		foreach (self::$disabled_hosts as $host => $id) {
+			$disabled_hosts_data[] = [
+				'host' => $host,
+				'groups' => [['groupid' => 4]],
+				'status' => 1
+			];
+		}
+		$disabled_hosts = CDataHelper::call('host.create', $disabled_hosts_data);
+		$this->assertArrayHasKey('hostids', $disabled_hosts);
+
+		$disabled_hostids = CDataHelper::getIds('host');
+		self::$disabled_hosts['disabled_host1'] = $disabled_hostids['disabled_host1'];
+		self::$disabled_hosts['disabled_host2'] = $disabled_hostids['disabled_host2'];
+		self::$disabled_hosts['disabled_host3'] = $disabled_hostids['disabled_host3'];
+		self::$disabled_hosts['disabled_host4'] = $disabled_hostids['disabled_host4'];
+		self::$disabled_hosts['disabled_host5'] = $disabled_hostids['disabled_host5'];
+		self::$disabled_hosts['disabled_host6'] = $disabled_hostids['disabled_host6'];
+		self::$disabled_hosts['disabled_host7'] = $disabled_hostids['disabled_host7'];
+		self::$disabled_hosts['disabled_host8'] = $disabled_hostids['disabled_host8'];
+
+		// Create active proxies.
+		$active_proxy_data = [];
+		foreach (self::$active_proxies as $proxy => $id) {
+			$active_proxy_data[] = [
+				'host' => $proxy,
+				'status' => 5
+			];
+		}
+
+		$active_proxies = CDataHelper::call('proxy.create', $active_proxy_data);
+		$this->assertArrayHasKey('proxyids', $active_proxies);
+
+		$active_proxyids = CDataHelper::getIds('host');
+		self::$active_proxies['active_proxy1'] = $active_proxyids['active_proxy1'];
+		self::$active_proxies['active_proxy2'] = $active_proxyids['active_proxy2'];
+		self::$active_proxies['active_proxy3'] = $active_proxyids['active_proxy3'];
+		self::$active_proxies['active_proxy4'] = $active_proxyids['active_proxy4'];
+		self::$active_proxies['active_proxy5'] = $active_proxyids['active_proxy5'];
+
+		// Create passive proxies.
+		$passive_proxy_data = [];
+		foreach (self::$passive_proxies as $proxy => $id) {
+			$passive_proxy_data[] = [
+				'host' => $proxy,
+				'status' => 6,
+				'interface' => [
+					'ip'=> '127.0.0.1',
+					'dns' => '',
+					'useip' => '1',
+					'port' => '10051'
+				]
+			];
+		}
+
+		$passive_proxies = CDataHelper::call('proxy.create', $passive_proxy_data);
+		$this->assertArrayHasKey('proxyids', $passive_proxies);
+
+		$passive_proxyids = CDataHelper::getIds('host');
+		self::$passive_proxies['passive_proxy1'] = $passive_proxyids['passive_proxy1'];
+		self::$passive_proxies['passive_proxy2'] = $passive_proxyids['passive_proxy2'];
+		self::$passive_proxies['passive_proxy3'] = $passive_proxyids['passive_proxy3'];
+		self::$passive_proxies['passive_proxy4'] = $passive_proxyids['passive_proxy4'];
+		self::$passive_proxies['passive_proxy5'] = $passive_proxyids['passive_proxy5'];
+
+		CDataHelper::call('proxy.update', [
+			[
+				'proxyid' => $active_proxyids['active_proxy1'],
+				'hosts' => [
+					['hostid' => $enabled_hostids['enabled_host1']]
+				]
+			],
+			[
+				'proxyid' => $passive_proxyids['passive_proxy1'],
+				'hosts' => [
+					['hostid' => $disabled_hostids['disabled_host1']]
+				]
+			],
+			[
+				'proxyid' => $active_proxyids['active_proxy2'],
+				'hosts' => [
+					['hostid' => $enabled_hostids['enabled_host2']],
+					['hostid' => $enabled_hostids['enabled_host3']]
+				]
+			],
+			[
+				'proxyid' => $passive_proxyids['passive_proxy2'],
+				'hosts' => [
+					['hostid' => $enabled_hostids['enabled_host4']],
+					['hostid' => $enabled_hostids['enabled_host5']]
+				]
+			],
+			[
+				'proxyid' => $active_proxyids['active_proxy3'],
+				'hosts' => [
+					['hostid' => $disabled_hostids['disabled_host2']],
+					['hostid' => $disabled_hostids['disabled_host3']]
+				]
+			],
+			[
+				'proxyid' => $passive_proxyids['passive_proxy3'],
+				'hosts' => [
+					['hostid' => $disabled_hostids['disabled_host4']],
+					['hostid' => $disabled_hostids['disabled_host5']]
+				]
+			],
+			[
+				'proxyid' =>  $active_proxyids['active_proxy4'],
+				'hosts' => [
+					['hostid' => $enabled_hostids['enabled_host6']],
+					['hostid' => $disabled_hostids['disabled_host6']]
+				]
+			],
+			[
+				'proxyid' => $passive_proxyids['passive_proxy4'],
+				'hosts' => [
+					['hostid' => $enabled_hostids['enabled_host7']],
+					['hostid' => $enabled_hostids['enabled_host8']],
+					['hostid' => $disabled_hostids['disabled_host7']],
+					['hostid' => $disabled_hostids['disabled_host8']]
+				]
+			]
+		]);
 	}
 
 	public function testPageAdministrationGeneralProxies_Layout() {
@@ -68,6 +263,410 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 			$this->assertTrue($this->query('button', $button)->one()->isVisible());
 			$this->assertFalse($this->query('button', $button)->one()->isClickable());
 		}
+	}
+
+	public function getFilterProxyData() {
+		return [
+			[
+				[
+					'filter' => [
+						'Name' => 'for filter'
+					],
+					'result' => [
+						'Proxy_1 for filter',
+						'Proxy_2 for filter'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Mode' => 'Active',
+
+					],
+					'result' => [
+						'Active proxy 1',
+						'Active proxy 2',
+						'Active proxy 3',
+						'Active proxy to delete',
+						'Proxy_1 for filter',
+						'Proxy_2 for filter'
+					],
+					'check_stats' => true
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Mode' => 'Passive',
+
+					],
+					'result' => [
+						'Passive proxy 1',
+						'Passive proxy 2',
+						'Passive proxy 3',
+						'Passive proxy to delete'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Name' => 'filter',
+						'Mode' => 'Active'
+
+					],
+					'result' => [
+						'Proxy_1 for filter',
+						'Proxy_2 for filter'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Name' => 'filter',
+						'Mode' => 'Passive'
+
+					],
+					'result' => []
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getFilterProxyData
+	 */
+	public function testPageAdministrationGeneralProxies_Filter($data) {
+		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
+		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+
+		// Reset filter in case if some filtering remained before ongoing test case.
+		$form->query('button:Reset')->one()->click();
+
+		// Fill filter form with data.
+		$form->fill($data['filter']);
+		$form->submit();
+		$this->page->waitUntilReady();
+
+		// Check filtered result.
+		$this->assertTableDataColumn($data['result']);
+
+		if (CTestArrayHelper::get($data, 'check_stats')) {
+			$this->assertTableStats(count($data['result']));
+		}
+
+		// Reset filter not to impact the results of next tests.
+		$this->query('button:Reset')->one()->click();
+	}
+
+	public static function getActionsProxyData() {
+		return [
+			// Refresh of one active proxy.
+			[
+				[
+					'action' => 'Refresh configuration',
+					'proxies' => [
+						'active_proxy5'
+					],
+					'alert' => 'Refresh configuration of the selected proxy?',
+					'title' => 'Request sent successfully',
+					'message' => null
+				]
+			],
+			// Refresh of one passive proxy.
+			[
+				[
+					'action' => 'Refresh configuration',
+					'proxies' => [
+						'passive_proxy5'
+					],
+					'alert' => 'Refresh configuration of the selected proxy?',
+					'title' => 'Request sent successfully',
+					'message' => null
+				]
+			],
+			// Refresh of one proxy with hosts.
+			[
+				[
+					'action' => 'Refresh configuration',
+					'proxies' => [
+						'passive_proxy4'
+					],
+					'alert' => 'Refresh configuration of the selected proxy?',
+					'title' => 'Request sent successfully',
+					'message' => null
+				]
+			],
+			// Refresh of one proxy used by discovery rule.
+			[
+				[
+					'action' => 'Refresh configuration',
+					'proxies' => [
+						'Passive proxy 1'
+					],
+					'alert' => 'Refresh configuration of the selected proxy?',
+					'title' => 'Request sent successfully',
+					'message' => null
+				]
+			],
+			// Mass refresh of several proxies.
+			[
+				[
+					'action' => 'Refresh configuration',
+					'proxies' => [
+						'passive_proxy5',
+						'active_proxy4',
+						'Passive proxy 1'
+					],
+					'alert' => 'Refresh configuration of the selected proxies?',
+					'title' => 'Request sent successfully',
+					'message' => null
+				]
+			],
+			// Enable 1 enabled host on 1 proxy.
+			[
+				[
+					'action' => 'Enable hosts',
+					'proxies' => [
+						'active_proxy1'
+					],
+					'hosts' => [
+						'enabled_host1'
+					],
+					'alert' => 'Enable hosts monitored by selected proxies?',
+					'title' => 'Hosts enabled',
+					'message' => null
+				]
+			],
+			// Disable 1 disabled host on 1 proxy.
+			[
+				[
+					'action' => 'Disable hosts',
+					'proxies' => [
+						'passive_proxy1'
+					],
+					'hosts' => [
+						'disabled_host1'
+					],
+					'alert' => 'Disable hosts monitored by selected proxies?',
+					'title' => 'Hosts disabled',
+					'message' => null
+				]
+			],
+			// Enable 1 enabled and 1 disabled hosts on 1 proxy.
+			[
+				[
+					'action' => 'Enable hosts',
+					'proxies' => [
+						'active_proxy1',
+						'passive_proxy1'
+					],
+					'hosts' => [
+						'enabled_host1',
+						'disabled_host1'
+					],
+					'alert' => 'Enable hosts monitored by selected proxies?',
+					'title' => 'Host enabled',
+					'message' => 'Updated status of host "disabled_host1".'
+				]
+			],
+			// Enable 2 disabled and 2 enabled hosts on 2 proxies.
+			[
+				[
+					'action' => 'Enable hosts',
+					'proxies' => [
+						'active_proxy3',
+						'passive_proxy2'
+					],
+					'hosts' => [
+						'disabled_host2',
+						'disabled_host3',
+						'enabled_host4',
+						'enabled_host5'
+					],
+					'alert' => 'Enable hosts monitored by selected proxies?',
+					'title' => 'Hosts enabled',
+					'message' => [
+						'Updated status of host "disabled_host2".',
+						'Updated status of host "disabled_host3".'
+					]
+				]
+			],
+			// Disable 3 disabled and 3 enabled hosts on 2 proxies.
+			[
+				[
+					'action' => 'Disable hosts',
+					'proxies' => [
+						'active_proxy4',
+						'passive_proxy4'
+					],
+					'hosts' => [
+						'enabled_host6',
+						'disabled_host6',
+						'enabled_host7',
+						'enabled_host8',
+						'disabled_host7',
+						'disabled_host8'
+					],
+					'alert' => 'Disable hosts monitored by selected proxies?',
+					'title' => 'Hosts disabled',
+					'message' => [
+						'Updated status of host "enabled_host6".',
+						'Updated status of host "enabled_host7".',
+						'Updated status of host "enabled_host8".'
+					]
+				]
+			],
+			// Delete active proxy.
+			[
+				[
+					'action' => 'Delete',
+					'proxies' => [
+						'active_proxy5',
+					],
+					'alert' => 'Delete selected proxy?',
+					'title' => 'Proxy deleted',
+					'message' => null
+				]
+			],
+			// Delete passive proxy.
+			[
+				[
+					'action' => 'Delete',
+					'proxies' => [
+						'passive_proxy5',
+					],
+					'alert' => 'Delete selected proxy?',
+					'title' => 'Proxy deleted',
+					'message' => null
+				]
+			],
+			// Mass delete of active and passive proxies.
+			[
+				[
+					'action' => 'Delete',
+					'proxies' => [
+						'active_proxy6',
+						'passive_proxy6',
+					],
+					'alert' => 'Delete selected proxies?',
+					'title' => 'Proxies deleted',
+					'message' => null
+				]
+			],
+			// Mass delete when one of the proxies monitor some host.
+			[
+				[
+					'expected' => TEST_BAD,
+					'action' => 'Delete',
+					'proxies' => [
+						'active_proxy1',
+						'active_proxy7',
+					],
+					'alert' => 'Delete selected proxies?',
+					'title' => 'Cannot delete proxies',
+					'error' => 'Host "enabled_host1" is monitored by proxy "active_proxy1".'
+				]
+			],
+			// Mass delete when one of the proxies monitor is used by discovery rule.
+			[
+				[
+					'expected' => TEST_BAD,
+					'action' => 'Delete',
+					'proxies' => [
+						'passive_proxy7',
+						'Passive proxy 1'
+					],
+					'alert' => 'Delete selected proxies?',
+					'title' => 'Cannot delete proxies',
+					'error' => "Proxy \"Passive proxy 1\" is used by discovery rule \"Discovery rule for update\"."
+				]
+			],
+			// Delete one proxy with host.
+			[
+				[
+					'expected' => TEST_BAD,
+					'action' => 'Delete',
+					'proxies' => [
+						'Proxy_2 for filter'
+					],
+					'alert' => 'Delete selected proxy?',
+					'title' => 'Cannot delete proxy',
+					'error' => 'Host "Host_2 with proxy" is monitored by proxy "Proxy_2 for filter".'
+				]
+			],
+			// Delete one proxy used by discovery rule.
+			[
+				[
+					'expected' => TEST_BAD,
+					'action' => 'Delete',
+					'proxies' => [
+						'Passive proxy 1'
+					],
+					'alert' => 'Delete selected proxy?',
+					'title' => 'Cannot delete proxy',
+					'error' => "Proxy \"Passive proxy 1\" is used by discovery rule \"Discovery rule for update\"."
+				]
+			]
+		];
+	}
+
+	/**
+	 * @onBeforeOnce prepareProxyHostsData
+	 *
+	 * @dataProvider getActionsProxyData
+	 */
+	public function testPageAdministrationGeneralProxies_Actions($data) {
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$old_hash = CDBHelper::getHash($this->sql);
+		}
+
+		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
+		$this->query('class:list-table')->asTable()->one()->findRows('Name', $data['proxies'])->select();
+		$this->query('button', $data['action'])->waitUntilClickable()->one()->click();
+
+		$this->assertTrue($this->page->isAlertPresent());
+		$this->assertEquals($data['alert'], $this->page->getAlertText());
+		$this->page->acceptAlert();
+
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, $data['title'], $data['error']);
+
+			// Check that DB hash is not changed.
+			$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		}
+		else {
+			$this->assertMessage(TEST_GOOD, $data['title'], $data['message']);
+
+			// Check DB.
+			foreach ($data['proxies'] as $proxy) {
+				$this->assertEquals(($data['action'] === 'Delete') ? 0 : 1,
+						CDBHelper::getCount('SELECT * FROM hosts WHERE host='.zbx_dbstr($proxy))
+				);
+
+				$exists = ($data['action'] === 'Delete')
+					? array_key_exists('expected', $data)
+					: true;
+
+				$this->assertEquals($exists, $this->query('link', $proxy)->exists());
+			}
+
+			// Check that hosts are actually enabled/disabled.
+			if ($data['action'] === 'Enable hosts' || $data['action'] === 'Disable hosts') {
+				// DB check for hosts.
+				foreach ($data['hosts'] as $host)  {
+					$this->assertEquals(($data['action'] === 'Enable hosts') ? 0 : 1,
+							CDBHelper::getValue('SELECT status FROM hosts WHERE host ='.zbx_dbstr($host))
+					);
+				}
+			}
+		}
+
+		// Check that user redirected on Proxies page.
+		$this->page->assertTitle('Configuration of proxies');
+		$this->page->assertHeader('Proxies');
 	}
 }
 
