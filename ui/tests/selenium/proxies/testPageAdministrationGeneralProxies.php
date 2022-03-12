@@ -100,16 +100,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 
 		$enabled_hosts = CDataHelper::call('host.create', $enabled_hosts_data);
 		$this->assertArrayHasKey('hostids', $enabled_hosts);
-
 		$enabled_hostids = CDataHelper::getIds('host');
-		self::$enabled_hosts['enabled_host1'] = $enabled_hostids['enabled_host1'];
-		self::$enabled_hosts['enabled_host2'] = $enabled_hostids['enabled_host2'];
-		self::$enabled_hosts['enabled_host3'] = $enabled_hostids['enabled_host3'];
-		self::$enabled_hosts['enabled_host4'] = $enabled_hostids['enabled_host4'];
-		self::$enabled_hosts['enabled_host5'] = $enabled_hostids['enabled_host5'];
-		self::$enabled_hosts['enabled_host6'] = $enabled_hostids['enabled_host6'];
-		self::$enabled_hosts['enabled_host7'] = $enabled_hostids['enabled_host7'];
-		self::$enabled_hosts['enabled_host8'] = $enabled_hostids['enabled_host8'];
 
 		// Disabled hosts data.
 		$disabled_hosts_data = [];
@@ -122,16 +113,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 		}
 		$disabled_hosts = CDataHelper::call('host.create', $disabled_hosts_data);
 		$this->assertArrayHasKey('hostids', $disabled_hosts);
-
 		$disabled_hostids = CDataHelper::getIds('host');
-		self::$disabled_hosts['disabled_host1'] = $disabled_hostids['disabled_host1'];
-		self::$disabled_hosts['disabled_host2'] = $disabled_hostids['disabled_host2'];
-		self::$disabled_hosts['disabled_host3'] = $disabled_hostids['disabled_host3'];
-		self::$disabled_hosts['disabled_host4'] = $disabled_hostids['disabled_host4'];
-		self::$disabled_hosts['disabled_host5'] = $disabled_hostids['disabled_host5'];
-		self::$disabled_hosts['disabled_host6'] = $disabled_hostids['disabled_host6'];
-		self::$disabled_hosts['disabled_host7'] = $disabled_hostids['disabled_host7'];
-		self::$disabled_hosts['disabled_host8'] = $disabled_hostids['disabled_host8'];
 
 		// Create active proxies.
 		$active_proxy_data = [];
@@ -144,13 +126,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 
 		$active_proxies = CDataHelper::call('proxy.create', $active_proxy_data);
 		$this->assertArrayHasKey('proxyids', $active_proxies);
-
 		$active_proxyids = CDataHelper::getIds('host');
-		self::$active_proxies['active_proxy1'] = $active_proxyids['active_proxy1'];
-		self::$active_proxies['active_proxy2'] = $active_proxyids['active_proxy2'];
-		self::$active_proxies['active_proxy3'] = $active_proxyids['active_proxy3'];
-		self::$active_proxies['active_proxy4'] = $active_proxyids['active_proxy4'];
-		self::$active_proxies['active_proxy5'] = $active_proxyids['active_proxy5'];
 
 		// Create passive proxies.
 		$passive_proxy_data = [];
@@ -169,14 +145,9 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 
 		$passive_proxies = CDataHelper::call('proxy.create', $passive_proxy_data);
 		$this->assertArrayHasKey('proxyids', $passive_proxies);
-
 		$passive_proxyids = CDataHelper::getIds('host');
-		self::$passive_proxies['passive_proxy1'] = $passive_proxyids['passive_proxy1'];
-		self::$passive_proxies['passive_proxy2'] = $passive_proxyids['passive_proxy2'];
-		self::$passive_proxies['passive_proxy3'] = $passive_proxyids['passive_proxy3'];
-		self::$passive_proxies['passive_proxy4'] = $passive_proxyids['passive_proxy4'];
-		self::$passive_proxies['passive_proxy5'] = $passive_proxyids['passive_proxy5'];
 
+		// Add hosts to proxies.
 		CDataHelper::call('proxy.update', [
 			[
 				'proxyid' => $active_proxyids['active_proxy1'],
