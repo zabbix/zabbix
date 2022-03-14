@@ -57,7 +57,10 @@ class CVaultCyberArk extends CVault {
 	}
 
 	public function validateParameters(): bool {
-		if (parse_url($this->api_endpoint, PHP_URL_HOST) === null) {
+		$api_endpoint = parse_url($this->api_endpoint);
+
+		if (!array_key_exists('scheme', $api_endpoint) || !array_key_exists('host', $api_endpoint)
+				|| strtolower($api_endpoint['scheme']) !== 'https' || $api_endpoint['host'] === '') {
 			$this->addError(_s('Provided API endpoint "%1$s" is invalid.', $this->api_endpoint));
 		}
 
