@@ -236,6 +236,66 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 		}
 	}
 
+	public function testPageAdministrationGeneralProxies_CheckTableAndFilterReset() {
+		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
+		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+
+		// Reset filter in case if some filtering remained before ongoing test case.
+		$form->query('button:Reset')->one()->click();
+		$table = $this->query('class:list-table')->asTable()->one()->waitUntilPresent();
+		$rows_count = $table->getRows()->count();
+		$table_contents = $this->getTableResult('Name');
+
+		// Fill filter form with data.
+		$form->fill(['Name' => '1']);
+		$form->submit();
+		$this->page->waitUntilReady();
+
+		$filter_result = [
+			[
+				'Name' => 'Active proxy 1',
+				'Mode' => 'Active',
+				'Encryption' => 'None',
+				'Compression' => 'On',
+				'Last seen (age)' => 'Never',
+				'Host count' => '',
+				'Item count' => '',
+				'Required performance (vps)' => '',
+				'Hosts' => 'Test item host'
+			],
+			[
+				'Name' => 'Passive proxy 1',
+				'Mode' => 'Passive',
+				'Encryption' => 'None',
+				'Compression' => 'On',
+				'Last seen (age)' => 'Never',
+				'Host count' => '',
+				'Item count' => '',
+				'Required performance (vps)' => '',
+				'Hosts' => ''
+			],
+			[
+				'Name' => 'Proxy_1 for filter',
+				'Mode' => 'Active',
+				'Encryption' => 'None',
+				'Compression' => 'On',
+				'Last seen (age)' => 'Never',
+				'Host count' => '',
+				'Item count' => '',
+				'Required performance (vps)' => '',
+				'Hosts' => 'Host_1 with proxy'
+			]
+		];
+
+		// Check filtered result.
+		$this->assertTableData($filter_result);
+
+		// Reset filter and assert row count.
+		$form->query('button:Reset')->one()->click();
+		$this->assertEquals($rows_count, $table->getRows()->count());
+		$this->assertEquals($table_contents, $this->getTableResult('Name'));
+	}
+
 	public function getFilterProxyData() {
 		return [
 			[
