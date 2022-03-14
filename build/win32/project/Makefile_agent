@@ -64,6 +64,7 @@ OBJS = \
 	..\..\..\src\libs\zbxsys\symbols.o \
 	..\..\..\src\libs\zbxsys\threads.o \
 	..\..\..\src\libs\zbxexec\execute.o \
+	..\..\..\src\libs\zbxhash\zbxhash.o \
 	..\..\..\src\libs\zbxhttp\http.o \
 	..\..\..\src\libs\zbxhttp\punycode.o \
 	..\..\..\src\libs\zbxhttp\urlencode.o \
