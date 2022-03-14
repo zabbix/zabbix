@@ -134,7 +134,7 @@ class CControllerMiscConfigEdit extends CController {
 		]);
 		$data['alert_usrgrp_data'] = CArrayHelper::renameObjectsKeys($data['alert_usrgrp_data'], ['usrgrpid' => 'id']);
 
-		$data['has_vault'] = APP::Vault() !== null;
+		$data['has_vault_provider'] = APP::Vault() !== null;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Other configuration parameters'));
