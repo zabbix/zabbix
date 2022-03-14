@@ -416,7 +416,8 @@ $translate_strings = [
 		'All' => _('All')
 	],
 	'macrovalue.js' => [
-		'Set new value' => _('Set new value')
+		'Set new value' => _('Set new value'),
+		'value' => _('value')
 	],
 	'popup.condition.common.js' => [
 		'Services' => _('Services')
