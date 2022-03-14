@@ -312,8 +312,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Mode' => 'Active',
-
+						'Mode' => 'Active'
 					],
 					'result' => [
 						'Active proxy 1',
@@ -329,8 +328,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Mode' => 'Passive',
-
+						'Mode' => 'Passive'
 					],
 					'result' => [
 						'Passive proxy 1',
@@ -345,7 +343,6 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 					'filter' => [
 						'Name' => 'filter',
 						'Mode' => 'Active'
-
 					],
 					'result' => [
 						'Proxy_1 for filter',
@@ -358,7 +355,6 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 					'filter' => [
 						'Name' => 'filter',
 						'Mode' => 'Passive'
-
 					],
 					'result' => []
 				]
@@ -555,7 +551,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 				[
 					'action' => 'Delete',
 					'proxies' => [
-						'active_proxy5',
+						'active_proxy5'
 					],
 					'alert' => 'Delete selected proxy?',
 					'title' => 'Proxy deleted',
@@ -567,7 +563,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 				[
 					'action' => 'Delete',
 					'proxies' => [
-						'passive_proxy5',
+						'passive_proxy5'
 					],
 					'alert' => 'Delete selected proxy?',
 					'title' => 'Proxy deleted',
@@ -580,7 +576,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 					'action' => 'Delete',
 					'proxies' => [
 						'active_proxy6',
-						'passive_proxy6',
+						'passive_proxy6'
 					],
 					'alert' => 'Delete selected proxies?',
 					'title' => 'Proxies deleted',
@@ -594,7 +590,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 					'action' => 'Delete',
 					'proxies' => [
 						'active_proxy1',
-						'active_proxy7',
+						'active_proxy7'
 					],
 					'alert' => 'Delete selected proxies?',
 					'title' => 'Cannot delete proxies',
