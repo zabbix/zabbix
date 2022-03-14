@@ -99,7 +99,7 @@ $from_list = (new CFormList())
 	->addRow(_('Vault provider'),
 		(new CRadioButtonList('vault_provider', (int) $data['vault_provider']))
 			->addValue(_('HashiCorp Vault'), ZBX_VAULT_TYPE_HASHICORP)
-			->addValue(_('CyberArk Digital Vault'), ZBX_VAULT_TYPE_CYBERARK)
+			->addValue(_('CyberArk Vault'), ZBX_VAULT_TYPE_CYBERARK)
 			->setModern(true)
 			->setEnabled(!$data['vault_credentials_used'])
 	)
