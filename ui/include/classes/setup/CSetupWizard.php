@@ -24,8 +24,6 @@
  */
 class CSetupWizard extends CForm {
 
-	private const VAULT_URL_DEFAULT = 'https://localhost:8200';
-
 	public const STAGE_WELCOME			= 1;
 	public const STAGE_REQUIREMENTS		= 2;
 	public const STAGE_DB_CONNECTION	= 3;
@@ -77,6 +75,12 @@ class CSetupWizard extends CForm {
 		];
 
 		$this->doAction();
+	}
+
+	public function getStep(): int {
+		$step = $this->getConfig('step');
+
+		return array_key_exists($step, $this->stages) ? $step : self::STAGE_WELCOME;
 	}
 
 	private function doAction(): void {
@@ -170,8 +174,8 @@ class CSetupWizard extends CForm {
 					break;
 
 				case DB_STORE_CREDS_VAULT_CYBERARK:
-					$this->setConfig('DB_VAULT_URL', getRequest('vault_url', $this->getConfig('DB_VAULT_URL',
-						CVaultCyberArk::API_ENDPOINT_DEFAULT)));
+					$this->setConfig('DB_VAULT_URL', getRequest('vault_url',
+						$this->getConfig('DB_VAULT_URL', CVaultCyberArk::API_ENDPOINT_DEFAULT)));
 
 					$this->setConfig('DB_VAULT_DB_PATH',
 						getRequest('vault_query_string', $this->getConfig('DB_VAULT_DB_PATH')));
@@ -556,8 +560,12 @@ class CSetupWizard extends CForm {
 			// Vault common.
 			->addRow(
 				(new CLabel(_('Vault API endpoint')))->setAsteriskMark(),
-				(new CTextBox('vault_url', $this->getConfig('DB_VAULT_URL', self::VAULT_URL_DEFAULT)))
-					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+				(new CTextBox('vault_url',
+					$this->getConfig('DB_VAULT_URL', $db_creds_storage == DB_STORE_CREDS_VAULT_HASHICORP
+						? CVaultHashiCorp::API_ENDPOINT_DEFAULT
+						: CVaultCyberArk::API_ENDPOINT_DEFAULT
+					)
+				))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 				'vault_url_row',
 				!in_array($db_creds_storage, [DB_STORE_CREDS_VAULT_HASHICORP, DB_STORE_CREDS_VAULT_CYBERARK])
 					? ZBX_STYLE_DISPLAY_NONE
@@ -1054,12 +1062,6 @@ class CSetupWizard extends CForm {
 
 	private function unsetConfig(array $keys): void {
 		CSessionHelper::unset($keys);
-	}
-
-	private function getStep(): int {
-		$step = $this->getConfig('step');
-
-		return array_key_exists($step, $this->stages) ? $step : self::STAGE_WELCOME;
 	}
 
 	private function getList(): CList {

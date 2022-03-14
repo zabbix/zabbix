@@ -187,10 +187,21 @@ $sub_footer = (new CDiv([_('Licensed under'), ' ', $link]))->addClass(ZBX_STYLE_
 
 (new CTag('body', true,
 	(new CDiv([
-		(new CTag('main', true, [$setup_wizard, $sub_footer])), makePageFooter()])
-	)->addClass(ZBX_STYLE_LAYOUT_WRAPPER)
+		(new CTag('main', true, [$setup_wizard, $sub_footer])),
+		makePageFooter()
+	]))->addClass(ZBX_STYLE_LAYOUT_WRAPPER)
 ))
 	->setAttribute('lang', substr($default_lang, 0, strpos($default_lang, '_')))
+	->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'step' => $setup_wizard->getStep(),
+		'hashicorp_endpoint_default' => CVaultHashiCorp::API_ENDPOINT_DEFAULT,
+		'cyberark_endpoint_default' => CVaultCyberArk::API_ENDPOINT_DEFAULT
+	]).');
+'))
+	->setOnDocumentReady()
 	->show();
 ?>
 </html>
