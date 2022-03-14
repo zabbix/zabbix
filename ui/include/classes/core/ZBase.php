@@ -94,6 +94,15 @@ class ZBase {
 	/**
 	 * Get component registry.
 	 *
+	 * @return CVault
+	 */
+	public static function Vault(): ?CVault {
+		return self::getInstance()->vault;
+	}
+
+	/**
+	 * Get component registry.
+	 *
 	 * @return CComponentRegistry
 	 */
 	public static function Component() {

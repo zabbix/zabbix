@@ -101,7 +101,7 @@ $from_list = (new CFormList())
 			->addValue(_('HashiCorp Vault'), ZBX_VAULT_TYPE_HASHICORP)
 			->addValue(_('CyberArk Vault'), ZBX_VAULT_TYPE_CYBERARK)
 			->setModern(true)
-			->setEnabled(!$data['vault_credentials_used'])
+			->setEnabled($data['has_vault'])
 	)
 	->addRow((new CTag('h4', true, _('Security')))->addClass('input-section-header'))
 	->addRow(_('Validate URI schemes'),
