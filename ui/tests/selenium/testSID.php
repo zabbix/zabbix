@@ -385,10 +385,10 @@ class testSID extends CWebTest {
 			[['link' => 'zabbix.php?action=proxy.delete&proxyids[]=99455']],
 
 			// Proxy host disable.
-			[['link' => 'zabbix.php?form_refresh=1&proxyids%5B20000%5D=20000&action=proxy.hostdisable']],
+			[['link' => 'zabbix.php?action=proxy.host.disable&proxyids%5B20000%5D=20000']],
 
 			// Proxy host enable.
-			[['link' => 'zabbix.php?form_refresh=1&proxyids%5B20000%5D=20000&action=proxy.hostenable']],
+			[['link' => 'zabbix.php?action=proxy.host.enable&proxyids%5B20000%5D=20000']],
 
 			// Authentication update.
 			[['link' => 'zabbix.php?form_refresh=3&action=authentication.update&db_authentication_type=0&'.
@@ -1022,8 +1022,10 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'incorrect_request' => true,
-					'link' => 'zabbix.php?action=proxy.edit&proxyid=20000'
+					'server_error' => true,
+					'link' => 'zabbix.php?action=proxy.list',
+					'case' => 'proxy update',
+					'proxy' => 'Active proxy 1'
 				]
 			],
 
@@ -1031,8 +1033,9 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'incorrect_request' => true,
-					'link' => 'zabbix.php?action=proxy.edit'
+					'server_error' => true,
+					'link' => 'zabbix.php?action=proxy.list',
+					'case' => 'proxy create'
 				]
 			],
 
@@ -1205,6 +1208,16 @@ class testSID extends CWebTest {
 		elseif ((CTestArrayHelper::get($data, 'case') === 'token update')) {
 			$this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()->findRow('Name',
 					self::UPDATE_TOKEN)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		}
+		elseif ((CTestArrayHelper::get($data, 'case') === 'proxy create')) {
+			$this->query('button:Create proxy')->waitUntilClickable()->one()->click();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+			$dialog->asForm()->fill(['Proxy name' => 'test remove sid']);
+		}
+		elseif ((CTestArrayHelper::get($data, 'case') === 'proxy update')) {
+			$this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()->findRow('Name',
+					$data['proxy'])->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
 			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		}
 
