@@ -67,6 +67,11 @@ Bug fixes:
 ...G...... [ZBX-20487] fixed agent handling of invalid time intervals (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.2
+
+6.0.2rc1 was released as 6.0.2 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.2rc1
 
 New features:
