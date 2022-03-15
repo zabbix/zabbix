@@ -59,8 +59,8 @@
 
 		disableOptionsByActions(actions) {
 			[...this.action_options].map((elem) => {
-				if (!actions.includes(elem.value)) {
-					elem.disabled = true;
+				elem.disabled = !actions.includes(elem.value);
+				if (elem.disabled) {
 					elem.checked = false;
 				}
 			});
