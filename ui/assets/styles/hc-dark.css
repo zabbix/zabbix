@@ -2365,9 +2365,11 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
     background-color: #000000;
     padding: 10px 0;
     margin-bottom: 6px; }
-    .filter-container.tabfilter-container .tabfilter-content-container.tabfilter-collapsed .tabfilter-tabs-container,
-    .filter-container.tabfilter-container .tabfilter-content-container.tabfilter-collapsed .form-buttons {
-      display: none; }
+    .filter-container.tabfilter-container .tabfilter-content-container.tabfilter-collapsed {
+      padding: 0 0 10px 0; }
+      .filter-container.tabfilter-container .tabfilter-content-container.tabfilter-collapsed .tabfilter-tabs-container,
+      .filter-container.tabfilter-container .tabfilter-content-container.tabfilter-collapsed .form-buttons {
+        display: none; }
   .filter-container.tabfilter-container nav > ul {
     display: flex;
     flex: 1;

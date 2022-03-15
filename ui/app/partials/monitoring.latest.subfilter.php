@@ -166,7 +166,7 @@ else {
 		new CTag('h4', true, [
 			_('Subfilter'), ' ', (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)
 		])
-	]])
+	]], ZBX_STYLE_HOVER_NOBG)
 	->addRow(
 		$subfilter_options['hostids']
 			? [[
