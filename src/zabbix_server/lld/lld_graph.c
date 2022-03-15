@@ -1003,7 +1003,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 		if (0 != graph->graphid)
 		{
-			zbx_audit_graph_create_entry(AUDIT_ACTION_UPDATE, graph->graphid, (NULL == graph->name_orig) ?
+			zbx_audit_graph_create_entry(ZBX_AUDIT_ACTION_UPDATE, graph->graphid, (NULL == graph->name_orig) ?
 					graph->name : graph->name_orig, ZBX_FLAG_DISCOVERY_CREATED);
 		}
 
@@ -1088,7 +1088,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 					(int)show_3d, percent_left, percent_right, (int)ymin_type, graph->ymin_itemid,
 					(int)ymax_type, graph->ymax_itemid, (int)ZBX_FLAG_DISCOVERY_CREATED);
 
-			zbx_audit_graph_create_entry(AUDIT_ACTION_ADD, graphid, graph->name,
+			zbx_audit_graph_create_entry(ZBX_AUDIT_ACTION_ADD, graphid, graph->name,
 					ZBX_FLAG_DISCOVERY_CREATED);
 
 			zbx_audit_graph_update_json_add_data(graphid, graph->name, width, height, yaxismin, yaxismax, 0,

@@ -50,9 +50,9 @@ void	zbx_audit_ha_add_create_fields(const char *nodeid, const char *name, int st
 
 	entry = zbx_audit_get_entry(0, nodeid, AUDIT_HA_NODE_ID);
 
-	zbx_audit_entry_append_string(entry, AUDIT_ACTION_ADD, ZBX_AUDIT_HA_NODEID, nodeid);
-	zbx_audit_entry_append_string(entry, AUDIT_ACTION_ADD, ZBX_AUDIT_HA_NAME, name);
-	zbx_audit_entry_append_int(entry, AUDIT_ACTION_ADD, ZBX_AUDIT_HA_STATUS, status);
+	zbx_audit_entry_append_string(entry, ZBX_AUDIT_ACTION_ADD, ZBX_AUDIT_HA_NODEID, nodeid);
+	zbx_audit_entry_append_string(entry, ZBX_AUDIT_ACTION_ADD, ZBX_AUDIT_HA_NAME, name);
+	zbx_audit_entry_append_int(entry, ZBX_AUDIT_ACTION_ADD, ZBX_AUDIT_HA_STATUS, status);
 }
 
 void	zbx_audit_ha_update_field_string(const char *nodeid, const char *key, const char *old_value,
@@ -63,7 +63,7 @@ void	zbx_audit_ha_update_field_string(const char *nodeid, const char *key, const
 	RETURN_IF_AUDIT_OFF();
 
 	entry = zbx_audit_get_entry(0, nodeid, AUDIT_HA_NODE_ID);
-	zbx_audit_entry_append_string(entry, AUDIT_ACTION_UPDATE, key, old_value, new_value);
+	zbx_audit_entry_append_string(entry, ZBX_AUDIT_ACTION_UPDATE, key, old_value, new_value);
 }
 
 void	zbx_audit_ha_update_field_int(const char *nodeid, const char *key, int old_value, int new_value)
@@ -73,5 +73,5 @@ void	zbx_audit_ha_update_field_int(const char *nodeid, const char *key, int old_
 	RETURN_IF_AUDIT_OFF();
 
 	entry = zbx_audit_get_entry(0, nodeid, AUDIT_HA_NODE_ID);
-	zbx_audit_entry_append_int(entry, AUDIT_ACTION_UPDATE, key, old_value, new_value);
+	zbx_audit_entry_append_int(entry, ZBX_AUDIT_ACTION_UPDATE, key, old_value, new_value);
 }

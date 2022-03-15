@@ -23,10 +23,10 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 
-#define AUDIT_ACTION_ADD		0
-#define AUDIT_ACTION_UPDATE		1
-#define AUDIT_ACTION_DELETE		2
-#define AUDIT_ACTION_EXECUTE		7
+#define ZBX_AUDIT_ACTION_ADD		0
+#define ZBX_AUDIT_ACTION_UPDATE		1
+#define ZBX_AUDIT_ACTION_DELETE		2
+#define ZBX_AUDIT_ACTION_EXECUTE		7
 
 #define	AUDIT_DETAILS_KEY_LEN		100
 

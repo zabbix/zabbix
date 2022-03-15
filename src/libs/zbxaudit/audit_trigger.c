@@ -70,7 +70,7 @@ void	zbx_audit_trigger_create_entry(int audit_action, zbx_uint64_t triggerid, co
 		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_trigger_entry_insert,
 				sizeof(local_audit_trigger_entry_insert));
 
-		if (AUDIT_ACTION_ADD == audit_action)
+		if (ZBX_AUDIT_ACTION_ADD == audit_action)
 		{
 			zbx_audit_update_json_append_uint64(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_ADD,
 					TR_OR_TRP(triggerid), triggerid, "triggers", "triggerid");
@@ -240,7 +240,7 @@ void	zbx_audit_DBselect_delete_for_trigger(const char *sql, zbx_vector_uint64_t 
 		ZBX_STR2UINT64(id, row[0]);
 		zbx_vector_uint64_append(ids, id);
 
-		zbx_audit_trigger_create_entry(AUDIT_ACTION_DELETE, id, row[1], atoi(row[2]));
+		zbx_audit_trigger_create_entry(ZBX_AUDIT_ACTION_DELETE, id, row[1], atoi(row[2]));
 	}
 
 	DBfree_result(result);

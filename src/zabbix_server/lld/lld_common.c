@@ -96,12 +96,12 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 				}
 				else if (0 == strcmp(table, "graph_discovery"))
 				{
-					zbx_audit_graph_create_entry(AUDIT_ACTION_DELETE, id, name,
+					zbx_audit_graph_create_entry(ZBX_AUDIT_ACTION_DELETE, id, name,
 							(int)ZBX_FLAG_DISCOVERY_CREATED);
 				}
 				else if (0 == strcmp(table, "trigger_discovery"))
 				{
-					zbx_audit_trigger_create_entry(AUDIT_ACTION_DELETE, id, name,
+					zbx_audit_trigger_create_entry(ZBX_AUDIT_ACTION_DELETE, id, name,
 							ZBX_FLAG_DISCOVERY_CREATED);
 				}
 			}

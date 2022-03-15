@@ -223,7 +223,7 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 	if (ZBX_DB_OK > DBexecute("insert into auditlog (auditid,userid,username,clock,action,ip,resourceid,"
 			"resourcename,resourcetype,recordsetid,details) values ('%s'," ZBX_FS_UI64 ",'%s',%d,'%d','%s',"
 			ZBX_FS_UI64 ",'%s',%d,'%s','%s')", auditid_cuid, userid, username, (int)time(NULL),
-			AUDIT_ACTION_EXECUTE, clientip, hostid, hostname, AUDIT_RESOURCE_SCRIPT, auditid_cuid,
+			ZBX_AUDIT_ACTION_EXECUTE, clientip, hostid, hostname, AUDIT_RESOURCE_SCRIPT, auditid_cuid,
 			details_esc))
 	{
 		ret = FAIL;
@@ -308,7 +308,7 @@ void	zbx_audit_flush(void)
 
 	while (NULL != (audit_entry = (zbx_audit_entry_t **)zbx_hashset_iter_next(&iter)))
 	{
-		if (AUDIT_ACTION_DELETE == (*audit_entry)->audit_action ||
+		if (ZBX_AUDIT_ACTION_DELETE == (*audit_entry)->audit_action ||
 				0 != strcmp((*audit_entry)->details_json.buffer, "{}"))
 		{
 			char	*details_esc;
@@ -347,7 +347,7 @@ int	zbx_audit_flush_once(void)
 		char	id[ZBX_MAX_UINT64_LEN + 1], *pvalue, *name_esc, *details_esc;
 		const char	*pfield;
 
-		if (AUDIT_ACTION_DELETE != (*audit_entry)->audit_action &&
+		if (ZBX_AUDIT_ACTION_DELETE != (*audit_entry)->audit_action &&
 				0 == strcmp((*audit_entry)->details_json.buffer, "{}"))
 		{
 			continue;
@@ -625,10 +625,10 @@ void	zbx_audit_entry_append_int(zbx_audit_entry_t *entry, int audit_op, const ch
 
 	switch (audit_op)
 	{
-		case AUDIT_ACTION_ADD:
+		case ZBX_AUDIT_ACTION_ADD:
 			append_int_json(&entry->details_json, AUDIT_DETAILS_ACTION_ADD, key, value1);
 			break;
-		case AUDIT_ACTION_UPDATE:
+		case ZBX_AUDIT_ACTION_UPDATE:
 			value2 = va_arg(args, int);
 			update_int_json(&entry->details_json, key, value1, value2);
 			break;
@@ -650,10 +650,10 @@ void	zbx_audit_entry_append_string(zbx_audit_entry_t *entry, int audit_op, const
 
 	switch (audit_op)
 	{
-		case AUDIT_ACTION_ADD:
+		case ZBX_AUDIT_ACTION_ADD:
 			append_str_json(&entry->details_json, AUDIT_DETAILS_ACTION_ADD, key, value1);
 			break;
-		case AUDIT_ACTION_UPDATE:
+		case ZBX_AUDIT_ACTION_UPDATE:
 			value2 = va_arg(args, const char *);
 			update_str_json(&entry->details_json, key, value1, value2);
 			break;

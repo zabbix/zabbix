@@ -231,7 +231,7 @@ void	zbx_audit_##funcname##_create_entry(int audit_action, zbx_uint64_t hostid, 
 		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_host_entry_insert,			\
 				sizeof(local_audit_host_entry_insert));						\
 														\
-		if (AUDIT_ACTION_ADD == audit_action)								\
+		if (ZBX_AUDIT_ACTION_ADD == audit_action)								\
 		{												\
 			zbx_audit_update_json_append_uint64(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD,	\
 					#auditentry".hostid", hostid, "hosts", "hostid");			\
@@ -449,7 +449,7 @@ void	zbx_audit_host_hostgroup_delete(zbx_uint64_t hostid, const char* hostname, 
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, hostid, hostname);
+	zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_UPDATE, hostid, hostname);
 
 	for (i = 0; i < groupids->values_num; i++)
 	{
@@ -463,7 +463,7 @@ void	zbx_audit_host_del(zbx_uint64_t hostid, const char *hostname)
 {
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_audit_host_create_entry(AUDIT_ACTION_DELETE, hostid, hostname);
+	zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_DELETE, hostid, hostname);
 }
 
 void	zbx_audit_host_update_json_add_details(zbx_uint64_t hostid, const char *host, zbx_uint64_t proxy_hostid,
@@ -575,7 +575,7 @@ void	zbx_audit_host_prototype_del(zbx_uint64_t hostid, const char *hostname)
 {
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_audit_host_prototype_create_entry(AUDIT_ACTION_DELETE, hostid, hostname);
+	zbx_audit_host_prototype_create_entry(ZBX_AUDIT_ACTION_DELETE, hostid, hostname);
 }
 
 void	zbx_audit_host_prototype_update_json_add_details(zbx_uint64_t hostid, zbx_uint64_t templateid,
@@ -919,7 +919,7 @@ void	zbx_audit_host_group_del(zbx_uint64_t groupid, const char *name)
 {
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_audit_host_group_create_entry(AUDIT_ACTION_DELETE, groupid, name);
+	zbx_audit_host_group_create_entry(ZBX_AUDIT_ACTION_DELETE, groupid, name);
 }
 
 void	zbx_audit_host_group_update_json_add_details(zbx_uint64_t groupid, const char *name, int flags)
