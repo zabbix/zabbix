@@ -30,12 +30,6 @@
 #include "../zbxalgo/vectorimpl.h"
 #include "zbxxml.h"
 
-#ifdef HAVE_LIBXML2
-#	include <libxml/parser.h>
-#	include <libxml/xpath.h>
-#	include <libxml/xmlerror.h>
-#endif
-
 typedef struct
 {
 	char		*host;

@@ -30,12 +30,6 @@
 
 #include "../zbxalgo/vectorimpl.h"
 
-#define XML_TEXT_NAME	"text"
-#define XML_CDATA_NAME	"cdata"
-#define XML_TEXT_TAG	"#text"
-#define XML_JSON_TRUE	1
-#define XML_JSON_FALSE	0
-
 typedef struct _zbx_xml_node_t zbx_xml_node_t;
 
 ZBX_PTR_VECTOR_DECL(xml_node_ptr, zbx_xml_node_t *)
@@ -56,6 +50,8 @@ static char	data_static[ZBX_MAX_B64_LEN];
 /******************************************************************************
  *                                                                            *
  * Purpose: get DATA from <tag>DATA</tag>                                     *
+ *                                                                            *
+ * !!! Attention: static !!! Not thread-safe                                  *
  *                                                                            *
  ******************************************************************************/
 int	zbx_xml_get_data_dyn(const char *xml, const char *tag, char **data)
@@ -89,6 +85,11 @@ int	zbx_xml_get_data_dyn(const char *xml, const char *tag, char **data)
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * !!! Attention: static !!! Not thread-safe                                  *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_xml_free_data_dyn(char **data)
 {
 	if (*data == data_static)
@@ -365,6 +366,13 @@ out:
 }
 
 #ifdef HAVE_LIBXML2
+
+#define XML_TEXT_NAME	"text"
+#define XML_CDATA_NAME	"cdata"
+#define XML_TEXT_TAG	"#text"
+#define XML_JSON_TRUE	1
+#define XML_JSON_FALSE	0
+
 /******************************************************************************
  *                                                                            *
  * Purpose: compare two xml nodes by name                                     *
@@ -983,7 +991,6 @@ exit:
 }
 
 #ifdef HAVE_LIBXML2
-
 typedef struct
 {
 	char	*buf;
@@ -1067,7 +1074,6 @@ int	zbx_xml_xpath_check(const char *xpath, char *error, size_t errlen)
 }
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-
 /******************************************************************************
  *                                                                            *
  * Purpose: populate array of values from an xml data                         *
