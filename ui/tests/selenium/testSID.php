@@ -31,6 +31,8 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  */
 class testSID extends CWebTest {
 
+	const UPDATE_TOKEN = 'api_update';
+
 	/**
 	 * Token ID used for update.
 	 *
@@ -40,7 +42,7 @@ class testSID extends CWebTest {
 
 	public function prepareTokenData() {
 		$response = CDataHelper::call('token.create', [
-			'name' => 'api_update',
+			'name' => self::UPDATE_TOKEN,
 			'userid' => '1'
 		]);
 		$this->assertArrayHasKey('tokenids', $response);
@@ -991,8 +993,9 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM token',
-					'incorrect_request' => true,
-					'link' => 'zabbix.php?action=token.edit'
+					'server_error' => true,
+					'link' => 'zabbix.php?action=token.list',
+					'case' => 'token create'
 				]
 			],
 
@@ -1000,8 +1003,9 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM token',
-					'incorrect_request' => true,
-					'link' => 'zabbix.php?action=token.edit&tokenid='
+					'server_error' => true,
+					'link' => 'zabbix.php?action=token.list',
+					'case' => 'token update'
 				]
 			],
 
@@ -1144,8 +1148,9 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM token',
-					'incorrect_request' => true,
-					'link' => 'zabbix.php?action=user.token.edit'
+					'server_error' => true,
+					'link' => 'zabbix.php?action=user.token.list',
+					'case' => 'token create'
 				]
 			],
 
@@ -1153,8 +1158,9 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM token',
-					'incorrect_request' => true,
-					'link' => 'zabbix.php?action=user.token.edit&tokenid='
+					'server_error' => true,
+					'link' => 'zabbix.php?action=user.token.list',
+					'case' => 'token update'
 				]
 			],
 
@@ -1184,9 +1190,32 @@ class testSID extends CWebTest {
 		$hash_before = CDBHelper::getHash($data['db']);
 		$url = (!str_contains($data['link'], 'tokenid') ? $data['link'] : $data['link'].self::$token_id);
 		$this->page->login()->open($url)->waitUntilReady();
-		$this->query('xpath://input[@name="sid"]')->one()->delete();
-		$this->query(($this->query('button:Update')->exists()) ? 'button:Update' : 'xpath://button[text()="Add" and'.
-				' @type="submit"]')->waitUntilClickable()->one()->click();
+
+		if (CTestArrayHelper::get($data, 'case') === 'token create') {
+			$this->query('button:Create API token')->waitUntilClickable()->one()->click();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+			$fill_data = ['Name' => 'test', 'User' => 'admin-zabbix', 'Expires at' => '2037-12-31 00:00:00'];
+
+			if (strpos($data['link'], 'user') ) {
+				unset($fill_data['User']);
+			}
+
+			$dialog->asForm()->fill($fill_data);
+		}
+		elseif ((CTestArrayHelper::get($data, 'case') === 'token update')) {
+			$this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()->findRow('Name',
+					self::UPDATE_TOKEN)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		}
+
+		foreach ($this->query('xpath://input[@name="sid"]')->all() as $input) {
+			$input->delete();
+		}
+
+		$query = ($this->query('button:Update')->exists())
+			? 'button:Update'
+			: 'xpath://button[text()="Add" and @type="submit"] | //div[@class="overlay-dialogue-footer"]//button[text()="Add"]';
+		$this->query($query)->waitUntilClickable()->one()->click();
 
 		if (CTestArrayHelper::get($data, 'incorrect_request')) {
 			$message = 'Access denied';
@@ -1209,5 +1238,9 @@ class testSID extends CWebTest {
 		}
 
 		$this->assertEquals($hash_before, CDBHelper::getHash($data['db']));
+
+		if (CTestArrayHelper::get($data, 'case')) {
+			$dialog->close();
+		}
 	}
 }

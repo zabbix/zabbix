@@ -19,8 +19,8 @@
 
 #ifndef _WINDOWS
 
-#include "common.h"
 #include "diskdevices.h"
+
 #include "stats.h"
 #include "log.h"
 #include "mutexs.h"

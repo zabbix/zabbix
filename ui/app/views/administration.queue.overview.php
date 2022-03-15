@@ -39,7 +39,8 @@ $widget = (new CWidget())
 					->getUrl() => _('Queue details')
 			]
 		]
-	]);
+	])
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::QUEUE_OVERVIEW));
 
 $table = (new CTableInfo())->setHeader([
 	_('Items'),

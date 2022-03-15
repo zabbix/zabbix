@@ -2,7 +2,7 @@
 # Slack webhook
 ![](images/Slack_RGB.png?raw=true)
 
-This guide describes how to integrate your Zabbix 6.0 and higher installation with Slack using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
+This guide describes how to integrate your Zabbix 6.2 and higher installation with Slack using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
 
 ## Setting up a Slack bot
 
@@ -46,8 +46,8 @@ The **Send to** field can contain several variants of values:
 
 6\. You must add your bot to the target channel
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/6.0/manual/config/notifications) and [Slack API](https://api.slack.com) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/6.2/manual/config/notifications) and [Slack API](https://api.slack.com) documentations.
 
 ## Supported Versions
 
-Zabbix 5.4
+Zabbix 6.2

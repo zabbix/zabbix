@@ -17,9 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "cpustat.h"
+
 #include "common.h"
 #include "stats.h"
-#include "cpustat.h"
 #ifdef _WINDOWS
 #	include "perfstat.h"
 /* defined in sysinfo lib */

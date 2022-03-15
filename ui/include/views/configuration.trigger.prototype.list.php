@@ -27,6 +27,10 @@ require_once dirname(__FILE__).'/js/configuration.trigger.prototype.list.js.php'
 
 $widget = (new CWidget())
 	->setTitle(_('Trigger prototypes'))
+	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
+		? CDocHelper::CONFIGURATION_HOST_TRIGGER_PROTOTYPE_LIST
+		: CDocHelper::CONFIGURATION_TEMPLATES_TRIGGER_PROTOTYPE_LIST
+	))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())->addItem(new CRedirectButton(_('Create trigger prototype'),
@@ -203,8 +207,9 @@ $triggersForm->addItem([
 			'popup.massupdate.triggerprototype' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
-						"return openMassupdatePopup('popup.massupdate.triggerprototype', {}, {
-							dialogue_class: 'modal-popup-static'
+						"openMassupdatePopup('popup.massupdate.triggerprototype', {}, {
+							dialogue_class: 'modal-popup-static',
+							trigger_element: this
 						});"
 					)
 					->addClass(ZBX_STYLE_BTN_ALT)

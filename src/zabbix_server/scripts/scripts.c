@@ -17,7 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "scripts.h"
+
 #include "../poller/checks_agent.h"
 #include "../ipmi/ipmi.h"
 #include "../poller/checks_ssh.h"
@@ -27,10 +28,7 @@
 #include "db.h"
 #include "log.h"
 #include "zbxtasks.h"
-#include "zbxjson.h"
 #include "zbxembed.h"
-
-#include "scripts.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_IPMIPOLLER_FORKS;

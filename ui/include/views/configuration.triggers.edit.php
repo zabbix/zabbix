@@ -25,7 +25,9 @@
 
 require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
-$widget = (new CWidget())->setTitle(_('Triggers'));
+$widget = (new CWidget())
+	->setTitle(_('Triggers'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_TRIGGERS_EDIT));
 
 // Append host summary to widget header.
 if ($data['hostid'] != 0) {

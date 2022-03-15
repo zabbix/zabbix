@@ -30,6 +30,7 @@ if ($data['uncheck']) {
 $widget = (new CWidget())
 	->setTitle(_('Regular expressions'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_REGEX_LIST))
 	->setControls((new CTag('nav', true,
 		(new CForm())
 			->cleanItems()

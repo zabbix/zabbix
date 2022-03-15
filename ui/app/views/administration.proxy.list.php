@@ -32,6 +32,7 @@ if ($data['uncheck']) {
 
 $widget = (new CWidget())
 	->setTitle(_('Proxies'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_PROXY_LIST))
 	->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(new CRedirectButton(_('Create proxy'), 'zabbix.php?action=proxy.edit'))

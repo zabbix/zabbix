@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerTokenEdit extends CController {
+class CControllerPopupTokenEdit extends CController {
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -28,18 +28,17 @@ class CControllerTokenEdit extends CController {
 	protected function checkInput() {
 		$fields = [
 			'tokenid'       => 'db token.tokenid',
-			'name'          => 'db token.name',
-			'description'   => 'db token.description',
-			'userid'        => 'db users.userid',
-			'expires_state' => 'in 0,1',
-			'expires_at'    => 'string',
-			'status'        => 'db token.status|in '.ZBX_AUTH_TOKEN_ENABLED.','.ZBX_AUTH_TOKEN_DISABLED
+			'admin_mode'    => 'required|in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				(new CControllerResponseData([
+					'main_block' => json_encode(['errors' => getMessages()->toString()])
+				]))->disableView()
+			);
 		}
 
 		return $ret;
@@ -50,9 +49,13 @@ class CControllerTokenEdit extends CController {
 			return false;
 		}
 
-		return ($this->checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)
-			&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
-		);
+		if ($this->getInput('admin_mode') === '1') {
+			return ($this->checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)
+				&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
+			);
+		}
+
+		return $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS);
 	}
 
 	protected function doAction() {
@@ -69,7 +72,7 @@ class CControllerTokenEdit extends CController {
 			$data = $tokens[0];
 
 			if ($data['expires_at'] != 0) {
-				$data['expires_at'] = date(DATE_TIME_FORMAT_SECONDS, (int) $data['expires_at']);
+				$data['expires_at'] = date(ZBX_FULL_DATE_TIME, (int) $data['expires_at']);
 				$data['expires_state'] = '1';
 			}
 			else {
@@ -102,6 +105,10 @@ class CControllerTokenEdit extends CController {
 
 			$data['ms_user'] = [['id' => $user['userid'], 'name' => getUserFullname($user)]];
 		}
+
+		$data['admin_mode'] = $this->getInput('admin_mode');
+
+		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('API tokens'));

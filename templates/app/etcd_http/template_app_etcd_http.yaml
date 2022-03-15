@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-27T09:41:49Z'
+  date: '2022-03-01T13:29:44Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -609,7 +609,7 @@ zabbix_export:
           key: etcd.leader.changes
           delay: '0'
           history: 7d
-          description: 'The the number of leader changes the member has seen since its start.'
+          description: 'The number of leader changes the member has seen since its start.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -1446,7 +1446,7 @@ zabbix_export:
         -
           macro: '{$ETCD.GRPC_CODE.TRIGGER.MATCHES}'
           value: Aborted|Unavailable
-          description: 'Filter of discoverable gRPC codes which will be create triggers.'
+          description: 'Filter of discoverable gRPC codes which will create triggers.'
         -
           macro: '{$ETCD.HTTP.FAIL.MAX.WARN}'
           value: '2'

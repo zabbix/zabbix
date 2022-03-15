@@ -17,21 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
-#include "dbcache.h"
+#include "housekeeper.h"
 #include "log.h"
 #include "daemon.h"
 #include "zbxself.h"
-#include "zbxalgo.h"
 #include "zbxserver.h"
 #include "zbxrtc.h"
-#include "zbxipcservice.h"
 
 #include "history_compress.h"
 #include "../../libs/zbxdbcache/valuecache.h"
 
-#include "housekeeper.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;

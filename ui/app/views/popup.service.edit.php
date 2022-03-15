@@ -411,6 +411,7 @@ else {
 
 $output = [
 	'header' => $title,
+	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_SERVICE_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().

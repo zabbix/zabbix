@@ -36,7 +36,7 @@ if (!defined('PHPUNIT_BASEDIR')) {
 	}
 
 	function formatCallStack() {
-		$calls = debug_backtrace(0);
+		$calls = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
 		// never show the call to this method
 		array_shift($calls);

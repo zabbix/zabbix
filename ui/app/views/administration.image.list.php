@@ -29,6 +29,7 @@ $page_url = (new CUrl('zabbix.php'))->setArgument('action', 'image.list');
 $widget = (new CWidget())
 	->setTitle(_('Images'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_IMAGE_LIST))
 	->setControls((new CTag('nav', true,
 		(new CForm())
 			->cleanItems()
