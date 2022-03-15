@@ -225,7 +225,7 @@ class PostgresqlDbBackend extends DbBackend {
 
 		$resource = @pg_connect($conn_string);
 
-		if (!$resour	ce) {
+		if (!$resource) {
 			$this->setError('Error connecting to database.');
 			return null;
 		}
