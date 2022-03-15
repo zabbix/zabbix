@@ -26,6 +26,11 @@ class CControllerItemMassCheckNow extends CController {
 	 */
 	private $item_cache = [];
 
+	/**
+	 * @var bool  Whether the request is for items (false) or LLD rules (true).
+	 */
+	private $is_discovery_rule;
+
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
@@ -53,7 +58,10 @@ class CControllerItemMassCheckNow extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		$this->is_discovery_rule = (bool) $this->getInput('discovery_rule', 0);
+		$min_user_type = $this->is_discovery_rule ? USER_TYPE_ZABBIX_ADMIN : USER_TYPE_ZABBIX_USER;
+
+		return ($this->getUserType() >= $min_user_type);
 	}
 
 	protected function doAction(): void {
@@ -62,14 +70,11 @@ class CControllerItemMassCheckNow extends CController {
 		// List of item IDs that are coming from input (later overwritten).
 		$itemids = $this->getInput('itemids');
 
-		// True if request comes from LLD rule list view.
-		$is_discovery_rule = (bool) $this->getInput('discovery_rule', 0);
-
 		// Error message details.
 		$errors = [];
 
 		// Find items or LLD rules.
-		if ($is_discovery_rule) {
+		if ($this->is_discovery_rule) {
 			$items = API::DiscoveryRule()->get([
 				'output' => ['type', 'name', 'status', 'flags', 'master_itemid'],
 				'selectHosts' => ['name', 'status'],
