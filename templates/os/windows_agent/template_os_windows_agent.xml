@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-02T13:38:16Z</date>
+   <date>2022-03-15T07:13:24Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -1700,15 +1700,21 @@ Template tooling version used: 0.39</description>
                         <formulaid>B</formulaid>
                      </condition>
                      <condition>
+                        <macro>{#SERVICE.NAME}</macro>
+                        <value>{$SERVICE.NAME.NOT_MATCHES.EXTENDED}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>C</formulaid>
+                     </condition>
+                     <condition>
                         <macro>{#SERVICE.STARTUPNAME}</macro>
                         <value>{$SERVICE.STARTUPNAME.MATCHES}</value>
-                        <formulaid>C</formulaid>
+                        <formulaid>D</formulaid>
                      </condition>
                      <condition>
                         <macro>{#SERVICE.STARTUPNAME}</macro>
                         <value>{$SERVICE.STARTUPNAME.NOT_MATCHES}</value>
                         <operator>NOT_MATCHES_REGEX</operator>
-                        <formulaid>D</formulaid>
+                        <formulaid>E</formulaid>
                      </condition>
                   </conditions>
                </filter>
@@ -1742,6 +1748,11 @@ Template tooling version used: 0.39</description>
             <macro>
                <macro>{$SERVICE.NAME.MATCHES}</macro>
                <value>^.*$</value>
+               <description>This macro is used in Service discovery. Can be overridden on the host or linked template level.</description>
+            </macro>
+            <macro>
+               <macro>{$SERVICE.NAME.NOT_MATCHES.EXTENDED}</macro>
+               <value>^(CDPUserSvc_.+|WpnUserService_.+|OneSyncSvc_.+|WbioSrvc|BITS|tiledatamodelsvc|GISvc|ShellHWDetection|TrustedInstaller|TabletInputService|CDPSvc)$</value>
                <description>This macro is used in Service discovery. Can be overridden on the host or linked template level.</description>
             </macro>
             <macro>
