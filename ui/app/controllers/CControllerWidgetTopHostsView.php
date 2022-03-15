@@ -357,8 +357,7 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 				$values = [];
 
 				foreach ($items as $itemid => $item) {
-					if (in_array($item['value_type'],
-							[ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
+					if ($item['source'] === 'history') {
 						$history = Manager::History()->getValueAt($item, $time_to, 0);
 
 						if (is_array($history)) {
@@ -409,9 +408,8 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 		if ($data_source == CWidgetFieldColumnsList::HISTORY_DATA_HISTORY
 				|| $data_source == CWidgetFieldColumnsList::HISTORY_DATA_TRENDS) {
 			foreach ($items as &$item) {
-				$item['source'] = ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT
-						|| $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
-					&& $data_source == CWidgetFieldColumnsList::HISTORY_DATA_TRENDS
+				$item['source'] = $data_source == CWidgetFieldColumnsList::HISTORY_DATA_TRENDS
+					&& ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
 						? 'trends'
 						: 'history';
 			}
