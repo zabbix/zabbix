@@ -286,11 +286,13 @@ class CSetupWizard extends CForm {
 
 				switch ($this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG)) {
 					case DB_STORE_CREDS_VAULT_HASHICORP:
+						$vault_config['VAULT'] = CVaultHashiCorp::NAME;
 						$vault_config['VAULT_URL'] = $this->getConfig('DB_VAULT_URL');
 						$vault_config['VAULT_DB_PATH'] = $this->getConfig('DB_VAULT_DB_PATH');
 						$vault_config['VAULT_TOKEN'] = $this->getConfig('DB_VAULT_TOKEN');
 						break;
 					case DB_STORE_CREDS_VAULT_CYBERARK:
+						$vault_config['VAULT'] = CVaultCyberArk::NAME;
 						$vault_config['VAULT_URL'] = $this->getConfig('DB_VAULT_URL');
 						$vault_config['VAULT_DB_PATH'] = $this->getConfig('DB_VAULT_DB_PATH');
 						$vault_config['VAULT_CERT_FILE'] = $this->getConfig('VAULT_CERT_FILE');
