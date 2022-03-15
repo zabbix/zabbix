@@ -40,8 +40,7 @@ foreach ($data['configuration'] as $column_config) {
 	}
 }
 
-$table = (new CTableInfo())
-	->setHeader($headers);
+$table = (new CTableInfo())->setHeader($headers);
 
 foreach ($data['rows'] as $columns) {
 	$row = [];

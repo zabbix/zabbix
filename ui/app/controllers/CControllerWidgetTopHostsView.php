@@ -114,7 +114,8 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 
 				$master_items_min = reset($master_item_values);
 				$master_items_max = end($master_item_values);
-			} else {
+			}
+			else {
 				arsort($master_item_values, SORT_NATURAL);
 			}
 		}
