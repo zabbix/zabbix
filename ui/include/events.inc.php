@@ -557,11 +557,7 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 							&& !(array_key_exists($tag['tag'], $subfilter_tags)
 								&& array_key_exists($tag['value'], $subfilter_tags[$tag['tag']]))) {
 						$tags[$element[$key]][] = (new CSimpleButton($value))
-							->onClick(CHtml::encode(
-								'view.setSubfilter('.json_encode([
-									'subfilter_tags['.$tag['tag'].'][]', $tag['value']
-								]).')'
-							))
+							->setAttribute('data-subfilter-tag', ['subfilter_tags['.$tag['tag'].'][]', $tag['value']])
 							->addClass(ZBX_STYLE_BTN_TAG)
 							->setHint(getTagString($tag), '', false);
 					}
@@ -591,11 +587,7 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 							&& !(array_key_exists($tag['tag'], $subfilter_tags)
 								&& array_key_exists($tag['value'], $subfilter_tags[$tag['tag']]))) {
 						$hint_content[$element[$key]][] = (new CSimpleButton($value))
-							->onClick(CHtml::encode(
-								'view.setSubfilter('.json_encode([
-									'subfilter_tags['.$tag['tag'].'][]', $tag['value']
-								]).')'
-							))
+							->setAttribute('data-subfilter-tag', ['subfilter_tags['.$tag['tag'].'][]', $tag['value']])
 							->addClass(ZBX_STYLE_BTN_TAG)
 							->setHint(getTagString($tag), '', false);
 					}
