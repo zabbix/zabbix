@@ -58,7 +58,6 @@ $form_grid->addItem([
 	new CLabel(_('Data'), 'data'),
 	new CFormField(
 		(new CSelect('data'))
-			->setId('data')
 			->setValue($data['data'])
 			->addOptions(CSelect::createOptionsFromArray([
 				CWidgetFieldColumnsList::DATA_ITEM_VALUE => _('Item value'),
@@ -123,13 +122,10 @@ $numeric_only_warning = new CSpan([
 $form_grid->addItem([
 	new CLabel([
 		_('Aggregation function'),
-		$numeric_only_warning
-			->setId('aggregate_function_warning')
-			->addStyle($data['aggregate_function'] == AGGREGATE_NONE ? 'display: none' : '')
+		$numeric_only_warning->setId('aggregate-function-warning')
 	], 'aggregate_function'),
 	new CFormField(
 		(new CSelect('aggregate_function'))
-			->setId('aggregate_function')
 			->setValue($data['aggregate_function'])
 			->addOptions(CSelect::createOptionsFromArray([
 				AGGREGATE_NONE => _('none'),
@@ -156,9 +152,7 @@ $form_grid->addItem([
 $form_grid->addItem([
 	new CLabel([
 		_('Display'),
-		$numeric_only_warning
-			->setId('display_warning')
-			->addStyle($data['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS ? 'display: none' : '')
+		$numeric_only_warning->setId('display-warning')
 	], 'display'),
 	new CFormField(
 		(new CRadioButtonList('display', (int) $data['display']))
@@ -251,9 +245,7 @@ $thresholds->addItem(
 $form_grid->addItem([
 	new CLabel([
 		_('Thresholds'),
-		$numeric_only_warning
-			->setId('thresholds_warning')
-			->addStyle(!$data['thresholds'] ? 'display: none' : '')
+		$numeric_only_warning->setId('thresholds-warning')
 	], 'thresholds_table'),
 	new CFormField($thresholds)
 ]);

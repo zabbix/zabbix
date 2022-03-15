@@ -25,16 +25,13 @@ window.tophosts_column_edit_form = new class {
 	init({form_name, thresholds, thresholds_colors}) {
 		this._$widget_form = $(`form[name="${form_name}"]`);
 		this._$thresholds_table = this._$widget_form.find('#thresholds_table');
-		this.warning_message_box = null;
 
-		for (const id of ['data', 'aggregate_function', 'display']) {
-			document
-				.getElementById(id)
-				.addEventListener('change', () => {
-					this.updateAccessibility();
-					this.checkItemColumnSettings();
-				});
-		}
+		$('[name="display"],[name="data"],[name="aggregate_function"]', this._$widget_form).on('change', () => {
+			this.updateAccessibility();
+		});
+
+		$('[name="aggregate_function"]', this._$widget_form).on('change', () => this.toggleAggregateFunctionWarning());
+		$('[name="display"]', this._$widget_form).on('change', () => this.toggleDisplayWarning());
 
 		colorPalette.setThemeColors(thresholds_colors);
 
@@ -58,9 +55,9 @@ window.tophosts_column_edit_form = new class {
 
 				$colorpicker.colorpicker({appendTo: $colorpicker.closest('.input-color-picker')});
 
-				this.checkItemColumnSettings();
+				this.toggleThresholdsWarning();
 			})
-			.on('afterremove.dynamicRows', () => this.checkItemColumnSettings());
+			.on('afterremove.dynamicRows', () => this.toggleThresholdsWarning());
 
 		this._$widget_form.on('process.form', (e, overlay) => {
 			this.handleFormSubmit(e, overlay);
@@ -69,7 +66,9 @@ window.tophosts_column_edit_form = new class {
 		// Initialize form elements accessibility.
 		this.updateAccessibility();
 
-		this.checkItemColumnSettings();
+		this.toggleAggregateFunctionWarning();
+		this.toggleDisplayWarning();
+		this.toggleThresholdsWarning();
 	}
 
 	updateAccessibility() {
@@ -95,6 +94,22 @@ window.tophosts_column_edit_form = new class {
 			$(elm).toggle(is_visible);
 			form_field.toggle(is_visible);
 		});
+	}
+
+	toggleAggregateFunctionWarning() {
+		$('#aggregate-function-warning').toggle(
+			$('[name="aggregate_function"]', this._$widget_form).val() != <?= AGGREGATE_NONE ?>
+		);
+	}
+
+	toggleDisplayWarning() {
+		$('#display-warning').toggle(
+			$('[name="display"]:checked', this._$widget_form).val() != <?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>
+		);
+	}
+
+	toggleThresholdsWarning() {
+		$('#thresholds-warning').toggle($('#thresholds_table tbody tr').length > 1);
 	}
 
 	handleFormSubmit(e, overlay) {
@@ -132,15 +147,5 @@ window.tophosts_column_edit_form = new class {
 			.finally(() => {
 				overlay.unsetLoading();
 			});
-	}
-
-	checkItemColumnSettings() {
-		document.getElementById('aggregate_function_warning').style.display =
-			document.getElementById('aggregate_function').value == <?= AGGREGATE_NONE ?> ? 'none' : '';
-		document.getElementById('display_warning').style.display =
-			document.querySelector('#display input:checked').value == <?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>
-				? 'none' : '';
-		document.getElementById('thresholds_warning').style.display =
-			document.querySelector('#thresholds_table tbody').rows.length == 1 ? 'none' : '';
 	}
 }();
