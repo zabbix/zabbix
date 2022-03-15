@@ -438,13 +438,13 @@ class testFormTabIndicators extends CWebTest {
 			// Proxy configuration form tab data.
 			[
 				[
-					'url' => 'zabbix.php?action=proxy.edit',
+					'url' => 'zabbix.php?action=proxy.list',
 					'form' => 'id:proxy-form',
 					'tabs' => [
 						[
 							'name' => 'Encryption',
 							'entries' => [
-								'selector' => 'id:tls_in_psk',
+								'selector' => 'id:tls_accept_psk',
 								'value' => true,
 								'old_value' => false
 							],
@@ -665,6 +665,10 @@ class testFormTabIndicators extends CWebTest {
 			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
 			$form->getField('Type')->fill('Graph');
 			$form->invalidate();
+		}
+		elseif ($data['url'] === 'zabbix.php?action=proxy.list') {
+			$this->query('button:Create proxy')->one()->click();
+			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 		}
 		else {
 			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
