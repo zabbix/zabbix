@@ -1330,8 +1330,7 @@ static void	ha_set_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client,
 		ZBX_STR2UINT64(configid, row[0]);
 		zbx_audit_init(info->auditlog);
 		zbx_audit_settings_create_entry(AUDIT_ACTION_UPDATE, configid);
-		zbx_audit_update_json_update_int(configid, AUDIT_CONFIG_ID, "settings.ha_failover_delay", atoi(row[1]),
-				delay);
+		zbx_audit_settings_update_field_int(configid, "settings.ha_failover_delay", atoi(row[1]), delay);
 		ha_flush_audit(info);
 	}
 	else
