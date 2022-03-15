@@ -274,11 +274,16 @@ foreach ($data['discoveries'] as $discovery) {
 		}
 	}
 
+	$checkbox = new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', $discovery['itemid']);
+
+	if (in_array($discovery['type'], checkNowAllowedTypes())
+			&& $discovery['status'] == ITEM_STATUS_ACTIVE
+			&& $discovery['hosts'][0]['status'] == HOST_STATUS_MONITORED) {
+		$checkbox->setAttribute('data-actions', 'execute');
+	}
+
 	$discoveryTable->addRow([
-		(new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', $discovery['itemid']))
-			->setAttribute('data-execute', in_array($discovery['type'], checkNowAllowedTypes())
-				&& $discovery['status'] == ITEM_STATUS_ACTIVE && $discovery['hosts'][0]['status'] == HOST_STATUS_MONITORED
-			),
+		$checkbox,
 		$discovery['hosts'][0]['name'],
 		$description,
 		[
@@ -335,8 +340,8 @@ if ($data['context'] === 'host') {
 				->onClick('view.massCheckNow(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('no-chkbxrange')
-				->addClass('js-check-now')
 				->setEnabled(!$data['is_template'])
+				->setAttribute('data-required', 'execute')
 				->setAttribute('data-disabled', $data['is_template'])
 		],
 	];

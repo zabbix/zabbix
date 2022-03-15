@@ -270,11 +270,15 @@ foreach ($data['items'] as $item) {
 		}
 	}
 
+	$checkbox = new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']);
+
+	if (in_array($item['type'], checkNowAllowedTypes())
+			&& $item['status'] == ITEM_STATUS_ACTIVE && $item['hosts'][0]['status'] == HOST_STATUS_MONITORED) {
+		$checkbox->setAttribute('data-actions', 'execute');
+	}
+
 	$itemTable->addRow([
-		(new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']))
-			->setAttribute('data-execute', in_array($item['type'], checkNowAllowedTypes())
-				&& $item['status'] == ITEM_STATUS_ACTIVE && $item['hosts'][0]['status'] == HOST_STATUS_MONITORED
-			),
+		$checkbox,
 		$wizard,
 		($data['hostid'] == 0) ? $item['host'] : null,
 		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
@@ -312,8 +316,8 @@ if ($data['context'] === 'host') {
 				->onClick('view.massCheckNow(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('no-chkbxrange')
-				->addClass('js-check-now')
 				->setEnabled(!$data['is_template'])
+				->setAttribute('data-required', 'execute')
 				->setAttribute('data-disabled', $data['is_template'])
 		],
 		'item.massclearhistory' => $massclearhistory

@@ -258,49 +258,50 @@ var chkbxRange = {
 	 * Update the state of the "Go" controls.
 	 */
 	updateGoButton: function() {
+		const object = this.pageGoName;
 		let selected_count = 0;
-		const execute_btn_exists = (document.querySelectorAll('.js-check-now').length > 0);
-		const graph_btn_exists = (document.querySelectorAll('.js-display-graph').length > 0);
+		let actions = [];
 
-		if (execute_btn_exists || graph_btn_exists) {
-			var object = this.pageGoName;
-		}
-
-		if (execute_btn_exists) {
-			var execute_count = 0;
-		}
-
-		if (graph_btn_exists) {
-			var graph_count = 0;
-		}
-
-		jQuery.each(this.getSelectedIds(), function() {
+		for (const id in this.getSelectedIds()) {
 			selected_count++;
 
-			if (execute_btn_exists && document.getElementById(object + '_' + this).getAttribute('data-execute')) {
-				execute_count++;
-			}
+			const checkbox_actions = document.getElementById(object + '_' + id).getAttribute('data-actions');
 
-			if (execute_btn_exists && document.getElementById(object + '_' + this).getAttribute('data-graph')) {
-				graph_count++;
-			}
-		});
+			// Count the special attributes for checkboxes.
+			if (checkbox_actions) {
+				const action_list = checkbox_actions.split(' ');
 
-		const selectedCountSpan = jQuery('#selected_count');
-		selectedCountSpan.text(selected_count + ' ' + selectedCountSpan.text().split(' ')[1]);
-
-		jQuery('#action_buttons button').each((_, val) => {
-			const $val = jQuery(val);
-
-			if (!$val.data('disabled')) {
-				if ($val.hasClass('js-check-now')) {
-					$val.prop('disabled', execute_count == 0);
+				for (const action of action_list) {
+					if (!actions.hasOwnProperty(action)) {
+						actions[action] = 0;
+					}
+					actions[action]++;
 				}
-				else if ($val.hasClass('js-display-graph')) {
-					$val.prop('disabled', graph_count == 0);
+			}
+		}
+
+		// Replace the selected count text.
+		const selected_count_span = document.getElementById('selected_count');
+		selected_count_span.innerHTML = selected_count + ' ' + selected_count_span.innerHTML.split(' ')[1];
+
+		document.querySelectorAll('#action_buttons button').forEach((button) => {
+			// In case button is not permanently disabled by view, enable it depending on attributes and count.
+			if (!button.dataset.disabled) {
+				// First disabled the button and then check if it can be enabled.
+				button.disabled = true;
+
+				// Check if a special attribute is required to enable the button.
+				if (button.dataset.required) {
+					for (const [action, count] of Object.entries(actions)) {
+						// Checkbox data-actions attribute must match the button attribute.
+						if (button.dataset.required === action) {
+							button.disabled = (count == 0);
+						}
+					}
 				}
 				else {
-					$val.prop('disabled', selected_count == 0);
+					// No special attributes required, enable the button depending only on selected count.
+					button.disabled = (selected_count == 0);
 				}
 			}
 		});

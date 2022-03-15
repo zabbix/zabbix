@@ -55,18 +55,19 @@ class CActionButtonList extends CObject {
 	protected $selected_count_element = null;
 
 	/**
-	 * @param string       $action_name                 Name of submit buttons.
-	 * @param string       $checkboxes_name             Name of paramerer into which checked checkboxes will be put in.
-	 * @param array        $buttons_data                Buttons data array.
-	 * @param string       $buttons_data[]['name']      Button caption.
-	 * @param string       $buttons_data[]['confirm']   Confirmation text (optional).
-	 * @param string       $buttons_data[]['redirect']  Redirect URL (optional).
-	 * @param bool         $buttons_data[]['disabled']  Set button state disabled (optional).
-	 * @param string       $buttons_data[]['class']     Additional button CSS class or JS class. Multiple classes
-	 *                                                  are separated by spaces.
-	 * @param CTag         $buttons_data[]['content']   A HTML tag. For example a CButton wrapped in CList object.
-	 * @param string|null  $name_prefix                 Prefix for sessionStorage used for storing currently selected
-	 *                                                  checkboxes.
+	 * @param string       $action_name                   Name of submit buttons.
+	 * @param string       $checkboxes_name               Name of paramerer into which checked checkboxes will be put
+	 *                                                    in.
+	 * @param array        $buttons_data                  Buttons data array.
+	 * @param string       $buttons_data[]['name']        Button caption.
+	 * @param string       $buttons_data[]['confirm']     Confirmation text (optional).
+	 * @param string       $buttons_data[]['redirect']    Redirect URL (optional).
+	 * @param bool         $buttons_data[]['disabled']    Set button state disabled (optional).
+	 * @param array        $buttons_data[]['attributes']  Set additional HTML attributes where array key is attribute
+	 *                                                    name array value is the attribute value.
+	 * @param CTag         $buttons_data[]['content']     A HTML tag. For example a CButton wrapped in CList object.
+	 * @param string|null  $name_prefix                   Prefix for sessionStorage used for storing currently selected
+	 *                                                    checkboxes.
 	 */
 	function __construct($action_name, $checkboxes_name, array $buttons_data, $name_prefix = null) {
 		$this->checkboxes_name = $checkboxes_name;
@@ -81,8 +82,11 @@ class CActionButtonList extends CObject {
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id');
 
-				if (array_key_exists('class', $button_data) && $button_data['class'] !== '') {
-					$button->addClass($button_data['class']);
+				if (array_key_exists('attributes', $button_data) && is_array($button_data['attributes'])
+						&& $button_data['attributes']) {
+					foreach ($button_data['attributes'] as $attr_name => $attr_value) {
+						$button->setAttribute($attr_name, $attr_value);
+					}
 				}
 
 				if (array_key_exists('redirect', $button_data)) {
