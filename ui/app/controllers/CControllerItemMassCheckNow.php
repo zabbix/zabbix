@@ -26,6 +26,10 @@ class CControllerItemMassCheckNow extends CController {
 	 */
 	private $item_cache = [];
 
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'itemids' => 'required|array_db items.itemid',

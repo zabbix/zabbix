@@ -208,8 +208,8 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
-				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-				body: urlEncodeData({itemids: [document.getElementById('itemid').value], discovery_rule: 1})
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({itemids: [document.getElementById('itemid').value], discovery_rule: 1})
 			})
 				.then((response) => response.json())
 				.then((response) => {
