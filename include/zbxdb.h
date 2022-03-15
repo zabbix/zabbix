@@ -177,7 +177,8 @@ int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 #define ZBX_ORACLE_MAX_VERSION_FRIENDLY			"Database 21c Release 21.x.x"
 
 #define ZBX_ELASTIC_MIN_VERSION				70000
-#define ZBX_ELASTIC_MIN_VERSION_FRIENDLY		"7.x"
+#define ZBX_ELASTIC_SUPPORTED_VERSION_FRIENDLY		"7.x"
+#define ZBX_ELASTIC_MAX_VERSION				79999
 
 #define ZBX_DBVERSION_UNDEFINED				0
 

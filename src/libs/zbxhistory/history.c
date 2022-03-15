@@ -438,5 +438,7 @@ void	zbx_history_value2variant(const history_value_t *value, unsigned char value
 void	zbx_history_check_version(struct zbx_json *json)
 {
 	if (NULL != CONFIG_HISTORY_STORAGE_URL)
+	{
 		zbx_elastic_version_extract(json);
+	}
 }

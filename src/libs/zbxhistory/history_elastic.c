@@ -37,6 +37,7 @@ const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text"};
 
 extern char	*CONFIG_HISTORY_STORAGE_URL;
 extern int	CONFIG_HISTORY_STORAGE_PIPELINES;
+extern int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS;
 
 static zbx_uint32_t	ZBX_ELASTIC_SVERSION = ZBX_DBVERSION_UNDEFINED;
 
@@ -1089,11 +1090,41 @@ out:
 
 	db_version_info.database = "ElasticDB";
 	db_version_info.friendly_current_version = version_friendly;
-	db_version_info.friendly_min_version = ZBX_ELASTIC_MIN_VERSION_FRIENDLY;
-	db_version_info.friendly_max_version = "";
+	db_version_info.friendly_min_version = ZBX_ELASTIC_SUPPORTED_VERSION_FRIENDLY;
+	db_version_info.friendly_max_version = ZBX_ELASTIC_SUPPORTED_VERSION_FRIENDLY;
 	db_version_info.friendly_min_supported_version = NULL;
+
 	db_version_info.flag = zbx_db_version_check(db_version_info.database, version, ZBX_ELASTIC_MIN_VERSION,
-			ZBX_DBVERSION_UNDEFINED, ZBX_DBVERSION_UNDEFINED);
+			ZBX_ELASTIC_MAX_VERSION, ZBX_DBVERSION_UNDEFINED);
+
+	if (DB_VERSION_HIGHER_THAN_MAXIMUM == db_version_info.flag)
+	{
+		if (0 == CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS)
+		{
+			zabbix_log(LOG_LEVEL_ERR, " ");
+			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix proxy due to unsupported %s database server"
+					" version (%s)", db_version_info.database,
+					db_version_info.friendly_current_version);
+
+			zabbix_log(LOG_LEVEL_ERR, "Must be up to (%s)",
+						db_version_info.friendly_max_version);
+
+			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
+			zabbix_log(LOG_LEVEL_ERR, "Override by setting AllowUnsupportedDBVersions=1"
+					" in Zabbix proxy configuration file at your own risk.");
+			zabbix_log(LOG_LEVEL_ERR, " ");
+			exit(EXIT_FAILURE);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_ERR, " ");
+			zabbix_log(LOG_LEVEL_ERR, "Warning! Unsupported %s database server version (%s)",
+					db_version_info.database, db_version_info.friendly_current_version);
+			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
+			zabbix_log(LOG_LEVEL_ERR, " ");
+		}
+	}
+
 	db_version_info.history_pk = 0;
 
 	zbx_db_version_json_create(json, &db_version_info);
