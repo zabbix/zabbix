@@ -2863,7 +2863,7 @@ form.is-loading {
       border-bottom-color: rgba(31, 44, 51, 0.5); }
     .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .tag, .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .btn-tag {
       background-color: rgba(31, 44, 51, 0.5); }
-    .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .icon-wzrd-action {
+    .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .icon-wizard-action {
       background-position: -165px -624px; }
     .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td button:focus {
       box-shadow: 0 0 0 2px rgba(31, 44, 51, 0.5); }
@@ -2872,7 +2872,7 @@ form.is-loading {
     border-radius: 2px; }
   .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td [class*='icon-depend-'],
   .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .icon-description,
-  .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .icon-wzrd-action {
+  .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .icon-wizard-action {
     background-color: transparent; }
   .list-table.compact-view .link-action {
     color: #1f2c33; }
@@ -2936,7 +2936,7 @@ form.is-loading {
       background-position: -49px -731px; }
     .list-table.compact-view td .icon-depend-down::before {
       background-position: -49px -767px; }
-    .list-table.compact-view td .icon-wzrd-action {
+    .list-table.compact-view td .icon-wizard-action {
       background: url("../img/icon-sprite.svg?20211222") no-repeat -6px -624px;
       height: 12px;
       min-height: 12px;
@@ -4192,7 +4192,7 @@ button {
     background-color: transparent;
     opacity: .25; }
 
-.btn-kiosk, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .btn-dashboard-kioskmode-toggle-slideshow.slideshow-state-started, .btn-dashboard-kioskmode-toggle-slideshow.slideshow-state-stopped, .btn-dashboard-kioskmode-previous-page, .btn-dashboard-kioskmode-next-page, .icon-cal, .icon-wzrd-action, .drag-icon {
+.btn-kiosk, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .btn-dashboard-kioskmode-toggle-slideshow.slideshow-state-started, .btn-dashboard-kioskmode-toggle-slideshow.slideshow-state-stopped, .btn-dashboard-kioskmode-previous-page, .btn-dashboard-kioskmode-next-page, .icon-cal, .icon-wizard-action, .drag-icon {
   width: 24px;
   height: auto;
   padding: 0; }
@@ -4324,17 +4324,17 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .icon-cal {
   background: transparent url("../img/icon-sprite.svg?20211222") no-repeat -42px -834px; }
 
-.icon-wzrd-action {
+.icon-wizard-action {
   background: transparent url("../img/icon-sprite.svg?20211222") no-repeat -6px -617px; }
 
-.icon-cal, .icon-wzrd-action {
+.icon-cal, .icon-wizard-action {
   border: 0;
   margin: -4px 0;
   vertical-align: middle;
   cursor: pointer;
   opacity: .75;
   transition: opacity .2s ease-out; }
-  .icon-cal:hover, .icon-wzrd-action:hover, .icon-cal:focus, .icon-wzrd-action:focus, .icon-cal:active, .icon-wzrd-action:active {
+  .icon-cal:hover, .icon-wizard-action:hover, .icon-cal:focus, .icon-wizard-action:focus, .icon-cal:active, .icon-wizard-action:active {
     opacity: 1;
     background-color: transparent; }
 

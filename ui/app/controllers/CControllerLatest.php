@@ -25,16 +25,16 @@
 abstract class CControllerLatest extends CController {
 
 	// Filter idx prefix.
-	const FILTER_IDX = 'web.monitoring.latest';
+	public const FILTER_IDX = 'web.monitoring.latest';
 
 	// Number of tag value rows allowed to be included in subfilter.
-	const SUBFILTERS_TAG_VALUE_ROWS = 10;
+	public const SUBFILTERS_TAG_VALUE_ROWS = 10;
 
 	// Number of tag value rows when tag values subfilter is expanded.
-	const SUBFILTERS_TAG_VALUE_ROWS_EXPANDED = 200;
+	private const SUBFILTERS_TAG_VALUE_ROWS_EXPANDED = 200;
 
 	// Filter fields default values.
-	const FILTER_FIELDS_DEFAULT = [
+	public const FILTER_FIELDS_DEFAULT = [
 		'groupids' => [],
 		'hostids' => [],
 		'name' => '',

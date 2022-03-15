@@ -154,7 +154,7 @@ if (count($subfilters['tags']) > 0) {
 	if (!$tags_expanded && count($subfilters['tags']) > CControllerLatest::SUBFILTERS_TAG_VALUE_ROWS) {
 		$subfilter_options['tags'][] = (new CButton('expand_tag_values'))
 			->setAttribute('data-name', 'tags')
-			->addClass(ZBX_STYLE_ICON_WZRD_ACTION);
+			->addClass(ZBX_STYLE_ICON_WIZARD_ACTION);
 	}
 }
 else {

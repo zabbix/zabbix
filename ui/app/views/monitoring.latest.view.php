@@ -27,7 +27,7 @@ $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.tagfilteritem.js');
 $this->addJsFile('class.tabfilter.js');
 $this->addJsFile('class.tabfilteritem.js');
-$this->addJsFile('class.expandable.js');
+$this->addJsFile('class.expandable.subfilter.js');
 
 $this->includeJsFile('monitoring.latest.view.js.php');
 
