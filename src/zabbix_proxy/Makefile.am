@@ -64,7 +64,6 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_builddir)/src/libs/zbxaudit/libzbxaudit.a \
 	$(top_builddir)/src/libs/zbxconf/libzbxconf.a \
-	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_builddir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_builddir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_builddir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
