@@ -165,6 +165,10 @@ extern int	CONFIG_UNSAFE_USER_PARAMETERS;
 #define ZBX_PROC_STAT_DISK	4
 #define ZBX_PROC_STAT_TRACE	5
 
+#define ZBX_PROC_MODE_PROCESS	0
+#define ZBX_PROC_MODE_THREAD	1
+#define ZBX_PROC_MODE_SUMMARY	2
+
 #define ZBX_DO_SUM		0
 #define ZBX_DO_MAX		1
 #define ZBX_DO_MIN		2
@@ -254,6 +258,7 @@ int	KERNEL_OPENFILES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif
 
+int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result);

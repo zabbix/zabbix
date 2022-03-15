@@ -23,6 +23,11 @@
 #include "log.h"
 #include "stats.h"
 #include "proc.h"
+#include "zbxjson.h"
+
+#define PROC_VAL_TYPE_TEXT	0
+#define PROC_VAL_TYPE_NUM	1
+#define PROC_VAL_TYPE_BYTE	2
 
 extern int	CONFIG_TIMEOUT;
 
@@ -41,6 +46,44 @@ typedef struct
 }
 zbx_sysinfo_proc_t;
 
+typedef struct
+{
+	zbx_uint64_t	pid;
+	zbx_uint64_t	ppid;
+	zbx_uint64_t	tid;
+
+	char		*name;
+	char		*tname;
+	char		*cmdline;
+	char		*state;
+	zbx_uint64_t	processes;
+
+	zbx_uint64_t	cputime_user;
+	zbx_uint64_t	cputime_system;
+	zbx_uint64_t	ctx_switches;
+	zbx_uint64_t	threads;
+	zbx_uint64_t	page_faults;
+	zbx_uint64_t	fds;
+	zbx_uint64_t	io_read_b;
+	zbx_uint64_t	io_write_b;
+
+	zbx_uint64_t	vsize;
+	zbx_uint64_t	pmem;
+	zbx_uint64_t	rss;
+	zbx_uint64_t	data;
+	zbx_uint64_t	exe;
+	zbx_uint64_t	hwm;
+	zbx_uint64_t	lck;
+	zbx_uint64_t	lib;
+	zbx_uint64_t	peak;
+	zbx_uint64_t	pin;
+	zbx_uint64_t	pte;
+	zbx_uint64_t	size;
+	zbx_uint64_t	stk;
+	zbx_uint64_t	swap;
+}
+zbx_proc_data_t;
+
 /******************************************************************************
  *                                                                            *
  * Purpose: frees process data structure                                      *
@@ -53,6 +96,21 @@ static void	zbx_sysinfo_proc_free(zbx_sysinfo_proc_t *proc)
 	zbx_free(proc->cmdline);
 
 	zbx_free(proc);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: frees process data structure                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_proc_data_free(zbx_proc_data_t *proc_data)
+{
+	zbx_free(proc_data->name);
+	zbx_free(proc_data->tname);
+	zbx_free(proc_data->cmdline);
+	zbx_free(proc_data->state);
+
+	zbx_free(proc_data);
 }
 
 static int	get_cmdline(FILE *f_cmd, char **line, size_t *line_offset)
@@ -231,6 +289,97 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
 	}
 
 	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Read value from a string in /proc file.                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     f     - [IN] file to read from                                         *
+ *     pos   - [IN] position to start                                         *
+ *     label - [IN] label to look for, e.g. "VmData:\t"                       *
+ *     type  - [IN] value type                                                *
+ *     num   - [OUT] numeric result                                           *
+ *     str   - [OUT] string result                                            *
+ *                                                                            *
+ * Return value: SUCCEED - successful reading,                                *
+ *               NOTSUPPORTED - the search string was not found.              *
+ *               FAIL - the search string was found but could not be parsed.  *
+ *                                                                            *
+ ******************************************************************************/
+static int	read_value_from_proc_file(FILE *f, long pos, const char *label, int type, zbx_uint64_t *num, char **str)
+{
+	char	buf[MAX_STRING_LEN], *p_value, *p_unit;
+	size_t	label_len;
+	int	ret = NOTSUPPORTED;
+
+	if ((NULL == str && PROC_VAL_TYPE_TEXT == type) ||
+			(NULL == num && (PROC_VAL_TYPE_NUM == type || PROC_VAL_TYPE_BYTE == type)))
+	{
+		return FAIL;
+	}
+
+	label_len = strlen(label);
+	p_value = buf + label_len + 1;
+	pos = ftell(f);
+
+	while (NULL != fgets(buf, (int)sizeof(buf), f))
+	{
+		if (0 != strncmp(buf, label, label_len))
+			continue;
+
+		if (PROC_VAL_TYPE_BYTE == type)
+		{
+			if (NULL == (p_unit = strrchr(p_value, ' ')))
+			{
+				ret = FAIL;
+				break;
+			}
+
+			*p_unit++ = '\0';
+		}
+
+		while (' ' == *p_value || '\t' == *p_value)
+			p_value++;
+
+		zbx_rtrim(p_value, "\n");
+
+		if (PROC_VAL_TYPE_TEXT == type)
+		{
+			*str = zbx_strdup(NULL, p_value);
+		}
+		else if (FAIL == is_uint64(p_value, num))
+		{
+			ret = FAIL;
+			break;
+		}
+
+		if (PROC_VAL_TYPE_BYTE == type)
+		{
+			zbx_rtrim(p_unit, "\n");
+
+			if (0 == strcasecmp(p_unit, "kB"))
+				*num <<= 10;
+			else if (0 == strcasecmp(p_unit, "mB"))
+				*num <<= 20;
+			else if (0 == strcasecmp(p_unit, "GB"))
+				*num <<= 30;
+			else if (0 == strcasecmp(p_unit, "TB"))
+				*num <<= 40;
+		}
+
+		ret = SUCCEED;
+		break;
+	}
+
+	if (0 != pos && NOTSUPPORTED == ret)
+	{
+		rewind(f);
+		ret = read_value_from_proc_file(f, pos, label, type, num, str);
+	}
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1258,6 +1407,7 @@ out:
 	return ret;
 }
 
+//TODO: rever function header comment
 /******************************************************************************
  *                                                                            *
  * Purpose: frees process vector read by zbx_proc_get_processes function      *
@@ -1268,6 +1418,18 @@ out:
 void	zbx_proc_free_processes(zbx_vector_ptr_t *processes)
 {
 	zbx_vector_ptr_clear_ext(processes, (zbx_mem_free_func_t)zbx_sysinfo_proc_free);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: frees process vector read by proc_get_data function               *
+ *                                                                            *
+ * Parameters: processes - [IN/OUT] the process data vector to free           *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_proc_free_proc_data(zbx_vector_ptr_t *proc_data)
+{
+	zbx_vector_ptr_clear_ext(proc_data, (zbx_mem_free_func_t)zbx_proc_data_free);
 }
 
 /******************************************************************************
@@ -1420,6 +1582,476 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	SET_DBL_RESULT(result, value);
+
+	return SYSINFO_RET_OK;
+}
+
+static zbx_proc_data_t	*proc_get_data(FILE *f_status, FILE *f_stat, FILE *f_io, int zbx_proc_mode)
+{
+	zbx_proc_data_t	*proc_data;
+	zbx_uint64_t	val;
+	char		buf[MAX_STRING_LEN], *ptr, *state;
+	int		n = 0, offset;
+
+	proc_data = (zbx_proc_data_t *)zbx_malloc(NULL, sizeof(zbx_proc_data_t));
+	memset(proc_data, 0, sizeof(zbx_proc_data_t));
+
+	if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode)
+	{
+		read_value_from_proc_file(f_status, 0, "PPid", PROC_VAL_TYPE_NUM, &proc_data->ppid, NULL);
+		read_value_from_proc_file(f_status, 0, "Name", PROC_VAL_TYPE_TEXT, NULL, &proc_data->tname);
+	}
+
+	if (ZBX_PROC_MODE_THREAD != zbx_proc_mode)
+	{
+		read_value_from_proc_file(f_status, 0, "VmPeak", PROC_VAL_TYPE_BYTE, &proc_data->peak, NULL);
+		read_value_from_proc_file(f_status, 0, "VmSize", PROC_VAL_TYPE_BYTE, &proc_data->vsize, NULL);
+		read_value_from_proc_file(f_status, 0, "VmLck", PROC_VAL_TYPE_BYTE, &proc_data->lck, NULL);
+		read_value_from_proc_file(f_status, 0, "VmPin", PROC_VAL_TYPE_BYTE, &proc_data->pin, NULL);
+		read_value_from_proc_file(f_status, 0, "VmHWM", PROC_VAL_TYPE_BYTE, &proc_data->hwm, NULL);
+		read_value_from_proc_file(f_status, 0, "VmRSS", PROC_VAL_TYPE_BYTE, &proc_data->rss, NULL);
+		read_value_from_proc_file(f_status, 0, "VmData", PROC_VAL_TYPE_BYTE, &proc_data->data, NULL);
+		read_value_from_proc_file(f_status, 0, "VmStk", PROC_VAL_TYPE_BYTE, &proc_data->stk, NULL);
+		read_value_from_proc_file(f_status, 0, "VmExe", PROC_VAL_TYPE_BYTE, &proc_data->exe, NULL);
+		read_value_from_proc_file(f_status, 0, "VmLib", PROC_VAL_TYPE_BYTE, &proc_data->lib, NULL);
+		read_value_from_proc_file(f_status, 0, "VmPTE", PROC_VAL_TYPE_BYTE, &proc_data->pte, NULL);
+		read_value_from_proc_file(f_status, 0, "VmSwap", PROC_VAL_TYPE_BYTE, &proc_data->swap, NULL);
+		read_value_from_proc_file(f_status, 0, "VmPeak", PROC_VAL_TYPE_BYTE, &proc_data->peak, NULL);
+		read_value_from_proc_file(f_status, 0, "Threads", PROC_VAL_TYPE_NUM, &proc_data->threads, NULL);
+		proc_data->size = proc_data->exe + proc_data->data + proc_data->stk;
+
+		if (SUCCEED == get_total_memory(&val) && 0 != val)
+			proc_data->pmem = proc_data->rss / val;
+	}
+
+	read_value_from_proc_file(f_status, 0, "voluntary_ctxt_switches", PROC_VAL_TYPE_NUM, &proc_data->ctx_switches,
+			NULL);
+	read_value_from_proc_file(f_status, 0, "nonvoluntary_ctxt_switches", PROC_VAL_TYPE_NUM, &val, NULL);
+	proc_data->ctx_switches += val;
+
+	if (NULL != f_io)
+	{
+		read_value_from_proc_file(f_io, 0, "read_bytes", PROC_VAL_TYPE_NUM, &proc_data->io_read_b, NULL);
+		read_value_from_proc_file(f_io, 0, "write_bytes", PROC_VAL_TYPE_NUM, &proc_data->io_write_b, NULL);
+	}
+
+	if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode &&
+			SUCCEED == read_value_from_proc_file(f_status, 0, "State", PROC_VAL_TYPE_TEXT, NULL, &state))
+	{
+		switch (*state)
+		{
+			case 'R':
+				proc_data->state = zbx_strdup(NULL, "run");
+				break;
+			case 'S':
+				proc_data->state = zbx_strdup(NULL, "sleep");
+				break;
+			case 'Z':
+				proc_data->state = zbx_strdup(NULL, "zomb");
+				break;
+			case 'D':
+				proc_data->state = zbx_strdup(NULL, "disk");
+				break;
+			case 'T':
+				proc_data->state = zbx_strdup(NULL, "trace");
+				break;
+			default:
+				proc_data->state = zbx_strdup(NULL, "other");
+				break;
+		}
+
+		zbx_free(state);
+	}
+
+	if (NULL == fgets(buf, (int)sizeof(buf), f_stat) || NULL == (ptr = strrchr(buf, ')')))
+		goto out;
+
+	while ('\0' != *ptr)
+	{
+		if (' ' != *ptr++)
+			continue;
+
+		switch (++n)
+		{
+			case 10:
+				if (FAIL == (offset = proc_read_value(ptr, &proc_data->page_faults)))
+					goto out;
+
+				ptr += offset;
+				break;
+			case 12:
+				if (FAIL == (offset = proc_read_value(ptr, &proc_data->cputime_user)))
+					goto out;
+
+				ptr += offset;
+				break;
+			case 13:
+				proc_read_value(ptr, &proc_data->cputime_system);
+				goto out;
+		}
+	}
+
+out:
+	return proc_data;
+}
+
+static zbx_proc_data_t	*proc_read_data(char *path, int zbx_proc_mode)
+{
+	char		tmp[MAX_STRING_LEN];
+	zbx_proc_data_t	*proc_data;
+	FILE		*f_status, *f_stat, *f_io;
+
+	zbx_snprintf(tmp, sizeof(tmp), "%s/status", path);
+
+	if (NULL == (f_status = fopen(tmp, "r")))
+		return NULL;
+
+	zbx_snprintf(tmp, sizeof(tmp), "%s/stat", path);
+
+	if (NULL == (f_stat = fopen(tmp, "r")))
+		return NULL;
+
+	zbx_snprintf(tmp, sizeof(tmp), "%s/io", path);
+	f_io = fopen(tmp, "r");
+
+	proc_data = proc_get_data(f_status, f_stat, f_io, zbx_proc_mode);
+
+	zbx_fclose(f_status);
+	zbx_fclose(f_stat);
+	zbx_fclose(f_io);
+
+	return proc_data;
+}
+
+int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	char			*procname, *proccomm, *param;
+	char			*pname = NULL, *cmdline = NULL;
+	DIR			*dir;
+	struct dirent		*entries;
+	struct passwd		*usrinfo;
+	FILE			*f_cmd = NULL, *f_status = NULL, *f_stat = NULL, *f_io = NULL;
+	int			invalid_user = 0, zbx_proc_mode, i;
+	zbx_proc_data_t		*proc_data;
+	zbx_vector_ptr_t	proc_data_ctx;
+	struct zbx_json		j;
+
+	if (4 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	procname = get_rparam(request, 0);
+	param = get_rparam(request, 1);
+
+	if (NULL != param && '\0' != *param)
+	{
+		errno = 0;
+
+		if (NULL == (usrinfo = getpwnam(param)))
+		{
+			if (0 != errno)
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+							zbx_strerror(errno)));
+				return SYSINFO_RET_FAIL;
+			}
+
+			invalid_user = 1;
+		}
+	}
+	else
+		usrinfo = NULL;
+
+	proccomm = get_rparam(request, 2);
+	param = get_rparam(request, 3);
+
+	if (NULL == param || '\0' == *param || 0 == strcmp(param, "process"))
+		zbx_proc_mode = ZBX_PROC_MODE_PROCESS;
+	else if (0 == strcmp(param, "thread"))
+		zbx_proc_mode = ZBX_PROC_MODE_THREAD;
+	else if (0 == strcmp(param, "summary") && (NULL == proccomm || '\0' == *proccomm))
+		zbx_proc_mode = ZBX_PROC_MODE_SUMMARY;
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (1 == invalid_user)
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid user"));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (dir = opendir("/proc")))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_vector_ptr_create(&proc_data_ctx);
+
+	while (NULL != (entries = readdir(dir)))
+	{
+		char		tmp[MAX_STRING_LEN];
+		zbx_uint64_t	pid;
+		size_t		l;
+
+		zbx_fclose(f_cmd);
+		zbx_fclose(f_status);
+		zbx_free(cmdline);
+		zbx_free(pname);
+
+		if (FAIL == is_uint32(entries->d_name, &pid))
+			continue;
+
+		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/cmdline", entries->d_name);
+
+		if (NULL == (f_cmd = fopen(tmp, "r")))
+			continue;
+
+		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/status", entries->d_name);
+
+		if (NULL == (f_status = fopen(tmp, "r")))
+			continue;
+
+		if (SUCCEED != get_cmdline(f_cmd, &cmdline, &l))
+			continue;
+
+		if ('\0' != *cmdline)
+		{
+			char	*p, *pdel;
+			size_t	alloc_len = 0, offset = 0;
+
+			if (NULL == (p = strrchr(cmdline, '/')))
+				p = cmdline;
+			else
+				p++;
+
+			if (NULL != (pdel = strchr(p, ' ')))
+				l = (size_t)(pdel - p);
+			else
+				l = strlen(p);
+
+			zbx_strncpy_alloc(&pname, &alloc_len, &offset, p, l);
+		}
+		else
+			read_value_from_proc_file(f_status, 0, "Name", PROC_VAL_TYPE_TEXT, NULL, &pname);
+
+		if (NULL != procname && '\0' != *procname && 0 != strcmp(pname, procname))
+			continue;
+
+		if (FAIL == check_user(f_status, usrinfo))
+			continue;
+
+		if (FAIL == check_proccomm(f_cmd, proccomm))
+			continue;
+
+		if (ZBX_PROC_MODE_THREAD == zbx_proc_mode)
+		{
+			DIR	*taskdir;
+
+			zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/task", entries->d_name);
+
+			if (NULL != (taskdir = opendir(tmp)))
+			{
+				struct dirent	*threads;
+				char		path[MAX_STRING_LEN];
+				zbx_uint64_t	tid;
+
+				while (NULL != (threads = readdir(taskdir)))
+				{
+					if (FAIL == is_uint32(threads->d_name, &tid))
+						continue;
+
+					zbx_snprintf(path, sizeof(path), "%s/%s", tmp, threads->d_name);
+
+					if (NULL != (proc_data = proc_read_data(path, zbx_proc_mode)))
+					{
+						proc_data->pid = pid;
+						proc_data->tid = tid;
+						proc_data->cmdline = zbx_strdup(NULL, cmdline);
+						proc_data->name = zbx_strdup(NULL, pname);
+						zbx_vector_ptr_append(&proc_data_ctx, proc_data);
+					}
+				}
+				closedir(taskdir);
+			}
+		}
+		else
+		{
+			zbx_fclose(f_stat);
+			zbx_fclose(f_io);
+
+			zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/stat", entries->d_name);
+
+			if (NULL == (f_stat = fopen(tmp, "r")))
+				continue;
+
+			zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/io", entries->d_name);
+			f_io = fopen(tmp, "r");
+
+			if (NULL != (proc_data = proc_get_data(f_status, f_stat, f_io, zbx_proc_mode)))
+			{
+				DIR	*fddir;
+
+				proc_data->pid = pid;
+				proc_data->cmdline = cmdline;
+				proc_data->name = pname;
+
+				zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/fd", entries->d_name);
+
+				if (NULL != (fddir = opendir(tmp)))
+				{
+					while (NULL != readdir(fddir))
+						proc_data->fds++;
+
+					if (2 <= proc_data->fds)
+						proc_data->fds -= 2;
+				}
+				closedir(fddir);
+
+				zbx_vector_ptr_append(&proc_data_ctx, proc_data);
+				cmdline = pname = NULL;
+			}
+		}
+	}
+	zbx_fclose(f_cmd);
+	zbx_fclose(f_status);
+	zbx_fclose(f_stat);
+	zbx_fclose(f_io);
+	closedir(dir);
+
+	zbx_free(cmdline);
+	zbx_free(pname);
+
+	if (ZBX_PROC_MODE_SUMMARY == zbx_proc_mode)
+	{
+		int	k;
+
+		for (i = 0; i < proc_data_ctx.values_num; i++)
+		{
+			zbx_proc_data_t	*pdata = (zbx_proc_data_t *)proc_data_ctx.values[i];
+
+			pdata->processes = 1;
+
+			for (k = i + 1; k < proc_data_ctx.values_num; k++)
+			{
+				zbx_proc_data_t	*pdata_cmp = (zbx_proc_data_t *)proc_data_ctx.values[k];
+
+				if (0 == strcmp(pdata->name, pdata_cmp->name))
+				{
+					pdata->processes++;
+					pdata->vsize += pdata_cmp->vsize;
+					pdata->pmem += pdata_cmp->pmem;
+					pdata->rss += pdata_cmp->rss;
+					pdata->data += pdata_cmp->data;
+					pdata->exe += pdata_cmp->exe;
+					pdata->lck += pdata_cmp->lck;
+					pdata->lib += pdata_cmp->lib;
+					pdata->pin += pdata_cmp->pin;
+					pdata->pte += pdata_cmp->pte;
+					pdata->size += pdata_cmp->size;
+					pdata->stk += pdata_cmp->stk;
+					pdata->swap += pdata_cmp->swap;
+					pdata->cputime_user += pdata_cmp->cputime_user;
+					pdata->cputime_system += pdata_cmp->cputime_system;
+					pdata->ctx_switches += pdata_cmp->ctx_switches;
+					pdata->threads += pdata_cmp->threads;
+					pdata->page_faults += pdata_cmp->page_faults;
+					pdata->fds += pdata_cmp->fds;
+					pdata->io_read_b += pdata_cmp->io_read_b;
+					pdata->io_write_b += pdata_cmp->io_write_b;
+
+					zbx_proc_data_free(pdata_cmp);
+					zbx_vector_ptr_remove(&proc_data_ctx, k--);
+				}
+			}
+		}
+	}
+
+	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	for (i = 0; i < proc_data_ctx.values_num; i++)
+	{
+		zbx_proc_data_t	*pdata;
+
+		pdata = (zbx_proc_data_t *)proc_data_ctx.values[i];
+
+		zbx_json_addobject(&j, NULL);
+
+		if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode)
+		{
+			zbx_json_adduint64(&j, "pid", pdata->pid);
+			zbx_json_adduint64(&j, "ppid", pdata->ppid);
+		}
+
+		zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
+
+		if (ZBX_PROC_MODE_SUMMARY == zbx_proc_mode)
+			zbx_json_adduint64(&j, "processes", pdata->processes);
+
+		if (ZBX_PROC_MODE_THREAD == zbx_proc_mode)
+		{
+			zbx_json_adduint64(&j, "tid", pdata->tid);
+			zbx_json_addstring(&j, "tname", ZBX_NULL2EMPTY_STR(pdata->tname), ZBX_JSON_TYPE_STRING);
+		}
+		else
+		{
+			if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode)
+				zbx_json_addstring(&j, "cmdline", ZBX_NULL2EMPTY_STR(pdata->cmdline), ZBX_JSON_TYPE_STRING);
+
+			zbx_json_adduint64(&j, "vsize", pdata->vsize);
+			zbx_json_adduint64(&j, "pmem", pdata->pmem);
+			zbx_json_adduint64(&j, "rss", pdata->rss);
+			zbx_json_adduint64(&j, "data", pdata->data);
+			zbx_json_adduint64(&j, "exe", pdata->exe);
+
+			if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode)
+				zbx_json_adduint64(&j, "hwm", pdata->hwm);
+
+			zbx_json_adduint64(&j, "lck", pdata->lck);
+			zbx_json_adduint64(&j, "lib", pdata->lib);
+
+			if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode)
+				zbx_json_adduint64(&j, "peak", pdata->peak);
+
+			zbx_json_adduint64(&j, "pin", pdata->pin);
+			zbx_json_adduint64(&j, "pte", pdata->pte);
+			zbx_json_adduint64(&j, "size", pdata->size);
+			zbx_json_adduint64(&j, "stk", pdata->stk);
+			zbx_json_adduint64(&j, "swap", pdata->swap);
+		}
+
+		zbx_json_adduint64(&j, "cputime_user", pdata->cputime_user);
+		zbx_json_adduint64(&j, "cputime_system", pdata->cputime_system);
+
+		if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode)
+			zbx_json_addstring(&j, "state", ZBX_NULL2EMPTY_STR(pdata->state), ZBX_JSON_TYPE_STRING);
+
+		zbx_json_adduint64(&j, "ctx_switches", pdata->ctx_switches);
+
+		if (ZBX_PROC_MODE_THREAD != zbx_proc_mode)
+		{
+			zbx_json_adduint64(&j, "threads", pdata->threads);
+			zbx_json_adduint64(&j, "page_faults", pdata->page_faults);
+			zbx_json_adduint64(&j, "fds", pdata->fds);
+		}
+
+		zbx_json_adduint64(&j, "io_read_b", pdata->io_read_b);
+		zbx_json_adduint64(&j, "io_write_b", pdata->io_write_b);
+
+		zbx_json_close(&j);
+	}
+
+	zbx_json_close(&j);
+	zbx_proc_free_proc_data(&proc_data_ctx);
+	zbx_vector_ptr_destroy(&proc_data_ctx);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+	zbx_json_free(&j);
 
 	return SYSINFO_RET_OK;
 }
