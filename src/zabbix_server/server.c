@@ -1152,11 +1152,11 @@ static void	zbx_check_db(void)
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Should be at least (%s)",
 						db_version_info.friendly_min_supported_version);
+				db_version_info.flag = DB_VERSION_NOT_SUPPORTED_WARNING;
 			}
 
 			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
 			zabbix_log(LOG_LEVEL_ERR, " ");
-			db_version_info.flag = DB_VERSION_NOT_SUPPORTED_WARNING;
 		}
 	}
 
