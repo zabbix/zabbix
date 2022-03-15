@@ -152,6 +152,7 @@
 				.attr({
 					id: $input.attr('id'),
 					name: $input.attr('name'),
+					placeholder: t('value'),
 					maxlength: $input.attr('maxlength')
 				})
 				.text($input.is(':disabled') ? '' : $input.val())
