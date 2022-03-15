@@ -825,7 +825,6 @@ class CWidgetHelper {
 								'parameters' => [
 									'srctbl' => 'items',
 									'srcfld1' => 'itemid',
-									'normal_only' => 1,
 									'real_hosts' => 1,
 									'numeric' => 1,
 									'webitems' => 1,
@@ -1183,7 +1182,6 @@ class CWidgetHelper {
 								'parameters' => [
 									'srctbl' => 'items',
 									'srcfld1' => 'name',
-									'normal_only' => 1,
 									'real_hosts' => 1,
 									'numeric' => 1,
 									'webitems' => 1,
