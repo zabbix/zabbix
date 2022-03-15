@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:31:18Z'
+  date: '2022-03-01T12:59:26Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1227,7 +1227,7 @@ zabbix_export:
                   tags:
                     -
                       tag: scope
-                      value: perfomance
+                      value: performance
             -
               uuid: 4832c8d39e0d4329af6876c594a3d741
               name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Wait'
@@ -1258,7 +1258,7 @@ zabbix_export:
                   tags:
                     -
                       tag: scope
-                      value: perfomance
+                      value: performance
             -
               uuid: c22389aa983a4cdca504e3cc41126f03
               name: 'WildFly {#JMX_DATA_SOURCE}: XA: Commit time, avg'
@@ -1481,7 +1481,7 @@ zabbix_export:
               value_type: FLOAT
               username: '{$WILDFLY.USER}'
               password: '{$WILDFLY.PASSWORD}'
-              description: 'The number of XAResource recover invocationsper second.'
+              description: 'The number of XAResource recover invocations per second.'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND

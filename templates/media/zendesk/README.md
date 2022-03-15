@@ -76,7 +76,7 @@ In addition, you can override the severity mapping between the Zabbix problem an
 
 [![](images/tn_10.png?raw=true)](images/10.png)
 
-* Please note, that in order to notify on problems with host this user must has at least read permissions for such host.
+* Please note, that in order to notify on problems with host this user must have at least read permissions for such host.
 
 5\. Click on the **Media** tab and, inside of the **Media** box, click the **Add** button.
 
