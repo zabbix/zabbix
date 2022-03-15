@@ -219,20 +219,14 @@ class PostgresqlDbBackend extends DbBackend {
 
 		$conn_string = '';
 
-		try {
-			foreach ($params as $key => $param) {
-				$conn_string .= ((bool) $param) ? $key.'=\''.pg_connect_escape($param).'\' ' : '';
-			}
-
-			$resource = pg_connect($conn_string);
-
-			if (!$resource) {
-				throw new RuntimeException('Error connecting to database.');
-			}
+		foreach ($params as $key => $param) {
+			$conn_string .= ((bool) $param) ? $key.'=\''.pg_connect_escape($param).'\' ' : '';
 		}
-		catch (Throwable $exception) {
-			$this->setError($exception->getMessage());
 
+		$resource = @pg_connect($conn_string);
+
+		if (!$resour	ce) {
+			$this->setError('Error connecting to database.');
 			return null;
 		}
 

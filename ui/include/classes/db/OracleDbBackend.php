@@ -67,26 +67,20 @@ class OracleDbBackend extends DbBackend {
 	 * @return resource|null
 	 */
 	public function connect($host, $port, $user, $password, $dbname, $schema) {
-		try {
-			$connect = '';
+		$connect = '';
 
-			if ($host) {
-				$connect = '//'.$host.(($port) ? ':'.$port : '').(($dbname) ? '/'.$dbname : '');
-			}
-			elseif ($dbname) {
-				$connect = $dbname;
-			}
-
-			$resource = oci_connect($user, $password, $connect, 'UTF8');
-
-			if (!$resource) {
-				$ociError = oci_error();
-				throw new RuntimeException('Error connecting to database: '.$ociError['message']);
-			}
+		if ($host) {
+			$connect = '//'.$host.(($port) ? ':'.$port : '').(($dbname) ? '/'.$dbname : '');
 		}
-		catch (Throwable $exception) {
-			$this->setError($exception->getMessage());
+		elseif ($dbname) {
+			$connect = $dbname;
+		}
 
+		$resource = @oci_connect($user, $password, $connect, 'UTF8');
+
+		if (!$resource) {
+			$ociError = oci_error();
+			$this->setError('Error connecting to database: '.$ociError['message']);
 			return null;
 		}
 

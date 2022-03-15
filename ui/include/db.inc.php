@@ -219,56 +219,64 @@ function DBrollback() {
  * @param int $limit    max number of record to return
  * @param int $offset   return starting from $offset record
  *
- * @return resource or object, False if failed
+ * @return resource|false
  */
 function DBselect($query, $limit = null, $offset = 0) {
 	global $DB;
 
-	if (!isset($DB['DB']) || empty($DB['DB'])) {
+	if (!array_key_exists('DB', $DB) || $DB['DB'] === null) {
 		return false;
 	}
 
-	// add the LIMIT clause
-	if (!$query = DBaddLimit($query, $limit, $offset)) {
+	$query = DBaddLimit($query, $limit, $offset);
+
+	if ($query === false) {
 		return false;
 	}
 
-	$result = false;
 	$time_start = microtime(true);
+
 	$DB['SELECT_COUNT']++;
 
-	try {
-		switch ($DB['TYPE']) {
-			case ZBX_DB_MYSQL:
-				if (!$result = mysqli_query($DB['DB'], $query)) {
-					throw new RuntimeException('Error in query ['.$query.'] ['.mysqli_error($DB['DB']).']');
-				}
-				break;
+	$result = false;
 
-			case ZBX_DB_POSTGRESQL:
-				if (!$result = pg_query($DB['DB'], $query)) {
-					throw new RuntimeException('Error in query ['.$query.'] ['.pg_last_error().']');
-				}
-				break;
+	switch ($DB['TYPE']) {
+		case ZBX_DB_MYSQL:
+			try {
+				$result = mysqli_query($DB['DB'], $query);
+			}
+			catch (mysqli_sql_exception $e) {
+				error('Error in query ['.$query.'] ['.$e->getMessage().']', 'sql');
+			}
 
-			case ZBX_DB_ORACLE:
-				if (!$result = oci_parse($DB['DB'], $query)) {
-					$e = oci_error();
-					throw new RuntimeException('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
-				}
-				elseif (!oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
-					$e = oci_error($result);
-					throw new RuntimeException('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
-				}
+			break;
+
+		case ZBX_DB_POSTGRESQL:
+			if (!$result = pg_query($DB['DB'], $query)) {
+				error('Error in query ['.$query.'] ['.pg_last_error().']', 'sql');
+			}
+
+			break;
+
+		case ZBX_DB_ORACLE:
+			$result = oci_parse($DB['DB'], $query);
+
+			if ($result === false) {
+				$e = oci_error();
+				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', 'sql');
+
 				break;
-		}
-	} catch (Throwable $exception) {
-		error($exception->getMessage(), 'sql');
-		$result = false;
+			}
+
+			if (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
+				$e = oci_error($result);
+				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', 'sql');
+			}
+
+			break;
 	}
 
-	// $result is false only if an error occurred
-	if ($DB['TRANSACTION_NO_FAILED_SQLS'] && !$result) {
+	if (!$result) {
 		$DB['TRANSACTION_NO_FAILED_SQLS'] = false;
 	}
 
@@ -333,50 +341,63 @@ function DBaddLimit($query, $limit = 0, $offset = 0) {
 	return $query;
 }
 
-function DBexecute($query) {
+/**
+ * @param $query
+ *
+ * @return bool
+ */
+function DBexecute($query): bool {
 	global $DB;
 
-	if (!isset($DB['DB']) || empty($DB['DB'])) {
+	if (!array_key_exists('DB', $DB) || $DB['DB'] === null) {
 		return false;
 	}
 
-	$result = false;
 	$time_start = microtime(true);
 
 	$DB['EXECUTE_COUNT']++;
 
-	try {
-		switch ($DB['TYPE']) {
-			case ZBX_DB_MYSQL:
-				if (!$result = mysqli_query($DB['DB'], $query)) {
-					error('Error in query ['.$query.'] ['.mysqli_error($DB['DB']).']', 'sql');
-				}
+	$result = false;
+
+	switch ($DB['TYPE']) {
+		case ZBX_DB_MYSQL:
+			try {
+				$result = mysqli_query($DB['DB'], $query);
+			}
+			catch (mysqli_sql_exception $e) {
+				error('Error in query ['.$query.'] ['.$e->getMessage().']', 'sql');
+			}
+
+			break;
+
+		case ZBX_DB_POSTGRESQL:
+			if (!$result = (bool) pg_query($DB['DB'], $query)) {
+				error('Error in query ['.$query.'] ['.pg_last_error().']', 'sql');
+			}
+
+			break;
+
+		case ZBX_DB_ORACLE:
+			$result = oci_parse($DB['DB'], $query);
+
+			if ($result === false) {
+				$e = oci_error();
+				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', 'sql');
+
 				break;
-			case ZBX_DB_POSTGRESQL:
-				if (!$result = (bool) pg_query($DB['DB'], $query)) {
-					error('Error in query ['.$query.'] ['.pg_last_error().']', 'sql');
-				}
-				break;
-			case ZBX_DB_ORACLE:
-				if (!$result = oci_parse($DB['DB'], $query)) {
-					$e = @oci_error();
-					error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', 'sql');
-				}
-				elseif (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
-					$e = oci_error($result);
-					error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', 'sql');
-				}
-				else {
-					$result = true; // function must return boolean
-				}
-				break;
-		}
-	}
-	catch (Throwable $exception) {
-		error($exception->getMessage());
+			}
+
+			if (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
+				$e = oci_error($result);
+				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', 'sql');
+			}
+
+			$result = true;
+
+			break;
 	}
 
-	if ($DB['TRANSACTIONS'] != 0 && !$result) {
+	if (!$result) {
 		$DB['TRANSACTION_NO_FAILED_SQLS'] = false;
 	}
 
