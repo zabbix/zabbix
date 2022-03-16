@@ -1,3 +1,4 @@
+//go:build oracle_tests
 // +build oracle_tests
 
 /*
