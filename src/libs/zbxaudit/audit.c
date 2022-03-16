@@ -343,7 +343,7 @@ int	zbx_audit_flush_once(void)
 
 	while (NULL != (audit_entry = (zbx_audit_entry_t **)zbx_hashset_iter_next(&iter)))
 	{
-		char	id[ZBX_MAX_UINT64_LEN + 1], *pvalue, *name_esc, *details_esc;
+		char	id[ZBX_MAX_UINT64_LEN + 1], userid[ZBX_MAX_UINT64_LEN + 1], *pvalue, *name_esc, *details_esc;
 		const char	*pfield;
 
 		if (AUDIT_ACTION_DELETE != (*audit_entry)->audit_action &&
@@ -364,13 +364,18 @@ int	zbx_audit_flush_once(void)
 			pvalue = (*audit_entry)->cuid;
 		}
 
+		if (0 == AUDIT_USERID)
+			zbx_strlcpy(userid, "null", sizeof(userid));
+		else
+			zbx_snprintf(userid, sizeof(userid), ZBX_FS_UI64, AUDIT_USERID);
+
 		name_esc = DBdyn_escape_string((*audit_entry)->name);
 		details_esc = DBdyn_escape_string((*audit_entry)->details_json.buffer);
 
 		ret = DBexecute_once("insert into auditlog (auditid,userid,username,"
 				"clock,action,ip,%s,resourcename,resourcetype,recordsetid,details) values"
-				" ('%s',%d,'%s','%d','%d','%s','%s','%s',%d,'%s','%s')",
-				pfield, (*audit_entry)->audit_cuid, AUDIT_USERID, AUDIT_USERNAME, (int)time(NULL),
+				" ('%s',%s,'%s','%d','%d','%s','%s','%s',%d,'%s','%s')",
+				pfield, (*audit_entry)->audit_cuid, userid, AUDIT_USERNAME, (int)time(NULL),
 				(*audit_entry)->audit_action, AUDIT_IP, pvalue, name_esc, (*audit_entry)->resource_type,
 				recsetid_cuid, 0 == strcmp(details_esc, "{}") ? "" : details_esc);
 
