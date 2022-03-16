@@ -144,7 +144,9 @@ if (count($subfilters['tags']) > 0) {
 			(new CExpandableSubfilter('tagnames', $tag_values, array_key_exists('tagnames', $subfilters_expanded)))
 				->addClass(CExpandableSubfilter::ZBX_STYLE_EXPANDABLE_TEN_LINES)
 				->addClass('subfilter-options')
-		]))->addClass('subfilter-option-grid');
+		]))
+			->addClass('subfilter-option-grid')
+			->addClass('tag-values-subfilter');
 
 		if (!$tags_expanded && ++$index > CControllerLatest::SUBFILTERS_TAG_VALUE_ROWS) {
 			$subfilter_options['tags'][$tag]->addClass('display-none');

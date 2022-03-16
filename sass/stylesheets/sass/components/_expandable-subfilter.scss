@@ -1,11 +1,12 @@
 .expandable-subfilter {
-	$line-height: 18px;
+	$line-height: 22px;
 
 	position: relative;
 	overflow: hidden;
 	word-break: break-word;
 	max-height: $line-height;
 	line-height: $line-height;
+	padding: 1px;
 
 	&.ten-lines {
 		max-height: calc(#{$line-height} * 10);
@@ -25,5 +26,11 @@
 		.hidden {
 			display: unset;
 		}
+	}
+}
+
+.tag-values-subfilter {
+	> label {
+		padding-top: 3px;
 	}
 }

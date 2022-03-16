@@ -36,7 +36,7 @@ class CExpandableSubfilter extends CDiv {
 	 * @param bool              $expanded  (optional) Whether subfilter must be expanded.
 	 */
 	public function __construct(string $name, $items = null, bool $expanded = false) {
-		parent::__construct([new CDiv($items)]);
+		parent::__construct([$items]);
 
 		$this
 			->addClass(self::ZBX_STYLE_EXPANDABLE)
