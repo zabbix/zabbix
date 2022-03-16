@@ -703,13 +703,12 @@ out:
  * Purpose: record mass proxy configuration refresh into audit log            *
  *                                                                            *
  ******************************************************************************/
-int	zbx_auditlog_mass_proxy_config_reload(zbx_vector_ptr_pair_t *active_proxies, zbx_vector_ptr_pair_t *passive_proxies)
+int	zbx_auditlog_mass_proxy_config_reload(zbx_vector_ptr_t *active_proxies, zbx_vector_ptr_t *passive_proxies)
 {
 	int		i, ret = SUCCEED;
 	char		auditid_cuid[CUID_LEN];
 	zbx_config_t	cfg;
 	zbx_db_insert_t	insert;
-	zbx_ptr_pair_t	pair;
 	zbx_uint64_t	proxy_hostid;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
@@ -724,24 +723,26 @@ int	zbx_auditlog_mass_proxy_config_reload(zbx_vector_ptr_pair_t *active_proxies,
 
 	for (i = 0; i < active_proxies->values_num; i++)
 	{
+		zbx_cached_proxy_t	*proxy;
+
+		proxy = active_proxies->values[i];
 		zbx_new_cuid(auditid_cuid);
 
-		pair = active_proxies->values[i];
-		proxy_hostid = *((zbx_uint64_t *)pair.first);
-
 		zbx_db_insert_add_values(&insert, auditid_cuid, AUDIT_USERID, AUDIT_USERNAME, (int)time(NULL),
-			AUDIT_ACTION_CONFIG_REFRESH, AUDIT_IP, proxy_hostid, pair.second, AUDIT_RESOURCE_PROXY, auditid_cuid, "");
+				AUDIT_ACTION_CONFIG_REFRESH, AUDIT_IP, proxy->hostid, proxy->name, AUDIT_RESOURCE_PROXY,
+				auditid_cuid, "");
 	}
 
 	for (i = 0; i < passive_proxies->values_num; i++)
 	{
+		zbx_cached_proxy_t	*proxy;
+
+		proxy = passive_proxies->values[i];
 		zbx_new_cuid(auditid_cuid);
 
-		pair = passive_proxies->values[i];
-		proxy_hostid = *((zbx_uint64_t *)pair.first);
-
 		zbx_db_insert_add_values(&insert, auditid_cuid, AUDIT_USERID, AUDIT_USERNAME, (int)time(NULL),
-			AUDIT_ACTION_CONFIG_REFRESH, AUDIT_IP, proxy_hostid, pair.second, AUDIT_RESOURCE_PROXY, auditid_cuid, "");
+				AUDIT_ACTION_CONFIG_REFRESH, AUDIT_IP, proxy->hostid, proxy->name,
+				AUDIT_RESOURCE_PROXY, auditid_cuid, "");
 	}
 
 	zbx_db_insert_execute(&insert);

@@ -124,6 +124,6 @@ void	zbx_audit_entry_append_int(zbx_audit_entry_t *entry, int audit_op, const ch
 void	zbx_audit_entry_append_string(zbx_audit_entry_t *entry, int audit_op, const char *key, ...);
 
 int	zbx_auditlog_proxy_config_reload(zbx_uint64_t proxy_hostid, const char *proxy_name);
-int	zbx_auditlog_mass_proxy_config_reload(zbx_vector_ptr_pair_t *active_proxies, zbx_vector_ptr_pair_t *passive_proxies);
+int	zbx_auditlog_mass_proxy_config_reload(zbx_vector_ptr_t *active_proxies, zbx_vector_ptr_t *passive_proxies);
 
 #endif	/* ZABBIX_AUDIT_H */

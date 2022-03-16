@@ -624,6 +624,7 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 	char			buffer[MAX_ID_LEN + 1];
 	int			passive_proxy_count = 0;
 	zbx_vector_ptr_t	tasks_active;
+	zbx_vector_str_t	proxynames_log;
 
 	if (FAIL == zbx_json_open(data, &jp))
 	{
@@ -639,6 +640,7 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 	}
 
 	zbx_vector_ptr_create(&tasks_active);
+	zbx_vector_str_create(&proxynames_log);
 
 	for (ptr = NULL; NULL != (ptr = zbx_json_next(&jp_data, ptr));)
 	{
@@ -646,13 +648,14 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 		{
 			zbx_uint64_t	proxyid;
 			int		type;
+			char		*name;
 
 			ZBX_STR2UINT64(proxyid, buffer);
 
-			if (FAIL == zbx_dc_get_proxy_type_by_id(proxyid, &type))
+			if (FAIL == zbx_dc_get_proxy_name_type_by_id(proxyid, &type, &name))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "failed to reload configuration cache "
-						"for proxyid " ZBX_FS_UI64 ": proxy is not in cache", proxyid);
+						"for proxy " ZBX_FS_UI64 ": proxy is not in cache", proxyid);
 				continue;
 			}
 
@@ -662,6 +665,7 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 
 				task = tm_create_active_proxy_reload_task(proxyid);
 				zbx_vector_ptr_append(&tasks_active, task);
+				zbx_vector_str_append(&proxynames_log, name);
 			}
 			else if (HOST_STATUS_PROXY_PASSIVE == type)
 			{
@@ -671,9 +675,35 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 							"with id " ZBX_FS_UI64 ": failed to update nextcheck", proxyid);
 				}
 				else
+				{
 					passive_proxy_count++;
+					zbx_vector_str_append(&proxynames_log, name);
+				}
 			}
 		}
+	}
+
+	if (0 < proxynames_log.values_num)
+	{
+		int	i = 0;
+		char	*names_success = NULL;
+
+		while (1)
+		{
+			if (i + 1 == proxynames_log.values_num)
+			{
+				names_success = zbx_strdcatf(names_success, "\"%s\"", proxynames_log.values[i]);
+				break;
+			}
+			else
+			{
+				names_success = zbx_strdcatf(names_success, "\"%s\", ", proxynames_log.values[i]);
+				i++;
+			}
+		}
+
+		zabbix_log(LOG_LEVEL_WARNING, "reloading configuration on proxies %s", names_success);
+		zbx_free(names_success);
 	}
 
 	if (0 < tasks_active.values_num)
@@ -682,6 +712,8 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 		zbx_vector_ptr_clear_ext(&tasks_active, (zbx_clean_func_t)zbx_tm_task_free);
 	}
 
+	zbx_vector_str_clear_ext(&proxynames_log, zbx_str_free);
+	zbx_vector_str_destroy(&proxynames_log);
 	zbx_vector_ptr_destroy(&tasks_active);
 
 	if (passive_proxy_count > 0)
@@ -943,6 +975,12 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 	return processed_num + expired_num;
 }
 
+void	zbx_cached_proxy_free(zbx_cached_proxy_t *proxy)
+{
+	zbx_free(proxy->name);
+	zbx_free(proxy);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: remove old done/expired tasks                                     *
@@ -959,51 +997,42 @@ static void	tm_remove_old_tasks(int now)
 static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 {
 	int			i;
-	zbx_vector_ptr_pair_t	active_proxies, passive_proxies;
+	zbx_vector_ptr_t	active_proxies, passive_proxies;
 	zbx_vector_ptr_t	tasks_active;
-	zbx_ptr_pair_t		pair;
-	zbx_uint64_t		proxy_hostid;
-	const char		*hostname;
 
-	zbx_vector_ptr_pair_create(&active_proxies);
-	zbx_vector_ptr_pair_create(&passive_proxies);
+	zbx_vector_ptr_create(&active_proxies);
+	zbx_vector_ptr_create(&passive_proxies);
 
 	zbx_vector_ptr_create(&tasks_active);
 
 	zbx_dc_get_all_proxies(&active_proxies, &passive_proxies);
 
+	zabbix_log(LOG_LEVEL_WARNING, "reloading configuration cache on all proxies");
+
 	for (i = 0; i < active_proxies.values_num; i++)
 	{
-		zbx_tm_task_t	*task;
+		zbx_tm_task_t		*task;
+		zbx_cached_proxy_t	*proxy;
 
-		pair = active_proxies.values[i];
-		proxy_hostid = *((zbx_uint64_t *)pair.first);
-		hostname = (const char *)pair.second;
+		proxy = (zbx_cached_proxy_t *)active_proxies.values[i];
 
-		task = tm_create_active_proxy_reload_task(proxy_hostid);
+		task = tm_create_active_proxy_reload_task(proxy->hostid);
 		zbx_vector_ptr_append(&tasks_active, task);
-
-		zabbix_log(LOG_LEVEL_WARNING, "reloading configuration cache on proxy '%s'", hostname);
 	}
 
 	if (0 < passive_proxies.values_num)
 	{
 		for (i = 0; i < passive_proxies.values_num; i++)
 		{
-			pair = passive_proxies.values[i];
-			proxy_hostid = *((zbx_uint64_t *)pair.first);
-			hostname = (const char *)pair.second;
+			zbx_cached_proxy_t	*proxy;
 
-			if (FAIL == zbx_dc_update_passive_proxy_nextcheck(proxy_hostid))
+			proxy = (zbx_cached_proxy_t *)passive_proxies.values[i];
+
+			if (FAIL == zbx_dc_update_passive_proxy_nextcheck(proxy->hostid))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "failed to reload configuration cache on proxy "
 						"with id " ZBX_FS_UI64 " [%s]: failed to update nextcheck",
-						proxy_hostid, hostname);
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "reloading configuration cache on proxy '%s'",
-						hostname);
+						proxy->hostid, proxy->name);
 			}
 		}
 
@@ -1022,8 +1051,10 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 
 	zbx_vector_ptr_destroy(&tasks_active);
 
-	zbx_vector_ptr_pair_destroy(&active_proxies);
-	zbx_vector_ptr_pair_destroy(&passive_proxies);
+	zbx_vector_ptr_clear_ext(&active_proxies, (zbx_clean_func_t)zbx_cached_proxy_free);
+	zbx_vector_ptr_clear_ext(&passive_proxies, (zbx_clean_func_t)zbx_cached_proxy_free);
+	zbx_vector_ptr_destroy(&active_proxies);
+	zbx_vector_ptr_destroy(&passive_proxies);
 }
 
 /******************************************************************************
@@ -1041,6 +1072,10 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 	char			name[HOST_NAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	int			passive_proxy_count = 0;
 	zbx_vector_ptr_t	tasks_active;
+	zbx_vector_str_t	proxynames_log;
+	char			*names_success = NULL;
+
+	zbx_vector_str_create(&proxynames_log);
 
 	if (FAIL == zbx_json_open((const char *)data, &jp))
 	{
@@ -1062,17 +1097,6 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 		{
 			zbx_uint64_t	proxyid;
 			unsigned char	type;
-			char		*error;
-
-			zabbix_log(LOG_LEVEL_WARNING, "reloading configuration cache on proxy '%s'", name);
-
-			if (FAIL == zbx_check_hostname(name, &error))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "failed to reload configuration cache on proxy: invalid "
-						"host name [%s]: %s ", name, error);
-				zbx_free(error);
-				continue;
-			}
 
 			if (FAIL == zbx_dc_get_proxyid_by_name(name, &proxyid, &type))
 			{
@@ -1080,9 +1104,6 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 						"on proxy '%s': proxy is not in cache", name);
 				continue;
 			}
-
-			zabbix_log(LOG_LEVEL_WARNING, "sending request to reload the configuration cache on proxy '%s'",
-					name);
 
 			if (HOST_STATUS_PROXY_ACTIVE == type)
 			{
@@ -1103,8 +1124,34 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 			}
 
 			zbx_auditlog_proxy_config_reload(proxyid, name);
+			zbx_vector_str_append(&proxynames_log, zbx_strdup(NULL, name));
 		}
 	}
+
+	if (0 < proxynames_log.values_num)
+	{
+		int	i = 0;
+
+		while (1)
+		{
+			if (i + 1 == proxynames_log.values_num)
+			{
+				names_success = zbx_strdcatf(names_success, "\"%s\"", proxynames_log.values[i]);
+				break;
+			}
+			else
+			{
+				names_success = zbx_strdcatf(names_success, "\"%s\", ", proxynames_log.values[i]);
+				i++;
+			}
+		}
+
+		zabbix_log(LOG_LEVEL_WARNING, "reloading configuration on proxies %s", names_success);
+		zbx_free(names_success);
+	}
+
+	zbx_vector_str_clear_ext(&proxynames_log, zbx_str_free);
+	zbx_vector_str_destroy(&proxynames_log);
 
 	if (0 < tasks_active.values_num)
 	{

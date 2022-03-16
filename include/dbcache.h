@@ -1050,7 +1050,16 @@ void	zbx_db_trigger_get_function_value(const DB_TRIGGER *trigger, int index, cha
 
 int	zbx_dc_get_proxyid_by_name(const char *name, zbx_uint64_t *proxyid, unsigned char *type);
 int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid);
-void	zbx_dc_get_all_proxies(zbx_vector_ptr_pair_t *active_proxies, zbx_vector_ptr_pair_t *passive_proxies);
-int	zbx_dc_get_proxy_type_by_id(zbx_uint64_t proxyid, int *status);
+
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	char		*name;
+}
+zbx_cached_proxy_t;
+
+void	zbx_dc_get_all_proxies(zbx_vector_ptr_t *active_proxies, zbx_vector_ptr_t *passive_proxies);
+
+int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **name);
 
 #endif
