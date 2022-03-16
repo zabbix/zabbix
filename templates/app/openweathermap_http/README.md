@@ -55,7 +55,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Locations discovery |<p>Weather metrics discovery by location.</p> |DEPENDENT |openweathermap.locations.discovery<p>**Preprocessing**:</p><p>- CHECK_JSON_ERROR: `$.error`</p><p>- JSONPATH: `$.data`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Locations discovery |<p>Weather metrics discovery by location.</p> |DEPENDENT |openweathermap.locations.discovery<p>**Preprocessing**:</p><p>- CHECK_JSON_ERROR: `$.errors`</p><p>- JSONPATH: `$.data`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
 ## Items collected
 
@@ -73,7 +73,7 @@ There are no template links in this template.
 |OpenWeatherMap |[{#LOCATION}, {#COUNTRY}]: Wind direction |<p>Wind direction in degrees.</p> |DEPENDENT |openweathermap.wind.direction[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.wind.deg`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |OpenWeatherMap |[{#LOCATION}, {#COUNTRY}]: Wind speed |<p>Wind speed value.</p> |DEPENDENT |openweathermap.wind.speed[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.wind.speed`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Zabbix raw items |Openweathermap: Get data |<p>JSON array with result of OpenWeatherMap API requests.</p> |SCRIPT |openweathermap.get.data<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Zabbix raw items |Openweathermap: Get data collection errors |<p>Errors from get data requests by script item.</p> |DEPENDENT |openweathermap.get.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Zabbix raw items |Openweathermap: Get data collection errors |<p>Errors from get data requests by script item.</p> |DEPENDENT |openweathermap.get.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
 ## Triggers
 

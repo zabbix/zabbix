@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-16T07:25:58Z'
+  date: '2022-03-16T19:36:20Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -57,7 +57,11 @@ zabbix_export:
                 error_msg = [],
                 measurement,
                 temp_unit,
-                wind_unit;
+                wind_unit,
+                errors_only = [],
+                error_locations = [],
+                unique_errors,
+                new_error_msg;
             
             function getHttpData(query) {
                 url = params.api_endpoint + query + '&appid=' + params.apikey + '&units=' + params.units + '&lang=' + params.lang;
@@ -124,14 +128,34 @@ zabbix_export:
                         data.push(result);
                     }
                 } catch (error) {
-                    error_msg.push(locations[i] + ' : ' + error);
+                    errors = {};
+                    errors.location = locations[i];
+                    errors.error = error.toString();
+                    error_msg.push(errors);
+                    errors_only.push(error);
                 }
             }
             
-            return JSON.stringify({
-                'data': data,
-                'error': error_msg.toString()
+            unique_errors = errors_only.filter(function (value, index, self) { 
+                return self.indexOf(value) == index; 
             });
+            
+            if (unique_errors.length === 1) {
+                for (var j in error_msg) {
+                    error_locations.push(error_msg[j].location);
+                }
+                new_error_msg = 'Failed to retrieve data for the following locations: ' + error_locations + '. ' + unique_errors;
+                
+                return JSON.stringify({
+                    'data': data,
+                    'errors': new_error_msg
+                });
+            } else {
+                return JSON.stringify({
+                    'data': data,
+                    'errors': error_msg
+                });
+            }
           description: 'JSON array with result of OpenWeatherMap API requests.'
           timeout: '{$OPENWEATHERMAP.DATA.TIMEOUT}'
           parameters:
@@ -168,7 +192,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.error
+                - $.errors
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -640,7 +664,7 @@ zabbix_export:
             -
               type: CHECK_JSON_ERROR
               parameters:
-                - $.error
+                - $.errors
               error_handler: DISCARD_VALUE
             -
               type: JSONPATH
@@ -704,70 +728,53 @@ zabbix_export:
           name: 'Wind direction'
           mappings:
             -
-              type: IN_RANGE
               value: '0 - 11.24'
               newvalue: 'N'
             -
-              type: IN_RANGE
               value: '11.25 - 33.74'
               newvalue: NNE
             -
-              type: IN_RANGE
               value: '33.75 - 56.24'
               newvalue: NE
             -
-              type: IN_RANGE
               value: '56.25 - 78.74'
               newvalue: ENE
             -
-              type: IN_RANGE
               value: '78.75 - 101.24'
               newvalue: E
             -
-              type: IN_RANGE
               value: '101.25 - 123.74'
               newvalue: ESE
             -
-              type: IN_RANGE
               value: '123.75 - 146.24'
               newvalue: SE
             -
-              type: IN_RANGE
               value: '146.25 - 168.74'
               newvalue: SSE
             -
-              type: IN_RANGE
               value: '168.75 - 191.24'
               newvalue: S
             -
-              type: IN_RANGE
               value: '191.25 - 213.74'
               newvalue: SSW
             -
-              type: IN_RANGE
               value: '213.75 - 236.24'
               newvalue: SW
             -
-              type: IN_RANGE
               value: '236.25 - 258.74'
               newvalue: WSW
             -
-              type: IN_RANGE
               value: '258.75 - 281.24'
               newvalue: W
             -
-              type: IN_RANGE
               value: '281.25 - 303.74'
               newvalue: WNW
             -
-              type: IN_RANGE
               value: '303.75 - 326.24'
               newvalue: NW
             -
-              type: IN_RANGE
               value: '326.25 - 348.74'
               newvalue: NNW
             -
-              type: IN_RANGE
               value: '348.75 - 379.99'
               newvalue: 'N'
