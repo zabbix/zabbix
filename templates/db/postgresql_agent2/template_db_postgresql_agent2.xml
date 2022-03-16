@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-24T06:54:28Z</date>
+   <date>2022-02-08T13:48:49Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -1284,6 +1284,19 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                </triggers>
             </item>
             <item>
+               <name>PostgreSQL: Get queries</name>
+               <key>pgsql.queries["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <description>Collect all metrics by query execution time</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
                <name>Replication: Standby count</name>
                <key>pgsql.replication.count["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                <history>7d</history>
@@ -1522,7 +1535,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                      </application_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>DB {#DBNAME}: Disk blocks read per second</name>
+                     <name>DB {#DBNAME}: Disk blocks read time</name>
                      <type>DEPENDENT</type>
                      <key>pgsql.dbstat.blk_read_time.rate["{#DBNAME}"]</key>
                      <delay>0</delay>
@@ -1554,7 +1567,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>DB {#DBNAME}: Disk blocks read per second</name>
+                     <name>DB {#DBNAME}: Disk blocks write time</name>
                      <type>DEPENDENT</type>
                      <key>pgsql.dbstat.blk_write_time.rate["{#DBNAME}"]</key>
                      <delay>0</delay>
@@ -2204,6 +2217,217 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                         <key>pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
+                  <item_prototype>
+                     <name>DB {#DBNAME}: Queries slow maintenance count</name>
+                     <type>DEPENDENT</type>
+                     <key>pgsql.queries.mro.slow_count["{#DBNAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Slow maintenance query count</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>PostgreSQL: DB {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#DBNAME}'].mro_slow_count</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>pgsql.queries["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>DB {#DBNAME}: Queries max maintenance time</name>
+                     <type>DEPENDENT</type>
+                     <key>pgsql.queries.mro.time_max["{#DBNAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>s</units>
+                     <description>Max maintenance query time</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>PostgreSQL: DB {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#DBNAME}'].mro_time_max</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>pgsql.queries["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>DB {#DBNAME}: Queries sum maintenance time</name>
+                     <type>DEPENDENT</type>
+                     <key>pgsql.queries.mro.time_sum["{#DBNAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>s</units>
+                     <description>Sum maintenance query time</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>PostgreSQL: DB {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#DBNAME}'].mro_time_sum</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>pgsql.queries["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>DB {#DBNAME}: Queries slow query count</name>
+                     <type>DEPENDENT</type>
+                     <key>pgsql.queries.query.slow_count["{#DBNAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Slow query count</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>PostgreSQL: DB {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#DBNAME}'].query_slow_count</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>pgsql.queries["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}</expression>
+                           <name>DB {#DBNAME}: Too many slow queries (over {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"} in 5m)</name>
+                           <priority>WARNING</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>DB {#DBNAME}: Queries max query time</name>
+                     <type>DEPENDENT</type>
+                     <key>pgsql.queries.query.time_max["{#DBNAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>s</units>
+                     <description>Max query time</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>PostgreSQL: DB {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#DBNAME}'].query_time_max</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>pgsql.queries["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>DB {#DBNAME}: Queries sum query time</name>
+                     <type>DEPENDENT</type>
+                     <key>pgsql.queries.query.time_sum["{#DBNAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>s</units>
+                     <description>Sum query time</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>PostgreSQL: DB {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#DBNAME}'].query_time_sum</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>pgsql.queries["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>DB {#DBNAME}: Queries slow transaction count</name>
+                     <type>DEPENDENT</type>
+                     <key>pgsql.queries.tx.slow_count["{#DBNAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Slow transaction query count</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>PostgreSQL: DB {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#DBNAME}'].tx_slow_count</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>pgsql.queries["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>DB {#DBNAME}: Queries max transaction time</name>
+                     <type>DEPENDENT</type>
+                     <key>pgsql.queries.tx.time_max["{#DBNAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>s</units>
+                     <description>Max transaction query time</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>PostgreSQL: DB {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#DBNAME}'].tx_time_max</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>pgsql.queries["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>DB {#DBNAME}: Queries sum transaction time</name>
+                     <type>DEPENDENT</type>
+                     <key>pgsql.queries.tx.time_sum["{#DBNAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>s</units>
+                     <description>Sum transaction query time</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>PostgreSQL: DB {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#DBNAME}'].tx_time_sum</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>pgsql.queries["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
+                     </master_item>
+                  </item_prototype>
                </item_prototypes>
                <graph_prototypes>
                   <graph_prototype>
@@ -2413,6 +2637,65 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                      </graph_items>
                   </graph_prototype>
                   <graph_prototype>
+                     <name>DB {#DBNAME}: Queries</name>
+                     <ymin_type_1>FIXED</ymin_type_1>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <yaxisside>RIGHT</yaxisside>
+                           <item>
+                              <host>Template DB PostgreSQL by Zabbix agent 2</host>
+                              <key>pgsql.queries.mro.time_max["{#DBNAME}"]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <yaxisside>RIGHT</yaxisside>
+                           <item>
+                              <host>Template DB PostgreSQL by Zabbix agent 2</host>
+                              <key>pgsql.queries.query.time_max["{#DBNAME}"]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <color>F63100</color>
+                           <yaxisside>RIGHT</yaxisside>
+                           <item>
+                              <host>Template DB PostgreSQL by Zabbix agent 2</host>
+                              <key>pgsql.queries.tx.time_max["{#DBNAME}"]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>3</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>A54F10</color>
+                           <item>
+                              <host>Template DB PostgreSQL by Zabbix agent 2</host>
+                              <key>pgsql.queries.mro.time_sum["{#DBNAME}"]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>4</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>FC6EA3</color>
+                           <item>
+                              <host>Template DB PostgreSQL by Zabbix agent 2</host>
+                              <key>pgsql.queries.query.time_sum["{#DBNAME}"]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>5</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>6C59DC</color>
+                           <item>
+                              <host>Template DB PostgreSQL by Zabbix agent 2</host>
+                              <key>pgsql.queries.tx.time_sum["{#DBNAME}"]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
                      <name>DB {#DBNAME}: Size</name>
                      <graph_items>
                         <graph_item>
@@ -2421,6 +2704,35 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                            <item>
                               <host>Template DB PostgreSQL by Zabbix agent 2</host>
                               <key>pgsql.db.size["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>DB {#DBNAME}: Slow queries</name>
+                     <ymin_type_1>FIXED</ymin_type_1>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template DB PostgreSQL by Zabbix agent 2</host>
+                              <key>pgsql.queries.mro.slow_count["{#DBNAME}"]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template DB PostgreSQL by Zabbix agent 2</host>
+                              <key>pgsql.queries.query.slow_count["{#DBNAME}"]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template DB PostgreSQL by Zabbix agent 2</host>
+                              <key>pgsql.queries.tx.slow_count["{#DBNAME}"]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -2574,6 +2886,16 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                <value>postgres</value>
             </macro>
             <macro>
+               <macro>{$PG.QUERY_ETIME.MAX.WARN}</macro>
+               <value>30</value>
+               <description>Execution time limit for count of slow queries.</description>
+            </macro>
+            <macro>
+               <macro>{$PG.SLOW_QUERIES.MAX.WARN}</macro>
+               <value>5</value>
+               <description>Slow queries count threshold for a trigger.</description>
+            </macro>
+            <macro>
                <macro>{$PG.URI}</macro>
                <value>tcp://localhost:5432</value>
             </macro>
@@ -2665,6 +2987,50 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                      <height>100</height>
                      <x>1</x>
                      <y>1</y>
+                     <colspan>1</colspan>
+                     <rowspan>1</rowspan>
+                     <elements>25</elements>
+                     <valign>0</valign>
+                     <halign>0</halign>
+                     <dynamic>0</dynamic>
+                     <sort_triggers>0</sort_triggers>
+                     <url/>
+                     <application/>
+                     <max_columns>3</max_columns>
+                  </screen_item>
+                  <screen_item>
+                     <resourcetype>20</resourcetype>
+                     <style>0</style>
+                     <resource>
+                        <name>DB {#DBNAME}: Queries</name>
+                        <host>Template DB PostgreSQL by Zabbix agent 2</host>
+                     </resource>
+                     <width>500</width>
+                     <height>100</height>
+                     <x>0</x>
+                     <y>2</y>
+                     <colspan>1</colspan>
+                     <rowspan>1</rowspan>
+                     <elements>25</elements>
+                     <valign>0</valign>
+                     <halign>0</halign>
+                     <dynamic>0</dynamic>
+                     <sort_triggers>0</sort_triggers>
+                     <url/>
+                     <application/>
+                     <max_columns>3</max_columns>
+                  </screen_item>
+                  <screen_item>
+                     <resourcetype>20</resourcetype>
+                     <style>0</style>
+                     <resource>
+                        <name>DB {#DBNAME}: Slow queries</name>
+                        <host>Template DB PostgreSQL by Zabbix agent 2</host>
+                     </resource>
+                     <width>500</width>
+                     <height>100</height>
+                     <x>1</x>
+                     <y>2</y>
                      <colspan>1</colspan>
                      <rowspan>1</rowspan>
                      <elements>25</elements>
