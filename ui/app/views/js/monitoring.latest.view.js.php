@@ -326,9 +326,6 @@
 
 					// Deselect the "Execute now" button in both success and error cases, since there is no page reload.
 					button.blur();
-
-					// Scroll to top to see the success or error message.
-					document.querySelector('header').scrollIntoView();
 				});
 		},
 
@@ -364,10 +361,6 @@
 
 					clearMessages();
 					addMessage(message_box);
-				})
-				.finally(() => {
-					// Scroll to top to see the success or error message.
-					document.querySelector('header').scrollIntoView();
 				});
 		},
 
