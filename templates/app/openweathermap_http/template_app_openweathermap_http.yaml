@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-16T19:36:20Z'
+  date: '2022-03-16T22:18:23Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -62,12 +62,12 @@ zabbix_export:
                 error_locations = [],
                 unique_errors,
                 new_error_msg;
-            
+              
             function getHttpData(query) {
                 url = params.api_endpoint + query + '&appid=' + params.apikey + '&units=' + params.units + '&lang=' + params.lang;
                 response = request.get(url);
                 Zabbix.log(4, '[ Openweathermap ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
-            
+              
                 if (response !== null) {
                     try {
                         response = JSON.parse(response);
@@ -76,7 +76,7 @@ zabbix_export:
                         throw 'Failed to parse response.';
                     }
                 }
-            
+              
                 if (request.getStatus() !== 200) {
                     if (response.error && response.error.message) {
                         throw response.error.message;
@@ -87,7 +87,7 @@ zabbix_export:
                 }
                 return response;
             }
-            
+              
             switch (params.units) {
                 case 'metric':
                     measurement = 'metric';
@@ -104,7 +104,7 @@ zabbix_export:
                     temp_unit = 'K';
                     wind_unit = 'meter/sec';
             }
-            
+              
             locations = params.location.split('|');
             for (var i in locations) {
                 try {
@@ -132,29 +132,36 @@ zabbix_export:
                     errors.location = locations[i];
                     errors.error = error.toString();
                     error_msg.push(errors);
-                    errors_only.push(error);
+                    errors_only.push(error.toString());
                 }
             }
             
-            unique_errors = errors_only.filter(function (value, index, self) { 
-                return self.indexOf(value) == index; 
-            });
-            
-            if (unique_errors.length === 1) {
-                for (var j in error_msg) {
-                    error_locations.push(error_msg[j].location);
-                }
-                new_error_msg = 'Failed to retrieve data for the following locations: ' + error_locations + '. ' + unique_errors;
-                
+            if (error_msg.length === 0) {
                 return JSON.stringify({
                     'data': data,
-                    'errors': new_error_msg
+                    'errors': error_msg.toString()
                 });
             } else {
-                return JSON.stringify({
-                    'data': data,
-                    'errors': error_msg
+                unique_errors = errors_only.filter(function (value, index, self) { 
+                    return self.indexOf(value) == index; 
                 });
+              
+                if (unique_errors.length === 1) {
+                    for (var j in error_msg) {
+                        error_locations.push(error_msg[j].location);
+                    }
+                    new_error_msg = 'Failed to retrieve data for the following locations: ' + error_locations + '. ' + unique_errors[0];
+                  
+                    return JSON.stringify({
+                        'data': data,
+                        'errors': new_error_msg
+                    });
+                } else {
+                    return JSON.stringify({
+                        'data': data,
+                        'errors': error_msg
+                    });
+                }
             }
           description: 'JSON array with result of OpenWeatherMap API requests.'
           timeout: '{$OPENWEATHERMAP.DATA.TIMEOUT}'
@@ -728,53 +735,70 @@ zabbix_export:
           name: 'Wind direction'
           mappings:
             -
+              type: IN_RANGE
               value: '0 - 11.24'
               newvalue: 'N'
             -
+              type: IN_RANGE
               value: '11.25 - 33.74'
               newvalue: NNE
             -
+              type: IN_RANGE
               value: '33.75 - 56.24'
               newvalue: NE
             -
+              type: IN_RANGE
               value: '56.25 - 78.74'
               newvalue: ENE
             -
+              type: IN_RANGE
               value: '78.75 - 101.24'
               newvalue: E
             -
+              type: IN_RANGE
               value: '101.25 - 123.74'
               newvalue: ESE
             -
+              type: IN_RANGE
               value: '123.75 - 146.24'
               newvalue: SE
             -
+              type: IN_RANGE
               value: '146.25 - 168.74'
               newvalue: SSE
             -
+              type: IN_RANGE
               value: '168.75 - 191.24'
               newvalue: S
             -
+              type: IN_RANGE
               value: '191.25 - 213.74'
               newvalue: SSW
             -
+              type: IN_RANGE
               value: '213.75 - 236.24'
               newvalue: SW
             -
+              type: IN_RANGE
               value: '236.25 - 258.74'
               newvalue: WSW
             -
+              type: IN_RANGE
               value: '258.75 - 281.24'
               newvalue: W
             -
+              type: IN_RANGE
               value: '281.25 - 303.74'
               newvalue: WNW
             -
+              type: IN_RANGE
               value: '303.75 - 326.24'
               newvalue: NW
             -
+              type: IN_RANGE
               value: '326.25 - 348.74'
               newvalue: NNW
             -
+              type: IN_RANGE
               value: '348.75 - 379.99'
               newvalue: 'N'
