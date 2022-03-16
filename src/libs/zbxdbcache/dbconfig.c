@@ -13000,28 +13000,22 @@ void	zbx_dc_get_all_proxies(zbx_vector_ptr_t *active_proxies, zbx_vector_ptr_t *
 
 	while (NULL != (dc_host = (ZBX_DC_HOST_H *)zbx_hashset_iter_next(&iter)))
 	{
+		zbx_cached_proxy_t	*proxy;
+		zbx_vector_ptr_t	*proxies;
+
 		if (dc_host->host_ptr->status == HOST_STATUS_PROXY_ACTIVE)
-		{
-			zbx_cached_proxy_t	*proxy;
-
-			proxy = (zbx_cached_proxy_t *)zbx_malloc(NULL, sizeof(zbx_cached_proxy_t));
-
-			proxy->name = zbx_strdup(NULL, dc_host->host_ptr->host);
-			proxy->hostid = dc_host->host_ptr->hostid;
-
-			zbx_vector_ptr_append(active_proxies, proxy);
-		}
+			proxies = active_proxies;
 		else if (dc_host->host_ptr->status == HOST_STATUS_PROXY_PASSIVE)
-		{
-			zbx_cached_proxy_t	*proxy;
+			proxies = passive_proxies;
+		else
+			continue;
 
-			proxy = (zbx_cached_proxy_t *)zbx_malloc(NULL, sizeof(zbx_cached_proxy_t));
+		proxy = (zbx_cached_proxy_t *)zbx_malloc(NULL, sizeof(zbx_cached_proxy_t));
 
-			proxy->name = zbx_strdup(NULL, dc_host->host_ptr->host);
-			proxy->hostid = dc_host->host_ptr->hostid;
+		proxy->name = zbx_strdup(NULL, dc_host->host_ptr->host);
+		proxy->hostid = dc_host->host_ptr->hostid;
 
-			zbx_vector_ptr_append(passive_proxies, proxy);
-		}
+		zbx_vector_ptr_append(proxies, proxy);
 	}
 
 	UNLOCK_CACHE;
