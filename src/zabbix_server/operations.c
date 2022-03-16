@@ -20,8 +20,8 @@
 #include "operations.h"
 
 #include "log.h"
-#include "../../libs/zbxaudit/audit.h"
-#include "../../libs/zbxaudit/audit_host.h"
+#include "audit/zbxaudit.h"
+#include "audit/zbxaudit_host.h"
 
 typedef enum
 {
@@ -609,7 +609,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 							" where hostid=" ZBX_FS_UI64,
 							DBsql_id_ins(proxy_hostid), hostid);
 
-					zbx_audit_host_update_json_update_proxy_hostid(hostid, proxy_hostid);
+					zbx_audit_host_update_json_add_proxy_hostid(hostid, proxy_hostid);
 				}
 
 				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);

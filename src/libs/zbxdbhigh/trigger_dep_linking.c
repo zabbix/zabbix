@@ -21,7 +21,7 @@
 
 #include "db.h"
 #include "log.h"
-#include "../../libs/zbxaudit/audit_trigger.h"
+#include "audit/zbxaudit_trigger.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 
 typedef struct

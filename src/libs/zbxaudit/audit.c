@@ -18,7 +18,7 @@
 **/
 
 #include "audit.h"
-#include "zbxaudit.h"
+#include "audit/zbxaudit.h"
 
 #include "log.h"
 #include "zbxjson.h"

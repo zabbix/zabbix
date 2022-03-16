@@ -20,8 +20,7 @@
 #ifndef ZABBIX_ZAUDIT_H
 #define ZABBIX_ZAUDIT_H
 
-#include "zbxalgo.h"
-#include "zbxjson.h"
+#include "zbxtypes.h"
 
 #define ZBX_AUDIT_ACTION_ADD		0
 #define ZBX_AUDIT_ACTION_UPDATE		1

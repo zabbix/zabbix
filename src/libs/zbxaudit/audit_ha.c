@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "audit_ha.h"
+#include "audit/zbxaudit_ha.h"
 
+#include "audit/zbxaudit.h"
 #include "zbxalgo.h"
 #include "audit.h"
 

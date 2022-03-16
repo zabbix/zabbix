@@ -23,8 +23,8 @@
 #include "log.h"
 #include "dbcache.h"
 #include "../zbxalgo/vectorimpl.h"
-#include "../../libs/zbxaudit/audit.h"
-#include "../../libs/zbxaudit/audit_item.h"
+#include "audit/zbxaudit.h"
+#include "audit/zbxaudit_item.h"
 
 struct _zbx_template_item_preproc_t
 {

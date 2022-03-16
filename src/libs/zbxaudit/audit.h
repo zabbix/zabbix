@@ -20,6 +20,9 @@
 #ifndef ZABBIX_AUDIT_H
 #define ZABBIX_AUDIT_H
 
+#include "zbxalgo.h"
+#include "zbxjson.h"
+
 #define AUDIT_DETAILS_ACTION_ADD	"add"
 #define AUDIT_DETAILS_ACTION_UPDATE	"update"
 #define AUDIT_DETAILS_ACTION_DELETE	"delete"

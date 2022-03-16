@@ -24,8 +24,8 @@
 #include "zbxregexp.h"
 #include "zbxprometheus.h"
 
-#include "../../libs/zbxaudit/audit.h"
-#include "../../libs/zbxaudit/audit_item.h"
+#include "audit/zbxaudit.h"
+#include "audit/zbxaudit_item.h"
 
 typedef zbx_lld_item_full_t	zbx_lld_item_t;
 

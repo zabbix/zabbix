@@ -20,8 +20,8 @@
 #include "graph_linking.h"
 
 #include "db.h"
-#include "../../libs/zbxaudit/audit.h"
-#include "../../libs/zbxaudit/audit_graph.h"
+#include "audit/zbxaudit.h"
+#include "audit/zbxaudit_graph.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 
 typedef struct

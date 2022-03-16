@@ -20,10 +20,10 @@
 #include "log.h"
 #include "db.h"
 
-#include "../../libs/zbxaudit/audit.h"
-#include "../../libs/zbxaudit/audit_item.h"
-#include "../../libs/zbxaudit/audit_graph.h"
-#include "../../libs/zbxaudit/audit_trigger.h"
+#include "audit/zbxaudit.h"
+#include "audit/zbxaudit_item.h"
+#include "audit/zbxaudit_graph.h"
+#include "audit/zbxaudit_trigger.h"
 
 void	lld_field_str_rollback(char **field, char **field_orig, zbx_uint64_t *flags, zbx_uint64_t flag)
 {

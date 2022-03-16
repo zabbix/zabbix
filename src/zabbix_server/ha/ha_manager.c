@@ -26,9 +26,9 @@
 #include "threads.h"
 #include "mutexs.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
-#include "../../libs/zbxaudit/audit.h"
-#include "../../libs/zbxaudit/audit_ha.h"
-#include "../../libs/zbxaudit/audit_settings.h"
+#include "audit/zbxaudit.h"
+#include "audit/zbxaudit_ha.h"
+#include "audit/zbxaudit_settings.h"
 
 #define ZBX_HA_POLL_PERIOD	5
 
@@ -1329,8 +1329,9 @@ static void	ha_set_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client,
 		ZBX_STR2UINT64(configid, row[0]);
 		zbx_audit_init(info->auditlog);
 		zbx_audit_settings_create_entry(ZBX_AUDIT_ACTION_UPDATE, configid);
-		zbx_audit_update_json_update_int(configid, AUDIT_CONFIG_ID, "settings.ha_failover_delay", atoi(row[1]),
-				delay);
+		// todo uncomment later
+		//zbx_audit_update_json_update_int(configid, AUDIT_CONFIG_ID, "settings.ha_failover_delay", atoi(row[1]),
+		//		delay);
 		ha_flush_audit(info);
 	}
 	else

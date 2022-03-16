@@ -21,8 +21,8 @@
 
 #include "log.h"
 #include "zbxserver.h"
-#include "../../libs/zbxaudit/audit.h"
-#include "../../libs/zbxaudit/audit_host.h"
+#include "audit/zbxaudit.h"
+#include "audit/zbxaudit_host.h"
 
 typedef struct
 {

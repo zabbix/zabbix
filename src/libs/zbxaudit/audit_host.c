@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "audit_host.h"
+#include "audit/zbxaudit_host.h"
 
+#include "audit/zbxaudit.h"
 #include "audit.h"
 
 #define PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(auditentry)							\
@@ -946,9 +947,7 @@ void	zbx_audit_host_group_update_json_update_##resource(zbx_uint64_t groupid, ty
 
 PREPARE_AUDIT_HOST_GROUP_UPDATE(name, const char*, string)
 
-#undef PREPARE_AUDIT_HOST_GROUP_UPDATE
-
-void	zbx_audit_host_update_json_update_proxy_hostid(zbx_uint64_t hostid, zbx_uint64_t proxy_hostid)
+void	zbx_audit_host_update_json_add_proxy_hostid(zbx_uint64_t hostid, zbx_uint64_t proxy_hostid)
 
 {
 	RETURN_IF_AUDIT_OFF();
@@ -957,3 +956,4 @@ void	zbx_audit_host_update_json_update_proxy_hostid(zbx_uint64_t hostid, zbx_uin
 			proxy_hostid, "hosts", "proxy_hostid");
 
 }
+#undef PREPARE_AUDIT_HOST_GROUP_UPDATE
