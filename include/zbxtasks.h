@@ -139,10 +139,10 @@ zbx_tm_remote_command_result_t	*zbx_tm_remote_command_result_create(zbx_uint64_t
 
 zbx_tm_check_now_t	*zbx_tm_check_now_create(zbx_uint64_t itemid);
 
-zbx_tm_data_t		*zbx_tm_data_create(zbx_uint64_t parent_taskid, const char *str, int len, int type);
+zbx_tm_data_t		*zbx_tm_data_create(zbx_uint64_t parent_taskid, const char *str, size_t len, int type);
 zbx_tm_data_result_t	*zbx_tm_data_result_create(zbx_uint64_t parent_taskid, int status, const char *info);
 
-int	zbx_tm_execute_task_data(const char *data, int len, zbx_uint64_t proxy_hostid, char **info);
+int	zbx_tm_execute_task_data(const char *data, size_t len, zbx_uint64_t proxy_hostid, char **info);
 
 void	zbx_tm_save_tasks(zbx_vector_ptr_t *tasks);
 int	zbx_tm_save_task(zbx_tm_task_t *task);

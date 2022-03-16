@@ -225,7 +225,7 @@ zbx_tm_check_now_t	*zbx_tm_check_now_create(zbx_uint64_t itemid)
  * Return value: The created data task.                                       *
  *                                                                            *
  ******************************************************************************/
-zbx_tm_data_t	*zbx_tm_data_create(zbx_uint64_t parent_taskid, const char *str, int len, int type)
+zbx_tm_data_t	*zbx_tm_data_create(zbx_uint64_t parent_taskid, const char *str, size_t len, int type)
 {
 	zbx_tm_data_t	*data;
 
@@ -1153,7 +1153,7 @@ void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_p
  * Return value: The created data task id or 0 on failure.                    *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	zbx_create_task_data(const char *data, int len, zbx_uint64_t proxy_hostid)
+static zbx_uint64_t	zbx_create_task_data(const char *data, size_t len, zbx_uint64_t proxy_hostid)
 {
 	zbx_tm_task_t	*task;
 	zbx_uint64_t	taskid;
@@ -1232,7 +1232,7 @@ static int	zbx_tm_task_result_wait(zbx_uint64_t taskid, char **info)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tm_execute_task_data(const char *data, int len, zbx_uint64_t proxy_hostid, char **info)
+int	zbx_tm_execute_task_data(const char *data, size_t len, zbx_uint64_t proxy_hostid, char **info)
 {
 	zbx_uint64_t	taskid;
 
