@@ -877,7 +877,6 @@ else {
 		'profileIdx' => $prefix.'host_discovery.filter',
 		'active_tab' => CProfile::get($prefix.'host_discovery.filter.active', 1),
 		'checkbox_hash' => $checkbox_hash,
-		'is_template' => true,
 		'context' => getRequest('context')
 	];
 
@@ -973,20 +972,6 @@ else {
 	}
 
 	$data['discoveries'] = expandItemNamesWithMasterItems($data['discoveries'], 'items');
-
-	// Set is_template false, when one of hosts is not template.
-	if ($data['discoveries']) {
-		$hosts_status = [];
-		foreach ($data['discoveries'] as $discovery) {
-			$hosts_status[$discovery['hosts'][0]['status']] = true;
-		}
-		foreach ($hosts_status as $key => $value) {
-			if ($key != HOST_STATUS_TEMPLATE) {
-				$data['is_template'] = false;
-				break;
-			}
-		}
-	}
 
 	// pager
 	if (hasRequest('page')) {

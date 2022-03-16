@@ -302,8 +302,7 @@ $button_list = [
 if ($data['context'] === 'host') {
 	$massclearhistory = [
 		'name' => _('Clear history'),
-		'confirm' => _('Delete history of selected items?'),
-		'disabled' => $data['is_template']
+		'confirm' => _('Delete history of selected items?')
 	];
 
 	if ($data['config']['compression_status']) {
@@ -316,9 +315,7 @@ if ($data['context'] === 'host') {
 				->onClick('view.massCheckNow(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('no-chkbxrange')
-				->setEnabled(!$data['is_template'])
 				->setAttribute('data-required', 'execute')
-				->setAttribute('data-disabled', $data['is_template'])
 		],
 		'item.massclearhistory' => $massclearhistory
 	];

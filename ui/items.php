@@ -1171,7 +1171,6 @@ else {
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'hostid' => $hostid,
-		'is_template' => true,
 		'context' => getRequest('context')
 	];
 
@@ -1548,20 +1547,6 @@ else {
 	}
 	else {
 		$page_num = CPagerHelper::loadPage($page['file']);
-	}
-
-	// Set is_template false, when one of hosts is not template.
-	if ($data['items']) {
-		$hosts_status = [];
-		foreach ($data['items'] as $item) {
-			$hosts_status[$item['hosts'][0]['status']] = true;
-		}
-		foreach ($hosts_status as $key => $value) {
-			if ($key != HOST_STATUS_TEMPLATE) {
-				$data['is_template'] = false;
-				break;
-			}
-		}
 	}
 
 	CPagerHelper::savePage($page['file'], $page_num);

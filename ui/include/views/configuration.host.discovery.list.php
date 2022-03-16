@@ -340,9 +340,7 @@ if ($data['context'] === 'host') {
 				->onClick('view.massCheckNow(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('no-chkbxrange')
-				->setEnabled(!$data['is_template'])
 				->setAttribute('data-required', 'execute')
-				->setAttribute('data-disabled', $data['is_template'])
 		],
 	];
 }
