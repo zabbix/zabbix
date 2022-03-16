@@ -28,7 +28,7 @@ class testDashboardCopyWidgets extends CWebTest {
 
 	const DASHBOARD_ID = 1300;
 	const PASTE_DASHBOARD_ID = 1310;
-	const NEW_PAGE_ID = 1430;
+	const NEW_PAGE_ID = 14300;
 	const NEW_PAGE_NAME = 'Test_page';
 	const UPDATE_TEMPLATEID = 50000;
 	const TEMPLATED_PAGE_NAME = 'Page for pasting widgets';

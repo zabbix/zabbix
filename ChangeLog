@@ -1,3 +1,15 @@
+Changes for 6.0.3rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.2
+
+6.0.2rc1 was released as 6.0.2 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.2rc1
 
 New features:
@@ -6,6 +18,8 @@ A.F....... [ZBXNEXT-7485] fixed debug_backtrace function usage for php8 (acikuns
 .D.G...... [ZBXNEXT-7116] added ability to force active checks after restart on Zabbix agent2 (vso)
 
 Bug fixes:
+..F....... [ZBX-19583] unified date format across datepickers (averza)
+..F....... [ZBX-19223] fixed disabled hosts not listed in latest data view (averza)
 .........T [ZBX-20521] corrected typos in templates, README and media types (drasihov)
 ..F....... [ZBX-20685] fixed graph widget configuration for small screens (acikuns)
 ..F....... [ZBX-20645] fixed empty space missing between table headers in Filters table in LLD config form (acikuns)
@@ -485,6 +499,7 @@ A.F....... [ZBXNEXT-7485] fixed debug_backtrace function usage for php8 (acikuns
 .D.G...... [ZBXNEXT-7116] added ability to force active checks after restart on Zabbix agent2 (vso)
 
 Bug fixes:
+..F....... [ZBX-19223] fixed disabled hosts not listed in latest data view (averza)
 ..F....... [ZBX-20640] fixed X-axis field placement in different rows in Axis tab in Graph widget (acikuns)
 ..F....... [ZBX-20049] implemented keyboard control for info icons (acikuns, ashubin)
 ........S. [ZBX-19965] fixed database upgrade for SNMP interfaces (akozlovs)
@@ -1763,6 +1778,8 @@ A.F....... [ZBXNEXT-7485] fixed debug_backtrace function usage for php8 (acikuns
 .........T [ZBXNEXT-7493] added garbage collector and memory pool discovery to generic Java template (vkhaliev)
 
 Bug fixes:
+...G...... [ZBX-20390] fixed Oracle Solaris vm.memory.size[available] item kstats memory read (arimdjonoks)
+..F....... [ZBX-19223] fixed disabled hosts not listed in latest data view (averza)
 .........T [ZBX-20521] corrected typos in templates, README and media types (drasihov)
 ..F....... [ZBX-20640] fixed X-axis field placement in different rows in Axis tab in Graph widget (acikuns)
 ..F....... [ZBX-20049] implemented keyboard control for info icons (acikuns, ashubin)

@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "heart.h"
+
 #include "daemon.h"
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxself.h"
 
-#include "heart.h"
 #include "zbxcrypto.h"
 #include "zbxcompress.h"
 #include "comms.h"

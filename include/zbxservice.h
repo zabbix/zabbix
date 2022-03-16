@@ -21,7 +21,6 @@
 #define ZABBIX_SERVICE_H
 
 #include "zbxtypes.h"
-#include "zbxalgo.h"
 #include "db.h"
 #include "zbxipcservice.h"
 

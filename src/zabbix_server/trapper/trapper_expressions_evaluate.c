@@ -17,12 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "trapper_expressions_evaluate.h"
+
 #include "zbxalgo.h"
 #include "dbcache.h"
-
 #include "trapper_auth.h"
-#include "trapper_expressions_evaluate.h"
 
 static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, zbx_vector_ptr_t *expressions,
 				char **error)

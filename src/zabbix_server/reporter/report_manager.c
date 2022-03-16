@@ -17,16 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "log.h"
+#include "report_manager.h"
+
 #include "zbxself.h"
-#include "zbxipcservice.h"
 #include "daemon.h"
-#include "db.h"
-#include "zbxjson.h"
 #include "base64.h"
-#include "zbxalgo.h"
-#include "dbcache.h"
 #include "zbxreport.h"
 #include "../../libs/zbxcrypto/hmac_sha256.h"
 #include "sha256crypt.h"
@@ -34,8 +29,6 @@
 #include "zbxalert.h"
 #include "zbxserver.h"
 #include "report_protocol.h"
-
-#include "report_manager.h"
 
 #define ZBX_REPORT_INCLUDE_USER		0
 #define ZBX_REPORT_EXCLUDE_USER		1
