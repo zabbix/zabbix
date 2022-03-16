@@ -128,7 +128,7 @@ abstract class CControllerLatest extends CController {
 			$items_rw = $items;
 
 			// If user role checkbox 'Invoke "Execute now" on read-only hosts' is OFF, get only read-write items.
-			if ($this->getUserType() < USER_TYPE_SUPER_ADMIN
+			if (!$this->hasInput('filter_counters') && $this->getUserType() < USER_TYPE_SUPER_ADMIN
 					&& !$this->checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW)) {
 				$items_rw = API::Item()->get([
 					'output' => [],
