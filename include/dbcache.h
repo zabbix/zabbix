@@ -1054,11 +1054,12 @@ int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid);
 typedef struct
 {
 	zbx_uint64_t	hostid;
+	unsigned char	status;
 	char		*name;
 }
 zbx_cached_proxy_t;
 
-void	zbx_dc_get_all_proxies(zbx_vector_ptr_t *active_proxies, zbx_vector_ptr_t *passive_proxies);
+void	zbx_dc_get_all_proxies(zbx_vector_ptr_t *proxies);
 
 int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **name);
 

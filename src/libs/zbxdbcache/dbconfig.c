@@ -12988,32 +12988,25 @@ int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid)
  * Purpose: retrieve proxyids for all cached proxies                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_all_proxies(zbx_vector_ptr_t *active_proxies, zbx_vector_ptr_t *passive_proxies)
+void	zbx_dc_get_all_proxies(zbx_vector_ptr_t *proxies)
 {
 	ZBX_DC_HOST_H		*dc_host;
 	zbx_hashset_iter_t	iter;
-	zbx_ptr_pair_t		pair;
 
 	RDLOCK_CACHE;
 
+	zbx_vector_ptr_reserve(proxies, (size_t)config->hosts_p.num_data);
 	zbx_hashset_iter_reset(&config->hosts_p, &iter);
 
 	while (NULL != (dc_host = (ZBX_DC_HOST_H *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_cached_proxy_t	*proxy;
-		zbx_vector_ptr_t	*proxies;
-
-		if (dc_host->host_ptr->status == HOST_STATUS_PROXY_ACTIVE)
-			proxies = active_proxies;
-		else if (dc_host->host_ptr->status == HOST_STATUS_PROXY_PASSIVE)
-			proxies = passive_proxies;
-		else
-			continue;
 
 		proxy = (zbx_cached_proxy_t *)zbx_malloc(NULL, sizeof(zbx_cached_proxy_t));
 
 		proxy->name = zbx_strdup(NULL, dc_host->host_ptr->host);
 		proxy->hostid = dc_host->host_ptr->hostid;
+		proxy->status = dc_host->host_ptr->status;
 
 		zbx_vector_ptr_append(proxies, proxy);
 	}

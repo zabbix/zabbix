@@ -94,6 +94,7 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 		const char *output, const char *error);
 
 void	zbx_audit_init(int audit_mode_set);
+void	zbx_audit_prepare(void);
 void	zbx_audit_clean(void);
 void	zbx_audit_flush(void);
 int	zbx_audit_flush_once(void);
@@ -122,8 +123,5 @@ void	zbx_audit_update_json_delete(const zbx_uint64_t id, const int id_table, con
 zbx_audit_entry_t	*zbx_audit_get_entry(zbx_uint64_t id, const char *cuid, int id_table);
 void	zbx_audit_entry_append_int(zbx_audit_entry_t *entry, int audit_op, const char *key, ...);
 void	zbx_audit_entry_append_string(zbx_audit_entry_t *entry, int audit_op, const char *key, ...);
-
-int	zbx_auditlog_proxy_config_reload(zbx_uint64_t proxy_hostid, const char *proxy_name);
-int	zbx_auditlog_mass_proxy_config_reload(zbx_vector_ptr_t *active_proxies, zbx_vector_ptr_t *passive_proxies);
 
 #endif	/* ZABBIX_AUDIT_H */
