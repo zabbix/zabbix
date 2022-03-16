@@ -1000,11 +1000,11 @@ static void	tm_remove_old_tasks(int now)
 
 static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 {
-	int			i, notify_proxypollers = 0;
-	zbx_vector_ptr_t	proxies;
-	zbx_vector_ptr_t	tasks_active;
+	int				i, notify_proxypollers = 0;
+	zbx_vector_cached_proxy_t	proxies;
+	zbx_vector_ptr_t		tasks_active;
 
-	zbx_vector_ptr_create(&proxies);
+	zbx_vector_cached_proxy_create(&proxies);
 
 	zbx_vector_ptr_create(&tasks_active);
 
@@ -1019,7 +1019,7 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 		zbx_tm_task_t		*task;
 		zbx_cached_proxy_t	*proxy;
 
-		proxy = (zbx_cached_proxy_t *)proxies.values[i];
+		proxy = proxies.values[i];
 
 		if (HOST_STATUS_PROXY_ACTIVE == proxy->status)
 		{
@@ -1056,8 +1056,8 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 
 	zbx_vector_ptr_destroy(&tasks_active);
 
-	zbx_vector_ptr_clear_ext(&proxies, (zbx_clean_func_t)zbx_cached_proxy_free);
-	zbx_vector_ptr_destroy(&proxies);
+	zbx_vector_cached_proxy_clear_ext(&proxies, (zbx_cached_proxy_free_func_t)zbx_cached_proxy_free);
+	zbx_vector_cached_proxy_destroy(&proxies);
 }
 
 /******************************************************************************
@@ -1115,6 +1115,7 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 
 				task = tm_create_active_proxy_reload_task(proxyid);
 				zbx_vector_ptr_append(&tasks_active, task);
+				zbx_vector_str_append(&proxynames_log, zbx_strdup(NULL, name));
 			}
 			else if (HOST_STATUS_PROXY_PASSIVE == type)
 			{

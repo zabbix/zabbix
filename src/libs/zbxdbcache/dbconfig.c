@@ -65,6 +65,8 @@ int	sync_in_progress = 0;
 		in_maintenance_without_data_collection(dc_host->maintenance_status,	\
 				dc_host->maintenance_type, dc_item->type)
 
+ZBX_PTR_VECTOR_IMPL(cached_proxy, zbx_cached_proxy_t *)
+
 /******************************************************************************
  *                                                                            *
  * Purpose: validate macro value when expanding user macros                   *
@@ -12988,14 +12990,14 @@ int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid)
  * Purpose: retrieve proxyids for all cached proxies                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_all_proxies(zbx_vector_ptr_t *proxies)
+void	zbx_dc_get_all_proxies(zbx_vector_cached_proxy_t *proxies)
 {
 	ZBX_DC_HOST_H		*dc_host;
 	zbx_hashset_iter_t	iter;
 
 	RDLOCK_CACHE;
 
-	zbx_vector_ptr_reserve(proxies, (size_t)config->hosts_p.num_data);
+	zbx_vector_cached_proxy_reserve(proxies, (size_t)config->hosts_p.num_data);
 	zbx_hashset_iter_reset(&config->hosts_p, &iter);
 
 	while (NULL != (dc_host = (ZBX_DC_HOST_H *)zbx_hashset_iter_next(&iter)))
@@ -13008,7 +13010,7 @@ void	zbx_dc_get_all_proxies(zbx_vector_ptr_t *proxies)
 		proxy->hostid = dc_host->host_ptr->hostid;
 		proxy->status = dc_host->host_ptr->status;
 
-		zbx_vector_ptr_append(proxies, proxy);
+		zbx_vector_cached_proxy_append(proxies, proxy);
 	}
 
 	UNLOCK_CACHE;
