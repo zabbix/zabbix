@@ -363,7 +363,8 @@ clean:
  *               FAIL - error processing config file                          *
  *                                                                            *
  ******************************************************************************/
-static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict, int noexit)
+static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict,
+		int noexit)
 {
 #define ZBX_MAX_INCLUDE_LEVEL	10
 
@@ -481,11 +482,14 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 					case TYPE_CUSTOM:
 						if (NULL != cfg[i].variable)
 						{
-							cfg_custom_parameter_parser_t custom_parser =
-									(cfg_custom_parameter_parser_t)cfg[i].variable;
+							cfg_custom_parameter_parser_t	*p =
+									(cfg_custom_parameter_parser_t*)cfg[i].variable;
 
-							if (SUCCEED != custom_parser(value, &cfg[i]))
+							if (SUCCEED != p->cfg_custom_parameter_parser_func(value,
+									&cfg[i]))
+							{
 								goto incorrect_config;
+							}
 
 							continue;
 						}

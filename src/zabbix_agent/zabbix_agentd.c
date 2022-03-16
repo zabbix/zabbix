@@ -17,10 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
-
-#include "cfg.h"
 #include "log.h"
 #include "zbxconf.h"
 #include "zbxgetopt.h"
@@ -469,7 +465,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	/* Option 'c' is always optional.	*/
 	/*   p  t  i  d  s  x  m    opt_mask	*/
 	/* ---------------------    --------	*/
-	/*   -  -  -  -  -  -  - 	0x00	*/
+	/*   -  -  -  -  -  -  -	0x00	*/
 	/*   p  -  -  -  -  -  -	0x40	*/
 	/*   -  t  -  -  -  -  -	0x20	*/
 	/*   -  -  i  -  -  -  -	0x10	*/
@@ -675,8 +671,8 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 	if (NULL != CONFIG_HOST_INTERFACE && HOST_INTERFACE_LEN < zbx_strlen_utf8(CONFIG_HOST_INTERFACE))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "the value of \"HostInterface\" configuration parameter cannot be longer than"
-				" %d characters", HOST_INTERFACE_LEN);
+		zabbix_log(LOG_LEVEL_CRIT, "the value of \"HostInterface\" configuration parameter cannot be longer"
+				" than %d characters", HOST_INTERFACE_LEN);
 		err = 1;
 	}
 
@@ -820,8 +816,9 @@ static int	load_enable_remote_commands(const char *value, const struct cfg_line 
  ******************************************************************************/
 static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 {
-	static char		*active_hosts;
-	zbx_vector_str_t	hostnames;
+	static char			*active_hosts;
+	zbx_vector_str_t		hostnames;
+	cfg_custom_parameter_parser_t	parser_load_enable_remove_commands, parser_load_key_access_rule;
 
 	struct cfg_line	cfg[] =
 	{
@@ -873,7 +870,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	SEC_PER_MIN,		SEC_PER_HOUR},
 		{"MaxLinesPerSecond",		&CONFIG_MAX_LINES_PER_SECOND,		TYPE_INT,
 			PARM_OPT,	1,			1000},
-		{"EnableRemoteCommands",	&load_enable_remote_commands,		TYPE_CUSTOM,
+		{"EnableRemoteCommands",	&parser_load_enable_remove_commands,	TYPE_CUSTOM,
 			PARM_OPT,	0,			1},
 		{"LogRemoteCommands",		&CONFIG_LOG_REMOTE_COMMANDS,		TYPE_INT,
 			PARM_OPT,	0,			1},
@@ -933,14 +930,17 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"TLSCipherAll",		&CONFIG_TLS_CIPHER_ALL,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"AllowKey",			load_key_access_rule,			TYPE_CUSTOM,
+		{"AllowKey",			&parser_load_key_access_rule,		TYPE_CUSTOM,
 			PARM_OPT,	0,			0},
-		{"DenyKey",			load_key_access_rule,			TYPE_CUSTOM,
+		{"DenyKey",			&parser_load_key_access_rule,		TYPE_CUSTOM,
 			PARM_OPT,	0,			0},
 		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
 			PARM_OPT,	0,			INT_MAX},
 		{NULL}
 	};
+
+	parser_load_enable_remove_commands.cfg_custom_parameter_parser_func = load_enable_remote_commands;
+	parser_load_key_access_rule.cfg_custom_parameter_parser_func = load_key_access_rule;
 
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_ALIASES);
@@ -1264,7 +1264,7 @@ void	zbx_free_service_resources(int ret)
 {
 	if (NULL != threads)
 	{
-		zbx_threads_wait(threads, threads_flags, threads_num, ret);	/* wait for all child processes to exit */
+		zbx_threads_wait(threads, threads_flags, threads_num, ret); /* wait for all child processes to exit */
 		zbx_free(threads);
 		zbx_free(threads_flags);
 	}

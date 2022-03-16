@@ -517,7 +517,10 @@ $form->addItem([
 		'popup.massupdate.host' => [
 			'content' => (new CButton('', _('Mass update')))
 				->onClick(
-					"return openMassupdatePopup('popup.massupdate.host', {}, {dialogue_class: 'modal-popup-static'});"
+					"openMassupdatePopup('popup.massupdate.host', {}, {
+						dialogue_class: 'modal-popup-static',
+						trigger_element: this
+					});"
 				)
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('no-chkbxrange')

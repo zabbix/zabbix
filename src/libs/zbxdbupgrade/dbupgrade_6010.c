@@ -29,12 +29,24 @@ extern unsigned char	program_type;
 
 #ifndef HAVE_SQLITE3
 
-static int	DBpatch_6010000(void)
+static int	DBpatch_6010001(void)
+{
+#define ZBX_MD5_SIZE	32
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update users set passwd='' where length(passwd)=%d", ZBX_MD5_SIZE))
+		return FAIL;
+
+	return SUCCEED;
+#undef ZBX_MD5_SIZE
+}
+
+static int	DBpatch_6010002(void)
 {
 	const ZBX_FIELD	field = {"vault_provider", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
-}
 
 #endif
 
@@ -42,6 +54,7 @@ DBPATCH_START(6010)
 
 /* version, duplicates flag, mandatory flag */
 
-DBPATCH_ADD(6010000, 0, 1)
+DBPATCH_ADD(6010001, 0, 1)
+DBPATCH_ADD(6010002, 0, 1)
 
 DBPATCH_END()

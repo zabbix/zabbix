@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:50:04Z'
+  date: '2022-03-01T08:23:53Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -150,7 +150,7 @@ zabbix_export:
               tags:
                 -
                   tag: scope
-                  value: perfomance
+                  value: performance
         -
           uuid: dcb11355c5ae4c6ab5f1326aa1c7bbd6
           name: 'PHP-FPM: Max children reached'
@@ -379,7 +379,7 @@ zabbix_export:
               tags:
                 -
                   tag: scope
-                  value: perfomance
+                  value: performance
         -
           uuid: 9a625629fc0a4222acfefa0409ec1c72
           name: 'PHP-FPM: Start time'

@@ -23,8 +23,6 @@
 #include "sysinfo.h" //included for convenience
 #include "db.h"
 #include "comms.h"
-#include "zbxalgo.h"
-#include "zbxjson.h"
 #include "memalloc.h"
 #include "zbxeval.h"
 

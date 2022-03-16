@@ -3630,7 +3630,7 @@ void	zbx_update_env(double time_now)
  *                                                                            *
  ******************************************************************************/
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
-		int *nextcheck, char **error)
+		int *nextcheck, int *scheduling, char **error)
 {
 	int			simple_interval;
 	zbx_custom_interval_t	*custom_intervals;
@@ -3640,6 +3640,11 @@ int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now
 		*nextcheck = ZBX_JAN_2038;
 		return FAIL;
 	}
+
+	if (NULL != custom_intervals->scheduling)
+		*scheduling = SUCCEED;
+	else
+		*scheduling = FAIL;
 
 	*nextcheck = calculate_item_nextcheck(itemid, ITEM_TYPE_ZABBIX, simple_interval, custom_intervals, now);
 	zbx_custom_interval_free(custom_intervals);

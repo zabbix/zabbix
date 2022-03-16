@@ -19,8 +19,6 @@
 
 #include "evalfunc.h"
 
-#include "common.h"
-#include "db.h"
 #include "log.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"

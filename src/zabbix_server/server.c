@@ -17,29 +17,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "config.h"
 
 #ifdef HAVE_SQLITE3
 #	error SQLite is not supported as a main Zabbix database backend.
 #endif
 
+#include "export.h"
+#include "zbxself.h"
+#include "sighandler.h"
+
 #include "cfg.h"
-#include "pid.h"
-#include "db.h"
-#include "dbcache.h"
 #include "zbxdbupgrade.h"
 #include "log.h"
 #include "zbxgetopt.h"
 #include "mutexs.h"
-
-#include "sysinfo.h"
 #include "zbxmodules.h"
-#include "zbxserver.h"
-
 #include "zbxnix.h"
 #include "daemon.h"
-#include "zbxself.h"
-#include "../libs/zbxnix/control.h"
 
 #include "alerter/alerter.h"
 #include "alerter/alert_manager.h"
@@ -78,7 +73,6 @@
 #include "../libs/zbxvault/vault.h"
 #include "zbxtrends.h"
 #include "ha/ha.h"
-#include "sighandler.h"
 #include "zbxrtc.h"
 #include "zbxha.h"
 

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:50:35Z'
+  date: '2022-03-01T08:26:12Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -356,7 +356,7 @@ zabbix_export:
               tags:
                 -
                   tag: scope
-                  value: perfomance
+                  value: performance
         -
           uuid: 4e4d6eda8fbb4dd2ba7f48fba5723473
           name: 'PHP-FPM: Start time'

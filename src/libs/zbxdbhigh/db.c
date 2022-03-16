@@ -500,25 +500,6 @@ DB_RESULT	DBselectN(const char *query, int n)
 	return rc;
 }
 
-int	DBget_row_count(const char *table_name)
-{
-	int		count = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table_name:'%s'", __func__, table_name);
-
-	result = DBselect("select count(*) from %s", table_name);
-
-	if (NULL != (row = DBfetch(result)))
-		count = atoi(row[0]);
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, count);
-
-	return count;
-}
-
 int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 {
 	DB_RESULT	result;

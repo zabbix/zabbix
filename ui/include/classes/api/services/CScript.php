@@ -1188,7 +1188,9 @@ class CScript extends CApiService {
 
 		$group_search_names = [];
 		foreach ($result as $script) {
-			$has_write_access_level |= ($script['host_access'] == PERM_READ_WRITE);
+			if ($script['host_access'] == PERM_READ_WRITE) {
+				$has_write_access_level = true;
+			}
 
 			// If any script belongs to all host groups.
 			if ($script['groupid'] == 0) {

@@ -17,15 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "zbxreport.h"
-#include "zbxipcservice.h"
-#include "zbxserialize.h"
-#include "zbxalgo.h"
-#include "db.h"
-#include "zbxalert.h"
-
 #include "report_protocol.h"
+
+#include "zbxserialize.h"
+#include "zbxalert.h"
 
 static int	json_uint_by_tag(const struct zbx_json_parse *jp, const char *tag, zbx_uint64_t *value, char **error)
 {

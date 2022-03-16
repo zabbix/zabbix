@@ -247,7 +247,7 @@ ZBX_NotificationCollection.prototype.removeDanglingNodes = function() {
 			.then(function(node) {
 				node.parentNode && node.remove();
 			});
-		first &= false;
+		first = false;
 	}
 };
 
