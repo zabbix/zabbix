@@ -2411,6 +2411,7 @@ void	zbx_udp_close(zbx_socket_t *s)
 	zbx_socket_close(s->socket);
 }
 
+/* TODO: move remaining comms functions from libzbxcommon */
 int	zbx_comms_parse_response(char *xml, char *host, size_t host_len, char *key, size_t key_len,
 		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
 		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
