@@ -55,32 +55,32 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Locations discovery |<p>Weather metrics discovery by location.</p> |DEPENDENT |openweathermap.locations.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Locations discovery |<p>Weather metrics discovery by location.</p> |DEPENDENT |openweathermap.locations.discovery<p>**Preprocessing**:</p><p>- CHECK_JSON_ERROR: `$.error`</p><p>- JSONPATH: `$.data`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
 ## Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|OpenWeatherMap |OpenWeatherMap: {#LOCATION},{#COUNTRY}: Atmospheric pressure |<p>Atmospheric pressure in Pa.</p> |DEPENDENT |openweathermap.pressure[{#LOCATION},{#COUNTRY}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=='{#LOCATION}' && @.sys.country=='{#COUNTRY}')].main.pressure.first()`</p><p>- MULTIPLIER: `100`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|OpenWeatherMap |OpenWeatherMap: {#LOCATION},{#COUNTRY}: Cloudiness |<p>Cloudiness in %.</p> |DEPENDENT |openweathermap.clouds[{#LOCATION},{#COUNTRY}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=='{#LOCATION}' && @.sys.country=='{#COUNTRY}')].clouds.all.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|OpenWeatherMap |OpenWeatherMap: {#LOCATION},{#COUNTRY}: Humidity |<p>Humidity in %.</p> |DEPENDENT |openweathermap.humidity[{#LOCATION},{#COUNTRY}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=='{#LOCATION}' && @.sys.country=='{#COUNTRY}')].main.humidity.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|OpenWeatherMap |OpenWeatherMap: {#LOCATION},{#COUNTRY}: Rain volume for the last one hour |<p>Rain volume for the lat one hour in m.</p> |DEPENDENT |openweathermap.rain[{#LOCATION},{#COUNTRY}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=='{#LOCATION}' && @.sys.country=='{#COUNTRY}')].rain.1h.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|OpenWeatherMap |OpenWeatherMap: {#LOCATION},{#COUNTRY}: Short weather status |<p>Short weather status description.</p> |DEPENDENT |openweathermap.description[{#LOCATION},{#COUNTRY}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=='{#LOCATION}' && @.sys.country=='{#COUNTRY}')].weather..description.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|OpenWeatherMap |OpenWeatherMap: {#LOCATION},{#COUNTRY}: Snow volume for the last one hour |<p>Snow volume for the lat one hour in m.</p> |DEPENDENT |openweathermap.snow[{#LOCATION},{#COUNTRY}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=='{#LOCATION}' && @.sys.country=='{#COUNTRY}')].snow.1h.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|OpenWeatherMap |OpenWeatherMap: {#LOCATION},{#COUNTRY}: Temperature |<p>Atmospheric temperature value.</p> |DEPENDENT |openweathermap.temp[{#LOCATION},{#COUNTRY}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=='{#LOCATION}' && @.sys.country=='{#COUNTRY}')].main.temp.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|OpenWeatherMap |OpenWeatherMap: {#LOCATION},{#COUNTRY}: Visibility |<p>Visibility in m.</p> |DEPENDENT |openweathermap.visibility[{#LOCATION},{#COUNTRY}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=='{#LOCATION}' && @.sys.country=='{#COUNTRY}')].visibility.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|OpenWeatherMap |OpenWeatherMap: {#LOCATION},{#COUNTRY}: Wind direction |<p>Wind direction in degrees.</p> |DEPENDENT |openweathermap.wind.direction[{#LOCATION},{#COUNTRY}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=='{#LOCATION}' && @.sys.country=='{#COUNTRY}')].wind.deg.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|OpenWeatherMap |OpenWeatherMap: {#LOCATION},{#COUNTRY}: Wind speed |<p>Wind speed value.</p> |DEPENDENT |openweathermap.wind.speed[{#LOCATION},{#COUNTRY}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=='{#LOCATION}' && @.sys.country=='{#COUNTRY}')].wind.speed.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|OpenWeatherMap |[{#LOCATION}, {#COUNTRY}]: Data |<p>JSON with result of OpenWeatherMap API request by location.</p> |DEPENDENT |openweathermap.location.data[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.[?(@.id=='{#ID}')].first()`</p> |
+|OpenWeatherMap |[{#LOCATION}, {#COUNTRY}]: Atmospheric pressure |<p>Atmospheric pressure in Pa.</p> |DEPENDENT |openweathermap.pressure[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.main.pressure`</p><p>- MULTIPLIER: `100`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|OpenWeatherMap |[{#LOCATION}, {#COUNTRY}]: Cloudiness |<p>Cloudiness in %.</p> |DEPENDENT |openweathermap.clouds[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.clouds.all`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|OpenWeatherMap |[{#LOCATION}, {#COUNTRY}]: Humidity |<p>Humidity in %.</p> |DEPENDENT |openweathermap.humidity[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.main.humidity`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|OpenWeatherMap |[{#LOCATION}, {#COUNTRY}]: Rain volume for the last one hour |<p>Rain volume for the lat one hour in m.</p> |DEPENDENT |openweathermap.rain[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.rain.1h`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|OpenWeatherMap |[{#LOCATION}, {#COUNTRY}]: Short weather status |<p>Short weather status description.</p> |DEPENDENT |openweathermap.description[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.weather..description.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|OpenWeatherMap |[{#LOCATION}, {#COUNTRY}]: Snow volume for the last one hour |<p>Snow volume for the lat one hour in m.</p> |DEPENDENT |openweathermap.snow[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.snow.1h`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|OpenWeatherMap |[{#LOCATION}, {#COUNTRY}]: Temperature |<p>Atmospheric temperature value.</p> |DEPENDENT |openweathermap.temp[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.main.temp`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|OpenWeatherMap |[{#LOCATION}, {#COUNTRY}]: Visibility |<p>Visibility in m.</p> |DEPENDENT |openweathermap.visibility[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.visibility`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|OpenWeatherMap |[{#LOCATION}, {#COUNTRY}]: Wind direction |<p>Wind direction in degrees.</p> |DEPENDENT |openweathermap.wind.direction[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.wind.deg`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|OpenWeatherMap |[{#LOCATION}, {#COUNTRY}]: Wind speed |<p>Wind speed value.</p> |DEPENDENT |openweathermap.wind.speed[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.wind.speed`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Zabbix raw items |Openweathermap: Get data |<p>JSON array with result of OpenWeatherMap API requests.</p> |SCRIPT |openweathermap.get.data<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Zabbix raw items |Openweathermap: Clean data |<p>JSON array with result of OpenWeatherMap API requests without errors.</p> |DEPENDENT |openweathermap.clean.data<p>**Preprocessing**:</p><p>- JSONPATH: `$.data`</p> |
-|Zabbix raw items |Openweathermap: Get data collection errors |<p>Errors from get data requests by script item.</p> |DEPENDENT |openweathermap.get.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p> |
+|Zabbix raw items |Openweathermap: Get data collection errors |<p>Errors from get data requests by script item.</p> |DEPENDENT |openweathermap.get.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|OpenWeatherMap: {#LOCATION},{#COUNTRY}: Temperature is too high (over {$TEMP.CRIT.HIGH} for 30m) |<p>Temperature value is too high.</p> |`min(/OpenWeatherMap by HTTP/openweathermap.temp[{#LOCATION},{#COUNTRY}],#3)>{$TEMP.CRIT.HIGH}` |AVERAGE |<p>Manual close: YES</p> |
-|OpenWeatherMap: {#LOCATION},{#COUNTRY}: Temperature is too low (below {$TEMP.CRIT.LOW} for 30m) |<p>Temperature value is too low.</p> |`max(/OpenWeatherMap by HTTP/openweathermap.temp[{#LOCATION},{#COUNTRY}],#3)<{$TEMP.CRIT.LOW}` |AVERAGE |<p>Manual close: YES</p> |
+|[{#LOCATION}, {#COUNTRY}]: Temperature is too high (over {$TEMP.CRIT.HIGH} for 30m) |<p>Temperature value is too high.</p> |`min(/OpenWeatherMap by HTTP/openweathermap.temp[{#ID}],#3)>{$TEMP.CRIT.HIGH}` |AVERAGE |<p>Manual close: YES</p> |
+|[{#LOCATION}, {#COUNTRY}]: Temperature is too low (below {$TEMP.CRIT.LOW} for 30m) |<p>Temperature value is too low.</p> |`max(/OpenWeatherMap by HTTP/openweathermap.temp[{#ID}],#3)<{$TEMP.CRIT.LOW}` |AVERAGE |<p>Manual close: YES</p> |
 |Openweathermap: There are errors in requests to OpenWeatherMap API |<p>Zabbix has received errors in requests to OpenWeatherMap API.</p> |`length(last(/OpenWeatherMap by HTTP/openweathermap.get.errors))>0` |AVERAGE |<p>Manual close: YES</p> |
 
 ## Feedback
