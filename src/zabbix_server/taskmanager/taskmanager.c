@@ -1056,7 +1056,7 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 
 	zbx_vector_ptr_destroy(&tasks_active);
 
-	zbx_vector_cached_proxy_clear_ext(&proxies, (zbx_cached_proxy_free_func_t)zbx_cached_proxy_free);
+	zbx_vector_cached_proxy_clear_ext(&proxies, zbx_cached_proxy_free);
 	zbx_vector_cached_proxy_destroy(&proxies);
 }
 

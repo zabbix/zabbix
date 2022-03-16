@@ -1059,7 +1059,9 @@ typedef struct
 }
 zbx_cached_proxy_t;
 
-void	zbx_dc_get_all_proxies(zbx_vector_ptr_t *proxies);
+ZBX_PTR_VECTOR_DECL(cached_proxy, zbx_cached_proxy_t *)
+
+void	zbx_dc_get_all_proxies(zbx_vector_cached_proxy_t *proxies);
 
 int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **name);
 
