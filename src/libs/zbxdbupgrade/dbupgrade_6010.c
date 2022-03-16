@@ -47,7 +47,7 @@ static int	DBpatch_6010002(void)
 	const ZBX_FIELD	field = {"vault_provider", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
-
+}
 #endif
 
 DBPATCH_START(6010)
