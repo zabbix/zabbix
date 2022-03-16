@@ -92,7 +92,7 @@ class ZBase {
 	}
 
 	/**
-	 * Get component registry.
+	 * Get vault provider.
 	 *
 	 * @return CVault
 	 */
@@ -398,7 +398,7 @@ class ZBase {
 	/**
 	 * Load zabbix config file.
 	 */
-	protected function loadConfigFile() {
+	protected function loadConfigFile(): void {
 		$configFile = $this->getRootDir().CConfigFile::CONFIG_FILE_PATH;
 
 		$config = new CConfigFile($configFile);
@@ -433,6 +433,7 @@ class ZBase {
 					$this->config['DB']['VAULT_DB_PATH'], $this->config['DB']['VAULT_CERT_FILE'],
 					$this->config['DB']['VAULT_KEY_FILE']);
 				break;
+
 			case CVaultHashiCorp::NAME:
 				$this->vault = new CVaultHashiCorp($this->config['DB']['VAULT_URL'],
 					$this->config['DB']['VAULT_DB_PATH'], $this->config['DB']['VAULT_TOKEN']);
@@ -490,7 +491,7 @@ class ZBase {
 	/**
 	 * Initialize translations, set up translated date and time constants.
 	 *
-	 * @param string $lang  Locale variant prefix like en_US, ru_RU etc.
+	 * @param string|null $language  Locale variant prefix like en_US, ru_RU etc.
 	 */
 	public function initLocales(?string $language): void {
 		if (!setupLocale($language, $error) && $error !== '') {

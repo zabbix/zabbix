@@ -126,14 +126,12 @@ class CSetupWizard extends CForm {
 				'DB_PORT' => getRequest('port', $this->getConfig('DB_PORT', '0')),
 				'DB_DATABASE' => getRequest('database', $this->getConfig('DB_DATABASE', 'zabbix')),
 				'DB_CREDS_STORAGE' => getRequest('creds_storage',
-					$this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG)
-				),
+					$this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG)),
 				'DB_PASSWORD' => getRequest('password', $this->getConfig('DB_PASSWORD', '')),
 				'DB_SCHEMA' => getRequest('schema', $this->getConfig('DB_SCHEMA', '')),
 				'DB_ENCRYPTION' => (bool) getRequest('tls_encryption', $this->getConfig('DB_ENCRYPTION', false)),
 				'DB_ENCRYPTION_ADVANCED' => (bool) getRequest('verify_certificate',
-					$this->getConfig('DB_ENCRYPTION_ADVANCED', false)
-				),
+					$this->getConfig('DB_ENCRYPTION_ADVANCED', false)),
 				'DB_VERIFY_HOST' => (bool) getRequest('verify_host', $this->getConfig('DB_VERIFY_HOST', false)),
 				'DB_KEY_FILE' => getRequest('key_file', $this->getConfig('DB_KEY_FILE', '')),
 				'DB_CERT_FILE' => getRequest('cert_file', $this->getConfig('DB_CERT_FILE', '')),
@@ -291,6 +289,7 @@ class CSetupWizard extends CForm {
 						$vault_config['VAULT_DB_PATH'] = $this->getConfig('DB_VAULT_DB_PATH');
 						$vault_config['VAULT_TOKEN'] = $this->getConfig('DB_VAULT_TOKEN');
 						break;
+
 					case DB_STORE_CREDS_VAULT_CYBERARK:
 						$vault_config['VAULT'] = CVaultCyberArk::NAME;
 						$vault_config['VAULT_URL'] = $this->getConfig('DB_VAULT_URL');
@@ -298,6 +297,7 @@ class CSetupWizard extends CForm {
 						$vault_config['VAULT_CERT_FILE'] = $this->getConfig('VAULT_CERT_FILE');
 						$vault_config['VAULT_KEY_FILE'] = $this->getConfig('VAULT_KEY_FILE');
 						break;
+
 					default:
 						$db_creds_config['USER'] = $this->getConfig('DB_USER');
 						$db_creds_config['PASSWORD'] = $this->getConfig('DB_PASSWORD');
@@ -986,7 +986,7 @@ class CSetupWizard extends CForm {
 		$db_connected = $this->dbConnect($db_user, $db_password);
 		$is_superadmin = (CWebUser::$data && CWebUser::getType() == USER_TYPE_SUPER_ADMIN);
 
-		$session_key_update_failed = ($db_connected && !$is_superadmin)
+		$session_key_update_failed = $db_connected && !$is_superadmin
 			? !CEncryptHelper::updateKey(CEncryptHelper::generateKey())
 			: false;
 
@@ -1091,8 +1091,8 @@ class CSetupWizard extends CForm {
 		$DB['SERVER'] = $this->getConfig('DB_SERVER', 'localhost');
 		$DB['PORT'] = $this->getConfig('DB_PORT', '0');
 		$DB['DATABASE'] = $this->getConfig('DB_DATABASE', 'zabbix');
-		$DB['USER'] = $username ?: $this->getConfig('DB_USER', 'root');
-		$DB['PASSWORD'] = $password ?: $this->getConfig('DB_PASSWORD', '');
+		$DB['USER'] = $username ?? $this->getConfig('DB_USER', 'root');
+		$DB['PASSWORD'] = $password ?? $this->getConfig('DB_PASSWORD', '');
 		$DB['SCHEMA'] = $this->getConfig('DB_SCHEMA', '');
 		$DB['ENCRYPTION'] = (bool) $this->getConfig('DB_ENCRYPTION', true);
 		$DB['VERIFY_HOST'] = (bool) $this->getConfig('DB_VERIFY_HOST', true);

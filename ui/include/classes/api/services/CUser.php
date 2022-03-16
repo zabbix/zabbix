@@ -2089,10 +2089,7 @@ class CUser extends CApiService {
 	 * @param string|null $timezone
 	 */
 	private function setTimezone(?string $timezone): void {
-		if($timezone === NULL) {
-			return;
-		}
-		if ($timezone !== ZBX_DEFAULT_TIMEZONE) {
+		if ($timezone !== null && $timezone !== ZBX_DEFAULT_TIMEZONE) {
 			date_default_timezone_set($timezone);
 		}
 	}

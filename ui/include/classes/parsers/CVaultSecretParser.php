@@ -54,8 +54,10 @@ class CVaultSecretParser extends CParser {
 		switch ($this->options['provider']) {
 			case ZBX_VAULT_TYPE_HASHICORP:
 				return $this->parseHashiCorp($source, $pos);
+
 			case ZBX_VAULT_TYPE_CYBERARK:
 				return $this->parseCyberArk($source, $pos);
+
 			default:
 				return self::PARSE_FAIL;
 		}
