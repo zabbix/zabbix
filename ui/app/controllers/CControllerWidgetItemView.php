@@ -177,7 +177,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 						 * number. So we convert the value again which results in 0.
 						 */
 						if ($raw_units['is_numeric']) {
-							$value = self::convertNumeric($value, $fields['decimal_places']);
+							$value = self::convertNumeric($value, $fields['decimal_places'], $value_type);
 						}
 
 						// In order to split the number into value and fraction, we need to convert it to string.
@@ -340,15 +340,27 @@ class CControllerWidgetItemView extends CControllerWidget {
 	 *
 	 * @param string $value     Value to convert.
 	 * @param int    $decimals  Number of decimal places.
+	 * @param string $type		Value type
 	 *
 	 * @return double|string  Return string if number is very large. Otherwise returns double (float).
 	 */
-	private static function convertNumeric(string $value, int $decimals) {
+	private static function convertNumeric(string $value, int $decimals, string $type) {
 		if ($value >= pow(10, ZBX_FLOAT_DIG)) {
 			return sprintf('%.'.ZBX_FLOAT_DIG.'E', $value);
 		}
 		else {
-			return round((float) $value, $decimals);
+			if ($type == ITEM_VALUE_TYPE_FLOAT) {
+				$numeric_formatting = localeconv();
+
+				return number_format((float) $value,
+					$decimals,
+					$numeric_formatting['decimal_point'],
+					$numeric_formatting['thousands_sep']
+				);
+			}
+			else {
+				return $value;
+			}
 		}
 	}
 
