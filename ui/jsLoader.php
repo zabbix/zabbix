@@ -385,7 +385,8 @@ $translate_strings = [
 		'URLs' => _('URLs'),
 		'Values' => _('Values'),
 		'Web' => _('Web'),
-		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader')
+		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader'),
+		'Execute now' => _('Execute now')
 	],
 	'init.js' => [
 		'Debug' => _('Debug'),
