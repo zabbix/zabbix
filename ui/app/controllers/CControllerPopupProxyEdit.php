@@ -55,7 +55,8 @@ class CControllerPopupProxyEdit extends CController {
 					'tls_issuer', 'tls_subject'
 				],
 				'selectInterface' => ['dns', 'ip', 'useip', 'port'],
-				'proxyids' => $this->getInput('proxyid')
+				'proxyids' => $this->getInput('proxyid'),
+				'editable' => true
 			]);
 
 			if (!$this->proxy) {
