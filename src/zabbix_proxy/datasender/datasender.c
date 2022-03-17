@@ -184,7 +184,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
 		/* retry till have a connection */
-		if (FAIL == connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
+		if (FAIL == zbx_connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
 				configured_tls_connect_mode, CONFIG_PROXYDATA_FREQUENCY, LOG_LEVEL_WARNING))
 		{
 			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
@@ -246,7 +246,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 			}
 		}
 
-		disconnect_server(&sock);
+		zbx_disconnect_server(&sock);
 	}
 clean:
 	zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);

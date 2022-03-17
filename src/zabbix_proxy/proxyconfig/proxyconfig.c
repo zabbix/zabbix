@@ -69,7 +69,7 @@ static void	process_configuration_sync(size_t *data_size)
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
-	if (FAIL == connect_to_server(&sock,CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
+	if (FAIL == zbx_connect_to_server(&sock,CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
 			configured_tls_connect_mode, CONFIG_PROXYCONFIG_RETRY, LOG_LEVEL_WARNING))	/* retry till have a connection */
 	{
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
@@ -131,7 +131,7 @@ static void	process_configuration_sync(size_t *data_size)
 		DCupdate_interfaces_availability();
 	}
 error:
-	disconnect_server(&sock);
+	zbx_disconnect_server(&sock);
 out:
 	zbx_free(error);
 	zbx_free(buffer);

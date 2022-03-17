@@ -66,13 +66,13 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 	return ret;
 }
 
-int	connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_t *addrs, int timeout,
+int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_t *addrs, int timeout,
 		int connect_timeout, unsigned int tls_connect, int retry_interval, int level)
 {
 	int	res;
 	char	*tls_arg1, *tls_arg2;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In connect_to_server() [%s]:%d [timeout:%d, connection timeout:%d]",
+	zabbix_log(LOG_LEVEL_DEBUG, "In zbx_connect_to_server() [%s]:%d [timeout:%d, connection timeout:%d]",
 			((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port, timeout,
 			connect_timeout);
 
@@ -133,7 +133,7 @@ int	connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_
 	return res;
 }
 
-void	disconnect_server(zbx_socket_t *sock)
+void	zbx_disconnect_server(zbx_socket_t *sock)
 {
 	zbx_tcp_close(sock);
 }
