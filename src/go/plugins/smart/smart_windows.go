@@ -47,7 +47,7 @@ func (p *Plugin) executeSmartctl(args string, strict bool) ([]byte, error) {
 	if strict {
 		out, err = zbxcmd.ExecuteStrict(executable, time.Second*time.Duration(p.options.Timeout), "")
 	} else {
-		out, err = zbxcmd.Execute(executable, time.Second*time.Duration(p.options.Timeout). "")
+		out, err = zbxcmd.Execute(executable, time.Second*time.Duration(p.options.Timeout), "")
 	}
 
 	p.Tracef("command %s smartctl raw response: %s", executable, out)
