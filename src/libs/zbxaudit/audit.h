@@ -104,5 +104,4 @@ zbx_audit_entry_t	*zbx_audit_get_entry(zbx_uint64_t id, const char *cuid, int id
 void	zbx_audit_entry_append_int(zbx_audit_entry_t *entry, int audit_op, const char *key, ...);
 void	zbx_audit_entry_append_string(zbx_audit_entry_t *entry, int audit_op, const char *key, ...);
 
-
 #endif	/* ZABBIX_AUDIT_H */

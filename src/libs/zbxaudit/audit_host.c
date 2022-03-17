@@ -948,12 +948,10 @@ void	zbx_audit_host_group_update_json_update_##resource(zbx_uint64_t groupid, ty
 PREPARE_AUDIT_HOST_GROUP_UPDATE(name, const char*, string)
 
 void	zbx_audit_host_update_json_add_proxy_hostid(zbx_uint64_t hostid, zbx_uint64_t proxy_hostid)
-
 {
 	RETURN_IF_AUDIT_OFF();
 
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.proxy_hostid",
 			proxy_hostid, "hosts", "proxy_hostid");
-
 }
 #undef PREPARE_AUDIT_HOST_GROUP_UPDATE

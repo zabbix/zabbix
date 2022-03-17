@@ -3,6 +3,7 @@
 noinst_LIBRARIES = libzbxaudit.a
 
 libzbxaudit_a_SOURCES = \
+	audit.h \
 	audit.c \
 	audit_host.c \
 	audit_httptest.c \
