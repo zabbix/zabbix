@@ -1758,7 +1758,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$column_amount = count($data['column_fields']);
 			$table = $form->query('id:list_columns')->one()->asTable();
 
-			// We substract 1, because getRows counts table headers as one row.
+			// We subtract 1, because getRows counts table headers as one row.
 			$row_amount = $table->getRows()->count() - 1;
 
 			if ($action === 'create') {
