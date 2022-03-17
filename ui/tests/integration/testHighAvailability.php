@@ -56,7 +56,7 @@ class testHighAvailability extends CIntegrationTest {
 			self::COMPONENT_SERVER => [
 				'HANodeName' => self::NODE1_NAME,
 				'CacheSize' => '128K',
-				'ListenPort' => PHPUNIT_PORT_PREFIX.'0'.self::SERVER_PORT_SUFFIX
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_HANODE1_PORT_SUFFIX
 			]
 		];
 	}
@@ -70,7 +70,7 @@ class testHighAvailability extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'HANodeName' => self::NODE1_NAME,
-				'ListenPort' => PHPUNIT_PORT_PREFIX.'0'.self::SERVER_PORT_SUFFIX
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_HANODE1_PORT_SUFFIX
 			],
 			self::COMPONENT_SERVER_HANODE1 => [
 				'HANodeName' => self::NODE2_NAME,
