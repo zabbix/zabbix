@@ -246,7 +246,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 			}
 		}
 
-		zbx_disconnect_server(&sock);
+		zbx_disconnect_from_server(&sock);
 	}
 clean:
 	zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);

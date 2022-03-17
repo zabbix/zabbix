@@ -74,7 +74,7 @@ static int	send_heartbeat(void)
 				error);
 	}
 
-	zbx_disconnect_server(&sock);
+	zbx_disconnect_from_server(&sock);
 	zbx_free(error);
 clean:
 	zbx_free(buffer);

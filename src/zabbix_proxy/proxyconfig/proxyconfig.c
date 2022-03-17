@@ -131,7 +131,7 @@ static void	process_configuration_sync(size_t *data_size)
 		DCupdate_interfaces_availability();
 	}
 error:
-	zbx_disconnect_server(&sock);
+	zbx_disconnect_from_server(&sock);
 out:
 	zbx_free(error);
 	zbx_free(buffer);

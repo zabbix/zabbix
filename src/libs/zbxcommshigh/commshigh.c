@@ -133,7 +133,7 @@ int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_
 	return res;
 }
 
-void	zbx_disconnect_server(zbx_socket_t *sock)
+void	zbx_disconnect_from_server(zbx_socket_t *sock)
 {
 	zbx_tcp_close(sock);
 }
