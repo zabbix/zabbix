@@ -567,7 +567,7 @@ class CTask extends CApiService {
 
 		// If some items were not found in cache, select them from DB.
 		if ($itemids) {
-			$items = API::Item()->get([
+			$items_db = API::Item()->get([
 				'output' => ['type', 'name', 'status', 'flags', 'master_itemid'],
 				'selectHosts' => ['name', 'status'],
 				'itemids' => $itemids,
@@ -575,14 +575,17 @@ class CTask extends CApiService {
 				'preservekeys' => true
 			]);
 
-			if (!$items) {
+			if (!$items_db) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
 				);
 			}
 
 			// Add newly found items to cache.
-			$this->item_cache += $items;
+			$this->item_cache += $items_db;
+
+			// Append newly found items to items requested from cache.
+			$items += $items_db;
 		}
 
 		// Return only requested items either from cache or DB.
