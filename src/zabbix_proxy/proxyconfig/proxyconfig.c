@@ -78,7 +78,7 @@ static void	process_configuration_sync(size_t *data_size)
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-	if (SUCCEED != get_data_from_server(&sock, &buffer, buffer_size, reserved, &error))
+	if (SUCCEED != zbx_get_data_from_server(&sock, &buffer, buffer_size, reserved, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
 				sock.peer, error);

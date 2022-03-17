@@ -193,7 +193,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-		upload_state = put_data_to_server(&sock, &buffer, buffer_size, reserved, &error);
+		upload_state = zbx_put_data_to_server(&sock, &buffer, buffer_size, reserved, &error);
 		get_hist_upload_state(sock.buffer, hist_upload_state);
 
 		if (SUCCEED != upload_state)

@@ -26,8 +26,8 @@ int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_
 		int connect_timeout, unsigned int tls_connect, int retry_interval, int level);
 void	zbx_disconnect_from_server(zbx_socket_t *sock);
 
-int	get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
-int	put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
+int	zbx_get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
+int	zbx_put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
 
 int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, const char *version, int protocol,
 		int timeout);

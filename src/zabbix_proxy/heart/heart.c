@@ -68,7 +68,7 @@ static int	send_heartbeat(void)
 		goto clean;
 	}
 
-	if (SUCCEED != (ret = put_data_to_server(&sock, &buffer, buffer_size, reserved, &error)))
+	if (SUCCEED != (ret = zbx_put_data_to_server(&sock, &buffer, buffer_size, reserved, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send heartbeat message to server at \"%s\": %s", sock.peer,
 				error);

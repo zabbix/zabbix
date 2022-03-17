@@ -146,7 +146,7 @@ void	zbx_disconnect_from_server(zbx_socket_t *sock)
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-int	get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error)
+int	zbx_get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error)
 {
 	int		ret = FAIL;
 
@@ -183,7 +183,7 @@ exit:
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-int	put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error)
+int	zbx_put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error)
 {
 	int	ret = FAIL;
 
