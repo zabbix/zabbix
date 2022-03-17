@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 Template for monitoring pfSense by SNMP
 
 This template was tested on:
@@ -12,7 +12,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
 
 1. Import template into Zabbix
 2. Enable SNMP daemon at Services in pfSense web interface https://docs.netgate.com/pfsense/en/latest/services/snmp.html

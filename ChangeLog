@@ -1,6 +1,8 @@
 Changes for 6.2.0alpha1
 
 New features:
+.......PS. [ZBXNEXT-7498] moved internal items processing from history to regular pollers (akozlovs)
+..F....... [ZBXNEXT-7420] added documentation links to Zabbix frontend sections (rdetlavs)
 A.F....... [ZBXNEXT-7485] fixed debug_backtrace function usage for php8 (acikuns)
 .........T [ZBXNEXT-7493] added garbage collector and memory pool discovery to generic Java template (vkhaliev)
 ..F.I..... [ZBXNEXT-7397] removed support for md5 user passwords (asestakovs, mkrisjanis)
@@ -16,6 +18,10 @@ A.F....... [ZBXNEXT-6470,ZBXNEXT-6959] implemented audit logging of host prototy
 .........T [ZBXNEXT-6624] added triggers, macros, changed filters and overrides in LLD rules (mchudinov)
 
 Bug fixes:
+...G...... [ZBX-19407] removed redundant encoding check in get_codepage() for Windows (arimdjonoks)
+........S. [ZBX-20503] fixed queue overview updates for active agent items (dgoloscapov)
+..F....... [ZBX-19583] unified date format across datepickers (averza)
+..F....... [ZBX-19223] fixed disabled hosts not listed in latest data view (averza)
 .........T [ZBX-20521] corrected typos in templates, README and media types (drasihov)
 ..F....... [ZBX-20685] fixed graph widget configuration for small screens (acikuns)
 ..F....... [ZBX-20645] fixed empty space missing between table headers in Filters table in LLD config form (acikuns)
@@ -59,6 +65,18 @@ Bug fixes:
 ..F....... [ZBX-19956] fixed Proxy address and PSK field issues when cloning a proxy and fixed green indicator not showing in edit mode (Ivo, miks)
 ..F....... [ZBX-20426] fixed maintenance icon with host name in latest data table (acikuns)
 ...G...... [ZBX-20487] fixed agent handling of invalid time intervals (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.3rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.2
+
+6.0.2rc1 was released as 6.0.2 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.2rc1
@@ -1829,6 +1847,7 @@ A.F....... [ZBXNEXT-7485] fixed debug_backtrace function usage for php8 (acikuns
 .........T [ZBXNEXT-7493] added garbage collector and memory pool discovery to generic Java template (vkhaliev)
 
 Bug fixes:
+...G...... [ZBX-20390] fixed Oracle Solaris vm.memory.size[available] item kstats memory read (arimdjonoks)
 ..F....... [ZBX-19223] fixed disabled hosts not listed in latest data view (averza)
 .........T [ZBX-20521] corrected typos in templates, README and media types (drasihov)
 ..F....... [ZBX-20640] fixed X-axis field placement in different rows in Axis tab in Graph widget (acikuns)

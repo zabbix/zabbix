@@ -16,3 +16,5 @@ libzbxlld_a_SOURCES = \
 	lld_trigger.c \
 	lld_worker.c \
 	lld_worker.h
+
+libzbxlld_a_CFLAGS = $(LIBXML2_CFLAGS)

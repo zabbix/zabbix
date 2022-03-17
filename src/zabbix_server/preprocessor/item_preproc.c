@@ -24,9 +24,8 @@
 #include "zbxembed.h"
 #include "zbxprometheus.h"
 
-/* LIBXML2 is used */
+#include "zbxxml.h"
 #ifdef HAVE_LIBXML2
-#	include <libxml/parser.h>
 #	include <libxml/xpath.h>
 #endif
 

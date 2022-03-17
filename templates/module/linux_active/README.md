@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 
 ## Setup
 
@@ -64,7 +64,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 
 ## Setup
 
@@ -123,7 +123,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 
 ## Setup
 
@@ -176,7 +176,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 
 ## Setup
 
@@ -233,7 +233,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 
 ## Setup
 
@@ -294,7 +294,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 
 ## Setup
 
@@ -328,8 +328,8 @@ There are no template links in this template.
 |General |System name |<p>System host name.</p> |ZABBIX_ACTIVE |system.hostname<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
 |General |System description |<p>The information as normally returned by 'uname -a'.</p> |ZABBIX_ACTIVE |system.uname<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
 |General |Number of logged in users |<p>Number of users who are currently logged in.</p> |ZABBIX_ACTIVE |system.users.num |
-|General |Maximum number of open file descriptors |<p>It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.</p> |ZABBIX_ACTIVE |kernel.maxfiles<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|General |Maximum number of processes |<p>It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.</p> |ZABBIX_ACTIVE |kernel.maxproc<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|General |Maximum number of open file descriptors |<p>It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.</p> |ZABBIX_ACTIVE |kernel.maxfiles<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|General |Maximum number of processes |<p>It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.</p> |ZABBIX_ACTIVE |kernel.maxproc<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |General |Number of processes |<p>-</p> |ZABBIX_ACTIVE |proc.num |
 |General |Number of running processes |<p>-</p> |ZABBIX_ACTIVE |proc.num[,,run] |
 |Inventory |Operating system |<p>-</p> |ZABBIX_ACTIVE |system.sw.os<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
