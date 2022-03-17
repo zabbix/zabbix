@@ -23,7 +23,6 @@
 #include "log.h"
 #include "sysinfo.h"
 #include "logfiles/logfiles.h"
-#include "zbxcomms.h"
 #include "zbxcommshigh.h"
 #include "threads.h"
 #include "zbxjson.h"

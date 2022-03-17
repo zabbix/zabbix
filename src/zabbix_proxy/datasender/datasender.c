@@ -19,7 +19,6 @@
 
 #include "datasender.h"
 
-#include "zbxcomms.h"
 #include "zbxcommshigh.h"
 #include "db.h"
 #include "log.h"
