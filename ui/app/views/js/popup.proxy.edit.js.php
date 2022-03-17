@@ -171,7 +171,7 @@ window.proxy_edit_popup = new class {
 		this._post(this.delete_url, {proxyids: [this.proxyid]}, 'dialogue.delete');
 	}
 
-	_submit() {
+	submit() {
 		const fields = getFormFields(this.form);
 
 		if (this.proxyid !== null) {
