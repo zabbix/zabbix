@@ -269,6 +269,7 @@ switch ($data['method']) {
 				];
 
 				if ($data['object_name'] === 'graph_prototypes') {
+					$options['selectDiscoveryRule'] = ['hostid'];
 					$records = API::GraphPrototype()->get($options);
 				}
 				else {
@@ -282,10 +283,20 @@ switch ($data['method']) {
 				}
 
 				foreach ($records as $record) {
+					$prefix = $record['hosts'][0]['name'];
+					if ($data['object_name'] === 'graph_prototypes') {
+						$hostname_by_hostid = [];
+						foreach ($record['hosts'] as $host) {
+							$hostname_by_hostid[$host['hostid']] = $host['name'];
+						}
+
+						$prefix = $hostname_by_hostid[$record['discoveryRule']['hostid']];
+					}
+
 					$result[] = [
 						'id' => $record['graphid'],
 						'name' => $record['name'],
-						'prefix' => $record['hosts'][0]['name'].NAME_DELIMITER
+						'prefix' => $prefix.NAME_DELIMITER
 					];
 				}
 				break;

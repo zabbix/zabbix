@@ -151,9 +151,18 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			];
 		}
 
-		$widget_header = $this->hasInput('name')
-			? $this->getInput('name')
-			: $graph_prototype['hosts'][0]['name'].NAME_DELIMITER.$graph_prototype['name'];
+		if ($this->hasInput('name')) {
+			$widget_header = $this->getInput('name');
+		}
+		else {
+			$hostname_by_hostid = [];
+			foreach ($graph_prototype['hosts'] as $host) {
+				$hostname_by_hostid[$host['hostid']] = $host['name'];
+			}
+
+			$widget_header = $hostname_by_hostid[$graph_prototype['discoveryRule']['hostid']].
+				NAME_DELIMITER.$graph_prototype['name'];
+		}
 
 		return [
 			'header' => $widget_header,

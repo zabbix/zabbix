@@ -272,15 +272,21 @@ class CControllerDashboardWidgetEdit extends CController {
 			$graph_prototypes = API::GraphPrototype()->get([
 				'output' => ['graphid', 'name'],
 				'selectHosts' => ['name'],
+				'selectDiscoveryRule' => ['hostid'],
 				'graphids' => array_keys($prototype_graphids),
 				'preservekeys' => true
 			]);
 
 			foreach ($graph_prototypes as $graphid => $graph) {
+				$hostname_by_hostid = [];
+				foreach ($graph['hosts'] as $host) {
+					$hostname_by_hostid[$host['hostid']] = $host['name'];
+				}
+
 				foreach ($prototype_graphids[$graphid] as $field_name) {
 					$captions['ms']['graph_prototypes'][$field_name][$graphid] += [
 						'name' => $graph['name'],
-						'prefix' => $graph['hosts'][0]['name'].NAME_DELIMITER
+						'prefix' => $hostname_by_hostid[$graph['discoveryRule']['hostid']].NAME_DELIMITER
 					];
 				}
 			}
