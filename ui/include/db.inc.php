@@ -410,75 +410,70 @@ function DBexecute($query): bool {
 }
 
 /**
- * Returns the next data set from a DB resource or false if there are no more results.
+ * Return the next data set from a DB resource or false if there are no more results.
  *
- * @param mysqli_result $cursor
- * @param bool     $convertNulls  Convert all null values to string zeros.
+ * @param mixed $cursor        A DB-specific resource returned by DBselect or DBexecute.
+ * @param bool  $convertNulls  Convert all null values to string zeros.
  *
  * @return array|bool
  */
 function DBfetch($cursor, $convertNulls = true) {
 	global $DB;
 
-	$result = false;
-
-	if (!isset($DB['DB']) || empty($DB['DB']) || is_bool($cursor)) {
-		return $result;
+	if (!array_key_exists('DB', $DB) || $DB['DB'] === null || $cursor === false) {
+		return false;
 	}
 
-	try {
-		switch ($DB['TYPE']) {
-			case ZBX_DB_MYSQL:
-				$result = mysqli_fetch_assoc($cursor);
+	$result = false;
 
-				if (!$result) {
-					mysqli_free_result($cursor);
-				}
-				break;
+	switch ($DB['TYPE']) {
+		case ZBX_DB_MYSQL:
+			$result = mysqli_fetch_assoc($cursor);
 
-			case ZBX_DB_POSTGRESQL:
-				if ($result = pg_fetch_assoc($cursor)) {
-					$i = 0;
+			if (!$result) {
+				mysqli_free_result($cursor);
+			}
 
-					foreach ($result as &$value) {
-						if (pg_field_type($cursor, $i++) === 'bytea') {
-							$value = pg_unescape_bytea($value);
-						}
-					}
-					unset($value);
-				}
-				else {
-					pg_free_result($cursor);
-				}
-				break;
+			break;
 
-			case ZBX_DB_ORACLE:
-				if ($row = oci_fetch_assoc($cursor)) {
-					$result = [];
+		case ZBX_DB_POSTGRESQL:
+			if ($result = pg_fetch_assoc($cursor)) {
+				$i = 0;
 
-					foreach ($row as $key => $value) {
-						$field_type = strtolower(oci_field_type($cursor, $key));
-
-						// Oracle does not support NULL values for string fields,
-						// so if the string is empty, it will return NULL.
-						// Convert it to an empty string to be consistent with other databases.
-						$value = (str_in_array($field_type, ['varchar', 'varchar2', 'blob', 'clob']) && is_null($value))
-							? ''
-							: $value;
-
-						if (is_object($value) && (strpos($field_type, 'lob') !== false)) {
-							$value = $value->load();
-						}
-
-						$result[strtolower($key)] = $value;
+				foreach ($result as &$value) {
+					if (pg_field_type($cursor, $i++) === 'bytea') {
+						$value = pg_unescape_bytea($value);
 					}
 				}
-				break;
-		}
-	} catch (Throwable $exception) {
-		error($exception->getMessage(), 'sql');
+				unset($value);
+			}
+			else {
+				pg_free_result($cursor);
+			}
 
-		return false;
+			break;
+
+		case ZBX_DB_ORACLE:
+			if ($row = oci_fetch_assoc($cursor)) {
+				$result = [];
+
+				foreach ($row as $key => $value) {
+					$field_type = strtolower(oci_field_type($cursor, $key));
+
+					// Since Oracle reports nulls for empty strings, convert those back to empty strings.
+					$value = (str_in_array($field_type, ['varchar', 'varchar2', 'blob', 'clob']) && is_null($value))
+						? ''
+						: $value;
+
+					if (is_object($value) && (strpos($field_type, 'lob') !== false)) {
+						$value = $value->load();
+					}
+
+					$result[strtolower($key)] = $value;
+				}
+			}
+
+			break;
 	}
 
 	if ($result) {
