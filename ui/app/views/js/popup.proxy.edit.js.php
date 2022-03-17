@@ -45,12 +45,12 @@ window.proxy_edit_popup = new class {
 
 		document
 			.getElementById('useip')
-			.addEventListener('change', () => this.updateInterface());
+			.addEventListener('change', () => this._updateInterface());
 
 		if (this.display_change_psk) {
 			document
 				.getElementById('tls-psk-change')
-				.addEventListener('click', () => this.changePsk());
+				.addEventListener('click', () => this._changePsk());
 
 			for (const element of this.form.querySelectorAll('.js-tls-psk-identity, .js-tls-psk')) {
 				element.style.display = 'none';
@@ -60,16 +60,16 @@ window.proxy_edit_popup = new class {
 		for (const id of ['status', 'tls_connect', 'tls_accept_psk', 'tls_accept_certificate']) {
 			document
 				.getElementById(id)
-				.addEventListener('change', () => this.update());
+				.addEventListener('change', () => this._update());
 		}
 
-		this.update();
+		this._update();
 
 		document.getElementById('proxy-form').style.display = '';
 		document.getElementById('host').focus();
 	}
 
-	updateInterface() {
+	_updateInterface() {
 		if (this.form.querySelector('#useip input:checked').value == <?= INTERFACE_USE_IP ?>) {
 			document.querySelector('.js-interface input[name="ip"]').setAttribute('aria-required', 'true');
 			document.querySelector('.js-interface input[name="dns"]').removeAttribute('aria-required');
@@ -80,7 +80,7 @@ window.proxy_edit_popup = new class {
 		}
 	}
 
-	changePsk() {
+	_changePsk() {
 		for (const element of this.form.querySelectorAll('.js-tls-psk-change')) {
 			element.remove();
 		}
@@ -96,7 +96,7 @@ window.proxy_edit_popup = new class {
 		this.display_change_psk = false;
 	}
 
-	update() {
+	_update() {
 		const status_active = document.querySelector('#status input:checked').value == <?= HOST_STATUS_PROXY_ACTIVE ?>;
 
 		for (const element of this.form.querySelectorAll('.js-interface')) {
@@ -155,8 +155,8 @@ window.proxy_edit_popup = new class {
 		}
 	}
 
-	refreshConfig() {
-		this.post(this.refresh_config_url, {proxyids: [this.proxyid]}, 'dialogue.configRefresh');
+	_refreshConfig() {
+		this._post(this.refresh_config_url, {proxyids: [this.proxyid]}, 'dialogue.configRefresh');
 	}
 
 	clone({title, buttons}) {
@@ -167,11 +167,11 @@ window.proxy_edit_popup = new class {
 		this.overlay.setProperties({title, buttons});
 	}
 
-	delete() {
-		this.post(this.delete_url, {proxyids: [this.proxyid]}, 'dialogue.delete');
+	_delete() {
+		this._post(this.delete_url, {proxyids: [this.proxyid]}, 'dialogue.delete');
 	}
 
-	submit() {
+	_submit() {
 		const fields = getFormFields(this.form);
 
 		if (this.proxyid !== null) {
@@ -193,10 +193,10 @@ window.proxy_edit_popup = new class {
 			}
 		}
 
-		this.post(this.proxyid !== null ? this.update_url : this.create_url, fields, 'dialogue.submit');
+		this._post(this.proxyid !== null ? this.update_url : this.create_url, fields, 'dialogue.submit');
 	}
 
-	post(url, data, event_name) {
+	_post(url, data, event_name) {
 		for (const element of this.form.parentNode.children) {
 			if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 				element.parentNode.removeChild(element);
