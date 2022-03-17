@@ -2908,8 +2908,6 @@ form.is-loading {
     .list-table.compact-view td .icon-depend-down::before {
       background-position: -49px -767px; }
     .list-table.compact-view td .icon-wizard-action {
-        background-position: -48px -804px; }
-    .list-table.compact-view td .icon-wizard-action {
       background: url("../img/icon-sprite.svg?20211222") no-repeat -6px -624px;
       height: 12px;
       min-height: 12px;

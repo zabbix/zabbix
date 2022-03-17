@@ -25,7 +25,7 @@ const ZBX_STYLE_EXPANDED = 'expanded';
 const ZBX_STYLE_HIDDEN = 'hidden';
 
 // Empty space in pixels reserved for expand button.
-const ZBX_EXPANDAND_BUTTON_SIZE = 40;
+const ZBX_EXPAND_BUTTON_SIZE = 40;
 
 class CExpandableSubfilter extends CBaseComponent {
 
@@ -49,7 +49,7 @@ class CExpandableSubfilter extends CBaseComponent {
 	hideOverflown() {
 		const isOverflown = (element) => {
 			return element.offsetTop + element.offsetHeight > this._target.offsetHeight
-				|| ZBX_EXPANDAND_BUTTON_SIZE > this._target.offsetWidth - element.offsetLeft - element.offsetWidth;
+				|| ZBX_EXPAND_BUTTON_SIZE > this._target.offsetWidth - element.offsetLeft - element.offsetWidth;
 		};
 
 		this._target.querySelectorAll(`.subfilter.${ZBX_STYLE_HIDDEN}`).forEach((element) => {
