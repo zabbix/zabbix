@@ -431,6 +431,9 @@ class CTask extends CApiService {
 			return [];
 		}
 
+		// Create backup of item IDs, so that later the order can be maintained.
+		$itemids_og = $itemids;
+
 		// Check permissions.
 		$items = API::Item()->get([
 			'output' => ['type', 'name', 'status', 'flags', 'master_itemid'],
@@ -532,7 +535,12 @@ class CTask extends CApiService {
 			}
 		}
 
-		// Returns real item IDs (no the ependent item IDs, but top level master item IDs).
+		// Try to maintain order of originally passed item IDs.
+		uksort($itemids, function($key1, $key2) use ($itemids_og) {
+			return (array_search($key1, $itemids_og) > array_search($key2, $itemids_og));
+		});
+
+		// Returns real item IDs (not the ependent item IDs, but top level master item IDs).
 		return array_keys($itemids);
 	}
 
