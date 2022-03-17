@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 /**
  * Trait for filter related tests.
  */
-trait FilterTrait {
+trait TagTrait {
 
 	protected $filter_selector = 'id:filter-tags';
 

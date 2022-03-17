@@ -20,7 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
-require_once dirname(__FILE__).'/traits/FilterTrait.php';
+require_once dirname(__FILE__).'/traits/TagTrait.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -29,7 +29,7 @@ use Facebook\WebDriver\WebDriverBy;
  */
 class testPageProblems extends CLegacyWebTest {
 
-	use FilterTrait;
+	use TagTrait;
 	use TableTrait;
 
 	public function testPageProblems_CheckLayout() {
