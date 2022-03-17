@@ -309,7 +309,7 @@ class CControllerAuditLogList extends CController {
 			// We cut string and show "Details" button if audit detail string more than 255 symbols.
 			foreach ($short_details as &$detail) {
 				// Remove all line breaks from short details.
-				$detail = str_replace("\n", ' ', $detail);
+				$detail = str_replace(["\r\n", "\n"], " ", $detail);
 
 				if (mb_strlen($detail) > 255) {
 					$detail = mb_substr($detail, 0, 252).'...';
