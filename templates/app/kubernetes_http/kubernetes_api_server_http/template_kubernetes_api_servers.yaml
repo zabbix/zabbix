@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-24T14:53:17Z'
+  date: '2022-03-17T17:01:47Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -296,7 +296,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Get raw metrics from API instance /metrics endpoint'
+          description: 'Get raw metrics from API instance /metrics endpoint.'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED

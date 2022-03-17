@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-17T11:50:12Z'
+  date: '2022-03-17T17:02:00Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -222,7 +222,7 @@ zabbix_export:
           key: kube.deployment.count
           delay: '0'
           history: 7d
-          description: 'The number of deployments'
+          description: 'The number of deployments.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -347,7 +347,7 @@ zabbix_export:
           key: kube.node.count
           delay: '0'
           history: 7d
-          description: 'The number of nodes'
+          description: 'The number of nodes.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -530,7 +530,7 @@ zabbix_export:
           key: kube.service.count
           delay: '0'
           history: 7d
-          description: 'The number of services'
+          description: 'The number of services.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -701,7 +701,7 @@ zabbix_export:
           key: kube.statefulset.count
           delay: '0'
           history: 7d
-          description: 'The number of statefulsets'
+          description: 'The number of statefulsets.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -1169,7 +1169,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The number of nodes that should be running the daemon pod'
+              description: 'The number of nodes that should be running the daemon pod.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1198,7 +1198,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The number of nodes running a daemon pod but are not supposed to'
+              description: 'The number of nodes running a daemon pod but are not supposed to.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1227,7 +1227,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The number of nodes that should be running the daemon pod and have one or more running and ready'
+              description: 'The number of nodes that should be running the daemon pod and have one or more running and ready.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1256,7 +1256,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The number of nodes running at least one daemon pod and that are supposed to'
+              description: 'The number of nodes running at least one daemon pod and are supposed to.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1285,7 +1285,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The total number of nodes that are running updated daemon pod'
+              description: 'The total number of nodes that are running updated daemon pod.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1965,6 +1965,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
+              description: 'Result of livez helthcheck for component.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3428,6 +3429,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
+              description: 'Result of readyz helthcheck for component.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3939,21 +3941,27 @@ zabbix_export:
         -
           macro: '{$KUBE.API_SERVER.PORT}'
           value: '6443'
+          description: 'Kubernetes API servers metrics endpoint port. Used in ControlPlane LLD.'
         -
           macro: '{$KUBE.API_SERVER.SCHEME}'
           value: https
+          description: 'Kubernetes API servers metrics endpoint scheme. Used in ControlPlane LLD.'
         -
           macro: '{$KUBE.CONTROLLER_MANAGER.PORT}'
           value: '10252'
+          description: 'Kubernetes Controller manager metrics endpoint port. Used in ControlPlane LLD.'
         -
           macro: '{$KUBE.CONTROLLER_MANAGER.SCHEME}'
           value: http
+          description: 'Kubernetes Controller manager metrics endpoint scheme. Used in ControlPlane LLD.'
         -
           macro: '{$KUBE.KUBELET.PORT}'
           value: '10250'
+          description: 'Kubernetes Kubelet manager metrics endpoint port. Used in Kubelet LLD.'
         -
           macro: '{$KUBE.KUBELET.SCHEME}'
           value: https
+          description: 'Kubernetes Kubelet manager metrics endpoint scheme. Used in Kubelet LLD.'
         -
           macro: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
           value: '.*'
@@ -3981,9 +3989,11 @@ zabbix_export:
         -
           macro: '{$KUBE.SCHEDULER.PORT}'
           value: '10251'
+          description: 'Kubernetes Scheduler manager metrics endpoint port. Used in ControlPlane LLD.'
         -
           macro: '{$KUBE.SCHEDULER.SCHEME}'
           value: http
+          description: 'Kubernetes Scheduler manager metrics endpoint scheme. Used in ControlPlane LLD.'
         -
           macro: '{$KUBE.STATE.ENDPOINT.NAME}'
           value: zabbix-kube-state-metrics

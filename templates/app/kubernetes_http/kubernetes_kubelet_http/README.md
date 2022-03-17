@@ -41,7 +41,7 @@ No specific Zabbix configuration is required.
 |{$KUBE.KUBELET.CADVISOR.ENDPOINT} |<p>cAdvisor metrics from Kubelet /metrics/cadvisor endpoint</p> |`/metrics/cadvisor` |
 |{$KUBE.KUBELET.METRIC.ENDPOINT} |<p>Kubelet /metrics endpoint</p> |`/metrics` |
 |{$KUBE.KUBELET.PODS.ENDPOINT} |<p>Kubelet /pods endpoint</p> |`/pods` |
-|{$KUBE.KUBELET.URL} | |`https://localhost:10250` |
+|{$KUBE.KUBELET.URL} |<p>Instance URL</p> |`https://localhost:10250` |
 
 ## Template links
 

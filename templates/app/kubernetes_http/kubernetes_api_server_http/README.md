@@ -102,7 +102,7 @@ There are no template links in this template.
 |Kubernetes API |Kubernetes API: ["{#NAME}"] Workqueue adds total, rate |<p>Total number of adds handled by workqueue per second.</p> |DEPENDENT |kubernetes.api.workqueue_adds_total.rate["{#NAME}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `workqueue_adds_total{name = "{#NAME}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Kubernetes API |Kubernetes API: Certificate expiration seconds bucket, {#LE} |<p>Distribution of the remaining lifetime on the certificate used to authenticate a request.</p> |DEPENDENT |kubernetes.api.client_certificate_expiration_seconds_bucket[{#LE}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `apiserver_client_certificate_expiration_seconds_bucket{le = "{#LE}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes API |Kubernetes API: Client certificate expiration, p1 |<p>1 percentile of of the remaining lifetime on the certificate used to authenticate a request.</p> |CALCULATED |kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]<p>**Expression**:</p>`bucket_percentile(//kubernetes.api.client_certificate_expiration_seconds_bucket[*],5m,1)` |
-|Zabbix raw items |Kubernetes API: Get API instance metrics |<p>Get raw metrics from API instance /metrics endpoint</p> |HTTP_AGENT |kubernetes.api.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Zabbix raw items |Kubernetes API: Get API instance metrics |<p>Get raw metrics from API instance /metrics endpoint.</p> |HTTP_AGENT |kubernetes.api.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 
 ## Triggers
 

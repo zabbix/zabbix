@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-24T14:52:33Z'
+  date: '2022-03-17T17:21:40Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -282,6 +282,7 @@ zabbix_export:
           type: DEPENDENT
           key: kube.kubelet.container.memory.cache.discovery
           delay: '0'
+          lifetime: '0'
           item_prototypes:
             -
               uuid: 8f8b1df2a801475a92604544b2019b2e
@@ -535,6 +536,7 @@ zabbix_export:
           type: DEPENDENT
           key: kube.kubelet.pods.discovery
           delay: '0'
+          lifetime: '0'
           item_prototypes:
             -
               uuid: 41e8f027979a462983789f1f45a9e332
@@ -965,3 +967,4 @@ zabbix_export:
         -
           macro: '{$KUBE.KUBELET.URL}'
           value: 'https://localhost:10250'
+          description: 'Instance URL'

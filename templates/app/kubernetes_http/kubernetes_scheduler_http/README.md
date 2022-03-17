@@ -86,7 +86,7 @@ There are no template links in this template.
 |Kubernetes Scheduler |Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p90 |<p>90 percentile of e2e scheduling latency.</p> |CALCULATED |kubernetes.scheduler.e2e_scheduling_p90["{#RESULT}"]<p>**Expression**:</p>`bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,"{#RESULT}"],5m,90)` |
 |Kubernetes Scheduler |Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p90 |<p>95 percentile of e2e scheduling latency.</p> |CALCULATED |kubernetes.scheduler.e2e_scheduling_p95["{#RESULT}"]<p>**Expression**:</p>`bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,"{#RESULT}"],5m,95)` |
 |Kubernetes Scheduler |Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p99 |<p>95 percentile of e2e scheduling latency.</p> |CALCULATED |kubernetes.scheduler.e2e_scheduling_p99["{#RESULT}"]<p>**Expression**:</p>`bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,"{#RESULT}"],5m,99)` |
-|Zabbix raw items |Kubernetes Scheduler: Get Scheduler metrics |<p>Get raw metrics from Scheduler instance /metrics endpoint</p> |HTTP_AGENT |kubernetes.scheduler.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Zabbix raw items |Kubernetes Scheduler: Get Scheduler metrics |<p>Get raw metrics from Scheduler instance /metrics endpoint.</p> |HTTP_AGENT |kubernetes.scheduler.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 
 ## Triggers
 

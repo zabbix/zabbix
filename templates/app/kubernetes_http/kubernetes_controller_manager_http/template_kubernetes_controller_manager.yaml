@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-24T14:52:36Z'
+  date: '2022-03-17T17:02:12Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -193,7 +193,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Get raw metrics from Controller instance /metrics endpoint'
+          description: 'Get raw metrics from Controller instance /metrics endpoint.'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -381,7 +381,6 @@ zabbix_export:
           type: DEPENDENT
           key: kubernetes.controller.workqueue.discovery
           delay: '0'
-          description: 'Discovery raw data and percentile items of workqueues.'
           item_prototypes:
             -
               uuid: 70277a128a254462ad0bf7a023738ba0
@@ -393,7 +392,7 @@ zabbix_export:
               trends: '0'
               discover: NO_DISCOVER
               value_type: FLOAT
-              description: 'How long in seconds processing an item from workqueue takes'
+              description: 'How long in seconds processing an item from workqueue takes.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
