@@ -56,6 +56,7 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$KUBE.API.COMPONENTSTATUSES.ENDPOINT} |<p>Kubernetes API componentstatuses endpoint /api/v1/componentstatuses</p> |`/api/v1/componentstatuses` |
 |{$KUBE.API.LIVEZ.ENDPOINT} |<p>Kubernetes API livez endpoint /livez</p> |`/livez` |
 |{$KUBE.API.READYZ.ENDPOINT} |<p>Kubernetes API readyz endpoint /readyz</p> |`/readyz` |
 |{$KUBE.API.TOKEN} |<p>Service account bearer token</p> |`` |

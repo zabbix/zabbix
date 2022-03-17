@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-02T21:56:29Z'
+  date: '2022-03-17T11:50:12Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -3917,6 +3917,10 @@ zabbix_export:
           tag: target
           value: 'kubernetes state'
       macros:
+        -
+          macro: '{$KUBE.API.COMPONENTSTATUSES.ENDPOINT}'
+          value: /api/v1/componentstatuses
+          description: 'Kubernetes API componentstatuses endpoint /api/v1/componentstatuses'
         -
           macro: '{$KUBE.API.LIVEZ.ENDPOINT}'
           value: /livez
