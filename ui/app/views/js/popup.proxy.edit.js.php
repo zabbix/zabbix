@@ -197,12 +197,6 @@ window.proxy_edit_popup = new class {
 	}
 
 	_post(url, data, event_name) {
-		for (const element of this.form.parentNode.children) {
-			if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-				element.parentNode.removeChild(element);
-			}
-		}
-
 		return fetch(new Curl(url).getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -219,6 +213,12 @@ window.proxy_edit_popup = new class {
 				this.dialogue.dispatchEvent(new CustomEvent(event_name, {detail: response.success}));
 			})
 			.catch((exception) => {
+				for (const element of this.form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
+				}
+
 				let title;
 				let messages = [];
 
