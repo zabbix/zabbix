@@ -678,13 +678,13 @@ class ZBase {
 						->setArgument('request', $request_url)
 						->toString()
 				)
-				->onClick('document.location = this.dataset["login-url"];');
+				->onClick('document.location = this.dataset.loginUrl;');
 		}
 
 		if (CWebUser::isLoggedIn()) {
 			$view['buttons'][] = (new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
 				->setAttribute('data-home-url', CMenuHelper::getFirstUrl())
-				->onClick('document.location = this.dataset["home-url"];');
+				->onClick('document.location = this.dataset.homeUrl;');
 		}
 
 		switch ($router->getLayout()) {
