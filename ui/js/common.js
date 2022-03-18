@@ -325,19 +325,22 @@ function getPosition(obj) {
 /**
  * Opens popup content in overlay dialogue.
  *
- * @param {string}           action           Popup controller related action.
- * @param {array|object}     parameters       Array with key/value pairs that will be used as query for popup request.
+ * @param {string}           action              Popup controller related action.
+ * @param {array|object}     parameters          Array with key/value pairs that will be used as query for popup
+ *                                               request.
  *
- * @param {string}           dialogue_class   CSS class, usually based on .modal-popup and .modal-popup-{size}.
- * @param {string|null}      dialogueid       ID of overlay dialogue.
- * @param {HTMLElement|null} trigger_element  UI element which was clicked to open overlay dialogue.
+ * @param {string}           dialogue_class      CSS class, usually based on .modal-popup and .modal-popup-{size}.
+ * @param {string|null}      dialogueid          ID of overlay dialogue.
+ * @param {HTMLElement|null} trigger_element     UI element which was clicked to open overlay dialogue.
+ * @param {bool}             prevent_navigation  Show warning when navigating away from an active dialogue.
  *
  * @returns {Overlay}
  */
 function PopUp(action, parameters, {
 	dialogueid = null,
 	dialogue_class = '',
-	trigger_element = document.activeElement
+	trigger_element = document.activeElement,
+	prevent_navigation = false
 } = {}) {
 	var overlay = overlays_stack.getById(dialogueid);
 
@@ -350,16 +353,17 @@ function PopUp(action, parameters, {
 			class: 'modal-popup ' + dialogue_class,
 			buttons: [],
 			element: trigger_element,
-			type: 'popup'
+			type: 'popup',
+			prevent_navigation
 		});
 	}
 
 	overlay
 		.load(action, parameters)
 		.then(function(resp) {
-			if ('error' in resp) {
+			if (typeof resp.errors !== 'undefined') {
 				overlay.setProperties({
-					content: makeMessageBox('bad', resp.error.messages ?? [], resp.error.title ?? '', false, true)
+					content: resp.errors
 				});
 			}
 			else {
@@ -390,7 +394,7 @@ function PopUp(action, parameters, {
 					doc_url: resp.doc_url,
 					content: resp.body,
 					controls: resp.controls,
-					buttons: buttons,
+					buttons,
 					debug: resp.debug,
 					script_inline: resp.script_inline,
 					data: resp.data || null

@@ -65,7 +65,8 @@
 		openUserTokenPopup(user_token_data) {
 			const overlay = PopUp('popup.token.edit', user_token_data, {
 				dialogueid: 'token_edit',
-				dialogue_class: 'modal-popup-generic'
+				dialogue_class: 'modal-popup-generic',
+				prevent_navigation: true
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.userTokenSuccess, {once: true});

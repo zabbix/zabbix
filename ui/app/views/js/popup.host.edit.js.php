@@ -34,21 +34,9 @@ window.host_edit_popup = {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
-		this.addEventListeners();
-
 		history.replaceState({}, '', popup_url);
 
 		host_edit.init({form_name, host_interfaces, host_is_discovered});
-	},
-
-	addEventListeners() {
-		this.enableNavigationWarning();
-		this.overlay.$dialogue[0].addEventListener('overlay.close', this.events.overlayClose, {once: true});
-	},
-
-	removeEventListeners() {
-		this.disableNavigationWarning();
-		this.overlay.$dialogue[0].removeEventListener('overlay.close', this.events.overlayClose);
 	},
 
 	submit() {
@@ -97,10 +85,10 @@ window.host_edit_popup = {
 		delete parameters.sid;
 		parameters.clone = 1;
 
-		this.removeEventListeners();
 		PopUp('popup.host.edit', parameters, {
 			dialogueid: 'host_edit',
-			dialogue_class: 'modal-popup-large'
+			dialogue_class: 'modal-popup-large',
+			prevent_navigation: true
 		});
 	},
 
@@ -110,10 +98,10 @@ window.host_edit_popup = {
 		delete parameters.sid;
 		parameters.full_clone = 1;
 
-		this.removeEventListeners();
 		PopUp('popup.host.edit', parameters, {
 			dialogueid: 'host_edit',
-			dialogue_class: 'modal-popup-large'
+			dialogue_class: 'modal-popup-large',
+			prevent_navigation: true
 		});
 	},
 
@@ -156,14 +144,6 @@ window.host_edit_popup = {
 		}
 	},
 
-	enableNavigationWarning() {
-		window.addEventListener('beforeunload', this.events.beforeUnload, {passive: false});
-	},
-
-	disableNavigationWarning() {
-		window.removeEventListener('beforeunload', this.events.beforeUnload);
-	},
-
 	ajaxExceptionHandler: (exception) => {
 		const form = host_edit_popup.form;
 		let title;
@@ -180,17 +160,5 @@ window.host_edit_popup = {
 		const message_box = makeMessageBox('bad', messages, title, true, true)[0];
 
 		form.parentNode.insertBefore(message_box, form);
-	},
-
-	events: {
-		beforeUnload(e) {
-			// Display confirmation message.
-			e.preventDefault();
-			e.returnValue = '';
-		},
-
-		overlayClose() {
-			host_edit_popup.disableNavigationWarning();
-		}
 	}
 };

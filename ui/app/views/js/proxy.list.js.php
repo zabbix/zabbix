@@ -76,7 +76,8 @@
 		_edit(parameters = {}) {
 			const overlay = PopUp('popup.proxy.edit', parameters, {
 				dialogueid: 'proxy_edit',
-				dialogue_class: 'modal-popup-large'
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail));
@@ -93,7 +94,8 @@
 
 			const overlay = PopUp('popup.host.edit', {hostid}, {
 				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large'
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.create', (e) => this._reload(e.detail.success));
