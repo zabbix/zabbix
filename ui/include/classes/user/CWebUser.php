@@ -183,6 +183,7 @@ class CWebUser {
 			'alias' => ZBX_GUEST_USER,
 			'userid' => 0,
 			'lang' => 'en_gb',
+			'theme' => 'default',
 			'type' => 0,
 			'debug_mode' => false
 		];
