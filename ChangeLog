@@ -1,8 +1,23 @@
 Changes for 6.0.3rc1
 
 New features:
+...G...... [ZBXNEXT-7452] added SNI support to TLS protocol for Agent 2 (asestakovs)
+...G.....T [ZBXNEXT-7065] added queries metrics to postgresql by agent2 template (esneiders, vkhaliev)
+.........T [ZBXNEXT-7023] updated regular expressions for services discovery in windows templates (vkhaliev)
+A.F....... [ZBXNEXT-7478] fixed optional parameters before required issue (acikuns, ashubin)
 
 Bug fixes:
+..F....... [ZBX-20319] fixed multiline details in audit log (rlataria)
+.D........ [ZBX-20762] fixed StartAlerters and StartEscalators range in configuration file comments (akozlovs)
+........S. [ZBX-20651] fixed crash in availability manager on some platforms (vso)
+...G...... [ZBX-19311] fixed raid device discovery in smart plugin in Zabbix agent 2 (esneiders)
+.......PS. [ZBX-20518] fixed lastaccess update during proxy throttling (dgoloscapov)
+........S. [ZBX-20503] fixed queue overview updates for active agent items (dgoloscapov)
+..F....... [ZBX-20621] fixed value trimming in Administration -> Geographical maps configuration (miks)
+...G...... [ZBX-20539] fixed TLS parameters for mysql and postgresql in Zabbix agent 2 (esneiders)
+...G...... [ZBX-19407] removed redundant encoding check in get_codepage() for Windows (arimdjonoks)
+...G...... [ZBX-20390] fixed Oracle Solaris vm.memory.size[available] item kstats memory read (arimdjonoks)
+.........T [ZBX-20521] corrected missed typos in templates and README (drasihov)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.2
