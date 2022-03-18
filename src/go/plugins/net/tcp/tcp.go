@@ -21,6 +21,7 @@ package tcpudp
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
 	"math"
@@ -144,9 +145,10 @@ func (p *Plugin) validateSmtp(buf []byte) int {
 }
 
 func (p *Plugin) validateFtp(buf []byte) int {
-	sc := bufio.NewScanner(strings.NewReader(string(buf)))
+	sc := bufio.NewScanner(bytes.NewReader(buf))
+	ok := []byte("220 ")
 	for sc.Scan() {
-		if sc.Text()[:4] == "220 " {
+		if bytes.Equal(sc.Bytes()[:4], ok) {
 			return tcpExpectOk
 		}
 	}
