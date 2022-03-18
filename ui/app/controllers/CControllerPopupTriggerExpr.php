@@ -1195,22 +1195,16 @@ class CControllerPopupTriggerExpr extends CController {
 			'add' =>				'in 1'
 		];
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput($fields) || !$this->hasInput('add');
 
 		if (!$ret) {
-			$output = [];
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
-			if ($this->hasInput('add')) {
-				$this->setResponse(
-					(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
-				);
-			}
-			else {
-				$ret = true;
-			}
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
 		}
 
 		return $ret;

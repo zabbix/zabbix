@@ -25,7 +25,7 @@ class CControllerProxyList extends CController {
 		$this->disableSIDValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'sort' =>			'in host',
 			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
@@ -45,7 +45,7 @@ class CControllerProxyList extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES);
 	}
 

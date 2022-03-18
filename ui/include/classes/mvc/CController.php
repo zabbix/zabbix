@@ -449,19 +449,22 @@ abstract class CController {
 	/**
 	 * Main controller processing routine. Returns response object: data, redirect or fatal redirect.
 	 *
-	 * @return CControllerResponse
+	 * @throws CAccessDeniedException
+	 *
+	 * @return CControllerResponse|null
 	 */
-	final public function run() {
+	final public function run(): ?CControllerResponse {
 		$this->populateRawInput();
 
 		if ($this->validate_sid && !$this->checkSID()) {
-			access_deny(ACCESS_DENY_PAGE);
+			throw new CAccessDeniedException();
 		}
 
 		if ($this->checkInput()) {
 			if ($this->checkPermissions() !== true) {
-				access_deny(ACCESS_DENY_PAGE);
+				throw new CAccessDeniedException();
 			}
+
 			$this->doAction();
 		}
 

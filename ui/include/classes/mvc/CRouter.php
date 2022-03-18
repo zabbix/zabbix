@@ -42,13 +42,6 @@ class CRouter {
 	private $view = null;
 
 	/**
-	 * Unique action (request) identifier.
-	 *
-	 * @var string
-	 */
-	private $action = null;
-
-	/**
 	 * Mapping between action and corresponding controller, layout and view.
 	 *
 	 * @var array
@@ -186,7 +179,6 @@ class CRouter {
 		'popup.scriptexec'							=> ['CControllerPopupScriptExec',						'layout.json',			'popup.scriptexec'],
 		'popup.service.edit'						=> ['CControllerPopupServiceEdit',						'layout.json',			'popup.service.edit'],
 		'popup.service.statusrule.edit'				=> ['CControllerPopupServiceStatusRuleEdit',			'layout.json',			'popup.service.statusrule.edit'],
-		'popup.service.time.edit'					=> ['CControllerPopupServiceTimeEdit',					'layout.json',			'popup.service.time.edit'],
 		'popup.services'							=> ['CControllerPopupServices',							'layout.json',			'popup.services'],
 		'popup.sla.edit'							=> ['CControllerPopupSlaEdit',							'layout.json',			'popup.sla.edit'],
 		'popup.sla.excludeddowntime.edit'			=> ['CControllerPopupSlaExcludedDowntimeEdit',			'layout.json',			'popup.sla.excludeddowntime.edit'],
@@ -362,6 +354,13 @@ class CRouter {
 		'trigger_prototypes.php'		=> ['CLegacyAction', null, null],
 		'triggers.php'					=> ['CLegacyAction', null, null]
 	];
+
+	/**
+	 * Unique action (request) identifier.
+	 *
+	 * @var string
+	 */
+	private $action = null;
 
 	/**
 	 * Add new actions (potentially overwriting the existing ones).

@@ -112,11 +112,13 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			}
 		}
 
-		if (($messages = getMessages(false, null, false)) !== null) {
+		if (!$ret) {
 			$this->setResponse(
-				(new CControllerResponseData([
-					'main_block' => json_encode(['errors' => $messages->toString()])
-				]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
 			);
 		}
 

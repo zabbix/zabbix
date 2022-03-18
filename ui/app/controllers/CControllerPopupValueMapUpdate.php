@@ -48,7 +48,7 @@ class CControllerPopupValueMapUpdate extends CController {
 	}
 
 	/**
-	 * Validate vlue map to be added.
+	 * Validate value map to be added.
 	 *
 	 * @return bool
 	 */

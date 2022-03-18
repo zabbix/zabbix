@@ -357,9 +357,9 @@ function PopUp(action, parameters, {
 	overlay
 		.load(action, parameters)
 		.then(function(resp) {
-			if (typeof resp.errors !== 'undefined') {
+			if ('error' in resp) {
 				overlay.setProperties({
-					content: resp.errors
+					content: makeMessageBox('bad', resp.error.messages ?? [], resp.error.title ?? '', false, true)
 				});
 			}
 			else {
