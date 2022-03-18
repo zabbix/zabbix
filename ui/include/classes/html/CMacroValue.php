@@ -135,13 +135,10 @@ class CMacroValue extends CInput {
 		elseif ($value_type == ZBX_MACRO_TYPE_VAULT) {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_VAULT;
 			$dropdown_btn_class = ZBX_STYLE_ICON_SECRET_TEXT;
-			$placeholder = CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER) == ZBX_VAULT_TYPE_CYBERARK
-				? CVaultCyberArk::MACRO_PLACEHOLDER
-				: CVaultHashiCorp::MACRO_PLACEHOLDER;
 
 			$elements[] = (new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
 				->setMaxlength($this->maxlength)
-				->setAttribute('placeholder', $placeholder)
+				->setAttribute('placeholder', _('value'))
 				->setReadonly($readonly);
 		}
 		else {
