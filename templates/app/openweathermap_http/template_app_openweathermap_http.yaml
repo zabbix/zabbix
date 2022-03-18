@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-16T22:18:23Z'
+  date: '2022-03-18T09:49:27Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -669,14 +669,15 @@ zabbix_export:
               path: $.wind_unit
           preprocessing:
             -
-              type: CHECK_JSON_ERROR
-              parameters:
-                - $.errors
-              error_handler: DISCARD_VALUE
-            -
               type: JSONPATH
               parameters:
                 - $.data
+            -
+              type: NOT_MATCHES_REGEX
+              parameters:
+                - '\[\]'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Failed to receive data about required locations from API'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:

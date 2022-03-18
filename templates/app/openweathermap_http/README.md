@@ -55,7 +55,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Locations discovery |<p>Weather metrics discovery by location.</p> |DEPENDENT |openweathermap.locations.discovery<p>**Preprocessing**:</p><p>- CHECK_JSON_ERROR: `$.errors`</p><p>- JSONPATH: `$.data`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Locations discovery |<p>Weather metrics discovery by location.</p> |DEPENDENT |openweathermap.locations.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.data`</p><p>- NOT_MATCHES_REGEX: `\[\]`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
 ## Items collected
 
