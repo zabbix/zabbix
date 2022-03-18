@@ -464,7 +464,7 @@ static int tls_new(SSL_CTX_LP ctx, const char *psk_identity, const char *psk_key
 	return 0;
 }
 
-static tls_t *tls_new_client(SSL_CTX_LP ctx, const char *psk_identity, const char *psk_key)
+static tls_t *tls_new_client(SSL_CTX_LP ctx, const char *psk_identity, const char *psk_key, const char *servername)
 {
 	tls_t	*tls;
 	int	ret;
@@ -473,6 +473,9 @@ static tls_t *tls_new_client(SSL_CTX_LP ctx, const char *psk_identity, const cha
 	{
 		if (psk_identity != NULL && psk_key != NULL)
 			SSL_set_psk_client_callback(tls->ssl, tls_psk_client_cb);
+
+		if (NULL != servername && '\0' != *servername)
+			SSL_set_tlsext_host_name(tls->ssl, servername);
 
 		SSL_set_connect_state(tls->ssl);
 		if (1 == (ret = SSL_connect(tls->ssl)) || SSL_ERROR_WANT_READ == SSL_get_error(tls->ssl, ret))
@@ -930,6 +933,7 @@ import (
 	"unsafe"
 
 	"zabbix.com/pkg/log"
+	"zabbix.com/pkg/uri"
 )
 
 // TLS initialization
@@ -1133,7 +1137,7 @@ func (c *Client) Read(b []byte) (n int, err error) {
 	}
 }
 
-func NewClient(nc net.Conn, cfg *Config, timeout time.Duration, shiftDeadline bool) (conn net.Conn, err error) {
+func NewClient(nc net.Conn, cfg *Config, timeout time.Duration, shiftDeadline bool, address string) (conn net.Conn, err error) {
 	if !supported {
 		return nil, errors.New(SupportedErrMsg())
 	}
@@ -1142,7 +1146,7 @@ func NewClient(nc net.Conn, cfg *Config, timeout time.Duration, shiftDeadline bo
 		return nc, nil
 	}
 
-	var cUser, cSecret *C.char
+	var cUser, cSecret, cHostname *C.char
 	context := defaultContext
 	if cfg.Connect == ConnPSK {
 		cUser = C.CString(cfg.PSKIdentity)
@@ -1155,12 +1159,20 @@ func NewClient(nc net.Conn, cfg *Config, timeout time.Duration, shiftDeadline bo
 		context = pskContext
 	}
 
+	if url, err := uri.New(address, nil); err == nil {
+		hostname := url.Host()
+		if nil == net.ParseIP(hostname) {
+			cHostname = C.CString(hostname)
+			defer C.free(unsafe.Pointer(cHostname))
+		}
+	}
+
 	// for TLS we overwrite the timeoutMode and force it to move on every read or write
 	c := &Client{
 		tlsConn: tlsConn{
 			conn:          nc,
 			buf:           make([]byte, 4096),
-			tls:           unsafe.Pointer(C.tls_new_client(C.SSL_CTX_LP(context), cUser, cSecret)),
+			tls:           unsafe.Pointer(C.tls_new_client(C.SSL_CTX_LP(context), cUser, cSecret, cHostname)),
 			timeout:       timeout,
 			shiftDeadline: shiftDeadline,
 		},
