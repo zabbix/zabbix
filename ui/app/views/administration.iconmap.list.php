@@ -26,6 +26,7 @@
 $widget = (new CWidget())
 	->setTitle(_('Icon mapping'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_ICONMAP_LIST))
 	->setControls((new CTag('nav', true,
 		(new CForm())
 			->cleanItems()

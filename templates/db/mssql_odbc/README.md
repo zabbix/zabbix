@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 The template is developed for monitoring DBMS Microsoft SQL Server via ODBC.
 
 This template was tested on:
@@ -12,7 +12,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/odbc_checks) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/odbc_checks) for basic instructions.
 
 1. Create an MSSQL user for monitoring. For example, zbx_monitor.
   **View Server State** and **View Any Definition** permissions should be granted to the user.
@@ -164,7 +164,7 @@ There are no template links in this template.
 |MSSQL |MSSQL: Full scans to Index searches ratio |<p>The ratio of Full scans per second to Index searches per second. The threshold recommendation is strictly for OLTP workloads.</p> |CALCULATED |mssql.scan_to_search<p>**Expression**:</p>`last(//mssql.full_scans_sec.rate) / (last(//mssql.index_searches_sec.rate) + (last(//mssql.index_searches_sec.rate)=0))` |
 |MSSQL |MSSQL: Failed auto-params per second |<p>Number of failed auto-parameterization attempts per second. This number should be small. Note that auto-parameterizations are also known as simple parameterizations in the newer versions of SQL Server.</p> |DEPENDENT |mssql.failed_autoparams_sec.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' && @.counter_name=='Failed Auto-Params/sec')].cntr_value.first()`</p><p>- CHANGE_PER_SECOND</p> |
 |MSSQL |MSSQL: Safe auto-params per second |<p>Number of safe auto-parameterization attempts per second. Safe refers to a determination that a cached execution plan can be shared between different similar-looking Transact-SQL statements. SQL Server makes many auto-parameterization attempts some of which turn out to be safe and others fail. Note that auto-parameterizations are also known as simple parameterizations in the newer versions of SQL Server. This does not include forced parameterizations.</p> |DEPENDENT |mssql.safe_autoparams_sec.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' && @.counter_name=='Safe Auto-Params/sec')].cntr_value.first()`</p><p>- CHANGE_PER_SECOND</p> |
-|MSSQL |MSSQL: SQL compilations per second |<p>Number of SQL compilations per second. Indicates the number of times the compile code path is entered. Includes compiles caused by statement-level recompilations in SQL Server. After SQL Server user activity is stable, this value reaches a steady state.</p> |DEPENDENT |mssql.sql_compilations_sec.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' && @.counter_name=='SQL Compilations/sec')].cntr_value.first()`</p><p>- CHANGE_PER_SECOND</p> |
+|MSSQL |MSSQL: SQL compilations per second |<p>Number of SQL compilations per second. Indicates the number of times the compile code path is entered. Includes runs caused by statement-level recompilations in SQL Server. After SQL Server user activity is stable, this value reaches a steady state.</p> |DEPENDENT |mssql.sql_compilations_sec.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' && @.counter_name=='SQL Compilations/sec')].cntr_value.first()`</p><p>- CHANGE_PER_SECOND</p> |
 |MSSQL |MSSQL: SQL re-compilations per second |<p>Number of statement recompiles per second. Counts the number of times statement recompiles are triggered. Generally, you want the recompiles to be low.</p> |DEPENDENT |mssql.sql_recompilations_sec.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' && @.counter_name=='SQL Re-Compilations/sec')].cntr_value.first()`</p><p>- CHANGE_PER_SECOND</p> |
 |MSSQL |MSSQL: Unsafe auto-params per second |<p>Number of unsafe auto-parameterization attempts per second. For example, the query has some characteristics that prevent the cached plan from being shared. These are designated as unsafe. This does not count the number of forced parameterizations.</p> |DEPENDENT |mssql.unsafe_autoparams_sec.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' && @.counter_name=='Unsafe Auto-Params/sec')].cntr_value.first()`</p><p>- CHANGE_PER_SECOND</p> |
 |MSSQL |MSSQL: Total transactions number |<p>The number of currently active transactions of all types.</p> |DEPENDENT |mssql.transactions<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.object_name=='{$MSSQL.INSTANCE}:Transactions' && @.counter_name=='Transactions')].cntr_value.first()`</p> |

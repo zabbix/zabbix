@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-17T19:48:29Z'
+  date: '2022-03-05T06:43:31Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1962,7 +1962,7 @@ zabbix_export:
                       value: notice
             -
               uuid: e1359646453e43cbaf0b4e1b89bdcdeb
-              name: 'RabbitMQ: Healthcheck: local alarms in effect on the this node{#SINGLETON}'
+              name: 'RabbitMQ: Healthcheck: local alarms in effect on this node{#SINGLETON}'
               type: HTTP_AGENT
               key: 'rabbitmq.healthcheck.local_alarms[{#SINGLETON}]'
               history: 7d
@@ -2056,7 +2056,7 @@ zabbix_export:
                 -
                   uuid: 36b4702437614a3681a5a77acef323fc
                   expression: 'last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.mirror_sync[{#SINGLETON}])=0'
-                  name: 'RabbitMQ: There are queues that could potentially lose data if the this node goes offline.'
+                  name: 'RabbitMQ: There are queues that could potentially lose data if this node goes offline.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
@@ -2108,7 +2108,7 @@ zabbix_export:
                 -
                   uuid: cfaba160cc0441c09010de05316596bd
                   expression: 'last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.quorum[{#SINGLETON}])=0'
-                  name: 'RabbitMQ: There are queues that would lose their quorum and availability if the this node is shut down.'
+                  name: 'RabbitMQ: There are queues that would lose their quorum and availability if this node is shut down.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
@@ -2118,7 +2118,7 @@ zabbix_export:
                       value: notice
             -
               uuid: d701b9acae86464282b308df720a1de2
-              name: 'RabbitMQ: Healthcheck: virtual hosts on the this node{#SINGLETON}'
+              name: 'RabbitMQ: Healthcheck: virtual hosts on this node{#SINGLETON}'
               type: HTTP_AGENT
               key: 'rabbitmq.healthcheck.virtual_hosts[{#SINGLETON}]'
               history: 7d

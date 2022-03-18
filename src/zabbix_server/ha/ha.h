@@ -20,7 +20,6 @@
 #ifndef ZABBIX_HA_H
 #define ZABBIX_HA_H
 
-#include "common.h"
 #include "zbxrtc.h"
 
 typedef struct

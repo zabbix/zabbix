@@ -1183,7 +1183,7 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 	{
 		zbx_eval_context_t	ctx, ctx_r;
 		zbx_trigger_copy_t	*trigger_copy_template = trigger_copies_insert->values[i];
-		zbx_uint64_t		parse_rules = ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION | ZBX_EVAL_COMPOSE_FUNCTIONID;
+		zbx_uint64_t            parse_rules = ZBX_EVAL_PARSE_TRIGGER_EXPRESSION | ZBX_EVAL_COMPOSE_FUNCTIONID;
 
 		if (0 != (trigger_copy_template->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 			parse_rules |= ZBX_EVAL_PARSE_LLDMACRO | ZBX_EVAL_COMPOSE_LLD;

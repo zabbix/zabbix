@@ -26,6 +26,7 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Discovery rules'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOST_DISCOVERY_EDIT))
 	->setNavigation(getHostNavigation('discoveries', $data['hostid'],
 		array_key_exists('itemid', $data) ? $data['itemid'] : 0
 	));
@@ -1002,21 +1003,23 @@ if (!empty($data['itemid'])) {
 	))->setEnabled(!$data['limited']);
 	$buttons[] = new CButtonCancel(url_param('context'));
 
-	$tab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
+	$form_actions = new CFormActions(new CSubmit('update', _('Update')), $buttons);
 }
 else {
 	$cancel_button = $data['backurl'] !== null
 		? new CButtonCancel(null, "redirect('".$data['backurl']."');")
 		: new CButtonCancel(url_param('context'));
 
-	$tab->setFooter(makeFormFooter(
+	$form_actions = new CFormActions(
 		new CSubmit('add', _('Add')),
 		[
 			(new CSimpleButton(_('Test')))->setId('test_item'),
 			$cancel_button
 		]
-	));
+	);
 }
+
+$tab->setFooter(new CFormGrid($form_actions));
 
 $form->addItem($tab);
 $widget->addItem($form);

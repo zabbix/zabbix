@@ -116,6 +116,7 @@ zbx_add_post_js('timeControl.processObjects();');
 
 (new CWidget())
 	->setTitle(_('100 busiest triggers'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORTS_TOPTRIGGERS))
 	->addItem($filterForm)
 	->addItem($table)
 	->show();

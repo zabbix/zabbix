@@ -25,7 +25,9 @@
 
 $this->includeJsFile('administration.userrole.edit.js.php');
 
-$widget = (new CWidget())->setTitle(_('User roles'));
+$widget = (new CWidget())
+	->setTitle(_('User roles'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_USERROLE_EDIT));
 
 $form = (new CForm())
 	->setId('userrole-form')

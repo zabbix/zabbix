@@ -19,6 +19,16 @@ header {
 		white-space: nowrap;
 	}
 
+	.header-doc-link {
+		flex-shrink: 0;
+		margin: 0 -2px 0 auto;
+		padding: 2px;
+
+		& + .header-controls {
+			margin-left: 0;
+		}
+	}
+
 	.header-controls {
 		flex-shrink: 0;
 		margin: 0 -2px 0 auto;
