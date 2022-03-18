@@ -117,7 +117,11 @@
 		}
 
 		_enableHosts(target, proxyids) {
-			if (!window.confirm(<?= json_encode(_('Enable hosts monitored by selected proxies?')) ?>)) {
+			const confirmation = proxyids.length > 1
+				? <?= json_encode(_('Enable hosts monitored by selected proxies?')) ?>
+				: <?= json_encode(_('Enable hosts monitored by selected proxy?')) ?>;
+
+			if (!window.confirm(confirmation)) {
 				return;
 			}
 
@@ -125,7 +129,11 @@
 		}
 
 		_disableHosts(target, proxyids) {
-			if (!window.confirm(<?= json_encode(_('Disable hosts monitored by selected proxies?')) ?>)) {
+			const confirmation = proxyids.length > 1
+				? <?= json_encode(_('Disable hosts monitored by selected proxies?')) ?>
+				: <?= json_encode(_('Disable hosts monitored by selected proxy?')) ?>;
+
+			if (!window.confirm(confirmation)) {
 				return;
 			}
 
