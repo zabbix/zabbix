@@ -226,8 +226,8 @@ class CControllerHostList extends CController {
 				'status', 'tls_connect', 'tls_accept'
 			],
 			'selectParentTemplates' => ['templateid', 'name'],
-			'selectInterfaces' => ['interfaceid', 'type', 'available', 'error', 'details', 'ip', 'dns', 'port',
-				'useip'
+			'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip',  'ip', 'dns', 'port', 'available', 'error',
+				'details'
 			],
 			'selectItems' => API_OUTPUT_COUNT,
 			'selectDiscoveries' => API_OUTPUT_COUNT,

@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 SharePoint includes a Representational State Transfer (REST) service. Developers can perform read operations from their SharePoint Add-ins, solutions, and client applications, using REST web technologies and standard Open Data Protocol (OData) syntax. Details in
 https://docs.microsoft.com/ru-ru/sharepoint/dev/sp-add-ins/get-to-know-the-sharepoint-rest-service?tabs=csom
 
@@ -14,7 +14,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 Create a new host.
 Define macros according to your Sharepoint web portal.
@@ -63,7 +63,7 @@ There are no template links in this template.
 |Sharepoint |Sharepoint: Size ({#SHAREPOINT.LLD.FULL_PATH}) |<p>Size of:</p><p>{#SHAREPOINT.LLD.FULL_PATH}</p> |DEPENDENT |sharepoint.size["{#SHAREPOINT.LLD.FULL_PATH}"]<p>**Preprocessing**:</p><p>- JSONPATH: `{{#SHAREPOINT.LLD.JSON_PATH}.regsub("(.*)", \1)}.meta.size`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `24h`</p> |
 |Sharepoint |Sharepoint: Modified ({#SHAREPOINT.LLD.FULL_PATH}) |<p>Date of change:</p><p>{#SHAREPOINT.LLD.FULL_PATH}</p> |DEPENDENT |sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"]<p>**Preprocessing**:</p><p>- JSONPATH: `{{#SHAREPOINT.LLD.JSON_PATH}.regsub("(.*)", \1)}.meta.modified`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Sharepoint |Sharepoint: Created ({#SHAREPOINT.LLD.FULL_PATH}) |<p>Date of creation:</p><p>{#SHAREPOINT.LLD.FULL_PATH}</p> |DEPENDENT |sharepoint.created["{#SHAREPOINT.LLD.FULL_PATH}"]<p>**Preprocessing**:</p><p>- JSONPATH: `{{#SHAREPOINT.LLD.JSON_PATH}.regsub("(.*)", \1)}.meta.created`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Zabbix_raw_items |Sharepoint: Get directory structure |<p>Used to get directory structure information</p> |SCRIPT |sharepoint.get_dir<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> {"status":520,"data":{},"time":0}`</p><p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Zabbix raw items |Sharepoint: Get directory structure |<p>Used to get directory structure information</p> |SCRIPT |sharepoint.get_dir<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> {"status":520,"data":{},"time":0}`</p><p>**Expression**:</p>`The text is too long. Please see the template.` |
 
 ## Triggers
 

@@ -898,7 +898,7 @@ class CLineGraphDraw extends CGraphDraw {
 	 * Draw main period label in black color with 7px font size under X axis and a 1px dashed gray vertical line
 	 * according to that label.
 	 *
-	 * @param strimg $value     Readable timestamp.
+	 * @param string $value     Readable timestamp.
 	 * @param int    $position  Position on X axis.
 	 */
 	private function drawSubPeriod($value, $position) {
@@ -2069,7 +2069,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->calcDimensions();
 
 		$this->selectData();
-		if (hasErrorMesssages()) {
+		if (hasErrorMessages()) {
 			show_messages();
 		}
 

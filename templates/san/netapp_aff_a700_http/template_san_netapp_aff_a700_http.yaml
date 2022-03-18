@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T15:01:55Z'
+  date: '2022-01-26T10:39:41Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -15,7 +15,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/SAN
@@ -35,8 +35,8 @@ zabbix_export:
           url: '{$URL}/api/cluster/chassis?fields=id,state'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 49490a886b5f4e5c9e8cc121a6ffd713
           name: 'Get cluster'
@@ -52,8 +52,8 @@ zabbix_export:
           url: '{$URL}/api/cluster'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 2c98b9d6353a4b1f9c0a794681788c22
           name: 'Cluster location'
@@ -77,8 +77,8 @@ zabbix_export:
             key: netapp.cluster.get
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: cluster
         -
           uuid: a052583b18b44ed9b8df1c1eca375113
           name: 'Cluster name'
@@ -102,8 +102,8 @@ zabbix_export:
             key: netapp.cluster.get
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: cluster
         -
           uuid: 63c3ea4634024fb88841cee7e64c964b
           name: 'Cluster IOPS, other rate'
@@ -127,8 +127,11 @@ zabbix_export:
             key: netapp.cluster.get
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: iops
         -
           uuid: 5f38f233c9c0446e8bb9e60229294cdf
           name: 'Cluster IOPS, read rate'
@@ -152,8 +155,11 @@ zabbix_export:
             key: netapp.cluster.get
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: iops
         -
           uuid: 8380db1dbf2a4c2e95eff184d3a61fde
           name: 'Cluster IOPS, total rate'
@@ -177,8 +183,11 @@ zabbix_export:
             key: netapp.cluster.get
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: iops
         -
           uuid: 65a4b938010045ef9735a7d9f6239ccd
           name: 'Cluster IOPS, write rate'
@@ -202,8 +211,11 @@ zabbix_export:
             key: netapp.cluster.get
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: iops
         -
           uuid: 77253d87ce8242afa45a3c79ab96a91e
           name: 'Cluster IOPS raw, other'
@@ -222,8 +234,11 @@ zabbix_export:
             key: netapp.cluster.get
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: iops
         -
           uuid: 14262390978b45729fa3ac593cf21a69
           name: 'Cluster IOPS raw, read'
@@ -242,8 +257,11 @@ zabbix_export:
             key: netapp.cluster.get
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: iops
         -
           uuid: 7a0407b68348478f9bc56bf0629f59d2
           name: 'Cluster IOPS raw, total'
@@ -262,8 +280,11 @@ zabbix_export:
             key: netapp.cluster.get
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: iops
         -
           uuid: 92640d6a2d044100a59c5d180d43fbce
           name: 'Cluster IOPS raw, write'
@@ -282,8 +303,11 @@ zabbix_export:
             key: netapp.cluster.get
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: iops
         -
           uuid: 4bd4fe94e9a54fa2b8ab9bdf0475edff
           name: 'Cluster latency, other'
@@ -299,8 +323,11 @@ zabbix_export:
           description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: latency
         -
           uuid: 4b89e603f9cf4b92a85293b1ad15c005
           name: 'Cluster latency, read'
@@ -316,8 +343,11 @@ zabbix_export:
           description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for read I/O operations.'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: latency
         -
           uuid: 2c953f67a7484e389d11ac5ef6b06c44
           name: 'Cluster latency, total'
@@ -333,8 +363,11 @@ zabbix_export:
           description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric aggregated over all types of I/O operations.'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: latency
         -
           uuid: 543ba306d85e41c98d34dab39463dd87
           name: 'Cluster latency, write'
@@ -350,8 +383,11 @@ zabbix_export:
           description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for write I/O operations.'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: latency
         -
           uuid: acd5b961c4d843589514771fa9a0aaa3
           name: 'Cluster latency raw, other'
@@ -370,8 +406,11 @@ zabbix_export:
             key: netapp.cluster.get
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: latency
         -
           uuid: 3e81e918028d412eaa2cb27718ae3b98
           name: 'Cluster latency raw, read'
@@ -390,8 +429,11 @@ zabbix_export:
             key: netapp.cluster.get
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: latency
         -
           uuid: 78253f625b7e468898f6dd48c9707ad3
           name: 'Cluster latency raw, total'
@@ -410,8 +452,11 @@ zabbix_export:
             key: netapp.cluster.get
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: latency
         -
           uuid: fb73702348d3468cad5312af772eaeb9
           name: 'Cluster latency raw, write'
@@ -430,8 +475,11 @@ zabbix_export:
             key: netapp.cluster.get
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: latency
         -
           uuid: 61acb5f1435f4452a789c44bfd105da3
           name: 'Cluster throughput, other rate'
@@ -455,8 +503,11 @@ zabbix_export:
             key: netapp.cluster.get
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: throughput
         -
           uuid: a1fad2e35b8f4c1da450b953d3952263
           name: 'Cluster throughput, read rate'
@@ -480,8 +531,11 @@ zabbix_export:
             key: netapp.cluster.get
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: throughput
         -
           uuid: e894ad01c2d74edfb8f954198979070c
           name: 'Cluster throughput, total rate'
@@ -505,8 +559,11 @@ zabbix_export:
             key: netapp.cluster.get
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: throughput
         -
           uuid: c06c118d3fbe48b78db12e43232d6d97
           name: 'Cluster throughput, write rate'
@@ -530,8 +587,11 @@ zabbix_export:
             key: netapp.cluster.get
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: throughput
         -
           uuid: 5029bccf54f542b1a2dc760067ddabe3
           name: 'Cluster status'
@@ -555,8 +615,8 @@ zabbix_export:
             key: netapp.cluster.get
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: cluster
           triggers:
             -
               uuid: c823a2eb325a4153871be705d7c24c72
@@ -564,6 +624,13 @@ zabbix_export:
               name: 'Cluster status is abnormal'
               priority: AVERAGE
               description: 'Any errors associated with the sample. For example, if the aggregation of data over multiple nodes fails then any of the partial errors might be returned, “ok” on success, or “error” on any internal uncategorized failure. Whenever a sample collection is missed but done at a later time, it is back filled to the previous 15 second timestamp and tagged with "backfilled_data". “Inconsistent_ delta_time” is encountered when the time between two collections is not the same for all nodes. Therefore, the aggregated value might be over or under inflated. “Negative_delta” is returned when an expected monotonically increasing value has decreased in value. “Inconsistent_old_data” is returned when one or more nodes do not have the latest data.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: cd56dc70e28f4a3382f2f1b08a4fa584
           name: 'Cluster software version'
@@ -587,8 +654,8 @@ zabbix_export:
             key: netapp.cluster.get
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 4a2936f068ed486f8c8a2cf2cfa7440b
@@ -597,6 +664,10 @@ zabbix_export:
               priority: INFO
               description: '__RESOURCE__ version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: c9bf91e0f23c4961aed8ee5b32ff7767
           name: 'Get disks'
@@ -612,8 +683,8 @@ zabbix_export:
           url: '{$URL}/api/storage/disks?fields=state,node.name'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 54163ca73a8c40188048ef5d89ec4927
           name: 'Get FRUs'
@@ -644,8 +715,8 @@ zabbix_export:
           url: '{$URL}/api/cluster/chassis?fields=id,frus.id,frus.state'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: c9b6ac2405af48c0899d1536662f752b
           name: 'Get LUNs'
@@ -661,8 +732,8 @@ zabbix_export:
           url: '{$URL}/api/storage/luns?fields=name,svm.name,space.size,space.used,status.state,status.container_state'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 5c36efc545ba4dcbb0be84da5e8088cc
           name: 'Get nodes'
@@ -678,8 +749,8 @@ zabbix_export:
           url: '{$URL}/api/cluster/nodes?fields=*'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: c677a3caf7a04710bc67b165b4152808
           name: 'Get ethernet ports'
@@ -695,8 +766,8 @@ zabbix_export:
           url: '{$URL}/api/network/ethernet/ports?fields=name,type,node.name,broadcast_domain.name,enabled,state,mtu,speed'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 2a6abfe87cc548bb81fcb217cde4f805
           name: 'Get FC ports'
@@ -712,8 +783,8 @@ zabbix_export:
           url: '{$URL}/api/network/fc/ports?fields=name,node.name,description,enabled,fabric.switch_port,state'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 7a813b7cb05d497fbf77bf11b01757dd
           name: 'Get SVMs'
@@ -729,8 +800,8 @@ zabbix_export:
           url: '{$URL}/api/svm/svms?fields=name,state,comment'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: fa7fa8daaaa640d494af38614ba12c2e
           name: 'Get volumes'
@@ -746,8 +817,8 @@ zabbix_export:
           url: '{$URL}/api/storage/volumes?fields=name,comment,state,type,svm.name,space.size,space.available,space.used,statistics'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
       discovery_rules:
         -
           uuid: c5265605c1b5440999b7c0dbff8ce328
@@ -782,8 +853,11 @@ zabbix_export:
                 key: netapp.chassis.get
               tags:
                 -
-                  tag: Application
-                  value: 'Chassis "{#ID}"'
+                  tag: chassis
+                  value: '{#ID}'
+                -
+                  tag: component
+                  value: chassis
               trigger_prototypes:
                 -
                   uuid: 381eb797545d452a84d3dba43865bbed
@@ -794,6 +868,10 @@ zabbix_export:
                   priority: AVERAGE
                   description: 'Something is wrong with the chassis.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           timeout: '{$HTTP.AGENT.TIMEOUT}'
           url: '{$URL}/api/cluster/chassis?fields=id'
           preprocessing:
@@ -841,8 +919,14 @@ zabbix_export:
                 key: netapp.disks.get
               tags:
                 -
-                  tag: Application
-                  value: 'Node "{#NODENAME}" disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: disk
+                  value: '{#DISKNAME}'
+                -
+                  tag: node
+                  value: '{#NODENAME}'
               trigger_prototypes:
                 -
                   uuid: 72c1925f51c149eca27c7ddd1c81e44f
@@ -853,6 +937,10 @@ zabbix_export:
                   priority: AVERAGE
                   description: 'Something is wrong with the disk.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           timeout: '{$HTTP.AGENT.TIMEOUT}'
           url: '{$URL}/api/storage/disks?fields=name,node.name'
           preprocessing:
@@ -897,8 +985,14 @@ zabbix_export:
                 key: netapp.frus.get
               tags:
                 -
-                  tag: Application
-                  value: 'Chassis "{#CHASSISID}"'
+                  tag: chassis
+                  value: '{#CHASSISID}'
+                -
+                  tag: component
+                  value: fru
+                -
+                  tag: fru
+                  value: '{#FRUID}'
               trigger_prototypes:
                 -
                   uuid: a17cb2ea98b6415d9e22e7f591d80adb
@@ -909,6 +1003,13 @@ zabbix_export:
                   priority: AVERAGE
                   description: 'Something is wrong with the FRU.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           master_item:
             key: netapp.frus.get
           preprocessing:
@@ -959,8 +1060,14 @@ zabbix_export:
                 key: netapp.luns.get
               tags:
                 -
-                  tag: Application
-                  value: 'SVM "{#SVMNAME}"'
+                  tag: component
+                  value: lun
+                -
+                  tag: lun
+                  value: '{#LUNNAME}'
+                -
+                  tag: svm
+                  value: '{#SVMNAME}'
             -
               uuid: e12b5d04f3264ee2b602d459fb64c6ee
               name: '{#LUNNAME}: Space used'
@@ -983,8 +1090,14 @@ zabbix_export:
                 key: netapp.luns.get
               tags:
                 -
-                  tag: Application
-                  value: 'SVM "{#SVMNAME}"'
+                  tag: component
+                  value: lun
+                -
+                  tag: lun
+                  value: '{#LUNNAME}'
+                -
+                  tag: svm
+                  value: '{#SVMNAME}'
             -
               uuid: 701fdb0345874ea39afc3362faa2f5a4
               name: '{#LUNNAME}: Container state'
@@ -1008,8 +1121,14 @@ zabbix_export:
                 key: netapp.luns.get
               tags:
                 -
-                  tag: Application
-                  value: 'SVM "{#SVMNAME}"'
+                  tag: component
+                  value: lun
+                -
+                  tag: lun
+                  value: '{#LUNNAME}'
+                -
+                  tag: svm
+                  value: '{#SVMNAME}'
               trigger_prototypes:
                 -
                   uuid: 7a4e0a681edd4db6b701b131fea0e5e4
@@ -1020,6 +1139,10 @@ zabbix_export:
                   priority: AVERAGE
                   description: 'LUNs are only available when their containers are available.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: ae15b98b9de2472e8c56ddb2a13d7981
               name: '{#LUNNAME}: State'
@@ -1043,8 +1166,14 @@ zabbix_export:
                 key: netapp.luns.get
               tags:
                 -
-                  tag: Application
-                  value: 'SVM "{#SVMNAME}"'
+                  tag: component
+                  value: lun
+                -
+                  tag: lun
+                  value: '{#LUNNAME}'
+                -
+                  tag: svm
+                  value: '{#SVMNAME}'
               trigger_prototypes:
                 -
                   uuid: 5b065dd69e654bee881ae60464a5c9fe
@@ -1055,6 +1184,10 @@ zabbix_export:
                   priority: AVERAGE
                   description: 'Normal states for a LUN are online and offline. Other states indicate errors.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           timeout: '{$HTTP.AGENT.TIMEOUT}'
           url: '{$URL}/api/storage/luns?fields=name,svm.name,space.size,space.used,status.state,status.container_state'
           preprocessing:
@@ -1102,8 +1235,11 @@ zabbix_export:
                 key: netapp.nodes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Node "{#NODENAME}"'
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODENAME}'
               trigger_prototypes:
                 -
                   uuid: 34092a7ade784221ae50eb74a6fbcb5d
@@ -1112,6 +1248,10 @@ zabbix_export:
                   priority: INFO
                   description: '{#NODENAME} version has changed. Ack to close.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 416e2a3d707d4a5389c90566b588bf7f
               name: '{#NODENAME}: Controller over temperature'
@@ -1135,8 +1275,11 @@ zabbix_export:
                 key: netapp.nodes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Node "{#NODENAME}"'
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODENAME}'
               trigger_prototypes:
                 -
                   uuid: 4dbb3a9da15f45989b8fa4217f3f25c3
@@ -1144,6 +1287,13 @@ zabbix_export:
                   name: '{#NODENAME}: Node has over temperature'
                   priority: AVERAGE
                   description: 'The hardware shuts down if the temperature exceeds critical thresholds(item''s value is "over").'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: f554158202d347388304751c8bdf7515
               name: '{#NODENAME}: Location'
@@ -1167,8 +1317,11 @@ zabbix_export:
                 key: netapp.nodes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Node "{#NODENAME}"'
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODENAME}'
             -
               uuid: be634e1ba1ea454fbc6c7c8224909187
               name: '{#NODENAME}: Membership'
@@ -1196,8 +1349,11 @@ zabbix_export:
                 key: netapp.nodes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Node "{#NODENAME}"'
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODENAME}'
             -
               uuid: 5b3b6fab8fe54f3585c1a270caad2b3e
               name: '{#NODENAME}: State'
@@ -1229,8 +1385,11 @@ zabbix_export:
                 key: netapp.nodes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Node "{#NODENAME}"'
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODENAME}'
               trigger_prototypes:
                 -
                   uuid: db8ff0f2cd294cc5952992a0d476e798
@@ -1245,6 +1404,13 @@ zabbix_export:
                     waiting_for_giveback - Node has been taken over by its HA partner and is waiting for the HA partner to giveback disks.
                     degraded - Node has one or more critical services offline.
                     unknown - Node or its HA partner cannot be contacted and there is no information on the node's state.
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 56e0b6df4dbd456880c2481bec40b41e
               name: '{#NODENAME}: Uptime'
@@ -1263,8 +1429,11 @@ zabbix_export:
                 key: netapp.nodes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Node "{#NODENAME}"'
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODENAME}'
               trigger_prototypes:
                 -
                   uuid: 61357dfdb08846c4935f62ba894b159a
@@ -1273,6 +1442,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           timeout: '{$HTTP.AGENT.TIMEOUT}'
           url: '{$URL}/api/cluster/nodes?fields=name'
           preprocessing:
@@ -1320,8 +1493,14 @@ zabbix_export:
                 key: netapp.ports.eth.get
               tags:
                 -
-                  tag: Application
-                  value: 'Node "{#NODENAME}" Ethernet ports'
+                  tag: component
+                  value: interfaces
+                -
+                  tag: interfaces
+                  value: '{#ETHPORTNAME}'
+                -
+                  tag: node
+                  value: '{#NODENAME}'
               trigger_prototypes:
                 -
                   uuid: 0fa3a54b559349d58b616720ee33cdf5
@@ -1332,6 +1511,10 @@ zabbix_export:
                   priority: AVERAGE
                   description: 'Something is wrong with the ethernet port.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           timeout: '{$HTTP.AGENT.TIMEOUT}'
           url: '{$URL}/api/network/ethernet/ports?fields=name,state,node.name'
           preprocessing:
@@ -1379,8 +1562,14 @@ zabbix_export:
                 key: netapp.ports.fc.get
               tags:
                 -
-                  tag: Application
-                  value: 'Node "{#NODENAME}" FC ports'
+                  tag: component
+                  value: fc-port
+                -
+                  tag: fc-port
+                  value: '{#FCPORTNAME}'
+                -
+                  tag: node
+                  value: '{#NODENAME}'
             -
               uuid: e939576d865041dd8f4af24bb7811117
               name: '{#FCPORTNAME}: State'
@@ -1412,8 +1601,14 @@ zabbix_export:
                 key: netapp.ports.fc.get
               tags:
                 -
-                  tag: Application
-                  value: 'Node "{#NODENAME}" FC ports'
+                  tag: component
+                  value: fc-port
+                -
+                  tag: fc-port
+                  value: '{#FCPORTNAME}'
+                -
+                  tag: node
+                  value: '{#NODENAME}'
               trigger_prototypes:
                 -
                   uuid: a985c047b9834081bf21ae50836cef46
@@ -1424,6 +1619,13 @@ zabbix_export:
                   priority: AVERAGE
                   description: 'Something is wrong with the FC port.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           timeout: '{$HTTP.AGENT.TIMEOUT}'
           url: '{$URL}/api/network/fc/ports?fields=node.name,name,state'
           preprocessing:
@@ -1471,8 +1673,11 @@ zabbix_export:
                 key: netapp.svms.get
               tags:
                 -
-                  tag: Application
-                  value: 'SVM "{#SVMNAME}"'
+                  tag: component
+                  value: svm
+                -
+                  tag: svm
+                  value: '{#SVMNAME}'
             -
               uuid: 6534f78b5b6c4e61b8ee0ab05bcc6fa3
               name: '{#SVMNAME}: State'
@@ -1496,8 +1701,11 @@ zabbix_export:
                 key: netapp.svms.get
               tags:
                 -
-                  tag: Application
-                  value: 'SVM "{#SVMNAME}"'
+                  tag: component
+                  value: svm
+                -
+                  tag: svm
+                  value: '{#SVMNAME}'
               trigger_prototypes:
                 -
                   uuid: 7c5695fd13a4489ca1c9772f1d3376a7
@@ -1508,6 +1716,13 @@ zabbix_export:
                   priority: AVERAGE
                   description: 'Something is wrong with the SVM.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           timeout: '{$HTTP.AGENT.TIMEOUT}'
           url: '{$URL}/api/svm/svms?fields=name'
           preprocessing:
@@ -1555,8 +1770,11 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Volume "{#VOLUMENAME}"'
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: 63c67432c4dd48f3a9b2736b1d8eda60
               name: '{#VOLUMENAME}: Available size'
@@ -1579,8 +1797,11 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Volume "{#VOLUMENAME}"'
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: b17602cccbb84012b6cb8edd8bd80374
               name: '{#VOLUMENAME}: Space size'
@@ -1603,8 +1824,11 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Volume "{#VOLUMENAME}"'
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: 0166239c8d4a4e42ba2f9b3b530143a8
               name: '{#VOLUMENAME}: Used size'
@@ -1627,8 +1851,11 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Volume "{#VOLUMENAME}"'
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: fa2ae9b23fce43a49efa9c66369cce27
               name: '{#VOLUMENAME}: State'
@@ -1652,8 +1879,11 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Volume "{#VOLUMENAME}"'
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
               trigger_prototypes:
                 -
                   uuid: b00f339ed1a9450ba096cabababcf76e
@@ -1664,6 +1894,10 @@ zabbix_export:
                   priority: AVERAGE
                   description: 'A volume can only be brought online if it is offline. Taking a volume offline removes its junction path. The ''mixed'' state applies to FlexGroup volumes only and cannot be specified as a target state. An ''error'' state implies that the volume is not in a state to serve data.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: cb4cfb0ce84f405ebfbf2e4a64c12ca2
               name: '{#VOLUMENAME}: Volume IOPS, other rate'
@@ -1687,8 +1921,14 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Volume "{#VOLUMENAME}"'
+                  tag: component
+                  value: iops
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: ae3142dae1294a16a4cdd0ef153f7cfb
               name: '{#VOLUMENAME}: Volume IOPS, read rate'
@@ -1712,8 +1952,14 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Volume "{#VOLUMENAME}"'
+                  tag: component
+                  value: iops
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: b767b6185c744ddc8061bef36d16581d
               name: '{#VOLUMENAME}: Volume IOPS, total rate'
@@ -1737,8 +1983,14 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Volume "{#VOLUMENAME}"'
+                  tag: component
+                  value: iops
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: ffe8787aeaa2414e82a925ab0dbfb9aa
               name: '{#VOLUMENAME}: Volume IOPS, write rate'
@@ -1762,8 +2014,14 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Volume "{#VOLUMENAME}"'
+                  tag: component
+                  value: iops
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: 64a56ed125f249308d0f525aa0a3e56d
               name: '{#VOLUMENAME}: Volume IOPS raw, other'
@@ -1782,8 +2040,14 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: iops
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: 01ee6910b06e42e294e2c80229cc960e
               name: '{#VOLUMENAME}: Volume IOPS raw, read'
@@ -1802,8 +2066,14 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: iops
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: 5964ea1edbb74fa4a7c04a79ef776ff3
               name: '{#VOLUMENAME}: Volume IOPS raw, total'
@@ -1822,8 +2092,14 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: iops
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: 77329ceefeef490e98f7d23689765c87
               name: '{#VOLUMENAME}: Volume IOPS raw, write'
@@ -1842,8 +2118,14 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: iops
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: fc21c2c1ff87454ea9fc59af4d0d4693
               name: '{#VOLUMENAME}: Volume latency, other'
@@ -1859,8 +2141,14 @@ zabbix_export:
               description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.'
               tags:
                 -
-                  tag: Application
-                  value: 'Volume "{#VOLUMENAME}"'
+                  tag: component
+                  value: latency
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: 3e80e6c55bd0497f87d4f4e71f11f0aa
               name: '{#VOLUMENAME}: Volume latency, read'
@@ -1876,8 +2164,14 @@ zabbix_export:
               description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for read I/O operations.'
               tags:
                 -
-                  tag: Application
-                  value: 'Volume "{#VOLUMENAME}"'
+                  tag: component
+                  value: latency
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: ff804a090b064bfeb60183d7d7d2abe1
               name: '{#VOLUMENAME}: Volume latency, total'
@@ -1893,8 +2187,14 @@ zabbix_export:
               description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric aggregated over all types of I/O operations.'
               tags:
                 -
-                  tag: Application
-                  value: 'Volume "{#VOLUMENAME}"'
+                  tag: component
+                  value: latency
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: eb2b3a3c4807415a8a88d11b19ae7fe6
               name: '{#VOLUMENAME}: Volume latency, write'
@@ -1910,8 +2210,14 @@ zabbix_export:
               description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for write I/O operations.'
               tags:
                 -
-                  tag: Application
-                  value: 'Volume "{#VOLUMENAME}"'
+                  tag: component
+                  value: latency
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: 4fdf1c23cad2453aa00710289fde1460
               name: '{#VOLUMENAME}: Volume latency raw, other'
@@ -1930,8 +2236,14 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: latency
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: 0923b8b2933e4b309a4b751eea06353a
               name: '{#VOLUMENAME}: Volume latency raw, read'
@@ -1950,8 +2262,14 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: latency
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: 48479110a92b4b3094e72882ec9d4812
               name: '{#VOLUMENAME}: Volume latency raw, total'
@@ -1970,8 +2288,14 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: latency
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: a6c653c4a6164de9971b22e7a28c40d9
               name: '{#VOLUMENAME}: Volume latency raw, write'
@@ -1990,8 +2314,14 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: latency
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: f23b393e033a4285b7f5b8742b0be669
               name: '{#VOLUMENAME}: Volume throughput, other rate'
@@ -2015,8 +2345,14 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Volume "{#VOLUMENAME}"'
+                  tag: component
+                  value: throughput
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: fcbef2bcc3004ba6b1f122f00419fc2c
               name: '{#VOLUMENAME}: Volume throughput, read rate'
@@ -2040,8 +2376,14 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Volume "{#VOLUMENAME}"'
+                  tag: component
+                  value: throughput
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: 9218d4e861244353bc779fc2dfd561b9
               name: '{#VOLUMENAME}: Volume throughput, total rate'
@@ -2065,8 +2407,14 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Volume "{#VOLUMENAME}"'
+                  tag: component
+                  value: throughput
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: 9d1cf308b4de4b88a632eee0b5a90267
               name: '{#VOLUMENAME}: Volume throughput, write rate'
@@ -2090,8 +2438,14 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Volume "{#VOLUMENAME}"'
+                  tag: component
+                  value: throughput
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: 1b48c3ecd33f4acd88b57f5c76c2892c
               name: '{#VOLUMENAME}: SVM name'
@@ -2115,8 +2469,11 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Volume "{#VOLUMENAME}"'
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
             -
               uuid: 540405e59a93446cbbe71b05206a50be
               name: '{#VOLUMENAME}: Type'
@@ -2144,8 +2501,11 @@ zabbix_export:
                 key: netapp.volumes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Volume "{#VOLUMENAME}"'
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#VOLUMENAME}'
           graph_prototypes:
             -
               uuid: 5f9bc8697c9c4e22ab55781366fbb9c4
@@ -2203,6 +2563,16 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(result);
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: netapp
+        -
+          tag: target
+          value: netapp-aff-a700
       macros:
         -
           macro: '{$HTTP.AGENT.TIMEOUT}'

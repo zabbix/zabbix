@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 The template to monitor Ceph cluster by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -17,7 +17,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
 1. Setup and configure zabbix-agent2 compiled with the Ceph monitoring plugin.
 2. Set the {$CEPH.CONNSTRING} such as <protocol(host:port)> or named session.
@@ -115,10 +115,10 @@ There are no template links in this template.
 |Ceph |Ceph: [{#POOLNAME}] Pool Write bandwidth |<p>Per-pool write Bytes/second</p> |DEPENDENT |ceph.pool["{#POOLNAME}",wr_bytes.rate]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools["{#POOLNAME}"].wr_bytes`</p><p>- CHANGE_PER_SECOND</p> |
 |Ceph |Ceph: [{#POOLNAME}] Pool Read operations |<p>Per-pool read operations/second</p> |DEPENDENT |ceph.pool["{#POOLNAME}",rd_ops.rate]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools["{#POOLNAME}"].rd_ops`</p><p>- CHANGE_PER_SECOND</p> |
 |Ceph |Ceph: [{#POOLNAME}] Pool Write operations |<p>Per-pool write operations/second</p> |DEPENDENT |ceph.pool["{#POOLNAME}",wr_ops.rate]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools["{#POOLNAME}"].wr_ops`</p><p>- CHANGE_PER_SECOND</p> |
-|Zabbix_raw_items |Ceph: Get overall cluster status | |ZABBIX_PASSIVE |ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"] |
-|Zabbix_raw_items |Ceph: Get OSD stats | |ZABBIX_PASSIVE |ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"] |
-|Zabbix_raw_items |Ceph: Get OSD dump | |ZABBIX_PASSIVE |ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"] |
-|Zabbix_raw_items |Ceph: Get df | |ZABBIX_PASSIVE |ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"] |
+|Zabbix raw items |Ceph: Get overall cluster status | |ZABBIX_PASSIVE |ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"] |
+|Zabbix raw items |Ceph: Get OSD stats | |ZABBIX_PASSIVE |ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"] |
+|Zabbix raw items |Ceph: Get OSD dump | |ZABBIX_PASSIVE |ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"] |
+|Zabbix raw items |Ceph: Get df | |ZABBIX_PASSIVE |ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"] |
 
 ## Triggers
 
@@ -136,5 +136,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410059-discussion-thread-for-official-zabbix-template-ceph).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410059-discussion-thread-for-official-zabbix-template-ceph).
 

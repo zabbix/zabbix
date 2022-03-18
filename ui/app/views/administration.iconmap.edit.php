@@ -27,7 +27,8 @@ $this->includeJsFile('administration.iconmap.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Icon mapping'))
-	->setTitleSubmenu(getAdministrationGeneralSubmenu());
+	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_ICONMAP_EDIT));
 
 $form_list = new CFormList();
 

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T08:55:31Z'
+  date: '2022-01-26T10:00:08Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -23,7 +23,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/393527-discussion-thread-for-official-zabbix-template-haproxy
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -55,14 +55,8 @@ zabbix_export:
           url: '{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv'
           tags:
             -
-              tag: data
+              tag: component
               value: raw
-            -
-              tag: target
-              value: haproxy
-            -
-              tag: transport
-              value: http
         -
           uuid: 6af51d085a2f41f983bc3b20c6f4cc22
           name: 'HAProxy: Get nodes'
@@ -86,14 +80,8 @@ zabbix_export:
             key: haproxy.get
           tags:
             -
-              tag: data
+              tag: component
               value: raw
-            -
-              tag: target
-              value: haproxy
-            -
-              tag: transport
-              value: dependent
         -
           uuid: 123c03c715494faea6b1d4f8b8fa564d
           name: 'HAProxy: Get stats page'
@@ -109,14 +97,8 @@ zabbix_export:
           url: '{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH}'
           tags:
             -
-              tag: data
+              tag: component
               value: raw
-            -
-              tag: target
-              value: haproxy
-            -
-              tag: transport
-              value: http
         -
           uuid: 06a33ebaed3148889c19eba2de859d70
           name: 'HAProxy: Uptime'
@@ -142,17 +124,8 @@ zabbix_export:
             key: haproxy.get_html
           tags:
             -
-              tag: resource
-              value: general
-            -
-              tag: target
-              value: haproxy
-            -
-              tag: transport
-              value: dependent
-            -
-              tag: type
-              value: gauge
+              tag: component
+              value: application
           triggers:
             -
               uuid: ff606f3c571340389562fabc9e814463
@@ -161,6 +134,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: a2cd747feaaf4c278972ac7adbd9015a
           name: 'HAProxy: Version'
@@ -185,17 +162,8 @@ zabbix_export:
             key: haproxy.get_html
           tags:
             -
-              tag: resource
-              value: general
-            -
-              tag: target
-              value: haproxy
-            -
-              tag: transport
-              value: dependent
-            -
-              tag: type
-              value: gauge
+              tag: component
+              value: application
           triggers:
             -
               uuid: c4b8346311a34cd19ebc8fbab53737fe
@@ -204,6 +172,10 @@ zabbix_export:
               priority: INFO
               description: 'HAProxy version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 6f9c22a840764181be9cf98609e7f691
           name: 'HAProxy: Service response time'
@@ -214,17 +186,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: resource
-              value: general
+              tag: component
+              value: health
             -
-              tag: target
-              value: haproxy
-            -
-              tag: transport
-              value: simple
-            -
-              tag: type
-              value: gauge
+              tag: component
+              value: network
           triggers:
             -
               uuid: 1fed5fffc6414e0babe362c0ad742e43
@@ -236,6 +202,10 @@ zabbix_export:
                 -
                   name: 'HAProxy: Service is down'
                   expression: 'last(/HAProxy by HTTP/net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 68cb52357d7443d79373df3890ed175f
           name: 'HAProxy: Service status'
@@ -251,17 +221,11 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: resource
-              value: general
+              tag: component
+              value: health
             -
-              tag: target
-              value: haproxy
-            -
-              tag: transport
-              value: simple
-            -
-              tag: type
-              value: gauge
+              tag: component
+              value: network
           triggers:
             -
               uuid: b346943ac4d04a96bcef42f3c43fc555
@@ -269,6 +233,10 @@ zabbix_export:
               name: 'HAProxy: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 7b4ab1338cdf4e499c1fdea4c886ae9a
@@ -313,17 +281,8 @@ zabbix_export:
                   tag: backend
                   value: '{#PXNAME}'
                 -
-                  tag: resource
-                  value: backend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
+                  tag: component
+                  value: servers
             -
               uuid: 08debce7e9084094b38fd1100e03c553
               name: 'HAProxy Backend {#PXNAME}: Number of backup servers'
@@ -348,17 +307,8 @@ zabbix_export:
                   tag: backend
                   value: '{#PXNAME}'
                 -
-                  tag: resource
-                  value: backend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
+                  tag: component
+                  value: servers
             -
               uuid: 8a53b50c1ce441c18fe6e6d5e0ad48d6
               name: 'HAProxy Backend {#PXNAME}: Incoming traffic'
@@ -389,17 +339,8 @@ zabbix_export:
                   tag: backend
                   value: '{#PXNAME}'
                 -
-                  tag: resource
-                  value: backend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: component
+                  value: network
             -
               uuid: 1c24125e97014d4ba6a8155af5744d38
               name: 'HAProxy Backend {#PXNAME}: Outgoing traffic'
@@ -430,17 +371,8 @@ zabbix_export:
                   tag: backend
                   value: '{#PXNAME}'
                 -
-                  tag: resource
-                  value: backend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: component
+                  value: network
             -
               uuid: 59eeafe66fe34334a81d736f62b88ec0
               name: 'HAProxy Backend {#PXNAME}: Responses denied per second'
@@ -466,17 +398,8 @@ zabbix_export:
                   tag: backend
                   value: '{#PXNAME}'
                 -
-                  tag: resource
-                  value: backend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: component
+                  value: responses
             -
               uuid: e885cb2b53a941cd932211c4ccf334f6
               name: 'HAProxy Backend {#PXNAME}: Errors connection per second'
@@ -502,17 +425,8 @@ zabbix_export:
                   tag: backend
                   value: '{#PXNAME}'
                 -
-                  tag: resource
-                  value: backend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: component
+                  value: connections
             -
               uuid: c42f04d1a00c4d4fa96705746cb32631
               name: 'HAProxy Backend {#PXNAME}: Response errors per second'
@@ -538,17 +452,8 @@ zabbix_export:
                   tag: backend
                   value: '{#PXNAME}'
                 -
-                  tag: resource
-                  value: backend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: component
+                  value: responses
               trigger_prototypes:
                 -
                   uuid: efe5a794bd47419398aa3aa35a177f08
@@ -556,6 +461,10 @@ zabbix_export:
                   name: 'HAProxy backend {#PXNAME}: Number of responses with error is more than {$HAPROXY.BACK_ERESP.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of requests on backend, whose responses yielded an error, is more than {$HAPROXY.BACK_ERESP.MAX.WARN}.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 55edb3b8afaa4ee2961d1fead3653dbd
               name: 'HAProxy Backend {#PXNAME}: Number of responses with codes 1xx per second'
@@ -581,17 +490,8 @@ zabbix_export:
                   tag: backend
                   value: '{#PXNAME}'
                 -
-                  tag: resource
-                  value: backend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: component
+                  value: responses
             -
               uuid: a4e5dd0c25c3471e82e28b88b6b42e39
               name: 'HAProxy Backend {#PXNAME}: Number of responses with codes 2xx per second'
@@ -617,17 +517,8 @@ zabbix_export:
                   tag: backend
                   value: '{#PXNAME}'
                 -
-                  tag: resource
-                  value: backend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: component
+                  value: responses
             -
               uuid: 7e32a61240004b99bf19caf29c5d1409
               name: 'HAProxy Backend {#PXNAME}: Number of responses with codes 3xx per second'
@@ -653,17 +544,8 @@ zabbix_export:
                   tag: backend
                   value: '{#PXNAME}'
                 -
-                  tag: resource
-                  value: backend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: component
+                  value: responses
             -
               uuid: 9519222f512e46d8ae1a7ca3a47f3970
               name: 'HAProxy Backend {#PXNAME}: Number of responses with codes 4xx per second'
@@ -689,17 +571,8 @@ zabbix_export:
                   tag: backend
                   value: '{#PXNAME}'
                 -
-                  tag: resource
-                  value: backend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: component
+                  value: responses
             -
               uuid: fdaa48cf19164fed8c3f00cc42c3bab8
               name: 'HAProxy Backend {#PXNAME}: Number of responses with codes 5xx per second'
@@ -725,17 +598,8 @@ zabbix_export:
                   tag: backend
                   value: '{#PXNAME}'
                 -
-                  tag: resource
-                  value: backend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: component
+                  value: responses
             -
               uuid: 7985131c621d49419dfe5bcfecb675f2
               name: 'HAProxy Backend {#PXNAME}: Unassigned requests'
@@ -756,17 +620,8 @@ zabbix_export:
                   tag: backend
                   value: '{#PXNAME}'
                 -
-                  tag: resource
-                  value: backend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
+                  tag: component
+                  value: requests
               trigger_prototypes:
                 -
                   uuid: be428614e0874726b63d79150813542d
@@ -774,6 +629,10 @@ zabbix_export:
                   name: 'HAProxy backend {#PXNAME}: Current number of requests unassigned in queue is more than {$HAPROXY.BACK_QCUR.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Current number of requests on backend unassigned in queue is more than {$HAPROXY.BACK_QCUR.MAX.WARN}.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 1592ee4ff7b2448a9e044a0ad7904693
               name: 'HAProxy Backend {#PXNAME}: Time in queue'
@@ -800,17 +659,8 @@ zabbix_export:
                   tag: backend
                   value: '{#PXNAME}'
                 -
-                  tag: resource
-                  value: backend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
+                  tag: component
+                  value: requests
               trigger_prototypes:
                 -
                   uuid: fa8211069df846a1b2ee8afcdd52f4a0
@@ -818,6 +668,10 @@ zabbix_export:
                   name: 'HAProxy backend {#PXNAME}: Average time spent in queue is more than {$HAPROXY.BACK_QTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average time spent in queue (in ms) for the last 1,024 requests is more than {$HAPROXY.BACK_QTIME.MAX.WARN}.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 5ddd3cd8af904faaa69f34df442c9717
               name: 'HAProxy Backend {#PXNAME}: Responses time'
@@ -844,17 +698,8 @@ zabbix_export:
                   tag: backend
                   value: '{#PXNAME}'
                 -
-                  tag: resource
-                  value: backend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
+                  tag: component
+                  value: responses
               trigger_prototypes:
                 -
                   uuid: 90c0bd8c280246b7903ac90c32553fd5
@@ -862,6 +707,10 @@ zabbix_export:
                   name: 'HAProxy backend {#PXNAME}: Average response time is more than {$HAPROXY.BACK_RTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average backend response time (in ms) for the last 1,024 requests is more than {$HAPROXY.BACK_RTIME.MAX.WARN}.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 16bb7ee405a84bb4865c46fdf996511f
               name: 'HAProxy Backend {#PXNAME}: Status'
@@ -897,17 +746,8 @@ zabbix_export:
                   tag: backend
                   value: '{#PXNAME}'
                 -
-                  tag: resource
-                  value: backend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: state
+                  tag: component
+                  value: health
               trigger_prototypes:
                 -
                   uuid: 5ea80b42a6be4df48f048a5aa253c923
@@ -916,6 +756,10 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Backend is not available.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 76d9497f428142268a5c1eeb24cbbad7
               name: 'HAProxy Backend {#PXNAME}: Sessions per second'
@@ -941,17 +785,8 @@ zabbix_export:
                   tag: backend
                   value: '{#PXNAME}'
                 -
-                  tag: resource
-                  value: backend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: component
+                  value: sessions
             -
               uuid: f1d26d9c409d4983b7f94ff412ae72f3
               name: 'HAProxy Backend {#PXNAME}: Weight'
@@ -976,17 +811,8 @@ zabbix_export:
                   tag: backend
                   value: '{#PXNAME}'
                 -
-                  tag: resource
-                  value: backend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
+                  tag: component
+                  value: balancer
             -
               uuid: 00d3038c7df34512ae39ba1051712674
               name: 'HAProxy Backend {#PXNAME}: Redispatched requests per second'
@@ -1012,17 +838,8 @@ zabbix_export:
                   tag: backend
                   value: '{#PXNAME}'
                 -
-                  tag: resource
-                  value: backend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: component
+                  value: requests
             -
               uuid: e0eafe2c4d0d40e492822e43f6cf108e
               name: 'HAProxy Backend {#PXNAME}: Retried connections per second'
@@ -1048,17 +865,8 @@ zabbix_export:
                   tag: backend
                   value: '{#PXNAME}'
                 -
-                  tag: resource
-                  value: backend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: component
+                  value: connections
           graph_prototypes:
             -
               uuid: 47e7dc2c8ff2424eb81f396f83dbb2c0
@@ -1201,20 +1009,11 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
+                  tag: component
+                  value: network
+                -
                   tag: frontend
                   value: '{#PXNAME}'
-                -
-                  tag: resource
-                  value: frontend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
             -
               uuid: 5550e3842d00486999c822b0d514b78e
               name: 'HAProxy Frontend {#PXNAME}: Outgoing traffic'
@@ -1242,20 +1041,11 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
+                  tag: component
+                  value: network
+                -
                   tag: frontend
                   value: '{#PXNAME}'
-                -
-                  tag: resource
-                  value: frontend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
             -
               uuid: 819b1559cf294958ab03cae8663eb7e3
               name: 'HAProxy Frontend {#PXNAME}: Denied requests per second'
@@ -1278,20 +1068,11 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
+                  tag: component
+                  value: requests
+                -
                   tag: frontend
                   value: '{#PXNAME}'
-                -
-                  tag: resource
-                  value: frontend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
               trigger_prototypes:
                 -
                   uuid: 4d8ac22673944752979263b34521af65
@@ -1299,6 +1080,10 @@ zabbix_export:
                   name: 'HAProxy frontend {#PXNAME}: Number of requests denied is more than {$HAPROXY.FRONT_DREQ.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of requests denied due to security concerns (ACL-restricted) is more than {$HAPROXY.FRONT_DREQ.MAX.WARN}.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 0b2a1b9e1c9045519e4ac52d5d83e86b
               name: 'HAProxy Frontend {#PXNAME}: Request errors per second'
@@ -1321,20 +1106,11 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
+                  tag: component
+                  value: requests
+                -
                   tag: frontend
                   value: '{#PXNAME}'
-                -
-                  tag: resource
-                  value: frontend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
               trigger_prototypes:
                 -
                   uuid: c51ac95f4d4a46e1ac1df1d057197f6e
@@ -1342,6 +1118,10 @@ zabbix_export:
                   name: 'HAProxy frontend {#PXNAME}: Number of request errors is more than {$HAPROXY.FRONT_EREQ.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of request errors is more than {$HAPROXY.FRONT_EREQ.MAX.WARN}.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: c287463b994c40caaaeb195a4dca5d37
               name: 'HAProxy Frontend {#PXNAME}: Number of responses with codes 1xx per second'
@@ -1364,20 +1144,11 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
+                  tag: component
+                  value: responses
+                -
                   tag: frontend
                   value: '{#PXNAME}'
-                -
-                  tag: resource
-                  value: frontend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
             -
               uuid: 41cd2084595d482ea204f9edc62a985a
               name: 'HAProxy Frontend {#PXNAME}: Number of responses with codes 2xx per second'
@@ -1400,20 +1171,11 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
+                  tag: component
+                  value: responses
+                -
                   tag: frontend
                   value: '{#PXNAME}'
-                -
-                  tag: resource
-                  value: frontend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
             -
               uuid: f1ae1b8f477449c9832e80bfd145211a
               name: 'HAProxy Frontend {#PXNAME}: Number of responses with codes 3xx per second'
@@ -1436,20 +1198,11 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
+                  tag: component
+                  value: responses
+                -
                   tag: frontend
                   value: '{#PXNAME}'
-                -
-                  tag: resource
-                  value: frontend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
             -
               uuid: f1635a2f379b4542b9c44c9d5224fc4d
               name: 'HAProxy Frontend {#PXNAME}: Number of responses with codes 4xx per second'
@@ -1472,20 +1225,11 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
+                  tag: component
+                  value: responses
+                -
                   tag: frontend
                   value: '{#PXNAME}'
-                -
-                  tag: resource
-                  value: frontend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
             -
               uuid: cf9ae6b634fd4acc92c180bc10c9b0f5
               name: 'HAProxy Frontend {#PXNAME}: Number of responses with codes 5xx per second'
@@ -1508,20 +1252,11 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
+                  tag: component
+                  value: responses
+                -
                   tag: frontend
                   value: '{#PXNAME}'
-                -
-                  tag: resource
-                  value: frontend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
             -
               uuid: 6c09de61332c4d56a4b90ee4e9ab6fe2
               name: 'HAProxy Frontend {#PXNAME}: Sessions rate'
@@ -1539,20 +1274,11 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
+                  tag: component
+                  value: sessions
+                -
                   tag: frontend
                   value: '{#PXNAME}'
-                -
-                  tag: resource
-                  value: frontend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
             -
               uuid: 7097695ee69e4b7895c0d885606b8456
               name: 'HAProxy Frontend {#PXNAME}: Requests rate'
@@ -1570,20 +1296,11 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
+                  tag: component
+                  value: requests
+                -
                   tag: frontend
                   value: '{#PXNAME}'
-                -
-                  tag: resource
-                  value: frontend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
             -
               uuid: 7985345dcd274811ac6a2e69940f6cb7
               name: 'HAProxy Frontend {#PXNAME}: Established sessions'
@@ -1601,20 +1318,11 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
+                  tag: component
+                  value: sessions
+                -
                   tag: frontend
                   value: '{#PXNAME}'
-                -
-                  tag: resource
-                  value: frontend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
             -
               uuid: 8b185b2272244229865315cc0139d43f
               name: 'HAProxy Frontend {#PXNAME}: Session limits'
@@ -1636,20 +1344,11 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
+                  tag: component
+                  value: sessions
+                -
                   tag: frontend
                   value: '{#PXNAME}'
-                -
-                  tag: resource
-                  value: frontend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
             -
               uuid: 6e7372afcd6842c0865a1480973fc8e5
               name: 'HAProxy Frontend {#PXNAME}: Status'
@@ -1675,20 +1374,11 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
+                  tag: component
+                  value: health
+                -
                   tag: frontend
                   value: '{#PXNAME}'
-                -
-                  tag: resource
-                  value: frontend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: state
             -
               uuid: 53efa6139fe3400283c96ec76eb20855
               name: 'HAProxy Frontend {#PXNAME}: Session utilization'
@@ -1701,27 +1391,22 @@ zabbix_export:
               description: 'Percentage of sessions used (scur / slim * 100).'
               tags:
                 -
+                  tag: component
+                  value: sessions
+                -
                   tag: frontend
                   value: '{#PXNAME}'
-                -
-                  tag: resource
-                  value: frontend
-                -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: calculated
-                -
-                  tag: type
-                  value: gauge
               trigger_prototypes:
                 -
                   uuid: ad33db7c356342e78ee19e904c981f1f
                   expression: 'min(/HAProxy by HTTP/haproxy.frontend.sutil[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.FRONT_SUTIL.MAX.WARN}'
                   name: 'HAProxy frontend {#PXNAME}: Session utilization is more than {$HAPROXY.FRONT_SUTIL.MAX.WARN}% for 5m'
                   priority: WARNING
-                  description: 'Alerting on this metric is essential to ensure your server has sufficient capacity to handle all concurrent sessions. Unlike requests, upon reaching the session limit HAProxy will deny additional clients until resource consumption drops. Furthermore, if you find your session usage percentage to be hovering above 80%, it could be time to either modify HAProxy’s configuration to allow more sessions, or migrate your HAProxy server to a bigger box.'
+                  description: 'Alerting on this metric is essential to ensure your server has sufficient capacity to handle all concurrent sessions. Unlike requests, upon reaching the session limit HAProxy will deny additional clients until resource consumption drops. Furthermore, if you find your session usage percentage to be hovering above 80%, it could be time to either modify HAProxy''s configuration to allow more sessions, or migrate your HAProxy server to a bigger box.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 29c858f57e5447758c9bb39008ba7aa9
@@ -1876,20 +1561,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: role
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
+                  tag: service
+                  value: '{#SVNAME}'
             -
               uuid: 49b7da6cc75c4bb7ad2c3b7c25beccb5
               name: 'HAProxy {#PXNAME} {#SVNAME}: Server is backup'
@@ -1913,20 +1592,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: role
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
+                  tag: service
+                  value: '{#SVNAME}'
             -
               uuid: 355525dba53747c899f19fe4114a3ca4
               name: 'HAProxy {#PXNAME} {#SVNAME}: Incoming traffic'
@@ -1954,20 +1627,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: network
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: service
+                  value: '{#SVNAME}'
             -
               uuid: 0d721252dd3946818f87815a56ced8d0
               name: 'HAProxy {#PXNAME} {#SVNAME}: Outgoing traffic'
@@ -1995,20 +1662,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: network
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: service
+                  value: '{#SVNAME}'
             -
               uuid: 6fe4502c3b534ee6b9a39a3fcc8d0b98
               name: 'HAProxy {#PXNAME} {#SVNAME}: Status of last health check'
@@ -2048,20 +1709,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: health
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: state
+                  tag: service
+                  value: '{#SVNAME}'
               trigger_prototypes:
                 -
                   uuid: 6c4f8cf76ab046aaa4bd51e41cc10de7
@@ -2074,6 +1729,10 @@ zabbix_export:
                     -
                       name: 'HAProxy {#PXNAME} {#SVNAME}: Server is DOWN'
                       expression: 'count(/HAProxy by HTTP/haproxy.server.status[{#PXNAME},{#SVNAME}],#5,"eq","DOWN")=5'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 6e5824eca488428eb61a17d1d4efd055
               name: 'HAProxy {#PXNAME} {#SVNAME}: Responses denied per second'
@@ -2096,20 +1755,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: responses
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: service
+                  value: '{#SVNAME}'
             -
               uuid: 18533da75eb142dbb216acc7af3bde4b
               name: 'HAProxy {#PXNAME} {#SVNAME}: Errors connection per second'
@@ -2132,20 +1785,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: connections
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: service
+                  value: '{#SVNAME}'
             -
               uuid: 3412ca47e4fe4481b434f95dda566c5e
               name: 'HAProxy {#PXNAME} {#SVNAME}: Response errors per second'
@@ -2168,20 +1815,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: responses
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: service
+                  value: '{#SVNAME}'
               trigger_prototypes:
                 -
                   uuid: bf952df23dac4b059d0219b204449830
@@ -2189,6 +1830,10 @@ zabbix_export:
                   name: 'HAProxy {#PXNAME} {#SVNAME}: Number of responses with error is more than {$HAPROXY.SERVER_ERESP.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of requests on server, whose responses yielded an error, is more than {$HAPROXY.SERVER_ERESP.MAX.WARN}.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: b0a39c6bdf7b4db0a27fce9c0e08aecb
               name: 'HAProxy {#PXNAME} {#SVNAME}: Number of responses with codes 1xx per second'
@@ -2211,20 +1856,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: responses
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: service
+                  value: '{#SVNAME}'
             -
               uuid: 786330b63708432c963725c83fa1791e
               name: 'HAProxy {#PXNAME} {#SVNAME}: Number of responses with codes 2xx per second'
@@ -2247,20 +1886,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: responses
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: service
+                  value: '{#SVNAME}'
             -
               uuid: 1a96152c277d4018acced2f9d9ffd6cd
               name: 'HAProxy {#PXNAME} {#SVNAME}: Number of responses with codes 3xx per second'
@@ -2283,20 +1916,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: responses
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: service
+                  value: '{#SVNAME}'
             -
               uuid: 66076fc3a6fc401cb1423fb015dfe187
               name: 'HAProxy {#PXNAME} {#SVNAME}: Number of responses with codes 4xx per second'
@@ -2319,20 +1946,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: responses
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: service
+                  value: '{#SVNAME}'
             -
               uuid: 631d2471fc7346a5b0ce8379a400f13e
               name: 'HAProxy {#PXNAME} {#SVNAME}: Number of responses with codes 5xx per second'
@@ -2355,20 +1976,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: responses
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: service
+                  value: '{#SVNAME}'
             -
               uuid: ff7d8b0633ce4e119ad2f8976ce0ea18
               name: 'HAProxy {#PXNAME} {#SVNAME}: Server was selected per second'
@@ -2391,20 +2006,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: connections
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: service
+                  value: '{#SVNAME}'
             -
               uuid: 0bc4c4f25d00423b9dc188c9dbe34db0
               name: 'HAProxy {#PXNAME} {#SVNAME}: Unassigned requests'
@@ -2422,20 +2031,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: requests
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
+                  tag: service
+                  value: '{#SVNAME}'
               trigger_prototypes:
                 -
                   uuid: 24e803eab76244d38ff90f2fce396b7f
@@ -2443,6 +2046,10 @@ zabbix_export:
                   name: 'HAProxy {#PXNAME} {#SVNAME}: Current number of requests unassigned in queue is more than {$HAPROXY.SERVER_QCUR.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Current number of requests unassigned in queue is more than {$HAPROXY.SERVER_QCUR.MAX.WARN}.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: d2d92c67b546498d929b1e38b7a48561
               name: 'HAProxy {#PXNAME} {#SVNAME}: Configured maxqueue'
@@ -2470,20 +2077,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: queues
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
+                  tag: service
+                  value: '{#SVNAME}'
             -
               uuid: aa3b73b8d06a463f84b10621461c1577
               name: 'HAProxy {#PXNAME} {#SVNAME}: Time in queue'
@@ -2507,20 +2108,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: requests
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
+                  tag: service
+                  value: '{#SVNAME}'
               trigger_prototypes:
                 -
                   uuid: f6d92dc0d2334ca4a7a4c0c81f60c44c
@@ -2528,6 +2123,10 @@ zabbix_export:
                   name: 'HAProxy {#PXNAME} {#SVNAME}: Average time spent in queue is more than {$HAPROXY.SERVER_QTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average time spent in queue (in ms) for the last 1,024 requests is more than {$HAPROXY.SERVER_QTIME.MAX.WARN}.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: f790d237b494452a9b77b4f002a7ca46
               name: 'HAProxy {#PXNAME} {#SVNAME}: Responses time'
@@ -2551,20 +2150,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: health
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
+                  tag: service
+                  value: '{#SVNAME}'
               trigger_prototypes:
                 -
                   uuid: 5a0444417ebf47cab0218e8407f04354
@@ -2572,6 +2165,10 @@ zabbix_export:
                   name: 'HAProxy {#PXNAME} {#SVNAME}: Average response time is more than {$HAPROXY.SERVER_RTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average server response time (in ms) for the last 1,024 requests is more than {$HAPROXY.SERVER_RTIME.MAX.WARN}.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 80ceac1d54e94e50988bf205318392a8
               name: 'HAProxy {#PXNAME} {#SVNAME}: Status'
@@ -2596,20 +2193,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: health
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: state
+                  tag: service
+                  value: '{#SVNAME}'
               trigger_prototypes:
                 -
                   uuid: ccf6dbe8970f4f9f9223027e676aa57e
@@ -2618,6 +2209,10 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Server is not available.'
+                  tags:
+                    -
+                      tag: scope
+                      value: avialability
             -
               uuid: 10cfb75db0ef4a9fb33670480303522b
               name: 'HAProxy {#PXNAME} {#SVNAME}: Sessions per second'
@@ -2640,20 +2235,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: sessions
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: service
+                  value: '{#SVNAME}'
             -
               uuid: b8b0e8b0c3904335aa391f0727aac871
               name: 'HAProxy {#PXNAME} {#SVNAME}: Weight'
@@ -2675,20 +2264,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: balancer
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
+                  tag: service
+                  value: '{#SVNAME}'
             -
               uuid: d7419ca33427455688a08ecff8ad6fb0
               name: 'HAProxy {#PXNAME} {#SVNAME}: Redispatched requests per second'
@@ -2711,20 +2294,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: requests
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: service
+                  value: '{#SVNAME}'
             -
               uuid: 96cfadc919d8457ebb7519e11ac93d79
               name: 'HAProxy {#PXNAME} {#SVNAME}: Retried connections per second'
@@ -2747,20 +2324,14 @@ zabbix_export:
                 key: haproxy.get
               tags:
                 -
-                  tag: resource
-                  value: server
+                  tag: component
+                  value: connections
                 -
                   tag: server
-                  value: '{#PXNAME} {#SVNAME}'
+                  value: '{#PXNAME}'
                 -
-                  tag: target
-                  value: haproxy
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: rate
+                  tag: service
+                  value: '{#SVNAME}'
           graph_prototypes:
             -
               uuid: b7170d909b78413daa7057320d4280d8
@@ -2857,6 +2428,13 @@ zabbix_export:
                   value: 'Number of responses with codes'
                   status: ENABLED
                   discover: NO_DISCOVER
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: haproxy
       macros:
         -
           macro: '{$HAPROXY.BACK_ERESP.MAX.WARN}'

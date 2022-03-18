@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 
 This template was tested on:
 
@@ -11,7 +11,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
 
 ### Setup Squid
 Enable SNMP support following [official documentation](https://wiki.squid-cache.org/Features/Snmp).
@@ -23,11 +23,11 @@ snmp_access allow <zbx_acl_name> <zabbix_server_ip>
 ```
 
 ### Setup Zabbix
-1\. [Import](https://www.zabbix.com/documentation/6.0/manual/xml_export_import/templates) the template [template_app_squid_snmp.yaml](template_app_squid_snmp.yaml) into Zabbix.
+1\. [Import](https://www.zabbix.com/documentation/6.2/manual/xml_export_import/templates) the template [template_app_squid_snmp.yaml](template_app_squid_snmp.yaml) into Zabbix.
 
 2\. Set values for {$SQUID.SNMP.COMMUNITY}, {$SQUID.SNMP.PORT} and {$SQUID.HTTP.PORT} as configured in squid.conf.
 
-3\. [Link](https://www.zabbix.com/documentation/6.0/manual/config/templates/linking) the imported template to a host with Squid.
+3\. [Link](https://www.zabbix.com/documentation/6.2/manual/config/templates/linking) the imported template to a host with Squid.
 
 4\. Add SNMPv2 interface to Squid host. Set **Port** as {$SQUID.SNMP.PORT} and **SNMP community** as {$SQUID.SNMP.COMMUNITY}.
 
@@ -103,7 +103,7 @@ There are no template links in this template.
 |Squid |Squid: HTTP all service time per hour |<p>HTTP all service time per hour</p> |SNMP |squid[cacheHttpAllSvcTime.60]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
 |Squid |Squid: HTTP miss service time per 5 minutes |<p>HTTP miss service time per 5 minutes</p> |SNMP |squid[cacheHttpMissSvcTime.5]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
 |Squid |Squid: HTTP miss service time per hour |<p>HTTP miss service time per hour</p> |SNMP |squid[cacheHttpMissSvcTime.60]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
-|Squid |Squid: HTTP miss service time per 5 minutes |<p>HTTP hit service time per 5 minutes</p> |SNMP |squid[cacheHttpHitSvcTime.5]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
+|Squid |Squid: HTTP hit service time per 5 minutes |<p>HTTP hit service time per 5 minutes</p> |SNMP |squid[cacheHttpHitSvcTime.5]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
 |Squid |Squid: HTTP hit service time per hour |<p>HTTP hit service time per hour</p> |SNMP |squid[cacheHttpHitSvcTime.60]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
 |Squid |Squid: ICP query service time per 5 minutes |<p>ICP query service time per 5 minutes</p> |SNMP |squid[cacheIcpQuerySvcTime.5]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
 |Squid |Squid: ICP query service time per hour |<p>ICP query service time per hour</p> |SNMP |squid[cacheIcpQuerySvcTime.60]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
@@ -128,5 +128,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/409339-discussion-thread-for-official-zabbix-template-squid).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/409339-discussion-thread-for-official-zabbix-template-squid).
 

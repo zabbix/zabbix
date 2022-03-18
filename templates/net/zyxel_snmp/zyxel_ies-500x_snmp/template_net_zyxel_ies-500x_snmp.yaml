@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-17T06:34:10Z'
+  date: '2022-01-26T19:42:10Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -27,7 +27,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Network devices'
@@ -47,8 +47,8 @@ zabbix_export:
                 - 1h
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: network
           triggers:
             -
               uuid: 73967d1d3d01458c8e947a1aacb838b0
@@ -57,6 +57,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 5bc150cfc9b147e68b5d15a750546a3f
           name: 'ZYXEL IES-500x: Contact'
@@ -80,8 +84,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: cd669772d4454a359f1c372dce4a01de
           name: 'ZYXEL IES-500x: Location'
@@ -104,8 +108,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 591148b198854413aed834874bf8f137
           name: 'ZYXEL IES-500x: MAC address'
@@ -131,8 +135,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: aa26dcc1d8c54feaaa70d42c6ff4d1c7
           name: 'ZYXEL IES-500x: Hardware model name'
@@ -159,8 +163,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
           triggers:
             -
               uuid: d4b378535f5c4299af1295029e94f9d1
@@ -168,6 +172,10 @@ zabbix_export:
               name: 'ZYXEL IES-500x: Template does not match hardware'
               priority: INFO
               description: 'This template is for Zyxel IES-500x, but connected to {ITEM.VALUE}'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: ee9da829778e4da69fde78f72b5b0783
           name: 'ZYXEL IES-500x: Host name'
@@ -191,8 +199,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 28df2d29a94d429d811dd40ceb510fcf
           name: 'ZYXEL IES-500x: Uptime'
@@ -215,8 +223,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: d618295a763f42cd9063fad5cd600c34
@@ -225,6 +233,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
       discovery_rules:
         -
           uuid: 2ddba614e41f4014abef703418439e2a
@@ -253,8 +265,8 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: b02248180f314948bdbb68e8b940cb99
@@ -262,6 +274,10 @@ zabbix_export:
                   name: 'ZYXEL IES-500x: High Packet buffer utilization in Slot {#ZYXEL.SLOT.ID} (>{#ZYXEL.BUFFERHIGHTHRESH}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free buffer.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 83573a387ef24596bf7e4171506a9ea5
@@ -314,8 +330,8 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: cpu
               trigger_prototypes:
                 -
                   uuid: e2e689642a884509a5254e946deaf69f
@@ -324,6 +340,10 @@ zabbix_export:
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: c9a9a54478ba46bbb91b4945c977a823
@@ -374,8 +394,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
+                -
+                  tag: component
+                  value: sensor
               trigger_prototypes:
                 -
                   uuid: 9e249839db314f05a7a3cd16172ae9a7
@@ -384,6 +407,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: 79f318a961b5418e888de36f8ffe17e7
@@ -421,8 +448,8 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: c3099861742f4303af838a0bf3921fac
@@ -430,6 +457,10 @@ zabbix_export:
                   name: 'ZYXEL IES-500x: High memory utilization in Slot {#ZYXEL.SLOT.ID} pool (>{#ZYXEL.MEMORYHIGHTHRESH}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 0b72c4f49d434e0c9a7de3a6617511ea
@@ -507,8 +538,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 3a97021a210442c3bdc461060fbe700b
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: ATUC attenuation'
@@ -534,8 +571,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 375982ea68ec4800aa27a50a89fd79d5
@@ -543,6 +586,10 @@ zabbix_export:
                   name: 'ZYXEL IES-500x: High the DSL line attenuation in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
                   priority: WARNING
                   description: 'The reductions in amplitude of the downstream and upstream DSL signals.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: 62f3eb71d01946a68d799aa6ed1d29a3
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: ATUC output power'
@@ -567,8 +614,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 540251c3a4024e4289194130853be305
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: ATUC noise margin'
@@ -594,8 +647,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 8d2f57548d4e47f2981a4fd79d065246
@@ -603,6 +662,10 @@ zabbix_export:
                   name: 'ZYXEL IES-500x: Low the DSL line noise margins in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
                   priority: WARNING
                   description: 'Signal-to-noise margin (SNR Margin) which is the difference between the actual SNR and the SNR required to sync at a specific speed'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: a664c452a98d4478b4663aa7cca9c19c
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: ATUR attenuation'
@@ -628,8 +691,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 1dec7ed135a348b1a1cebb3b4319d77f
@@ -637,6 +706,10 @@ zabbix_export:
                   name: 'ZYXEL IES-500x: High the DSL line attenuation in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
                   priority: WARNING
                   description: 'The reductions in amplitude of the downstream and upstream DSL signals.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: 91a4b40293d54fe8bc8894303055cba3
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: ATUR output power'
@@ -661,8 +734,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 691ffcf882c54ebe8d0dfa305d8497e0
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: ATUR noise margin'
@@ -688,8 +767,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 7f8f4a2bff14464fbe2f956be87ad56d
@@ -697,6 +782,10 @@ zabbix_export:
                   name: 'ZYXEL IES-500x: Low the DSL line noise margins in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
                   priority: WARNING
                   description: 'Signal-to-noise margin (SNR Margin) which is the difference between the actual SNR and the SNR required to sync at a specific speed'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: c00cf2ee74c0476f9118594d04e6640d
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Interface description'
@@ -716,8 +805,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 3df0ee0298c2445f81e1aca8ee748a50
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Incoming broadcast packages'
@@ -738,8 +833,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 05799441c906425d8f584ead3e9b909b
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Incoming multicast packages'
@@ -761,8 +862,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: fff4c400f6774b9ba5e47fbeb214e5ec
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Incoming traffic'
@@ -786,8 +893,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 4ffe4823f03b4c738b305f03ae4f1d55
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Incoming unicast packages'
@@ -808,8 +921,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 514910a945e34befa0ecc22ea0b89783
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Interface name'
@@ -829,8 +948,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 216ad17a0c3348d7a250697f768a6481
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Operational status'
@@ -852,8 +977,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 8afcc973a7e94a0782a057205cc1b8ed
@@ -870,6 +1001,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 7eec054602cb4f988999d80b29f25a32
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Outgoing broadcast packages'
@@ -891,8 +1026,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 420fa08f36bf487cb0af6dc64f335e7b
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Outgoing multicast packages'
@@ -915,8 +1056,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 70a1342e17634500ac9c896c66177de6
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Outgoing traffic'
@@ -941,8 +1088,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 5c2f168d421e4b81a3d62e415ec8218a
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Outgoing unicast packages'
@@ -964,8 +1117,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
           graph_prototypes:
             -
               uuid: a98704946d534a06909de85a05d75224
@@ -1106,8 +1265,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 7bd13f8dd37c417dbbc92abbcbefbdde
               name: 'ZYXEL IES-500x: Port {#SNMPINDEX}: Interface description'
@@ -1127,8 +1292,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 7ab66a4640ee4852ad0e587eb1076f9d
               name: 'ZYXEL IES-500x: Port {#SNMPINDEX}: Link speed'
@@ -1151,8 +1322,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 0b1508bec31642c381b4bab5b1c394fb
               name: 'ZYXEL IES-500x: Port {#SNMPINDEX}: Incoming broadcast packages'
@@ -1173,8 +1350,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 5a77fb99febd45feaadbb4f1c6f58ead
               name: 'ZYXEL IES-500x: Port {#SNMPINDEX}: Incoming multicast packages'
@@ -1196,8 +1379,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: a4375745658546598b786c43bafb629f
               name: 'ZYXEL IES-500x: Port {#SNMPINDEX}: Incoming traffic'
@@ -1221,8 +1410,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: eb00c7f533b24a06b3b9b926dc8aff2d
               name: 'ZYXEL IES-500x: Port {#SNMPINDEX}: Incoming unicast packages'
@@ -1243,8 +1438,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: c90cfe865d7a4fdd89970e086b04a9a7
               name: 'ZYXEL IES-500x: Port {#SNMPINDEX}: Incoming utilization'
@@ -1268,8 +1469,14 @@ zabbix_export:
                     - 'return +parseFloat(value).toFixed(0);'
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: bbbd8624e0e24db8b062625a2de1785b
               name: 'ZYXEL IES-500x: Port {#SNMPINDEX}: Interface name'
@@ -1289,8 +1496,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: d3e519c9648c4c58a7e55a9c90d8a3c0
               name: 'ZYXEL IES-500x: Port {#SNMPINDEX}: Operational status'
@@ -1312,8 +1525,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 71a10836f3094184bba728a0cf4d005a
@@ -1330,6 +1549,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 7816c8845baa498a96cc6d0a4049357c
               name: 'ZYXEL IES-500x: Port {#SNMPINDEX}: Outgoing broadcast packages'
@@ -1351,8 +1574,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: bbd80eaceee848019cfef5e20f0c356a
               name: 'ZYXEL IES-500x: Port {#SNMPINDEX}: Outgoing multicast packages'
@@ -1375,8 +1604,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: c9f694268c334213a39c09dbadcdd067
               name: 'ZYXEL IES-500x: Port {#SNMPINDEX}: Outgoing traffic'
@@ -1401,8 +1636,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: f929a7e5d0b741c4b557715fbc5a7e1f
               name: 'ZYXEL IES-500x: Port {#SNMPINDEX}: Outgoing unicast packages'
@@ -1424,8 +1665,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 74beae2dcc424702a906aa736e9f9d0f
               name: 'ZYXEL IES-500x: Port {#SNMPINDEX}: Outgoing utilization'
@@ -1449,8 +1696,14 @@ zabbix_export:
                     - 'return +parseFloat(value).toFixed(0);'
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
           graph_prototypes:
             -
               uuid: cb09087451b3472ab5d04f18c829acc9
@@ -1627,8 +1880,11 @@ zabbix_export:
                       return outArray.join();
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
               trigger_prototypes:
                 -
                   uuid: d2dd1a23dbbb467e90ab99ff59a817a2
@@ -1636,6 +1892,10 @@ zabbix_export:
                   name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID} alarm'
                   priority: AVERAGE
                   description: 'The slot reported an error.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: a58ef41b02d94d16abe294bc26fc0874
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID}: DSL modem code version'
@@ -1656,8 +1916,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: firmware
+                -
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
               trigger_prototypes:
                 -
                   uuid: 1b163693dc87407db836021da67bdccc
@@ -1667,6 +1933,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Firmware version has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: bf65cd99df724b64a4cad64c0681ab27
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID}: Description'
@@ -1686,8 +1956,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
             -
               uuid: 081fb5758fb6412890a54630d737f239
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID}: Driver version'
@@ -1708,8 +1981,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: firmware
+                -
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
               trigger_prototypes:
                 -
                   uuid: 44f7087bcb524593a419887c199fb613
@@ -1719,6 +1998,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Firmware version has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 6b3a925397094b00aa31efee03a226fa
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID}: Firmware version'
@@ -1739,8 +2022,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: firmware
+                -
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
               trigger_prototypes:
                 -
                   uuid: 6de6e5adadf04a79813ed7778b454043
@@ -1750,6 +2039,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Firmware version has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: c16e15224326406ba5f4c58a1c2e3b2c
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID}: Hardware version'
@@ -1770,8 +2063,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: firmware
+                -
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
               trigger_prototypes:
                 -
                   uuid: 42969016e9c846a8954ebf95d2ff0ffc
@@ -1781,6 +2080,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Firmware version has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: eed64c81e4b54ccd9d7f0e5b86ede083
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID}: MAC address 1'
@@ -1800,8 +2103,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
             -
               uuid: d0fdd2a7dcb348b58dd3bea0357f84b3
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID}: MAC address 2'
@@ -1821,8 +2127,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
             -
               uuid: 6f9532e9368344ad8f7d35273e14c358
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID}: Serial number'
@@ -1842,8 +2151,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
               trigger_prototypes:
                 -
                   uuid: 0994c0ab8b004dc280d1a036e7043cc0
@@ -1852,6 +2164,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Slot {#ZYXEL.SLOT.ID} serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 7b8791b7c91e4c14aa56a29617a6fa81
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID}: Status'
@@ -1871,8 +2187,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
             -
               uuid: 9387847247134f3296e077713407686e
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID}: Type'
@@ -1892,8 +2211,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
             -
               uuid: be141094a1ee4b2391bf8684ddca86e6
               name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID}: Uptime'
@@ -1907,8 +2229,11 @@ zabbix_export:
                 The time (in seconds) since the plug-in card was last re-initialized.
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
               trigger_prototypes:
                 -
                   uuid: 6717069c115147b095321f2c4c5ec51b
@@ -1917,6 +2242,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
         -
           uuid: c2d924fbfe3b44a58454e6a4392aa6a8
           name: 'Temperature discovery'
@@ -1944,8 +2273,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: c4993b2d52e04808862ac0d043b0e982
@@ -1954,6 +2286,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the temperature'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: 3b8799c609344e749de0da409b666714
@@ -2009,8 +2345,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: voltage
               trigger_prototypes:
                 -
                   uuid: 55bc511ff2094a86b10c542e896d10e2
@@ -2019,6 +2358,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: bf0cfa212f934287b8dd3e405f8d1de3
@@ -2045,6 +2388,22 @@ zabbix_export:
                       outArr.push(item)
                   });
                   return JSON.stringify(outArr);
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: dslam
+        -
+          tag: target
+          value: ies-5000
+        -
+          tag: target
+          value: ies-5005
+        -
+          tag: target
+          value: zyxel
       macros:
         -
           macro: '{$SNMP.TIMEOUT}'

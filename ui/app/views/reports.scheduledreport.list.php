@@ -29,6 +29,7 @@ if ($data['uncheck']) {
 
 $widget = (new CWidget())
 	->setTitle(_('Scheduled reports'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORTS_SCHEDULEDREPORT_LIST))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())->addItem(

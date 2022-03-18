@@ -17,11 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "comms.h"
+
+#include "common.h"
+#include "base64.h"
 #include "log.h"
 #include "../zbxcrypto/tls_tcp.h"
 #include "zbxcompress.h"
+#include "zbxxml.h"
 
 #ifdef _WINDOWS
 #	ifndef _WIN32_WINNT_WIN7
@@ -469,6 +472,9 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	struct addrinfo	*ai_bind = NULL;
 	char		service[8], *error = NULL;
 	void		(*func_socket_close)(zbx_socket_t *s);
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	const char	*server_name = NULL;
+#endif
 
 	zbx_socket_clean(s);
 
@@ -550,8 +556,13 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (NULL != ip && SUCCEED != is_ip(ip))
+	{
+		server_name = ip;
+	}
+
 	if ((ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect) &&
-			SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, &error))
+			SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, server_name, &error))
 	{
 		zbx_tcp_close(s);
 		zbx_set_socket_strerror("TCP successful, cannot establish TLS to [[%s]:%hu]: %s", ip, port, error);
@@ -582,6 +593,9 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	struct addrinfo	hints, *ai;
 	char		*error = NULL;
 	void		(*func_socket_close)(zbx_socket_t *s);
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	const char	*server_name = NULL;
+#endif
 
 	if (SOCK_DGRAM == type && (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect))
 	{
@@ -673,8 +687,14 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (NULL != ip && SUCCEED != is_ip(ip))
+	{
+		server_name = ip;
+	}
+
+
 	if ((ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect) &&
-			SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, &error))
+			SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, server_name, &error))
 	{
 		zbx_tcp_close(s);
 		zbx_set_socket_strerror("TCP successful, cannot establish TLS to [[%s]:%hu]: %s", ip, port, error);
@@ -2389,4 +2409,96 @@ void	zbx_udp_close(zbx_socket_t *s)
 
 	zbx_socket_free(s);
 	zbx_socket_close(s->socket);
+}
+
+/* TODO: move remaining comms functions from libzbxcommon */
+int	zbx_comms_parse_response(char *xml, char *host, size_t host_len, char *key, size_t key_len,
+		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
+		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
+		char *severity, size_t severity_len)
+{
+	int	i, ret = SUCCEED;
+	char	*data_b64 = NULL;
+
+	assert(NULL != host && 0 != host_len);
+	assert(NULL != key && 0 != key_len);
+	assert(NULL != data && 0 != data_len);
+	assert(NULL != lastlogsize && 0 != lastlogsize_len);
+	assert(NULL != timestamp && 0 != timestamp_len);
+	assert(NULL != source && 0 != source_len);
+	assert(NULL != severity && 0 != severity_len);
+
+	if (SUCCEED == zbx_xml_get_data_dyn(xml, "host", &data_b64))
+	{
+		str_base64_decode(data_b64, host, (int)host_len - 1, &i);
+		host[i] = '\0';
+		zbx_xml_free_data_dyn(&data_b64);
+	}
+	else
+	{
+		*host = '\0';
+		ret = FAIL;
+	}
+
+	if (SUCCEED == zbx_xml_get_data_dyn(xml, "key", &data_b64))
+	{
+		str_base64_decode(data_b64, key, (int)key_len - 1, &i);
+		key[i] = '\0';
+		zbx_xml_free_data_dyn(&data_b64);
+	}
+	else
+	{
+		*key = '\0';
+		ret = FAIL;
+	}
+
+	if (SUCCEED == zbx_xml_get_data_dyn(xml, "data", &data_b64))
+	{
+		str_base64_decode(data_b64, data, (int)data_len - 1, &i);
+		data[i] = '\0';
+		zbx_xml_free_data_dyn(&data_b64);
+	}
+	else
+	{
+		*data = '\0';
+		ret = FAIL;
+	}
+
+	if (SUCCEED == zbx_xml_get_data_dyn(xml, "lastlogsize", &data_b64))
+	{
+		str_base64_decode(data_b64, lastlogsize, (int)lastlogsize_len - 1, &i);
+		lastlogsize[i] = '\0';
+		zbx_xml_free_data_dyn(&data_b64);
+	}
+	else
+		*lastlogsize = '\0';
+
+	if (SUCCEED == zbx_xml_get_data_dyn(xml, "timestamp", &data_b64))
+	{
+		str_base64_decode(data_b64, timestamp, (int)timestamp_len - 1, &i);
+		timestamp[i] = '\0';
+		zbx_xml_free_data_dyn(&data_b64);
+	}
+	else
+		*timestamp = '\0';
+
+	if (SUCCEED == zbx_xml_get_data_dyn(xml, "source", &data_b64))
+	{
+		str_base64_decode(data_b64, source, (int)source_len - 1, &i);
+		source[i] = '\0';
+		zbx_xml_free_data_dyn(&data_b64);
+	}
+	else
+		*source = '\0';
+
+	if (SUCCEED == zbx_xml_get_data_dyn(xml, "severity", &data_b64))
+	{
+		str_base64_decode(data_b64, severity, (int)severity_len - 1, &i);
+		severity[i] = '\0';
+		zbx_xml_free_data_dyn(&data_b64);
+	}
+	else
+		*severity = '\0';
+
+	return ret;
 }

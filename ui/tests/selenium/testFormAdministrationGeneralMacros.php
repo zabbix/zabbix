@@ -18,17 +18,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/traits/MacrosTrait.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/common/testFormMacros.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup globalmacro
  */
-class testFormAdministrationGeneralMacros extends CLegacyWebTest {
+class testFormAdministrationGeneralMacros extends testFormMacros {
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -64,6 +64,15 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 
 	private $sqlHashGlobalMacros = '';
 	private $oldHashGlobalMacros = '';
+
+	public $macro_resolve = '{$Z_GLOBAL_MACRO_2_RESOLVE}';
+	public $macro_resolve_hostid = 99134;
+
+	public $vault_object = 'macros';
+	public $vault_error_field = '/1/value';
+
+	public $update_vault_macro = '{$1_VAULT_MACRO_CHANGED}';
+	public $vault_macro_index = 1;
 
 	private function openGlobalMacros() {
 		$this->zbxTestLogin('zabbix.php?action=macros.edit');
@@ -828,168 +837,13 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 		$this->assertEquals($old_values, CDBHelper::getRow($sql));
 	}
 
-	public function testFormAdministrationGeneralMacros_ResolveSecretMacro() {
-		$item_url = 'zabbix.php?show_details=1&show_without_data=1&action=latest.view&hostids%5B%5D=99134';
-		$macro = [
-			'macro' => '{$Z_GLOBAL_MACRO_2_RESOLVE}',
-			'value' => 'Value 2 B resolved'
-		];
-
-		// Open the list of "Available host" host items and check macro resolution in item name.
-		$this->page->login()->open($item_url)->waitUntilReady();
-//		Caused by https://support.zabbix.com/browse/ZBXNEXT-7115
-//		Support of user macros in item names has been dropped.
-		$this->assertTrue($this->query('xpath://span[text()='.CXPATHHelper::escapeQuotes('trap['.$macro['value'].']').']')->exists());
-
-		// Change macro type.
-		$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();
-		$value_field = $this->getValueField($macro['macro']);
-		$value_field->changeInputType(CInputGroupElement::TYPE_SECRET);
-		$this->query('button:Update')->one()->click();
-
-		// Open list of items and check that macro value is hidden.
-		$this->page->open($item_url)->waitUntilReady();
-//		Caused by https://support.zabbix.com/browse/ZBXNEXT-7115
-//		Support of user macros in item names has been dropped.
-		$this->assertTrue($this->query('xpath://span[text()="trap[******]"]')->exists());
-	}
-
-	public function getCreateVaultMacrosData() {
-		return [
-			[
-				[
-					'expected' => TEST_GOOD,
-					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO}',
-						'value' => [
-							'text' => 'secret/path:key',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description'
-					],
-					'title' => 'Macros updated'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO2}',
-						'value' => [
-							'text' => 'one/two/three/four/five/six:key',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description7'
-					],
-					'title' => 'Macros updated'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO3}',
-						'value' => [
-							'text' => 'secret/path:',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description2'
-					],
-					'title' => 'Cannot update macros',
-					'message' => 'Invalid parameter "/1/value": incorrect syntax near "path:".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO4}',
-						'value' => [
-							'text' => '/path:key',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description3'
-					],
-					'title' => 'Cannot update macros',
-					'message' => 'Invalid parameter "/1/value": incorrect syntax near "/path:key".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO5}',
-						'value' => [
-							'text' => 'path:key',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description4'
-					],
-					'title' => 'Cannot update macros',
-					'message' => 'Invalid parameter "/1/value": incorrect syntax near "path:key".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO6}',
-						'value' => [
-							'text' => ':key',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description5'
-					],
-					'title' => 'Cannot update macros',
-					'message' => 'Invalid parameter "/1/value": incorrect syntax near ":key".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO7}',
-						'value' => [
-							'text' => 'secret/path',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description6'
-					],
-					'title' => 'Cannot update macros',
-					'message' => 'Invalid parameter "/1/value": incorrect syntax near "path".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO8}',
-						'value' => [
-							'text' => '/secret/path:key',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description8'
-					],
-					'title' => 'Cannot update macros',
-					'message' => 'Invalid parameter "/1/value": incorrect syntax near "/secret/path:key".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO9}',
-						'value' => [
-							'text' => '',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description9'
-					],
-					'title' => 'Cannot update macros',
-					'message' => 'Invalid parameter "/1/value": cannot be empty.'
-				]
-			]
-		];
+	/**
+	 * 	Test opens the list of items of "Available host" and "Latest data" and checks macro resolution in item fields.
+	 *
+	 * @dataProvider getResolveSecretMacroData
+	 */
+	public function testFormAdministrationGeneralMacros_ResolveSecretMacro($data) {
+		$this->resolveSecretMacro($data);
 	}
 
 	/**
@@ -1010,44 +864,6 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 			$value_field = $this->getValueField($data['macro_fields']['macro']);
 			$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
 		}
-	}
-
-	public function getUpdateVaultMacrosData() {
-		return [
-			[
-				[
-					'action' => USER_ACTION_UPDATE,
-					'index' => 1,
-					'macro' => '{$1_VAULT_MACRO_CHANGED}',
-					'value' => [
-						'text' => 'secret/path:key'
-					],
-					'description' => ''
-				]
-			],
-			[
-				[
-					'action' => USER_ACTION_UPDATE,
-					'index' => 1,
-					'macro' => '{$1_VAULT_MACRO_CHANGED}',
-					'value' => [
-						'text' => 'new/path/to/secret:key'
-					],
-					'description' => ''
-				]
-			],
-			[
-				[
-					'action' => USER_ACTION_UPDATE,
-					'index' => 1,
-					'macro' => '{$1_VAULT_MACRO_CHANGED}',
-					'value' => [
-						'text' => 'new/path/to/secret:key'
-					],
-					'description' => 'Changing description'
-				]
-			]
-		];
 	}
 
 	public function prepareUpdateData() {

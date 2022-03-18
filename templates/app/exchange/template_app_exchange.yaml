@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T06:56:58Z'
+  date: '2022-01-27T08:51:04Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -18,7 +18,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/415007-discussion-thread-for-official-zabbix-template-microsoft-exchange
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -37,8 +37,8 @@ zabbix_export:
                 - 3h
           tags:
             -
-              tag: Application
-              value: 'MS Exchange'
+              tag: component
+              value: application
         -
           uuid: 9b59700d8db8472fbde41c85c7a06ffc
           name: 'MS Exchange [Client Access Server]: ActiveSync: ping command pending'
@@ -49,8 +49,8 @@ zabbix_export:
           description: 'Shows the number of ping commands currently pending in the queue.'
           tags:
             -
-              tag: Application
-              value: 'MS Exchange'
+              tag: component
+              value: application
         -
           uuid: fa70b4e2d17c44c6945dd2d1c971c34c
           name: 'MS Exchange [Client Access Server]: ActiveSync: requests per second'
@@ -61,8 +61,8 @@ zabbix_export:
           description: 'Shows the number of HTTP requests received from the client via ASP.NET per second. Determines the current Exchange ActiveSync request rate. Used only to determine current user load.'
           tags:
             -
-              tag: Application
-              value: 'MS Exchange'
+              tag: component
+              value: application
         -
           uuid: 8528015c73134a239d7ac235464788dd
           name: 'MS Exchange [Client Access Server]: ActiveSync: sync commands per second'
@@ -73,8 +73,8 @@ zabbix_export:
           description: 'Shows the number of sync commands processed per second. Clients use this command to synchronize items within a folder.'
           tags:
             -
-              tag: Application
-              value: 'MS Exchange'
+              tag: component
+              value: application
         -
           uuid: 456cb7af0b224a59afabae36d24d2cbc
           name: 'MS Exchange [Client Access Server]: Autodiscover: requests per second'
@@ -85,8 +85,8 @@ zabbix_export:
           description: 'Shows the number of Autodiscover service requests processed each second. Determines current user load.'
           tags:
             -
-              tag: Application
-              value: 'MS Exchange'
+              tag: component
+              value: application
         -
           uuid: b9a539175cbb4259b064a787a25e9dbe
           name: 'MS Exchange [Client Access Server]: Availability Service: availability requests per second'
@@ -97,8 +97,8 @@ zabbix_export:
           description: 'Shows the number of requests serviced per second. The request can be only for free/ busy information or include suggestions. One request may contain multiple mailboxes. Determines the rate at which Availability service requests are occurring.'
           tags:
             -
-              tag: Application
-              value: 'MS Exchange'
+              tag: component
+              value: application
         -
           uuid: 3c2a83dfef35497baf8c38b801854882
           name: 'MS Exchange [Client Access Server]: Outlook Web App: current unique users'
@@ -109,8 +109,8 @@ zabbix_export:
           description: 'Shows the number of unique users currently logged on to Outlook Web App. This value monitors the number of unique active user sessions, so that users are only removed from this counter after they log off or their session times out. Determines current user load.'
           tags:
             -
-              tag: Application
-              value: 'MS Exchange'
+              tag: component
+              value: application
         -
           uuid: 2c7fd331673e4d84aa09551222469b08
           name: 'MS Exchange [Client Access Server]: Outlook Web App: requests per second'
@@ -121,8 +121,8 @@ zabbix_export:
           description: 'Shows the number of requests handled by Outlook Web App per second. Determines current user load.'
           tags:
             -
-              tag: Application
-              value: 'MS Exchange'
+              tag: component
+              value: application
         -
           uuid: 9808449df53148a9a988a69d66944371
           name: 'MS Exchange [Client Access Server]: MSExchangeWS: requests per second'
@@ -133,8 +133,8 @@ zabbix_export:
           description: 'Shows the number of requests processed each second. Determines current user load.'
           tags:
             -
-              tag: Application
-              value: 'MS Exchange'
+              tag: component
+              value: application
       discovery_rules:
         -
           uuid: f3d6e34eaff844bfab582cb55d679e82
@@ -160,8 +160,11 @@ zabbix_export:
                     - 3h
               tags:
                 -
-                  tag: Application
-                  value: 'Database {#INSTANCE}'
+                  tag: component
+                  value: database
+                -
+                  tag: database
+                  value: '{#INSTANCE}'
             -
               uuid: 9ad0743878ed411ab1e76b8e774e91e9
               name: 'Information Store [{#INSTANCE}]: Page faults per second'
@@ -172,8 +175,11 @@ zabbix_export:
               description: 'Indicates the rate of page faults that can''t be serviced because there are no pages available for allocation from the database cache. If this counter is above 0, it''s an indication that the MSExchange Database\I/O Database Writes (Attached) Average Latency is too high.'
               tags:
                 -
-                  tag: Application
-                  value: 'Database {#INSTANCE}'
+                  tag: component
+                  value: database
+                -
+                  tag: database
+                  value: '{#INSTANCE}'
               trigger_prototypes:
                 -
                   uuid: 07e0dce4546b4d15bfbb34fa2044c319
@@ -181,6 +187,10 @@ zabbix_export:
                   name: 'Information Store [{#INSTANCE}]: Page faults is too high (>{$MS.EXCHANGE.DB.FAULTS.WARN} for {$MS.EXCHANGE.DB.FAULTS.TIME})'
                   priority: AVERAGE
                   description: 'Too much page faults stalls for database "{#INSTANCE}". This counter should be 0 on production servers.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 1af9e0b4abb74e07af1d0d183333f0c4
               name: 'Information Store [{#INSTANCE}]: Log records stalled'
@@ -191,8 +201,11 @@ zabbix_export:
               description: 'Indicates the number of log records that can''t be added to the log buffers per second because the log buffers are full. The average value should be below 10 per second. Spikes (maximum values) shouldn''t be higher than 100 per second.'
               tags:
                 -
-                  tag: Application
-                  value: 'Database {#INSTANCE}'
+                  tag: component
+                  value: database
+                -
+                  tag: database
+                  value: '{#INSTANCE}'
               trigger_prototypes:
                 -
                   uuid: 688cbee95ef2432abc03c81d39049a44
@@ -200,6 +213,10 @@ zabbix_export:
                   name: 'Information Store [{#INSTANCE}]: Log records stalls is too high (>{$MS.EXCHANGE.LOG.STALLS.WARN} for {$MS.EXCHANGE.LOG.STALLS.TIME})'
                   priority: AVERAGE
                   description: 'Stalled log records too high. The average value should be less than 10 threads waiting.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 1b53de26c73a49bdb7fe55328db03ddd
               name: 'Information Store [{#INSTANCE}]: Log threads waiting'
@@ -210,8 +227,11 @@ zabbix_export:
               description: 'Indicates the number of threads waiting to complete an update of the database by writing their data to the log.'
               tags:
                 -
-                  tag: Application
-                  value: 'Database {#INSTANCE}'
+                  tag: component
+                  value: database
+                -
+                  tag: database
+                  value: '{#INSTANCE}'
             -
               uuid: 1da31e52e5dd4b72bea5811a9bb06a01
               name: 'Database Counters [{#INSTANCE}]: Active database read operations per second'
@@ -222,8 +242,11 @@ zabbix_export:
               description: 'Shows the number of database read operations.'
               tags:
                 -
-                  tag: Application
-                  value: 'Database {#INSTANCE}'
+                  tag: component
+                  value: database
+                -
+                  tag: database
+                  value: '{#INSTANCE}'
             -
               uuid: 0bc5750ca13f4f738904e45f9860b76a
               name: 'Database Counters [{#INSTANCE}]: Active database read operations latency'
@@ -240,8 +263,11 @@ zabbix_export:
                     - '0.001'
               tags:
                 -
-                  tag: Application
-                  value: 'Database {#INSTANCE}'
+                  tag: component
+                  value: database
+                -
+                  tag: database
+                  value: '{#INSTANCE}'
               trigger_prototypes:
                 -
                   uuid: 053583bbe81d4ce0961ee365cee5a802
@@ -249,6 +275,10 @@ zabbix_export:
                   name: 'Database Counters [{#INSTANCE}]: Average read time latency is too high (>{$MS.EXCHANGE.DB.ACTIVE.READ.WARN}s for {$MS.EXCHANGE.DB.ACTIVE.READ.TIME})'
                   priority: WARNING
                   description: 'Should be less than 20ms on average.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 3095c843659341fd854fb297a9fdf14a
               name: 'Database Counters [{#INSTANCE}]: Passive database read operations latency'
@@ -265,8 +295,11 @@ zabbix_export:
                     - '0.001'
               tags:
                 -
-                  tag: Application
-                  value: 'Database {#INSTANCE}'
+                  tag: component
+                  value: database
+                -
+                  tag: database
+                  value: '{#INSTANCE}'
               trigger_prototypes:
                 -
                   uuid: 4a07a86df67b4aa08e538d4463c2d3df
@@ -274,6 +307,10 @@ zabbix_export:
                   name: 'Database Counters [{#INSTANCE}]: Average read time latency is too high (>{$MS.EXCHANGE.DB.PASSIVE.READ.WARN}s for {$MS.EXCHANGE.DB.PASSIVE.READ.TIME})'
                   priority: WARNING
                   description: 'Should be less than 200ms on average.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 7456bcbbac114ead9c417bcbeefa0e1c
               name: 'Database Counters [{#INSTANCE}]: Active database write operations per second'
@@ -284,8 +321,11 @@ zabbix_export:
               description: 'Shows the number of database write operations per second for each attached database instance.'
               tags:
                 -
-                  tag: Application
-                  value: 'Database {#INSTANCE}'
+                  tag: component
+                  value: database
+                -
+                  tag: database
+                  value: '{#INSTANCE}'
             -
               uuid: e45413cc0e46458f9a00132b30c7c354
               name: 'Database Counters [{#INSTANCE}]: Active database write operations latency'
@@ -302,8 +342,11 @@ zabbix_export:
                     - '0.001'
               tags:
                 -
-                  tag: Application
-                  value: 'Database {#INSTANCE}'
+                  tag: component
+                  value: database
+                -
+                  tag: database
+                  value: '{#INSTANCE}'
               trigger_prototypes:
                 -
                   uuid: 87cc1ca8b39541e89eb02a1c094892c0
@@ -311,6 +354,10 @@ zabbix_export:
                   name: 'Database Counters [{#INSTANCE}]: Average write time latency is too high for {$MS.EXCHANGE.DB.ACTIVE.WRITE.TIME}'
                   priority: WARNING
                   description: 'Should be less than 50ms on average.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 5b7fc1949b67404584d2809556f3d595
               name: 'Database Counters [{#INSTANCE}]: Passive database write operations latency'
@@ -327,8 +374,11 @@ zabbix_export:
                     - '0.001'
               tags:
                 -
-                  tag: Application
-                  value: 'Database {#INSTANCE}'
+                  tag: component
+                  value: database
+                -
+                  tag: database
+                  value: '{#INSTANCE}'
             -
               uuid: 6128c55bf63a4c48981dfccd077b4635
               name: 'Information Store [{#INSTANCE}]: Active mailboxes count'
@@ -339,8 +389,11 @@ zabbix_export:
               description: 'Number of active mailboxes in this database.'
               tags:
                 -
-                  tag: Application
-                  value: 'Database {#INSTANCE}'
+                  tag: component
+                  value: database
+                -
+                  tag: database
+                  value: '{#INSTANCE}'
             -
               uuid: 4db79306eb044db899be5e7672651959
               name: 'Information Store [{#INSTANCE}]: Database state'
@@ -362,8 +415,11 @@ zabbix_export:
                     - 3m
               tags:
                 -
-                  tag: Application
-                  value: 'Database {#INSTANCE}'
+                  tag: component
+                  value: database
+                -
+                  tag: database
+                  value: '{#INSTANCE}'
             -
               uuid: 6bc9bc6d20df4de89ff03d63f21f6eab
               name: 'Information Store [{#INSTANCE}]: RPC requests latency'
@@ -380,8 +436,11 @@ zabbix_export:
                     - '0.001'
               tags:
                 -
-                  tag: Application
-                  value: 'Database {#INSTANCE}'
+                  tag: component
+                  value: database
+                -
+                  tag: database
+                  value: '{#INSTANCE}'
               trigger_prototypes:
                 -
                   uuid: b9b2f224082a4ec687d121534402170c
@@ -389,6 +448,10 @@ zabbix_export:
                   name: 'Information Store [{#INSTANCE}]: RPC Requests latency is too high (>{$MS.EXCHANGE.RPC.WARN}s for {$MS.EXCHANGE.RPC.TIME})'
                   priority: WARNING
                   description: 'Should be less than 50ms at all times, with spikes less than 100ms.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 5321c367d288406d8d9eac217a444e9c
               name: 'Information Store [{#INSTANCE}]: RPC requests per second'
@@ -399,8 +462,11 @@ zabbix_export:
               description: 'Shows the number of RPC operations per second for each database instance.'
               tags:
                 -
-                  tag: Application
-                  value: 'Database {#INSTANCE}'
+                  tag: component
+                  value: database
+                -
+                  tag: database
+                  value: '{#INSTANCE}'
             -
               uuid: 701d6a4fcfe14f899e0282eb75e08753
               name: 'Information Store [{#INSTANCE}]: RPC requests total'
@@ -411,8 +477,11 @@ zabbix_export:
               description: 'Indicates the overall RPC requests currently executing within the information store process. Should be below 70 at all times.'
               tags:
                 -
-                  tag: Application
-                  value: 'Database {#INSTANCE}'
+                  tag: component
+                  value: database
+                -
+                  tag: database
+                  value: '{#INSTANCE}'
               trigger_prototypes:
                 -
                   uuid: 6349d2b6cd13413187b8c77e10fa96a2
@@ -420,6 +489,10 @@ zabbix_export:
                   name: 'Information Store [{#INSTANCE}]: RPC Requests total count is too high (>{$MS.EXCHANGE.RPC.COUNT.WARN} for {$MS.EXCHANGE.RPC.COUNT.TIME})'
                   priority: WARNING
                   description: 'Should be below 70 at all times.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           trigger_prototypes:
             -
               uuid: 2eb26276a3a24ce4af517ff8740f4566
@@ -427,6 +500,10 @@ zabbix_export:
               name: 'Database Counters [{#INSTANCE}]: Average write time latency is higher than read time latency for {$MS.EXCHANGE.DB.PASSIVE.WRITE.TIME}'
               priority: WARNING
               description: 'Should be less than the read latency for the same instance, as measured by the MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Recovery) Average Latency counter.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: d3de0d2651bf49bc856c3354437cea70
@@ -509,8 +586,11 @@ zabbix_export:
                     - '0.001'
               tags:
                 -
-                  tag: Application
-                  value: 'MS Exchange'
+                  tag: component
+                  value: ldap
+                -
+                  tag: ldap
+                  value: '{#INSTANCE}'
               trigger_prototypes:
                 -
                   uuid: 799366198fd04746bf265431c00269ab
@@ -518,6 +598,10 @@ zabbix_export:
                   name: 'Domain Controller [{#INSTANCE}]: LDAP read time is too high (>{$MS.EXCHANGE.LDAP.WARN}s for {$MS.EXCHANGE.LDAP.TIME})'
                   priority: AVERAGE
                   description: 'Should be less than 50ms at all times, with spikes less than 100ms.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: c7326e542e534afd9a1df9a8ec1226e4
               name: 'Domain Controller [{#INSTANCE}]: Search time'
@@ -534,8 +618,11 @@ zabbix_export:
                     - '0.001'
               tags:
                 -
-                  tag: Application
-                  value: 'MS Exchange'
+                  tag: component
+                  value: ldap
+                -
+                  tag: ldap
+                  value: '{#INSTANCE}'
               trigger_prototypes:
                 -
                   uuid: 0db1b4e3f149481e8b04fe8b5eafa508
@@ -543,6 +630,10 @@ zabbix_export:
                   name: 'Domain Controller [{#INSTANCE}]: LDAP search time is too high (>{$MS.EXCHANGE.LDAP.WARN}s for {$MS.EXCHANGE.LDAP.TIME})'
                   priority: AVERAGE
                   description: 'Should be less than 50ms at all times, with spikes less than 100ms.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 68caa8f72b21476f8f18695843c14328
@@ -576,8 +667,18 @@ zabbix_export:
               description: 'Shows the current number of connections established to the each Web Service.'
               tags:
                 -
-                  tag: Application
-                  value: 'MS Exchange'
+                  tag: component
+                  value: web
+                -
+                  tag: web
+                  value: '{#INSTANCE}'
+      tags:
+        -
+          tag: class
+          value: application
+        -
+          tag: target
+          value: ms-exchange
       macros:
         -
           macro: '{$MS.EXCHANGE.DB.ACTIVE.READ.TIME}'

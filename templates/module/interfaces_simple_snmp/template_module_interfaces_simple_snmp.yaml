@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-16T08:28:20Z'
+  date: '2022-03-01T09:45:10Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -20,7 +20,7 @@ zabbix_export:
         
           Description: 32bit counters are used in this template (since there is no ifXtable available). If busy interfaces return incorrect bits sent/received - set update interval to 1m or less.
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Modules
@@ -104,8 +104,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFDESCR}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: f97ed0e4b7b3473a988f27a60e5d79ef
               name: 'Interface {#IFDESCR}: Inbound packets with errors'
@@ -124,8 +130,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFDESCR}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 3a971825c99e476aa2c18b1a792ec19d
               name: 'Interface {#IFDESCR}: Bits received'
@@ -137,7 +149,7 @@ zabbix_export:
               units: bps
               description: |
                 MIB: IF-MIB
-                The total number of octets received on the interface,including framing characters. Discontinuities in the value of this counter can occurat re-initialization of the management system, and atother times as indicated by the value of ifCounterDiscontinuityTime.
+                The total number of octets received on the interface,including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and atother times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -149,8 +161,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFDESCR}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 2395b3a694474b9894e64f759dbe805e
               name: 'Interface {#IFDESCR}: Outbound packets discarded'
@@ -173,8 +191,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFDESCR}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: f6872ed88b464c37800738fd5e492896
               name: 'Interface {#IFDESCR}: Outbound packets with errors'
@@ -193,8 +217,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFDESCR}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 2a7b5b7e48444c8c8cf38f89a1a1091e
               name: 'Interface {#IFDESCR}: Bits sent'
@@ -206,7 +236,7 @@ zabbix_export:
               units: bps
               description: |
                 MIB: IF-MIB
-                The total number of octets transmitted out of the interface, including framing characters. Discontinuities in the value of this counter can occurat re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                The total number of octets transmitted out of the interface, including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -218,8 +248,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFDESCR}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: b93b4164db1c4c838ecfd5c2b261acfb
               name: 'Interface {#IFDESCR}: Speed'
@@ -236,12 +272,18 @@ zabbix_export:
                 For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made,
                 this object should contain the nominal bandwidth.
                 If the bandwidth of the interface is greater than the maximum value reportable by this object then
-                this object should report its maximum value (4,294,967,295) and ifHighSpeed must be used to report the interace's speed.
+                this object should report its maximum value (4,294,967,295) and ifHighSpeed must be used to report the interface's speed.
                 For a sub-layer which has no concept of bandwidth, this object should be zero.
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFDESCR}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 43d9d7883a1b4f6dbe4e118ef12d731e
               name: 'Interface {#IFDESCR}: Operational status'
@@ -263,8 +305,14 @@ zabbix_export:
                 name: 'IF-MIB::ifOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFDESCR}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 94097ac2b53748aea45fed2f3014c1b6
@@ -282,6 +330,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 9470d6a01c4e4ea2a007582ac1c0ce64
               name: 'Interface {#IFDESCR}: Interface type'
@@ -294,7 +346,7 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 The type of interface.
-                Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),
+                Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),
                 through updating the syntax of the IANAifType textual convention.
               valuemap:
                 name: 'IF-MIB::ifType'
@@ -305,8 +357,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFDESCR}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: 13c523ffdf154e6fb1ab7628e3a2010a
@@ -336,6 +394,10 @@ zabbix_export:
                   name: 'Interface {#IFDESCR}: Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 7594011ba1964285abd0f232ffeb22e3
               expression: |
@@ -356,6 +418,10 @@ zabbix_export:
                   name: 'Interface {#IFDESCR}: Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 2eb4baaf86a2405b9a1a232241eee72b
               expression: |
@@ -375,6 +441,10 @@ zabbix_export:
                   name: 'Interface {#IFDESCR}: Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 80ae528968304d06a676f69c4e321c07

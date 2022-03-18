@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:48:45Z'
+  date: '2022-03-01T10:10:01Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -52,8 +52,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 2a6711992f354095b056b628be78022c
@@ -61,6 +64,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 11297d0102734139aa4fa81eefad9839
           name: 'ICMP loss'
@@ -71,8 +78,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 8e66ba0787b54af2897dd348e5453f10
@@ -84,6 +94,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Ubiquiti AirOS SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: d8416e68bab94a568b8fbc67927ae739
           name: 'ICMP response time'
@@ -94,8 +111,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 4ae253aa403a42ad8cd4721e2ffdfbca
@@ -110,6 +130,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Ubiquiti AirOS SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 11edabc72e4a4d69a0dc9c36458fbfbc
           name: 'SNMP traps (fallback)'
@@ -122,8 +149,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: 362b533375e544d9804eba534e5f4935
           name: 'System contact details'
@@ -145,8 +172,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 1aaf7d729983431cb28351e7ba0c8235
           name: 'CPU utilization'
@@ -161,8 +188,8 @@ zabbix_export:
             5 minute load average of processor load.
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: 0a779320c2ba4494b8c55aef969e7c9d
@@ -171,6 +198,10 @@ zabbix_export:
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: a05d416bcdde44929f091c4cde2e6537
           name: 'System description'
@@ -193,8 +224,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 9e8ab4b180f24b64bcddfc1606d616d0
           name: 'Firmware version'
@@ -215,8 +246,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: ab4a91cf3c2a4305a59727558c00a1f8
@@ -226,6 +257,10 @@ zabbix_export:
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: e770de183b1e4ffc9348750520719b41
           name: 'Hardware model name'
@@ -247,8 +282,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: eabbdf5343fb42bfa3e5f13bc51ad66d
           name: 'System location'
@@ -270,8 +305,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 5994fe565b1d437f8e9f1d0d8ec83104
           name: 'System name'
@@ -293,8 +328,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 15523bce03a24cd6a4818ab655d1d2ad
@@ -303,6 +338,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: 2fbfe02459724f089b5bcd31ff6245d9
           name: 'System object ID'
@@ -323,8 +365,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: de270e3ac6874ca59a236a040d82c099
           name: Uptime
@@ -345,8 +387,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 2d9ed5a3b714461bbcdc4c530f955e5b
@@ -359,6 +401,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/Ubiquiti AirOS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 6393f8a84fd4417abdccd8bd867aac7e
           name: 'Memory (buffers)'
@@ -377,8 +423,8 @@ zabbix_export:
                 - '1024'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 224c8d32f0d649b3b94b77e960934f15
           name: 'Memory (cached)'
@@ -397,8 +443,8 @@ zabbix_export:
                 - '1024'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 401b95eff89743cba6942606ac051b01
           name: 'Free memory'
@@ -415,8 +461,8 @@ zabbix_export:
                 - '1024'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: eefa6d2e8560407f82bbb8783bb399ad
           name: 'Total memory'
@@ -435,8 +481,8 @@ zabbix_export:
                 - '1024'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 29df9ffb192d4434a88ac6a413b9569d
           name: 'Memory utilization'
@@ -449,8 +495,8 @@ zabbix_export:
           description: 'Memory utilization in %'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
           triggers:
             -
               uuid: 30c0c80ae6df45bb96c434016e394bba
@@ -458,6 +504,13 @@ zabbix_export:
               name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 0aad82f9addd45efa20253da000ec699
           name: 'SNMP agent availability'
@@ -474,8 +527,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 7735f20ab7fd40b8b34cead6cb306b30
@@ -488,6 +544,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Ubiquiti AirOS SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 441118e6712e4f6bae4c9cab7be8d0a2
@@ -568,8 +628,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFDESCR}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: cec2d0f88b494cb8b49a8e234108cbbb
               name: 'Interface {#IFDESCR}: Inbound packets with errors'
@@ -588,8 +654,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFDESCR}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 0610c78c5be54df29ef6833758331896
               name: 'Interface {#IFDESCR}: Bits received'
@@ -601,7 +673,7 @@ zabbix_export:
               units: bps
               description: |
                 MIB: IF-MIB
-                The total number of octets received on the interface,including framing characters. Discontinuities in the value of this counter can occurat re-initialization of the management system, and atother times as indicated by the value of ifCounterDiscontinuityTime.
+                The total number of octets received on the interface,including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and atother times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -613,8 +685,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFDESCR}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 9a129fa67db34b4fa6af29e4c0936f09
               name: 'Interface {#IFDESCR}: Outbound packets discarded'
@@ -637,8 +715,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFDESCR}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 016c8fc0a0524df3b5fa9a7d6a28fb94
               name: 'Interface {#IFDESCR}: Outbound packets with errors'
@@ -657,8 +741,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFDESCR}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 84be5259caec44cfb5963e8d31c27e71
               name: 'Interface {#IFDESCR}: Bits sent'
@@ -670,7 +760,7 @@ zabbix_export:
               units: bps
               description: |
                 MIB: IF-MIB
-                The total number of octets transmitted out of the interface, including framing characters. Discontinuities in the value of this counter can occurat re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                The total number of octets transmitted out of the interface, including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -682,8 +772,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFDESCR}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 570b2d64c79748ac9c8350fa68933de5
               name: 'Interface {#IFDESCR}: Speed'
@@ -700,12 +796,18 @@ zabbix_export:
                 For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made,
                 this object should contain the nominal bandwidth.
                 If the bandwidth of the interface is greater than the maximum value reportable by this object then
-                this object should report its maximum value (4,294,967,295) and ifHighSpeed must be used to report the interace's speed.
+                this object should report its maximum value (4,294,967,295) and ifHighSpeed must be used to report the interface's speed.
                 For a sub-layer which has no concept of bandwidth, this object should be zero.
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFDESCR}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: ec9624acd1d940e49f6cb996551ec66b
               name: 'Interface {#IFDESCR}: Operational status'
@@ -727,8 +829,14 @@ zabbix_export:
                 name: 'IF-MIB::ifOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFDESCR}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: c360a22671ea4dcda48fc49ec7847c2d
@@ -746,6 +854,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 435d93d378d646c388ddccb22bb43dc9
               name: 'Interface {#IFDESCR}: Interface type'
@@ -758,7 +870,7 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 The type of interface.
-                Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),
+                Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),
                 through updating the syntax of the IANAifType textual convention.
               valuemap:
                 name: 'IF-MIB::ifType'
@@ -769,8 +881,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFDESCR}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: 9ccbb6859cd7422684e1946c1e321b3c
@@ -800,6 +918,10 @@ zabbix_export:
                   name: 'Interface {#IFDESCR}: Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 80e37d44eddf49c89b39dacc8c88ac07
               expression: |
@@ -820,6 +942,10 @@ zabbix_export:
                   name: 'Interface {#IFDESCR}: Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 3d7c8f98d0c447038c630f4e2ad81c06
               expression: |
@@ -839,6 +965,10 @@ zabbix_export:
                   name: 'Interface {#IFDESCR}: Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 756cecebd5e04ffc8f535fa20412734d
@@ -885,6 +1015,16 @@ zabbix_export:
                   item:
                     host: 'Ubiquiti AirOS SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: airos
+        -
+          tag: target
+          value: ubiquiti
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'

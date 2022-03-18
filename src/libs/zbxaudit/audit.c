@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "audit.h"
+
 #include "log.h"
 #include "zbxjson.h"
 #include "dbcache.h"
-
-#include "audit.h"
 
 #define AUDIT_USERID	0
 #define AUDIT_USERNAME	"System"

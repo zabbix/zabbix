@@ -34,6 +34,7 @@ class ZBarGauge extends HTMLElement {
 		this._solid = false;
 		this._min = 0;
 		this._max = 100;
+		this._value = 0;
 
 		const shadow = this.attachShadow({mode: 'open'});
 
@@ -59,21 +60,24 @@ class ZBarGauge extends HTMLElement {
 	}
 
 	attributeChangedCallback(name, old_value, new_value) {
+		if (old_value === new_value) {
+			return;
+		}
+
 		switch (name) {
 			case 'fill':
 				this._fill = (new_value !== null && /^#([0-9A-F]{6})$/i.test(new_value))
 					? new_value
 					: BAR_GAUGE_BAR_DEFAULT_COLOR;
 
-				this._events.update();
-				break;
+				return this._events.update();
 
 			case 'max':
-				this._max = new_value !== null && !isNaN(new_value) ? new_value : BAR_GAUGE_BAR_DEFAULT_MAX;
+				this._max = new_value !== null && !isNaN(new_value) ? Number(new_value) : BAR_GAUGE_BAR_DEFAULT_MAX;
 				break
 
 			case 'min':
-				this._min = new_value !== null && !isNaN(new_value) ? new_value : BAR_GAUGE_BAR_DEFAULT_MIN;
+				this._min = new_value !== null && !isNaN(new_value) ? Number(new_value) : BAR_GAUGE_BAR_DEFAULT_MIN;
 				break;
 
 			case 'solid':
@@ -81,8 +85,8 @@ class ZBarGauge extends HTMLElement {
 				break;
 
 			case 'value':
-				if (new_value !== null && old_value !== new_value) {
-					this.value = new_value;
+				if (new_value !== null) {
+					this._value = Number(new_value);
 
 					this.dispatchEvent(new Event('change', {bubbles: true}));
 				}
@@ -160,24 +164,29 @@ class ZBarGauge extends HTMLElement {
 			const width = this.offsetWidth - 2;
 			this._canvas.height = this.offsetHeight - 2;
 
-			const value = Math.max(this._min, Math.min(this._max, Number(this.value)));
+			const value = Math.max(this._min, Math.min(this._max, this._value));
 
 			if (this._solid) {
-				const bar_size = value == this._min ? 0 : Math.max(width / (this._max - this._min) * value - 2, 2);
+				const bar_size = value > this._min
+					? Math.max(Math.floor(width / (this._max - this._min) * (value - this._min)), 2)
+					: 0;
 
-				this._canvas.width = width;
+				this._canvas.width = width + 2;
 
 				this._drawCell(ctx, 1, bar_size, this._getThresholdColorByValue(value), 1);
 			}
 			else {
-				const cell_count = Math.floor((width - 1) / BAR_GAUGE_BAR_ITEM_WIDTH);
+				const cell_count = Math.floor(width / BAR_GAUGE_BAR_ITEM_WIDTH);
 				const cell_interval = (this._max - this._min) / cell_count;
 
 				this._canvas.width = cell_count * BAR_GAUGE_BAR_ITEM_WIDTH + 1;
 
 				for (let i = 0; i < cell_count; i++) {
+					const alpha = (value - this._min) / cell_interval > i ? 1 : .25;
+
 					this._drawCell(ctx, i * BAR_GAUGE_BAR_ITEM_WIDTH + 1, BAR_GAUGE_BAR_ITEM_WIDTH - 1,
-						this._getThresholdColorByValue(i * cell_interval), value / cell_interval > i ? 1 : .25);
+						this._getThresholdColorByValue(i * cell_interval + this._min), alpha
+					);
 				}
 			}
 		});

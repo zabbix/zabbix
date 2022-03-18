@@ -38,7 +38,6 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 				' ',
 				new CSup($element['count'])
 			]))
-				->addClass(ZBX_STYLE_NOWRAP)
 				->addClass(ZBX_STYLE_SUBFILTER)
 				->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
 		}
@@ -67,9 +66,7 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 					$link,
 					' ',
 					new CSup(($subfilter ? '+' : '').$element['count'])
-				]))
-					->addClass(ZBX_STYLE_NOWRAP)
-					->addClass(ZBX_STYLE_SUBFILTER);
+				]))->addClass(ZBX_STYLE_SUBFILTER);
 			}
 		}
 	}
@@ -111,7 +108,6 @@ function prepareTagsSubfilterOutput(array $data, array &$subfilter): array {
 				' ',
 				new CSup($tag['count'])
 			]))
-				->addClass(ZBX_STYLE_NOWRAP)
 				->addClass(ZBX_STYLE_SUBFILTER)
 				->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
 		}
@@ -137,9 +133,7 @@ function prepareTagsSubfilterOutput(array $data, array &$subfilter): array {
 					$link,
 					' ',
 					new CSup(($subfilter ? '+' : '').$tag['count'])
-				]))
-					->addClass(ZBX_STYLE_NOWRAP)
-					->addClass(ZBX_STYLE_SUBFILTER);
+				]))->addClass(ZBX_STYLE_SUBFILTER);
 			}
 		}
 
@@ -149,7 +143,7 @@ function prepareTagsSubfilterOutput(array $data, array &$subfilter): array {
 	return $output;
 }
 
-function makeItemSubfilter(array &$filter_data, array $items = [], string $context) {
+function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 	// subfilters
 	$table_subfilter = (new CTableInfo())
 		->addRow([
@@ -191,7 +185,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name === 'subfilter_tags') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 
 			if ($show_item) {
@@ -211,7 +208,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name == 'subfilter_hosts') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 			if ($show_item) {
 				$host = reset($item['hosts']);
@@ -229,7 +229,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name == 'subfilter_types') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 			if ($show_item) {
 				$item_params['types'][$item['type']]['count']++;
@@ -250,7 +253,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name == 'subfilter_value_types') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 			if ($show_item) {
 				$item_params['value_types'][$item['value_type']]['count']++;
@@ -270,7 +276,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name == 'subfilter_status') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 			if ($show_item) {
 				$item_params['status'][$item['status']]['count']++;
@@ -290,7 +299,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name == 'subfilter_state') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 			if ($show_item) {
 				$item_params['state'][$item['state']]['count']++;
@@ -310,7 +322,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name == 'subfilter_inherited') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 			if ($show_item) {
 				if ($item['templateid'] == 0) {
@@ -335,7 +350,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name == 'subfilter_with_triggers') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 			if ($show_item) {
 				if (count($item['triggers']) == 0) {
@@ -360,7 +378,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name == 'subfilter_discovered') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 			if ($show_item) {
 				if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
@@ -397,7 +418,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name === 'subfilter_trends') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 
 			if ($show_item) {
@@ -429,7 +453,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name === 'subfilter_history') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 
 			if ($show_item) {
@@ -473,7 +500,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name === 'subfilter_interval') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 
 			if ($show_item) {

@@ -70,7 +70,7 @@ class testFormHostConfiguration extends testFormHost {
 		$this->cloneHost($data);
 
 		// Check that items aren't cloned from original host.
-		$this->assertItemsDBCount($data['host_fields']['Host name'], 0);
+		$this->assertItemsDBCount($data['Host name'], 0);
 	}
 
 	/**
@@ -80,7 +80,7 @@ class testFormHostConfiguration extends testFormHost {
 		$this->cloneHost($data, 'Full clone');
 
 		// Check that items cloned from original host.
-		$this->assertItemsDBCount($data['host_fields']['Host name'], 3);
+		$this->assertItemsDBCount($data['Host name'], 3);
 	}
 
 	/**

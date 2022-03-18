@@ -169,7 +169,7 @@ class CApiService {
 	}
 
 	/**
-	 * Returns the name of the option that refers the PK column. If the $tableName parameter
+	 * Returns the name of the option that refers to the PK column. If the $tableName parameter
 	 * is not given, the Pk option of the current table will be returned.
 	 *
 	 * @param string $tableName

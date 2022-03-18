@@ -27,9 +27,13 @@
 $headers = [];
 
 foreach ($data['configuration'] as $column_config) {
-	if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
-			&& $column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
-		$headers[] = (new CColHeader($column_config['name']))->addClass(ZBX_STYLE_CENTER);
+	if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE) {
+		if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
+			$headers[] = (new CColHeader($column_config['name']))->addClass(ZBX_STYLE_CENTER);
+		}
+		else {
+			$headers[] = (new CColHeader($column_config['name']))->setColSpan(2);
+		}
 	}
 	else {
 		$headers[] = $column_config['name'];
@@ -42,69 +46,25 @@ foreach ($data['rows'] as $columns) {
 	$row = [];
 
 	foreach ($columns as $i => $column) {
+		$column_config = $data['configuration'][$i];
+
 		if ($column === null) {
-			$row[] = '';
+			if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
+					&& $column_config['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS) {
+				$row[] = (new CCol(''))->setColSpan(2);
+			}
+			else {
+				$row[] = '';
+			}
 
 			continue;
 		}
 
-		$column_config = $data['configuration'][$i];
+		$color = $column_config['base_color'];
 
-		switch ($column_config['data']) {
-			case CWidgetFieldColumnsList::DATA_HOST_NAME:
-				$cell = (new CLinkAction($column['value']))->setMenuPopup(CMenuPopupHelper::getHost($column['hostid']));
-				break;
-
-			case CWidgetFieldColumnsList::DATA_TEXT:
-				$cell = new CDiv($column['value']);
-				break;
-
-			case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
-				if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
-					$cell = (new CDiv(formatHistoryValue($column['value'], $column['item'])))
-						->addClass('item-value')
-						->addClass(ZBX_STYLE_CURSOR_POINTER)
-						->setHint(
-							(new CDiv(mb_substr($column['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))
-								->addClass(ZBX_STYLE_HINTBOX_WRAP)
-						);
-
-					break;
-				}
-
-				$cell = (new CBarGauge())
-					->setValue($column['value'])
-					->addClass('item-value');
-
-				if (array_key_exists('thresholds', $column_config)) {
-					foreach ($column_config['thresholds'] as $threshold) {
-						$cell->addThreshold($threshold['threshold'], '#'.$threshold['color']);
-					}
-				}
-
-				if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_BAR) {
-					$cell->setAttribute('solid', 1);
-				}
-
-				if (array_key_exists('base_color', $column_config)) {
-					$cell->setAttribute('fill', '#'.$column_config['base_color']);
-				}
-
-				if (array_key_exists('min', $column_config)) {
-					$cell->setAttribute('min', $column_config['min']);
-				}
-
-				if (array_key_exists('max', $column_config)) {
-					$cell->setAttribute('max', $column_config['max']);
-				}
-				break;
-		}
-
-		$color = array_key_exists('base_color', $column_config) ? $column_config['base_color'] : '';
-
-		if (array_key_exists('thresholds', $column_config)
-				&& array_key_exists('display', $column_config)
-				&& $column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
+		if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
+				&& $column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS
+				&& array_key_exists('thresholds', $column_config)) {
 			foreach ($column_config['thresholds'] as $threshold) {
 				if ($column['value'] < $threshold['threshold']) {
 					break;
@@ -114,11 +74,69 @@ foreach ($data['rows'] as $columns) {
 			}
 		}
 
-		if (!is_a($cell, CBarGauge::class) && $color !== '') {
-			$cell = (new CCol($cell))->addStyle('background-color: #'.$color);
-		}
+		switch ($column_config['data']) {
+			case CWidgetFieldColumnsList::DATA_HOST_NAME:
+				$row[] = (new CCol(
+					(new CLinkAction($column['value']))->setMenuPopup(CMenuPopupHelper::getHost($column['hostid']))
+				))->addStyle($color !== '' ? 'background-color: #'.$color : null);
 
-		$row[] = $cell;
+				break;
+
+			case CWidgetFieldColumnsList::DATA_TEXT:
+				$row[] = (new CCol($column['value']))
+					->addStyle($color !== '' ? 'background-color: #'.$color : null);
+
+				break;
+
+			case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
+				if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
+					$row[] = (new CCol())
+						->addStyle($color !== '' ? 'background-color: #'.$color : null)
+						->addItem(
+							(new CDiv(formatHistoryValue($column['value'], $column['item'])))
+								->addClass(ZBX_STYLE_CENTER)
+								->addClass(ZBX_STYLE_CURSOR_POINTER)
+								->setHint(
+									(new CDiv($column['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
+								)
+						);
+
+					break;
+				}
+
+				$bar_gauge = (new CBarGauge())
+					->setValue($column['value'])
+					->setAttribute('fill', $column_config['base_color'] !== ''
+						? '#'.$column_config['base_color']
+						: ZBX_WIDGET_TOP_HOSTS_DEFAULT_FILL
+					)
+					->setAttribute('min', $column_config['min'])
+					->setAttribute('max', $column_config['max']);
+
+				if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_BAR) {
+					$bar_gauge->setAttribute('solid', 1);
+				}
+
+				if (array_key_exists('thresholds', $column_config)) {
+					foreach ($column_config['thresholds'] as $threshold) {
+						$bar_gauge->addThreshold($threshold['threshold'], '#'.$threshold['color']);
+					}
+				}
+
+				$row[] = new CCol($bar_gauge);
+				$row[] = (new CCol())
+					->addStyle('width: 0;')
+					->addItem(
+						(new CDiv(formatHistoryValue($column['value'], $column['item'])))
+							->addClass(ZBX_STYLE_CURSOR_POINTER)
+							->addClass(ZBX_STYLE_NOWRAP)
+							->setHint(
+								(new CDiv($column['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
+							)
+					);
+
+				break;
+		}
 	}
 
 	$table->addRow($row);

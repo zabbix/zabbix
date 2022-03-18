@@ -26,6 +26,8 @@ class EntitiesTags {
 	 * @return array
 	 */
 	public static function load() {
+		CDataHelper::setSessionId(null);
+
 		// Create host groups.
 		CDataHelper::call('hostgroup.create', [
 			['name' => 'HostTags'],
@@ -135,6 +137,25 @@ class EntitiesTags {
 						'value' => 'update'
 					]
 				]
+			],
+			[
+				'host' => '1 template for removing tags',
+				'groups' => [
+					'groupid' => $groupids['TemplateTags']
+				],
+				'tags' => [
+					[
+						'tag' => 'action',
+						'value' => 'remove'
+					],
+					[
+						'tag' => 'tag',
+						'value' => 'remove'
+					],
+					[
+						'tag' => 'tag'
+					]
+				]
 			]
 		]);
 
@@ -195,6 +216,25 @@ class EntitiesTags {
 							[
 								'tag' => 'test',
 								'value' => 'update'
+							]
+						]
+					],
+					[
+						'name' => 'Item for tags removing',
+						'key_' => 'tags.remove',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'tags' => [
+							[
+								'tag' => 'action',
+								'value' => 'remove'
+							],
+							[
+								'tag' => 'tag',
+								'value' => 'remove'
+							],
+							[
+								'tag' => 'tag'
 							]
 						]
 					]
@@ -288,6 +328,27 @@ class EntitiesTags {
 						'value' => 'update'
 					]
 				]
+			],
+			[
+				'host' => 'Host for removing tags',
+				'interfaces' => [],
+				'groups' => [
+					'groupid' => $groupids['HostTags']
+				],
+				'status' => HOST_STATUS_MONITORED,
+				'tags' => [
+					[
+						'tag' => 'action',
+						'value' => 'remove'
+					],
+					[
+						'tag' => 'tag',
+						'value' => 'remove'
+					],
+					[
+						'tag' => 'tag'
+					]
+				]
 			]
 		]);
 
@@ -307,6 +368,23 @@ class EntitiesTags {
 					[
 						'tag' => 'test',
 						'value' => 'update'
+					]
+				]
+			],
+			[
+				'description' => 'Trigger for tags removing',
+				'expression' => 'last(/Host for tags testing/trap.host)=0',
+				'tags' => [
+					[
+						'tag' => 'action',
+						'value' => 'remove'
+					],
+					[
+						'tag' => 'tag',
+						'value' => 'remove'
+					],
+					[
+						'tag' => 'tag'
 					]
 				]
 			],
@@ -382,6 +460,27 @@ class EntitiesTags {
 					[
 						'tag' => 'test',
 						'value' => 'update'
+					]
+				]
+			],
+			[
+				'hostid' => $hosts['hostids']['Host for tags testing'],
+				'ruleid' => $hosts['discoveryruleids']['Host for tags testing:trap_discovery'],
+				'name' => 'Item prototype for removig tags: {#KEY}',
+				'key_' => 'remving.tags_trap[{#KEY}]',
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'tags' => [
+					[
+						'tag' => 'action',
+						'value' => 'remove'
+					],
+					[
+						'tag' => 'tag',
+						'value' => 'remove'
+					],
+					[
+						'tag' => 'tag'
 					]
 				]
 			],
@@ -486,6 +585,23 @@ class EntitiesTags {
 				]
 			],
 			[
+				'description' => 'Trigger prototype for removing tags',
+				'expression' => 'count(/Host for tags testing/itemprototype_trap[{#KEY}],1)=0',
+				'tags' => [
+					[
+						'tag' => 'action',
+						'value' => 'update'
+					],
+					[
+						'tag' => 'tag without value'
+					],
+					[
+						'tag' => 'test',
+						'value' => 'update'
+					]
+				]
+			],
+			[
 				'description' => 'Template trigger prototype with tags for full cloning',
 				'expression' => 'last(/Template for tags testing/template.itemprototype_trap[{#KEY}])=0',
 				'tags' => [
@@ -555,6 +671,26 @@ class EntitiesTags {
 					[
 						'tag' => 'test',
 						'value' => 'update'
+					]
+				]
+			],
+			[
+				'ruleid' => $hosts['discoveryruleids']['Host for tags testing:trap_discovery'],
+				'host' => '{#HOST} prototype with for removing tags',
+				'groupLinks' => [
+					['groupid' => $groupids['HostPrototypeTags']]
+				],
+				'tags' => [
+					[
+						'tag' => 'action',
+						'value' => 'remove'
+					],
+					[
+						'tag' => 'tag',
+						'value' => 'remove'
+					],
+					[
+						'tag' => 'tag'
 					]
 				]
 			],
@@ -639,6 +775,30 @@ class EntitiesTags {
 				]
 			],
 			[
+				'name' => 'Web scenario for removing tags',
+				'hostid' => $hosts['hostids']['Host for tags testing'],
+				'steps' => [
+					[
+						'name' => 'Homepage',
+						'url' => 'http://zabbix.com',
+						'no' => 1
+					]
+				],
+				'tags' => [
+					[
+						'tag' => 'action',
+						'value' => 'remove'
+					],
+					[
+						'tag' => 'tag',
+						'value' => 'remove'
+					],
+					[
+						'tag' => 'tag'
+					]
+				]
+			],
+			[
 				'name' => 'Template web scenario with tags for full cloning',
 				'hostid' => $templates['templateids']['Template for tags testing'],
 				'steps' => [
@@ -663,6 +823,120 @@ class EntitiesTags {
 					[
 						'tag' => 'common tag on template and element',
 						'value' => 'common value'
+					]
+				]
+			]
+		]);
+
+		// Create servises.
+		CDataHelper::call('service.create', [
+			[
+				'name' => 'Service with tags for updating',
+				'algorithm' => 1,
+				'sortorder' => 0,
+				'tags' => [
+					[
+						'tag' => 'action',
+						'value' => 'update'
+					],
+					[
+						'tag' => 'tag without value'
+					],
+					[
+						'tag' => 'test',
+						'value' => 'update'
+					]
+				],
+				'problem_tags' => [
+					[
+						'tag' => 'problem action',
+						'operator' => 2,
+						'value' => 'problem update'
+					],
+					[
+						'tag' => 'problem tag without value'
+					],
+					[
+						'tag' => 'problem test',
+						'operator' => 0,
+						'value' => 'problem update'
+					]
+				]
+			],
+			[
+				'name' => 'Service with tags for cloning',
+				'algorithm' => 1,
+				'sortorder' => 0,
+				'tags' => [
+					[
+						'tag' => 'a',
+						'value' => ':a'
+					],
+					[
+						'tag' => 'action',
+						'value' => 'clone'
+					],
+					[
+						'tag' => 'tag without value'
+					],
+					[
+						'tag' => 'common tag on host and element',
+						'value' => 'common value'
+					]
+				],
+				'problem_tags' => [
+					[
+						'tag' => 'problem a',
+						'operator' => 2,
+						'value' => ':problem a'
+					],
+					[
+						'tag' => 'problem action',
+						'operator' => 0,
+						'value' => 'problem clone'
+					],
+					[
+						'tag' => 'problem tag without value',
+						'operator' => 2
+					],
+					[
+						'tag' => 'problem common tag on host and element',
+						'operator' => 0,
+						'value' => 'problem common value'
+					]
+				]
+			],
+			[
+				'name' => 'Service for removing tags',
+				'algorithm' => 1,
+				'sortorder' => 0,
+				'tags' => [
+					[
+						'tag' => 'action',
+						'value' => 'remove'
+					],
+					[
+						'tag' => 'tag',
+						'value' => 'remove'
+					],
+					[
+						'tag' => 'tag'
+					]
+				],
+				'problem_tags' => [
+					[
+						'tag' => 'problem remove',
+						'operator' => 0,
+						'value' => 'problem remove'
+					],
+					[
+						'tag' => 'problem tag',
+						'operator' => 2,
+						'value' => 'problem remove'
+					],
+					[
+						'tag' => 'problem tag',
+						'operator' => 2
 					]
 				]
 			]

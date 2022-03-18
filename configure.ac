@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[6.0.0rc1])
+AC_INIT([Zabbix],[6.2.0alpha1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects filename-length-max=99])
 
@@ -1966,23 +1966,24 @@ if test "x$agent2" = "xyes"; then
 	CGO_CFLAGS="$TLS_CFLAGS $LIBPCRE_CFLAGS $LIBPCRE2_CFLAGS"
 	CGO_LDFLAGS="$AGENT2_LDFLAGS $LD_START_GROUP \
 		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
-		\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
+		\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
 		\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
-		\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
-		\${abs_top_builddir}/src/libs/zbxsys/libzbxsys.a \
-		\${abs_top_builddir}/src/libs/zbxnix/libzbxnix.a \
-		\${abs_top_builddir}/src/libs/zbxconf/libzbxconf.a \
-		\${abs_top_builddir}/src/libs/zbxhttp/libzbxhttp.a \
+		\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
 		\${abs_top_builddir}/src/libs/zbxcompress/libzbxcompress.a \
+		\${abs_top_builddir}/src/libs/zbxconf/libzbxconf.a \
+		\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
+		\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
+		\${abs_top_builddir}/src/libs/zbxhttp/libzbxhttp.a \
+		\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
+		\${abs_top_builddir}/src/libs/zbxnix/libzbxnix.a \
 		\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
-		\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagent2sysinfo.a \
-		\${abs_top_builddir}/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
-		\${abs_top_builddir}/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+		\${abs_top_builddir}/src/libs/zbxsys/libzbxsys.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspechostnamesysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspecsysinfo.a \
-		\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
-		\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
-		\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
+		\${abs_top_builddir}/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+		\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagent2sysinfo.a \
+		\${abs_top_builddir}/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+		\${abs_top_builddir}/src/libs/zbxxml/libzbxxml.a \
 		$LIBS $AGENT2_LIBS $LD_END_GROUP"
 
 	AC_SUBST(CGO_CFLAGS)

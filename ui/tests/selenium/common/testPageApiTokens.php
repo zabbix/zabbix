@@ -35,9 +35,7 @@ class testPageApiTokens extends CWebTest {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [
-			'class' => CMessageBehavior::class
-		];
+		return ['class' => CMessageBehavior::class];
 	}
 
 	/**
@@ -178,7 +176,7 @@ class testPageApiTokens extends CWebTest {
 			$db_status = '1';
 		}
 
-		$this->assertMessage(TEST_GOOD, $message_title );
+		$this->assertMessage(TEST_GOOD, $message_title);
 		$this->assertEquals($column_status, $row->getColumn('Status')->getText());
 		$this->assertEquals($db_status, CDBHelper::getValue('SELECT status FROM token WHERE name='.zbx_dbstr($token)));
 	}
@@ -261,7 +259,7 @@ class testPageApiTokens extends CWebTest {
 		$this->query('class:list-table')->asTable()->one()->findRow('Name', $token)->select();
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();
 		$this->page->acceptAlert();
-		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'API token deleted');
 
 		// Check that token is deleted from DB.
 		$this->assertEquals(0, CDBHelper::getCount('SELECT tokenid FROM token WHERE name='.zbx_dbstr($token)));

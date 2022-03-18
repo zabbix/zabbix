@@ -75,8 +75,7 @@
  *                                                                            *
  * This is zbx_snmp_walk() callback function prototype.                       *
  *                                                                            *
- * Parameters: arg   - [IN] an user argument passed to zbx_snmp_walk()        *
- *                          function                                          *
+ * Parameters: arg   - [IN] user argument passed to zbx_snmp_walk() function  *
  *             snmp_oid - [IN] the OID the walk function is looking for       *
  *             index    - [IN] the index of found OID                         *
  *             value    - [IN] the OID value                                  *

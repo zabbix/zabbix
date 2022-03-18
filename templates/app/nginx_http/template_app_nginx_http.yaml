@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T06:57:46Z'
+  date: '2022-01-26T10:31:29Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -17,7 +17,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384765-discussion-thread-for-official-zabbix-template-nginx
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -32,8 +32,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: application
+            -
+              tag: component
+              value: health
           triggers:
             -
               uuid: fc1f7927b8864996986c1da44df57279
@@ -45,6 +48,10 @@ zabbix_export:
                 -
                   name: 'Nginx: Service is down'
                   expression: 'last(/Nginx by HTTP/net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: e4a09193bc8f42f2888ece83f89f84af
           name: 'Nginx: Service status'
@@ -60,8 +67,11 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: application
+            -
+              tag: component
+              value: health
           triggers:
             -
               uuid: 7b3de87ba0ea425280d42235bb626b8b
@@ -69,6 +79,10 @@ zabbix_export:
               name: 'Nginx: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: e054b58ebbbe4b45961ba697b468ab9e
           name: 'Nginx: Connections accepted per second'
@@ -92,8 +106,8 @@ zabbix_export:
             key: nginx.get_stub_status
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: connections
         -
           uuid: 2e4b049ab60947d9a05165f67388e531
           name: 'Nginx: Connections active'
@@ -112,8 +126,8 @@ zabbix_export:
             key: nginx.get_stub_status
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: connections
         -
           uuid: eecc0e887a744627be7f3b01cec6d46e
           name: 'Nginx: Connections dropped per second'
@@ -140,8 +154,8 @@ zabbix_export:
             key: nginx.get_stub_status
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: connections
           triggers:
             -
               uuid: 79767fbc18594069a1fc0cbec832f8ff
@@ -154,6 +168,10 @@ zabbix_export:
                 -
                   name: 'Nginx: Service is down'
                   expression: 'last(/Nginx by HTTP/net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: a53cf4f2d2ad4a84a70ff57df6299adc
           name: 'Nginx: Connections handled per second'
@@ -177,8 +195,8 @@ zabbix_export:
             key: nginx.get_stub_status
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: connections
         -
           uuid: 73493cbf8508419a8fed3abff8cc5851
           name: 'Nginx: Connections reading'
@@ -197,8 +215,8 @@ zabbix_export:
             key: nginx.get_stub_status
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: connections
         -
           uuid: cf393814511a48b498da8aab94d7ca00
           name: 'Nginx: Connections waiting'
@@ -217,8 +235,8 @@ zabbix_export:
             key: nginx.get_stub_status
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: connections
         -
           uuid: b0d63efb16984042945fe42e192f7d4e
           name: 'Nginx: Connections writing'
@@ -237,8 +255,8 @@ zabbix_export:
             key: nginx.get_stub_status
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: connections
         -
           uuid: 86f93d1941d147fe94d754eddd3e8ff2
           name: 'Nginx: Get stub status page'
@@ -261,8 +279,11 @@ zabbix_export:
           retrieve_mode: BOTH
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: application
+            -
+              tag: component
+              value: health
           triggers:
             -
               uuid: 78e0a6322a1941469a0e108a9367c420
@@ -277,6 +298,10 @@ zabbix_export:
                 -
                   name: 'Nginx: Service is down'
                   expression: 'last(/Nginx by HTTP/net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 071b3d77324740a59045be19da231d76
           name: 'Nginx: Requests total'
@@ -295,8 +320,8 @@ zabbix_export:
             key: nginx.get_stub_status
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: requests
         -
           uuid: 81b17056ec664f9f926a74ee390ab9c1
           name: 'Nginx: Requests per second'
@@ -320,8 +345,8 @@ zabbix_export:
             key: nginx.get_stub_status
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: requests
         -
           uuid: 716b627d6d894ac2af3ae8c4aeaa8c0c
           name: 'Nginx: Version'
@@ -345,8 +370,8 @@ zabbix_export:
             key: nginx.get_stub_status
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: application
           triggers:
             -
               uuid: 0f2689d4967a446e98a107b933179817
@@ -355,6 +380,17 @@ zabbix_export:
               priority: INFO
               description: 'Nginx version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: nginx
       macros:
         -
           macro: '{$NGINX.DROP_RATE.MAX.WARN}'

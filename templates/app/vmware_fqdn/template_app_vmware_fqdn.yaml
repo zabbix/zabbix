@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:38:31Z'
+  date: '2022-02-18T10:53:23Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -31,8 +31,8 @@ zabbix_export:
           description: 'Collect VMware event log. See also: https://www.zabbix.com/documentation/6.0/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: log
         -
           uuid: ebb8417eceb541b1b51909c745642f05
           name: 'VMware: Full name'
@@ -52,8 +52,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: system
         -
           uuid: edfdedd78e9c4c299a1555bd13b2f677
           name: 'VMware: Version'
@@ -73,8 +73,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: system
       discovery_rules:
         -
           uuid: dc0a844c06f7456b8643f9f9672e6b8e
@@ -99,8 +99,11 @@ zabbix_export:
                 name: 'VMware status'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: cluster
+                  value: '{#CLUSTER.NAME}'
+                -
+                  tag: component
+                  value: cluster
         -
           uuid: 3cd02594ee644dbe88bdfc4f4257ae05
           name: 'Discover VMware datastores'
@@ -121,8 +124,11 @@ zabbix_export:
               description: 'Amount of time for a read operation from the datastore (milliseconds).'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: datastore
+                -
+                  tag: datastore
+                  value: '{#DATASTORE}'
             -
               uuid: a2b1785fc773404e9ce69bcd868c5b88
               name: 'VMware: Free space on datastore {#DATASTORE} (percentage)'
@@ -137,8 +143,11 @@ zabbix_export:
               description: 'VMware datastore space in percentage from total.'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: datastore
+                -
+                  tag: datastore
+                  value: '{#DATASTORE}'
             -
               uuid: 78fb4b4b0eec44a99207f8354773269d
               name: 'VMware: Total size of datastore {#DATASTORE}'
@@ -152,8 +161,11 @@ zabbix_export:
               description: 'VMware datastore space in bytes.'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: datastore
+                -
+                  tag: datastore
+                  value: '{#DATASTORE}'
             -
               uuid: d9570c0822cc4996a7dda1ddb9426404
               name: 'VMware: Average write latency of the datastore {#DATASTORE}'
@@ -165,8 +177,11 @@ zabbix_export:
               description: 'Amount of time for a write operation to the datastore (milliseconds).'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: datastore
+                -
+                  tag: datastore
+                  value: '{#DATASTORE}'
         -
           uuid: 988bb85b325449b29780eeda15c73620
           name: 'Discover VMware hypervisors'
@@ -247,6 +262,16 @@ zabbix_export:
               interfaces:
                 -
                   ip: '{#VM.IP}'
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: vmware
+        -
+          tag: target
+          value: vmware-fqdn
       macros:
         -
           macro: '{$VMWARE.PASSWORD}'
@@ -302,8 +327,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: cluster
         -
           uuid: 31389342688f4b0696a49431923a528f
           name: 'VMware: CPU latency in percents'
@@ -317,8 +342,8 @@ zabbix_export:
           description: 'Percentage of time the virtual machine is unable to run because it is contending for access to the physical CPU(s).'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: cpu
         -
           uuid: bbfb146e74144160b2e47c0f2cdc6c20
           name: 'VMware: Number of virtual CPUs'
@@ -336,8 +361,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: cpu
         -
           uuid: f4d72109b7ee4e0bb65aab1de85b6b05
           name: 'VMware: CPU readiness latency in percents'
@@ -351,8 +376,8 @@ zabbix_export:
           description: 'Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: cpu
         -
           uuid: ff0a31df94784cfbbf10deca55f76145
           name: 'VMware: CPU ready'
@@ -365,8 +390,8 @@ zabbix_export:
           description: 'Time that the virtual machine was ready, but could not get scheduled to run on the physical CPU during last measurement interval (VMware vCenter/ESXi Server performance counter sampling interval - 20 seconds)'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: cpu
         -
           uuid: 50de05f27f33425cb207a3fdece7ecb1
           name: 'VMware: CPU swap-in latency in percents'
@@ -379,8 +404,8 @@ zabbix_export:
           description: 'Percentage of CPU time spent waiting for swap-in.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: cpu
         -
           uuid: 50606be978814b51b4bae54340965cdc
           name: 'VMware: CPU usage in percents'
@@ -394,8 +419,8 @@ zabbix_export:
           description: 'CPU usage as a percentage during the interval.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: cpu
         -
           uuid: ea416ff054cc4031ac6b5cf446156540
           name: 'VMware: CPU usage'
@@ -408,8 +433,8 @@ zabbix_export:
           description: 'Current upper-bound on CPU usage. The upper-bound is based on the host the virtual machine is current running on, as well as limits configured on the virtual machine itself or any parent resource pool. Valid while the virtual machine is running.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: cpu
         -
           uuid: 3e70b5d443b942db974b5f92a7acce19
           name: 'VMware: Datacenter name'
@@ -429,8 +454,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: datacenter
         -
           uuid: e645130999db470fbbf14a8055c95b23
           name: 'VMware: Guest memory swapped'
@@ -443,8 +468,8 @@ zabbix_export:
           description: 'Amount of guest physical memory that is swapped out to the swap space.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: memory
         -
           uuid: 521a0396514845e3bc5d3dc54ec3d940
           name: 'VMware: Uptime of guest OS'
@@ -457,8 +482,8 @@ zabbix_export:
           description: 'Total time elapsed since the last operating system boot-up (in seconds).'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: system
           triggers:
             -
               uuid: da703e83e2e146569c173fd9bc6988dd
@@ -467,6 +492,10 @@ zabbix_export:
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: fedec469a1d040ae971e0013102e1e7c
           name: 'VMware: Hypervisor name'
@@ -486,8 +515,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: hypervisor
         -
           uuid: fbe7477fd85a4ee39a9226b2c6995446
           name: 'VMware: Ballooned memory'
@@ -500,8 +529,8 @@ zabbix_export:
           description: 'The amount of guest physical memory that is currently reclaimed through the balloon driver.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: memory
         -
           uuid: 9e7b9360e4d84e9397b5f0a7ab074726
           name: 'VMware: Compressed memory'
@@ -514,8 +543,8 @@ zabbix_export:
           description: 'The amount of memory currently in the compression cache for this VM.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: memory
         -
           uuid: 04a40f805fed4ddfa1590274a996a019
           name: 'VMware: Host memory consumed'
@@ -528,8 +557,8 @@ zabbix_export:
           description: 'Amount of host physical memory consumed for backing up guest physical memory pages.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: memory
         -
           uuid: 6563409185804ed89b49dfde92edfa10
           name: 'VMware: Private memory'
@@ -542,8 +571,8 @@ zabbix_export:
           description: 'Amount of memory backed by host memory and not being shared.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: memory
         -
           uuid: c6a539ee57bf48f78342358c391c65ea
           name: 'VMware: Shared memory'
@@ -556,8 +585,8 @@ zabbix_export:
           description: 'The amount of guest physical memory shared through transparent page sharing.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: memory
         -
           uuid: b064f0e0a53f4f6588827100becb4335
           name: 'VMware: Swapped memory'
@@ -570,8 +599,8 @@ zabbix_export:
           description: 'The amount of guest physical memory swapped out to the VM''s swap device by ESX.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: memory
         -
           uuid: e960399726a240de9ecc12eff65415ae
           name: 'VMware: Guest memory usage'
@@ -584,8 +613,8 @@ zabbix_export:
           description: 'The amount of guest physical memory that is being used by the VM.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: memory
         -
           uuid: 6fcbe4e95fce445aa417b9738004391f
           name: 'VMware: Host memory usage'
@@ -598,8 +627,8 @@ zabbix_export:
           description: 'The amount of host physical memory allocated to the VM, accounting for saving from memory sharing with other VMs.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: memory
         -
           uuid: 9533bc39366443fe8a3808190801441a
           name: 'VMware: Memory size'
@@ -618,8 +647,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: memory
         -
           uuid: e82daa73e03e43b9838d9e414d710e38
           name: 'VMware: Host memory usage in percents'
@@ -633,8 +662,8 @@ zabbix_export:
           description: 'Percentage of host physical memory that has been consumed.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: memory
         -
           uuid: 0943ff346c9d4cc69fc773843066c473
           name: 'VMware: Power state'
@@ -653,8 +682,8 @@ zabbix_export:
                 - 1h
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: power
         -
           uuid: 13173517c99e4a87aa6750392d14b255
           name: 'VMware: Committed storage space'
@@ -667,8 +696,8 @@ zabbix_export:
           description: 'Total storage space, in bytes, committed to this virtual machine across all datastores.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: storage
         -
           uuid: 8183cf2c54774d7eb544f645d5c26b8c
           name: 'VMware: Uncommitted storage space'
@@ -681,8 +710,8 @@ zabbix_export:
           description: 'Additional storage space, in bytes, potentially used by this virtual machine on all datastores.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: storage
         -
           uuid: 35aa9ee1743e4c1787c426da20f48097
           name: 'VMware: Unshared storage space'
@@ -695,8 +724,8 @@ zabbix_export:
           description: 'Total storage space, in bytes, occupied by the virtual machine across all datastores, that is not shared with any other virtual machine.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: storage
         -
           uuid: 4c3b010d7ea74da6b0dc1dd4e625bbb0
           name: 'VMware: Uptime'
@@ -709,8 +738,8 @@ zabbix_export:
           description: 'System uptime.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: system
       discovery_rules:
         -
           uuid: 914634668bab4266bd641ee224dbc1e4
@@ -734,8 +763,11 @@ zabbix_export:
               description: 'VMware virtual machine network interface input statistics (bytes per second).'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: interface
+                -
+                  tag: interface
+                  value: '{#IFDESC}'
             -
               uuid: 863c3aee5d9248d48adbf86832fa6c8e
               name: 'VMware: Number of packets received on interface {#IFDESC}'
@@ -747,8 +779,11 @@ zabbix_export:
               description: 'VMware virtual machine network interface input statistics (packets per second).'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: interface
+                -
+                  tag: interface
+                  value: '{#IFDESC}'
             -
               uuid: 0993e42664a14cd7936351c55b1d64a4
               name: 'VMware: Number of bytes transmitted on interface {#IFDESC}'
@@ -761,8 +796,11 @@ zabbix_export:
               description: 'VMware virtual machine network interface output statistics (bytes per second).'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: interface
+                -
+                  tag: interface
+                  value: '{#IFDESC}'
             -
               uuid: 144a2ed3f76e49af92462e0fea275ede
               name: 'VMware: Number of packets transmitted on interface {#IFDESC}'
@@ -774,8 +812,11 @@ zabbix_export:
               description: 'VMware virtual machine network interface output statistics (packets per second).'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: interface
+                -
+                  tag: interface
+                  value: '{#IFDESC}'
             -
               uuid: 9c3cd13576cc4c0a8972fa188f911e96
               name: 'VMware: Network utilization on interface {#IFDESC}'
@@ -793,8 +834,11 @@ zabbix_export:
                     - '1024'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: interface
+                -
+                  tag: interface
+                  value: '{#IFDESC}'
         -
           uuid: b1543bdfb5a342d7ad694c87248fe173
           name: 'Disk device discovery'
@@ -816,8 +860,11 @@ zabbix_export:
               description: 'Average number of outstanding read requests to the virtual disk during the collection interval.'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: disk
+                -
+                  tag: disk
+                  value: '{#DISKDESC}'
             -
               uuid: 172e4882d39f49d486ab5590163fdd4b
               name: 'VMware: Average read latency to the disk {#DISKDESC}'
@@ -830,8 +877,11 @@ zabbix_export:
               description: 'The average time a read from the virtual disk takes.'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: disk
+                -
+                  tag: disk
+                  value: '{#DISKDESC}'
             -
               uuid: 4fe54828be084b15bb92507106756a5f
               name: 'VMware: Average write latency to the disk {#DISKDESC}'
@@ -844,8 +894,11 @@ zabbix_export:
               description: 'The average time a write to the virtual disk takes.'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: disk
+                -
+                  tag: disk
+                  value: '{#DISKDESC}'
             -
               uuid: a74614af101c404eb7ebec10319dca05
               name: 'VMware: Average number of outstanding write requests to the disk {#DISKDESC}'
@@ -857,8 +910,11 @@ zabbix_export:
               description: 'Average number of outstanding write requests to the virtual disk during the collection interval.'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: disk
+                -
+                  tag: disk
+                  value: '{#DISKDESC}'
             -
               uuid: bd151efc8a0b41e9b64cbf21303fc659
               name: 'VMware: Average number of bytes read from the disk {#DISKDESC}'
@@ -871,8 +927,11 @@ zabbix_export:
               description: 'VMware virtual machine disk device read statistics (bytes per second).'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: disk
+                -
+                  tag: disk
+                  value: '{#DISKDESC}'
             -
               uuid: e6248013150d4f23a0774f6cc80e8df3
               name: 'VMware: Average number of reads from the disk {#DISKDESC}'
@@ -884,8 +943,11 @@ zabbix_export:
               description: 'VMware virtual machine disk device read statistics (operations per second).'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: disk
+                -
+                  tag: disk
+                  value: '{#DISKDESC}'
             -
               uuid: 7ea68380b855460b8e51281223659661
               name: 'VMware: Average number of bytes written to the disk {#DISKDESC}'
@@ -898,8 +960,11 @@ zabbix_export:
               description: 'VMware virtual machine disk device write statistics (bytes per second).'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: disk
+                -
+                  tag: disk
+                  value: '{#DISKDESC}'
             -
               uuid: 8344a1066f5c4ef49894d2d18fac2339
               name: 'VMware: Average number of writes to the disk {#DISKDESC}'
@@ -911,8 +976,11 @@ zabbix_export:
               description: 'VMware virtual machine disk device write statistics (operations per second).'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: disk
+                -
+                  tag: disk
+                  value: '{#DISKDESC}'
         -
           uuid: 44ff9ef164dc4d20acf06b3368d64456
           name: 'Mounted filesystem discovery'
@@ -935,8 +1003,11 @@ zabbix_export:
               description: 'VMware virtual machine file system statistics (bytes).'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: 3103537bb1d24633a064d173b3b530f2
               name: 'VMware: Free disk space on {#FSNAME} (percentage)'
@@ -950,8 +1021,11 @@ zabbix_export:
               description: 'VMware virtual machine file system statistics (percentages).'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: 08d05eac03994b56867ec302a346735c
               name: 'VMware: Total disk space on {#FSNAME}'
@@ -970,8 +1044,11 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: 09bb15da42464d8295d5e94b1d42cc87
               name: 'VMware: Used disk space on {#FSNAME}'
@@ -984,8 +1061,21 @@ zabbix_export:
               description: 'VMware virtual machine used disk space (bytes).'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: vmware
+        -
+          tag: target
+          value: vmware-guest
       macros:
         -
           macro: '{$VMWARE.PASSWORD}'
@@ -1035,8 +1125,11 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: application
+            -
+              tag: component
+              value: health
           triggers:
             -
               uuid: ab84a61566a5402db59efd40d20714a5
@@ -1045,6 +1138,10 @@ zabbix_export:
               priority: AVERAGE
               description: 'The service is unavailable or does not accept ICMP ping.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: af4d0877fda84753816c817ad76162f1
           name: 'VMware: Cluster name'
@@ -1064,8 +1161,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: cluster
         -
           uuid: c4ebd62118464e7a8d1945f80d70f8ae
           name: 'VMware: CPU usage in percents'
@@ -1079,8 +1176,8 @@ zabbix_export:
           description: 'CPU usage as a percentage during the interval.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: cpu
         -
           uuid: 1bff6fbd300d4455a787a273d957bba3
           name: 'VMware: CPU usage'
@@ -1093,8 +1190,8 @@ zabbix_export:
           description: 'Aggregated CPU usage across all cores on the host in Hz. This is only available if the host is connected.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: cpu
         -
           uuid: aad168c33cd14f76aa14ab5ca26498ec
           name: 'VMware: CPU utilization'
@@ -1108,8 +1205,8 @@ zabbix_export:
           description: 'CPU usage as a percentage during the interval depends on power management or HT.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: cpu
         -
           uuid: e4d27d7f9b9048d4ae6c60cbdd6c0091
           name: 'VMware: Datacenter name'
@@ -1129,8 +1226,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: datacenter
         -
           uuid: 5c29837f75f04d7f9a5786691b3dd991
           name: 'VMware: Full name'
@@ -1150,8 +1247,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: system
         -
           uuid: ad0053d57b834e6a9776c08e1c455d55
           name: 'VMware: CPU frequency'
@@ -1165,8 +1262,8 @@ zabbix_export:
           description: 'The speed of the CPU cores. This is an average value if there are multiple speeds. The product of CPU frequency and number of cores is approximately equal to the sum of the MHz for all the individual cores on the host.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: cpu
         -
           uuid: 3f0c35fcef9e4699ac5a1c51d80f8da4
           name: 'VMware: CPU model'
@@ -1181,8 +1278,8 @@ zabbix_export:
           description: 'The CPU model.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: cpu
         -
           uuid: c99a5bf2e3904f97b3d361ca20af7883
           name: 'VMware: CPU cores'
@@ -1200,8 +1297,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: cpu
         -
           uuid: 89cb0a4809e7454a862f398a0e9d6bed
           name: 'VMware: CPU threads'
@@ -1214,8 +1311,8 @@ zabbix_export:
           description: 'Number of physical CPU threads on the host.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: cpu
         -
           uuid: ce89c38e6e5d4338a30ee150be1b2b67
           name: 'VMware: Total memory'
@@ -1229,8 +1326,8 @@ zabbix_export:
           description: 'The physical memory size.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: memory
         -
           uuid: 7ed7ac26da384bcda976badf24ebbec1
           name: 'VMware: Model'
@@ -1245,8 +1342,8 @@ zabbix_export:
           description: 'The system model identification.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: system
         -
           uuid: 6c4aab55b3e640779a25ac90b9ca2a43
           name: 'VMware: Bios UUID'
@@ -1261,8 +1358,8 @@ zabbix_export:
           description: 'The hardware BIOS identification.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: system
         -
           uuid: aec06090d16d4bdd8ed3494b448f19d8
           name: 'VMware: Vendor'
@@ -1277,8 +1374,8 @@ zabbix_export:
           description: 'The hardware vendor identification.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: system
         -
           uuid: 21020a79436a49c38caf8941f6b68da3
           name: 'VMware: Ballooned memory'
@@ -1291,8 +1388,8 @@ zabbix_export:
           description: 'The amount of guest physical memory that is currently reclaimed through the balloon driver. Sum of all guest VMs.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: memory
         -
           uuid: 93d680d6886d446badbbe995ddd9ba9c
           name: 'VMware: Used memory'
@@ -1305,8 +1402,8 @@ zabbix_export:
           description: 'Physical memory usage on the host.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: memory
         -
           uuid: 33f78ab6ee6c4e7585a83a60cdecab6f
           name: 'VMware: Number of bytes received'
@@ -1319,8 +1416,8 @@ zabbix_export:
           description: 'VMware hypervisor network input statistics (bytes per second).'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: network
         -
           uuid: b013afcba08b47f4a5b590a59f464a58
           name: 'VMware: Number of bytes transmitted'
@@ -1333,8 +1430,8 @@ zabbix_export:
           description: 'VMware hypervisor network output statistics (bytes per second).'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: network
         -
           uuid: e4116d7c7e234c5ebd5784f42ade1f2e
           name: 'VMware: Power usage maximum allowed'
@@ -1352,8 +1449,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: power
         -
           uuid: 179a981cf30f4f77869e3b50dc2bc333
           name: 'VMware: Power usage'
@@ -1366,50 +1463,23 @@ zabbix_export:
           description: 'Current power usage.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: power
         -
-          uuid: 36b28fccf6db4c49bf20157c419400d0
-          name: 'VMware: Health state rollup'
+          uuid: 3c9d6ffb53624758ad888bf70f69218c
+          name: 'VMware: Get sensors'
           type: SIMPLE
-          key: 'vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
-          history: 7d
+          key: 'vmware.hv.sensors.get[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'The host health state rollup sensor value: gray - unknown, green - ok, red - it has a problem, yellow - it might have a problem.'
-          valuemap:
-            name: 'VMware status'
+          description: 'Master item for sensors data.'
           tags:
             -
-              tag: Application
-              value: VMware
-          triggers:
-            -
-              uuid: ffb8e14b1ea546b69f40070c628ac653
-              expression: 'last(/VMware Hypervisor/vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
-              name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
-              priority: HIGH
-              description: 'One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.'
-              dependencies:
-                -
-                  name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
-                  expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
-            -
-              uuid: 4825f11dcbf74e2c8e7e2b251cbeb7d9
-              expression: 'last(/VMware Hypervisor/vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2'
-              name: 'VMware: The {$VMWARE.HV.UUID} health is Yellow'
-              priority: AVERAGE
-              description: 'One or more components in the appliance might become overloaded soon.'
-              dependencies:
-                -
-                  name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
-                  expression: 'last(/VMware Hypervisor/vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
-                -
-                  name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
-                  expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
-                -
-                  name: 'VMware: The {$VMWARE.HV.UUID} health is Yellow'
-                  expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2'
+              tag: component
+              value: raw
         -
           uuid: 0cec294521314c5482233b5b96e90c8d
           name: 'VMware: Overall status'
@@ -1423,8 +1493,8 @@ zabbix_export:
             name: 'VMware status'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: health
           triggers:
             -
               uuid: 378511e0f1794874a68aef1b43561ee5
@@ -1432,6 +1502,13 @@ zabbix_export:
               name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
               priority: HIGH
               description: 'One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: ef6ca4d7033c4c8cb963eb7d493b3c7b
               expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2'
@@ -1442,6 +1519,13 @@ zabbix_export:
                 -
                   name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
                   expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: ecad96137494476293b57a0440de3f65
           name: 'VMware: Uptime'
@@ -1454,8 +1538,8 @@ zabbix_export:
           description: 'System uptime.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: system
           triggers:
             -
               uuid: 01d316b0a8cf4998b344f0c4ef1daa32
@@ -1464,6 +1548,10 @@ zabbix_export:
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 222ad20887cf479b8e81a4c338078d17
           name: 'VMware: Version'
@@ -1478,8 +1566,8 @@ zabbix_export:
           description: 'Dot-separated version string.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: system
         -
           uuid: 2045df572e864834bd4bd97046353f4e
           name: 'VMware: Number of guest VMs'
@@ -1492,8 +1580,8 @@ zabbix_export:
           description: 'Number of guest virtual machines.'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: system
       discovery_rules:
         -
           uuid: fb7774df87994355baff7402d9fabcc2
@@ -1515,8 +1603,11 @@ zabbix_export:
               description: 'Number of available datastore paths.'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: datastore
+                -
+                  tag: datastore
+                  value: '{#DATASTORE}'
               trigger_prototypes:
                 -
                   uuid: 8f1de4827ba446ef902ca5fa44109c6d
@@ -1526,6 +1617,10 @@ zabbix_export:
                   priority: AVERAGE
                   description: 'The number of available datastore paths less than registered ({#MULTIPATH.COUNT}).'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 259d1ff4bde143248f7ee2f7f880cb62
               name: 'VMware: Average read latency of the datastore {#DATASTORE}'
@@ -1537,8 +1632,11 @@ zabbix_export:
               description: 'Average amount of time for a read operation from the datastore (milliseconds).'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: datastore
+                -
+                  tag: datastore
+                  value: '{#DATASTORE}'
             -
               uuid: f36245398cc4460a9cb4ec741612693b
               name: 'VMware: Free space on datastore {#DATASTORE} (percentage)'
@@ -1553,8 +1651,11 @@ zabbix_export:
               description: 'VMware datastore space in percentage from total.'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: datastore
+                -
+                  tag: datastore
+                  value: '{#DATASTORE}'
             -
               uuid: cc83e8f5ec08483db75482706bf01aba
               name: 'VMware: Total size of datastore {#DATASTORE}'
@@ -1568,8 +1669,11 @@ zabbix_export:
               description: 'VMware datastore space in bytes.'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: datastore
+                -
+                  tag: datastore
+                  value: '{#DATASTORE}'
             -
               uuid: 9db980d8f5f44af5ad11a5949d80031d
               name: 'VMware: Average write latency of the datastore {#DATASTORE}'
@@ -1581,8 +1685,108 @@ zabbix_export:
               description: 'Average amount of time for a write operation to the datastore (milliseconds).'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: datastore
+                -
+                  tag: datastore
+                  value: '{#DATASTORE}'
+        -
+          uuid: deb31adf69634837839e2d8f87167f28
+          name: 'Healthcheck discovery'
+          type: DEPENDENT
+          key: vmware.hv.healthcheck.discovery
+          delay: '0'
+          description: 'VMware Rollup Health State sensor discovery'
+          item_prototypes:
+            -
+              uuid: fabb7524dd454daa942266e5565ce40e
+              name: 'VMware: Health state rollup'
+              type: DEPENDENT
+              key: 'vmware.hv.sensor.health.state[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The host health state rollup sensor value: gray - unknown, green - ok, red - it has a problem, yellow - it might have a problem.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..HostNumericSensorInfo[?(@.name=="VMware Rollup Health State")].healthState.label.first()'
+              master_item:
+                key: 'vmware.hv.sensors.get[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
+              tags:
+                -
+                  tag: component
+                  value: health
+              trigger_prototypes:
+                -
+                  uuid: 9f2a65161946436986aacf6c9a637673
+                  expression: 'last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])="Red"'
+                  name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
+                  priority: HIGH
+                  description: 'One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.'
+                  dependencies:
+                    -
+                      name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
+                      expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+                -
+                  uuid: dc4f84eb8d2143bb80999fbc58f38928
+                  expression: 'last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])="Yellow"'
+                  name: 'VMware: The {$VMWARE.HV.UUID} health is Yellow'
+                  priority: AVERAGE
+                  description: 'One or more components in the appliance might become overloaded soon.'
+                  dependencies:
+                    -
+                      name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
+                      expression: 'last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])="Red"'
+                    -
+                      name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
+                      expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
+                    -
+                      name: 'VMware: The {$VMWARE.HV.UUID} health is Yellow'
+                      expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+          master_item:
+            key: 'vmware.hv.sensors.get[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$..HostNumericSensorInfo[?(@.name=="VMware Rollup Health State")]'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '[]'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(value != "[]" ? [{''{#SINGLETON}'': ''''}] : []);'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: vmware
+        -
+          tag: target
+          value: vmware-hypervisor
       macros:
         -
           macro: '{$VMWARE.PASSWORD}'

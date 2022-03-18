@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:37:04Z'
+  date: '2022-03-01T09:00:20Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -35,8 +35,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: 'Monitoring agent'
+              tag: component
+              value: system
         -
           uuid: 3e70e8cc76bb4099a3a6b96f5669f059
           name: 'Zabbix agent ping'
@@ -47,8 +47,8 @@ zabbix_export:
             name: 'Zabbix agent ping status'
           tags:
             -
-              tag: Application
-              value: 'Monitoring agent'
+              tag: component
+              value: system
         -
           uuid: 32e67f37a30c4fb28db9119d9e26a996
           name: 'Version of Zabbix agent running'
@@ -64,42 +64,56 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: 'Monitoring agent'
+              tag: component
+              value: application
         -
           uuid: d25aa1f2eae445ceb18b7e4ee5383585
           name: 'Maximum number of opened files'
           key: kernel.maxfiles
           delay: 1h
           history: 7d
-          description: 'It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.'
+          description: 'It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.'
           tags:
             -
-              tag: Application
-              value: OS
+              tag: component
+              value: os
           triggers:
             -
               uuid: 933b14ead0974a9c96d36c833da90ebb
               expression: last(/macOS/kernel.maxfiles)<1024
               name: 'Configured max number of opened files is too low'
               priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 5c376cae54854613a1533eb804bcee56
           name: 'Maximum number of processes'
           key: kernel.maxproc
           delay: 1h
           history: 7d
-          description: 'It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.'
+          description: 'It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.'
           tags:
             -
-              tag: Application
-              value: OS
+              tag: component
+              value: os
           triggers:
             -
               uuid: 0e89b2e0cad948c0b81bc223d2ed673c
               expression: last(/macOS/kernel.maxproc)<256
               name: 'Configured max number of processes is too low'
               priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 951d874e6b644f9787c7a0d267bafcf8
           name: 'Incoming network traffic on en0'
@@ -117,8 +131,8 @@ zabbix_export:
                 - '8'
           tags:
             -
-              tag: Application
-              value: 'Network interfaces'
+              tag: component
+              value: network
         -
           uuid: ac875bd25d484d38b16cb02c30be6b67
           name: 'Outgoing network traffic on en0'
@@ -136,8 +150,8 @@ zabbix_export:
                 - '8'
           tags:
             -
-              tag: Application
-              value: 'Network interfaces'
+              tag: component
+              value: network
         -
           uuid: 928f973c004447d099a79e09a8b98cee
           name: 'Host boot time'
@@ -147,11 +161,8 @@ zabbix_export:
           units: unixtime
           tags:
             -
-              tag: Application
-              value: General
-            -
-              tag: Application
-              value: OS
+              tag: component
+              value: os
         -
           uuid: 5abd63bb64114794ae6d253dcc12afb4
           name: 'Processor load (1 min average per core)'
@@ -161,17 +172,21 @@ zabbix_export:
           description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
           tags:
             -
-              tag: Application
-              value: CPU
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: 3cf40421e61b41bab7697bbf9a2649d6
               expression: 'avg(/macOS/system.cpu.load[percpu,avg1],5m)>5'
               name: 'Processor load is too high'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 7e569411a7b4415098d21aaa44068dee
           name: 'Processor load (5 min average per core)'
@@ -181,11 +196,8 @@ zabbix_export:
           description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
           tags:
             -
-              tag: Application
-              value: CPU
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: cpu
         -
           uuid: 1ddc219f824541ca9c9ef30afda56df2
           name: 'Processor load (15 min average per core)'
@@ -195,11 +207,8 @@ zabbix_export:
           description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
           tags:
             -
-              tag: Application
-              value: CPU
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: cpu
         -
           uuid: 9c0230c0bb944523bd781c37304bb87b
           name: 'Host name'
@@ -217,17 +226,18 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: General
-            -
-              tag: Application
-              value: OS
+              tag: component
+              value: os
           triggers:
             -
               uuid: ffb713a281a543879e4196e4207bdd62
               expression: 'last(/macOS/system.hostname,#1)<>last(/macOS/system.hostname,#2)'
               name: 'Hostname was changed'
               priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 5a7ce2c61d3a4696ac76e0406308e61b
           name: 'Host local time'
@@ -236,11 +246,8 @@ zabbix_export:
           units: unixtime
           tags:
             -
-              tag: Application
-              value: General
-            -
-              tag: Application
-              value: OS
+              tag: component
+              value: os
         -
           uuid: 5c73ff0f28d24d92955c667e5245cfa0
           name: 'System information'
@@ -258,17 +265,18 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: General
-            -
-              tag: Application
-              value: OS
+              tag: component
+              value: os
           triggers:
             -
               uuid: 55d8650af70d4aeea56345985e454df9
               expression: 'last(/macOS/system.uname,#1)<>last(/macOS/system.uname,#2)'
               name: 'Host information was changed'
               priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 34c001a77a904224aa90338590375870
           name: 'System uptime'
@@ -278,17 +286,18 @@ zabbix_export:
           units: uptime
           tags:
             -
-              tag: Application
-              value: General
-            -
-              tag: Application
-              value: OS
+              tag: component
+              value: os
           triggers:
             -
               uuid: 1f0cc03186cc4bb98483927f425df8e9
               expression: change(/macOS/system.uptime)<0
               name: 'Server has just been restarted'
               priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 31ea6bafabbe440ea1b8d1b6cea74444
           name: 'Number of logged in users'
@@ -297,11 +306,11 @@ zabbix_export:
           description: 'Number of users who are currently logged in.'
           tags:
             -
-              tag: Application
-              value: OS
+              tag: component
+              value: os
             -
-              tag: Application
-              value: Security
+              tag: component
+              value: security
         -
           uuid: 6df0d9e8694d45dfa11e433d8de7be41
           name: 'Checksum of /etc/passwd'
@@ -310,14 +319,18 @@ zabbix_export:
           history: 7d
           tags:
             -
-              tag: Application
-              value: Security
+              tag: component
+              value: security
           triggers:
             -
               uuid: 39cfe50a3d2a46ad9a53b9ec7443ec18
               expression: 'last(/macOS/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/macOS/vfs.file.cksum[/etc/passwd,sha256],#2)'
               name: '/etc/passwd has been changed'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: security
         -
           uuid: daf35c33bb84443f893bb06bfe10f870
           name: 'Available memory'
@@ -327,14 +340,21 @@ zabbix_export:
           description: 'Available memory is defined as free+cached+buffers memory.'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
           triggers:
             -
               uuid: c38dfc1b95d1463585d378f60d6a689a
               expression: 'last(/macOS/vm.memory.size[available])<20M'
               name: 'Lack of available memory on server'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 83c0218324a548c4a01054801a4d8b0b
           name: 'Total memory'
@@ -344,8 +364,8 @@ zabbix_export:
           units: B
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: d00cf9691f6c446fa35dab03b2201aa4
           name: 'Zabbix agent availability'
@@ -357,8 +377,8 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 0766e9c2a02f46e7adbb86dbef67556f
@@ -367,6 +387,10 @@ zabbix_export:
               priority: AVERAGE
               description: 'For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: c537fbe006d7434dab08add1dcf87537
@@ -390,14 +414,24 @@ zabbix_export:
               units: '%'
               tags:
                 -
-                  tag: Application
-                  value: Filesystems
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
               trigger_prototypes:
                 -
                   uuid: 91cccd7935854a47bf4ca184b1d4d09a
                   expression: 'last(/macOS/vfs.fs.inode[{#FSNAME},pfree])<20'
                   name: '{#FSNAME}: Free inodes is less than 20%'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 29340ac4c5d3419cb4508641e85d787d
               name: '{#FSNAME}: Free disk space'
@@ -406,8 +440,11 @@ zabbix_export:
               units: B
               tags:
                 -
-                  tag: Application
-                  value: Filesystems
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: 6d9aa50bddb642499ad575a0cc71146b
               name: '{#FSNAME}: Free disk space (percentage)'
@@ -417,14 +454,24 @@ zabbix_export:
               units: '%'
               tags:
                 -
-                  tag: Application
-                  value: Filesystems
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
               trigger_prototypes:
                 -
                   uuid: 673dbc5aec474abda3a3b392d31b6c11
                   expression: 'last(/macOS/vfs.fs.size[{#FSNAME},pfree])<20'
                   name: '{#FSNAME}: Free disk space is less than 20%'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: c311ced2b4204b368af1c8a8c27f9c99
               name: '{#FSNAME}: Total disk space'
@@ -434,8 +481,11 @@ zabbix_export:
               units: B
               tags:
                 -
-                  tag: Application
-                  value: Filesystems
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: 748612098b4e4befa0f39f11b99eced4
               name: '{#FSNAME}: Used disk space'
@@ -444,8 +494,11 @@ zabbix_export:
               units: B
               tags:
                 -
-                  tag: Application
-                  value: Filesystems
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
           graph_prototypes:
             -
               uuid: 6ce28b13df4e4494a4d39750afb25290
@@ -469,6 +522,13 @@ zabbix_export:
                   item:
                     host: macOS
                     key: 'vfs.fs.size[{#FSNAME},free]'
+      tags:
+        -
+          tag: class
+          value: os
+        -
+          tag: target
+          value: macos
       macros:
         -
           macro: '{$AGENT.TIMEOUT}'

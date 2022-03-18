@@ -247,7 +247,7 @@ var chkbxRange = {
 	 */
 	update: function(object) {
 		// update main checkbox state
-		this.updateMainCheckbox();
+		this.updateMainCheckbox(object);
 
 		if (this.pageGoName == object) {
 			this.updateGoButton();
@@ -275,30 +275,33 @@ var chkbxRange = {
 		});
 	},
 
-	// check if all checkboxes are selected and select main checkbox, else disable checkbox, select options and button
-	updateMainCheckbox: function() {
-		var mainCheckbox = jQuery('.list-table .header input[type=checkbox]:not(:disabled)');
-		if (!mainCheckbox.length) {
+	/**
+	 * Select main checkbox if all other checkboxes are selected.
+	 *
+	 * @param {string} object
+	 */
+	updateMainCheckbox: function(object) {
+		const checkbox_list = this.getObjectCheckboxes(object);
+		const $main_checkbox = $(checkbox_list)
+			.parents('table')
+			.find('thead input[type=checkbox]');
+
+		if ($main_checkbox.length == 0) {
 			return;
 		}
 
-		var countAvailable = jQuery('.list-table tr:not(.header) input[type=checkbox]:not(:disabled)').length;
+		const count_available = checkbox_list.length;
 
-		if (countAvailable > 0) {
-			var countChecked = jQuery('.list-table tr:not(.header) input[type=checkbox]:not(:disabled):checked').length;
+		if (count_available > 0) {
+			const checked = [];
 
-			mainCheckbox = mainCheckbox[0];
-			mainCheckbox.checked = (countChecked == countAvailable);
+			jQuery.each(checkbox_list, (i, checkbox) => {
+				if (checkbox.checked) {
+					checked.push(checkbox);
+				}
+			});
 
-			if (mainCheckbox.checked) {
-				jQuery('.list-table .header').addClass('selectedMain');
-			}
-			else {
-				jQuery('.list-table .header').removeClass('selectedMain');
-			}
-		}
-		else {
-			mainCheckbox.disabled = true;
+			$main_checkbox[0].checked = (checked.length == count_available);
 		}
 	},
 

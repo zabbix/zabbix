@@ -175,8 +175,6 @@ function getMenuPopupHost(options, trigger_element) {
 			var graphs_url = new Curl('zabbix.php', false);
 
 			graphs_url.setArgument('action', 'charts.view')
-			graphs_url.setArgument('view_as', 'showgraph'); // HISTORY_GRAPH
-			graphs_url.setArgument('filter_search_type', '0'); // ZBX_SEARCH_TYPE_STRICT
 			graphs_url.setArgument('filter_hostids[]', options.hostid);
 			graphs_url.setArgument('filter_set', '1');
 			graphs.url = graphs_url.getUrl();

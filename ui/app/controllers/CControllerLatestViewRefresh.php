@@ -52,8 +52,8 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 			$prepared_data = $this->prepareData($filter, $filter['sort'], $filter['sortorder']);
 
 			// Prepare subfilter data.
-			$subfilters_fields = self::getSubfilterFields($filter);
-			$subfilters = self::getSubfilters($subfilters_fields, $prepared_data, $filter);
+			$subfilters_fields = self::getSubfilterFields($filter, (count($filter['hostids']) == 1));
+			$subfilters = self::getSubfilters($subfilters_fields, $prepared_data);
 			$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
 
 			$page = $this->getInput('page', 1);

@@ -34,7 +34,6 @@ class CControllerLatestView extends CControllerLatest {
 			'groupids' =>				'array_db hosts_groups.groupid',
 			'hostids' =>				'array_db hosts.hostid',
 			'name' =>					'string',
-			'show_without_data' =>		'in 1,0',
 			'show_details' =>			'in 1,0',
 			'evaltype' =>				'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'tags' =>					'array',
@@ -145,8 +144,8 @@ class CControllerLatestView extends CControllerLatest {
 		$prepared_data = $this->prepareData($filter, $sort_field, $sort_order);
 
 		// Prepare subfilter data.
-		$subfilters_fields = self::getSubfilterFields($filter);
-		$subfilters = self::getSubfilters($subfilters_fields, $prepared_data, $filter);
+		$subfilters_fields = self::getSubfilterFields($filter, (count($filter['hostids']) == 1));
+		$subfilters = self::getSubfilters($subfilters_fields, $prepared_data);
 		$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
 
 		$view_url = (new CUrl('zabbix.php'))->setArgument('action', 'latest.view');
@@ -160,7 +159,6 @@ class CControllerLatestView extends CControllerLatest {
 			'groupids' => $filter['groupids'],
 			'hostids' => $filter['hostids'],
 			'name' => $filter['name'],
-			'show_without_data' => $filter['show_without_data'] ? 1 : 0,
 			'show_details' => $filter['show_details'] ? 1 : 0,
 			'evaltype' => $filter['evaltype'],
 			'tags' => $filter['tags'],

@@ -48,6 +48,18 @@ class testFormMacrosHost extends testFormMacros {
 	 */
 	protected static $hostid_remove_inherited;
 
+	public $macro_resolve = '{$X_SECRET_HOST_MACRO_2_RESOLVE}';
+	public $macro_resolve_hostid = 99135;
+
+	public $vault_object = 'host';
+	public $vault_error_field = '/1/macros/6/value';
+	public $update_vault_macro = '{$VAULT_HOST_MACRO3_CHANGED}';
+	public $vault_macro_index = 2;
+
+	public $revert_macro_1 = '{$SECRET_HOST_MACRO_REVERT}';
+	public $revert_macro_2 = '{$SECRET_HOST_MACRO_2_TEXT_REVERT}';
+	public $revert_macro_object = 'host';
+
 	/**
 	 * @dataProvider getCreateMacrosData
 	 */
@@ -232,28 +244,6 @@ class testFormMacrosHost extends testFormMacros {
 		$this->createSecretMacros($data, 'zabbix.php?action=host.view', 'hosts', 'Available host');
 	}
 
-	public function getRevertSecretMacrosData() {
-		return [
-			[
-				[
-					'macro_fields' => [
-						'macro' => '{$SECRET_HOST_MACRO_REVERT}',
-						'value' => 'Secret host value'
-					]
-				]
-			],
-			[
-				[
-					'macro_fields' => [
-						'macro' => '{$SECRET_HOST_MACRO_2_TEXT_REVERT}',
-						'value' => 'Secret host value 2'
-					],
-					'set_to_text' => true
-				]
-			]
-		];
-	}
-
 	/**
 	 * @dataProvider getRevertSecretMacrosData
 	 */
@@ -306,176 +296,13 @@ class testFormMacrosHost extends testFormMacros {
 	}
 
 	/**
-	 * Check how secret macro is resolved in item name for host, host prototype and template entities.
+	 * Test opens the list of items of "Available host in maintenance" and "Latest data"
+	 * and checks macro resolution in item fields.
+	 *
+	 * @dataProvider getResolveSecretMacroData
 	 */
-	public function testFormMacrosHost_ResolveSecretMacro() {
-		$hostid = 99135;
-		$hostname = 'Available host in maintenance';
-
-		$macro = [
-			'macro' => '{$X_SECRET_HOST_MACRO_2_RESOLVE}',
-			'value' => 'Value 2 B resolved'
-		];
-
-		// Open Hosts items page and check macro resolved text.
-		$this->page->login()->open('zabbix.php?show_details=1&show_without_data=1&action=latest.view&hostids%5B%5D='.
-				$hostid)->waitUntilReady();
-//		Caused by https://support.zabbix.com/browse/ZBXNEXT-7115
-//		Support of user macros in item names has been dropped.
-		$this->assertTrue($this->query('xpath://span[text()='.CXPATHHelper::escapeQuotes('trap['.$macro['value'].']').']')->exists());
-
-		// Open host form in popup and change macro type.
-		$form = $this->openMacrosTab('zabbix.php?action=host.view', 'hosts', false, $hostname);
-		$this->getValueField($macro['macro'])->changeInputType(CInputGroupElement::TYPE_SECRET);
-
-		$form->submit();
-		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, 'Host updated');
-
-		// Open items page and check secret macro appearance.
-		$this->page->open('zabbix.php?show_details=1&show_without_data=1&action=latest.view&hostids%5B%5D='.
-				$hostid)->waitUntilReady();
-//		Caused by https://support.zabbix.com/browse/ZBXNEXT-7115
-//		Support of user macros in item names has been dropped.
-		$this->assertTrue($this->query('xpath://span[text()="trap[******]"]')->exists());
-	}
-
-	public function getCreateVaultMacrosData() {
-		return [
-			[
-				[
-					'expected' => TEST_GOOD,
-					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO}',
-						'value' => [
-							'text' => 'secret/path:key',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description'
-					],
-					'title' => 'Host updated'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO2}',
-						'value' => [
-							'text' => 'one/two/three/four/five/six:key',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description7'
-					],
-					'title' => 'Host updated'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO3}',
-						'value' => [
-							'text' => 'secret/path:',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description2'
-					],
-					'title' => 'Cannot update host',
-					'message' => 'Invalid parameter "/1/macros/6/value": incorrect syntax near "path:".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO4}',
-						'value' => [
-							'text' => '/path:key',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description3'
-					],
-					'title' => 'Cannot update host',
-					'message' => 'Invalid parameter "/1/macros/6/value": incorrect syntax near "/path:key".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO5}',
-						'value' => [
-							'text' => 'path:key',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description4'
-					],
-					'title' => 'Cannot update host',
-					'message' => 'Invalid parameter "/1/macros/6/value": incorrect syntax near "path:key".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO6}',
-						'value' => [
-							'text' => ':key',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description5'
-					],
-					'title' => 'Cannot update host',
-					'message' => 'Invalid parameter "/1/macros/6/value": incorrect syntax near ":key".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO7}',
-						'value' => [
-							'text' => 'secret/path',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description6'
-					],
-					'title' => 'Cannot update host',
-					'message' => 'Invalid parameter "/1/macros/6/value": incorrect syntax near "path".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO8}',
-						'value' => [
-							'text' => '/secret/path:key',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description8'
-					],
-					'title' => 'Cannot update host',
-					'message' => 'Invalid parameter "/1/macros/6/value": incorrect syntax near "/secret/path:key".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO9}',
-						'value' => [
-							'text' => '',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description9'
-					],
-					'title' => 'Cannot update host',
-					'message' => 'Invalid parameter "/1/macros/6/value": cannot be empty.'
-				]
-			]
-		];
+	public function testFormMacrosHost_ResolveSecretMacro($data) {
+		$this->resolveSecretMacro($data, 'host');
 	}
 
 	/**
@@ -484,44 +311,6 @@ class testFormMacrosHost extends testFormMacros {
 	 */
 	public function testFormMacrosHost_CreateVaultMacros($data) {
 		$this->createVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', 'Available host');
-	}
-
-	public function getUpdateVaultMacrosData() {
-		return [
-			[
-				[
-					'action' => USER_ACTION_UPDATE,
-					'index' => 2,
-					'macro' => '{$VAULT_HOST_MACRO3_CHANGED}',
-					'value' => [
-						'text' => 'secret/path:key'
-					],
-					'description' => ''
-				]
-			],
-			[
-				[
-					'action' => USER_ACTION_UPDATE,
-					'index' => 2,
-					'macro' => '{$VAULT_HOST_MACRO3_CHANGED}',
-					'value' => [
-						'text' => 'new/path/to/secret:key'
-					],
-					'description' => ''
-				]
-			],
-			[
-				[
-					'action' => USER_ACTION_UPDATE,
-					'index' => 2,
-					'macro' => '{$VAULT_HOST_MACRO3_CHANGED}',
-					'value' => [
-						'text' => 'new/path/to/secret:key'
-					],
-					'description' => 'Changing description'
-				]
-			]
-		];
 	}
 
 	/**

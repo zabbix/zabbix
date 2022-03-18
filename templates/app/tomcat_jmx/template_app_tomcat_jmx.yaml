@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T06:58:14Z'
+  date: '2022-03-01T13:07:23Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -17,7 +17,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/411862-discussion-thread-for-official-zabbix-template-tomcat
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -41,8 +41,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: Tomcat
+              tag: component
+              value: system
           triggers:
             -
               uuid: 152d235652914aa2af78334385334214
@@ -51,6 +51,10 @@ zabbix_export:
               priority: INFO
               description: 'Tomcat version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
       discovery_rules:
         -
           uuid: a478be537e5f48fe95310997d0df0eda
@@ -88,8 +92,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'Tomcat: ProtocolHandler {#JMXVALUE}'
+                  tag: component
+                  value: protocol-handler
+                -
+                  tag: protocol-handler
+                  value: '{#JMXVALUE}'
               trigger_prototypes:
                 -
                   uuid: 7d707de73a164f1db6b69e4dcb8c6ae9
@@ -98,6 +105,10 @@ zabbix_export:
                   priority: INFO
                   description: 'gzip compression is disabled for connector {#JMXVALUE}.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
         -
           uuid: 77175f79fe844bb8bca66de437a3ba32
@@ -112,14 +123,14 @@ zabbix_export:
             conditions:
               -
                 macro: '{#JMXNAME}'
-                value: '{$TOMCAT.LLD.FILTER.MATCHES:"GlobalRequesProcessor"}'
+                value: '{$TOMCAT.LLD.FILTER.MATCHES:"GlobalRequestProcessor"}'
                 formulaid: A
               -
                 macro: '{#JMXNAME}'
-                value: '{$TOMCAT.LLD.FILTER.NOT_MATCHES:"GlobalRequesProcessor"}'
+                value: '{$TOMCAT.LLD.FILTER.NOT_MATCHES:"GlobalRequestProcessor"}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovery for GlobalRequesProcessor'
+          description: 'Discovery for GlobalRequestProcessor'
           item_prototypes:
             -
               uuid: d7cb07f3f5e04792850332c416284dd9
@@ -139,8 +150,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
+                  tag: component
+                  value: request
+                -
+                  tag: jmx-name
+                  value: '{#JMXNAME}'
+                -
+                  tag: jmx-type
+                  value: '{#JMXTYPE}'
             -
               uuid: abad7332ed6b417c92f6038ce12ae000
               name: '{#JMXNAME}: Bytes sent per second'
@@ -159,8 +176,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
+                  tag: component
+                  value: request
+                -
+                  tag: jmx-name
+                  value: '{#JMXNAME}'
+                -
+                  tag: jmx-type
+                  value: '{#JMXTYPE}'
             -
               uuid: 1596a335401d47d6b2bde7a5b0de7b07
               name: '{#JMXNAME}: Errors per second'
@@ -178,8 +201,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
+                  tag: component
+                  value: request
+                -
+                  tag: jmx-name
+                  value: '{#JMXNAME}'
+                -
+                  tag: jmx-type
+                  value: '{#JMXTYPE}'
             -
               uuid: 985d3eeacd9d404385bfcef693add39a
               name: '{#JMXNAME}: Requests processing time'
@@ -189,7 +218,9 @@ zabbix_export:
               units: s
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
-              description: 'The total time to process all incoming requests of request processor {#JMXNAME}'
+              description: |
+                The total time to process all incoming requests of request processor
+                {#JMXNAME}
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -198,8 +229,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
+                  tag: component
+                  value: request
+                -
+                  tag: jmx-name
+                  value: '{#JMXNAME}'
+                -
+                  tag: jmx-type
+                  value: '{#JMXTYPE}'
             -
               uuid: 8e0307b5063549dab118e0e374a62aad
               name: '{#JMXNAME}: Requests per second'
@@ -217,8 +254,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
+                  tag: component
+                  value: request
+                -
+                  tag: jmx-name
+                  value: '{#JMXNAME}'
+                -
+                  tag: jmx-type
+                  value: '{#JMXTYPE}'
           graph_prototypes:
             -
               uuid: 87de97d55baa4be1964652957a051fc2
@@ -272,8 +315,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'Tomcat: Context {#JMXHOST}{#JMXCONTEXT}'
+                  tag: component
+                  value: context
+                -
+                  tag: jmx-context
+                  value: '{#JMXCONTEXT}'
+                -
+                  tag: jmx-host
+                  value: '{#JMXHOST}'
             -
               uuid: bc3c2a3cff614f3eaf001463df1b2364
               name: '{#JMXHOST}{#JMXCONTEXT}: Sessions allowed maximum'
@@ -287,8 +336,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'Tomcat: Context {#JMXHOST}{#JMXCONTEXT}'
+                  tag: component
+                  value: context
+                -
+                  tag: jmx-context
+                  value: '{#JMXCONTEXT}'
+                -
+                  tag: jmx-host
+                  value: '{#JMXHOST}'
             -
               uuid: fd8678e68cf440939af2dd8f3568a42f
               name: '{#JMXHOST}{#JMXCONTEXT}: Sessions active maximum so far'
@@ -301,8 +356,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'Tomcat: Context {#JMXHOST}{#JMXCONTEXT}'
+                  tag: component
+                  value: context
+                -
+                  tag: jmx-context
+                  value: '{#JMXCONTEXT}'
+                -
+                  tag: jmx-host
+                  value: '{#JMXHOST}'
             -
               uuid: 34702e2d6b2142ec9aa43bea1059a98a
               name: '{#JMXHOST}{#JMXCONTEXT}: Sessions rejected per second'
@@ -320,8 +381,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'Tomcat: Context {#JMXHOST}{#JMXCONTEXT}'
+                  tag: component
+                  value: context
+                -
+                  tag: jmx-context
+                  value: '{#JMXCONTEXT}'
+                -
+                  tag: jmx-host
+                  value: '{#JMXHOST}'
             -
               uuid: eb28f9bd99d440f4a50d1c24ae758029
               name: '{#JMXHOST}{#JMXCONTEXT}: Sessions created per second'
@@ -339,8 +406,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'Tomcat: Context {#JMXHOST}{#JMXCONTEXT}'
+                  tag: component
+                  value: context
+                -
+                  tag: jmx-context
+                  value: '{#JMXCONTEXT}'
+                -
+                  tag: jmx-host
+                  value: '{#JMXHOST}'
           graph_prototypes:
             -
               uuid: dfd46f5443f9438fb21ae23dfd4010c0
@@ -413,8 +486,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
+                  tag: component
+                  value: thread-pool
+                -
+                  tag: jmx-name
+                  value: '{#JMXNAME}'
+                -
+                  tag: jmx-type
+                  value: '{#JMXTYPE}'
             -
               uuid: 35b1e99fbc44448083b5aad0ce1239a1
               name: '{#JMXNAME}: Threads busy'
@@ -427,8 +506,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
+                  tag: component
+                  value: thread-pool
+                -
+                  tag: jmx-name
+                  value: '{#JMXNAME}'
+                -
+                  tag: jmx-type
+                  value: '{#JMXTYPE}'
             -
               uuid: 32e316ce567c4f94aecb89d9763e4d27
               name: '{#JMXNAME}: Threads limit'
@@ -446,8 +531,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
+                  tag: component
+                  value: thread-pool
+                -
+                  tag: jmx-name
+                  value: '{#JMXNAME}'
+                -
+                  tag: jmx-type
+                  value: '{#JMXTYPE}'
           trigger_prototypes:
             -
               uuid: 7a15296553a447f6aebf4958631b6704
@@ -455,6 +546,10 @@ zabbix_export:
               name: '{#JMXNAME}: Busy worker threads count are more than {$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}% of the limit for {$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"}'
               priority: HIGH
               description: 'When current threads busy counter reaches the limit, no more requests could be handled, and the application chokes.'
+              tags:
+                -
+                  tag: scope
+                  value: notice
           graph_prototypes:
             -
               uuid: d8236335204a42488c6221c8b2d31e77
@@ -481,6 +576,13 @@ zabbix_export:
                     host: 'Apache Tomcat by JMX'
                     key: 'jmx[{#JMXOBJ},currentThreadsBusy]'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: tomcat
       macros:
         -
           macro: '{$TOMCAT.LLD.FILTER.MATCHES}'

@@ -28,6 +28,7 @@ class testFormTagsHost extends testFormTags {
 
 	public $update_name = 'Host with tags for updating';
 	public $clone_name = 'Host with tags for cloning';
+	public $remove_name = 'Host for removing tags';
 	public $link = 'zabbix.php?action=host.list';
 	public $saved_link = 'zabbix.php?action=host.edit&hostid=';
 
@@ -61,5 +62,12 @@ class testFormTagsHost extends testFormTags {
 	 */
 	public function testFormTagsHost_FullClone() {
 		$this->executeCloning('host', 'Full clone');
+	}
+
+	/**
+	 * Test removing tags from Host.
+	 */
+	public function testFormTagsHost_RemoveTags() {
+		$this->clearTags('host');
 	}
 }

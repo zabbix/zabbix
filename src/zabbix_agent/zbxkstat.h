@@ -17,14 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-
 #ifndef ZABBIX_ZBXKSTAT_H
 #define ZABBIX_ZBXKSTAT_H
 
-#if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
-
 #include "zbxtypes.h"
+
+#if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
 
 typedef struct
 {

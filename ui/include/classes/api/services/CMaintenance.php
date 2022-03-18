@@ -287,7 +287,7 @@ class CMaintenance extends CApiService {
 	/**
 	 * @param array $maintenances
 	 *
-	 * @throws APIException if no permissions to object, it does no exists or the input is invalid.
+	 * @throws APIException if no permissions to object, it does not exist or the input is invalid.
 	 */
 	protected function validateCreate(array &$maintenances): void {
 		$api_input_rules =		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [

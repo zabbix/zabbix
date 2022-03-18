@@ -33,9 +33,9 @@ class testPageTemplates extends CLegacyWebTest {
 	use TableTrait;
 
 	public static function allTemplates() {
-		// TODO: remove 'AND name NOT LIKE "%Cisco Catalyst%"' and change to single quotes after fix ZBX-19356
-		return CDBHelper::getRandomizedDataProvider("SELECT * FROM hosts WHERE status IN (".HOST_STATUS_TEMPLATE.")".
-				" AND name NOT LIKE '%Cisco Catalyst%' AND name NOT LIKE '%Mellanox%'", 25);
+		return CDBHelper::getRandomizedDataProvider(
+			'SELECT * FROM hosts WHERE status IN ('.HOST_STATUS_TEMPLATE.')', 25
+		);
 	}
 
 	public function testPageTemplates_CheckLayout() {
@@ -67,11 +67,6 @@ class testPageTemplates extends CLegacyWebTest {
 	 * @dataProvider allTemplates
 	 */
 	public function testPageTemplates_SimpleUpdate($template) {
-		// TODO: Remove the below if condition along with its content when ZBX-20020 is merged
-		if ($template['name'] === 'Cisco UCS Manager SNMP') {
-			return;
-		}
-
 		$host = $template['host'];
 		$name = $template['name'];
 

@@ -27,6 +27,7 @@ require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
 $triggersWidget = (new CWidget())
 	->setTitle(_('Trigger prototypes'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_TRIGGER_PROTOTYPE_EDIT))
 	->setNavigation(getHostNavigation('triggers', $data['hostid'], $data['parent_discoveryid']));
 
 $url = (new CUrl('trigger_prototypes.php'))
@@ -651,7 +652,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList, TAB_INDICATOR_DEPENDENCY);
 
-$cancelButton = $data['backurl']
+$cancelButton = $data['backurl'] !== null
 	? new CButtonCancel(null, "redirect('".$data['backurl']."');")
 	: new CButtonCancel(url_params(['parent_discoveryid', 'context']));
 

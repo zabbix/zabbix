@@ -25,7 +25,9 @@
 
 require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
-$widget = (new CWidget())->setTitle(_('Triggers'));
+$widget = (new CWidget())
+	->setTitle(_('Triggers'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_TRIGGERS_EDIT));
 
 // Append host summary to widget header.
 if ($data['hostid'] != 0) {
@@ -653,7 +655,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList, TAB_INDICATOR_DEPENDENCY);
 
-$cancelButton = $data['backurl']
+$cancelButton = $data['backurl'] !== null
 	? new CButtonCancel(null, "redirect('".$data['backurl']."');")
 	: new CButtonCancel(url_param('context'));
 

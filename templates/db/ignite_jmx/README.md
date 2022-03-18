@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 Official JMX Template for Apache Ignite computing platform.
 This template is based on the original template developed by Igor Akkuratov, Senior Engineer at GridGain Systems and Apache Ignite Contributor.
 
@@ -14,7 +14,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/jmx) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/jmx) for basic instructions.
 
 This template works with standalone and cluster instances. Metrics are collected by JMX. All metrics are discoverable.
 
@@ -55,16 +55,16 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Ignite kernal metrics |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:group=Kernal,name=IgniteKernal,*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
-|Cluster metrics |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:group=Kernal,name=ClusterMetricsMXBeanImpl,*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
-|Local node metrics |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:group=Kernal,name=ClusterLocalNodeMetricsMXBeanImpl,*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
-|TCP discovery SPI |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:group=SPIs,name=TcpDiscoverySpi,*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
-|TCP Communication SPI metrics |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:group=SPIs,name=TcpCommunicationSpi,*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
-|Transaction metrics |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:group=TransactionMetrics,name=TransactionMetricsMxBeanImpl,*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
-|Cache metrics |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:name=\"org.apache.ignite.internal.processors.cache.CacheLocalMetricsMXBeanImpl\",*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Filter**:</p>AND <p>- {#JMXGROUP} MATCHES_REGEX `{$IGNITE.LLD.FILTER.CACHE.MATCHES}`</p><p>- {#JMXGROUP} NOT_MATCHES_REGEX `{$IGNITE.LLD.FILTER.CACHE.NOT_MATCHES}`</p> |
-|Data region metrics |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:group=DataRegionMetrics,*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Filter**:</p>AND <p>- {#JMXNAME} MATCHES_REGEX `{$IGNITE.LLD.FILTER.DATA.REGION.MATCHES}`</p><p>- {#JMXNAME} NOT_MATCHES_REGEX `{$IGNITE.LLD.FILTER.DATA.REGION.NOT_MATCHES}`</p> |
 |Cache groups |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:group=\"Cache groups\",*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Filter**:</p>AND <p>- {#JMXNAME} MATCHES_REGEX `{$IGNITE.LLD.FILTER.CACHE.MATCHES}`</p><p>- {#JMXNAME} NOT_MATCHES_REGEX `{$IGNITE.LLD.FILTER.CACHE.NOT_MATCHES}`</p> |
+|Cache metrics |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:name=\"org.apache.ignite.internal.processors.cache.CacheLocalMetricsMXBeanImpl\",*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Filter**:</p>AND <p>- {#JMXGROUP} MATCHES_REGEX `{$IGNITE.LLD.FILTER.CACHE.MATCHES}`</p><p>- {#JMXGROUP} NOT_MATCHES_REGEX `{$IGNITE.LLD.FILTER.CACHE.NOT_MATCHES}`</p> |
+|Cluster metrics |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:group=Kernal,name=ClusterMetricsMXBeanImpl,*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Data region metrics |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:group=DataRegionMetrics,*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Filter**:</p>AND <p>- {#JMXNAME} MATCHES_REGEX `{$IGNITE.LLD.FILTER.DATA.REGION.MATCHES}`</p><p>- {#JMXNAME} NOT_MATCHES_REGEX `{$IGNITE.LLD.FILTER.DATA.REGION.NOT_MATCHES}`</p> |
+|Ignite kernal metrics |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:group=Kernal,name=IgniteKernal,*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Local node metrics |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:group=Kernal,name=ClusterLocalNodeMetricsMXBeanImpl,*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|TCP Communication SPI metrics |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:group=SPIs,name=TcpCommunicationSpi,*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|TCP discovery SPI |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:group=SPIs,name=TcpDiscoverySpi,*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Thread pool metrics |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:group=\"Thread Pools\",*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Filter**:</p>AND <p>- {#JMXNAME} MATCHES_REGEX `{$IGNITE.LLD.FILTER.THREAD.POOL.MATCHES}`</p><p>- {#JMXNAME} NOT_MATCHES_REGEX `{$IGNITE.LLD.FILTER.THREAD.POOL.NOT_MATCHES}`</p> |
+|Transaction metrics |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:group=TransactionMetrics,name=TransactionMetricsMxBeanImpl,*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 
 ## Items collected
 
@@ -172,5 +172,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
 

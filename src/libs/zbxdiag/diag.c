@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "zbxalgo.h"
+#include "diag.h"
+
 #include "dbcache.h"
 #include "preproc.h"
 #include "zbxdiag.h"
-#include "diag.h"
 #include "log.h"
+#include "mutexs.h"
 
 void	diag_map_free(zbx_diag_map_t *map)
 {

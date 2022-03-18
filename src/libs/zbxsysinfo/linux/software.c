@@ -17,11 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "software.h"
+
 #include "sysinfo.h"
 #include "zbxalgo.h"
 #include "zbxexec.h"
 #include "cfg.h"
-#include "software.h"
 #include "zbxregexp.h"
 #include "log.h"
 

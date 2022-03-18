@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:38:41Z'
+  date: '2022-01-26T10:32:52Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -41,8 +41,8 @@ zabbix_export:
                 - '$..[''{#CPU.UTIL}''].avg()'
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: bb8b2193ed4c437284d569a38f500367
@@ -51,6 +51,10 @@ zabbix_export:
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'
@@ -118,8 +122,8 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: f5b701faf10d40d596d04e1d921861f9
               name: '{#MEMNAME}: Used memory'
@@ -138,8 +142,8 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: 99961a81ae4a474ea157f108c8014c77
               name: '{#MEMNAME}: Memory utilization'
@@ -152,8 +156,8 @@ zabbix_export:
               description: 'Memory utilization in %'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: fb87fa900e404e2ba53fa5769fecc511
@@ -161,6 +165,13 @@ zabbix_export:
                   name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 47a47f92e42047fe937e01ad163ca665
@@ -230,8 +241,8 @@ zabbix_export:
                 - '$..[''{#CPU.UTIL}''].avg()'
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: d1b02854c6cd473090735eabfbd4d908
@@ -240,6 +251,10 @@ zabbix_export:
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
       discovery_rules:
         -
           uuid: 083012fc49c248cc8869484266c5bc35
@@ -283,8 +298,11 @@ zabbix_export:
               description: 'Space utilization in % for {#FSNAME}'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: fe61fddd59e34574b4cde449a4a1bd0e
               name: '{#FSNAME}: Total space'
@@ -305,8 +323,11 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: 7e5e0fae3cd24a8fb0a526d726599915
               name: '{#FSNAME}: Used space'
@@ -325,8 +346,11 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
           trigger_prototypes:
             -
               uuid: 8283f8b8663f444aad85633010615c15
@@ -342,6 +366,13 @@ zabbix_export:
                  - The disk free space is less than 5G.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: capacity
             -
               uuid: 2d9c475d718b4c2ba14b129f66014f75
               expression: |
@@ -362,6 +393,13 @@ zabbix_export:
                   expression: |
                     last(/HOST-RESOURCES-MIB SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                     ((last(/HOST-RESOURCES-MIB SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/HOST-RESOURCES-MIB SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<5G or timeleft(/HOST-RESOURCES-MIB SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: capacity
           graph_prototypes:
             -
               uuid: 347d802fcd114cad882a2299eb2b02de
@@ -435,8 +473,8 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: c555b61dfac744c3abb77d014efc8e0d
               name: '{#MEMNAME}: Used memory'
@@ -455,8 +493,8 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: 01e2f5515f2145a68d93a4637abfe4e9
               name: '{#MEMNAME}: Memory utilization'
@@ -469,8 +507,8 @@ zabbix_export:
               description: 'Memory utilization in %'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: 730a76bd19a24a55be24f72175251046
@@ -478,6 +516,13 @@ zabbix_export:
                   name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: ce1f2938b1da4b1c9d78b99e9e1e3435
@@ -662,8 +707,11 @@ zabbix_export:
               description: 'Space utilization in % for {#FSNAME}'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: de2da3226b2145f3943d18ce59f2d803
               name: '{#FSNAME}: Total space'
@@ -684,8 +732,11 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: 719bf2d97348421cb02544efe5caf1bb
               name: '{#FSNAME}: Used space'
@@ -704,8 +755,11 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
           trigger_prototypes:
             -
               uuid: 9fbb4a0ceeba4c9e935f54610d5f1afb
@@ -721,6 +775,13 @@ zabbix_export:
                  - The disk free space is less than 5G.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: capacity
             -
               uuid: 5db5f43d1c3b4b1f91bef16ec1090945
               expression: |
@@ -741,6 +802,13 @@ zabbix_export:
                   expression: |
                     last(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                     ((last(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<5G or timeleft(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: capacity
           graph_prototypes:
             -
               uuid: c5af27b4061c4e9795489f7bc25c42dd
@@ -789,18 +857,6 @@ zabbix_export:
           value: '80'
   graphs:
     -
-      uuid: fe501ac6688d4165a645ef804644cf93
-      name: 'CPU utilization'
-      ymin_type_1: FIXED
-      ymax_type_1: FIXED
-      graph_items:
-        -
-          drawtype: GRADIENT_LINE
-          color: 1A7C11
-          item:
-            host: 'HOST-RESOURCES-MIB CPU SNMP'
-            key: system.cpu.util
-    -
       uuid: f55018667c2242c5a9bb969bbcaf4770
       name: 'CPU utilization'
       ymin_type_1: FIXED
@@ -811,4 +867,16 @@ zabbix_export:
           color: 1A7C11
           item:
             host: 'HOST-RESOURCES-MIB SNMP'
+            key: system.cpu.util
+    -
+      uuid: fe501ac6688d4165a645ef804644cf93
+      name: 'CPU utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'HOST-RESOURCES-MIB CPU SNMP'
             key: system.cpu.util

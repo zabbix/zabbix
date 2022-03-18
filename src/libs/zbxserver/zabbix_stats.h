@@ -20,6 +20,8 @@
 #ifndef ZABBIX_ZABBIX_STATS_H_
 #define ZABBIX_ZABBIX_STATS_H_
 
+#include "zbxjson.h"
+
 extern int	CONFIG_SERVER_STARTUP_TIME;
 
 void	zbx_get_zabbix_stats(struct zbx_json *json);

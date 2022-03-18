@@ -29,7 +29,7 @@ use Facebook\WebDriver\WebDriverBy;
 class testFormTemplate extends CLegacyWebTest {
 	public $template = 'Form test template';
 	public $template_edit_name = 'Template-layout-test-001';
-	public $template_clone = 'Intel SR1530 IPMI';
+	public $template_clone = 'Linux by Zabbix agent';
 	public $template_full_delete = 'Inheritance test template';
 
 	public static function create() {
@@ -60,7 +60,7 @@ class testFormTemplate extends CLegacyWebTest {
 					'name' => 'Selenium Test Template',
 					'error_msg' => 'Cannot add template',
 					'errors' => [
-						'Template with the same name "Selenium Test Template" already exists.'
+						'Template with host name "Selenium Test Template" already exists.'
 					]
 
 				]
@@ -72,7 +72,7 @@ class testFormTemplate extends CLegacyWebTest {
 					'visible_name' => 'Selenium Test template with visible name',
 					'error_msg' => 'Cannot add template',
 					'errors' => [
-						'Template with the same visible name "Selenium Test template with visible name" already exists.'
+						'Template with visible name "Selenium Test template with visible name" already exists.'
 					]
 
 				]
@@ -246,26 +246,24 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->assertEquals(0, CDBHelper::getCount("SELECT dashboardid FROM dashboard WHERE templateid='".$template['hostid']."'"));
 	}
 
-	/**	TODO: need to find correct template.
-	*
-	*	public function testFormTemplate_FullCloneTemplate() {
-	*		$cloned_template_name = 'Full cloned template';
-	*
-	*		$this->zbxTestLogin('templates.php?page=2');
-	*		$this->filterAndOpenTemplate($this->template_clone);
-	*		$this->zbxTestClickWait('full_clone');
-	*		$this->zbxTestInputTypeOverwrite('template_name', $cloned_template_name);
-	*		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
-	*		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template added');
-	*		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='".$cloned_template_name."'"));
-	*		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template_clone'"));
-	*
-	*		$template = CDBHelper::getRow("select hostid from hosts where host like '".$cloned_template_name."'");
-	*		$this->assertEquals(66, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
-	*		$this->assertEquals(1, CDBHelper::getCount("SELECT dashboardid FROM dashboard WHERE templateid='".$template['hostid']."'"));
-	*	}
-	*/
-		public function testFormTemplate_Delete() {
+	public function testFormTemplate_FullCloneTemplate() {
+		$cloned_template_name = 'Full cloned template';
+
+		$this->zbxTestLogin('templates.php?page=2');
+		$this->filterAndOpenTemplate($this->template_clone);
+		$this->zbxTestClickWait('full_clone');
+		$this->zbxTestInputTypeOverwrite('template_name', $cloned_template_name);
+		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template added');
+		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='".$cloned_template_name."'"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template_clone'"));
+
+		$template = CDBHelper::getRow("select hostid from hosts where host like '".$cloned_template_name."'");
+		$this->assertEquals(67, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
+		$this->assertEquals(2, CDBHelper::getCount("SELECT dashboardid FROM dashboard WHERE templateid='".$template['hostid']."'"));
+	}
+
+	public function testFormTemplate_Delete() {
 		$template = CDBHelper::getRow("select hostid from hosts where host like '".$this->template."'");
 
 		$this->zbxTestLogin('templates.php?page=1');

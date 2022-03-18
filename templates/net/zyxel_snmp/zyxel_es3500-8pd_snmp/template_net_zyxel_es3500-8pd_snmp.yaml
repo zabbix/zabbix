@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-17T06:34:00Z'
+  date: '2022-01-26T19:42:08Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -27,7 +27,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Network devices'
@@ -47,8 +47,8 @@ zabbix_export:
                 - 1h
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: network
           triggers:
             -
               uuid: 3bbbd93c114f4bf5b8f4788ca6825afd
@@ -57,6 +57,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 6d513a036f8547219b1120fc4fffff1d
           name: 'ZYXEL ES3500-8PD: Contact'
@@ -80,8 +84,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: e7fd0f225802477aabbbcbfe5ac4a7f6
           name: 'ZYXEL ES3500-8PD: CPU utilization'
@@ -97,8 +101,8 @@ zabbix_export:
             getting the values.
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: 3cf67f911a854d2ebeb9e006f3f97738
@@ -107,6 +111,10 @@ zabbix_export:
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 8749f59cbfeb4c43b7753901f3219716
           name: 'ZYXEL ES3500-8PD: ZyNOS F/W Version'
@@ -139,8 +147,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
           triggers:
             -
               uuid: bd6d0fe201094c00b6c93d7c04c27729
@@ -150,6 +158,10 @@ zabbix_export:
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: cbccb45e9d1d4b529cce2d43e6c96a24
           name: 'ZYXEL ES3500-8PD: Location'
@@ -172,8 +184,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 1479a543105a4cf2b524bf8d042afd00
           name: 'ZYXEL ES3500-8PD: MAC address'
@@ -199,8 +211,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: c753caf7686e49968931df18076a5d4f
           name: 'ZYXEL ES3500-8PD: Hardware model name'
@@ -227,8 +239,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
           triggers:
             -
               uuid: e03ca45643354a18a9d6ffbb38a07654
@@ -236,6 +248,10 @@ zabbix_export:
               name: 'ZYXEL ES3500-8PD: Template does not match hardware'
               priority: INFO
               description: 'This template is for Zyxel ES3500-8PD, but connected to {ITEM.VALUE}'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 2072ac4b4437425a9ef1496b90c64990
           name: 'ZYXEL ES3500-8PD: Host name'
@@ -259,8 +275,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 93a3b8ef959e41fe822abb959f090939
           name: 'ZYXEL ES3500-8PD: Hardware serial number'
@@ -282,8 +298,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
           triggers:
             -
               uuid: 83548aba74c148e28e6611d5abfb9694
@@ -292,6 +308,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: bbd24719955740e0acc2316a945dac38
           name: 'ZYXEL ES3500-8PD: Uptime'
@@ -314,8 +334,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: eb7a268bfa324366953221e3c1788127
@@ -324,6 +344,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
       discovery_rules:
         -
           uuid: dfc515bfe86642e784735637bdb6c0a7
@@ -351,8 +375,8 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: c59c3730eea44cf7a842fe46aa12fa3d
@@ -360,6 +384,10 @@ zabbix_export:
                   name: 'ZYXEL ES3500-8PD: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: c71d57f8ed0b470faae1bfd7033fbcf0
           name: 'Interface discovery'
@@ -410,8 +438,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 1daef38185b14a96b8f0fce757c48677
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Interface name'
@@ -431,8 +465,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 4de0488610054ed9bd869dc48a07174e
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Link speed'
@@ -455,8 +495,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 55cf0d86b8bc4a6fa6806c9f8bce7ee9
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Incoming broadcast packages'
@@ -477,8 +523,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 0ce5c7ae49284615a41aba4cdd0f565b
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Incoming multicast packages'
@@ -500,8 +552,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 34a86d17de7e4725aa6e5893c1e52526
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Incoming traffic'
@@ -525,8 +583,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: b1c630d6f06748b88d695dfdb734cd19
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Incoming unicast packages'
@@ -547,8 +611,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: f24ad30d48ca427eb3b19d4459cab733
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Incoming utilization'
@@ -572,8 +642,14 @@ zabbix_export:
                     - 'return +parseFloat(value).toFixed(0);'
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 8c141ab269eb4a8891937a1847312890
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Link type'
@@ -593,8 +669,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 018c1028b7904fbea8b1bb0d2fac1621
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Interface description'
@@ -614,8 +696,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 4f75b84c02b4496db2cbedca8df00c04
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Operational status'
@@ -637,8 +725,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 27ba4832c79d447186ae6de254aad9d7
@@ -655,6 +749,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: bb4c00143a4f4cc2b445daeffdcf6b57
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Outgoing broadcast packages'
@@ -676,8 +774,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 103385b00f6442beab10712ca42d5719
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Outgoing multicast packages'
@@ -700,8 +804,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 08cd8a42816040d582d3192a9d8c2fb7
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Outgoing traffic'
@@ -726,8 +836,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: df030eba0fd548d5be224e2fe120373c
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Outgoing unicast packages'
@@ -749,8 +865,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: cabb6da9aa3e4ae0ae6938b3f3d47138
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Outgoing utilization'
@@ -774,8 +896,14 @@ zabbix_export:
                     - 'return +parseFloat(value).toFixed(0);'
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 5200e032f5f6438e8326799208072845
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Speed Duplex'
@@ -795,8 +923,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
           graph_prototypes:
             -
               uuid: a4b7fd4158464655a71732de5ebc9a9d
@@ -932,8 +1066,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#ZYXEL.SFP.PORT}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 8ce109a9f09b41458a4e9d8698238ad0
@@ -941,12 +1081,20 @@ zabbix_export:
                   name: 'ZYXEL ES3500-8PD: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The upper threshold value of the parameter is exceeded'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: 6ecef48a1fdd4e16afe9472f59e0ad1a
                   expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
                   name: 'ZYXEL ES3500-8PD: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The parameter values are less than the lower threshold'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: c114cc7fee5c4c8fa3301db0eb3b60f7
@@ -1020,8 +1168,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 2b30a4497cbd497886c52ae79ad03a01
               name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX}: Part number'
@@ -1042,8 +1196,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 25aa375ed4a345e6b975bcb238cf530d
               name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX}: Revision'
@@ -1064,8 +1224,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 3f24d3aa58624ed0ad7a137fc9b1611a
               name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX}: Serial number'
@@ -1086,8 +1252,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 46739144d51b441886d544829749cf21
@@ -1096,6 +1268,10 @@ zabbix_export:
                   priority: INFO
                   description: 'SFP {#SNMPINDEX} serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 054942c20bca4459b26e41aca8657e4c
               name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX}: Status'
@@ -1116,8 +1292,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 7621973ef61b47c9bc034eec3d008957
               name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX}: Transceiver'
@@ -1138,8 +1320,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 715feecd140b4e9ca350b41490f7c7f9
               name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX}: Vendor'
@@ -1160,8 +1348,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
         -
           uuid: 9c8f5212222a42bcbd42f8d848476804
           name: 'Temperature discovery'
@@ -1191,8 +1385,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 51fad2cd7daf49ad9027f44fd9ea81af
@@ -1201,6 +1398,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the temperature'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: a1931b48befb4c76a4d5a7ff6c15cbaf
@@ -1256,8 +1457,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: voltage
               trigger_prototypes:
                 -
                   uuid: 2cce1a60cfea4bb89e1b9582f6045d3c
@@ -1266,6 +1470,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: 94ee588ae558416da5bcf4c199797d93
@@ -1289,6 +1497,19 @@ zabbix_export:
                   outArr.push(item)
                   });
                   return JSON.stringify(outArr);
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: es3500-8pd
+        -
+          tag: target
+          value: switch
+        -
+          tag: target
+          value: zyxel
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'

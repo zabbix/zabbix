@@ -217,21 +217,6 @@ static void	rtc_subscribe(zbx_rtc_t *rtc, zbx_ipc_client_t *client, const unsign
 	zbx_vector_rtc_sub_append(&rtc->subs, sub);
 }
 
-static void	rtc_unsubscribe(zbx_rtc_t *rtc, zbx_ipc_client_t *client)
-{
-	int	i;
-
-	for (i = 0; i < rtc->subs.values_num; i++)
-	{
-		if (rtc->subs.values[i]->client == client)
-		{
-			zbx_free(rtc->subs.values[i]);
-			zbx_vector_rtc_sub_remove_noorder(&rtc->subs, i);
-			break;
-		}
-	}
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: process runtime control option                                    *
@@ -430,19 +415,10 @@ int	zbx_rtc_wait_config_sync(zbx_rtc_t *rtc)
 		}
 
 		if (NULL != client)
-		{
 			zbx_ipc_client_release(client);
-
-			/* client process has exited */
-			if (NULL == message)
-			{
-				rtc_unsubscribe(rtc, client);
-				return FAIL;
-			}
-		}
 	}
 
-	return SUCCEED;
+	return !ZBX_IS_RUNNING() && FAIL == ZBX_EXIT_STATUS() ? FAIL : SUCCEED;
 }
 
 /******************************************************************************

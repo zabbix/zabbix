@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:40:33Z'
+  date: '2022-01-26T10:36:03Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -50,8 +50,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 937225d93eea44b3a8328eee03cf66f0
@@ -59,6 +62,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 4af423253e1b4960825b49041d9c8feb
           name: 'ICMP loss'
@@ -69,8 +76,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: ec37a141b33c46308b8d810069ce9142
@@ -82,6 +92,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/IBM IMM SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: b1659e3298fb447f8ee93e8bab98a22d
           name: 'ICMP response time'
@@ -92,8 +109,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 0541700de60549da8439f9b75cf83e7f
@@ -108,6 +128,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/IBM IMM SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: e0a1cdb1df4d408087a8ed3d473ce1fe
           name: 'SNMP traps (fallback)'
@@ -120,8 +147,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: 6686560b390540b593a2d3bb3289ea41
           name: 'System contact details'
@@ -143,8 +170,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 905c91ce799849dfb56b800c93849826
           name: 'System description'
@@ -167,8 +194,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 7075609a2d2545828a93f701d7b02c17
           name: 'Hardware model name'
@@ -188,8 +215,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: db393421a28b44148b0a1e1273186900
           name: 'Hardware serial number'
@@ -211,8 +238,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: b2bf06198d5840c6905ea6cf6d9e443c
@@ -221,6 +248,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 589def06a1b74a7f8ada7cc4576aa9eb
           name: 'System location'
@@ -242,8 +273,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 596ce9f7e6b848e4869cd195996c7114
           name: 'System name'
@@ -265,8 +296,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 188852025e644d5ab583f9d7a9dea06c
@@ -275,6 +306,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: ad8eada79b464821a14759f32f6d7f2a
           name: 'System object ID'
@@ -295,8 +333,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 33572e0e11214d8b8454e6947e0d282d
           name: 'Overall system health status'
@@ -313,8 +351,8 @@ zabbix_export:
             name: 'IMM-MIB::systemHealthStat'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: ea8fbc9446d34033b60a8214b8199ea1
@@ -323,6 +361,13 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for faults'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: a76c198aeb7d452a8c710ddde21aa12e
               expression: 'count(/IBM IMM SNMP/system.status[systemHealthStat.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
@@ -334,6 +379,13 @@ zabbix_export:
                 -
                   name: 'System is in unrecoverable state!'
                   expression: 'count(/IBM IMM SNMP/system.status[systemHealthStat.0],#1,"eq","{$HEALTH_DISASTER_STATUS}")=1'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: acd147a3d41b49478410f4d49562cde2
               expression: 'count(/IBM IMM SNMP/system.status[systemHealthStat.0],#1,"eq","{$HEALTH_WARN_STATUS}")=1'
@@ -348,6 +400,13 @@ zabbix_export:
                 -
                   name: 'System status is in critical state'
                   expression: 'count(/IBM IMM SNMP/system.status[systemHealthStat.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 97cd7cf6a9a545788a2f709bacb925ed
           name: Uptime
@@ -368,8 +427,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 7dd529ec3f1a4a59846a3a76536a7fa0
@@ -382,6 +441,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/IBM IMM SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 59d2bec423a84ca186d5785ddea5270b
           name: 'SNMP agent availability'
@@ -398,8 +461,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: fbec2f12ac244723bb31dec5efcc6f85
@@ -412,6 +478,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/IBM IMM SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: c93e3c9379a4434f84334e5989ec2592
@@ -442,8 +512,8 @@ zabbix_export:
                     - \1
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
             -
               uuid: 6e576c4059c84b6fa80376ee59fd373b
               name: '{#FAN_DESCR}: Fan status'
@@ -459,8 +529,8 @@ zabbix_export:
                 A description of the fan component status.
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: b2d4ae5922174af6b0ef274accc8ae21
@@ -469,6 +539,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: INFO
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
         -
           uuid: dbf08da1d50c4a919bd2bbb1ee15f77e
           name: 'Physical Disk Discovery'
@@ -492,8 +566,11 @@ zabbix_export:
                 disk module FRU name.
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: da7aa00e553c4014a70fe08f5fdb67fd
               name: '{#SNMPINDEX}: Physical disk status'
@@ -506,8 +583,11 @@ zabbix_export:
               description: 'MIB: IMM-MIB'
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 45eb3fe3369a41b199179e2eca725027
@@ -516,6 +596,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check physical disk for warnings or errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: e83e43db572d4a25b80629a115214ae8
           name: 'PSU Discovery'
@@ -540,8 +627,8 @@ zabbix_export:
                 A description of the power module status.
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: 4e7767484cff49b098e73b068ef04160
@@ -550,6 +637,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: INFO
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
         -
           uuid: b5ac4b78efca4e8a9d8b2eb875f49c49
           name: 'Temperature Discovery'
@@ -579,8 +670,8 @@ zabbix_export:
                 Temperature readings of testpoint: {#SNMPVALUE}
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 958eebe18bd94670b2b9029064a84bc9
@@ -591,6 +682,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: ecb8ac5828e44a94a32164dce9811fbc
                   expression: 'avg(/IBM IMM SNMP/sensor.temp.value[tempReading.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
@@ -605,6 +703,13 @@ zabbix_export:
                       name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                       expression: 'avg(/IBM IMM SNMP/sensor.temp.value[tempReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                       recovery_expression: 'max(/IBM IMM SNMP/sensor.temp.value[tempReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 8ff82421c9f74d509766e7dc139ab2c8
                   expression: 'avg(/IBM IMM SNMP/sensor.temp.value[tempReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
@@ -613,6 +718,13 @@ zabbix_export:
                   name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 1e4d30dcff7f48bc872127d11f2e22b8
           name: 'Temperature Discovery Ambient'
@@ -642,8 +754,8 @@ zabbix_export:
                 Temperature readings of testpoint: Ambient
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 615967071d6b40f6b02e386c9586a66e
@@ -654,6 +766,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: e6bcdf201e304471aa84cc8d34b290ec
                   expression: 'avg(/IBM IMM SNMP/sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Ambient"}'
@@ -668,6 +787,13 @@ zabbix_export:
                       name: 'Ambient: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
                       expression: 'avg(/IBM IMM SNMP/sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Ambient"}'
                       recovery_expression: 'max(/IBM IMM SNMP/sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Ambient"}-3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: dd773e52746840e4b6f7517740873102
                   expression: 'avg(/IBM IMM SNMP/sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Ambient"}'
@@ -676,6 +802,13 @@ zabbix_export:
                   name: 'Ambient: Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 7eb45db4b05e42d39e0e2cf889dec2b8
           name: 'Temperature Discovery CPU'
@@ -705,8 +838,8 @@ zabbix_export:
                 Temperature readings of testpoint: CPU
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: e994d3d8398147c49062bc712dc4c204
@@ -717,6 +850,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 3b7396311de1487e90416aa2c42cb03d
                   expression: 'avg(/IBM IMM SNMP/sensor.temp.value[tempReading.CPU.{#SNMPINDEX}],5m)>{$TEMP_WARN:"CPU"}'
@@ -731,6 +871,13 @@ zabbix_export:
                       name: 'CPU: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
                       expression: 'avg(/IBM IMM SNMP/sensor.temp.value[tempReading.CPU.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
                       recovery_expression: 'max(/IBM IMM SNMP/sensor.temp.value[tempReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: e39d0e009efb4216ac7cbbe544ad4bc0
                   expression: 'avg(/IBM IMM SNMP/sensor.temp.value[tempReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"CPU"}'
@@ -739,6 +886,23 @@ zabbix_export:
                   name: 'CPU: Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+      tags:
+        -
+          tag: class
+          value: hardware
+        -
+          tag: target
+          value: ibm
+        -
+          tag: target
+          value: imm
       macros:
         -
           macro: '{$DISK_OK_STATUS}'

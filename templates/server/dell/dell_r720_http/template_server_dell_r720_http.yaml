@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-16T20:16:17Z'
+  date: '2022-01-27T18:35:18Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -15,7 +15,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/426752-discussion-thread-for-official-zabbix-dell-templates
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Server hardware'
@@ -43,8 +43,8 @@ zabbix_export:
             key: dell.server.system.get
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: c7c3d5301c8843528929123e1473af5f
@@ -54,6 +54,10 @@ zabbix_export:
               priority: INFO
               description: 'Firmware version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 6ef767b8b0a94ebc822c81abd9ee5a8b
           name: 'Dell R720: Hardware model name'
@@ -78,8 +82,8 @@ zabbix_export:
             key: dell.server.system.get
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: 114dd17f872c491eb739f708ae86b340
           name: 'Dell R720: Hardware serial number'
@@ -104,8 +108,8 @@ zabbix_export:
             key: dell.server.system.get
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 53caaec2a0664e879f85c263a43715c3
@@ -114,6 +118,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 3cce4b6aff674b29a80aa5369268d99d
           name: 'Dell R720: Overall system health status'
@@ -137,8 +145,8 @@ zabbix_export:
             key: dell.server.system.get
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: da2b7ee5a60948d582327e8a5a9169b9
@@ -147,6 +155,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for faults.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: b8294b60044c4549baa7c930ce8acc48
               expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.status,,"like","Warning")=1'
@@ -158,6 +170,10 @@ zabbix_export:
                 -
                   name: 'Dell R720: Server is in a critical state'
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.status,,"like","Critical")=1'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 05403c3757624072be7919dbd8864871
           name: 'Dell R720: Get system'
@@ -270,8 +286,8 @@ zabbix_export:
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: system
         -
           uuid: f71cb6b0b93945ccbb20dc660c73e15c
           name: 'Dell R720: Redfish API'
@@ -287,8 +303,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: system
           triggers:
             -
               uuid: 24004d9971ea4686b2941ecf8135b421
@@ -296,6 +315,10 @@ zabbix_export:
               name: 'Dell R720: Redfish API service is unavailable'
               priority: HIGH
               description: 'The service is unavailable or does not accept TCP connections.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: acf63330ee40478aa81fa73c156ee6c8
@@ -332,8 +355,11 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: battery
+                -
+                  tag: component
+                  value: diskarray
               trigger_prototypes:
                 -
                   uuid: e4549547cb7747318895e6f237fc52b8
@@ -342,6 +368,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 3788759c5f91471da7cac5560593be2b
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}],,"like","Warning")=1'
@@ -353,6 +383,10 @@ zabbix_export:
                     -
                       name: 'Dell R720: {#BATTERY_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage'
           preprocessing:
             -
@@ -493,8 +527,11 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: diskarray
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: d8139731126649a8825550863b9ea832
@@ -503,6 +540,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 6764e247bd64411692e09fe6618c5411
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}],,"like","Warning")=1'
@@ -514,6 +555,10 @@ zabbix_export:
                     -
                       name: 'Dell R720: {#CNTLR_NAME} in slot {#SLOT} is in a critical state'
                       expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage'
           preprocessing:
             -
@@ -646,8 +691,11 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: fan
+                -
+                  tag: component
+                  value: raw
             -
               uuid: 32c00337c3a24ce1bd76622b8203141f
               name: 'Dell R720: {#SENSOR_NAME} Speed'
@@ -666,8 +714,8 @@ zabbix_export:
                 key: 'dell.server.sensor.fan.get[{#SENSOR_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
             -
               uuid: b9167957cb1a42749afcecbfd1062f7c
               name: 'Dell R720: {#SENSOR_NAME} Status'
@@ -691,8 +739,8 @@ zabbix_export:
                 key: 'dell.server.sensor.fan.get[{#SENSOR_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: c856499a11124210811fec617dbdd8a8
@@ -701,6 +749,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: d97e44aad2e743759dcf486e73b6e141
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.sensor.fan.status[{#SENSOR_NAME}],,"like","Warning")=1'
@@ -712,6 +764,10 @@ zabbix_export:
                     -
                       name: 'Dell R720: {#SENSOR_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.sensor.fan.status[{#SENSOR_NAME}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           url: '{$API.URL}/redfish/v1/Chassis/System.Embedded.1/Sensors'
           preprocessing:
             -
@@ -825,8 +881,11 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: raw
             -
               uuid: 5a29abc9a33c498498ede924953e506e
               name: 'Dell R720: {#IFNAME} Status'
@@ -850,8 +909,8 @@ zabbix_export:
                 key: 'dell.server.net.if.get[{#IFNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Network interfaces'
+                  tag: component
+                  value: network
               trigger_prototypes:
                 -
                   uuid: c83b9b49f9bd4ddd9fb19033b5ad581c
@@ -860,6 +919,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: db482b43f586470c9cf46e711954f148
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.net.if.health[{#IFNAME}],,"like","Warning")=1'
@@ -871,6 +934,10 @@ zabbix_export:
                     -
                       name: 'Dell R720: {#IFNAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.net.if.health[{#IFNAME}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 03a1c99b946b470393bf59a1025dfad4
               name: 'Dell R720: {#IFNAME} Speed'
@@ -893,8 +960,8 @@ zabbix_export:
                 key: 'dell.server.net.if.get[{#IFNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Network interfaces'
+                  tag: component
+                  value: network
             -
               uuid: bbfc1c324a92402381adf94fee5c4ca0
               name: 'Dell R720: {#IFNAME} State'
@@ -918,8 +985,8 @@ zabbix_export:
                 key: 'dell.server.net.if.get[{#IFNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Network interfaces'
+                  tag: component
+                  value: network
             -
               uuid: a68c98640efc4c5eb146409339261f51
               name: 'Dell R720: {#IFNAME} Link status'
@@ -943,8 +1010,8 @@ zabbix_export:
                 key: 'dell.server.net.if.get[{#IFNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Network interfaces'
+                  tag: component
+                  value: network
               trigger_prototypes:
                 -
                   uuid: bf30aa7ff82e4d08b3b48ded248c4d46
@@ -962,6 +1029,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           url: '{$API.URL}/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters'
           preprocessing:
             -
@@ -1095,8 +1166,14 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: storage
             -
               uuid: e3ae47c99fb44bcba8037c71852d7bf6
               name: 'Dell R720: {#DISK_NAME} Media type'
@@ -1120,8 +1197,11 @@ zabbix_export:
                 key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 3aab8fb330dc49d885afb31d972299fc
               name: 'Dell R720: {#DISK_NAME} Model name'
@@ -1145,8 +1225,11 @@ zabbix_export:
                 key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: cc0f3d4b18a24cd5a98ce6d85e69a374
               name: 'Dell R720: {#DISK_NAME} Serial number'
@@ -1170,8 +1253,11 @@ zabbix_export:
                 key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: efaef650ead54921b101e0fe4bb4381a
@@ -1180,6 +1266,10 @@ zabbix_export:
                   priority: INFO
                   description: '{#DISK_NAME} serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 9a72ed848c574f5aaaca432f0548272f
               name: 'Dell R720: {#DISK_NAME} Size'
@@ -1203,8 +1293,11 @@ zabbix_export:
                 key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 0db3af82611c4f49899e54c09d600aef
               name: 'Dell R720: {#DISK_NAME} Status'
@@ -1228,8 +1321,11 @@ zabbix_export:
                 key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 56757be1596c4b0189e5cd6fe0a8fa45
@@ -1238,6 +1334,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 0e68f903e424472dac82f3cbd72ef248
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],,"like","Warning")=1'
@@ -1249,6 +1349,10 @@ zabbix_export:
                     -
                       name: 'Dell R720: {#DISK_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage'
           preprocessing:
             -
@@ -1382,8 +1486,11 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: psu
+                -
+                  tag: component
+                  value: raw
             -
               uuid: 6c7f9247ea1f46c2938fcf1cd441dd6f
               name: 'Dell R720: {#SENSOR_NAME} Status'
@@ -1407,8 +1514,8 @@ zabbix_export:
                 key: 'dell.server.sensor.psu.get[{#SENSOR_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: psu
               trigger_prototypes:
                 -
                   uuid: 1a9a063e006343c0bce9bf21ead9d93f
@@ -1417,6 +1524,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: c9b528eac8844abea4de8a53c0ff8893
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.sensor.psu.status[{#SENSOR_NAME}],,"like","Warning")=1'
@@ -1428,6 +1539,10 @@ zabbix_export:
                     -
                       name: 'Dell R720: {#SENSOR_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.sensor.psu.status[{#SENSOR_NAME}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           url: '{$API.URL}/redfish/v1/Chassis/System.Embedded.1/Sensors'
           preprocessing:
             -
@@ -1555,8 +1670,11 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: temperature
             -
               uuid: 7426672931d045349f7a1048a29fd404
               name: 'Dell R720: {#SENSOR_NAME} Status'
@@ -1580,8 +1698,8 @@ zabbix_export:
                 key: 'dell.server.sensor.temp.get[{#SENSOR_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: c909cc04251c4b53bf512128476dc9ba
@@ -1590,6 +1708,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 9d4bede243904a6aa92f96948d6f9ed7
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.sensor.temp.status[{#SENSOR_NAME}],,"like","Warning")=1'
@@ -1601,6 +1723,10 @@ zabbix_export:
                     -
                       name: 'Dell R720: {#SENSOR_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.sensor.temp.status[{#SENSOR_NAME}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 0fb34178623b47609fd59674c01cbc70
               name: 'Dell R720: {#SENSOR_NAME} Value'
@@ -1620,8 +1746,8 @@ zabbix_export:
                 key: 'dell.server.sensor.temp.get[{#SENSOR_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
           url: '{$API.URL}/redfish/v1/Chassis/System.Embedded.1/Sensors'
           preprocessing:
             -
@@ -1749,8 +1875,11 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: a6e3cb66270744598ef9d5ad5b99b4a7
               name: 'Dell R720: {#DISK_NAME} RAID status'
@@ -1774,8 +1903,11 @@ zabbix_export:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: 1f11df437d8544e6b8824f9ab4b36fd1
               name: 'Dell R720: {#DISK_NAME} Read policy'
@@ -1799,8 +1931,11 @@ zabbix_export:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: b1529c9635904ecbb8ea1168fd006253
               name: 'Dell R720: {#DISK_NAME} Size'
@@ -1824,8 +1959,11 @@ zabbix_export:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: aed92b93740a4dc3a0a3db66ebded2d1
               name: 'Dell R720: {#DISK_NAME} Current state'
@@ -1849,8 +1987,11 @@ zabbix_export:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: d80c7530a7e84a31a0e5013229c7d3fe
               name: 'Dell R720: {#DISK_NAME} Status'
@@ -1874,8 +2015,11 @@ zabbix_export:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
               trigger_prototypes:
                 -
                   uuid: 2284cde0da39410396fa7dd3d9151d85
@@ -1884,6 +2028,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: ebd49db8ab2f491e9238dd60befe0b20
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.hw.virtualdisk.status[{#DISK_NAME}],,"like","Warning")=1'
@@ -1895,6 +2043,10 @@ zabbix_export:
                     -
                       name: 'Dell R720: {#DISK_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.hw.virtualdisk.status[{#DISK_NAME}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: b7a38f742f6d46e596e373de673db7aa
               name: 'Dell R720: {#DISK_NAME} Write policy'
@@ -1918,8 +2070,11 @@ zabbix_export:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage'
           preprocessing:
             -
@@ -2027,6 +2182,16 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+      tags:
+        -
+          tag: class
+          value: hardware
+        -
+          tag: target
+          value: dell
+        -
+          tag: target
+          value: 'dell poweredge'
       macros:
         -
           macro: '{$API.PASSWORD}'

@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 The template to monitor systemd units.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -17,7 +17,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
 1. Setup and configure zabbix-agent2 compiled with the Systemd monitoring plugin.
 2. Set filters with macros if you want to override default filter parameters.
@@ -65,8 +65,8 @@ There are no template links in this template.
 |Systemd |{#UNIT.NAME}: Active time |<p>Number of seconds since unit entered the active state.</p> |DEPENDENT |systemd.service.uptime["{#UNIT.NAME}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Systemd |{#UNIT.NAME}: Connections accepted per sec |<p>The number of accepted socket connections (NAccepted) per second.</p> |DEPENDENT |systemd.socket.conn_accepted.rate["{#UNIT.NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.NAccepted`</p><p>- CHANGE_PER_SECOND</p> |
 |Systemd |{#UNIT.NAME}: Connections connected |<p>The current number of socket connections (NConnections).</p> |DEPENDENT |systemd.socket.conn_count["{#UNIT.NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.NConnections`</p> |
-|Zabbix_raw_items |{#UNIT.NAME}: Get unit info |<p>Returns all properties of a systemd service unit.</p><p> Unit description: {#UNIT.DESCRIPTION}.</p> |ZABBIX_PASSIVE |systemd.unit.get["{#UNIT.NAME}"] |
-|Zabbix_raw_items |{#UNIT.NAME}: Get unit info |<p>Returns all properties of a systemd socket unit.</p><p> Unit description: {#UNIT.DESCRIPTION}.</p> |ZABBIX_PASSIVE |systemd.unit.get["{#UNIT.NAME}",Socket] |
+|Zabbix raw items |{#UNIT.NAME}: Get unit info |<p>Returns all properties of a systemd service unit.</p><p> Unit description: {#UNIT.DESCRIPTION}.</p> |ZABBIX_PASSIVE |systemd.unit.get["{#UNIT.NAME}"] |
+|Zabbix raw items |{#UNIT.NAME}: Get unit info |<p>Returns all properties of a systemd socket unit.</p><p> Unit description: {#UNIT.DESCRIPTION}.</p> |ZABBIX_PASSIVE |systemd.unit.get["{#UNIT.NAME}",Socket] |
 
 ## Triggers
 
@@ -79,5 +79,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
 

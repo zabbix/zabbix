@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:40:28Z'
+  date: '2022-01-26T10:36:14Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -34,8 +34,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 755a4c5e809d418cbb1162102b0d1c26
@@ -43,6 +46,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 1db2fcdd357e4d15a989c0511bbed8bd
           name: 'ICMP loss'
@@ -53,8 +60,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 0492380bc6374f24b92b4661b27d8f2c
@@ -66,6 +76,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/HP iLO SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 8be612f43d1d40ce9efd3c36d18e6a20
           name: 'ICMP response time'
@@ -76,8 +93,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: a869db9f341c479c80dca50bac0ff309
@@ -92,6 +112,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/HP iLO SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 399110973c134983bd5020b9e5b509f4
           name: 'System: Temperature status'
@@ -117,8 +144,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Temperature
+              tag: component
+              value: temperature
         -
           uuid: 0107bcd0d6b840c4a64061ee83e69f11
           name: 'SNMP traps (fallback)'
@@ -131,8 +158,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: 2203e586148a418f9e2f06b38c340b53
           name: 'System contact details'
@@ -154,8 +181,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 03ff0b6d9c7a483eaae565d90473d291
           name: 'System description'
@@ -178,8 +205,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 2708e6cb2ba240a791685ebdcab3407f
           name: 'Hardware model name'
@@ -200,8 +227,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: 96e27ad668944845a7f598f35b577d18
           name: 'Hardware serial number'
@@ -222,8 +249,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 7e8d377e1b49469a8b19b94e6dad97ce
@@ -232,6 +259,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 84ed489ba1be43738be79f8a71b60381
           name: 'System location'
@@ -253,8 +284,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 88baf9f1da184fc78a49b064f0b4de85
           name: 'System name'
@@ -276,8 +307,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: df3c9e64b0f844ddac8f40f6df956595
@@ -286,6 +317,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: d02b8e2d5c7a4afabc2fbadc8674288c
           name: 'System object ID'
@@ -306,8 +344,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 5f30715570c449ecb4e07858256a3e05
           name: 'Overall system health status'
@@ -328,8 +366,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 6d0d0554e1c945dc90701aebd531f9cb
@@ -338,6 +376,13 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for errors'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 273c27c7929649f1a45ddc92c09ab982
               expression: 'count(/HP iLO SNMP/system.status[cpqHeMibCondition.0],#1,"eq","{$HEALTH_WARN_STATUS}")=1'
@@ -349,6 +394,13 @@ zabbix_export:
                 -
                   name: 'System status is in critical state'
                   expression: 'count(/HP iLO SNMP/system.status[cpqHeMibCondition.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 05166eb015534cae9798f9266d3d0a6b
           name: Uptime
@@ -369,8 +421,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 261749b9936c4a26b48d660f01435fb7
@@ -383,6 +435,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/HP iLO SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: e5ebd75f34f24502b3cdc2a707fb24c5
           name: 'SNMP agent availability'
@@ -399,8 +455,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 8870beab300f41ea8d54619fd2bf0371
@@ -413,6 +472,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/HP iLO SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 7589f2f30c7e4cf88bb7cd1d57f543a4
@@ -462,8 +525,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Disk arrays'
+                  tag: component
+                  value: array
+                -
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: b3049aa19e5d45d28937c1af262aba3e
@@ -472,6 +541,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the device for faults'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 384fd446bcb042f89ca348ec7459f1aa
                   expression: 'count(/HP iLO SNMP/system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS:\"degraded\"}")=1'
@@ -483,6 +559,13 @@ zabbix_export:
                     -
                       name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state!'
                       expression: 'count(/HP iLO SNMP/system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:\"failed\"}")=1 or count(/HP iLO SNMP/system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:\"capacitorFailed\"}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 2e20ec1d27374dceb363a6cdd568d23d
               name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller status'
@@ -532,8 +615,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Disk arrays'
+                  tag: component
+                  value: array
+                -
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: a4c81fb1ef6140199bbde241691183cd
@@ -542,6 +631,16 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the device for faults'
+                  tags:
+                    -
+                      tag: component
+                      value: array
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 7370a7c6388c4ff8b094959ca0c34a72
                   expression: 'count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_WARN_STATUS:\"cacheModDegradedFailsafeSpeed\"}")=1 or count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_WARN_STATUS:\"cacheReadCacheNotMapped\"}")=1 or count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_WARN_STATUS:\"cacheModFlashMemNotAttached\"}")=1'
@@ -553,6 +652,13 @@ zabbix_export:
                     -
                       name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!'
                       expression: 'count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_CRIT_STATUS:\"cacheModCriticalFailure\"}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 4db3b402580c43eba0d9dc6349cf95ca
                   expression: 'count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"ne","{$DISK_ARRAY_CACHE_OK_STATUS:\"enabled\"}")=1 and last(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])<>{$DISK_ARRAY_CACHE_WARN_STATUS:"invalid"}'
@@ -567,6 +673,13 @@ zabbix_export:
                     -
                       name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state'
                       expression: 'count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_WARN_STATUS:\"cacheModDegradedFailsafeSpeed\"}")=1 or count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_WARN_STATUS:\"cacheReadCacheNotMapped\"}")=1 or count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_WARN_STATUS:\"cacheModFlashMemNotAttached\"}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -601,8 +714,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Disk arrays'
+                  tag: component
+                  value: array
+                -
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 71ae1496057044819a80f0660d838083
               name: '{#CNTLR_LOCATION}: Disk array controller status'
@@ -624,8 +743,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Disk arrays'
+                  tag: component
+                  value: array
+                -
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: a318564fe4eb488eba251f3cba3d31b6
@@ -634,6 +759,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 6b65d2b2477c4567953fcec31b1ab9a3
                   expression: 'count(/HP iLO SNMP/system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_WARN_STATUS}")=1'
@@ -645,6 +777,13 @@ zabbix_export:
                     -
                       name: '{#CNTLR_LOCATION}: Disk array controller is in critical state'
                       expression: 'count(/HP iLO SNMP/system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CRIT_STATUS}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -684,8 +823,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: 0731e25040504428acb466b0d4e2803a
@@ -694,6 +833,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: c8c9ea062fa849b0b550ad4dd1d2cec7
                   expression: 'count(/HP iLO SNMP/sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS}")=1'
@@ -705,6 +851,13 @@ zabbix_export:
                     -
                       name: 'Fan {#SNMPINDEX}: Fan is in critical state'
                       expression: 'count(/HP iLO SNMP/sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -742,8 +895,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 82f09b232147488fb9bd7253ce1432c2
               name: '{#DISK_LOCATION}: Physical disk model name'
@@ -766,8 +922,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 5eca1a95575f4cb891545bde063aae7b
               name: '{#DISK_LOCATION}: Physical disk serial number'
@@ -790,8 +949,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 87bcd812474b44729da19f49344ba976
@@ -800,6 +962,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Disk serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 03cf9c027f9b4557a0d0a233347c58d2
               name: '{#DISK_LOCATION}: Disk size'
@@ -829,8 +995,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: e0864c9d70204f048fc0c597a996b19f
               name: '{#DISK_LOCATION}: Physical disk S.M.A.R.T. status'
@@ -854,8 +1023,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 180f8f9124a041d0bf1c350d0226c3d3
@@ -868,6 +1040,13 @@ zabbix_export:
                     -
                       name: '{#DISK_LOCATION}: Physical disk failed'
                       expression: 'count(/HP iLO SNMP/system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: d88cd26724fd4f19b899b4767fb33814
               name: '{#DISK_LOCATION}: Physical disk status'
@@ -893,8 +1072,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 95e887baa0b9480a8a59848b07418c6b
@@ -903,6 +1085,13 @@ zabbix_export:
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check physical disk for warnings or errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 857540089794495799eb1a04b172c70c
                   expression: 'count(/HP iLO SNMP/system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}],#1,"eq","{$DISK_WARN_STATUS}")=1'
@@ -914,6 +1103,13 @@ zabbix_export:
                     -
                       name: '{#DISK_LOCATION}: Physical disk failed'
                       expression: 'count(/HP iLO SNMP/system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -952,8 +1148,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: 7a34714fcbb74294af97bc4f39c21413
@@ -962,6 +1158,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: db7679204aa544cb8ffe38df5c68b7ce
                   expression: 'count(/HP iLO SNMP/sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS}")=1'
@@ -973,6 +1176,13 @@ zabbix_export:
                     -
                       name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state'
                       expression: 'count(/HP iLO SNMP/sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1023,8 +1233,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: b7786ff4c57a4143b79e95bfc5470dcd
@@ -1033,18 +1243,30 @@ zabbix_export:
                   priority: INFO
                   description: 'Temperature could not be determined.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: 11365923a7b242fea930250e26fcc548
                   expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 4'
                   name: '{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: dd0fd44bd7bb43bd85fdd63a199e0e69
                   expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 3'
                   name: '{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 63fd55c6dee6427bbba7daa023d8f91a
               name: '{#SNMPINDEX}: Temperature sensor location'
@@ -1065,8 +1287,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
             -
               uuid: 7c7d2807f0714bca8c8f263c2a4be8e6
               name: '{#SNMPINDEX}: Temperature'
@@ -1086,8 +1308,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1142,8 +1364,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: e955550a2496435eb799d317f2036c55
@@ -1152,18 +1374,30 @@ zabbix_export:
                   priority: INFO
                   description: 'Temperature could not be determined.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: 8cd2c8b62b164923afed02da2be52dcc
                   expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 4'
                   name: 'Ambient: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: d11e13c5714a42d49bea54d837f9f418
                   expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 3'
                   name: 'Ambient: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: fd9c9a22a2a946ef895f92300de12004
               name: 'Ambient: Temperature'
@@ -1183,8 +1417,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1235,8 +1469,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 512654c27ea94ed4993380793a67f68b
@@ -1245,18 +1479,30 @@ zabbix_export:
                   priority: INFO
                   description: 'Temperature could not be determined.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: 7853d0c8ed4a4ebe98e38c7499417ebe
                   expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 4'
                   name: 'CPU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: 0434d2a6a1b54cb7bcd0e6f58d973be4
                   expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 3'
                   name: 'CPU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 0bfe29bdf06e4432aafbbddb5bc02272
               name: 'CPU-{#SNMPINDEX}: Temperature'
@@ -1276,8 +1522,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1328,8 +1574,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 2875e5ebea474eccac8d53dd13539bd6
@@ -1338,18 +1584,30 @@ zabbix_export:
                   priority: INFO
                   description: 'Temperature could not be determined.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: 593b167fe62e4a7fae35ebb508540325
                   expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 4'
                   name: 'I/O-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: bf6a10f0596a45b4b8f8a2f0acf7c778
                   expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 3'
                   name: 'I/O-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 5a37a9c96a9748468d10562bd1242aa0
               name: 'I/O-{#SNMPINDEX}: Temperature'
@@ -1369,8 +1627,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1421,8 +1679,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 881f28f6411c467493c56a64237d8ca8
@@ -1431,18 +1689,30 @@ zabbix_export:
                   priority: INFO
                   description: 'Temperature could not be determined.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: c05402995e6146d28c53fc33e88d8164
                   expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 4'
                   name: 'Memory-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: bfac7287a9d842cb89d8089af72e2e12
                   expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 3'
                   name: 'Memory-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: feb78ed0e9c640f2b2e122bebca181a7
               name: 'Memory-{#SNMPINDEX}: Temperature'
@@ -1462,8 +1732,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1514,8 +1784,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 14ab7adae80c4859952381bfe17a14a3
@@ -1524,18 +1794,30 @@ zabbix_export:
                   priority: INFO
                   description: 'Temperature could not be determined.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: 97481f1183c3444c851fe99428bd7bf3
                   expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 4'
                   name: 'PSU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: 8c7f5250756946a595b742519e4890a5
                   expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 3'
                   name: 'PSU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: d2e8eb2989364732b85dbef4eb7d1ce4
               name: 'PSU-{#SNMPINDEX}: Temperature'
@@ -1555,8 +1837,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1607,8 +1889,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: d161829ab0ec496bb4718ed156853c3f
@@ -1617,18 +1899,30 @@ zabbix_export:
                   priority: INFO
                   description: 'Temperature could not be determined.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: a65a8386fdd048f986a3aa3fcf29a959
                   expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 4'
                   name: 'System-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: 0b13f436c7984eef9624632bb5f43970
                   expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 3'
                   name: 'System-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: aa985d3fb0084e24bd9f3e81c249cae4
               name: 'System-{#SNMPINDEX}: Temperature'
@@ -1648,8 +1942,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1683,8 +1977,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 39add64d1cef451091f5416440ea0adc
               name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Disk size'
@@ -1712,8 +2009,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: e0de2e2cc2ac423c95bcca5c77b1a53c
               name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Status'
@@ -1731,8 +2031,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 3f809df0d34f47a2bc1addbf2f4387ac
@@ -1741,6 +2044,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check virtual disk for warnings or errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 439b8dfa246f42d190d8f4deeebfeb53
                   expression: 'count(/HP iLO SNMP/system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}],#1,"ne","{$VDISK_OK_STATUS}")=1'
@@ -1752,11 +2062,28 @@ zabbix_export:
                     -
                       name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed'
                       expression: 'count(/HP iLO SNMP/system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}],#1,"eq","{$VDISK_CRIT_STATUS}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+      tags:
+        -
+          tag: class
+          value: hardware
+        -
+          tag: target
+          value: hp
+        -
+          tag: target
+          value: ilo
       macros:
         -
           macro: '{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"capacitorFailed"}'

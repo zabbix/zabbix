@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:39:14Z'
+  date: '2022-01-27T08:33:00Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -40,8 +40,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: 'NetApp FAS3220'
+              tag: component
+              value: storage
         -
           uuid: 980e2c347d254c4d88d918b2171679bb
           name: 'NetApp FAS3220: Failed disks message'
@@ -59,8 +59,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: 'NetApp FAS3220'
+              tag: component
+              value: storage
         -
           uuid: 7b6d8c8272714343bd420a32c6763c9e
           name: 'NetApp FAS3220: Product firmware version'
@@ -78,8 +78,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: 'NetApp FAS3220'
+              tag: component
+              value: system
         -
           uuid: 3f0418935b9d40e98d129f280ba5ba6b
           name: 'NetApp FAS3220: Product version'
@@ -99,8 +99,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: 'NetApp FAS3220'
+              tag: component
+              value: system
         -
           uuid: 62c6bb1b70ee4ece865b562e298cafb0
           name: 'ICMP ping'
@@ -111,8 +111,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 826eb817329249f59b7989c92ca62d99
@@ -120,6 +123,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: f7c934ef77d04c00bdec19f8e3950d85
           name: 'ICMP loss'
@@ -130,8 +137,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 4fb4b0022ca3433c8da1402f1d996760
@@ -143,6 +153,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/NetApp FAS3220 SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 72f8c27991b7440ba186f6eb037605cf
           name: 'ICMP response time'
@@ -153,8 +170,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: bb13f4d369294c0d83f8e6d888cbb062
@@ -169,6 +189,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/NetApp FAS3220 SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 4380826947fc4df6a341fe074f42da6a
           name: 'SNMP traps (fallback)'
@@ -181,8 +208,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: 045800cfeaf6448ab9a9e97f8b5172c1
           name: 'System contact details'
@@ -204,8 +231,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: c12c6668d9564855b227dee42a9d86f8
           name: 'System description'
@@ -228,8 +255,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: f46b736cdb7f44fcacf33d272d905db8
           name: 'System location'
@@ -251,8 +278,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 65c5b2a3742c4c6d8a04c63bb96b46c6
           name: 'System name'
@@ -274,8 +301,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 5266fcf7c9db457885c219385cfd5025
@@ -284,6 +311,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: 2d9d7b390c774a188a07dbb5bb4a583e
           name: 'System object ID'
@@ -304,8 +338,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 564b458cee7a4a2bb2b4f4777bead32d
           name: Uptime
@@ -326,8 +360,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: d33ca3f0d2f14feca01dce7bdf476776
@@ -340,6 +374,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/NetApp FAS3220 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: fff713712c44477aa081445d9962c002
           name: 'SNMP agent availability'
@@ -356,8 +394,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: e778b1ae80174f7aa82085b4882e1160
@@ -370,6 +411,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/NetApp FAS3220 SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: c999a3f338934982aa4359d9f0a8df30
@@ -395,8 +440,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE.NAME} Health'
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
             -
               uuid: ac1d666db8c0495c860a59d98caeb4ab
               name: 'Node {#NODE.NAME}: Failed FAN message'
@@ -414,8 +462,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE.NAME} Health'
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
             -
               uuid: ad74f96ff33249e1937c2702c4bbce94
               name: 'Node {#NODE.NAME}: Degraded power supplies count'
@@ -431,8 +482,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE.NAME} Health'
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
             -
               uuid: 343e02ff8f9f417292a2bb548db355ee
               name: 'Node {#NODE.NAME}: Degraded power supplies message'
@@ -450,8 +504,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE.NAME} Health'
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
             -
               uuid: 73853db2e6924c8395aac1655fab24b4
               name: 'Node {#NODE.NAME}: Over-temperature'
@@ -467,8 +524,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE.NAME} Health'
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
               trigger_prototypes:
                 -
                   uuid: e03547e4ede74580909ed57c7f53dac1
@@ -476,6 +536,10 @@ zabbix_export:
                   name: 'Node {#NODE.NAME}: Temperature is over than recommended'
                   priority: HIGH
                   description: 'The hardware will shutdown if the temperature exceeds critical thresholds.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: c6663dc780f14fd4bb01a108d0d2c6b0
               name: 'Node {#NODE.NAME}: Health'
@@ -493,8 +557,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE.NAME} Health'
+                  tag: component
+                  value: health
+                -
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
               trigger_prototypes:
                 -
                   uuid: 0c331366ac9d4398bfc815c3cb241e7c
@@ -502,6 +572,13 @@ zabbix_export:
                   name: 'Node {#NODE.NAME}: Node can not communicate with the cluster'
                   priority: HIGH
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: b8c922cbd60e4432822268c2a642fd95
               name: 'Node {#NODE.NAME}: Location'
@@ -519,8 +596,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE.NAME} Inventory'
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
             -
               uuid: eae21d81e97a47dfa80701fb343294b4
               name: 'Node {#NODE.NAME}: Model'
@@ -538,8 +618,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE.NAME} Inventory'
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
             -
               uuid: cd00e7ff616f4b69a94af9e9494b060e
               name: 'Node {#NODE.NAME}: NVRAM battery status'
@@ -569,8 +652,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE.NAME} Health'
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
               trigger_prototypes:
                 -
                   uuid: 567a28dd5b364aea84a43438aee24c5c
@@ -578,6 +664,10 @@ zabbix_export:
                   name: 'Node {#NODE.NAME}: NVRAM battery status is not OK'
                   priority: AVERAGE
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 4fc5f0cdd87147d59fe8d073e361c2d8
               name: 'Node {#NODE.NAME}: Serial number'
@@ -595,8 +685,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE.NAME} Inventory'
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
             -
               uuid: 8ed05a8e28bd4b87b2b5981b45ec9fbe
               name: 'Node {#NODE.NAME}: Uptime'
@@ -613,8 +706,11 @@ zabbix_export:
                     - '0.01'
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE.NAME} Health'
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
               trigger_prototypes:
                 -
                   uuid: 6040422dc0b34863a90af558d72956ee
@@ -623,6 +719,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           trigger_prototypes:
             -
               uuid: 64a737bc63b1463eb533d2a187c6b58a
@@ -630,12 +730,23 @@ zabbix_export:
               name: 'Node {#NODE.NAME}: Degraded power supplies count is more than zero'
               priority: AVERAGE
               description: '{{ITEM.VALUE2}.regsub("(.*)", \1)}'
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: 36b7326a738e41b7be3e0a478bc9f858
               expression: 'last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeEnvFailedFanCount, "{#NODE.NAME}"])>0 and last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"])=last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"])'
               name: 'Node {#NODE.NAME}: Failed FAN count is over than zero'
               priority: HIGH
               description: '{{ITEM.VALUE2}.regsub("(.*)", \1)}'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: e0b97a8434f94d0ba14023cc434a8926
           name: 'CPU discovery'
@@ -657,8 +768,11 @@ zabbix_export:
               description: 'The average, over the last minute, of the percentage of time that this processor was not idle.'
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE.NAME} CPU'
+                  tag: component
+                  value: cpu
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
               trigger_prototypes:
                 -
                   uuid: adb98d2d2f13435bbe1897208bb86989
@@ -667,6 +781,13 @@ zabbix_export:
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 5e87cb453b3f41138d75783eabeeb17b
@@ -726,14 +847,27 @@ zabbix_export:
                     - '1024'
               tags:
                 -
-                  tag: Application
-                  value: '{#VSERVER}{#FSNAME}'
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+                -
+                  tag: vserver
+                  value: '{#VSERVER}'
               trigger_prototypes:
                 -
                   uuid: 6ab014a44ad84966a97125c478b10789
                   expression: 'min(/NetApp FAS3220 SNMP/fas3220.fs[df64AvailKBytes, "{#VSERVER}{#FSNAME}"],{$FAS3220.FS.TIME:"{#FSNAME}"})<{$FAS3220.FS.AVAIL.MIN.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=0'
                   name: '{#VSERVER}{#FSNAME}: Disk space is too low (below {$FAS3220.FS.AVAIL.MIN.CRIT:"{#FSNAME}"} for {$FAS3220.FS.TIME:"{#FSNAME}"})'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: be517380be12421c867ed48e16fe5c4e
               name: '{#VSERVER}{#FSNAME}: Total space'
@@ -750,8 +884,14 @@ zabbix_export:
                     - '1024'
               tags:
                 -
-                  tag: Application
-                  value: '{#VSERVER}{#FSNAME}'
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+                -
+                  tag: vserver
+                  value: '{#VSERVER}'
             -
               uuid: d4989438446a4d228b83b0b22c11af90
               name: '{#VSERVER}{#FSNAME}: Total space used'
@@ -768,8 +908,14 @@ zabbix_export:
                     - '1024'
               tags:
                 -
-                  tag: Application
-                  value: '{#VSERVER}{#FSNAME}'
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+                -
+                  tag: vserver
+                  value: '{#VSERVER}'
             -
               uuid: 74868589894f468fa5daada73c042aca
               name: '{#VSERVER}{#FSNAME}: Saved by compression percents'
@@ -782,8 +928,14 @@ zabbix_export:
               description: 'Provides the percentage of compression savings in a volume, which is ((compr_saved/used)) * 10(compr_saved + 0). This is only returned for volumes.'
               tags:
                 -
-                  tag: Application
-                  value: '{#VSERVER}{#FSNAME}'
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+                -
+                  tag: vserver
+                  value: '{#VSERVER}'
             -
               uuid: 6fd01f706f8f4088b91cd6aad58a65ce
               name: '{#VSERVER}{#FSNAME}: Saved by deduplication percents'
@@ -796,8 +948,14 @@ zabbix_export:
               description: 'Provides the percentage of deduplication savings in a volume, which is ((dedup_saved/(dedup_saved + used)) * 100). This is only returned for volumes.'
               tags:
                 -
-                  tag: Application
-                  value: '{#VSERVER}{#FSNAME}'
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+                -
+                  tag: vserver
+                  value: '{#VSERVER}'
             -
               uuid: b74fafe10c844feda4e72346b2fe88f6
               name: '{#VSERVER}{#FSNAME}: Used space percents'
@@ -809,14 +967,27 @@ zabbix_export:
               description: 'The percentage of disk space currently in use on {#FSNAME}.'
               tags:
                 -
-                  tag: Application
-                  value: '{#VSERVER}{#FSNAME}'
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+                -
+                  tag: vserver
+                  value: '{#VSERVER}'
               trigger_prototypes:
                 -
                   uuid: 712d9096c8064ef19005c4989794db45
                   expression: 'max(/NetApp FAS3220 SNMP/fas3220.fs[dfPerCentKBytesCapacity, "{#VSERVER}{#FSNAME}"],{$FAS3220.FS.TIME:"{#FSNAME}"})>{$FAS3220.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=1'
                   name: '{#VSERVER}{#FSNAME}: Disk space is too low (used over {$FAS3220.FS.PUSED.MAX.CRIT:"{#FSNAME}"}% for {$FAS3220.FS.TIME:"{#FSNAME}"})'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 938f484a19454b8d9c80be5dbc1887df
@@ -900,8 +1071,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE.NAME} HA'
+                  tag: component
+                  value: ha
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
               trigger_prototypes:
                 -
                   uuid: 798e093f3c9941e6a2d7edc24dd22835
@@ -928,6 +1102,13 @@ zabbix_export:
                       alreadyInTakenoverMode(17),
                       nvramLogUnsynchronized(18),
                       stateofBackupMailboxIsDoubtful(19).
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 70624f45000443999b416d5806ead949
               name: 'Node {#NODE.NAME}: HA settings'
@@ -945,8 +1126,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE.NAME} HA'
+                  tag: component
+                  value: ha
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
               trigger_prototypes:
                 -
                   uuid: f4ee8e2a63e8471598b6aad929151404
@@ -954,12 +1138,26 @@ zabbix_export:
                   name: 'Node {#NODE.NAME}: HA is not licensed'
                   priority: AVERAGE
                   description: 'The value notConfigured(1) indicates that the HA is not licensed.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: db2c37150e1649fba89898459150ada8
                   expression: 'last(/NetApp FAS3220 SNMP/fas3220.ha[haSettings, "{#NODE.NAME}"])=5'
                   name: 'Node {#NODE.NAME}: Node has been taken over'
                   priority: HIGH
                   description: 'The thisNodeDead(5) setting indicates that this node has been takenover.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 0984cb890ec64f748e6bc5531bf80112
           name: 'Network ports discovery'
@@ -1017,8 +1215,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: network
+                -
+                  tag: description
                   value: '{#IFDESCR}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 6f8c273e8efa40e3888716c7cad79f3f
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Inbound packets with errors'
@@ -1037,8 +1241,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: network
+                -
+                  tag: description
                   value: '{#IFDESCR}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 6fa2bb39354e4024805a82acf4feab29
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Bits received'
@@ -1059,8 +1269,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: network
+                -
+                  tag: description
                   value: '{#IFDESCR}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: b414bb327e744c4b932263502da396c1
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Outbound packets discarded'
@@ -1079,8 +1295,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: network
+                -
+                  tag: description
                   value: '{#IFDESCR}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: baf565d001c044f8b8b5ea5caf09ea60
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Outbound packets with errors'
@@ -1099,8 +1321,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: network
+                -
+                  tag: description
                   value: '{#IFDESCR}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: cd474bb9b7b741e8a19654f9e2a67890
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Bits sent'
@@ -1121,8 +1349,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: network
+                -
+                  tag: description
                   value: '{#IFDESCR}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: fc759bc9f1fd479498157c5ded9d1123
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Health degraded reason'
@@ -1140,8 +1374,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: network
+                -
+                  tag: description
                   value: '{#IFDESCR}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: d50375f621464117afa5c469d06aa3a6
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Health'
@@ -1160,8 +1400,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: network
+                -
+                  tag: description
                   value: '{#IFDESCR}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 13b38a463e7a49058ca6907a9430d49f
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): State'
@@ -1179,8 +1425,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: network
+                -
+                  tag: description
                   value: '{#IFDESCR}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: ba18b4cebd7547c1bd6f92bd9e0ca791
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Role'
@@ -1198,8 +1450,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: network
+                -
+                  tag: description
                   value: '{#IFDESCR}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 7e8816bdb15e4f1ab60c2c1b9706a34f
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Speed'
@@ -1217,8 +1475,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: network
+                -
+                  tag: description
                   value: '{#IFDESCR}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: ea7cd0c80dae43e3bfd871b8ce1c541b
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Up by an administrator'
@@ -1236,8 +1500,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: network
+                -
+                  tag: description
                   value: '{#IFDESCR}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: 9ea5b5b667df4bd1943892150c9f2fda
@@ -1253,6 +1523,10 @@ zabbix_export:
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 2c7730f4606a4833bc729c108349d7b4
               expression: 'last(/NetApp FAS3220 SNMP/fas3220.net.port[netportLinkState, "{#NODE}", "{#IFNAME}"])<>2 and last(/NetApp FAS3220 SNMP/fas3220.net.port[netportUpAdmin, "{#NODE}", "{#IFNAME}"])=1'
@@ -1260,12 +1534,26 @@ zabbix_export:
               priority: AVERAGE
               description: 'Link state is not UP and the port status is set ''UP'' by an administrator.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: a95e60addfe04055bb15138dd9d1f37f
               expression: 'last(/NetApp FAS3220 SNMP/fas3220.net.port[netportHealthStatus, "{#NODE}", "{#IFNAME}"])<>0 and length(last(/NetApp FAS3220 SNMP/fas3220.net.port[netportDegradedReason, "{#NODE}", "{#IFNAME}"]))>0'
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Port is not healthy'
               priority: INFO
               description: '{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 252ef20da69f43fd90afd5a560fdbd1e
@@ -1360,6 +1648,16 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(out);
+      tags:
+        -
+          tag: class
+          value: hardware
+        -
+          tag: target
+          value: netapp
+        -
+          tag: target
+          value: netapp-fas3220
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'
@@ -1697,3 +1995,10 @@ zabbix_export:
       priority: WARNING
       description: '{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}'
       type: MULTIPLE
+      tags:
+        -
+          tag: scope
+          value: availability
+        -
+          tag: scope
+          value: performance

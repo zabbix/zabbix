@@ -3,13 +3,13 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 The template to monitor Cloudflare to watch your web traffic and DNS metrics.
 It works without any external scripts and uses the Script item.
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 1\. Create a host, for example mywebsite.com, for a site in your Cloudflare account.
 
@@ -70,7 +70,7 @@ There are no template links in this template.
 |General |Cloudflare: Unencrypted requests |<p>The number of unencrypted requests.</p> |DEPENDENT |cloudflare.requests.ssl.unencrypted<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.unencrypted`</p> |
 |General |Cloudflare: Total threats |<p>The number of all threats.</p> |DEPENDENT |cloudflare.threats.all<p>**Preprocessing**:</p><p>- JSONPATH: `$.threats.all`</p> |
 |General |Cloudflare: Unique visitors |<p>The number of all visitors IPs.</p> |DEPENDENT |cloudflare.uniques.all<p>**Preprocessing**:</p><p>- JSONPATH: `$.uniques.all`</p> |
-|Zabbix_raw_items |Cloudflare: Get data |<p>The JSON with result of Cloudflare API request.</p> |SCRIPT |cloudflare.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Zabbix raw items |Cloudflare: Get data |<p>The JSON with result of Cloudflare API request.</p> |SCRIPT |cloudflare.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
 
 ## Triggers
 

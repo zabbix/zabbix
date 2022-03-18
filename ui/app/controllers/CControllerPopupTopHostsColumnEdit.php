@@ -105,7 +105,7 @@ class CControllerPopupTopHostsColumnEdit extends CController {
 			$this->setResponse(new CControllerResponseData([
 				'action'			=> $this->getAction(),
 				'thresholds_colors'	=> CWidgetFieldColumnsList::THRESHOLDS_DEFAULT_COLOR_PALETTE,
-				'errors' 			=> hasErrorMesssages() ? getMessages() : null,
+				'errors' 			=> hasErrorMessages() ? getMessages() : null,
 				'user' 				=> [
 					'debug_mode' => $this->getDebugMode()
 				]
@@ -114,12 +114,16 @@ class CControllerPopupTopHostsColumnEdit extends CController {
 			return;
 		}
 
+		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+
 		$thresholds = [];
 
 		if (array_key_exists('thresholds', $input)) {
 			foreach ($input['thresholds'] as $threshold) {
-				if (trim($threshold['threshold']) !== '') {
-					$thresholds[] = $threshold;
+				$order_threshold = trim($threshold['threshold']);
+
+				if ($order_threshold !== '' && $number_parser->parse($order_threshold) == CParser::PARSE_SUCCESS) {
+					$thresholds[] = $threshold + ['order_threshold' => $number_parser->calcValue()];
 				}
 			}
 
@@ -127,8 +131,15 @@ class CControllerPopupTopHostsColumnEdit extends CController {
 		}
 
 		if ($thresholds) {
-			CArrayHelper::sort($thresholds, ['threshold']);
-			$input['thresholds'] = array_values($thresholds);
+			CArrayHelper::sort($thresholds, ['order_threshold']);
+
+			$input['thresholds'] = [];
+
+			foreach ($thresholds as $threshold) {
+				unset($threshold['order_threshold']);
+
+				$input['thresholds'][] = $threshold;
+			}
 		}
 
 		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($input)]))->disableView());

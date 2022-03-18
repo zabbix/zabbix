@@ -920,10 +920,10 @@ function makeInformationList($info_icons) {
  *
  * @param string $message
  *
- * @return CSpan
+ * @return CLink
  */
 function makeInformationIcon($message) {
-	return (new CSpan())
+	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_GREEN)
 		->setHint($message, ZBX_STYLE_HINTBOX_WRAP);
@@ -936,7 +936,7 @@ function makeInformationIcon($message) {
  * @param string $name         Name of the maintenance.
  * @param string $description  Description of the maintenance.
  *
- * @return CSpan
+ * @return CLink
  */
 function makeMaintenanceIcon($type, $name, $description) {
 	$hint = $name.' ['.($type
@@ -947,9 +947,8 @@ function makeMaintenanceIcon($type, $name, $description) {
 		$hint .= "\n".$description;
 	}
 
-	return (new CSpan())
-		->addClass(ZBX_STYLE_ICON_MAINT)
-		->addClass(ZBX_STYLE_CURSOR_POINTER)
+	return (new CLink())
+		->addClass(ZBX_STYLE_ICON_MAINTENANCE)
 		->setHint($hint);
 }
 
@@ -960,7 +959,7 @@ function makeMaintenanceIcon($type, $name, $description) {
  * @param string $icon_data[]['suppress_until']    Time until the problem is suppressed.
  * @param string $icon_data[]['maintenance_name']  Name of the maintenance.
  *
- * @return CSpan
+ * @return CLink
  */
 function makeSuppressedProblemIcon(array $icon_data) {
 	$suppress_until = max(zbx_objectValues($icon_data, 'suppress_until'));
@@ -968,9 +967,8 @@ function makeSuppressedProblemIcon(array $icon_data) {
 	CArrayHelper::sort($icon_data, ['maintenance_name']);
 	$maintenance_names = implode(', ', zbx_objectValues($icon_data, 'maintenance_name'));
 
-	return (new CSpan())
+	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_INVISIBLE)
-		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint(
 			_s('Suppressed till: %1$s', ($suppress_until < strtotime('tomorrow'))
 				? zbx_date2str(TIME_FORMAT, $suppress_until)
@@ -1031,12 +1029,11 @@ function makeActionIcon(array $icon_data): CTag {
  *
  * @param string $description
  *
- * @return CSpan
+ * @return CLink
  */
 function makeDescriptionIcon($description) {
-	return (new CSpan())
+	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_DESCRIPTION)
-		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint(zbx_str2links($description), ZBX_STYLE_HINTBOX_WRAP);
 }
 
@@ -1045,10 +1042,10 @@ function makeDescriptionIcon($description) {
  *
  * @param string $error
  *
- * @return CSpan
+ * @return CLink
  */
 function makeErrorIcon($error) {
-	return (new CSpan())
+	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_RED)
 		->setHint($error, ZBX_STYLE_HINTBOX_WRAP." ".ZBX_STYLE_RED);
@@ -1059,27 +1056,12 @@ function makeErrorIcon($error) {
  *
  * @param string|array|CTag $help_text
  *
- * @return CSpan
+ * @return CLink
  */
-function makeHelpIcon($help_text): CSpan {
-	return (new CSpan())
+function makeHelpIcon($help_text): CLink {
+	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_HELP_HINT)
-		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint($help_text, ZBX_STYLE_HINTBOX_WRAP);
-}
-
-/**
- * Renders an unknown icon like grey [i] with error message
- *
- * @param string $error
- *
- * @return CSpan
- */
-function makeUnknownIcon($error) {
-	return (new CSpan())
-		->addClass(ZBX_STYLE_ICON_INFO)
-		->addClass(ZBX_STYLE_STATUS_DARK_GREY)
-		->setHint($error, ZBX_STYLE_HINTBOX_WRAP." ".ZBX_STYLE_RED);
 }
 
 /**
@@ -1087,10 +1069,10 @@ function makeUnknownIcon($error) {
  *
  * @param string $error
  *
- * @return CSpan
+ * @return CLink
  */
 function makeWarningIcon($error) {
-	return (new CSpan())
+	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_YELLOW)
 		->setHint($error, ZBX_STYLE_HINTBOX_WRAP);

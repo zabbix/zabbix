@@ -43,6 +43,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
+	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_srcdir)/src/zabbix_agent/libzbxagent.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
@@ -77,6 +78,7 @@ VFS_FS_DISCOVERY_LDFLAGS = @AGENT_LDFLAGS@
 VFS_FS_DISCOVERY_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 KERNEL_MAXPROC_SOURCES = \
+	KERNEL_COMMON.c \
 	KERNEL_MAXPROC.c \
 	$(COMMON_SRC_FILES)
 
@@ -103,6 +105,7 @@ SYSTEM_CPU_SWITCHES_LDFLAGS = @AGENT_LDFLAGS@
 SYSTEM_CPU_SWITCHES_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 KERNEL_MAXFILES_SOURCES = \
+	KERNEL_COMMON.c \
 	KERNEL_MAXFILES.c \
 	$(COMMON_SRC_FILES)
 
@@ -143,6 +146,7 @@ SYSTEM_BOOTTIME_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 #NET_IF_TOTAL	
 NET_IF_TOTAL_SOURCES = \
+	NET_IF_COMMON.c \
 	NET_IF_TOTAL.c \
 	$(COMMON_SRC_FILES)
 
@@ -152,6 +156,7 @@ NET_IF_TOTAL_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 #NET_IF_IN
 NET_IF_IN_SOURCES = \
+	NET_IF_COMMON.c \
 	NET_IF_IN.c \
 	$(COMMON_SRC_FILES)
 
@@ -161,6 +166,7 @@ NET_IF_IN_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 #NET_IF_OUT
 NET_IF_OUT_SOURCES = \
+	NET_IF_COMMON.c \
 	NET_IF_OUT.c \
 	$(COMMON_SRC_FILES)
 
