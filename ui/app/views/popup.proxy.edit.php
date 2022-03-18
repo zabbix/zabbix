@@ -88,7 +88,9 @@ $proxy_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Description'), 'description'),
 		new CFormField(
-			(new CTextArea('description', $data['form']['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			(new CTextArea('description', $data['form']['description']))
+				->setMaxlength(DB::getFieldLength('hosts', 'description'))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
 	]);
 
