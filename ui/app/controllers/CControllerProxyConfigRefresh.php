@@ -68,7 +68,7 @@ class CControllerProxyConfigRefresh extends CController {
 		]);
 
 		if ($result) {
-			$output['success']['title'] = _('Request sent successfully');
+			$output['success']['title'] = _('Request created successfully');
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -76,7 +76,7 @@ class CControllerProxyConfigRefresh extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _('Cannot send request'),
+				'title' => _('Cannot create request'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}
