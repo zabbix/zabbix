@@ -112,11 +112,13 @@ class CControllerMiscConfigEdit extends CController {
 			)),
 			'report_test_timeout' => $this->getInput('report_test_timeout', CSettingsHelper::get(
 				CSettingsHelper::SCHEDULED_REPORT_TEST_TIMEOUT
-			)),
-			'vault_provider' => $this->getInput('vault_provider', CSettingsHelper::get(
-				CSettingsHelper::VAULT_PROVIDER
 			))
 		];
+
+		$data['has_vault_provider'] = APP::Vault() !== null;
+		$data['vault_provider'] = $data['has_vault_provider']
+			? APP::Vault()::TYPE
+			: $this->getInput('vault_provider', CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER));
 
 		$data['discovery_group_data'] = API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
@@ -133,8 +135,6 @@ class CControllerMiscConfigEdit extends CController {
 			'usrgrpids' => $data['alert_usrgrpid']
 		]);
 		$data['alert_usrgrp_data'] = CArrayHelper::renameObjectsKeys($data['alert_usrgrp_data'], ['usrgrpid' => 'id']);
-
-		$data['has_vault_provider'] = APP::Vault() !== null;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Other configuration parameters'));

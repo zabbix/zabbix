@@ -24,10 +24,10 @@
  */
 class CVaultCyberArk extends CVault {
 
+	public const TYPE					= ZBX_VAULT_TYPE_CYBERARK;
 	public const NAME					= 'CyberArk';
 	public const API_ENDPOINT_DEFAULT	= 'https://localhost:1858';
 	public const DB_PATH_PLACEHOLDER	= 'AppID=foo&Query=Safe=bar;Object=buzz';
-	public const MACRO_PLACEHOLDER		= 'AppID=foo&Query=Safe=bar;Object=buzz:key';
 
 	/**
 	 * @var string

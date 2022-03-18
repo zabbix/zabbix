@@ -24,10 +24,10 @@
  */
 class CVaultHashiCorp extends CVault {
 
+	public const TYPE					= ZBX_VAULT_TYPE_HASHICORP;
 	public const NAME					= 'HashiCorp';
 	public const API_ENDPOINT_DEFAULT	= 'https://localhost:8200';
 	public const DB_PATH_PLACEHOLDER	= 'path/to/secret';
-	public const MACRO_PLACEHOLDER		= 'path/to/secret:key';
 
 	/**
 	 * @var string
