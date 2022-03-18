@@ -121,7 +121,7 @@ class CVaultSecretParser extends CParser {
 		$this->cyberark_has_key = true;
 		$has_appid = false;
 
-		while (preg_match('/^(?<parameter>[A-Za-z ]+)=(?<value>[^+&%:]*)/', substr($source, $pos), $matches) == 1) {
+		while (preg_match('/^(?<parameter>[A-Za-z]+)=(?<value>[^+&%:]*)/', substr($source, $pos), $matches) == 1) {
 			if ($matches['parameter'] === 'AppID') {
 				$has_appid = true;
 			}
