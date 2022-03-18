@@ -113,9 +113,8 @@ class testPageDashboard extends CLegacyWebTest {
 	}
 
 	public function testPageDashboard_AddFavouriteGraphs() {
-		$item_ids = CDBHelper::getAll('SELECT itemid FROM items WHERE hostid=10084 AND name IN ('.
-				zbx_dbstr($this->graphCpu).','.zbx_dbstr($this->graphMemory).')'
-		);
+		$cpu_itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE hostid=10084 AND name='.zbx_dbstr($this->graphCpu));
+		$memory_itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE hostid=10084 AND name='.zbx_dbstr($this->graphMemory));
 
 		$this->zbxTestLogin('zabbix.php?action=latest.view');
 		$this->zbxTestCheckHeader('Latest data');
@@ -125,7 +124,6 @@ class testPageDashboard extends CLegacyWebTest {
 		$filter->getField('Name')->fill($this->graphCpu);
 		$filter->submit();
 		$cpu_link = $this->query('link:Graph')->one();
-		$cpu_url = 'history.php?action=showgraph&itemids%5B0%5D='.$item_ids[0]['itemid'];
 		$cpu_link->click();
 
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
@@ -140,7 +138,6 @@ class testPageDashboard extends CLegacyWebTest {
 		$filter->getField('Name')->fill($this->graphMemory);
 		$filter->submit();
 		$memory_link = $this->query('link:Graph')->one();
-		$memory_url = 'history.php?action=showgraph&itemids%5B0%5D='.$item_ids[1]['itemid'];
 		$memory_link->click();
 
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
@@ -153,11 +150,11 @@ class testPageDashboard extends CLegacyWebTest {
 		$this->page->waitUntilReady();
 		$url_xpath = '//div[@class="dashboard-grid"]/div[8]//a[@href=';
 
-		foreach ([$this->graphCpu => $cpu_url, $this->graphMemory => $memory_url] as $graph => $graph_url) {
+		foreach ([$this->graphCpu => $cpu_itemid, $this->graphMemory => $memory_itemid] as $graph => $itemid) {
+			$graph_url = 'history.php?action=showgraph&itemids%5B0%5D='.$itemid;
 			$this->zbxTestAssertElementText($url_xpath.CXPathHelper::escapeQuotes($graph_url).']', 'ЗАББИКС Сервер: '.$graph);
-			$graph_id = str_replace('history.php?action=showgraph&itemids%5B0%5D=', '', $graph_url);
 			$this->assertEquals(1, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='
-					.zbx_dbstr('web.favorite.graphids').' AND value_id='.$graph_id)
+					.zbx_dbstr('web.favorite.graphids').' AND value_id='.$itemid)
 			);
 		}
 	}

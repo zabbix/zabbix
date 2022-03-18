@@ -1539,7 +1539,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete template web scenatios from host                           *
+ * Purpose: delete template web scenarios from host                           *
  *                                                                            *
  * Parameters: hostid      - [IN] host identifier from database               *
  *             templateids - [IN] array of template IDs                       *
@@ -5812,7 +5812,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete hosts from database, check if there are any host           *
+ * Purpose: delete hosts from database, check if there are any hosts          *
  *          prototypes and delete them first                                  *
  *                                                                            *
  * Parameters: hostids   - [IN] host identifiers from database                *

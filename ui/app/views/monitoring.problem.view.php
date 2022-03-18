@@ -93,6 +93,7 @@ if ($data['action'] === 'problem.view') {
 	$widget = (new CWidget())
 		->setTitle(_('Problems'))
 		->setWebLayoutMode($web_layout_mode)
+		->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_PROBLEM_VIEW))
 		->setControls(
 			(new CTag('nav', true,
 				(new CList())

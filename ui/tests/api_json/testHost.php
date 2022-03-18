@@ -32,14 +32,14 @@ class testHost extends CAPITest {
 				'hostids' => [
 					'61001'
 				],
-				'expected_error' => 'Cannot delete host because maintenance "maintenance_has_only_host" must contain at least one host or host group.'
+				'expected_error' => 'Cannot delete host "maintenance_has_only_host" because maintenance "maintenance_has_only_host" must contain at least one host or host group.'
 			],
 			[
 				'hostids' => [
 					'61001',
 					'61003'
 				],
-				'expected_error' => 'Cannot delete selected hosts because maintenance "maintenance_has_only_host" must contain at least one host or host group.'
+				'expected_error' => 'Cannot delete host "maintenance_has_only_host" because maintenance "maintenance_has_only_host" must contain at least one host or host group.'
 			],
 			[
 				'hostids' => [
@@ -52,7 +52,7 @@ class testHost extends CAPITest {
 					'61004',
 					'61005'
 				],
-				'expected_error' => 'Cannot delete selected hosts because maintenance "maintenance_two_hosts" must contain at least one host or host group.'
+				'expected_error' => 'Cannot delete hosts "maintenance_host_1", "maintenance_host_2" because maintenance "maintenance_two_hosts" must contain at least one host or host group.'
 			],
 			[
 				'hostids' => [

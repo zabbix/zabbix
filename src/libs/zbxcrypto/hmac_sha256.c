@@ -3,12 +3,12 @@ hmac_sha256.c
 Originally written by https://github.com/h5p9sl
 */
 
+#include "hmac_sha256.h"
+
 #include "sha256crypt.h"
 
 #include <stdlib.h>
 #include <string.h>
-
-#include "hmac_sha256.h"
 
 #define SHA256_BLOCK_SIZE	64
 

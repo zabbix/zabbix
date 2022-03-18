@@ -27,8 +27,6 @@
 #include "zbxalgo.h"
 #include "dbcache.h"
 #include "mutexs.h"
-
-#define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
 
 #include "configcache_mock.h"

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:46:41Z'
+  date: '2022-03-01T08:29:43Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -788,7 +788,7 @@ zabbix_export:
           value: service
         -
           tag: target
-          value: claudflare
+          value: cloudflare
       macros:
         -
           macro: '{$CLOUDFLARE.API.TOKEN}'

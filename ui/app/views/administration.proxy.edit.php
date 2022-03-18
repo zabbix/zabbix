@@ -25,7 +25,9 @@
 
 $this->includeJsFile('administration.proxy.edit.js.php');
 
-$widget = (new CWidget())->setTitle(_('Proxies'));
+$widget = (new CWidget())
+	->setTitle(_('Proxies'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_PROXY_EDIT));
 
 $tabs = new CTabView();
 

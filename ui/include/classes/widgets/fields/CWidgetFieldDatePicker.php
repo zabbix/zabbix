@@ -22,11 +22,6 @@
 class CWidgetFieldDatePicker extends CWidgetField {
 
 	/**
-	 * @var array
-	 */
-	private $date_time_formats;
-
-	/**
 	 * @var bool
 	 */
 	private $is_date_only;
@@ -34,13 +29,11 @@ class CWidgetFieldDatePicker extends CWidgetField {
 	/**
 	 * @param string $name
 	 * @param string $label
-	 * @param array  $date_time_formats
 	 * @param bool   $is_date_only
 	 */
-	public function __construct(string $name, string $label, array $date_time_formats, bool $is_date_only) {
+	public function __construct(string $name, string $label, bool $is_date_only) {
 		parent::__construct($name, $label);
 
-		$this->date_time_formats = $date_time_formats;
 		$this->is_date_only = $is_date_only;
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
@@ -75,20 +68,6 @@ class CWidgetFieldDatePicker extends CWidgetField {
 	}
 
 	/**
-	 * @return array
-	 */
-	public function getDateTimeFormats(): array {
-		return $this->date_time_formats;
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function isDateOnly(): bool {
-		return $this->is_date_only;
-	}
-
-	/**
 	 * @param bool $strict
 	 *
 	 * @return array
@@ -107,11 +86,16 @@ class CWidgetFieldDatePicker extends CWidgetField {
 			return [];
 		}
 
-		foreach ($this->getDateTimeFormats() as $datetime_format) {
-			$datetime = DateTime::createFromFormat('!'.$datetime_format, $value);
-			$last_errors = DateTime::getLastErrors();
+		$absolute_time_parser = new CAbsoluteTimeParser();
 
-			if ($datetime !== false && $last_errors['warning_count'] == 0 && $last_errors['error_count'] == 0) {
+		if ($absolute_time_parser->parse($value) == CParser::PARSE_SUCCESS) {
+			$has_errors = false;
+
+			if ($this->is_date_only) {
+				$has_errors = $absolute_time_parser->getDateTime(true)->format('H:i:s') !== '00:00:00';
+			}
+
+			if (!$has_errors) {
 				$this->setValue($value);
 
 				return [];
@@ -123,7 +107,7 @@ class CWidgetFieldDatePicker extends CWidgetField {
 		if ($relative_time_parser->parse($value) == CParser::PARSE_SUCCESS) {
 			$has_errors = false;
 
-			if ($this->isDateOnly()) {
+			if ($this->is_date_only) {
 				foreach ($relative_time_parser->getTokens() as $token) {
 					if ($token['suffix'] === 'h' || $token['suffix'] === 'm' || $token['suffix'] === 's') {
 						$has_errors = true;
@@ -143,7 +127,7 @@ class CWidgetFieldDatePicker extends CWidgetField {
 
 		return [
 			_s('Invalid parameter "%1$s": %2$s.', $label,
-				$this->isDateOnly() ? _('a date is expected') : _('a time is expected')
+				$this->is_date_only ? _('a date is expected') : _('a time is expected')
 			)
 		];
 	}

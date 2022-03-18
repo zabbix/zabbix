@@ -20,8 +20,6 @@
 #ifndef ZABBIX_ALERTER_PROTOCOL_H
 #define ZABBIX_ALERTER_PROTOCOL_H
 
-#include "common.h"
-#include "zbxalgo.h"
 #include "zbxalert.h"
 
 #define ZBX_IPC_SERVICE_ALERTER	"alerter"

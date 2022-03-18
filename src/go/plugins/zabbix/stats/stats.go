@@ -13,9 +13,9 @@ import (
 )
 
 type Options struct {
-	Timeout  int    `conf:"optional,range=1:30"`
-	Capacity int    `conf:"optional,range=1:100"`
-	SourceIP string `conf:"optional"`
+	plugin.SystemOptions `conf:"optional,name=System"`
+	Timeout              int    `conf:"optional,range=1:30"`
+	SourceIP             string `conf:"optional"`
 }
 
 // Plugin -

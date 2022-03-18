@@ -30,6 +30,7 @@ if (array_key_exists('error', $data)) {
 if (array_key_exists('no_data', $data)) {
 	(new CWidget())
 		->setTitle(_('Dashboards'))
+		->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_HOST_DASHBOARD_VIEW))
 		->addItem(new CTableInfo())
 		->show();
 
@@ -66,6 +67,7 @@ $web_layout_mode = $this->getLayoutMode();
 $widget = (new CWidget())
 	->setTitle($data['dashboard']['name'])
 	->setWebLayoutMode($web_layout_mode)
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_HOST_DASHBOARD_VIEW))
 	->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(

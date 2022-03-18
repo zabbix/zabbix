@@ -373,5 +373,6 @@ if ($data['admin']) {
 
 (new CWidget())
 	->setTitle(_('Search').': '.$data['search'])
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::SEARCH))
 	->addItem(new CDiv($widgets))
 	->show();

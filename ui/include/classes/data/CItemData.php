@@ -319,11 +319,6 @@ final class CItemData {
 		],
 		ITEM_TYPE_INTERNAL => [
 			'zabbix[boottime]',
-			'zabbix[history]',
-			'zabbix[history_log]',
-			'zabbix[history_str]',
-			'zabbix[history_text]',
-			'zabbix[history_uint]',
 			'zabbix[host,,items]',
 			'zabbix[host,,items_unsupported]',
 			'zabbix[host,,maintenance]',
@@ -344,8 +339,6 @@ final class CItemData {
 			'zabbix[stats,<ip>,<port>,queue,<from>,<to>]',
 			'zabbix[stats,<ip>,<port>]',
 			'zabbix[tcache, cache, <parameter>]',
-			'zabbix[trends]',
-			'zabbix[trends_uint]',
 			'zabbix[triggers]',
 			'zabbix[uptime]',
 			'zabbix[vcache,buffer,<mode>]',
@@ -1605,26 +1598,6 @@ final class CItemData {
 				'description' => _('Startup time of Zabbix server, Unix timestamp.'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
-			'zabbix[history]' => [
-				'description' => _('Number of values stored in table HISTORY.'),
-				'value_type' => ITEM_VALUE_TYPE_UINT64
-			],
-			'zabbix[history_log]' => [
-				'description' => _('Number of values stored in table HISTORY_LOG.'),
-				'value_type' => ITEM_VALUE_TYPE_UINT64
-			],
-			'zabbix[history_str]' => [
-				'description' => _('Number of values stored in table HISTORY_STR.'),
-				'value_type' => ITEM_VALUE_TYPE_UINT64
-			],
-			'zabbix[history_text]' => [
-				'description' => _('Number of values stored in table HISTORY_TEXT.'),
-				'value_type' => ITEM_VALUE_TYPE_UINT64
-			],
-			'zabbix[history_uint]' => [
-				'description' => _('Number of values stored in table HISTORY_UINT.'),
-				'value_type' => ITEM_VALUE_TYPE_UINT64
-			],
 			'zabbix[host,,items]' => [
 				'description' => _('Number of enabled items on the host.'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
@@ -1704,14 +1677,6 @@ final class CItemData {
 			'zabbix[tcache, cache, <parameter>]' => [
 				'description' => _('Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests.'),
 				'value_type' => null
-			],
-			'zabbix[trends]' => [
-				'description' => _('Number of values stored in table TRENDS.'),
-				'value_type' => ITEM_VALUE_TYPE_UINT64
-			],
-			'zabbix[trends_uint]' => [
-				'description' => _('Number of values stored in table TRENDS_UINT.'),
-				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'zabbix[triggers]' => [
 				'description' => _('Number of triggers in Zabbix database.'),

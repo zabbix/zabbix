@@ -21,7 +21,6 @@
 #define ZABBIX_COMMON_H
 
 #include "sysinc.h"
-#include "zbxtypes.h"
 #include "module.h"
 #include "version.h"
 #include "md5.h"
@@ -798,7 +797,7 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_TRIGGER_CORRELATION_NONE	0
 #define ZBX_TRIGGER_CORRELATION_TAG	1
 
-/* acknowledgement actions (flags) */
+/* acknowledgment actions (flags) */
 #define ZBX_PROBLEM_UPDATE_CLOSE		0x0001
 #define ZBX_PROBLEM_UPDATE_ACKNOWLEDGE		0x0002
 #define ZBX_PROBLEM_UPDATE_MESSAGE		0x0004
@@ -1247,16 +1246,6 @@ char	*zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3
 char	*zbx_strdcat(char *dest, const char *src);
 char	*zbx_strdcatf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 
-int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
-void	xml_free_data_dyn(char **data);
-char	*xml_escape_dyn(const char *data);
-void	xml_escape_xpath(char **data);
-
-int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size_t key_len,
-		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
-		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
-		char *severity, size_t severity_len);
-
 /* misc functions */
 int	is_ip6(const char *ip);
 int	is_ip4(const char *ip);
@@ -1693,7 +1682,7 @@ int	zbx_validate_value_dbl(double value, int dbl_precision);
 
 void	zbx_update_env(double time_now);
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
-		int *nextcheck, char **error);
+		int *nextcheck, int *scheduling, char **error);
 #define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
 char	*zbx_create_token(zbx_uint64_t seed);
 
@@ -1748,13 +1737,6 @@ zbx_function_type_t;
 
 zbx_function_type_t	zbx_get_function_type(const char *func);
 int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg);
-int	zbx_xmlnode_to_json(void *xml_node, char **jstr);
-int	zbx_xml_to_json(char *xml_data, char **jstr, char **errmsg);
-int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg);
-#ifdef HAVE_LIBXML2
-int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **root_node, char **errmsg);
-int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
-#endif
 
 /* audit logging mode */
 #define ZBX_AUDITLOG_DISABLED	0

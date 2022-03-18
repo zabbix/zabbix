@@ -340,10 +340,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			]);
 
 			if ($dbTriggers) {
-				$result &= copyTriggersToHosts(zbx_objectValues($dbTriggers, 'triggerid'),
-						$input_templateid, $cloneTemplateId);
-
-				if (!$result) {
+				if (!copyTriggersToHosts(zbx_objectValues($dbTriggers, 'triggerid'), $input_templateid,
+						$cloneTemplateId)) {
 					throw new Exception();
 				}
 			}
@@ -367,10 +365,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			]);
 
 			if ($dbDiscoveryRules) {
-				$result &= API::DiscoveryRule()->copy([
+				if (!API::DiscoveryRule()->copy([
 					'discoveryids' => zbx_objectValues($dbDiscoveryRules, 'itemid'),
 					'hostids' => [$input_templateid]
-				]);
+				])) {
+					$result = false;
+				}
 
 				if (!$result) {
 					throw new Exception();

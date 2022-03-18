@@ -26,11 +26,6 @@ class CControllerSlaUpdate extends CControllerSlaCreateUpdate {
 	 */
 	private $schedule = [];
 
-	/**
-	 * @var int
-	 */
-	private $effective_date;
-
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
@@ -45,7 +40,7 @@ class CControllerSlaUpdate extends CControllerSlaCreateUpdate {
 			'schedule_mode' =>		'required|in '.implode(',', [CSlaHelper::SCHEDULE_MODE_24X7, CSlaHelper::SCHEDULE_MODE_CUSTOM]),
 			'schedule_enabled' =>	'array',
 			'schedule_periods' =>	'array',
-			'effective_date' =>		'required|string|not_empty',
+			'effective_date' =>		'required|abs_date',
 			'service_tags' =>		'required|array',
 			'description' =>		'required|string',
 			'status' =>				'in '.ZBX_SLA_STATUS_ENABLED,
@@ -65,16 +60,6 @@ class CControllerSlaUpdate extends CControllerSlaCreateUpdate {
 					info($e->getMessage());
 					$ret = false;
 				}
-			}
-
-			try {
-				$this->effective_date = self::validateEffectiveDate($this->getInput('effective_date'),
-					'effective_date'
-				);
-			}
-			catch (InvalidArgumentException $e) {
-				info($e->getMessage());
-				$ret = false;
 			}
 		}
 
@@ -105,11 +90,17 @@ class CControllerSlaUpdate extends CControllerSlaCreateUpdate {
 	}
 
 	/**
-	 * @throws APIException
+	 * @throws Exception
 	 */
 	protected function doAction(): void {
+		$parser = new CAbsoluteTimeParser();
+		$parser->parse($this->getInput('effective_date'));
+		$effective_date = $parser
+			->getDateTime(true, new DateTimeZone('UTC'))
+			->getTimestamp();
+
 		$sla = [
-			'effective_date' => $this->effective_date,
+			'effective_date' => $effective_date,
 			'status' => $this->hasInput('status') ? ZBX_SLA_STATUS_ENABLED : ZBX_SLA_STATUS_DISABLED,
 			'schedule' => $this->schedule,
 			'service_tags' => [],

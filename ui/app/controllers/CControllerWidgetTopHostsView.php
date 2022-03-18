@@ -302,19 +302,11 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 
 		$timeshift = $column['timeshift'] !== '' ? timeUnitToSeconds($column['timeshift']) : 0;
 
-		if ($timeshift == 0 && $column['aggregate_function'] == AGGREGATE_NONE) {
-			$data = Manager::History()->getLastValues($items, $history_period);
-
-			return array_column(array_column($data, 0), 'value', 'itemid');
-		}
-
 		$time_to = $time_now + $timeshift;
 
 		$time_from = $column['aggregate_function'] != AGGREGATE_NONE
 			? $time_to - timeUnitToSeconds($column['aggregate_interval'])
 			: $time_to - $history_period;
-
-		self::addDataSource($items, $time_from, $time_now, $column['data']);
 
 		$function = $column['aggregate_function'] != AGGREGATE_NONE
 			? $column['aggregate_function']
@@ -322,10 +314,33 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 
 		$interval = $time_to;
 
-		$data = Manager::History()->getAggregationByInterval($items, $time_from, $time_to, $function, $interval);
-		$data = array_column(array_column($data, 'data'), 0);
+		self::addDataSource($items, $time_from, $time_now, $column['history']);
 
-		return array_column($data, $function == AGGREGATE_COUNT ? 'count' : 'value', 'itemid');
+		$result = [];
+
+		if ($timeshift == 0 && $column['aggregate_function'] == AGGREGATE_NONE) {
+			$items_by_source = ['history' => [], 'trends' => []];
+
+			foreach ($items as $itemid => $item) {
+				$items_by_source[$item['source']][$itemid] = $item;
+			}
+
+			$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period);
+			$values = array_column(array_column($values, 0), 'value', 'itemid');
+
+			$result += $values;
+
+			$items = $items_by_source['trends'];
+		}
+
+		$values = Manager::History()->getAggregationByInterval($items, $time_from, $time_to, $function, $interval);
+		$values = array_column(array_column(array_column($values, 'data'), 0),
+			$function == AGGREGATE_COUNT ? 'count' : 'value', 'itemid'
+		);
+
+		$result += $values;
+
+		return $result;
 	}
 
 	/**

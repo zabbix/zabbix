@@ -50,7 +50,7 @@ typedef struct
 }
 zbx_expression_query_one_t;
 
-/* many item query data - matching itemids */
+/* many items query data - matching itemids */
 typedef struct
 {
 	zbx_vector_uint64_t	itemids;
@@ -60,7 +60,7 @@ zbx_expression_query_many_t;
 /* expression item query */
 typedef struct
 {
-	/* query flags, see see ZBX_ITEM_QUERY_* defines */
+	/* query flags, see ZBX_ITEM_QUERY_* defines */
 	zbx_uint32_t		flags;
 
 	/* the item query /host/key?[filter] */
@@ -1895,6 +1895,29 @@ void	zbx_expression_eval_resolve_item_hosts(zbx_expression_eval_t *eval, const D
 
 		if (0 != (ZBX_ITEM_QUERY_HOST_SELF & query->flags) || 0 == strcmp(query->ref.host, "{HOST.HOST}"))
 			query->ref.host = zbx_strdup(query->ref.host, item->host.host);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_expression_eval_resolve_filter_macros                        *
+ *                                                                            *
+ * Purpose: resolve calculated item formula macros in filter                  *
+ *                                                                            *
+ * Parameters: eval - [IN] the evaluation data                                *
+ *             item - [IN] the calculated item                                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_expression_eval_resolve_filter_macros(zbx_expression_eval_t *eval, const DC_ITEM *item)
+{
+	int	i;
+
+	for (i = 0; i < eval->queries.values_num; i++)
+	{
+		zbx_expression_query_t	*query = (zbx_expression_query_t *)eval->queries.values[i];
+
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL, NULL, NULL, NULL,
+				&query->ref.filter, MACRO_TYPE_QUERY_FILTER, NULL, 0);
 	}
 }
 

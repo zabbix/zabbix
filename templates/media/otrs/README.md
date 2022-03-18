@@ -2,12 +2,12 @@
 # OTRS webhook
 ![](images/otrs_logo.png?raw=true)
 
-This guide describes how to integrate your Zabbix 5.0 installation with OTRS using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
+This guide describes how to integrate your Zabbix 6.2 installation with OTRS using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
 
 ## Requirements
 
 - OTRS version 6
-- Zabbix version 5.0 or higher
+- Zabbix version 6.2 or higher
 
 ## Setting up a OTRS
 
@@ -58,8 +58,8 @@ For **Send to**: enter any text, as this value is not used, but is required.
 
 [![](images/thumb.09.png?raw=true)](images/09.png)
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/6.0/manual/config/notifications) and [OTRS](https://doc.otrs.com) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/6.2/manual/config/notifications) and [OTRS](https://doc.otrs.com) documentations.
 
 ## Supported Versions
 
-Zabbix 5.0
+Zabbix 6.2

@@ -95,7 +95,7 @@ class CXmlImportReader extends CImportReader {
 							$data[$node_name][$xml->name] = $xml->value;
 						}
 
-						// it make $this->isEmptyElement valid after processing attributes
+						// it makes $this->isEmptyElement valid after processing attributes
 						$xml->moveToElement();
 
 						/*

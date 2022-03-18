@@ -83,6 +83,6 @@ class CColorPickerElement extends CElement {
 	 * @param string $color		color code
 	 */
 	public function fill($color) {
-		$this->overwrite($color.WebDriverKeys::ENTER)->waitUntilNotVisible();
+		$this->overwrite($color)->close();
 	}
 }

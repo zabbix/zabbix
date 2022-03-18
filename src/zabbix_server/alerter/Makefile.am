@@ -12,3 +12,4 @@ libzbxalerter_a_SOURCES = \
 	alerter_protocol.c \
 	alerter_protocol.h
 
+libzbxalerter_a_CFLAGS = $(LIBXML2_CFLAGS)

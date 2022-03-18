@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "preproc_worker.h"
+
 #include "common.h"
 #include "daemon.h"
 #include "zbxself.h"
@@ -26,8 +28,6 @@
 #include "zbxembed.h"
 #include "item_preproc.h"
 #include "preproc_history.h"
-
-#include "preproc_worker.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
