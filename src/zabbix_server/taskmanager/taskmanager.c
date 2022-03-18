@@ -684,7 +684,11 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 		}
 	}
 
-	if (0 < proxynames_log.values_num)
+	if (1 == proxynames_log.values_num)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "reloading configuration on proxy \"%s\"", proxynames_log.values[0]);
+	}
+	else if (1 < proxynames_log.values_num)
 	{
 		int	i = 0;
 		char	*names_success = NULL;
@@ -1134,7 +1138,11 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 
 	zbx_audit_flush();
 
-	if (0 < proxynames_log.values_num)
+	if (1 == proxynames_log.values_num)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "reloading configuration on proxy \"%s\"", proxynames_log.values[0]);
+	}
+	else if (1 < proxynames_log.values_num)
 	{
 		int	i = 0;
 
