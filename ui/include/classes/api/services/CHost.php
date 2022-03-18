@@ -2161,8 +2161,8 @@ class CHost extends CHostGeneral {
 					}
 				}
 			}
-			// Permissions to host groups is validated in massUpdate().
 
+			// Permissions to host groups is validated in massUpdate().
 			if (array_key_exists('macros', $host)) {
 				if (!CApiInputValidator::validate($macro_rules, $host['macros'], '/'.($index + 1).'/macros', $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);

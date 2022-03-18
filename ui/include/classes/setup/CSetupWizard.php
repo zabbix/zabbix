@@ -126,12 +126,14 @@ class CSetupWizard extends CForm {
 				'DB_PORT' => getRequest('port', $this->getConfig('DB_PORT', '0')),
 				'DB_DATABASE' => getRequest('database', $this->getConfig('DB_DATABASE', 'zabbix')),
 				'DB_CREDS_STORAGE' => getRequest('creds_storage',
-					$this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG)),
+					$this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG)
+				),
 				'DB_PASSWORD' => getRequest('password', $this->getConfig('DB_PASSWORD', '')),
 				'DB_SCHEMA' => getRequest('schema', $this->getConfig('DB_SCHEMA', '')),
 				'DB_ENCRYPTION' => (bool) getRequest('tls_encryption', $this->getConfig('DB_ENCRYPTION', false)),
 				'DB_ENCRYPTION_ADVANCED' => (bool) getRequest('verify_certificate',
-					$this->getConfig('DB_ENCRYPTION_ADVANCED', false)),
+					$this->getConfig('DB_ENCRYPTION_ADVANCED', false)
+				),
 				'DB_VERIFY_HOST' => (bool) getRequest('verify_host', $this->getConfig('DB_VERIFY_HOST', false)),
 				'DB_KEY_FILE' => getRequest('key_file', $this->getConfig('DB_KEY_FILE', '')),
 				'DB_CERT_FILE' => getRequest('cert_file', $this->getConfig('DB_CERT_FILE', '')),
@@ -160,34 +162,42 @@ class CSetupWizard extends CForm {
 			switch ($this->getConfig('DB_CREDS_STORAGE')) {
 				case DB_STORE_CREDS_VAULT_HASHICORP:
 					$this->setConfig('DB_VAULT_URL', getRequest('vault_url',
-						$this->getConfig('DB_VAULT_URL', CVaultHashiCorp::API_ENDPOINT_DEFAULT)));
+						$this->getConfig('DB_VAULT_URL', CVaultHashiCorp::API_ENDPOINT_DEFAULT)
+					));
 
 					$this->setConfig('DB_VAULT_DB_PATH', getRequest('vault_db_path',
-						$this->getConfig('DB_VAULT_DB_PATH', '')));
+						$this->getConfig('DB_VAULT_DB_PATH', '')
+					));
 
 					$this->setConfig('DB_VAULT_TOKEN', getRequest('vault_token', $this->getConfig('DB_VAULT_TOKEN')));
 
 					$this->unsetConfig(['DB_USER', 'DB_PASSWORD', 'DB_VAULT_CERTIFICATES', 'DB_VAULT_CERT_FILE',
-						'DB_VAULT_KEY_FILE']);
+						'DB_VAULT_KEY_FILE']
+					);
 					break;
 
 				case DB_STORE_CREDS_VAULT_CYBERARK:
 					$this->setConfig('DB_VAULT_URL', getRequest('vault_url',
-						$this->getConfig('DB_VAULT_URL', CVaultCyberArk::API_ENDPOINT_DEFAULT)));
+						$this->getConfig('DB_VAULT_URL', CVaultCyberArk::API_ENDPOINT_DEFAULT)
+					));
 
 					$this->setConfig('DB_VAULT_DB_PATH',
-						getRequest('vault_query_string', $this->getConfig('DB_VAULT_DB_PATH')));
+						getRequest('vault_query_string', $this->getConfig('DB_VAULT_DB_PATH'))
+					);
 
 					$vault_certificates = (bool) getRequest('vault_certificates',
-						$this->getConfig('DB_VAULT_CERTIFICATES', false));
+						$this->getConfig('DB_VAULT_CERTIFICATES', false)
+					);
 					$this->setConfig('DB_VAULT_CERTIFICATES', $vault_certificates);
 
 					if ($vault_certificates) {
 						$this->setConfig('DB_VAULT_CERT_FILE', getRequest('vault_cert_file',
-							$this->getConfig('DB_VAULT_CERT_FILE')));
+							$this->getConfig('DB_VAULT_CERT_FILE')
+						));
 
 						$this->setConfig('DB_VAULT_KEY_FILE', getRequest('vault_key_file',
-							$this->getConfig('DB_VAULT_KEY_FILE')));
+							$this->getConfig('DB_VAULT_KEY_FILE')
+						));
 					}
 
 					$this->unsetConfig(['DB_USER', 'DB_PASSWORD', 'DB_VAULT_TOKEN']);
@@ -198,7 +208,8 @@ class CSetupWizard extends CForm {
 					$this->setConfig('DB_PASSWORD', getRequest('password', $this->getConfig('DB_PASSWORD', '')));
 
 					$this->unsetConfig(['DB_VAULT_URL', 'DB_VAULT_DB_PATH', 'DB_VAULT_TOKEN', 'DB_VAULT_CERTIFICATES',
-						'DB_VAULT_CERT_FILE', 'DB_VAULT_KEY_FILE']);
+						'DB_VAULT_CERT_FILE', 'DB_VAULT_KEY_FILE']
+					);
 					break;
 			}
 
@@ -206,13 +217,15 @@ class CSetupWizard extends CForm {
 				switch ($this->getConfig('DB_CREDS_STORAGE')) {
 					case DB_STORE_CREDS_VAULT_HASHICORP:
 						$vault_provider = new CVaultHashiCorp($this->getConfig('DB_VAULT_URL'),
-							$this->getConfig('DB_VAULT_DB_PATH'), $this->getConfig('DB_VAULT_TOKEN'));
+							$this->getConfig('DB_VAULT_DB_PATH'), $this->getConfig('DB_VAULT_TOKEN')
+						);
 						break;
 
 					case DB_STORE_CREDS_VAULT_CYBERARK:
 						$vault_provider = new CVaultCyberArk($this->getConfig('DB_VAULT_URL'),
 							$this->getConfig('DB_VAULT_DB_PATH'), $this->getConfig('DB_VAULT_CERT_FILE'),
-							$this->getConfig('DB_VAULT_KEY_FILE'));
+							$this->getConfig('DB_VAULT_KEY_FILE')
+						);
 						break;
 
 					default:
@@ -809,11 +822,11 @@ class CSetupWizard extends CForm {
 				$table
 					->addRow(
 						(new CSpan(_('SSL certificate file')))->addClass(ZBX_STYLE_GREY),
-						$this->getConfig('VAULT_CERT_FILE') ?: ''
+						$this->getConfig('VAULT_CERT_FILE') ? $this->getConfig('VAULT_CERT_FILE') : ''
 					)
 					->addRow(
 						(new CSpan(_('SSL key file')))->addClass(ZBX_STYLE_GREY),
-						$this->getConfig('VAULT_KEY_FILE') ?: ''
+						$this->getConfig('VAULT_KEY_FILE') ? $this->getConfig('VAULT_KEY_FILE') : ''
 					);
 			}
 		}
@@ -909,7 +922,8 @@ class CSetupWizard extends CForm {
 			$vault_config['VAULT_TOKEN'] = $this->getConfig('DB_VAULT_TOKEN');
 
 			$vault_provider = new CVaultHashiCorp($vault_config['VAULT_URL'], $vault_config['VAULT_DB_PATH'],
-				$vault_config['VAULT_TOKEN']);
+				$vault_config['VAULT_TOKEN']
+			);
 
 			$db_credentials = $vault_provider->getCredentials();
 
