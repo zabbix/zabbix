@@ -38,6 +38,8 @@ class C44ImportConverter extends CConverter {
 			$data['zabbix_export']['hosts'] = $this->convertSnmpFieldsToInterfaces($data['zabbix_export']['hosts']);
 		}
 
+		unset($data['zabbix_export']['hosts']['host']['interfaces']['interface']);
+
 		$data['zabbix_export'] = $this->sanitizeSnmpFields($data['zabbix_export']);
 
 		return $data;
@@ -258,7 +260,7 @@ class C44ImportConverter extends CConverter {
 
 		if ($item['type'] == CXmlConstantName::SNMP_TRAP) {
 			$interface['details']['version'] = CXmlConstantName::SNMPV1;
-			$interface['details']['community'] = 'public';
+			$interface['details']['community'] = $item['community'];
 		}
 		else {
 			$interface['details']['version'] = $item['type'];
@@ -376,6 +378,7 @@ class C44ImportConverter extends CConverter {
 									if (array_key_exists('new', $iface)) {
 
 										if ($item['type'] === CXmlConstantName::SNMPV3) {
+											$iface['details']['version'] = CXmlConstantName::SNMPV3;
 											$iface['details']['contextname'] = $item['contextname'];
 											$iface['details']['securityname'] = $item['securityname'];
 											$iface['details']['securitylevel'] = $item['securitylevel'];

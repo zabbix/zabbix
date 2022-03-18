@@ -393,8 +393,6 @@ class CHostInterface extends CApiService {
 
 			$this->checkSnmpVersion($interface);
 
-			$this->checkSnmpCommunity($interface);
-
 			$this->checkSnmpBulk($interface);
 
 			$this->checkSnmpSecurityLevel($interface);
