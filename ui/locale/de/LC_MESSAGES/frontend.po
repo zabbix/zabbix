@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-17 15:53+0200\n"
+"POT-Creation-Date: 2022-03-18 16:33+0200\n"
 "PO-Revision-Date: 2021-10-01 11:19+0300\n"
 "Last-Translator: Joachim <joachim.schwender@web.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -490,8 +490,9 @@ msgid "Access to services"
 msgstr "Zugriff auf Dienste"
 
 #: app/views/hintbox.eventlist.php:76
-#: app/views/monitoring.widget.problems.view.php:66 include/actions.inc.php:161
-#: include/blocks.inc.php:581 include/classes/screens/CScreenProblem.php:863
+#: app/views/monitoring.widget.problems.view.php:66
+#: include/actions.inc.php:161 include/blocks.inc.php:581
+#: include/classes/screens/CScreenProblem.php:863
 #: include/classes/screens/CScreenProblem.php:888
 #: include/classes/screens/CScreenProblem.php:1157 include/events.inc.php:290
 msgid "Ack"
@@ -944,7 +945,7 @@ msgstr "Benutzergruppe hinzufügen"
 msgid "Add widget"
 msgstr "Widget hinzufügen"
 
-#: app/controllers/CControllerAuditLogList.php:356
+#: app/controllers/CControllerAuditLogList.php:359
 #: app/controllers/CControllerPopupImportCompare.php:161
 msgid "Added"
 msgstr "Hinzugefügt"
@@ -1215,7 +1216,8 @@ msgstr ""
 #: app/views/service.list.edit.php:79 app/views/service.list.edit.php:107
 #: app/views/service.list.php:82 app/views/sla.list.php:51
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:36
-#: include/triggers.inc.php:1593 include/views/configuration.action.list.php:82
+#: include/triggers.inc.php:1593
+#: include/views/configuration.action.list.php:82
 #: include/views/configuration.maintenance.list.php:69
 msgid "Any"
 msgstr "Jeden"
@@ -1527,8 +1529,8 @@ msgstr "Automatisches Abmelden"
 #: app/partials/configuration.host.edit.html.php:360
 #: app/partials/popup.operations.php:228
 #: app/views/administration.miscconfig.edit.php:62
-#: app/views/popup.lldoperation.php:282 app/views/popup.massupdate.host.php:184
-#: include/hosts.inc.php:1128
+#: app/views/popup.lldoperation.php:282
+#: app/views/popup.massupdate.host.php:184 include/hosts.inc.php:1128
 #: include/views/configuration.host.prototype.edit.php:365
 msgid "Automatic"
 msgstr "Automatisch"
@@ -1856,8 +1858,8 @@ msgstr "Rückruf"
 #: app/views/monitoring.dashboard.view.php:149
 #: app/views/popup.import.compare.php:162 app/views/popup.service.edit.php:382
 #: app/views/popup.sla.edit.php:265 include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:322 jsLoader.php:207 jsLoader.php:217
-#: jsLoader.php:332 jsLoader.php:409
+#: include/classes/setup/CSetupWizard.php:322 jsLoader.php:207
+#: jsLoader.php:217 jsLoader.php:332 jsLoader.php:409
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -4116,7 +4118,8 @@ msgstr "Enthält"
 #: app/views/monitoring.discovery.view.php:41
 #: app/views/monitoring.host.dashboard.view.php:89
 #: app/views/monitoring.host.view.php:53
-#: app/views/monitoring.latest.view.php:42 app/views/monitoring.map.view.php:72
+#: app/views/monitoring.latest.view.php:42
+#: app/views/monitoring.map.view.php:72
 #: app/views/monitoring.problem.view.php:104
 #: app/views/monitoring.web.view.php:42
 #: app/views/reports.scheduledreport.list.php:40
@@ -4545,7 +4548,8 @@ msgstr "Benutzerdefinierter Ausdruck"
 msgid "Custom graphs"
 msgstr "Benutzerdefinierte Diagramme"
 
-#: app/views/popup.lldoperation.php:169 app/views/popup.massupdate.item.php:275
+#: app/views/popup.lldoperation.php:169
+#: app/views/popup.massupdate.item.php:275
 #: include/views/configuration.host.discovery.edit.php:703
 #: include/views/configuration.item.edit.php:817
 #: include/views/configuration.item.prototype.edit.php:777
@@ -4989,7 +4993,8 @@ msgstr "Standard-Thema"
 msgid "Default time zone"
 msgstr "Standardzeitzone"
 
-#: app/views/popup.lldoperation.php:105 app/views/popup.massupdate.item.php:217
+#: app/views/popup.lldoperation.php:105
+#: app/views/popup.massupdate.item.php:217
 msgid "Delay"
 msgstr "Verzögerung"
 
@@ -5026,9 +5031,10 @@ msgstr "Verspätung"
 #: app/views/configuration.discovery.list.php:123
 #: app/views/configuration.host.edit.php:49
 #: app/views/configuration.host.list.php:530
-#: app/views/monitoring.dashboard.list.php:124 app/views/popup.host.edit.php:82
-#: app/views/popup.service.edit.php:390 app/views/popup.sla.edit.php:273
-#: app/views/popup.tabfilter.edit.php:71 app/views/popup.token.edit.php:140
+#: app/views/monitoring.dashboard.list.php:124
+#: app/views/popup.host.edit.php:82 app/views/popup.service.edit.php:390
+#: app/views/popup.sla.edit.php:273 app/views/popup.tabfilter.edit.php:71
+#: app/views/popup.token.edit.php:140
 #: app/views/reports.scheduledreport.list.php:95 app/views/sla.list.php:175
 #: include/classes/html/CButtonDelete.php:25
 #: include/classes/widgets/CWidgetHelper.php:845
@@ -5336,7 +5342,7 @@ msgstr "Auslöser löschen?"
 msgid "Delete web scenario?"
 msgstr "Web-Szenario löschen?"
 
-#: app/controllers/CControllerAuditLogList.php:359
+#: app/controllers/CControllerAuditLogList.php:362
 msgid "Deleted"
 msgstr "Gelöscht"
 
@@ -5601,7 +5607,8 @@ msgstr "Ausgewählte Web Szenarios löschen?"
 #: app/views/configuration.correlation.list.php:109
 #: app/views/configuration.discovery.list.php:58
 #: app/views/configuration.host.list.php:283 app/views/popup.generic.php:646
-#: app/views/popup.lldoperation.php:280 app/views/popup.massupdate.host.php:140
+#: app/views/popup.lldoperation.php:280
+#: app/views/popup.massupdate.host.php:140
 #: app/views/popup.massupdate.host.php:182
 #: app/views/reports.scheduledreport.list.php:63 app/views/sla.list.php:53
 #: app/views/sla.list.php:107 app/views/sla.list.php:116
@@ -5743,8 +5750,8 @@ msgstr "Erkennung von virtuellen VMware-Maschinen, <url> - VMware-Service-URL. G
 #: app/controllers/CControllerAuditLogList.php:215
 #: app/views/configuration.discovery.edit.php:138
 #: app/views/monitoring.discovery.view.php:50
-#: app/views/monitoring.widget.discovery.view.php:32 include/actions.inc.php:52
-#: include/forms.inc.php:930
+#: app/views/monitoring.widget.discovery.view.php:32
+#: include/actions.inc.php:52 include/forms.inc.php:930
 msgid "Discovery rule"
 msgstr "Host-Suchläufe"
 
@@ -5879,13 +5886,15 @@ msgstr "Anzeigeoptionen"
 msgid "Division denominator"
 msgstr "Divisionsnenner"
 
-#: app/views/popup.lldoperation.php:190 app/views/popup.massupdate.item.php:293
+#: app/views/popup.lldoperation.php:190
+#: app/views/popup.massupdate.item.php:293
 #: include/views/configuration.item.edit.php:850
 #: include/views/configuration.item.prototype.edit.php:787
 msgid "Do not keep history"
 msgstr "Keine Historie aufbewahren"
 
-#: app/views/popup.lldoperation.php:211 app/views/popup.massupdate.item.php:309
+#: app/views/popup.lldoperation.php:211
+#: app/views/popup.massupdate.item.php:309
 #: include/views/configuration.item.edit.php:890
 #: include/views/configuration.item.prototype.edit.php:802
 msgid "Do not keep trends"
@@ -6061,7 +6070,8 @@ msgstr "Jeder Datenpunkt"
 #: app/views/js/configuration.discovery.edit.js.php:33
 #: app/views/js/popup.service.edit.js.php:194
 #: app/views/js/popup.sla.edit.js.php:110 app/views/service.list.edit.php:139
-#: app/views/service.list.php:115 include/classes/widgets/CWidgetHelper.php:591
+#: app/views/service.list.php:115
+#: include/classes/widgets/CWidgetHelper.php:591
 #: include/views/configuration.action.edit.php:245
 #: include/views/configuration.action.edit.php:273
 #: include/views/configuration.action.edit.php:357
@@ -6885,7 +6895,8 @@ msgstr "Feld \"%1$s\" darf nicht NULL sein."
 #: include/classes/api/services/CDRule.php:528
 #: include/classes/api/services/CDRule.php:538
 #: include/classes/api/services/CHost.php:892
-#: include/classes/validators/CNewValidator.php:86 include/validate.inc.php:286
+#: include/classes/validators/CNewValidator.php:86
+#: include/validate.inc.php:286
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr "\"%1$s\" ist ein Pflichtfeld."
@@ -7064,7 +7075,8 @@ msgid "Fixed status"
 msgstr "Behobener Status"
 
 #: app/views/js/popup.massupdate.tmpl.js.php:81
-#: app/views/popup.lldoperation.php:124 app/views/popup.massupdate.item.php:233
+#: app/views/popup.lldoperation.php:124
+#: app/views/popup.massupdate.item.php:233
 #: include/views/configuration.host.discovery.edit.php:665
 #: include/views/configuration.item.edit.php:769
 #: include/views/configuration.item.edit.php:776
@@ -7782,8 +7794,9 @@ msgid "History functions"
 msgstr "Historienfunktionen"
 
 #: app/controllers/CControllerPopupLldOperation.php:219
-#: app/views/popup.lldoperation.php:185 app/views/popup.massupdate.item.php:290
-#: disc_prototypes.php:131 include/views/configuration.item.edit.php:847
+#: app/views/popup.lldoperation.php:185
+#: app/views/popup.massupdate.item.php:290 disc_prototypes.php:131
+#: include/views/configuration.item.edit.php:847
 #: include/views/configuration.item.prototype.edit.php:784 items.php:67
 msgid "History storage period"
 msgstr "Speicherdauer Verlauf"
@@ -8652,8 +8665,9 @@ msgstr "Unzugänglicher Auslöser"
 #: app/controllers/CControllerScheduledReportEdit.php:281
 #: app/controllers/CControllerScheduledReportList.php:136
 #: include/actions.inc.php:2009 include/actions.inc.php:2032
-#: include/actions.inc.php:2037 include/classes/helpers/CDashboardHelper.php:39
-#: include/events.inc.php:251 include/views/monitoring.sysmap.edit.php:83
+#: include/actions.inc.php:2037
+#: include/classes/helpers/CDashboardHelper.php:39 include/events.inc.php:251
+#: include/views/monitoring.sysmap.edit.php:83
 msgid "Inaccessible user"
 msgstr "Unerreichbarer Benutzer"
 
@@ -9673,8 +9687,8 @@ msgstr "Internet Explorer"
 
 #: app/partials/monitoring.latest.view.html.php:73
 #: app/views/configuration.discovery.list.php:80
-#: app/views/popup.lldoperation.php:115 app/views/popup.massupdate.item.php:225
-#: include/forms.inc.php:595
+#: app/views/popup.lldoperation.php:115
+#: app/views/popup.massupdate.item.php:225 include/forms.inc.php:595
 #: include/views/configuration.host.discovery.edit.php:660
 #: include/views/configuration.host.discovery.list.php:203
 #: include/views/configuration.httpconf.list.php:140
@@ -10479,7 +10493,8 @@ msgstr "Kerberos"
 #: app/controllers/CControllerPopupGeneric.php:283
 #: app/partials/configuration.filter.items.php:94
 #: app/views/popup.discovery.check.php:62 disc_prototypes.php:46
-#: host_discovery.php:50 include/views/configuration.host.discovery.edit.php:82
+#: host_discovery.php:50
+#: include/views/configuration.host.discovery.edit.php:82
 #: include/views/configuration.host.discovery.list.php:107
 #: include/views/configuration.host.discovery.list.php:202
 #: include/views/configuration.item.edit.php:133
@@ -11133,8 +11148,8 @@ msgstr "Verwalten von geplanten Berichten"
 #: app/partials/configuration.host.edit.html.php:359
 #: app/partials/popup.operations.php:227
 #: app/views/administration.miscconfig.edit.php:61
-#: app/views/popup.lldoperation.php:281 app/views/popup.massupdate.host.php:183
-#: include/hosts.inc.php:1127
+#: app/views/popup.lldoperation.php:281
+#: app/views/popup.massupdate.host.php:183 include/hosts.inc.php:1127
 #: include/views/configuration.host.prototype.edit.php:364
 msgid "Manual"
 msgstr "Manuell"
@@ -11458,8 +11473,8 @@ msgid "Media type with ID \"%1$s\" is not available."
 msgstr "Medientyp der ID \"%1$s\" ist nicht verfügbar."
 
 #: app/views/administration.mediatype.edit.php:31
-#: app/views/administration.mediatype.list.php:31 app/views/popup.import.php:45
-#: include/classes/helpers/CMenuHelper.php:306
+#: app/views/administration.mediatype.list.php:31
+#: app/views/popup.import.php:45 include/classes/helpers/CMenuHelper.php:306
 #: include/classes/helpers/CRoleHelper.php:428
 msgid "Media types"
 msgstr "Medientypen"
@@ -12211,8 +12226,9 @@ msgstr "Nächster Schritt"
 #: app/views/hintbox.eventlist.php:178 app/views/hintbox.eventlist.php:182
 #: app/views/monitoring.widget.problems.view.php:264
 #: app/views/monitoring.widget.problems.view.php:268
-#: app/views/popup.condition.common.php:679 app/views/popup.lldoperation.php:85
-#: app/views/popup.lldoperation.php:97 app/views/popup.massupdate.item.php:327
+#: app/views/popup.condition.common.php:679
+#: app/views/popup.lldoperation.php:85 app/views/popup.lldoperation.php:97
+#: app/views/popup.massupdate.item.php:327
 #: app/views/popup.massupdate.item.php:336
 #: app/views/popup.massupdate.item.php:378
 #: app/views/popup.massupdate.trigger.php:63 include/actions.inc.php:33
@@ -13884,8 +13900,8 @@ msgstr "Führt eine DNS-Abfrage durch. Gibt eine Zeichenkette mit dem gewünscht
 #: app/controllers/CControllerPopupTriggerExpr.php:104
 #: app/partials/scheduledreport.formgrid.html.php:83
 #: app/partials/scheduledreport.table.html.php:42
-#: app/views/popup.lldoperation.php:116 app/views/popup.massupdate.item.php:226
-#: app/views/popup.triggerexpr.php:182
+#: app/views/popup.lldoperation.php:116
+#: app/views/popup.massupdate.item.php:226 app/views/popup.triggerexpr.php:182
 #: include/views/configuration.host.discovery.edit.php:660
 #: include/views/configuration.item.edit.php:762
 #: include/views/configuration.item.prototype.edit.php:734
@@ -14999,7 +15015,8 @@ msgid "Required string"
 msgstr "Geforderte Zeichenkette"
 
 #: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
-#: include/classes/html/CFilter.php:215 include/classes/html/CTabFilter.php:102
+#: include/classes/html/CFilter.php:215
+#: include/classes/html/CTabFilter.php:102
 msgid "Reset"
 msgstr "Zurücksetzen"
 
@@ -15304,10 +15321,10 @@ msgstr "SAML Einstellungen"
 
 #: app/controllers/CControllerAuditLogList.php:239
 #: app/controllers/CControllerPopupGeneric.php:382
-#: app/controllers/CControllerSlaList.php:157 app/partials/service.info.php:122
-#: app/views/popup.sla.edit.php:211 app/views/popup.sla.edit.php:240
-#: app/views/sla.list.php:185 app/views/slareport.list.php:40
-#: include/classes/helpers/CMenuHelper.php:90
+#: app/controllers/CControllerSlaList.php:157
+#: app/partials/service.info.php:122 app/views/popup.sla.edit.php:211
+#: app/views/popup.sla.edit.php:240 app/views/sla.list.php:185
+#: app/views/slareport.list.php:40 include/classes/helpers/CMenuHelper.php:90
 #: include/classes/helpers/CRoleHelper.php:356
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:28
 msgid "SLA"
@@ -15679,7 +15696,8 @@ msgid "Scheduled reports"
 msgstr "Geplante Berichte"
 
 #: app/views/js/popup.massupdate.tmpl.js.php:84
-#: app/views/popup.lldoperation.php:125 app/views/popup.massupdate.item.php:234
+#: app/views/popup.lldoperation.php:125
+#: app/views/popup.massupdate.item.php:234
 #: include/views/configuration.host.discovery.edit.php:666
 #: include/views/configuration.item.edit.php:770
 #: include/views/configuration.item.edit.php:777
@@ -16080,8 +16098,9 @@ msgstr "Der Dienst mit der ID \"%2$s\" ist für die Benutzerrolle \"%1$s\" nicht
 #: app/controllers/CControllerServiceList.php:149
 #: app/controllers/CControllerServiceListRefresh.php:133
 #: app/views/administration.housekeeping.edit.php:96
-#: app/views/popup.condition.common.php:642 app/views/service.list.edit.php:123
-#: app/views/service.list.php:105 include/classes/helpers/CMenuHelper.php:78
+#: app/views/popup.condition.common.php:642
+#: app/views/service.list.edit.php:123 app/views/service.list.php:105
+#: include/classes/helpers/CMenuHelper.php:78
 #: include/classes/helpers/CMenuHelper.php:103
 #: include/classes/helpers/CRoleHelper.php:306
 #: include/classes/helpers/CRoleHelper.php:351 jsLoader.php:421
@@ -16200,7 +16219,8 @@ msgctxt "screen reader"
 msgid "Severity changed"
 msgstr "Schweregrad geändert"
 
-#: include/actions.inc.php:1754 include/classes/screens/CScreenProblem.php:1216
+#: include/actions.inc.php:1754
+#: include/classes/screens/CScreenProblem.php:1216
 msgid "Severity changes"
 msgstr "Schweregradänderungen"
 
@@ -16693,7 +16713,8 @@ msgstr "Statistik und Verfügbarkeit des Zabbix-Schreibcache. Cache - einer der 
 #: app/views/configuration.correlation.list.php:79
 #: app/views/configuration.discovery.list.php:54
 #: app/views/configuration.discovery.list.php:82
-#: app/views/configuration.host.list.php:179 app/views/hintbox.eventlist.php:74
+#: app/views/configuration.host.list.php:179
+#: app/views/hintbox.eventlist.php:74
 #: app/views/monitoring.widget.actionlog.view.php:38
 #: app/views/monitoring.widget.problems.view.php:56
 #: app/views/popup.massupdate.host.php:134
@@ -17106,10 +17127,11 @@ msgstr ""
 #: app/partials/monitoring.problem.filter.php:231
 #: app/partials/service.info.php:126 app/partials/service.list.edit.php:58
 #: app/partials/service.list.php:55 app/views/configuration.host.list.php:159
-#: app/views/configuration.host.list.php:199 app/views/hintbox.eventlist.php:77
-#: app/views/monitoring.web.view.php:88
+#: app/views/configuration.host.list.php:199
+#: app/views/hintbox.eventlist.php:77 app/views/monitoring.web.view.php:88
 #: app/views/monitoring.widget.problems.view.php:68
-#: app/views/popup.lldoperation.php:262 app/views/popup.massupdate.host.php:193
+#: app/views/popup.lldoperation.php:262
+#: app/views/popup.massupdate.host.php:193
 #: app/views/popup.massupdate.host.php:286
 #: app/views/popup.massupdate.item.php:476
 #: app/views/popup.massupdate.item.php:492
@@ -17827,8 +17849,9 @@ msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, 
 msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:227
-#: app/views/popup.lldoperation.php:206 app/views/popup.massupdate.item.php:306
-#: disc_prototypes.php:139 include/views/configuration.item.edit.php:885
+#: app/views/popup.lldoperation.php:206
+#: app/views/popup.massupdate.item.php:306 disc_prototypes.php:139
+#: include/views/configuration.item.edit.php:885
 #: include/views/configuration.item.prototype.edit.php:797 items.php:84
 msgid "Trend storage period"
 msgstr "Speicherdauer Tendenz"
@@ -18113,8 +18136,9 @@ msgstr ""
 #: app/views/popup.condition.common.php:47
 #: app/views/popup.condition.common.php:168
 #: app/views/popup.condition.common.php:657
-#: app/views/popup.dashboard.share.edit.php:123 app/views/popup.generic.php:111
-#: app/views/popup.lldoperation.php:114 app/views/popup.massupdate.item.php:47
+#: app/views/popup.dashboard.share.edit.php:123
+#: app/views/popup.generic.php:111 app/views/popup.lldoperation.php:114
+#: app/views/popup.massupdate.item.php:47
 #: app/views/popup.massupdate.item.php:224 app/views/popup.media.php:70
 #: app/views/popup.valuemap.edit.php:51
 #: include/classes/widgets/CWidgetHelper.php:73
@@ -18383,14 +18407,15 @@ msgstr "Einheit"
 #: include/classes/screens/CScreenHttpTestDetails.php:115
 #: include/discovery.inc.php:115 include/discovery.inc.php:151
 #: include/events.inc.php:45 include/events.inc.php:76
-#: include/graphs.inc.php:37 include/graphs.inc.php:67 include/hosts.inc.php:47
-#: include/hosts.inc.php:74 include/html.inc.php:287
+#: include/graphs.inc.php:37 include/graphs.inc.php:67
+#: include/hosts.inc.php:47 include/hosts.inc.php:74 include/html.inc.php:287
 #: include/httptest.inc.php:41 include/httptest.inc.php:58
-#: include/items.inc.php:45 include/items.inc.php:110 include/items.inc.php:133
-#: include/items.inc.php:167 include/maintenances.inc.php:33
-#: include/maps.inc.php:39 include/triggers.inc.php:83
-#: include/triggers.inc.php:1868 include/users.inc.php:64
-#: include/users.inc.php:87 include/views/configuration.action.edit.php:232
+#: include/items.inc.php:45 include/items.inc.php:110
+#: include/items.inc.php:133 include/items.inc.php:167
+#: include/maintenances.inc.php:33 include/maps.inc.php:39
+#: include/triggers.inc.php:83 include/triggers.inc.php:1868
+#: include/users.inc.php:64 include/users.inc.php:87
+#: include/views/configuration.action.edit.php:232
 #: include/views/configuration.triggers.list.php:77
 msgid "Unknown"
 msgstr "Unbekannt"
@@ -18557,7 +18582,8 @@ msgstr "Erreichbar"
 #: app/views/popup.sla.excludeddowntime.edit.php:91
 #: app/views/popup.token.edit.php:125
 #: app/views/popup.tophosts.column.edit.php:254
-#: app/views/popup.valuemap.edit.php:126 include/classes/html/CTabFilter.php:99
+#: app/views/popup.valuemap.edit.php:126
+#: include/classes/html/CTabFilter.php:99
 #: include/views/configuration.action.edit.php:500
 #: include/views/configuration.graph.edit.php:455
 #: include/views/configuration.host.discovery.edit.php:1005
@@ -18588,8 +18614,9 @@ msgstr "Ändere existierende"
 #: app/controllers/CControllerPopupLldOperation.php:208
 #: app/partials/configuration.filter.items.php:160
 #: app/views/configuration.discovery.edit.php:69
-#: app/views/popup.lldoperation.php:177 app/views/popup.massupdate.item.php:284
-#: disc_prototypes.php:60 host_discovery.php:62 host_discovery.php:227
+#: app/views/popup.lldoperation.php:177
+#: app/views/popup.massupdate.item.php:284 disc_prototypes.php:60
+#: host_discovery.php:62 host_discovery.php:227
 #: include/views/configuration.host.discovery.edit.php:648
 #: include/views/configuration.host.discovery.list.php:143
 #: include/views/configuration.httpconf.edit.php:72
@@ -18608,7 +18635,7 @@ msgstr "Vorgänge aktualisieren"
 msgid "Update problem"
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:364
+#: app/controllers/CControllerAuditLogList.php:367
 #: app/controllers/CControllerPopupImportCompare.php:160
 msgid "Updated"
 msgstr ""
@@ -18670,9 +18697,10 @@ msgstr "Benutzt in Aktion"
 #: app/partials/js/scheduledreport.subscription.js.php:78
 #: app/partials/popup.operations.php:105
 #: app/views/administration.token.list.php:127
-#: app/views/administration.user.edit.php:290 app/views/popup.token.edit.php:60
-#: app/views/popup.token.view.php:40 app/views/reports.auditlog.list.php:91
-#: httpconf.php:65 include/actions.inc.php:1700 include/actions.inc.php:1754
+#: app/views/administration.user.edit.php:290
+#: app/views/popup.token.edit.php:60 app/views/popup.token.view.php:40
+#: app/views/reports.auditlog.list.php:91 httpconf.php:65
+#: include/actions.inc.php:1700 include/actions.inc.php:1754
 #: include/actions.inc.php:1976 include/classes/setup/CSetupWizard.php:536
 #: include/hosts.inc.php:61 include/users.inc.php:52
 #: include/views/configuration.httpconf.edit.php:167
@@ -19276,7 +19304,8 @@ msgstr ""
 #: app/views/popup.condition.common.php:601 app/views/popup.httpstep.php:70
 #: app/views/popup.httpstep.php:96 app/views/popup.httpstep.php:120
 #: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:262
-#: app/views/popup.lldoperation.php:268 app/views/popup.massupdate.host.php:202
+#: app/views/popup.lldoperation.php:268
+#: app/views/popup.massupdate.host.php:202
 #: app/views/popup.massupdate.item.php:119
 #: app/views/popup.massupdate.item.php:485
 #: app/views/popup.massupdate.service.php:49
@@ -19953,8 +19982,9 @@ msgstr "jährlich"
 #: app/views/hintbox.eventlist.php:178 app/views/hintbox.eventlist.php:182
 #: app/views/monitoring.widget.problems.view.php:264
 #: app/views/monitoring.widget.problems.view.php:268
-#: app/views/popup.condition.common.php:680 app/views/popup.lldoperation.php:84
-#: app/views/popup.lldoperation.php:96 app/views/popup.massupdate.item.php:326
+#: app/views/popup.condition.common.php:680
+#: app/views/popup.lldoperation.php:84 app/views/popup.lldoperation.php:96
+#: app/views/popup.massupdate.item.php:326
 #: app/views/popup.massupdate.item.php:335
 #: app/views/popup.massupdate.item.php:377
 #: app/views/popup.massupdate.trigger.php:64 include/actions.inc.php:32
@@ -20106,7 +20136,8 @@ msgstr "Name des Zabbix-Servers"
 msgid "Zabbix trapper"
 msgstr "Zabbix-Trapper"
 
-#: include/classes/html/CFilter.php:251 include/classes/html/CTabFilter.php:333
+#: include/classes/html/CFilter.php:251
+#: include/classes/html/CTabFilter.php:333
 msgid "Zoom out"
 msgstr "verkleinern"
 
@@ -20853,7 +20884,8 @@ msgid "e() - Returns Euler's number"
 msgstr ""
 
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78
-#: include/actions.inc.php:24 include/classes/helpers/CCorrelationHelper.php:34
+#: include/actions.inc.php:24
+#: include/classes/helpers/CCorrelationHelper.php:34
 #: include/views/inventory.host.list.php:72
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:169
 msgid "equals"
@@ -22138,8 +22170,8 @@ msgstr ""
 #: app/views/js/popup.valuemap.edit.js.php:30
 #: app/views/js/popup.valuemap.edit.js.php:31
 #: app/views/js/popup.valuemap.edit.js.php:32
-#: app/views/popup.itemtestedit.view.php:83 app/views/popup.service.edit.php:97
-#: app/views/popup.sla.edit.php:156
+#: app/views/popup.itemtestedit.view.php:83
+#: app/views/popup.service.edit.php:97 app/views/popup.sla.edit.php:156
 #: include/classes/helpers/CTagFilterFieldHelper.php:78
 #: include/classes/helpers/CTagFilterFieldHelper.php:131
 #: include/classes/html/CMacroValue.php:131
