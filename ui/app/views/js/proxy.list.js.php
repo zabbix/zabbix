@@ -51,7 +51,7 @@
 			form
 				.querySelector('.js-refresh-proxy-config')
 				.addEventListener('click', (e) => {
-					this._refreshConfig(e.target, Object.values(chkbxRange.getSelectedIds()));
+					this.refreshConfig(e.target, Object.values(chkbxRange.getSelectedIds()));
 				});
 
 			form
@@ -104,7 +104,7 @@
 			});
 		}
 
-		_refreshConfig(target, proxyids) {
+		refreshConfig(target, proxyids) {
 			const confirmation = proxyids.length > 1
 				? <?= json_encode(_('Refresh configuration of the selected proxies?')) ?>
 				: <?= json_encode(_('Refresh configuration of the selected proxy?')) ?>;

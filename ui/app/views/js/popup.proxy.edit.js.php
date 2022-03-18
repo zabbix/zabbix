@@ -155,8 +155,23 @@ window.proxy_edit_popup = new class {
 		}
 	}
 
-	_refreshConfig() {
-		this._post(this.refresh_config_url, {proxyids: [this.proxyid]}, 'dialogue.configRefresh');
+	refreshConfig() {
+		this
+			._post(this.refresh_config_url, {proxyids: [this.proxyid]})
+			.then((response) => {
+				for (const element of this.form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
+				}
+
+				const title = response.success.title ?? null;
+				const messages = response.success.messages ?? [];
+
+				const message_box = makeMessageBox('good', messages, title, true, true)[0];
+
+				this.form.parentNode.insertBefore(message_box, this.form);
+			});
 	}
 
 	clone({title, buttons}) {
@@ -168,7 +183,13 @@ window.proxy_edit_popup = new class {
 	}
 
 	_delete() {
-		this._post(this.delete_url, {proxyids: [this.proxyid]}, 'dialogue.delete');
+		this
+			._post(this.delete_url, {proxyids: [this.proxyid]})
+			.then((response) => {
+				overlayDialogueDestroy(this.overlay.dialogueid);
+
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+			});
 	}
 
 	submit() {
@@ -193,11 +214,17 @@ window.proxy_edit_popup = new class {
 			}
 		}
 
-		this._post(this.proxyid !== null ? this.update_url : this.create_url, fields, 'dialogue.submit');
+		this
+			._post(this.proxyid !== null ? this.update_url : this.create_url, fields)
+			.then((response) => {
+				overlayDialogueDestroy(this.overlay.dialogueid);
+
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+			});
 	}
 
-	_post(url, data, event_name) {
-		return fetch(new Curl(url).getUrl(), {
+	_post(url, data) {
+		const request = fetch(new Curl(url).getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify(data)
@@ -208,10 +235,10 @@ window.proxy_edit_popup = new class {
 					throw {error: response.error};
 				}
 
-				overlayDialogueDestroy(this.overlay.dialogueid);
+				return response;
+			});
 
-				this.dialogue.dispatchEvent(new CustomEvent(event_name, {detail: response.success}));
-			})
+		request
 			.catch((exception) => {
 				for (const element of this.form.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
@@ -237,5 +264,7 @@ window.proxy_edit_popup = new class {
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
+
+		return request;
 	}
 };
