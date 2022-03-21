@@ -1004,7 +1004,7 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector("[name='private']:checked");
 
-		if (element !== null && element.value > 0) {
+		if (element !== null && element.value == 0) {
 			return true;
 		}
 
