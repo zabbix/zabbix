@@ -804,6 +804,7 @@ static tls_t *tls_new_client(SSL_CTX_LP ctx, const char *psk_identity, const cha
 	TLS_UNUSED(ctx);
 	TLS_UNUSED(psk_identity);
 	TLS_UNUSED(psk_key);
+	TLS_UNUSED(servername);
 	return NULL;
 }
 
