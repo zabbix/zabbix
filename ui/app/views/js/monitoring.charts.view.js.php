@@ -60,7 +60,7 @@
 			);
 
 			this._app = new ChartList( $('#charts'), this._data.timeline, this._data.config, this._container);
-			this._app.setCharts(this._data.charts);
+			this._app.refresh();
 			this._app.onResize();
 
 			this._resize_observer = new ResizeObserver(this._app.onResize.bind(this._app));
