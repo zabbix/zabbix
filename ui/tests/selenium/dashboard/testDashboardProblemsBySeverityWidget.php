@@ -1498,7 +1498,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			}
 		}
 		if (CTestArrayHelper::get($data,'tags',false)) {
-			$this->setFilterSelector('id:tags_table_tags');
+			$this->setTagSelector('id:tags_table_tags');
 			$this->setTags($data['tags']);
 		}
 		$form->submit();

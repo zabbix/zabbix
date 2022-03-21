@@ -371,7 +371,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->page->login()->open('zabbix.php?show_timeline=0&action=problem.view&sort=name&sortorder=ASC');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:evaltype_0' => $data['evaluation_type']]);
-		$this->setFilterSelector('id:filter-tags_0');
+		$this->setTagSelector('id:filter-tags_0');
 		$this->setTags($data['tags']);
 		$this->query('name:filter_apply')->one()->click();
 		$this->page->waitUntilReady();

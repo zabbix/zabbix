@@ -36,7 +36,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 *
 	 * @var integer
 	 */
-	protected static $dashboardid;
+	protected static $dashboardids;
 
 	/**
 	 * Widget name for update.
@@ -436,7 +436,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 		]);
 
 		$this->assertArrayHasKey('dashboardids', $response);
-		self::$dashboardid = CDataHelper::getIds('name');
+		self::$dashboardids = CDataHelper::getIds('name');
 	}
 
 	public static function getCreateData() {
@@ -1174,7 +1174,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testDashboardTopHostsWidget_Create($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid['top_host_create']);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_create']);
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 		$form = $dashboard->edit()->addWidget()->asForm();
@@ -1187,19 +1187,18 @@ class testDashboardTopHostsWidget extends CWebTest {
 		}
 
 		if (array_key_exists('tags', $data)) {
-			$this->setFilterSelector('id:tags_table_tags');
+			$this->setTagSelector('id:tags_table_tags');
 			$this->setTags($data['tags']);
 		}
 
 		$form->fill($data['main_fields']);
 		$form->submit();
+		$this->page->waitUntilReady();
 
 		// Check error message in main widget form.
 		if (array_key_exists('main_error', $data)) {
 			$this->assertMessage(TEST_BAD, null, $data['main_error']);
 		}
-
-		$this->page->waitUntilReady();
 
 		if ($data['expected'] === TEST_GOOD) {
 			// Make sure that the widget is present before saving the dashboard.
@@ -1215,6 +1214,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$this->checkWidget($header, $data, 'create');
 		}
 		else {
+			COverlayDialogElement::find()->waitUntilReady()->one()->close();
 			$dashboard->save();
 
 			// Check message that widget added.
@@ -1230,18 +1230,15 @@ class testDashboardTopHostsWidget extends CWebTest {
 		// Hash before simple update.
 		$old_hash = CDBHelper::getHash($this->sql);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid['top_host_update']);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_update']);
 		$dashboard = CDashboardElement::find()->one();
-		$dashboard->edit()->getWidget(self::$updated_name)->edit();
+		$dashboard->edit()->getWidget(self::$updated_name)->edit()->submit();
 		$dashboard->save();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
-		// Hash after simple update.
-		$new_hash = CDBHelper::getHash($this->sql);
-
 		// Compare old hash and new one.
-		$this->assertEquals($old_hash, $new_hash);
+		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
 
 	public static function getUpdateData() {
@@ -1250,7 +1247,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [],
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
@@ -1272,7 +1268,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [],
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
@@ -1291,7 +1286,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [],
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
@@ -1310,7 +1304,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [],
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
@@ -1361,7 +1354,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [],
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
@@ -1377,7 +1369,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [],
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
@@ -1393,7 +1384,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [],
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
@@ -1409,7 +1399,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [],
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
@@ -1426,7 +1415,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [],
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
@@ -1443,7 +1431,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [],
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
@@ -1459,7 +1446,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'main_fields' =>  [],
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
@@ -1526,7 +1512,71 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #16 update item column adding new values and fields.
+			// #16 update first column to Item column and check available time shift values.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'main_fields' =>  [
+						'Name' => 'Time shift 10s'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Time shift' => '10s'
+						]
+					]
+				]
+			],
+			// #17
+			[
+				[
+					'expected' => TEST_GOOD,
+					'main_fields' =>  [
+						'Name' => 'Time shift 10m'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Time shift' => '10m'
+						]
+					]
+				]
+			],
+			// #18
+			[
+				[
+					'expected' => TEST_GOOD,
+					'main_fields' =>  [
+						'Name' => 'Time shift 10h'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Time shift' => '10h'
+						]
+					]
+				]
+			],
+			// #19
+			[
+				[
+					'expected' => TEST_GOOD,
+					'main_fields' =>  [
+						'Name' => 'Time shift 10w'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'Available memory',
+							'Time shift' => '10w'
+						]
+					]
+				]
+			],
+			// #20 update item column adding new values and fields.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1587,7 +1637,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$old_hash = CDBHelper::getHash($this->sql);
 		}
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid['top_host_update']);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_update']);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->getWidget(self::$updated_name)->edit();
 
@@ -1597,19 +1647,20 @@ class testDashboardTopHostsWidget extends CWebTest {
 		}
 
 		if (array_key_exists('tags', $data)) {
-			$this->setFilterSelector('id:tags_table_tags');
+			$this->setTagSelector('id:tags_table_tags');
 			$this->setTags($data['tags']);
 		}
 
-		$form->fill($data['main_fields']);
-		$form->submit();
+		if (array_key_exists('main_fields', $data)) {
+			$form->fill($data['main_fields']);
+			$form->submit();
+			$this->page->waitUntilReady();
+		}
 
 		// Check error message in main widget form.
 		if (array_key_exists('main_error', $data)) {
 			$this->assertMessage(TEST_BAD, null, $data['main_error']);
 		}
-
-		$this->page->waitUntilReady();
 
 		if ($data['expected'] === TEST_GOOD) {
 			self::$updated_name = (array_key_exists('Name', $data['main_fields']))
@@ -1627,14 +1678,12 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$this->checkWidget(self::$updated_name, $data, 'update');
 		}
 		else {
+			COverlayDialogElement::find()->waitUntilReady()->one()->close();
 			$dashboard->save();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
-			// Hash after update.
-			$new_hash = CDBHelper::getHash($this->sql);
-
 			// Compare old hash and new one.
-			$this->assertEquals($old_hash, $new_hash);
+			$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 		}
 	}
 
@@ -1644,7 +1693,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 	public function testDashboardTopHostsWidget_Delete() {
 		$name = 'Top hosts delete';
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid['top_host_delete']);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_delete']);
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$dashboard->deleteWidget($name);
 		$this->page->waitUntilReady();
@@ -1693,7 +1742,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 * @dataProvider getRemoveData
 	 */
 	public function testDashboardTopHostsWidget_Remove($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid['top_host_remove']);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_remove']);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->getWidget('Top hosts for remove')->edit();
 
@@ -1758,7 +1807,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$column_amount = count($data['column_fields']);
 			$table = $form->query('id:list_columns')->one()->asTable();
 
-			// We subtract 1, because getRows counts table headers as one row.
+			// It is required to subtract 1 to ignore header row
 			$row_amount = $table->getRows()->count() - 1;
 
 			if ($action === 'create') {
@@ -1843,9 +1892,9 @@ class testDashboardTopHostsWidget extends CWebTest {
 
 		$form = $this->query('id:widget-dialogue-form')->one()->asForm();
 		foreach ($data['column_fields'] as $values) {
-			// What should be pressed - Add or Edit.
+			// Open the Column configuration add or column update dialog depending on the action type.
 			$selector = ($action === 'create') ? 'id:add' : 'xpath:(.//button[@name="edit"])['.$column_count.']';
-			$form->query($selector)->waitUntilReady()->one()->click();
+			$form->query($selector)->waitUntilClickable()->one()->click();
 			$column_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->all()->last();
 
 			// Fill Base color.

@@ -781,7 +781,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->page->login()->open('zabbix.php?port=10051&action=host.view&groupids%5B%5D=4');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:evaltype_0' => $data['tag_options']['type']]);
-		$this->setFilterSelector('id:tags_0');
+		$this->setTagSelector('id:tags_0');
 		$this->setTags($data['tag_options']['tags']);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
