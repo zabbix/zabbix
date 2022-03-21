@@ -5400,25 +5400,28 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 
 		if (NULL == preprocitem || itemid != preprocitem->itemid)
 		{
-			if (NULL == (preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_search(&config->preprocitems, &itemid)))
+			if (NULL == (preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_search(&config->preprocitems,
+					&itemid)))
 			{
 				ZBX_DC_PREPROCITEM	preprocitem_local;
 
 				preprocitem_local.itemid = itemid;
+				preprocitem_local.update_time = timestamp;
 
-				preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_insert(&config->preprocitems, &preprocitem_local,
-						sizeof(preprocitem_local));
-
-				zbx_vector_ptr_create_ext(&preprocitem->preproc_ops, __config_mem_malloc_func,
+				zbx_vector_ptr_create_ext(&preprocitem_local.preproc_ops, __config_mem_malloc_func,
 						__config_mem_realloc_func, __config_mem_free_func);
-			}
 
-			preprocitem->update_time = timestamp;
+				preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_insert(&config->preprocitems,
+						&preprocitem_local, sizeof(preprocitem_local));
+			}
+			else
+				preprocitem->update_time = timestamp;
 		}
 
 		ZBX_STR2UINT64(item_preprocid, row[0]);
 
-		op = (zbx_dc_preproc_op_t *)DCfind_id(&config->preprocops, item_preprocid, sizeof(zbx_dc_preproc_op_t), &found);
+		op = (zbx_dc_preproc_op_t *)DCfind_id(&config->preprocops, item_preprocid, sizeof(zbx_dc_preproc_op_t),
+				&found);
 
 		ZBX_STR2UCHAR(op->type, row[2]);
 		DCstrpool_replace(found, &op->params, row[3]);
@@ -5442,7 +5445,8 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 		if (NULL == (op = (zbx_dc_preproc_op_t *)zbx_hashset_search(&config->preprocops, &rowid)))
 			continue;
 
-		if (NULL != (preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_search(&config->preprocitems, &op->itemid)))
+		if (NULL != (preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_search(&config->preprocitems,
+				&op->itemid)))
 		{
 			if (FAIL != (index = zbx_vector_ptr_search(&preprocitem->preproc_ops, op,
 					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
@@ -13544,13 +13548,14 @@ zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const
 
 	if (NULL == session)
 	{
+		session_local.last_valueid = 0;
+
 		WRLOCK_CACHE;
+		session_local.token = dc_strdup(token);
+
 		session = (zbx_data_session_t *)zbx_hashset_insert(&config->data_sessions, &session_local,
 				sizeof(session_local));
-		session->token = dc_strdup(token);
 		UNLOCK_CACHE;
-
-		session->last_valueid = 0;
 	}
 
 	session->lastaccess = now;

@@ -588,10 +588,10 @@ static zbx_ipmi_manager_host_t	*ipmi_manager_cache_host(zbx_ipmi_manager_t *mana
 		zbx_ipmi_manager_host_t	host_local;
 
 		host_local.hostid = hostid;
-		host = (zbx_ipmi_manager_host_t *)zbx_hashset_insert(&manager->hosts, &host_local, sizeof(host_local));
+		host_local.disable_until = 0;
+		host_local.poller = ipmi_manager_get_host_poller(manager);
 
-		host->disable_until = 0;
-		host->poller = ipmi_manager_get_host_poller(manager);
+		host = (zbx_ipmi_manager_host_t *)zbx_hashset_insert(&manager->hosts, &host_local, sizeof(host_local));
 	}
 
 	host->lastcheck = now;
