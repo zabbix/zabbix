@@ -1124,6 +1124,7 @@ static void	zbx_check_db(void)
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Must not be higher than (%s)",
 						db_version_info.friendly_max_version);
+				db_version_info.flag = DB_VERSION_HIGHER_THAN_MAXIMUM_ERROR;
 			}
 			else
 			{
@@ -1147,6 +1148,7 @@ static void	zbx_check_db(void)
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Should not be higher than (%s)",
 						db_version_info.friendly_max_version);
+				db_version_info.flag = DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING;
 			}
 			else
 			{
