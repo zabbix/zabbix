@@ -353,37 +353,30 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 		$result = [];
 
 		if ($column['aggregate_function'] == AGGREGATE_NONE) {
+			$items_by_source = ['history' => [], 'trends' => []];
+
+			foreach ($items as $itemid => $item) {
+				$items_by_source[$item['source']][$itemid] = $item;
+			}
+
 			if ($timeshift != 0) {
 				$values = [];
 
-				foreach ($items as $itemid => $item) {
-					if ($item['source'] === 'history') {
-						$history = Manager::History()->getValueAt($item, $time_to, 0);
+				foreach ($items_by_source['history'] as $itemid => $item) {
+					$history = Manager::History()->getValueAt($item, $time_to, 0);
 
-						if (is_array($history)) {
-							$values[$itemid] = $history['value'];
-						}
-
-						unset($items[$itemid]);
+					if (is_array($history)) {
+						$values[$itemid] = $history['value'];
 					}
 				}
-
-				$result += $values;
 			}
 			else {
-				$items_by_source = ['history' => [], 'trends' => []];
-
-				foreach ($items as $itemid => $item) {
-					$items_by_source[$item['source']][$itemid] = $item;
-				}
-
 				$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period);
 				$values = array_column(array_column($values, 0), 'value', 'itemid');
-
-				$result += $values;
-
-				$items = $items_by_source['trends'];
 			}
+
+			$result += $values;
+			$items = $items_by_source['trends'];
 		}
 
 		$values = Manager::History()->getAggregationByInterval($items, $time_from, $time_to, $function, $interval);
