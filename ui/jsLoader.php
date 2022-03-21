@@ -361,6 +361,7 @@ $translate_strings = [
 		'Delete' => _('Delete'),
 		'Delete dashboard?' => _('Delete dashboard?'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
+		'Execute now' => _('Execute now'),
 		'Item' => _('Item'),
 		'Insert expression' => _('Insert expression'),
 		'Sharing' => _('Sharing'),
@@ -385,8 +386,7 @@ $translate_strings = [
 		'URLs' => _('URLs'),
 		'Values' => _('Values'),
 		'Web' => _('Web'),
-		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader'),
-		'Execute now' => _('Execute now')
+		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader')
 	],
 	'init.js' => [
 		'Debug' => _('Debug'),
