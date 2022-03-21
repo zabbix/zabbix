@@ -25,8 +25,8 @@
 
 #define AUDIT_USERID		0
 #define AUDIT_USERID_SQL	"null"
-#define AUDIT_USERNAME	"System"
-#define AUDIT_IP	""
+#define AUDIT_USERNAME		"System"
+#define AUDIT_IP		""
 
 static int		audit_mode;
 static zbx_hashset_t	zbx_audit;
