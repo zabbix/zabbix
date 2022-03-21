@@ -799,7 +799,7 @@ static void tls_free_context(SSL_CTX_LP ctx)
 	TLS_UNUSED(ctx);
 }
 
-static tls_t *tls_new_client(SSL_CTX_LP ctx, const char *psk_identity, const char *psk_key)
+static tls_t *tls_new_client(SSL_CTX_LP ctx, const char *psk_identity, const char *psk_key, const char *servername)
 {
 	TLS_UNUSED(ctx);
 	TLS_UNUSED(psk_identity);
