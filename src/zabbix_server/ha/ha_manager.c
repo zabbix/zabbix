@@ -984,8 +984,8 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 	{
 		if ('\0' == *info->name)
 		{
-			ha_set_error(info, "\"HANodeName\" configuration parameter must be specified if multiple nodes"
-					" are started");
+			ha_set_error(info, "multiple servers have been started without configuring \"HANodeName\" "
+					"parameter");
 		}
 		else
 			ha_set_error(info, "the server HA registry record has changed ownership");
