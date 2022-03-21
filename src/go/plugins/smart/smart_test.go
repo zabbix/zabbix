@@ -25,6 +25,118 @@ import (
 	"testing"
 )
 
+const (
+	nvme = `{
+		"smartctl": {
+		  "exit_status": 0
+		},
+		"device": {
+		  "name": "/dev/nvme0",
+		  "type": "nvme"
+		},
+		"model_name": "INTEL SSDPEKNW512G8H",
+		"serial_number": "BTNH115603K7512A",
+		"firmware_version": "HPS1",
+		"smart_status": {
+		  "passed": true
+		},
+		"nvme_smart_health_information_log": {
+		  "critical_warning": 0,
+		  "temperature": 25,
+		  "percentage_used": 0,
+		  "power_on_hours": 2222,
+		  "media_errors": 0
+		}
+	  }`
+
+	hdd = `{
+		"json_format_version": [
+			1,
+			0
+		],
+		"smartctl": {
+			"version": [
+				7,
+				2
+			],
+			"svn_revision": "5155",
+			"platform_info": "x86_64-linux-5.13.0-30-generic",
+			"build_info": "(local build)",
+			"argv": [
+				"smartctl",
+				"-a",
+				"-j",
+				"/dev/sda"
+			],
+			"exit_status": 0
+		},
+		"device": {
+			"name": "/dev/sda",
+			"info_name": "/dev/sda [SAT]",
+			"type": "sat",
+			"protocol": "ATA"
+		},
+		"model_family": "Seagate Surveillance",
+		"model_name": "ST1000VX000-1ES162",
+		"serial_number": "Z4Y7SJBD",
+		"wwn": {
+			"naa": 5,
+			"oui": 3152,
+			"id": 2071267458
+		},
+		"firmware_version": "CV26",
+		"user_capacity": {
+			"blocks": 1953525168,
+			"bytes": 1000204886016
+		},
+		"logical_block_size": 512,
+		"physical_block_size": 4096,
+		"rotation_rate": 7200,
+		"form_factor": {
+			"ata_value": 2,
+			"name": "3.5 inches"
+		},
+		"ata_smart_data": {
+			"self_test": {
+				"status": {
+					"value": 0,
+					"string": "completed without error",
+					"passed": true
+				}
+			},
+			"capabilities": {
+				"self_tests_supported": true
+			}
+		},
+		"ata_smart_attributes": {
+ 			"table": [
+				{
+					"id": 1,
+					"name": "Raw_Read_Error_Rate",
+					"raw": {
+						"value": 182786912,
+						"string": "182786912"
+					}
+				},
+				{
+					"id": 3,
+					"name": "Spin_Up_Time",
+					"raw": {
+						"value": 0,
+						"string": "0"
+					}
+				}
+			]
+		},
+		"power_on_time": {
+			"hours": 39153
+		},
+		 "temperature": {
+			"current": 30
+		}
+	}`
+)
+
 var (
 	table1    = table{"test1", 1, 11}
 	table2    = table{"test2", 2, 22}
@@ -33,12 +145,91 @@ var (
 	attrTable = table{"Spin_Up_Time", 5, 55}
 )
 
+func Test_setSingleDiskFields(t *testing.T) {
+	var nilReference *bool
+
+	selftestSuccess := true
+
+	type args struct {
+		dev []byte
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantOut map[string]interface{}
+		wantErr bool
+	}{
+		{
+			"nvme_device",
+			args{[]byte(nvme)},
+			map[string]interface{}{
+				"critical_warning": 0,
+				"disk_type":        "nvme",
+				"error":            "",
+				"exit_status":      0,
+				"firmware_version": "HPS1",
+				"media_errors":     0,
+				"model_name":       "INTEL SSDPEKNW512G8H",
+				"percentage_used":  0,
+				"power_on_time":    2222,
+				"self_test.passed": nilReference,
+				"serial_number":    "BTNH115603K7512A",
+				"temperature":      25,
+			},
+			false,
+		},
+
+		{
+			"hdd_device",
+			args{[]byte(hdd)},
+			map[string]interface{}{
+				"critical_warning": 0,
+				"disk_type":        "hdd",
+				"error":            "",
+				"exit_status":      0,
+				"firmware_version": "CV26",
+				"media_errors":     0,
+				"model_name":       "ST1000VX000-1ES162",
+				"percentage_used":  0,
+				"power_on_time":    39153,
+				"self_test.passed": &selftestSuccess,
+				"serial_number":    "Z4Y7SJBD",
+				"temperature":      30,
+				"raw_read_error_rate": rawField{
+					Value: 182786912,
+					Str:   "182786912",
+				},
+				"spin_up_time": rawField{
+					Value: 0,
+					Str:   "0",
+				},
+			},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotOut, err := setSingleDiskFields(tt.args.dev)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("setSingleDiskFields() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			if !reflect.DeepEqual(gotOut, tt.wantOut) {
+				t.Errorf("setSingleDiskFields() = %v, want %v", gotOut, tt.wantOut)
+			}
+		})
+	}
+}
+
 func Test_setDiskFields(t *testing.T) {
-	//nolint:lll
-	jsonSdaStr := `{"device": {"name": "/dev/sda","info_name": "/dev/sda [SAT]","type": "sat","protocol": "ATA"},"rotation_rate": 0}`
-	//nolint:lll
+	jsonSdaStr := `{
+		"device": {"name": "/dev/sda","info_name": "/dev/sda [SAT]","type": "sat","protocol": "ATA"},"rotation_rate": 0
+		}`
 	sdaOutStr := map[string]interface{}{
-		"device":    map[string]interface{}{"name": "/dev/sda", "info_name": "/dev/sda [SAT]", "type": "sat", "protocol": "ATA"},
+		"device": map[string]interface{}{
+			"name": "/dev/sda", "info_name": "/dev/sda [SAT]", "type": "sat", "protocol": "ATA",
+		},
 		"disk_name": "sda", "disk_type": "ssd", "rotation_rate": 0,
 	}
 
