@@ -168,6 +168,18 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 					$dbversion['database'], $dbversion['min_supported_version']
 				);
 				break;
+
+			case DB_VERSION_HIGHER_THAN_MAXIMUM_ERROR:
+				$error = _s('Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must not be higher than (%2$s)',
+					$dbversion['database'], $dbversion['max_version']
+				);
+				break;
+
+			case DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING:
+				$error = _s('Warning! Unsupported %1$s database server version. Should not be higher than (%2$s)',
+					$dbversion['database'], $dbversion['max_version']
+				);
+				break;
 		}
 
 		$info_table->addRow(
