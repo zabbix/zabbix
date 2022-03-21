@@ -42,6 +42,13 @@ class CRouter {
 	private $view = null;
 
 	/**
+	 * Unique action (request) identifier.
+	 *
+	 * @var string
+	 */
+	private $action = null;
+
+	/**
 	 * Mapping between action and corresponding controller, layout and view.
 	 *
 	 * @var array
@@ -354,13 +361,6 @@ class CRouter {
 		'trigger_prototypes.php'		=> ['CLegacyAction', null, null],
 		'triggers.php'					=> ['CLegacyAction', null, null]
 	];
-
-	/**
-	 * Unique action (request) identifier.
-	 *
-	 * @var string
-	 */
-	private $action = null;
 
 	/**
 	 * Add new actions (potentially overwriting the existing ones).
