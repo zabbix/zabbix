@@ -115,10 +115,9 @@ class CControllerMiscConfigEdit extends CController {
 			))
 		];
 
-		$data['has_vault_provider'] = APP::Vault() !== null;
-		$data['vault_provider'] = $data['has_vault_provider']
-			? APP::Vault()::TYPE
-			: $this->getInput('vault_provider', CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER));
+		$data['vault_provider'] = $this->getInput('vault_provider',
+			CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER)
+		);
 
 		$data['discovery_group_data'] = API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
