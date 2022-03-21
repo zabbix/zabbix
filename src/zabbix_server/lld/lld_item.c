@@ -5082,7 +5082,7 @@ out:
  *             items_index - [IN] lld item index                              *
  *                                                                            *
  ******************************************************************************/
-static void	lld_link_dependent_items(zbx_vector_ptr_t *items, zbx_hashset_t *items_index)
+static void	lld_link_dependent_items(zbx_vector_ptr_t *items, zbx_hashset_t *items_index, char **error)
 {
 	zbx_lld_item_t		*item, *master;
 	zbx_lld_item_index_t	*item_index, item_index_local;
@@ -5104,6 +5104,13 @@ static void	lld_link_dependent_items(zbx_vector_ptr_t *items, zbx_hashset_t *ite
 		{
 			master = item_index->item;
 			zbx_vector_ptr_append(&master->dependent_items, item);
+		}
+		else
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s dependent item: master item is not discovered.\n",
+						(0 != item->itemid ? "update" : "create"));
+
+			item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
 		}
 	}
 
@@ -5161,7 +5168,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_pt
 	lld_items_make(&item_prototypes, lld_rows, lld_macro_paths, &items, &items_index, error);
 	lld_items_preproc_make(&item_prototypes, lld_macro_paths, &items);
 
-	lld_link_dependent_items(&items, &items_index);
+	lld_link_dependent_items(&items, &items_index, error);
 
 	zbx_vector_ptr_create(&item_dependencies);
 	lld_item_dependencies_get(&item_prototypes, &item_dependencies);
