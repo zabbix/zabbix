@@ -982,7 +982,13 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 
 	if (SUCCEED != zbx_cuid_compare(ha_sessionid, node->ha_sessionid))
 	{
-		ha_set_error(info, "the server HA registry record has changed ownership");
+		if ('\0' == *info->name)
+		{
+			ha_set_error(info, "\"HANodeName\" configuration parameter must be specified if multiple nodes"
+					" are started");
+		}
+		else
+			ha_set_error(info, "the server HA registry record has changed ownership");
 		goto out;
 	}
 
