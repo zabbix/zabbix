@@ -14318,7 +14318,7 @@ msgstr ""
 #: app/views/hintbox.eventlist.php:44
 #: include/classes/helpers/CVaultHelper.php:107
 #, c-format
-msgid " \"%1$s\" is invalid."
+msgid "Provided URL \"%1$s\" is invalid."
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:157
