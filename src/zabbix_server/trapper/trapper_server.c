@@ -26,6 +26,7 @@
 #include "db.h"
 #include "../alerter/alerter_protocol.h"
 #include "zbxipcservice.h"
+#include "zbxcommshigh.h"
 
 extern int	CONFIG_REPORTMANAGER_FORKS;
 
