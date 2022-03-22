@@ -432,11 +432,82 @@ class testDashboardTopHostsWidget extends CWebTest {
 						]
 					]
 				]
+			],
+			[
+				'name' => 'top_host_screenshots',
+				'display_period' => 30,
+				'auto_start' => 1,
+				'pages' => [
+					[
+						'name' => '',
+						'widgets' => [
+							[
+								'type' => 'tophosts',
+								'name' => 'Top hosts screenshots',
+								'x' => 0,
+								'y' => 0,
+								'width' => 12,
+								'height' => 8,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'columns.name.0',
+										'value' => ''
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.data.0',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'columns.item.0',
+										'value' => '1_item'
+									],
+									[
+										'type' => 1,
+										'name' => 'columns.timeshift.0',
+										'value' => ''
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.aggregate_function.0',
+										'value' => 0
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.display.0',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.history.0',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'columns.base_color.0',
+										'value' => ''
+									],
+									[
+										'type' => 0,
+										'name' => 'column',
+										'value' => 0
+									]
+								]
+							]
+						]
+					]
+				]
 			]
 		]);
 
 		$this->assertArrayHasKey('dashboardids', $response);
 		self::$dashboardids = CDataHelper::getIds('name');
+
+		// Add value to item displayed in Top Hosts widget.
+		CDataHelper::addItemData(99086, 1000);
 	}
 
 	public static function getCreateData() {
@@ -1641,7 +1712,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->getWidget(self::$updated_name)->edit();
 
-		// Add new column.
+		// Update column.
 		if (array_key_exists('column_fields', $data)) {
 			$this->fillColumnForm($data, 'update');
 		}
@@ -1910,7 +1981,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			// Fill Thresholds values.
 			if (array_key_exists('Thresholds', $values)) {
 				foreach ($values['Thresholds'] as $tid => $threshold) {
-					if ($action === 'create') {
+					if ($action === 'create' || $column_form->query('xpath:.//table[@id="thresholds_table"]/tbody/tr')->all()->count() < 2) {
 						$column_form->query('button:Add')->one()->click();
 					}
 
@@ -1944,5 +2015,128 @@ class testDashboardTopHostsWidget extends CWebTest {
 
 			$column_form->waitUntilNotVisible();
 		}
+	}
+
+	public static function getBarScreenshotsData() {
+		return [
+			// #0 As is.
+			[
+				[
+					'main_fields' =>  [],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => '1_item'
+						]
+					],
+					'screen_name' => 'as_is'
+				]
+			],
+			// #1 Bar.
+			[
+				[
+					'main_fields' =>  [],
+					'column_fields' => [
+						[
+							'Display' => 'Bar',
+							'Min' => '500',
+							'Max' => '2000',
+							'Thresholds' => [
+								[
+									'value' => ''
+								]
+							]
+						]
+					],
+					'screen_name' => 'bar'
+				]
+			],
+			// #2 Bar with threshold.
+			[
+				[
+					'main_fields' =>  [],
+					'column_fields' => [
+						[
+							'Display' => 'Bar',
+							'Min' => '500',
+							'Max' => '2000',
+							'Thresholds' => [
+								[
+									'value' => '1500'
+								]
+							]
+						]
+					],
+					'screen_name' => 'bar_thre'
+				]
+			],
+			// #3 Indicators.
+			[
+				[
+					'main_fields' =>  [],
+					'column_fields' => [
+						[
+							'Display' => 'Indicators',
+							'Min' => '500',
+							'Max' => '2000',
+							'Thresholds' => [
+								[
+									'value' => ''
+								]
+							]
+						]
+					],
+					'screen_name' => 'indi'
+				]
+			],
+			// #4 Indicators with threshold.
+			[
+				[
+					'main_fields' =>  [],
+					'column_fields' => [
+						[
+							'Display' => 'Indicators',
+							'Min' => '500',
+							'Max' => '2000',
+							'Thresholds' => [
+								[
+									'value' => '1500'
+								]
+							]
+						]
+					],
+					'screen_name' => 'indi_thre'
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check widget bars with screenshots.
+	 *
+	 * @dataProvider getBarScreenshotsData
+	 */
+	public function testDashboardTopHostsWidget_BarScreenshots($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_screenshots']);
+		$dashboard = CDashboardElement::find()->one();
+		$form = $dashboard->edit()->getWidget('Top hosts screenshots')->edit();
+
+		// Update column.
+		if (array_key_exists('column_fields', $data)) {
+			$this->fillColumnForm($data, 'update');
+		}
+
+		if (array_key_exists('main_fields', $data)) {
+			$form->fill($data['main_fields']);
+			$form->submit();
+			$this->page->waitUntilReady();
+		}
+
+		$dashboard->save();
+
+		// Check message that widget added.
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		$element = $dashboard->getWidget('Top hosts screenshots')->query('class:list-table')->one();
+		$this->assertScreenshot($element, $data['screen_name']);
 	}
 }

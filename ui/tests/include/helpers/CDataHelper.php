@@ -23,6 +23,7 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../../include/hosts.inc.php';
+require_once dirname(__FILE__).'/../../../include/db.inc.php';
 
 class CDataHelper extends CAPIHelper {
 
@@ -362,5 +363,17 @@ class CDataHelper extends CAPIHelper {
 		}
 
 		return true;
+	}
+	
+	/**
+	 *  Add data to item.
+	 *
+	 * @param string $itemid    item id
+	 * @param mixed  $value		value that should be sent to item
+	 */
+	public static function addItemData($itemid, $value) {
+		$time = time();
+		DBexecute('INSERT INTO history_uint (itemid, clock, value, ns) VALUES ('.zbx_dbstr($itemid).', '
+				.zbx_dbstr($time).', '.zbx_dbstr($value).', 726692808)');
 	}
 }
