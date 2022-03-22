@@ -2039,7 +2039,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Display' => 'Bar',
-							'Min' => '500',
+							'Min' => '0',
 							'Max' => '2000',
 							'Thresholds' => [
 								[
@@ -2058,11 +2058,11 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Display' => 'Bar',
-							'Min' => '500',
+							'Min' => '0',
 							'Max' => '2000',
 							'Thresholds' => [
 								[
-									'value' => '1500'
+									'value' => '500'
 								]
 							]
 						]
@@ -2077,7 +2077,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Display' => 'Indicators',
-							'Min' => '500',
+							'Min' => '0',
 							'Max' => '2000',
 							'Thresholds' => [
 								[
