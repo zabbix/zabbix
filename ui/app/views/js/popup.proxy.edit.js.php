@@ -154,22 +154,20 @@ window.proxy_edit_popup = new class {
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'proxy.config.refresh');
 
-		this
-			._post(curl.getUrl(), {proxyids: [this.proxyid]})
-			.then((response) => {
-				for (const element of this.form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
+		this._post(curl.getUrl(), {proxyids: [this.proxyid]}, (response) => {
+			for (const element of this.form.parentNode.children) {
+				if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+					element.parentNode.removeChild(element);
 				}
+			}
 
-				const title = response.success.title ?? null;
-				const messages = response.success.messages ?? [];
+			const title = response.success.title ?? null;
+			const messages = response.success.messages ?? [];
 
-				const message_box = makeMessageBox('good', messages, title, true, true)[0];
+			const message_box = makeMessageBox('good', messages, title, true, true)[0];
 
-				this.form.parentNode.insertBefore(message_box, this.form);
-			});
+			this.form.parentNode.insertBefore(message_box, this.form);
+		});
 	}
 
 	clone({title, buttons}) {
@@ -184,13 +182,11 @@ window.proxy_edit_popup = new class {
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'proxy.delete');
 
-		this
-			._post(curl.getUrl(), {proxyids: [this.proxyid]})
-			.then((response) => {
-				overlayDialogueDestroy(this.overlay.dialogueid);
+		this._post(curl.getUrl(), {proxyids: [this.proxyid]}, (response) => {
+			overlayDialogueDestroy(this.overlay.dialogueid);
 
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
-			});
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+		});
 	}
 
 	submit() {
@@ -218,17 +214,15 @@ window.proxy_edit_popup = new class {
 		const curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', this.proxyid !== null ? 'proxy.update' : 'proxy.create');
 
-		this
-			._post(curl.getUrl(), fields)
-			.then((response) => {
-				overlayDialogueDestroy(this.overlay.dialogueid);
+		this._post(curl.getUrl(), fields, (response) => {
+			overlayDialogueDestroy(this.overlay.dialogueid);
 
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
-			});
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+		});
 	}
 
-	_post(url, data) {
-		const request = fetch(url, {
+	_post(url, data, success_callback) {
+		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify(data)
@@ -240,9 +234,8 @@ window.proxy_edit_popup = new class {
 				}
 
 				return response;
-			});
-
-		request
+			})
+			.then(success_callback)
 			.catch((exception) => {
 				for (const element of this.form.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
@@ -268,7 +261,5 @@ window.proxy_edit_popup = new class {
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
-
-		return request;
 	}
 };
