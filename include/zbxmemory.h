@@ -17,16 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_MEMALLOC_H
-#define ZABBIX_MEMALLOC_H
+#ifndef ZABBIX_MEMORY_H
+#define ZABBIX_MEMORY_H
 
 #include "zbxtypes.h"
 
 #define MEM_MIN_ALLOC	24	/* should be a multiple of 8 and at least (2 * ZBX_PTR_SIZE) */
 
-#define MEM_MIN_BUCKET_SIZE	MEM_MIN_ALLOC
+#define ZBX_MEM_MIN_BUCKET_SIZE	MEM_MIN_ALLOC
 #define MEM_MAX_BUCKET_SIZE	256 /* starting from this size all free chunks are put into the same bucket */
-#define MEM_BUCKET_COUNT	((MEM_MAX_BUCKET_SIZE - MEM_MIN_BUCKET_SIZE) / 8 + 1)
+#define ZBX_MEM_BUCKET_COUNT	((MEM_MAX_BUCKET_SIZE - ZBX_MEM_MIN_BUCKET_SIZE) / 8 + 1)
 
 typedef struct
 {
@@ -57,7 +57,7 @@ typedef struct
 	zbx_uint64_t	min_chunk_size;
 	zbx_uint64_t	max_chunk_size;
 	zbx_uint64_t	overhead;
-	unsigned int	chunks_num[MEM_BUCKET_COUNT];
+	unsigned int	chunks_num[ZBX_MEM_BUCKET_COUNT];
 	unsigned int	free_chunks;
 	unsigned int	used_chunks;
 }
@@ -130,4 +130,4 @@ ZBX_MEM_FUNC1_IMPL_MALLOC(__prefix, __info)				\
 ZBX_MEM_FUNC1_IMPL_REALLOC(__prefix, __info)				\
 ZBX_MEM_FUNC1_IMPL_FREE(__prefix, __info)
 
-#endif
+#endif /* ZABBIX_MEMORY_H */

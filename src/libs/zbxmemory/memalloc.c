@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "memalloc.h"
+#include "zbxmemory.h"
 
 #include "common.h"
 #include "log.h"
@@ -149,11 +149,11 @@ static zbx_uint64_t	mem_proper_alloc_size(zbx_uint64_t size)
 
 static int	mem_bucket_by_size(zbx_uint64_t size)
 {
-	if (size < MEM_MIN_BUCKET_SIZE)
+	if (size < ZBX_MEM_MIN_BUCKET_SIZE)
 		return 0;
 	if (size < MEM_MAX_BUCKET_SIZE)
-		return (size - MEM_MIN_BUCKET_SIZE) >> 3;
-	return MEM_BUCKET_COUNT - 1;
+		return (size - ZBX_MEM_MIN_BUCKET_SIZE) >> 3;
+	return ZBX_MEM_BUCKET_COUNT - 1;
 }
 
 static void	mem_set_chunk_size(void *chunk, zbx_uint64_t size)
@@ -246,12 +246,12 @@ static void	*__mem_malloc(zbx_mem_info_t *info, zbx_uint64_t size)
 
 	index = mem_bucket_by_size(size);
 
-	while (index < MEM_BUCKET_COUNT - 1 && NULL == info->buckets[index])
+	while (index < ZBX_MEM_BUCKET_COUNT - 1 && NULL == info->buckets[index])
 		index++;
 
 	chunk = info->buckets[index];
 
-	if (index == MEM_BUCKET_COUNT - 1)
+	if (index == ZBX_MEM_BUCKET_COUNT - 1)
 	{
 		/* otherwise, find a chunk big enough according to first-fit strategy */
 
@@ -582,9 +582,9 @@ int	zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, 
 	base = (void *)(*info + 1);
 
 	(*info)->buckets = (void **)ALIGNPTR(base);
-	memset((*info)->buckets, 0, MEM_BUCKET_COUNT * ZBX_PTR_SIZE);
-	size -= (char *)((*info)->buckets + MEM_BUCKET_COUNT) - (char *)base;
-	base = (void *)((*info)->buckets + MEM_BUCKET_COUNT);
+	memset((*info)->buckets, 0, ZBX_MEM_BUCKET_COUNT * ZBX_PTR_SIZE);
+	size -= (char *)((*info)->buckets + ZBX_MEM_BUCKET_COUNT) - (char *)base;
+	base = (void *)((*info)->buckets + ZBX_MEM_BUCKET_COUNT);
 
 	zbx_strlcpy((char *)base, descr, size);
 	(*info)->mem_descr = (char *)base;
@@ -716,7 +716,7 @@ void	zbx_mem_clear(zbx_mem_info_t *info)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	memset(info->buckets, 0, MEM_BUCKET_COUNT * ZBX_PTR_SIZE);
+	memset(info->buckets, 0, ZBX_MEM_BUCKET_COUNT * ZBX_PTR_SIZE);
 	index = mem_bucket_by_size(info->total_size);
 	info->buckets[index] = info->lo_bound;
 	mem_set_chunk_size(info->buckets[index], info->total_size);
@@ -738,7 +738,7 @@ void	zbx_mem_get_stats(const zbx_mem_info_t *info, zbx_mem_stats_t *stats)
 	stats->max_chunk_size = __UINT64_C(0);
 	stats->min_chunk_size = __UINT64_C(0xffffffffffffffff);
 
-	for (i = 0; i < MEM_BUCKET_COUNT; i++)
+	for (i = 0; i < ZBX_MEM_BUCKET_COUNT; i++)
 	{
 		counter = 0;
 		chunk = info->buckets[i];
@@ -770,13 +770,13 @@ void	zbx_mem_dump_stats(int level, zbx_mem_info_t *info)
 
 	zabbix_log(level, "=== memory statistics for %s ===", info->mem_descr);
 
-	for (i = 0; i < MEM_BUCKET_COUNT; i++)
+	for (i = 0; i < ZBX_MEM_BUCKET_COUNT; i++)
 	{
 		if (0 == stats.chunks_num[i])
 			continue;
 
-		zabbix_log(level, "free chunks of size %2s %3d bytes: %8u", i == MEM_BUCKET_COUNT - 1 ? ">=" : "",
-			MEM_MIN_BUCKET_SIZE + 8 * i, stats.chunks_num[i]);
+		zabbix_log(level, "free chunks of size %2s %3d bytes: %8u", i == ZBX_MEM_BUCKET_COUNT - 1 ? ">=" : "",
+			ZBX_MEM_MIN_BUCKET_SIZE + 8 * i, stats.chunks_num[i]);
 	}
 
 	zabbix_log(level, "min chunk size: %10llu bytes", (unsigned long long)stats.min_chunk_size);
@@ -809,7 +809,7 @@ size_t	zbx_mem_required_size(int chunks_num, const char *descr, const char *para
 	size += 7;					/* ensure we allocate enough to 8-align zbx_mem_info_t */
 	size += sizeof(zbx_mem_info_t);
 	size += ZBX_PTR_SIZE - 1;			/* ensure we allocate enough to align bucket pointers */
-	size += ZBX_PTR_SIZE * MEM_BUCKET_COUNT;
+	size += ZBX_PTR_SIZE * ZBX_MEM_BUCKET_COUNT;
 	size += strlen(descr) + 1;
 	size += strlen(param) + 1;
 	size += (MEM_SIZE_FIELD - 1) + 8;		/* ensure we allocate enough to align the first chunk */

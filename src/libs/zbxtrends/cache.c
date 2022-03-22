@@ -22,7 +22,7 @@
 #include "log.h"
 #include "zbxtrends.h"
 #include "mutexs.h"
-#include "memalloc.h"
+#include "zbxmemory.h"
 #include "trends.h"
 
 extern zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE;
