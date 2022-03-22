@@ -78,7 +78,6 @@ PROXY_SUBDIRS = \
 	zabbix_server/service \
 	zabbix_proxy \
 	zabbix_js
-	
 endif
 endif
 
@@ -94,7 +93,6 @@ SUBDIRS = \
 	$(SERVER_SUBDIRS) \
 	$(PROXY_SUBDIRS) \
 	$(JAVA_SUBDIRS)
-	
 
 ## "dist-hook" run after the distribution directory is filled, but before the actual tar (or shar) file is created.
 dist-hook:

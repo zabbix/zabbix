@@ -501,34 +501,6 @@ DB_RESULT	DBselectN(const char *query, int n)
 	return rc;
 }
 
-int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*host_esc;
-	int		ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	host_esc = DBdyn_escape_string(hostname);
-	result = DBselect("select lastaccess from hosts where host='%s' and status in (%d,%d)",
-			host_esc, HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE);
-	zbx_free(host_esc);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		*lastaccess = atoi(row[0]);
-		ret = SUCCEED;
-	}
-	else
-		*error = zbx_dsprintf(*error, "Proxy \"%s\" does not exist.", hostname);
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
 #ifdef HAVE_MYSQL
 static size_t	get_string_field_size(unsigned char type)
 {

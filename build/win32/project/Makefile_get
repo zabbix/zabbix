@@ -35,7 +35,6 @@ OBJS = \
 	..\..\..\src\libs\zbxcommon\variant.o \
 	..\..\..\src\libs\zbxcommon\str.o \
 	..\..\..\src\libs\zbxcommon\time.o \
-	..\..\..\src\libs\zbxcommon\xml.o \
 	..\..\..\src\libs\zbxcommon\zbxgetopt.o \
 	..\..\..\src\libs\zbxcommshigh\comms.o \
 	..\..\..\src\libs\zbxcomms\comms.o \
@@ -54,6 +53,7 @@ OBJS = \
 	..\..\..\src\libs\zbxsys\threads.o \
 	..\..\..\src\zabbix_get\zabbix_get.o \
 	..\..\..\src\libs\zbxregexp\zbxregexp.o \
+	..\..\..\src\libs\zbxxml\xml.o \
 	..\..\..\src\libs\zbxwin32\fatal.o
 
 LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib user32.lib $(LIBS)

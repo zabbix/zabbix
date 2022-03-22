@@ -3030,16 +3030,46 @@ $form-icon-btn: (
 	display: table;
 	position: absolute;
 	z-index: 1000;
-	padding: 15px 10px 10px;
+	padding: 13px 10px 10px;
 	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
 	border-bottom-color: darken($action-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
 
+	.dashboard-widget-head {
+		margin: -8px -10px 6px -10px;
+		padding: 8px 10px;
+
+		.icon-doc-link {
+			width: 18px;
+			height: 18px;
+			margin: -9px -6px 0 38px;
+			line-height: 18px;
+
+			&::after {
+				font-size: 15px;
+			}
+		}
+	}
+
 	&.modal {
 		position: fixed;
 		overflow: hidden;
 		margin: 0 10px;
+
+		.dashboard-widget-head {
+			margin-bottom: 14px;
+
+			.icon-doc-link {
+				margin-right: -26px;
+			}
+
+			.overlay-close-btn {
+				position: static;
+				margin: -9px -6px 0 38px;
+				font-size: 24px;
+			}
+		}
 
 		.overlay-dialogue-body {
 			overflow: auto;
@@ -3094,13 +3124,6 @@ $form-icon-btn: (
 					padding-left: 0;
 				}
 			}
-		}
-
-		> .overlay-close-btn {
-			position: relative;
-			float: right;
-			top: -13px;
-			right: -8px;
 		}
 	}
 
@@ -3198,10 +3221,6 @@ $form-icon-btn: (
 				display: block;
 			}
 		}
-	}
-
-	.dashboard-widget-head {
-		margin: -10px -10px 6px;
 	}
 
 	.maps-container {
@@ -3582,15 +3601,12 @@ $form-icon-btn: (
 	width: 250px;
 
 	.dashboard-widget-head {
-		margin: -11px 0 7px -9px;
-		padding: 0;
+		margin: -13px -10px 7px;
 
 		ul {
-			position: relative;
-			display: inline-block;
+			margin: 4px 0 0 1px;
 
 			li {
-				float: none;
 				display: inline-block;
 			}
 		}
@@ -5577,6 +5593,43 @@ button {
 	&:hover,
 	&:focus {
 		border-bottom: none;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px $btn-border-focus-color;
+	}
+}
+
+.icon-doc-link {
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+	text-align: center;
+	line-height: 24px;
+	border-radius: 2px;
+
+	&::after {
+		content: '?';
+		position: relative;
+		font-size: 18px;
+		font-weight: bold;
+		color: $font-alt-color;
+		opacity: 0.5;
+		transition: opacity .2s ease-out;
+	}
+
+	&:active,
+	&:hover,
+	&:link,
+	&:visited {
+		border-bottom: 0;
+	}
+
+	&:hover,
+	&:focus {
+		&::after {
+			opacity: 1;
+		}
 	}
 
 	&:focus {

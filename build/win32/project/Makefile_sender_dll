@@ -40,7 +40,6 @@ OBJS = \
 	..\..\..\src\libs\zbxcommon\variant.o \
 	..\..\..\src\libs\zbxcommon\str.o \
 	..\..\..\src\libs\zbxcommon\time.o \
-	..\..\..\src\libs\zbxcommon\xml.o \
 	..\..\..\src\libs\zbxcommon\zbxgetopt.o \
 	..\..\..\src\libs\zbxcommshigh\comms.o \
 	..\..\..\src\libs\zbxcomms\comms.o \
@@ -60,6 +59,7 @@ OBJS = \
 	..\..\..\src\libs\zbxalgo\algodefs.o \
 	..\..\..\src\libs\zbxalgo\vector.o \
 	..\..\..\src\libs\zbxregexp\zbxregexp.o \
+	..\..\..\src\libs\zbxxml\xml.o \
 	..\..\..\src\zabbix_sender\win32\zabbix_sender.o
 
 LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib

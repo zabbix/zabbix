@@ -20,6 +20,8 @@
 #include "zbxmocktest.h"
 #include "zbxmockutil.h"
 
+#include "zbxxml.h"
+
 void	zbx_mock_test_entry(void **state)
 {
 	char	*xml, *expected_json, *json = NULL, *error = NULL;

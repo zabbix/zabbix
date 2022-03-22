@@ -99,6 +99,7 @@ $filter = (new CFilter())
 $widget = (new CWidget())
 	->setTitle(_('API tokens'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_TOKEN_LIST))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())->addItem(

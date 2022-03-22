@@ -221,14 +221,14 @@ $tab_time_period = (new CFormList())
 	->addRow(
 		CWidgetHelper::getLabel($fields['time_from']),
 		CWidgetHelper::getDatePicker($fields['time_from'])
-			->setDateFormat(DATE_TIME_FORMAT_SECONDS)
-			->setPlaceholder(DATE_TIME_FORMAT_SECONDS_PLACEHOLDER)
+			->setDateFormat(ZBX_FULL_DATE_TIME)
+			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
 	)
 	->addRow(
 		CWidgetHelper::getLabel($fields['time_to']),
 		CWidgetHelper::getDatePicker($fields['time_to'])
-			->setDateFormat(DATE_TIME_FORMAT_SECONDS)
-			->setPlaceholder(DATE_TIME_FORMAT_SECONDS_PLACEHOLDER)
+			->setDateFormat(ZBX_FULL_DATE_TIME)
+			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
 	);
 
 // Create 'Axes' tab.

@@ -33,6 +33,7 @@ $form->addItem((new CInput('submit', 'dashboard_widget_config_submit'))->addStyl
 
 $output = [
 	'header' => $data['unique_id'] !== null ? _s('Edit widget') : _s('Add widget'),
+	'doc_url' => CDocHelper::getUrl(CDocHelper::MONITORING_DASHBOARD_WIDGET_EDIT),
 	'body' => '',
 	'buttons' => [
 		[

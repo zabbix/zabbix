@@ -29,6 +29,7 @@ if ($data['uncheck']) {
 
 $widget = (new CWidget())
 	->setTitle(_('Event correlation'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_CORRELATION_LIST))
 	->setControls((new CTag('nav', true,
 		(new CForm('get'))
 			->cleanItems()

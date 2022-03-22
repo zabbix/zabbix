@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 Link to MIBs: https://www.tp-link.com/en/support/download/t2600g-28ts/#MIBs_Files
 Sample device overview page: https://www.tp-link.com/en/business-networking/managed-switch/t2600g-28ts/#overview
 Emulation page (web): https://emulator.tp-link.com/T2600G-28TS(UN)_1.0/Index.htm

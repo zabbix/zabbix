@@ -85,6 +85,7 @@ $filter = (new CFilter())
 
 $widget = (new CWidget())
 	->setTitle(_('Templates'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_TEMPLATES_LIST))
 	->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(new CRedirectButton(_('Create template'),

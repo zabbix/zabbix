@@ -72,6 +72,7 @@ $form->addItem([
 
 (new CWidget())
 	->setTitle(_('Dashboards'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_DASHBOARD_LIST))
 	->setControls(
 		(new CTag('nav', true, new CRedirectButton(_('Create dashboard'),
 			(new CUrl('zabbix.php'))
