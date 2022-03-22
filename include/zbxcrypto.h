@@ -21,6 +21,7 @@
 #define ZABBIX_ZBXCRYPTO_H
 
 #include "zbxtypes.h"
+#include "zbxhash.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
@@ -42,6 +43,8 @@ void	zbx_tls_free_on_signal(void);
 void	zbx_tls_version(void);
 
 #endif	/* #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL) */
+
+#define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
 
 char	*zbx_create_token(zbx_uint64_t seed);
 

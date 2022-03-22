@@ -20,8 +20,7 @@
 #ifndef ZABBIX_ZBXHASH_H
 #define ZABBIX_ZBXHASH_H
 
-#ifndef md5_INCLUDED
-#define md5_INCLUDED
+/* ------------ md5.h file included with Zabbix modifications ------------ */
 /*
 ** Copyright (C) 1999, 2002 Aladdin Enterprises.  All rights reserved.
 **
@@ -113,8 +112,5 @@ void zbx_md5_finish(md5_state_t *pms, md5_byte_t digest[16]);
 #endif
 
 void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
-#endif /* md5_INCLUDED */
-
-#define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
-
+/* ------------------ end of included md5.h file ------------------------- */
 #endif /* ZABBIX_HASH_H */
