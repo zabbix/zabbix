@@ -143,7 +143,7 @@ function prepareTagsSubfilterOutput(array $data, array &$subfilter): array {
 	return $output;
 }
 
-function makeItemSubfilter(array &$filter_data, array $items = [], string $context) {
+function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 	// subfilters
 	$table_subfilter = (new CTableInfo())
 		->addRow([

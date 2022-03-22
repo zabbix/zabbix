@@ -35,12 +35,13 @@ Templates are of two types:
 * Get the token automatically created when you install Zabbix Helm Chart.
 
 ```bash
-kubectl get secret zabbix-service-account -n zabbix -o jsonpath={.data.token} | base64 -d
+kubectl get secret zabbix-service-account -n monitoring -o jsonpath={.data.token} | base64 -d
 ```
 
 * Create a generic host for the nodes and assign to it the "Kubernetes nodes by HTTP" template.
 * Set macros according to the [template instructions](kubernetes_nodes_http/README.md).
 * Create a cluster state host and assign the "Kubernetes cluster state by HTTP" template to it.
+* Specify a dummy host interface required for HTTP items.
 * Set macros according to the [template instructions](kubernetes_state_http/README.md).
 
 > It is strongly recommended to use filtering macros when configuring templates, as on a large cluster the number of discoverable objects can reduce the performance of the monitoring system.

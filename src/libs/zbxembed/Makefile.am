@@ -14,8 +14,9 @@ libzbxembed_a_SOURCES = \
 	global.h \
 	httprequest.c \
 	httprequest.h \
-	xml.c \
-	xml.h \
+	embed_xml.c \
+	embed_xml.h \
 	zabbix.c \
 	zabbix.h
 
+libzbxembed_a_CFLAGS = $(LIBXML2_CFLAGS)

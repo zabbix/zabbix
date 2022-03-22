@@ -601,15 +601,15 @@ class testFormTabIndicators extends CWebTest {
 			// Map configuration form tab data.
 			[
 				[
-					'url' => 'sysmaps.php?form=update&sysmapid=1',
+					'url' => 'sysmaps.php?form=Create+map',
 					'form' => 'id:sysmap-form',
 					'tabs' => [
 						[
 							'name' => 'Sharing',
 							'entries' => [
 								'selector' => 'id:private',
-								'value' => 'Private',
-								'old_value' => 'Public'
+								'value' => 'Public',
+								'old_value' => 'Private'
 							],
 							'field_type' => 'general_field'
 						]
