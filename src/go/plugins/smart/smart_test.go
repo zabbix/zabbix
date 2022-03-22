@@ -301,6 +301,7 @@ func Test_setSingleDiskFields(t *testing.T) {
 			gotOut, err := setSingleDiskFields(tt.args.dev)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("setSingleDiskFields() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
 

@@ -107,10 +107,6 @@ type power struct {
 	Hours int `json:"hours"`
 }
 
-type singelRequestAttribute struct {
-	SmartAttributes singelRequestTables `json:"ata_smart_attributes"`
-}
-
 type singelRequestTables struct {
 	Table []singelRequestRaw `json:"table"`
 }
@@ -264,32 +260,39 @@ func (p *Plugin) executeSingle(path string) (device []byte, err error) {
 func (p *Plugin) getDevices() (basic, raid, megaraid []deviceInfo, err error) {
 	basicTmp, err := p.scanDevices("--scan -j")
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf("Failed to scan for devices: %s.", err)
+		return nil, nil, nil, fmt.Errorf("Failed to scan for devices: %s.", err.Error())
 	}
 
 	raidTmp, err := p.scanDevices("--scan -d sat -j")
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf("Failed to scan for sat devices: %s.", err)
+		return nil, nil, nil, fmt.Errorf("Failed to scan for sat devices: %s.", err.Error())
 	}
 
-raid:
-	for _, tmp := range basicTmp {
-		for _, r := range raidTmp {
+	basic, raid, megaraid = formatDeviceOutput(basicTmp, raidTmp)
+
+	return
+}
+
+func formatDeviceOutput(basic, raid []deviceInfo) (basicDev, raidDev, megaraidDev []deviceInfo) {
+loop:
+	for _, tmp := range basic {
+		for _, r := range raid {
 			if tmp.Name == r.Name {
-				continue raid
+				continue loop
 			}
 		}
 
-		basic = append(basic, tmp)
+		basicDev = append(basicDev, tmp)
 	}
 
-	for _, r := range raidTmp {
+	for _, r := range raid {
 		if strings.Contains(r.DevType, "megaraid") {
-			megaraid = append(megaraid, r)
+			megaraidDev = append(megaraidDev, r)
+
 			continue
 		}
 
-		raid = append(raid, r)
+		raidDev = append(raidDev, r)
 	}
 
 	return
