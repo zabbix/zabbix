@@ -25,6 +25,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
@@ -60,6 +61,124 @@ func getProcessName(pid string) (name string, err error) {
 		return "", fmt.Errorf("cannot find process name starting position in /proc/%s/stat", pid)
 	}
 	return string(data[left+1 : right]), nil
+}
+
+func readProcStatus(pid uint64, proc *procStatus) (err error) {
+	proc.Pid = pid
+	proc.CtxSwitches = 0
+
+	pid_str := strconv.FormatUint(pid, 10)
+	var data []byte
+	if data, err = read2k("/proc/" + pid_str + "/status"); err != nil {
+		return err
+	}
+
+	var pos int
+	s := strings.Split(string(data), "\n")
+	for _, tmp := range s {
+		if pos = strings.IndexRune(tmp, ':'); pos == -1 {
+			continue
+		}
+
+		k := tmp[:pos]
+		v := strings.TrimSpace(tmp[pos+1:])
+
+		switch k {
+		case "Name":
+			proc.ProcName = v
+		case "State":
+			if len(v) < 1 {
+				continue
+			}
+			switch string(v[0]) {
+			case "R":
+				proc.State = "run"
+			case "S":
+				proc.State = "sleep"
+			case "Z":
+				proc.State = "zomb"
+			case "D":
+				proc.State = "disk"
+			case "T":
+				proc.State = "trace"
+			default:
+				proc.State = "other"
+			}
+		case "PPid":
+			setUint64(v, &proc.PPid)
+		case "Tgid":
+			setUint64(v, &proc.Tgid)
+		case "VmSize":
+			trimUnit(v, &proc.Vsize)
+		case "VmRSS":
+			trimUnit(v, &proc.Rss)
+		case "VmData":
+			trimUnit(v, &proc.Data)
+		case "VmExe":
+			trimUnit(v, &proc.Exe)
+		case "VmHWM":
+			trimUnit(v, &proc.Hwm)
+		case "VmLck":
+			trimUnit(v, &proc.Lck)
+		case "VmLib":
+			trimUnit(v, &proc.Lib)
+		case "VmPeak":
+			trimUnit(v, &proc.Peak)
+		case "VmPin":
+			trimUnit(v, &proc.Pin)
+		case "VmPTE":
+			trimUnit(v, &proc.Pte)
+		case "VmStk":
+			trimUnit(v, &proc.Stk)
+		case "VmSwap":
+			trimUnit(v, &proc.Swap)
+		case "Threads":
+			setUint64(v, &proc.Threads)
+		case "voluntary_ctxt_switches", "nonvoluntary_ctxt_switches":
+			if value, tmperr := strconv.ParseUint(v, 10, 64); tmperr == nil {
+				proc.CtxSwitches += value
+			}
+		}
+	}
+
+	proc.Name, proc.Cmdline, err = getProcessCmdline(pid_str, procInfoName)
+	if err != nil {
+		return err
+	}
+
+	var stat cpuUtil
+	getProcCpuUtil(int64(pid), &stat)
+	if stat.err == nil {
+		proc.CpuTimeUser = stat.utime
+		proc.CpuTimeSystem = stat.stime
+	}
+
+	if fds, err := ioutil.ReadDir("/proc/" + pid_str + "/fd"); err == nil {
+		proc.Fds = uint64(len(fds))
+	}
+
+	if data, err = read2k("/proc/" + pid_str + "/io"); err != nil {
+		return err
+	}
+
+	s = strings.Split(string(data), "\n")
+	for _, tmp := range s {
+		if pos = strings.IndexRune(tmp, ':'); pos == -1 {
+			continue
+		}
+
+		k := tmp[:pos]
+		v := strings.TrimSpace(tmp[pos+1:])
+
+		switch k {
+		case "read_bytes":
+			setUint64(v, &proc.IoReadsB)
+		case "write_bytes":
+			setUint64(v, &proc.IoWritesB)
+		}
+	}
+
+	return nil
 }
 
 func getProcessState(pid string) (name string, err error) {
@@ -117,7 +236,7 @@ func getProcessCmdline(pid string, flags int) (arg0 string, cmdline string, err 
 	return arg0, string(data), nil
 }
 
-func (p *Plugin) getProcCpuUtil(pid int64, stat *cpuUtil) {
+func getProcCpuUtil(pid int64, stat *cpuUtil) {
 	var data []byte
 	if data, stat.err = read2k(fmt.Sprintf("/proc/%d/stat", pid)); stat.err != nil {
 		return
@@ -195,4 +314,74 @@ func getProcesses(flags int) (processes []*procInfo, err error) {
 	}
 
 	return processes, nil
+}
+
+func getProcfsIds(path string) (pids []uint64, err error) {
+	dir, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer dir.Close()
+
+	names, err := dir.Readdirnames(0)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, name := range names {
+		pid, err := strconv.ParseUint(name, 10, 64)
+		if err == nil {
+			pids = append(pids, pid)
+		}
+	}
+
+	return pids, nil
+}
+
+func getPids() (pids []uint64, err error) {
+	return getProcfsIds("/proc")
+}
+
+func getThreadIds(pid uint64) (pids []uint64, err error) {
+	return getProcfsIds("/proc/" + strconv.FormatUint(pid, 10) + "/task")
+}
+
+func trimUnit(v string, p *uint64) () {
+	var tmperr error
+	var value uint64
+	var pos int
+	if pos = strings.IndexRune(v, ' '); pos == -1 {
+		return
+	}
+
+	if value, tmperr = strconv.ParseUint(v[:pos], 10, 64); tmperr != nil {
+		return
+	}
+
+	unit := v[pos + 1:]
+	switch unit {
+	case "kB":
+		value <<= 10
+	case "mB":
+		value <<= 20
+	case "GB":
+		value <<= 30
+	case "TB":
+		value <<= 40
+	default:
+		return
+	}
+
+	*p = value
+}
+
+func setUint64(v string, p *uint64) () {
+	var tmperr error
+	var value uint64
+
+	if value, tmperr = strconv.ParseUint(v, 10, 64); tmperr != nil {
+		return
+	}
+
+	*p = value
 }
