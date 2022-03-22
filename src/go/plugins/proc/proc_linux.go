@@ -145,8 +145,6 @@ type procInfo struct {
 type procStatus struct {
 	Pid           uint64  `json:"pid"`
 	PPid          uint64  `json:"ppid"`
-	Tgid          uint64  `json:"-"`
-	ProcName      string  `json:"-"`
 	Name          string  `json:"name"`
 	Cmdline       string  `json:"cmdline"`
 	Vsize         uint64  `json:"vsize"`
@@ -791,13 +789,13 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 		return nil, errors.New("Too many parameters.")
 	}
 
+	var uid int64
 	var pids []uint64
 	var err error
 	var array []procStatus
 	var threadArray []thread
 	var summaryArray []procSummary
 
-	_ = userName
 	if pids, err = getPids(); err != nil {
 		return nil, fmt.Errorf("Cannot open /proc: %s", err)
 	}
@@ -819,6 +817,16 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 
 			if name != "" && data.Name != name {
 				continue
+			}
+
+			if userName != "" {
+				if uid, err = getProcessUserID(strconv.FormatUint(pid, 10)); err == nil {
+					var u *user.User
+					u, err = user.Lookup(userName)
+					if err == nil && u.Uid != strconv.FormatInt(uid, 10) {
+						continue
+					}
+				}
 			}
 
 			if mode != "summary" && cmdline != "" && regexpErr == nil &&
@@ -845,6 +853,22 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 			if name != "" && data.Name != name {
 				continue
 			}
+
+			if userName != "" {
+				if uid, err = getProcessUserID(strconv.FormatUint(tid, 10)); err == nil {
+					var u *user.User
+					u, err = user.Lookup(userName)
+					if err == nil && u.Uid != strconv.FormatInt(uid, 10) {
+						continue
+					}
+				}
+			}
+
+			if mode != "summary" && cmdline != "" && regexpErr == nil &&
+				!cmdlinePattern.Match([]byte(data.Cmdline)) {
+					continue
+			}
+
 
 			if cmdline != "" && regexpErr == nil && !cmdlinePattern.Match([]byte(data.Cmdline)) {
 				continue

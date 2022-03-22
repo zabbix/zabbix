@@ -84,8 +84,6 @@ func readProcStatus(pid uint64, proc *procStatus) (err error) {
 		v := strings.TrimSpace(tmp[pos+1:])
 
 		switch k {
-		case "Name":
-			proc.ProcName = v
 		case "State":
 			if len(v) < 1 {
 				continue
@@ -106,8 +104,6 @@ func readProcStatus(pid uint64, proc *procStatus) (err error) {
 			}
 		case "PPid":
 			setUint64(v, &proc.PPid)
-		case "Tgid":
-			setUint64(v, &proc.Tgid)
 		case "VmSize":
 			trimUnit(v, &proc.Vsize)
 		case "VmRSS":
