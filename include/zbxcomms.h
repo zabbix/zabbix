@@ -17,34 +17,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_COMMS_H
-#define ZABBIX_COMMS_H
+#ifndef ZABBIX_ZCOMMS_H
+#define ZABBIX_ZCOMMS_H
 
 #include "zbxalgo.h"
 
 #ifdef _WINDOWS
-#	define ZBX_TCP_WRITE(s, b, bl)		((ssize_t)send((s), (b), (int)(bl), 0))
-#	define ZBX_TCP_READ(s, b, bl)		((ssize_t)recv((s), (b), (int)(bl), 0))
-#	define zbx_socket_close(s)		if (ZBX_SOCKET_ERROR != (s)) closesocket(s)
 #	define zbx_socket_last_error()		WSAGetLastError()
-#	define zbx_bind(s, a, l)		(bind((s), (a), (int)(l)))
-#	define zbx_sendto(fd, b, n, f, a, l)	(sendto((fd), (b), (int)(n), (f), (a), (l)))
 
-#	define ZBX_PROTO_AGAIN			WSAEINTR
 #	define ZBX_PROTO_ERROR			SOCKET_ERROR
-#	define ZBX_SOCKET_ERROR			INVALID_SOCKET
 #	define ZBX_SOCKET_TO_INT(s)		((int)(s))
 #else
-#	define ZBX_TCP_WRITE(s, b, bl)		((ssize_t)write((s), (b), (bl)))
-#	define ZBX_TCP_READ(s, b, bl)		((ssize_t)read((s), (b), (bl)))
-#	define zbx_socket_close(s)		if (ZBX_SOCKET_ERROR != (s)) close(s)
 #	define zbx_socket_last_error()		errno
-#	define zbx_bind(s, a, l)		(bind((s), (a), (l)))
-#	define zbx_sendto(fd, b, n, f, a, l)	(sendto((fd), (b), (n), (f), (a), (l)))
 
-#	define ZBX_PROTO_AGAIN		EINTR
 #	define ZBX_PROTO_ERROR		-1
-#	define ZBX_SOCKET_ERROR		-1
 #	define ZBX_SOCKET_TO_INT(s)	(s)
 #endif
 
@@ -84,7 +70,7 @@ typedef struct
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_context_t		*tls_ctx;
 #endif
-	unsigned int 			connection_type;	/* type of connection actually established: */
+	unsigned int			connection_type;	/* type of connection actually established: */
 								/* ZBX_TCP_SEC_UNENCRYPTED, ZBX_TCP_SEC_TLS_PSK or */
 								/* ZBX_TCP_SEC_TLS_CERT */
 	int				timeout;
@@ -126,7 +112,8 @@ void	zbx_socket_timeout_set(zbx_socket_t *s, int timeout);
 const char	*zbx_tcp_connection_type_name(unsigned int type);
 
 #define zbx_tcp_send(s, d)				zbx_tcp_send_ext((s), (d), strlen(d), 0, ZBX_TCP_PROTOCOL, 0)
-#define zbx_tcp_send_to(s, d, timeout)			zbx_tcp_send_ext((s), (d), strlen(d), 0, ZBX_TCP_PROTOCOL, timeout)
+#define zbx_tcp_send_to(s, d, timeout)			zbx_tcp_send_ext((s), (d), strlen(d), 0,	\
+									ZBX_TCP_PROTOCOL, timeout)
 #define zbx_tcp_send_bytes_to(s, d, len, timeout)	zbx_tcp_send_ext((s), (d), len, 0, ZBX_TCP_PROTOCOL, timeout)
 #define zbx_tcp_send_raw(s, d)				zbx_tcp_send_ext((s), (d), strlen(d), 0, 0, 0)
 
@@ -202,4 +189,9 @@ int	zbx_comms_parse_response(char *xml, char *host, size_t host_len, char *key, 
 		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
 		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
 		char *severity, size_t severity_len);
-#endif // ZABBIX_COMMS_H
+
+int	zbx_telnet_test_login(ZBX_SOCKET socket_fd);
+int	zbx_telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *password, AGENT_RESULT *result);
+int	zbx_telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *result, const char *encoding);
+
+#endif // ZABBIX_ZCOMMS_H
