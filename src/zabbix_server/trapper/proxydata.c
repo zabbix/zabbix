@@ -26,7 +26,7 @@
 #include "mutexs.h"
 #include "daemon.h"
 #include "zbxcompress.h"
-
+#include "zbxcommshigh.h"
 
 extern unsigned char	program_type;
 static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;

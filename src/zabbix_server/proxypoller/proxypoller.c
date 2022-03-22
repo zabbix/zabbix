@@ -30,6 +30,7 @@
 #include "../trapper/proxydata.h"
 #include "zbxcompress.h"
 #include "zbxrtc.h"
+#include "zbxcommshigh.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
