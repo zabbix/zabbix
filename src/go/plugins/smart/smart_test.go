@@ -85,17 +85,7 @@ const (
 			"id": 2071267458
 		},
 		"firmware_version": "CV26",
-		"user_capacity": {
-			"blocks": 1953525168,
-			"bytes": 1000204886016
-		},
-		"logical_block_size": 512,
-		"physical_block_size": 4096,
 		"rotation_rate": 7200,
-		"form_factor": {
-			"ata_value": 2,
-			"name": "3.5 inches"
-		},
 		"ata_smart_data": {
 			"self_test": {
 				"status": {
