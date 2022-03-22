@@ -72,7 +72,7 @@ int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_
 	int	res;
 	char	*tls_arg1, *tls_arg2;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In zbx_connect_to_server() [%s]:%d [timeout:%d, connection timeout:%d]",
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s]:%d [timeout:%d, connection timeout:%d]", __func__,
 			((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port, timeout,
 			connect_timeout);
 
