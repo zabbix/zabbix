@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-17T17:01:54Z'
+  date: '2022-03-21T08:07:11Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -527,7 +527,7 @@ zabbix_export:
                   value: '{#RESULT}'
             -
               uuid: 706fc27da4d34a4e9189c566c7aa96ff
-              name: 'Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p90'
+              name: 'Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p95'
               type: CALCULATED
               key: 'kubernetes.scheduler.e2e_scheduling_p95["{#RESULT}"]'
               history: 7d
