@@ -146,6 +146,12 @@ func readProcStatus(pid uint64, proc *procStatus) (err error) {
 		return err
 	}
 
+	var mem uint64
+	mem, err = procfs.GetMemory("MemTotal")
+	if err == nil {
+		proc.Pmem = float64(proc.Rss) / float64(mem) * 100.00
+	}
+
 	var stat cpuUtil
 	getProcCpuUtil(int64(pid), &stat)
 	if stat.err == nil {
