@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T14:29:54Z'
+  date: '2022-03-04T11:22:59Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -84,7 +84,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.'
+          description: 'It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN

@@ -27,6 +27,7 @@
 #include "zbxmedia.h"
 #include "zbxembed.h"
 #include "zbxserialize.h"
+#include "zbxxml.h"
 
 #define ZBX_AM_LOCATION_NOWHERE		0
 #define ZBX_AM_LOCATION_QUEUE		1
@@ -1104,7 +1105,7 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 		{
 			char	*am_esc;
 
-			am_esc = xml_escape_dyn(alert_message);
+			am_esc = zbx_xml_escape_dyn(alert_message);
 			alert_message = zbx_dsprintf(alert_message, "<html><pre>%s</pre></html>", am_esc);
 			zbx_free(am_esc);
 		}

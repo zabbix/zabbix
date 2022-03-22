@@ -23,6 +23,7 @@
 #include "zbxserver.h"
 #include "zbxregexp.h"
 #include "zbxprometheus.h"
+#include "zbxxml.h"
 
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
@@ -1347,7 +1348,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 		case ZBX_PREPROC_XPATH:
 			/* break; is not missing here */
 		case ZBX_PREPROC_ERROR_FIELD_XML:
-			ret = xml_xpath_check(pp->params, err, sizeof(err));
+			ret = zbx_xml_xpath_check(pp->params, err, sizeof(err));
 			break;
 		case ZBX_PREPROC_MULTIPLIER:
 			if (FAIL == (ret = is_double(pp->params, NULL)))

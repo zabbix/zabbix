@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-11 19:55+0200\n"
+"POT-Creation-Date: 2022-03-17 15:53+0200\n"
 "PO-Revision-Date: 2016-02-09 16:27+0300\n"
 "Last-Translator: Oleksii <oleksii.zagorskyi@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -28,19 +28,19 @@ msgstr ""
 msgid "\"%1$s\" instead \"%2$s\""
 msgstr ""
 
-#: include/classes/import/validators/C10XmlValidator.php:321
-#: include/classes/import/validators/C10XmlValidator.php:338
-#: include/classes/import/validators/C20XmlValidator.php:801
-#: include/classes/import/validators/C30XmlValidator.php:864
-#: include/classes/import/validators/C32XmlValidator.php:975
-#: include/classes/import/validators/C34XmlValidator.php:1079
-#: include/classes/import/validators/C40XmlValidator.php:1258
-#: include/classes/import/validators/C42XmlValidator.php:1316
-#: include/classes/import/validators/C44XmlValidator.php:1721
-#: include/classes/import/validators/C50XmlValidator.php:1871
-#: include/classes/import/validators/C52XmlValidator.php:1993
-#: include/classes/import/validators/C54XmlValidator.php:2048
-#: include/classes/import/validators/C60XmlValidator.php:2050
+#: include/classes/import/validators/C10XmlValidator.php:323
+#: include/classes/import/validators/C10XmlValidator.php:341
+#: include/classes/import/validators/C20XmlValidator.php:803
+#: include/classes/import/validators/C30XmlValidator.php:866
+#: include/classes/import/validators/C32XmlValidator.php:977
+#: include/classes/import/validators/C34XmlValidator.php:1081
+#: include/classes/import/validators/C40XmlValidator.php:1260
+#: include/classes/import/validators/C42XmlValidator.php:1315
+#: include/classes/import/validators/C44XmlValidator.php:1719
+#: include/classes/import/validators/C50XmlValidator.php:1869
+#: include/classes/import/validators/C52XmlValidator.php:1991
+#: include/classes/import/validators/C54XmlValidator.php:2046
+#: include/classes/import/validators/C60XmlValidator.php:2048
 #: include/classes/import/validators/C62XmlValidator.php:2050
 #, c-format
 msgid "\"%1$s\" is expected"
@@ -57,9 +57,9 @@ msgstr ""
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
 msgstr "\"%1$s\" значення має бути меншим або рівним \"%2$s\" значенню"
 
-#: include/classes/import/validators/C10XmlValidator.php:356
-#: include/classes/import/validators/C10XmlValidator.php:378
-#: include/classes/import/validators/C10XmlValidator.php:399
+#: include/classes/import/validators/C10XmlValidator.php:360
+#: include/classes/import/validators/C10XmlValidator.php:383
+#: include/classes/import/validators/C10XmlValidator.php:405
 msgid "\"host:key\" pair is expected"
 msgstr "очікувалась пара \"вузел мережі:ключ\""
 
@@ -326,7 +326,7 @@ msgstr "(без проксі)"
 msgid "0 - use default port"
 msgstr "0 - використовувати порт по замовчуванню"
 
-#: include/triggers.inc.php:1595
+#: include/triggers.inc.php:1594
 msgid "0 or 1"
 msgstr "0 або 1"
 
@@ -510,9 +510,8 @@ msgid "Access to services"
 msgstr ""
 
 #: app/views/hintbox.eventlist.php:76
-#: app/views/monitoring.widget.problems.view.php:66
-#: include/actions.inc.php:161 include/blocks.inc.php:581
-#: include/classes/screens/CScreenProblem.php:863
+#: app/views/monitoring.widget.problems.view.php:66 include/actions.inc.php:161
+#: include/blocks.inc.php:581 include/classes/screens/CScreenProblem.php:863
 #: include/classes/screens/CScreenProblem.php:888
 #: include/classes/screens/CScreenProblem.php:1157 include/events.inc.php:290
 msgid "Ack"
@@ -1186,7 +1185,7 @@ msgstr ""
 
 #: app/partials/popup.operations.php:240
 #: app/views/configuration.correlation.edit.php:119
-#: app/views/popup.lldoverride.php:68 include/triggers.inc.php:1061
+#: app/views/popup.lldoverride.php:68 include/triggers.inc.php:1060
 #: include/views/configuration.action.edit.php:127
 #: include/views/configuration.host.discovery.edit.php:752
 #: include/views/configuration.trigger.prototype.edit.php:160
@@ -1238,8 +1237,7 @@ msgstr ""
 #: app/views/service.list.edit.php:79 app/views/service.list.edit.php:107
 #: app/views/service.list.php:82 app/views/sla.list.php:51
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:36
-#: include/triggers.inc.php:1594
-#: include/views/configuration.action.list.php:82
+#: include/triggers.inc.php:1593 include/views/configuration.action.list.php:82
 #: include/views/configuration.maintenance.list.php:69
 msgid "Any"
 msgstr "Будь-який"
@@ -1307,7 +1305,7 @@ msgstr "Розмір області"
 msgid "Area type"
 msgstr "Тип області"
 
-#: include/items.inc.php:1836
+#: include/items.inc.php:1835
 msgid "Arithmetic"
 msgstr "Арифметика"
 
@@ -1551,8 +1549,8 @@ msgstr "Авто-вихід"
 #: app/partials/configuration.host.edit.html.php:360
 #: app/partials/popup.operations.php:228
 #: app/views/administration.miscconfig.edit.php:62
-#: app/views/popup.lldoperation.php:282
-#: app/views/popup.massupdate.host.php:184 include/hosts.inc.php:1128
+#: app/views/popup.lldoperation.php:282 app/views/popup.massupdate.host.php:184
+#: include/hosts.inc.php:1128
 #: include/views/configuration.host.prototype.edit.php:365
 msgid "Automatic"
 msgstr "Автоматично"
@@ -1722,7 +1720,7 @@ msgstr ""
 msgid "Bold line"
 msgstr "Товста лінія"
 
-#: include/items.inc.php:1849
+#: include/items.inc.php:1848
 msgid "Boolean to decimal"
 msgstr "Логічне до десяткового"
 
@@ -1828,7 +1826,7 @@ msgstr ""
 msgid "CRLF"
 msgstr ""
 
-#: include/items.inc.php:1829
+#: include/items.inc.php:1828
 msgid "CSV to JSON"
 msgstr ""
 
@@ -1879,8 +1877,8 @@ msgstr "Зворотній виклик"
 #: app/views/monitoring.dashboard.view.php:149
 #: app/views/popup.import.compare.php:162 app/views/popup.service.edit.php:382
 #: app/views/popup.sla.edit.php:265 include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:322 jsLoader.php:207
-#: jsLoader.php:217 jsLoader.php:332 jsLoader.php:409
+#: include/classes/setup/CSetupWizard.php:322 jsLoader.php:207 jsLoader.php:217
+#: jsLoader.php:332 jsLoader.php:409
 msgid "Cancel"
 msgstr "Скасувати та повернутись"
 
@@ -3377,7 +3375,7 @@ msgstr "Не вдалося оновити шаблони"
 msgid "Cannot update trigger"
 msgstr "Не вдалося оновити тригер"
 
-#: include/classes/api/services/CTriggerGeneral.php:1887
+#: include/classes/api/services/CTriggerGeneral.php:1886
 #, c-format
 msgid "Cannot update trigger \"%1$s\": %2$s."
 msgstr "Не вдалося оновити тригер \"%1$s\": %2$s."
@@ -3390,7 +3388,7 @@ msgstr[0] "Не вдалося оновити прототип тригера"
 msgstr[1] "Не вдалося оновити прототипи тригерів"
 msgstr[2] "Не вдалося оновити прототипи тригерів"
 
-#: include/classes/api/services/CTriggerGeneral.php:1722
+#: include/classes/api/services/CTriggerGeneral.php:1721
 #, c-format
 msgid "Cannot update trigger prototype \"%1$s\": %2$s."
 msgstr "Не вдалося оновити прототип тригера \"%1$s\": %2$s."
@@ -3465,8 +3463,8 @@ msgid "Certificate"
 msgstr "Сертіфикат"
 
 #: app/partials/monitoring.latest.view.html.php:79
-#: app/partials/monitoring.latest.view.html.php:92 include/items.inc.php:1840
-#: include/items.inc.php:1844
+#: app/partials/monitoring.latest.view.html.php:92 include/items.inc.php:1839
+#: include/items.inc.php:1843
 msgctxt "noun"
 msgid "Change"
 msgstr "Зміна"
@@ -3499,7 +3497,7 @@ msgstr ""
 msgid "Change password"
 msgstr "Змінити пароль"
 
-#: include/items.inc.php:1845
+#: include/items.inc.php:1844
 msgid "Change per second"
 msgstr "Зміна в секунду"
 
@@ -3552,19 +3550,19 @@ msgstr "Перевірка вже існує."
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "Перевірте частину виразу починаючи з \"%1$s\"."
 
-#: include/items.inc.php:1877
+#: include/items.inc.php:1876
 msgid "Check for error in JSON"
 msgstr "Перевірка на помилки в JSON"
 
-#: include/items.inc.php:1881
+#: include/items.inc.php:1880
 msgid "Check for error in XML"
 msgstr "Перевірка на помилки в XML"
 
-#: include/items.inc.php:1885
+#: include/items.inc.php:1884
 msgid "Check for error using regular expression"
 msgstr "Перевірка на помилки при використанні регулярного виразу"
 
-#: include/items.inc.php:1889
+#: include/items.inc.php:1888
 msgid "Check for not supported value"
 msgstr ""
 
@@ -3807,7 +3805,7 @@ msgstr "Команди"
 msgid "Communication with Zabbix server"
 msgstr ""
 
-#: include/items.inc.php:1319
+#: include/items.inc.php:1318
 msgctxt "SNMP Community"
 msgid "Community"
 msgstr ""
@@ -4184,8 +4182,7 @@ msgstr "Містить"
 #: app/views/monitoring.discovery.view.php:41
 #: app/views/monitoring.host.dashboard.view.php:89
 #: app/views/monitoring.host.view.php:53
-#: app/views/monitoring.latest.view.php:42
-#: app/views/monitoring.map.view.php:72
+#: app/views/monitoring.latest.view.php:42 app/views/monitoring.map.view.php:72
 #: app/views/monitoring.problem.view.php:104
 #: app/views/monitoring.web.view.php:42
 #: app/views/reports.scheduledreport.list.php:40
@@ -4221,7 +4218,7 @@ msgstr "Меню вмісту"
 
 #: app/partials/configuration.host.interface.row.php:104
 #: app/views/popup.discovery.check.php:81
-#: app/views/popup.itemtestedit.view.php:154 include/items.inc.php:1304
+#: app/views/popup.itemtestedit.view.php:154 include/items.inc.php:1303
 msgid "Context name"
 msgstr "Ім'я контексту"
 
@@ -4616,8 +4613,7 @@ msgstr "Довільний вираз"
 msgid "Custom graphs"
 msgstr "Графіки користувача"
 
-#: app/views/popup.lldoperation.php:169
-#: app/views/popup.massupdate.item.php:275
+#: app/views/popup.lldoperation.php:169 app/views/popup.massupdate.item.php:275
 #: include/views/configuration.host.discovery.edit.php:703
 #: include/views/configuration.item.edit.php:817
 #: include/views/configuration.item.prototype.edit.php:777
@@ -4639,7 +4635,7 @@ msgstr "Ярлик користувача для елементів карти �
 msgid "Custom message"
 msgstr ""
 
-#: include/items.inc.php:1837
+#: include/items.inc.php:1836
 msgid "Custom multiplier"
 msgstr "Користувацький множник"
 
@@ -4652,7 +4648,7 @@ msgstr "Довільне при помилці"
 msgid "Custom schedule"
 msgstr ""
 
-#: include/items.inc.php:1860
+#: include/items.inc.php:1859
 msgid "Custom scripts"
 msgstr "Довільні скрипти"
 
@@ -4682,7 +4678,7 @@ msgctxt "abbreviation of severity level"
 msgid "D"
 msgstr ""
 
-#: include/classes/import/validators/C10XmlValidator.php:321
+#: include/classes/import/validators/C10XmlValidator.php:323
 msgctxt "XML date format"
 msgid "DD.MM.YY"
 msgstr "DD.MM.YY"
@@ -5060,8 +5056,7 @@ msgstr "Тема по замовчуванню"
 msgid "Default time zone"
 msgstr ""
 
-#: app/views/popup.lldoperation.php:105
-#: app/views/popup.massupdate.item.php:217
+#: app/views/popup.lldoperation.php:105 app/views/popup.massupdate.item.php:217
 msgid "Delay"
 msgstr "Затримка"
 
@@ -5098,10 +5093,9 @@ msgstr "Затримується на"
 #: app/views/configuration.discovery.list.php:123
 #: app/views/configuration.host.edit.php:49
 #: app/views/configuration.host.list.php:530
-#: app/views/monitoring.dashboard.list.php:124
-#: app/views/popup.host.edit.php:82 app/views/popup.service.edit.php:390
-#: app/views/popup.sla.edit.php:273 app/views/popup.tabfilter.edit.php:71
-#: app/views/popup.token.edit.php:140
+#: app/views/monitoring.dashboard.list.php:124 app/views/popup.host.edit.php:82
+#: app/views/popup.service.edit.php:390 app/views/popup.sla.edit.php:273
+#: app/views/popup.tabfilter.edit.php:71 app/views/popup.token.edit.php:140
 #: app/views/reports.scheduledreport.list.php:95 app/views/sla.list.php:175
 #: include/classes/html/CButtonDelete.php:25
 #: include/classes/widgets/CWidgetHelper.php:845
@@ -5439,7 +5433,7 @@ msgstr ""
 msgid "Dependencies"
 msgstr "Залежності"
 
-#: include/triggers.inc.php:2399
+#: include/triggers.inc.php:2398
 msgid "Dependent"
 msgstr "Залежність"
 
@@ -5447,7 +5441,7 @@ msgstr "Залежність"
 msgid "Dependent item"
 msgstr "Залежний елемент даних"
 
-#: app/views/popup.generic.php:279 include/triggers.inc.php:2399
+#: app/views/popup.generic.php:279 include/triggers.inc.php:2398
 #: include/views/configuration.trigger.prototype.list.php:98
 #: include/views/configuration.triggers.list.php:242
 msgid "Depends on"
@@ -5674,8 +5668,7 @@ msgstr "Дезактивувати вибрані веб сценарії?"
 #: app/views/configuration.correlation.list.php:109
 #: app/views/configuration.discovery.list.php:58
 #: app/views/configuration.host.list.php:283 app/views/popup.generic.php:646
-#: app/views/popup.lldoperation.php:280
-#: app/views/popup.massupdate.host.php:140
+#: app/views/popup.lldoperation.php:280 app/views/popup.massupdate.host.php:140
 #: app/views/popup.massupdate.host.php:182
 #: app/views/reports.scheduledreport.list.php:63 app/views/sla.list.php:53
 #: app/views/sla.list.php:107 app/views/sla.list.php:116
@@ -5683,7 +5676,7 @@ msgstr "Дезактивувати вибрані веб сценарії?"
 #: include/html.inc.php:284 include/httptest.inc.php:48
 #: include/items.inc.php:138 include/items.inc.php:141
 #: include/items.inc.php:185 include/maps.inc.php:325
-#: include/triggers.inc.php:1872 include/users.inc.php:84
+#: include/triggers.inc.php:1871 include/users.inc.php:84
 #: include/views/configuration.action.list.php:84
 #: include/views/configuration.action.list.php:136
 #: include/views/configuration.host.discovery.list.php:171
@@ -5696,11 +5689,11 @@ msgstr "Дезактивовано"
 msgid "Disaster"
 msgstr "Критична"
 
-#: include/items.inc.php:1893
+#: include/items.inc.php:1892
 msgid "Discard unchanged"
 msgstr "Відкинути без змін"
 
-#: include/items.inc.php:1897
+#: include/items.inc.php:1896
 msgid "Discard unchanged with heartbeat"
 msgstr "Відкинути без змін, з пульсом"
 
@@ -5815,8 +5808,8 @@ msgstr ""
 #: app/controllers/CControllerAuditLogList.php:215
 #: app/views/configuration.discovery.edit.php:138
 #: app/views/monitoring.discovery.view.php:50
-#: app/views/monitoring.widget.discovery.view.php:32
-#: include/actions.inc.php:52 include/forms.inc.php:930
+#: app/views/monitoring.widget.discovery.view.php:32 include/actions.inc.php:52
+#: include/forms.inc.php:930
 msgid "Discovery rule"
 msgstr "Правило виявлення"
 
@@ -5955,15 +5948,13 @@ msgstr "Опції відображення"
 msgid "Division denominator"
 msgstr ""
 
-#: app/views/popup.lldoperation.php:190
-#: app/views/popup.massupdate.item.php:293
+#: app/views/popup.lldoperation.php:190 app/views/popup.massupdate.item.php:293
 #: include/views/configuration.item.edit.php:850
 #: include/views/configuration.item.prototype.edit.php:787
 msgid "Do not keep history"
 msgstr ""
 
-#: app/views/popup.lldoperation.php:211
-#: app/views/popup.massupdate.item.php:309
+#: app/views/popup.lldoperation.php:211 app/views/popup.massupdate.item.php:309
 #: include/views/configuration.item.edit.php:890
 #: include/views/configuration.item.prototype.edit.php:802
 msgid "Do not keep trends"
@@ -6012,7 +6003,7 @@ msgstr ""
 msgid "Does not exist"
 msgstr ""
 
-#: include/items.inc.php:1873
+#: include/items.inc.php:1872
 msgid "Does not match regular expression"
 msgstr "Не відповідає регулярному виразу"
 
@@ -6139,8 +6130,7 @@ msgstr ""
 #: app/views/js/configuration.discovery.edit.js.php:33
 #: app/views/js/popup.service.edit.js.php:194
 #: app/views/js/popup.sla.edit.js.php:110 app/views/service.list.edit.php:139
-#: app/views/service.list.php:115
-#: include/classes/widgets/CWidgetHelper.php:591
+#: app/views/service.list.php:115 include/classes/widgets/CWidgetHelper.php:591
 #: include/views/configuration.action.edit.php:245
 #: include/views/configuration.action.edit.php:273
 #: include/views/configuration.action.edit.php:357
@@ -6446,7 +6436,7 @@ msgstr "Активувати трапи"
 #: include/discovery.inc.php:107 include/html.inc.php:280
 #: include/httptest.inc.php:47 include/items.inc.php:138
 #: include/items.inc.php:141 include/items.inc.php:182
-#: include/triggers.inc.php:996 include/triggers.inc.php:1869
+#: include/triggers.inc.php:996 include/triggers.inc.php:1868
 #: include/views/configuration.action.edit.php:153
 #: include/views/configuration.action.list.php:83
 #: include/views/configuration.action.list.php:144
@@ -6705,7 +6695,7 @@ msgstr ""
 msgid "Executed"
 msgstr "Виконано"
 
-#: include/items.inc.php:1766
+#: include/items.inc.php:1765
 #: include/views/configuration.host.discovery.edit.php:628
 #: include/views/configuration.item.edit.php:712
 #: include/views/configuration.item.prototype.edit.php:687
@@ -6961,8 +6951,7 @@ msgstr "Поле \"%1$s\" не може бути встановлено в NULL.
 #: include/classes/api/services/CDRule.php:528
 #: include/classes/api/services/CDRule.php:538
 #: include/classes/api/services/CHost.php:892
-#: include/classes/validators/CNewValidator.php:86
-#: include/validate.inc.php:286
+#: include/classes/validators/CNewValidator.php:86 include/validate.inc.php:286
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr "Поле \"%1$s\" є обов'язковим."
@@ -7141,8 +7130,7 @@ msgid "Fixed status"
 msgstr ""
 
 #: app/views/js/popup.massupdate.tmpl.js.php:81
-#: app/views/popup.lldoperation.php:124
-#: app/views/popup.massupdate.item.php:233
+#: app/views/popup.lldoperation.php:124 app/views/popup.massupdate.item.php:233
 #: include/views/configuration.host.discovery.edit.php:665
 #: include/views/configuration.item.edit.php:769
 #: include/views/configuration.item.edit.php:776
@@ -7177,7 +7165,7 @@ msgstr "Розмір шрифту"
 msgid "Form data"
 msgstr "Дані форми"
 
-#: include/items.inc.php:1770 include/views/configuration.item.edit.php:734
+#: include/items.inc.php:1769 include/views/configuration.item.edit.php:734
 #: include/views/configuration.item.prototype.edit.php:707
 msgid "Formula"
 msgstr "Формула"
@@ -7315,7 +7303,7 @@ msgid "Get value from host"
 msgstr ""
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:48
-#: include/triggers.inc.php:1144
+#: include/triggers.inc.php:1143
 msgid "Given expression is not a macro"
 msgstr "Наданий вираз це не макрос"
 
@@ -7746,7 +7734,7 @@ msgstr "Висота"
 msgid "Help"
 msgstr "Допомога"
 
-#: include/items.inc.php:1857
+#: include/items.inc.php:1856
 msgid "Hexadecimal to decimal"
 msgstr "Шістнадцяткове в десяткове"
 
@@ -7858,9 +7846,8 @@ msgid "History functions"
 msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:219
-#: app/views/popup.lldoperation.php:185
-#: app/views/popup.massupdate.item.php:290 disc_prototypes.php:131
-#: include/views/configuration.item.edit.php:847
+#: app/views/popup.lldoperation.php:185 app/views/popup.massupdate.item.php:290
+#: disc_prototypes.php:131 include/views/configuration.item.edit.php:847
 #: include/views/configuration.item.prototype.edit.php:784 items.php:67
 msgid "History storage period"
 msgstr "Період зберігання історії"
@@ -8654,7 +8641,7 @@ msgstr "В періоді сервісу"
 msgid "In progress"
 msgstr "В роботі"
 
-#: include/items.inc.php:1865
+#: include/items.inc.php:1864
 msgid "In range"
 msgstr "В діапазоні"
 
@@ -8701,7 +8688,7 @@ msgstr ""
 #: app/partials/monitoring.latest.view.html.php:210
 #: app/views/configuration.host.list.php:270
 #: include/classes/screens/CScreenProblem.php:386
-#: include/hostgroups.inc.php:293 include/triggers.inc.php:2024
+#: include/hostgroups.inc.php:293 include/triggers.inc.php:2023
 #: include/views/inventory.host.view.php:42
 msgid "Inaccessible maintenance"
 msgstr "Недоступне обслуговування"
@@ -8717,11 +8704,11 @@ msgstr ""
 
 #: httpconf.php:661 include/graphs.inc.php:274 include/hosts.inc.php:649
 #: include/httptest.inc.php:222 include/items.inc.php:916
-#: include/triggers.inc.php:2163
+#: include/triggers.inc.php:2162
 msgid "Inaccessible template"
 msgstr "Недоступний шаблон"
 
-#: include/triggers.inc.php:2369 include/triggers.inc.php:2377
+#: include/triggers.inc.php:2368 include/triggers.inc.php:2376
 msgid "Inaccessible trigger"
 msgstr "Недоступний тригер"
 
@@ -8734,9 +8721,8 @@ msgstr "Недоступний тригер"
 #: app/controllers/CControllerScheduledReportEdit.php:281
 #: app/controllers/CControllerScheduledReportList.php:136
 #: include/actions.inc.php:2009 include/actions.inc.php:2032
-#: include/actions.inc.php:2037
-#: include/classes/helpers/CDashboardHelper.php:39 include/events.inc.php:251
-#: include/views/monitoring.sysmap.edit.php:83
+#: include/actions.inc.php:2037 include/classes/helpers/CDashboardHelper.php:39
+#: include/events.inc.php:251 include/views/monitoring.sysmap.edit.php:83
 msgid "Inaccessible user"
 msgstr "Недоступний користувач"
 
@@ -9061,7 +9047,7 @@ msgid "Incorrect filter condition operator for discovery rule \"%1$s\"."
 msgstr "Некоректний оператор умови фільтру для правила виявлення \"%1$s\"."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:49
-#: include/triggers.inc.php:1145
+#: include/triggers.inc.php:1144
 msgid "Incorrect function is used"
 msgstr "Використано некоректну функцію"
 
@@ -9101,17 +9087,17 @@ msgstr "Некоректний режим інвентарних даних в �
 msgid "Incorrect item for axis value."
 msgstr "Некоректний елемент даних для значення вісі."
 
-#: include/classes/api/services/CTriggerGeneral.php:1632
+#: include/classes/api/services/CTriggerGeneral.php:1631
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "У виразі тригера \"%2$s\" вказано некоректний ключ елемента даних \"%1$s\"."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:50
-#: include/triggers.inc.php:1146
+#: include/triggers.inc.php:1145
 msgid "Incorrect item value type"
 msgstr "Некоректний тип значення елемента даних"
 
-#: include/classes/api/services/CTriggerGeneral.php:1639
+#: include/classes/api/services/CTriggerGeneral.php:1638
 #, c-format
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
 msgstr "Некоректний тип значення елемента даних \"%1$s\" вказано для функції тригера \"%2$s\"."
@@ -9193,22 +9179,22 @@ msgid "Incorrect trigger expression."
 msgstr "Некоректний вираз тригера."
 
 #: include/classes/api/services/CTriggerGeneral.php:587
-#: include/classes/api/services/CTriggerGeneral.php:1405
+#: include/classes/api/services/CTriggerGeneral.php:1404
 #, c-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Некоректний вираз тригера. Вузел мережі \"%1$s\" не існує або ви не маєте до цього вузла мережі."
 
-#: include/classes/api/services/CTriggerGeneral.php:1406
+#: include/classes/api/services/CTriggerGeneral.php:1405
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
 msgstr "Некоректний вираз тригера. Елементи виразу тригера не повинні належати шаблону та вузлу мережі одночасно."
 
 #: include/classes/api/services/CTriggerGeneral.php:588
-#: include/classes/api/services/CTriggerGeneral.php:1411
+#: include/classes/api/services/CTriggerGeneral.php:1410
 #, c-format
 msgid "Incorrect trigger prototype expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Некоректний вираз прототипу тригера. Вузел мережі \"%1$s\" не існує або у вас немає права доступу до нього."
 
-#: include/classes/api/services/CTriggerGeneral.php:1412
+#: include/classes/api/services/CTriggerGeneral.php:1411
 msgid "Incorrect trigger prototype expression. Trigger prototype expression elements should not belong to a template and a host simultaneously."
 msgstr "Некоректний вираз прототипу тригера. Елементи виразу прототипу тригера не повинні належати шаблону та вузлу мережі одночасно."
 
@@ -9535,7 +9521,7 @@ msgstr "Некоректне значення для поля \"%1$s\"."
 #: include/classes/validators/CNewValidator.php:352
 #: include/classes/widgets/fields/CWidgetFieldNavTree.php:109
 #: include/classes/widgets/fields/CWidgetFieldNavTree.php:124
-#: include/items.inc.php:2067 include/sounds.inc.php:113
+#: include/items.inc.php:2066 include/sounds.inc.php:113
 #: include/validate.inc.php:330
 #, c-format
 msgid "Incorrect value for field \"%1$s\": %2$s."
@@ -9732,8 +9718,8 @@ msgstr "Період зберігання внутрішніх даних"
 #: include/classes/api/services/CGraphGeneral.php:550
 #: include/classes/api/services/CGraphGeneral.php:733
 #: include/classes/api/services/CTriggerGeneral.php:1035
-#: include/classes/api/services/CTriggerGeneral.php:1416
-#: include/classes/api/services/CTriggerGeneral.php:1822
+#: include/classes/api/services/CTriggerGeneral.php:1415
+#: include/classes/api/services/CTriggerGeneral.php:1821
 #: include/classes/core/CJsonRpc.php:191
 #: include/classes/import/validators/CXmlValidatorGeneral.php:226
 #: include/classes/widgets/fields/CWidgetField.php:105
@@ -9756,8 +9742,8 @@ msgstr "Internet Explorer"
 
 #: app/partials/monitoring.latest.view.html.php:73
 #: app/views/configuration.discovery.list.php:80
-#: app/views/popup.lldoperation.php:115
-#: app/views/popup.massupdate.item.php:225 include/forms.inc.php:595
+#: app/views/popup.lldoperation.php:115 app/views/popup.massupdate.item.php:225
+#: include/forms.inc.php:595
 #: include/views/configuration.host.discovery.edit.php:660
 #: include/views/configuration.host.discovery.list.php:203
 #: include/views/configuration.httpconf.list.php:140
@@ -9918,8 +9904,8 @@ msgstr "Неправильні параметри методу."
 #: include/classes/api/services/CScript.php:910
 #: include/classes/api/services/CTemplate.php:1017
 #: include/classes/api/services/CTriggerGeneral.php:665
-#: include/classes/api/services/CTriggerGeneral.php:1774
-#: include/classes/api/services/CTriggerGeneral.php:1793
+#: include/classes/api/services/CTriggerGeneral.php:1773
+#: include/classes/api/services/CTriggerGeneral.php:1792
 #: include/classes/api/services/CUser.php:908
 #: include/classes/api/services/CUser.php:919
 #: include/classes/api/services/CValueMap.php:432
@@ -10075,53 +10061,53 @@ msgstr "Неправильний код відповіді \"%1$s\"."
 #: include/classes/import/readers/CXmlImportReader.php:77
 #: include/classes/import/readers/CXmlImportReader.php:116
 #: include/classes/import/readers/CXmlImportReader.php:134
-#: include/classes/import/validators/C10XmlValidator.php:321
-#: include/classes/import/validators/C10XmlValidator.php:338
-#: include/classes/import/validators/C10XmlValidator.php:356
+#: include/classes/import/validators/C10XmlValidator.php:323
+#: include/classes/import/validators/C10XmlValidator.php:341
 #: include/classes/import/validators/C10XmlValidator.php:360
-#: include/classes/import/validators/C10XmlValidator.php:378
-#: include/classes/import/validators/C10XmlValidator.php:382
-#: include/classes/import/validators/C10XmlValidator.php:399
-#: include/classes/import/validators/C20XmlValidator.php:801
-#: include/classes/import/validators/C30XmlValidator.php:864
-#: include/classes/import/validators/C32XmlValidator.php:975
-#: include/classes/import/validators/C34XmlValidator.php:1079
-#: include/classes/import/validators/C40XmlValidator.php:1258
-#: include/classes/import/validators/C42XmlValidator.php:1316
-#: include/classes/import/validators/C44XmlValidator.php:1721
-#: include/classes/import/validators/C44XmlValidator.php:1983
-#: include/classes/import/validators/C44XmlValidator.php:2095
-#: include/classes/import/validators/C44XmlValidator.php:2115
-#: include/classes/import/validators/C44XmlValidator.php:2139
-#: include/classes/import/validators/C44XmlValidator.php:2181
-#: include/classes/import/validators/C50XmlValidator.php:1871
-#: include/classes/import/validators/C50XmlValidator.php:2133
-#: include/classes/import/validators/C50XmlValidator.php:2245
-#: include/classes/import/validators/C50XmlValidator.php:2265
-#: include/classes/import/validators/C50XmlValidator.php:2289
-#: include/classes/import/validators/C50XmlValidator.php:2331
-#: include/classes/import/validators/C52XmlValidator.php:1993
-#: include/classes/import/validators/C52XmlValidator.php:2223
-#: include/classes/import/validators/C52XmlValidator.php:2410
-#: include/classes/import/validators/C52XmlValidator.php:2430
-#: include/classes/import/validators/C52XmlValidator.php:2454
-#: include/classes/import/validators/C52XmlValidator.php:2496
-#: include/classes/import/validators/C52XmlValidator.php:2573
-#: include/classes/import/validators/C52XmlValidator.php:2579
-#: include/classes/import/validators/C54XmlValidator.php:2048
-#: include/classes/import/validators/C54XmlValidator.php:2278
-#: include/classes/import/validators/C54XmlValidator.php:2465
-#: include/classes/import/validators/C54XmlValidator.php:2485
-#: include/classes/import/validators/C54XmlValidator.php:2509
-#: include/classes/import/validators/C54XmlValidator.php:2586
-#: include/classes/import/validators/C54XmlValidator.php:2592
-#: include/classes/import/validators/C60XmlValidator.php:2050
-#: include/classes/import/validators/C60XmlValidator.php:2280
-#: include/classes/import/validators/C60XmlValidator.php:2467
-#: include/classes/import/validators/C60XmlValidator.php:2487
-#: include/classes/import/validators/C60XmlValidator.php:2511
-#: include/classes/import/validators/C60XmlValidator.php:2588
-#: include/classes/import/validators/C60XmlValidator.php:2594
+#: include/classes/import/validators/C10XmlValidator.php:364
+#: include/classes/import/validators/C10XmlValidator.php:383
+#: include/classes/import/validators/C10XmlValidator.php:387
+#: include/classes/import/validators/C10XmlValidator.php:405
+#: include/classes/import/validators/C20XmlValidator.php:803
+#: include/classes/import/validators/C30XmlValidator.php:866
+#: include/classes/import/validators/C32XmlValidator.php:977
+#: include/classes/import/validators/C34XmlValidator.php:1081
+#: include/classes/import/validators/C40XmlValidator.php:1260
+#: include/classes/import/validators/C42XmlValidator.php:1315
+#: include/classes/import/validators/C44XmlValidator.php:1719
+#: include/classes/import/validators/C44XmlValidator.php:1971
+#: include/classes/import/validators/C44XmlValidator.php:2082
+#: include/classes/import/validators/C44XmlValidator.php:2101
+#: include/classes/import/validators/C44XmlValidator.php:2124
+#: include/classes/import/validators/C44XmlValidator.php:2165
+#: include/classes/import/validators/C50XmlValidator.php:1869
+#: include/classes/import/validators/C50XmlValidator.php:2120
+#: include/classes/import/validators/C50XmlValidator.php:2231
+#: include/classes/import/validators/C50XmlValidator.php:2250
+#: include/classes/import/validators/C50XmlValidator.php:2273
+#: include/classes/import/validators/C50XmlValidator.php:2314
+#: include/classes/import/validators/C52XmlValidator.php:1991
+#: include/classes/import/validators/C52XmlValidator.php:2212
+#: include/classes/import/validators/C52XmlValidator.php:2396
+#: include/classes/import/validators/C52XmlValidator.php:2415
+#: include/classes/import/validators/C52XmlValidator.php:2438
+#: include/classes/import/validators/C52XmlValidator.php:2479
+#: include/classes/import/validators/C52XmlValidator.php:2554
+#: include/classes/import/validators/C52XmlValidator.php:2560
+#: include/classes/import/validators/C54XmlValidator.php:2046
+#: include/classes/import/validators/C54XmlValidator.php:2267
+#: include/classes/import/validators/C54XmlValidator.php:2451
+#: include/classes/import/validators/C54XmlValidator.php:2470
+#: include/classes/import/validators/C54XmlValidator.php:2493
+#: include/classes/import/validators/C54XmlValidator.php:2568
+#: include/classes/import/validators/C54XmlValidator.php:2574
+#: include/classes/import/validators/C60XmlValidator.php:2048
+#: include/classes/import/validators/C60XmlValidator.php:2268
+#: include/classes/import/validators/C60XmlValidator.php:2452
+#: include/classes/import/validators/C60XmlValidator.php:2471
+#: include/classes/import/validators/C60XmlValidator.php:2494
+#: include/classes/import/validators/C60XmlValidator.php:2569
+#: include/classes/import/validators/C60XmlValidator.php:2575
 #: include/classes/import/validators/C62XmlValidator.php:2050
 #: include/classes/import/validators/C62XmlValidator.php:2280
 #: include/classes/import/validators/C62XmlValidator.php:2467
@@ -10374,15 +10360,15 @@ msgstr ""
 msgid "Item values"
 msgstr "Значення елемента даних"
 
-#: include/items.inc.php:2103
+#: include/items.inc.php:2102
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Елемент не було оновлено. Будь ласка введіть коректний інтервал оновлення."
 
-#: include/items.inc.php:2090
+#: include/items.inc.php:2089
 msgid "Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval."
 msgstr "Елемент даних не може бути оновлено. Вказаний інтервал оновлення повинен мати принаймні один гнучкий або запланований інтервал."
 
-#: include/items.inc.php:2095
+#: include/items.inc.php:2094
 msgid "Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used."
 msgstr "Елемент даних не буде оновлено. Інтервал оновлення повинен бути між 1s та 1d. Також може використовуватись запланований/гнучкий інтервал."
 
@@ -10509,7 +10495,7 @@ msgstr "очікувався JSON рядок"
 msgid "JSON-RPC error generation failed. No such error \"%1$s\"."
 msgstr ""
 
-#: include/items.inc.php:1825
+#: include/items.inc.php:1824
 #: include/views/configuration.host.discovery.edit.php:866
 msgid "JSONPath"
 msgstr "JSONPath"
@@ -10528,7 +10514,7 @@ msgstr "Японська (ja_JP)"
 
 #: app/views/administration.mediatype.edit.php:221
 #: app/views/administration.script.edit.php:189 include/forms.inc.php:1365
-#: include/items.inc.php:1861
+#: include/items.inc.php:1860
 #: include/views/configuration.host.discovery.edit.php:257
 #: include/views/configuration.item.edit.php:314
 #: include/views/configuration.item.prototype.edit.php:300
@@ -10566,8 +10552,7 @@ msgstr ""
 #: app/controllers/CControllerPopupGeneric.php:283
 #: app/partials/configuration.filter.items.php:94
 #: app/views/popup.discovery.check.php:62 disc_prototypes.php:46
-#: host_discovery.php:50
-#: include/views/configuration.host.discovery.edit.php:82
+#: host_discovery.php:50 include/views/configuration.host.discovery.edit.php:82
 #: include/views/configuration.host.discovery.list.php:107
 #: include/views/configuration.host.discovery.list.php:202
 #: include/views/configuration.item.edit.php:133
@@ -10819,7 +10804,7 @@ msgstr "З лівого боку"
 msgid "Left Y"
 msgstr "Вісь Y зліва"
 
-#: include/items.inc.php:1817
+#: include/items.inc.php:1816
 msgid "Left trim"
 msgstr "Обрізати зліва"
 
@@ -11226,8 +11211,8 @@ msgstr ""
 #: app/partials/configuration.host.edit.html.php:359
 #: app/partials/popup.operations.php:227
 #: app/views/administration.miscconfig.edit.php:61
-#: app/views/popup.lldoperation.php:281
-#: app/views/popup.massupdate.host.php:183 include/hosts.inc.php:1127
+#: app/views/popup.lldoperation.php:281 app/views/popup.massupdate.host.php:183
+#: include/hosts.inc.php:1127
 #: include/views/configuration.host.prototype.edit.php:364
 msgid "Manual"
 msgstr "Вручну"
@@ -11409,7 +11394,7 @@ msgstr "Масове оновлення фігур"
 msgid "Master item"
 msgstr "Головний елемент даних"
 
-#: include/items.inc.php:1869
+#: include/items.inc.php:1868
 msgid "Matches regular expression"
 msgstr "Відповідає регулярному виразу"
 
@@ -11554,8 +11539,8 @@ msgid "Media type with ID \"%1$s\" is not available."
 msgstr "Метод повідомлень з ID \"%1$s\" недоступний."
 
 #: app/views/administration.mediatype.edit.php:31
-#: app/views/administration.mediatype.list.php:31
-#: app/views/popup.import.php:45 include/classes/helpers/CMenuHelper.php:306
+#: app/views/administration.mediatype.list.php:31 app/views/popup.import.php:45
+#: include/classes/helpers/CMenuHelper.php:306
 #: include/classes/helpers/CRoleHelper.php:428
 msgid "Media types"
 msgstr "Методи повідомлень"
@@ -12312,9 +12297,8 @@ msgstr "Наступний крок"
 #: app/views/hintbox.eventlist.php:178 app/views/hintbox.eventlist.php:182
 #: app/views/monitoring.widget.problems.view.php:264
 #: app/views/monitoring.widget.problems.view.php:268
-#: app/views/popup.condition.common.php:679
-#: app/views/popup.lldoperation.php:85 app/views/popup.lldoperation.php:97
-#: app/views/popup.massupdate.item.php:327
+#: app/views/popup.condition.common.php:679 app/views/popup.lldoperation.php:85
+#: app/views/popup.lldoperation.php:97 app/views/popup.massupdate.item.php:327
 #: app/views/popup.massupdate.item.php:336
 #: app/views/popup.massupdate.item.php:378
 #: app/views/popup.massupdate.trigger.php:63 include/actions.inc.php:33
@@ -13076,19 +13060,19 @@ msgstr "Кількість віртуальних машин на гіперві
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
 msgstr "Кількість inode у відсотках. Повертає ціле число для кількості; дробове - для відсотків"
 
-#: include/items.inc.php:1848 include/items.inc.php:1852
-#: include/items.inc.php:1856
+#: include/items.inc.php:1847 include/items.inc.php:1851
+#: include/items.inc.php:1855
 msgid "Numeral systems"
 msgstr "Числові системи"
 
 #: app/partials/configuration.filter.items.php:138
 #: app/views/popup.massupdate.item.php:156 include/items.inc.php:125
-#: include/triggers.inc.php:1591 include/views/configuration.item.edit.php:120
+#: include/triggers.inc.php:1590 include/views/configuration.item.edit.php:120
 #: include/views/configuration.item.prototype.edit.php:106
 msgid "Numeric (float)"
 msgstr "Числовий (дробове)"
 
-#: include/triggers.inc.php:1592
+#: include/triggers.inc.php:1591
 msgid "Numeric (integer)"
 msgstr "Числовий (ціле)"
 
@@ -13158,7 +13142,7 @@ msgstr ""
 msgid "Oct"
 msgstr "Жов"
 
-#: include/items.inc.php:1853
+#: include/items.inc.php:1852
 msgid "Octal to decimal"
 msgstr "Вісімкове в десяткове"
 
@@ -13393,7 +13377,7 @@ msgstr "Опції"
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:93
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:69
 #: include/classes/widgets/forms/CWidgetFormWeb.php:63
-#: include/triggers.inc.php:1061
+#: include/triggers.inc.php:1060
 #: include/views/configuration.action.edit.php:128
 #: include/views/configuration.host.discovery.edit.php:753
 #: include/views/configuration.maintenance.edit.php:144
@@ -13981,8 +13965,8 @@ msgstr "Виконує DNS запит. Повертає рядок символ�
 #: app/controllers/CControllerPopupTriggerExpr.php:104
 #: app/partials/scheduledreport.formgrid.html.php:83
 #: app/partials/scheduledreport.table.html.php:42
-#: app/views/popup.lldoperation.php:116
-#: app/views/popup.massupdate.item.php:226 app/views/popup.triggerexpr.php:182
+#: app/views/popup.lldoperation.php:116 app/views/popup.massupdate.item.php:226
+#: app/views/popup.triggerexpr.php:182
 #: include/views/configuration.host.discovery.edit.php:660
 #: include/views/configuration.item.edit.php:762
 #: include/views/configuration.item.prototype.edit.php:734
@@ -14388,15 +14372,15 @@ msgstr ""
 msgid "Profile"
 msgstr ""
 
-#: include/items.inc.php:1900 include/items.inc.php:1904
+#: include/items.inc.php:1899 include/items.inc.php:1903
 msgid "Prometheus"
 msgstr "Prometheus"
 
-#: include/items.inc.php:1901
+#: include/items.inc.php:1900
 msgid "Prometheus pattern"
 msgstr "Prometheus маска"
 
-#: include/items.inc.php:1905
+#: include/items.inc.php:1904
 msgid "Prometheus to JSON"
 msgstr "Prometheus в JSON"
 
@@ -14726,7 +14710,7 @@ msgid "Regular"
 msgstr "Звичайні"
 
 #: app/controllers/CControllerAuditLogList.php:234
-#: app/views/popup.lldoverride.php:101 include/items.inc.php:1801
+#: app/views/popup.lldoverride.php:101 include/items.inc.php:1800
 #: include/views/configuration.host.discovery.edit.php:770
 msgid "Regular expression"
 msgstr "Регулярний вираз"
@@ -14981,7 +14965,7 @@ msgstr ""
 #: app/views/popup.massupdate.template.php:48
 #: app/views/popup.massupdate.template.php:92
 #: app/views/popup.massupdate.template.php:126
-#: app/views/popup.massupdate.trigger.php:78 include/items.inc.php:1805
+#: app/views/popup.massupdate.trigger.php:78 include/items.inc.php:1804
 #: include/views/configuration.trigger.prototype.edit.php:174
 #: include/views/configuration.trigger.prototype.edit.php:371
 #: include/views/configuration.triggers.edit.php:197
@@ -15097,8 +15081,7 @@ msgid "Required string"
 msgstr "Необхідна строка"
 
 #: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
-#: include/classes/html/CFilter.php:215
-#: include/classes/html/CTabFilter.php:102
+#: include/classes/html/CFilter.php:215 include/classes/html/CTabFilter.php:102
 msgid "Reset"
 msgstr "Скинути"
 
@@ -15327,7 +15310,7 @@ msgstr "З правого боку"
 msgid "Right Y"
 msgstr "Вісь Y справа"
 
-#: include/items.inc.php:1813
+#: include/items.inc.php:1812
 msgid "Right trim"
 msgstr "Обрізати справа"
 
@@ -15400,10 +15383,10 @@ msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:239
 #: app/controllers/CControllerPopupGeneric.php:382
-#: app/controllers/CControllerSlaList.php:157
-#: app/partials/service.info.php:122 app/views/popup.sla.edit.php:211
-#: app/views/popup.sla.edit.php:240 app/views/sla.list.php:185
-#: app/views/slareport.list.php:40 include/classes/helpers/CMenuHelper.php:90
+#: app/controllers/CControllerSlaList.php:157 app/partials/service.info.php:122
+#: app/views/popup.sla.edit.php:211 app/views/popup.sla.edit.php:240
+#: app/views/sla.list.php:185 app/views/slareport.list.php:40
+#: include/classes/helpers/CMenuHelper.php:90
 #: include/classes/helpers/CRoleHelper.php:356
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:28
 msgid "SLA"
@@ -15558,7 +15541,7 @@ msgstr "Ключ SNMP trap помилковий."
 msgid "SNMP version"
 msgstr ""
 
-#: include/items.inc.php:1300
+#: include/items.inc.php:1299
 #, c-format
 msgid "SNMPv%1$d"
 msgstr ""
@@ -15603,7 +15586,7 @@ msgstr ""
 msgid "SQL count: %1$s (selects: %2$s | executes: %3$s)"
 msgstr "SQL запитів: %1$s (selects: %2$s | executes: %3$s)"
 
-#: include/items.inc.php:1768
+#: include/items.inc.php:1767
 #: include/views/configuration.host.discovery.edit.php:638
 #: include/views/configuration.item.edit.php:723
 #: include/views/configuration.item.prototype.edit.php:697
@@ -15781,8 +15764,7 @@ msgid "Scheduled reports"
 msgstr ""
 
 #: app/views/js/popup.massupdate.tmpl.js.php:84
-#: app/views/popup.lldoperation.php:125
-#: app/views/popup.massupdate.item.php:234
+#: app/views/popup.lldoperation.php:125 app/views/popup.massupdate.item.php:234
 #: include/views/configuration.host.discovery.edit.php:666
 #: include/views/configuration.item.edit.php:770
 #: include/views/configuration.item.edit.php:777
@@ -15809,7 +15791,7 @@ msgstr "Межі"
 #: app/views/administration.script.edit.php:187
 #: app/views/administration.script.edit.php:266
 #: app/views/administration.script.list.php:141 include/items.inc.php:103
-#: include/items.inc.php:1762 include/media.inc.php:25
+#: include/items.inc.php:1761 include/media.inc.php:25
 #: include/views/configuration.host.discovery.edit.php:253
 #: include/views/configuration.item.edit.php:310
 #: include/views/configuration.item.prototype.edit.php:296
@@ -16186,9 +16168,8 @@ msgstr ""
 #: app/controllers/CControllerServiceList.php:149
 #: app/controllers/CControllerServiceListRefresh.php:133
 #: app/views/administration.housekeeping.edit.php:96
-#: app/views/popup.condition.common.php:642
-#: app/views/service.list.edit.php:123 app/views/service.list.php:105
-#: include/classes/helpers/CMenuHelper.php:78
+#: app/views/popup.condition.common.php:642 app/views/service.list.edit.php:123
+#: app/views/service.list.php:105 include/classes/helpers/CMenuHelper.php:78
 #: include/classes/helpers/CMenuHelper.php:103
 #: include/classes/helpers/CRoleHelper.php:306
 #: include/classes/helpers/CRoleHelper.php:351 jsLoader.php:421
@@ -16307,8 +16288,7 @@ msgctxt "screen reader"
 msgid "Severity changed"
 msgstr "Важливість змінено"
 
-#: include/actions.inc.php:1754
-#: include/classes/screens/CScreenProblem.php:1216
+#: include/actions.inc.php:1754 include/classes/screens/CScreenProblem.php:1216
 msgid "Severity changes"
 msgstr "Зміна важливості"
 
@@ -16513,7 +16493,7 @@ msgstr "Вихід"
 msgid "Simple"
 msgstr "Простий"
 
-#: include/items.inc.php:1841
+#: include/items.inc.php:1840
 msgid "Simple change"
 msgstr "Проста зміна"
 
@@ -16798,8 +16778,7 @@ msgstr ""
 #: app/views/configuration.correlation.list.php:79
 #: app/views/configuration.discovery.list.php:54
 #: app/views/configuration.discovery.list.php:82
-#: app/views/configuration.host.list.php:179
-#: app/views/hintbox.eventlist.php:74
+#: app/views/configuration.host.list.php:179 app/views/hintbox.eventlist.php:74
 #: app/views/monitoring.widget.actionlog.view.php:38
 #: app/views/monitoring.widget.problems.view.php:56
 #: app/views/popup.massupdate.host.php:134
@@ -16959,7 +16938,7 @@ msgid "Straight"
 msgstr "Straight"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:528
-#: include/triggers.inc.php:1593
+#: include/triggers.inc.php:1592
 msgid "String"
 msgstr ""
 
@@ -16967,8 +16946,8 @@ msgstr ""
 msgid "String functions"
 msgstr ""
 
-#: include/items.inc.php:1820 include/items.inc.php:1824
-#: include/items.inc.php:1828 include/items.inc.php:1832
+#: include/items.inc.php:1819 include/items.inc.php:1823
+#: include/items.inc.php:1827 include/items.inc.php:1831
 msgid "Structured data"
 msgstr "Структуровані дані"
 
@@ -17208,11 +17187,10 @@ msgstr ""
 #: app/partials/monitoring.problem.filter.php:231
 #: app/partials/service.info.php:126 app/partials/service.list.edit.php:58
 #: app/partials/service.list.php:55 app/views/configuration.host.list.php:159
-#: app/views/configuration.host.list.php:199
-#: app/views/hintbox.eventlist.php:77 app/views/monitoring.web.view.php:88
+#: app/views/configuration.host.list.php:199 app/views/hintbox.eventlist.php:77
+#: app/views/monitoring.web.view.php:88
 #: app/views/monitoring.widget.problems.view.php:68
-#: app/views/popup.lldoperation.php:262
-#: app/views/popup.massupdate.host.php:193
+#: app/views/popup.lldoperation.php:262 app/views/popup.massupdate.host.php:193
 #: app/views/popup.massupdate.host.php:286
 #: app/views/popup.massupdate.item.php:476
 #: app/views/popup.massupdate.item.php:492
@@ -17497,9 +17475,9 @@ msgstr "Тема тесту"
 #: app/views/popup.tophosts.column.edit.php:65
 #: app/views/popup.tophosts.column.edit.php:72
 #: include/classes/html/CMacroValue.php:156 include/items.inc.php:131
-#: include/items.inc.php:1800 include/items.inc.php:1804
-#: include/items.inc.php:1808 include/items.inc.php:1812
-#: include/items.inc.php:1816 include/views/configuration.item.edit.php:123
+#: include/items.inc.php:1799 include/items.inc.php:1803
+#: include/items.inc.php:1807 include/items.inc.php:1811
+#: include/items.inc.php:1815 include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109
 #: include/views/js/monitoring.sysmaps.js.php:377
 #: include/views/js/monitoring.sysmaps.js.php:538
@@ -17690,7 +17668,7 @@ msgstr "Межа"
 msgid "Thresholds"
 msgstr ""
 
-#: include/items.inc.php:1892 include/items.inc.php:1896
+#: include/items.inc.php:1891 include/items.inc.php:1895
 msgid "Throttling"
 msgstr "Дедуплікація"
 
@@ -17932,9 +17910,8 @@ msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, 
 msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:227
-#: app/views/popup.lldoperation.php:206
-#: app/views/popup.massupdate.item.php:306 disc_prototypes.php:139
-#: include/views/configuration.item.edit.php:885
+#: app/views/popup.lldoperation.php:206 app/views/popup.massupdate.item.php:306
+#: disc_prototypes.php:139 include/views/configuration.item.edit.php:885
 #: include/views/configuration.item.prototype.edit.php:797 items.php:84
 msgid "Trend storage period"
 msgstr "Період зберігання трендів"
@@ -17965,7 +17942,7 @@ msgstr "Тригер"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "Тригер \"%1$s\" вже існує у \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:1814
+#: include/classes/api/services/CTriggerGeneral.php:1813
 #, c-format
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "Тригер \"%1$s\" належить шаблонам з різними зв'язками."
@@ -18070,12 +18047,12 @@ msgstr "Прототип тригера"
 msgid "Trigger prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Прототип тригера \"%1$s\" вже існує в \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:1818
+#: include/classes/api/services/CTriggerGeneral.php:1817
 #, c-format
 msgid "Trigger prototype \"%1$s\" belongs to templates with different linkages."
 msgstr "Прототип тригера \"%1$s\" належить шаблонам з різними зв'язками."
 
-#: include/classes/api/services/CTriggerGeneral.php:1716
+#: include/classes/api/services/CTriggerGeneral.php:1715
 #, c-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "Прототип тригера \"%1$s\" містить прототипи елементів даних з декількох правил виявлення."
@@ -18085,7 +18062,7 @@ msgstr "Прототип тригера \"%1$s\" містить прототип
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Прототип тригера \"%1$s\" залежить від тригера \"%2$s\", який не існує."
 
-#: include/classes/api/services/CTriggerGeneral.php:1711
+#: include/classes/api/services/CTriggerGeneral.php:1710
 #, c-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr "Прототип тригера \"%1$s\" повинен містити принаймні один прототип елемента даних."
@@ -18179,7 +18156,7 @@ msgstr "Тригери видалено"
 msgid "Triggers top 100"
 msgstr "Найбільш активні 100 тригерів"
 
-#: include/items.inc.php:1809
+#: include/items.inc.php:1808
 msgid "Trim"
 msgstr "Обрізати"
 
@@ -18223,9 +18200,8 @@ msgstr ""
 #: app/views/popup.condition.common.php:47
 #: app/views/popup.condition.common.php:168
 #: app/views/popup.condition.common.php:657
-#: app/views/popup.dashboard.share.edit.php:123
-#: app/views/popup.generic.php:111 app/views/popup.lldoperation.php:114
-#: app/views/popup.massupdate.item.php:47
+#: app/views/popup.dashboard.share.edit.php:123 app/views/popup.generic.php:111
+#: app/views/popup.lldoperation.php:114 app/views/popup.massupdate.item.php:47
 #: app/views/popup.massupdate.item.php:224 app/views/popup.media.php:70
 #: app/views/popup.valuemap.edit.php:51
 #: include/classes/widgets/CWidgetHelper.php:73
@@ -18494,15 +18470,14 @@ msgstr "Одиниця виміру"
 #: include/classes/screens/CScreenHttpTestDetails.php:115
 #: include/discovery.inc.php:115 include/discovery.inc.php:151
 #: include/events.inc.php:45 include/events.inc.php:76
-#: include/graphs.inc.php:37 include/graphs.inc.php:67
-#: include/hosts.inc.php:47 include/hosts.inc.php:74 include/html.inc.php:287
+#: include/graphs.inc.php:37 include/graphs.inc.php:67 include/hosts.inc.php:47
+#: include/hosts.inc.php:74 include/html.inc.php:287
 #: include/httptest.inc.php:41 include/httptest.inc.php:58
-#: include/items.inc.php:45 include/items.inc.php:110
-#: include/items.inc.php:133 include/items.inc.php:167
-#: include/maintenances.inc.php:33 include/maps.inc.php:39
-#: include/triggers.inc.php:83 include/triggers.inc.php:1869
-#: include/users.inc.php:64 include/users.inc.php:87
-#: include/views/configuration.action.edit.php:232
+#: include/items.inc.php:45 include/items.inc.php:110 include/items.inc.php:133
+#: include/items.inc.php:167 include/maintenances.inc.php:33
+#: include/maps.inc.php:39 include/triggers.inc.php:83
+#: include/triggers.inc.php:1868 include/users.inc.php:64
+#: include/users.inc.php:87 include/views/configuration.action.edit.php:232
 #: include/views/configuration.triggers.list.php:77
 msgid "Unknown"
 msgstr "Невідомо"
@@ -18521,12 +18496,12 @@ msgstr "Невідома помилка"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
 #: app/controllers/CControllerPopupTriggerExpr.php:1347
-#: include/triggers.inc.php:1143
+#: include/triggers.inc.php:1142
 msgid "Unknown host item, no such item in selected host"
 msgstr "Невідомий елемент даних вузла мережі, немає цього елемента в обраному вузлі"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:46
-#: include/triggers.inc.php:1142
+#: include/triggers.inc.php:1141
 msgid "Unknown host, no such host present in system"
 msgstr "Невідомий вузел мережі, його не представлено в системі"
 
@@ -18544,7 +18519,7 @@ msgstr "Невідомий ресурс"
 msgid "Unknown step failed: %1$s"
 msgstr "Помилка в невідомому кроці: %1$s"
 
-#: include/items.inc.php:1414
+#: include/items.inc.php:1413
 msgid "Unknown value type"
 msgstr "Невідомий тип"
 
@@ -18669,8 +18644,7 @@ msgstr "Доступний"
 #: app/views/popup.sla.excludeddowntime.edit.php:91
 #: app/views/popup.token.edit.php:125
 #: app/views/popup.tophosts.column.edit.php:254
-#: app/views/popup.valuemap.edit.php:126
-#: include/classes/html/CTabFilter.php:99
+#: app/views/popup.valuemap.edit.php:126 include/classes/html/CTabFilter.php:99
 #: include/views/configuration.action.edit.php:500
 #: include/views/configuration.graph.edit.php:455
 #: include/views/configuration.host.discovery.edit.php:1005
@@ -18701,9 +18675,8 @@ msgstr "Оновити існуючі"
 #: app/controllers/CControllerPopupLldOperation.php:208
 #: app/partials/configuration.filter.items.php:160
 #: app/views/configuration.discovery.edit.php:69
-#: app/views/popup.lldoperation.php:177
-#: app/views/popup.massupdate.item.php:284 disc_prototypes.php:60
-#: host_discovery.php:62 host_discovery.php:227
+#: app/views/popup.lldoperation.php:177 app/views/popup.massupdate.item.php:284
+#: disc_prototypes.php:60 host_discovery.php:62 host_discovery.php:227
 #: include/views/configuration.host.discovery.edit.php:648
 #: include/views/configuration.host.discovery.list.php:143
 #: include/views/configuration.httpconf.edit.php:72
@@ -18784,10 +18757,9 @@ msgstr "Використовується в діях"
 #: app/partials/js/scheduledreport.subscription.js.php:78
 #: app/partials/popup.operations.php:105
 #: app/views/administration.token.list.php:127
-#: app/views/administration.user.edit.php:290
-#: app/views/popup.token.edit.php:60 app/views/popup.token.view.php:40
-#: app/views/reports.auditlog.list.php:91 httpconf.php:65
-#: include/actions.inc.php:1700 include/actions.inc.php:1754
+#: app/views/administration.user.edit.php:290 app/views/popup.token.edit.php:60
+#: app/views/popup.token.view.php:40 app/views/reports.auditlog.list.php:91
+#: httpconf.php:65 include/actions.inc.php:1700 include/actions.inc.php:1754
 #: include/actions.inc.php:1976 include/classes/setup/CSetupWizard.php:536
 #: include/hosts.inc.php:61 include/users.inc.php:52
 #: include/views/configuration.httpconf.edit.php:167
@@ -19364,10 +19336,10 @@ msgstr ""
 msgid "Validate URI schemes"
 msgstr ""
 
-#: include/items.inc.php:1864 include/items.inc.php:1868
-#: include/items.inc.php:1872 include/items.inc.php:1876
-#: include/items.inc.php:1880 include/items.inc.php:1884
-#: include/items.inc.php:1888
+#: include/items.inc.php:1863 include/items.inc.php:1867
+#: include/items.inc.php:1871 include/items.inc.php:1875
+#: include/items.inc.php:1879 include/items.inc.php:1883
+#: include/items.inc.php:1887
 msgid "Validation"
 msgstr "Валідація"
 
@@ -19396,8 +19368,7 @@ msgstr "Валідація"
 #: app/views/popup.condition.common.php:601 app/views/popup.httpstep.php:70
 #: app/views/popup.httpstep.php:96 app/views/popup.httpstep.php:120
 #: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:262
-#: app/views/popup.lldoperation.php:268
-#: app/views/popup.massupdate.host.php:202
+#: app/views/popup.lldoperation.php:268 app/views/popup.massupdate.host.php:202
 #: app/views/popup.massupdate.item.php:119
 #: app/views/popup.massupdate.item.php:485
 #: app/views/popup.massupdate.service.php:49
@@ -19930,7 +19901,7 @@ msgstr "X2"
 msgid "XML"
 msgstr ""
 
-#: include/items.inc.php:1821
+#: include/items.inc.php:1820
 msgid "XML XPath"
 msgstr "XML XPath"
 
@@ -19949,7 +19920,7 @@ msgstr "XML пустий"
 msgid "XML is expected"
 msgstr ""
 
-#: include/items.inc.php:1833
+#: include/items.inc.php:1832
 msgid "XML to JSON"
 msgstr ""
 
@@ -20041,17 +20012,17 @@ msgstr "YYYY-MM-DD hh:mm"
 msgid "YYYY-MM-DD hh:mm:ss"
 msgstr ""
 
-#: include/classes/import/validators/C20XmlValidator.php:801
-#: include/classes/import/validators/C30XmlValidator.php:864
-#: include/classes/import/validators/C32XmlValidator.php:975
-#: include/classes/import/validators/C34XmlValidator.php:1079
-#: include/classes/import/validators/C40XmlValidator.php:1258
-#: include/classes/import/validators/C42XmlValidator.php:1316
-#: include/classes/import/validators/C44XmlValidator.php:1721
-#: include/classes/import/validators/C50XmlValidator.php:1871
-#: include/classes/import/validators/C52XmlValidator.php:1993
-#: include/classes/import/validators/C54XmlValidator.php:2048
-#: include/classes/import/validators/C60XmlValidator.php:2050
+#: include/classes/import/validators/C20XmlValidator.php:803
+#: include/classes/import/validators/C30XmlValidator.php:866
+#: include/classes/import/validators/C32XmlValidator.php:977
+#: include/classes/import/validators/C34XmlValidator.php:1081
+#: include/classes/import/validators/C40XmlValidator.php:1260
+#: include/classes/import/validators/C42XmlValidator.php:1315
+#: include/classes/import/validators/C44XmlValidator.php:1719
+#: include/classes/import/validators/C50XmlValidator.php:1869
+#: include/classes/import/validators/C52XmlValidator.php:1991
+#: include/classes/import/validators/C54XmlValidator.php:2046
+#: include/classes/import/validators/C60XmlValidator.php:2048
 #: include/classes/import/validators/C62XmlValidator.php:2050
 msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
@@ -20075,9 +20046,8 @@ msgstr "Щороку"
 #: app/views/hintbox.eventlist.php:178 app/views/hintbox.eventlist.php:182
 #: app/views/monitoring.widget.problems.view.php:264
 #: app/views/monitoring.widget.problems.view.php:268
-#: app/views/popup.condition.common.php:680
-#: app/views/popup.lldoperation.php:84 app/views/popup.lldoperation.php:96
-#: app/views/popup.massupdate.item.php:326
+#: app/views/popup.condition.common.php:680 app/views/popup.lldoperation.php:84
+#: app/views/popup.lldoperation.php:96 app/views/popup.massupdate.item.php:326
 #: app/views/popup.massupdate.item.php:335
 #: app/views/popup.massupdate.item.php:377
 #: app/views/popup.massupdate.trigger.php:64 include/actions.inc.php:32
@@ -20229,8 +20199,7 @@ msgstr "Ім'я Zabbix сервера"
 msgid "Zabbix trapper"
 msgstr "Zabbix трапер"
 
-#: include/classes/html/CFilter.php:251
-#: include/classes/html/CTabFilter.php:333
+#: include/classes/html/CFilter.php:251 include/classes/html/CTabFilter.php:333
 msgid "Zoom out"
 msgstr "Розширити"
 
@@ -20414,19 +20383,19 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:481
 #: include/classes/api/services/CItemGeneral.php:2588
 #: include/classes/api/services/CItemGeneral.php:2610
-#: include/classes/import/validators/C44XmlValidator.php:2095
-#: include/classes/import/validators/C44XmlValidator.php:2115
-#: include/classes/import/validators/C50XmlValidator.php:2245
-#: include/classes/import/validators/C50XmlValidator.php:2265
-#: include/classes/import/validators/C52XmlValidator.php:2410
-#: include/classes/import/validators/C52XmlValidator.php:2430
-#: include/classes/import/validators/C52XmlValidator.php:2579
-#: include/classes/import/validators/C54XmlValidator.php:2465
-#: include/classes/import/validators/C54XmlValidator.php:2485
-#: include/classes/import/validators/C54XmlValidator.php:2592
-#: include/classes/import/validators/C60XmlValidator.php:2467
-#: include/classes/import/validators/C60XmlValidator.php:2487
-#: include/classes/import/validators/C60XmlValidator.php:2594
+#: include/classes/import/validators/C44XmlValidator.php:2082
+#: include/classes/import/validators/C44XmlValidator.php:2101
+#: include/classes/import/validators/C50XmlValidator.php:2231
+#: include/classes/import/validators/C50XmlValidator.php:2250
+#: include/classes/import/validators/C52XmlValidator.php:2396
+#: include/classes/import/validators/C52XmlValidator.php:2415
+#: include/classes/import/validators/C52XmlValidator.php:2560
+#: include/classes/import/validators/C54XmlValidator.php:2451
+#: include/classes/import/validators/C54XmlValidator.php:2470
+#: include/classes/import/validators/C54XmlValidator.php:2574
+#: include/classes/import/validators/C60XmlValidator.php:2452
+#: include/classes/import/validators/C60XmlValidator.php:2471
+#: include/classes/import/validators/C60XmlValidator.php:2575
 #: include/classes/import/validators/C62XmlValidator.php:2467
 #: include/classes/import/validators/C62XmlValidator.php:2487
 #: include/classes/import/validators/C62XmlValidator.php:2594
@@ -20452,8 +20421,8 @@ msgstr "очікується масив або рядок символів"
 msgid "an array or object is expected"
 msgstr ""
 
-#: include/classes/import/validators/C10XmlValidator.php:360
-#: include/classes/import/validators/C10XmlValidator.php:382
+#: include/classes/import/validators/C10XmlValidator.php:364
+#: include/classes/import/validators/C10XmlValidator.php:387
 msgid "an empty string is expected"
 msgstr "очікувався пустий рядок"
 
@@ -20977,8 +20946,7 @@ msgid "e() - Returns Euler's number"
 msgstr ""
 
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78
-#: include/actions.inc.php:24
-#: include/classes/helpers/CCorrelationHelper.php:34
+#: include/actions.inc.php:24 include/classes/helpers/CCorrelationHelper.php:34
 #: include/views/inventory.host.list.php:72
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:169
 msgid "equals"
@@ -21067,7 +21035,7 @@ msgctxt "hour short"
 msgid "h"
 msgstr "г"
 
-#: include/classes/import/validators/C10XmlValidator.php:338
+#: include/classes/import/validators/C10XmlValidator.php:341
 msgctxt "XML time format"
 msgid "hh.mm"
 msgstr "hh.mm"
@@ -21193,7 +21161,7 @@ msgstr ""
 msgid "invalid byte sequence in UTF-8"
 msgstr "помилкова послідовність байт в UTF-8"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2067
+#: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2066
 msgid "invalid delay"
 msgstr "некоректна затримка"
 
@@ -22038,11 +22006,11 @@ msgid "the table \"%1$s\" was not found"
 msgstr ""
 
 #: include/classes/export/CConfigurationExportBuilder.php:87
-#: include/classes/import/validators/C44XmlValidator.php:1983
-#: include/classes/import/validators/C50XmlValidator.php:2133
-#: include/classes/import/validators/C52XmlValidator.php:2223
-#: include/classes/import/validators/C54XmlValidator.php:2278
-#: include/classes/import/validators/C60XmlValidator.php:2280
+#: include/classes/import/validators/C44XmlValidator.php:1971
+#: include/classes/import/validators/C50XmlValidator.php:2120
+#: include/classes/import/validators/C52XmlValidator.php:2212
+#: include/classes/import/validators/C54XmlValidator.php:2267
+#: include/classes/import/validators/C60XmlValidator.php:2268
 #: include/classes/import/validators/C62XmlValidator.php:2280
 #: include/classes/import/validators/CXmlValidatorGeneral.php:183
 #: include/classes/import/validators/CXmlValidatorGeneral.php:202
@@ -22113,11 +22081,11 @@ msgstr "для тригера не дозволено закриття вруч�
 msgid "trigger expression must contain at least one /host/key reference"
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1723
+#: include/classes/api/services/CTriggerGeneral.php:1722
 msgid "trigger prototype cannot be moved to another template or host"
 msgstr "прототип тригера неможливо перемістити в другий шаблон або вузел мережі"
 
-#: include/classes/api/services/CTriggerGeneral.php:1889
+#: include/classes/api/services/CTriggerGeneral.php:1888
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "тригера зв зв'язками неможливо перемістити в другий шаблон або вузел мережі"
 
@@ -22138,9 +22106,9 @@ msgstr "почніть друкувати для пошуку"
 msgid "unacceptable URL"
 msgstr ""
 
-#: include/classes/import/validators/C44XmlValidator.php:2182
-#: include/classes/import/validators/C50XmlValidator.php:2332
-#: include/classes/import/validators/C52XmlValidator.php:2497
+#: include/classes/import/validators/C44XmlValidator.php:2166
+#: include/classes/import/validators/C50XmlValidator.php:2315
+#: include/classes/import/validators/C52XmlValidator.php:2480
 #: include/classes/import/validators/CXmlValidatorGeneral.php:298
 #, c-format
 msgid "unexpected constant \"%1$s\""
@@ -22148,11 +22116,11 @@ msgstr ""
 
 #: include/classes/export/CConfigurationExportBuilder.php:119
 #: include/classes/import/converters/CConstantImportConverter.php:60
-#: include/classes/import/validators/C44XmlValidator.php:2140
-#: include/classes/import/validators/C50XmlValidator.php:2290
-#: include/classes/import/validators/C52XmlValidator.php:2455
-#: include/classes/import/validators/C54XmlValidator.php:2510
-#: include/classes/import/validators/C60XmlValidator.php:2512
+#: include/classes/import/validators/C44XmlValidator.php:2125
+#: include/classes/import/validators/C50XmlValidator.php:2274
+#: include/classes/import/validators/C52XmlValidator.php:2439
+#: include/classes/import/validators/C54XmlValidator.php:2494
+#: include/classes/import/validators/C60XmlValidator.php:2495
 #: include/classes/import/validators/C62XmlValidator.php:2512
 #, c-format
 msgid "unexpected constant value \"%1$s\""
@@ -22262,8 +22230,8 @@ msgstr ""
 #: app/views/js/popup.valuemap.edit.js.php:30
 #: app/views/js/popup.valuemap.edit.js.php:31
 #: app/views/js/popup.valuemap.edit.js.php:32
-#: app/views/popup.itemtestedit.view.php:83
-#: app/views/popup.service.edit.php:97 app/views/popup.sla.edit.php:156
+#: app/views/popup.itemtestedit.view.php:83 app/views/popup.service.edit.php:97
+#: app/views/popup.sla.edit.php:156
 #: include/classes/helpers/CTagFilterFieldHelper.php:78
 #: include/classes/helpers/CTagFilterFieldHelper.php:131
 #: include/classes/html/CMacroValue.php:131
@@ -22312,8 +22280,8 @@ msgstr "значення \"%1$s\" не знайдено"
 msgid "value %1$s already exists"
 msgstr "значення %1$s вже існує"
 
-#: include/classes/api/services/CTriggerGeneral.php:1774
-#: include/classes/api/services/CTriggerGeneral.php:1794
+#: include/classes/api/services/CTriggerGeneral.php:1773
+#: include/classes/api/services/CTriggerGeneral.php:1793
 #: include/classes/validators/CApiInputValidator.php:389
 #: include/classes/validators/CApiInputValidator.php:473
 #: include/classes/validators/CApiInputValidator.php:504
@@ -22401,9 +22369,9 @@ msgstr ""
 #: include/classes/api/services/CMap.php:1158
 #: include/classes/api/services/CReport.php:201
 #: include/classes/api/services/CReport.php:597
-#: include/classes/import/validators/C52XmlValidator.php:2574
-#: include/classes/import/validators/C54XmlValidator.php:2587
-#: include/classes/import/validators/C60XmlValidator.php:2589
+#: include/classes/import/validators/C52XmlValidator.php:2555
+#: include/classes/import/validators/C54XmlValidator.php:2569
+#: include/classes/import/validators/C60XmlValidator.php:2570
 #: include/classes/import/validators/C62XmlValidator.php:2589
 #: include/classes/validators/CNewValidator.php:531
 #: include/validate.inc.php:587
