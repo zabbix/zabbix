@@ -19,7 +19,6 @@
 **/
 
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
@@ -39,8 +38,6 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 	private static $delete_proxy_with_hosts = 'Proxy_2 for filter';
 	private static $delete_proxy_with_discovery_rule = 'Passive proxy 1';
 
-	use TableTrait;
-
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -51,7 +48,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 	}
 
 	/**
-	 * Function used to create roles.
+	 * Function used to create proxies.
 	 */
 	public function prepareProxyData() {
 		CDataHelper::call('proxy.create', [
@@ -73,7 +70,6 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 				'tls_issuer' => 'activerefreshpsk',
 				'tls_subject' => 'activerefreshpsk',
 				'proxy_address' => '127.0.1.2'
-
 			],
 			[
 				'host' => self::$change_passive_proxy,
@@ -100,6 +96,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 				[
 					'mode' => 'Active',
 					'check_layout' => true,
+					'check_alert' => true,
 					'Connections to proxy' => 'No encryption',
 					'settings' => [
 						[
@@ -491,10 +488,18 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		if (CTestArrayHelper::get($data, 'check_layout')) {
 			if ($data['mode'] === 'Active') {
 				// Check fields lengths.
-				foreach (['Proxy name' => 128, 'Proxy address' => 255,
-//					'Description' => 65535,
-					'PSK identity' => 128, 'PSK' => 512, 'Issuer' => 1024, 'Subject' => 1024] as $field_name => $maxlength) {
-					$field = $form->getField($field_name);
+				$field_maxlengths = [
+					'Proxy name' => 128,
+					'Proxy address' => 255,
+					'Description' => 65535,
+					'PSK identity' => 128,
+					'PSK' => 512,
+					'Issuer' => 1024,
+					'Subject' => 1024
+				];
+
+				foreach ($field_maxlengths as $name => $maxlength) {
+					$field = $form->getField($name);
 					$this->assertEquals('', $field->getValue());
 					$this->assertEquals($maxlength, $field->getAttribute('maxlength'));
 				}
@@ -510,7 +515,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 				$this->assertFalse($form->getField('Proxy address')->isVisible());
 
 				// Check Interface field for passive scenario.
-				$selector = 'xpath://div[@class="table-forms-separator"]/table';
+				$selector = 'xpath:.//div[@class="table-forms-separator"]/table';
 				$this->assertTrue($dialog->query($selector)->one()->isEnabled());
 				$this->assertEquals(['IP address', 'DNS name', 'Connect to', 'Port'],
 						$dialog->query($selector)->one()->asTable()->getHeadersText()
@@ -559,18 +564,19 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 
 		$this->switchAndAssertEncryption($data, $form, $condition, $checked_proxy, $opposite_proxy);
 
+		if (CTestArrayHelper::get($data, 'check_alert')) {
+			// Check alert when trying to refresh page.
+			$this->page->refresh();
+			$this->assertTrue($this->page->isAlertPresent());
+//			$this->assertEquals('Changes you made may not be saved.', $this->page->getAlertText());
+			$this->page->acceptAlert();
 
-		$dialog->close();
-
-		// Check alert when trying to refresh page.
-//		$this->page->refresh();
-//		$this->assertTrue($this->page->isAlertPresent());
-//		var_dump($this->page->getAlertText());
-//		$this->assertEquals('', $this->page->getAlertText());
-//		$this->page->acceptAlert();
-//		// Check that after accepting alert user remained on Proxies page.
-//		$this->page->assertTitle('Configuration of proxies');
-//		$this->page->assertHeader('Proxies');
+			// Check that after accepting alert user remained on Proxies page.
+			$this->page->assertHeader('Proxies');
+		}
+		else {
+			$dialog->close();
+		}
 	}
 
 	/**
@@ -579,7 +585,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 	 *
 	 * @param array           $data            given data provider
 	 * @param CFormElement    $form            proxy configuration form
-	 * @param boolean         $condition        defines if opposite proxy needs to be selected
+	 * @param boolean         $condition       defines if opposite proxy needs to be selected
 	 * @param string          $checked_proxy   name of proxy which layout is checked
 	 * @param string          $opposite_proxy  name of proxy which is opposite to checked proxy
 	 */
@@ -611,8 +617,9 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 			}
 
 			foreach ($setting['inputs'] as $id => $value) {
-				$this->assertTrue($form->query('id', $id)->one(false)->isVisible($value['visible']));
-				$this->assertTrue($form->query('id', $id)->one(false)->isEnabled($value['enabled']));
+				$input = $form->query('id', $id)->one(false);
+				$this->assertTrue($input->isVisible($value['visible']));
+				$this->assertTrue($input->isEnabled($value['enabled']));
 			}
 		}
 	}
@@ -741,7 +748,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => 'Wrong IP',
 						'Proxy mode' => 'Passive',
-						'id:ip' => 'test'
+						'id:ip' => '127.0.0.999'
 					],
 					'error' => 'Invalid parameter "/1/interface/ip": an IP address is expected.'
 				]
@@ -804,21 +811,6 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
-						'Proxy name' => 'Wrong PSK Active',
-						'Proxy mode' => 'Active'
-					],
-					'encryption_fields' => [
-						'id:tls_accept_psk' => true,
-						'PSK identity' => 'test',
-						'PSK' => '41b4d07b27a8efdcc15d474'
-					],
-					'error' => 'Invalid parameter "/1/tls_psk": minimum length is 32 characters.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'proxy_fields' => [
 						'Proxy name' => 'Short PSK',
 						'Proxy mode' => 'Active'
 					],
@@ -834,43 +826,13 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
-						'Proxy name' => 'Long PSK',
+						'Proxy name' => 'Uueven PSK',
 						'Proxy mode' => 'Active'
 					],
 					'encryption_fields' => [
 						'id:tls_accept_psk' => true,
 						'PSK identity' => 'test',
-						'PSK' => '41b4d07b27a8efdcc15d4742e03857eba377fe010853a1499b0522df1712828888888888888888888'
-					],
-					'error' => 'Invalid parameter "/1/tls_psk": an even number of hexadecimal characters is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'proxy_fields' => [
-						'Proxy name' => 'Short letters PSK',
-						'Proxy mode' => 'Active'
-					],
-					'encryption_fields' => [
-						'id:tls_accept_psk' => true,
-						'PSK identity' => 'test',
-						'PSK' => 'qwertyuiopa'
-					],
-					'error' => 'Invalid parameter "/1/tls_psk": minimum length is 32 characters.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'proxy_fields' => [
-						'Proxy name' => 'Wrong letters PSK',
-						'Proxy mode' => 'Active'
-					],
-					'encryption_fields' => [
-						'id:tls_accept_psk' => true,
-						'PSK identity' => 'test',
-						'PSK' => 'qwertyuiopasdfghjkloaqcvfrtybnaqs'
+						'PSK' => '3713AD479CE5B2FA06EB308D7AE96408A70ADE7F630191B6035E13B6DD779B68303FA08E38E38E38E38E38E38E38E38E38E37'
 					],
 					'error' => 'Invalid parameter "/1/tls_psk": an even number of hexadecimal characters is expected.'
 				]
@@ -947,7 +909,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 					'encryption_fields' => [
 						'Connections to proxy' => 'PSK',
 						'PSK identity' => 'test',
-						'PSK' => '41b4d07b27a8efdcc15d4742e03857eba377fe010853a1499b0522df171282cb'
+						'PSK' => '581F7BA5C7D5EB29A4AB80E25E4239A771AAFD989E68E923389685F16258F8A6B39900E38E38E38E38E38E38E38E38E38E38'
 					]
 				]
 			],
@@ -955,7 +917,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 				[
 					'proxy_fields' => [
 						'Proxy name' => '      Selenium test proxy with spaces    ',
-						'Description' => '       Test description with trailling spaces        ',
+						'Description' => '       Test description with trailing spaces        ',
 						'Proxy mode' => 'Active'
 					],
 					'encryption_fields' => [
@@ -1214,7 +1176,8 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		$this->assertTrue($this->page->isAlertPresent());
 		$this->assertEquals('Refresh configuration of the selected proxy?', $this->page->getAlertText());
 		$this->page->acceptAlert();
-		$this->assertMessage(TEST_GOOD, 'Request sent successfully');
+		$this->assertMessage(TEST_GOOD, 'Request created successfully');
+		$dialog->close();
 
 		// Check that form fields did not change.
 		$this->query('link', $data['proxy'])->one()->waitUntilClickable()->click();
@@ -1297,15 +1260,11 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 
 		// Check that user remained on Proxies page.
 		$this->page->waitUntilReady();
-		$this->page->assertTitle('Configuration of proxies');
 		$this->page->assertHeader('Proxies');
 		$this->assertMessage(TEST_GOOD, 'Proxy updated');
 
 		// Check name remained in frontend table.
 		$this->assertTrue($this->query('link', $data['proxy'])->exists());
-
-		// Check DB.
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM hosts WHERE host='.zbx_dbstr($data['proxy'])));
 
 		// Check that DB hash is not changed.
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
@@ -1332,12 +1291,12 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 				[
 					'action' => 'Refresh configuration'
 				]
+			],
+			[
+				[
+					'action' => 'Clone'
+				]
 			]
-//			[
-//				[
-//					'action' => 'Clone'
-//				]
-//			]
 		];
 	}
 
@@ -1397,7 +1356,6 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 
 		// Check that user remained on Proxies page.
 		$this->page->assertTitle('Configuration of proxies');
-		$this->page->assertHeader('Proxies');
 
 		// Check that DB hash is not changed.
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
@@ -1448,7 +1406,6 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 
 			// Close dialog.
 			$dialog->close();
-			$dialog->ensureNotPresent();
 		}
 		else {
 			$dialog->ensureNotPresent();
@@ -1463,6 +1420,5 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 
 		// Check that user redirected on Proxies page.
 		$this->page->assertTitle('Configuration of proxies');
-		$this->page->assertHeader('Proxies');
 	}
 }

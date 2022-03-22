@@ -32,45 +32,45 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 	private $sql = 'SELECT * FROM hosts ORDER BY hostid';
 
 	private static $enabled_hosts = [
-			'enabled_host1' => null,
-			'enabled_host2' => null,
-			'enabled_host3' => null,
-			'enabled_host4' => null,
-			'enabled_host5' => null,
-			'enabled_host6' => null,
-			'enabled_host7' => null,
-			'enabled_host8' => null
+			'enabled_host1',
+			'enabled_host2',
+			'enabled_host3',
+			'enabled_host4',
+			'enabled_host5',
+			'enabled_host6',
+			'enabled_host7',
+			'enabled_host8'
 	];
 
 	private static $disabled_hosts = [
-			'disabled_host1' => null,
-			'disabled_host2' => null,
-			'disabled_host3' => null,
-			'disabled_host4' => null,
-			'disabled_host5' => null,
-			'disabled_host6' => null,
-			'disabled_host7' => null,
-			'disabled_host8' => null
+			'disabled_host1',
+			'disabled_host2',
+			'disabled_host3',
+			'disabled_host4',
+			'disabled_host5',
+			'disabled_host6',
+			'disabled_host7',
+			'disabled_host8'
 	];
 
 	private static $active_proxies = [
-			'active_proxy1' => null,
-			'active_proxy2' => null,
-			'active_proxy3' => null,
-			'active_proxy4' => null,
-			'active_proxy5' => null,
-			'active_proxy6' => null,
-			'active_proxy7' => null
+			'active_proxy1',
+			'active_proxy2',
+			'active_proxy3',
+			'active_proxy4',
+			'active_proxy5',
+			'active_proxy6',
+			'active_proxy7'
 	];
 
 	private static $passive_proxies = [
-			'passive_proxy1' => null,
-			'passive_proxy2' => null,
-			'passive_proxy3' => null,
-			'passive_proxy4' => null,
-			'passive_proxy5' => null,
-			'passive_proxy6' => null,
-			'passive_proxy7' => null
+			'passive_proxy1',
+			'passive_proxy2',
+			'passive_proxy3',
+			'passive_proxy4',
+			'passive_proxy5',
+			'passive_proxy6',
+			'passive_proxy7'
 	];
 
 	use TableTrait;
@@ -90,7 +90,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 	public function prepareProxyHostsData() {
 		// Create enabled hosts.
 		$enabled_hosts_data = [];
-		foreach (self::$enabled_hosts as $host => $id) {
+		foreach (self::$enabled_hosts as $host) {
 			$enabled_hosts_data[] = [
 				'host' => $host,
 				'groups' => [['groupid' => 4]],
@@ -104,7 +104,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 
 		// Disabled hosts data.
 		$disabled_hosts_data = [];
-		foreach (self::$disabled_hosts as $host => $id) {
+		foreach (self::$disabled_hosts as $host) {
 			$disabled_hosts_data[] = [
 				'host' => $host,
 				'groups' => [['groupid' => 4]],
@@ -117,7 +117,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 
 		// Create active proxies.
 		$active_proxy_data = [];
-		foreach (self::$active_proxies as $proxy => $id) {
+		foreach (self::$active_proxies as $proxy) {
 			$active_proxy_data[] = [
 				'host' => $proxy,
 				'status' => 5
@@ -130,7 +130,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 
 		// Create passive proxies.
 		$passive_proxy_data = [];
-		foreach (self::$passive_proxies as $proxy => $id) {
+		foreach (self::$passive_proxies as $proxy) {
 			$passive_proxy_data[] = [
 				'host' => $proxy,
 				'status' => 6,
@@ -227,7 +227,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 		);
 
 		// Check that sortable header is clickable.
-		$this->assertTrue($table->query('link:Name')->waitUntilClickable()->exists());
+		$this->assertTrue($table->query('link:Name')->one()->isClickable());
 
 		// Check buttons are disabled by default.
 		foreach (['Refresh configuration', 'Enable hosts', 'Disable hosts', 'Delete'] as $button) {
@@ -398,8 +398,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 						'active_proxy5'
 					],
 					'alert' => 'Refresh configuration of the selected proxy?',
-					'title' => 'Request sent successfully',
-					'message' => null
+					'title' => 'Request created successfully'
 				]
 			],
 			// Refresh of one passive proxy.
@@ -410,8 +409,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 						'passive_proxy5'
 					],
 					'alert' => 'Refresh configuration of the selected proxy?',
-					'title' => 'Request sent successfully',
-					'message' => null
+					'title' => 'Request created successfully'
 				]
 			],
 			// Refresh of one proxy with hosts.
@@ -422,8 +420,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 						'passive_proxy4'
 					],
 					'alert' => 'Refresh configuration of the selected proxy?',
-					'title' => 'Request sent successfully',
-					'message' => null
+					'title' => 'Request created successfully'
 				]
 			],
 			// Refresh of one proxy used by discovery rule.
@@ -434,8 +431,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 						'Passive proxy 1'
 					],
 					'alert' => 'Refresh configuration of the selected proxy?',
-					'title' => 'Request sent successfully',
-					'message' => null
+					'title' => 'Request created successfully'
 				]
 			],
 			// Mass refresh of several proxies.
@@ -448,8 +444,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 						'Passive proxy 1'
 					],
 					'alert' => 'Refresh configuration of the selected proxies?',
-					'title' => 'Request sent successfully',
-					'message' => null
+					'title' => 'Request created successfully'
 				]
 			],
 			// Enable 1 enabled host on 1 proxy.
@@ -462,9 +457,8 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 					'hosts' => [
 						'enabled_host1'
 					],
-					'alert' => 'Enable hosts monitored by selected proxies?',
-					'title' => 'Hosts enabled',
-					'message' => null
+					'alert' => 'Enable hosts monitored by selected proxy?',
+					'title' => 'Hosts enabled'
 				]
 			],
 			// Disable 1 disabled host on 1 proxy.
@@ -477,12 +471,11 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 					'hosts' => [
 						'disabled_host1'
 					],
-					'alert' => 'Disable hosts monitored by selected proxies?',
-					'title' => 'Hosts disabled',
-					'message' => null
+					'alert' => 'Disable hosts monitored by selected proxy?',
+					'title' => 'Hosts disabled'
 				]
 			],
-			// Enable 1 enabled and 1 disabled hosts on 1 proxy.
+			// Enable 1 enabled and 1 disabled hosts on 2 proxies.
 			[
 				[
 					'action' => 'Enable hosts',
@@ -554,8 +547,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 						'active_proxy5'
 					],
 					'alert' => 'Delete selected proxy?',
-					'title' => 'Proxy deleted',
-					'message' => null
+					'title' => 'Proxy deleted'
 				]
 			],
 			// Delete passive proxy.
@@ -566,8 +558,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 						'passive_proxy5'
 					],
 					'alert' => 'Delete selected proxy?',
-					'title' => 'Proxy deleted',
-					'message' => null
+					'title' => 'Proxy deleted'
 				]
 			],
 			// Mass delete of active and passive proxies.
@@ -579,8 +570,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 						'passive_proxy6'
 					],
 					'alert' => 'Delete selected proxies?',
-					'title' => 'Proxies deleted',
-					'message' => null
+					'title' => 'Proxies deleted'
 				]
 			],
 			// Mass delete when one of the proxies monitor some host.
@@ -665,13 +655,13 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 			$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 		}
 		else {
-			$this->assertMessage(TEST_GOOD, $data['title'], $data['message']);
+			$this->assertMessage(TEST_GOOD, $data['title'], CTestArrayHelper::get($data, 'message', null));
 
 			// Check DB.
+			$db_proxies = CDBHelper::getColumn('SELECT * FROM hosts WHERE status IN (5,6)', 'host');
+
 			foreach ($data['proxies'] as $proxy) {
-				$this->assertEquals(($data['action'] === 'Delete') ? 0 : 1,
-						CDBHelper::getCount('SELECT * FROM hosts WHERE host='.zbx_dbstr($proxy))
-				);
+				$this->assertEquals(($data['action'] !== 'Delete'), in_array($proxy, array_values($db_proxies)));
 
 				$exists = ($data['action'] === 'Delete')
 					? array_key_exists('expected', $data)
@@ -682,18 +672,18 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 
 			// Check that hosts are actually enabled/disabled.
 			if ($data['action'] === 'Enable hosts' || $data['action'] === 'Disable hosts') {
+				$hosts = CDBHelper::getAll('SELECT host, status FROM hosts WHERE proxy_hostid IS NOT NULL');
+
 				// DB check for hosts.
-				foreach ($data['hosts'] as $host)  {
-					$this->assertEquals(($data['action'] === 'Enable hosts') ? 0 : 1,
-							CDBHelper::getValue('SELECT status FROM hosts WHERE host ='.zbx_dbstr($host))
-					);
+				foreach ($hosts as $host) {
+					if (in_array($host['host'], $data['hosts'])) {
+						$this->assertEquals(($data['action'] === 'Enable hosts') ? 0 : 1, $host['status']);
+					}
 				}
 			}
 		}
 
 		// Check that user redirected on Proxies page.
-		$this->page->assertTitle('Configuration of proxies');
 		$this->page->assertHeader('Proxies');
 	}
 }
-

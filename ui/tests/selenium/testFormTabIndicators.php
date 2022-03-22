@@ -439,6 +439,7 @@ class testFormTabIndicators extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=proxy.list',
+					'create_button' => 'Create proxy',
 					'form' => 'id:proxy-form',
 					'tabs' => [
 						[
@@ -666,8 +667,8 @@ class testFormTabIndicators extends CWebTest {
 			$form->getField('Type')->fill('Graph');
 			$form->invalidate();
 		}
-		elseif ($data['url'] === 'zabbix.php?action=proxy.list') {
-			$this->query('button:Create proxy')->one()->click();
+		elseif (CTestArrayHelper::get($data, 'create_button')) {
+			$this->query('button', $data['create_button'])->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 		}
 		else {
@@ -701,6 +702,10 @@ class testFormTabIndicators extends CWebTest {
 			$this->updateTabFields($tab, $form, USER_ACTION_REMOVE);
 			$old_value = (CTestArrayHelper::get($tab, 'count', false)) ? 0 : $old_value;
 			$this->assertTabIndicator($tab_selector, $old_value);
+		}
+
+		if (CTestArrayHelper::get($data, 'create_button')) {
+			COverlayDialogElement::find()->one()->waitUntilReady()->close();
 		}
 	}
 

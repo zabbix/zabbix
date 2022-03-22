@@ -728,7 +728,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'server_error' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=host.edit'
 				]
 			],
@@ -737,7 +737,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'server_error' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=host.edit&hostid=99062'
 				]
 			],
@@ -858,7 +858,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM correlation',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=correlation.edit'
 				]
 			],
@@ -867,7 +867,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM correlation',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?correlationid=99002&action=correlation.edit'
 				]
 			],
@@ -876,7 +876,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM host_discovery',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=discovery.edit'
 				]
 			],
@@ -885,7 +885,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM host_discovery',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=discovery.edit&druleid=5'
 				]
 			],
@@ -894,7 +894,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM config',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=gui.edit'
 				]
 			],
@@ -903,7 +903,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM autoreg_host',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=autoreg.edit'
 				]
 			],
@@ -912,7 +912,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM housekeeper',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=housekeeping.edit'
 				]
 			],
@@ -921,7 +921,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM images',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=image.edit&imageid=1'
 				]
 			],
@@ -930,7 +930,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM images',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=image.edit&imagetype=1'
 				]
 			],
@@ -939,7 +939,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM icon_map',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=iconmap.edit&iconmapid=101'
 				]
 			],
@@ -948,7 +948,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM icon_map',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=iconmap.edit'
 				]
 			],
@@ -957,7 +957,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM regexps',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=regex.edit&regexid=20'
 				]
 			],
@@ -966,7 +966,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM regexps',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=regex.edit'
 				]
 			],
@@ -975,7 +975,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM globalmacro',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=macros.edit'
 				]
 			],
@@ -984,7 +984,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM config',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=trigdisplay.edit'
 				]
 			],
@@ -993,7 +993,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM token',
-					'server_error' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=token.list',
 					'case' => 'token create'
 				]
@@ -1003,7 +1003,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM token',
-					'server_error' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=token.list',
 					'case' => 'token update'
 				]
@@ -1013,7 +1013,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM config',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=miscconfig.edit'
 				]
 			],
@@ -1022,7 +1022,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'server_error' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=proxy.list',
 					'case' => 'proxy update',
 					'proxy' => 'Active proxy 1'
@@ -1033,7 +1033,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'server_error' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=proxy.list',
 					'case' => 'proxy create'
 				]
@@ -1043,7 +1043,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM config',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=authentication.edit'
 				]
 			],
@@ -1052,7 +1052,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM users_groups',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=usergroup.edit&usrgrpid=7'
 				]
 			],
@@ -1061,7 +1061,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM users_groups',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=usergroup.edit'
 				]
 			],
@@ -1070,7 +1070,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM users',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=user.edit&userid=1'
 				]
 			],
@@ -1079,7 +1079,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM users',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=user.edit'
 				]
 			],
@@ -1088,7 +1088,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM media',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=mediatype.edit&mediatypeid=1'
 				]
 			],
@@ -1097,7 +1097,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM media',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=mediatype.edit'
 				]
 			],
@@ -1106,7 +1106,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM scripts',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=script.edit&scriptid=1'
 				]
 			],
@@ -1115,7 +1115,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM scripts',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=script.edit'
 				]
 			],
@@ -1124,7 +1124,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM profiles',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=userprofile.edit'
 				]
 			],
@@ -1133,7 +1133,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM role',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=userrole.edit&roleid=2'
 				]
 			],
@@ -1142,7 +1142,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM role',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=userrole.edit'
 				]
 			],
@@ -1151,7 +1151,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM token',
-					'server_error' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=user.token.list',
 					'case' => 'token create'
 				]
@@ -1161,7 +1161,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM token',
-					'server_error' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=user.token.list',
 					'case' => 'token update'
 				]
@@ -1171,7 +1171,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM report',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=scheduledreport.edit'
 				]
 			],
@@ -1179,7 +1179,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM report',
-					'incorrect_request' => true,
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=scheduledreport.edit&reportid=3'
 				]
 			]
@@ -1194,43 +1194,49 @@ class testSID extends CWebTest {
 		$url = (!str_contains($data['link'], 'tokenid') ? $data['link'] : $data['link'].self::$token_id);
 		$this->page->login()->open($url)->waitUntilReady();
 
-		if (CTestArrayHelper::get($data, 'case') === 'token create') {
-			$this->query('button:Create API token')->waitUntilClickable()->one()->click();
-			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-			$fill_data = ['Name' => 'test', 'User' => 'admin-zabbix', 'Expires at' => '2037-12-31 00:00:00'];
+		if(array_key_exists('case', $data)) {
+			switch($data['case']) {
+				case 'token create':
+					$this->query('button:Create API token')->waitUntilClickable()->one()->click();
+					$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+					$fill_data = ['Name' => 'test', 'User' => 'admin-zabbix', 'Expires at' => '2037-12-31 00:00:00'];
 
-			if (strpos($data['link'], 'user') ) {
-				unset($fill_data['User']);
+					if (strpos($data['link'], 'user') ) {
+						unset($fill_data['User']);
+					}
+
+					$dialog->asForm()->fill($fill_data);
+					break;
+
+				case 'token update':
+				case 'proxy update':
+					$name = ($data['case'] === 'token update') ? self::UPDATE_TOKEN : $data['proxy'];
+					$this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()->findRow('Name',
+							$name)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
+					$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+					break;
+
+				case 'proxy create':
+					$this->query('button:Create proxy')->waitUntilClickable()->one()->click();
+					$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+					$dialog->asForm()->fill(['Proxy name' => 'test remove sid']);
+					break;
 			}
 
-			$dialog->asForm()->fill($fill_data);
+			$element = $dialog;
 		}
-		elseif ((CTestArrayHelper::get($data, 'case') === 'token update')) {
-			$this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()->findRow('Name',
-					self::UPDATE_TOKEN)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
-			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		}
-		elseif ((CTestArrayHelper::get($data, 'case') === 'proxy create')) {
-			$this->query('button:Create proxy')->waitUntilClickable()->one()->click();
-			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-			$dialog->asForm()->fill(['Proxy name' => 'test remove sid']);
-		}
-		elseif ((CTestArrayHelper::get($data, 'case') === 'proxy update')) {
-			$this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()->findRow('Name',
-					$data['proxy'])->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
-			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		else {
+			$element = $this;
 		}
 
-		foreach ($this->query('xpath://input[@name="sid"]')->all() as $input) {
-			$input->delete();
-		}
+		$element->query('xpath:.//input[@name="sid"]')->one()->delete();
 
 		$query = ($this->query('button:Update')->exists())
 			? 'button:Update'
 			: 'xpath://button[text()="Add" and @type="submit"] | //div[@class="overlay-dialogue-footer"]//button[text()="Add"]';
 		$this->query($query)->waitUntilClickable()->one()->click();
 
-		if (CTestArrayHelper::get($data, 'incorrect_request')) {
+		if (CTestArrayHelper::get($data, 'access_denied')) {
 			$message = 'Access denied';
 			$details = 'You are logged in as "Admin". You have no permissions to access this page.';
 		}

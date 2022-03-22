@@ -221,7 +221,8 @@ class testPageReportsAudit extends CLegacyWebTest {
 					break;
 
 				default:
-					$this->assertEquals(['Configuration refresh', 'Execute', 'Failed login', 'History clear', 'Login', 'Logout'], $disabled
+					$this->assertEquals(['Configuration refresh', 'Execute', 'Failed login', 'History clear', 'Login',
+							'Logout'], $disabled
 					);
 			}
 		}
