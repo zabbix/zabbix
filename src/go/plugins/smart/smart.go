@@ -223,6 +223,8 @@ func (p *Plugin) attributeDiscovery() (jsonArray []byte, err error) {
 	return
 }
 
+// setSingleDiskFields goes through provided device json data and sets required output fields.
+// It returns an error if there is an issue with unmarshal for the provided input JSON map.
 func setSingleDiskFields(dev []byte) (out map[string]interface{}, err error) {
 	attr := make(map[string]interface{})
 	if err = json.Unmarshal(dev, &attr); err != nil {

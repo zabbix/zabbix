@@ -245,6 +245,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 	return r, err
 }
 
+// executeSingle returns device data for single device from smartctl based on provided path.
 func (p *Plugin) executeSingle(path string) (device []byte, err error) {
 	device, err = p.executeSmartctl(fmt.Sprintf("-a %s -j", path), false)
 	if err != nil {
@@ -254,90 +255,7 @@ func (p *Plugin) executeSingle(path string) (device []byte, err error) {
 	return
 }
 
-// getDevices returns a parsed slices of all devices returned by smartctl scan.
-// Returns a separate slice for both normal and raid devices.
-// It returns an error if there is an issue with getting or parsing results from smartctl.
-func (p *Plugin) getDevices() (basic, raid, megaraid []deviceInfo, err error) {
-	basicTmp, err := p.scanDevices("--scan -j")
-	if err != nil {
-		return nil, nil, nil, fmt.Errorf("Failed to scan for devices: %s.", err.Error())
-	}
-
-	raidTmp, err := p.scanDevices("--scan -d sat -j")
-	if err != nil {
-		return nil, nil, nil, fmt.Errorf("Failed to scan for sat devices: %s.", err.Error())
-	}
-
-	basic, raid, megaraid = formatDeviceOutput(basicTmp, raidTmp)
-
-	return
-}
-
-func formatDeviceOutput(basic, raid []deviceInfo) (basicDev, raidDev, megaraidDev []deviceInfo) {
-loop:
-	for _, tmp := range basic {
-		for _, r := range raid {
-			if tmp.Name == r.Name {
-				continue loop
-			}
-		}
-
-		basicDev = append(basicDev, tmp)
-	}
-
-	for _, r := range raid {
-		if strings.Contains(r.DevType, "megaraid") {
-			megaraidDev = append(megaraidDev, r)
-
-			continue
-		}
-
-		raidDev = append(raidDev, r)
-	}
-
-	return
-}
-
-// scanDevices executes smartctl.
-// It parses the smartctl data into a slice with deviceInfo.
-// The data is sorted based on device name in alphabet order.
-// It returns an error if there is an issue with getting or parsing results from smartctl.
-func (p *Plugin) scanDevices(args string) ([]deviceInfo, error) {
-	var d devices
-
-	devices, err := p.executeSmartctl(args, false)
-	if err != nil {
-		return nil, err
-	}
-
-	if err = json.Unmarshal(devices, &d); err != nil {
-		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
-	}
-
-	var names []string
-	for _, info := range d.Info {
-		names = append(names, info.InfoName)
-	}
-
-	sort.Strings(names)
-
-	var out []deviceInfo
-
-names:
-	for _, name := range names {
-		for _, info := range d.Info {
-			if name == info.InfoName {
-				out = append(out, info)
-
-				continue names
-			}
-		}
-	}
-
-	return out, nil
-}
-
-//executeBase executed runners for basic devices retrived from smartctl
+//executeBase executed runners for basic devices retrieved from smartctl.
 func (r *runner) executeBase(basicDev []deviceInfo, jsonRunner bool) error {
 	r.startBasicRunners(jsonRunner)
 
@@ -764,6 +682,91 @@ func (dp *deviceParser) checkErr() (err error) {
 	}
 
 	return
+}
+
+// getDevices returns a parsed slices of all devices returned by smartctl scan.
+// Returns a separate slice for both normal and raid devices.
+// It returns an error if there is an issue with getting or parsing results from smartctl.
+func (p *Plugin) getDevices() (basic, raid, megaraid []deviceInfo, err error) {
+	basicTmp, err := p.scanDevices("--scan -j")
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("Failed to scan for devices: %s.", err.Error())
+	}
+
+	raidTmp, err := p.scanDevices("--scan -d sat -j")
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("Failed to scan for sat devices: %s.", err.Error())
+	}
+
+	basic, raid, megaraid = formatDeviceOutput(basicTmp, raidTmp)
+
+	return
+}
+
+// formatDeviceOutput removes raid devices from basic device list and separates megaraid devices from the rest of raid
+// devices.
+func formatDeviceOutput(basic, raid []deviceInfo) (basicDev, raidDev, megaraidDev []deviceInfo) {
+loop:
+	for _, tmp := range basic {
+		for _, r := range raid {
+			if tmp.Name == r.Name {
+				continue loop
+			}
+		}
+
+		basicDev = append(basicDev, tmp)
+	}
+
+	for _, r := range raid {
+		if strings.Contains(r.DevType, "megaraid") {
+			megaraidDev = append(megaraidDev, r)
+
+			continue
+		}
+
+		raidDev = append(raidDev, r)
+	}
+
+	return
+}
+
+// scanDevices executes smartctl.
+// It parses the smartctl data into a slice with deviceInfo.
+// The data is sorted based on device name in alphabet order.
+// It returns an error if there is an issue with getting or parsing results from smartctl.
+func (p *Plugin) scanDevices(args string) ([]deviceInfo, error) {
+	var d devices
+
+	devices, err := p.executeSmartctl(args, false)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = json.Unmarshal(devices, &d); err != nil {
+		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+	}
+
+	var names []string
+	for _, info := range d.Info {
+		names = append(names, info.InfoName)
+	}
+
+	sort.Strings(names)
+
+	var out []deviceInfo
+
+names:
+	for _, name := range names {
+		for _, info := range d.Info {
+			if name == info.InfoName {
+				out = append(out, info)
+
+				continue names
+			}
+		}
+	}
+
+	return out, nil
 }
 
 func init() {
