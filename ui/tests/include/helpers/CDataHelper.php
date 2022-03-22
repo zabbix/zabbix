@@ -364,7 +364,7 @@ class CDataHelper extends CAPIHelper {
 
 		return true;
 	}
-	
+
 	/**
 	 *  Add data to item.
 	 *
