@@ -197,19 +197,7 @@ $form
 	->addItem(
 		(new CScriptTag('
 			proxy_edit_popup.init('.json_encode([
-				'proxyid' => $data['proxyid'],
-				'create_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'proxy.create')
-					->getUrl(),
-				'update_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'proxy.update')
-					->getUrl(),
-				'refresh_config_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'proxy.config.refresh')
-					->getUrl(),
-				'delete_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'proxy.delete')
-					->getUrl()
+				'proxyid' => $data['proxyid']
 			]).');
 		'))->setOnDocumentReady()
 	);

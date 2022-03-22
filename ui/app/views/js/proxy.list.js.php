@@ -23,12 +23,7 @@
 <script>
 	const view = new class {
 
-		init({refresh_config_url, enable_hosts_url, disable_hosts_url, delete_url}) {
-			this.refresh_config_url = refresh_config_url;
-			this.enable_hosts_url = enable_hosts_url;
-			this.disable_hosts_url = disable_hosts_url;
-			this.delete_url = delete_url;
-
+		init() {
 			this._initActions();
 		}
 
@@ -115,7 +110,10 @@
 				return;
 			}
 
-			this._post(target, proxyids, this.refresh_config_url);
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'proxy.config.refresh');
+
+			this._post(target, proxyids, curl.getUrl());
 		}
 
 		_enableHosts(target, proxyids) {
@@ -127,7 +125,10 @@
 				return;
 			}
 
-			this._post(target, proxyids, this.enable_hosts_url);
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'proxy.host.enable');
+
+			this._post(target, proxyids, curl.getUrl());
 		}
 
 		_disableHosts(target, proxyids) {
@@ -139,7 +140,10 @@
 				return;
 			}
 
-			this._post(target, proxyids, this.disable_hosts_url);
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'proxy.host.disable');
+
+			this._post(target, proxyids, curl.getUrl());
 		}
 
 		_delete(target, proxyids) {
@@ -151,7 +155,10 @@
 				return;
 			}
 
-			this._post(target, proxyids, this.delete_url);
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'proxy.delete');
+
+			this._post(target, proxyids, curl.getUrl());
 		}
 
 		_post(target, proxyids, url) {

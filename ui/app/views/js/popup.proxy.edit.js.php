@@ -26,13 +26,8 @@ window.proxy_edit_popup = new class {
 		this.clone_proxyid = null;
 	}
 
-	init({proxyid, create_url, update_url, refresh_config_url, delete_url}) {
+	init({proxyid}) {
 		this.proxyid = proxyid;
-
-		this.create_url = create_url;
-		this.update_url = update_url;
-		this.refresh_config_url = refresh_config_url;
-		this.delete_url = delete_url;
 
 		this.overlay = overlays_stack.getById('proxy_edit');
 		this.dialogue = this.overlay.$dialogue[0];
@@ -156,8 +151,11 @@ window.proxy_edit_popup = new class {
 	}
 
 	refreshConfig() {
+		const curl = new Curl('zabbix.php');
+		curl.setArgument('action', 'proxy.config.refresh');
+
 		this
-			._post(this.refresh_config_url, {proxyids: [this.proxyid]})
+			._post(curl.getUrl(), {proxyids: [this.proxyid]})
 			.then((response) => {
 				for (const element of this.form.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
@@ -182,9 +180,12 @@ window.proxy_edit_popup = new class {
 		this.overlay.setProperties({title, buttons});
 	}
 
-	_delete() {
+	delete() {
+		const curl = new Curl('zabbix.php');
+		curl.setArgument('action', 'proxy.delete');
+
 		this
-			._post(this.delete_url, {proxyids: [this.proxyid]})
+			._post(curl.getUrl(), {proxyids: [this.proxyid]})
 			.then((response) => {
 				overlayDialogueDestroy(this.overlay.dialogueid);
 
@@ -214,8 +215,11 @@ window.proxy_edit_popup = new class {
 			}
 		}
 
+		const curl = new Curl('zabbix.php', false);
+		curl.setArgument('action', this.proxyid !== null ? 'proxy.update' : 'proxy.create');
+
 		this
-			._post(this.proxyid !== null ? this.update_url : this.create_url, fields)
+			._post(curl.getUrl(), fields)
 			.then((response) => {
 				overlayDialogueDestroy(this.overlay.dialogueid);
 
@@ -224,7 +228,7 @@ window.proxy_edit_popup = new class {
 	}
 
 	_post(url, data) {
-		const request = fetch(new Curl(url).getUrl(), {
+		const request = fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify(data)

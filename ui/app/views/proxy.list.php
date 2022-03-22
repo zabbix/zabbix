@@ -214,24 +214,7 @@ $form->addItem(
 	->show();
 
 (new CScriptTag('
-	view.init('.json_encode([
-		'refresh_config_url' => (new CUrl('zabbix.php'))
-			->setArgument('action', 'proxy.config.refresh')
-			->setArgumentSID()
-			->getUrl(),
-		'enable_hosts_url' => (new CUrl('zabbix.php'))
-			->setArgument('action', 'proxy.host.enable')
-			->setArgumentSID()
-			->getUrl(),
-		'disable_hosts_url' => (new CUrl('zabbix.php'))
-			->setArgument('action', 'proxy.host.disable')
-			->setArgumentSID()
-			->getUrl(),
-		'delete_url' => (new CUrl('zabbix.php'))
-			->setArgument('action', 'proxy.delete')
-			->setArgumentSID()
-			->getUrl()
-	]).');
+	view.init();
 '))
 	->setOnDocumentReady()
 	->show();
