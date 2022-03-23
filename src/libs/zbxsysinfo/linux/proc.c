@@ -1768,11 +1768,17 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	param = get_rparam(request, 3);
 
 	if (NULL == param || '\0' == *param || 0 == strcmp(param, "process"))
+	{
 		zbx_proc_mode = ZBX_PROC_MODE_PROCESS;
+	}
 	else if (0 == strcmp(param, "thread"))
+	{
 		zbx_proc_mode = ZBX_PROC_MODE_THREAD;
+	}
 	else if (0 == strcmp(param, "summary") && (NULL == proccomm || '\0' == *proccomm))
+	{
 		zbx_proc_mode = ZBX_PROC_MODE_SUMMARY;
+	}
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
@@ -2001,7 +2007,10 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else
 		{
 			if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode)
-				zbx_json_addstring(&j, "cmdline", ZBX_NULL2EMPTY_STR(pdata->cmdline), ZBX_JSON_TYPE_STRING);
+			{
+				zbx_json_addstring(&j, "cmdline", ZBX_NULL2EMPTY_STR(pdata->cmdline),
+						ZBX_JSON_TYPE_STRING);
+			}
 
 			zbx_json_adduint64(&j, "vsize", pdata->vsize);
 			zbx_json_adduint64(&j, "pmem", pdata->pmem);
