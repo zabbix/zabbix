@@ -85,7 +85,9 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 				'show' => $fields['axisx']
 			],
 			'legend' => $fields['legend'],
+			'legend_statistic' => $fields['legend_statistic'],
 			'legend_lines' => $fields['legend_lines'],
+			'legend_columns' => $fields['legend_columns'],
 			'problems' => [
 				'show_problems' => ($fields['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW),
 				'graph_item_problems' => $fields['graph_item_problems'],

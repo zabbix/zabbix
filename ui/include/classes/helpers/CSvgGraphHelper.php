@@ -60,7 +60,7 @@ class CSvgGraphHelper {
 		self::getMetricsAggregatedData($metrics);
 
 		// Legend single line height is 18. Value should be synchronized with $svg-legend-line-height in 'screen.scss'.
-		$legend_height = ($options['legend'] == SVG_GRAPH_LEGEND_TYPE_SHORT) ? $options['legend_lines'] * 18 : 0;
+		$legend_height = ($options['legend'] == SVG_GRAPH_LEGEND_ON) ? $options['legend_lines'] * 18 : 0;
 
 		// Draw SVG graph.
 		$graph = (new CSvgGraph([

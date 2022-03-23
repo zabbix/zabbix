@@ -26,37 +26,105 @@ window.widget_svggraph_form = new class {
 		this.form_id = form_id;
 		this.form_tabs = form_tabs_id;
 
-		jQuery(".overlay-dialogue-body").on("scroll", function() {
-			if (jQuery("#svg-graph-preview").length) {
-				const $dialogue_body = jQuery(this);
-				const $preview_container = jQuery(".<?= ZBX_STYLE_SVG_GRAPH_PREVIEW ?>");
+		//jQuery(".overlay-dialogue-body").on("scroll", function() {
+		//	if (jQuery("#svg-graph-preview").length) {
+		//		const $dialogue_body = jQuery(this);
+		//		const $preview_container = jQuery(".<?//= ZBX_STYLE_SVG_GRAPH_PREVIEW ?>//");
+		//
+		//		if ($preview_container.offset().top < $dialogue_body.offset().top && $dialogue_body.height() > 400) {
+		//			jQuery("#svg-graph-preview").css("top", $dialogue_body.offset().top - $preview_container.offset().top);
+		//			jQuery(".graph-widget-config-tabs .ui-tabs-nav").css("top", $preview_container.height());
+		//		}
+		//		else {
+		//			jQuery("#svg-graph-preview").css("top", 0);
+		//			jQuery(".graph-widget-config-tabs .ui-tabs-nav").css("top", 0);
+		//		}
+		//	}
+		//	else {
+		//		jQuery(".overlay-dialogue-body").off("scroll");
+		//	}
+		//});
 
-				if ($preview_container.offset().top < $dialogue_body.offset().top && $dialogue_body.height() > 400) {
-					jQuery("#svg-graph-preview").css("top", $dialogue_body.offset().top - $preview_container.offset().top);
-					jQuery(".graph-widget-config-tabs .ui-tabs-nav").css("top", $preview_container.height());
-				}
-				else {
-					jQuery("#svg-graph-preview").css("top", 0);
-					jQuery(".graph-widget-config-tabs .ui-tabs-nav").css("top", 0);
-				}
+		//jQuery(`#${this.form_tabs}`).on("change", "input, z-select, .multiselect", () => this.onGraphConfigChange());
+		//
+		//
+		//this.onGraphConfigChange();
+		//
+		//$(".overlay-dialogue").on("overlay-dialogue-resize", (event, size_new, size_old) => {
+		//	if (jQuery("#svg-graph-preview").length) {
+		//		if (size_new.width != size_old.width) {
+		//			this.onGraphConfigChange();
+		//		}
+		//	} else {
+		//		$(".overlay-dialogue").off("overlay-dialogue-resize");
+		//	}
+		//});
+
+		document
+			.getElementById('dataset-menu')
+			.addEventListener('click', this._addDataset);
+	}
+
+	_timePeriodTabInit() { // TODO: Time period tab - update controls enable status on 'Set custom time period' checkbox change
+		jQuery("#time_from, #time_to, #time_from_calendar, #time_to_calendar")
+			.prop("disabled", !jQuery(this).is(":checked"));
+	}
+
+	_axesTabInit() {
+		widget_svggraph_form.onLeftYChange(); // TODO: on Left Y checkbox
+
+		widget_svggraph_form.onRightYChange(); // TODO: on Right Y checkbox
+	}
+
+	_legendTabInit() { // TODO: on Show legend checkbox
+		jQuery("[name=legend_lines]").rangeControl(
+			jQuery(this).is(":checked") ? "enable" : "disable"
+		);
+	}
+
+	_problemsTabInit() { // TODO: Problems tab - update controls enable status on 'Show problems' checkbox change
+		var on = jQuery(this).is(":checked"),
+			widget = jQuery(this).closest(".ui-widget");
+
+		jQuery("#graph_item_problems, #problem_name, #problemhosts_select").prop("disabled", !on);
+		jQuery("#problemhosts_").multiSelect(on ? "enable" : "disable");
+		jQuery("[name^=\"severities[\"]", widget).prop("disabled", !on);
+		jQuery("[name=\"evaltype\"]", widget).prop("disabled", !on);
+		jQuery("input, button, z-select", jQuery("#tags_table_tags", widget)).prop("disabled", !on);
+	}
+
+	_addDataset(e) {
+		const menu = [
+			{
+				items: [
+					{
+						label: <?= json_encode(_('Item pattern')) ?>,
+						clickCallback: (event) => {
+							//debugger;
+						}
+					},
+					{
+						label: <?= json_encode(_('Item list')) ?>,
+						clickCallback: () => ZABBIX.Dashboard.addNewDashboardPage()
+					}
+				]
+			},
+			{
+				items: [
+					{
+						label: <?= json_encode(_('Clone')) ?>,
+						clickCallback: () => ZABBIX.Dashboard.addNewDashboardPage()
+					}
+				]
 			}
-			else {
-				jQuery(".overlay-dialogue-body").off("scroll");
-			}
-		});
+		];
 
-		jQuery(`#${this.form_tabs}`).on("change", "input, z-select, .multiselect", () => this.onGraphConfigChange());
-
-
-		this.onGraphConfigChange();
-
-		$(".overlay-dialogue").on("overlay-dialogue-resize", (event, size_new, size_old) => {
-			if (jQuery("#svg-graph-preview").length) {
-				if (size_new.width != size_old.width) {
-					this.onGraphConfigChange();
-				}
-			} else {
-				$(".overlay-dialogue").off("overlay-dialogue-resize");
+		jQuery(e.target).menuPopup(menu, new jQuery.Event(e), {
+			position: {
+				of: e.target,
+				my: 'left top',
+				at: 'left bottom',
+				within: '.wrapper'
 			}
 		});
 	}

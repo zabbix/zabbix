@@ -650,6 +650,7 @@ class CWidgetHelper {
 		}
 
 		$tags_table = (new CTable())->setId('tags_table_'.$field->getName());
+
 		$enabled = !($field->getFlags() & CWidgetField::FLAG_DISABLED);
 		$i = 0;
 
@@ -1374,12 +1375,30 @@ class CWidgetHelper {
 		}
 
 		// Add 'Add' button under accordion.
+//		$list->addItem(
+//			(new CDiv(
+//				(new CButton('data_sets_add', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add new data set')]))
+//					->addClass(ZBX_STYLE_BTN_ALT)
+//					->setId('dataset-add')
+//			)),
+//			ZBX_STYLE_LIST_ACCORDION_FOOT
+//		);
+
 		$list->addItem(
-			(new CDiv(
-				(new CButton('data_sets_add', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add new data set')]))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->setId('dataset-add')
-			)),
+			(new CList())
+				->addClass(ZBX_STYLE_BTN_SPLIT)
+				->addItem([
+					(new CButton(null, [
+						(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON),
+						_('Add new data set')
+					]))
+						->setId('dataset-add')
+						->addClass(ZBX_STYLE_BTN_ALT),
+					(new CButton(null, '&#8203;'))
+						->setId('dataset-menu')
+						->addClass(ZBX_STYLE_BTN_ALT)
+						->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
+				]),
 			ZBX_STYLE_LIST_ACCORDION_FOOT
 		);
 

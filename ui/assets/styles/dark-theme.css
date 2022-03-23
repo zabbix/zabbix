@@ -19,7 +19,7 @@
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var,
 b,
 strong, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
+time, mark, audio, video, textarea {
   margin: 0;
   padding: 0;
   border: 0;
@@ -652,6 +652,14 @@ footer {
       opacity: 1; }
   .sidebar-nav-toggle + div {
     flex-shrink: 1; }
+
+.grid-columns {
+  display: grid;
+  align-items: start; }
+  .grid-columns.columns-2 {
+    grid-template-columns: repeat(2, 1fr); }
+  .grid-columns.columns-3 {
+    grid-template-columns: repeat(3, 1fr); }
 
 .form-grid {
   display: grid;
@@ -2215,7 +2223,7 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   .radio-list-control label {
     display: inline-block;
     border: 1px solid #4f4f4f;
-    line-height: 1.2em;
+    line-height: 14px;
     padding: 4px 11px;
     transition: background-color .2s ease-out;
     cursor: pointer; }
@@ -2256,6 +2264,89 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
       transition: none; }
   .radio-list-control + .icon-info {
     margin-left: 5px; }
+
+.range-control {
+  position: relative;
+  display: inline-block; }
+  .range-control input[type=range] {
+    cursor: pointer;
+    -webkit-appearance: none;
+    /* Hides the slider so that custom slider can be made */
+    -moz-appearance: none;
+    /* Hides the slider so that custom slider can be made */
+    width: calc(100% + 10px);
+    opacity: 0;
+    vertical-align: middle;
+    margin: 0 -5px;
+    padding: 0;
+    height: 20px;
+    /* Special styling for WebKit/Blink */ }
+    .range-control input[type=range]:focus {
+      outline: none; }
+    .range-control input[type=range]::-webkit-slider-thumb {
+      margin-top: 1px;
+      /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+      height: 10px;
+      width: 10px;
+      opacity: 0; }
+    .range-control input[type=range]::-webkit-slider-runnable-track {
+      height: 10px;
+      opacity: 0; }
+  .range-control input[type=text] {
+    width: 31px; }
+  .range-control > div {
+    position: relative;
+    display: inline-block;
+    width: calc(100% - 10px - 31px);
+    margin-right: 10px; }
+  .range-control .range-control-track,
+  .range-control .range-control-progress {
+    position: absolute;
+    top: 50%;
+    margin-top: -1px;
+    left: 0;
+    height: 2px;
+    cursor: pointer; }
+  .range-control .range-control-track {
+    width: 100%;
+    background: #c0c0c0; }
+  .range-control .range-control-progress {
+    background: #4796c4; }
+  .range-control .range-control-thumb {
+    position: absolute;
+    top: 50%;
+    margin-top: -5px;
+    margin-left: -5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #4796c4; }
+  .range-control.range-control-focus .range-control-thumb {
+    margin-top: -6.66667px;
+    margin-left: -6.66667px;
+    background: #4796c4;
+    border: 2px solid #8599a4; }
+  .range-control.range-control-focus .range-control-progress {
+    background: #4796c4; }
+  .range-control.disabled {
+    opacity: 1; }
+    .range-control.disabled input[type=range] {
+      cursor: default; }
+    .range-control.disabled .range-control-progress,
+    .range-control.disabled .range-control-thumb {
+      background: #c0c0c0; }
+  .range-control datalist {
+    position: absolute;
+    display: flex;
+    width: 100%;
+    top: 50%;
+    margin-top: -1px; }
+    .range-control datalist option {
+      padding: 0;
+      font-size: 0;
+      flex: 1 0 0;
+      height: 2px;
+      border-left: 1px solid #0e1012; }
 
 .service-info {
   margin: -10px 0;
@@ -2661,6 +2752,8 @@ div.dashboard-grid-widget-slareport .date-vertical {
 
 .overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .table-forms-container, .overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .browser-warning-container {
   border: 1px solid #303030; }
+.overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph table {
+  width: initial; }
 
 .link-action {
   border-bottom: 1px dotted;
@@ -3484,8 +3577,6 @@ form.is-loading {
     vertical-align: middle;
     width: 85%;
     position: relative; }
-    .table-forms .table-forms-td-right.has-before {
-      padding-top: 0; }
     .table-forms .table-forms-td-right td {
       padding: 5px 5px 5px 0;
       position: relative; }
@@ -3617,7 +3708,7 @@ select {
 
 .form-input-margin {
   display: inline-block;
-  margin: 0 3px 0 0; }
+  margin: 0 4px 0 0; }
 
 .checkbox-radio {
   position: absolute !important;
@@ -4513,7 +4604,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       overflow: auto;
       overflow-x: hidden;
       width: 100%;
-      max-height: calc(100vh - 220px);
+      max-height: 100vh;
       max-width: inherit;
       margin: 0 -10px 10px;
       padding: 0 10px;
@@ -4548,7 +4639,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       top: -13px;
       right: -8px; }
   .overlay-dialogue.modal-popup {
-    top: 50px;
+    top: 0;
     max-width: 1024px; }
     .overlay-dialogue.modal-popup.modal-popup-small {
       max-width: 450px;
@@ -4835,9 +4926,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .calendar-footer .btn-grey {
     float: left;
     margin-top: 0; }
-
-.calendar-control input {
-  vertical-align: middle; }
 
 .notif {
   width: 250px; }
@@ -6296,91 +6384,6 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
 
 #expressions_list .ui-sortable-helper {
   display: table; }
-
-.range-control {
-  position: relative;
-  display: inline-block;
-  vertical-align: middle; }
-  .range-control input[type=range] {
-    cursor: pointer;
-    -webkit-appearance: none;
-    /* Hides the slider so that custom slider can be made */
-    -moz-appearance: none;
-    /* Hides the slider so that custom slider can be made */
-    width: calc(100% + 10px);
-    opacity: 0;
-    vertical-align: middle;
-    margin: 0 -5px;
-    padding: 0;
-    height: 20px;
-    /* Special styling for WebKit/Blink */ }
-    .range-control input[type=range]:focus {
-      outline: none; }
-    .range-control input[type=range]::-webkit-slider-thumb {
-      margin-top: 1px;
-      /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
-      height: 10px;
-      width: 10px;
-      opacity: 0; }
-    .range-control input[type=range]::-webkit-slider-runnable-track {
-      height: 10px;
-      opacity: 0; }
-  .range-control input[type=text] {
-    width: 31px;
-    float: right; }
-  .range-control > div {
-    position: relative;
-    width: calc(100% - 10px - 31px);
-    margin: 2px 10px 0 0;
-    float: left; }
-  .range-control .range-control-track,
-  .range-control .range-control-progress {
-    position: absolute;
-    top: 50%;
-    margin-top: -1px;
-    left: 0;
-    height: 2px;
-    cursor: pointer; }
-  .range-control .range-control-track {
-    width: 100%;
-    background: #c0c0c0; }
-  .range-control .range-control-progress {
-    background: #4796c4; }
-  .range-control .range-control-thumb {
-    position: absolute;
-    top: 50%;
-    margin-top: -5px;
-    margin-left: -5px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #4796c4; }
-  .range-control.range-control-focus .range-control-thumb {
-    margin-top: -6.66667px;
-    margin-left: -6.66667px;
-    background: #4796c4;
-    border: 2px solid #8599a4; }
-  .range-control.range-control-focus .range-control-progress {
-    background: #4796c4; }
-  .range-control.disabled {
-    opacity: 1; }
-    .range-control.disabled input[type=range] {
-      cursor: default; }
-    .range-control.disabled .range-control-progress,
-    .range-control.disabled .range-control-thumb {
-      background: #c0c0c0; }
-  .range-control datalist {
-    position: absolute;
-    display: flex;
-    width: 100%;
-    top: 50%;
-    margin-top: -1px; }
-    .range-control datalist option {
-      padding: 0;
-      font-size: 0;
-      flex: 1 0 0;
-      height: 2px;
-      border-left: 1px solid #0e1012; }
 
 .graph-legend {
   text-align: left;
