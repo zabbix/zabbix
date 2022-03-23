@@ -480,7 +480,7 @@ class C44ImportConverter extends CConverter {
 						else {
 							// Interface not used in items. Create with default values.
 							$new_interfaces[$interfaceid][] = ['details' => $parent_interface['details']
-									+ ['version' => CXmlConstantName::SNMPV2, 'community' => 'public']
+									+ ['version' => CXmlConstantName::SNMPV2, 'community' => '{$SNMP_COMMUNITY}']
 								] + $parent_interface;
 						}
 
