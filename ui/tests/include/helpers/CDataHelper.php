@@ -368,12 +368,47 @@ class CDataHelper extends CAPIHelper {
 	/**
 	 *  Add data to item.
 	 *
-	 * @param string $itemid    item id
-	 * @param mixed  $value		value that should be sent to item
+	 * @param string $itemid		item id
+	 * @param array  $values		value that should be sent to item
+	 * @param mixed $time			time when value was received
 	 */
-	public static function addItemData($itemid, $value) {
-		$time = time();
-		DBexecute('INSERT INTO history_uint (itemid, clock, value, ns) VALUES ('.zbx_dbstr($itemid).', '
-				.zbx_dbstr($time).', '.zbx_dbstr($value).', 726692808)');
+	public static function addItemData($itemid, $values, $time = null) {
+		if (!is_array($values)) {
+			$values = [$values];
+		}
+
+		if ($time === null) {
+			$time = time();
+		}
+		elseif (is_array($time)) {
+            if (count($time) !== count($values)) {
+				throw new Exception('Value count should match the time record count.');
+			}
+
+			$time = array_values($time);
+		}
+
+		// Check item value type to set correct history table where to insert data.
+		$value_type = CDBHelper::getValue('SELECT value_type FROM items where itemid='.zbx_dbstr($itemid));
+		switch ($value_type) {
+			case 1:
+				$history_table = 'history_str';
+				break;
+			case 2:
+				$history_table = 'history_log';
+				break;
+			case 4:
+				$history_table = 'history_text';
+				break;
+			default:
+				$history_table = 'history_uint';
+				break;
+		}
+
+		foreach (array_values($values) as $k => $value) {
+			$clock = is_array($time) ? $time[$k] : $time;
+            DBexecute('INSERT INTO '.$history_table.' (itemid, clock, value) VALUES ('.zbx_dbstr($itemid).', '
+					.zbx_dbstr($clock).', '.zbx_dbstr($value).')');
+        }
 	}
 }
