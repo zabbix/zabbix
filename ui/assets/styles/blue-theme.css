@@ -1624,7 +1624,6 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
 
 .expandable-subfilter {
   position: relative;
-  overflow: hidden;
   word-break: break-word;
   max-height: 18px;
   line-height: 18px; }
