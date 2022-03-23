@@ -173,8 +173,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 							]
 						]
 					]
-				]
-			],
+				],
 				[
 					'hosts' => [
 						[
@@ -274,7 +273,9 @@ class C44ImportConverterTest extends CImportConverterTest {
 							]
 						]
 					]
-				],
+				]
+			],
+			[
 				[
 					'hosts' => [
 						[
@@ -342,6 +343,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 						]
 					]
 				]
+			]
 			]
 		];
 	}
