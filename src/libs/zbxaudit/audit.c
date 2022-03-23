@@ -23,7 +23,7 @@
 #include "zbxjson.h"
 #include "dbcache.h"
 
-#define AUDIT_USERID	0
+#define AUDIT_USERID	__UINT64_C(0)
 #define AUDIT_USERNAME	"System"
 #define AUDIT_IP	""
 
@@ -369,7 +369,7 @@ int	zbx_audit_flush_once(void)
 
 		ret = DBexecute_once("insert into auditlog (auditid,userid,username,"
 				"clock,action,ip,%s,resourcename,resourcetype,recordsetid,details) values"
-				" ('%s',%d,'%s','%d','%d','%s','%s','%s',%d,'%s','%s')",
+				" ('%s'," ZBX_FS_UI64 ",'%s','%d','%d','%s','%s','%s',%d,'%s','%s')",
 				pfield, (*audit_entry)->audit_cuid, AUDIT_USERID, AUDIT_USERNAME, (int)time(NULL),
 				(*audit_entry)->audit_action, AUDIT_IP, pvalue, name_esc, (*audit_entry)->resource_type,
 				recsetid_cuid, 0 == strcmp(details_esc, "{}") ? "" : details_esc);
