@@ -157,6 +157,7 @@ type deviceInfo struct {
 	Name     string `json:"name"`
 	InfoName string `json:"info_name"`
 	DevType  string `json:"type"`
+	path     string `json:"-"`
 }
 
 type smartctl struct {
@@ -247,40 +248,12 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 
 // executeSingle returns device data for single device from smartctl based on provided path.
 func (p *Plugin) executeSingle(path string) (device []byte, err error) {
-	basicDev, raidDev, megaraidDev, err := p.getDevices()
-	if err != nil {
-		return nil, err
-	}
-
-	device, err = p.executeSmartctl(fmt.Sprintf("-a %s -j", getDeviceName(path, basicDev, raidDev, megaraidDev)), false)
+	device, err = p.executeSmartctl(fmt.Sprintf("-a %s -j", path), false)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
 	}
 
 	return
-}
-
-// getDeviceName returns single device name, based on the provided path.
-func getDeviceName(path string, basicDev, raidDev, megaraidDev []deviceInfo) string {
-	for _, b := range basicDev {
-		if b.Name == path {
-			return b.Name
-		}
-	}
-
-	for _, b := range raidDev {
-		if b.Name == path {
-			return b.InfoName
-		}
-	}
-
-	for _, b := range megaraidDev {
-		if b.Name == path {
-			return fmt.Sprintf("-a %s -d %s -j ", b.Name, b.DevType)
-		}
-	}
-
-	return path
 }
 
 //executeBase executed runners for basic devices retrieved from smartctl.
@@ -480,6 +453,8 @@ func (r *runner) getBasicDevices(jsonRunner bool) {
 			return
 		}
 
+		dp.Info.path = name
+
 		r.mux.Lock()
 
 		if jsonRunner {
@@ -555,8 +530,10 @@ runner:
 			if dp.SmartStatus != nil {
 				if raid.rType == satType {
 					dp.Info.Name = fmt.Sprintf("%s %s", raid.name, raid.rType)
+					dp.Info.path = fmt.Sprintf("%s -d %s", raid.name, raid.rType)
 				} else {
 					dp.Info.Name = fmt.Sprintf("%s %s,%d", raid.name, raid.rType, i)
+					dp.Info.path = fmt.Sprintf("%s -d %s,%d", raid.name, raid.rType, i)
 				}
 
 				if r.setRaidDevices(dp, device, raid.rType, jsonRunner) {
