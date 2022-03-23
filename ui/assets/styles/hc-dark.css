@@ -2324,6 +2324,10 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   grid-template-columns: minmax(75px, max-content) auto;
   display: grid;
   margin: 5px 0; }
+  .subfilter-option-grid > label {
+    max-width: 75px;
+    text-overflow: ellipsis;
+    overflow: hidden; }
   .subfilter-option-grid .subfilter-options {
     grid-column: 2 / -1; }
 
