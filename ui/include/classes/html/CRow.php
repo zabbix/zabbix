@@ -43,25 +43,25 @@ class CRow extends CTag {
 	 */
 	public function addItem($item) {
 		if ($item instanceof CCol) {
-			$this->colspan += $item->getColspan();
+			$this->colspan += $item->getColSpan();
 			parent::addItem($item);
 		}
 		elseif (is_array($item)) {
 			foreach ($item as $el) {
 				if ($el instanceof CCol) {
-					$this->colspan += $el->getColspan();
+					$this->colspan += $el->getColSpan();
 					parent::addItem($el);
 				}
 				elseif ($el !== null) {
 					$col = $this->createCell($el);
-					$this->colspan += $col->getColspan();
+					$this->colspan += $col->getColSpan();
 					parent::addItem($col);
 				}
 			}
 		}
 		elseif ($item !== null) {
 			$col = $this->createCell($item);
-			$this->colspan += $col->getColspan();
+			$this->colspan += $col->getColSpan();
 			parent::addItem($col);
 		}
 
