@@ -312,10 +312,10 @@ class C44ImportConverterTest extends CImportConverterTest {
 					'hosts' => [
 						[
 							'interfaces' => [
-								[
+								0 => [
 									'interface_ref' => 'if1',
 								],
-								[
+								1 => [
 									'interface_ref' => 'if3',
 									'type' => 'SNMP',
 									'port' => '161',
