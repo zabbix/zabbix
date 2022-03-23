@@ -194,7 +194,7 @@ void	zbx_new_cuid(char *cuid)
 
 	gettimeofday(&current_time, NULL);
 	from_decimal(timestamp, CUID_BASE_36, ((zbx_uint64_t)current_time.tv_sec * 1000 + current_time.tv_usec / 1000));
-	pad(counter, sizeof(counter), CUID_TIMESTAMP_SIZE, PAD_FILL_CHAR);
+	pad(timestamp, sizeof(timestamp), CUID_TIMESTAMP_SIZE, PAD_FILL_CHAR);
 
 	from_decimal(rand_block_1, CUID_BASE_36, (zbx_uint64_t)rand());
 	pad(rand_block_1, sizeof(rand_block_1), CUID_BLOCK_SIZE, PAD_FILL_CHAR);
