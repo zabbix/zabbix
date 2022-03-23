@@ -744,6 +744,8 @@ abstract class CItemGeneral extends CApiService {
 				return $interface_by_type[$interface_type];
 			}
 		}
+
+		return null;
 	}
 
 	/**
