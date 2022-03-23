@@ -225,7 +225,7 @@ func Test_setSingleDiskFields(t *testing.T) {
 				"model_name":       "INTEL SSDPEKNW512G8H",
 				"percentage_used":  0,
 				"power_on_time":    2222,
-				"self_test.passed": nilReference,
+				"self_test_passed": nilReference,
 				"serial_number":    "BTNH115603K7512A",
 				"temperature":      25,
 			},
@@ -244,7 +244,7 @@ func Test_setSingleDiskFields(t *testing.T) {
 				"model_name":       "ST1000VX000-1ES162",
 				"percentage_used":  0,
 				"power_on_time":    39153,
-				"self_test.passed": &selftestSuccess,
+				"self_test_passed": &selftestSuccess,
 				"serial_number":    "Z4Y7SJBD",
 				"temperature":      30,
 				"raw_read_error_rate": rawField{
@@ -271,7 +271,7 @@ func Test_setSingleDiskFields(t *testing.T) {
 				"model_name":       "TS128GMTS800",
 				"percentage_used":  0,
 				"power_on_time":    732,
-				"self_test.passed": &selftestSuccess,
+				"self_test_passed": &selftestSuccess,
 				"serial_number":    "D486530350",
 				"temperature":      18,
 				"raw_read_error_rate": rawField{
