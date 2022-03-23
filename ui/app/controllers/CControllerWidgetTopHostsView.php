@@ -77,10 +77,9 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 		$time_now = time();
 
 		$master_column = $configuration[$fields['column']];
-		// Do we allow only numeric items?
-		$is_numeric_only_column = self::isNumericOnlyColumn($master_column);
+		$master_items_only_numeric_allowed = self::isNumericOnlyColumn($master_column);
 
-		$master_items = self::getItems($master_column['item'], $is_numeric_only_column, $groupids, $hostids);
+		$master_items = self::getItems($master_column['item'], $master_items_only_numeric_allowed, $groupids, $hostids);
 		$master_item_values = self::getItemValues($master_items, $master_column, $time_now);
 
 		if (!$master_item_values) {
@@ -90,15 +89,14 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			];
 		}
 
-		// Do we have only numeric items?
-		$is_numeric_only_column = $is_numeric_only_column && !array_filter($master_items,
+		$master_items_only_numeric_present = $master_items_only_numeric_allowed && !array_filter($master_items,
 			static function(array $item): bool {
-				return in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]);
+				return !in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
 			}
 		);
 
 		if ($fields['order'] == CWidgetFormTopHosts::ORDER_TOPN) {
-			if ($is_numeric_only_column) {
+			if ($master_items_only_numeric_present) {
 				arsort($master_item_values, SORT_NUMERIC);
 
 				$master_items_min = end($master_item_values);
@@ -109,7 +107,7 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			}
 		}
 		else {
-			if ($is_numeric_only_column) {
+			if ($master_items_only_numeric_present) {
 				asort($master_item_values, SORT_NUMERIC);
 
 				$master_items_min = reset($master_item_values);

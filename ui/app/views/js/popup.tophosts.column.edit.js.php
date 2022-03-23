@@ -26,12 +26,9 @@ window.tophosts_column_edit_form = new class {
 		this._$widget_form = $(`form[name="${form_name}"]`);
 		this._$thresholds_table = this._$widget_form.find('#thresholds_table');
 
-		$('[name="display"],[name="data"],[name="aggregate_function"]', this._$widget_form).on('change', () => {
-			this.updateAccessibility();
+		$('[name="data"], [name="aggregate_function"], [name="display"]', this._$widget_form).on('change', () => {
+			this._update();
 		});
-
-		$('[name="aggregate_function"]', this._$widget_form).on('change', () => this.toggleAggregateFunctionWarning());
-		$('[name="display"]', this._$widget_form).on('change', () => this.toggleDisplayWarning());
 
 		colorPalette.setThemeColors(thresholds_colors);
 
@@ -55,23 +52,22 @@ window.tophosts_column_edit_form = new class {
 
 				$colorpicker.colorpicker({appendTo: $colorpicker.closest('.input-color-picker')});
 
-				this.toggleThresholdsWarning();
+				this._update();
 			})
-			.on('afterremove.dynamicRows', () => this.toggleThresholdsWarning());
+			.on('afterremove.dynamicRows', () => this._update());
 
 		this._$widget_form.on('process.form', (e, overlay) => {
 			this.handleFormSubmit(e, overlay);
 		});
 
 		// Initialize form elements accessibility.
-		this.updateAccessibility();
+		this._update();
 
-		this.toggleAggregateFunctionWarning();
-		this.toggleDisplayWarning();
-		this.toggleThresholdsWarning();
+		this._$widget_form[0].style.display = '';
+		this._$widget_form[0].querySelector('[name="name"]').focus();
 	}
 
-	updateAccessibility() {
+	_update() {
 		const display_as_is = ($('[name="display"]:checked').val() == <?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>);
 		const data_item_value = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_ITEM_VALUE ?>);
 		const data_text = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_TEXT ?>);
@@ -86,6 +82,21 @@ window.tophosts_column_edit_form = new class {
 		this._$thresholds_table.toggleClass('disabled', !data_item_value);
 		$('[name$="[color]"],[name$="[threshold]"],button', this._$thresholds_table).attr('disabled', !data_item_value);
 
+		// Toggle warning icons for non-numeric items settings.
+		if (data_item_value) {
+			for (const element of this._$widget_form[0].querySelectorAll('#aggregate-function-warning')) {
+				element.style.display = no_aggregate_function ? 'none' : '';
+			}
+
+			for (const element of this._$widget_form[0].querySelectorAll('#display-warning')) {
+				element.style.display = display_as_is ? 'none' : '';
+			}
+
+			for (const element of this._$widget_form[0].querySelectorAll('#thresholds-warning')) {
+				element.style.display = this._$thresholds_table[0].rows.length > 2 ? '' : 'none';
+			}
+		}
+
 		// Toggle visibility of disabled form elements.
 		$('.form-grid > label', this._$widget_form).each((i, elm) => {
 			const form_field = $(elm).next();
@@ -94,22 +105,6 @@ window.tophosts_column_edit_form = new class {
 			$(elm).toggle(is_visible);
 			form_field.toggle(is_visible);
 		});
-	}
-
-	toggleAggregateFunctionWarning() {
-		$('#aggregate-function-warning').toggle(
-			$('[name="aggregate_function"]', this._$widget_form).val() != <?= AGGREGATE_NONE ?>
-		);
-	}
-
-	toggleDisplayWarning() {
-		$('#display-warning').toggle(
-			$('[name="display"]:checked', this._$widget_form).val() != <?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>
-		);
-	}
-
-	toggleThresholdsWarning() {
-		$('#thresholds-warning').toggle($('#thresholds_table tbody tr').length > 1);
 	}
 
 	handleFormSubmit(e, overlay) {

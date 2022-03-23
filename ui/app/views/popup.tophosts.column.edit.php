@@ -26,6 +26,7 @@
 
 $form = (new CForm())
 	->setName('tophosts_column')
+	->addStyle('display: none;')
 	->addVar('action', $data['action'])
 	->addVar('update', 1)
 	->addItem(
@@ -114,7 +115,7 @@ $form_grid->addItem([
 ]);
 
 $numeric_only_warning = new CSpan([
-	' ',
+	'&nbsp;',
 	makeWarningIcon(_('With this setting only numeric items will be displayed in this column.'))
 ]);
 
