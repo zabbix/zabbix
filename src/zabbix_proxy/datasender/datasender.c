@@ -28,6 +28,8 @@
 #include "zbxtasks.h"
 #include "zbxcrypto.h"
 #include "zbxcompress.h"
+#include "zbxavailability.h"
+#include "avail_protocol.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -45,10 +47,12 @@ extern unsigned int	configured_tls_connect_mode;
 #define ZBX_DATASENDER_TASKS			0x0010
 #define ZBX_DATASENDER_TASKS_RECV		0x0020
 #define ZBX_DATASENDER_TASKS_REQUEST		0x8000
+#define ZBX_DATASENDER_HOSTDATA			0x40
 
 #define ZBX_DATASENDER_DB_UPDATE	(ZBX_DATASENDER_HISTORY | ZBX_DATASENDER_DISCOVERY |		\
 					ZBX_DATASENDER_AUTOREGISTRATION | ZBX_DATASENDER_TASKS |	\
 					ZBX_DATASENDER_TASKS_RECV)
+
 
 /******************************************************************************
  *                                                                            *
@@ -85,7 +89,8 @@ static void	get_hist_upload_state(const char *buffer, int *state)
  ******************************************************************************/
 static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 {
-	static int		data_timestamp = 0, task_timestamp = 0, upload_state = SUCCEED;
+	static int		data_timestamp = 0, task_timestamp = 0, active_avail_timestamp = 0,
+				upload_state = SUCCEED;
 
 	zbx_socket_t		sock;
 	struct zbx_json		j;
@@ -146,6 +151,29 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 		}
 
 		flags |= ZBX_DATASENDER_TASKS_REQUEST;
+	}
+
+	if (SUCCEED == upload_state && ZBX_ACTIVE_PROXY_HOSTDATA_FREQUENCY <= now - active_avail_timestamp)
+	{
+		active_avail_timestamp = now;
+		zbx_ipc_message_t	response;
+
+		zbx_ipc_message_init(&response);
+		zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_HOSTDATA, 0, 0, &response);
+
+		if (0 != response.size)
+		{
+			zbx_vector_ptr_t	hostdata;
+
+			zbx_vector_ptr_create(&hostdata);
+			zbx_availability_deserialize_hostdata(response.data, &hostdata);
+			zbx_availability_serialize_json_hostdata(&hostdata, &j);
+
+			zbx_vector_ptr_clear_ext(&hostdata, (zbx_clean_func_t)zbx_ptr_free);
+			zbx_vector_ptr_destroy(&hostdata);
+		}
+
+		zbx_ipc_message_clean(&response);
 	}
 
 	if (SUCCEED != upload_state)

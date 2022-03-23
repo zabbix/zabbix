@@ -91,6 +91,8 @@ char	*CONFIG_TLS_CIPHER_CMD		= NULL;	/* not used in agent, defined for linking w
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
+int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
+
 #ifndef _WINDOWS
 #	include "../libs/zbxnix/control.h"
 #	include "zbxmodules.h"
@@ -936,6 +938,8 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
 			PARM_OPT,	0,			INT_MAX},
+		{"HeartbeatFrequency",		&CONFIG_HEARTBEAT_FREQUENCY,		TYPE_INT,
+			PARM_OPT,	0,			3600},
 		{NULL}
 	};
 

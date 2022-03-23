@@ -3386,6 +3386,89 @@ void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t 
 	zbx_free(sql);
 }
 
+typedef struct
+{
+	size_t	sql_offset;
+	size_t	sql_alloc;
+	char	*hostids;
+	char	*sql;
+}
+zbx_db_active_avail_clear_query_t;
+
+void	zbx_db_update_active_check_availabilities(void *data, int data_type)
+{
+	//size_t			sql_offset = 0, sql_alloc = 4 * ZBX_KIBIBYTE;
+	//char			*hostids = NULL, *sql = NULL;
+	zbx_host_active_avail_t	*host;
+	int			i = 0;
+	zbx_db_insert_t		insert;
+
+	zbx_db_active_avail_clear_query_t	del_query = {
+			.sql_offset = 0,
+			.sql_alloc = 4 * ZBX_KIBIBYTE,
+			.hostids = NULL,
+			.sql = NULL
+		};
+
+	zbx_db_insert_prepare(&insert, "host_rtdata", "hostid", "availability_status", NULL);
+
+	if (ZBX_ACTIVE_CHECK_AVAILS_DATA_HASHSET == data_type)
+	{
+		zbx_hashset_t		*queue;
+		zbx_hashset_iter_t	iter;
+
+		queue = (zbx_hashset_t *)data;
+
+		zbx_hashset_iter_reset(queue, &iter);
+
+		while (NULL != (host = (zbx_host_active_avail_t *)zbx_hashset_iter_next(&iter)))
+		{
+			if (i > 0)
+				del_query.hostids = zbx_strdcatf(del_query.hostids, "," ZBX_FS_UI64, host->hostid);
+			else
+				del_query.hostids = zbx_strdcatf(del_query.hostids, ZBX_FS_UI64, host->hostid);
+
+			zbx_db_insert_add_values(&insert, host->hostid, host->active_status);
+
+			i++;
+		}
+	}
+	else if (ZBX_ACTIVE_CHECK_AVAILS_DATA_VECTOR == data_type)
+	{
+		zbx_vector_ptr_t	*v;
+
+		v = (zbx_vector_ptr_t *)data;
+
+		while (i < v->values_num)
+		{
+			host = (zbx_host_active_avail_t *)v->values[i];
+
+			if (i > 0)
+				del_query.hostids = zbx_strdcatf(del_query.hostids, "," ZBX_FS_UI64, host->hostid);
+			else
+				del_query.hostids = zbx_strdcatf(del_query.hostids, ZBX_FS_UI64, host->hostid);
+
+			zbx_db_insert_add_values(&insert, host->hostid, host->active_status);
+
+			i++;
+		}
+	}
+
+	zbx_snprintf_alloc(&del_query.sql, &del_query.sql_alloc, &del_query.sql_offset,
+			"delete from host_rtdata where hostid in (%s)", del_query.hostids);
+
+	zbx_free(del_query.hostids);
+
+	DBbegin();
+
+	DBexecute("%s", del_query.sql);
+	zbx_db_insert_execute(&insert);
+	DBcommit();
+
+	zbx_db_insert_clean(&insert);
+	zbx_free(del_query.sql);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: validate that session is active and get associated user data      *

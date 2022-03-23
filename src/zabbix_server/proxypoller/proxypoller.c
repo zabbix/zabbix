@@ -486,6 +486,79 @@ out:
 	return ret;
 }
 
+static int	proxy_process_host_data(DC_PROXY *proxy, const char *answer, zbx_timespec_t *ts)
+{
+	struct zbx_json_parse	jp, jp_hostdata, jp_host;
+	char			*error = NULL;
+	const char		*ptr;
+	char			buffer[MAX_STRING_LEN];
+	zbx_vector_ptr_t	host_avails;
+
+	if (FAIL == zbx_json_open(answer, &jp))
+		return FAIL;
+	
+	if (FAIL == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_HOST_DATA, &jp_hostdata))
+		return FAIL;
+
+	zbx_vector_ptr_create(&host_avails);
+
+	for (ptr = NULL; NULL != (ptr = zbx_json_next(&jp_hostdata, ptr));)
+	{
+		zbx_host_active_avail_t	*avail;
+
+		if (SUCCEED != zbx_json_brackets_open(ptr, &jp_host))
+			continue;
+
+		if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_HOSTID, buffer, sizeof(buffer), NULL))
+		{
+			avail = (zbx_host_active_avail_t *)zbx_malloc(NULL, sizeof(zbx_host_active_avail_t));
+			avail->hostid = atoi(buffer);
+		}
+		else
+			continue;
+
+		if (FAIL == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_ACTIVE_STATUS, buffer, sizeof(buffer), NULL))
+		{
+			zbx_free(avail);
+			continue;
+		}
+
+		avail->active_status = atoi(buffer);
+
+		zbx_vector_ptr_append(&host_avails, avail);
+	}
+
+	if (0 != host_avails.values_num)
+	{
+		zbx_db_update_active_check_availabilities(&host_avails, ZBX_ACTIVE_CHECK_AVAILS_DATA_VECTOR);
+
+		zbx_vector_ptr_clear_ext(&host_avails, zbx_ptr_free);
+		zbx_vector_ptr_destroy(&host_avails);
+	}
+
+	return SUCCEED;
+}
+
+static int	proxy_get_hostdata(DC_PROXY *proxy)
+{
+	char		*answer = NULL;
+	int		ret;
+	zbx_timespec_t	ts;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED != (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_HOST_DATA, &answer, &ts)))
+		return FAIL;
+
+	proxy->lastaccess = time(NULL);
+	ret = proxy_process_host_data(proxy, answer, &ts);
+	zbx_free(answer);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve values of metrics from monitored hosts                   *
@@ -517,6 +590,8 @@ static int	process_proxy(void)
 			update_nextcheck |= ZBX_PROXY_DATA_NEXTCHECK;
 		if (proxy.proxy_tasks_nextcheck <= now)
 			update_nextcheck |= ZBX_PROXY_TASKS_NEXTCHECK;
+		if (proxy.proxy_hostdata_nextcheck <= now)
+			update_nextcheck |= ZBX_PROXY_HOSTDATA_NEXTCHECK;
 
 		/* Check if passive proxy has been misconfigured on the server side. If it has happened more */
 		/* recently than last synchronisation of cache then there is no point to retry connecting to */
@@ -564,6 +639,11 @@ static int	process_proxy(void)
 					check_tasks = 0;
 				}
 				while (ZBX_PROXY_DATA_MORE == more);
+			}
+
+			if (proxy.proxy_hostdata_nextcheck <= now)
+			{
+				proxy_get_hostdata(&proxy);
 			}
 
 			if (1 == check_tasks)

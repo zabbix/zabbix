@@ -42,6 +42,28 @@ static int	DBpatch_6010001(void)
 #undef ZBX_MD5_SIZE
 }
 
+static int	DBpatch_6010002(void)
+{
+	const ZBX_TABLE	table =
+			{"host_rtdata", "hostid", 0,
+				{
+					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"available_active", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6010003(void)
+{
+	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("host_rtdata", 1, &field);
+}
+
 #endif
 
 DBPATCH_START(6010)
@@ -49,5 +71,7 @@ DBPATCH_START(6010)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(6010001, 0, 1)
+DBPATCH_ADD(6010002, 0, 1)
+DBPATCH_ADD(6010003, 0, 1)
 
 DBPATCH_END()
