@@ -1629,11 +1629,10 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   position: relative;
   overflow: hidden;
   word-break: break-word;
-  max-height: 22px;
-  line-height: 22px;
-  padding: 1px; }
+  max-height: 18px;
+  line-height: 18px; }
   .expandable-subfilter.ten-lines {
-    max-height: calc(22px * 10); }
+    max-height: calc(18px * 10); }
   .expandable-subfilter > div {
     display: inline; }
   .expandable-subfilter .hidden {
@@ -1642,9 +1641,6 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
     max-height: none; }
     .expandable-subfilter.expanded .hidden {
       display: unset; }
-
-.tag-values-subfilter > label {
-  padding-top: 3px; }
 
 .form-search {
   position: relative;
@@ -2335,7 +2331,6 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
 .subfilter-enabled {
   display: inline-block;
   height: 18px;
-  line-height: 18px;
   position: relative; }
 
 .subfilter {

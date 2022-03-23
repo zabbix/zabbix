@@ -101,7 +101,7 @@
 			const expand_tags = document.getElementById('expand_tag_values');
 			if (expand_tags !== null) {
 				expand_tags.addEventListener('click', () => {
-					document.querySelectorAll('.tag-values-subfilter.display-none').forEach((element) => {
+					document.querySelectorAll('.subfilter-option-grid.display-none').forEach((element) => {
 						element.classList.remove('display-none');
 					});
 
