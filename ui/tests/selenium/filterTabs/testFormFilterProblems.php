@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/common/testFormFilter.php';
+require_once dirname(__FILE__).'/../common/testFormFilter.php';
 
 /**
  * @backup profiles
@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/common/testFormFilter.php';
 class testFormFilterProblems extends testFormFilter {
 
 	public $url = 'zabbix.php?action=problem.view';
+	public $table_selector = 'class:list-table';
 
 	public static function getCheckCreatedFilterData() {
 		return [
@@ -105,7 +106,7 @@ class testFormFilterProblems extends testFormFilter {
 						'Host groups' => ['Group to check Overview']
 					],
 					'filter' => [
-						'Name' => 'кирилица'
+						'Name' => 'кириллица'
 					],
 					'tab_id' => '4'
 				]
@@ -138,29 +139,29 @@ class testFormFilterProblems extends testFormFilter {
 	 * @dataProvider getCheckCreatedFilterData
 	 */
 	public function testFormFilterProblems_CheckCreatedFilter($data) {
-		$this->createFilter($data, 'filter-create');
-		$this->checkFilters($data);
+		$this->createFilter($data, 'filter-create', 'zabbix');
+		$this->checkFilters($data, $this->table_selector);
 	}
 
 	/**
 	 * Delete filters.
 	 */
 	public function testFormFilterProblems_Delete() {
-		$this->deleteFilter('filter-delete');
+		$this->deleteFilter('filter-delete', 'zabbix');
 	}
 
 	/**
 	 * Updating filter form.
 	 */
 	public function testFormFilterProblems_UpdateForm() {
-		$this->updateFilterForm('filter-update');
+		$this->updateFilterForm('filter-update', 'zabbix', $this->table_selector);
 	}
 
 	/**
 	 * Updating saved filter properties.
 	 */
 	public function testFormFilterProblems_UpdateProperties() {
-		$this->updateFilterProperties('filter-update');
+		$this->updateFilterProperties('filter-update', 'zabbix');
 	}
 
 
@@ -195,7 +196,7 @@ class testFormFilterProblems extends testFormFilter {
 	 * @dataProvider getCustomTimePeriodData
 	 */
 	public function testFormFilterProblems_TimePeriod($data) {
-		$this->createFilter($data, 'Admin');
+		$this->createFilter($data, 'Admin', 'zabbix');
 		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
 		$formid = $this->query('xpath://a[text()="'.$data['filter']['Name'].'"]/parent::li')->waitUntilVisible()->one()->getAttribute('data-target');
 		$form = $this->query('id:'.$formid)->asForm()->one();
