@@ -1010,7 +1010,7 @@ function openMassupdatePopup(action, parameters = {}, {
 }) {
 	const form = trigger_element.closest('form');
 
-	parameters.ids = chkbxRange.getSelectedIds();
+	parameters.ids = Object.keys(chkbxRange.getSelectedIds());
 
 	switch (action) {
 		case 'popup.massupdate.item':
@@ -1045,10 +1045,10 @@ function uncheckTableRows(page, keepids = [], mvc = true) {
 	const key = mvc ? 'cb_zabbix_'+page : 'cb_'+page;
 
 	if (keepids.length) {
-		// If keepids will not have same key as value, it will create mess, when new checkbox will be checked.
 		let keepids_formatted = {};
-		for (const id of Object.values(keepids)) {
-			keepids_formatted[id.toString()] = id.toString();
+
+		for (const [id, attr] of Object.entries(keepids)) {
+			keepids_formatted[id.toString()] = attr;
 		}
 
 		sessionStorage.setItem(key, JSON.stringify(keepids_formatted));

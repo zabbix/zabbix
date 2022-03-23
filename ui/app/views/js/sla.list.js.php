@@ -72,13 +72,13 @@
 					this.disable(e.target, [e.target.dataset.slaid]);
 				}
 				else if (e.target.classList.contains('js-massenable-sla')) {
-					this.enable(e.target, Object.values(chkbxRange.getSelectedIds()));
+					this.enable(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (e.target.classList.contains('js-massdisable-sla')) {
-					this.disable(e.target, Object.values(chkbxRange.getSelectedIds()));
+					this.disable(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (e.target.classList.contains('js-massdelete-sla')) {
-					this.delete(e.target, Object.values(chkbxRange.getSelectedIds()));
+					this.delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 			});
 		},

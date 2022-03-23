@@ -186,11 +186,12 @@ var chkbxRange = {
 				checkbox.checked = checked;
 
 				jQuery(checkbox).closest('tr').toggleClass('row-selected', checked);
-				// Remove class attribute if it's empty
+				// Remove class attribute if it's empty.
 				jQuery(checkbox).closest('tr').filter('*[class=""]').removeAttr('class');
 
 				if (checked) {
-					selected_ids[objectId] = objectId;
+					const actions = document.getElementById(object + '_' + objectId).getAttribute('data-actions');
+					selected_ids[objectId] = (actions === null) ? '' : actions;
 				}
 				else {
 					delete selected_ids[objectId];
@@ -262,14 +263,12 @@ var chkbxRange = {
 		let selected_count = 0;
 		let actions = [];
 
-		for (const id in this.getSelectedIds()) {
+		for (const [id, attr] of Object.entries(this.getSelectedIds())) {
 			selected_count++;
 
-			const checkbox_actions = document.getElementById(object + '_' + id).getAttribute('data-actions');
-
 			// Count the special attributes for checkboxes.
-			if (checkbox_actions) {
-				const action_list = checkbox_actions.split(' ');
+			if (attr !== null) {
+				const action_list = attr.split(' ');
 
 				for (const action of action_list) {
 					if (!actions.hasOwnProperty(action)) {

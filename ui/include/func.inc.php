@@ -2163,11 +2163,16 @@ function hasErrorMessages() {
  * @param array  $keepids   checked rows ids
  */
 function uncheckTableRows($parentid = null, $keepids = []) {
-	$key = implode('_', array_filter(['cb', basename($_SERVER['SCRIPT_NAME'], '.php'), $parentid]));
+	if ($parentid === null) {
+		$key = implode('_', ['cb', basename($_SERVER['SCRIPT_NAME'], '.php')]);
+	}
+	else {
+		// Allow $parentid to be zero. For example actionconf.php uses $parentid as event source.
+		$key = implode('_', ['cb', basename($_SERVER['SCRIPT_NAME'], '.php'), $parentid]);
+	}
 
 	if ($keepids) {
-		// If $keepids will not have same key as value, it will create mess, when new checkbox will be checked.
-		$keepids = array_combine($keepids, $keepids);
+		$keepids = array_fill_keys($keepids, '');
 
 		insert_js('sessionStorage.setItem('.json_encode($key).', JSON.stringify('.json_encode($keepids).'));');
 	}

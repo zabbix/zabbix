@@ -41,7 +41,7 @@
 					this.editUserToken(e.target.dataset.tokenid);
 				}
 				else if (e.target.classList.contains('js-massdelete-token')) {
-					this.massDeleteUserToken(e.target, Object.values(chkbxRange.getSelectedIds()));
+					this.massDeleteUserToken(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 			});
 		},
@@ -90,7 +90,7 @@
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					tokenids: chkbxRange.getSelectedIds()
+					tokenids: Object.keys(chkbxRange.getSelectedIds())
 				})
 			})
 				.then((response) => response.json())

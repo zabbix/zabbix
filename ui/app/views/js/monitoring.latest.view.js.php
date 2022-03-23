@@ -279,7 +279,7 @@
 			fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({itemids: chkbxRange.getSelectedIds()})
+				body: JSON.stringify({itemids: Object.keys(chkbxRange.getSelectedIds())})
 			})
 				.then((response) => response.json())
 				.then((response) => {
@@ -302,7 +302,7 @@
 						addMessage(makeMessageBox('good', [], response.success.title, true, false));
 
 						let uncheckids = chkbxRange.getSelectedIds();
-						uncheckids = Object.values(uncheckids);
+						uncheckids = Object.keys(uncheckids);
 
 						// This will only unset checkboxes from session storage, but not physically deselect them.
 						uncheckTableRows('latest', []);
