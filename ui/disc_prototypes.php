@@ -488,7 +488,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			$db_item = $db_item[0];
 
-			if ($db_item['templateid'] == 0) {
+			if ($item['type'] == ITEM_TYPE_HTTPAGENT && $db_item['templateid'] == 0) {
 				$item = prepareItemHttpAgentFormData($http_item) + $item;
 			}
 
@@ -521,7 +521,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if ($db_item['templateid'] != 0) {
 				$allowed_fields = array_fill_keys([
-					'delay', 'delay_flex', 'history', 'trends', 'history_mode', 'trends_mode', 'allow_traps',
+					'itemid', 'delay', 'delay_flex', 'history', 'trends', 'history_mode', 'trends_mode', 'allow_traps',
 					'description', 'status', 'discover'
 				], true);
 
