@@ -315,7 +315,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 								0 => [
 									'interface_ref' => 'if1',
 								],
-								1 => [
+								2 => [
 									'interface_ref' => 'if3',
 									'type' => 'SNMP',
 									'port' => '161',
