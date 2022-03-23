@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ZCOMMS_H
-#define ZABBIX_ZCOMMS_H
+#ifndef ZABBIX_ZBXCOMMS_H
+#define ZABBIX_ZBXCOMMS_H
 
 #include "zbxalgo.h"
 
@@ -194,4 +194,4 @@ int	zbx_telnet_test_login(ZBX_SOCKET socket_fd);
 int	zbx_telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *password, AGENT_RESULT *result);
 int	zbx_telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *result, const char *encoding);
 
-#endif // ZABBIX_ZCOMMS_H
+#endif // ZABBIX_ZBXCOMMS_H
