@@ -115,7 +115,7 @@ function organizeInterfaces(interface_ids_by_types, item_interface_types, item_t
 		}
 	}
 
-	if (!select_options.some((option) => !option.disabled)) {
+	if (typeof interface_type !== 'undefined' && !select_options.some((option) => !option.disabled)) {
 		noRequiredInterfacesFound();
 	}
 }
