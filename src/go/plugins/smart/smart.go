@@ -252,7 +252,7 @@ func setSingleDiskFields(dev []byte) (out map[string]interface{}, err error) {
 	}
 
 	out["error"] = strings.Join(errors, ", ")
-	out["self_test.passed"] = setSelfTest(sd)
+	out["self_test_passed"] = setSelfTest(sd)
 
 	if diskType == nvmeType {
 		out["temperature"] = sd.HealthLog.Temperature
