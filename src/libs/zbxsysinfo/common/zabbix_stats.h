@@ -20,6 +20,8 @@
 #ifndef ZABBIX_SYSINFO_COMMON_ZABBIX_STATS_H_
 #define ZABBIX_SYSINFO_COMMON_ZABBIX_STATS_H_
 
+#include "module.h"
+
 extern char	*CONFIG_SOURCE_IP;
 extern int	CONFIG_TIMEOUT;
 

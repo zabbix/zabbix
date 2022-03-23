@@ -20,6 +20,8 @@
 #ifndef ZABBIX_HTTPREQUEST_H
 #define ZABBIX_HTTPREQUEST_H
 
+#include "zbxembed.h"
+
 int	zbx_es_init_httprequest(zbx_es_t *es, char **error);
 
 #endif

@@ -17,28 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "expression.h"
+
 #include "zbxserver.h"
 #include "evalfunc.h"
 #include "log.h"
 #include "zbxregexp.h"
 #include "zbxvariant.h"
 #include "zbxeval.h"
-
 #include "valuecache.h"
 #include "macrofunc.h"
 #include "../zbxalgo/vectorimpl.h"
-#ifdef HAVE_LIBXML2
-#	include <libxml/parser.h>
-#	include <libxml/xpath.h>
-#	include <libxml/xmlerror.h>
-
-typedef struct
-{
-	char	*buf;
-	size_t	len;
-}
-zbx_libxml_error_t;
-#endif
+#include "zbxxml.h"
 
 typedef struct
 {
@@ -53,8 +43,6 @@ zbx_rootcause_t;
 
 ZBX_VECTOR_DECL(rootcause, zbx_rootcause_t)
 ZBX_VECTOR_IMPL(rootcause, zbx_rootcause_t)
-
-#include "expression.h"
 
 /* The following definitions are used to identify the request field */
 /* for various value getters grouped by their scope:                */
@@ -117,7 +105,7 @@ static int	get_trigger_severity_name(unsigned char priority, char **replace_to)
  *                                                                            *
  * Purpose: get human readable list of problem update actions                 *
  *                                                                            *
- * Parameters: ack     - [IN] the acknowledge (problem update) data           *
+ * Parameters: ack     - [IN] problem update data                             *
  *             actions - [IN] the required action flags                       *
  *             out     - [OUT] the output buffer                              *
  *                                                                            *
@@ -4223,17 +4211,21 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 		else if (0 == indexed_macro &&
 				0 != (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_PARAMS_FIELD |
 						MACRO_TYPE_LLD_FILTER | MACRO_TYPE_ALLOWED_HOSTS |
-						MACRO_TYPE_SCRIPT_PARAMS_FIELD)))
+						MACRO_TYPE_SCRIPT_PARAMS_FIELD | MACRO_TYPE_QUERY_FILTER)))
 		{
-			if (ZBX_TOKEN_USER_MACRO == token.type)
+			if (ZBX_TOKEN_USER_MACRO == token.type && 0 == (MACRO_TYPE_QUERY_FILTER & macro_type))
 			{
 				DCget_user_macro(&dc_item->host.hostid, 1, m, &replace_to);
 				pos = token.loc.r;
 			}
 			else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
+			{
 				replace_to = zbx_strdup(replace_to, dc_item->host.host);
+			}
 			else if (0 == strcmp(m, MVAR_HOST_NAME))
+			{
 				replace_to = zbx_strdup(replace_to, dc_item->host.name);
+			}
 			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 			{
 				if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
@@ -4652,6 +4644,15 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 		if (0 != (macro_type & MACRO_TYPE_HTTP_JSON) && NULL != replace_to)
 			zbx_json_escape(&replace_to);
 
+		if (0 != (macro_type & MACRO_TYPE_QUERY_FILTER) && NULL != replace_to)
+		{
+			char	*esc;
+
+			esc = zbx_dyn_escape_string(replace_to, "\\");
+			zbx_free(replace_to);
+			replace_to = esc;
+		}
+
 		if (ZBX_TOKEN_FUNC_MACRO == token.type && NULL != replace_to)
 		{
 			if (SUCCEED != (ret = zbx_calculate_macro_function(*data, &token.data.func_macro, &replace_to)))
@@ -4760,7 +4761,7 @@ static int	expand_trigger_macros(zbx_eval_context_t *ctx, const DB_EVENT *event,
 		if (ZBX_EVAL_TOKEN_VAR_MACRO != token->type && ZBX_EVAL_TOKEN_VAR_STR != token->type)
 			continue;
 
-		/* all trigger macros macros are already extracted into strings */
+		/* all trigger macros are already extracted into strings */
 		if (ZBX_VARIANT_STR != token->value.type)
 			continue;
 
@@ -5557,7 +5558,7 @@ static void	process_lld_macro_token(char **data, zbx_token_t *token, int flags, 
 	}
 	else if (0 != (flags & ZBX_TOKEN_XPATH))
 	{
-		xml_escape_xpath(&replace_to);
+		zbx_xml_escape_xpath(&replace_to);
 	}
 	else if (0 != (flags & ZBX_TOKEN_PROMETHEUS))
 	{
@@ -6495,81 +6496,6 @@ exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
-#endif
-}
-
-#ifdef HAVE_LIBXML2
-/******************************************************************************
- *                                                                            *
- * Purpose: libxml2 callback function for error handle                        *
- *                                                                            *
- * Parameters: user_data - [IN/OUT] the user context                          *
- *             err       - [IN] the libxml2 error message                     *
- *                                                                            *
- ******************************************************************************/
-static void	libxml_handle_error(void *user_data, xmlErrorPtr err)
-{
-	zbx_libxml_error_t	*err_ctx;
-
-	if (NULL == user_data)
-		return;
-
-	err_ctx = (zbx_libxml_error_t *)user_data;
-	zbx_strlcat(err_ctx->buf, err->message, err_ctx->len);
-
-	if (NULL != err->str1)
-		zbx_strlcat(err_ctx->buf, err->str1, err_ctx->len);
-
-	if (NULL != err->str2)
-		zbx_strlcat(err_ctx->buf, err->str2, err_ctx->len);
-
-	if (NULL != err->str3)
-		zbx_strlcat(err_ctx->buf, err->str3, err_ctx->len);
-}
-#endif
-
-/******************************************************************************
- *                                                                            *
- * Purpose: validate xpath string                                             *
- *                                                                            *
- * Parameters: xpath  - [IN] the xpath value                                  *
- *             error  - [OUT] the error message buffer                        *
- *             errlen - [IN] the size of error message buffer                 *
- *                                                                            *
- * Return value: SUCCEED - the xpath component was parsed successfully        *
- *               FAIL    - xpath parsing error                                *
- *                                                                            *
- ******************************************************************************/
-int	xml_xpath_check(const char *xpath, char *error, size_t errlen)
-{
-#ifndef HAVE_LIBXML2
-	ZBX_UNUSED(xpath);
-	ZBX_UNUSED(error);
-	ZBX_UNUSED(errlen);
-	return FAIL;
-#else
-	zbx_libxml_error_t	err;
-	xmlXPathContextPtr	ctx;
-	xmlXPathCompExprPtr	p;
-
-	err.buf = error;
-	err.len = errlen;
-
-	ctx = xmlXPathNewContext(NULL);
-	xmlSetStructuredErrorFunc(&err, &libxml_handle_error);
-
-	p = xmlXPathCtxtCompile(ctx, (xmlChar *)xpath);
-	xmlSetStructuredErrorFunc(NULL, NULL);
-
-	if (NULL == p)
-	{
-		xmlXPathFreeContext(ctx);
-		return FAIL;
-	}
-
-	xmlXPathFreeCompExpr(p);
-	xmlXPathFreeContext(ctx);
-	return SUCCEED;
 #endif
 }
 

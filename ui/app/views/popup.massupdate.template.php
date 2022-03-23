@@ -162,6 +162,7 @@ $form->addItem(new CJsScript($this->readJsFile('popup.massupdate.macros.js.php')
 
 $output = [
 	'header' => $data['title'],
+	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_MASSUPDATE_TEMPLATE),
 	'body' => $form->toString(),
 	'buttons' => [
 		[

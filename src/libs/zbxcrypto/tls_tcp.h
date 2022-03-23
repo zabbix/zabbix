@@ -22,7 +22,7 @@
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
-		char **error);
+		const char *server_name, char **error);
 int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error);
 ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error);
 ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error);

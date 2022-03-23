@@ -27,6 +27,10 @@ require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
 
 $widget = (new CWidget())
 	->setTitle(_('Items'))
+	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
+		? CDocHelper::CONFIGURATION_HOST_ITEM_LIST
+		: CDocHelper::CONFIGURATION_TEMPLATE_ITEM_LIST
+	))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())->addItem(
@@ -274,7 +278,7 @@ foreach ($data['items'] as $item) {
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$wizard,
 		($data['hostid'] == 0) ? $item['host'] : null,
-		$description,
+		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
 		$triggerInfo,
 		(new CDiv(CHtml::encode($item['key_'])))->addClass(ZBX_STYLE_WORDWRAP),
 		$item['delay'],
@@ -314,8 +318,9 @@ $button_list += [
 	'popup.massupdate.item' => [
 		'content' => (new CButton('', _('Mass update')))
 			->onClick(
-				"return openMassupdatePopup('popup.massupdate.item', {}, {
-					dialogue_class: 'modal-popup-preprocessing'
+				"openMassupdatePopup('popup.massupdate.item', {}, {
+					dialogue_class: 'modal-popup-preprocessing',
+					trigger_element: this
 				});"
 			)
 			->addClass(ZBX_STYLE_BTN_ALT)

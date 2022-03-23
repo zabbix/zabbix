@@ -323,45 +323,43 @@ func mergeWithSessionData(out map[string]string, metricParams []*Param, session 
 }
 
 // EvalParams returns a mapping of parameters' names to their values passed to a plugin and/or
-// sessions specified in the configuration file.
+// sessions specified in the configuration file and extra remaining parameters.
 // If a session is configured, then an other connection parameters must not be accepted and an error will be returned.
 // Also it returns error in following cases:
 // * incorrect number of parameters are passed;
 // * missing required parameter;
 // * value validation is failed.
-func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params map[string]string, err error) {
-	var (
-		session interface{}
-		val     *string
-	)
-
-	if !m.varParam && len(rawParams) > len(m.params) {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
-
-	if len(rawParams) > 0 && m.params[0].kind == kindSession {
-		session = findSession(rawParams[0], sessions)
+func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params map[string]string, extraParams []string,
+	err error) {
+	session, err := m.parseRawParams(rawParams, sessions)
+	if err != nil {
+		return
 	}
 
 	params = make(map[string]string)
 
-	for i, p := range m.params {
+	var i int
+	for _, p := range m.params {
 		kind := p.kind
 		if kind == kindSession {
 			if session != nil {
+				i++
+
 				continue
 			}
 
 			kind = kindConn
+		} else if kind == kindSessionOnly {
+			continue
 		}
 
-		val = nil
+		var val *string
 		skipConnIfSessionIsSet := !(session != nil && kind == kindConn)
 		ordNum := ordinalize(i + 1)
 
 		if i >= len(rawParams) || rawParams[i] == "" {
 			if p.required && skipConnIfSessionIsSet {
-				return nil, zbxerr.ErrorTooFewParameters.Wrap(
+				return nil, nil, zbxerr.ErrorTooFewParameters.Wrap(
 					fmt.Errorf("%s parameter %q is required", ordNum, p.name))
 			}
 
@@ -369,12 +367,10 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params ma
 				val = p.defaultValue
 			}
 		} else {
-			if p.kind == kindSessionOnly {
-				return nil, zbxerr.ErrorInvalidParams.Wrap(
-					fmt.Errorf("%q cannot be passed as a key parameter", p.name))
-			}
 			val = &rawParams[i]
 		}
+
+		i++
 
 		if val == nil {
 			continue
@@ -382,7 +378,7 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params ma
 
 		if p.validator != nil && skipConnIfSessionIsSet {
 			if err = p.validator.Validate(val); err != nil {
-				return nil, zbxerr.New(fmt.Sprintf("invalid %s parameter %q", ordNum, p.name)).Wrap(err)
+				return nil, nil, zbxerr.New(fmt.Sprintf("invalid %s parameter %q", ordNum, p.name)).Wrap(err)
 			}
 		}
 
@@ -390,7 +386,7 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params ma
 			if session == nil {
 				params[p.name] = *val
 			} else {
-				return nil, zbxerr.ErrorInvalidParams.Wrap(
+				return nil, nil, zbxerr.ErrorInvalidParams.Wrap(
 					fmt.Errorf("%s parameter %q cannot be passed along with session", ordNum, p.name))
 			}
 		}
@@ -403,13 +399,37 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params ma
 	// Fill connection parameters with data from a session
 	if session != nil {
 		if err = mergeWithSessionData(params, m.params, session); err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
 		params["sessionName"] = rawParams[0]
 	}
 
-	return params, nil
+	if i < len(rawParams) {
+		extraParams = rawParams[i:]
+	}
+
+	return params, extraParams, nil
+}
+
+func (m *Metric) parseRawParams(rawParams []string, sessions interface{}) (interface{}, error) {
+	var nonsessionParams int
+
+	for _, p := range m.params {
+		if p.kind != kindSessionOnly {
+			nonsessionParams++
+		}
+	}
+
+	if !m.varParam && len(rawParams) > nonsessionParams {
+		return nil, zbxerr.ErrorTooManyParameters
+	}
+
+	if len(rawParams) > 0 && m.params[0].kind == kindSession {
+		return findSession(rawParams[0], sessions), nil
+	}
+
+	return nil, nil
 }
 
 // MetricSet stores a mapping of keys to metrics.

@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "audit_settings.h"
+
 #include "zbxalgo.h"
 #include "audit.h"
-
-#include "audit_settings.h"
 
 void	zbx_audit_settings_create_entry(int audit_action, zbx_uint64_t configid)
 {

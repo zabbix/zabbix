@@ -43,6 +43,15 @@ const (
 	defaultIndex = 60
 )
 
+func numCPUOnline() int {
+	return numCPU()
+}
+
+func numCPUConf() int {
+	// unsupported on Windows
+	return 0
+}
+
 func numCPU() (numCpu int) {
 	size, err := win32.GetLogicalProcessorInformationEx(win32.RelationProcessorCore, nil)
 	if err != nil {

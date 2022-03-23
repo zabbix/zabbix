@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxprometheus.h"
+
 #include "common.h"
-#include "zbxalgo.h"
 #include "zbxregexp.h"
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxeval.h"
-#include "zbxprometheus.h"
 
 /* Defines maximum row length to be written in error message in the case of parsing failure */
 #define ZBX_PROMEHTEUS_ERROR_MAX_ROW_LENGTH	50
@@ -996,8 +996,8 @@ static int	prometheus_metric_parse_labels(const char *data, size_t pos, zbx_vect
  * Return value: SUCCEED - the row was parsed successfully                    *
  *               FAIL    - otherwise                                          *
  *                                                                            *
- * Comments: If there was no parsing errors, but the row does not match filter*
- *           conditions then success with NULL prow is be returned.           *
+ * Comments: If there were no parsing errors, but the row does not match      *
+ *           filter conditions then success with NULL prow is returned.       *
  *                                                                            *
  ******************************************************************************/
 static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *data, size_t pos,

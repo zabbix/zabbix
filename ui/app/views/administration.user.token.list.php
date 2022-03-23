@@ -21,13 +21,11 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
-if ($data['uncheck']) {
-	uncheckTableRows('user.token');
-}
-
 $this->includeJsFile('administration.user.token.list.js.php');
+$this->addJsFile('class.calendar.js');
 
 $filter = (new CFilter())
 	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'user.token.list'))
@@ -44,7 +42,8 @@ $filter = (new CFilter())
 			->addRow(_('Expires in less than'), [
 				(new CCheckBox('filter_expires_state'))
 					->setChecked($data['filter']['expires_state'])
-					->setId('filter-expires-state'),
+					->setId('filter-expires-state')
+					->onClick('view.expiresDaysHandler()'),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CNumericBox('filter_expires_days', $data['filter']['expires_days'], 3, false, false, false))
 					->setId('filter-expires-days')
@@ -66,10 +65,11 @@ $filter = (new CFilter())
 $widget = (new CWidget())
 	->setTitle(_('API tokens'))
 	->setTitleSubmenu(getUserSettingsSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_USER_TOKEN_LIST))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())->addItem(new CRedirectButton(_('Create API token'),
-				(new CUrl('zabbix.php'))->setArgument('action', 'user.token.edit'))
+			(new CList())->addItem(
+				(new CSimpleButton(_('Create API token')))->addClass('js-create-token')
 			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
@@ -109,10 +109,9 @@ $token_table = (new CTableInfo())
 	]);
 
 foreach ($data['tokens'] as $token) {
-	$name = new CLink($token['name'], (new CUrl('zabbix.php'))
-		->setArgument('action', 'user.token.edit')
-		->setArgument('tokenid', $token['tokenid'])
-	);
+	$name = (new CLink($token['name'], 'javascript:void(0)'))
+		->addClass('js-edit-token')
+		->setAttribute('data-tokenid', $token['tokenid']);
 
 	$token_table->addRow([
 		new CCheckBox('tokenids['.$token['tokenid'].']', $token['tokenid']),
@@ -150,10 +149,20 @@ $token_form->addItem([
 	new CActionButtonList('action', 'tokenids', [
 		'token.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected API tokens?')],
 		'token.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected API tokens?')],
-		'token.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected API tokens?')]
+		'token.delete' => [
+			'content' => (new CSimpleButton(_('Delete')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdelete-token')
+				->addClass('no-chkbxrange')
+				->removeid()
+		]
 	], 'user.token')
 ]);
 
 $widget
 	->addItem($token_form)
+	->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
 	->show();

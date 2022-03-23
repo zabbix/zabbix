@@ -20,9 +20,7 @@
 #ifndef ZABBIX_AVAIL_PROTOCOL_H
 #define ZABBIX_AVAIL_PROTOCOL_H
 
-#include "common.h"
 #include "db.h"
-#include "zbxalgo.h"
 
 void	zbx_availability_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_interface_availability_t *interface_availability);

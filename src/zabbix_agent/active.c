@@ -17,21 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "zbxconf.h"
+#include "active.h"
 
-#include "cfg.h"
+#include "zbxconf.h"
 #include "log.h"
 #include "sysinfo.h"
 #include "logfiles/logfiles.h"
-#include "comms.h"
+#include "zbxcommshigh.h"
 #include "threads.h"
 #include "zbxjson.h"
 #include "alias.h"
-#include "metrics.h"
 #include "zbxregexp.h"
-
-#include "active.h"
 
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
@@ -530,7 +526,7 @@ out:
  *             proto  - configuration parameter prototype                        *
  *                                                                               *
  ********************************************************************************/
-static void process_config_item(struct zbx_json *json, char *config, size_t length, const char *proto)
+static void	process_config_item(struct zbx_json *json, char *config, size_t length, const char *proto)
 {
 	char		**value;
 	AGENT_RESULT	result;
@@ -557,7 +553,7 @@ static void process_config_item(struct zbx_json *json, char *config, size_t leng
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get host %s using \"%s\" item specified by"
 					" \"%s\" configuration parameter: returned value is not"
-					" an UTF-8 string",config_type, config, config_name);
+					" a UTF-8 string",config_type, config, config_name);
 		}
 		else
 		{
@@ -641,7 +637,7 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs)
 
 	level = SUCCEED != last_ret ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
 
-	if (SUCCEED == (ret = connect_to_server(&s, CONFIG_SOURCE_IP, addrs, CONFIG_TIMEOUT, CONFIG_TIMEOUT,
+	if (SUCCEED == (ret = zbx_connect_to_server(&s, CONFIG_SOURCE_IP, addrs, CONFIG_TIMEOUT, CONFIG_TIMEOUT,
 			configured_tls_connect_mode, 0, level)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "sending [%s]", json.buffer);
@@ -822,7 +818,7 @@ static int	send_buffer(zbx_vector_ptr_t *addrs, zbx_vector_pre_persistent_t *pre
 
 	level = 0 == buffer.first_error ? LOG_LEVEL_WARNING : LOG_LEVEL_DEBUG;
 
-	if (SUCCEED == (ret = connect_to_server(&s, CONFIG_SOURCE_IP, addrs, MIN(buffer.count * CONFIG_TIMEOUT, 60),
+	if (SUCCEED == (ret = zbx_connect_to_server(&s, CONFIG_SOURCE_IP, addrs, MIN(buffer.count * CONFIG_TIMEOUT, 60),
 			CONFIG_TIMEOUT, configured_tls_connect_mode, 0, level)))
 	{
 		zbx_timespec(&ts);
@@ -1227,6 +1223,7 @@ static void	process_active_checks(zbx_vector_ptr_t *addrs)
 		if (0 == metric->refresh)
 		{
 			ret = FAIL;
+			metric->refresh = SEC_PER_YEAR;
 			error = zbx_strdup(error, "Incorrect update interval.");
 		}
 		else if (0 != ((ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT) & metric->flags))
@@ -1419,6 +1416,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			else
 			{
 				nextrefresh = time(NULL) + CONFIG_REFRESH_ACTIVE_CHECKS;
+				nextcheck = 0;
 			}
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 			zbx_remove_inactive_persistent_files(&persistent_inactive_vec);

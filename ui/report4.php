@@ -61,7 +61,9 @@ CArrayHelper::sort($db_media_types, ['name']);
 
 $media_types = array_column($db_media_types, 'name', 'mediatypeid');
 
-$widget = (new CWidget())->setTitle(_('Notifications'));
+$widget = (new CWidget())
+	->setTitle(_('Notifications'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORT4));
 
 if ($media_types) {
 	$table = (new CTableInfo())->makeVerticalRotation();

@@ -324,7 +324,7 @@ class CTest extends TestCase {
 
 			if (self::$last_test_case !== $case_name) {
 				if (array_key_exists($case_name, self::$test_data_sets)) {
-					// Check for data data set limit.
+					// Check for data set limit.
 					$limit = $this->getAnnotationTokensByName($method_annotations, 'dataLimit');
 
 					if (count($limit) === 1 && is_numeric($limit[0]) && $limit[0] >= 1

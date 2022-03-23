@@ -324,7 +324,7 @@ class testFormScheduledReport extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'start time 24 hour'
+						'Name' => 'start time 24 hours'
 					],
 					'Start time' => '24:10',
 					'message_details' => 'Incorrect value for field "hours": value must be no greater than "23".'
