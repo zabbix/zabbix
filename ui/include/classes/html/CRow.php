@@ -22,7 +22,7 @@
 class CRow extends CTag {
 
 	protected $heading_column;
-	protected $colspan_count = 0;
+	protected $colspan = 0;
 
 	/**
 	 * @param CTag|array|null $item
@@ -43,25 +43,25 @@ class CRow extends CTag {
 	 */
 	public function addItem($item) {
 		if ($item instanceof CCol) {
-			$this->colspan_count += $item->getColspan();
+			$this->colspan += $item->getColspan();
 			parent::addItem($item);
 		}
 		elseif (is_array($item)) {
 			foreach ($item as $el) {
 				if ($el instanceof CCol) {
-					$this->colspan_count += $el->getColspan();
+					$this->colspan += $el->getColspan();
 					parent::addItem($el);
 				}
 				elseif ($el !== null) {
 					$col = $this->createCell($el);
-					$this->colspan_count += $col->getColspan();
+					$this->colspan += $col->getColspan();
 					parent::addItem($col);
 				}
 			}
 		}
 		elseif ($item !== null) {
 			$col = $this->createCell($item);
-			$this->colspan_count += $col->getColspan();
+			$this->colspan += $col->getColspan();
 			parent::addItem($col);
 		}
 
@@ -86,7 +86,7 @@ class CRow extends CTag {
 	 *
 	 * @return int
 	 */
-	public function getColspan(): int {
-		return $this->colspan_count;
+	public function getColSpan(): int {
+		return $this->colspan;
 	}
 }

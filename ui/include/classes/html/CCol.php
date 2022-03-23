@@ -34,6 +34,10 @@ class CCol extends CTag {
 		return $this;
 	}
 
+	public function getColSpan() {
+		return $this->getAttribute('colspan') ?? 1;
+	}
+
 	public function setColSpan($value) {
 		$this->setAttribute('colspan', $value);
 
@@ -44,9 +48,5 @@ class CCol extends CTag {
 		$this->setAttribute('width', $value);
 
 		return $this;
-	}
-
-	public function getColspan() {
-		return $this->getAttribute('colspan') ?? 1;
 	}
 }
