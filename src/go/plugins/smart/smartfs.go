@@ -64,12 +64,12 @@ type devices struct {
 }
 
 type device struct {
-	Name         string   `json:"{#NAME}"`
-	DeviceType   string   `json:"{#DISKTYPE}"`
-	Model        string   `json:"{#MODEL}"`
-	SerialNumber string   `json:"{#SN}"`
-	Path         string   `json:"{#PATH}"`
-	Attributes   []string `json:"{#ATTRIBUTES}"`
+	Name         string `json:"{#NAME}"`
+	DeviceType   string `json:"{#DISKTYPE}"`
+	Model        string `json:"{#MODEL}"`
+	SerialNumber string `json:"{#SN}"`
+	Path         string `json:"{#PATH}"`
+	Attributes   string `json:"{#ATTRIBUTES}"`
 }
 type jsonDevice struct {
 	serialNumber string
