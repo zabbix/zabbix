@@ -320,9 +320,14 @@ class C44ImportConverterTest extends CImportConverterTest {
 									'type' => 'SNMP',
 									'port' => '161',
 									'details' => [
+										'bulk' => 'YES',
 										'version' => 'SNMPV1',
 										'community' => 'public'
-									]
+									],
+									'default' => 'YES',
+									'useip' => 'YES',
+									'ip' => '127.0.0.1',
+									'dns' => ''
 								]
 							],
 							'items' => [
