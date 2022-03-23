@@ -17,14 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "dns.h"
+
 #include "common.h"
 #include "sysinfo.h"
-
-#include "comms.h"
+#include "zbxcomms.h"
 #include "log.h"
-#include "cfg.h"
-
-#include "dns.h"
 #include "zbxalgo.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)

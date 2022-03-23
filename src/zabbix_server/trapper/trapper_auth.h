@@ -20,7 +20,7 @@
 #ifndef ZABBIX_TRAPPER_AUTH_H
 #define ZABBIX_TRAPPER_AUTH_H
 
-#include "comms.h"
+#include "common.h"
 #include "zbxjson.h"
 
 int	zbx_get_user_from_json(const struct zbx_json_parse *jp, zbx_user_t *user, char **result);

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T06:58:33Z'
+  date: '2022-01-26T10:50:14Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -18,7 +18,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -41,8 +41,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: application
           triggers:
             -
               uuid: 926f1767aae74529a972c7b8b09f4442
@@ -51,6 +51,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 5c0653e99ddb4f26ae12ce4d6ce9892c
           name: 'WildFly: Launch type'
@@ -70,8 +74,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: application
         -
           uuid: 5412059106e844ae89f6f84b4da42388
           name: 'WildFly: Name'
@@ -93,8 +97,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: application
         -
           uuid: d5e2f5e277874567a5d46196fd032298
           name: 'WildFly: Process type'
@@ -114,8 +118,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: application
         -
           uuid: f1bb15824f384e21bb9ae1224abd18e0
           name: 'WildFly: Version'
@@ -135,8 +139,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             -
-              tag: Application
-              value: WildFly
+              tag: component
+              value: application
           triggers:
             -
               uuid: 76d500211fd9479fafbd0fb7d41ffd68
@@ -145,6 +149,10 @@ zabbix_export:
               priority: INFO
               description: 'WildFly version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
       discovery_rules:
         -
           uuid: 3af697e56771487abee9f62e453fb0c3
@@ -191,8 +199,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly deployment [{#DEPLOYMENT}]'
+                  tag: component
+                  value: deployments
+                -
+                  tag: deployment
+                  value: '{#DEPLOYMENT}'
+                -
+                  tag: server-group
+                  value: '{#SERVER_GROUP}'
             -
               uuid: 45d729721df34ef297109b58027ca4c1
               name: 'WildFly deployment [{#DEPLOYMENT}]: Managed'
@@ -216,8 +230,14 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly deployment [{#DEPLOYMENT}]'
+                  tag: component
+                  value: deployments
+                -
+                  tag: deployment
+                  value: '{#DEPLOYMENT}'
+                -
+                  tag: server-group
+                  value: '{#SERVER_GROUP}'
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           lld_macro_paths:
             -
@@ -274,8 +294,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly domain: Server [{#SERVER}]'
+                  tag: component
+                  value: servers
+                -
+                  tag: server
+                  value: '{#SERVER}'
             -
               uuid: bd544e2d41c148f993b84ca7d1aad4a9
               name: 'WildFly domain: Server {#SERVER}: Server group'
@@ -295,8 +318,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly domain: Server [{#SERVER}]'
+                  tag: component
+                  value: servers
+                -
+                  tag: server
+                  value: '{#SERVER}'
               trigger_prototypes:
                 -
                   uuid: da5368f2eec040bbb05f13faa6375052
@@ -305,6 +331,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Server group has changed. Ack to close.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 64a8a71b3d254a479ce4e5ea82f566ee
               name: 'WildFly domain: Server {#SERVER}: Status'
@@ -324,8 +354,11 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 -
-                  tag: Application
-                  value: 'WildFly domain: Server [{#SERVER}]'
+                  tag: component
+                  value: servers
+                -
+                  tag: server
+                  value: '{#SERVER}'
               trigger_prototypes:
                 -
                   uuid: 79409a9fae6442c9ad655655a752365d
@@ -334,6 +367,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'Server status has changed. Ack to close.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           lld_macro_paths:
             -
@@ -342,6 +379,13 @@ zabbix_export:
             -
               lld_macro: '{#SERVER}'
               path: '$.properties.["server-config"]'
+      tags:
+        -
+          tag: class
+          value: application
+        -
+          tag: target
+          value: wildfly-domain
       macros:
         -
           macro: '{$WILDFLY.DEPLOYMENT.MATCHES}'

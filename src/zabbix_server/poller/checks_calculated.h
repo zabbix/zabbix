@@ -20,9 +20,8 @@
 #ifndef ZABBIX_CHECKS_CALCULATED_H
 #define ZABBIX_CHECKS_CALCULATED_H
 
-#include "common.h"
 #include "dbcache.h"
-#include "sysinfo.h"
+#include "module.h"
 
 int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result);
 

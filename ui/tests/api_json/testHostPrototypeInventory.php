@@ -31,7 +31,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 class testHostPrototypeInventory extends CAPITest {
 
 	public static function dataProviderCreate() {
-		$ruleid = 40066;
+		$ruleid = 400660;
 
 		return [
 			[

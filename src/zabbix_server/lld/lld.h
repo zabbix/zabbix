@@ -22,7 +22,6 @@
 
 #include "common.h"
 #include "zbxjson.h"
-#include "zbxalgo.h"
 #include "db.h"
 
 typedef struct
@@ -225,8 +224,6 @@ typedef struct
 zbx_lld_item_full_t;
 
 void	lld_field_str_rollback(char **field, char **field_orig, zbx_uint64_t *flags, zbx_uint64_t flag);
-void	lld_field_uint64_rollback(zbx_uint64_t *field, zbx_uint64_t *field_orig, zbx_uint64_t *flags,
-		zbx_uint64_t flag);
 
 void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, const char **delay,
 		const char **history, const char **trends, zbx_vector_db_tag_ptr_t *override_tags,

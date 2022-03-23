@@ -26,23 +26,14 @@
 $table = (new CTableInfo())->setNoDataMessage(_('No graphs added.'));
 
 foreach ($data['graphs'] as $graph) {
-	$url = $graph['simple']
-		? (new CUrl('history.php'))
-			->setArgument('action', HISTORY_GRAPH)
-			->setArgument('itemids', [$graph['itemid']])
-		: (new CUrl('zabbix.php'))
-			->setArgument('action', 'charts.view')
-			->setArgument('view_as', HISTORY_GRAPH)
-			->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
-			->setArgument('filter_graphids', [$graph['graphid']])
-			->setArgument('filter_set', '1');
+	$url = (new CUrl('history.php'))
+		->setArgument('action', HISTORY_GRAPH)
+		->setArgument('itemids', [$graph['itemid']]);
 
-	$on_click = $graph['simple']
-		? "rm4favorites('itemid','".$graph['itemid']."')"
-		: "rm4favorites('graphid','".$graph['graphid']."')";
+	$on_click = "rm4favorites('itemid','".$graph['itemid']."')";
 
 	$table->addRow([
-		($graph['simple'] && $data['allowed_ui_latest_data']) || (!$graph['simple'] && $data['allowed_ui_hosts'])
+		$data['allowed_ui_latest_data']
 			? new CLink($graph['label'], $url)
 			: $graph['label'],
 		(new CButton())

@@ -100,7 +100,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_search_type=0&filter_graphids%5B%5D=523&filter_set=1',
+				'url' => 'zabbix.php?action=charts.view&filter_hostids%5B0%5D=10084&filter_show=1&filter_set=1',
 				'title' =>	'Custom graphs',
 				'no_permissions_to_object' => true,
 				'users' => [

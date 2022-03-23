@@ -28,25 +28,25 @@ class CHintBoxHelper {
 	 * @param string $eventid_till
 	 * @param bool   $show_timeline              (optional) Show time line flag.
 	 * @param int    $show_tags                  (optional) Show tags flag. Possible values:
-	 *                                             - PROBLEMS_SHOW_TAGS_NONE;
-	 *                                             - PROBLEMS_SHOW_TAGS_1;
-	 *                                             - PROBLEMS_SHOW_TAGS_2;
-	 *                                             - PROBLEMS_SHOW_TAGS_3 (default).
+	 *                                             - SHOW_TAGS_NONE;
+	 *                                             - SHOW_TAGS_1;
+	 *                                             - SHOW_TAGS_2;
+	 *                                             - SHOW_TAGS_3 (default).
 	 * @param array  $filter_tags                (optional) An array of tag filtering data.
 	 * @param string $filter_tags[]['tag']       Tag name.
 	 * @param int    $filter_tags[]['operator']  Tag operator.
 	 * @param string $filter_tags[]['value']     Tag value.
 	 * @param int    $tag_name_format            (optional) Tag name format. Possible values:
-	 *                                             - PROBLEMS_TAG_NAME_FULL (default);
-	 *                                             - PROBLEMS_TAG_NAME_SHORTENED;
-	 *                                             - PROBLEMS_TAG_NAME_NONE.
+	 *                                             - TAG_NAME_FULL (default);
+	 *                                             - TAG_NAME_SHORTENED;
+	 *                                             - TAG_NAME_NONE.
 	 * @param string $tag_priority               (optional) A list of comma-separated tag names.
 	 *
 	 * @return array
 	 */
 	public static function getEventList(string $triggerid, string $eventid_till, bool $show_timeline = true,
-			int $show_tags = PROBLEMS_SHOW_TAGS_3, array $filter_tags = [],
-			int $tag_name_format = PROBLEMS_TAG_NAME_FULL, string $tag_priority = ''): array {
+			int $show_tags = SHOW_TAGS_3, array $filter_tags = [],
+			int $tag_name_format = TAG_NAME_FULL, string $tag_priority = ''): array {
 		$data = [
 			'type' => 'eventlist',
 			'data' => [

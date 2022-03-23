@@ -205,7 +205,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Edit dashboard'
 					],
 					'list_link' => 'zabbix.php?action=dashboard.list',
-					'action_link' => 'zabbix.php?action=dashboard.view&dashboardid=122',
+					'action_link' => 'zabbix.php?action=dashboard.view&dashboardid=1220',
 					'action' => 'Create and edit dashboards',
 					'check_links' => ['zabbix.php?action=dashboard.view&new=1']
 				]
@@ -529,6 +529,7 @@ class testUserRolesPermissions extends CWebTest {
 
 		foreach ([true, false] as $action_status) {
 			$page_number = $this->query('xpath://ul[@class="menu-main"]/li/a')->count();
+			$all_pages = [];
 
 			for ($i = 1; $i <= $page_number; ++$i) {
 				$all_pages[] = $this->query('xpath:(//ul[@class="menu-main"]/li/a)['.$i.']')->one()->getText();
@@ -537,7 +538,6 @@ class testUserRolesPermissions extends CWebTest {
 			if ($action_status) {
 				$this->assertEquals($pages_before, $all_pages);
 				$this->changeRoleRule(['5th Module' => false]);
-				$all_pages = [];
 			}
 			else {
 				$pages_after = array_values(array_diff($pages_before, ['Module 5 menu']));
@@ -1411,6 +1411,10 @@ class testUserRolesPermissions extends CWebTest {
 			$services_mode->select('Edit');
 			$this->page->waituntilReady();
 		}
+
+		// Filter out unnecessary services.
+		$this->query('id:filter_tags_0_tag')->waitUntilVisible()->one()->fill('action');
+		$this->query('id:filter_tags_0_operator')->asZDropdown()->waitUntilVisible()->one()->fill('Does not exist');
 
 		// Apply filter in order to see the list of available services.
 		$this->query('name:filter_set')->waitUntilClickable()->one()->click();

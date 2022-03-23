@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-16T07:40:17Z'
+  date: '2022-01-26T10:37:09Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -19,7 +19,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Databases
@@ -45,8 +45,8 @@ zabbix_export:
           url: '{$PD.URL}:{$PD.PORT}/metrics'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 7eb740eed4eb43a0a449e1c1436e582b
           name: 'PD: Get instance status'
@@ -66,8 +66,11 @@ zabbix_export:
           url: '{$PD.URL}:{$PD.PORT}/pd/api/v1/status'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: health
+            -
+              tag: component
+              value: raw
         -
           uuid: 101266930d0747748bf3cbd9259e2818
           name: 'PD: GRPC Commands total, rate'
@@ -91,8 +94,8 @@ zabbix_export:
             key: pd.get_metrics
           tags:
             -
-              tag: Application
-              value: 'PD instance'
+              tag: component
+              value: grpc
         -
           uuid: c18f702f68bf4fed94a598daffdada8a
           name: 'PD: Status'
@@ -120,14 +123,18 @@ zabbix_export:
             key: pd.get_status
           tags:
             -
-              tag: Application
-              value: 'PD instance'
+              tag: component
+              value: health
           triggers:
             -
               uuid: ab1d0d23dad844099e42debb71512887
               expression: 'last(/TiDB PD by HTTP/pd.status)=0'
               name: 'PD: Instance is not responding'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 0b71c8a5104b46ebbeabe0d708b6676e
           name: 'PD: Uptime'
@@ -153,8 +160,8 @@ zabbix_export:
             key: pd.get_status
           tags:
             -
-              tag: Application
-              value: 'PD instance'
+              tag: component
+              value: application
           triggers:
             -
               uuid: 9f47a19f6f424df598e74c5a653ebf27
@@ -163,6 +170,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: c7e8e9bf01d04e5db25bd8eaafff3b80
           name: 'PD: Version'
@@ -186,8 +197,8 @@ zabbix_export:
             key: pd.get_status
           tags:
             -
-              tag: Application
-              value: 'PD instance'
+              tag: component
+              value: application
           triggers:
             -
               uuid: 6fb6045405af4c89b09750f57ada472a
@@ -196,6 +207,10 @@ zabbix_export:
               priority: INFO
               description: 'PD version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
       discovery_rules:
         -
           uuid: cd1f27cf5f1d4f6f84032386ec7f8abb
@@ -222,8 +237,11 @@ zabbix_export:
                 key: pd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'TiDB cluster'
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: regions
             -
               uuid: 0950ba514e05447c8cfe726ec2d76944
               name: 'TiDB cluster: Current peer count'
@@ -241,8 +259,11 @@ zabbix_export:
                 key: pd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'TiDB cluster'
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: peers
             -
               uuid: d39f58372e3f464c87b2ec42acdf2061
               name: 'TiDB cluster: Storage capacity'
@@ -266,8 +287,11 @@ zabbix_export:
                 key: pd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'TiDB cluster'
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: storage
             -
               uuid: c72e6a2f89d041c4bf764021b9bc182c
               name: 'TiDB cluster: Storage size'
@@ -287,8 +311,11 @@ zabbix_export:
                 key: pd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'TiDB cluster'
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 517cea991add45319d30047ac96fd9e4
               name: 'TiDB cluster: Disconnect stores'
@@ -310,8 +337,11 @@ zabbix_export:
                 key: pd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'TiDB cluster'
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: stores
               trigger_prototypes:
                 -
                   uuid: 077d39f8ea194081a9d0c5dfdec4d1b5
@@ -319,6 +349,10 @@ zabbix_export:
                   name: 'TiDB cluster: There are disconnected TiKV nodes'
                   priority: WARNING
                   description: 'PD does not receive a TiKV heartbeat within 20 seconds. Normally a TiKV heartbeat comes in every 10 seconds.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 7125a7c858264f339e879c1389c6c027
               name: 'TiDB cluster: Down stores'
@@ -340,8 +374,11 @@ zabbix_export:
                 key: pd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'TiDB cluster'
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: stores
               trigger_prototypes:
                 -
                   uuid: 526b935d3fa04825b7544eb6efd50ab5
@@ -349,6 +386,10 @@ zabbix_export:
                   name: 'TiDB cluster: There are offline TiKV nodes'
                   priority: AVERAGE
                   description: 'PD has not received a TiKV heartbeat for a long time.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: c3bd9d1e0f6c427ab5232e57769030d1
               name: 'TiDB cluster: Lowspace stores'
@@ -370,8 +411,11 @@ zabbix_export:
                 key: pd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'TiDB cluster'
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: stores
               trigger_prototypes:
                 -
                   uuid: 87ef0f211afd4d58adec05007ef1d263
@@ -379,6 +423,10 @@ zabbix_export:
                   name: 'TiDB cluster: There are low space TiKV nodes'
                   priority: AVERAGE
                   description: 'Indicates that there is no sufficient space on the TiKV node.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: 3c24fb49463b45f199dbc3955e87d01b
               name: 'TiDB cluster: Offline stores'
@@ -399,8 +447,11 @@ zabbix_export:
                 key: pd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'TiDB cluster'
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: stores
             -
               uuid: 476a1b6e3c9b4b41ae1637f0e12801c9
               name: 'TiDB cluster: Tombstone stores'
@@ -422,8 +473,11 @@ zabbix_export:
                 key: pd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'TiDB cluster'
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: stores
             -
               uuid: 89db2b996fbe41bdb6b82ccf75139090
               name: 'TiDB cluster: Unhealth stores'
@@ -445,8 +499,11 @@ zabbix_export:
                 key: pd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'TiDB cluster'
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: stores
             -
               uuid: ff80108e2a5e45779a428a6fd31ea089
               name: 'TiDB cluster: Normal stores'
@@ -468,8 +525,11 @@ zabbix_export:
                 key: pd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'TiDB cluster'
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: stores
           trigger_prototypes:
             -
               uuid: 843d566b33bc401390c2a633d08bb033
@@ -477,6 +537,10 @@ zabbix_export:
               name: 'TiDB cluster: Current storage usage is too high (over {$PD.STORAGE_USAGE.MAX.WARN}% for 5m)'
               priority: WARNING
               description: 'Over {$PD.STORAGE_USAGE.MAX.WARN}% of the cluster space is occupied.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
           graph_prototypes:
             -
               uuid: 270de7aa73cf454cb147a3f5b39ebb35
@@ -540,8 +604,11 @@ zabbix_export:
                 key: pd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'PD instance'
+                  tag: component
+                  value: grpc
+                -
+                  tag: grpc_method
+                  value: '{#GRPC_METHOD}'
           master_item:
             key: pd.get_metrics
           preprocessing:
@@ -602,8 +669,11 @@ zabbix_export:
                 key: pd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'TiDB Store [{#STORE_ADDRESS}]'
+                  tag: address
+                  value: '{#STORE_ADDRESS}'
+                -
+                  tag: component
+                  value: regions
             -
               uuid: 1d1d686f5c544a89a691a9b75e5c3b11
               name: 'PD: Region heartbeat: active, rate'
@@ -628,8 +698,11 @@ zabbix_export:
                 key: pd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'TiDB Store [{#STORE_ADDRESS}]'
+                  tag: address
+                  value: '{#STORE_ADDRESS}'
+                -
+                  tag: component
+                  value: regions
             -
               uuid: c44f934ce8a144afa95252041535ef44
               name: 'PD: Region schedule push: total, rate'
@@ -653,8 +726,11 @@ zabbix_export:
                 key: pd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'TiDB Store [{#STORE_ADDRESS}]'
+                  tag: address
+                  value: '{#STORE_ADDRESS}'
+                -
+                  tag: component
+                  value: regions
             -
               uuid: ea76344669de4251a0e7bef35d70494a
               name: 'PD: Region heartbeat: total, rate'
@@ -679,8 +755,11 @@ zabbix_export:
                 key: pd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'TiDB Store [{#STORE_ADDRESS}]'
+                  tag: address
+                  value: '{#STORE_ADDRESS}'
+                -
+                  tag: component
+                  value: regions
           master_item:
             key: pd.get_metrics
           preprocessing:
@@ -735,8 +814,11 @@ zabbix_export:
                 key: pd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'TiDB cluster'
+                  tag: component
+                  value: regions
+                -
+                  tag: type
+                  value: '{#TYPE}'
           master_item:
             key: pd.get_metrics
           preprocessing:
@@ -784,8 +866,11 @@ zabbix_export:
                 key: pd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'TiDB cluster'
+                  tag: component
+                  value: regions
+                -
+                  tag: type
+                  value: '{#TYPE}'
               trigger_prototypes:
                 -
                   uuid: 2bc6b48bbfd8436e80903ea947571501
@@ -794,6 +879,10 @@ zabbix_export:
                   discover: NO_DISCOVER
                   priority: WARNING
                   description: 'The number of Regions with an unresponsive peer reported by the Raft leader.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 1f80bd81d11345f59699617113a0cad5
                   expression: 'min(/TiDB PD by HTTP/pd.region_status[{#TYPE}],5m)>{$PD.MISS_REGION.MAX.WARN}'
@@ -801,6 +890,10 @@ zabbix_export:
                   discover: NO_DISCOVER
                   priority: WARNING
                   description: 'The number of Region replicas is smaller than the value of max-replicas. When a TiKV machine is down and its downtime exceeds max-down-time, it usually leads to missing replicas for some Regions during a period of time. When a TiKV node is made offline, it might result in a small number of Regions with missing replicas.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           master_item:
             key: pd.get_metrics
           preprocessing:
@@ -883,8 +976,11 @@ zabbix_export:
                 key: pd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'TiDB cluster'
+                  tag: component
+                  value: scheduler
+                -
+                  tag: scheduler
+                  value: '{#KIND}'
           master_item:
             key: pd.get_metrics
           preprocessing:
@@ -906,6 +1002,16 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+      tags:
+        -
+          tag: class
+          value: database
+        -
+          tag: target
+          value: pd
+        -
+          tag: target
+          value: tidb
       macros:
         -
           macro: '{$PD.MISS_REGION.MAX.WARN}'

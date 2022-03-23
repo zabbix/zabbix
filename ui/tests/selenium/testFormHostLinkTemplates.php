@@ -47,9 +47,9 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
 		$dialog = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
-		$dialog->fill(['Templates' => 'Linux by Zabbix agent']);
+		$dialog->fill(['Templates' => 'Linux by Zabbix agent active']);
 
-		$this->zbxTestTextPresent('Linux by Zabbix agent');
+		$this->zbxTestTextPresent('Linux by Zabbix agent active');
 		$dialog->submit();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
@@ -62,7 +62,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 	public function testFormHostLinkTemplates_TemplateUnlink() {
 		// Unlink a template from a host from host properties page
 
-		$template = 'Linux by Zabbix agent';
+		$template = 'Linux by Zabbix agent active';
 		$host = 'Template linkage test host';
 
 		$sql = 'select hostid from hosts where host='.zbx_dbstr($host).' and status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
@@ -107,9 +107,9 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
 		$form = $this->query('name:host-form')->asForm()->waitUntilReady()->one();
-		$form->fill(['Templates' => 'Linux by Zabbix agent']);
+		$form->fill(['Templates' => 'Linux by Zabbix agent active']);
 
-		$this->zbxTestTextPresent('Linux by Zabbix agent');
+		$this->zbxTestTextPresent('Linux by Zabbix agent active');
 		$form->submit();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
@@ -122,7 +122,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 	public function testFormHostLinkTemplates_TemplateUnlinkAndClear() {
 		// Unlink and clear a template from a host from host properties page
 
-		$template = 'Linux by Zabbix agent';
+		$template = 'Linux by Zabbix agent active';
 		$host = 'Template linkage test host';
 
 		$sql = 'select hostid from hosts where host='.zbx_dbstr($host).' and status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';

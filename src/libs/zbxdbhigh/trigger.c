@@ -22,8 +22,6 @@
 #include "db.h"
 #include "log.h"
 #include "dbcache.h"
-#include "zbxserver.h"
-#include "template.h"
 #include "events.h"
 
 #define ZBX_FLAGS_TRIGGER_CREATE_NOTHING		0x00
@@ -545,7 +543,7 @@ int	zbx_db_trigger_get_itemid(const DB_TRIGGER *trigger, int index, zbx_uint64_t
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get unique itemids of trigger functions in the order at they are  *
+ * Purpose: get unique itemids of trigger functions in the order they are     *
  *          written in expression                                             *
  *                                                                            *
  * Parameters: trigger - [IN] the trigger                                     *

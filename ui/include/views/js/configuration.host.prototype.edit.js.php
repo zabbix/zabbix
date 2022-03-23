@@ -34,13 +34,20 @@
 			<button class="<?= ZBX_STYLE_BTN_LINK ?> group-prototype-remove" type="button" name="remove">
 				<?= _('Remove') ?>
 			</button>
-			<input type="hidden" name="group_prototypes[#{i}][group_prototypeid]" value="#{group_prototypeid}" />
 		</td>
 	</tr>
 </script>
 
 <script type="text/x-jquery-tmpl" id="host-interface-row-tmpl">
 	<?= (new CPartial('configuration.host.interface.row'))->getOutput() ?>
+</script>
+
+<script>
+	const view = {
+		editHost(e, hostid) {
+			return;
+		}
+	}
 </script>
 
 <script type="text/javascript">
@@ -192,13 +199,10 @@
 		});
 
 		<?php if (!$data['host_prototype']['groupPrototypes']): ?>
-			addGroupPrototypeRow({'name': '', 'group_prototypeid': ''});
+			addGroupPrototypeRow({'name': ''});
 		<?php endif ?>
 		<?php foreach ($data['host_prototype']['groupPrototypes'] as $i => $groupPrototype): ?>
-			addGroupPrototypeRow(<?= json_encode([
-				'name' => $groupPrototype['name'],
-				'group_prototypeid' => isset($groupPrototype['group_prototypeid']) ? $groupPrototype['group_prototypeid'] : null
-			]) ?>);
+			addGroupPrototypeRow(<?= json_encode(['name' => $groupPrototype['name']]) ?>);
 		<?php endforeach ?>
 
 		<?php if ($data['host_prototype']['templateid']): ?>

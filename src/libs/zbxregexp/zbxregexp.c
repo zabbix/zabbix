@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "zbxregexp.h"
+
+#include "common.h"
 #include "log.h"
 
 #ifdef HAVE_PCRE_H
@@ -150,12 +151,12 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 #ifdef HAVE_PCRE2_H
 	*err_msg = NULL;
 
-	if (NULL == (pcre2_regexp = pcre2_compile(pattern, PCRE2_ZERO_TERMINATED, PCRE2_UTF | flags, &error,
-			&error_offset, NULL)))
+	if (NULL == (pcre2_regexp = pcre2_compile((PCRE2_SPTR)pattern, PCRE2_ZERO_TERMINATED, PCRE2_UTF | flags,
+			&error, &error_offset, NULL)))
 	{
 		err_msg_buff = (char*)zbx_malloc(NULL, ZBX_REGEXP_ERR_MSG_SIZE);
 
-		if (0 > pcre2_get_error_message(error, err_msg_buff, ZBX_REGEXP_ERR_MSG_SIZE))
+		if (0 > pcre2_get_error_message(error, (PCRE2_UCHAR*)err_msg_buff, ZBX_REGEXP_ERR_MSG_SIZE))
 			zbx_snprintf(err_msg_buff, ZBX_REGEXP_ERR_MSG_SIZE, "unknown regexp error");
 
 		*err_msg = (const char*)err_msg_buff;
@@ -347,8 +348,8 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	}
 	else
 	{
-		if (0 <= (r = pcre2_match(regexp->pcre2_regexp, string, PCRE2_ZERO_TERMINATED, 0, flags, match_data,
-				regexp->match_ctx)))
+		if (0 <= (r = pcre2_match(regexp->pcre2_regexp, (PCRE2_SPTR)string, PCRE2_ZERO_TERMINATED, 0, flags,
+			match_data, regexp->match_ctx)))
 		{
 			if (NULL != matches)
 			{

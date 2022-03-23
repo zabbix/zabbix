@@ -54,8 +54,8 @@ const (
 )
 
 type Options struct {
-	Timeout  time.Duration `conf:"optional,range=1:30"`
-	Capacity int           `conf:"optional,range=1:100"`
+	plugin.SystemOptions `conf:"optional,name=System"`
+	Timeout              time.Duration `conf:"optional,range=1:30"`
 }
 
 // Plugin -

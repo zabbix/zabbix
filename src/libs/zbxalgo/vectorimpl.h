@@ -22,6 +22,8 @@
 
 #define	ZBX_VECTOR_ARRAY_GROWTH_FACTOR	3/2
 
+#include "log.h"
+
 #define	ZBX_VECTOR_IMPL(__id, __type)										\
 														\
 static void	__vector_ ## __id ## _ensure_free_space(zbx_vector_ ## __id ## _t *vector)			\

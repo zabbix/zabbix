@@ -80,7 +80,6 @@
 
 		openHostPopup(host_data) {
 			const original_url = location.href;
-
 			const overlay = PopUp('popup.host.edit', host_data, {
 				dialogueid: 'host_edit',
 				dialogue_class: 'modal-popup-large'

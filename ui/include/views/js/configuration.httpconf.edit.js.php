@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 ?>
 
@@ -84,7 +85,82 @@
 	?>
 </script>
 
-<script type="text/javascript">
+<script>
+	const view = {
+		form_name: null,
+
+		init({form_name}) {
+			this.form_name = form_name;
+		},
+
+		editHost(e, hostid) {
+			e.preventDefault();
+			const host_data = {hostid};
+
+			this.openHostPopup(host_data);
+		},
+
+		openHostPopup(host_data) {
+			const original_url = location.href;
+			const overlay = PopUp('popup.host.edit', host_data, {
+				dialogueid: 'host_edit',
+				dialogue_class: 'modal-popup-large'
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', original_url);
+			}, {once: true});
+		},
+
+		refresh() {
+			const url = new Curl('', false);
+			const form = document.getElementsByName(this.form_name)[0].cloneNode(true);
+
+			form.append(httpconf.scenario.toFragment());
+			form.append(httpconf.steps.toFragment());
+
+			const fields = getFormFields(form);
+
+			post(url.getUrl(), fields);
+		},
+
+		events: {
+			hostSuccess(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				view.refresh();
+			},
+
+			hostDelete(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				const curl = new Curl('zabbix.php', false);
+				curl.setArgument('action', 'host.list');
+
+				location.href = curl.getUrl();
+			}
+		}
+	};
+
 	jQuery(function($) {
 		window.httpconf = {
 			templated:                           <?= $data['templated'] ? 1 : 0 ?>,

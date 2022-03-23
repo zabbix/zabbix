@@ -42,7 +42,7 @@ class CSvgGraphHelper {
 	 *
 	 * @return array
 	 */
-	public static function get(array $options = [], $width, $height) {
+	public static function get(array $options, $width, $height) {
 		$metrics = [];
 		$errors = [];
 
@@ -135,7 +135,7 @@ class CSvgGraphHelper {
 		$dataset_metrics = [];
 
 		foreach ($metrics as $metric_num => &$metric) {
-			if ($metric['options']['aggregate_function'] == GRAPH_AGGREGATE_NONE) {
+			if ($metric['options']['aggregate_function'] == AGGREGATE_NONE) {
 				continue;
 			}
 
@@ -177,11 +177,11 @@ class CSvgGraphHelper {
 		unset($metric);
 
 		foreach ($metrics as &$metric) {
-			if ($metric['options']['aggregate_function'] == GRAPH_AGGREGATE_NONE) {
+			if ($metric['options']['aggregate_function'] == AGGREGATE_NONE) {
 				continue;
 			}
 
-			$result = Manager::History()->getGraphAggregationByInterval(
+			$result = Manager::History()->getAggregationByInterval(
 				$metric['items'], $metric['time_period']['time_from'], $metric['time_period']['time_to'],
 				$metric['options']['aggregate_function'], $metric['options']['aggregate_interval']
 			);
@@ -205,17 +205,17 @@ class CSvgGraphHelper {
 				ksort($metric_points, SORT_NUMERIC);
 
 				switch ($metric['options']['aggregate_function']) {
-					case GRAPH_AGGREGATE_MIN:
+					case AGGREGATE_MIN:
 						foreach ($metric_points as $tick => $point) {
 							$metric['points'][] = ['clock' => $tick, 'value' => min($point['value'])];
 						}
 						break;
-					case GRAPH_AGGREGATE_MAX:
+					case AGGREGATE_MAX:
 						foreach ($metric_points as $tick => $point) {
 							$metric['points'][] = ['clock' => $tick, 'value' => max($point['value'])];
 						}
 						break;
-					case GRAPH_AGGREGATE_AVG:
+					case AGGREGATE_AVG:
 						foreach ($metric_points as $tick => $point) {
 							$metric['points'][] = [
 								'clock' => $tick,
@@ -223,17 +223,17 @@ class CSvgGraphHelper {
 							];
 						}
 						break;
-					case GRAPH_AGGREGATE_COUNT:
+					case AGGREGATE_COUNT:
 						foreach ($metric_points as $tick => $point) {
 							$metric['points'][] = ['clock' => $tick, 'value' => array_sum($point['count'])];
 						}
 						break;
-					case GRAPH_AGGREGATE_SUM:
+					case AGGREGATE_SUM:
 						foreach ($metric_points as $tick => $point) {
 							$metric['points'][] = ['clock' => $tick, 'value' => array_sum($point['value'])];
 						}
 						break;
-					case GRAPH_AGGREGATE_FIRST:
+					case AGGREGATE_FIRST:
 						foreach ($metric_points as $tick => $point) {
 							if ($point['clock']) {
 								$metric['points'][] = [
@@ -243,7 +243,7 @@ class CSvgGraphHelper {
 							}
 						}
 						break;
-					case GRAPH_AGGREGATE_LAST:
+					case AGGREGATE_LAST:
 						foreach ($metric_points as $tick => $point) {
 							if ($point['clock']) {
 								$metric['points'][] = [
@@ -261,11 +261,11 @@ class CSvgGraphHelper {
 	/**
 	 * Select data to show in graph for each metric.
 	 */
-	protected static function getMetricsData(array &$metrics = [], $width) {
+	protected static function getMetricsData(array &$metrics, $width) {
 		// To reduce number of requests, group metrics by time range.
 		$tr_groups = [];
 		foreach ($metrics as $metric_num => &$metric) {
-			if ($metric['options']['aggregate_function'] != GRAPH_AGGREGATE_NONE) {
+			if ($metric['options']['aggregate_function'] != AGGREGATE_NONE) {
 				continue;
 			}
 
@@ -320,7 +320,7 @@ class CSvgGraphHelper {
 	/**
 	 * Calculate what data source must be used for each metric.
 	 */
-	protected static function getGraphDataSource(array &$metrics = [], array &$errors = [], $data_source, $width) {
+	protected static function getGraphDataSource(array &$metrics, array &$errors, $data_source, $width) {
 		/**
 		 * If data source is not specified, calculate it automatically. Otherwise, set given $data_source to each
 		 * $metric.
@@ -686,7 +686,7 @@ class CSvgGraphHelper {
 	/**
 	 * Apply time period for each metric.
 	 */
-	protected static function getTimePeriods(array &$metrics = [], array $options) {
+	protected static function getTimePeriods(array &$metrics, array $options) {
 		foreach ($metrics as &$metric) {
 			$metric['time_period'] = $options;
 

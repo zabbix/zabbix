@@ -1,1 +1,0 @@
-........S. [ZBX-19456] changed zbx_trends_parse_range() behavior for zero time period, added test cases (ssimonenko)

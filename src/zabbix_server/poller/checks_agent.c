@@ -17,12 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "comms.h"
-#include "log.h"
-#include "../../libs/zbxcrypto/tls_tcp_active.h"
-
 #include "checks_agent.h"
+
+#include "log.h"
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 extern unsigned char	program_type;

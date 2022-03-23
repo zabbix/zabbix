@@ -17,9 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "selfmon.h"
+
 #include "zbxself.h"
 #include "common.h"
-#include "selfmon.h"
 
 #ifndef _WINDOWS
 #	include "mutexs.h"
@@ -121,7 +122,7 @@ extern int	CONFIG_ALERTDB_FORKS;
 extern int	CONFIG_HISTORYPOLLER_FORKS;
 extern int	CONFIG_AVAILMAN_FORKS;
 extern int	CONFIG_SERVICEMAN_FORKS;
-extern int	CONFIG_PROBLEMHOUSEKEEPER_FORKS;
+extern int	CONFIG_TRIGGERHOUSEKEEPER_FORKS;
 extern int	CONFIG_ODBCPOLLER_FORKS;
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
@@ -208,8 +209,8 @@ int	get_process_type_forks(unsigned char proc_type)
 			return CONFIG_AVAILMAN_FORKS;
 		case ZBX_PROCESS_TYPE_SERVICEMAN:
 			return CONFIG_SERVICEMAN_FORKS;
-		case ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER:
-			return CONFIG_PROBLEMHOUSEKEEPER_FORKS;
+		case ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER:
+			return CONFIG_TRIGGERHOUSEKEEPER_FORKS;
 		case ZBX_PROCESS_TYPE_ODBCPOLLER:
 			return CONFIG_ODBCPOLLER_FORKS;
 	}
@@ -669,21 +670,6 @@ void	zbx_sleep_loop(int sleeptime)
 		sleep(1);
 	}
 	while (0 < --sleep_remains);
-
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
-}
-
-void	zbx_sleep_forever(void)
-{
-	sleep_remains = 1;
-
-	update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
-
-	do
-	{
-		sleep(1);
-	}
-	while (0 != sleep_remains);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 }

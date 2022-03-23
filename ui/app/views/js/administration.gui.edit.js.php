@@ -54,13 +54,13 @@
 								"<?= DB::getDefault('config', 'max_overview_table_size') ?>"
 							);
 							$('#max_in_table').val("<?= DB::getDefault('config', 'max_in_table') ?>");
-							$('#server_check_interval').prop('checked',
-								<?= (DB::getDefault('config', 'server_check_interval') == 0) ? 'false' : 'true' ?>
-							);
+							$('#server_check_interval').prop('checked', <?=
+								json_encode((bool) DB::getDefault('config', 'server_check_interval'))
+							?>);
 							$('#work_period').val("<?= DB::getDefault('config', 'work_period') ?>");
-							$('#show_technical_errors').prop('checked',
-								<?= (DB::getDefault('config', 'show_technical_errors') == 0) ? 'false' : 'true' ?>
-							);
+							$('#show_technical_errors').prop('checked', <?=
+								json_encode((bool) DB::getDefault('config', 'show_technical_errors'))
+							?>);
 							$('#history_period').val("<?= DB::getDefault('config', 'history_period') ?>");
 							$('#period_default').val("<?= DB::getDefault('config', 'period_default') ?>");
 							$('#max_period').val("<?= DB::getDefault('config', 'max_period') ?>");

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-17T06:34:56Z'
+  date: '2022-01-26T19:42:19Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -27,7 +27,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Network devices'
@@ -47,8 +47,8 @@ zabbix_export:
                 - 1h
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: network
           triggers:
             -
               uuid: fd9a321842544253896e5a4c1a58ced3
@@ -57,6 +57,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 23ae05ce4d5c4022a716ed9e8e701ae9
           name: 'ZYXEL XGS-4728F: Contact'
@@ -80,8 +84,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 1cccb7e7616944aa8747508e96f54968
           name: 'ZYXEL XGS-4728F: CPU utilization'
@@ -97,8 +101,8 @@ zabbix_export:
             getting the values.
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: 20f368f955f74fc9b8380b1bbff7e057
@@ -107,6 +111,10 @@ zabbix_export:
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 222a051f0b84433faa6f29237b6d1552
           name: 'ZYXEL XGS-4728F: ZyNOS F/W Version'
@@ -139,8 +147,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
           triggers:
             -
               uuid: 5da304609e8c45d980c46579f6848f0a
@@ -150,6 +158,10 @@ zabbix_export:
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: cc5065f635bc486cb90898f842fa8a61
           name: 'ZYXEL XGS-4728F: Location'
@@ -172,8 +184,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 9a646e8e82c844c08754c7e72e161712
           name: 'ZYXEL XGS-4728F: MAC address'
@@ -199,8 +211,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: a152c262c465441da0f1924bc7614a23
           name: 'ZYXEL XGS-4728F: Hardware model name'
@@ -227,8 +239,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
           triggers:
             -
               uuid: 0329f3f5aa6a4315a4f3611ad662103e
@@ -236,6 +248,10 @@ zabbix_export:
               name: 'ZYXEL XGS-4728F: Template does not match hardware'
               priority: INFO
               description: 'This template is for Zyxel XGS-4728F, but connected to {ITEM.VALUE}'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 49e365a43809409f8d4636f88e4d64a9
           name: 'ZYXEL XGS-4728F: Host name'
@@ -259,8 +275,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 79c80ac11d854edea93a598c4b28ffc0
           name: 'ZYXEL XGS-4728F: Hardware serial number'
@@ -282,8 +298,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
           triggers:
             -
               uuid: 4df7c31c3079411baabd4ae66e580652
@@ -292,6 +308,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: b3302cbfbae64d55a638240ffb368b9c
           name: 'ZYXEL XGS-4728F: Uptime'
@@ -314,8 +334,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 36b9a7d3d3fb45f782a5ea05de6816f9
@@ -324,6 +344,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
       discovery_rules:
         -
           uuid: bc0d797343b240bdbd5765dc2e7821fd
@@ -352,8 +376,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
+                -
+                  tag: component
+                  value: sensor
               trigger_prototypes:
                 -
                   uuid: 012219b8b16941b59d1f9a3f685e9f38
@@ -362,6 +389,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: 96aed516a0254866b0d0b43095b8a5b7
@@ -398,8 +429,8 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: 90b328c3b56c417eb938091338bd07fc
@@ -407,6 +438,10 @@ zabbix_export:
                   name: 'ZYXEL XGS-4728F: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 75a0f2676e134b6e8ab9e8c11ac17d57
           name: 'Interface discovery'
@@ -457,8 +492,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: dbc94a6eabd64eefbe97f57f8831e834
               name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Interface name'
@@ -478,8 +519,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 840096d5a418425c851ea7d236b7e34e
               name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Link speed'
@@ -502,8 +549,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 0105dea3226d46f8868aa07aa3f416a2
               name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Incoming broadcast packages'
@@ -524,8 +577,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: de7b202e7240422dbdbc40e78689e6fe
               name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Incoming multicast packages'
@@ -547,8 +606,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 075b04bdaff54a2cafc1b177e59df3be
               name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Incoming traffic'
@@ -572,8 +637,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: c2a8e3985ed1414789b1bfe226de6d37
               name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Incoming unicast packages'
@@ -594,8 +665,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 72f7ee1e5099452aa4804d988adfb7a5
               name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Incoming utilization'
@@ -619,8 +696,14 @@ zabbix_export:
                     - 'return +parseFloat(value).toFixed(0);'
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: db488317d10e43eea21ecaa74d7a58dc
               name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Link type'
@@ -640,8 +723,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 8877747043f94216b92ef7f097925d8e
               name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Interface description'
@@ -661,8 +750,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: b091be1b0a8f415b82d73b3537cf6187
               name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Operational status'
@@ -684,8 +779,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 3f3ce5111d47490382cb0c18e2d36f77
@@ -702,6 +803,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: ad7378144b254962aad0a73fb151e097
               name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Outgoing broadcast packages'
@@ -723,8 +828,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 67b776b7f51e4b24bad3b616979d7f98
               name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Outgoing multicast packages'
@@ -747,8 +858,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 4afef8d3601646f1bfc81090b090c11c
               name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Outgoing traffic'
@@ -773,8 +890,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: ba1b314aacd0449fa0c9730fdb8ee3f9
               name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Outgoing unicast packages'
@@ -796,8 +919,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 7941df5f5b884b33bcda9951e4b0158d
               name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Outgoing utilization'
@@ -821,8 +950,14 @@ zabbix_export:
                     - 'return +parseFloat(value).toFixed(0);'
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: f56f1c0cf5d34435895ea489eb71b84a
               name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Speed Duplex'
@@ -842,8 +977,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
           graph_prototypes:
             -
               uuid: 18c2bd830caa49308459d64ef85cfc71
@@ -979,8 +1120,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#ZYXEL.SFP.PORT}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 409c52cfed074352810bacfd52aa89f0
@@ -988,12 +1135,20 @@ zabbix_export:
                   name: 'ZYXEL XGS-4728F: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The upper threshold value of the parameter is exceeded'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: a2c40df40a334f6da00a438eb70f8374
                   expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
                   name: 'ZYXEL XGS-4728F: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The parameter values are less than the lower threshold'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: 109ff7d258524b82bdbf4662e612795b
@@ -1067,8 +1222,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: c585762763604f83a9d14b7df21188ee
               name: 'ZYXEL XGS-4728F: SFP {#SNMPINDEX}: Part number'
@@ -1089,8 +1250,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 33395170c38043828cedbfbedea959cc
               name: 'ZYXEL XGS-4728F: SFP {#SNMPINDEX}: Revision'
@@ -1111,8 +1278,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 175f4200563549a0ae1ebaed18eeb636
               name: 'ZYXEL XGS-4728F: SFP {#SNMPINDEX}: Serial number'
@@ -1133,8 +1306,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 632be557ffed439e98425eaa59361e50
@@ -1143,6 +1322,10 @@ zabbix_export:
                   priority: INFO
                   description: 'SFP {#SNMPINDEX} serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 5d3d0c6135924b2088b2f97d30a743cb
               name: 'ZYXEL XGS-4728F: SFP {#SNMPINDEX}: Status'
@@ -1163,8 +1346,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: b16f7fe769a74ea99aafaa60a97d286c
               name: 'ZYXEL XGS-4728F: SFP {#SNMPINDEX}: Transceiver'
@@ -1185,8 +1374,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 5abb9b467e934873808b4b49bdd74f5f
               name: 'ZYXEL XGS-4728F: SFP {#SNMPINDEX}: Vendor'
@@ -1207,8 +1402,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
         -
           uuid: fa0881c21d834db1b421ae727254bff9
           name: 'Temperature discovery'
@@ -1238,8 +1439,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 6181f094ae4c4cf4ae4b2e198e2f9b6e
@@ -1248,6 +1452,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the temperature'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: 1068300241bb430b8c51048303922e55
@@ -1303,8 +1511,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: voltage
               trigger_prototypes:
                 -
                   uuid: 631202a132dc44afa90b0537f9957ee1
@@ -1313,6 +1524,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: 560c37d174e741a6a2590d17574123ed
@@ -1336,6 +1551,19 @@ zabbix_export:
                   outArr.push(item)
                   });
                   return JSON.stringify(outArr);
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: switch
+        -
+          tag: target
+          value: xgs-4728f
+        -
+          tag: target
+          value: zyxel
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'

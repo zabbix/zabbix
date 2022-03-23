@@ -20,10 +20,9 @@
 #ifndef ZABBIX_CHECKS_SNMP_H
 #define ZABBIX_CHECKS_SNMP_H
 
-#include "common.h"
-#include "log.h"
+#include "config.h"
+#include "module.h"
 #include "dbcache.h"
-#include "sysinfo.h"
 
 extern char	*CONFIG_SOURCE_IP;
 extern int	CONFIG_TIMEOUT;

@@ -20,9 +20,8 @@
 #ifndef ZABBIX_ANOMALYSTL_H
 #define ZABBIX_ANOMALYSTL_H
 
-#include "common.h"
-
-#include "evalfunc_common.h"
+#include "zbxalgo.h"
+#include "zbxhistory.h"
 
 /* default values which can be used in zbx_STL() arguments */
 #define STL_DEF_DEVIATIONS	3

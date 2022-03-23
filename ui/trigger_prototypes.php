@@ -99,6 +99,7 @@ $fields = [
 	'cancel' =>									[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form' =>									[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>							[T_ZBX_INT, O_OPT, null,	null,		null],
+	'backurl' =>								[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>									[T_ZBX_STR, O_OPT, P_SYS, IN('"description","priority","status","discover"'),		null],
 	'sortorder' =>								[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -130,6 +131,11 @@ if (hasRequest('triggerid')) {
 	if (!$triggerPrototypes) {
 		access_deny();
 	}
+}
+
+// Validate backurl.
+if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
+	access_deny();
 }
 
 $tags = getRequest('tags', []);
@@ -244,7 +250,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$result = (bool) API::TriggerPrototype()->create($trigger_prototype);
 
-		show_messages($result, _('Trigger prototype added'), _('Cannot add trigger prototype'));
+		if ($result) {
+			CMessageHelper::setSuccessTitle(_('Trigger prototype added'));
+		}
+		else {
+			CMessageHelper::setErrorTitle(_('Cannot add trigger prototype'));
+		}
 	}
 	else {
 		$db_trigger_prototypes = API::TriggerPrototype()->get([
@@ -347,22 +358,40 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$result = true;
 		}
 
-		show_messages($result, _('Trigger prototype updated'), _('Cannot update trigger prototype'));
+		if ($result) {
+			CMessageHelper::setSuccessTitle(_('Trigger prototype updated'));
+		}
+		else {
+			CMessageHelper::setErrorTitle(_('Cannot update trigger prototype'));
+		}
 	}
 
 	if ($result) {
 		unset($_REQUEST['form']);
 		uncheckTableRows(getRequest('parent_discoveryid'));
+
+		if (hasRequest('backurl')) {
+			$response = new CControllerResponseRedirect(getRequest('backurl'));
+			$response->redirect();
+		}
 	}
 }
 elseif (hasRequest('delete') && hasRequest('triggerid')) {
 	$result = API::TriggerPrototype()->delete([getRequest('triggerid')]);
 
 	if ($result) {
+		CMessageHelper::setSuccessTitle(_('Trigger prototype deleted'));
 		unset($_REQUEST['form'], $_REQUEST['triggerid']);
 		uncheckTableRows(getRequest('parent_discoveryid'));
+
+		if (hasRequest('backurl')) {
+			$response = new CControllerResponseRedirect(getRequest('backurl'));
+			$response->redirect();
+		}
 	}
-	show_messages($result, _('Trigger prototype deleted'), _('Cannot delete trigger prototype'));
+	else {
+		CMessageHelper::setErrorTitle(_('Cannot delete trigger prototype'));
+	}
 }
 elseif (hasRequest('add_dependency') && hasRequest('new_dependency')) {
 	if (!hasRequest('dependencies')) {
@@ -499,7 +528,8 @@ if (isset($_REQUEST['form'])) {
 		'correlation_mode' => getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE),
 		'correlation_tag' => getRequest('correlation_tag', ''),
 		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
-		'context' => getRequest('context')
+		'context' => getRequest('context'),
+		'backurl' => getRequest('backurl')
 	]);
 
 	// render view

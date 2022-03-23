@@ -17,10 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxipcservice.h"
-#include "zbxjson.h"
-#include "zbxrtc.h"
 #include "rtc.h"
+
+#include "common.h"
+#include "zbxserialize.h"
+#include "zbxjson.h"
+#include "zbxself.h"
+#include "log.h"
 
 extern int	CONFIG_TIMEOUT;
 
@@ -186,12 +189,8 @@ int	zbx_rtc_process(const char *option, char **error)
 	switch (code)
 	{
 		/* allow only socket based runtime control options */
-		case ZBX_RTC_DIAGINFO:
-		case ZBX_RTC_HA_STATUS:
-		case ZBX_RTC_HA_REMOVE_NODE:
-		case ZBX_RTC_HA_SET_FAILOVER_DELAY:
-			break;
-		default:
+		case ZBX_RTC_LOG_LEVEL_DECREASE:
+		case ZBX_RTC_LOG_LEVEL_INCREASE:
 			*error = zbx_dsprintf(NULL, "operation is not supported on the given operating system");
 			return FAIL;
 	}
@@ -230,24 +229,123 @@ int	zbx_rtc_open(zbx_ipc_async_socket_t *asocket, int timeout, char **error)
  *                                                                            *
  * Purpose: notify RTC service about finishing initial configuration sync     *
  *                                                                            *
+ * Parameters: rtc   - [OUT] the RTC notification subscription socket         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_rtc_notify_config_sync(zbx_ipc_async_socket_t *rtc)
+{
+	if (FAIL == zbx_ipc_async_socket_send(rtc, ZBX_RTC_CONFIG_SYNC_NOTIFY, NULL, 0))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send configuration syncer notification");
+		exit(EXIT_FAILURE);
+	}
+
+	if (FAIL == zbx_ipc_async_socket_flush(rtc, CONFIG_TIMEOUT))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot flush configuration syncer notification");
+		exit(EXIT_FAILURE);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: subscribe process for RTC notifications                           *
+ *                                                                            *
+ * Parameters: rtc   - [OUT] the RTC notification subscription socket         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_rtc_subscribe(zbx_ipc_async_socket_t *rtc, unsigned char proc_type, int proc_num)
+{
+	unsigned char		data[sizeof(int) + sizeof(unsigned char)];
+	const zbx_uint32_t	size = (zbx_uint32_t)(sizeof(int) + sizeof(unsigned char));
+	char			*error = NULL;
+
+	if (FAIL == zbx_ipc_async_socket_open(rtc, ZBX_IPC_SERVICE_RTC, CONFIG_TIMEOUT, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to RTC service: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	(void)zbx_serialize_value(data, proc_type);
+	(void)zbx_serialize_value(data + sizeof(proc_type), proc_num);
+
+	if (FAIL == zbx_ipc_async_socket_send(rtc, ZBX_RTC_SUBSCRIBE, data, size))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send RTC notification subscribe request");
+		exit(EXIT_FAILURE);
+	}
+
+	if (FAIL == zbx_ipc_async_socket_flush(rtc, CONFIG_TIMEOUT))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot flush RTC notification subscribe request");
+		exit(EXIT_FAILURE);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: wait for RTC notification                                         *
+ *                                                                            *
+ * Parameters: rtc     - [IN] the RTC notification subscription socket        *
+ *             cmd     - [OUT] the RTC notification code                      *
+ *             data    - [OUT] the RTC notification data                      *
+ *             timeout - [OUT] the timeout                                    *
+ *             error   - [OUT] error message                                  *
+ *                                                                            *
+ * Return value: SUCCEED - a notification was received or timeout occurred    *
+ *               FAIL    - communication error                                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_rtc_wait(zbx_ipc_async_socket_t *rtc, zbx_uint32_t *cmd, unsigned char **data, int timeout)
+{
+	zbx_ipc_message_t	*message;
+	int			ret;
+
+	if (0 != timeout)
+		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+
+	ret = zbx_ipc_async_socket_recv(rtc, timeout, &message);
+
+	if (0 != timeout)
+		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
+	if (FAIL == ret)
+		return FAIL;
+
+	if (NULL != message)
+	{
+		*cmd = message->code;
+		*data = message->data;
+		zbx_free(message);
+	}
+	else
+		*cmd = 0;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: notify RTC service about finishing initial configuration sync     *
+ *                                                                            *
  * Parameters: error - [OUT] error message                                    *
  *                                                                            *
  * Return value: SUCCEED - the notification was sent successfully             *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_rtc_notify_config_sync(char **error)
+int	zbx_rtc_reload_config_cache(char **error)
 {
-	zbx_ipc_socket_t	sock;
-	int			ret;
+	unsigned char	*result = NULL;
 
-	if (FAIL == zbx_ipc_socket_open(&sock, ZBX_IPC_SERVICE_RTC, CONFIG_TIMEOUT, error))
+	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_RTC, ZBX_RTC_CONFIG_CACHE_RELOAD_WAIT,
+			ZBX_IPC_WAIT_FOREVER, NULL, 0, &result, error))
+	{
 		return FAIL;
+	}
 
-	if (FAIL == (ret = zbx_ipc_socket_write(&sock, ZBX_RTC_CONFIG_SYNC_NOTIFY, NULL, 0)))
-		*error = zbx_strdup(NULL, "failed to send message");
+	zbx_free(result);
 
-	zbx_ipc_socket_close(&sock);
-
-	return ret;
+	return SUCCEED;
 }

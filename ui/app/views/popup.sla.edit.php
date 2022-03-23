@@ -113,8 +113,8 @@ $sla_tab = (new CFormGrid())
 		(new CLabel(_('Effective date'), 'effective_date'))->setAsteriskMark(),
 		new CFormField(
 			(new CDateSelector('effective_date', $data['form']['effective_date']))
-				->setDateFormat(DATE_FORMAT)
-				->setPlaceholder(DATE_FORMAT_PLACEHOLDER)
+				->setDateFormat(ZBX_DATE)
+				->setPlaceholder(_('YYYY-MM-DD'))
 				->setAriaRequired()
 		)
 	])
@@ -251,14 +251,23 @@ if ($data['slaid'] !== null) {
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'sla_edit_popup.clone('.json_encode(_('New SLA')).');'
-		],
-		[
-			'title' => _('Add'),
-			'class' => implode(' ', [ZBX_STYLE_DISPLAY_NONE, 'js-add']),
-			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'sla_edit_popup.submit();'
+			'action' => 'sla_edit_popup.clone('.json_encode([
+				'title' => _('New SLA'),
+				'buttons' => [
+					[
+						'title' => _('Add'),
+						'class' => 'js-add',
+						'keepOpen' => true,
+						'isSubmit' => true,
+						'action' => 'sla_edit_popup.submit();'
+					],
+					[
+						'title' => _('Cancel'),
+						'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-cancel']),
+						'cancel' => true
+					]
+				]
+			]).');'
 		],
 		[
 			'title' => _('Delete'),
@@ -285,6 +294,7 @@ else {
 
 $output = [
 	'header' => $title,
+	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_SLA_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().

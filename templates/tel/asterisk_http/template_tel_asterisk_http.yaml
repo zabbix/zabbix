@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-14T17:44:29Z'
+  date: '2022-01-26T10:42:41Z'
   groups:
     -
       uuid: 1d12408342854fd5a4436dd6d5d1bd4a
@@ -25,7 +25,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410060-discussion-thread-for-official-zabbix-template-asterisk
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Telephony
@@ -47,8 +47,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: calls
         -
           uuid: bb9ac1ac188b43239456477e13ae555f
           name: 'Asterisk: Active channels'
@@ -66,8 +66,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: channels
         -
           uuid: ccfc2a8a5880430196e2c874b66370ca
           name: 'Asterisk: Calls processed'
@@ -85,8 +85,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: calls
         -
           uuid: 196af875a190438abd8de5a6803a550f
           name: 'Asterisk: Calls processed per second'
@@ -109,8 +109,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: calls
         -
           uuid: 7db3e9cdae3d4bffa7429617e351fce1
           name: 'Asterisk: Get stats'
@@ -448,8 +448,8 @@ zabbix_export:
           retrieve_mode: HEADERS
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: d9900a1f096a4b89a2aa4af89f30b2cc
           name: 'Asterisk: IAX trunks active channels'
@@ -467,8 +467,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: channels
           triggers:
             -
               uuid: 0ae0a5b6123a42dd9722219e5e5839df
@@ -476,6 +476,10 @@ zabbix_export:
               name: 'Asterisk: Total number of active channels of IAX trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"} for 10m)'
               priority: WARNING
               description: 'The IAX trunks may not be able to process new calls.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 0798cf46d82041e6a7091698c7693ec5
           name: 'Asterisk: IAX offline peers'
@@ -493,8 +497,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: peers
         -
           uuid: bf741f5560734530be352341071c5984
           name: 'Asterisk: IAX online peers'
@@ -512,8 +516,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: peers
         -
           uuid: ccb62e9b41da4f20b4ab19e4eecd598b
           name: 'Asterisk: IAX peers'
@@ -531,8 +535,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: peers
         -
           uuid: cf5c07c1a09b4a10af21292b876fcb20
           name: 'Asterisk: IAX unmonitored peers'
@@ -550,8 +554,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: peers
         -
           uuid: 5ae6135a49764db7b496f5d2378ddd77
           name: 'Asterisk: PJSIP trunks active channels'
@@ -569,8 +573,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: channels
           triggers:
             -
               uuid: 9b158fe0efb4416cb6ad5d53b38c3e38
@@ -578,6 +582,10 @@ zabbix_export:
               name: 'Asterisk: Total number of active channels of PJSIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"} for 10m)'
               priority: WARNING
               description: 'The PJSIP trunks may not be able to process new calls.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: cc07f186104842aabec3d26dcd4322d2
           name: 'Asterisk: PJSIP available endpoints'
@@ -595,8 +603,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: peers
         -
           uuid: fdc888cb355a4b738be8a77354a7ce76
           name: 'Asterisk: PJSIP endpoints'
@@ -614,8 +622,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: peers
         -
           uuid: 5c10fe1a4bfb4628be20137d0f1ec725
           name: 'Asterisk: PJSIP unavailable endpoints'
@@ -633,8 +641,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: peers
         -
           uuid: 2df0dca89a744e86b4f5a2cec673d427
           name: 'Asterisk: SIP trunks active channels'
@@ -652,8 +660,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: channels
           triggers:
             -
               uuid: d2fde5d26d284a129346a12ba0949b60
@@ -661,6 +669,10 @@ zabbix_export:
               name: 'Asterisk: Total number of active channels of SIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"} for 10m)'
               priority: WARNING
               description: 'The SIP trunks may not be able to process new calls.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: fb08ec8d143a41a097f8652c8261bad8
           name: 'Asterisk: SIP monitored offline'
@@ -678,8 +690,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: peers
         -
           uuid: 23744b0a04b54637a7dbe1c7f8f5200f
           name: 'Asterisk: SIP monitored online'
@@ -697,8 +709,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: peers
         -
           uuid: fb78998a342942ac942a7e1632b98208
           name: 'Asterisk: SIP peers'
@@ -716,8 +728,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: peers
         -
           uuid: ae21f8c13063402d9eece400a18c6167
           name: 'Asterisk: SIP unmonitored offline'
@@ -735,8 +747,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: peers
         -
           uuid: 1cd5fb5232ca4f4398f85d959ac11b2c
           name: 'Asterisk: SIP unmonitored online'
@@ -754,8 +766,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: peers
         -
           uuid: 9c64cb54c2c541c1862558dcf8c6e3a3
           name: 'Asterisk: Total queues'
@@ -773,8 +785,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: queues
         -
           uuid: 8395ab5b70a7433eb508c513995988bb
           name: 'Asterisk: Uptime'
@@ -794,8 +806,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: system
           triggers:
             -
               uuid: 35ca01e504a548db9d4db8be1390d6b9
@@ -808,6 +820,10 @@ zabbix_export:
                 -
                   name: 'Asterisk: Service is down'
                   expression: 'last(/Asterisk by HTTP/net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: 100d38b62c1d4ce298a9fadfbab19e4c
               expression: 'last(/Asterisk by HTTP/asterisk.uptime)<10m'
@@ -815,6 +831,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 86e23b5b9fd64e6e840588d25921fcbf
           name: 'Asterisk: Uptime after reload'
@@ -834,8 +854,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: system
           triggers:
             -
               uuid: 4e99b65188264ba1aa80e24662f9b3cd
@@ -844,6 +864,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 8ed124c5d61541c0ab1dcc3491fb05c6
           name: 'Asterisk: Version'
@@ -863,8 +887,8 @@ zabbix_export:
             key: asterisk.get_stats
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: application
           triggers:
             -
               uuid: f1a260626ae6446d89e1e725e14c1098
@@ -873,6 +897,10 @@ zabbix_export:
               priority: INFO
               description: 'Asterisk version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 09102393dc6a4ac598f02d95801c6ca0
           name: 'Asterisk: Service response time'
@@ -884,8 +912,8 @@ zabbix_export:
           description: 'Asterisk Manager API performance.'
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: network
           triggers:
             -
               uuid: dbc74502be01498194003dc1a3d90014
@@ -897,6 +925,10 @@ zabbix_export:
                 -
                   name: 'Asterisk: Service is down'
                   expression: 'last(/Asterisk by HTTP/net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 58e18df6a5534395bf74d3babdb73170
           name: 'Asterisk: Service status'
@@ -913,8 +945,11 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: Asterisk
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 1fa3370fa93f4d07a2c470f993096554
@@ -922,6 +957,10 @@ zabbix_export:
               name: 'Asterisk: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 3e7facc25a344cec8e384e8a9f8b372a
@@ -947,8 +986,11 @@ zabbix_export:
                 key: asterisk.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Asterisk IAX trunks'
+                  tag: component
+                  value: channels
+                -
+                  tag: trunk
+                  value: '{#OBJECTNAME}'
               trigger_prototypes:
                 -
                   uuid: e2a6c7a9b6234e2aae20c9aa480f9ef1
@@ -956,6 +998,10 @@ zabbix_export:
                   name: 'IAX trunk "{#OBJECTNAME}": Number of the IAX trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m)'
                   priority: WARNING
                   description: 'The IAX trunk may not be able to process new calls.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: bbde7e898b4b4d34b27308d6ddaf86fc
               name: 'IAX trunk "{#OBJECTNAME}": Status'
@@ -984,8 +1030,11 @@ zabbix_export:
                 key: asterisk.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Asterisk IAX trunks'
+                  tag: component
+                  value: health
+                -
+                  tag: trunk
+                  value: '{#OBJECTNAME}'
               trigger_prototypes:
                 -
                   uuid: db595245acef4ec9b771c266c14100d2
@@ -993,6 +1042,10 @@ zabbix_export:
                   name: 'IAX trunk "{#OBJECTNAME}": IAX trunk {#OBJECTNAME} has a state {ITEM.VALUE}'
                   priority: AVERAGE
                   description: 'The IAX trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           master_item:
             key: asterisk.get_stats
           lld_macro_paths:
@@ -1032,8 +1085,11 @@ zabbix_export:
                 key: asterisk.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Asterisk PJSIP trunks'
+                  tag: component
+                  value: channels
+                -
+                  tag: trunk
+                  value: '{#OBJECTNAME}'
               trigger_prototypes:
                 -
                   uuid: f192d555011c42c28c6a8f52c0388fe1
@@ -1041,6 +1097,10 @@ zabbix_export:
                   name: 'PJSIP trunk "{#OBJECTNAME}": Number of the PJSIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m)'
                   priority: WARNING
                   description: 'The PJSIP trunk may not be able to process new calls.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: c364b2ac50344372b155cbb98d9a7afe
               name: 'PJSIP trunk "{#OBJECTNAME}": Device state'
@@ -1068,8 +1128,11 @@ zabbix_export:
                 key: asterisk.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Asterisk PJSIP trunks'
+                  tag: component
+                  value: health
+                -
+                  tag: trunk
+                  value: '{#OBJECTNAME}'
               trigger_prototypes:
                 -
                   uuid: 6f31d886d6954b82874d38646b233689
@@ -1077,6 +1140,10 @@ zabbix_export:
                   name: 'PJSIP trunk "{#OBJECTNAME}": PJSIP trunk {#OBJECTNAME} has a state Unavailable'
                   priority: AVERAGE
                   description: 'The PJSIP trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           master_item:
             key: asterisk.get_stats
           lld_macro_paths:
@@ -1116,8 +1183,11 @@ zabbix_export:
                 key: asterisk.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Asterisk queue "{#QUEUE}"'
+                  tag: component
+                  value: members
+                -
+                  tag: queue
+                  value: '{#QUEUE}'
             -
               uuid: c271c7d76b2e49dea386bb08d60307d0
               name: '"{#QUEUE}": Callers'
@@ -1135,8 +1205,11 @@ zabbix_export:
                 key: asterisk.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Asterisk queue "{#QUEUE}"'
+                  tag: component
+                  value: calls
+                -
+                  tag: queue
+                  value: '{#QUEUE}'
               trigger_prototypes:
                 -
                   uuid: 4f72c6a755be465287f36b8b12d3175b
@@ -1144,6 +1217,10 @@ zabbix_export:
                   name: '"{#QUEUE}": Number of callers in the queue "{#QUEUE}" is too high (over {$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"} for 10m)'
                   priority: WARNING
                   description: 'There is a large number of calls in the queue.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 8319ec55cf6f4e8590f180f1a81f37ed
               name: '"{#QUEUE}": Logged in'
@@ -1161,8 +1238,11 @@ zabbix_export:
                 key: asterisk.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Asterisk queue "{#QUEUE}"'
+                  tag: component
+                  value: members
+                -
+                  tag: queue
+                  value: '{#QUEUE}'
           master_item:
             key: asterisk.get_stats
           lld_macro_paths:
@@ -1202,8 +1282,11 @@ zabbix_export:
                 key: asterisk.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Asterisk SIP trunks'
+                  tag: component
+                  value: channels
+                -
+                  tag: trunk
+                  value: '{#OBJECTNAME}'
               trigger_prototypes:
                 -
                   uuid: 51820b1326f84f51ba0e561946275133
@@ -1211,6 +1294,10 @@ zabbix_export:
                   name: 'SIP trunk "{#OBJECTNAME}": Number of the SIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m)'
                   priority: WARNING
                   description: 'The SIP trunk may not be able to process new calls.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: df33da749e874f55be5f0c33cd201f62
               name: 'SIP trunk "{#OBJECTNAME}": Status'
@@ -1239,8 +1326,11 @@ zabbix_export:
                 key: asterisk.get_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Asterisk SIP trunks'
+                  tag: component
+                  value: health
+                -
+                  tag: trunk
+                  value: '{#OBJECTNAME}'
               trigger_prototypes:
                 -
                   uuid: 39cac88e9263470da6e4b1a08f806c58
@@ -1248,6 +1338,10 @@ zabbix_export:
                   name: 'SIP trunk "{#OBJECTNAME}": SIP trunk {#OBJECTNAME} has a state {ITEM.VALUE}'
                   priority: AVERAGE
                   description: 'The SIP trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           master_item:
             key: asterisk.get_stats
           lld_macro_paths:
@@ -1263,6 +1357,13 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+      tags:
+        -
+          tag: class
+          value: voip
+        -
+          tag: target
+          value: asterisk
       macros:
         -
           macro: '{$AMI.PORT}'

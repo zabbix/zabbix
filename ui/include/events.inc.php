@@ -490,19 +490,25 @@ function orderEventTagsByPriority(array $event_tags, array $priorities) {
  *                                            - 'triggerid' - for triggers.
  * @param int    $list_tag_count             Maximum number of tags to display.
  * @param array  $filter_tags                An array of tag filtering data.
+ * @param ?array $subfilter_tags             Array of selected sub-filter tags. Null when tags are not clickable.
+ * @param array  $subfilter_tags[<tag>]
+ * @param array  $subfilter_tags[<tag>][<value1>]
+ * @param array  $subfilter_tags[<tag>][<value2>]
+ * @param array  $subfilter_tags[<tag>][<value...>]
  * @param string $filter_tags[]['tag']
  * @param int    $filter_tags[]['operator']
  * @param string $filter_tags[]['value']
  * @param int    $tag_name_format            Tag name format. Possible values:
- *                                            - PROBLEMS_TAG_NAME_FULL (default);
- *                                            - PROBLEMS_TAG_NAME_SHORTENED;
- *                                            - PROBLEMS_TAG_NAME_NONE.
+ *                                            - TAG_NAME_FULL (default);
+ *                                            - TAG_NAME_SHORTENED;
+ *                                            - TAG_NAME_NONE.
  * @param string $tag_priority               A list of comma-separated tag names.
  *
  * @return array
  */
 function makeTags(array $list, bool $html = true, string $key = 'eventid', int $list_tag_count = ZBX_TAG_COUNT_DEFAULT,
-		array $filter_tags = [], int $tag_name_format = PROBLEMS_TAG_NAME_FULL, string $tag_priority = ''): array {
+		array $filter_tags = [], ?array $subfilter_tags = null, int $tag_name_format = TAG_NAME_FULL,
+		string $tag_priority = ''): array {
 	$tags = [];
 
 	if ($html) {
@@ -547,6 +553,14 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 				$value = getTagString($tag, $tag_name_format);
 
 				if ($value !== '') {
+					if ($subfilter_tags !== null
+							&& !(array_key_exists($tag['tag'], $subfilter_tags)
+								&& array_key_exists($tag['value'], $subfilter_tags[$tag['tag']]))) {
+						$value = (new CLinkAction($value))->onClick(CHtml::encode(
+							'view.setSubfilter('.json_encode(['subfilter_tags['.$tag['tag'].'][]', $tag['value']]).')'
+						));
+					}
+
 					$tags[$element[$key]][] = (new CSpan($value))
 						->addClass(ZBX_STYLE_TAG)
 						->setHint(getTagString($tag));
@@ -566,6 +580,15 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 
 				foreach ($element['tags'] as $tag) {
 					$value = getTagString($tag);
+
+					if ($subfilter_tags !== null
+							&& !(array_key_exists($tag['tag'], $subfilter_tags)
+								&& array_key_exists($tag['value'], $subfilter_tags[$tag['tag']]))) {
+						$value = (new CLinkAction($value))->onClick(CHtml::encode(
+							'view.setSubfilter('.json_encode(['subfilter_tags['.$tag['tag'].'][]', $tag['value']]).')'
+						));
+					}
+
 					$hint_content[$element[$key]][] = (new CSpan($value))
 						->addClass(ZBX_STYLE_TAG)
 						->setHint($value);
@@ -594,16 +617,16 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
  * @param array  $tag
  * @param string $tag['tag']
  * @param string $tag['value']
- * @param int    $tag_name_format  PROBLEMS_TAG_NAME_*
+ * @param int    $tag_name_format  TAG_NAME_*
  *
  * @return string
  */
-function getTagString(array $tag, $tag_name_format = PROBLEMS_TAG_NAME_FULL) {
+function getTagString(array $tag, $tag_name_format = TAG_NAME_FULL) {
 	switch ($tag_name_format) {
-		case PROBLEMS_TAG_NAME_NONE:
+		case TAG_NAME_NONE:
 			return $tag['value'];
 
-		case PROBLEMS_TAG_NAME_SHORTENED:
+		case TAG_NAME_SHORTENED:
 			return substr($tag['tag'], 0, 3).(($tag['value'] === '') ? '' : ': '.$tag['value']);
 
 		default:

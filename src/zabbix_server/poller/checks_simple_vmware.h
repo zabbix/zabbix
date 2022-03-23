@@ -17,12 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "common.h"
+
 #ifndef ZABBIX_CHECKS_SIMPLE_VMWARE_H
 #define ZABBIX_CHECKS_SIMPLE_VMWARE_H
 
-#include "common.h"
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-#include "sysinfo.h"
+#include "module.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
 

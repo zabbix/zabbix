@@ -20,6 +20,8 @@
 #ifndef ZABBIX_EVENTS_H
 #define ZABBIX_EVENTS_H
 
+#include "db.h"
+
 void	zbx_initialize_events(void);
 void	zbx_uninitialize_events(void);
 DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,

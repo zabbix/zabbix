@@ -20,19 +20,30 @@
 
 require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/MacrosTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 /**
  * Base class for Macros tests.
  */
-abstract class testFormMacros extends CWebTest {
+abstract class testFormMacros extends CLegacyWebTest {
 
 	use MacrosTrait;
 
 	const SQL_HOSTS = 'SELECT * FROM hosts ORDER BY hostid';
 
+	public $macro_resolve;
+	public $macro_resolve_hostid;
+
+	public $vault_object;
+	public $vault_error_field;
+	public $vault_macro_index;
+	public $update_vault_macro;
+
+	public $revert_macro_1;
+	public $revert_macro_2;
+	public $revert_macro_object;
 	/**
 	 * Attach Behaviors to the test.
 	 *
@@ -1465,6 +1476,28 @@ abstract class testFormMacros extends CWebTest {
 		}
 	}
 
+	public function getRevertSecretMacrosData() {
+		return [
+			[
+				[
+					'macro_fields' => [
+						'macro' => $this->revert_macro_1,
+						'value' => 'Secret '.$this->revert_macro_object.' value'
+					]
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => $this->revert_macro_2,
+						'value' => 'Secret '.$this->revert_macro_object.' value 2'
+					],
+					'set_to_text' => true
+				]
+			]
+		];
+	}
+
 	/**
 	 *  Check that it is possible to revert secret macro changes for host, host prototype and template entities.
 	 *
@@ -1624,6 +1657,144 @@ abstract class testFormMacros extends CWebTest {
 		return $global_macros;
 	}
 
+	public function getCreateVaultMacrosData() {
+		return [
+			[
+				[
+					'expected' => TEST_GOOD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO}',
+						'value' => [
+							'text' => 'secret/path:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description'
+					],
+					'title' => ucfirst($this->vault_object).' updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO2}',
+						'value' => [
+							'text' => 'one/two/three/four/five/six:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description7'
+					],
+					'title' => ucfirst($this->vault_object).' updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO3}',
+						'value' => [
+							'text' => 'secret/path:',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description2'
+					],
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near "path:".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO4}',
+						'value' => [
+							'text' => '/path:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description3'
+					],
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near "/path:key".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO5}',
+						'value' => [
+							'text' => 'path:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description4'
+					],
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near "path:key".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO6}',
+						'value' => [
+							'text' => ':key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description5'
+					],
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near ":key".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO7}',
+						'value' => [
+							'text' => 'secret/path',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description6'
+					],
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near "path".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO8}',
+						'value' => [
+							'text' => '/secret/path:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description8'
+					],
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near "/secret/path:key".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO9}',
+						'value' => [
+							'text' => '',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description9'
+					],
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->vault_error_field.'": cannot be empty.'
+				]
+			]
+		];
+	}
+
 	public function createVaultMacros($data, $url, $source, $name = null) {
 		$form = $this->openMacrosTab($url, $source, true, $name);
 		$this->fillMacros([$data['macro_fields']]);
@@ -1652,6 +1823,44 @@ abstract class testFormMacros extends CWebTest {
 		}
 	}
 
+	public function getUpdateVaultMacrosData() {
+		return [
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => $this->vault_macro_index,
+					'macro' => $this->update_vault_macro,
+					'value' => [
+						'text' => 'secret/path:key'
+					],
+					'description' => ''
+				]
+			],
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => $this->vault_macro_index,
+					'macro' => $this->update_vault_macro,
+					'value' => [
+						'text' => 'new/path/to/secret:key'
+					],
+					'description' => ''
+				]
+			],
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => $this->vault_macro_index,
+					'macro' => $this->update_vault_macro,
+					'value' => [
+						'text' => 'new/path/to/secret:key'
+					],
+					'description' => 'Changing description'
+				]
+			]
+		];
+	}
+
 	public function updateVaultMacros($data, $url, $source, $name = null) {
 		$form = $this->openMacrosTab($url, $source, true, $name);
 		$this->fillMacros([$data]);
@@ -1675,5 +1884,77 @@ abstract class testFormMacros extends CWebTest {
 			COverlayDialogElement::find()->one()->close();
 			COverlayDialogElement::ensureNotPresent();
 		}
+	}
+
+	public function getResolveSecretMacroData() {
+		return [
+			// Latest data page. Macro is resolved only in key.
+			[
+				[
+					'url' => 'zabbix.php?action=latest.view&hostids%5B%5D='.$this->macro_resolve_hostid.'&show_details=1',
+					'name' => 'Macro value: '.$this->macro_resolve,
+					'key' => 'trap[Value 2 B resolved]',
+					'key_secret' => 'trap[******]'
+				]
+			],
+			// Hosts items page. Macro is not resolved in any field.
+			[
+				[
+					'url' => 'items.php?filter_set=1&filter_hostids%5B0%5D='.$this->macro_resolve_hostid.'&context=host',
+					'name' => 'Macro value: '.$this->macro_resolve,
+					'key' => 'trap['.$this->macro_resolve.']',
+					'key_secret' => 'trap['.$this->macro_resolve.']'
+				]
+			]
+		];
+	}
+
+	/**
+	 * Function for testing resolving macros on host or global level.
+	 *
+	 * @param string $data    data provider
+	 * @param string $object  macros level: global or host
+	 */
+	public function resolveSecretMacro($data, $object = 'global') {
+		$this->checkItemFields($data['url'], $data['name'], $data['key']);
+
+		if ($object === 'host') {
+			// Open host form in popup and change macro type to secret.
+			$form = $this->openMacrosTab('zabbix.php?action=host.view', 'hosts', false, 'Available host in maintenance');
+			$this->getValueField($this->macro_resolve)->changeInputType(CInputGroupElement::TYPE_SECRET);
+
+			$form->submit();
+			$this->page->waitUntilReady();
+			$this->assertMessage(TEST_GOOD, 'Host updated');
+		}
+		else {
+			// Change global macro type to secret.
+			$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();
+			$this->getValueField($this->macro_resolve)->changeInputType(CInputGroupElement::TYPE_SECRET);
+			$this->query('button:Update')->one()->click();
+		}
+
+		$this->checkItemFields($data['url'], $data['name'], $data['key_secret']);
+	}
+
+	/**
+	 * 	Function for checking item field on Latest data or Items page.
+	 *
+	 * @param string $url    Latest data or Items page URL
+	 * @param string $name   item name
+	 * @param string $key    item key
+	 */
+	private function checkItemFields($url, $name, $key) {
+		$this->page->login()->open($url)->waitUntilReady();
+		$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"] | '.
+				'//table[contains(@class, "overflow-ellipsis")]')->asTable()->waitUntilPresent()->one();
+
+		$name_column = $table->findRow('Name', $name, true)->getColumn('Name');
+		$this->assertEquals($name, $name_column->query('tag:a')->one()->getText());
+
+		$this->assertEquals($key, (strpos($url, 'latest')
+				? $name_column->query('xpath://span[@class="green"]')->one()->getText()
+				: $table->findRow('Name', $name)->getColumn('Key')->getText()
+		));
 	}
 }

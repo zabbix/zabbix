@@ -24,13 +24,70 @@
  */
 ?>
 
-<script type="text/javascript">
-	jQuery(function($) {
-		// Disable the status filter when using the state filter.
-		$('#filter_state')
-			.on('change', function() {
-				$('input[name=filter_status]').prop('disabled', $('input[name=filter_state]:checked').val() != -1);
-			})
-			.trigger('change');
-	});
+<script>
+	const view = {
+		init() {
+			// Disable the status filter when using the state filter.
+			$('#filter_state')
+				.on('change', () => {
+					$('input[name=filter_status]').prop('disabled', $('input[name=filter_state]:checked').val() != -1);
+				})
+				.trigger('change');
+		},
+
+		editHost(e, hostid) {
+			e.preventDefault();
+			const host_data = {hostid};
+
+			this.openHostPopup(host_data);
+		},
+
+		openHostPopup(host_data) {
+			const original_url = location.href;
+			const overlay = PopUp('popup.host.edit', host_data, {
+				dialogueid: 'host_edit',
+				dialogue_class: 'modal-popup-large'
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', original_url);
+			}, {once: true});
+		},
+
+		events: {
+			hostSuccess(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				location.href = location.href;
+			},
+
+			hostDelete(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				const curl = new Curl('zabbix.php', false);
+				curl.setArgument('action', 'host.list');
+
+				location.href = curl.getUrl();
+			}
+		}
+	};
 </script>

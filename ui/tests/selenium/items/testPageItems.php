@@ -43,7 +43,6 @@ class testPageItems extends CLegacyWebTest {
 			$this->zbxTestTextPresent('All hosts');
 			$this->zbxTestTextPresent(
 				[
-					'Wizard',
 					'Name',
 					'Triggers',
 					'Key',
@@ -60,7 +59,6 @@ class testPageItems extends CLegacyWebTest {
 			$this->zbxTestTextPresent('All templates');
 			$this->zbxTestTextPresent(
 				[
-					'Wizard',
 					'Name',
 					'Triggers',
 					'Key',

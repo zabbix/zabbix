@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.0.0rc1');
-define('ZABBIX_API_VERSION',	'6.0.0');
-define('ZABBIX_EXPORT_VERSION',	'6.0');
+define('ZABBIX_VERSION',		'6.2.0alpha1');
+define('ZABBIX_API_VERSION',	'6.2.0');
+define('ZABBIX_EXPORT_VERSION',	'6.2');
 
-define('ZABBIX_DB_VERSION',		5050141);
+define('ZABBIX_DB_VERSION',		6010001);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -34,8 +34,9 @@ define('DB_VERSION_NOT_SUPPORTED_WARNING',	5);
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2022');
 
+define('ZBX_DOCUMENTATION_URL', 'https://www.zabbix.com/documentation');
+
 define('ZBX_BCRYPT_COST',		10);
-define('ZBX_MD5_SIZE',			32);
 
 define('ZBX_SESSION_NAME', 'zbx_session'); // Session cookie name for Zabbix front-end.
 
@@ -1056,16 +1057,20 @@ define('TAG_OPERATOR_NOT_EQUAL',	3);
 define('TAG_OPERATOR_EXISTS',		4);
 define('TAG_OPERATOR_NOT_EXISTS',	5);
 
+define('GRAPH_FILTER_ALL',		0);
+define('GRAPH_FILTER_HOST',		1);
+define('GRAPH_FILTER_SIMPLE',	2);
+
 define('GRAPH_AGGREGATE_DEFAULT_INTERVAL',	'1h');
 
-define('GRAPH_AGGREGATE_NONE',	0);
-define('GRAPH_AGGREGATE_MIN',	1);
-define('GRAPH_AGGREGATE_MAX',	2);
-define('GRAPH_AGGREGATE_AVG',	3);
-define('GRAPH_AGGREGATE_COUNT',	4);
-define('GRAPH_AGGREGATE_SUM',	5);
-define('GRAPH_AGGREGATE_FIRST',	6);
-define('GRAPH_AGGREGATE_LAST',	7);
+define('AGGREGATE_NONE',	0);
+define('AGGREGATE_MIN',		1);
+define('AGGREGATE_MAX',		2);
+define('AGGREGATE_AVG',		3);
+define('AGGREGATE_COUNT',	4);
+define('AGGREGATE_SUM',		5);
+define('AGGREGATE_FIRST',	6);
+define('AGGREGATE_LAST',	7);
 
 define('GRAPH_AGGREGATE_BY_ITEM',		0);
 define('GRAPH_AGGREGATE_BY_DATASET',	1);
@@ -1430,6 +1435,10 @@ define('ZBX_API_ERROR_PERMISSIONS',	120);
 define('ZBX_API_ERROR_NO_AUTH',		200);
 define('ZBX_API_ERROR_NO_METHOD',	300);
 
+// Error types of unexpected API parameter.
+define('API_ERR_INHERITED', 0);
+define('API_ERR_DISCOVERED', 1);
+
 define('API_OUTPUT_EXTEND',		'extend');
 define('API_OUTPUT_COUNT',		'count');
 
@@ -1507,7 +1516,6 @@ define('ZBX_HINTBOX_CONTENT_LIMIT',				8192);
 // dashboard widgets
 define('WIDGET_ACTION_LOG',			'actionlog');
 define('WIDGET_CLOCK',				'clock');
-define('WIDGET_DATA_OVER',			'dataover');
 define('WIDGET_DISCOVERY',			'discovery');
 define('WIDGET_FAV_GRAPHS',			'favgraphs');
 define('WIDGET_FAV_MAPS',			'favmaps');
@@ -1524,10 +1532,13 @@ define('WIDGET_PROBLEMS_BY_SV',		'problemsbysv');
 define('WIDGET_SLA_REPORT',			'slareport');
 define('WIDGET_SVG_GRAPH',			'svggraph');
 define('WIDGET_SYSTEM_INFO',		'systeminfo');
+define('WIDGET_TOP_HOSTS',			'tophosts');
 define('WIDGET_TRIG_OVER',			'trigover');
 define('WIDGET_URL',				'url');
 define('WIDGET_WEB',				'web');
 define('WIDGET_ITEM',				'item');
+// Deprecated widgets
+define('WIDGET_DATA_OVER',			'dataover');
 
 // Item widget object positions.
 define('WIDGET_ITEM_POS_LEFT',		0);
@@ -1597,6 +1608,9 @@ define('ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE',	3);
 // widget view modes
 define('ZBX_WIDGET_VIEW_MODE_NORMAL',			0);
 define('ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER',	1);
+
+// top hosts widget
+define('ZBX_WIDGET_TOP_HOSTS_DEFAULT_FILL',	'#97AAB3');
 
 // validation
 define('DB_ID',		"({}>=0&&bccomp({},\"9223372036854775807\")<=0)&&");
@@ -1702,6 +1716,7 @@ define('TAB_INDICATOR_VALUEMAPS', 'valuemaps');
 
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
+define('ZBX_STYLE_ACTION_CONTAINER', 'action-container');
 define('ZBX_STYLE_ADM_IMG', 'adm-img');
 define('ZBX_STYLE_AVERAGE_BG', 'average-bg');
 define('ZBX_STYLE_ARROW_DOWN', 'arrow-down');
@@ -1850,7 +1865,7 @@ define('ZBX_STYLE_ICON_INFO', 'icon-info');
 define('ZBX_STYLE_ICON_INVISIBLE', 'icon-invisible');
 define('ZBX_STYLE_ICON_USER', 'icon-user');
 define('ZBX_STYLE_ICON_USER_GROUP', 'icon-user-group');
-define('ZBX_STYLE_ICON_MAINT', 'icon-maint');
+define('ZBX_STYLE_ICON_MAINTENANCE', 'icon-maintenance');
 define('ZBX_STYLE_ICON_WZRD_ACTION', 'icon-wzrd-action');
 define('ZBX_STYLE_ACTION_COMMAND', 'icon-action-command');
 define('ZBX_STYLE_ACTION_ICON_CLOSE', 'icon-action-close');
@@ -1873,7 +1888,6 @@ define('ZBX_STYLE_INLINE_FILTER', 'inline-filter');
 define('ZBX_STYLE_INLINE_FILTER_LABEL', 'inline-filter-label');
 define('ZBX_STYLE_INLINE_FILTER_FOOTER', 'inline-filter-footer');
 define('ZBX_STYLE_INLINE_FILTER_STATS', 'inline-filter-stats');
-define('ZBX_STYLE_INPUT_COLOR_PICKER', 'input-color-picker');
 define('ZBX_STYLE_LAYOUT_KIOSKMODE', 'layout-kioskmode');
 define('ZBX_STYLE_CONTAINER', 'container');
 define('ZBX_STYLE_LAYOUT_WRAPPER', 'wrapper');
@@ -2066,6 +2080,7 @@ define('ZBX_STYLE_CHECKBOX_BLOCK', 'checkbox-block');
 define('ZBX_STYLE_ICON_TEXT', 'icon-text');
 define('ZBX_STYLE_ICON_SECRET_TEXT', 'icon-secret');
 define('ZBX_STYLE_ICON_HELP_HINT', 'icon-help-hint');
+define('ZBX_STYLE_ICON_DOC_LINK', 'icon-doc-link');
 
 // Host interface styles.
 define('ZBX_STYLE_HOST_INTERFACE_CONTAINER', 'interface-container');
@@ -2101,15 +2116,15 @@ define('ZBX_PROPERTY_OWN',			0x02);
 define('ZBX_PROPERTY_BOTH',			0x03);	// ZBX_PROPERTY_INHERITED | ZBX_PROPERTY_OWN
 
 // Number of tags to display in Problems widget and Monitoring > Problems.
-define('PROBLEMS_SHOW_TAGS_NONE', 0);
-define('PROBLEMS_SHOW_TAGS_1', 1);
-define('PROBLEMS_SHOW_TAGS_2', 2);
-define('PROBLEMS_SHOW_TAGS_3', 3);
+define('SHOW_TAGS_NONE', 0);
+define('SHOW_TAGS_1', 1);
+define('SHOW_TAGS_2', 2);
+define('SHOW_TAGS_3', 3);
 
 // Tag name format to display in Problems widget and Monitoring > Problems.
-define('PROBLEMS_TAG_NAME_FULL',      0);
-define('PROBLEMS_TAG_NAME_SHORTENED', 1);
-define('PROBLEMS_TAG_NAME_NONE',      2);
+define('TAG_NAME_FULL',      0);
+define('TAG_NAME_SHORTENED', 1);
+define('TAG_NAME_NONE',      2);
 
 define('OPERATIONAL_DATA_SHOW_NONE',         0);
 define('OPERATIONAL_DATA_SHOW_SEPARATELY',   1);

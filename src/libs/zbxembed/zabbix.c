@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zabbix.h"
+
 #include "common.h"
 #include "log.h"
 #include "zbxjson.h"
-#include "zbxembed.h"
 #include "embed.h"
 #include "duktape.h"
-#include "zabbix.h"
 
 /******************************************************************************
  *                                                                            *
@@ -106,8 +106,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: es_zabbix_sleep                                                  *
- *                                                                            *
  * Purpose: sleep for given duration in milliseconds                          *
  *                                                                            *
  * Parameters: ctx - [IN] pointer to duk_context                              *
@@ -122,18 +120,20 @@ out:
  ******************************************************************************/
 static duk_ret_t	es_zabbix_sleep(duk_context *ctx)
 {
-	zbx_es_env_t		*env;
-	duk_memory_functions	out_funcs;
-	struct timespec		ts_sleep;
-	zbx_uint64_t		timeout, duration;
-	unsigned int		sleep_ms;
-	double			sleep_dbl;
-	duk_idx_t		err_idx = -1;
+	zbx_es_env_t	*env;
+	struct timespec	ts_sleep;
+	zbx_uint64_t	timeout, duration;
+	unsigned int	sleep_ms;
+	double		sleep_dbl;
+	duk_idx_t	err_idx = -1;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return duk_error(ctx, DUK_ERR_ERROR, "cannot access internal environment");
 
 	/* use duk_to_number() instead of duk_to_uint() to distinguish between zero value and error */
 	sleep_dbl = duk_to_number(ctx, 0);
 
-	if (0 != DUK_ISNAN((float)sleep_dbl) || 0.0 > sleep_dbl)
+	if (FP_NAN == fpclassify((float)sleep_dbl) || 0.0 > sleep_dbl)
 		return duk_error(ctx, DUK_ERR_EVAL_ERROR, "invalid Zabbix.sleep() duration");
 
 	if (DUK_UINT_MAX < sleep_dbl)
@@ -141,9 +141,7 @@ static duk_ret_t	es_zabbix_sleep(duk_context *ctx)
 	else
 		sleep_ms = (unsigned int)sleep_dbl;
 
-	duk_get_memory_functions(ctx, &out_funcs);
-	env = (zbx_es_env_t *)out_funcs.udata;
-	timeout = (unsigned int)env->timeout * 1000;
+	timeout = env->timeout <= 0 ? 0 : (zbx_uint64_t)env->timeout * 1000;
 
 	if (sleep_ms > timeout)
 	{

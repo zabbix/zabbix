@@ -120,8 +120,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 				? new CLink(_('Latest data'),
 					(new CUrl('zabbix.php'))
 						->setArgument('action', 'latest.view')
-						->setArgument('filter_set', '1')
-						->setArgument('filter_hostids', [$host['hostid']])
+						->setArgument('hostids', [$host['hostid']])
+						->setArgument('filter_name', '')
 				)
 				: _('Latest data')
 		],
@@ -131,8 +131,9 @@ foreach ($data['hosts'] as $hostid => $host) {
 				new CLink(_('Graphs'),
 					(new CUrl('zabbix.php'))
 						->setArgument('action', 'charts.view')
-						->setArgument('filter_set', '1')
 						->setArgument('filter_hostids', (array) $host['hostid'])
+						->setArgument('filter_show', GRAPH_FILTER_HOST)
+						->setArgument('filter_set', '1')
 				),
 				CViewHelper::showNum($host['graphs'])
 			]

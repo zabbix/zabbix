@@ -549,8 +549,6 @@ class CMacrosResolverHelper {
 	/**
 	 * Resolve single item widget description macros.
 	 *
-	 * @static
-	 *
 	 * @param array  $items
 	 * @param string $items[n]['hostid']
 	 * @param string $items[n]['itemid']
@@ -562,6 +560,20 @@ class CMacrosResolverHelper {
 		self::init();
 
 		return self::$macrosResolver->resolveWidgetItemNames($items);
+	}
+
+	/**
+	 * Resolve text-type column macros for top-hosts widget.
+	 *
+	 * @param array $columns
+	 * @param array $items
+	 *
+	 * @return array
+	 */
+	public static function resolveWidgetTopHostsTextColumns(array $columns, array $items): array {
+		self::init();
+
+		return self::$macrosResolver->resolveWidgetTopHostsTextColumns($columns, $items);
 	}
 
 	/**

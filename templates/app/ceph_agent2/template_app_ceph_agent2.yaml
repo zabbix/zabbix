@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T06:56:38Z'
+  date: '2022-01-26T09:59:53Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410059-discussion-thread-for-official-zabbix-template-ceph
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -27,8 +27,11 @@ zabbix_export:
           value_type: TEXT
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: disk
+            -
+              tag: component
+              value: raw
         -
           uuid: 45c9df734d424e6a8d3fea99c4a66246
           name: 'Ceph: Minimum Mon release version'
@@ -52,8 +55,8 @@ zabbix_export:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: monitors
           triggers:
             -
               uuid: 716f166b3943443aba70a4faed882ffb
@@ -62,6 +65,10 @@ zabbix_export:
               priority: INFO
               description: 'Ceph version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 5d5276504d6c41eebe8e18846edcff45
           name: 'Ceph: Number of Monitors'
@@ -83,8 +90,8 @@ zabbix_export:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: monitors
         -
           uuid: 09d7a872f35349c6ba7d4a678bf71652
           name: 'Ceph: Number of OSDs'
@@ -106,8 +113,11 @@ zabbix_export:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: osd
         -
           uuid: 795939e16e70475381e917b213bf6f70
           name: 'Ceph: Number of OSDs in state: IN'
@@ -129,8 +139,11 @@ zabbix_export:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: osd
         -
           uuid: d2d5caaad2914fb1ba07343956edb5b8
           name: 'Ceph: Number of OSDs in state: UP'
@@ -152,8 +165,11 @@ zabbix_export:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: osd
         -
           uuid: 46ea920b0951408daa5d678f298b1097
           name: 'Ceph: Number of Placement Groups'
@@ -175,8 +191,11 @@ zabbix_export:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: placement-groups
         -
           uuid: 97fbecc8ee824e658dd95d8115fec5e9
           name: 'Ceph: Number of Placement Groups in Temporary state'
@@ -194,8 +213,8 @@ zabbix_export:
             key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: placement-groups
         -
           uuid: b0e36ff76db049ab870fa26c29e5e69c
           name: 'Ceph: Number of Pools'
@@ -213,8 +232,11 @@ zabbix_export:
             key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: pools
         -
           uuid: e7eb1f67d81c4e2ba7c57cfbc81d1a00
           name: 'Ceph: Get OSD dump'
@@ -224,8 +246,11 @@ zabbix_export:
           value_type: TEXT
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: osd
+            -
+              tag: component
+              value: raw
         -
           uuid: 35b63ca6519e4137bb7655e37ed08e51
           name: 'Ceph: Get OSD stats'
@@ -235,8 +260,11 @@ zabbix_export:
           value_type: TEXT
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: osd
+            -
+              tag: component
+              value: raw
         -
           uuid: 0d6cffa1f06748738431524667ea8db0
           name: 'Ceph: Ceph backfill full ratio'
@@ -259,8 +287,8 @@ zabbix_export:
             key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
         -
           uuid: 52c5efe132b8404f8fc4ac995c3d5c2c
           name: 'Ceph: Ceph OSD avg fill'
@@ -280,8 +308,11 @@ zabbix_export:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: osd
         -
           uuid: 453cebeed3214153ba4e3a5b224c063d
           name: 'Ceph: Ceph OSD max fill'
@@ -301,8 +332,11 @@ zabbix_export:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: osd
         -
           uuid: f6efbd37e8104272be131d686a700808
           name: 'Ceph: Ceph OSD min fill'
@@ -322,8 +356,11 @@ zabbix_export:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: osd
         -
           uuid: 532891a1d8934211a016524b136cfb1e
           name: 'Ceph: Ceph full ratio'
@@ -346,8 +383,8 @@ zabbix_export:
             key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
         -
           uuid: 074c0881384446ea90e99d355afe4f4f
           name: 'Ceph: Ceph OSD Apply latency Avg'
@@ -367,8 +404,11 @@ zabbix_export:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: osd
         -
           uuid: ef0a76f0c16147d1a280e00e66d3806f
           name: 'Ceph: Ceph OSD Apply latency Max'
@@ -388,8 +428,11 @@ zabbix_export:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: osd
         -
           uuid: d45ad876b0a04345be347af54211aa69
           name: 'Ceph: Ceph OSD Apply latency Min'
@@ -409,8 +452,11 @@ zabbix_export:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: osd
         -
           uuid: 52e1b146c36e4c2e82acf36f1c7d12eb
           name: 'Ceph: Ceph OSD Commit latency Avg'
@@ -430,8 +476,11 @@ zabbix_export:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: osd
         -
           uuid: 3027a1dbdd8e4f9bbef8927b92eb8e77
           name: 'Ceph: Ceph OSD Commit latency Max'
@@ -451,8 +500,11 @@ zabbix_export:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: osd
         -
           uuid: b9900b84c22843dab4ad335b9642e040
           name: 'Ceph: Ceph OSD Commit latency Min'
@@ -472,8 +524,11 @@ zabbix_export:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: osd
         -
           uuid: 477d94bd838d4273a556537de36bb1f6
           name: 'Ceph: Ceph nearfull ratio'
@@ -496,8 +551,8 @@ zabbix_export:
             key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
         -
           uuid: 27ea5688271347bca429d91ace62d4e2
           name: 'Ceph: Ceph OSD avg PGs'
@@ -516,8 +571,14 @@ zabbix_export:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: osd
+            -
+              tag: component
+              value: placement-groups
         -
           uuid: 4174d7d3190e47ccb55b1e50da4cedc5
           name: 'Ceph: Ceph OSD max PGs'
@@ -536,8 +597,14 @@ zabbix_export:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: osd
+            -
+              tag: component
+              value: placement-groups
         -
           uuid: 47f56243cd1c430fae217d1a0cbc4a99
           name: 'Ceph: Ceph OSD min PGs'
@@ -556,8 +623,14 @@ zabbix_export:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: osd
+            -
+              tag: component
+              value: placement-groups
         -
           uuid: 4023ca309692470eab2651f69d49419a
           name: 'Ceph: Overall cluster status'
@@ -581,8 +654,8 @@ zabbix_export:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: health
           triggers:
             -
               uuid: 6ab06350bd8b426681f1b8bddde76a13
@@ -590,6 +663,10 @@ zabbix_export:
               name: 'Ceph: Cluster in ERROR state'
               priority: AVERAGE
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: 8b6ba1a7ae014e80a5287ffd13b5d8aa
               expression: 'last(/Ceph by Zabbix agent 2/ceph.overall_status)=1'
@@ -602,6 +679,10 @@ zabbix_export:
                 -
                   name: 'Ceph: Cluster in ERROR state'
                   expression: 'last(/Ceph by Zabbix agent 2/ceph.overall_status)=2'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 9b073153d7474b0abfccb1844d0e6981
           name: 'Ceph: Number of Placement Groups in Active state'
@@ -619,8 +700,8 @@ zabbix_export:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: placement-groups
         -
           uuid: 1471a13aaadc48c7a265835abcb93a03
           name: 'Ceph: Number of Placement Groups in Backfilling state'
@@ -638,8 +719,8 @@ zabbix_export:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: placement-groups
         -
           uuid: 3b44c79e03d4402ba442331593dbdfa3
           name: 'Ceph: Number of Placement Groups in backfill_toofull state'
@@ -657,8 +738,8 @@ zabbix_export:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: placement-groups
         -
           uuid: ada3f638ee2e48eeb8889526898aed2f
           name: 'Ceph: Number of Placement Groups in backfill_wait state'
@@ -676,8 +757,8 @@ zabbix_export:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: placement-groups
         -
           uuid: b1af2b88fe424723b97c9aa4eee12d83
           name: 'Ceph: Number of Placement Groups in Clean state'
@@ -695,8 +776,8 @@ zabbix_export:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: placement-groups
         -
           uuid: f8acf8f66fbc401799d3515eb3e2ea43
           name: 'Ceph: Number of Placement Groups in degraded state'
@@ -714,8 +795,8 @@ zabbix_export:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: placement-groups
         -
           uuid: 79e056b9e3af40eabab0f927fb326491
           name: 'Ceph: Number of Placement Groups in inconsistent state'
@@ -733,8 +814,8 @@ zabbix_export:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: placement-groups
         -
           uuid: 9ddef3d2e7df43eda7d2835ceac19d32
           name: 'Ceph: Number of Placement Groups in Peering state'
@@ -752,8 +833,8 @@ zabbix_export:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: placement-groups
         -
           uuid: 573461fc94e84f96b8ae6f6d89916424
           name: 'Ceph: Number of Placement Groups in recovering state'
@@ -771,8 +852,8 @@ zabbix_export:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: placement-groups
         -
           uuid: c150a9414fee40acaa65d532fd110c4e
           name: 'Ceph: Number of Placement Groups in recovery_wait state'
@@ -790,8 +871,8 @@ zabbix_export:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: placement-groups
         -
           uuid: bac3270faf854267a466eaa6a4acad91
           name: 'Ceph: Number of Placement Groups in remapped state'
@@ -809,8 +890,8 @@ zabbix_export:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: placement-groups
         -
           uuid: 8a0117845436492d951e96b46eb67e1c
           name: 'Ceph: Number of Placement Groups in Scrubbing state'
@@ -828,8 +909,8 @@ zabbix_export:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: placement-groups
         -
           uuid: 4998e4542ed746f08f82ecf53b553c36
           name: 'Ceph: Number of Placement Groups in Undersized state'
@@ -847,8 +928,8 @@ zabbix_export:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: placement-groups
         -
           uuid: c922613c5ffb4f689c01f13143633ec3
           name: 'Ceph: Number of Placement Groups in Unknown state'
@@ -866,8 +947,8 @@ zabbix_export:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: placement-groups
         -
           uuid: 911e8a654ca44e7ca56b8010ac7381c8
           name: 'Ceph: Ping'
@@ -882,8 +963,11 @@ zabbix_export:
                 - 30m
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: application
+            -
+              tag: component
+              value: health
           triggers:
             -
               uuid: 9ffc9a5c3d1c47d288c665c8be7d2fbb
@@ -891,6 +975,10 @@ zabbix_export:
               name: 'Ceph: Can not connect to cluster'
               priority: AVERAGE
               description: 'Connection to Ceph RESTful module is broken (if there is any error presented including AUTH and configuration issues).'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 89d7df2ebfbc4aa88b4ff4de44dc4b8b
           name: 'Ceph: Ceph Read bandwidth'
@@ -914,8 +1002,11 @@ zabbix_export:
             key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: disk
         -
           uuid: 8a35a37de63746498291993d4f3fc1cc
           name: 'Ceph: Ceph Read operations per sec'
@@ -935,8 +1026,11 @@ zabbix_export:
             key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: disk
         -
           uuid: 8b43d105f9d64a3a94196f3f3bc7eac3
           name: 'Ceph: Get overall cluster status'
@@ -946,8 +1040,8 @@ zabbix_export:
           value_type: TEXT
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 5e400c932acf4ad498e17daca0ad4943
           name: 'Ceph: Total bytes available'
@@ -966,8 +1060,11 @@ zabbix_export:
             key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: disk
         -
           uuid: c4b1a31efb5f47518cc5dd6082f3a42b
           name: 'Ceph: Total bytes'
@@ -986,8 +1083,11 @@ zabbix_export:
             key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: disk
         -
           uuid: d3910275462b43dba1fa8022a398ed1c
           name: 'Ceph: Total number of objects'
@@ -1005,8 +1105,8 @@ zabbix_export:
             key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
         -
           uuid: 6ad8e289eef349ab8ebfd4cc92a35c18
           name: 'Ceph: Total bytes used'
@@ -1025,8 +1125,11 @@ zabbix_export:
             key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: disk
         -
           uuid: 51e100668e5344d29afd50dc9b9eabc9
           name: 'Ceph: Ceph Write bandwidth'
@@ -1050,8 +1153,11 @@ zabbix_export:
             key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: disk
         -
           uuid: 0a7203defa7147f7b975b404e6706b60
           name: 'Ceph: Ceph Write operations per sec'
@@ -1075,8 +1181,11 @@ zabbix_export:
             key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
             -
-              tag: Application
-              value: Ceph
+              tag: component
+              value: cluster
+            -
+              tag: component
+              value: disk
       discovery_rules:
         -
           uuid: 374557a43a824d938e9a8e656151e0c9
@@ -1103,8 +1212,17 @@ zabbix_export:
                 key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Ceph {#HOST} OSD [{#CLASS}]'
+                  tag: class
+                  value: '{#CLASS}'
+                -
+                  tag: component
+                  value: osd
+                -
+                  tag: host
+                  value: '{#HOST}'
+                -
+                  tag: osd
+                  value: '{#OSDNAME}'
             -
               uuid: fc2518ca8b9341d8befc6f9b1cbd4b79
               name: 'Ceph: [osd.{#OSDNAME}] OSD in'
@@ -1125,8 +1243,17 @@ zabbix_export:
                 key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Ceph {#HOST} OSD [{#CLASS}]'
+                  tag: class
+                  value: '{#CLASS}'
+                -
+                  tag: component
+                  value: osd
+                -
+                  tag: host
+                  value: '{#HOST}'
+                -
+                  tag: osd
+                  value: '{#OSDNAME}'
             -
               uuid: 2eb6a0d999d14906a4737ed32834ccc7
               name: 'Ceph: [osd.{#OSDNAME}] OSD latency apply'
@@ -1147,8 +1274,17 @@ zabbix_export:
                 key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Ceph {#HOST} OSD [{#CLASS}]'
+                  tag: class
+                  value: '{#CLASS}'
+                -
+                  tag: component
+                  value: osd
+                -
+                  tag: host
+                  value: '{#HOST}'
+                -
+                  tag: osd
+                  value: '{#OSDNAME}'
             -
               uuid: 14f392b369504f10b7e068522ac4a086
               name: 'Ceph: [osd.{#OSDNAME}] OSD latency commit'
@@ -1169,8 +1305,17 @@ zabbix_export:
                 key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Ceph {#HOST} OSD [{#CLASS}]'
+                  tag: class
+                  value: '{#CLASS}'
+                -
+                  tag: component
+                  value: osd
+                -
+                  tag: host
+                  value: '{#HOST}'
+                -
+                  tag: osd
+                  value: '{#OSDNAME}'
             -
               uuid: 63234342c0bd49e6b1f8737bf595851f
               name: 'Ceph: [osd.{#OSDNAME}] OSD PGs'
@@ -1188,8 +1333,17 @@ zabbix_export:
                 key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Ceph {#HOST} OSD [{#CLASS}]'
+                  tag: class
+                  value: '{#CLASS}'
+                -
+                  tag: component
+                  value: osd
+                -
+                  tag: host
+                  value: '{#HOST}'
+                -
+                  tag: osd
+                  value: '{#OSDNAME}'
             -
               uuid: 12c20b2fbf10466bba7e1097c014e968
               name: 'Ceph: [osd.{#OSDNAME}] OSD up'
@@ -1210,8 +1364,17 @@ zabbix_export:
                 key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Ceph {#HOST} OSD [{#CLASS}]'
+                  tag: class
+                  value: '{#CLASS}'
+                -
+                  tag: component
+                  value: osd
+                -
+                  tag: host
+                  value: '{#HOST}'
+                -
+                  tag: osd
+                  value: '{#OSDNAME}'
               trigger_prototypes:
                 -
                   uuid: 21535bb935b44b3aa073542db3cc7827
@@ -1221,6 +1384,10 @@ zabbix_export:
                   description: |
                     OSD osd.{#OSDNAME} is marked "down" in the osdmap.
                     The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OSD over the network.
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           trigger_prototypes:
             -
               uuid: cd04e8d542a04bdf89abad7ee4719e75
@@ -1231,11 +1398,19 @@ zabbix_export:
                 -
                   name: 'Ceph: OSD osd.{#OSDNAME} is full'
                   expression: 'min(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix agent 2/ceph.osd_full_ratio)*100'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
             -
               uuid: 5d7a028166584c29b959914ce904a713
               expression: 'min(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix agent 2/ceph.osd_full_ratio)*100'
               name: 'Ceph: OSD osd.{#OSDNAME} is full'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: capacity
           graph_prototypes:
             -
               uuid: c88d53bfa7b8456aa70b4d7a2cb63ef5
@@ -1276,8 +1451,14 @@ zabbix_export:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
+                  tag: component
+                  value: pools
+                -
+                  tag: crushrule
+                  value: '{#CRUSHRULE}'
+                -
+                  tag: pool
+                  value: '{#POOLNAME}'
             -
               uuid: 4e49ce8a11084dd287f89b076cc70535
               name: 'Ceph: [{#POOLNAME}] Max available'
@@ -1296,8 +1477,14 @@ zabbix_export:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
+                  tag: component
+                  value: pools
+                -
+                  tag: crushrule
+                  value: '{#CRUSHRULE}'
+                -
+                  tag: pool
+                  value: '{#POOLNAME}'
             -
               uuid: 5c7bd85f9d944215acaced87b0eb216f
               name: 'Ceph: [{#POOLNAME}] Pool objects'
@@ -1315,8 +1502,14 @@ zabbix_export:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
+                  tag: component
+                  value: pools
+                -
+                  tag: crushrule
+                  value: '{#CRUSHRULE}'
+                -
+                  tag: pool
+                  value: '{#POOLNAME}'
             -
               uuid: eda166ae6c4c46cf8c01c2b928f07ec5
               name: 'Ceph: [{#POOLNAME}] Pool Percent Used'
@@ -1335,8 +1528,14 @@ zabbix_export:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
+                  tag: component
+                  value: pools
+                -
+                  tag: crushrule
+                  value: '{#CRUSHRULE}'
+                -
+                  tag: pool
+                  value: '{#POOLNAME}'
             -
               uuid: 5311f1a539284c5483458e1820496be3
               name: 'Ceph: [{#POOLNAME}] Pool Read bandwidth'
@@ -1360,8 +1559,14 @@ zabbix_export:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
+                  tag: component
+                  value: pools
+                -
+                  tag: crushrule
+                  value: '{#CRUSHRULE}'
+                -
+                  tag: pool
+                  value: '{#POOLNAME}'
             -
               uuid: 76871b86d66d4307a83e813a8d9fc1b0
               name: 'Ceph: [{#POOLNAME}] Pool Read operations'
@@ -1385,8 +1590,14 @@ zabbix_export:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
+                  tag: component
+                  value: pools
+                -
+                  tag: crushrule
+                  value: '{#CRUSHRULE}'
+                -
+                  tag: pool
+                  value: '{#POOLNAME}'
             -
               uuid: 4c053bbaaf6946bcaf5288cc154d6fdd
               name: 'Ceph: [{#POOLNAME}] Pool RAW Used'
@@ -1405,8 +1616,14 @@ zabbix_export:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
+                  tag: component
+                  value: pools
+                -
+                  tag: crushrule
+                  value: '{#CRUSHRULE}'
+                -
+                  tag: pool
+                  value: '{#POOLNAME}'
             -
               uuid: 955353da182243e29d326b3b2807286a
               name: 'Ceph: [{#POOLNAME}] Pool Write bandwidth'
@@ -1430,8 +1647,14 @@ zabbix_export:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
+                  tag: component
+                  value: pools
+                -
+                  tag: crushrule
+                  value: '{#CRUSHRULE}'
+                -
+                  tag: pool
+                  value: '{#POOLNAME}'
             -
               uuid: acb3081d772444dab060a055fb3f4304
               name: 'Ceph: [{#POOLNAME}] Pool Write operations'
@@ -1455,8 +1678,14 @@ zabbix_export:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
+                  tag: component
+                  value: pools
+                -
+                  tag: crushrule
+                  value: '{#CRUSHRULE}'
+                -
+                  tag: pool
+                  value: '{#POOLNAME}'
           graph_prototypes:
             -
               uuid: 1a469f2c99214b1ba7fe3a7520e43439
@@ -1509,6 +1738,13 @@ zabbix_export:
                   item:
                     host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",stored_raw]'
+      tags:
+        -
+          tag: class
+          value: application
+        -
+          tag: target
+          value: ceph
       macros:
         -
           macro: '{$CEPH.API.KEY}'

@@ -21,7 +21,6 @@
 #define ZABBIX_COMMON_H
 
 #include "sysinc.h"
-#include "zbxtypes.h"
 #include "module.h"
 #include "version.h"
 #include "md5.h"
@@ -569,7 +568,7 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_REPORTMANAGER		33
 #define ZBX_PROCESS_TYPE_REPORTWRITER		34
 #define ZBX_PROCESS_TYPE_SERVICEMAN		35
-#define ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER	36
+#define ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER	36
 #define ZBX_PROCESS_TYPE_ODBCPOLLER		37
 #define ZBX_PROCESS_TYPE_COUNT			38	/* number of process types */
 
@@ -798,7 +797,7 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_TRIGGER_CORRELATION_NONE	0
 #define ZBX_TRIGGER_CORRELATION_TAG	1
 
-/* acknowledgement actions (flags) */
+/* acknowledgment actions (flags) */
 #define ZBX_PROBLEM_UPDATE_CLOSE		0x0001
 #define ZBX_PROBLEM_UPDATE_ACKNOWLEDGE		0x0002
 #define ZBX_PROBLEM_UPDATE_MESSAGE		0x0004
@@ -998,6 +997,11 @@ zbx_task_t;
 #define ZBX_RTC_HA_REMOVE_NODE			15
 #define ZBX_RTC_HA_SET_FAILOVER_DELAY		16
 #define ZBX_RTC_USER_PARAMETERS_RELOAD		17
+
+/* internal rtc messages */
+#define ZBX_RTC_SUBSCRIBE			100
+#define ZBX_RTC_SHUTDOWN			101
+#define ZBX_RTC_CONFIG_CACHE_RELOAD_WAIT	102
 
 /* runtime control notifications, must be less than 10000 */
 #define ZBX_RTC_CONFIG_SYNC_NOTIFY		9999
@@ -1241,16 +1245,6 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 char	*zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 char	*zbx_strdcat(char *dest, const char *src);
 char	*zbx_strdcatf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
-
-int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
-void	xml_free_data_dyn(char **data);
-char	*xml_escape_dyn(const char *data);
-void	xml_escape_xpath(char **data);
-
-int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size_t key_len,
-		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
-		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
-		char *severity, size_t severity_len);
 
 /* misc functions */
 int	is_ip6(const char *ip);
@@ -1688,7 +1682,7 @@ int	zbx_validate_value_dbl(double value, int dbl_precision);
 
 void	zbx_update_env(double time_now);
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
-		int *nextcheck, char **error);
+		int *nextcheck, int *scheduling, char **error);
 #define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
 char	*zbx_create_token(zbx_uint64_t seed);
 
@@ -1743,13 +1737,6 @@ zbx_function_type_t;
 
 zbx_function_type_t	zbx_get_function_type(const char *func);
 int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg);
-int	zbx_xmlnode_to_json(void *xml_node, char **jstr);
-int	zbx_xml_to_json(char *xml_data, char **jstr, char **errmsg);
-int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg);
-#ifdef HAVE_LIBXML2
-int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **root_node, char **errmsg);
-int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
-#endif
 
 /* audit logging mode */
 #define ZBX_AUDITLOG_DISABLED	0

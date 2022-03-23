@@ -20,11 +20,11 @@
 #ifndef ZABBIX_CHECKS_SSH_H
 #define ZABBIX_CHECKS_SSH_H
 
-#include "common.h"
+#include "module.h"
+#include "config.h"
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 #include "dbcache.h"
-#include "sysinfo.h"
 
 extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_SSH_KEY_LOCATION;

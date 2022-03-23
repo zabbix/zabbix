@@ -409,9 +409,10 @@ class C44ImportConverter extends CConverter {
 
 								// Find interfaces having same SNMP version.
 								$same_ver_interfaces = array_filter($new_interfaces[$interfaceid],
-									function (array $iface) use ($item): bool {
+									function (array $iface) use (&$item): bool {
 										// Use default SNMP V2 interface for SNMP traps.
 										if ($item['type'] === CXmlConstantName::SNMP_TRAP) {
+											$item['community'] = '{$SNMP_COMMUNITY}';
 											$item['type'] = CXmlConstantName::SNMPV2;
 										}
 
@@ -425,7 +426,9 @@ class C44ImportConverter extends CConverter {
 											// If item port differs from interface ports it is 100% new interface.
 											if ($item['port'] === '') {
 												// Item port not set and interface port not equal parent port.
-												return ($iface['port'] === $parent_interface['port']);
+												if ($iface['port'] !== $parent_interface['port']) {
+													return false;
+												}
 											}
 											else {
 												// If item port not equal interface ports it is 100% new interface.

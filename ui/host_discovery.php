@@ -233,6 +233,7 @@ $fields = [
 	'filter_status' =>			[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]),
 									null
 								],
+	'backurl' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"delay","key_","name","status","type"'),	null],
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -292,6 +293,11 @@ elseif ($hostid) {
 	if (!$host) {
 		access_deny();
 	}
+}
+
+// Validate backurl.
+if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
+	access_deny();
 }
 
 $prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
@@ -447,13 +453,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 				if ($simple_interval_parser->parse($interval['delay']) != CParser::PARSE_SUCCESS) {
 					$result = false;
-					info(_s('Invalid interval "%1$s".', $interval['delay']));
+					error(_s('Invalid interval "%1$s".', $interval['delay']));
 					break;
 				}
 
 				if ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
 					$result = false;
-					info(_s('Invalid interval "%1$s".', $interval['period']));
+					error(_s('Invalid interval "%1$s".', $interval['period']));
 					break;
 				}
 
@@ -466,7 +472,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 				if ($scheduling_interval_parser->parse($interval['schedule']) != CParser::PARSE_SUCCESS) {
 					$result = false;
-					info(_s('Invalid interval "%1$s".', $interval['schedule']));
+					error(_s('Invalid interval "%1$s".', $interval['schedule']));
 					break;
 				}
 
@@ -518,6 +524,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
 				'error_handler_params' => ''
 			];
+
+			unset($step['sortorder']);
 		}
 		unset($step);
 
@@ -711,15 +719,30 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 
 	if (hasRequest('add')) {
-		show_messages($result, _('Discovery rule created'), _('Cannot add discovery rule'));
+		if ($result) {
+			CMessageHelper::setSuccessTitle(_('Discovery rule created'));
+		}
+		else {
+			CMessageHelper::setErrorTitle(_('Cannot add discovery rule'));
+		}
 	}
 	else {
-		show_messages($result, _('Discovery rule updated'), _('Cannot update discovery rule'));
+		if ($result) {
+			CMessageHelper::setSuccessTitle(_('Discovery rule updated'));
+		}
+		else {
+			CMessageHelper::setErrorTitle(_('Cannot update discovery rule'));
+		}
 	}
 
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
 		uncheckTableRows($checkbox_hash);
+
+		if (hasRequest('backurl')) {
+			$response = new CControllerResponseRedirect(getRequest('backurl'));
+			$response->redirect();
+		}
 	}
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['discoveryrule.massenable', 'discoveryrule.massdisable']) && hasRequest('g_hostdruleid')) {
@@ -825,8 +848,10 @@ if (hasRequest('form')) {
 	$data['display_interfaces'] = ($host['status'] == HOST_STATUS_MONITORED
 		|| $host['status'] == HOST_STATUS_NOT_MONITORED
 	);
+	$data['backurl'] = getRequest('backurl');
 
 	if (!hasRequest('form_refresh')) {
+		$i = 0;
 		foreach ($data['preprocessing'] as &$step) {
 			if ($step['type'] == ZBX_PREPROC_SCRIPT) {
 				$step['params'] = [$step['params'], ''];
@@ -834,9 +859,12 @@ if (hasRequest('form')) {
 			else {
 				$step['params'] = explode("\n", $step['params']);
 			}
+			$step['sortorder'] = $i++;
 		}
 		unset($step);
 	}
+
+	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
 
 	// update form
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
@@ -857,6 +885,13 @@ if (hasRequest('form')) {
 
 	if ($data['type'] != ITEM_TYPE_JMX) {
 		$data['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
+	}
+
+	$data['counter'] = null;
+	if (hasRequest('conditions')) {
+		$conditions = getRequest('conditions');
+		krsort($conditions);
+		$data['counter'] = key($conditions) + 1;
 	}
 
 	// render view

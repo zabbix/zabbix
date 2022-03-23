@@ -23,7 +23,9 @@
  * @var CView $this
  */
 
-$widget = (new CWidget())->setTitle(_('Web monitoring'));
+$widget = (new CWidget())
+	->setTitle(_('Web monitoring'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HTTPCONF_EDIT));
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
@@ -298,3 +300,11 @@ zbx_subarray_push($this->data['scenario_tab_data']['agent_visibility'], ZBX_AGEN
 require_once dirname(__FILE__).'/js/configuration.httpconf.edit.js.php';
 
 $widget->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'form_name' => $http_form->getName()
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

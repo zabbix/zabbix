@@ -26,6 +26,7 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Discovery rules'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOST_DISCOVERY_EDIT))
 	->setNavigation(getHostNavigation('discoveries', $data['hostid'],
 		array_key_exists('itemid', $data) ? $data['itemid'] : 0
 	));
@@ -39,7 +40,8 @@ $form = (new CForm('post', $url))
 	->setName('itemForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
-	->addVar('hostid', $data['hostid']);
+	->addVar('hostid', $data['hostid'])
+	->addVar('backurl', $data['backurl']);
 
 if (!empty($data['itemid'])) {
 	$form->addVar('itemid', $data['itemid']);
@@ -105,12 +107,21 @@ $item_tab
 $query_fields_data = [];
 
 if (is_array($data['query_fields']) && $data['query_fields']) {
+	$i = 0;
 	foreach ($data['query_fields'] as $pair) {
-		$query_fields_data[] = ['name' => key($pair), 'value' => reset($pair)];
+		$query_fields_data[] = [
+			'name' => key($pair),
+			'value' => reset($pair),
+			'sortorder' => $i++
+		];
 	}
 }
 elseif (!$data['limited']) {
-	$query_fields_data[] = ['name' => '', 'value' => ''];
+	$query_fields_data[] = [
+		'name' => '',
+		'value' => '',
+		'sortorder' => 0
+	];
 }
 
 $query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
@@ -185,7 +196,11 @@ $item_tab
 				(new CTag('script', true))
 					->setAttribute('type', 'text/x-jquery-tmpl')
 					->addItem(new CRow([
-						(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol(
+							(new CDiv(
+								new CVar('query_fields[sortorder][#{index}]', '#{sortorder}')
+							))->addClass(ZBX_STYLE_DRAG_ICON)
+						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('query_fields[name][#{index}]', '#{name}', $data['limited']))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
@@ -300,12 +315,21 @@ $item_tab
 $headers_data = [];
 
 if (is_array($data['headers']) && $data['headers']) {
+	$i = 0;
 	foreach ($data['headers'] as $pair) {
-		$headers_data[] = ['name' => key($pair), 'value' => reset($pair)];
+		$headers_data[] = [
+			'name' => key($pair),
+			'value' => reset($pair),
+			'sortorder' => $i++
+		];
 	}
 }
 elseif (!$data['limited']) {
-	$headers_data[] = ['name' => '', 'value' => ''];
+	$headers_data[] = [
+		'name' => '',
+		'value' => '',
+		'sortorder' => 0
+	];
 }
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
 $headers->items = [json_encode($headers_data)];
@@ -329,7 +353,11 @@ $item_tab
 				(new CTag('script', true))
 					->setAttribute('type', 'text/x-jquery-tmpl')
 					->addItem(new CRow([
-						(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol(
+							(new CDiv(
+								new CVar('headers[sortorder][#{index}]', '#{sortorder}')
+							))->addClass(ZBX_STYLE_DRAG_ICON)
+						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('headers[name][#{index}]', '#{name}', $data['limited']))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
@@ -539,7 +567,7 @@ $item_tab
 
 $item_tab
 	->addItem([
-		(new CLabel(_('IPMI sensor')))->setId('js-item-impi-sensor-label'),
+		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setId('js-item-impi-sensor-label'),
 		(new CFormField((new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $data['limited'], 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-impi-sensor-field')
@@ -565,7 +593,7 @@ $item_tab
 		))->setId('js-item-jmx-endpoint-field')
 	])
 	->addItem([
-		(new CLabel(_('User name')))->setId('js-item-username-label'),
+		(new CLabel(_('User name'), 'username'))->setId('js-item-username-label'),
 		(new CFormField((new CTextBox('username', $data['username'], false, 64))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->disableAutocomplete()
@@ -590,7 +618,7 @@ $item_tab
 		))->setId('js-item-private-key-field')
 	])
 	->addItem([
-		(new CLabel(_('Password')))->setId('js-item-password-label'),
+		(new CLabel(_('Password'), 'password'))->setId('js-item-password-label'),
 		(new CFormField((new CTextBox('password', $data['password'], false, 64))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->disableAutocomplete()
@@ -692,17 +720,17 @@ $item_tab
 		))->setId('js-item-allow-traps-field')
 	])
 	->addItem([
-		(new CLabel(_('Allowed hosts')))->setId('js-item-trapper-hosts-label'),
+		(new CLabel(_('Allowed hosts'), 'trapper_hosts'))->setId('js-item-trapper-hosts-label'),
 		(new CFormField((new CTextBox('trapper_hosts', $data['trapper_hosts']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-trapper-hosts-field')
 	])
 	->addItem([
-		new CLabel(_('Description')),
+		new CLabel(_('Description'), 'description'),
 		new CFormField((new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
 	])
 	->addItem([
-		new CLabel(_('Enabled')),
+		new CLabel(_('Enabled'), 'status'),
 		new CFormField((new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($data['status'] == ITEM_STATUS_ACTIVE))
 	]);
 
@@ -974,14 +1002,23 @@ if (!empty($data['itemid'])) {
 	))->setEnabled(!$data['limited']);
 	$buttons[] = new CButtonCancel(url_param('context'));
 
-	$tab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
+	$form_actions = new CFormActions(new CSubmit('update', _('Update')), $buttons);
 }
 else {
-	$tab->setFooter(makeFormFooter(
+	$cancel_button = $data['backurl'] !== null
+		? new CButtonCancel(null, "redirect('".$data['backurl']."');")
+		: new CButtonCancel(url_param('context'));
+
+	$form_actions = new CFormActions(
 		new CSubmit('add', _('Add')),
-		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel(url_param('context'))]
-	));
+		[
+			(new CSimpleButton(_('Test')))->setId('test_item'),
+			$cancel_button
+		]
+	);
 }
+
+$tab->setFooter(new CFormGrid($form_actions));
 
 $form->addItem($tab);
 $widget->addItem($form);
@@ -998,3 +1035,12 @@ $widget->show();
 		'interface_types' => itemTypeInterface()
 	]).');
 '))->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'form_name' => $form->getName(),
+		'counter' => $data['counter']
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

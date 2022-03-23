@@ -114,7 +114,7 @@ class testItemPrototype extends CAPITest {
 			$item_type_tests[] = [
 				'request_data' => $params + [
 					'hostid' => '50009',
-					'ruleid' => '40066',
+					'ruleid' => '400660',
 					'name' => 'Test item prototype of type '.$type,
 					'key_' => 'test_item_prototype_of_type_'.$type,
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
@@ -129,7 +129,7 @@ class testItemPrototype extends CAPITest {
 			[
 				'request_data' => [
 					'hostid' => '50009',
-					'ruleid' => '40066',
+					'ruleid' => '400660',
 					'name' => 'Item prototype with invalid item type',
 					'key_' => 'item_prototype_with_invalid_item_type',
 					'interfaceid' => '50022',
@@ -148,7 +148,7 @@ class testItemPrototype extends CAPITest {
 			[
 				'request_data' => [
 					'hostid' => '50009',
-					'ruleid' => '40066',
+					'ruleid' => '400660',
 					'name' => 'Test mqtt key',
 					'key_' => 'mqtt.get[{#0}]',
 					'interfaceid' => '50022',
@@ -172,7 +172,7 @@ class testItemPrototype extends CAPITest {
 			[
 				'request_data' => [
 					'hostid' => '50009',
-					'ruleid' => '40066',
+					'ruleid' => '400660',
 					'name' => 'Test mqtt key with 0 delay',
 					'key_' => 'mqtt.get[{#2}]',
 					'interfaceid' => '50022',
@@ -186,7 +186,7 @@ class testItemPrototype extends CAPITest {
 			[
 				'request_data' => [
 					'hostid' => '50009',
-					'ruleid' => '40066',
+					'ruleid' => '400660',
 					'name' => 'Test mqtt key for active agent',
 					'key_' => 'mqtt.get[{#3}]',
 					'interfaceid' => '50022',
@@ -198,7 +198,7 @@ class testItemPrototype extends CAPITest {
 			[
 				'request_data' => [
 					'hostid' => '50009',
-					'ruleid' => '40066',
+					'ruleid' => '400660',
 					'name' => 'Test mqtt key with 0 delay for active agent',
 					'key_' => 'mqtt.get[{#4}]',
 					'interfaceid' => '50022',
@@ -211,7 +211,7 @@ class testItemPrototype extends CAPITest {
 			[
 				'request_data' => [
 					'hostid' => '50009',
-					'ruleid' => '40066',
+					'ruleid' => '400660',
 					'name' => 'Test mqtt with wrong key and 0 delay',
 					'key_' => 'mqt.get[{#5}]',
 					'interfaceid' => '50022',

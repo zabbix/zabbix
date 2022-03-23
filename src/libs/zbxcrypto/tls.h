@@ -20,6 +20,8 @@
 #ifndef ZABBIX_TLS_H
 #define ZABBIX_TLS_H
 
+#include "config.h"
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
 #if defined(HAVE_GNUTLS)

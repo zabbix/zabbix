@@ -20,7 +20,8 @@
 #ifndef ZABBIX_CHECKS_HTTP_H
 #define ZABBIX_CHECKS_HTTP_H
 
-#include "common.h"
+#include "config.h"
+#include "module.h"
 
 #ifdef HAVE_LIBCURL
 #include "dbcache.h"

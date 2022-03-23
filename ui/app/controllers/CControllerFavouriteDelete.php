@@ -23,7 +23,7 @@ class CControllerFavouriteDelete extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'object' =>		'fatal|required|in graphid,itemid,sysmapid',
+			'object' =>		'fatal|required|in itemid,sysmapid',
 			'objectid' =>	'fatal|required|id'
 		];
 
@@ -42,7 +42,6 @@ class CControllerFavouriteDelete extends CController {
 
 	protected function doAction() {
 		$profile = [
-			'graphid' => 'web.favorite.graphids',
 			'itemid' => 'web.favorite.graphids',
 			'sysmapid' => 'web.favorite.sysmapids'
 		];

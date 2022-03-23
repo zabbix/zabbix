@@ -34,8 +34,6 @@
 #	define ZBX_NO_RETURN
 #endif
 
-ZBX_NO_RETURN void	_fail(const char * const file, const int line);
-
 void	zbx_mock_test_entry(void **state);
 
 #endif	/* ZABBIX_MOCK_TEST_H */

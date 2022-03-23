@@ -21,11 +21,11 @@
 
 #ifdef HAVE_UNIXODBC
 
+#include "odbc.h"
+
 #include <sql.h>
 #include <sqlext.h>
-#include <sqltypes.h>
 
-#include "odbc.h"
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"

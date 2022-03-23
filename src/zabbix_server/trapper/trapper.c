@@ -17,32 +17,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "trapper.h"
 
 #include "log.h"
-#include "zbxjson.h"
-#include "dbcache.h"
 #include "proxy.h"
 #include "zbxself.h"
-
 #include "active.h"
 #include "nodecommand.h"
 #include "proxyconfig.h"
 #include "proxydata.h"
-
 #include "daemon.h"
 #include "zbxcrypto.h"
+#include "zbxcommshigh.h"
 #include "../../libs/zbxserver/zabbix_stats.h"
-#include "zbxipcservice.h"
 #include "../poller/checks_snmp.h"
-#include "zbxrtc.h"
-
 #include "trapper_auth.h"
 #include "trapper_preproc.h"
 #include "trapper_expressions_evaluate.h"
 #include "trapper_item_test.h"
-#include "trapper.h"
 #include "trapper_request.h"
+
+#ifdef HAVE_NETSNMP
+#	include "zbxrtc.h"
+#endif
 
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
@@ -53,10 +50,6 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 extern size_t				(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsigned int *);
 
 extern int	CONFIG_CONFSYNCER_FORKS;
-
-#ifdef HAVE_NETSNMP
-static volatile sig_atomic_t	snmp_cache_reload_requested;
-#endif
 
 typedef struct
 {
@@ -1111,7 +1104,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 
 		if ('<' == *s)	/* XML protocol */
 		{
-			comms_parse_response(s, host, sizeof(host), key, sizeof(key), value_dec,
+			zbx_comms_parse_response(s, host, sizeof(host), key, sizeof(key), value_dec,
 					sizeof(value_dec), lastlogsize, sizeof(lastlogsize), timestamp,
 					sizeof(timestamp), source, sizeof(source), severity, sizeof(severity));
 
@@ -1174,21 +1167,15 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts)
 	process_trap(sock, sock->buffer, bytes_received, ts);
 }
 
-static void	zbx_trapper_sigusr_handler(int flags)
-{
-#ifdef HAVE_NETSNMP
-	if (ZBX_RTC_SNMP_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
-		snmp_cache_reload_requested = 1;
-#else
-	ZBX_UNUSED(flags);
-#endif
-}
-
 ZBX_THREAD_ENTRY(trapper_thread, args)
 {
-	double		sec = 0.0;
-	zbx_socket_t	s;
-	int		ret;
+	double			sec = 0.0;
+	zbx_socket_t		s;
+	int			ret;
+
+#ifdef HAVE_NETSNMP
+	zbx_ipc_async_socket_t	rtc;
+#endif
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -1209,17 +1196,18 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	zbx_set_sigusr_handler(zbx_trapper_sigusr_handler);
+#ifdef HAVE_NETSNMP
+	zbx_rtc_subscribe(&rtc, process_type, process_num);
+#endif
 
 	while (ZBX_IS_RUNNING())
 	{
 #ifdef HAVE_NETSNMP
-		if (1 == snmp_cache_reload_requested)
-		{
-			zbx_clear_cache_snmp(process_type, process_num);
-			snmp_cache_reload_requested = 0;
-		}
+		zbx_uint32_t	rtc_cmd;
+		unsigned char	*rtc_data;
+		int		snmp_reload = 0;
 #endif
+
 		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection]",
 				get_process_type_string(process_type), process_num, sec);
 
@@ -1243,6 +1231,22 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			zbx_setproctitle("%s #%d [processing data]", get_process_type_string(process_type),
 					process_num);
 
+#ifdef HAVE_NETSNMP
+			while (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, 0) && 0 != rtc_cmd)
+			{
+				if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd && 0 == snmp_reload)
+				{
+					zbx_clear_cache_snmp(process_type, process_num);
+					snmp_reload = 1;
+				}
+				else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
+				{
+					zbx_tcp_unaccept(&s);
+					goto out;
+				}
+
+			}
+#endif
 			sec = zbx_time();
 			process_trapper_child(&s, &ts);
 			sec = zbx_time() - sec;
@@ -1255,7 +1259,9 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 					zbx_socket_strerror());
 		}
 	}
-
+#ifdef HAVE_NETSNMP
+out:
+#endif
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)

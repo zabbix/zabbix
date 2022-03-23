@@ -23,7 +23,7 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in history,host,item,item_prototype,map_element,refresh,trigger,trigger_macro,widget_actions',
+			'type' => 'required|in history,host,item,item_configuration,item_prototype_configuration,map_element,refresh,trigger,trigger_macro,widget_actions',
 			'data' => 'array'
 		];
 
@@ -223,7 +223,7 @@ class CControllerMenuPopup extends CController {
 	}
 
 	/**
-	 * Prepare data for item context menu popup.
+	 * Prepare data for item latest data context menu popup.
 	 *
 	 * @param array  $data
 	 * @param string $data['itemid']
@@ -232,7 +232,55 @@ class CControllerMenuPopup extends CController {
 	 */
 	private static function getMenuDataItem(array $data) {
 		$db_items = API::Item()->get([
-			'output' => ['hostid', 'name', 'value_type', 'flags'],
+			'output' => ['hostid', 'type', 'value_type', 'history', 'trends'],
+			'itemids' => $data['itemid'],
+			'webitems' => true
+		]);
+
+		if ($db_items) {
+			$db_item = $db_items[0];
+			$is_writable = false;
+
+			if ($db_item['type'] != ITEM_TYPE_HTTPTEST && CWebUser::getType() > USER_TYPE_ZABBIX_USER) {
+				$is_writable = (bool) API::Host()->get([
+					'output' => [],
+					'hostids' => $db_item['hostid'],
+					'editable' => true
+				]);
+			}
+
+			return [
+				'type' => 'item',
+				'itemid' => $data['itemid'],
+				'hostid' => $db_item['hostid'],
+				'showGraph' => ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT
+					|| $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64
+				),
+				'history' => $db_item['history'] != 0,
+				'trends' => $db_item['trends'] != 0,
+				'isWriteable' => $is_writable,
+				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+			];
+		}
+
+		error(_('No permissions to referred object or it does not exist!'));
+
+		return null;
+	}
+
+	/**
+	 * Prepare data for item configuration context menu popup.
+	 *
+	 * @param array  $data
+	 * @param string $data['itemid']
+	 * @param string $data['backurl']
+	 *
+	 * @return mixed
+	 */
+	private static function getMenuDataItemConfiguration(array $data) {
+		$db_items = API::Item()->get([
+			'output' => ['hostid', 'key_', 'name', 'flags'],
+			'selectHosts' => ['host'],
 			'itemids' => $data['itemid'],
 			'webitems' => true
 		]);
@@ -240,45 +288,29 @@ class CControllerMenuPopup extends CController {
 		if ($db_items) {
 			$db_item = $db_items[0];
 			$menu_data = [
-				'type' => 'item',
+				'type' => 'item_configuration',
+				'backurl' => $data['backurl'],
 				'itemid' => $data['itemid'],
 				'hostid' => $db_item['hostid'],
+				'host' => $db_item['hosts'][0]['host'],
 				'name' => $db_item['name'],
+				'key' => $db_item['key_'],
 				'create_dependent_item' => ($db_item['flags'] != ZBX_FLAG_DISCOVERY_CREATED),
-				'create_dependent_discovery' => ($db_item['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
+				'create_dependent_discovery' => ($db_item['flags'] != ZBX_FLAG_DISCOVERY_CREATED),
+				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
+				'triggers' => []
 			];
 
-			if (in_array($db_item['value_type'], [ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])) {
-				$db_triggers = API::Trigger()->get([
-					'output' => ['triggerid', 'description', 'recovery_mode'],
-					'selectFunctions' => API_OUTPUT_EXTEND,
-					'itemids' => $data['itemid']
-				]);
+			$db_triggers = API::Trigger()->get([
+				'output' => ['triggerid', 'description'],
+				'itemids' => $data['itemid']
+			]);
 
-				$menu_data['show_triggers'] = true;
-				$menu_data['triggers'] = [];
-
-				foreach ($db_triggers as $db_trigger) {
-					if ($db_trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
-						continue;
-					}
-
-					foreach ($db_trigger['functions'] as $function) {
-						$parameters = array_map(function ($param) {
-							return trim($param, ' "');
-						}, explode(',', $function['parameter']));
-
-						if ($function['function'] !== 'find' || !array_key_exists(2, $parameters)
-								|| !in_array($parameters[2], ['regexp', 'iregexp'])) {
-							continue 2;
-						}
-					}
-
-					$menu_data['triggers'][] = [
-						'triggerid' => $db_trigger['triggerid'],
-						'name' => $db_trigger['description']
-					];
-				}
+			foreach ($db_triggers as $db_trigger) {
+				$menu_data['triggers'][] = [
+					'triggerid' => $db_trigger['triggerid'],
+					'name' => $db_trigger['description']
+				];
 			}
 
 			return $menu_data;
@@ -290,29 +322,48 @@ class CControllerMenuPopup extends CController {
 	}
 
 	/**
-	 * Prepare data for item prototype context menu popup.
+	 * Prepare data for item prototype configuration context menu popup.
 	 *
 	 * @param array  $data
 	 * @param string $data['itemid']
+	 * @param string $data['backurl']
 	 *
 	 * @return mixed
 	 */
-	private static function getMenuDataItemPrototype(array $data) {
+	private static function getMenuDataItemPrototypeConfiguration(array $data) {
 		$db_item_prototypes = API::ItemPrototype()->get([
-			'output' => ['name'],
+			'output' => ['name', 'key_'],
 			'selectDiscoveryRule' => ['itemid'],
+			'selectHosts' => ['host'],
 			'itemids' => $data['itemid']
 		]);
 
 		if ($db_item_prototypes) {
 			$db_item_prototype = $db_item_prototypes[0];
 
-			return [
-				'type' => 'item_prototype',
+			$menu_data = [
+				'type' => 'item_prototype_configuration',
+				'backurl' => $data['backurl'],
 				'itemid' => $data['itemid'],
 				'name' => $db_item_prototype['name'],
-				'parent_discoveryid' => $db_item_prototype['discoveryRule']['itemid']
+				'key' => $db_item_prototype['key_'],
+				'host' => $db_item_prototype['hosts'][0]['host'],
+				'parent_discoveryid' => $db_item_prototype['discoveryRule']['itemid'],
+				'trigger_prototypes' => []
 			];
+
+			$db_trigger_prototypes = API::TriggerPrototype()->get([
+				'output' => ['triggerid', 'description'],
+				'itemids' => $data['itemid']
+			]);
+
+			foreach ($db_trigger_prototypes as $db_trigger_prototype) {
+				$menu_data['trigger_prototypes'][] = [
+					'triggerid' => $db_trigger_prototype['triggerid'],
+					'name' => $db_trigger_prototype['description']
+				];
+			}
+			return $menu_data;
 		}
 
 		error(_('No permissions to referred object or it does not exist!'));
@@ -748,8 +799,12 @@ class CControllerMenuPopup extends CController {
 				$menu_data = self::getMenuDataItem($data);
 				break;
 
-			case 'item_prototype':
-				$menu_data = self::getMenuDataItemPrototype($data);
+			case 'item_configuration':
+				$menu_data = self::getMenuDataItemConfiguration($data);
+				break;
+
+			case 'item_prototype_configuration':
+				$menu_data = self::getMenuDataItemPrototypeConfiguration($data);
 				break;
 
 			case 'map_element':

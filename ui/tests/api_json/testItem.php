@@ -411,10 +411,10 @@ class testItem extends CAPITest {
 	public static function getItemDeleteData() {
 		return [
 			[
-				'item' => ['40072'],
+				'item' => ['400720'],
 				'data' => [
 					'discovered_triggerids' => ['30002'],
-					'dependent_item' => ['40074'],
+					'dependent_item' => ['400740'],
 					'dependent_item_disc_triggerids' => ['30004']
 				],
 				'expected_error' => null

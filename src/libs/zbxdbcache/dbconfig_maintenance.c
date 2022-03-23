@@ -16,17 +16,14 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
+#include "dbconfig.h"
+
 #include "common.h"
 #include "log.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
-#include "mutexs.h"
-
-#define ZBX_DBCONFIG_IMPL
-#include "dbconfig.h"
-
 #include "dbsync.h"
-#include "zbxserver.h"
 
 extern int		CONFIG_TIMER_FORKS;
 

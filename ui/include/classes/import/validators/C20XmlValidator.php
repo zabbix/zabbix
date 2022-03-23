@@ -36,11 +36,12 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Base validation function.
 	 *
-	 * @param array  $data	import data
-	 * @param string $path	XML path (for error reporting)
+	 * @param array  $data  Import data.
+	 * @param string $path  XML path (for error reporting).
 	 *
-	 * @return array		Validator does some manipulation for the incoming data. For example, converts empty tags to
-	 *						an array, if desired. Converted array is returned.
+	 * @throws Exception
+	 * @return array        Validator does some manipulation for the incoming data. For example, converts empty tags to
+	 *                      an array, if desired. Converted array is returned.
 	 */
 	public function validate(array $data, string $path) {
 		$rules = ['type' => XML_ARRAY, 'rules' => [
@@ -790,13 +791,14 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate date and time format.
 	 *
-	 * @param string $data			import data
-	 * @param array  $parent_data	data's parent array
-	 * @param string $path			XML path (for error reporting)
+	 * @param string     $data         Import data.
+	 * @param array|null $parent_data  Data's parent array.
+	 * @param string     $path         XML path (for error reporting).
 	 *
-	 * @throws Exception			if the date or time is invalid
+	 * @throws Exception if the date or time is invalid.
+	 * @return string
 	 */
-	public function validateDateTime($data, array $parent_data = null, $path) {
+	public function validateDateTime($data, ?array $parent_data, $path) {
 		if (!preg_match('/^20[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01])T(2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]Z$/', $data)) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('YYYY-MM-DDThh:mm:ssZ', 'XML date and time format'))));
 		}
@@ -807,13 +809,14 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate the "discovery_rule/filter" tag.
 	 *
-	 * @param string $data			import data
-	 * @param array  $parent_data	data's parent array
-	 * @param string $path			XML path (for error reporting)
+	 * @param string     $data         Import data.
+	 * @param array|null $parent_data  Data's parent array.
+	 * @param string     $path         XML path (for error reporting).
 	 *
-	 * @throws Exception			if the filter is invalid
+	 * @throws Exception if the filter is invalid.
+	 * @return mixed
 	 */
-	public function validateFilter($data, array $parent_data = null, $path) {
+	public function validateFilter($data, ?array $parent_data, $path) {
 		if (is_array($data)) {
 			$rules = ['type' => XML_ARRAY, 'rules' => [
 				'evaltype' =>	['type' => XML_STRING | XML_REQUIRED],
@@ -837,9 +840,9 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Checking the map element for requirement.
 	 *
-	 * @param array  $parent_data	data's parent array
+	 * @param array|null $parent_data  Data's parent array.
 	 *
-	 * @throws Exception			if the check is failed
+	 * @return bool
 	 */
 	public function requiredMapElement(array $parent_data = null) {
 		if (zbx_is_int($parent_data['elementtype'])) {
@@ -858,13 +861,14 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate map element.
 	 *
-	 * @param string $data			import data
-	 * @param array  $parent_data	data's parent array
-	 * @param string $path			XML path
+	 * @param string     $data         Import data.
+	 * @param array|null $parent_data  Data's parent array.
+	 * @param string     $path         XML path.
 	 *
-	 * @throws Exception			if the map element is invalid
+	 * @throws Exception if the map element is invalid.
+	 * @return mixed
 	 */
-	public function validateMapElement($data, array $parent_data = null, $path) {
+	public function validateMapElement($data, ?array $parent_data, $path) {
 		if (zbx_is_int($parent_data['elementtype'])) {
 			switch ($parent_data['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_HOST:
@@ -905,13 +909,14 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate "screen_item/resource" tag.
 	 *
-	 * @param string $data			import data
-	 * @param array  $parent_data	data's parent array
-	 * @param string $path			XML path
+	 * @param string     $data         Import data.
+	 * @param array|null $parent_data  Data's parent array.
+	 * @param string     $path         XML path.
 	 *
-	 * @throws Exception			if the map element is invalid
+	 * @throws Exception if the map element is invalid.
+	 * @return mixed
 	 */
-	public function validateScreenItemResource($data, array $parent_data = null, $path) {
+	public function validateScreenItemResource($data, ?array $parent_data, $path) {
 		if (zbx_is_int($parent_data['resourcetype'])) {
 			switch ($parent_data['resourcetype']) {
 				case self::SCREEN_RESOURCE_TYPE_GRAPH:
@@ -944,13 +949,14 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate "ymin_item_1" tag.
 	 *
-	 * @param string $data			import data
-	 * @param array  $parent_data	data's parent array
-	 * @param string $path			XML path
+	 * @param string     $data         Import data.
+	 * @param array|null $parent_data  Data's parent array.
+	 * @param string     $path         XML path.
 	 *
-	 * @throws Exception			if the element is invalid
+	 * @throws Exception if the element is invalid.
+	 * @return mixed
 	 */
-	public function validateYMinItem($data, array $parent_data = null, $path) {
+	public function validateYMinItem($data, ?array $parent_data, $path) {
 		if (zbx_is_int($parent_data['ymin_type_1']) && $parent_data['ymin_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			$rules = ['type' => XML_ARRAY, 'rules' => [
 				'host' =>	['type' => XML_STRING | XML_REQUIRED],
@@ -967,13 +973,14 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate "ymax_item_1" tag.
 	 *
-	 * @param string $data			import data
-	 * @param array  $parent_data	data's parent array
-	 * @param string $path			XML path
+	 * @param string     $data         Import data.
+	 * @param array|null $parent_data  Data's parent array.
+	 * @param string     $path         XML path.
 	 *
-	 * @throws Exception			if the element is invalid
+	 * @throws Exception if the element is invalid.
+	 * @return mixed
 	 */
-	public function validateYMaxItem($data, array $parent_data = null, $path) {
+	public function validateYMaxItem($data, ?array $parent_data, $path) {
 		if (zbx_is_int($parent_data['ymax_type_1']) && $parent_data['ymax_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			$rules = ['type' => XML_ARRAY, 'rules' => [
 				'host' =>	['type' => XML_STRING | XML_REQUIRED],
@@ -988,11 +995,11 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 	}
 
 	/**
-	 * Transforms tags containing zero into an empty array
+	 * Transforms tags containing zero into an empty array.
 	 *
 	 * @param mixed $value
 	 *
-	 * @return mixed		converted value
+	 * @return mixed
 	 */
 	public function transformZero2Array($value) {
 		return ($value === '0') ? [] : $value;

@@ -20,9 +20,7 @@
 #ifndef ZABBIX_TRAPPER_ACTIVE_H
 #define ZABBIX_TRAPPER_ACTIVE_H
 
-#include "common.h"
-#include "db.h"
-#include "comms.h"
+#include "zbxcomms.h"
 #include "zbxjson.h"
 
 extern int	CONFIG_TIMEOUT;

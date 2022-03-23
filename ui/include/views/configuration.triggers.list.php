@@ -144,6 +144,10 @@ $filter = (new CFilter())
 
 $widget = (new CWidget())
 	->setTitle(_('Triggers'))
+	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
+		? CDocHelper::CONFIGURATION_HOST_TRIGGERS_LIST
+		: CDocHelper::CONFIGURATION_TEMPLATE_TRIGGERS_LIST
+	))
 	->setControls(new CList([
 		(new CTag('nav', true, ($data['single_selected_hostid'] != 0)
 			? new CRedirectButton(_('Create trigger'), (new CUrl('triggers.php'))
@@ -344,8 +348,9 @@ $triggers_form->addItem([
 			'popup.massupdate.trigger' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
-						"return openMassupdatePopup('popup.massupdate.trigger', {}, {
-							dialogue_class: 'modal-popup-static'
+						"openMassupdatePopup('popup.massupdate.trigger', {}, {
+							dialogue_class: 'modal-popup-static',
+							trigger_element: this
 						});"
 					)
 					->addClass(ZBX_STYLE_BTN_ALT)
@@ -361,3 +366,7 @@ $triggers_form->addItem([
 $widget->addItem($triggers_form);
 
 $widget->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
+	->show();

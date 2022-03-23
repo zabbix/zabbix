@@ -349,7 +349,7 @@ abstract class CItemGeneral extends CApiService {
 			if ($fullItem['type'] == ITEM_TYPE_CALCULATED) {
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 					'params' =>		['type' => API_CALC_FORMULA, 'flags' => $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'length' => DB::getFieldLength('items', 'params')],
-					'value_type' =>	['type' => API_INT32, 'in' => ITEM_VALUE_TYPE_UINT64.','.ITEM_VALUE_TYPE_FLOAT]
+					'value_type' =>	['type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])]
 				]];
 
 				$data = array_intersect_key($item, $api_input_rules['fields']);

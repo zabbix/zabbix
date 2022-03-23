@@ -18,9 +18,8 @@
 **/
 
 #include "common.h"
+
 #include "db.h"
-#include "log.h"
-#include "dbcache.h"
 
 /******************************************************************************
  *                                                                            *
@@ -215,7 +214,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 
 /******************************************************************************
  *                                                                            *
- * Purpose: free the event with it's resources                                *
+ * Purpose: free the event with its resources                                 *
  *                                                                            *
  * Parameters: event - [IN] event data                                        *
  *                                                                            *

@@ -20,10 +20,8 @@
 #ifndef ZABBIX_TRIGGER_DEP_LINKING_H
 #define ZABBIX_TRIGGER_DEP_LINKING_H
 
-#include "log.h"
 #include "common.h"
 #include "zbxalgo.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
 
 #define TRIGGER_DEP_SYNC_INSERT_OP 0
 #define TRIGGER_DEP_SYNC_UPDATE_OP 1

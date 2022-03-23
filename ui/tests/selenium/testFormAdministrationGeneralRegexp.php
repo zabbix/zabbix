@@ -46,10 +46,8 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Expressions');
 		$this->zbxTestAssertElementPresentId('name');
 		$this->zbxTestAssertAttribute("//input[@id='name']", "maxlength", 128);
-		$this->zbxTestAssertAttribute("//input[@id='name']", "size", 20);
 
 		$this->zbxTestAssertAttribute("//input[@id='expressions_0_expression']", "maxlength", 255);
-		$this->zbxTestAssertAttribute("//input[@id='expressions_0_expression']", "size", 20);
 
 		$this->zbxTestDropdownHasOptions('expressions_0_expression_type', [
 			'Character string included',

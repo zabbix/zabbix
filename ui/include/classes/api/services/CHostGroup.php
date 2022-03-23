@@ -449,12 +449,22 @@ class CHostGroup extends CApiService {
 
 	/**
 	 * @param array $groupids
-	 * @param bool 	$nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete(array $groupids, bool $nopermissions = false): array {
-		$this->validateDelete($groupids, $db_groups, $nopermissions);
+	public function delete(array $groupids): array {
+		$this->validateDelete($groupids, $db_groups);
+
+		self::deleteForce($db_groups);
+
+		return ['groupids' => $groupids];
+	}
+
+	/**
+	 * @param array $db_groups
+	 */
+	public static function deleteForce(array $db_groups): void {
+		$groupids = array_keys($db_groups);
 
 		// delete sysmap element
 		DB::delete('sysmaps_elements', ['elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP, 'elementid' => $groupids]);
@@ -546,8 +556,6 @@ class CHostGroup extends CApiService {
 		DB::delete('hstgrp', ['groupid' => $groupids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST_GROUP, $db_groups);
-
-		return ['groupids' => $groupids];
 	}
 
 	/**
@@ -607,11 +615,10 @@ class CHostGroup extends CApiService {
 	 *
 	 * @param array      $groupids
 	 * @param array|null $db_groups
-	 * @param bool       $nopermissions
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array $groupids, array &$db_groups = null, bool $nopermissions): void {
+	private function validateDelete(array $groupids, array &$db_groups = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $groupids, '/', $error)) {
@@ -622,8 +629,7 @@ class CHostGroup extends CApiService {
 			'output' => ['groupid', 'name', 'internal'],
 			'groupids' => $groupids,
 			'editable' => true,
-			'preservekeys' => true,
-			'nopermissions' => $nopermissions
+			'preservekeys' => true
 		]);
 
 		if (count($db_groups) != count($groupids)) {
@@ -652,6 +658,17 @@ class CHostGroup extends CApiService {
 				)
 			);
 		}
+
+		self::validateDeleteForce($db_groups);
+	}
+
+	/**
+	 * @param array $db_groups
+	 *
+	 * @throws APIException if unable to delete groups.
+	 */
+	public static function validateDeleteForce(array $db_groups): void {
+		$groupids = array_keys($db_groups);
 
 		$db_hosts = API::Host()->get([
 			'output' => ['host'],
@@ -703,7 +720,7 @@ class CHostGroup extends CApiService {
 			);
 		}
 
-		self::validateDeleteCheckMaintenances($groupids);
+		self::checkMaintenances($groupids);
 	}
 
 	/**
@@ -796,36 +813,42 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Validates if host groups may be deleted, due to maintenance constrain.
-	 *
-	 * @static
+	 * Check that no maintenance object will be left without hosts and host groups as the result of the given host
+	 * groups deletion.
 	 *
 	 * @param array $groupids
 	 *
-	 * @throws APIException if a constrain failed
+	 * @throws APIException
 	 */
-	private static function validateDeleteCheckMaintenances(array $groupids): void {
+	private static function checkMaintenances(array $groupids): void {
 		$maintenance = DBfetch(DBselect(
-			'SELECT m.name'.
+			'SELECT m.maintenanceid,m.name'.
 			' FROM maintenances m'.
 			' WHERE NOT EXISTS ('.
 				'SELECT NULL'.
 				' FROM maintenances_groups mg'.
 				' WHERE m.maintenanceid=mg.maintenanceid'.
-					' AND '.dbConditionInt('mg.groupid', $groupids, true).
+					' AND '.dbConditionId('mg.groupid', $groupids, true).
 			')'.
 				' AND NOT EXISTS ('.
 					'SELECT NULL'.
 					' FROM maintenances_hosts mh'.
 					' WHERE m.maintenanceid=mh.maintenanceid'.
 				')'
-		));
+		, 1));
 
 		if ($maintenance) {
+			$maintenance_groups = DBfetchColumn(DBselect(
+				'SELECT g.name'.
+				' FROM maintenances_groups mg,hstgrp g'.
+				' WHERE mg.groupid=g.groupid'.
+					' AND '.dbConditionId('mg.maintenanceid', [$maintenance['maintenanceid']])
+			), 'name');
+
 			self::exception(ZBX_API_ERROR_PARAMETERS, _n(
-				'Cannot delete host group because maintenance "%1$s" must contain at least one host or host group.',
-				'Cannot delete selected host groups because maintenance "%1$s" must contain at least one host or host group.',
-				$maintenance['name'], count($groupids)
+				'Cannot delete host group %1$s because maintenance "%2$s" must contain at least one host or host group.',
+				'Cannot delete host groups %1$s because maintenance "%2$s" must contain at least one host or host group.',
+				'"'.implode('", "', $maintenance_groups).'"', $maintenance['name'], count($maintenance_groups)
 			));
 		}
 	}

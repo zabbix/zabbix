@@ -26,7 +26,7 @@
 #include "module.h"
 #include "zbxvariant.h"
 
-#include <malloc.h>
+#include <stdlib.h>
 
 const char	*zbx_mock_get_parameter_string(const char *path)
 {

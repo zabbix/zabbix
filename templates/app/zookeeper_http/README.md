@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 The template to monitor Apache Zookeeper by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -15,7 +15,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 This template works with standalone and cluster instances. Metrics are collected from each Zookeper node by requests to [AdminServer](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver).
 By default AdminServer is enabled and listens on port 8080.
@@ -46,15 +46,15 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Leader metrics discovery |<p>Additional metrics for leader node</p> |DEPENDENT |zookeeper.metrics.leader<p>**Preprocessing**:</p><p>- JSONPATH: `$.server_state`</p><p>- JAVASCRIPT: `return JSON.stringify(value == 'leader' ? [{'{#SINGLETON}': ''}] : []);`</p> |
 |Clients discovery |<p>Get list of client connections.</p><p>Note, depending on the number of client connections this operation may be expensive (i.e. impact server performance).</p> |HTTP_AGENT |zookeeper.clients<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Leader metrics discovery |<p>Additional metrics for leader node</p> |DEPENDENT |zookeeper.metrics.leader<p>**Preprocessing**:</p><p>- JSONPATH: `$.server_state`</p><p>- JAVASCRIPT: `return JSON.stringify(value == 'leader' ? [{'{#SINGLETON}': ''}] : []);`</p> |
 
 ## Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Zabbix_raw_items |Zookeeper: Get server metrics |<p>-</p> |HTTP_AGENT |zookeeper.get_metrics |
-|Zabbix_raw_items |Zookeeper: Get connections stats |<p>Get information on client connections to server. Note, depending on the number of client connections this operation may be expensive (i.e. impact server performance).</p> |HTTP_AGENT |zookeeper.get_connections_stats |
+|Zabbix raw items |Zookeeper: Get server metrics |<p>-</p> |HTTP_AGENT |zookeeper.get_metrics |
+|Zabbix raw items |Zookeeper: Get connections stats |<p>Get information on client connections to server. Note, depending on the number of client connections this operation may be expensive (i.e. impact server performance).</p> |HTTP_AGENT |zookeeper.get_connections_stats |
 |Zookeeper |Zookeeper: Server mode |<p>Mode of the server. In an ensemble, this may either be leader or follower. Otherwise, it is standalone</p> |DEPENDENT |zookeeper.server_state<p>**Preprocessing**:</p><p>- JSONPATH: `$.server_state`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Zookeeper |Zookeeper: Uptime |<p>Uptime of Zookeeper server.</p> |DEPENDENT |zookeeper.uptime<p>**Preprocessing**:</p><p>- JSONPATH: `$.uptime`</p><p>- MULTIPLIER: `0.001`</p> |
 |Zookeeper |Zookeeper: Version |<p>Version of Zookeeper server.</p> |DEPENDENT |zookeeper.version<p>**Preprocessing**:</p><p>- JSONPATH: `$.version`</p><p>- REGEX: `([^,]+)--(.+) \1`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
@@ -118,5 +118,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 

@@ -246,7 +246,7 @@ class CLdap {
 		$info['name'] = $user_result['cn'][0];
 		$info['grps'] = [];
 
-		// overwrite if other attribs are specified.
+		// overwrite if other attributes are specified.
 		if (is_array($this->cnf['mapping'])) {
 			foreach ($this->cnf['mapping'] as $localkey => $key) {
 				$info[$localkey] = isset($user_result[$key])?$user_result[$key][0]:null;

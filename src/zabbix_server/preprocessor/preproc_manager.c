@@ -17,21 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "preproc_manager.h"
 
-#include "dbcache.h"
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
-#include "zbxserver.h"
-#include "sysinfo.h"
-#include "zbxserialize.h"
-#include "zbxipcservice.h"
 #include "zbxlld.h"
-
 #include "preprocessing.h"
-#include "preproc_manager.h"
-#include "zbxalgo.h"
 #include "preproc_history.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

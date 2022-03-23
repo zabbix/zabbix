@@ -18,8 +18,6 @@
 **/
 
 #include "common.h"
-
-#include "db.h"
 #include "log.h"
 #include "dbcache.h"
 #include "zbxserver.h"
@@ -28,9 +26,12 @@
 #include "../../libs/zbxaudit/audit_trigger.h"
 #include "../../libs/zbxaudit/audit_httptest.h"
 #include "../../libs/zbxaudit/audit_graph.h"
+#include "../../libs/zbxaudit/audit.h"
 #include "trigger_linking.h"
 #include "graph_linking.h"
 #include "../zbxalgo/vectorimpl.h"
+
+#include "db.h"
 
 typedef struct
 {
@@ -1538,7 +1539,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete template web scenatios from host                           *
+ * Purpose: delete template web scenarios from host                           *
  *                                                                            *
  * Parameters: hostid      - [IN] host identifier from database               *
  *             templateids - [IN] array of template IDs                       *
@@ -5811,7 +5812,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete hosts from database, check if there are any host           *
+ * Purpose: delete hosts from database, check if there are any hosts          *
  *          prototypes and delete them first                                  *
  *                                                                            *
  * Parameters: hostids   - [IN] host identifiers from database                *

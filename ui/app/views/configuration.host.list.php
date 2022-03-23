@@ -33,6 +33,7 @@ if ($data['uncheck']) {
 
 $widget = (new CWidget())
 	->setTitle(_('Hosts'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOST_LIST))
 	->setControls((new CTag('nav', true, (new CList())
 			->addItem(
 				(new CSimpleButton(_('Create host')))
@@ -40,7 +41,9 @@ $widget = (new CWidget())
 			)
 			->addItem(
 				(new CButton('form', _('Import')))
-					->onClick('return PopUp("popup.import", {rules_preset: "host"});')
+					->onClick(
+						'return PopUp("popup.import", {rules_preset: "host"}, {dialogue_class: "modal-popup-generic"});'
+					)
 					->removeId()
 			)
 		))->setAttribute('aria-label', _('Content controls'))
@@ -515,7 +518,10 @@ $form->addItem([
 		'popup.massupdate.host' => [
 			'content' => (new CButton('', _('Mass update')))
 				->onClick(
-					"return openMassupdatePopup('popup.massupdate.host', {}, {dialogue_class: 'modal-popup-static'});"
+					"openMassupdatePopup('popup.massupdate.host', {}, {
+						dialogue_class: 'modal-popup-static',
+						trigger_element: this
+					});"
 				)
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('no-chkbxrange')

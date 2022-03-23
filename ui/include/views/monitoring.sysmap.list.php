@@ -25,6 +25,7 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Maps'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_SYSMAP_LIST))
 	->setControls((new CTag('nav', true,
 		(new CForm('get'))
 			->cleanItems()
@@ -32,7 +33,11 @@ $widget = (new CWidget())
 				->addItem((new CSubmit('form', _('Create map')))->setEnabled($data['allowed_edit']))
 				->addItem(
 					(new CButton('form', _('Import')))
-						->onClick('return PopUp("popup.import", {rules_preset: "map"});')
+						->onClick(
+							'return PopUp("popup.import", {rules_preset: "map"},
+								{dialogue_class: "modal-popup-generic"}
+							);'
+						)
 						->setEnabled($data['allowed_edit'])
 						->removeId()
 				)

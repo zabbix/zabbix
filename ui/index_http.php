@@ -23,13 +23,9 @@ require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $redirect_to = (new CUrl('index.php'))->setArgument('form', 'default');
-
 $request = getRequest('request', '');
-$test_request = [];
-preg_match('/^\/?(?<filename>[a-z0-9\_\.]+\.php)(\?.*)?$/i', $request, $test_request);
 
-if (!array_key_exists('filename', $test_request) || !file_exists('./'.$test_request['filename'])
-		|| $test_request['filename'] == basename(__FILE__)) {
+if ($request !== '' && !CHtmlUrlValidator::validateSameSite($request)) {
 	$request = '';
 }
 

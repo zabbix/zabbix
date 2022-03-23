@@ -72,8 +72,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 		? new CLink(_('Latest data'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'latest.view')
-				->setArgument('filter_hostids[]', $hostid)
-				->setArgument('filter_set', '1')
+				->setArgument('hostids[]', $hostid)
+				->setArgument('filter_name', '')
 		)
 		: _('Latest data');
 
@@ -92,8 +92,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 		? new CLink(_('Graphs'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'charts.view')
-				->setArgument('view_as', HISTORY_GRAPH)
-				->setArgument('filter_hostids[]', $hostid)
+				->setArgument('filter_hostids', (array) $hostid)
 				->setArgument('filter_set', '1')
 		)
 		: _('Graphs');
@@ -231,8 +230,8 @@ foreach ($data['groups'] as $groupid => $group) {
 		? new CLink(_('Latest data'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'latest.view')
-				->setArgument('filter_groupids[]', $groupid)
-				->setArgument('filter_set', '1')
+				->setArgument('groupids[]', $groupid)
+				->setArgument('filter_name', '')
 		)
 		: _('Latest data');
 
@@ -374,5 +373,6 @@ if ($data['admin']) {
 
 (new CWidget())
 	->setTitle(_('Search').': '.$data['search'])
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::SEARCH))
 	->addItem(new CDiv($widgets))
 	->show();

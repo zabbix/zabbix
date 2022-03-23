@@ -20,7 +20,6 @@
 #ifndef ZABBIX_DIAG_H
 #define ZABBIX_DIAG_H
 
-#include "common.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "memalloc.h"

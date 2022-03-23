@@ -21,9 +21,7 @@
 #define ZABBIX_AUDIT_GRAPH_H
 
 #include "common.h"
-#include "audit.h"
-
-#include "../zbxdbhigh/template.h"
+#include "zbxalgo.h"
 
 void	zbx_audit_graph_create_entry(int audit_action, zbx_uint64_t graphid, const char *name, int flags);
 

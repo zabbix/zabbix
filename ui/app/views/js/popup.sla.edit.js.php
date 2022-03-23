@@ -178,19 +178,11 @@ window.sla_edit_popup = {
 		row.remove();
 	},
 
-	clone(dialog_title) {
+	clone({title, buttons}) {
 		this.slaid = null;
 
-		this.overlay.setProperties({title: dialog_title});
 		this.overlay.unsetLoading();
-
-		for (const element of this.footer.querySelectorAll('.js-update, .js-clone, .js-delete')) {
-			element.classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');
-		}
-
-		for (const element of this.footer.querySelectorAll('.js-add')) {
-			element.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
-		}
+		this.overlay.setProperties({title, buttons});
 	},
 
 	delete() {

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-10T07:56:32Z'
+  date: '2022-01-26T10:44:41Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -16,7 +16,7 @@ zabbix_export:
         F5-BIGIP-LOCAL-MIB
         F5-BIGIP-SYSTEM-MIB
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Network devices'
@@ -44,8 +44,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 0f7ecc11f860443582eb6dbe64b2bbb6
           name: 'F5 BIG-IP: Failover status'
@@ -65,8 +65,8 @@ zabbix_export:
             name: 'SNMP sysCmFailoverStatusId'
           tags:
             -
-              tag: Application
-              value: Cluster
+              tag: component
+              value: cluster
           triggers:
             -
               uuid: f93a7ff7cc614c0b84789f325ebb662b
@@ -75,6 +75,10 @@ zabbix_export:
               opdata: '{ITEM.LASTVALUE}'
               priority: WARNING
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 8ce387e2d78e42bfa6180b4b22096468
           name: 'F5 BIG-IP: Location'
@@ -97,8 +101,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: d9bf23e66ae347eb8f6f58867cdc3ca7
           name: 'F5 BIG-IP: Hardware model name'
@@ -125,8 +129,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 97d896e7b8ed422caf9c4ebf053bb8d9
           name: 'F5 BIG-IP: Host name'
@@ -150,8 +154,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 3d7299dcbfee4b4a8b39bbf8daa4a077
           name: 'F5 BIG-IP: Product build'
@@ -172,8 +176,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 065a6b42397e40c3874cf4176bd0fa6b
           name: 'F5 BIG-IP: Product build date'
@@ -194,8 +198,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 5b3c2a650f474a6da05262dc5b3634a9
           name: 'F5 BIG-IP: Product edition'
@@ -216,8 +220,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: dd91be3044a2465781af744dc45dd06f
           name: 'F5 BIG-IP: Product name'
@@ -238,8 +242,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: b670cf1b43d84b8784acfeaca1f01320
           name: 'F5 BIG-IP: Product version'
@@ -260,8 +264,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: a80409ff52bf4fe183a68ed257279db5
           name: 'F5 BIG-IP: Chassis serial number'
@@ -283,8 +287,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
           triggers:
             -
               uuid: 8a55167ddebb43f2ac8f6d028aef87c2
@@ -293,6 +297,10 @@ zabbix_export:
               priority: INFO
               description: 'Chassis serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 46bf5611d32340fdb9129966cca2c5da
           name: 'F5 BIG-IP: Sync Status'
@@ -317,8 +325,8 @@ zabbix_export:
             name: 'SNMP sysCmSyncStatusId'
           tags:
             -
-              tag: Application
-              value: Cluster
+              tag: component
+              value: cluster
           triggers:
             -
               uuid: 098fe258e8cc4216b0c1800913ba8e18
@@ -328,6 +336,10 @@ zabbix_export:
               priority: WARNING
               description: 'Changes have been made on the device not sync to the device group, requires user intervention'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
             -
               uuid: eb3517626c6d425f9b88a2bc35641ab6
               expression: 'last(/F5 Big-IP SNMP/bigip.syncstatus)=4'
@@ -336,6 +348,10 @@ zabbix_export:
               priority: WARNING
               description: 'The device is inconsistent with the device group, requires user intervention'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 78d6c13d575a41a8b160bd4e2c0bea7b
           name: 'F5 BIG-IP: TCP connections, CLOSE-WAIT/LAST-ACK'
@@ -348,8 +364,8 @@ zabbix_export:
             The number of current TCP connections in CLOSE-WAIT/LAST-ACK.
           tags:
             -
-              tag: Application
-              value: 'TCP/UDP stat'
+              tag: component
+              value: network
         -
           uuid: e28c1bfcd63e4a5c8394680886395669
           name: 'F5 BIG-IP: TCP connections, FIN-WAIT-1/CLOSING'
@@ -362,8 +378,8 @@ zabbix_export:
             The number of current TCP connections in FIN-WAIT-1/CLOSING.
           tags:
             -
-              tag: Application
-              value: 'TCP/UDP stat'
+              tag: component
+              value: network
         -
           uuid: 69576083e02c486998512c58ab2a6371
           name: 'F5 BIG-IP: TCP connections, FIN-WAIT-2'
@@ -376,8 +392,8 @@ zabbix_export:
             The number of current TCP connections in FIN-WAIT-2.
           tags:
             -
-              tag: Application
-              value: 'TCP/UDP stat'
+              tag: component
+              value: network
         -
           uuid: b58bae7e2e4f403ba7bce846ccf5228e
           name: 'F5 BIG-IP: Open TCP connections'
@@ -390,8 +406,8 @@ zabbix_export:
             The number of current open TCP connections.
           tags:
             -
-              tag: Application
-              value: 'TCP/UDP stat'
+              tag: component
+              value: network
         -
           uuid: bd3982fd369142878ffb9530656556e3
           name: 'F5 BIG-IP: TCP connections, TIME-WAIT'
@@ -404,8 +420,8 @@ zabbix_export:
             The number of current TCP connections in TIME-WAIT.
           tags:
             -
-              tag: Application
-              value: 'TCP/UDP stat'
+              tag: component
+              value: network
         -
           uuid: 843e855fb10f4cb0be81953dd8dbb87e
           name: 'F5 BIG-IP: Open UDP connections'
@@ -418,15 +434,16 @@ zabbix_export:
             The number of current open UDP connections.
           tags:
             -
-              tag: Application
-              value: 'TCP/UDP stat'
+              tag: component
+              value: network
         -
           uuid: efb83b0cb4864b249ecf61b2f81ec468
           name: 'F5 BIG-IP: Uptime'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.3375.2.1.6.6.0
           key: bigip.uptime
-          history: 7d
+          delay: 30s
+          history: 2w
           trends: 0d
           units: uptime
           description: |
@@ -439,8 +456,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 551fd3b77d144ed58f138865e4862901
@@ -449,6 +466,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: c91416602a9c451ca0eb959073f65fb0
           name: 'F5 BIG-IP: SNMP agent availability'
@@ -464,8 +485,8 @@ zabbix_export:
                 - 1h
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: network
           triggers:
             -
               uuid: 9ec4425af8dd4cf59dcb3146e6a8263c
@@ -474,6 +495,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 9368bf7cbf0742e5af8e0b1200200a15
@@ -506,8 +531,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: temperature
           graph_prototypes:
             -
               uuid: 1b43fb6913274a34ab6ad122d5db38ba
@@ -549,8 +577,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Voltage
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: voltage
             -
               uuid: 1c0bf38bb0d3473cae285704ccd3ee0b
               name: 'F5 BIG-IP: Voltage [{#VOLT.INDEX}]: Value'
@@ -576,8 +607,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Voltage
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: voltage
           graph_prototypes:
             -
               uuid: b5b1a26c3c9043d79eff63272c3e4b8d
@@ -617,8 +651,11 @@ zabbix_export:
                 The expiration date of the certificate in unix time.
               tags:
                 -
-                  tag: Application
-                  value: Security
+                  tag: certificate
+                  value: '{#CERT.NAME}'
+                -
+                  tag: component
+                  value: certificate
               trigger_prototypes:
                 -
                   uuid: 015ce3f5d10749aca1d871a1d26c51c5
@@ -627,6 +664,10 @@ zabbix_export:
                   opdata: 'Expires: {ITEM.VALUE}'
                   priority: WARNING
                   description: 'Please check certificate'
+                  tags:
+                    -
+                      tag: scope
+                      value: security
         -
           uuid: 1bab90f9f015432c817cabebb98453af
           name: 'Chassis fan discovery'
@@ -658,8 +699,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
+                -
+                  tag: component
+                  value: sensor
             -
               uuid: 13b1890ae83547d482c9130ea0ccf876
               name: 'F5 BIG-IP: FAN [{#FAN.INDEX}]: Status'
@@ -683,8 +727,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
+                -
+                  tag: component
+                  value: sensor
               trigger_prototypes:
                 -
                   uuid: 546745f6edf7470896d5bf251d760dfe
@@ -692,12 +739,20 @@ zabbix_export:
                   name: 'F5 BIG-IP: Fan[{#FAN.INDEX}] is in critical state'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: d20c56720aa54efba37f5fcdfdde0225
                   expression: 'last(/F5 Big-IP SNMP/bigip.chassis.fan.status[{#FAN.INDEX}])=2'
                   name: 'F5 BIG-IP: Fan[{#FAN.INDEX}] is not present'
                   priority: INFO
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: f0a043ed6fb249e489f143350b681a63
@@ -745,8 +800,8 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: 1e85cee65875477b85f74aedba6e86c9
@@ -754,12 +809,20 @@ zabbix_export:
                   name: 'F5 BIG-IP: Power supply [{#POWER.INDEX}] is in critical state'
                   priority: HIGH
                   description: 'Please check the power supply unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: 84469f28c4bf47f790a85b9f1f37cff0
                   expression: 'last(/F5 Big-IP SNMP/bigip.chassis.power.status[{#POWER.INDEX}])=2'
                   name: 'F5 BIG-IP: Power supply [{#POWER.INDEX}] is not present'
                   priority: INFO
                   description: 'Please check the power supply unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -796,8 +859,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 452167aafe594e3faa3748e6dc470fb1
@@ -805,6 +871,10 @@ zabbix_export:
                   name: 'F5 BIG-IP: Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.HIGH} °C'
                   opdata: '{ITEM.LASTVALUE}'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: 00c0212fcb8049309bf0b3de2b2363b4
                   expression: 'last(/F5 Big-IP SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.WARN}'
@@ -815,6 +885,10 @@ zabbix_export:
                     -
                       name: 'F5 BIG-IP: Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.HIGH} °C'
                       expression: 'last(/F5 Big-IP SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.HIGH}'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: ceea250c715948f3907290738451c328
@@ -853,8 +927,14 @@ zabbix_export:
                 The average time spent by the specified processor doing nothing for the associated host in the last one minute.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: 12acd2da83b04353aca2bd3cff842c97
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Idle, avg 5m'
@@ -869,8 +949,14 @@ zabbix_export:
                 The average time spent by the specified processor doing nothing for the associated host in the last five minutes.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: dd169e972fe041cca93020b8a942a4d2
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Idle, avg 5s'
@@ -885,8 +971,14 @@ zabbix_export:
                 The average time spent by the specified processor doing nothing for the associated host in the last five seconds.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: 808a6933a1834291b80d0cb072dded09
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: IO wait, avg 1m'
@@ -901,8 +993,14 @@ zabbix_export:
                 The average time spent by the specified processor waiting for external I/O to complete for the associated host in the last one minute.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: 6144e3ca25ac4f998559b860d059c385
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: IO wait, avg 5m'
@@ -917,8 +1015,14 @@ zabbix_export:
                 The average time spent by the specified processor waiting for external I/O to complete for the associated host in the last five minutes.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: b4715714c727483fb3ca6004a829ac46
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: IO wait, avg 5s'
@@ -933,8 +1037,14 @@ zabbix_export:
                 The average time spent by the specified processor waiting for external I/O to complete for the associated host in the last five seconds.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: 9f0f6dabac314744809a60161592a89f
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: IRQ, avg 1m'
@@ -949,8 +1059,14 @@ zabbix_export:
                 The average time spent by the specified processor servicing hardware interrupts for the associated host in the last one minute.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: f3d8ac2412ee4f0b88f264e590e278cb
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: IRQ, avg 5m'
@@ -965,8 +1081,14 @@ zabbix_export:
                 The average time spent by the specified processor servicing hardware interrupts for the associated host in the last five minutes.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: 7bc53c5f9a7148759d426e8e5fd7f358
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: IRQ, avg 5s'
@@ -981,8 +1103,14 @@ zabbix_export:
                 The average time spent by the specified processor servicing hardware interrupts for the associated host in the last five seconds.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: b74f502d97f54041a4c129f5993e0967
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Nice, avg 1m'
@@ -997,8 +1125,14 @@ zabbix_export:
                 The average time spent by the specified processor running niced processes for the associated host in the last one minute.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: bf51a4638db443a083ec19b934a6a915
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Nice, avg 5m'
@@ -1013,8 +1147,14 @@ zabbix_export:
                 The average time spent by the specified processor running niced processes for the associated host in the last five minutes.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: 0046e43000b7477ea410970884829e5c
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Nice, avg 5s'
@@ -1029,8 +1169,14 @@ zabbix_export:
                 The average time spent by the specified processor running niced processes for the associated host in the last five seconds.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: f2b1962e10b04dc28a124b91b7e9a235
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Soft IRQ, avg 1m'
@@ -1045,8 +1191,14 @@ zabbix_export:
                 The average time spent by the specified processor servicing soft interrupts for the associated host in the last one minute.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: 56f459510e444326bba84ab12c4c232c
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Soft IRQ, avg 5m'
@@ -1061,8 +1213,14 @@ zabbix_export:
                 The average time spent by the specified processor servicing soft interrupts for the associated host in the last five minutes.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: 8a6c086c524c4f5c93e66f9f453ed767
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Soft IRQ, avg 5s'
@@ -1077,8 +1235,14 @@ zabbix_export:
                 The average time spent by the specified processor servicing soft interrupts for the associated host in the last five seconds.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: 62e59d3a63014976a6c052ef259dbbc1
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Stolen, avg 1m'
@@ -1093,8 +1257,14 @@ zabbix_export:
                 The average time 'stolen' from the specified processor for the associated host in the last one minute.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: 757178b5d85041959609de5d38d93f20
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Stolen, avg 1s)'
@@ -1109,8 +1279,14 @@ zabbix_export:
                 The average time 'stolen' from the specified processor for the associated host in the last five seconds.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: c229331551284955befbed59fedae445
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Stolen, avg 5m'
@@ -1125,8 +1301,14 @@ zabbix_export:
                 The average time 'stolen' from the specified processor for the associated host in the last five minutes.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: 20a60cec7a50457a9c6c5a5e318b53e2
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: System, avg 1m'
@@ -1141,8 +1323,14 @@ zabbix_export:
                 The average time spent by the specified processor servicing system calls for the associated host in the last one minute.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: 9dc919dcc789473db23f989943f9a759
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: System, avg 5m'
@@ -1157,8 +1345,14 @@ zabbix_export:
                 The average time spent by the specified processor servicing system calls for the associated host in the last five minutes.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: 8b1bd4e936c149cfa44d8cf5d88bee4b
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: System, avg 5s'
@@ -1173,8 +1367,14 @@ zabbix_export:
                 The average time spent by the specified processor servicing system calls for the associated host in the last five seconds.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: e8f3b63e951d4de0b845647bcdd1524f
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Usage ratio, avg 1m'
@@ -1198,8 +1398,14 @@ zabbix_export:
                 iowait:sysMultiHostCpuIowait1m
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: 46e78b7f00904778abf5160fff93670a
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Usage ratio, avg 5m'
@@ -1223,8 +1429,14 @@ zabbix_export:
                 iowait:sysMultiHostCpuIowait5m
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
               trigger_prototypes:
                 -
                   uuid: 1163080e05d3433f884773fe1ee0271a
@@ -1234,6 +1446,10 @@ zabbix_export:
                   name: 'F5 BIG-IP: High CPU utilization (over {$BIGIP.CPU.UTIL.WARN.MAX}% for 5m)'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: e0e3bbd21d3e434c80e7bb1969388b27
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Usage ratio, avg 5s'
@@ -1257,8 +1473,14 @@ zabbix_export:
                 iowait:sysMultiHostCpuIowait5s
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: beaece1c9eaa41768e7c05993d2f4b3b
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: User, avg 1m'
@@ -1273,8 +1495,14 @@ zabbix_export:
                 The average time spent by the specified processor in user context for the associated host in the last one minute.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: 7344ae137ef94f80a99865057c105d96
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: User, avg 5m'
@@ -1289,8 +1517,14 @@ zabbix_export:
                 The average time spent by the specified processor in user context for the associated host in the last five minutes.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
             -
               uuid: 61176fa2de794fcf90f1eef2ead10df6
               name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: User, avg 5s'
@@ -1305,8 +1539,14 @@ zabbix_export:
                 The average time spent by the specified processor in user context for the associated host in the last five seconds.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
           graph_prototypes:
             -
               uuid: 64c251a6b0384d2ea7d5b498c7fe6422
@@ -1479,8 +1719,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: fan
+                -
+                  tag: component
+                  value: sensor
             -
               uuid: 03bd45f8a7004fd3a3d8b361a37547d3
               name: 'F5 BIG-IP: Sensor [{#CPU.SENSOR.SLOT}:{#CPU.SENSOR.INDEX}]: Name'
@@ -1501,8 +1744,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: name
+                -
+                  tag: component
+                  value: sensor
             -
               uuid: 1ffd09c7d99843b88e259de3614d003a
               name: 'F5 BIG-IP: Sensor [{#CPU.SENSOR.SLOT}:{#CPU.SENSOR.INDEX}]: Temperature'
@@ -1525,8 +1771,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: temperature
           graph_prototypes:
             -
               uuid: 714b13fd29ec47009f183d44ddaa8df6
@@ -1586,8 +1835,11 @@ zabbix_export:
                 The number of bytes in the specified partition.
               tags:
                 -
-                  tag: Application
-                  value: 'Mount point [{#PART.NAME}]'
+                  tag: component
+                  value: storage
+                -
+                  tag: mount-point
+                  value: '{#PART.NAME}'
             -
               uuid: 8fd4ee3dc199419189daf478ff2dc01d
               name: 'F5 BIG-IP: Mount point [{#PART.NAME}]: Free blocks'
@@ -1601,8 +1853,11 @@ zabbix_export:
                 The number of free blocks in the specified partition.
               tags:
                 -
-                  tag: Application
-                  value: 'Mount point [{#PART.NAME}]'
+                  tag: component
+                  value: storage
+                -
+                  tag: mount-point
+                  value: '{#PART.NAME}'
             -
               uuid: 5c0724be667946f192a46cc2a0584971
               name: 'F5 BIG-IP: Mount point [{#PART.NAME}]: Free nodes'
@@ -1616,8 +1871,11 @@ zabbix_export:
                 The number of free file nodes in the specified partition.
               tags:
                 -
-                  tag: Application
-                  value: 'Mount point [{#PART.NAME}]'
+                  tag: component
+                  value: storage
+                -
+                  tag: mount-point
+                  value: '{#PART.NAME}'
             -
               uuid: 50d267f74f9c476fac23884828f5275f
               name: 'F5 BIG-IP: Mount point [{#PART.NAME}]: Total blocks'
@@ -1631,8 +1889,11 @@ zabbix_export:
                 The number of total blocks in the specified partition.
               tags:
                 -
-                  tag: Application
-                  value: 'Mount point [{#PART.NAME}]'
+                  tag: component
+                  value: storage
+                -
+                  tag: mount-point
+                  value: '{#PART.NAME}'
             -
               uuid: 49cd22a896d941a2b55f3ba6e95698b4
               name: 'F5 BIG-IP: Mount point [{#PART.NAME}]: Total nodes'
@@ -1646,8 +1907,11 @@ zabbix_export:
                 The number of total file nodes in the specified partition.
               tags:
                 -
-                  tag: Application
-                  value: 'Mount point [{#PART.NAME}]'
+                  tag: component
+                  value: storage
+                -
+                  tag: mount-point
+                  value: '{#PART.NAME}'
           trigger_prototypes:
             -
               uuid: 32b87997dc0b4967bdb158f1dc0baad2
@@ -1658,6 +1922,10 @@ zabbix_export:
               priority: WARNING
               description: 'The system is running out of free space.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
           graph_prototypes:
             -
               uuid: ed63eb409eb2497bb9dc7721ac789022
@@ -1707,8 +1975,8 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: e01e3283d37a4ae09d62fbc679cc4dee
               name: 'F5 BIG-IP: Host [{#HOST.ID}]: Total swap'
@@ -1723,8 +1991,8 @@ zabbix_export:
                 The total swap in bytes for the specified host.
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: d1ebd77bd2bc4d24b45b32eb6cda6722
               name: 'F5 BIG-IP: Host [{#HOST.ID}]: Total memory'
@@ -1739,8 +2007,8 @@ zabbix_export:
                 The total host memory in bytes for the specified host.
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: 6c73ea2e54594a1ab6edbdc6de30f711
               name: 'F5 BIG-IP: Host [{#HOST.ID}]: Used other non-TMM memory'
@@ -1760,8 +2028,8 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: 3a9d6f2815644a4f93e008ccacbdb290
               name: 'F5 BIG-IP: Host [{#HOST.ID}]: Used swap'
@@ -1781,8 +2049,8 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: d5af8fa1079b4c0aa47b98e25a184af3
               name: 'F5 BIG-IP: Host [{#HOST.ID}]: Used memory'
@@ -1802,8 +2070,8 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
           trigger_prototypes:
             -
               uuid: e72f446075214129ab1d6269fcd87051
@@ -1813,6 +2081,10 @@ zabbix_export:
               name: 'F5 BIG-IP: High memory utilization in host [{#HOST.ID}] (over {$BIGIP.MEMORY.UTIL.WARN.MAX}%)'
               priority: WARNING
               description: 'The system is running out of free memory.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 5cf3e1f819ee46f49ba89156c53274ec
               expression: 'last(/F5 Big-IP SNMP/bigip.memory.used.swap[{#HOST.ID}])/last(/F5 Big-IP SNMP/bigip.memory.total.swap[{#HOST.ID}])*100>{$BIGIP.SWAP.UTIL.WARN.MAX}'
@@ -1821,6 +2093,10 @@ zabbix_export:
               name: 'F5 BIG-IP: High swap utilization in host [{#HOST.ID}] (over {$BIGIP.SWAP.UTIL.WARN.MAX}%)'
               priority: WARNING
               description: 'The system is running out of free swap memory.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
           graph_prototypes:
             -
               uuid: 3414dd36b37e434f9c28eacc0e8c58b9
@@ -1883,8 +2159,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Modules
+                  tag: component
+                  value: module
+                -
+                  tag: module
+                  value: '{#MODULE.NAME}'
             -
               uuid: eaeb7bc1225b48689124c373b04fc56f
               name: 'F5 BIG-IP: Module [{#MODULE.NAME}]: Disk ratio'
@@ -1902,8 +2181,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Modules
+                  tag: component
+                  value: module
+                -
+                  tag: module
+                  value: '{#MODULE.NAME}'
             -
               uuid: b384a7e297f844c89cc40c486e0c69db
               name: 'F5 BIG-IP: Module [{#MODULE.NAME}]: Memory ratio'
@@ -1921,8 +2203,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Modules
+                  tag: component
+                  value: module
+                -
+                  tag: module
+                  value: '{#MODULE.NAME}'
             -
               uuid: 36dbc22d430e477ab2105323ad8b0850
               name: 'F5 BIG-IP: Module [{#MODULE.NAME}]: Provision level'
@@ -1944,8 +2229,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Modules
+                  tag: component
+                  value: module
+                -
+                  tag: module
+                  value: '{#MODULE.NAME}'
           graph_prototypes:
             -
               uuid: cfc1606bfbdd40b095620e32e646e2fd
@@ -2000,8 +2288,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface [{#IF.NAME}]'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
             -
               uuid: 1ddb57921289497fb2c2e4f047f58c02
               name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Incoming traffic, rate'
@@ -2024,8 +2318,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface [{#IF.NAME}]'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
             -
               uuid: 45342d637fa440f8b73968a14bf39374
               name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Incoming packet drops'
@@ -2043,8 +2343,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface [{#IF.NAME}]'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
             -
               uuid: 5bc37dde99024866a2a5f97fbce15c2f
               name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Incoming packet error'
@@ -2063,8 +2369,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface [{#IF.NAME}]'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
             -
               uuid: 8aaff266f1b74a81a3eba46d321eb524
               name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Incoming multicast packet, rate'
@@ -2087,8 +2399,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface [{#IF.NAME}]'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
             -
               uuid: 40e811829adc4715af4e10d223be3bc5
               name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Incoming packet, rate'
@@ -2111,8 +2429,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface [{#IF.NAME}]'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
             -
               uuid: 202717aa54194cf882c86640e73b17af
               name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Incoming QnQ packet, rate'
@@ -2135,8 +2459,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface [{#IF.NAME}]'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
             -
               uuid: c98f48ddf6bc46f39ab9aec6cc249fa4
               name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Outgoing traffic, rate'
@@ -2159,8 +2489,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface [{#IF.NAME}]'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
             -
               uuid: b19203459ac842e2b96eee75b6754eac
               name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Outgoing packet drops'
@@ -2179,8 +2515,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface [{#IF.NAME}]'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
             -
               uuid: 1496879429724a6daee4b97fa162419b
               name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Outgoing packet error'
@@ -2200,8 +2542,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface [{#IF.NAME}]'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
             -
               uuid: 8ecd6a8dd5fa43c8b87a94119aac90b9
               name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Outgoing multicast packet, rate'
@@ -2224,8 +2572,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface [{#IF.NAME}]'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
             -
               uuid: fd4416466734469b85eec03c8e69185c
               name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Outgoing packet, rate'
@@ -2248,8 +2602,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface [{#IF.NAME}]'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
             -
               uuid: a4cb060cc3854aab9715c85174cc4933
               name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Outgoing QnQ packet, rate'
@@ -2272,8 +2632,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface [{#IF.NAME}]'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
             -
               uuid: 93a1107cb0ea44078f2ac04a7dc9e941
               name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Pause state'
@@ -2297,14 +2663,24 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface [{#IF.NAME}]'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
           trigger_prototypes:
             -
               uuid: 2d9214768b684ba880703d738ac52099
               expression: 'last(/F5 Big-IP SNMP/bigip.net.in.error[{#IF.NAME}])>last(/F5 Big-IP SNMP/bigip.net.in.error[{#IF.NAME}],#2) or last(/F5 Big-IP SNMP/bigip.net.out.error[{#IF.NAME}])>last(/F5 Big-IP SNMP/bigip.net.out.error[{#IF.NAME}],#2)'
               name: 'F5 BIG-IP: There are errors on the network interface ({#IF.NAME})'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: notice
           graph_prototypes:
             -
               uuid: f784ab335a314bd7b328c0fe5053f5f7
@@ -2379,8 +2755,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Node [{#NODE.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
             -
               uuid: 9530c81b45c24ddda2440e2589964d28
               name: 'F5 BIG-IP: Node [{#NODE.NAME}]: Incoming traffic, rate'
@@ -2404,8 +2786,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Node [{#NODE.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
             -
               uuid: 8e7ae014ea73489b81de960acad301b8
               name: 'F5 BIG-IP: Node [{#NODE.NAME}]: Incoming packet, rate'
@@ -2429,8 +2817,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Node [{#NODE.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
             -
               uuid: 88ec665ad6eb43e88a3625b50e130e82
               name: 'F5 BIG-IP: Node [{#NODE.NAME}]: Outgoing traffic, rate'
@@ -2454,8 +2848,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Node [{#NODE.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
             -
               uuid: 077bb28cd8a1429fb564786e7d150dbc
               name: 'F5 BIG-IP: Node [{#NODE.NAME}]: Outgoing packet, rate'
@@ -2479,8 +2879,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Node [{#NODE.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
             -
               uuid: 5a0278f4cfd04611895207d9b7f3b13c
               name: 'F5 BIG-IP: Node [{#NODE.NAME}]: Current sessions'
@@ -2499,8 +2905,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Node [{#NODE.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
             -
               uuid: 15129cb2af84466d8c58641854ad0b54
               name: 'F5 BIG-IP: Node [{#NODE.NAME}]: Connections hit a rate limit'
@@ -2520,8 +2932,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Node [{#NODE.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
             -
               uuid: 6be4c0fd41d6459db5acd6c33461c7f9
               name: 'F5 BIG-IP: Node [{#NODE.NAME}]: Duration of exceeding rate limit'
@@ -2542,8 +2960,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Node [{#NODE.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
           graph_prototypes:
             -
               uuid: 920bf6830fae4d168a3d9fc772a8f25c
@@ -2613,8 +3037,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Pool [{#POOL.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: pool
+                -
+                  tag: pool
+                  value: '{#POOL.NAME}'
               trigger_prototypes:
                 -
                   uuid: 0b6e708075684cbab0d8c598f3467e0c
@@ -2626,6 +3056,10 @@ zabbix_export:
                     -
                       name: 'F5 BIG-IP: Pool {#POOL.NAME} is not enabled in some capacity: {ITEM.VALUE1}'
                       expression: 'count(/F5 Big-IP SNMP/bigip.pool.enabled[{#POOL.NAME}],120m,"ne","1")>4'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: 391d21a1a44d49d4beb219b726e0f55e
               name: 'F5 BIG-IP: Pool [{#POOL.NAME}]: Status enabled'
@@ -2650,8 +3084,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Pool [{#POOL.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: pool
+                -
+                  tag: pool
+                  value: '{#POOL.NAME}'
               trigger_prototypes:
                 -
                   uuid: 4d0431e2c4934f37be7302ffedd69e8a
@@ -2659,6 +3099,10 @@ zabbix_export:
                   name: 'F5 BIG-IP: Pool {#POOL.NAME} is not enabled in some capacity: {ITEM.VALUE1}'
                   opdata: '{ITEM.LASTVALUE}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: 0c53c6f3ab9e49b688a8e97252471ded
               name: 'F5 BIG-IP: Pool [{#POOL.NAME}]: Current connections'
@@ -2677,8 +3121,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Pool [{#POOL.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: pool
+                -
+                  tag: pool
+                  value: '{#POOL.NAME}'
             -
               uuid: e6daed4f364c463dba542948b2272296
               name: 'F5 BIG-IP: Pool [{#POOL.NAME}]: Incoming traffic, rate'
@@ -2702,8 +3152,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Pool [{#POOL.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: pool
+                -
+                  tag: pool
+                  value: '{#POOL.NAME}'
             -
               uuid: b65e8d23fa3b4129936f0f3d7034c8a4
               name: 'F5 BIG-IP: Pool [{#POOL.NAME}]: Incoming packet, rate'
@@ -2727,8 +3183,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Pool [{#POOL.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: pool
+                -
+                  tag: pool
+                  value: '{#POOL.NAME}'
             -
               uuid: 6c58f56d63e34166b02ad7c31271e2bb
               name: 'F5 BIG-IP: Pool [{#POOL.NAME}]: Outgoing traffic, rate'
@@ -2752,8 +3214,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Pool [{#POOL.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: pool
+                -
+                  tag: pool
+                  value: '{#POOL.NAME}'
             -
               uuid: e432732fc4dd478892c6d4bab3fbd11c
               name: 'F5 BIG-IP: Pool [{#POOL.NAME}]: Outgoing packet, rate'
@@ -2777,8 +3245,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Pool [{#POOL.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: pool
+                -
+                  tag: pool
+                  value: '{#POOL.NAME}'
             -
               uuid: 068028e704f049b4b3daae524fe16d27
               name: 'F5 BIG-IP: Pool [{#POOL.NAME}]: Current sessions'
@@ -2797,8 +3271,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Pool [{#POOL.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: pool
+                -
+                  tag: pool
+                  value: '{#POOL.NAME}'
             -
               uuid: 6bacc7e284f14aa7804f69c8b2f744d4
               name: 'F5 BIG-IP: Pool [{#POOL.NAME}]: Age of the oldest queue entry'
@@ -2822,8 +3302,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Pool [{#POOL.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: pool
+                -
+                  tag: pool
+                  value: '{#POOL.NAME}'
             -
               uuid: 44ad195489cd46be87ae8cc029bcb480
               name: 'F5 BIG-IP: Pool [{#POOL.NAME}]: Queue'
@@ -2842,8 +3328,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Pool [{#POOL.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: pool
+                -
+                  tag: pool
+                  value: '{#POOL.NAME}'
           graph_prototypes:
             -
               uuid: a077af6d72a447a99a35f2daa8b0205e
@@ -2906,8 +3398,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual server [{#VSERVER.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: virtual-server
+                -
+                  tag: virtual-server
+                  value: '{#VSERVER.NAME}'
             -
               uuid: 206503cc777a4156a29f0687d8fb5a7c
               name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Incoming traffic, rate'
@@ -2931,8 +3429,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual server [{#VSERVER.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: virtual-server
+                -
+                  tag: virtual-server
+                  value: '{#VSERVER.NAME}'
             -
               uuid: d8a36a30d99c44ca9b7172a5b66e74d6
               name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Incoming packet, rate'
@@ -2956,8 +3460,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual server [{#VSERVER.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: virtual-server
+                -
+                  tag: virtual-server
+                  value: '{#VSERVER.NAME}'
             -
               uuid: efeb720fb7e44d068572d59eff947bc6
               name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Outgoing traffic, rate'
@@ -2981,8 +3491,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual server [{#VSERVER.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: virtual-server
+                -
+                  tag: virtual-server
+                  value: '{#VSERVER.NAME}'
             -
               uuid: bd588ea58eb4420085691046fa0a1e3b
               name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Outgoing packet, rate'
@@ -3006,8 +3522,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual server [{#VSERVER.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: virtual-server
+                -
+                  tag: virtual-server
+                  value: '{#VSERVER.NAME}'
             -
               uuid: 01352ac9b6c24f13a6ceebac666026cb
               name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Connections hit a rate limit'
@@ -3027,8 +3549,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual server [{#VSERVER.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: virtual-server
+                -
+                  tag: virtual-server
+                  value: '{#VSERVER.NAME}'
             -
               uuid: baa7718513a54ae4a7bd669f9b652521
               name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Duration of exceeding rate limit'
@@ -3048,8 +3576,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual server [{#VSERVER.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: virtual-server
+                -
+                  tag: virtual-server
+                  value: '{#VSERVER.NAME}'
             -
               uuid: 3e97e22368b84674a9720c3f076503c5
               name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Usage ratio, avg 1m'
@@ -3069,8 +3603,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual server [{#VSERVER.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: virtual-server
+                -
+                  tag: virtual-server
+                  value: '{#VSERVER.NAME}'
             -
               uuid: 2c8c5e0e53e34e4ebc84ed9e5a8c4bd9
               name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Usage ratio, avg 5m'
@@ -3090,8 +3630,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual server [{#VSERVER.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: virtual-server
+                -
+                  tag: virtual-server
+                  value: '{#VSERVER.NAME}'
             -
               uuid: d6079ebaebbb40d09386e2b1abcbe987
               name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Usage ratio, avg 5s'
@@ -3111,8 +3657,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual server [{#VSERVER.NAME}]'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: virtual-server
+                -
+                  tag: virtual-server
+                  value: '{#VSERVER.NAME}'
           graph_prototypes:
             -
               uuid: b49ee8a27f634c238317663d7cc9d426
@@ -3169,6 +3721,16 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: big-ip
+        -
+          tag: target
+          value: f5
       macros:
         -
           macro: '{$BIGIP.CERT.MIN}'

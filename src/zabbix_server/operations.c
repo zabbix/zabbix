@@ -17,15 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "comms.h"
-#include "db.h"
-#include "log.h"
-#include "dbcache.h"
-
 #include "operations.h"
-#include "zbxserver.h"
 
+#include "log.h"
+#include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_host.h"
 
 typedef enum

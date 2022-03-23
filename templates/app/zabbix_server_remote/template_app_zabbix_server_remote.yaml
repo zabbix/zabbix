@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-07T13:02:05Z'
+  date: '2022-01-26T10:48:12Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: 79b16cbbe593444eae3de66de0cb566b
       template: 'Remote Zabbix server health'
       name: 'Remote Zabbix server health'
-      description: 'Template tooling version used: 0.40'
+      description: 'Template tooling version used: 0.41'
       groups:
         -
           name: Templates/Applications
@@ -32,8 +32,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
         -
           uuid: 9881f258f69d459195b5a19c56c523a8
           name: 'Remote Zabbix server: Preprocessing queue'
@@ -51,8 +51,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
         -
           uuid: d8071d9c280c468cb70b19be50c756a5
           name: 'Remote Zabbix server: Utilization of alerter internal processes, in %'
@@ -74,8 +74,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: d4aae59fe9294da5b1c724b051af1683
@@ -84,6 +84,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.alerter.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of alerter processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 14347f8309934849a2ac13974e4b66d1
           name: 'Remote Zabbix server: Utilization of alert manager internal processes, in %'
@@ -105,8 +109,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: 310f33d488ae4f5faa245c96f8dc583c
@@ -115,6 +119,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.alert_manager.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of alert manager processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 236699e6400c4ae3a20868c79fd35027
           name: 'Remote Zabbix server: Utilization of alert syncer internal processes, in %'
@@ -136,8 +144,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: 0eb23de05fac4aeab4ee4aa337545b16
@@ -146,6 +154,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.alert_syncer.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of alert syncer processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 44ae7bbbca5346a4926bf1208e00deb8
           name: 'Remote Zabbix server: Utilization of availability manager internal processes, in %'
@@ -167,8 +179,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: ae06acfebdb3452b88359f1634c53876
@@ -177,6 +189,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.availability_manager.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of availability manager processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 439e81aed41e4fd7ba7f2e4a97ca1a91
           name: 'Remote Zabbix server: Utilization of configuration syncer internal processes, in %'
@@ -198,8 +214,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: f1caa410beea429eb91daaec8f027eb3
@@ -208,6 +224,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.configuration_syncer.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of configuration syncer processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 396cdd296a3a4ee4a247afaa0f64e41c
           name: 'Remote Zabbix server: Utilization of discoverer data collector processes, in %'
@@ -229,8 +249,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: 2ed92415c6c542639a8b8d1f0a4646f4
@@ -239,6 +259,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.discoverer.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of discoverer processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: d8110a23217142b9b10f2eda00a96f39
           name: 'Remote Zabbix server: Utilization of escalator internal processes, in %'
@@ -260,8 +284,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: de07be1b10d9446abed4a387dd4980dd
@@ -270,6 +294,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.escalator.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of escalator processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: edefe2732df14bc3933b8e1ff65fbd21
           name: 'Remote Zabbix server: Utilization of history poller data collector processes, in %'
@@ -291,8 +319,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: 655c59a6151d4ce985a833d9f91efc2a
@@ -301,6 +329,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.history_poller.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of history poller processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 2b651866c6f04880888a770e9a08a167
           name: 'Remote Zabbix server: Utilization of history syncer internal processes, in %'
@@ -322,8 +354,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: b8e6a6ce3667459bad05afa850e99bc0
@@ -332,6 +364,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.history_syncer.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of history syncer processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 8eb5b40740a349fbb14ed39dd840fc85
           name: 'Remote Zabbix server: Utilization of housekeeper internal processes, in %'
@@ -353,8 +389,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: b879623a755e4b79972c2ad3189886a2
@@ -363,6 +399,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.housekeeper.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of housekeeper processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 02371dc53214403dbf34ff9e970408ef
           name: 'Remote Zabbix server: Utilization of http poller data collector processes, in %'
@@ -384,8 +424,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: f7b4217cdd4b46b1949a5e6ac5fc3d02
@@ -394,6 +434,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.http_poller.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of http poller processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 3a2dfedfac164b69a01105137eefd5e9
           name: 'Remote Zabbix server: Utilization of icmp pinger data collector processes, in %'
@@ -415,8 +459,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: 312d404ff20740f38385ebe7c3e36d8f
@@ -425,6 +469,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.icmp_pinger.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of icmp pinger processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 52a05106bc5e4e05b04142827f394662
           name: 'Remote Zabbix server: Utilization of ipmi manager internal processes, in %'
@@ -446,8 +494,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: 3fe728ab8de9447c899b2a919b885cec
@@ -456,6 +504,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.ipmi_manager.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of ipmi manager processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 849f8b11cc984c758c4947fe256e3310
           name: 'Remote Zabbix server: Utilization of ipmi poller data collector processes, in %'
@@ -477,8 +529,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: dbf27d6a629a4a2cb75e04849b93ac0f
@@ -487,6 +539,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.ipmi_poller.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of ipmi poller processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: e55654715f8143c597c858d7eb522e31
           name: 'Remote Zabbix server: Utilization of java poller data collector processes, in %'
@@ -508,8 +564,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: 304a2dcf77c8494fb18f52cc6bae73a9
@@ -518,6 +574,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.java_poller.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of java poller processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: b8504e03317649399dabfffc2758d77c
           name: 'Remote Zabbix server: Utilization of LLD manager internal processes, in %'
@@ -539,8 +599,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: 4027f813da2549cfb99e1bb5e04e1d28
@@ -549,6 +609,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.lld_manager.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of lld manager processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: c4d708a59d314de6814f4936ec6b0a99
           name: 'Remote Zabbix server: Utilization of LLD worker internal processes, in %'
@@ -570,8 +634,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: ef1e836e906e4cf79b9fc8a11818c0a6
@@ -580,6 +644,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.lld_worker.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of lld worker processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 8a21a0281ae24e0788edc8c9b875a421
           name: 'Remote Zabbix server: Utilization of ODBC poller data collector processes, in %'
@@ -595,14 +663,12 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - '$.data.process[''odbc poller''].busy.avg'
-              error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes odbc poller not started'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: eadd70080005430c8b11666d7e93a095
@@ -611,6 +677,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.odbc_poller.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of ODBC poller processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 61df12fa054b46f4b50596807dbc90c3
           name: 'Remote Zabbix server: Utilization of poller data collector processes, in %'
@@ -632,8 +702,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: 689ed5dd9bbd4873a825dfa675378d50
@@ -642,6 +712,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.poller.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of poller processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 42e9efb8e5e54b26b84372dc53e823b3
           name: 'Remote Zabbix server: Utilization of preprocessing manager internal processes, in %'
@@ -663,8 +737,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: b43f04a35e17415bb81bfb59357d45ac
@@ -673,6 +747,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.preprocessing_manager.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of preprocessing manager processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 90bd4b46d63845b98a2c430aac157ea5
           name: 'Remote Zabbix server: Utilization of preprocessing worker internal processes, in %'
@@ -694,8 +772,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: 1c28310eb72047449437ee94854029fa
@@ -704,6 +782,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.preprocessing_worker.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of preprocessing worker processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 4c5eb5acc8a447afa47d732988dafbd9
           name: 'Remote Zabbix server: Utilization of proxy poller data collector processes, in %'
@@ -725,8 +807,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: c0d2c7c008cb45ee8b032b7c83018ae1
@@ -735,6 +817,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.proxy_poller.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of proxy poller processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 032c86725d7d479e8e0a8cf0ea14b349
           name: 'Remote Zabbix server: Utilization of report manager internal processes, in %'
@@ -756,8 +842,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: 32d6f18edd5a45e1999f294f227c600f
@@ -766,6 +852,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.report_manager.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of report manager processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 0a91377a6d5a460aa716164b201db6c0
           name: 'Remote Zabbix server: Utilization of report writer internal processes, in %'
@@ -787,8 +877,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: 83fa871d54f74c89a7c85d429d40da53
@@ -797,6 +887,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.report_writer.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of report writer processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 044bb995bcae42568979fd958383fc60
           name: 'Remote Zabbix server: Utilization of self-monitoring internal processes, in %'
@@ -818,8 +912,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: 0d9b8d1f2d7d454ab472320ac172252c
@@ -828,6 +922,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.self-monitoring.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of self-monitoring processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 99da1d8bd47447d282542d40c1edea00
           name: 'Remote Zabbix server: Utilization of service manager internal processes, in %'
@@ -849,8 +947,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: 001c9e2027ca4e7c8f5dc5b78681c573
@@ -859,6 +957,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.service_manager.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of service manager processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 643036d74a10414f94dc357efbbd42b2
           name: 'Remote Zabbix server: Utilization of snmp trapper data collector processes, in %'
@@ -880,8 +982,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: 4726331c52284261aa3f347448c1c3c5
@@ -890,6 +992,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.snmp_trapper.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of snmp trapper processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 7fad0515db154228b5baabb51d647a9f
           name: 'Remote Zabbix server: Utilization of task manager internal processes, in %'
@@ -911,8 +1017,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: 07d29e82b74a4cc5b0d701458af302b7
@@ -921,6 +1027,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.task_manager.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of task manager processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 105eae2d56d34d91b540f93009a575aa
           name: 'Remote Zabbix server: Utilization of timer internal processes, in %'
@@ -942,8 +1052,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: 72f3b3f143a94f5a9b4b2c509425954e
@@ -952,6 +1062,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.timer.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of timer processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 9c90b3a087e1495caa17a00bebb70145
           name: 'Remote Zabbix server: Utilization of trapper data collector processes, in %'
@@ -973,8 +1087,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: d31285f177224c4cb570373f6a730019
@@ -983,6 +1097,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.trapper.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of trapper processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 56dca0db33264d4b9c8fd769fbdff7b5
           name: 'Remote Zabbix server: Utilization of trigger housekeeper internal processes, in %'
@@ -1004,8 +1122,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: 9c0daf6e85884122aa8c5b8432709c92
@@ -1014,6 +1132,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.trigger_housekeeper.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of trigger housekeeper processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 8d43954f6b9843009353c560a4f84157
           name: 'Remote Zabbix server: Utilization of unreachable poller data collector processes, in %'
@@ -1035,8 +1157,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: d254ccddc7dd4e1ebf1eaa5113270e85
@@ -1045,6 +1167,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.unreachable_poller.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of unreachable poller processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 9f02a181362b42b882d869353fae93ce
           name: 'Remote Zabbix server: Utilization of vmware data collector processes, in %'
@@ -1066,8 +1192,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: 5929cfbe23494a41a20a4c05854f9578
@@ -1076,6 +1202,10 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.vmware_collector.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of vmware collector processes over 75%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 750964513e1d44d7b138980d6cac2188
           name: 'Remote Zabbix server: Configuration cache, % used'
@@ -1095,8 +1225,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
           triggers:
             -
               uuid: 9d5f36b486ab4781a5f58210143785e9
@@ -1104,6 +1234,13 @@ zabbix_export:
               name: 'Remote Zabbix server: More than 75% used in the configuration cache'
               priority: AVERAGE
               description: 'Consider increasing CacheSize in the zabbix_server.conf configuration file.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 1625b3470fbf4bd7aa5b7051e328b37c
           name: 'Remote Zabbix server: Trend function cache, % unique requests'
@@ -1128,8 +1265,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
         -
           uuid: 2c8bf95e97dd48679e34591c72626c90
           name: 'Remote Zabbix server: Trend function cache, % misses'
@@ -1151,8 +1288,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
         -
           uuid: 9f9d8d1fcd08498698e37b5889502b47
           name: 'Remote Zabbix server: Value cache, % used'
@@ -1172,8 +1309,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
           triggers:
             -
               uuid: d35671cd02034aeba3c7c71ed618f4ee
@@ -1181,6 +1318,13 @@ zabbix_export:
               name: 'Remote Zabbix server: More than 95% used in the value cache'
               priority: AVERAGE
               description: 'Consider increasing ValueCacheSize in the zabbix_server.conf configuration file.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 9bd0079126974bf2a61f552de2cdf880
           name: 'Remote Zabbix server: Value cache hits'
@@ -1206,8 +1350,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
         -
           uuid: e8c372778d4e434e98d3fba5ea603a50
           name: 'Remote Zabbix server: Value cache misses'
@@ -1233,8 +1377,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
         -
           uuid: 1a1daeb7267f4ed4bf75c70699d487b6
           name: 'Remote Zabbix server: Value cache operating mode'
@@ -1254,8 +1398,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
           triggers:
             -
               uuid: 95e8823159fc4baeb13d656be176ac16
@@ -1263,6 +1407,13 @@ zabbix_export:
               name: 'Remote Zabbix server: Zabbix value cache working in low memory mode'
               priority: HIGH
               description: 'Once the low memory mode has been switched on, the value cache will remain in this state for 24 hours, even if the problem that triggered this mode is resolved sooner.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: f0eab81aaf464b809ea4d487548e57c6
           name: 'Remote Zabbix server: Version'
@@ -1286,8 +1437,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
           triggers:
             -
               uuid: 93a52f22c79b40539fcd3a26183daad9
@@ -1296,6 +1447,10 @@ zabbix_export:
               priority: INFO
               description: 'Remote Zabbix server version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 9e2b2133916e4ce29ed4e9ca07c74123
           name: 'Remote Zabbix server: VMware cache, % used'
@@ -1317,8 +1472,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
           triggers:
             -
               uuid: 08e6c62dd52b4a0694be910c4f4fa997
@@ -1326,6 +1481,13 @@ zabbix_export:
               name: 'Remote Zabbix server: More than 75% used in the vmware cache'
               priority: AVERAGE
               description: 'Consider increasing VMwareCacheSize in the zabbix_server.conf configuration file.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 98f47a07e2ba4294a9eb2aa1df2ba9f3
           name: 'Remote Zabbix server: History write cache, % used'
@@ -1347,8 +1509,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
           triggers:
             -
               uuid: a66914bd7f2e4442a8b555deacebb4c9
@@ -1356,6 +1518,13 @@ zabbix_export:
               name: 'Remote Zabbix server: More than 75% used in the history cache'
               priority: AVERAGE
               description: 'Consider increasing HistoryCacheSize in the zabbix_server.conf configuration file.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: b1add70210a44b668f06cc3e062173ad
           name: 'Remote Zabbix server: History index cache, % used'
@@ -1377,8 +1546,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
           triggers:
             -
               uuid: 6aedbc1768ed4f949890248af98fdaa2
@@ -1386,6 +1555,13 @@ zabbix_export:
               name: 'Remote Zabbix server: More than 75% used in the history index cache'
               priority: AVERAGE
               description: 'Consider increasing HistoryIndexCacheSize in the zabbix_server.conf configuration file.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 1f79208bb2ec4e4eb26e6e1b95c3635e
           name: 'Remote Zabbix server: Trend write cache, % used'
@@ -1407,8 +1583,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
           triggers:
             -
               uuid: 742a4938fdd24026921b375a67cea921
@@ -1416,6 +1592,13 @@ zabbix_export:
               name: 'Remote Zabbix server: More than 75% used in the trends cache'
               priority: AVERAGE
               description: 'Consider increasing TrendCacheSize in the zabbix_server.conf configuration file.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 34fe014843974248a98a45596ce43e1a
           name: 'Remote Zabbix server: Number of processed values per second'
@@ -1440,8 +1623,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
         -
           uuid: 206f4fcb1e6d4e468a172e330f56b8aa
           name: 'Remote Zabbix server: Number of processed numeric (float) values per second'
@@ -1466,8 +1649,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
         -
           uuid: e2f3dc320d54446b80862eabe6fa0be5
           name: 'Remote Zabbix server: Number of processed log values per second'
@@ -1492,8 +1675,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
         -
           uuid: 82e088caf6e14c1cab700ad7fcc96263
           name: 'Remote Zabbix server: Number of processed not supported values per second'
@@ -1518,8 +1701,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
         -
           uuid: 99415cd1920a4e7f8b99f3c71e7eba97
           name: 'Remote Zabbix server: Number of processed character values per second'
@@ -1544,8 +1727,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
         -
           uuid: 7172378f31a44a36a095a2c2afed763b
           name: 'Remote Zabbix server: Number of processed text values per second'
@@ -1570,8 +1753,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
         -
           uuid: 7865ba7a928945f4a148acf623b72537
           name: 'Remote Zabbix server: Number of processed numeric (unsigned) values per second'
@@ -1596,8 +1779,8 @@ zabbix_export:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
         -
           uuid: 95c8bab7640a4227b8ce6cac06e1a08b
           name: 'Remote Zabbix server: Zabbix stats queue over 10m'
@@ -1612,8 +1795,8 @@ zabbix_export:
                 - $.queue
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
           triggers:
             -
               uuid: c8eddec1bb9740bb8ca05f74bd023fcc
@@ -1623,6 +1806,10 @@ zabbix_export:
               description: |
                 zabbix[stats,{$IP},{$PORT},queue,10m] item is collecting data about
                 how many items are missing data for more than 10 minutes.
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: c140ebe6c0404ee6b17b5ada2de09f28
           name: 'Remote Zabbix server: Zabbix stats queue'
@@ -1637,8 +1824,8 @@ zabbix_export:
                 - $.queue
           tags:
             -
-              tag: Application
-              value: 'Zabbix server'
+              tag: component
+              value: system
         -
           uuid: b9a588fee45047b6b991015e7e83f3f2
           name: 'Remote Zabbix server: Zabbix stats'
@@ -1650,8 +1837,8 @@ zabbix_export:
           description: 'Zabbix server statistics master item.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
       discovery_rules:
         -
           uuid: 0557f879881a4d558410444737ae3738
@@ -1684,8 +1871,14 @@ zabbix_export:
                 key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Cluster node [{#NODE.NAME}]'
+                  tag: component
+                  value: cluster
+                -
+                  tag: node-id
+                  value: '{#NODE.ID}'
+                -
+                  tag: node-name
+                  value: '{#NODE.NAME}'
             -
               uuid: a9ded61c4dba4abb9213aec9af00a604
               name: 'Cluster node [{#NODE.NAME}]: Last access age'
@@ -1704,8 +1897,14 @@ zabbix_export:
                 key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Cluster node [{#NODE.NAME}]'
+                  tag: component
+                  value: cluster
+                -
+                  tag: node-id
+                  value: '{#NODE.ID}'
+                -
+                  tag: node-name
+                  value: '{#NODE.NAME}'
             -
               uuid: 0968e4fe51eb4c2b98a508090014aba0
               name: 'Cluster node [{#NODE.NAME}]: Last access time'
@@ -1724,8 +1923,14 @@ zabbix_export:
                 key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Cluster node [{#NODE.NAME}]'
+                  tag: component
+                  value: cluster
+                -
+                  tag: node-id
+                  value: '{#NODE.ID}'
+                -
+                  tag: node-name
+                  value: '{#NODE.NAME}'
             -
               uuid: 2b629362886546cab34396352b93835a
               name: 'Cluster node [{#NODE.NAME}]: Status'
@@ -1749,8 +1954,14 @@ zabbix_export:
                 key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Cluster node [{#NODE.NAME}]'
+                  tag: component
+                  value: cluster
+                -
+                  tag: node-id
+                  value: '{#NODE.ID}'
+                -
+                  tag: node-name
+                  value: '{#NODE.NAME}'
               trigger_prototypes:
                 -
                   uuid: 5d68b55175924cb4adde600a019496c4
@@ -1760,6 +1971,10 @@ zabbix_export:
                   priority: INFO
                   description: 'The state of the node has changed. Confirm to close.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           lld_macro_paths:
@@ -1774,6 +1989,16 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.data.ha
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: server
+        -
+          tag: target
+          value: zabbix
       macros:
         -
           macro: '{$ADDRESS}'

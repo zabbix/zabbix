@@ -20,7 +20,6 @@
 #ifndef ZABBIX_ALERTER_H
 #define ZABBIX_ALERTER_H
 
-#include "db.h"
 #include "threads.h"
 
 extern char	*CONFIG_ALERT_SCRIPTS_PATH;

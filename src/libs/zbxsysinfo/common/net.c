@@ -17,15 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "net.h"
 
-#include "comms.h"
+#include "common.h"
+#include "zbxcomms.h"
 #include "log.h"
 #include "cfg.h"
-
-#include "net.h"
-#include "zbxalgo.h"
 
 int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
 		int (*validate_func)(const char *), const char *sendtoclose, int *value_int)

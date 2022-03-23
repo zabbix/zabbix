@@ -38,11 +38,13 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxjson/libzbxjson.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxsysinfo/osx/libspechostnamesysinfo.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxsysinfo/osx/libspecsysinfo.a
-#cgo LDFLAGS: -lz -lpcre -lresolv
+#cgo pcre  LDFLAGS: -lz -lpcre -lresolv
+#cgo pcre2 LDFLAGS: -lz -lpcre2-8 -lresolv
+#cgo LDFLAGS: -lz -lresolv
 
 #include "common.h"
 #include "sysinfo.h"
-#include "comms.h"
+#include "zbxcomms.h"
 #include "log.h"
 #include "../src/zabbix_agent/metrics.h"
 #include "../src/zabbix_agent/logfiles/logfiles.h"
@@ -82,6 +84,7 @@ char *CONFIG_TLS_CIPHER_CMD = NULL;
 
 int	CONFIG_PASSIVE_FORKS = 0;
 int	CONFIG_ACTIVE_FORKS = 0;
+int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
 const char	*progname = NULL;
 const char	title_message[] = "agent";

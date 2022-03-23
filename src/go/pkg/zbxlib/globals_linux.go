@@ -41,12 +41,13 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxexec/libzbxexec.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxalgo/libzbxalgo.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxjson/libzbxjson.a
-#cgo LDFLAGS: -lz -lpcre -lresolv
+#cgo pcre  LDFLAGS: -lz -lpcre -lresolv
+#cgo pcre2 LDFLAGS: -lz -lpcre2-8 -lresolv
 #cgo LDFLAGS: -Wl,--end-group
 
 #include "common.h"
 #include "sysinfo.h"
-#include "comms.h"
+#include "zbxcomms.h"
 #include "log.h"
 #include "../src/zabbix_agent/metrics.h"
 #include "../src/zabbix_agent/logfiles/logfiles.h"

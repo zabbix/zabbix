@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-10T07:41:44Z'
+  date: '2022-01-26T10:38:27Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -18,7 +18,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/420659-discussion-thread-for-official-zabbix-template-db-mongodb
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Databases
@@ -45,8 +45,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: documents
         -
           uuid: 5ecc078aeda04e3ca34ed42d966cdf40
           name: 'MongoDB: Document: inserted, rate'
@@ -69,8 +69,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: documents
         -
           uuid: 56fc9870503645069a9d937ac21ab7c2
           name: 'MongoDB: Document: returned, rate'
@@ -93,8 +93,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: documents
         -
           uuid: d21a95f1862b4c17b5a4ed83a67ffb1b
           name: 'MongoDB: Document: updated, rate'
@@ -117,8 +117,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: documents
         -
           uuid: d5ec0427c5ca49119f6e94211b0297bf
           name: 'MongoDB: Active clients: readers'
@@ -136,8 +136,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: clients
         -
           uuid: 1c2dc0b60eb44d259e02accf2531b389
           name: 'MongoDB: Active clients: total'
@@ -155,8 +155,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: clients
         -
           uuid: 9c5512c83e1844c5b4fdb675336edbf6
           name: 'MongoDB: Active clients: writers'
@@ -174,8 +174,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: clients
         -
           uuid: 5e6fa5d1c9fc48ada6c0bc5c8d1d3ec4
           name: 'MongoDB: Asserts: message, rate'
@@ -200,8 +200,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: asserts
         -
           uuid: 32d5177badac49eda8ce1f47c851ebf2
           name: 'MongoDB: Asserts: regular, rate'
@@ -226,8 +226,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: asserts
         -
           uuid: 67f2ef15386a47b6b88fc95dd7fe1be6
           name: 'MongoDB: Asserts: rollovers, rate'
@@ -252,8 +252,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: asserts
         -
           uuid: a7dfd56310d44d7dac1f3c02fa5fbc79
           name: 'MongoDB: Asserts: user, rate'
@@ -278,8 +278,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: asserts
         -
           uuid: 41638aa2b3374e56ad00ef9113e1ea61
           name: 'MongoDB: Asserts: warning, rate'
@@ -302,8 +302,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: asserts
         -
           uuid: 46f0a53612de4448ab8e98098375656b
           name: 'MongoDB: Get collections usage stats'
@@ -314,8 +314,11 @@ zabbix_export:
           description: 'Returns usage statistics for each collection.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: collections
+            -
+              tag: component
+              value: raw
         -
           uuid: 6ce4b63c962646ef91e4a705a42f36de
           name: 'MongoDB: Connections, active'
@@ -337,8 +340,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: connections
         -
           uuid: 3b53fa8cf9cb4d1a9ff364cd5d8ae724
           name: 'MongoDB: Connections, available'
@@ -356,8 +359,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: connections
         -
           uuid: c4d86707cd124d9db195ca6afd636e71
           name: 'MongoDB: Connections, current'
@@ -377,8 +380,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: connections
         -
           uuid: 37fd836b53fa4db88aeb0faeeccc2856
           name: 'MongoDB: New connections, rate'
@@ -402,8 +405,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: connections
         -
           uuid: 0f04a5b3b0e5415185e01ecf75f426ec
           name: 'MongoDB: Current queue: readers'
@@ -423,8 +426,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: global-lock
         -
           uuid: 47ecaffb9638429eb308572b7d7beb5a
           name: 'MongoDB: Current queue: total'
@@ -442,8 +445,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: global-lock
         -
           uuid: e68ff1592a5648fc8b5475054c327ac6
           name: 'MongoDB: Current queue: writers'
@@ -463,8 +466,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: global-lock
         -
           uuid: 1d2c068feba240d6b934b65249d1b5ea
           name: 'MongoDB: Cursor: open pinned'
@@ -482,8 +485,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: documents
         -
           uuid: f23bf716eced4ba5948b06c24c780904
           name: 'MongoDB: Cursor: open total'
@@ -501,14 +504,18 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: cursors
           triggers:
             -
               uuid: ed4a0c66c76d4ca699d0f2188cc8e71f
               expression: 'min(/MongoDB node by Zabbix agent 2/mongodb.cursor.open.total,5m)>{$MONGODB.CURSOR.OPEN.MAX.WARN}'
               name: 'MongoDB: Too many cursors opened by MongoDB for clients (over {$MONGODB.CURSOR.OPEN.MAX.WARN} in 5m)'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: capacity
         -
           uuid: b30b4c7b6d88467bbde22db411660d6b
           name: 'MongoDB: Cursor: timed out, rate'
@@ -531,14 +538,18 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: cursors
           triggers:
             -
               uuid: 41d37791111b461d94da779e4b2c7e46
               expression: 'min(/MongoDB node by Zabbix agent 2/mongodb.cursor.timed_out.rate,5m)>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}'
               name: 'MongoDB: Too many cursors are timing out (over {$MONGODB.CURSOR.TIMEOUT.MAX.WARN} per second in 5m)'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 4d0b20f4eeca4418bb08e7e2905cc68c
           name: 'MongoDB: Architecture'
@@ -561,8 +572,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: application
         -
           uuid: c88392536a334f9a9c907be28090424c
           name: 'MongoDB: Memory: mapped'
@@ -586,8 +597,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: memory
         -
           uuid: 7a10ad84604246679104111e83fa762e
           name: 'MongoDB: Memory: mapped with journal'
@@ -611,8 +622,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: memory
         -
           uuid: 2248b869cfca42bd95140451c0974f8c
           name: 'MongoDB: Memory: resident'
@@ -635,8 +646,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: memory
         -
           uuid: 561ea7508e44443cb692b7dfe8ed3bdc
           name: 'MongoDB: Memory: virtual'
@@ -659,8 +670,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: memory
         -
           uuid: 9c79163da0b44e39a704969ab1d6280b
           name: 'MongoDB: Cursor: open no timeout'
@@ -678,8 +689,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: documents
         -
           uuid: ba0502f80a044670993bdb63587cd282
           name: 'MongoDB: Bytes in, rate'
@@ -703,8 +714,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: network
         -
           uuid: 0545114b39a649ef9a4b75da500031fb
           name: 'MongoDB: Bytes out, rate'
@@ -728,8 +739,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: network
         -
           uuid: 73aba89f9012437eb3ed843ccbe63c06
           name: 'MongoDB: Requests, rate'
@@ -753,8 +764,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: network
         -
           uuid: 532a1f4a64624434986f54b9ac2d2e3a
           name: 'MongoDB: Operations: command, rate'
@@ -779,8 +790,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: operations
         -
           uuid: 540f30705ced49da89a16f80828e8775
           name: 'MongoDB: Operations: delete, rate'
@@ -803,8 +814,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: operations
         -
           uuid: 229345df70c240b5ab113b358fb738d9
           name: 'MongoDB: Operations: getmore, rate'
@@ -829,8 +840,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: operations
         -
           uuid: 4236ad60fcef48f793ac6da4cccdb029
           name: 'MongoDB: Operations: insert, rate'
@@ -853,8 +864,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: operations
         -
           uuid: b0f7def2c62047bba0db77d18f1df920
           name: 'MongoDB: Operations: query, rate'
@@ -877,8 +888,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: operations
         -
           uuid: 019ed179e4e1407db799e01920280e02
           name: 'MongoDB: Operations: update, rate'
@@ -901,8 +912,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: operations
         -
           uuid: 8e7406e64edd4fe5ba87d4018011c958
           name: 'MongoDB: Get oplog stats'
@@ -913,8 +924,11 @@ zabbix_export:
           description: 'Returns status of the replica set, using data polled from the oplog.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: oplog
+            -
+              tag: component
+              value: replicaset
         -
           uuid: 350da28ce7ab42f9b96728ec730d4bd6
           name: 'MongoDB: Ping'
@@ -931,8 +945,8 @@ zabbix_export:
                 - 30m
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: health
           triggers:
             -
               uuid: c4ab9bfdd6d14634870f8ebb44081655
@@ -940,6 +954,10 @@ zabbix_export:
               name: 'MongoDB: Connection to MongoDB is unavailable'
               priority: HIGH
               description: 'Connection to MongoDB instance is currently unavailable.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 3b448eff509240faba344f7b325f3e28
           name: 'MongoDB: Get Replica Set status'
@@ -950,8 +968,11 @@ zabbix_export:
           description: 'Returns the replica set status from the point of view of the member where the method is run.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
+            -
+              tag: component
+              value: replicaset
         -
           uuid: fb0cc7d44559406cada9d90a51bc999c
           name: 'MongoDB: Get server status'
@@ -962,8 +983,8 @@ zabbix_export:
           description: 'Returns a database''s state.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 2d1bf92792014ed8a3f8d8b13907fc7d
           name: 'MongoDB: Uptime'
@@ -983,8 +1004,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: application
           triggers:
             -
               uuid: 166444342def4adc954aa35f3dc22dba
@@ -997,6 +1018,10 @@ zabbix_export:
                 -
                   name: 'MongoDB: Connection to MongoDB is unavailable'
                   expression: 'last(/MongoDB node by Zabbix agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: 992590e47a7f42dda0e074c2f7a3e5ba
               expression: 'last(/MongoDB node by Zabbix agent 2/mongodb.uptime)<10m'
@@ -1004,6 +1029,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: c5679875dc254ddd833ee40ef4a2b3cf
           name: 'MongoDB: MongoDB version'
@@ -1027,8 +1056,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: MongoDB
+              tag: component
+              value: application
           triggers:
             -
               uuid: 0856e13b7e7644c5b353fcfa577acb51
@@ -1037,6 +1066,10 @@ zabbix_export:
               priority: INFO
               description: 'MongoDB version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
       discovery_rules:
         -
           uuid: a6398a8ae4fe4891a03bb6041bf71f53
@@ -1088,8 +1121,14 @@ zabbix_export:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: objects
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: ee5d3cefe6584900b400a4f598c84c1b
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Capped'
@@ -1117,8 +1156,14 @@ zabbix_export:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: application
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 5fc5b90792054b09a651b5d41328ca56
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Objects, count'
@@ -1136,8 +1181,14 @@ zabbix_export:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: objects
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 0ab52dbdcb424d759f6f717d8197cb30
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Capped: max number'
@@ -1157,8 +1208,14 @@ zabbix_export:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: application
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 8c0fe89cfa9f40e3bb04c92c417757df
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Capped: max size'
@@ -1178,8 +1235,14 @@ zabbix_export:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: disk
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: b8ebe075b01248179d93c5d174286d2f
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Indexes'
@@ -1197,8 +1260,14 @@ zabbix_export:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: application
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: a4d05a4ee48b4ce2aa4fbebd240b8c4c
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: commands, ms/s'
@@ -1222,8 +1291,14 @@ zabbix_export:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: operations
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: b6d89c096fec4194bbe834e026f33178
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: commands, rate'
@@ -1246,8 +1321,14 @@ zabbix_export:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: operations
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 6375b055efe84cdaa0a42c4b9981dde7
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: getmore, ms/s'
@@ -1271,8 +1352,14 @@ zabbix_export:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: operations
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 760a0a70a2674ad7acd9d551865693ef
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: getmore, rate'
@@ -1295,8 +1382,14 @@ zabbix_export:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: operations
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 812f76c720fe47ba9fd8764c349c4a36
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: insert, ms/s'
@@ -1320,8 +1413,14 @@ zabbix_export:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: operations
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: c824a6a997ef4308b47cdc4118799f33
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: insert, rate'
@@ -1344,8 +1443,14 @@ zabbix_export:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: operations
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 77de05da93b34432a7c2442fc01ca624
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: queries, ms/s'
@@ -1369,8 +1474,14 @@ zabbix_export:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: operations
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 41b1f661ceab494f81e7a4b943a07020
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: queries, rate'
@@ -1393,8 +1504,14 @@ zabbix_export:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: operations
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: a46f2c1c973d4eef8d9a7b1150702c74
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: remove, ms/s'
@@ -1418,8 +1535,14 @@ zabbix_export:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: operations
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 89b74a8511b84f4bb8cab94fc5471632
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: remove, rate'
@@ -1442,8 +1565,14 @@ zabbix_export:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: operations
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 67eaf64e851a45afbd69303ad0256077
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: total, ms/s'
@@ -1467,8 +1596,14 @@ zabbix_export:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: operations
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 1ca4ae9dcf494efdbf85d635d49d4de8
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: total, rate'
@@ -1491,8 +1626,14 @@ zabbix_export:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: operations
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 89b6f13894d64bdcbe0d0ec41568051a
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: update, ms/s'
@@ -1516,8 +1657,14 @@ zabbix_export:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: operations
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 8d75aa686d0d4f3f93089b8b089f1d3c
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: update, rate'
@@ -1540,8 +1687,14 @@ zabbix_export:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: operations
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 4d575525f749436ea4ea9098c3b164ba
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Read lock, ms/s'
@@ -1565,8 +1718,14 @@ zabbix_export:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: operations
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 9d2d62a252054e428d9b8863a2128ad8
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Read lock, rate'
@@ -1589,8 +1748,14 @@ zabbix_export:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: operations
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: e5e471e100834da5a2e9dddaaa453227
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Size'
@@ -1609,8 +1774,14 @@ zabbix_export:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: disk
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: d43709c548b84ea9b2c3c1b159bf28a3
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Get collection stats {#DBNAME}.{#COLLECTION}'
@@ -1621,8 +1792,14 @@ zabbix_export:
               description: 'Returns a variety of storage statistics for a given collection.'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: a2f095952fa44ed3a199b098c5fbee7a
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Storage size'
@@ -1641,8 +1818,14 @@ zabbix_export:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: disk
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: a4c46912b5e643be8565f2b0d32c62a9
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Write lock, ms/s'
@@ -1666,8 +1849,14 @@ zabbix_export:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: operations
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: ef83d379681241eaadd8be8de755a2bd
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Write lock, rate'
@@ -1690,8 +1879,14 @@ zabbix_export:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: operations
+                -
+                  tag: database
+                  value: '{#DBNAME}'
           graph_prototypes:
             -
               uuid: 76e921eae63a49b99102d880d5844a46
@@ -1853,8 +2048,11 @@ zabbix_export:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}'
+                  tag: component
+                  value: collections
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: a9d502096d664f6da44a6ab82f8b7d36
               name: 'MongoDB {#DBNAME}: Size, data'
@@ -1873,8 +2071,11 @@ zabbix_export:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}'
+                  tag: component
+                  value: disk
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: c5f4ae6a260e4c10aae0d51441fcbbf7
               name: 'MongoDB {#DBNAME}: Extents'
@@ -1893,8 +2094,11 @@ zabbix_export:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}'
+                  tag: component
+                  value: collections
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: cecffb75221440ac957fda5d676d7714
               name: 'MongoDB {#DBNAME}: Size, file'
@@ -1914,8 +2118,11 @@ zabbix_export:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}'
+                  tag: component
+                  value: disk
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 9567515baf7b46a0a685717839f4a48f
               name: 'MongoDB {#DBNAME}: Size, index'
@@ -1934,8 +2141,11 @@ zabbix_export:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}'
+                  tag: component
+                  value: disk
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: cd5ecd2eafc640319aa2f049db2cf582
               name: 'MongoDB {#DBNAME}: Objects, count'
@@ -1953,8 +2163,11 @@ zabbix_export:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}'
+                  tag: component
+                  value: objects
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: cadce6df66ec4872bd6b517233f77bfc
               name: 'MongoDB {#DBNAME}: Objects, avg size'
@@ -1974,8 +2187,11 @@ zabbix_export:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}'
+                  tag: component
+                  value: objects
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 829536cb5dd448d8a05a30cf6eff8599
               name: 'MongoDB {#DBNAME}: Get db stats {#DBNAME}'
@@ -1986,8 +2202,14 @@ zabbix_export:
               description: 'Returns statistics reflecting the database system''s state.'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: database
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 197a1d1f5d14413da8fe6c93bfdcf4f3
               name: 'MongoDB {#DBNAME}: Size, storage'
@@ -2006,8 +2228,11 @@ zabbix_export:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB: {#DBNAME}'
+                  tag: component
+                  value: disk
+                -
+                  tag: database
+                  value: '{#DBNAME}'
           graph_prototypes:
             -
               uuid: e65fcfed4eca4d518b5e6b5b6085ede8
@@ -2082,8 +2307,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB Replica Set: {#RS_NAME}'
+                  tag: component
+                  value: replication
+                -
+                  tag: replicaset
+                  value: '{#RS_NAME}'
             -
               uuid: a460d4356895439d9cf9143b38a18213
               name: 'MongoDB: Apply batches, rate'
@@ -2106,8 +2334,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB Replica Set: {#RS_NAME}'
+                  tag: component
+                  value: replication
+                -
+                  tag: replicaset
+                  value: '{#RS_NAME}'
             -
               uuid: 48970eb366f144b4b9ed3f72fbd983a7
               name: 'MongoDB: Apply ops, rate'
@@ -2130,8 +2361,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB Replica Set: {#RS_NAME}'
+                  tag: component
+                  value: replication
+                -
+                  tag: replicaset
+                  value: '{#RS_NAME}'
             -
               uuid: 8d8b0046f9fd409891d3d225f8a462ff
               name: 'MongoDB: Buffer'
@@ -2149,8 +2383,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB Replica Set: {#RS_NAME}'
+                  tag: component
+                  value: replication
+                -
+                  tag: replicaset
+                  value: '{#RS_NAME}'
             -
               uuid: 0a7522edb2a647989627de85f7e61319
               name: 'MongoDB: Buffer, max size'
@@ -2169,8 +2406,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB Replica Set: {#RS_NAME}'
+                  tag: component
+                  value: replication
+                -
+                  tag: replicaset
+                  value: '{#RS_NAME}'
             -
               uuid: fd9b7ea20e1e4e91b7a3c75d5416efe8
               name: 'MongoDB: Buffer, size'
@@ -2189,8 +2429,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB Replica Set: {#RS_NAME}'
+                  tag: component
+                  value: replication
+                -
+                  tag: replicaset
+                  value: '{#RS_NAME}'
             -
               uuid: 6f07d080d01d45dfa5383640c76175c5
               name: 'MongoDB: Replication lag'
@@ -2210,14 +2453,21 @@ zabbix_export:
                 key: 'mongodb.rs.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB Replica Set: {#RS_NAME}'
+                  tag: component
+                  value: replication
+                -
+                  tag: replicaset
+                  value: '{#RS_NAME}'
               trigger_prototypes:
                 -
                   uuid: 778d0b15affe4867b3e7f3e396c2a700
                   expression: 'min(/MongoDB node by Zabbix agent 2/mongodb.rs.lag[{#RS_NAME}],5m)>{$MONGODB.REPL.LAG.MAX.WARN}'
                   name: 'MongoDB: Replication lag with primary is too high (over {$MONGODB.REPL.LAG.MAX.WARN} in 5m)'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: be060c8d3fec46d5832f8047d3512903
               name: 'MongoDB: Network bytes, rate'
@@ -2241,8 +2491,14 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB Replica Set: {#RS_NAME}'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: replication
+                -
+                  tag: replicaset
+                  value: '{#RS_NAME}'
             -
               uuid: 68b7ac3fee984352bab02b07e0823f51
               name: 'MongoDB: Network getmores, ms/s'
@@ -2266,8 +2522,14 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB Replica Set: {#RS_NAME}'
+                  tag: component
+                  value: operations
+                -
+                  tag: component
+                  value: replication
+                -
+                  tag: replicaset
+                  value: '{#RS_NAME}'
             -
               uuid: 86d9ddbfc35447c7889bef826bab016f
               name: 'MongoDB: Network getmores, rate'
@@ -2290,8 +2552,14 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB Replica Set: {#RS_NAME}'
+                  tag: component
+                  value: operations
+                -
+                  tag: component
+                  value: replication
+                -
+                  tag: replicaset
+                  value: '{#RS_NAME}'
             -
               uuid: d2b3075c9728473a9dc8a0585ce43cfd
               name: 'MongoDB: Network ops, rate'
@@ -2314,8 +2582,14 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB Replica Set: {#RS_NAME}'
+                  tag: component
+                  value: operations
+                -
+                  tag: component
+                  value: replication
+                -
+                  tag: replicaset
+                  value: '{#RS_NAME}'
             -
               uuid: 7f9d03a683764e32a35b9c1d4da5ddab
               name: 'MongoDB: Network readers created, rate'
@@ -2338,8 +2612,14 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB Replica Set: {#RS_NAME}'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: replication
+                -
+                  tag: replicaset
+                  value: '{#RS_NAME}'
             -
               uuid: 341410549bfd46058a9cb289b3254639
               name: 'MongoDB {#RS_NAME}: Oplog time diff'
@@ -2358,8 +2638,11 @@ zabbix_export:
                 key: 'mongodb.oplog.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB Replica Set: {#RS_NAME}'
+                  tag: component
+                  value: replication
+                -
+                  tag: replicaset
+                  value: '{#RS_NAME}'
             -
               uuid: f759273556f5427196c86e822dc7aa95
               name: 'MongoDB: Preload docs, ms/s'
@@ -2384,8 +2667,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB Replica Set: {#RS_NAME}'
+                  tag: component
+                  value: replication
+                -
+                  tag: replicaset
+                  value: '{#RS_NAME}'
             -
               uuid: a364941cb8da416a84c0ca897a04c8f9
               name: 'MongoDB: Preload docs, rate'
@@ -2409,8 +2695,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB Replica Set: {#RS_NAME}'
+                  tag: component
+                  value: replication
+                -
+                  tag: replicaset
+                  value: '{#RS_NAME}'
             -
               uuid: c78b8e62a12b466ea6f1de84d0e9080a
               name: 'MongoDB: Preload indexes, ms/s'
@@ -2435,8 +2724,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB Replica Set: {#RS_NAME}'
+                  tag: component
+                  value: replication
+                -
+                  tag: replicaset
+                  value: '{#RS_NAME}'
             -
               uuid: ce37bf73939041ab869e4b2faaaedae3
               name: 'MongoDB: Preload indexes, rate'
@@ -2460,8 +2752,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB Replica Set: {#RS_NAME}'
+                  tag: component
+                  value: replication
+                -
+                  tag: replicaset
+                  value: '{#RS_NAME}'
             -
               uuid: 49e786da687a4b36a17bf617026e3c83
               name: 'MongoDB: Node state'
@@ -2485,8 +2780,11 @@ zabbix_export:
                 key: 'mongodb.rs.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB Replica Set: {#RS_NAME}'
+                  tag: component
+                  value: replication
+                -
+                  tag: replicaset
+                  value: '{#RS_NAME}'
               trigger_prototypes:
                 -
                   uuid: f9f29647a3db426c9c303fc47cfc48eb
@@ -2496,6 +2794,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'Node in ReplicaSet  changed the state. Ack to close.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 211d5f6768c044f8ac959724160d3ddc
               name: 'MongoDB: Number of replicas'
@@ -2518,8 +2820,11 @@ zabbix_export:
                 key: 'mongodb.rs.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB Replica Set: {#RS_NAME}'
+                  tag: component
+                  value: replication
+                -
+                  tag: replicaset
+                  value: '{#RS_NAME}'
             -
               uuid: 4b81b6e4ce1644689e5d8a4490650e6b
               name: 'MongoDB: Unhealthy replicas'
@@ -2550,8 +2855,11 @@ zabbix_export:
                 key: 'mongodb.rs.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB Replica Set: {#RS_NAME}'
+                  tag: component
+                  value: replication
+                -
+                  tag: replicaset
+                  value: '{#RS_NAME}'
             -
               uuid: b8d4a32cfa9f4b4fb5177e3389d15a5a
               name: 'MongoDB: Number of unhealthy replicas'
@@ -2574,14 +2882,21 @@ zabbix_export:
                 key: 'mongodb.rs.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB Replica Set: {#RS_NAME}'
+                  tag: component
+                  value: replication
+                -
+                  tag: replicaset
+                  value: '{#RS_NAME}'
           trigger_prototypes:
             -
               uuid: 975c5e5817b148ba8a8d551ac42053d0
               expression: 'last(/MongoDB node by Zabbix agent 2/mongodb.rs.unhealthy_count[{#RS_NAME}])>0 and length(last(/MongoDB node by Zabbix agent 2/mongodb.rs.unhealthy[{#RS_NAME}]))>0'
               name: 'MongoDB: There are unhealthy replicas in ReplicaSet'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: availability
           graph_prototypes:
             -
               uuid: 52724c49dd544470916eab1301be30da
@@ -2685,8 +3000,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: MongoDB
+                  tag: component
+                  value: cache
+                -
+                  tag: component
+                  value: wired-tiger
             -
               uuid: 20edd994c8b04e35bea96e6eacd33611
               name: 'MongoDB: WiredTiger cache: bytes, max'
@@ -2705,8 +3023,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: MongoDB
+                  tag: component
+                  value: cache
+                -
+                  tag: component
+                  value: wired-tiger
             -
               uuid: 4e07f3e517bf41c1b42661d3bbd5237e
               name: 'MongoDB: WiredTiger cache: max page size at eviction'
@@ -2725,8 +3046,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: MongoDB
+                  tag: component
+                  value: cache
+                -
+                  tag: component
+                  value: wired-tiger
             -
               uuid: 692685a9f3d9461daa88fdfcb0771e05
               name: 'MongoDB: WiredTiger cache: modified pages evicted'
@@ -2744,8 +3068,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: MongoDB
+                  tag: component
+                  value: cache
+                -
+                  tag: component
+                  value: wired-tiger
             -
               uuid: 634060250f474f269aed1df61f709ca7
               name: 'MongoDB: WiredTiger cache: pages evicted by application threads, rate'
@@ -2764,8 +3091,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: MongoDB
+                  tag: component
+                  value: cache
+                -
+                  tag: component
+                  value: wired-tiger
             -
               uuid: 547ccf6f4c7f4629831e39f72cbcfb70
               name: 'MongoDB: WiredTiger cache: pages held in cache'
@@ -2783,8 +3113,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: MongoDB
+                  tag: component
+                  value: cache
+                -
+                  tag: component
+                  value: wired-tiger
             -
               uuid: c01890f434b14e998e2aea7d61d600e5
               name: 'MongoDB: WiredTiger cache: pages read into cache'
@@ -2802,8 +3135,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: MongoDB
+                  tag: component
+                  value: cache
+                -
+                  tag: component
+                  value: wired-tiger
             -
               uuid: 0aa52db6d7684a2496fb0599139cd142
               name: 'MongoDB: WiredTiger cache: pages written from cache'
@@ -2821,8 +3157,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: MongoDB
+                  tag: component
+                  value: cache
+                -
+                  tag: component
+                  value: wired-tiger
             -
               uuid: 851100dc722b4e74883fa469e062a2e2
               name: 'MongoDB: WiredTiger cache: in-memory page splits'
@@ -2840,8 +3179,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: MongoDB
+                  tag: component
+                  value: cache
+                -
+                  tag: component
+                  value: wired-tiger
             -
               uuid: 85706ecdaa0e4c789a6542cbde35e80a
               name: 'MongoDB: WiredTiger cache: tracked dirty bytes in the cache'
@@ -2860,8 +3202,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: MongoDB
+                  tag: component
+                  value: cache
+                -
+                  tag: component
+                  value: wired-tiger
             -
               uuid: 7993e04be54b4dc0b663a105b7b9a3c4
               name: 'MongoDB: WiredTiger cache: unmodified pages evicted'
@@ -2879,8 +3224,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: MongoDB
+                  tag: component
+                  value: cache
+                -
+                  tag: component
+                  value: wired-tiger
             -
               uuid: b1a9800865db4ac8959bbdc4b2ab39ee
               name: 'MongoDB: WiredTiger concurrent transactions: read, available'
@@ -2898,8 +3246,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: MongoDB
+                  tag: component
+                  value: transactions
+                -
+                  tag: component
+                  value: wired-tiger
               trigger_prototypes:
                 -
                   uuid: 967928b915f64623b4416ed0dbf6ba98
@@ -2909,6 +3260,10 @@ zabbix_export:
                   description: |
                     "Too few available read tickets.
                     When the number of available read tickets remaining reaches zero, new read requests will be queued until a new read ticket is available."
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: b9415bf5203840209e149a6be4b110a1
               name: 'MongoDB: WiredTiger concurrent transactions: read, out'
@@ -2926,8 +3281,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: MongoDB
+                  tag: component
+                  value: transactions
+                -
+                  tag: component
+                  value: wired-tiger
             -
               uuid: 46c67d017c5040f691695fcd7645c224
               name: 'MongoDB: WiredTiger concurrent transactions: read, total tickets'
@@ -2945,8 +3303,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: MongoDB
+                  tag: component
+                  value: transactions
+                -
+                  tag: component
+                  value: wired-tiger
             -
               uuid: cb36bdd5ce0442cca03e46436f82c6a2
               name: 'MongoDB: WiredTiger concurrent transactions: write, available'
@@ -2964,8 +3325,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: MongoDB
+                  tag: component
+                  value: transactions
+                -
+                  tag: component
+                  value: wired-tiger
               trigger_prototypes:
                 -
                   uuid: 485e6e846f274b528902b3ffd08f2fc4
@@ -2975,6 +3339,10 @@ zabbix_export:
                   description: |
                     "Too few available write tickets.
                     When the number of available write tickets remaining reaches zero, new write requests will be queued until a new write ticket is available."
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: b997757256e441dca58758192126ac44
               name: 'MongoDB: WiredTiger concurrent transactions: write, out'
@@ -2992,8 +3360,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: MongoDB
+                  tag: component
+                  value: transactions
+                -
+                  tag: component
+                  value: wired-tiger
             -
               uuid: e9eb61954ab6462d9dbcf9206467b076
               name: 'MongoDB: WiredTiger concurrent transactions: write, total tickets'
@@ -3011,8 +3382,11 @@ zabbix_export:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
                 -
-                  tag: Application
-                  value: MongoDB
+                  tag: component
+                  value: transactions
+                -
+                  tag: component
+                  value: wired-tiger
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           preprocessing:
@@ -3026,6 +3400,13 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+      tags:
+        -
+          tag: class
+          value: database
+        -
+          tag: target
+          value: mongodb-node
       macros:
         -
           macro: '{$MONGODB.CONNS.PCT.USED.MAX.WARN}'
@@ -3135,6 +3516,10 @@ zabbix_export:
       name: 'MongoDB: Total number of open connections is too high (over {$MONGODB.CONNS.PCT.USED.MAX.WARN%} in 5m)'
       priority: WARNING
       description: 'Too few available connections. If MongoDB runs low on connections, in may not be able to handle incoming requests in a timely manner.'
+      tags:
+        -
+          tag: scope
+          value: capacity
   graphs:
     -
       uuid: b018e24581464b0282df09fb9d6fc129

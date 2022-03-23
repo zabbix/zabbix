@@ -17,15 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "log.h"
-
-#include "zbxalgo.h"
-#include "../zbxalgo/vectorimpl.h"
-#include "zbxvariant.h"
-#include "zbxserialize.h"
-#include "zbxserver.h"
+#include "zbxeval.h"
 #include "eval.h"
+
+#include "../zbxalgo/vectorimpl.h"
 
 ZBX_VECTOR_IMPL(eval_token, zbx_eval_token_t)
 

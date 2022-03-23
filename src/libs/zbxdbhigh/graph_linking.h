@@ -20,10 +20,8 @@
 #ifndef ZABBIX_GRAPH_LINKING_H
 #define ZABBIX_GRAPH_LINKING_H
 
-#include "log.h"
 #include "common.h"
 #include "zbxalgo.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
 
 int	DBcopy_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids);
 

@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 The template to monitor InfluxDB by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -18,7 +18,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 This template works with self-hosted InfluxDB instances. Internal service metrics are collected from InfluxDB /metrics endpoint.
 For organization discovery template need to use Authorization via API token. See docs: https://docs.influxdata.com/influxdb/v2.0/security/tokens/
@@ -80,7 +80,7 @@ There are no template links in this template.
 |InfluxDB |InfluxDB: [{#ORG_NAME}] Query requests, success |<p>Total number of query requests with status 200 per second.</p> |DEPENDENT |influxdb.org.query_request.success.rate["{#ORG_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="http_query_request_count" && @.labels.status == "200" && @.labels.endpoint == "/api/v2/query" && @.labels.org_id == "{#ORG_ID}") ].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |InfluxDB |InfluxDB: [{#ORG_NAME}] Query response bytes, success |<p>Count of bytes returned with status 200 per second.</p> |DEPENDENT |influxdb.org.http_query_response_bytes.success.rate["{#ORG_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="http_query_response_bytes" && @.labels.status == "200" && @.labels.endpoint == "/api/v2/query" && @.labels.org_id == "{#ORG_ID}") ].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |InfluxDB |InfluxDB: [{#ORG_NAME}] Query response bytes, failed |<p>Count of bytes returned with status not 200 per second.</p> |DEPENDENT |influxdb.org.http_query_response_bytes.failed.rate["{#ORG_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="http_query_response_bytes" && @.labels.status != "200" && @.labels.endpoint == "/api/v2/query" && @.labels.org_id == "{#ORG_ID}") ].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
-|Zabbix_raw_items |InfluxDB: Get instance metrics |<p>-</p> |HTTP_AGENT |influx.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- PROMETHEUS_TO_JSON</p> |
+|Zabbix raw items |InfluxDB: Get instance metrics |<p>-</p> |HTTP_AGENT |influx.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- PROMETHEUS_TO_JSON</p> |
 
 ## Triggers
 
@@ -96,5 +96,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 

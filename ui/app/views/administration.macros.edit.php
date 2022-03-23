@@ -27,7 +27,8 @@ $this->includeJsFile('administration.macros.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Macros'))
-	->setTitleSubmenu(getAdministrationGeneralSubmenu());
+	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_MACROS_EDIT));
 
 $table = (new CTable())
 	->setId('tbl_macros')

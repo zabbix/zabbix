@@ -1107,8 +1107,7 @@ function getDataOverviewCellData(array $db_items, array $data, int $show_suppres
  *
  * @return array
  */
-function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?array $tags,
-		int $evaltype = TAG_EVAL_TYPE_AND_OR): array {
+function getDataOverviewItems(?array $groupids, ?array $hostids, ?array $tags, int $evaltype): array {
 
 	if ($hostids === null) {
 		$limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE) + 1;
@@ -2187,6 +2186,9 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 			'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
 			'error_handler_params' => ''
 		];
+
+		// Remove fictional field that doesn't belong in DB and API.
+		unset($step['sortorder']);
 	}
 	unset($step);
 

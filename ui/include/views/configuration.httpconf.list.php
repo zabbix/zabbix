@@ -90,6 +90,10 @@ $filter = (new CFilter())
 
 $widget = (new CWidget())
 	->setTitle(_('Web monitoring'))
+	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
+		? CDocHelper::CONFIGURATION_HOST_HTTPCONF_LIST
+		: CDocHelper::CONFIGURATION_TEMPLATES_HTTPCONF_LIST
+	))
 	->setControls(
 		(new CTag('nav', true, ($data['hostid'] > 0)
 			? new CRedirectButton(_('Create web scenario'), (new CUrl('httpconf.php'))
@@ -233,3 +237,7 @@ $httpForm->addItem([$httpTable, $data['paging'], new CActionButtonList('action',
 $widget->addItem($httpForm);
 
 $widget->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
+	->show();

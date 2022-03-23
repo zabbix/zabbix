@@ -23,8 +23,14 @@
  * @var CView $this
  */
 
+require_once dirname(__FILE__).'/js/configuration.item.prototype.list.js.php';
+
 $widget = (new CWidget())
 	->setTitle(_('Item prototypes'))
+	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
+		? CDocHelper::CONFIGURATION_HOST_ITEM_PROTOTYPE_LIST
+		: CDocHelper::CONFIGURATION_TEMPLATES_ITEM_PROTOTYPE_LIST
+	))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())->addItem(new CRedirectButton(_('Create item prototype'),
@@ -55,7 +61,7 @@ $itemTable = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		_('Wizard'),
+		'',
 		make_sorting_header(_('Name'),'name', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Key'), 'key_', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Interval'), 'delay', $data['sort'], $data['sortorder'], $url),
@@ -143,7 +149,14 @@ foreach ($data['items'] as $item) {
 		$item['delay'] = $update_interval_parser->getDelay();
 	}
 
-	$item_menu = CMenuPopupHelper::getItemPrototype(['itemid' => $item['itemid'], 'context' => $data['context']]);
+	$item_menu = CMenuPopupHelper::getItemPrototypeConfiguration([
+		'itemid' => $item['itemid'],
+		'context' => $data['context'],
+		'backurl' => (new CUrl('disc_prototypes.php'))
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+			->setArgument('context', $data['context'])
+			->getUrl()
+	]);
 
 	$wizard = (new CButton(null))
 		->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
@@ -195,8 +208,9 @@ $itemForm->addItem([
 			'popup.massupdate.itemprototype' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
-						"return openMassupdatePopup('popup.massupdate.itemprototype', {}, {
-							dialogue_class: 'modal-popup-preprocessing'
+						"openMassupdatePopup('popup.massupdate.itemprototype', {}, {
+							dialogue_class: 'modal-popup-preprocessing',
+							trigger_element: this
 						});"
 					)
 					->addClass(ZBX_STYLE_BTN_ALT)

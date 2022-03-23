@@ -32,7 +32,8 @@ type Plugin struct {
 }
 
 type Options struct {
-	Timeout int `conf:"optional,range=1:30"`
+	plugin.SystemOptions `conf:"optional,name=System"`
+	Timeout              int `conf:"optional,range=1:30"`
 }
 
 var impl Plugin

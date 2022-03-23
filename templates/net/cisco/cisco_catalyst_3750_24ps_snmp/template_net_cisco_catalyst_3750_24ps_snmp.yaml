@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-17T07:22:56Z'
+  date: '2022-03-01T09:26:30Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -24,7 +24,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418396-discussion-thread-for-official-zabbix-templates-for-cisco
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Network devices'
@@ -39,8 +39,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: e66bcbef8f1d45fc8bc5d64e5dc848dc
@@ -48,6 +51,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: c40980a878c94c3db61f80e206b890ec
           name: 'ICMP loss'
@@ -58,8 +65,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 20ee878da19f4d758e4372c6c918c773
@@ -71,6 +81,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco Catalyst 3750V2-24PS SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: d1c2bc9cee7046c2a17f876dce1f063f
           name: 'ICMP response time'
@@ -81,8 +98,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 0facff81f25c43869e86a0541f0e3ecd
@@ -97,6 +117,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco Catalyst 3750V2-24PS SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 612f59e4d582463bb386046a1d4342da
           name: 'SNMP traps (fallback)'
@@ -109,8 +136,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 582260ed2f2d4f419651bc526e41b733
           name: 'System contact details'
@@ -132,8 +159,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 956ce9527d604b4493d52815799590ca
           name: 'System description'
@@ -156,8 +183,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: fb4df28cb44941e5b39348afe421a2ad
           name: 'Hardware model name'
@@ -177,8 +204,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: 664548f83e924a8aaa125579f230d0e9
           name: 'Hardware serial number'
@@ -198,8 +225,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 052fb88fae1349d5b9a5fa5bcf24d0fa
@@ -208,6 +235,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: b6d1ee7b8b3e42e380f6aa44bf39c008
           name: 'System location'
@@ -229,8 +260,8 @@ zabbix_export:
                 - 1h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 2f5f5b376c034f439ae19ed24e4d8bc5
           name: 'System name'
@@ -252,8 +283,8 @@ zabbix_export:
                 - 1h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: a678341d899846158fea2deb57f923cf
@@ -262,6 +293,10 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: d791eebac4884924b7f40c08174aef00
           name: 'System object ID'
@@ -281,8 +316,8 @@ zabbix_export:
                 - 1h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 2c7c4907dfdd46d18321f80b00152771
           name: 'Operating system'
@@ -307,8 +342,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 3e5d53072021491bb2af276aff3e1a0b
@@ -322,6 +357,10 @@ zabbix_export:
                 -
                   name: 'System name has changed (new name: {ITEM.VALUE})'
                   expression: 'last(/Cisco Catalyst 3750V2-24PS SNMP/system.name,#1)<>last(/Cisco Catalyst 3750V2-24PS SNMP/system.name,#2) and length(last(/Cisco Catalyst 3750V2-24PS SNMP/system.name))>0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: a9070d15765c4acaa856dde8ece57340
           name: Uptime
@@ -341,8 +380,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: a9633d3df8724c7cba6dfc6ec790c1fd
@@ -351,6 +390,10 @@ zabbix_export:
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 92d5d0c598674f20a0228cc66a433e84
           name: 'SNMP agent availability'
@@ -361,8 +404,8 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 0f2d48a1529c4ae49d58d466ed3a76e7
@@ -371,6 +414,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 8635e89e60fd4c65a47a6da2bf3c072d
@@ -403,8 +450,11 @@ zabbix_export:
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-index
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 471acd7fa3ad4040aba27535905bfe63
@@ -413,6 +463,13 @@ zabbix_export:
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: ab67e338f5784971b7b5a1cac20097fb
@@ -465,8 +522,11 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: serial-number
+                -
+                  tag: entity
+                  value: '{#ENT_NAME}'
               trigger_prototypes:
                 -
                   uuid: 70aca80b5a8d414686967b104d301023
@@ -474,6 +534,10 @@ zabbix_export:
                   name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
         -
           uuid: 235f74f154bc422482f524b9a4c08125
           name: 'FAN discovery'
@@ -497,8 +561,11 @@ zabbix_export:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
+                -
+                  tag: fan
+                  value: '{#SNMPVALUE}'
               trigger_prototypes:
                 -
                   uuid: e2b72d874d4f48e79aab3a6d514663b4
@@ -507,6 +574,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: d4bf389614f54be08ffd8d010e480da6
                   expression: 'last(/Cisco Catalyst 3750V2-24PS SNMP/sensor.fan.status[{#SNMPINDEX}])=2'
@@ -518,6 +592,13 @@ zabbix_export:
                     -
                       name: '{#SNMPVALUE}: Fan is in critical state'
                       expression: 'last(/Cisco Catalyst 3750V2-24PS SNMP/sensor.fan.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24PS SNMP/sensor.fan.status[{#SNMPINDEX}])=4'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 86589a8d54cb4cfc81c38a6eeac05b80
           name: 'Memory discovery'
@@ -544,8 +625,11 @@ zabbix_export:
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
+                -
+                  tag: memory
+                  value: '{#SNMPVALUE}'
             -
               uuid: 73a46e97c57e4fca912e74a7253e21f6
               name: '{#SNMPVALUE}: Used memory'
@@ -561,8 +645,11 @@ zabbix_export:
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
+                -
+                  tag: memory
+                  value: '{#SNMPVALUE}'
             -
               uuid: 50638b5c78584c99978c6b57bec520d4
               name: '{#SNMPVALUE}: Memory utilization'
@@ -575,8 +662,11 @@ zabbix_export:
               description: 'Memory utilization in %'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
+                -
+                  tag: memory
+                  value: '{#SNMPVALUE}'
               trigger_prototypes:
                 -
                   uuid: 918cf48b69d545dbb9f177fa1440f4cb
@@ -584,6 +674,13 @@ zabbix_export:
                   name: '{#SNMPVALUE}: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: e86ef2331d1644ca80b28f0855a7a7e9
@@ -684,8 +781,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 677b9af6e45e42c1bc59772453778de2
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -703,8 +806,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: df6bfacc52e1487d9f359c23545ceb84
@@ -719,6 +828,10 @@ zabbix_export:
                     -
                       name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                       expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Cisco Catalyst 3750V2-24PS SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: d745a153bdd443afb3b6c690a6cb1834
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -741,8 +854,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: e000bdb0549747b98ef9ef824ead399d
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -764,8 +883,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: bf863b01e546466e9f7516435fd34631
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -783,8 +908,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: aa49d99c77d64e31ad2369d09e547cab
@@ -799,6 +930,10 @@ zabbix_export:
                     -
                       name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                       expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Cisco Catalyst 3750V2-24PS SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 8b9edde24248456f902880625e33e289
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -821,8 +956,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: fa0715f32e7441958e1d555efe7ccc9f
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -845,8 +986,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 94183e5ed20f4f5495162b696097fd70
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -872,8 +1019,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 41d6b4a9fde546ae88005efdef1f4525
@@ -885,6 +1038,10 @@ zabbix_export:
                     This trigger expression works as follows:
                     1. Can be triggered if operations status is down.
                     2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 27b0676374f847ad8330028e62b7b6af
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -895,7 +1052,7 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 The type of interface.
-                Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),
+                Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),
                 through updating the syntax of the IANAifType textual convention.
               valuemap:
                 name: 'IF-MIB::ifType'
@@ -906,8 +1063,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: d6aaa83ed4744ef982a177b77fb1f2c4
@@ -935,6 +1098,10 @@ zabbix_export:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Cisco Catalyst 3750V2-24PS SNMP/net.if.status[{#SNMPINDEX}])=2)'
+              tags:
+                -
+                  tag: scope
+                  value: notice
             -
               uuid: 9e3e50611ef242b0b200c0a6343f4c5c
               expression: |
@@ -950,6 +1117,10 @@ zabbix_export:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Cisco Catalyst 3750V2-24PS SNMP/net.if.status[{#SNMPINDEX}])=2)'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 7c624697cd7b41d682b5856a3040737e
               expression: |
@@ -965,6 +1136,10 @@ zabbix_export:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Cisco Catalyst 3750V2-24PS SNMP/net.if.status[{#SNMPINDEX}])=2)'
+              tags:
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: f277c62e4c614924a79715beae06a63b
@@ -1069,8 +1244,14 @@ zabbix_export:
                 name: 'EtherLike-MIB::dot3StatsDuplexStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: df8eb5498b8a41709db02b742fa24d6a
@@ -1078,6 +1259,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 400dddbb882445af9e7b986bc4529908
           name: 'PSU discovery'
@@ -1101,8 +1286,11 @@ zabbix_export:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
+                -
+                  tag: power-supply
+                  value: '{#SNMPVALUE}'
               trigger_prototypes:
                 -
                   uuid: 1d509ec30e8349538d9d2b2447b70253
@@ -1111,6 +1299,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 4ef4e09de93e4cfbb2aab4f22e78c223
                   expression: 'last(/Cisco Catalyst 3750V2-24PS SNMP/sensor.psu.status[{#SNMPINDEX}])=2'
@@ -1122,6 +1314,10 @@ zabbix_export:
                     -
                       name: '{#SNMPVALUE}: Power supply is in critical state'
                       expression: 'last(/Cisco Catalyst 3750V2-24PS SNMP/sensor.psu.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24PS SNMP/sensor.psu.status[{#SNMPINDEX}])=4'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
         -
           uuid: b4eb58fb8820452d89447b786cee3361
           name: 'Temperature discovery'
@@ -1148,8 +1344,11 @@ zabbix_export:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
+                -
+                  tag: sensor
+                  value: '{#SNMPVALUE}'
               trigger_prototypes:
                 -
                   uuid: 506c98e9c29247cba7c58ca343c6fdf4
@@ -1158,6 +1357,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor state'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: d6b91f3e280c4d0fa3df0bf3fedd9183
                   expression: 'last(/Cisco Catalyst 3750V2-24PS SNMP/sensor.temp.status[{#SNMPINDEX}])=2'
@@ -1169,6 +1375,13 @@ zabbix_export:
                     -
                       name: '{#SNMPVALUE}: Temperature is in critical state'
                       expression: 'last(/Cisco Catalyst 3750V2-24PS SNMP/sensor.temp.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24PS SNMP/sensor.temp.status[{#SNMPINDEX}])=4'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 44a96489bbfc4245b8fe0ffee74e0c96
               name: '{#SNMPVALUE}: Temperature'
@@ -1184,8 +1397,11 @@ zabbix_export:
                 The current measurement of the test point being instrumented.
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
+                -
+                  tag: sensor
+                  value: '{#SNMPVALUE}'
               trigger_prototypes:
                 -
                   uuid: 63e41d0fe43c4daa8fd2e4eee6e4ed8a
@@ -1196,6 +1412,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: cc09047db63a435e816e560c2007b43a
                   expression: 'avg(/Cisco Catalyst 3750V2-24PS SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}'
@@ -1210,6 +1433,13 @@ zabbix_export:
                       name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}'
                       expression: 'avg(/Cisco Catalyst 3750V2-24PS SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
                       recovery_expression: 'max(/Cisco Catalyst 3750V2-24PS SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 156a35b375ff4978a2b98f38785897a5
                   expression: 'avg(/Cisco Catalyst 3750V2-24PS SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
@@ -1218,6 +1448,26 @@ zabbix_export:
                   name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: cisco
+        -
+          tag: target
+          value: cisco-catalyst
+        -
+          tag: target
+          value: cisco-catalyst-3750v2-24ps
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'

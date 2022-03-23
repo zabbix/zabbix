@@ -17,13 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-
-#include "zbxjson.h"
 #include "json_parser.h"
-#include "json.h"
 
-#include "log.h"
+#include "common.h"
+#include "json.h"
 
 static zbx_int64_t	json_parse_object(const char *start, char **error);
 
@@ -437,7 +434,7 @@ zbx_int64_t	zbx_json_validate(const char *start, char **error)
 				return 0;
 			break;
 		default:
-			/* not an json data, failing */
+			/* not json data, failing */
 			return json_error("invalid object format, expected opening character '{' or '['", start, error);
 	}
 

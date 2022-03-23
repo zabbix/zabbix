@@ -17,16 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "proxyconfig.h"
+
 #include "db.h"
 #include "log.h"
 #include "proxy.h"
+#include "zbxrtc.h"
+#include "zbxcommshigh.h"
 
-#include "../../libs/zbxcrypto/tls_tcp_active.h"
 #include "zbxcompress.h"
-#include "zbxipcservice.h"
-
-#include "proxyconfig.h"
 
 /******************************************************************************
  *                                                                            *
@@ -144,14 +143,10 @@ void	recv_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	if (SUCCEED == process_proxyconfig(&jp_data, &jp_kvs_paths))
 	{
-		unsigned char	*result;
-		char		*error = NULL;
+		char	*error = NULL;
 
-		if (SUCCEED == zbx_ipc_async_exchange(ZBX_IPC_SERVICE_CONFIG, ZBX_IPC_CONFIG_RELOAD_REQUEST,
-				ZBX_IPC_WAIT_FOREVER, NULL, 0, &result, &error))
+		if (SUCCEED == zbx_rtc_reload_config_cache(&error))
 		{
-			zbx_free(result);
-
 			if (NULL != jp_kvs_paths.start)
 				DCsync_kvs_paths(&jp_kvs_paths);
 		}

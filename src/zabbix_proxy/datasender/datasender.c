@@ -17,19 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "comms.h"
+#include "datasender.h"
+
+#include "zbxcommshigh.h"
 #include "db.h"
 #include "log.h"
 #include "daemon.h"
-#include "zbxjson.h"
 #include "proxy.h"
 #include "zbxself.h"
-#include "dbcache.h"
 #include "zbxtasks.h"
-#include "dbcache.h"
-
-#include "datasender.h"
 #include "zbxcrypto.h"
 #include "zbxcompress.h"
 
@@ -184,14 +180,19 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 		reserved = j.buffer_size;
 		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
 
+		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+
 		/* retry till have a connection */
-		if (FAIL == connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
+		if (FAIL == zbx_connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
 				configured_tls_connect_mode, CONFIG_PROXYDATA_FREQUENCY, LOG_LEVEL_WARNING))
 		{
+			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 			goto clean;
 		}
 
-		upload_state = put_data_to_server(&sock, &buffer, buffer_size, reserved, &error);
+		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
+		upload_state = zbx_put_data_to_server(&sock, &buffer, buffer_size, reserved, &error);
 		get_hist_upload_state(sock.buffer, hist_upload_state);
 
 		if (SUCCEED != upload_state)
@@ -232,7 +233,23 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 				}
 
 				if (0 != (flags & ZBX_DATASENDER_HISTORY))
+				{
+					zbx_uint64_t	history_maxid;
+					DB_RESULT	result;
+					DB_ROW		row;
+
+					result = DBselect("select max(id) from proxy_history");
+
+					if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+						history_maxid = history_lastid;
+					else
+						ZBX_STR2UINT64(history_maxid, row[0]);
+
+					DBfree_result(result);
+
+					reset_proxy_history_count(history_maxid - history_lastid);
 					proxy_set_hist_lastid(history_lastid);
+				}
 
 				if (0 != (flags & ZBX_DATASENDER_DISCOVERY))
 					proxy_set_dhis_lastid(discovery_lastid);
@@ -244,7 +261,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 			}
 		}
 
-		disconnect_server(&sock);
+		zbx_disconnect_from_server(&sock);
 	}
 clean:
 	zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);

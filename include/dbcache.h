@@ -20,11 +20,9 @@
 #ifndef ZABBIX_DBCACHE_H
 #define ZABBIX_DBCACHE_H
 
+#include "sysinfo.h" //included for convenience
 #include "db.h"
-#include "comms.h"
-#include "sysinfo.h"
-#include "zbxalgo.h"
-#include "zbxjson.h"
+#include "zbxcomms.h"
 #include "memalloc.h"
 #include "zbxeval.h"
 
@@ -207,6 +205,7 @@ typedef struct
 	zbx_uint64_t	itemid;
 	char		*function;
 	char		*parameter;
+	unsigned char	type;
 }
 DC_FUNCTION;
 
@@ -619,6 +618,10 @@ void	zbx_log_sync_history_cache_progress(void);
 int	init_database_cache(char **error);
 void	free_database_cache(int);
 
+void	change_proxy_history_count(int change_count);
+void	reset_proxy_history_count(int reset);
+int	get_proxy_history_count(void);
+
 #define ZBX_STATS_HISTORY_COUNTER	0
 #define ZBX_STATS_HISTORY_FLOAT_COUNTER	1
 #define ZBX_STATS_HISTORY_UINT_COUNTER	2
@@ -807,8 +810,8 @@ void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_u
 void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hashset_t *hosts);
 
 int	DCget_proxy_nodata_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *nodata_win, int *lastaccess);
-int	DCget_proxy_delay(zbx_uint64_t hostid, int *delay);
 int	DCget_proxy_delay_by_name(const char *name, int *delay, char **error);
+int	DCget_proxy_lastaccess_by_name(const char *name, int *lastaccess, char **error);
 
 unsigned int	DCget_internal_action_count(void);
 

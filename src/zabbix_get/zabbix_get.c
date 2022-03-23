@@ -18,11 +18,7 @@
 **/
 
 #include "common.h"
-
-#include "threads.h"
-#include "comms.h"
-#include "cfg.h"
-#include "log.h"
+#include "zbxcomms.h"
 #include "zbxgetopt.h"
 #include "zbxcrypto.h"
 

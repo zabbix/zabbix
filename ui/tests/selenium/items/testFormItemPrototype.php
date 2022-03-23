@@ -829,15 +829,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 				'Text'
 			]);
 
-			if ($type == 'Calculated') {
-				$this->zbxTestAssertAttribute("//*[@id='value_type']//li[text()='Character']", 'disabled');
-				$this->zbxTestAssertAttribute("//*[@id='value_type']//li[text()='Log']", 'disabled');
-				$this->zbxTestAssertAttribute("//*[@id='value_type']//li[text()='Text']", 'disabled');
-			}
-			else {
-				$this->zbxTestIsEnabled("//*[@id='value_type']//li[text()='Character']");
-				$this->zbxTestIsEnabled("//*[@id='value_type']//li[text()='Log']");
-				$this->zbxTestIsEnabled("//*[@id='value_type']//li[text()='Text']");
+			foreach (['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text'] as $info_type) {
+				$this->zbxTestIsEnabled('//*[@id="value_type"]//li[text()='.CXPathHelper::escapeQuotes($info_type).']');
 			}
 		}
 

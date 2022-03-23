@@ -307,22 +307,13 @@ class testGraphLinking extends CIntegrationTest {
 	}
 
 	/**
-	* Test graph linking cases.
-	*
-	* @required-components server
-	*/
+	 * Test graph linking cases.
+	 *
+	 * @configurationDataProvider agentConfigurationProvider
+	 * @required-components agent
+	 */
 	public function testGraphLinking_checkGraphsCreate() {
-
-		$this->reloadConfigurationCache();
-
-		self::prepareComponentConfiguration(self::COMPONENT_AGENT, $this->agentConfigurationProvider());
-		self::startComponent(self::COMPONENT_AGENT);
-
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, [
-			'End of DBregister_host_active():SUCCEED'
-		]);
-		sleep(10);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, ['End of DBregister_host_active():SUCCEED']);
 		$this->checkGraphsCreate();
-		self::stopComponent(self::COMPONENT_AGENT);
 	}
 }

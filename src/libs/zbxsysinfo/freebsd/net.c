@@ -19,7 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
-#include "../common/common.h"
+#include "../common/zbxsysinfo_common.h"
 #include "zbxjson.h"
 #include "log.h"
 

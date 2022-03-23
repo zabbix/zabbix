@@ -17,19 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "timer.h"
 
-#include "cfg.h"
-#include "pid.h"
-#include "db.h"
 #include "log.h"
 #include "dbcache.h"
-#include "zbxserver.h"
 #include "daemon.h"
 #include "zbxself.h"
-#include "db.h"
-
-#include "timer.h"
 
 #define ZBX_TIMER_DELAY		SEC_PER_MIN
 

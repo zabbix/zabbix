@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
-#include "comms.h"
-#include "log.h"
 #include "ntp.h"
+
+#include "zbxcomms.h"
+#include "log.h"
+#include "common.h"
 
 #define NTP_SCALE		4294967296.0	/* 2^32, of course! */
 

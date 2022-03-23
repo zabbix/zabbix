@@ -110,4 +110,11 @@ class COverlayDialogElement extends CElement {
 		(new CElementQuery('xpath', '//*['.CXPathHelper::fromClass('overlay-dialogue-body').' or '.
 				CXPathHelper::fromClass('overlay-bg').']'))->waitUntilNotVisible();
 	}
+
+	/**
+	 * Scroll the dialog to the top position.
+	 */
+	public function scrollToTop() {
+		CElementQuery::getDriver()->executeScript('arguments[0].scrollTo(0, 0)', [$this->getContent()]);
+	}
 }

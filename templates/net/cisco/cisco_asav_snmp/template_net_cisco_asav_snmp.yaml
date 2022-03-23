@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-17T06:24:09Z'
+  date: '2022-01-26T09:45:46Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -25,7 +25,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418396-discussion-thread-for-official-zabbix-templates-for-cisco
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Network devices'
@@ -53,8 +53,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: 2d4a058787a141629a33ab98194055f2
           name: 'Cisco ASAv: Location'
@@ -77,8 +77,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: c2e63e282bcd4fd09a80f1be95c089d4
           name: 'Cisco ASAv: System description'
@@ -105,8 +105,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: d20d56dccd494060a4bc130f2951a610
           name: 'Cisco ASAv: Host name'
@@ -130,8 +130,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: 526b1a118bab4c948af0935197a659f6
           name: 'Cisco ASAv: Uptime'
@@ -154,8 +154,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 7fcf46583d2b42f4be6758e85784f28f
@@ -164,6 +164,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 33e87e5fe2774f1fabb93553e782aaa0
           name: 'Cisco ASAv: SNMP agent availability'
@@ -179,8 +183,11 @@ zabbix_export:
                 - 1h
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: application
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 9ee945a0b0b942d7a7e3fcf218f0e82f
@@ -189,6 +196,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 0469f5b40a77457f9447512ed2e75f5e
@@ -215,8 +226,8 @@ zabbix_export:
                 and increases the value range to (0..100).
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
               trigger_prototypes:
                 -
                   uuid: 2e90218795b94ee8b3c01dd79d2dd8b3
@@ -225,6 +236,10 @@ zabbix_export:
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: c3d95f2670f346cda44b3def5a835379
@@ -258,8 +273,8 @@ zabbix_export:
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: a34b4279d8ac40ec8f2d6577ebaa4280
               name: 'Cisco ASAv: {#SNMPVALUE} Used memory'
@@ -274,8 +289,8 @@ zabbix_export:
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: d67342c8a8124b1b89ef5ec36684b2a7
               name: 'Cisco ASAv: {#SNMPVALUE} Memory utilization'
@@ -288,8 +303,8 @@ zabbix_export:
               description: 'Memory utilization in %'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: 688975747f664a15a3bca9dd3e1e0b01
@@ -297,6 +312,13 @@ zabbix_export:
                   name: 'Cisco ASAv: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 388a69f2dfad42ac934d3f09c5e0efd1
@@ -367,7 +389,13 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#CISCO.IF.DESC}'
+                -
+                  tag: interface
                   value: '{#CISCO.IF.NAME}'
             -
               uuid: 17f768ffe6604c678e15bb2538cb8cc5
@@ -388,7 +416,13 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#CISCO.IF.DESC}'
+                -
+                  tag: interface
                   value: '{#CISCO.IF.NAME}'
             -
               uuid: 01c5f157fc6140149dec01f512babadd
@@ -412,7 +446,13 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#CISCO.IF.DESC}'
+                -
+                  tag: interface
                   value: '{#CISCO.IF.NAME}'
             -
               uuid: 263e253c378f4928ad5c5f6fd0ce1cbe
@@ -434,7 +474,13 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#CISCO.IF.DESC}'
+                -
+                  tag: interface
                   value: '{#CISCO.IF.NAME}'
             -
               uuid: 9479f382e7e943e0aa560396d3a4db40
@@ -457,7 +503,13 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#CISCO.IF.DESC}'
+                -
+                  tag: interface
                   value: '{#CISCO.IF.NAME}'
             -
               uuid: 443ce01bb9b04e69a936ec8fb9636720
@@ -482,7 +534,13 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#CISCO.IF.DESC}'
+                -
+                  tag: interface
                   value: '{#CISCO.IF.NAME}'
             -
               uuid: 900bf66a4a7f411f9d9ce231daa8d8a8
@@ -504,7 +562,13 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#CISCO.IF.DESC}'
+                -
+                  tag: interface
                   value: '{#CISCO.IF.NAME}'
             -
               uuid: d7564be184564d06abb1f7a718bdf134
@@ -529,7 +593,13 @@ zabbix_export:
                     - 'return +parseFloat(value).toFixed(0);'
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#CISCO.IF.DESC}'
+                -
+                  tag: interface
                   value: '{#CISCO.IF.NAME}'
             -
               uuid: ceb3a35e289043668d0087255de5c79b
@@ -550,7 +620,13 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#CISCO.IF.DESC}'
+                -
+                  tag: interface
                   value: '{#CISCO.IF.NAME}'
             -
               uuid: 8d51a019f3634b079c2115ccb063840c
@@ -573,7 +649,13 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#CISCO.IF.DESC}'
+                -
+                  tag: interface
                   value: '{#CISCO.IF.NAME}'
               trigger_prototypes:
                 -
@@ -591,6 +673,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 8a97ed7804f042c7b6767f72bcf9a504
               name: 'Cisco ASAv: {#CISCO.IF.NAME} Outgoing broadcast packets'
@@ -612,7 +698,13 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#CISCO.IF.DESC}'
+                -
+                  tag: interface
                   value: '{#CISCO.IF.NAME}'
             -
               uuid: c0918a1acaa049e786a356c25c7dd654
@@ -636,7 +728,13 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#CISCO.IF.DESC}'
+                -
+                  tag: interface
                   value: '{#CISCO.IF.NAME}'
             -
               uuid: 8e9c4d99c0d649e79e2f7f64d91789bf
@@ -662,7 +760,13 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#CISCO.IF.DESC}'
+                -
+                  tag: interface
                   value: '{#CISCO.IF.NAME}'
             -
               uuid: 1439162918d842ab92f4fca35c32279f
@@ -685,7 +789,13 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#CISCO.IF.DESC}'
+                -
+                  tag: interface
                   value: '{#CISCO.IF.NAME}'
             -
               uuid: 559d5ddae7744b19b32993174ef06918
@@ -710,7 +820,13 @@ zabbix_export:
                     - 'return +parseFloat(value).toFixed(0);'
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: interface
+                -
+                  tag: description
+                  value: '{#CISCO.IF.DESC}'
+                -
+                  tag: interface
                   value: '{#CISCO.IF.NAME}'
           graph_prototypes:
             -
@@ -840,7 +956,10 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: physical
+                -
+                  tag: physical
                   value: '{#CISCO.ASAV.PHYS.NAME}'
             -
               uuid: a63fe0420f2e446ca10094fbf04ee4a8
@@ -866,7 +985,10 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: physical
+                -
+                  tag: physical
                   value: '{#CISCO.ASAV.PHYS.NAME}'
             -
               uuid: 862f2607838647b3b173d113e531c931
@@ -899,7 +1021,10 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: physical
+                -
+                  tag: physical
                   value: '{#CISCO.ASAV.PHYS.NAME}'
             -
               uuid: d64c4765f78847cc8071913c5454f433
@@ -931,7 +1056,10 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: physical
+                -
+                  tag: physical
                   value: '{#CISCO.ASAV.PHYS.NAME}'
             -
               uuid: 73739a08da634cd09b857a7512166d7b
@@ -959,7 +1087,10 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: physical
+                -
+                  tag: physical
                   value: '{#CISCO.ASAV.PHYS.NAME}'
             -
               uuid: 21da0a63b5344b099ab21932a4a65dc6
@@ -994,7 +1125,10 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: physical
+                -
+                  tag: physical
                   value: '{#CISCO.ASAV.PHYS.NAME}'
             -
               uuid: 9962cc7467c14221bee66a2f17aba12b
@@ -1024,7 +1158,10 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: physical
+                -
+                  tag: physical
                   value: '{#CISCO.ASAV.PHYS.NAME}'
               trigger_prototypes:
                 -
@@ -1034,6 +1171,10 @@ zabbix_export:
                   priority: INFO
                   description: '{#CISCO.ASAV.PHYS.NAME} serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 698a7613f08048b48d7aad4ad5285562
               name: 'Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} Software revision'
@@ -1062,7 +1203,10 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: physical
+                -
+                  tag: physical
                   value: '{#CISCO.ASAV.PHYS.NAME}'
         -
           uuid: b49543c7150a4e258645b4b076b2454a
@@ -1092,7 +1236,13 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: session
+                -
+                  tag: session-index
+                  value: '{#CISCO.CRAS.INDEX}'
+                -
+                  tag: session-user
                   value: '{#CISCO.CRAS.USER}'
             -
               uuid: 3071310f4f0e4c14bcf47d07a05568cc
@@ -1112,7 +1262,13 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: session
+                -
+                  tag: session-index
+                  value: '{#CISCO.CRAS.INDEX}'
+                -
+                  tag: session-user
                   value: '{#CISCO.CRAS.USER}'
             -
               uuid: 47c84fde7b47415d96d461c28da50526
@@ -1134,7 +1290,13 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: session
+                -
+                  tag: session-index
+                  value: '{#CISCO.CRAS.INDEX}'
+                -
+                  tag: session-user
                   value: '{#CISCO.CRAS.USER}'
             -
               uuid: 901b8473e8054e929a55dd3e5d507d5d
@@ -1156,7 +1318,13 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: session
+                -
+                  tag: session-index
+                  value: '{#CISCO.CRAS.INDEX}'
+                -
+                  tag: session-user
                   value: '{#CISCO.CRAS.USER}'
             -
               uuid: 452348005b1c4b7db194afcf3c95473d
@@ -1178,7 +1346,13 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: session
+                -
+                  tag: session-index
+                  value: '{#CISCO.CRAS.INDEX}'
+                -
+                  tag: session-user
                   value: '{#CISCO.CRAS.USER}'
             -
               uuid: c25050519610453baf3e69042fe77cf0
@@ -1198,7 +1372,13 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: session
+                -
+                  tag: session-index
+                  value: '{#CISCO.CRAS.INDEX}'
+                -
+                  tag: session-user
                   value: '{#CISCO.CRAS.USER}'
             -
               uuid: 63ea7737e7534608b60744ec3b82ffae
@@ -1220,7 +1400,13 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: session
+                -
+                  tag: session-index
+                  value: '{#CISCO.CRAS.INDEX}'
+                -
+                  tag: session-user
                   value: '{#CISCO.CRAS.USER}'
             -
               uuid: c7a05da2f7d84743851e7d628d1e9838
@@ -1247,7 +1433,13 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: session
+                -
+                  tag: session-index
+                  value: '{#CISCO.CRAS.INDEX}'
+                -
+                  tag: session-user
                   value: '{#CISCO.CRAS.USER}'
             -
               uuid: c71e07de9083472a982a827061496d5a
@@ -1274,7 +1466,13 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: session
+                -
+                  tag: session-index
+                  value: '{#CISCO.CRAS.INDEX}'
+                -
+                  tag: session-user
                   value: '{#CISCO.CRAS.USER}'
             -
               uuid: de873aa34ad64f3d91e11d6999950692
@@ -1295,7 +1493,13 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: session
+                -
+                  tag: session-index
+                  value: '{#CISCO.CRAS.INDEX}'
+                -
+                  tag: session-user
                   value: '{#CISCO.CRAS.USER}'
           graph_prototypes:
             -
@@ -1313,6 +1517,16 @@ zabbix_export:
                   item:
                     host: 'Cisco ASAv SNMP'
                     key: 'cisco.asav.session.out.traffic[{#SNMPINDEX}]'
+      tags:
+        -
+          tag: class
+          value: application
+        -
+          tag: target
+          value: cisco
+        -
+          tag: target
+          value: cisco-asav
       macros:
         -
           macro: '{$CISCO.LLD.FILTER.IF.ADMIN.MATCHES}'

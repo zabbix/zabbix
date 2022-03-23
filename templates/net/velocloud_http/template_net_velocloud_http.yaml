@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-17T06:33:51Z'
+  date: '2022-01-26T09:58:15Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -15,7 +15,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Network devices'
@@ -159,14 +159,8 @@ zabbix_export:
               value: '{$VELOCLOUD.URL}'
           tags:
             -
-              tag: data
+              tag: component
               value: raw
-            -
-              tag: target
-              value: velocloud
-            -
-              tag: transport
-              value: script
         -
           uuid: 9df4ba5324d94d0fb54d3231311016a6
           name: 'Velocloud: Clear data'
@@ -187,17 +181,8 @@ zabbix_export:
             key: velocloud.get
           tags:
             -
-              tag: resource
+              tag: component
               value: orchestrator
-            -
-              tag: target
-              value: velocloud
-            -
-              tag: transport
-              value: dependent
-            -
-              tag: type
-              value: text
         -
           uuid: 8a54309d8abc4fc7816b168329243de4
           name: 'Velocloud: Get data collection errors'
@@ -221,17 +206,8 @@ zabbix_export:
             key: velocloud.get
           tags:
             -
-              tag: resource
-              value: errors
-            -
-              tag: target
-              value: velocloud
-            -
-              tag: transport
-              value: dependent
-            -
-              tag: type
-              value: text
+              tag: component
+              value: application
           triggers:
             -
               uuid: a0623655a2fa4f60962ad560b8bb5a13
@@ -239,6 +215,10 @@ zabbix_export:
               name: 'Velocloud: There are errors in aggregate script item'
               priority: WARNING
               description: 'There are errors in aggregate script item.'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 3f589e2191c5419fb89cc33639595ae9
           name: 'Velocloud: Orchestrator API version'
@@ -258,17 +238,8 @@ zabbix_export:
             key: velocloud.get.clear_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: orchestrator
-            -
-              tag: target
-              value: velocloud
-            -
-              tag: transport
-              value: dependent
-            -
-              tag: type
-              value: text
           triggers:
             -
               uuid: 5a95d9c614e74c2c8b6181fc8dff2226
@@ -277,6 +248,10 @@ zabbix_export:
               priority: AVERAGE
               description: 'Zabbix has not received data for items for the last 30 minutes.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: ab24d8fc4c2a4130bca1b4b6d4f311ae
           name: 'Velocloud: Orchestrator build'
@@ -300,17 +275,8 @@ zabbix_export:
             key: velocloud.get.clear_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: orchestrator
-            -
-              tag: target
-              value: velocloud
-            -
-              tag: transport
-              value: dependent
-            -
-              tag: type
-              value: text
           triggers:
             -
               uuid: 37c16b3cbd8b4680ab85a1fea819611f
@@ -319,6 +285,10 @@ zabbix_export:
               priority: INFO
               description: 'Velocloud Orchestrator build has been changed.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 1f60b61051494ab495de4dfe2cd83450
           name: 'Velocloud: Orchestrator version'
@@ -342,17 +312,8 @@ zabbix_export:
             key: velocloud.get.clear_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: orchestrator
-            -
-              tag: target
-              value: velocloud
-            -
-              tag: transport
-              value: dependent
-            -
-              tag: type
-              value: text
           triggers:
             -
               uuid: a1d8e4d61a804c8fb11b33f590f0885c
@@ -361,6 +322,10 @@ zabbix_export:
               priority: INFO
               description: 'Velocloud Orchestrator version has been changed.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 1206789df5b44af7ba1c5416662344dd
           name: 'Velocloud: System properties'
@@ -388,17 +353,8 @@ zabbix_export:
           request_method: POST
           tags:
             -
-              tag: resource
-              value: orchestrator
-            -
-              tag: target
-              value: velocloud
-            -
-              tag: transport
-              value: dependent
-            -
-              tag: type
-              value: text
+              tag: component
+              value: application
           triggers:
             -
               uuid: 58541dfe798843fa822276e84a32b919
@@ -407,6 +363,10 @@ zabbix_export:
               priority: INFO
               description: 'System properties have changed.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
       discovery_rules:
         -
           uuid: 522ba6551cc64094b60a136d07c9921d
@@ -466,23 +426,14 @@ zabbix_export:
                   tag: city
                   value: '{#CITY}'
                 -
+                  tag: component
+                  value: edge
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: edge
-                -
                   tag: state
                   value: '{#STATE}'
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: State
             -
               uuid: cecb2a3698704c4c89ef12eb3bb39222
               name: 'Edge [{#NAME}]: Description'
@@ -509,23 +460,14 @@ zabbix_export:
                   tag: city
                   value: '{#CITY}'
                 -
+                  tag: component
+                  value: edge
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: edge
-                -
                   tag: state
                   value: '{#STATE}'
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: text
             -
               uuid: 490afb422d0f457595343d49536470b7
               name: 'Edge [{#NAME}]: HA state'
@@ -568,23 +510,14 @@ zabbix_export:
                   tag: city
                   value: '{#CITY}'
                 -
+                  tag: component
+                  value: edge
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: edge
-                -
                   tag: state
                   value: '{#STATE}'
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: State
               trigger_prototypes:
                 -
                   uuid: 075d35e3ed074b9daf01864b111945c7
@@ -592,6 +525,10 @@ zabbix_export:
                   name: 'Edge [{#NAME}]: HA state is in "FAILED" state'
                   priority: WARNING
                   description: 'High availability state is "FAILED".'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: fdb55947147249109da453009d6bd443
               name: 'Edge [{#NAME}]: Model number'
@@ -618,23 +555,14 @@ zabbix_export:
                   tag: city
                   value: '{#CITY}'
                 -
+                  tag: component
+                  value: edge
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: edge
-                -
                   tag: state
                   value: '{#STATE}'
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: text
             -
               uuid: 0af44b485ae54de49a0385923c897bee
               name: 'Edge [{#NAME}]: Service uptime'
@@ -662,23 +590,14 @@ zabbix_export:
                   tag: city
                   value: '{#CITY}'
                 -
+                  tag: component
+                  value: edge
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: edge
-                -
                   tag: state
                   value: '{#STATE}'
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: counter
             -
               uuid: e12fe7584fbd40268e7c16ed044aa4db
               name: 'Edge [{#NAME}]: Software version'
@@ -705,23 +624,14 @@ zabbix_export:
                   tag: city
                   value: '{#CITY}'
                 -
+                  tag: component
+                  value: edge
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: edge
-                -
                   tag: state
                   value: '{#STATE}'
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: text
             -
               uuid: 74b49eac72574daab1b727045be118ca
               name: 'Edge [{#NAME}]: State'
@@ -762,23 +672,14 @@ zabbix_export:
                   tag: city
                   value: '{#CITY}'
                 -
+                  tag: component
+                  value: edge
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: edge
-                -
                   tag: state
                   value: '{#STATE}'
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: State
               trigger_prototypes:
                 -
                   uuid: 962d2d0c6f124424b2e5a7aca89d293f
@@ -786,6 +687,10 @@ zabbix_export:
                   name: 'Edge [{#NAME}]: Edge is in "OFFLINE" state'
                   priority: WARNING
                   description: 'Edge state is "OFFLINE".'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: a86c1fa26d4d4481bdfb099338c27989
               name: 'Edge [{#NAME}]: System uptime'
@@ -813,23 +718,14 @@ zabbix_export:
                   tag: city
                   value: '{#CITY}'
                 -
+                  tag: component
+                  value: edge
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: edge
-                -
                   tag: state
                   value: '{#STATE}'
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: counter
               trigger_prototypes:
                 -
                   uuid: 156d96052fd54606828cc53484794bb2
@@ -837,6 +733,10 @@ zabbix_export:
                   name: 'Edge [{#NAME}]: Edge has been restarted (uptime < 10m)'
                   priority: WARNING
                   description: 'Edge was restarted.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           master_item:
             key: velocloud.get.clear_metrics
           lld_macro_paths:
@@ -901,23 +801,14 @@ zabbix_export:
                   tag: city
                   value: '{#CITY}'
                 -
+                  tag: component
+                  value: gateway
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: gateway
-                -
                   tag: state
                   value: '{#STATE}'
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
               trigger_prototypes:
                 -
                   uuid: f0d7bdb2ac3540258ab6a276b43a382c
@@ -926,6 +817,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'The number of connected edges is changed.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 5e588efb83be4dc2bc29eaa0a6630718
               name: 'Gateway [{#NAME}]: Description'
@@ -952,23 +847,14 @@ zabbix_export:
                   tag: city
                   value: '{#CITY}'
                 -
+                  tag: component
+                  value: gateway
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: gateway
-                -
                   tag: state
                   value: '{#STATE}'
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: text
             -
               uuid: 7f2a0a68386744cb84fab35df8c55a07
               name: 'Gateway [{#NAME}]: IP address'
@@ -995,23 +881,14 @@ zabbix_export:
                   tag: city
                   value: '{#CITY}'
                 -
+                  tag: component
+                  value: gateway
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: gateway
-                -
                   tag: state
                   value: '{#STATE}'
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: text
             -
               uuid: b304460854f0485189f88df12483b5ac
               name: 'Gateway [{#NAME}]: Service uptime'
@@ -1039,23 +916,14 @@ zabbix_export:
                   tag: city
                   value: '{#CITY}'
                 -
+                  tag: component
+                  value: gateway
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: gateway
-                -
                   tag: state
                   value: '{#STATE}'
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: counter
             -
               uuid: 91784583eda943a7ace430413450391c
               name: 'Gateway [{#NAME}]: State'
@@ -1082,23 +950,14 @@ zabbix_export:
                   tag: city
                   value: '{#CITY}'
                 -
+                  tag: component
+                  value: gateway
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: gateway
-                -
                   tag: state
                   value: '{#STATE}'
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: State
             -
               uuid: d902600ef51640ffaaa4384ce505bcc2
               name: 'Gateway [{#NAME}]: System uptime'
@@ -1126,23 +985,14 @@ zabbix_export:
                   tag: city
                   value: '{#CITY}'
                 -
+                  tag: component
+                  value: gateway
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: gateway
-                -
                   tag: state
                   value: '{#STATE}'
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: counter
               trigger_prototypes:
                 -
                   uuid: e51ea2da27284067bd3ec8fa4faffdde
@@ -1150,6 +1000,10 @@ zabbix_export:
                   name: 'Gateway [{#NAME}]: Gateway has been restarted (uptime < 10m)'
                   priority: WARNING
                   description: 'Gateway was restarted.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 66c8fe8095724fb38966b05ef5d77a37
               name: 'Gateway [{#NAME}]: Utilization CPU'
@@ -1172,23 +1026,17 @@ zabbix_export:
                   tag: city
                   value: '{#CITY}'
                 -
+                  tag: component
+                  value: cpu
+                -
+                  tag: component
+                  value: gateway
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: gateway
-                -
                   tag: state
                   value: '{#STATE}'
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
             -
               uuid: b510c38771464024a66dc20ce9d75505
               name: 'Gateway [{#NAME}]: Utilization load'
@@ -1211,23 +1059,14 @@ zabbix_export:
                   tag: city
                   value: '{#CITY}'
                 -
+                  tag: component
+                  value: gateway
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: gateway
-                -
                   tag: state
                   value: '{#STATE}'
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
             -
               uuid: ad83565ae40f480dacd56e63bd475ddc
               name: 'Gateway [{#NAME}]: Utilization memory'
@@ -1250,23 +1089,17 @@ zabbix_export:
                   tag: city
                   value: '{#CITY}'
                 -
+                  tag: component
+                  value: gateway
+                -
+                  tag: component
+                  value: memory
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: gateway
-                -
                   tag: state
                   value: '{#STATE}'
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
             -
               uuid: b10c51350f604a8195e9c0176ca2de85
               name: 'Gateway [{#NAME}]: Utilization overall'
@@ -1289,23 +1122,14 @@ zabbix_export:
                   tag: city
                   value: '{#CITY}'
                 -
+                  tag: component
+                  value: gateway
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: gateway
-                -
                   tag: state
                   value: '{#STATE}'
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
           graph_prototypes:
             -
               uuid: d8d9b176f439436ba6fe69ec8bc6409e
@@ -1396,26 +1220,23 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: link
+                -
                   tag: edge
                   value: '{#EDGE}'
                 -
                   tag: enterprise
                   value: '{#ENTERPRISE}'
                 -
+                  tag: interface
+                  value: '{#IF}'
+                -
+                  tag: ip
+                  value: '{#IP}'
+                -
                   tag: name
                   value: '{#NAME}'
-                -
-                  tag: resource
-                  value: link
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
             -
               uuid: 897c9055d51a4e75ba7bae1160c7303e
               name: 'Link [{#NAME}]:[{#IP}]: Best loss tx, %'
@@ -1434,26 +1255,23 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: link
+                -
                   tag: edge
                   value: '{#EDGE}'
                 -
                   tag: enterprise
                   value: '{#ENTERPRISE}'
                 -
+                  tag: interface
+                  value: '{#IF}'
+                -
+                  tag: ip
+                  value: '{#IP}'
+                -
                   tag: name
                   value: '{#NAME}'
-                -
-                  tag: resource
-                  value: link
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
             -
               uuid: 5602191f2e0f4cb2b2340a4cfc77cfc7
               name: 'Link [{#NAME}]:[{#IP}]: Bytes in'
@@ -1472,26 +1290,23 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: link
+                -
                   tag: edge
                   value: '{#EDGE}'
                 -
                   tag: enterprise
                   value: '{#ENTERPRISE}'
                 -
+                  tag: interface
+                  value: '{#IF}'
+                -
+                  tag: ip
+                  value: '{#IP}'
+                -
                   tag: name
                   value: '{#NAME}'
-                -
-                  tag: resource
-                  value: link
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
             -
               uuid: 758b71f1692c46a8bb0611566b00031b
               name: 'Link [{#NAME}]:[{#IP}]: Bytes out'
@@ -1510,26 +1325,23 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: link
+                -
                   tag: edge
                   value: '{#EDGE}'
                 -
                   tag: enterprise
                   value: '{#ENTERPRISE}'
                 -
+                  tag: interface
+                  value: '{#IF}'
+                -
+                  tag: ip
+                  value: '{#IP}'
+                -
                   tag: name
                   value: '{#NAME}'
-                -
-                  tag: resource
-                  value: link
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
             -
               uuid: 3320d368036b460091b3f20e3c5cebd9
               name: 'Link [{#NAME}]:[{#IP}]: Last active'
@@ -1552,26 +1364,23 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: link
+                -
                   tag: edge
                   value: '{#EDGE}'
                 -
                   tag: enterprise
                   value: '{#ENTERPRISE}'
                 -
+                  tag: interface
+                  value: '{#IF}'
+                -
+                  tag: ip
+                  value: '{#IP}'
+                -
                   tag: name
                   value: '{#NAME}'
-                -
-                  tag: resource
-                  value: link
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: counter
             -
               uuid: cf66e401adc6432e8052baf0128d6877
               name: 'Link [{#NAME}]:[{#IP}]: Packets in'
@@ -1590,26 +1399,23 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: link
+                -
                   tag: edge
                   value: '{#EDGE}'
                 -
                   tag: enterprise
                   value: '{#ENTERPRISE}'
                 -
+                  tag: interface
+                  value: '{#IF}'
+                -
+                  tag: ip
+                  value: '{#IP}'
+                -
                   tag: name
                   value: '{#NAME}'
-                -
-                  tag: resource
-                  value: link
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
             -
               uuid: 152d25185f3e4e8b80ffea7d8ba25775
               name: 'Link [{#NAME}]:[{#IP}]: Packets out'
@@ -1628,26 +1434,23 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: link
+                -
                   tag: edge
                   value: '{#EDGE}'
                 -
                   tag: enterprise
                   value: '{#ENTERPRISE}'
                 -
+                  tag: interface
+                  value: '{#IF}'
+                -
+                  tag: ip
+                  value: '{#IP}'
+                -
                   tag: name
                   value: '{#NAME}'
-                -
-                  tag: resource
-                  value: link
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
             -
               uuid: b1d5964d030841e28a8b9e80c8152e7a
               name: 'Link [{#NAME}]:[{#IP}]: State'
@@ -1685,26 +1488,23 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: link
+                -
                   tag: edge
                   value: '{#EDGE}'
                 -
                   tag: enterprise
                   value: '{#ENTERPRISE}'
                 -
+                  tag: interface
+                  value: '{#IF}'
+                -
+                  tag: ip
+                  value: '{#IP}'
+                -
                   tag: name
                   value: '{#NAME}'
-                -
-                  tag: resource
-                  value: link
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: text
               trigger_prototypes:
                 -
                   uuid: abceaab09aea4cb482dc4b554502429b
@@ -1712,6 +1512,10 @@ zabbix_export:
                   name: 'Link [{#NAME}]:[{#IP}]: Link state is not "STABLE"'
                   priority: WARNING
                   description: 'Link state is not "STABLE".'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 43deb16e85644937a182b01eadb875d0
               name: 'Link [{#NAME}]:[{#IP}]: Total bytes'
@@ -1730,26 +1534,23 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: link
+                -
                   tag: edge
                   value: '{#EDGE}'
                 -
                   tag: enterprise
                   value: '{#ENTERPRISE}'
                 -
+                  tag: interface
+                  value: '{#IF}'
+                -
+                  tag: ip
+                  value: '{#IP}'
+                -
                   tag: name
                   value: '{#NAME}'
-                -
-                  tag: resource
-                  value: link
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
             -
               uuid: 622408bd703040339d1b4bdebed3280e
               name: 'Link [{#NAME}]:[{#IP}]: Total packets'
@@ -1768,26 +1569,23 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: link
+                -
                   tag: edge
                   value: '{#EDGE}'
                 -
                   tag: enterprise
                   value: '{#ENTERPRISE}'
                 -
+                  tag: interface
+                  value: '{#IF}'
+                -
+                  tag: ip
+                  value: '{#IP}'
+                -
                   tag: name
                   value: '{#NAME}'
-                -
-                  tag: resource
-                  value: link
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
           graph_prototypes:
             -
               uuid: d117ffc6c5f245099209ca3a471cc63f
@@ -1902,20 +1700,17 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: sdwan-path
+                -
+                  tag: destination
+                  value: '{#DESTINATION}'
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: sdwanpath
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
+                  tag: source
+                  value: '{#SOURCE}'
             -
               uuid: 2fa176affa6b46ffae3682ea7cb96866
               name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Bytes out'
@@ -1934,20 +1729,17 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: sdwan-path
+                -
+                  tag: destination
+                  value: '{#DESTINATION}'
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: sdwanpath
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
+                  tag: source
+                  value: '{#SOURCE}'
             -
               uuid: cf8f3d0c61994e49b493d79160da27bf
               name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Packets in'
@@ -1966,20 +1758,17 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: sdwan-path
+                -
+                  tag: destination
+                  value: '{#DESTINATION}'
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: sdwanpath
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
+                  tag: source
+                  value: '{#SOURCE}'
             -
               uuid: 49fc4e85c5a5415793fc89f2c3cdec8f
               name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Packets out'
@@ -1998,20 +1787,17 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: sdwan-path
+                -
+                  tag: destination
+                  value: '{#DESTINATION}'
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: sdwanpath
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
+                  tag: source
+                  value: '{#SOURCE}'
             -
               uuid: 98a0c2c3a3be47e9bd32cf719069cad2
               name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Packet Loss in'
@@ -2031,20 +1817,17 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: sdwan-path
+                -
+                  tag: destination
+                  value: '{#DESTINATION}'
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: sdwanpath
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
+                  tag: source
+                  value: '{#SOURCE}'
             -
               uuid: 0f2ef8113a3644feae7b827675362485
               name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Packet Loss out'
@@ -2064,20 +1847,17 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: sdwan-path
+                -
+                  tag: destination
+                  value: '{#DESTINATION}'
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: sdwanpath
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
+                  tag: source
+                  value: '{#SOURCE}'
             -
               uuid: 3a7ed14c13874c3088f28253a25a0c10
               name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Bytes total'
@@ -2096,20 +1876,17 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: sdwan-path
+                -
+                  tag: destination
+                  value: '{#DESTINATION}'
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: sdwanpath
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
+                  tag: source
+                  value: '{#SOURCE}'
             -
               uuid: 1f7bbdd7c1e24429878538b3b6bbddc4
               name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Total packets'
@@ -2128,20 +1905,17 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: sdwan-path
+                -
+                  tag: destination
+                  value: '{#DESTINATION}'
+                -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: sdwanpath
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
-                  tag: type
-                  value: gauge
+                  tag: source
+                  value: '{#SOURCE}'
           master_item:
             key: velocloud.get.clear_metrics
           lld_macro_paths:
@@ -2188,23 +1962,17 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: sdwan-peer
+                -
                   tag: edge
                   value: '{#EDGE}'
                 -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: sdwanpeer
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
                   tag: type
-                  value: gauge
+                  value: '{#TYPE}'
             -
               uuid: 08fb5b9cf8464e4382224515ba75953d
               name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Description'
@@ -2228,23 +1996,17 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: sdwan-peer
+                -
                   tag: edge
                   value: '{#EDGE}'
                 -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: sdwanpeer
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
                   tag: type
-                  value: text
+                  value: '{#TYPE}'
             -
               uuid: ece78f083d55413ab82a33f03c0204ef
               name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Stable path'
@@ -2262,23 +2024,17 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: sdwan-peer
+                -
                   tag: edge
                   value: '{#EDGE}'
                 -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: sdwanpeer
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
                   tag: type
-                  value: gauge
+                  value: '{#TYPE}'
             -
               uuid: 3884e4bf4e8a46508c04a6cd06ae1513
               name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Standby path'
@@ -2296,23 +2052,17 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: sdwan-peer
+                -
                   tag: edge
                   value: '{#EDGE}'
                 -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: sdwanpeer
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
                   tag: type
-                  value: gauge
+                  value: '{#TYPE}'
             -
               uuid: 39389b7b594e4b5da678ff985da0ba2a
               name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Total path'
@@ -2330,23 +2080,17 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: sdwan-peer
+                -
                   tag: edge
                   value: '{#EDGE}'
                 -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: sdwanpeer
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
                   tag: type
-                  value: gauge
+                  value: '{#TYPE}'
             -
               uuid: 474e118fa98340f68c73f4ddc5f54f5e
               name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Unknown path'
@@ -2364,23 +2108,17 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: sdwan-peer
+                -
                   tag: edge
                   value: '{#EDGE}'
                 -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: sdwanpeer
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
                   tag: type
-                  value: gauge
+                  value: '{#TYPE}'
             -
               uuid: 4e93b5e2f88747b093aba97d94d433f2
               name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Unstable path'
@@ -2398,23 +2136,17 @@ zabbix_export:
                 key: velocloud.get.clear_metrics
               tags:
                 -
+                  tag: component
+                  value: sdwan-peer
+                -
                   tag: edge
                   value: '{#EDGE}'
                 -
                   tag: name
                   value: '{#NAME}'
                 -
-                  tag: resource
-                  value: sdwanpeer
-                -
-                  tag: target
-                  value: velocloud
-                -
-                  tag: transport
-                  value: dependent
-                -
                   tag: type
-                  value: gauge
+                  value: '{#TYPE}'
           graph_prototypes:
             -
               uuid: 36438b5369794ea8a9147ec7675bc1a6
@@ -2476,6 +2208,13 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: vmware-sd-wan-velocloud
       macros:
         -
           macro: '{$VELOCLOUD.LLD.EDGES.FILTER.MATCHES}'

@@ -76,8 +76,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_graph_time->getName()] = $field_graph_time;
 
 		// Date from.
-		$field_time_from = (new CWidgetFieldDatePicker('time_from', _('From'),
-				[DATE_FORMAT, DATE_TIME_FORMAT, DATE_TIME_FORMAT_SECONDS], false))
+		$field_time_from = (new CWidgetFieldDatePicker('time_from', _('From'), false))
 			->setDefault('now-1h')
 			->setFlags(CWidgetField::FLAG_NOT_EMPTY);
 
@@ -91,8 +90,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_time_from->getName()] = $field_time_from;
 
 		// Time to.
-		$field_time_to = (new CWidgetFieldDatePicker('time_to', _('To'),
-				[DATE_FORMAT, DATE_TIME_FORMAT, DATE_TIME_FORMAT_SECONDS], false))
+		$field_time_to = (new CWidgetFieldDatePicker('time_to', _('To'), false))
 			->setDefault('now')
 			->setFlags(CWidgetField::FLAG_NOT_EMPTY);
 

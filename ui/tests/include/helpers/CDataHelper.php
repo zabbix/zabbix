@@ -327,7 +327,9 @@ class CDataHelper extends CAPIHelper {
 		if (is_array($source)) {
 			$result = true;
 			foreach ($source as $name) {
-				$result &= static::load($name);
+				if (!static::load($name)) {
+					$result = false;
+				}
 			}
 
 			return $result;

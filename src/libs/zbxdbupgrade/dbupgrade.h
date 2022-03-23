@@ -20,6 +20,9 @@
 #ifndef ZABBIX_DBUPGRADE_H
 #define ZABBIX_DBUPGRADE_H
 
+#include "common.h"
+#include "dbschema.h"
+
 typedef struct
 {
 	int		(*function)(void);

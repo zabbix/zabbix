@@ -452,8 +452,6 @@ if (hasRequest('action') && hasRequest('group_httptestid') && !$result) {
 	uncheckTableRows(getRequest('hostid'), zbx_objectValues($httptests, 'httptestid'));
 }
 
-show_messages();
-
 /*
  * Display
  */

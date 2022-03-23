@@ -17,13 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxipcservice.h"
+#include "zbxserialize.h"
 #include "zbxjson.h"
 #include "daemon.h"
 #include "zbxrtc.h"
 #include "rtc.h"
 #include "log.h"
 #include "zbxdiag.h"
+#include "../../libs/zbxalgo/vectorimpl.h"
+
+ZBX_PTR_VECTOR_IMPL(rtc_sub, zbx_rtc_sub_t *)
+ZBX_PTR_VECTOR_IMPL(rtc_hook, zbx_rtc_hook_t *)
 
 #if defined(HAVE_SIGQUEUE)
 
@@ -178,24 +182,54 @@ static void	rtc_process_diaginfo(const char *data, char **result)
 	zbx_diag_log_info(scope, result);
 }
 
+void	rtc_notify(zbx_rtc_t *rtc, unsigned char process_type, int process_num, zbx_uint32_t code,
+		unsigned char *data, zbx_uint32_t size)
+{
+	int	i;
+
+	for (i = 0; i < rtc->subs.values_num; i++)
+	{
+		if (ZBX_PROCESS_TYPE_UNKNOWN != process_type && process_type != rtc->subs.values[i]->process_type)
+			continue;
+
+		if (0 != process_num && process_num != rtc->subs.values[i]->process_num)
+			continue;
+
+		if (FAIL == zbx_ipc_client_send(rtc->subs.values[i]->client, code, data, size))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot send RTC notification to process \"%s\" #%d",
+					get_process_type_string(rtc->subs.values[i]->process_type),
+					rtc->subs.values[i]->process_num);
+		}
+	}
+}
+
+static void	rtc_subscribe(zbx_rtc_t *rtc, zbx_ipc_client_t *client, const unsigned char *data)
+{
+	zbx_rtc_sub_t	*sub;
+
+	sub = (zbx_rtc_sub_t *)zbx_malloc(NULL, sizeof(zbx_rtc_sub_t));
+
+	sub->client = client;
+	data += zbx_deserialize_value(data, &sub->process_type);
+	(void)zbx_deserialize_value(data, &sub->process_num);
+
+	zbx_vector_rtc_sub_append(&rtc->subs, sub);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: process runtime control option                                    *
  *                                                                            *
- * Parameters: code   - [IN] the request code                                 *
+ * Parameters: rtc    - [IN] the RTC service                                  *
+ *             code   - [IN] the request code                                 *
  *             data   - [IN] the runtime control parameter (optional)         *
  *             result - [OUT] the runtime control result                      *
  *                                                                            *
  ******************************************************************************/
-static void	rtc_process_request(int code, const unsigned char *data, char **result)
+static void	rtc_process_request(zbx_rtc_t *rtc, int code, const unsigned char *data,
+		char **result)
 {
-#if defined(HAVE_SIGQUEUE)
-#ifdef HAVE_NETSNMP
-	int	cmd;
-	char	*tmp = NULL;
-#endif
-#endif
-
 	switch (code)
 	{
 #if defined(HAVE_SIGQUEUE)
@@ -203,36 +237,24 @@ static void	rtc_process_request(int code, const unsigned char *data, char **resu
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
 			rtc_process_loglevel(code, (const char *)data, result);
 			return;
+#endif
 		case ZBX_RTC_HOUSEKEEPER_EXECUTE:
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_HOUSEKEEPER, 1, ZBX_RTC_MAKE_MESSAGE(code, 0, 0),
-					result);
+			rtc_notify(rtc, ZBX_PROCESS_TYPE_HOUSEKEEPER, 0, ZBX_RTC_HOUSEKEEPER_EXECUTE, NULL, 0);
 			return;
 		case ZBX_RTC_CONFIG_CACHE_RELOAD:
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_CONFSYNCER, 1, ZBX_RTC_MAKE_MESSAGE(code, 0, 0),
-					result);
+			rtc_notify(rtc, ZBX_PROCESS_TYPE_CONFSYNCER, 0, ZBX_RTC_CONFIG_CACHE_RELOAD, NULL, 0);
 			return;
 		case ZBX_RTC_SNMP_CACHE_RELOAD:
 #ifdef HAVE_NETSNMP
-			cmd = ZBX_RTC_MAKE_MESSAGE(code, 0, 0);
-
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_UNREACHABLE, 0, cmd, result);
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_POLLER, 0, cmd, &tmp);
-			*result = zbx_strdcat(*result, tmp);
-			zbx_free(tmp);
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_TRAPPER, 0, cmd, &tmp);
-			*result = zbx_strdcat(*result, tmp);
-			zbx_free(tmp);
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_DISCOVERER, 0, cmd, &tmp);
-			*result = zbx_strdcat(*result, tmp);
-			zbx_free(tmp);
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_TASKMANAGER, 0, cmd, &tmp);
-			*result = zbx_strdcat(*result, tmp);
-			zbx_free(tmp);
+			rtc_notify(rtc, ZBX_PROCESS_TYPE_POLLER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
+			rtc_notify(rtc, ZBX_PROCESS_TYPE_UNREACHABLE, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
+			rtc_notify(rtc, ZBX_PROCESS_TYPE_TRAPPER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
+			rtc_notify(rtc, ZBX_PROCESS_TYPE_DISCOVERER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
+			rtc_notify(rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 #else
 			*result = zbx_strdup(NULL, "Invalid runtime control option: no SNMP support enabled\n");
 #endif
 			return;
-#endif
 		case ZBX_RTC_DIAGINFO:
 			rtc_process_diaginfo((const char *)data, result);
 			return;
@@ -243,28 +265,53 @@ static void	rtc_process_request(int code, const unsigned char *data, char **resu
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initialize runtime control service                                *
+ * Purpose: add hook for the specified control code                           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_rtc_init(zbx_rtc_t *rtc ,char **error)
+static void	rtc_add_control_hook(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_uint32_t code)
 {
-	return zbx_ipc_service_start(&rtc->service, ZBX_IPC_SERVICE_RTC, error);
+	zbx_rtc_hook_t	*hook;
+
+	hook = (zbx_rtc_hook_t *)zbx_malloc(NULL, sizeof(zbx_rtc_hook_t));
+	hook->client = client;
+	hook->code = code;
+	zbx_vector_rtc_hook_append(&rtc->hooks, hook);
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: accept and process runtime control request                        *
+ * Purpose: notify matching hooks and remove them                             *
  *                                                                            *
  ******************************************************************************/
-void	zbx_rtc_dispatch(zbx_ipc_client_t *client, zbx_ipc_message_t *message)
+static void	rtc_notify_hooks(zbx_rtc_t *rtc, zbx_uint32_t code, unsigned char *data, zbx_uint32_t size)
+{
+	int	i;
+
+	for (i = 0; i < rtc->hooks.values_num;)
+	{
+		if (rtc->hooks.values[i]->code == code)
+		{
+			(void)zbx_ipc_client_send(rtc->hooks.values[i]->client, code, data, size);
+			zbx_free(rtc->hooks.values[i]);
+			zbx_vector_rtc_hook_remove_noorder(&rtc->hooks, i);
+			continue;
+		}
+		i++;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process runtime control option                                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_process(zbx_rtc_t *rtc, zbx_ipc_client_t *client, int code, const unsigned char *data)
 {
 	char		*result = NULL, *result_ex = NULL;
 	zbx_uint32_t	size = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() code:%u", __func__, message->code);
-
-	if (FAIL == rtc_process_request_ex((int)message->code, message->data, &result_ex))
-		rtc_process_request((int)message->code, message->data, &result);
+	if (FAIL == rtc_process_request_ex(rtc, code, data, &result_ex))
+		rtc_process_request(rtc, code, data, &result);
 
 	if (NULL != result_ex)
 		result = zbx_strdcat(result, result_ex);
@@ -276,11 +323,50 @@ void	zbx_rtc_dispatch(zbx_ipc_client_t *client, zbx_ipc_message_t *message)
 	}
 
 	size = (zbx_uint32_t)strlen(result) + 1;
-	zbx_ipc_client_send(client, message->code, (unsigned char *)result, size);
+	zbx_ipc_client_send(client, (zbx_uint32_t)code, (unsigned char *)result, size);
 	zbx_free(result);
 
 	zbx_free(result_ex);
 	zbx_free(result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize runtime control service                                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_rtc_init(zbx_rtc_t *rtc ,char **error)
+{
+	zbx_vector_rtc_sub_create(&rtc->subs);
+	zbx_vector_rtc_hook_create(&rtc->hooks);
+	return zbx_ipc_service_start(&rtc->service, ZBX_IPC_SERVICE_RTC, error);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: accept and process runtime control request                        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_rtc_dispatch(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_ipc_message_t *message)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() code:%u size:%u", __func__, message->code, message->size);
+
+	switch (message->code)
+	{
+		case ZBX_RTC_SUBSCRIBE:
+			rtc_subscribe(rtc, client, message->data);
+			break;
+		case ZBX_RTC_CONFIG_CACHE_RELOAD_WAIT:
+			rtc_add_control_hook(rtc, client, ZBX_RTC_CONFIG_SYNC_NOTIFY);
+			rtc_notify(rtc, ZBX_PROCESS_TYPE_CONFSYNCER, 0, ZBX_RTC_CONFIG_CACHE_RELOAD, NULL, 0);
+			break;
+		case ZBX_RTC_CONFIG_SYNC_NOTIFY:
+			rtc_notify_hooks(rtc, message->code, message->data, message->size);
+			break;
+		default:
+			rtc_process(rtc, client, (int)message->code, message->data);
+			break;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -291,7 +377,7 @@ void	zbx_rtc_dispatch(zbx_ipc_client_t *client, zbx_ipc_message_t *message)
  *          dispatching runtime control commands                              *
  *                                                                            *
  ******************************************************************************/
-void	zbx_rtc_wait_config_sync(zbx_rtc_t *rtc)
+int	zbx_rtc_wait_config_sync(zbx_rtc_t *rtc)
 {
 	zbx_timespec_t	rtc_timeout = {1, 0};
 	int		sync = 0;
@@ -312,7 +398,8 @@ void	zbx_rtc_wait_config_sync(zbx_rtc_t *rtc)
 					break;
 				case ZBX_RTC_LOG_LEVEL_DECREASE:
 				case ZBX_RTC_LOG_LEVEL_INCREASE:
-					zbx_rtc_dispatch(client, message);
+				case ZBX_RTC_SUBSCRIBE:
+					zbx_rtc_dispatch(rtc, client, message);
 					break;
 				default:
 					if (ZBX_IPC_RTC_MAX >= message->code)
@@ -325,11 +412,43 @@ void	zbx_rtc_wait_config_sync(zbx_rtc_t *rtc)
 					}
 			}
 			zbx_ipc_message_free(message);
-
 		}
 
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 	}
+
+	return !ZBX_IS_RUNNING() && FAIL == ZBX_EXIT_STATUS() ? FAIL : SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: send shutdown signal to all subscribers                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_rtc_shutdown_subs(zbx_rtc_t *rtc)
+{
+	rtc_notify(rtc, ZBX_PROCESS_TYPE_UNKNOWN, 0, ZBX_RTC_SHUTDOWN, NULL, 0);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: reset the RTC service state by removing subscriptions and hooks   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_rtc_reset(zbx_rtc_t *rtc)
+{
+	int	i;
+
+	for (i = 0; i < rtc->subs.values_num; i++)
+	{
+		zbx_ipc_client_close(rtc->subs.values[i]->client);
+		zbx_free(rtc->subs.values[i]);
+	}
+	zbx_vector_rtc_sub_clear(&rtc->subs);
+
+	for (i = 0; i < rtc->hooks.values_num; i++)
+		zbx_free(rtc->hooks.values[i]);
+
+	zbx_vector_rtc_hook_clear(&rtc->hooks);
+}

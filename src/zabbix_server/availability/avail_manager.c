@@ -17,17 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "avail_manager.h"
+
 #include "log.h"
 #include "zbxself.h"
 #include "zbxavailability.h"
 #include "zbxipcservice.h"
-#include "avail_manager.h"
 #include "daemon.h"
 #include "sighandler.h"
 #include "dbcache.h"
-#include "zbxalgo.h"
 #include "avail_protocol.h"
+
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;

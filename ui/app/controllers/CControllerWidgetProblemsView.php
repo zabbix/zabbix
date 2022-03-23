@@ -70,7 +70,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		]);
 
 		if ($fields['show_tags']) {
-			$data['tags'] = makeTags($data['problems'], true, 'eventid', $fields['show_tags'], $fields['tags'],
+			$data['tags'] = makeTags($data['problems'], true, 'eventid', $fields['show_tags'], $fields['tags'], null,
 				$fields['tag_name_format'], $fields['tag_priority']
 			);
 		}

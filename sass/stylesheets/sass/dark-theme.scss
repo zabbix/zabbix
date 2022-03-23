@@ -442,3 +442,8 @@ $toc-title-bg-color: #4f4f4f;
 		content: "";
 	}
 }
+
+.selected.expanded .icon-filter::before {
+	// grey icon
+	background-position: -87px -547px;
+}

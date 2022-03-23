@@ -562,8 +562,10 @@ class CSvgGraph extends CSvg {
 
 		$this->left_y_is_binary = $this->left_y_units === 'B' || $this->left_y_units === 'Bps';
 
+		$calc_power = $this->left_y_units === '' || $this->left_y_units[0] !== '!';
+
 		$result = calculateGraphScaleExtremes($this->left_y_min, $this->left_y_max, $this->left_y_is_binary,
-			$this->left_y_min_calculated, $this->left_y_max_calculated, $rows_min, $rows_max
+			$calc_power, $this->left_y_min_calculated, $this->left_y_max_calculated, $rows_min, $rows_max
 		);
 
 		[
@@ -591,8 +593,10 @@ class CSvgGraph extends CSvg {
 
 		$this->right_y_is_binary = $this->right_y_units === 'B' || $this->right_y_units === 'Bps';
 
+		$calc_power = $this->right_y_units === '' || $this->right_y_units[0] !== '!';
+
 		$result = calculateGraphScaleExtremes($this->right_y_min, $this->right_y_max, $this->right_y_is_binary,
-			$this->right_y_min_calculated, $this->right_y_max_calculated, $rows_min, $rows_max
+			$calc_power, $this->right_y_min_calculated, $this->right_y_max_calculated, $rows_min, $rows_max
 		);
 
 		[

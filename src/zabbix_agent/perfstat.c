@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "stats.h"
 #include "perfstat.h"
+
+#include "stats.h"
 #include "alias.h"
 #include "log.h"
 #include "mutexs.h"
@@ -75,7 +75,7 @@ static void	deactivate_perf_counter(zbx_perf_counter_data_t *counter)
 
 /******************************************************************************
  *                                                                            *
- * Comments: if the specified counter exists or a new is successfully         *
+ * Comments: if the specified counter exists or the new one is successfully   *
  *           added, a pointer to that counter is returned, NULL otherwise     *
  *                                                                            *
  ******************************************************************************/

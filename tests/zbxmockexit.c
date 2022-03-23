@@ -34,10 +34,12 @@ void	__wrap_exit(int status)
 	int			expected_status;
 
 	if (ZBX_MOCK_NO_EXIT_CODE == (error = zbx_mock_exit_code(&expected_status)))
-		fail_msg("exit() was not expected, exitcode: %d.", status);
-
-	if (ZBX_MOCK_SUCCESS != error)
-		fail_msg("Cannot get exit code from test case data: %s", zbx_mock_error_string(error));
+		expected_status = EXIT_SUCCESS;
+	else
+	{
+		if (ZBX_MOCK_SUCCESS != error)
+			fail_msg("Cannot get exit code from test case data: %s", zbx_mock_error_string(error));
+	}
 
 	switch (status)
 	{

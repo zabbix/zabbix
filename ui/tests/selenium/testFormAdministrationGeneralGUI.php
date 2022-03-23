@@ -28,7 +28,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 	public $config_link = 'zabbix.php?action=gui.edit';
 	public $form_selector = 'xpath://form[contains(@action, "gui.update")]';
 
-	public $default = [
+	public $default_values = [
 		'Default language' => 'English (en_US)',
 		'Default time zone' => 'System',
 		'Default theme' => 'Blue',
@@ -43,7 +43,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 		'Max period for time selector' => '2y'
 	];
 
-	public $db_default = [
+	public $db_default_values = [
 		'default_lang' => 'en_US',
 		'default_timezone' => 'system',
 		'default_theme' => 'blue-theme',
@@ -58,7 +58,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 		'max_period' => '2y'
 	];
 
-	public $custom = [
+	public $custom_values = [
 		'Default language' => 'English (en_US)',
 		'Default theme' => 'Dark',
 		'Limit for search and filter results' => '50',
@@ -90,7 +90,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			$this->assertEquals($limit, $this->query('id', $id)->one()->getAttribute('maxlength'));
 		}
 
-		$this->query('xpath://span[@class="icon-info status-red"]')->one()->click();
+		$this->query('xpath://a[@class="icon-info status-red"]')->one()->click();
 		$this->assertEquals(
 			'You are not able to choose some of the languages,'.
 				' because locales for them are not installed on the web server.',
@@ -940,7 +940,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'field' =>  [
 						'Max count of elements to show inside table cell' => '2'
 					],
-					'link' => 'templates.php?filter_name=cisco',
+					'link' => 'hostgroups.php?filter_name=Templates&filter_set=1',
 					'element_count' => 2
 				]
 			],
@@ -970,7 +970,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 		$this->page->login()->open('zabbix.php?action=gui.edit');
 		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 		// Reset form in case of previous test case.
-		$this->resetConfiguration($form, $this->default, 'Reset defaults');
+		$this->resetConfiguration($form, $this->default_values, 'Reset defaults');
 		// Fill nesessary settings.
 		$form->fill($data['field']);
 		$form->submit();
@@ -991,7 +991,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 
 			case 'Max count of elements to show inside table cell':
 				$table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
-				$element_count = $table->findRow('Name', 'Alcatel Timetra TiMOS SNMP')->getColumn('Linked templates')
+				$element_count = $table->findRow('Name', 'Templates/Applications')->getColumn('Members')
 						->query('xpath:.//a[@class="link-alt grey"]')->all()->count();
 				$this->assertEquals(CTestArrayHelper::get($data, 'element_count'), $element_count);
 				break;

@@ -1311,8 +1311,8 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "report writer";
 		case ZBX_PROCESS_TYPE_SERVICEMAN:
 			return "service manager";
-		case ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER:
-			return "problem housekeeper";
+		case ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER:
+			return "trigger housekeeper";
 		case ZBX_PROCESS_TYPE_HA_MANAGER:
 			return "ha manager";
 		case ZBX_PROCESS_TYPE_ODBCPOLLER:
@@ -1468,6 +1468,8 @@ const char	*zbx_result_string(int result)
 			return "AGENT_ERROR";
 		case GATEWAY_ERROR:
 			return "GATEWAY_ERROR";
+		case SYSINFO_RET_FAIL:
+			return "SYSINFO_RET_FAIL";
 		default:
 			return "unknown";
 	}
@@ -1646,6 +1648,16 @@ const char	*zbx_event_value_string(unsigned char source, unsigned char object, u
 }
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
+/******************************************************************************
+ *                                                                            *
+ * Parameters: encoding - [IN] non-empty string, code page identifier         *
+ *                        (as in libiconv or Windows SDK docs)                *
+ *             codepage - [OUT] code page number                              *
+ *                                                                            *
+ * Return value: SUCCEED on success                                           *
+ *               FAIL on failure                                              *
+ *                                                                            *
+ ******************************************************************************/
 static int	get_codepage(const char *encoding, unsigned int *codepage)
 {
 	typedef struct
@@ -1693,12 +1705,6 @@ static int	get_codepage(const char *encoding, unsigned int *codepage)
 			{57002, "X-ISCII-DE"}, {57003, "X-ISCII-BE"}, {57004, "X-ISCII-TA"}, {57005, "X-ISCII-TE"},
 			{57006, "X-ISCII-AS"}, {57007, "X-ISCII-OR"}, {57008, "X-ISCII-KA"}, {57009, "X-ISCII-MA"},
 			{57010, "X-ISCII-GU"}, {57011, "X-ISCII-PA"}, {65000, "UTF-7"}, {65001, "UTF-8"}, {0, NULL}};
-
-	if ('\0' == *encoding)
-	{
-		*codepage = 0;	/* ANSI */
-		return SUCCEED;
-	}
 
 	/* by name */
 	for (i = 0; 0 != cp[i].codepage || NULL != cp[i].name; i++)
@@ -2024,7 +2030,7 @@ char	*zbx_strshift_utf8(char *text, size_t num)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Returns the size (in bytes) of an UTF-8 encoded character or 0    *
+ * Purpose: Returns the size (in bytes) of a UTF-8 encoded character or 0     *
  *          if the character is not a valid UTF-8.                            *
  *                                                                            *
  * Parameters: text - [IN] pointer to the 1st byte of UTF-8 character         *
@@ -5782,7 +5788,7 @@ const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf
  *             size   - [IN] the output buffer size                           *
  *             val    - [IN] double value to be converted                     *
  *                                                                            *
- * Return value: the oputput buffer with printed value                        *
+ * Return value: the output buffer with printed value                         *
  *                                                                            *
  ******************************************************************************/
 const char	*zbx_print_double(char *buffer, size_t size, double val)

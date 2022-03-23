@@ -192,11 +192,40 @@
 		});
 
 		$groups_ms.on('change', (e) => {
-			console.log('e')
 			$groups_ms.multiSelect('setDisabledEntries',
 				[... document.querySelectorAll('[name^="groups["], [name^="group_links["]')]
 					.map((input) => input.value)
 			);
 		});
+
+		document
+			.querySelector('#templates-form, #host-prototype-form')
+			.addEventListener('submit', (e) => {
+				e.preventDefault();
+
+				const form = e.target;
+				const form_fields = getFormFields(form);
+
+				let submitter = document.activeElement;
+
+				if (submitter.tagName !== 'BUTTON') {
+					submitter = form.querySelector('button[type="submit"]');
+				}
+
+				form_fields[submitter.name] = submitter.value;
+
+				const proxy_form = document.createElement('form');
+				proxy_form.action = form.action;
+				proxy_form.method = 'post';
+				proxy_form.hidden = true;
+				document.body.appendChild(proxy_form);
+
+				const formdata_input = document.createElement('input');
+				formdata_input.name = 'formdata_json';
+				formdata_input.value = JSON.stringify(form_fields);
+				proxy_form.appendChild(formdata_input);
+
+				proxy_form.submit();
+			}, {passive: false});
 	});
 </script>

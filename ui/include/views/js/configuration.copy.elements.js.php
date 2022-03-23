@@ -24,10 +24,20 @@
  */
 ?>
 
-<script type="text/javascript">
-	jQuery(function($) {
-		function changeTargetType(data) {
-			var $multiselect = $('<div>', {
+<script>
+	const view = {
+		form_name: null,
+
+		init({form_name, copy_targetids}) {
+			this.form_name = form_name;
+
+			$('[name="copy_type"]').on('change', this.changeTargetType);
+
+			this.changeTargetType(copy_targetids);
+		},
+
+		changeTargetType(data) {
+			let $multiselect = $('<div>', {
 					id: 'copy_targetids',
 					class: 'multiselect',
 					css: {
@@ -44,7 +54,7 @@
 					},
 					popup: {
 						parameters: {
-							dstfrm: '<?= $form->getName() ?>',
+							dstfrm: view.form_name,
 							dstfld1: 'copy_targetids',
 							writeonly: 1,
 							multiselect: 1
@@ -58,11 +68,13 @@
 					helper_options.popup.parameters.srctbl = 'host_groups';
 					helper_options.popup.parameters.srcfld1 = 'groupid';
 					break;
+
 				case '<?= COPY_TYPE_TO_HOST ?>':
 					helper_options.object_name = 'hosts';
 					helper_options.popup.parameters.srctbl = 'hosts';
 					helper_options.popup.parameters.srcfld1 = 'hostid';
 					break;
+
 				case '<?= COPY_TYPE_TO_TEMPLATE ?>':
 					helper_options.object_name = 'templates';
 					helper_options.popup.parameters.srctbl = 'templates';
@@ -74,10 +86,69 @@
 			$('#copy_targets').html($multiselect);
 
 			$multiselect.multiSelectHelper(helper_options);
+		},
+
+		refresh() {
+			const url = new Curl('', false);
+			const form = document.getElementsByName(this.form_name)[0];
+			const fields = getFormFields(form);
+
+			post(url.getUrl(), fields);
+		},
+
+		editHost(e, hostid) {
+			e.preventDefault();
+			const host_data = {hostid};
+
+			this.openHostPopup(host_data);
+		},
+
+		openHostPopup(host_data) {
+			const original_url = location.href;
+			const overlay = PopUp('popup.host.edit', host_data, {
+				dialogueid: 'host_edit',
+				dialogue_class: 'modal-popup-large'
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', original_url);
+			}, {once: true});
+		},
+
+		events: {
+			hostSuccess(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				view.refresh();
+			},
+
+			hostDelete(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				const curl = new Curl('zabbix.php', false);
+				curl.setArgument('action', 'host.list');
+
+				location.href = curl.getUrl();
+			}
 		}
-
-		$('#copy_type').on('change', changeTargetType);
-
-		changeTargetType(<?= json_encode($data['copy_targetids']) ?>);
-	});
+	};
 </script>

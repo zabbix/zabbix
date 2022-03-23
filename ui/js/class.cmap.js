@@ -3405,7 +3405,7 @@ ZABBIX.apps.map = (function($) {
 			this.triggerids = {};
 			this.domNode = $(new Template($('#mapShapeFormTpl').html()).evaluate()).appendTo(formContainer);
 
-			this.domNode.find('.input-color-picker input').colorpicker();
+			this.domNode.find('.color-picker input').colorpicker();
 		}
 
 		ShapeForm.prototype = {
@@ -3439,7 +3439,7 @@ ZABBIX.apps.map = (function($) {
 					$('[name=' + field + ']', this.domNode).val([shape[field]]);
 				}
 
-				$('.input-color-picker input', this.domNode).change();
+				$('.color-picker input', this.domNode).change();
 				$('#border_type').change();
 
 				$('#last_shape_type').val(shape.type);
@@ -3524,7 +3524,7 @@ ZABBIX.apps.map = (function($) {
 			this.triggerids = {};
 			this.domNode = $(new Template($('#mapMassShapeFormTpl').html()).evaluate()).appendTo(formContainer);
 
-			this.domNode.find('.input-color-picker input').colorpicker();
+			this.domNode.find('.color-picker input').colorpicker();
 			this.actionProcessor = new ActionProcessor(formActions);
 			this.actionProcessor.process();
 		}
@@ -3559,7 +3559,7 @@ ZABBIX.apps.map = (function($) {
 				this.active = false;
 				$(':checkbox', this.domNode).prop('checked', false).prop("disabled", false);
 				$('textarea, input[type=text]', this.domNode).val('');
-				$('.input-color-picker input', this.domNode).change();
+				$('.color-picker input', this.domNode).change();
 				this.actionProcessor.process();
 			},
 
@@ -3596,7 +3596,7 @@ ZABBIX.apps.map = (function($) {
 			this.triggerids = {};
 			this.domNode = $(new Template($('#linkFormTpl').html()).evaluate()).appendTo(formContainer);
 
-			this.domNode.find('.input-color-picker input').colorpicker();
+			this.domNode.find('.color-picker input').colorpicker();
 		}
 
 		LinkForm.prototype = {
@@ -3777,8 +3777,8 @@ ZABBIX.apps.map = (function($) {
 						.val(triggers[linkTrigger].drawtype);
 				}
 
-				table.find('.input-color-picker input').colorpicker();
-				$('.input-color-picker input', this.domNode).change();
+				table.find('.color-picker input').colorpicker();
+				$('.color-picker input', this.domNode).change();
 			},
 
 			/**
@@ -3814,8 +3814,8 @@ ZABBIX.apps.map = (function($) {
 					$(tpl.evaluate(linkTrigger)).appendTo(table);
 				}
 
-				table.find('.input-color-picker input').colorpicker();
-				$('.input-color-picker input', this.domNode).change();
+				table.find('.color-picker input').colorpicker();
+				$('.color-picker input', this.domNode).change();
 			},
 
 			/**
@@ -4007,7 +4007,7 @@ jQuery(function ($) {
 	 * new top and left position must be calculated. If the overlay dialogue is opened for the first time, position is
 	 * set depending on map size and canvas top position. This makes map more visible at first. In case popup window is
 	 * dragged outside visible view port or window is resized, popup will again be repositioned so it doesn't go outside
-	 * the viewport. In case the popup is too large, position it with a small margin depenging on whether is too long
+	 * the viewport. In case the popup is too large, position it with a small margin depending on whether is too long
 	 * or too wide.
 	 */
 	$.fn.positionOverlayDialogue = function () {

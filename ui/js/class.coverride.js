@@ -41,7 +41,7 @@ jQuery(function ($) {
 			const input = $('<input>', {'name': field_name, 'type': 'hidden', 'id': id}).val(value);
 
 			return $('<div>')
-				.addClass('input-color-picker')
+				.addClass('color-picker')
 				.append(input)
 				.append(close);
 		}

@@ -76,6 +76,7 @@ $filter_form = (new CFormList())
 
 $widget = (new CWidget())
 	->setTitle(_('Audit log'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORTS_AUDITLOG_LIST))
 	->addItem($filter
 		->addVar('action', $data['action'])
 		->setProfile($data['timeline']['profileIdx'])

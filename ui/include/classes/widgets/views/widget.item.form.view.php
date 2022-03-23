@@ -230,7 +230,7 @@ $scripts[] =
 		'}'.
 	'};'.
 
-	'$(".input-color-picker input", $(".overlay-dialogue-body"))'.
+	'$(".'.ZBX_STYLE_COLOR_PICKER.' input", $(".overlay-dialogue-body"))'.
 		'.colorpicker({appendTo: ".overlay-dialogue-body", use_default: true, onUpdate: window.setIndicatorColor});'.
 
 	'var $show = $(\'input[id^="show_"]\', "#widget-dialogue-form").not("#show_header");'.

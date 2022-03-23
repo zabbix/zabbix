@@ -17,14 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "checks_internal.h"
-#include "checks_java.h"
-#include "dbcache.h"
-#include "zbxself.h"
-#include "proxy.h"
-#include "zbxtrends.h"
 
+#include "checks_java.h"
+#include "zbxself.h"
+#include "preproc.h"
+#include "zbxtrends.h"
 #include "../vmware/vmware.h"
 #include "../../libs/zbxserver/zabbix_stats.h"
 #include "../../libs/zbxsysinfo/common/zabbix_stats.h"

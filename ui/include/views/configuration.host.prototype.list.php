@@ -23,8 +23,14 @@
  * @var CView $this
  */
 
+require_once dirname(__FILE__).'/js/configuration.host.prototype.list.js.php';
+
 $widget = (new CWidget())
 	->setTitle(_('Host prototypes'))
+	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
+		? CDocHelper::CONFIGURATION_HOST_PROTOTYPE_LIST
+		: CDocHelper::CONFIGURATION_TEMPLATES_PROTOTYPE_LIST
+	))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())->addItem(new CRedirectButton(_('Create host prototype'),

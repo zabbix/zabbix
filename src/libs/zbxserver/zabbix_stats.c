@@ -17,16 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zabbix_stats.h"
+
 #include "common.h"
-#include "zbxjson.h"
 #include "dbcache.h"
 #include "zbxself.h"
-#include "valuecache.h"
 #include "../../zabbix_server/vmware/vmware.h"
 #include "preproc.h"
-#include "zbxtrends.h"
-
-#include "zabbix_stats.h"
 
 extern unsigned char	program_type;
 

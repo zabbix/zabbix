@@ -17,10 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "dbcache.h"
+#include "audit_graph.h"
 
 #include "log.h"
-#include "audit_graph.h"
+#include "db.h"
+#include "audit.h"
 
 static int	graph_flag_to_resource_type(int flag)
 {
