@@ -276,6 +276,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 				]
 			],
 			[
+			[
 				[
 					'hosts' => [
 						[
@@ -287,6 +288,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 									'interface_ref' => 'if2',
 									'type' => 'SNMP',
 									'port' => '161'
+								]
 								],
 							'items' => [
 								[
@@ -322,6 +324,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 								'details' => [
 									'version' => 'SNMPV1',
 									'community' => 'public'
+									]
 								]
 							],
 							'items' => [
@@ -343,7 +346,6 @@ class C44ImportConverterTest extends CImportConverterTest {
 						]
 					]
 				]
-			]
 			]
 		];
 	}
