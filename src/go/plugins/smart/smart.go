@@ -374,13 +374,13 @@ func getAttributeType(devType string, rate int, tables []table) string {
 	return getTypeByRateAndAttr(rate, tables)
 }
 
-func getAttributes(in deviceParser) []string {
-	out := make([]string, len(in.SmartAttributes.Table))
+func getAttributes(in deviceParser) string {
+	tmp := make([]string, len(in.SmartAttributes.Table))
 	for i, table := range in.SmartAttributes.Table {
-		out[i] = table.Attrname
+		tmp[i] = table.Attrname
 	}
 
-	return out
+	return strings.Join(tmp, " ")
 }
 
 func getType(devType string, rate int, tables []table) string {

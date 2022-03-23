@@ -467,6 +467,45 @@ func Test_getAttributeType(t *testing.T) {
 	}
 }
 
+func Test_getAttributes(t *testing.T) {
+	type args struct {
+		in deviceParser
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			"attributes_set",
+			args{deviceParser{SmartAttributes: smartAttributes{Table: []table{table1, table2}}}},
+			"test1 test2",
+		},
+		{
+			"attributes_table_empty",
+			args{deviceParser{SmartAttributes: smartAttributes{Table: []table{}}}},
+			"",
+		},
+		{
+			"attributes_missing",
+			args{deviceParser{}},
+			"",
+		},
+		{
+			"parser_missing",
+			args{},
+			"",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getAttributes(tt.args.in); got != tt.want {
+				t.Errorf("getAttributes() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_getType(t *testing.T) {
 	type args struct {
 		devType string
