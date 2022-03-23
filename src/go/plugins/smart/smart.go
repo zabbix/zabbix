@@ -275,6 +275,7 @@ func setSingleDiskFields(dev []byte) (out map[string]interface{}, err error) {
 	return
 }
 
+// setSelfTest determines if device is self test capable and if the test is passed.
 func setSelfTest(sd singleDevice) *bool {
 	if sd.Data.Capabilities.SelfTestsSupported {
 		return &sd.Data.SelfTest.Status.Passed
