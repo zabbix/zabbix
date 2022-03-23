@@ -122,7 +122,7 @@ func (p *Plugin) diskDiscovery() (jsonArray []byte, err error) {
 			DeviceType:   getType(dev.Info.DevType, dev.RotationRate, dev.SmartAttributes.Table),
 			Model:        dev.ModelName,
 			SerialNumber: dev.SerialNumber,
-			Path:         dev.Info.Name,
+			Path:         dev.Info.path,
 			Attributes:   getAttributes(dev),
 		})
 	}
