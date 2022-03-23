@@ -75,6 +75,11 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'verify_peer'			=> 'in 0,1'
 		];
 
+		if (getRequest('interfaceid') == INTERFACE_TYPE_OPT) {
+			unset($fields['interfaceid']);
+			unset($_REQUEST['interfaceid']);
+		}
+
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
