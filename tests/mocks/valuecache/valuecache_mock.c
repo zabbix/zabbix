@@ -43,13 +43,13 @@ static zbx_timespec_t	vcmock_ts;
 
 int	__wrap_zbx_mutex_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error);
 void	__wrap_zbx_mutex_destroy(zbx_mutex_t *mutex);
-int	__wrap_zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
+int	__wrap_zbx_shmem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
 		int allow_oom, char **error);
-void	__wrap_zbx_mem_destroy(zbx_mem_info_t *info);
-void	*__wrap___zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const void *old, size_t size);
-void	*__wrap___zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *old, size_t size);
-void	__wrap___zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr);
-void	__wrap_zbx_mem_dump_stats(int level, zbx_mem_info_t *info);
+void	__wrap_zbx_shmem_destroy(zbx_mem_info_t *info);
+void	*__wrap___zbx_shmem_malloc(const char *file, int line, zbx_mem_info_t *info, const void *old, size_t size);
+void	*__wrap___zbx_shmem_realloc(const char *file, int line, zbx_mem_info_t *info, void *old, size_t size);
+void	__wrap___zbx_shmem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr);
+void	__wrap_zbx_shmem_dump_stats(int level, zbx_mem_info_t *info);
 int	__wrap_zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int count, int end,
 		zbx_vector_history_record_t *values);
 int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history);
@@ -497,7 +497,7 @@ void	__wrap_zbx_mutex_destroy(zbx_mutex_t *mutex)
 	zbx_mock_assert_ptr_eq("Attempting to destroy unknown mutex", vc_mutex, mutex);
 }
 
-int	__wrap_zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
+int	__wrap_zbx_shmem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
 		int allow_oom, char **error)
 {
 	*info = vc_meminfo;
@@ -510,12 +510,12 @@ int	__wrap_zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *
 	return SUCCEED;
 }
 
-void	__wrap_zbx_mem_destroy(zbx_mem_info_t *info)
+void	__wrap_zbx_shmem_destroy(zbx_mem_info_t *info)
 {
 	zbx_free(info);
 }
 
-void	*__wrap___zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const void *old, size_t size)
+void	*__wrap___zbx_shmem_malloc(const char *file, int line, zbx_mem_info_t *info, const void *old, size_t size)
 {
 	size_t	*psize;
 
@@ -535,7 +535,7 @@ void	*__wrap___zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, 
 	return (void *)(psize + 1);
 }
 
-void	*__wrap___zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *old, size_t size)
+void	*__wrap___zbx_shmem_realloc(const char *file, int line, zbx_mem_info_t *info, void *old, size_t size)
 {
 	size_t	*psize;
 
@@ -556,7 +556,7 @@ void	*__wrap___zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info,
 	return (void *)(psize + 1);
 }
 
-void	__wrap___zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr)
+void	__wrap___zbx_shmem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr)
 {
 	size_t	*psize;
 
@@ -575,7 +575,7 @@ void	__wrap___zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, voi
 	zbx_free(psize);
 }
 
-void	__wrap_zbx_mem_dump_stats(int level, zbx_mem_info_t *info)
+void	__wrap_zbx_shmem_dump_stats(int level, zbx_mem_info_t *info)
 {
 	ZBX_UNUSED(level);
 	ZBX_UNUSED(info);

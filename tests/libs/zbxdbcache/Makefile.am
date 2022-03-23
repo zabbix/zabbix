@@ -83,12 +83,12 @@ CACHE_LIBS = \
 COMMON_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_mutex_create \
 	-Wl,--wrap=zbx_mutex_destroy \
-	-Wl,--wrap=zbx_mem_create \
-	-Wl,--wrap=zbx_mem_destroy \
-	-Wl,--wrap=__zbx_mem_malloc \
-	-Wl,--wrap=__zbx_mem_realloc \
-	-Wl,--wrap=__zbx_mem_free \
-	-Wl,--wrap=zbx_mem_dump_stats \
+	-Wl,--wrap=zbx_shmem_create \
+	-Wl,--wrap=zbx_shmem_destroy \
+	-Wl,--wrap=__zbx_shmem_malloc \
+	-Wl,--wrap=__zbx_shmem_realloc \
+	-Wl,--wrap=__zbx_shmem_free \
+	-Wl,--wrap=zbx_shmem_dump_stats \
 	-Wl,--wrap=zbx_history_get_values \
 	-Wl,--wrap=zbx_history_add_values \
 	-Wl,--wrap=zbx_history_sql_init \
@@ -176,10 +176,10 @@ dc_expand_user_macros_in_func_params_CFLAGS = \
 	-I@top_srcdir@/tests/mocks/configcache \
 	-I@top_srcdir@/src/libs/zbxdbcache
 dc_expand_user_macros_in_func_params_SOURCES = \
-	dc_expand_user_macros_in_func_params.c 
+	dc_expand_user_macros_in_func_params.c
 dc_expand_user_macros_in_func_params_LDADD = \
 	$(top_srcdir)/tests/mocks/configcache/libconfigcachemock.a \
-	$(CACHE_LIBS) @SERVER_LIBS@ 
+	$(CACHE_LIBS) @SERVER_LIBS@
 dc_expand_user_macros_in_func_params_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=zbx_hashset_search
 

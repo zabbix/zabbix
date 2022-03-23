@@ -316,7 +316,7 @@ static void	rm_destroy(zbx_rm_t *manager)
 	zbx_vector_uint64_destroy(&manager->flush_queue);
 
 	zbx_queue_ptr_destroy(&manager->free_writers);
-	zbx_vector_ptr_clear_ext(&manager->writers, (zbx_mem_free_func_t)rm_writer_free);
+	zbx_vector_ptr_clear_ext(&manager->writers, (zbx_shmem_free_func_t)rm_writer_free);
 	zbx_vector_ptr_destroy(&manager->writers);
 }
 

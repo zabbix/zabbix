@@ -897,7 +897,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	zbx_preprocessor_flush();
 	zbx_clean_items(items, num, results);
 	DCconfig_clean_items(items, NULL, num);
-	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_result_ptr);
+	zbx_vector_ptr_clear_ext(&add_results, (zbx_shmem_free_func_t)zbx_free_result_ptr);
 	zbx_vector_ptr_destroy(&add_results);
 
 	if (NULL != data)

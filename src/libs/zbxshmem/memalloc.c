@@ -526,7 +526,7 @@ static void	__mem_free(zbx_mem_info_t *info, void *ptr)
 
 /* public memory interface */
 
-int	zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, const char *param, int allow_oom,
+int	zbx_shmem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, const char *param, int allow_oom,
 		char **error)
 {
 	int	shm_id, index, ret = FAIL;
@@ -624,12 +624,12 @@ out:
 	return ret;
 }
 
-void	zbx_mem_destroy(zbx_mem_info_t *info)
+void	zbx_shmem_destroy(zbx_mem_info_t *info)
 {
 	(void)shmdt(info->base);
 }
 
-void	*__zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const void *old, size_t size)
+void	*__zbx_shmem_malloc(const char *file, int line, zbx_mem_info_t *info, const void *old, size_t size)
 {
 	void	*chunk;
 
@@ -658,7 +658,7 @@ void	*__zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const v
 				file, line, __func__, (zbx_fs_size_t)size);
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): please increase %s configuration parameter",
 				file, line, __func__, info->mem_param);
-		zbx_mem_dump_stats(LOG_LEVEL_CRIT, info);
+		zbx_shmem_dump_stats(LOG_LEVEL_CRIT, info);
 		zbx_backtrace();
 		exit(EXIT_FAILURE);
 	}
@@ -666,7 +666,7 @@ void	*__zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const v
 	return (void *)((char *)chunk + MEM_SIZE_FIELD);
 }
 
-void	*__zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *old, size_t size)
+void	*__zbx_shmem_realloc(const char *file, int line, zbx_mem_info_t *info, void *old, size_t size)
 {
 	void	*chunk;
 
@@ -691,7 +691,7 @@ void	*__zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *
 				file, line, __func__, (zbx_fs_size_t)size);
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): please increase %s configuration parameter",
 				file, line, __func__, info->mem_param);
-		zbx_mem_dump_stats(LOG_LEVEL_CRIT, info);
+		zbx_shmem_dump_stats(LOG_LEVEL_CRIT, info);
 		zbx_backtrace();
 		exit(EXIT_FAILURE);
 	}
@@ -699,7 +699,7 @@ void	*__zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *
 	return (void *)((char *)chunk + MEM_SIZE_FIELD);
 }
 
-void	__zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr)
+void	__zbx_shmem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr)
 {
 	if (NULL == ptr)
 	{
@@ -710,7 +710,7 @@ void	__zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr)
 	__mem_free(info, ptr);
 }
 
-void	zbx_mem_clear(zbx_mem_info_t *info)
+void	zbx_shmem_clear(zbx_mem_info_t *info)
 {
 	int	index;
 
@@ -728,7 +728,7 @@ void	zbx_mem_clear(zbx_mem_info_t *info)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	zbx_mem_get_stats(const zbx_mem_info_t *info, zbx_mem_stats_t *stats)
+void	zbx_shmem_get_stats(const zbx_mem_info_t *info, zbx_mem_stats_t *stats)
 {
 	void		*chunk;
 	int		i;
@@ -761,12 +761,12 @@ void	zbx_mem_get_stats(const zbx_mem_info_t *info, zbx_mem_stats_t *stats)
 	stats->used_size = info->used_size;
 }
 
-void	zbx_mem_dump_stats(int level, zbx_mem_info_t *info)
+void	zbx_shmem_dump_stats(int level, zbx_mem_info_t *info)
 {
 	zbx_mem_stats_t	stats;
 	int		i;
 
-	zbx_mem_get_stats(info, &stats);
+	zbx_shmem_get_stats(info, &stats);
 
 	zabbix_log(level, "=== memory statistics for %s ===", info->mem_descr);
 
@@ -795,7 +795,7 @@ void	zbx_mem_dump_stats(int level, zbx_mem_info_t *info)
 	zabbix_log(level, "================================");
 }
 
-size_t	zbx_mem_required_size(int chunks_num, const char *descr, const char *param)
+size_t	zbx_shmem_required_size(int chunks_num, const char *descr, const char *param)
 {
 	size_t	size = 0;
 
@@ -823,7 +823,7 @@ size_t	zbx_mem_required_size(int chunks_num, const char *descr, const char *para
 	return size;
 }
 
-zbx_uint64_t	zbx_mem_required_chunk_size(zbx_uint64_t size)
+zbx_uint64_t	zbx_shmem_required_chunk_size(zbx_uint64_t size)
 {
 	if (0 == size)
 		return 0;

@@ -229,7 +229,7 @@ int	zbx_vault_init_db_credentials(char **error)
 	}
 
 	zbx_hashset_create_ext(&kvs, 2, zbx_vault_kv_hash, zbx_vault_kv_compare, zbx_vault_kv_clean,
-			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+			ZBX_DEFAULT_SHMEM_MALLOC_FUNC, ZBX_DEFAULT_SHMEM_REALLOC_FUNC, ZBX_DEFAULT_SHMEM_FREE_FUNC);
 
 	if (SUCCEED != zbx_vault_kvs_get(CONFIG_VAULTDBPATH, &kvs, error))
 		goto fail;

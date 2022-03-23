@@ -70,7 +70,7 @@ static void	__binary_heap_ensure_free_space(zbx_binary_heap_t *heap)
 
 	if (heap->elems_alloc != tmp_elems_alloc)
 	{
-		heap->elems = (zbx_binary_heap_elem_t *)heap->mem_realloc_func(heap->elems, tmp_elems_alloc * sizeof(zbx_binary_heap_elem_t));
+		heap->elems = (zbx_binary_heap_elem_t *)heap->shmem_realloc_func(heap->elems, tmp_elems_alloc * sizeof(zbx_binary_heap_elem_t));
 
 		if (NULL == heap->elems)
 		{
@@ -147,15 +147,15 @@ static int	__binary_heap_bubble_down(zbx_binary_heap_t *heap, int index)
 void	zbx_binary_heap_create(zbx_binary_heap_t *heap, zbx_compare_func_t compare_func, int options)
 {
 	zbx_binary_heap_create_ext(heap, compare_func, options,
-					ZBX_DEFAULT_MEM_MALLOC_FUNC,
-					ZBX_DEFAULT_MEM_REALLOC_FUNC,
-					ZBX_DEFAULT_MEM_FREE_FUNC);
+					ZBX_DEFAULT_SHMEM_MALLOC_FUNC,
+					ZBX_DEFAULT_SHMEM_REALLOC_FUNC,
+					ZBX_DEFAULT_SHMEM_FREE_FUNC);
 }
 
 void	zbx_binary_heap_create_ext(zbx_binary_heap_t *heap, zbx_compare_func_t compare_func, int options,
-					zbx_mem_malloc_func_t mem_malloc_func,
-					zbx_mem_realloc_func_t mem_realloc_func,
-					zbx_mem_free_func_t mem_free_func)
+					zbx_shmem_malloc_func_t shmem_malloc_func,
+					zbx_shmem_realloc_func_t shmem_realloc_func,
+					zbx_shmem_free_func_t shmem_free_func)
 {
 	heap->elems = NULL;
 	heap->elems_num = 0;
@@ -165,27 +165,27 @@ void	zbx_binary_heap_create_ext(zbx_binary_heap_t *heap, zbx_compare_func_t comp
 
 	if (HAS_DIRECT_OPTION(heap))
 	{
-		heap->key_index = (zbx_hashmap_t *)mem_malloc_func(NULL, sizeof(zbx_hashmap_t));
+		heap->key_index = (zbx_hashmap_t *)shmem_malloc_func(NULL, sizeof(zbx_hashmap_t));
 		zbx_hashmap_create_ext(heap->key_index, 512,
 					ZBX_DEFAULT_UINT64_HASH_FUNC,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC,
-					mem_malloc_func,
-					mem_realloc_func,
-					mem_free_func);
+					shmem_malloc_func,
+					shmem_realloc_func,
+					shmem_free_func);
 	}
 	else
 		heap->key_index = NULL;
 
-	heap->mem_malloc_func = mem_malloc_func;
-	heap->mem_realloc_func = mem_realloc_func;
-	heap->mem_free_func = mem_free_func;
+	heap->shmem_malloc_func = shmem_malloc_func;
+	heap->shmem_realloc_func = shmem_realloc_func;
+	heap->shmem_free_func = shmem_free_func;
 }
 
 void	zbx_binary_heap_destroy(zbx_binary_heap_t *heap)
 {
 	if (NULL != heap->elems)
 	{
-		heap->mem_free_func(heap->elems);
+		heap->shmem_free_func(heap->elems);
 		heap->elems = NULL;
 		heap->elems_num = 0;
 		heap->elems_alloc = 0;
@@ -196,14 +196,14 @@ void	zbx_binary_heap_destroy(zbx_binary_heap_t *heap)
 	if (HAS_DIRECT_OPTION(heap))
 	{
 		zbx_hashmap_destroy(heap->key_index);
-		heap->mem_free_func(heap->key_index);
+		heap->shmem_free_func(heap->key_index);
 		heap->key_index = NULL;
 		heap->options = 0;
 	}
 
-	heap->mem_malloc_func = NULL;
-	heap->mem_realloc_func = NULL;
-	heap->mem_free_func = NULL;
+	heap->shmem_malloc_func = NULL;
+	heap->shmem_realloc_func = NULL;
+	heap->shmem_free_func = NULL;
 }
 
 int	zbx_binary_heap_empty(zbx_binary_heap_t *heap)

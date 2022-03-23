@@ -271,7 +271,8 @@ static void	cache_put_snmp_index(const DC_ITEM *item, const char *snmp_oid, cons
 	{
 		zbx_hashset_create_ext(&snmpidx, 100,
 				__snmpidx_main_key_hash, __snmpidx_main_key_compare, __snmpidx_main_key_clean,
-				ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+				ZBX_DEFAULT_SHMEM_MALLOC_FUNC, ZBX_DEFAULT_SHMEM_REALLOC_FUNC,
+				ZBX_DEFAULT_SHMEM_FREE_FUNC);
 	}
 
 	main_key_local.addr = item->interface.addr;
@@ -292,9 +293,11 @@ static void	cache_put_snmp_index(const DC_ITEM *item, const char *snmp_oid, cons
 		main_key_local.mappings = (zbx_hashset_t *)zbx_malloc(NULL, sizeof(zbx_hashset_t));
 		zbx_hashset_create_ext(main_key_local.mappings, 100,
 				__snmpidx_mapping_hash, __snmpidx_mapping_compare, __snmpidx_mapping_clean,
-				ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+				ZBX_DEFAULT_SHMEM_MALLOC_FUNC, ZBX_DEFAULT_SHMEM_REALLOC_FUNC,
+				ZBX_DEFAULT_SHMEM_FREE_FUNC);
 
-		main_key = (zbx_snmpidx_main_key_t *)zbx_hashset_insert(&snmpidx, &main_key_local, sizeof(main_key_local));
+		main_key = (zbx_snmpidx_main_key_t *)zbx_hashset_insert(&snmpidx, &main_key_local,
+				sizeof(main_key_local));
 	}
 
 	if (NULL == (mapping = (zbx_snmpidx_mapping_t *)zbx_hashset_search(main_key->mappings, &value)))

@@ -36,7 +36,7 @@ static void	__hashset_free_entry(zbx_hashset_t *hs, ZBX_HASHSET_ENTRY_T *entry)
 	if (NULL != hs->clean_func)
 		hs->clean_func(entry->data);
 
-	hs->mem_free_func(entry);
+	hs->shmem_free_func(entry);
 }
 
 static int	zbx_hashset_init_slots(zbx_hashset_t *hs, size_t init_size)
@@ -47,7 +47,8 @@ static int	zbx_hashset_init_slots(zbx_hashset_t *hs, size_t init_size)
 	{
 		hs->num_slots = next_prime(init_size);
 
-		if (NULL == (hs->slots = (ZBX_HASHSET_ENTRY_T **)hs->mem_malloc_func(NULL, hs->num_slots * sizeof(ZBX_HASHSET_ENTRY_T *))))
+		if (NULL == (hs->slots = (ZBX_HASHSET_ENTRY_T **)hs->shmem_malloc_func(NULL, hs->num_slots *
+				sizeof(ZBX_HASHSET_ENTRY_T *))))
 			return FAIL;
 
 		memset(hs->slots, 0, hs->num_slots * sizeof(ZBX_HASHSET_ENTRY_T *));
@@ -68,25 +69,25 @@ void	zbx_hashset_create(zbx_hashset_t *hs, size_t init_size,
 				zbx_compare_func_t compare_func)
 {
 	zbx_hashset_create_ext(hs, init_size, hash_func, compare_func, NULL,
-					ZBX_DEFAULT_MEM_MALLOC_FUNC,
-					ZBX_DEFAULT_MEM_REALLOC_FUNC,
-					ZBX_DEFAULT_MEM_FREE_FUNC);
+					ZBX_DEFAULT_SHMEM_MALLOC_FUNC,
+					ZBX_DEFAULT_SHMEM_REALLOC_FUNC,
+					ZBX_DEFAULT_SHMEM_FREE_FUNC);
 }
 
 void	zbx_hashset_create_ext(zbx_hashset_t *hs, size_t init_size,
 				zbx_hash_func_t hash_func,
 				zbx_compare_func_t compare_func,
 				zbx_clean_func_t clean_func,
-				zbx_mem_malloc_func_t mem_malloc_func,
-				zbx_mem_realloc_func_t mem_realloc_func,
-				zbx_mem_free_func_t mem_free_func)
+				zbx_shmem_malloc_func_t shmem_malloc_func,
+				zbx_shmem_realloc_func_t shmem_realloc_func,
+				zbx_shmem_free_func_t shmem_free_func)
 {
 	hs->hash_func = hash_func;
 	hs->compare_func = compare_func;
 	hs->clean_func = clean_func;
-	hs->mem_malloc_func = mem_malloc_func;
-	hs->mem_realloc_func = mem_realloc_func;
-	hs->mem_free_func = mem_free_func;
+	hs->shmem_malloc_func = shmem_malloc_func;
+	hs->shmem_realloc_func = shmem_realloc_func;
+	hs->shmem_free_func = shmem_free_func;
 
 	zbx_hashset_init_slots(hs, init_size);
 }
@@ -113,15 +114,15 @@ void	zbx_hashset_destroy(zbx_hashset_t *hs)
 
 	if (NULL != hs->slots)
 	{
-		hs->mem_free_func(hs->slots);
+		hs->shmem_free_func(hs->slots);
 		hs->slots = NULL;
 	}
 
 	hs->hash_func = NULL;
 	hs->compare_func = NULL;
-	hs->mem_malloc_func = NULL;
-	hs->mem_realloc_func = NULL;
-	hs->mem_free_func = NULL;
+	hs->shmem_malloc_func = NULL;
+	hs->shmem_realloc_func = NULL;
+	hs->shmem_free_func = NULL;
 }
 
 /******************************************************************************
@@ -151,7 +152,7 @@ int	zbx_hashset_reserve(zbx_hashset_t *hs, int num_slots_req)
 
 		inc_slots = next_prime(hs->num_slots * SLOT_GROWTH_FACTOR);
 
-		if (NULL == (slots = hs->mem_realloc_func(hs->slots, inc_slots * sizeof(ZBX_HASHSET_ENTRY_T *))))
+		if (NULL == (slots = hs->shmem_realloc_func(hs->slots, inc_slots * sizeof(ZBX_HASHSET_ENTRY_T *))))
 			return FAIL;
 
 		hs->slots = (ZBX_HASHSET_ENTRY_T **)slots;
@@ -223,8 +224,11 @@ void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, s
 		/* recalculate new slot */
 		slot = hash % hs->num_slots;
 
-		if (NULL == (entry = (ZBX_HASHSET_ENTRY_T *)hs->mem_malloc_func(NULL, ZBX_HASHSET_ENTRY_OFFSET + size)))
+		if (NULL == (entry = (ZBX_HASHSET_ENTRY_T *)hs->shmem_malloc_func(NULL, ZBX_HASHSET_ENTRY_OFFSET +
+				size)))
+		{
 			return NULL;
+		}
 
 		memcpy((char *)entry->data + offset, (const char *)data + offset, size - offset);
 		entry->hash = hash;

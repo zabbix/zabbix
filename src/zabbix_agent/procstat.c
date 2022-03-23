@@ -1120,7 +1120,7 @@ clean:
 	zbx_proc_free_processes(&processes);
 	zbx_vector_ptr_destroy(&processes);
 
-	zbx_vector_ptr_clear_ext(&queries, (zbx_mem_free_func_t)procstat_free_query_data);
+	zbx_vector_ptr_clear_ext(&queries, (zbx_shmem_free_func_t)procstat_free_query_data);
 	zbx_vector_ptr_destroy(&queries);
 out:
 	runid++;

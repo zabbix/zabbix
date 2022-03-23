@@ -72,7 +72,7 @@ static int	vc_state = ZBX_VC_DISABLED;
 /* the value cache size */
 extern zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE;
 
-ZBX_MEM_FUNC_IMPL(__vc, vc_mem)
+ZBX_SHMEM_FUNC_IMPL(__vc, vc_mem)
 
 #define VC_STRPOOL_INIT_SIZE	(1000)
 #define VC_ITEMS_INIT_SIZE	(1000)
@@ -751,7 +751,7 @@ static void	vc_warn_low_memory(void)
 	{
 		vc_cache->last_warning_time = now;
 		vc_dump_items_statistics();
-		zbx_mem_dump_stats(LOG_LEVEL_WARNING, vc_mem);
+		zbx_shmem_dump_stats(LOG_LEVEL_WARNING, vc_mem);
 
 		zabbix_log(LOG_LEVEL_WARNING, "value cache is fully used: please increase ValueCacheSize"
 				" configuration parameter");
@@ -953,13 +953,13 @@ static void	*vc_item_malloc(zbx_vc_item_t *item, size_t size)
 {
 	char	*ptr;
 
-	if (NULL == (ptr = (char *)__vc_mem_malloc_func(NULL, size)))
+	if (NULL == (ptr = (char *)__vc_shmem_malloc_func(NULL, size)))
 	{
 		/* If failed to allocate required memory, try to free space in      */
 		/* cache and allocate again. If there still is not enough space -   */
 		/* return NULL as failure.                                          */
 		vc_release_space(item, size);
-		ptr = (char *)__vc_mem_malloc_func(NULL, size);
+		ptr = (char *)__vc_shmem_malloc_func(NULL, size);
 	}
 
 	return ptr;
@@ -1091,7 +1091,7 @@ static zbx_log_value_t	*vc_item_logdup(zbx_vc_item_t *item, const zbx_log_value_
 fail:
 	vc_item_strfree(plog->source);
 
-	__vc_mem_free_func(plog);
+	__vc_shmem_free_func(plog);
 
 	return NULL;
 }
@@ -1117,7 +1117,7 @@ static size_t	vc_item_logfree(zbx_log_value_t *log)
 		freed += vc_item_strfree(log->source);
 		freed += vc_item_strfree(log->value);
 
-		__vc_mem_free_func(log);
+		__vc_shmem_free_func(log);
 		freed += sizeof(zbx_log_value_t);
 	}
 
@@ -1589,7 +1589,7 @@ static size_t	vch_item_free_chunk(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk)
 	freed = sizeof(zbx_vc_chunk_t) + (chunk->slots_num - 1) * sizeof(zbx_history_record_t);
 	freed += vc_item_free_values(item, chunk->slots, chunk->first_value, chunk->last_value);
 
-	__vc_mem_free_func(chunk);
+	__vc_shmem_free_func(chunk);
 
 	return freed;
 }
@@ -2350,14 +2350,17 @@ int	zbx_vc_init(char **error)
 	if (SUCCEED != (ret = zbx_rwlock_create(&vc_lock, ZBX_RWLOCK_VALUECACHE, error)))
 		goto out;
 
-	size_reserved = zbx_mem_required_size(1, "value cache size", "ValueCacheSize");
+	size_reserved = zbx_shmem_required_size(1, "value cache size", "ValueCacheSize");
 
-	if (SUCCEED != zbx_mem_create(&vc_mem, CONFIG_VALUE_CACHE_SIZE, "value cache size", "ValueCacheSize", 1, error))
+	if (SUCCEED != zbx_shmem_create(&vc_mem, CONFIG_VALUE_CACHE_SIZE, "value cache size", "ValueCacheSize", 1,
+			error))
+	{
 		goto out;
+	}
 
 	CONFIG_VALUE_CACHE_SIZE -= size_reserved;
 
-	vc_cache = (zbx_vc_cache_t *)__vc_mem_malloc_func(vc_cache, sizeof(zbx_vc_cache_t));
+	vc_cache = (zbx_vc_cache_t *)__vc_shmem_malloc_func(vc_cache, sizeof(zbx_vc_cache_t));
 
 	if (NULL == vc_cache)
 	{
@@ -2368,7 +2371,7 @@ int	zbx_vc_init(char **error)
 
 	zbx_hashset_create_ext(&vc_cache->items, VC_ITEMS_INIT_SIZE,
 			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
-			__vc_mem_malloc_func, __vc_mem_realloc_func, __vc_mem_free_func);
+			__vc_shmem_malloc_func, __vc_shmem_realloc_func, __vc_shmem_free_func);
 
 	if (NULL == vc_cache->items.slots)
 	{
@@ -2378,7 +2381,7 @@ int	zbx_vc_init(char **error)
 
 	zbx_hashset_create_ext(&vc_cache->strpool, VC_STRPOOL_INIT_SIZE,
 			vc_strpool_hash_func, vc_strpool_compare_func, NULL,
-			__vc_mem_malloc_func, __vc_mem_realloc_func, __vc_mem_free_func);
+			__vc_shmem_malloc_func, __vc_shmem_realloc_func, __vc_shmem_free_func);
 
 	if (NULL == vc_cache->strpool.slots)
 	{
@@ -2419,10 +2422,10 @@ void	zbx_vc_destroy(void)
 		zbx_hashset_destroy(&vc_cache->items);
 		zbx_hashset_destroy(&vc_cache->strpool);
 
-		__vc_mem_free_func(vc_cache);
+		__vc_shmem_free_func(vc_cache);
 		vc_cache = NULL;
 
-		zbx_mem_destroy(vc_mem);
+		zbx_shmem_destroy(vc_mem);
 		vc_mem = NULL;
 		zbx_rwlock_destroy(&vc_lock);
 	}
@@ -2744,7 +2747,7 @@ void	zbx_vc_get_mem_stats(zbx_mem_stats_t *mem)
 	}
 
 	RDLOCK_CACHE;
-	zbx_mem_get_stats(vc_mem, mem);
+	zbx_shmem_get_stats(vc_mem, mem);
 	UNLOCK_CACHE;
 }
 

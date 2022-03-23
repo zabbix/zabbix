@@ -34,8 +34,8 @@
 
 #define ZBX_UPDATE_STR(dst, src)			\
 	if (NULL == src)				\
-		zbx_free(dst); 				\
-	else if (NULL == dst || 0 != strcmp(dst, src)) 	\
+		zbx_free(dst);				\
+	else if (NULL == dst || 0 != strcmp(dst, src))	\
 		dst = zbx_strdup(dst, src);
 
 #define ZBX_AM_DB_POLL_DELAY	1
@@ -1187,7 +1187,7 @@ static void	am_destroy(zbx_am_t *manager)
 
 	zbx_hashset_destroy(&manager->alerters_client);
 	zbx_queue_ptr_destroy(&manager->free_alerters);
-	zbx_vector_ptr_clear_ext(&manager->alerters, (zbx_mem_free_func_t)am_alerter_free);
+	zbx_vector_ptr_clear_ext(&manager->alerters, (zbx_shmem_free_func_t)am_alerter_free);
 	zbx_vector_ptr_destroy(&manager->alerters);
 
 	while (NULL != (alert = am_pop_alert(manager)))
