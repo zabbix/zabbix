@@ -182,7 +182,7 @@ else {
 				_('Subfilter'), ' ', (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)
 			])
 			: null
-		]]
+		]], ZBX_STYLE_HOVER_NOBG
 	)
 	->addRow(
 		$subfilter_options['tagnames']
