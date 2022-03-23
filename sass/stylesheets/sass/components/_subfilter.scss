@@ -3,12 +3,6 @@
 	display: grid;
 	margin: 5px 0;
 
-	> label {
-		max-width: 75px;
-		text-overflow: ellipsis;
-		overflow: hidden;
-	}
-
 	.subfilter-options {
 		grid-column: 2 / -1;
 	}
