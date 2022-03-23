@@ -23,7 +23,7 @@
 #include "sysinfo.h" //included for convenience
 #include "db.h"
 #include "zbxcomms.h"
-#include "zbxmemory.h"
+#include "zbxshmem.h"
 #include "zbxeval.h"
 
 #define ZBX_SYNC_DONE		0

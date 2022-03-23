@@ -23,7 +23,7 @@
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 #include "zbxhistory.h"
-#include "zbxmemory.h"
+#include "zbxshmem.h"
 
 /*
  * The Value Cache provides read caching of item historical data residing in history

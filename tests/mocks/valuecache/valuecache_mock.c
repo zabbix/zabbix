@@ -20,7 +20,7 @@
 #include "common.h"
 #include "log.h"
 #include "mutexs.h"
-#include "zbxmemory.h"
+#include "zbxshmem.h"
 #include "zbxalgo.h"
 #include "zbxhistory.h"
 #include "history.h"

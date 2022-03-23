@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_MEMORY_H
-#define ZABBIX_MEMORY_H
+#ifndef ZABBIX_SHMEM_H
+#define ZABBIX_SHMEM_H
 
 #include "zbxtypes.h"
 
@@ -130,4 +130,4 @@ ZBX_MEM_FUNC1_IMPL_MALLOC(__prefix, __info)				\
 ZBX_MEM_FUNC1_IMPL_REALLOC(__prefix, __info)				\
 ZBX_MEM_FUNC1_IMPL_FREE(__prefix, __info)
 
-#endif /* ZABBIX_MEMORY_H */
+#endif /* ZABBIX_SHMEM_H */

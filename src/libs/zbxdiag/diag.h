@@ -22,7 +22,7 @@
 
 #include "zbxjson.h"
 #include "zbxalgo.h"
-#include "zbxmemory.h"
+#include "zbxshmem.h"
 
 #define ZBX_DIAG_SECTION_MAX	64
 #define ZBX_DIAG_FIELD_MAX	64
