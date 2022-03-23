@@ -485,7 +485,11 @@ class CItem extends CItemGeneral {
 		$this->validateCreate($items);
 
 		$this->createForce($items);
-		$this->inherit($items);
+		[$tpl_items] = $this->getTemplatedObjects($items);
+
+		if ($tpl_items) {
+			$this->inherit($tpl_items);
+		}
 
 		return ['itemids' => array_column($items, 'itemid')];
 	}
@@ -574,7 +578,12 @@ class CItem extends CItemGeneral {
 		$this->validateUpdate($items, $db_items);
 
 		self::updateForce($items, $db_items);
-		$this->inherit($items);
+
+		[$tpl_items, $tpl_db_items] = $this->getTemplatedObjects($items, $db_items);
+
+		if ($tpl_items) {
+			$this->inherit($tpl_items, $tpl_db_items);
+		}
 
 		return ['itemids' => array_column($items, 'itemid')];
 	}
@@ -605,8 +614,8 @@ class CItem extends CItemGeneral {
 		}
 
 		$db_items = DBfetchArrayAssoc(DBselect(
-			'SELECT i.itemid,i.name,i.type,i.key_,i.value_type,i.units,i.history,i.trends,i.valuemapid,',
-				'i.inventory_link,i.logtimefmt,i.description,i.status,i.hostid,i.templateid,i.flags,'.
+			'SELECT i.itemid,i.name,i.type,i.key_,i.value_type,i.units,i.history,i.trends,i.valuemapid,'.
+				'i.inventory_link,i.logtimefmt,i.description,i.status,i.hostid,i.templateid,i.flags,i.master_itemid,'.
 				'h.status AS host_status'.
 			' FROM items i,hosts h'.
 			' WHERE i.hostid=h.hostid'.
@@ -650,7 +659,7 @@ class CItem extends CItemGeneral {
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
 
-		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'key_']);
+		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'key_', 'master_itemid']);
 
 		self::validateUniqueness($items);
 
@@ -809,8 +818,8 @@ class CItem extends CItemGeneral {
 	 */
 	public function syncTemplates(array $templateids, array $hostids): void {
 		$db_items = DBfetchArrayAssoc(DBselect(
-			'SELECT i.itemid,i.name,i.type,i.key_,i.value_type,i.units,i.history,i.trends,i.valuemapid,',
-				'i.inventory_link,i.logtimefmt,i.description,i.status,i.hostid,i.templateid,i.flags,'.
+			'SELECT i.itemid,i.name,i.type,i.key_,i.value_type,i.units,i.history,i.trends,i.valuemapid,'.
+				'i.inventory_link,i.logtimefmt,i.description,i.status,i.hostid,i.templateid,i.flags,i.master_itemid,'.
 				'h.status AS host_status'.
 			' FROM items i,hosts h'.
 			' WHERE i.hostid=h.hostid'.
@@ -852,7 +861,7 @@ class CItem extends CItemGeneral {
 		}
 		unset($item);
 
-		$this->inherit($items, $hostids);
+		$this->inherit($items, [], $hostids);
 	}
 
 	/**

@@ -646,421 +646,548 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Updates the children of the item on the given hosts and propagates the inheritance to the child hosts.
 	 *
-	 * @param array      $tpl_items  An array of items to inherit.
-	 * @param array|null $hostids    An array of hosts to inherit to; if set to null, the items will be inherited to all
-	 *                               linked hosts or templates.
+	 * @param array      $items     An array of newly created/updated template-items to inherit changes from.
+	 * @param array      $db_items  Their corresponding records (for updates).
+	 * @param array|null $hostids   A list of hosts IDs to limit inheritance to.
+	 *								If NULL, the items will be inherited to all linked hosts or templates.
 	 */
-	protected function inherit(array $tpl_items, array $hostids = null) {
-		$tpl_items = zbx_toHash($tpl_items, 'itemid');
+	protected function inherit(array $items, array $db_items = [], array $hostids = null) {
+		$dep_items = [];
+		$db_dep_items = [];
 
-		// Inherit starting from common items and finishing up dependent.
-		while ($tpl_items) {
-			$_tpl_items = [];
+		// Inherit starting from common items and finishing with dependent ones.
+		foreach ($items as $i => $item) {
+			// Item is (or switched type) to dependent; is changed along with its master-item.
+			if ($item['type'] == ITEM_TYPE_DEPENDENT
+					|| (array_key_exists('master_itemid', $item) && $item['master_itemid'] !=0)) {
+				$dep_items[$i] = $item;
+				unset($items[$i]);
 
-			foreach ($tpl_items as $tpl_item) {
-				if ($tpl_item['type'] != ITEM_TYPE_DEPENDENT
-						|| !array_key_exists($tpl_item['master_itemid'], $tpl_items)) {
-					$_tpl_items[$tpl_item['itemid']] = $tpl_item;
+				if (array_key_exists($item['itemid'], $db_items)) {
+					$db_dep_items[$item['itemid']] = $db_items[$item['itemid']];
+					unset($db_items[$item['itemid']]);
 				}
 			}
-
-			foreach ($_tpl_items as $itemid => $_tpl_item) {
-				unset($tpl_items[$itemid]);
-			}
-
-			$this->_inherit($_tpl_items, $hostids);
 		}
+
+		$this->_inherit($items, $db_items, $hostids);
+		$this->_inherit($dep_items, $db_dep_items, $hostids);
 	}
 
 	/**
-	 * Auxiliary method for item inheritance. See full description in inherit() method.
+	 * Auxiliary method for item inheritance.
+	 *
+	 * @see CItemGeneral::inherit()  For full description.
 	 */
-	private function _inherit(array $tpl_items, array $hostids = null) {
-		// Prepare the child items.
-		$new_items = $this->prepareInheritedItems($tpl_items, $hostids);
-		if (!$new_items) {
-			return;
-		}
 
+	private function _inherit(array $items, array $db_items = [], array $hostids = null): void {
 		$ins_items = [];
 		$upd_items = [];
+		$upd_db_items = [];
 
-		foreach ($new_items as $new_item) {
-			if (array_key_exists('itemid', $new_item)) {
-				if ($this instanceof CItemPrototype) {
-					unset($new_item['ruleid']);
-				}
-				$upd_items[$new_item['itemid']] = $new_item;
-			}
-			else {
-				$ins_items[] = $new_item;
+		if ($db_items) {
+			$_upd_db_items = $this->getChildObjectsUsingTemplateid($items, $db_items);
+
+			if ($_upd_db_items) {
+				$_upd_items = self::getUpdChildObjectsUsingTemplateid($items, $db_items, $_upd_db_items);
+
+				self::checkDuplicates($_upd_items, $_upd_db_items);
+
+				$upd_items = array_merge($upd_items, $_upd_items);
+				$upd_db_items += $_upd_db_items;
 			}
 		}
 
-		// self::checkDependentItems($items, $db_items, true);
-		// if ($this instanceof CItem) {
-		// 	static::checkInventoryLinks($items, $db_items);
-		// }
+		if (count($items) != count($db_items)) {
+			$_upd_db_items = $this->getChildObjectsUsingName($items, $hostids);
 
-		// Save the new items.
-		if ($ins_items) {
-			self::createForce($ins_items);
+			if ($_upd_db_items) {
+				$_upd_items = self::getUpdChildObjectsUsingName($items, $db_items, $_upd_db_items);
+
+				$upd_items = array_merge($upd_items, $_upd_items);
+				$upd_db_items += $_upd_db_items;
+			}
+
+			$ins_items = $this->getInsChildObjects($items, $_upd_db_items, $hostids);
+
+			self::checkKeyPresenceOnHosts($ins_items);
 		}
 
 		if ($upd_items) {
-			// $db_items = $this->getDbObjects($upd_items);
-
-			// self::updateForce($upd_items, $db_items);
+			$this->updateForce($upd_items, $upd_db_items);
 		}
 
-		$new_items = array_merge($upd_items, $ins_items);
+		if ($ins_items) {
+			$ins_items = self::syncMasterItemLinks($ins_items, array_column($items, null, 'itemid'));
 
-		// Inheriting items from the templates.
-		$db_items = DBselect(
-			'SELECT i.itemid'.
-			' FROM items i,hosts h'.
-			' WHERE i.hostid=h.hostid'.
-				' AND '.dbConditionInt('i.itemid', zbx_objectValues($new_items, 'itemid')).
-				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE])
+			$this->createForce($ins_items);
+		}
+
+		[$tpl_items, $tpl_db_items] = $this->getTemplatedObjects(
+			array_merge($upd_items, $ins_items), $upd_db_items
 		);
 
-		$tpl_itemids = [];
-		while ($db_item = DBfetch($db_items)) {
-			$tpl_itemids[$db_item['itemid']] = true;
-		}
+		self::checkDependentItems($tpl_items, $tpl_db_items);
 
-		foreach ($new_items as $index => $new_item) {
-			if (!array_key_exists($new_item['itemid'], $tpl_itemids)) {
-				unset($new_items[$index]);
-			}
+		if ($tpl_items) {
+			$this->inherit($tpl_items, $tpl_db_items);
 		}
-
-		$this->inherit($new_items);
 	}
 
 	/**
-	 * Prepares and returns an array of child items, inherited from items $tpl_items on the given hosts.
+	 * @param array $item
 	 *
-	 * @param array      $tpl_items
-	 * @param string     $tpl_items[<itemid>]['itemid']
-	 * @param string     $tpl_items[<itemid>]['hostid']
-	 * @param string     $tpl_items[<itemid>]['key_']
-	 * @param int        $tpl_items[<itemid>]['type']
-	 * @param array      $tpl_items[<itemid>]['preprocessing']                    (optional)
-	 * @param int        $tpl_items[<itemid>]['preprocessing'][]['type']
-	 * @param string     $tpl_items[<itemid>]['preprocessing'][]['params']
-	 * @param int        $tpl_items[<itemid>]['flags']
-	 * @param string     $tpl_items[<itemid>]['master_itemid']                    (optional)
-	 * @param mixed      $tpl_items[<itemid>][<field_name>]                       (optional)
+	 * @return array
+	 */
+	private static function unsetNestedObjectIds(array $item): array {
+		if (array_key_exists('preprocessing', $item)) {
+			foreach ($item['preprocessing'] as &$preprocessing) {
+				unset($preprocessing['item_preprocid']);
+			}
+			unset($preprocessing);
+		}
+
+		if (array_key_exists('tags', $item)) {
+			foreach ($item['tags'] as &$tag) {
+				unset($tag['itemtagid']);
+			}
+			unset($tag);
+		}
+
+		if (array_key_exists('parameters', $item)) {
+			foreach ($item['parameters'] as &$parameter) {
+				unset($parameter['item_parameterid']);
+			}
+			unset($parameter);
+		}
+
+		return $item;
+	}
+
+	/**
+	 * Collect all fields used by items of various types to select for their DB counterparts.
+	 *
+	 * @param array $items          Items and derivatives to inherit from.
+	 *								various combinations of fields depending on type/whether it was changed.
+	 * @param string $alias_prefix  Table alias prefix, 'i' by default.
+	 *
+	 * @return array
+	 */
+	protected static function getCombinedFields(array $items, $alias_prefix = 'i'): array {
+		$schema = DB::getSchema('items');
+		$item_fields = [];
+
+		foreach ($items as $item) {
+			$item_fields += array_fill_keys(array_keys($item), true);
+		}
+
+		if ($alias_prefix !== '') {
+			$alias_prefix = $alias_prefix.'.';
+		}
+
+		foreach (array_keys($item_fields) as $field) {
+			if (array_key_exists($field, $schema['fields'])) {
+				$item_fields[$field] = $alias_prefix.$field;
+			}
+			else {
+				unset($item_fields[$field]);
+			}
+		}
+
+		return $item_fields;
+	}
+
+	/**
+	 * Template items overide ones on host with the same key.
+	 * Load host.items that should be overriden with template.item if matched by name (key).
+	 *
+	 * @param array      $items
 	 * @param array|null $hostids
+	 *
+	 * @return array
+	 */
+	private function getChildObjectsUsingName(array $items, ?array $hostids): array {
+		$upd_db_items = [];
+		$parent_indexes = [];
+
+		$template_hostids = [];
+		$hostids = [];
+		$hostids_condition = ($hostids !== null) ? ' AND '.dbConditionId('ht.hostid', $hostids) : '';
+		$template_links = DBselect(
+			'SELECT ht.templateid,ht.hostid'.
+			' FROM hosts_templates ht'.
+			' WHERE '.dbConditionId('ht.templateid', array_column($items, 'hostid')).
+				$hostids_condition
+		);
+
+		while ($row = DBfetch($template_links)) {
+			$template_hostids[$row['templateid']][] = $row['hostid'];
+			$hostids[] = $row['hostid'];
+		}
+
+		$sql = 'SELECT '.implode(',', self::getCombinedFields($items));
+		$sql .= ($this instanceof CItemPrototype) ? ',id.parent_itemid AS ruleid' : '';
+		$sql .=	' FROM items i';
+		// "LEFT JOIN" is needed to check flags on inherited and existing item, item prototype or LLD rule.
+		// For example, when linking an item prototype with same key as in an item on target host or template.
+		$sql .= ($this instanceof CItemPrototype) ? ' LEFT JOIN item_discovery id ON i.itemid=id.itemid' : '';
+		$sql .= ' WHERE '.dbConditionId('i.hostid', $hostids).
+			' AND '.dbConditionString('i.key_', array_column($items, 'key_', 'key_'));
+
+		$db_items = DBselect($sql);
+
+		while ($row = DBfetch($db_items)) {
+			foreach ($items as $i => $item) {
+				if (array_key_exists($item['hostid'], $template_hostids)
+						&& in_array($row['hostid'], $template_hostids[$item['hostid']])
+						&& $row['key_'] === $item['key_']) {
+					$row['parent_host'] = $item['hostid'];
+
+					$upd_db_items[$row['itemid']] = $row;
+					$parent_indexes[$row['itemid']] = $i;
+				}
+			}
+		}
+
+		if ($upd_db_items) {
+			$upd_items = [];
+
+			foreach ($upd_db_items as $upd_db_item) {
+				$item = $items[$parent_indexes[$upd_db_item['itemid']]];
+
+				$upd_item = array_intersect_key($upd_db_item, array_flip(['itemid', 'hostid', 'type']));
+				$upd_item += [
+					'templateid' => $item['itemid'],
+					'preprocessing' => [],
+					'parameters' => [],
+					'tags' => [],
+				];
+
+				if ($this instanceof CItemPrototype) {
+					$upd_item['ruleid'] = $upd_db_item['ruleid'];
+				}
+
+				$upd_items[] = $upd_item;
+			}
+
+			static::addAffectedObjects($upd_items, $upd_db_items);
+		}
+
+		return $upd_db_items;
+	}
+
+	/**
+	 * Transfer input changes from parent items to child items.
+	 *
+	 * @param array $items         Items.
+	 * @param array $db_items
+	 * @param array $upd_db_items  Parent versions.
+	 *
+	 * @return array Items to update.
+	 */
+	private static function getUpdChildObjectsUsingTemplateid(array $items, array $db_items, array $upd_db_items) {
+		$upd_items = [];
+
+		foreach ($items as $item) {
+			if (!array_key_exists($item['itemid'], $db_items)) {
+				continue;
+			}
+
+			$item = self::unsetNestedObjectIds($item);
+
+			// Find children of template-item, add input changes.
+			foreach ($upd_db_items as $upd_db_item) {
+				if (bccomp($item['itemid'], $upd_db_item['templateid']) != 0) {
+					continue;
+				}
+
+				$upd_item = array_intersect_key($upd_db_item,
+					array_flip(['itemid', 'hostid', 'templateid', 'ruleid'])
+				) + $item;
+
+				$upd_items[] = $upd_item;
+			}
+		}
+
+		return $upd_items;
+	}
+
+	/**
+	 * Get updates/overrides to same-key item DB records derived from template-item having that key.
+	 *
+	 * @param array $items
+	 * @param array $db_items
+	 * @param array $upd_db_items
+	 *
+	 * @return array
+	 */
+	private static function getUpdChildObjectsUsingName(array $items, array $db_items, array $upd_db_items): array {
+		$upd_items = [];
+
+		foreach ($items as $item) {
+			if (array_key_exists($item['itemid'], $db_items)) {
+				continue;
+			}
+
+			$item = self::unsetNestedObjectIds($item);
+
+			foreach ($upd_db_items as $upd_db_item) {
+				if (bccomp($item['hostid'], $upd_db_item['parent_host']) != 0
+						|| $item['key_'] !== $upd_db_item['key_']) {
+					continue;
+				}
+
+				$upd_item = array_intersect_key($upd_db_item, array_flip(['itemid', 'hostid', 'templateid']));
+				$upd_item += $item;
+				$upd_item['templateid'] = $item['itemid'];
+
+				$upd_item += $upd_db_item['preprocessing'] ? ['preprocessing' => []] : [];
+				$upd_item += $upd_db_item['parameters'] ? ['parameters' => []] : [];
+				$upd_item += $upd_db_item['tags'] ? ['tags' => []] : [];
+
+				$upd_items[] = $upd_item;
+			}
+		}
+
+		return $upd_items;
+	}
+
+	/**
+	 * @param array      $items
+	 * @param array      $upd_db_items
+	 * @param array|null $hostids
+	 *
+	 * @return array
+	 */
+	private function getInsChildObjects(array $items, array $upd_db_items, ?array $hostids): array {
+		$ins_items = [];
+
+		$template_hostids = [];
+		$host_statuses = [];
+		$hostids_condition = ($hostids !== null) ? ' AND '.dbConditionId('ht.hostid', $hostids) : '';
+		$template_links = DBselect(
+			'SELECT ht.templateid,ht.hostid,h.status AS host_status'.
+			' FROM hosts_templates ht,hosts h'.
+			' WHERE '.dbConditionId('ht.templateid', array_column($items, 'hostid')).
+				' AND ht.hostid=h.hostid'.
+				$hostids_condition
+		);
+
+		while ($row = DBfetch($template_links)) {
+			$template_hostids[$row['templateid']][] = $row['hostid'];
+			$host_statuses[$row['hostid']] = $row['host_status'];
+		}
+
+		if (!$template_hostids) {
+			return $ins_items;
+		}
+
+		foreach ($items as $item) {
+			if (!array_key_exists($item['hostid'], $template_hostids)) {
+				continue;
+			}
+
+			$item['uuid'] = '';
+			$item = self::unsetNestedObjectIds($item);
+
+			if (__CLASS__ === 'CItem' || __CLASS__ === 'CDiscoveryRule') {
+				$item['rtdata'] = true;
+			}
+
+			foreach ($template_hostids[$item['hostid']] as $hostid) {
+				foreach ($upd_db_items as $upd_db_item) {
+					if (bccomp($hostid, $upd_db_item['hostid']) == 0
+							&& $item['key_'] == $upd_db_item['key_']) {
+						continue 2;
+					}
+				}
+
+				$ins_item = [
+					'hostid' => $hostid,
+					'templateid' => $item['itemid'],
+					'host_status' => $host_statuses[$hostid],
+				] + array_diff_key($item, array_flip(['itemid']));
+
+				$ins_items[] = $ins_item;
+			}
+		}
+
+		return $ins_items;
+	}
+
+	/**
+	 * @param array $items     Recently created/updated items that may need to be inherited.
+	 * @param array $db_items  Their current DB records.
+	 *
+	 * @return array           Templated items with child-object info filled in, where not being replaced.
+	 */
+	private function getChildObjectsUsingTemplateid(array $items, array $db_items): array {
+		$sql = 'SELECT i.itemid,i.hostid,i.key_,i.templateid,i.type,i.value_type,i.name,i.master_itemid,i.interfaceid,'.
+				'i.history,h.status as host_status';
+		$sql .= ($this instanceof CItemPrototype) ? ',id.parent_itemid AS ruleid' : '';
+		$sql .= ' FROM hosts h,items i';
+		$sql .= ($this instanceof CItemPrototype) ? ' LEFT JOIN item_discovery id ON id.itemid=i.itemid' : '';
+		$sql .= ' WHERE '.dbConditionInt('i.templateid', array_keys($db_items)).
+			' AND h.hostid=i.hostid';
+		$upd_db_items = DBfetchArrayAssoc(DBselect($sql), 'itemid');
+
+		if ($upd_db_items) {
+			$upd_items = [];
+
+			foreach ($upd_db_items as $upd_db_item) {
+				$db_item = $db_items[$upd_db_item['templateid']];
+
+				$upd_item = array_intersect_key($upd_db_item, array_flip(['itemid', 'hostid', 'templateid', 'type']));
+				$upd_item += array_intersect_key([
+					'preprocessing' => [],
+					'parameters' => [],
+					'tags' => []
+				], $db_item);
+
+				$upd_items[] = $upd_item;
+			}
+
+			static::addAffectedObjects($upd_items, $upd_db_items);
+		}
+
+		return $upd_db_items;
+	}
+
+	/**
+	 * Filters out $items that don't belong to a template, optionally ones limited via $hostids.
+	 *
+	 * @param array       $items      Recently created/updated items and derivatives.
+	 * @param string      $items[<itemid>]['itemid']
+	 * @param string      $items[<itemid>]['hostid']
+	 * @param string      $items[<itemid>]['key_']
+	 * @param int         $items[<itemid>]['type']
+	 * @param array       $items[<itemid>]['preprocessing']                    (optional)
+	 * @param int         $items[<itemid>]['preprocessing'][]['type']
+	 * @param string      $items[<itemid>]['preprocessing'][]['params']
+	 * @param int         $items[<itemid>]['flags']
+	 * @param string      $items[<itemid>]['master_itemid']                    (optional)
+	 * @param mixed       $items[<itemid>][<field_name>]                       (optional)
+	 * @param array|null  $db_items   Accompanying DB records.
+	 * @param array|null  $hostids    To filter for.
 	 *
 	 * @throws APIException
 	 *
-	 * @return array an array of unsaved child items
+	 * @return array     Consisting of [0] parent items and (on update) [1] their current DB records.
 	 */
-	private function prepareInheritedItems(array $tpl_items, array $hostids = null): array {
-		$itemids_by_templateid = [];
-		foreach ($tpl_items as $tpl_item) {
-			$itemids_by_templateid[$tpl_item['hostid']][] = $tpl_item['itemid'];
-		}
+	protected function getTemplatedObjects(array $items, array $db_items = null, array $hostids = null): array {
+		$hostids_condition = ($hostids === null)
+			? dbConditionId('ht.templateid', array_column($items, 'hostid', 'hostid'))
+			: dbConditionId('h.hostid', $hostids);
 
-		// Fetch all child hosts.
-		$chd_hosts = API::Host()->get([
-			'output' => ['hostid', 'host', 'status'],
-			'selectParentTemplates' => ['templateid'],
-			'selectInterfaces' => ['interfaceid', 'main', 'type'],
-			'templateids' => array_keys($itemids_by_templateid),
-			'hostids' => $hostids,
-			'preservekeys' => true,
-			'nopermissions' => true,
-			'templated_hosts' => true
-		]);
-		if (!$chd_hosts) {
-			return [];
-		}
+		$sql = 'SELECT DISTINCT ht.templateid'.
+		' FROM hosts_templates ht'.
+		' LEFT JOIN hosts h ON ht.hostid=h.hostid AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE]).
+		' WHERE '.$hostids_condition;
+		$templateids = DBfetchColumn(DBselect($sql), 'templateid');
 
-		$chd_items_tpl = [];
-		$chd_items_key = [];
+		foreach ($items as $i => $item) {
+			if (!in_array($item['hostid'], $templateids)) {
+				unset($items[$i]);
 
-		// Preparing list of items by item templateid.
-		$sql = 'SELECT i.itemid,i.hostid,i.type,i.key_,i.flags,i.templateid'.
-			' FROM items i'.
-			' WHERE '.dbConditionInt('i.templateid', zbx_objectValues($tpl_items, 'itemid'));
-		if ($hostids !== null) {
-			$sql .= ' AND '.dbConditionInt('i.hostid', $hostids);
-		}
-		$db_items = DBselect($sql);
-
-		while ($db_item = DBfetch($db_items)) {
-			$hostid = $db_item['hostid'];
-			unset($db_item['hostid']);
-
-			$chd_items_tpl[$hostid][$db_item['templateid']] = $db_item;
-		}
-
-		$hostids_by_key = [];
-
-		// Preparing list of items by item key.
-		foreach ($chd_hosts as $chd_host) {
-			$tpl_itemids = [];
-
-			foreach ($chd_host['parentTemplates'] as $parent_template) {
-				if (array_key_exists($parent_template['templateid'], $itemids_by_templateid)) {
-					$tpl_itemids = array_merge($tpl_itemids, $itemids_by_templateid[$parent_template['templateid']]);
-				}
-			}
-
-			foreach ($tpl_itemids as $tpl_itemid) {
-				if (!array_key_exists($chd_host['hostid'], $chd_items_tpl)
-						|| !array_key_exists($tpl_itemid, $chd_items_tpl[$chd_host['hostid']])) {
-					$hostids_by_key[$tpl_items[$tpl_itemid]['key_']][] = $chd_host['hostid'];
+				if ($db_items !== null && array_key_exists($item['itemid'], $db_items)) {
+					unset($db_items[$item['itemid']]);
 				}
 			}
 		}
 
-		foreach ($hostids_by_key as $key_ => $key_hostids) {
-			$sql_select = ($this instanceof CItemPrototype) ? ',id.parent_itemid AS ruleid' : '';
-			// "LEFT JOIN" is needed to check flags on inherited and existing item, item prototype or lld rule.
-			// For example, when linking an item prototype with same key as in an item on target host or template.
-			$sql_join = ($this instanceof CItemPrototype) ? ' LEFT JOIN item_discovery id ON i.itemid=id.itemid' : '';
-			$db_items = DBselect(
-				'SELECT i.itemid,i.hostid,i.type,i.key_,i.flags,i.templateid'.$sql_select.
-					' FROM items i'.$sql_join.
-					' WHERE '.dbConditionInt('i.hostid', $key_hostids).
-						' AND '.dbConditionString('i.key_', [$key_])
-			);
+		// Reindex sequentially for possible inserts.
+		$items = array_values($items);
 
-			while ($db_item = DBfetch($db_items)) {
-				$hostid = $db_item['hostid'];
-				unset($db_item['hostid']);
+		return ($db_items === null) ? [$items] : [$items, $db_items];
+	}
 
-				$chd_items_key[$hostid][$db_item['key_']] = $db_item;
-			}
+
+	/**
+	 * Throw exception if item with a new key already exists on the child host.
+	 *
+	 * @param array $items  To be inserted.
+	 *
+	 * @throws APIException
+	 * @return void
+	 */
+	protected function checkKeyPresenceOnHosts(array $items): void {
+		if (!$items) {
+			return;
 		}
 
-		// List of the discovery rules.
-		if ($this instanceof CItemPrototype) {
-			// List of itemids without 'ruleid' property.
-			$tpl_itemids = [];
-			$tpl_ruleids = [];
-			foreach ($tpl_items as $tpl_item) {
-				if (!array_key_exists('ruleid', $tpl_item)) {
-					$tpl_itemids[] = $tpl_item['itemid'];
-				}
-				else {
-					$tpl_ruleids[$tpl_item['ruleid']] = true;
-				}
-			}
+		$key_hostids = [];
+		$sql_where = [];
 
-			if ($tpl_itemids) {
-				$db_rules = DBselect(
-					'SELECT id.parent_itemid,id.itemid'.
-						' FROM item_discovery id'.
-						' WHERE '.dbConditionInt('id.itemid', $tpl_itemids)
-				);
-
-				while ($db_rule = DBfetch($db_rules)) {
-					$tpl_items[$db_rule['itemid']]['ruleid'] = $db_rule['parent_itemid'];
-					$tpl_ruleids[$db_rule['parent_itemid']] = true;
-				}
-			}
-
-			$sql = 'SELECT i.hostid,i.templateid,i.itemid'.
-					' FROM items i'.
-					' WHERE '.dbConditionInt('i.templateid', array_keys($tpl_ruleids));
-			if ($hostids !== null) {
-				$sql .= ' AND '.dbConditionInt('i.hostid', $hostids);
-			}
-			$db_rules = DBselect($sql);
-
-			// List of child lld ruleids by child hostid and parent lld ruleid.
-			$chd_ruleids = [];
-			while ($db_rule = DBfetch($db_rules)) {
-				$chd_ruleids[$db_rule['hostid']][$db_rule['templateid']] = $db_rule['itemid'];
-			}
+		foreach ($items as $item) {
+			$key_hostids[$item['key_']][] = $item['hostid'];
 		}
 
-		$new_items = [];
-		// List of the updated item keys by hostid.
-		$upd_hostids_by_key = [];
-
-		foreach ($chd_hosts as $chd_host) {
-			$tpl_itemids = [];
-
-			foreach ($chd_host['parentTemplates'] as $parent_template) {
-				if (array_key_exists($parent_template['templateid'], $itemids_by_templateid)) {
-					$tpl_itemids = array_merge($tpl_itemids, $itemids_by_templateid[$parent_template['templateid']]);
-				}
-			}
-
-			foreach ($tpl_itemids as $tpl_itemid) {
-				$tpl_item = $tpl_items[$tpl_itemid];
-
-				$chd_item = null;
-
-				// Update by templateid.
-				if (array_key_exists($chd_host['hostid'], $chd_items_tpl)
-						&& array_key_exists($tpl_item['itemid'], $chd_items_tpl[$chd_host['hostid']])) {
-					$chd_item = $chd_items_tpl[$chd_host['hostid']][$tpl_item['itemid']];
-
-					if ($tpl_item['key_'] !== $chd_item['key_']) {
-						$upd_hostids_by_key[$tpl_item['key_']][] = $chd_host['hostid'];
-					}
-				}
-				// Update by key.
-				elseif (array_key_exists($chd_host['hostid'], $chd_items_key)
-						&& array_key_exists($tpl_item['key_'], $chd_items_key[$chd_host['hostid']])) {
-					$chd_item = $chd_items_key[$chd_host['hostid']][$tpl_item['key_']];
-
-					// Check if an item of a different type with the same key exists.
-					if ($tpl_item['flags'] != $chd_item['flags']) {
-						$this->errorInheritFlags($chd_item['flags'], $chd_item['key_'], $chd_host['host']);
-					}
-
-					// Check if item already linked to another template.
-					if ($chd_item['templateid'] != 0 && bccomp($chd_item['templateid'], $tpl_item['itemid']) != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _params(
-							$this->getErrorMsg(self::ERROR_EXISTS_TEMPLATE), [$tpl_item['key_'], $chd_host['host']]
-						));
-					}
-
-					if ($this instanceof CItemPrototype) {
-						$chd_ruleid = $chd_ruleids[$chd_host['hostid']][$tpl_item['ruleid']];
-						if (bccomp($chd_item['ruleid'], $chd_ruleid) != 0) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Item prototype "%1$s" already exists on "%2$s", linked to another rule.',
-									$chd_item['key_'], $chd_host['host']
-								)
-							);
-						}
-					}
-				}
-
-				// copying item
-				$new_item = $tpl_item;
-				$new_item['uuid'] = '';
-
-				if ($chd_item !== null) {
-					$new_item['itemid'] = $chd_item['itemid'];
-				}
-				else {
-					unset($new_item['itemid']);
-					if ($this instanceof CItemPrototype) {
-						$new_item['ruleid'] = $chd_ruleids[$chd_host['hostid']][$tpl_item['ruleid']];
-					}
-				}
-				$new_item['hostid'] = $chd_host['hostid'];
-				$new_item['templateid'] = $tpl_item['itemid'];
-
-				if ($chd_host['status'] != HOST_STATUS_TEMPLATE) {
-					if ($chd_item === null || $new_item['type'] != $chd_item['type']) {
-						$interface = self::findInterfaceForItem($new_item['type'], $chd_host['interfaces']);
-
-						if ($interface) {
-							$new_item['interfaceid'] = $interface['interfaceid'];
-						}
-						elseif ($interface !== false) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _params(
-								$this->getErrorMsg(self::ERROR_NO_INTERFACE), [$chd_host['host'], $new_item['key_']]
-							));
-						}
-					}
-
-					if ($this instanceof CItem || $this instanceof CDiscoveryRule) {
-						if (!array_key_exists('itemid', $new_item)) {
-							$new_item['rtdata'] = true;
-						}
-					}
-				}
-
-				if (array_key_exists('preprocessing', $new_item)) {
-					foreach ($new_item['preprocessing'] as $preprocessing) {
-						if ($chd_item) {
-							$preprocessing['itemid'] = $chd_item['itemid'];
-						}
-						else {
-							unset($preprocessing['itemid']);
-						}
-					}
-				}
-
-				$new_items[] = $new_item;
-			}
+		foreach ($key_hostids as $key => $hostids) {
+			$sql_where[] = dbConditionId('i.hostid', $hostids).' AND '.dbConditionString('i.key_', [$key]);
 		}
 
-		// Check if item with a new key already exists on the child host.
-		if ($upd_hostids_by_key) {
-			$sql_where = [];
-			foreach ($upd_hostids_by_key as $key => $hostids) {
-				$sql_where[] = dbConditionInt('i.hostid', $hostids).' AND i.key_='.zbx_dbstr($key);
-			}
+		$sql = 'SELECT i.hostid,i.key_,h.host'.
+			' FROM items i, hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND ('.implode(') OR (', $sql_where).')';
 
-			$sql = 'SELECT i.hostid,i.key_'.
-				' FROM items i'.
-				' WHERE ('.implode(') OR (', $sql_where).')';
-			$db_items = DBselect($sql, 1);
-
-			if ($db_item = DBfetch($db_items)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _params($this->getErrorMsg(self::ERROR_EXISTS),
-					[$db_item['key_'], $chd_hosts[$db_item['hostid']]['host']]
-				));
-			}
+		if ($db_item = DBfetch(DBselect($sql, 1))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _params($this->getErrorMsg(self::ERROR_EXISTS),
+				[$db_item['key_'], $db_item['host']]
+			));
 		}
-
-		return $this->prepareDependentItems($tpl_items, $new_items, $hostids);
 	}
 
 	/**
-	 * Update relations for inherited dependent items to master items.
+	 * Update relation to master item for inherited dependent items.
 	 *
-	 * @param array      $tpl_items
-	 * @param int        $tpl_items[<itemid>]['type']
-	 * @param string     $tpl_items[<itemid>]['master_itemid']
-	 * @param array      $new_items
-	 * @param string     $new_items[<itemid>]['hostid']
-	 * @param int        $new_items[<itemid>]['type']
-	 * @param string     $new_items[<itemid>]['templateid']
-	 * @param array|null $hostids
+	 * @param array       $tpl_items                             Recently created/updated items.
+	 * @param int         $tpl_items[<itemid>]['type']
+	 * @param string      $tpl_items[<itemid>]['master_itemid']
+	 * @param array|null  $hostids                               To limit propagation to, otherwise any.
+	 * @param array       $items                                 Items prepared to be inherited.
+	 * @param string      $items[<itemid>]['hostid']
+	 * @param int         $items[<itemid>]['type']
+	 * @param string      $items[<itemid>]['templateid']
 	 *
-	 * @return array an array of synchronized inherited items.
+	 * @return array      Inherited items with master_itemid updated for dependent ones.
 	 */
-	private function prepareDependentItems(array $tpl_items, array $new_items, array $hostids = null) {
-		$tpl_master_itemids = [];
+	private static function syncMasterItemLinks(array $items, array $tpl_items): array {
+		$master_itemids = [];
 
 		foreach ($tpl_items as $tpl_item) {
 			if ($tpl_item['type'] == ITEM_TYPE_DEPENDENT) {
-				$tpl_master_itemids[$tpl_item['master_itemid']] = true;
+				$master_itemids[$tpl_item['master_itemid']] = $tpl_item['master_itemid'];
 			}
 		}
 
-		if ($tpl_master_itemids) {
-			$sql = 'SELECT i.itemid,i.hostid,i.templateid'.
-				' FROM items i'.
-				' WHERE '.dbConditionId('i.templateid', array_keys($tpl_master_itemids));
-			if ($hostids !== null) {
-				$sql .= ' AND '.dbConditionId('i.hostid', $hostids);
-			}
-			$db_items = DBselect($sql);
+		if (!$master_itemids) {
+			return $items;
+		}
 
-			$master_links = [];
+		$sql = 'SELECT i.itemid,i.hostid,i.templateid'.
+			' FROM items i'.
+			' WHERE '.dbConditionId('i.templateid', $master_itemids);
 
-			while ($db_item = DBfetch($db_items)) {
-				$master_links[$db_item['templateid']][$db_item['hostid']] = $db_item['itemid'];
-			}
+		$master_items = DBselect($sql);
+		$master_itemids = [];
 
-			foreach ($new_items as &$new_item) {
-				if ($new_item['type'] == ITEM_TYPE_DEPENDENT) {
-					$tpl_item = $tpl_items[$new_item['templateid']];
+		while ($master_item = DBfetch($master_items)) {
+			$master_itemids[$master_item['templateid']][$master_item['hostid']] = $master_item['itemid'];
+		}
 
-					if (array_key_exists('master_itemid', $tpl_item)) {
-						$new_item['master_itemid'] = $master_links[$tpl_item['master_itemid']][$new_item['hostid']];
-					}
+		foreach ($items as &$item) {
+			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+				$tpl_item = $tpl_items[$item['templateid']];
+
+				if (array_key_exists('master_itemid', $tpl_item)) {
+					$item['master_itemid'] = $master_itemids[$tpl_item['master_itemid']][$item['hostid']];
 				}
 			}
-			unset($new_item);
 		}
+		unset($item);
 
-		return $new_items;
+		return $items;
 	}
 
 	/**
@@ -1085,7 +1212,9 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * @param array $items
+	 * Common create handler for Items and derivatives.
+	 *
+	 * @param array $items Item or derived entity (prototype, discovery rule).
 	 */
 	protected static function createForce(array &$items): void {
 		$itemids = DB::insert('items', $items);
@@ -1109,6 +1238,10 @@ abstract class CItemGeneral extends CApiService {
 					'parent_itemid' => $item['ruleid']
 				];
 			}
+
+			if ($item['type'] != ITEM_TYPE_DEPENDENT) {
+				$item['master_itemid'] = null;
+			}
 		}
 		unset($item);
 
@@ -1128,11 +1261,14 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * @param array $items
-	 * @param array $db_items
+	 * Common update handler for Items and derivatives.
+	 *
+	 * @param array $items     Updates to apply.
+	 * @param array $db_items  Current versions of items, indexed by itemid.
 	 */
-	protected static function updateForce(array $items, array $db_items): void {
-		CArrayHelper::sort($items, ['itemid']);
+	protected function updateForce(array &$items, array $db_items): void {
+		// Helps to avoid deadlocks.
+		CArrayHelper::sort($items, ['itemid'], ZBX_SORT_DOWN);
 
 		self::addDefaultFields($items, $db_items);
 
@@ -1509,16 +1645,25 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected static function checkHostInterfaces(array $items, array $db_items = null): void {
 		foreach ($items as $i => $item) {
-			if (($db_items === null && !array_key_exists('interfaceid', $item))
-					|| ($db_items !== null
-						&& ($item['type'] == $db_items[$item['itemid']]['type']
-							|| $db_items[$item['itemid']]['host_status'] == HOST_STATUS_TEMPLATE)
-						&& (!array_key_exists('interfaceid', $item)
-							|| bccomp($item['interfaceid'], $db_items[$item['itemid']]['interfaceid']) == 0))) {
-				unset($items[$i]);
+			if (array_key_exists('interfaceid', $item)) {
+				if ($db_items !== null
+					&& bccomp($item['interfaceid'], $db_items[$item['itemid']]['interfaceid']) == 0) {
+					unset($items[$i]);
+					continue;
+				}
 			}
-			elseif (!array_key_exists('interfaceid', $item)) {
-				$item['interfaceid'] = $db_items[$item['itemid']]['interfaceid'];
+			elseif ($db_items === null) {
+				unset($items[$i]);
+				continue;
+			}
+			elseif ($item['type'] == $db_items[$item['itemid']]['type']
+				|| $db_items[$item['itemid']]['host_status'] == HOST_STATUS_TEMPLATE) {
+				unset($items[$i]);
+				continue;
+			}
+
+			if (array_key_exists('itemid', $item)) {
+				$items[$i]['interfaceid'] = $db_items[$item['itemid']]['interfaceid'];
 			}
 		}
 
@@ -1526,7 +1671,7 @@ abstract class CItemGeneral extends CApiService {
 			return;
 		}
 
-		$interfaceids = array_unique(array_column($items, 'interfaceid'));
+		$interfaceids = array_column($items, 'interfaceid', 'interfaceid');
 
 		$db_interfaces = DB::select('interface', [
 			'output' => ['interfaceid', 'hostid', 'type'],
@@ -1678,9 +1823,9 @@ abstract class CItemGeneral extends CApiService {
 		$del_links = [];
 
 		foreach ($items as $i => $item) {
-			if (!array_key_exists('master_itemid', $item)
+			if (!array_key_exists('master_itemid', $item) || $item['master_itemid'] == 0
 					|| (array_key_exists('itemid', $item)
-						&& bccomp($item['master_itemid'], $db_items[$item['itemid']]) == 0)) {
+						&& bccomp($item['master_itemid'], $db_items[$item['itemid']]['master_itemid']) == 0)) {
 				unset($items[$i]);
 			}
 			elseif (array_key_exists('itemid', $item)) {
@@ -2033,6 +2178,8 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array $db_items
 	 *
 	 * @return array
+	 *
+	 * @return int   Cumulative count of items under the root item.
 	 */
 	private static function getProblemCausedItemData(array $links_path, array $items, array $db_items): array {
 		$items_by_masterid = [];
@@ -2364,7 +2511,7 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		$output = array_flip(['itemid']);
+		$output = array_flip(['itemid', 'key_']);
 		$type_field_names = [];
 
 		foreach ($types as $type => $foo) {
@@ -2406,6 +2553,8 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
+	 * Note: instances may override this to add e.g. tags.
+	 *
 	 * @param array $items
 	 * @param array $db_items
 	 */

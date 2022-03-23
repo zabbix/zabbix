@@ -359,7 +359,11 @@ class CItemPrototype extends CItemGeneral {
 		$this->validateCreate($items);
 
 		$this->createForce($items);
-		$this->inherit($items);
+		[$tpl_items] = $this->getTemplatedObjects($items);
+
+		if ($tpl_items) {
+			$this->inherit($tpl_items);
+		}
 
 		return ['itemids' => array_column($items, 'itemid')];
 	}
