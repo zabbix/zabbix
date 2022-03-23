@@ -381,7 +381,7 @@ class CDataHelper extends CAPIHelper {
 			$time = time();
 		}
 		elseif (is_array($time)) {
-            if (count($time) !== count($values)) {
+			if (count($time) !== count($values)) {
 				throw new Exception('Value count should match the time record count.');
 			}
 
@@ -407,8 +407,8 @@ class CDataHelper extends CAPIHelper {
 
 		foreach (array_values($values) as $k => $value) {
 			$clock = is_array($time) ? $time[$k] : $time;
-            DBexecute('INSERT INTO '.$history_table.' (itemid, clock, value) VALUES ('.zbx_dbstr($itemid).', '
+			DBexecute('INSERT INTO '.$history_table.' (itemid, clock, value) VALUES ('.zbx_dbstr($itemid).', '
 					.zbx_dbstr($clock).', '.zbx_dbstr($value).')');
-        }
+		}
 	}
 }
