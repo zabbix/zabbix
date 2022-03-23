@@ -281,38 +281,6 @@ class C44ImportConverterTest extends CImportConverterTest {
 						[
 							'interfaces' => [
 								1 => [
-									'interface_ref' => 'if1',
-								],
-								2 => [
-									'interface_ref' => 'if2',
-									'type' => 'SNMP',
-									'port' => '161'
-								]
-							],
-							'items' => [
-								[
-									'interface_ref' => 'if2',
-									'key' => 'snmptrap.fallback',
-									'type' => 'SNMP_TRAP',
-									'name' => 'SNMp trap',
-									'delay' => 0
-								],
-								[
-									'interface_ref' => 'if2',
-									'key' => 'snmptrap[asd]',
-									'type' => 'SNMP_TRAP',
-									'name' => 'Snmp trap item',
-									'delay' => 0
-								]
-							]
-						]
-					]
-				],
-				[
-					'hosts' => [
-						[
-							'interfaces' => [
-								1 => [
 									'interface_ref' => 'if2',
 								],
 								2 => [
@@ -335,6 +303,38 @@ class C44ImportConverterTest extends CImportConverterTest {
 								],
 								[
 									'interface_ref' => 'if1',
+									'key' => 'snmptrap[asd]',
+									'type' => 'SNMP_TRAP',
+									'name' => 'Snmp trap item',
+									'delay' => 0
+								]
+							]
+						]
+					]
+				],
+				[
+					'hosts' => [
+						[
+							'interfaces' => [
+								1 => [
+									'interface_ref' => 'if1',
+								],
+								2 => [
+									'interface_ref' => 'if2',
+									'type' => 'SNMP',
+									'port' => '161'
+								]
+							],
+							'items' => [
+								[
+									'interface_ref' => 'if2',
+									'key' => 'snmptrap.fallback',
+									'type' => 'SNMP_TRAP',
+									'name' => 'SNMp trap',
+									'delay' => 0
+								],
+								[
+									'interface_ref' => 'if2',
 									'key' => 'snmptrap[asd]',
 									'type' => 'SNMP_TRAP',
 									'name' => 'Snmp trap item',
