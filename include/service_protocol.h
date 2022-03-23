@@ -20,7 +20,6 @@
 #ifndef ZABBIX_SERVICE_PROTOCOL_H
 #define ZABBIX_SERVICE_PROTOCOL_H
 
-#include "zbxalgo.h"
 #include "zbxservice.h"
 
 typedef struct

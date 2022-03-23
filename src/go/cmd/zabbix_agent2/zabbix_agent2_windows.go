@@ -48,7 +48,7 @@ func createSigsChan() chan os.Signal {
 }
 
 // handleSig() checks received signal and returns true if the signal is handled
-// and can be ignored, false if the progam should stop.
+// and can be ignored, false if the program should stop.
 // Needed for consistency with Unix.
 func handleSig(sig os.Signal) bool {
 	switch sig {

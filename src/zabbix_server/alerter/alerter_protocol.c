@@ -17,15 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "alerter_protocol.h"
+
 #include "log.h"
 #include "zbxserialize.h"
-#include "zbxalgo.h"
-#include "zbxipcservice.h"
-#include "zbxalert.h"
-#include "db.h"
-
-#include "alerter_protocol.h"
 
 void	zbx_am_db_mediatype_clear(zbx_am_db_mediatype_t *mediatype)
 {

@@ -1953,16 +1953,16 @@ class CApiInputValidator {
 	/**
 	 * Array of ids, int32 or strings uniqueness validator.
 	 *
-	 * @param array   $rule
-	 * @param integer $rule[type]
-	 * @param bool    $rule['uniq']    (optional)
-	 * @param array   $data
-	 * @param string  $path
-	 * @param string  $error
+	 * @param bool       $rule
+	 * @param integer    $rule['type']
+	 * @param bool       $rule['uniq']    (optional)
+	 * @param array|null $data
+	 * @param string     $path
+	 * @param string     $error
 	 *
 	 * @return bool
 	 */
-	private static function validateStringsUniqueness($rule, array $data = null, $path, &$error) {
+	private static function validateStringsUniqueness($rule, ?array $data, $path, &$error) {
 		// $data can be NULL when API_ALLOW_NULL is set
 		if ($data === null) {
 			return true;
@@ -2027,16 +2027,16 @@ class CApiInputValidator {
 	/**
 	 * Array of objects uniqueness validator.
 	 *
-	 * @param array  $rule
-	 * @param array  $rule['uniq']    (optional) subsets of unique fields ([['hostid', 'name'], [...]])
-	 * @param array  $rule['fields']
-	 * @param array  $data
-	 * @param string $path
-	 * @param string $error
+	 * @param array      $rule
+	 * @param array      $rule['uniq']    (optional) subsets of unique fields ([['hostid', 'name'], [...]])
+	 * @param array      $rule['fields']
+	 * @param array|null $data
+	 * @param string     $path
+	 * @param string     $error
 	 *
 	 * @return bool
 	 */
-	private static function validateObjectsUniqueness($rule, array $data = null, $path, &$error) {
+	private static function validateObjectsUniqueness($rule, ?array $data, $path, &$error) {
 		// $data can be NULL when API_ALLOW_NULL is set
 		if ($data === null) {
 			return true;
