@@ -151,33 +151,28 @@ class CTask extends CApiService {
 	 */
 	public function create(array $tasks): array {
 		$check_now_itemids = $this->validateCreate($tasks);
-		$check_now_tasks = [];
 
-		// Get diagnostic info tasks from API request.
-		$diaginfo_tasks = array_filter($tasks, function($task) {
-			if ($task['type'] == ZBX_TM_DATA_TYPE_DIAGINFO) {
-				return $task;
-			}
-		});
-
-		// Re-create check now task array from the valid item IDs.
-		foreach ($check_now_itemids as $itemid) {
-			$check_now_tasks[] = [
-				'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
-				'request' => [
-					'itemid' => $itemid,
-				]
-			];
-		}
-
-		// Put the array back together.
 		$tasks_by_types = [
-			ZBX_TM_DATA_TYPE_CHECK_NOW => $check_now_tasks,
-			ZBX_TM_DATA_TYPE_DIAGINFO => $diaginfo_tasks
+			ZBX_TM_DATA_TYPE_CHECK_NOW => [],
+			ZBX_TM_DATA_TYPE_DIAGINFO => []
 		];
 
+		foreach ($tasks as $index => $task) {
+			if ($task['type'] == ZBX_TM_DATA_TYPE_CHECK_NOW) {
+				$tasks_by_types[$task['type']][$index] = [
+					'type' => $task['type'],
+					'request' => [
+						'itemid' => $check_now_itemids[$task['request']['itemid']]
+					]
+				];
+			}
+			else {
+				$tasks_by_types[$task['type']][$index] = $task;
+			}
+		}
+
 		$return = $this->createTasksCheckNow($tasks_by_types[ZBX_TM_DATA_TYPE_CHECK_NOW]);
-		$return = array_merge($return, $this->createTasksDiagInfo($tasks_by_types[ZBX_TM_DATA_TYPE_DIAGINFO]));
+		$return += $this->createTasksDiagInfo($tasks_by_types[ZBX_TM_DATA_TYPE_DIAGINFO]);
 
 		ksort($return);
 
@@ -297,8 +292,8 @@ class CTask extends CApiService {
 
 		// Check if tasks for items and LLD rules already exist.
 		$db_tasks = DBselect(
-			'SELECT t.taskid, tcn.itemid'.
-			' FROM task t, task_check_now tcn'.
+			'SELECT t.taskid,tcn.itemid'.
+			' FROM task t,task_check_now tcn'.
 			' WHERE t.taskid=tcn.taskid'.
 				' AND t.type='.ZBX_TM_TASK_CHECK_NOW.
 				' AND t.status='.ZBX_TM_STATUS_NEW.
@@ -314,27 +309,36 @@ class CTask extends CApiService {
 
 		// Create new tasks.
 		if ($itemids) {
-			$taskid = DB::reserveIds('task', count($itemids));
+			$item_cnt = count(array_keys(array_flip($itemids)));
+			$taskid = DB::reserveIds('task', $item_cnt);
 			$task_rows = [];
 			$task_check_now_rows = [];
 			$time = time();
+			$itemids_taskids = [];
 
 			foreach ($itemids as $index => $itemid) {
-				$task_rows[] = [
-					'taskid' => $taskid,
-					'type' => ZBX_TM_TASK_CHECK_NOW,
-					'status' => ZBX_TM_STATUS_NEW,
-					'clock' => $time,
-					'ttl' => SEC_PER_HOUR
-				];
-				$task_check_now_rows[] = [
-					'taskid' => $taskid,
-					'itemid' => $itemid,
-					'parent_taskid' => $taskid
-				];
+				// Use already existing task ID and do not create a duplicate record in DB.
+				if (array_key_exists($itemid, $itemids_taskids)) {
+					$return[$index] = $itemids_taskids[$itemid];
+				}
+				else {
+					$task_rows[] = [
+						'taskid' => $taskid,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
+						'status' => ZBX_TM_STATUS_NEW,
+						'clock' => $time,
+						'ttl' => SEC_PER_HOUR
+					];
+					$task_check_now_rows[] = [
+						'taskid' => $taskid,
+						'itemid' => $itemid,
+						'parent_taskid' => $taskid
+					];
 
-				$return[$index] = $taskid;
-				$taskid = bcadd($taskid, 1, 0);
+					$return[$index] = $taskid;
+					$itemids_taskids[$itemid] = $taskid;
+					$taskid = bcadd($taskid, 1, 0);
+				}
 			}
 
 			DB::insertBatch('task', $task_rows, false);
@@ -431,8 +435,12 @@ class CTask extends CApiService {
 			return [];
 		}
 
-		// Create backup of item IDs, so that later the order can be maintained.
-		$itemids_og = $itemids;
+		/*
+		 * Array keys are the original item IDs given by user, but values are item IDs than can change whether item
+		 * is dependent or not. If item is dependent key remains the same, but value changes to master item ID. Until
+		 * the value is changed to top most master item ID.
+		 */
+		$itemid_mapping = array_combine($itemids, $itemids);
 
 		// Check permissions.
 		$items = API::Item()->get([
@@ -465,9 +473,6 @@ class CTask extends CApiService {
 		$allowed_types = checkNowAllowedTypes();
 		$master_itemids = [];
 
-		// Real item IDs that will be returned.
-		$itemids = [];
-
 		// Check item and LLD rule first level. Collect master item IDs if type is dependent.
 		foreach ($items as $itemid => $item) {
 			if (!in_array($item['type'], $allowed_types)) {
@@ -490,10 +495,10 @@ class CTask extends CApiService {
 
 			// Collect master item IDs and real item IDs.
 			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-				$master_itemids[$item['master_itemid']] = true;
-			}
-			else {
-				$itemids[$itemid] = true;
+				$master_itemids[$item['master_itemid']] = $itemid;
+
+				// Replace the dependent item IDs with master item ID.
+				$itemid_mapping[$itemid] = $item['master_itemid'];
 			}
 		}
 
@@ -526,22 +531,22 @@ class CTask extends CApiService {
 					 * store the item ID. This will replace the original item ID from request.
 					 */
 					if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-						$master_itemids[$item['master_itemid']] = true;
-					}
-					else {
-						$itemids[$itemid] = true;
+						// Look matching items and replace once again with master item ID.
+						foreach ($itemid_mapping as &$itemid_new) {
+							if (bccomp($itemid, $itemid_new) == 0) {
+								$itemid_new = $item['master_itemid'];
+							}
+						}
+						unset($itemid_new);
+
+						$master_itemids[$item['master_itemid']] = $itemid;
 					}
 				}
 			}
 		}
 
-		// Try to maintain order of originally passed item IDs.
-		uksort($itemids, function($key1, $key2) use ($itemids_og) {
-			return (array_search($key1, $itemids_og) > array_search($key2, $itemids_og));
-		});
-
-		// Returns real item IDs (not the ependent item IDs, but top level master item IDs).
-		return array_keys($itemids);
+		// Returns both original item IDs as keys and real item IDs as values.
+		return $itemid_mapping;
 	}
 
 	/**
