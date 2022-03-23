@@ -77,15 +77,20 @@ class CControllerPopupMassupdateItem extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret && $this->opt_interfaceid_expected) {
-			$options = [
-				'output' => ['type'],
-				'itemids' => $this->getInput('ids')
-			];
-			$item_types = (bool) $this->getInput('prototype')
-				? API::ItemPrototype()->get($options)
-				: API::Item()->get($options);
+			if ($this->hasInput('type')) {
+				$item_types = [$this->getInput('type')];
+			}
+			else {
+				$options = [
+					'output' => ['type'],
+					'itemids' => $this->getInput('ids')
+				];
+				$item_types = (bool) $this->getInput('prototype')
+					? API::ItemPrototype()->get($options)
+					: API::Item()->get($options);
 
-			$item_types = array_column($item_types, 'type', 'type');
+				$item_types = array_column($item_types, 'type', 'type');
+			}
 
 			foreach ($item_types as $item_type) {
 				if (itemTypeInterface($item_type) != INTERFACE_TYPE_OPT) {
