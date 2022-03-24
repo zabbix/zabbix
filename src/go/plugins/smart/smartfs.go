@@ -700,12 +700,12 @@ func (dp *deviceParser) checkErr() (err error) {
 func (p *Plugin) getDevices() (basic, raid, megaraid []deviceInfo, err error) {
 	basicTmp, err := p.scanDevices("--scan -j")
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf("Failed to scan for devices: %s.", err.Error())
+		return nil, nil, nil, fmt.Errorf("Failed to scan for devices: %w.", err)
 	}
 
 	raidTmp, err := p.scanDevices("--scan -d sat -j")
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf("Failed to scan for sat devices: %s.", err.Error())
+		return nil, nil, nil, fmt.Errorf("Failed to scan for sat devices: %w.", err)
 	}
 
 	basic, raid, megaraid = formatDeviceOutput(basicTmp, raidTmp)
