@@ -116,6 +116,11 @@ type singelRequestRaw struct {
 	Raw  rawField `json:"raw"`
 }
 
+type singleRequestAttribute struct {
+	Value int    `json:"value"`
+	Raw   string `json:"raw"`
+}
+
 type rawField struct {
 	Value int    `json:"value"`
 	Str   string `json:"string"`
