@@ -19,7 +19,6 @@
 
 #include "zbxcrypto.h"
 
-#include "zbxhash.h"
 #include "common.h"
 
 /******************************************************************************
