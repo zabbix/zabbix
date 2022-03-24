@@ -44,7 +44,4 @@ void	zbx_tls_version(void);
 #endif	/* #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL) */
 
 int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len);
-
-char	*zbx_gen_uuid4(const char *seed);
-
 #endif /* ZABBIX_CRYPTO_H */

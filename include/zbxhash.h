@@ -117,4 +117,5 @@ void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
 #define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
 #include "common.h"
 char	*zbx_create_token(zbx_uint64_t seed);
+char	*zbx_gen_uuid4(const char *seed);
 #endif /* ZABBIX_HASH_H */
