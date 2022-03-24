@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once __DIR__.'/../include/CAPITest.php';
 
 /**
  * @onBefore prepareItemsData
@@ -39,6 +39,8 @@ class testTaskCreate extends CAPITest {
 			'not_exists' => '01'
 		]
 	];
+
+	private static $clear_taskids = [];
 
 	public function prepareItemsData() {
 		// Create host group.
@@ -131,11 +133,20 @@ class testTaskCreate extends CAPITest {
 				'delay' => '30',
 				'interfaceid' => $interfaceid_monitored
 			],
+			[
+				'hostid' => self::$data['hostids']['monitored'],
+				'name' => '2 Item (1/1/1)',
+				'key_' => '2_item_111',
+				'type' => ITEM_TYPE_ZABBIX,
+				'value_type' => ITEM_VALUE_TYPE_FLOAT,
+				'delay' => '30',
+				'interfaceid' => $interfaceid_monitored
+			],
 			// Host is monitored, item is not monitored, but is of allowed type.
 			[
 				'hostid' => self::$data['hostids']['monitored'],
-				'name' => '2 Item (1/0/1)',
-				'key_' => '2_item_101',
+				'name' => '3 Item (1/0/1)',
+				'key_' => '3_item_101',
 				'type' => ITEM_TYPE_ZABBIX,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT,
 				'delay' => '30',
@@ -145,16 +156,16 @@ class testTaskCreate extends CAPITest {
 			// Host is monitored, item is monitored, but type is not allowed.
 			[
 				'hostid' => self::$data['hostids']['monitored'],
-				'name' => '3 Item (1/1/0)',
-				'key_' => '3_item_110',
+				'name' => '4 Item (1/1/0)',
+				'key_' => '4_item_110',
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			// Host is not monitored, item is monitored and is of allowed type.
 			[
 				'hostid' => self::$data['hostids']['not_monitored'],
-				'name' => '4 Item (0/1/1)',
-				'key_' => '4_item_011',
+				'name' => '5 Item (0/1/1)',
+				'key_' => '5_item_011',
 				'type' => ITEM_TYPE_ZABBIX,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT,
 				'delay' => '30',
@@ -163,8 +174,8 @@ class testTaskCreate extends CAPITest {
 			// Host is template, item is monitored and is of allowed type.
 			[
 				'hostid' => self::$data['hostids']['template'],
-				'name' => '5 Item-T (0/1/1)',
-				'key_' => '5_item_t_011',
+				'name' => '6 Item-T (0/1/1)',
+				'key_' => '6_item_t_011',
 				'type' => ITEM_TYPE_ZABBIX,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT,
 				'delay' => '30'
@@ -173,10 +184,11 @@ class testTaskCreate extends CAPITest {
 		$items = CDataHelper::call('item.create', $items_data);
 		self::$data['itemids'] += [
 			'1_item_111' => $items['itemids'][0],
-			'2_item_101' => $items['itemids'][1],
-			'3_item_110' => $items['itemids'][2],
-			'4_item_011' => $items['itemids'][3],
-			'5_item_t_011' => $items['itemids'][4]
+			'2_item_111' => $items['itemids'][1],
+			'3_item_101' => $items['itemids'][2],
+			'4_item_110' => $items['itemids'][3],
+			'5_item_011' => $items['itemids'][4],
+			'6_item_t_011' => $items['itemids'][5]
 		];
 
 		// Create dependent items.
@@ -202,28 +214,44 @@ class testTaskCreate extends CAPITest {
 			// Host is monitored, item is monitored and is of allowed type (but master item is not monitored).
 			[
 				'hostid' => self::$data['hostids']['monitored'],
-				'name' => '2.1 Item (1/1/1)',
-				'key_' => '2_1_item_111',
-				'type' => ITEM_TYPE_DEPENDENT,
-				'value_type' => ITEM_VALUE_TYPE_FLOAT,
-				'master_itemid' => self::$data['itemids']['2_item_101']
-			],
-			// Host is monitored, item is monitored and is of allowed type (but master item is not of allowed type).
-			[
-				'hostid' => self::$data['hostids']['monitored'],
 				'name' => '3.1 Item (1/1/1)',
 				'key_' => '3_1_item_111',
 				'type' => ITEM_TYPE_DEPENDENT,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT,
-				'master_itemid' => self::$data['itemids']['3_item_110']
+				'master_itemid' => self::$data['itemids']['3_item_101']
+			],
+			// Host is monitored, item is monitored and is of allowed type (but master item is not of allowed type).
+			[
+				'hostid' => self::$data['hostids']['monitored'],
+				'name' => '4.1 Item (1/1/1)',
+				'key_' => '4_1_item_111',
+				'type' => ITEM_TYPE_DEPENDENT,
+				'value_type' => ITEM_VALUE_TYPE_FLOAT,
+				'master_itemid' => self::$data['itemids']['4_item_110']
 			]
 		];
 		$items = CDataHelper::call('item.create', $items_data);
 		self::$data['itemids'] += [
 			'1_1_item_111' => $items['itemids'][0],
 			'1_2_item_111' => $items['itemids'][1],
-			'2_1_item_111' => $items['itemids'][2],
-			'3_1_item_111' => $items['itemids'][3]
+			'3_1_item_111' => $items['itemids'][2],
+			'4_1_item_111' => $items['itemids'][3]
+		];
+
+		// Level 3 item that depends on another dependent item.
+		$items_data = [
+			[
+				'hostid' => self::$data['hostids']['monitored'],
+				'name' => '1.2.1 Item (1/1/1)',
+				'key_' => '1_2_1_item_111',
+				'type' => ITEM_TYPE_DEPENDENT,
+				'value_type' => ITEM_VALUE_TYPE_FLOAT,
+				'master_itemid' => self::$data['itemids']['1_2_item_111']
+			]
+		];
+		$items = CDataHelper::call('item.create', $items_data);
+		self::$data['itemids'] += [
+			'1_2_1_item_111' => $items['itemids'][0]
 		];
 
 		// Create top level LLD rules.
@@ -300,27 +328,27 @@ class testTaskCreate extends CAPITest {
 			// Host is monitored, LLD rule is monitored and is of allowed type (but master item is not monitored).
 			[
 				'hostid' => self::$data['hostids']['monitored'],
-				'name' => '2.2 LLD (1/1/1)',
-				'key_' => '2_2_lld_111',
-				'type' => ITEM_TYPE_DEPENDENT,
-				'value_type' => ITEM_VALUE_TYPE_FLOAT,
-				'master_itemid' => self::$data['itemids']['2_item_101']
-			],
-			// Host is monitored, LLD rule is monitored and is of allowed type (but master item is not of allowed type).
-			[
-				'hostid' => self::$data['hostids']['monitored'],
 				'name' => '3.2 LLD (1/1/1)',
 				'key_' => '3_2_lld_111',
 				'type' => ITEM_TYPE_DEPENDENT,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT,
-				'master_itemid' => self::$data['itemids']['3_item_110']
+				'master_itemid' => self::$data['itemids']['3_item_101']
+			],
+			// Host is monitored, LLD rule is monitored and is of allowed type (but master item is not of allowed type).
+			[
+				'hostid' => self::$data['hostids']['monitored'],
+				'name' => '4.2 LLD (1/1/1)',
+				'key_' => '4_2_lld_111',
+				'type' => ITEM_TYPE_DEPENDENT,
+				'value_type' => ITEM_VALUE_TYPE_FLOAT,
+				'master_itemid' => self::$data['itemids']['4_item_110']
 			]
 		];
 		$discovery_rules = CDataHelper::call('discoveryrule.create', $discovery_rules_data);
 		self::$data['itemids'] += [
 			'1_3_lld_111' => $discovery_rules['itemids'][0],
-			'2_2_lld_111' => $discovery_rules['itemids'][1],
-			'3_2_lld_111' => $discovery_rules['itemids'][2]
+			'3_2_lld_111' => $discovery_rules['itemids'][1],
+			'4_2_lld_111' => $discovery_rules['itemids'][2]
 		];
 	}
 
@@ -339,8 +367,8 @@ class testTaskCreate extends CAPITest {
 						'itemid' => '1_item_111'
 					]
 				],
-				'expected_itemids' => [
-					'1_item_111'
+				'expected_results' => [
+					['itemid' => '1_item_111']
 				],
 				'expected_error' => null
 			],
@@ -351,8 +379,8 @@ class testTaskCreate extends CAPITest {
 						'itemid' => '1_lld_111'
 					]
 				],
-				'expected_itemids' => [
-					'1_lld_111'
+				'expected_results' => [
+					['itemid' => '1_lld_111']
 				],
 				'expected_error' => null
 			],
@@ -373,9 +401,9 @@ class testTaskCreate extends CAPITest {
 						]
 					]
 				],
-				'expected_itemids' => [
-					'1_lld_111',
-					'1_item_111'
+				'expected_results' => [
+					['itemid' => '1_lld_111'],
+					['itemid' => '1_item_111']
 				],
 				'expected_error' => null
 			],
@@ -388,8 +416,8 @@ class testTaskCreate extends CAPITest {
 						'itemid' => '1_1_item_111'
 					]
 				],
-				'expected_itemids' => [
-					'1_item_111'
+				'expected_results' => [
+					['itemid' => '1_item_111']
 				],
 				'expected_error' => null
 			],
@@ -414,8 +442,10 @@ class testTaskCreate extends CAPITest {
 						]
 					],
 				],
-				'expected_itemids' => [
-					'1_item_111'
+				'expected_results' => [
+					['itemid' => '1_item_111'],
+					['itemid' => '1_item_111'],
+					['itemid' => '1_item_111']
 				],
 				'expected_error' => null
 			],
@@ -434,8 +464,251 @@ class testTaskCreate extends CAPITest {
 						]
 					],
 				],
-				'expected_itemids' => [
-					'1_item_111'
+				'expected_results' => [
+					['itemid' => '1_item_111'],
+					['itemid' => '1_item_111']
+				],
+				'expected_error' => null
+			],
+			'Test dependent item lvl3 and dependent item lvl2 of same branch' => [
+				'task' => [
+					[
+						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'request' => [
+							'itemid' => '1_2_item_111'
+						]
+					],
+					[
+						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'request' => [
+							'itemid' => '1_2_1_item_111'
+						]
+					],
+				],
+				'expected_results' => [
+					['itemid' => '1_item_111'],
+					['itemid' => '1_item_111']
+				],
+				'expected_error' => null
+			],
+			'Test dependent item lvl3 and master item of different branch' => [
+				'task' => [
+					[
+						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'request' => [
+							'itemid' => '1_2_1_item_111'
+						]
+					],
+					[
+						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'request' => [
+							'itemid' => '2_item_111'
+						]
+					]
+				],
+				'expected_results' => [
+					['itemid' => '1_item_111'],
+					['itemid' => '2_item_111']
+				],
+				'expected_error' => null
+			],
+
+			// Check diagnostic info.
+			'Test diagnostic info separately' => [
+				'task' => [
+					[
+						'type' => ZBX_TM_DATA_TYPE_DIAGINFO,
+						'request' => [
+							'alerting' => [
+								'stats' => [
+									'alerts'
+								]
+							]
+						]
+					]
+				],
+				'expected_results' => [
+					[
+						'info' => json_encode([
+							'alerting' => [
+								'stats' => [
+									'alerts'
+								]
+							]
+						])
+					]
+				],
+				'expected_error' => null
+			],
+			'Test check now and diagnostic info (repeating)' => [
+				'task' => [
+					[
+						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'request' => [
+							'itemid' => '2_item_111'
+						]
+					],
+					[
+						'type' => ZBX_TM_DATA_TYPE_DIAGINFO,
+						'request' => [
+							'alerting' => [
+								'stats' => [
+									'alerts'
+								]
+							]
+						]
+					],
+					[
+						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'request' => [
+							'itemid' => '1_2_item_111'
+						]
+					],
+					[
+						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'request' => [
+							'itemid' => '2_item_111'
+						]
+					],
+					[
+						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'request' => [
+							'itemid' => '1_2_1_item_111'
+						]
+					]
+				],
+				'expected_results' => [
+					['2_item_111'],
+					[
+						'info' => json_encode([
+							'alerting' => [
+								'stats' => [
+									'alerts'
+								]
+							]
+						])
+					],
+					['1_item_111'],
+					['2_item_111'],
+					['1_item_111']
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	 * Data provider for testing the created tasks twice.
+	 *
+	 * @return array
+	 */
+	public static function getItemExistingDataValid() {
+		return [
+			'Test check now and diagnostic info (first)' => [
+				'task' => [
+					[
+						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'request' => [
+							'itemid' => '2_item_111'
+						]
+					],
+					[
+						'type' => ZBX_TM_DATA_TYPE_DIAGINFO,
+						'request' => [
+							'alerting' => [
+								'stats' => [
+									'alerts'
+								]
+							]
+						]
+					],
+					[
+						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'request' => [
+							'itemid' => '1_2_item_111'
+						]
+					],
+					[
+						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'request' => [
+							'itemid' => '2_item_111'
+						]
+					],
+					[
+						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'request' => [
+							'itemid' => '1_2_1_item_111'
+						]
+					]
+				],
+				'expected_results' => [
+					['2_item_111'],
+					[
+						'info' => json_encode([
+							'alerting' => [
+								'stats' => [
+									'alerts'
+								]
+							]
+						])
+					],
+					['1_item_111'],
+					['2_item_111'],
+					['1_item_111']
+				],
+				'expected_error' => null
+			],
+			'Test check now and diagnostic info (second)' => [
+				'task' => [
+					[
+						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'request' => [
+							'itemid' => '2_item_111'
+						]
+					],
+					[
+						'type' => ZBX_TM_DATA_TYPE_DIAGINFO,
+						'request' => [
+							'alerting' => [
+								'stats' => [
+									'alerts'
+								]
+							]
+						]
+					],
+					[
+						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'request' => [
+							'itemid' => '1_2_item_111'
+						]
+					],
+					[
+						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'request' => [
+							'itemid' => '2_item_111'
+						]
+					],
+					[
+						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'request' => [
+							'itemid' => '1_2_1_item_111'
+						]
+					]
+				],
+				'expected_results' => [
+					['2_item_111'],
+					[
+						'info' => json_encode([
+							'alerting' => [
+								'stats' => [
+									'alerts'
+								]
+							]
+						])
+					],
+					['1_item_111'],
+					['2_item_111'],
+					['1_item_111']
 				],
 				'expected_error' => null
 			]
@@ -455,7 +728,7 @@ class testTaskCreate extends CAPITest {
 			// Check required fields.
 			'Test empty parameters' => [
 				'tasks' => [],
-				'expected_itemids' => [],
+				'expected_results' => [],
 				'expected_error' => 'Invalid parameter "/": cannot be empty.'
 			],
 			'Test unexpected parameters' => [
@@ -466,14 +739,14 @@ class testTaskCreate extends CAPITest {
 					],
 					'flag' => true
 				],
-				'expected_itemids' => [],
+				'expected_results' => [],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "flag".'
 			],
 			'Test missing request' => [
 				'task' => [
 					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW
 				],
-				'expected_itemids' => [],
+				'expected_results' => [],
 				'expected_error' => 'Invalid parameter "/1": the parameter "request" is missing.'
 			],
 
@@ -484,7 +757,7 @@ class testTaskCreate extends CAPITest {
 						'itemid' => $itemid
 					]
 				],
-				'expected_itemids' => [],
+				'expected_results' => [],
 				'expected_error' => 'Invalid parameter "/1": the parameter "type" is missing.'
 			],
 			'Test invalid type (empty)' => [
@@ -494,7 +767,7 @@ class testTaskCreate extends CAPITest {
 						'itemid' => $itemid
 					]
 				],
-				'expected_itemids' => [],
+				'expected_results' => [],
 				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
 			],
 			'Test invalid type (string)' => [
@@ -504,7 +777,7 @@ class testTaskCreate extends CAPITest {
 						'itemid' => $itemid
 					]
 				],
-				'expected_itemids' => [],
+				'expected_results' => [],
 				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
 			],
 			'Test invalid type (value)' => [
@@ -514,7 +787,7 @@ class testTaskCreate extends CAPITest {
 						'itemid' => $itemid
 					]
 				],
-				'expected_itemids' => [],
+				'expected_results' => [],
 				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.(implode(', ', [
 					ZBX_TM_DATA_TYPE_DIAGINFO, ZBX_TM_DATA_TYPE_CHECK_NOW
 				])).'.'
@@ -526,7 +799,7 @@ class testTaskCreate extends CAPITest {
 					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
 					'request' => []
 				],
-				'expected_itemids' => [],
+				'expected_results' => [],
 				'expected_error' => 'Invalid parameter "/1/request": the parameter "itemid" is missing.'
 			],
 			'Test invalid itemid (empty)' => [
@@ -536,7 +809,7 @@ class testTaskCreate extends CAPITest {
 						'itemid' => ''
 					]
 				],
-				'expected_itemids' => [],
+				'expected_results' => [],
 				'expected_error' => 'Invalid parameter "/1/request/itemid": a number is expected.'
 			],
 			'Test invalid itemid (array)' => [
@@ -546,8 +819,106 @@ class testTaskCreate extends CAPITest {
 						'itemid' => ['']
 					]
 				],
-				'expected_itemids' => [],
+				'expected_results' => [],
 				'expected_error' => 'Invalid parameter "/1/request/itemid": a number is expected.'
+			],
+
+			// Check invalid diagnostic info.
+			'Test invalid diagnostic info (invalid parent field)' => [
+				'task' => [
+					[
+						'type' => ZBX_TM_DATA_TYPE_DIAGINFO,
+						'request' => [
+							'random_field' => [
+								'stats' => [
+									'alerts'
+								],
+								'top' => [
+									'media.alerts' => 10
+								]
+							]
+						]
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => 'Invalid parameter "/1/request": unexpected parameter "random_field".'
+			],
+			'Test invalid diagnostic info (invalid child field)' => [
+				'task' => [
+					[
+						'type' => ZBX_TM_DATA_TYPE_DIAGINFO,
+						'request' => [
+							'alerting' => [
+								'random_field' => [
+									'alerts'
+								]
+							]
+						]
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => 'Invalid parameter "/1/request/alerting": unexpected parameter "random_field".'
+			],
+			'Test invalid diagnostic info (invalid stats value)' => [
+				'task' => [
+					[
+						'type' => ZBX_TM_DATA_TYPE_DIAGINFO,
+						'request' => [
+							'alerting' => [
+								'stats' => [
+									'some_value'
+								]
+							]
+						]
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => 'Invalid parameter "/1/request/alerting/stats/1": value must be "alerts".'
+			],
+			'Test invalid diagnostic info (invalid media.alerts value)' => [
+				'task' => [
+					[
+						'type' => ZBX_TM_DATA_TYPE_DIAGINFO,
+						'request' => [
+							'alerting' => [
+								'stats' => [
+									'alerts'
+								],
+								'top' => [
+									'media.alerts' => 'abc'
+								]
+							]
+						]
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => 'Invalid parameter "/1/request/alerting/top/media.alerts": an integer is expected.'
+			],
+			'Test invalid diagnostic info (proxy does not exist)' => [
+				'task' => [
+					[
+						'type' => ZBX_TM_DATA_TYPE_DIAGINFO,
+						'request' => [
+							'alerting' => [
+								'stats' => [
+									'alerts'
+								],
+								'top' => [
+									'media.alerts' => 10
+								]
+							],
+							'lld' => [
+								'stats' => 'extend',
+								'top' => [
+									'values' => 5
+								]
+							]
+						],
+						'proxy_hostid' => '01'
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
 			]
 		];
 	}
@@ -567,7 +938,7 @@ class testTaskCreate extends CAPITest {
 						'itemid' => 'not_exists'
 					]
 				],
-				'expected_itemids' => [],
+				'expected_results' => [],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			'Test one valid and one invalid item' => [
@@ -585,7 +956,7 @@ class testTaskCreate extends CAPITest {
 						]
 					]
 				],
-				'expected_itemids' => [],
+				'expected_results' => [],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 
@@ -594,41 +965,41 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
 					'request' => [
-						'itemid' => '2_item_101'
+						'itemid' => '3_item_101'
 					]
 				],
-				'expected_itemids' => [],
-				'expected_error' => 'Cannot send request: item "2 Item (1/0/1)" on host "API test task.create monitored" is not monitored.'
+				'expected_results' => [],
+				'expected_error' => 'Cannot send request: item "3 Item (1/0/1)" on host "API test task.create monitored" is not monitored.'
 			],
 			'Test item (type not allowed)' => [
 				'task' => [
 					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
 					'request' => [
-						'itemid' => '3_item_110'
+						'itemid' => '4_item_110'
 					]
 				],
-				'expected_itemids' => [],
+				'expected_results' => [],
 				'expected_error' => 'Cannot send request: wrong item type.'
 			],
 			'Test item (host not monitored)' => [
 				'task' => [
 					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
 					'request' => [
-						'itemid' => '4_item_011'
+						'itemid' => '5_item_011'
 					]
 				],
-				'expected_itemids' => [],
-				'expected_error' => 'Cannot send request: item "4 Item (0/1/1)" on host "API test task.create not monitored" is not monitored.'
+				'expected_results' => [],
+				'expected_error' => 'Cannot send request: item "5 Item (0/1/1)" on host "API test task.create not monitored" is not monitored.'
 			],
 			'Test item (host is template)' => [
 				'task' => [
 					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
 					'request' => [
-						'itemid' => '5_item_t_011'
+						'itemid' => '6_item_t_011'
 					]
 				],
-				'expected_itemids' => [],
-				'expected_error' => 'Cannot send request: item "5 Item-T (0/1/1)" on host "API test task.create template" is not monitored.'
+				'expected_results' => [],
+				'expected_error' => 'Cannot send request: item "6 Item-T (0/1/1)" on host "API test task.create template" is not monitored.'
 			],
 			'Test LLD rule (not monitored)' => [
 				'task' => [
@@ -637,7 +1008,7 @@ class testTaskCreate extends CAPITest {
 						'itemid' => '2_lld_101'
 					]
 				],
-				'expected_itemids' => [],
+				'expected_results' => [],
 				'expected_error' => 'Cannot send request: discovery rule "2 LLD (1/0/1)" on host "API test task.create monitored" is not monitored.'
 			],
 			'Test LLD rule (type not allowed)' => [
@@ -647,7 +1018,7 @@ class testTaskCreate extends CAPITest {
 						'itemid' => '3_lld_110'
 					]
 				],
-				'expected_itemids' => [],
+				'expected_results' => [],
 				'expected_error' => 'Cannot send request: wrong discovery rule type.'
 			],
 			'Test LLD rule (host not monitored)' => [
@@ -657,7 +1028,7 @@ class testTaskCreate extends CAPITest {
 						'itemid' => '4_lld_011'
 					]
 				],
-				'expected_itemids' => [],
+				'expected_results' => [],
 				'expected_error' => 'Cannot send request: discovery rule "4 LLD (0/1/1)" on host "API test task.create not monitored" is not monitored.'
 			],
 			'Test LLD rule (host is template)' => [
@@ -667,49 +1038,49 @@ class testTaskCreate extends CAPITest {
 						'itemid' => '5_lld_t_011'
 					]
 				],
-				'expected_itemids' => [],
+				'expected_results' => [],
 				'expected_error' => 'Cannot send request: discovery rule "5 LLD-T (0/1/1)" on host "API test task.create template" is not monitored.'
 			],
 
-			// Test dependent items nad LLD rules.
+			// Test dependent items and LLD rules.
 			'Test dependent item (master item is not monitored)' => [
-				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
-					'request' => [
-						'itemid' => '2_1_item_111'
-					]
-				],
-				'expected_itemids' => [],
-				'expected_error' => 'Cannot send request: item "2 Item (1/0/1)" on host "API test task.create monitored" is not monitored.'
-			],
-			'Test dependent item (master item type is allowed)' => [
 				'task' => [
 					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
 					'request' => [
 						'itemid' => '3_1_item_111'
 					]
 				],
-				'expected_itemids' => [],
+				'expected_results' => [],
+				'expected_error' => 'Cannot send request: item "3 Item (1/0/1)" on host "API test task.create monitored" is not monitored.'
+			],
+			'Test dependent item (master item type is allowed)' => [
+				'task' => [
+					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'request' => [
+						'itemid' => '4_1_item_111'
+					]
+				],
+				'expected_results' => [],
 				'expected_error' => 'Cannot send request: wrong master item type.'
 			],
 			'Test dependent LLD rule (master item is not monitored)' => [
 				'task' => [
 					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
 					'request' => [
-						'itemid' => '2_2_lld_111'
+						'itemid' => '3_2_lld_111'
 					]
 				],
-				'expected_itemids' => [],
-				'expected_error' => 'Cannot send request: item "2 Item (1/0/1)" on host "API test task.create monitored" is not monitored.'
+				'expected_results' => [],
+				'expected_error' => 'Cannot send request: item "3 Item (1/0/1)" on host "API test task.create monitored" is not monitored.'
 			],
 			'Test dependent LLD rule (master item type is allowed)' => [
 				'task' => [
 					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
 					'request' => [
-						'itemid' => '3_2_lld_111'
+						'itemid' => '4_2_lld_111'
 					]
 				],
-				'expected_itemids' => [],
+				'expected_results' => [],
 				'expected_error' => 'Cannot send request: wrong master item type.'
 			]
 		];
@@ -722,56 +1093,161 @@ class testTaskCreate extends CAPITest {
 	 * @dataProvider getItemAndLLDDataCommonInvalid
 	 * @dataProvider getItemAndLLDDataInvalid
 	 */
-	public function testTaskCreate_CheckNow($tasks, $expected_itemids, $expected_error) {
+	public function testTaskCreate_new($tasks, $expected_results, $expected_error) {
 		// Accept single and multiple tasks.
 		if (!array_key_exists(0, $tasks)) {
 			$tasks = zbx_toArray($tasks);
 		}
 
-		// Replace ID placeholders with real IDs.
+		// Replace ID placeholders with real IDs for "check now" tasks.
 		foreach ($tasks as &$task) {
 			// Some tests that should fail may not have the required fields or they may be damaged.
-			if (array_key_exists('request', $task) && array_key_exists('itemid', $task['request'])
+			if (array_key_exists('type', $task) && $task['type'] == ZBX_TM_DATA_TYPE_CHECK_NOW
+					&& array_key_exists('request', $task) && array_key_exists('itemid', $task['request'])
 					&& !is_array($task['request']['itemid']) && $task['request']['itemid'] !== '') {
 				$task['request']['itemid'] = self::$data['itemids'][$task['request']['itemid']];
 			}
 		}
 		unset($task);
 
-		$sql_tasks = 'SELECT NULL FROM task_check_now';
-		$old_hash_tasks = CDBHelper::getHash($sql_tasks);
+		$sql_check_now_tasks = 'SELECT NULL FROM task_check_now';
+		$old_hash_check_now_tasks = CDBHelper::getHash($sql_check_now_tasks);
+
+		$sql_diag_info_task = "select NULL from task_data";
+		$old_hash_diag_info_tasks = CDBHelper::getHash($sql_diag_info_task);
 
 		$result = $this->call('task.create', $tasks, $expected_error);
 
 		if ($expected_error === null) {
-			// Check that changes actually happened in task table.
-			$this->assertNotSame($old_hash_tasks, CDBHelper::getHash($sql_tasks));
+			$check_now = false;
+			$diag_info = false;
 
-			// Check the count of expected results.
-			$this->assertEquals(count($result['result']['taskids']), count($expected_itemids));
+			foreach ($expected_results as $expected_result) {
+				if (array_key_exists('itemid', $expected_result)) {
+					$check_now = true;
+				}
 
-			$tasks_db = CDBHelper::getAll(
-				'SELECT tcn.itemid'.
-				' FROM task_check_now tcn'.
-				' WHERE '.dbConditionId('tcn.taskid', $result['result']['taskids'])
-			);
-			$tasks_db = array_column($tasks_db, 'itemid');
-
-			// Replace ID placeholders with real item IDs.
-			foreach ($expected_itemids as &$expected_itemid) {
-				$expected_itemid = self::$data['itemids'][$expected_itemid];
+				if (array_key_exists('info', $expected_result)) {
+					$diag_info = true;
+				}
 			}
-			unset($expected_itemid);
 
-			// Check the item ID order. The order must match the input.
-			$this->assertSame($expected_itemids, $tasks_db);
+			// Check that changes were made in corresponding tables.
+			if ($check_now) {
+				$this->assertNotSame($old_hash_check_now_tasks, CDBHelper::getHash($sql_check_now_tasks));
+			}
 
-			// Clear tasks  because same items are used multiple times.
+			if ($diag_info) {
+				$this->assertNotSame($old_hash_diag_info_tasks, CDBHelper::getHash($sql_diag_info_task));
+			}
+
+			// Check the count of expected results. Input item count should match the output task ID count.
+			$this->assertEquals(count($result['result']['taskids']), count($tasks));
+
+			foreach ($expected_results as $index => $expected_result) {
+				$taskid = $result['result']['taskids'][$index];
+
+				if (array_key_exists('itemid', $expected_result)) {
+					$itemid = self::$data['itemids'][$expected_result['itemid']];
+
+					$task_db = CDBHelper::getValue(
+						'SELECT tcn.itemid'.
+						' FROM task_check_now tcn'.
+						' WHERE '.dbConditionId('tcn.taskid', [$taskid])
+					);
+					$this->assertSame($itemid, $task_db);
+				}
+
+				if (array_key_exists('info', $expected_result)) {
+					$task_db = CDBHelper::getValue(
+						'SELECT td.data'.
+						' FROM task_data td'.
+						' WHERE '.dbConditionId('td.taskid', [$taskid])
+					);
+					$this->assertSame($expected_result['info'], $task_db);
+				}
+			}
+
+			// Clear tasks because same items are used multiple times so that hash checking works correctly.
 			DBexecute('DELETE FROM task WHERE '.dbConditionId('taskid', $result['result']['taskids']));
 		}
 		else {
-			// Check if no changes were made to DB.
-			$this->assertSame($old_hash_tasks, CDBHelper::getHash($sql_tasks));
+			// Check if no changes were made to DB in any of the corresponding tables.
+			$this->assertSame($old_hash_check_now_tasks, CDBHelper::getHash($sql_check_now_tasks));
+			$this->assertSame($old_hash_diag_info_tasks, CDBHelper::getHash($sql_diag_info_task));
+		}
+	}
+
+	/**
+	 * Test valid items and create tasks for them. Then create same tasks again for same items and expect task IDs to be
+	 * the same. No new records sould be added in for "check now". However diagnostic info does not have that check in
+	 * API and will create new record for diagnostic info tasks. Those task IDs are collected and then removed
+	 * when data is cleared.
+	 *
+	 * @dataProvider getItemExistingDataValid
+	 */
+	public function testTaskCreate_existing($tasks, $expected_results, $expected_error) {
+		// Accept single and multiple tasks.
+		if (!array_key_exists(0, $tasks)) {
+			$tasks = zbx_toArray($tasks);
+		}
+
+		// Replace ID placeholders with real IDs for "check now" tasks.
+		foreach ($tasks as &$task) {
+			if ($task['type'] == ZBX_TM_DATA_TYPE_CHECK_NOW) {
+				$task['request']['itemid'] = self::$data['itemids'][$task['request']['itemid']];
+			}
+		}
+		unset($task);
+
+		$sql_check_now_tasks = 'SELECT NULL FROM task_check_now';
+		$old_hash_check_now_tasks = CDBHelper::getHash($sql_check_now_tasks);
+
+		$sql_diag_info_task = "select NULL from task_data";
+		$old_hash_diag_info_tasks = CDBHelper::getHash($sql_diag_info_task);
+
+		$result = $this->call('task.create', $tasks, $expected_error);
+
+		// Check the count of expected results. Input item count should match the output task ID count.
+		$this->assertEquals(count($result['result']['taskids']), count($tasks));
+
+		foreach ($expected_results as $index => $expected_result) {
+			$taskid = $result['result']['taskids'][$index];
+
+			if (array_key_exists('itemid', $expected_result)) {
+				$itemid = self::$data['itemids'][$expected_result['itemid']];
+
+				$task_db = CDBHelper::getValue(
+					'SELECT tcn.itemid'.
+					' FROM task_check_now tcn'.
+					' WHERE '.dbConditionId('tcn.taskid', [$taskid])
+				);
+				$this->assertSame($itemid, $task_db);
+
+				if ($index == 0) {
+					// On first iteration task records are created.
+					$this->assertNotSame($old_hash_check_now_tasks, CDBHelper::getHash($sql_check_now_tasks));
+				}
+				else {
+					// On second iteration task records are the same, because same items were passed.
+					$this->assertSame($old_hash_check_now_tasks, CDBHelper::getHash($sql_check_now_tasks));
+				}
+			}
+
+			if (array_key_exists('info', $expected_result)) {
+				$task_db = CDBHelper::getValue(
+					'SELECT td.data'.
+					' FROM task_data td'.
+					' WHERE '.dbConditionId('td.taskid', [$taskid])
+				);
+				$this->assertSame($expected_result['info'], $task_db);
+
+				// For diagnostic info tasks, each time new records are created.
+				$this->assertNotSame($old_hash_diag_info_tasks, CDBHelper::getHash($sql_diag_info_task));
+
+				// Collect diagnostic info task IDs because these are not automatically deleted.
+				self::$clear_taskids[$taskid] = true;
+			}
 		}
 	}
 
@@ -780,13 +1256,13 @@ class testTaskCreate extends CAPITest {
 	 *
 	 * @return array
 	 */
-
 	public static function getDataPermissions() {
 		// Valid and existing item ID (host monitored, item monitored and type allowed).
-		$itemid = '1_item_111'; //self::$data['itemids']['master_itemids']['1_item_111'];
+		$itemid = '1_item_111';
 
 		return [
-			[
+			// Test check now.
+			'Test check now (admin)' => [
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'task' => [
 					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
@@ -796,7 +1272,7 @@ class testTaskCreate extends CAPITest {
 				],
 				'expected_error' => 'No permissions to call "task.create".'
 			],
-			[
+			'Test check now (user)' => [
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'task' => [
 					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
@@ -805,24 +1281,78 @@ class testTaskCreate extends CAPITest {
 					]
 				],
 				'expected_error' => 'No permissions to call "task.create".'
+			],
+
+			// Test diagnostic info.
+			'Test diagnostic info (admin)' => [
+				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
+				'task' => [
+					'type' => ZBX_TM_DATA_TYPE_DIAGINFO,
+					'request' => [
+						'alerting' => [
+							'stats' => [
+								'alerts'
+							],
+							'top' => [
+								'media.alerts' => 10
+							]
+						],
+						'lld' => [
+							'stats' => 'extend',
+							'top' => [
+								'values' => 5
+							]
+						]
+					],
+					'proxy_hostid' => 0
+				],
+				'expected_error' => 'No permissions to call "task.create".'
+			],
+			'Test diagnostic info (user)' => [
+				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
+				'task' => [
+					'type' => ZBX_TM_DATA_TYPE_DIAGINFO,
+					'request' => [
+						'alerting' => [
+							'stats' => [
+								'alerts'
+							],
+							'top' => [
+								'media.alerts' => 10
+							]
+						],
+						'lld' => [
+							'stats' => 'extend',
+							'top' => [
+								'values' => 5
+							]
+						]
+					],
+					'proxy_hostid' => 0
+				],
+				'expected_error' => 'No permissions to call "task.create".'
 			]
 		];
 	}
 
 	/**
-	 * Test user permissions on "check now" functionality.
+	 * Test user permissions.
 	 *
 	 * @dataProvider getDataPermissions
 	 */
 	public function testTaskCreate_UserPermissions($user, $task, $expected_error) {
-		$sql_task = "select NULL from task_check_now";
-		$old_hash_tasks = CDBHelper::getHash($sql_task);
+		$sql_check_now_task = "select NULL from task_check_now";
+		$old_hash_check_now_tasks = CDBHelper::getHash($sql_check_now_task);
+
+		$sql_diag_info_task = "select NULL from task_data";
+		$old_hash_diag_info_tasks = CDBHelper::getHash($sql_diag_info_task);
 
 		$this->authorize($user['user'], $user['password']);
 		$this->call('task.create', $task, $expected_error);
 
 		// Check if no changes were made in DB.
-		$this->assertSame($old_hash_tasks, CDBHelper::getHash($sql_task));
+		$this->assertSame($old_hash_check_now_tasks, CDBHelper::getHash($sql_check_now_task));
+		$this->assertSame($old_hash_diag_info_tasks, CDBHelper::getHash($sql_diag_info_task));
 	}
 
 	/**
@@ -842,5 +1372,10 @@ class testTaskCreate extends CAPITest {
 		CDataHelper::call('hostgroup.delete', [
 			self::$data['hostgroupid']
 		]);
+
+		// Once items are deleted, tasks for those items are also deleted. However diangonstic info task remain.
+		if (self::$clear_taskids) {
+			DBexecute('DELETE FROM task WHERE '.dbConditionId('taskid', array_keys(self::$clear_taskids)));
+		}
 	}
 }
