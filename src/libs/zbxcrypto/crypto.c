@@ -24,47 +24,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: creates semi-unique token based on the seed and current timestamp *
- *                                                                            *
- * Parameters:  seed - [IN] the seed                                          *
- *                                                                            *
- * Return value: Hexadecimal token string, must be freed by caller            *
- *                                                                            *
- * Comments: if you change token creation algorithm do not forget to adjust   *
- *           ZBX_DATA_SESSION_TOKEN_SIZE definition                           *
- *                                                                            *
- ******************************************************************************/
-char	*zbx_create_token(zbx_uint64_t seed)
-{
-	const char	*hex = "0123456789abcdef";
-	zbx_timespec_t	ts;
-	md5_state_t	state;
-	md5_byte_t	hash[MD5_DIGEST_SIZE];
-	int		i;
-	char		*token, *ptr;
-
-	ptr = token = (char *)zbx_malloc(NULL, ZBX_DATA_SESSION_TOKEN_SIZE + 1);
-
-	zbx_timespec(&ts);
-
-	zbx_md5_init(&state);
-	zbx_md5_append(&state, (const md5_byte_t *)&seed, (int)sizeof(seed));
-	zbx_md5_append(&state, (const md5_byte_t *)&ts, (int)sizeof(ts));
-	zbx_md5_finish(&state, hash);
-
-	for (i = 0; i < MD5_DIGEST_SIZE; i++)
-	{
-		*ptr++ = hex[hash[i] >> 4];
-		*ptr++ = hex[hash[i] & 15];
-	}
-
-	*ptr = '\0';
-
-	return token;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose:                                                                   *
  *     convert ASCII hex digit string to a binary representation (byte        *
  *     string)                                                                *

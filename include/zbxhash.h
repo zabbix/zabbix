@@ -111,6 +111,10 @@ void zbx_md5_finish(md5_state_t *pms, md5_byte_t digest[16]);
 }  /* end extern "C" */
 #endif
 
-void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
 /* ------------------ end of included md5.h file ------------------------- */
+void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
+
+#define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
+#include "common.h"
+char	*zbx_create_token(zbx_uint64_t seed);
 #endif /* ZABBIX_HASH_H */
