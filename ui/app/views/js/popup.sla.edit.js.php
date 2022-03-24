@@ -204,7 +204,7 @@ window.sla_edit_popup = {
 			.then((response) => response.json())
 			.then((response) => {
 				if ('error' in response) {
-					throw {response_error: response.error};
+					throw {error: response.error};
 				}
 
 				if ('success' in response) {
@@ -219,14 +219,14 @@ window.sla_edit_popup = {
 
 				location.href = location.href;
 			})
-			.catch((error) => {
+			.catch((exception) => {
 				this.overlay.unsetLoading();
 
 				let title, messages;
 
-				if (typeof error === 'object' && 'response_error' in error) {
-					title = error.response_error.title;
-					messages = error.response_error.messages;
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
 				}
 				else {
 					title = <?= json_encode(_('Unexpected server error.')) ?>;
