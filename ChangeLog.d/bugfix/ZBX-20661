@@ -1,1 +1,1 @@
-........S. [ZBX-20661] fixed crash on HA error status update (wiper)
+........S. [ZBX-20661] fixed crashes when setting HA failover delay with disabled auditlong or updating HA error status on exit (wiper)
