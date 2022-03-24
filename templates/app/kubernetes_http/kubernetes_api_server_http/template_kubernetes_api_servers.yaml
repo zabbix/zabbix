@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-17T17:01:47Z'
+  date: '2022-03-21T08:01:09Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1293,7 +1293,7 @@ zabbix_export:
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kubernetes.api.request_duration_seconds_bucket[*,"{#VERB}"],5m,90)'
+              params: 'bucket_percentile(//kubernetes.api.request_duration_seconds_bucket[*,"{#VERB}"],5m,50)'
               description: '50 percentile of response latency distribution in seconds for each verb.'
               tags:
                 -
@@ -1329,7 +1329,7 @@ zabbix_export:
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kubernetes.api.request_duration_seconds_bucket[*,"{#VERB}"],5m,90)'
+              params: 'bucket_percentile(//kubernetes.api.request_duration_seconds_bucket[*,"{#VERB}"],5m,95)'
               description: '95 percentile of response latency distribution in seconds for each verb.'
               tags:
                 -
@@ -1347,7 +1347,7 @@ zabbix_export:
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kubernetes.api.request_duration_seconds_bucket[*,"{#VERB}"],5m,90)'
+              params: 'bucket_percentile(//kubernetes.api.request_duration_seconds_bucket[*,"{#VERB}"],5m,99)'
               description: '99 percentile of response latency distribution in seconds for each verb.'
               tags:
                 -

@@ -28,6 +28,7 @@
 #include "proxydata.h"
 #include "daemon.h"
 #include "zbxcrypto.h"
+#include "zbxcommshigh.h"
 #include "../../libs/zbxserver/zabbix_stats.h"
 #include "../poller/checks_snmp.h"
 #include "trapper_auth.h"
