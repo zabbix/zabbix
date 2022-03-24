@@ -1023,16 +1023,25 @@ class CDashboard extends CBaseComponent {
 			.then(() => {
 				overlayDialogueDestroy(overlay.dialogueid);
 			})
-			.catch((error) => {
+			.catch((exception) => {
 				for (const el of form.parentNode.children) {
 					if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
 						el.parentNode.removeChild(el);
 					}
 				}
 
-				const message_box = (typeof error === 'object' && 'html_string' in error)
-					? new DOMParser().parseFromString(error.html_string, 'text/html').body.firstElementChild
-					: makeMessageBox('bad', [], t('Failed to update dashboard page properties.'), true, false)[0];
+				let title;
+				let messages = [];
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					title = t('Failed to update dashboard page properties.');
+				}
+
+				const message_box = makeMessageBox('bad', messages, title, true, false)[0];
 
 				form.parentNode.insertBefore(message_box, form);
 			})
@@ -1056,8 +1065,8 @@ class CDashboard extends CBaseComponent {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				if ('errors' in response) {
-					throw {html_string: response.errors};
+				if ('error' in response) {
+					throw {error: response.error};
 				}
 
 				if (data.unique_id !== null) {
