@@ -1092,6 +1092,7 @@ static void	zbx_check_db(void)
 {
 	struct zbx_db_version_info_t	db_version_info;
 	struct zbx_json			db_version_json;
+	int 					should_build_db_version_json = 0;	/* no */
 	int				result = SUCCEED;
 
 	DBextract_version_info(&db_version_info);
@@ -1132,18 +1133,25 @@ static void	zbx_check_db(void)
 		}
 	}
 
-	if(SUCCEED == result && (SUCCEED != DBcheck_capabilities(db_version_info.current_version) ||
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	if(SUCCEED == DBfield_exists("config", "dbversion_status"))
+	{
+		should_build_db_version_json = 1;	/* yes */
+		zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
+	}
+
+	if (SUCCEED == result &&
+			(SUCCEED != DBcheck_capabilities(
+					db_version_info.current_version,
+					should_build_db_version_json ? &db_version_json : NULL) ||
 			SUCCEED != DBcheck_version()))
 	{
 		result = FAIL;
 	}
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-	if(SUCCEED == DBfield_exists("config", "dbversion_status"))
+	if (should_build_db_version_json)
 	{
-		zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
-
 		if (SUCCEED == DBpk_exists("history"))
 		{
 			db_version_info.history_pk = 1;
@@ -1153,6 +1161,9 @@ static void	zbx_check_db(void)
 			db_version_info.history_pk = 0;
 			zabbix_log(LOG_LEVEL_WARNING, "database could be upgraded to use primary keys in history tables");
 		}
+
+		/* this parameter is specific to TimescaleDB, do not add it to json */
+		db_version_info.compression_availability = -1;
 
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
 

@@ -820,24 +820,149 @@ void	DBflush_version_requirements(const char *version)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+#ifdef HAVE_POSTGRESQL
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if PostgreSQL DBMS with TimescaleDB extension conforms to  *
+ *          minimal requirements and supports compression                     *
+ *                                                                            *
+ * Parameters: db_version - [IN] version of PostgreSQL DBMS                   *
+ *             json       - [IN/OUT] DB version information for the UI        *
+ *                                                                            *
+ * Return value: SUCCEED - if there are no critical errors                    *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int DBcheck_capabilities_timescaledb(zbx_uint32_t db_version, struct zbx_json *json)
+{
+	int	ret = FAIL;	/* in case of major upgrade, db_extension may be missing */
+	int compression_available = 0;	/* 0: false, 1: true */
+	int		timescaledb_version;
+	char	*timescaledb_license;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 */
+	/* and newer in TimescaleDB Community Edition, and it is not available in TimescaleDB Apache 2 Edition. */
+	/* timescaledb.license parameter is available in TimescaleDB API starting from TimescaleDB 2.0. */
+	if (ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB > db_version)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "PostgreSQL version %lu is not supported with TimescaleDB, minimum required is %d",
+				(unsigned long)db_version, ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB);
+		goto clean;
+	}
+
+	if (0 == (timescaledb_version = zbx_tsdb_get_version()))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Cannot determine TimescaleDB version");
+		goto clean;
+	}
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "TimescaleDB version: %d", timescaledb_version);
+
+	if (ZBX_TIMESCALEDB_MIN_VERSION > timescaledb_version)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "TimescaleDB version %d is too old.", timescaledb_version);
+		zabbix_log(LOG_LEVEL_CRIT, "Version must be at least %d. Recommended version should be at least %s %s.",
+				ZBX_TIMESCALEDB_MIN_VERSION,
+				ZBX_TIMESCALEDB_LICENSE_TIMESCALE_FRIENDLY, ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION_FRIENDLY);
+		goto clean;
+	}
+	else if (ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION > timescaledb_version)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "TimescaleDB version %d is not officially supported.", timescaledb_version);
+		zabbix_log(LOG_LEVEL_WARNING, "Recommended version should be at least %s %s.",
+				ZBX_TIMESCALEDB_LICENSE_TIMESCALE_FRIENDLY, ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION_FRIENDLY);
+	}
+	else
+	{
+		DBfree_result(result);
+
+		timescaledb_license = "";
+		if (NULL != (result = DBselect("show timescaledb.license")))
+			if (NULL != (row = DBfetch(result)))
+				timescaledb_license = row[0];
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "TimescaleDB license: [%s]", timescaledb_license);
+
+		if (0 == zbx_strcmp_null(timescaledb_license, ZBX_TIMESCALEDB_LICENSE_APACHE))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "%s does not support Timescale compression.",
+					ZBX_TIMESCALEDB_LICENSE_APACHE_FRIENDLY);
+			zabbix_log(LOG_LEVEL_WARNING, "%s is required to use Timescale compression.",
+					ZBX_TIMESCALEDB_LICENSE_TIMESCALE_FRIENDLY);
+		}
+		else if (0 == zbx_strcmp_null(timescaledb_license, ZBX_TIMESCALEDB_LICENSE_TIMESCALE))
+		{
+			compression_available = 1; /* enable */
+			zabbix_log(LOG_LEVEL_DEBUG, "%s was detected. Timescale compression is supported.",
+					ZBX_TIMESCALEDB_LICENSE_TIMESCALE_FRIENDLY);
+		}
+		else
+		{
+			/* This should not happen. */
+			/* It is not possible to check if compression is available, but no critical problem was detected. */
+			zabbix_log(LOG_LEVEL_WARNING, "This should not happen. Unknown TimescaleDB license was detected.");
+			zabbix_log(LOG_LEVEL_WARNING, "%s is required to use Timescale compression.",
+					ZBX_TIMESCALEDB_LICENSE_TIMESCALE_FRIENDLY);
+		}
+	}
+
+	/* prepare the json structure for the UI side*/
+	if (NULL != json)
+	{
+		struct zbx_db_version_info_t version_info;
+
+		version_info.database = "TimescaleDB";
+
+		version_info.current_version = (zbx_uint32_t)timescaledb_version;
+		version_info.min_version = ZBX_TIMESCALEDB_MIN_VERSION;
+		version_info.max_version = ZBX_TIMESCALEDB_MAX_VERSION;
+		version_info.min_supported_version = ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION;
+
+		version_info.friendly_current_version = zbx_tsdb_get_version_friendly(timescaledb_version);
+
+		version_info.friendly_min_version = ZBX_TIMESCALEDB_MIN_VERSION_FRIENDLY;
+		version_info.friendly_max_version = ZBX_TIMESCALEDB_MAX_VERSION_FRIENDLY;
+		version_info.friendly_min_supported_version = ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION_FRIENDLY;
+
+		version_info.flag = zbx_db_version_check(version_info.database, version_info.current_version,
+				version_info.min_version, version_info.max_version, version_info.min_supported_version);
+
+		version_info.history_pk = -1;	/* do not add to json */
+		version_info.compression_availability = compression_available; // TODO: compression_available is not available yet
+
+		zbx_db_version_json_create(json, &version_info);
+		zbx_free(version_info.friendly_current_version);
+	}
+
+	ret = SUCCEED;
+clean:
+	DBfree_result(result);
+out:
+	DBexecute("update config set compression_availability=%d", compression_available);
+	DBclose();
+
+	return ret;
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Purpose: checks DBMS for optional features and exit if is not suitable     *
  *                                                                            *
  * Parameters: db_version - [IN] version of DB                                *
+ *             json       - [IN/OUT] DB version information for the UI        *
  *                                                                            *
- * Return value: SUCCEED - if optional features were checked successfully     *
+ * Return value: SUCCEED - if there are no critical errors                    *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	DBcheck_capabilities(zbx_uint32_t db_version)
+int	DBcheck_capabilities(zbx_uint32_t db_version, struct zbx_json *json)
 {
 	int	ret = SUCCEED;
 #ifdef HAVE_POSTGRESQL
 
-#define MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB	100002
-#define MIN_TIMESCALEDB_VERSION			10500
-	int		timescaledb_version;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -855,32 +980,9 @@ int	DBcheck_capabilities(zbx_uint32_t db_version)
 	if (0 != zbx_strcmp_null(row[0], ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
 		goto clean;
 
-	ret = FAIL;	/* In case of major upgrade, db_extension may be missing */
-
-	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 */
-	if (MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB > db_version)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "PostgreSQL version %lu is not supported with TimescaleDB, minimum is %d",
-				(unsigned long)db_version, MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB);
-		goto clean;
-	}
-
-	if (0 == (timescaledb_version = zbx_tsdb_get_version()))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot determine TimescaleDB version");
-		goto clean;
-	}
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "TimescaleDB version: %d", timescaledb_version);
-
-	if (MIN_TIMESCALEDB_VERSION > timescaledb_version)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "TimescaleDB version %d is not supported, minimum is %d",
-				timescaledb_version, MIN_TIMESCALEDB_VERSION);
-		goto clean;
-	}
-
-	ret = SUCCEED;
+	/* check if PostgreSQL optional extension TimescaleDB conforms to minimal requirements and supports compression */
+	if (SUCCEED != DBcheck_capabilities_timescaledb(db_version, json))
+		ret = FAIL;
 clean:
 	DBfree_result(result);
 out:

@@ -100,6 +100,7 @@ zbx_err_codes_t	zbx_db_last_errcode(void);
 
 #ifdef HAVE_POSTGRESQL
 int	zbx_tsdb_get_version(void);
+char *zbx_tsdb_get_version_friendly(int ver);
 #define ZBX_DB_TSDB_V1	(20000 > zbx_tsdb_get_version())
 #endif
 
@@ -169,6 +170,19 @@ int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 #define ZBX_POSTGRESQL_MAX_VERSION			149999
 #define ZBX_POSTGRESQL_MAX_VERSION_FRIENDLY		"14.x"
 
+#define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB				100002
+#define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB_FRIENDLY	"10.2"
+#define ZBX_TIMESCALEDB_MIN_VERSION								10500
+#define ZBX_TIMESCALEDB_MIN_VERSION_FRIENDLY					"1.5.0"
+#define ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION 					20001
+#define ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION_FRIENDLY 			"2.0.1"
+#define ZBX_TIMESCALEDB_MAX_VERSION								20399
+#define ZBX_TIMESCALEDB_MAX_VERSION_FRIENDLY					"2.3"
+#define ZBX_TIMESCALEDB_LICENSE_APACHE							"apache"
+#define ZBX_TIMESCALEDB_LICENSE_APACHE_FRIENDLY					"TimescaleDB Apache 2 Edition"
+#define ZBX_TIMESCALEDB_LICENSE_TIMESCALE						"timescale"
+#define ZBX_TIMESCALEDB_LICENSE_TIMESCALE_FRIENDLY				"TimescaleDB Community Edition"
+
 #define ZBX_ORACLE_MIN_VERSION				1201000200
 #define ZBX_ORACLE_MIN_VERSION_FRIENDLY			"Database 12c Release 12.01.00.02.x"
 #define ZBX_ORACLE_MIN_SUPPORTED_VERSION		1900000000
@@ -213,6 +227,7 @@ struct zbx_db_version_info_t
 	zbx_db_version_status_t	flag;
 
 	int			history_pk;
+	int			compression_availability;	/* this parameter is specific to TimescaleDB */
 };
 
 void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);

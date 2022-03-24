@@ -2516,7 +2516,10 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 
 	zbx_json_addstring(json, "min_version", info->friendly_min_version, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(json, "max_version", info->friendly_max_version, ZBX_JSON_TYPE_STRING);
-	zbx_json_addint64(json, "history_pk", info->history_pk);
+	if (-1 != info->history_pk)
+		zbx_json_addint64(json, "history_pk", info->history_pk);
+	if (-1 != info->compression_availability)
+		zbx_json_addint64(json, "compression_availability", info->compression_availability);
 
 	if (NULL != info->friendly_min_supported_version)
 	{
@@ -2795,6 +2798,29 @@ out:
 }
 
 #if defined(HAVE_POSTGRESQL)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: converts TimescaleDB (TSDB) version to user friendly format       *
+ *                                                                            *
+ * Example: TSDB 10501 version will be returned as "1.5.1"                    *
+ *                                                                            *
+ * Return value: TSDB version in user friendly format                         *
+ *                                                                            *
+ * Comments: returns a pointer to allocated memory                            *
+ *                                                                            *
+ ******************************************************************************/
+char *zbx_tsdb_get_version_friendly(int ver)
+{
+	int major, minor, patch;
+
+	patch = ver % 100;
+	ver = (ver - patch) / 100;
+	minor = ver % 100;
+	major = (ver - minor) / 100;
+
+	return zbx_dsprintf(NULL, "%d.%d.%d", major, minor, patch);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: returns TimescaleDB (TSDB) version as integer: MMmmuu             *
