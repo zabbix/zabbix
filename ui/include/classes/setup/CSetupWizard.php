@@ -1142,6 +1142,8 @@ class CSetupWizard extends CForm {
 		}
 
 		if (!DBconnect($error)) {
+			error($error);
+
 			return false;
 		}
 
