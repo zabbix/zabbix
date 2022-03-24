@@ -561,13 +561,23 @@ class CDashboard extends CBaseComponent {
 
 				this._selectDashboardPage(dashboard_page, {is_async: true});
 			})
-			.catch((error) => {
+			.catch((exception) => {
 				clearMessages();
 
-				addMessage((typeof error === 'object' && 'html_string' in error)
-					? error.html_string
-					: makeMessageBox('bad', [], t('Failed to paste dashboard page.'))
-				);
+				let title;
+				let messages = [];
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					title = t('Failed to paste dashboard page.');
+				}
+
+				const message_box = makeMessageBox('bad', messages, title)[0];
+
+				addMessage(message_box);
 			})
 			.finally(() => this._deleteBusyCondition(busy_condition))
 	}
@@ -653,13 +663,25 @@ class CDashboard extends CBaseComponent {
 					unique_id: this._createUniqueId()
 				});
 			})
-			.catch((error) => {
+			.catch((exception) => {
+				dashboard_page.deleteWidget(paste_placeholder_widget);
+
 				clearMessages();
 
-				addMessage((typeof error === 'object' && 'html_string' in error)
-					? error.html_string
-					: makeMessageBox('bad', [], t('Failed to paste widget.'))
-				);
+				let title;
+				let messages = [];
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					title = t('Failed to paste widget.');
+				}
+
+				const message_box = makeMessageBox('bad', messages, title)[0];
+
+				addMessage(message_box);
 			})
 			.finally(() => this._deleteBusyCondition(busy_condition));
 	}
@@ -685,8 +707,8 @@ class CDashboard extends CBaseComponent {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				if ('errors' in response) {
-					throw {html_string: response.errors};
+				if ('error' in response) {
+					throw {error: response.error};
 				}
 
 				return response;
