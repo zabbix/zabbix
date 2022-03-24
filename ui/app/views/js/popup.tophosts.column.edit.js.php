@@ -112,7 +112,7 @@ window.tophosts_column_edit_form = new class {
 				else {
 					const error = <?= json_encode(_('Unexpected server error.')) ?>;
 
-					message_box = makeMessageBox('bad', [], error, true, false)[0];
+					message_box = makeMessageBox('bad', [], error)[0];
 				}
 
 				this._$widget_form.before(message_box, this);

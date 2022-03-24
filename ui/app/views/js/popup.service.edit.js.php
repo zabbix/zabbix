@@ -497,7 +497,7 @@ window.service_edit_popup = new class {
 					messages = [];
 				}
 
-				const message_box = makeMessageBox('bad', messages, title, true, false)[0];
+				const message_box = makeMessageBox('bad', messages, title)[0];
 
 				this.form.parentNode.insertBefore(message_box, this.form);
 			})
@@ -567,7 +567,7 @@ window.service_edit_popup = new class {
 				else {
 					const error = <?= json_encode(_('Unexpected server error.')) ?>;
 
-					message_box = makeMessageBox('bad', [], error, true, false)[0];
+					message_box = makeMessageBox('bad', [], error)[0];
 				}
 
 				this.form.parentNode.insertBefore(message_box, this.form);

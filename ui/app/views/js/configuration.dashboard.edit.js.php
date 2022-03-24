@@ -155,7 +155,7 @@
 							? <?= json_encode(_('Failed to create dashboard')) ?>
 							: <?= json_encode(_('Failed to update dashboard')) ?>;
 
-						addMessage(makeMessageBox('bad', [], message, true, false));
+						addMessage(makeMessageBox('bad', [], message));
 					}
 				})
 				.finally(() => {

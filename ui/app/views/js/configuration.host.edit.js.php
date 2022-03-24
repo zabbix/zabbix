@@ -158,7 +158,7 @@
 				title = <?= json_encode(_('Unexpected server error.')) ?>;
 			}
 
-			const message_box = makeMessageBox('bad', messages, title, true, true)[0];
+			const message_box = makeMessageBox('bad', messages, title);
 
 			clearMessages();
 			addMessage(message_box);

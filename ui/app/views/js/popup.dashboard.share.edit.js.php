@@ -93,7 +93,7 @@ window.dashboard_share_edit_popup = {
 					title = t('Failed to update dashboard sharing.');
 				}
 
-				const message_box = makeMessageBox('bad', messages, title, true, true)[0];
+				const message_box = makeMessageBox('bad', messages, title)[0];
 
 				form.parentNode.insertBefore(message_box, form);
 			})

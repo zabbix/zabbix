@@ -233,7 +233,7 @@ window.sla_edit_popup = {
 					messages = [];
 				}
 
-				const message_box = makeMessageBox('bad', messages, title, true, false)[0];
+				const message_box = makeMessageBox('bad', messages, title)[0];
 
 				this.form.parentNode.insertBefore(message_box, this.form);
 			})
@@ -296,7 +296,7 @@ window.sla_edit_popup = {
 				else {
 					const error = <?= json_encode(_('Unexpected server error.')) ?>;
 
-					message_box = makeMessageBox('bad', [], error, true, false)[0];
+					message_box = makeMessageBox('bad', [], error)[0];
 				}
 
 				this.form.parentNode.insertBefore(message_box, this.form);

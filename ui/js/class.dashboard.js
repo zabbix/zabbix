@@ -566,7 +566,7 @@ class CDashboard extends CBaseComponent {
 
 				addMessage((typeof error === 'object' && 'html_string' in error)
 					? error.html_string
-					: makeMessageBox('bad', [], t('Failed to paste dashboard page.'), true, false)
+					: makeMessageBox('bad', [], t('Failed to paste dashboard page.'))
 				);
 			})
 			.finally(() => this._deleteBusyCondition(busy_condition))
@@ -658,7 +658,7 @@ class CDashboard extends CBaseComponent {
 
 				addMessage((typeof error === 'object' && 'html_string' in error)
 					? error.html_string
-					: makeMessageBox('bad', [], t('Failed to paste widget.'), true, false)
+					: makeMessageBox('bad', [], t('Failed to paste widget.'))
 				);
 			})
 			.finally(() => this._deleteBusyCondition(busy_condition));
@@ -973,7 +973,7 @@ class CDashboard extends CBaseComponent {
 					title = t('Failed to update dashboard properties.');
 				}
 
-				const message_box = makeMessageBox('bad', messages, title, true, true)[0];
+				const message_box = makeMessageBox('bad', messages, title)[0];
 
 				form.parentNode.insertBefore(message_box, form);
 			})
@@ -1050,7 +1050,7 @@ class CDashboard extends CBaseComponent {
 					title = t('Failed to update dashboard page properties.');
 				}
 
-				const message_box = makeMessageBox('bad', messages, title, true, true)[0];
+				const message_box = makeMessageBox('bad', messages, title)[0];
 
 				form.parentNode.insertBefore(message_box, form);
 			})

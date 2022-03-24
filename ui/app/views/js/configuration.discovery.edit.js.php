@@ -385,7 +385,7 @@
 					|| '<?= ZBX_DISCOVERY_UNSPEC ?>';
 
 				if (hasDCheckDuplicates()) {
-					jQuery(makeMessageBox('bad', <?= json_encode(_('Check already exists.')) ?>, null, true, false))
+					jQuery(makeMessageBox('bad', <?= json_encode(_('Check already exists.')) ?>))
 						.insertBefore($form);
 
 					return false;
