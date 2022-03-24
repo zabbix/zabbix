@@ -20,7 +20,7 @@
 #ifndef ZABBIX_SHA256CRYPT_H
 #define ZABBIX_SHA256CRYPT_H
 
-#include "common.h"
+#include "sysinc.h"
 
 #define ZBX_SHA256_DIGEST_SIZE	32
 

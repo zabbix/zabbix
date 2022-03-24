@@ -20,11 +20,7 @@
 #ifndef ZABBIX_PREPROCESSING_H
 #define ZABBIX_PREPROCESSING_H
 
-#include "common.h"
-#include "module.h"
-#include "dbcache.h"
 #include "preproc.h"
-#include "zbxalgo.h"
 #include "zbxipcservice.h"
 
 #define ZBX_IPC_SERVICE_PREPROCESSING	"preprocessing"

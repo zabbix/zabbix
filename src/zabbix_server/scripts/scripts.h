@@ -20,7 +20,6 @@
 #ifndef ZABBIX_SCRIPTS_H
 #define ZABBIX_SCRIPTS_H
 
-#include "common.h"
 #include "dbcache.h"
 
 void	zbx_script_init(zbx_script_t *script);

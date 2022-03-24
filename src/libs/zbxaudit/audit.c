@@ -23,7 +23,7 @@
 #include "zbxjson.h"
 #include "dbcache.h"
 
-#define AUDIT_USERID		0
+#define AUDIT_USERID		__UINT64_C(0)
 #define AUDIT_USERID_SQL	"null"
 #define AUDIT_USERNAME		"System"
 #define AUDIT_IP		""
