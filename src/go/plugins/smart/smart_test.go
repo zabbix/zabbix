@@ -247,13 +247,13 @@ func Test_setSingleDiskFields(t *testing.T) {
 				"self_test_passed": &selftestSuccess,
 				"serial_number":    "Z4Y7SJBD",
 				"temperature":      30,
-				"raw_read_error_rate": rawField{
+				"raw_read_error_rate": singleRequestAttribute{
 					Value: 182786912,
-					Str:   "182786912",
+					Raw:   "182786912",
 				},
-				"spin_up_time": rawField{
+				"spin_up_time": singleRequestAttribute{
 					Value: 0,
-					Str:   "0",
+					Raw:   "0",
 				},
 			},
 			false,
@@ -274,13 +274,13 @@ func Test_setSingleDiskFields(t *testing.T) {
 				"self_test_passed": &selftestSuccess,
 				"serial_number":    "D486530350",
 				"temperature":      18,
-				"raw_read_error_rate": rawField{
+				"raw_read_error_rate": singleRequestAttribute{
 					Value: 0,
-					Str:   "0",
+					Raw:   "0",
 				},
-				"reallocated_sector_ct": rawField{
+				"reallocated_sector_ct": singleRequestAttribute{
 					Value: 10,
-					Str:   "10",
+					Raw:   "10",
 				},
 			},
 			false,
