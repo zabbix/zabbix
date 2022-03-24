@@ -1048,12 +1048,18 @@
 				this.overlay.unsetLoading();
 			})
 			.done((res) => {
-				if (res.errors) {
+				if ('error' in res) {
 					this.overlay.$dialogue.$body.find('output.msg-bad').remove();
-					this.overlay.$dialogue.$body.prepend(res.errors);
+
+					const title = res.error.title ?? null;
+					const messages = res.error.messages ?? [];
+					const message_box = makeMessageBox('bad', messages, title, false, true);
+
+					this.overlay.$dialogue.$body.prepend(message_box);
 
 					return this.overlay.unsetLoading();
 				}
+
 				// We keep overlay opened and in loading state during the full page reload.
 				this.submit(form_data);
 			});
@@ -1109,7 +1115,19 @@
 
 		this.overlay.xhr = $.post(url.getUrl(), {operation});
 		this.overlay.xhr
-			.done(res => this.onload(res))
+			.done((res) => {
+				if ('error' in res) {
+					const title = res.error.title ?? null;
+					const messages = res.error.messages ?? [];
+					const message_box = makeMessageBox('bad', messages, title, false, true);
+
+					this.overlay.setProperties({content: message_box});
+
+					return;
+				}
+
+				this.onload(res);
+			})
 			.fail(({statusText}) => this.overlay.setProperties({content: makeMessageBox('bad', statusText)}));
 	};
 
