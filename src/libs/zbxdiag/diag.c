@@ -160,14 +160,14 @@ void	diag_add_mem_stats(struct zbx_json *json, const char *name, const zbx_mem_s
 
 	zbx_json_addarray(json, "buckets");
 
-	for (i = 0; i < ZBX_MEM_BUCKET_COUNT; i++)
+	for (i = 0; i < ZBX_SHMEM_BUCKET_COUNT; i++)
 	{
 		if (0 != stats->chunks_num[i])
 		{
 			char	buf[MAX_ID_LEN + 2];
 
-			zbx_snprintf(buf, sizeof(buf), "%d%s", ZBX_MEM_MIN_BUCKET_SIZE + 8 * i,
-					(ZBX_MEM_BUCKET_COUNT - 1 == i ? "+" : ""));
+			zbx_snprintf(buf, sizeof(buf), "%d%s", ZBX_SHMEM_MIN_BUCKET_SIZE + 8 * i,
+					(ZBX_SHMEM_BUCKET_COUNT - 1 == i ? "+" : ""));
 			zbx_json_addobject(json, NULL);
 			zbx_json_adduint64(json, buf, stats->chunks_num[i]);
 			zbx_json_close(json);

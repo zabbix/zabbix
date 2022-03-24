@@ -22,11 +22,11 @@
 
 #include "zbxtypes.h"
 
-#define MEM_MIN_ALLOC	24	/* should be a multiple of 8 and at least (2 * ZBX_PTR_SIZE) */
+#define SHMEM_MIN_ALLOC	24		/* should be a multiple of 8 and at least (2 * ZBX_PTR_SIZE) */
 
-#define ZBX_MEM_MIN_BUCKET_SIZE	MEM_MIN_ALLOC
-#define MEM_MAX_BUCKET_SIZE	256 /* starting from this size all free chunks are put into the same bucket */
-#define ZBX_MEM_BUCKET_COUNT	((MEM_MAX_BUCKET_SIZE - ZBX_MEM_MIN_BUCKET_SIZE) / 8 + 1)
+#define ZBX_SHMEM_MIN_BUCKET_SIZE	SHMEM_MIN_ALLOC
+#define SHMEM_MAX_BUCKET_SIZE		256 /* starting from this size all free chunks are put into the same bucket */
+#define ZBX_SHMEM_BUCKET_COUNT	((SHMEM_MAX_BUCKET_SIZE - ZBX_SHMEM_MIN_BUCKET_SIZE) / 8 + 1)
 
 typedef struct
 {
@@ -57,7 +57,7 @@ typedef struct
 	zbx_uint64_t	min_chunk_size;
 	zbx_uint64_t	max_chunk_size;
 	zbx_uint64_t	overhead;
-	unsigned int	chunks_num[ZBX_MEM_BUCKET_COUNT];
+	unsigned int	chunks_num[ZBX_SHMEM_BUCKET_COUNT];
 	unsigned int	free_chunks;
 	unsigned int	used_chunks;
 }
