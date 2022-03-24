@@ -284,7 +284,7 @@ class testFormSetup extends CWebTest {
 		$this->assertEquals(426, count($timezones));
 		foreach (['System', 'Europe/Riga'] as $timezone_value) {
 			$timezone = CDateTimeHelper::getTimeZoneFormat($timezone_value);
-			$this->assertStringContainsString($timezone, $timezones);
+			$this->assertContains($timezone, $timezones);
 		}
 		// Select a certain timezone.
 		$form->getField('Default time zone')->select(CDateTimeHelper::getTimeZoneFormat('Europe/Riga'));
@@ -298,7 +298,7 @@ class testFormSetup extends CWebTest {
 		// Check that default theme has changed.
 		$stylesheet = $this->query('xpath://link[@rel="stylesheet"]')->one();
 		$parts = explode('/', $stylesheet->getAttribute('href'));
-		$this->assertStringContainsString('dark-theme.css', explode('?', end($parts)));
+		$this->assertContains('dark-theme.css', explode('?', end($parts)));
 		// Check layout via screenshot for dark theme.
 		$this->assertScreenshotExcept($form, $this->query('id:label-default-timezone')->one(), 'GUISettings_Dark');
 
