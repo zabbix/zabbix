@@ -63,30 +63,44 @@ window.dashboard_share_edit_popup = {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				if ('errors' in response) {
-					throw {html_string: response.errors};
+				if ('error' in response) {
+					throw {error: response.error};
 				}
 
-				overlay.unsetLoading();
-
-				addMessage(response.messages);
 				overlayDialogueDestroy(overlay.dialogueid);
-			})
-			.catch((error) => {
-				overlay.unsetLoading();
 
+				const title = response.success.title ?? null;
+				const messages = response.success.messages ?? [];
+				const message_box = makeMessageBox('good', messages, title, true, true)[0];
+
+				addMessage(message_box);
+			})
+			.catch((exception) => {
 				for (const el of form.parentNode.children) {
 					if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
 						el.parentNode.removeChild(el);
 					}
 				}
 
-				const message_box = (typeof error === 'object' && 'html_string' in error)
-					? new DOMParser().parseFromString(error.html_string, 'text/html').body.firstElementChild
-					: makeMessageBox('bad', [], t('Failed to update dashboard sharing.'), true, false)[0];
+				let title;
+				let messages = [];
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					title = t('Failed to update dashboard sharing.');
+				}
+
+				const message_box = makeMessageBox('bad', messages, title, true, true)[0];
 
 				form.parentNode.insertBefore(message_box, form);
+			})
+			.finally(() => {
+				overlay.unsetLoading();
 			});
+		;
 	},
 
 	removeUserGroupShares(usrgrpid) {
