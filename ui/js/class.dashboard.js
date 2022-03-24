@@ -575,7 +575,7 @@ class CDashboard extends CBaseComponent {
 					title = t('Failed to paste dashboard page.');
 				}
 
-				const message_box = makeMessageBox('bad', messages, title)[0];
+				const message_box = makeMessageBox('bad', messages, title);
 
 				addMessage(message_box);
 			})
