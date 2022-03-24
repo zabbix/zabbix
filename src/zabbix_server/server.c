@@ -1801,6 +1801,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 
+		if (ZBX_NODE_STATUS_ERROR == ha_status)
+			break;
+
 		now = time(NULL);
 
 		if (ZBX_NODE_STATUS_UNKNOWN != ha_status && ha_status != ha_status_old)
