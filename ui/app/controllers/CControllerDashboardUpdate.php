@@ -57,9 +57,13 @@ class CControllerDashboardUpdate extends CController {
 		}
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData([
-				'main_block' => json_encode(['errors' => getMessages()->toString()])
-			]));
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
 		}
 
 		return $ret;
@@ -71,8 +75,6 @@ class CControllerDashboardUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$data = [];
-
 		$save_dashboard = [
 			'name' => $this->getInput('name'),
 			'userid' => $this->getInput('userid', 0),
@@ -137,34 +139,34 @@ class CControllerDashboardUpdate extends CController {
 
 		if (array_key_exists('dashboardid', $save_dashboard)) {
 			$result = API::Dashboard()->update($save_dashboard);
-			$message = _('Dashboard updated');
-			$error_msg =  _('Failed to update dashboard');
+
+			$success_title = _('Dashboard updated');
+			$error_title =  _('Failed to update dashboard');
 		}
 		else {
 			$result = API::Dashboard()->create($save_dashboard);
-			$message = _('Dashboard created');
-			$error_msg = _('Failed to create dashboard');
+
+			$success_title = _('Dashboard created');
+			$error_title = _('Failed to create dashboard');
 		}
 
 		if ($result) {
-			$data['redirect'] = (new CUrl('zabbix.php'))
-				->setArgument('action', 'dashboard.view')
-				->setArgument('dashboardid', $result['dashboardids'][0])
-				->getUrl();
+			$output['success']['title'] = $success_title;
 
-			$data['system-message-ok'] = $message;
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
+
+			$output['dashboardid'] = $result['dashboardids'][0];
 		}
 		else {
-			if (!hasErrorMessages()) {
-				error($error_msg);
-			}
+			$output['error'] = [
+				'title' => $error_title,
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		if (($messages = getMessages()) !== null) {
-			$data['errors'] = $messages->toString();
-		}
-
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 
 	/**
