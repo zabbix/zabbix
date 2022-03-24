@@ -23,6 +23,7 @@
 #include "dbupgrade_macros.h"
 #include "log.h"
 #include "../zbxalgo/vectorimpl.h"
+#include "zbxhash.h"
 
 extern unsigned char	program_type;
 
