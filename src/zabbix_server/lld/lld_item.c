@@ -1762,6 +1762,8 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 				dependent = (zbx_lld_item_t *)item->dependent_items.values[j];
 				dependent->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
 			}
+
+			continue;
 		}
 
 		if (0 != item->master_itemid && (FAIL != zbx_vector_ptr_bsearch(item_prototypes, &item->master_itemid,
@@ -5090,7 +5092,7 @@ out:
  *             items_index - [IN] lld item index                              *
  *                                                                            *
  ******************************************************************************/
-static void	lld_link_dependent_items(zbx_vector_ptr_t *items, zbx_hashset_t *items_index, char **error)
+static void	lld_link_dependent_items(zbx_vector_ptr_t *items, zbx_hashset_t *items_index)
 {
 	zbx_lld_item_t		*item, *master;
 	zbx_lld_item_index_t	*item_index, item_index_local;
@@ -5169,7 +5171,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_pt
 	lld_items_make(&item_prototypes, lld_rows, lld_macro_paths, &items, &items_index, error);
 	lld_items_preproc_make(&item_prototypes, lld_macro_paths, &items);
 
-	lld_link_dependent_items(&items, &items_index, error);
+	lld_link_dependent_items(&items, &items_index);
 
 	zbx_vector_ptr_create(&item_dependencies);
 	lld_item_dependencies_get(&item_prototypes, &item_dependencies);
