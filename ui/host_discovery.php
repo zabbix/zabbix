@@ -537,7 +537,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$newItem = [
 			'itemid' => getRequest('itemid'),
-			'interfaceid' => getRequest('interfaceid'),
+			'interfaceid' => getRequest('interfaceid', 0),
 			'name' => getRequest('name'),
 			'description' => getRequest('description'),
 			'key_' => getRequest('key'),
