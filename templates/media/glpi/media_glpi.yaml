@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-02T15:36:08Z'
+  date: '2022-03-24T18:54:55Z'
   media_types:
     -
       name: GLPi
@@ -264,7 +264,8 @@ zabbix_export:
                     'id': glpi.problem_id,
                     'input': {
                         'name': params.alert_subject,
-                        'status': 5  // Set status "Solved"
+                        'status': 5,  // Set status "Solved"
+                        'urgency': params.event_nseverity
                     }
                 };
         
