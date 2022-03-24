@@ -50,7 +50,7 @@ class CVaultCyberArk extends CVault {
 	protected $key_file;
 
 	public function __construct(string $api_endpoint, string $db_path, ?string $cert_file, ?string $key_file) {
-		$this->api_endpoint = rtrim(trim($api_endpoint), '/').'/AIMWebService/api/Accounts';
+		$this->api_endpoint = rtrim(trim($api_endpoint), '/');
 		$this->db_path = trim($db_path);
 		$this->cert_file = $cert_file !== null ? trim($cert_file) : null;
 		$this->key_file = $key_file !== null ? trim($key_file) : null;
@@ -90,7 +90,7 @@ class CVaultCyberArk extends CVault {
 			];
 		}
 
-		$secret = @file_get_contents($this->api_endpoint.'?'.$this->db_path, false,
+		$secret = @file_get_contents($this->api_endpoint.'/AIMWebService/api/Accounts?'.$this->db_path, false,
 			stream_context_create(['http' => $http_context])
 		);
 
