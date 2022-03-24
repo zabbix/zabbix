@@ -269,7 +269,7 @@ func setSingleDiskFields(dev []byte) (out map[string]interface{}, err error) {
 	}
 
 	for _, a := range sd.SmartAttributes.Table {
-		out[strings.ToLower(a.Name)] = a.Raw
+		out[strings.ToLower(a.Name)] = singleRequestAttribute{a.Raw.Value, a.Raw.Str}
 	}
 
 	return
