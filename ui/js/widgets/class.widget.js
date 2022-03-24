@@ -388,7 +388,29 @@ class CWidget extends CBaseComponent {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({widgetid: this._widgetid, rf_rate})
-			});
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					if ('error' in response) {
+						throw {error: response.error};
+					}
+				})
+				.catch((exception) => {
+					let title;
+					let messages = [];
+
+					if (typeof exception === 'object' && 'error' in exception) {
+						title = exception.error.title;
+						messages = exception.error.messages;
+					}
+
+					title = title ?? t('Failed to update widget refresh rate.');
+
+					const message_box = makeMessageBox('bad', messages, title)[0];
+
+					clearMessages();
+					addMessage(message_box);
+				});
 		}
 	}
 
