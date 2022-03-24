@@ -1041,7 +1041,7 @@ class CDashboard extends CBaseComponent {
 					title = t('Failed to update dashboard page properties.');
 				}
 
-				const message_box = makeMessageBox('bad', messages, title, true, false)[0];
+				const message_box = makeMessageBox('bad', messages, title, true, true)[0];
 
 				form.parentNode.insertBefore(message_box, form);
 			})
