@@ -590,11 +590,12 @@ static zbx_ipmi_manager_host_t	*ipmi_manager_cache_host(zbx_ipmi_manager_t *mana
 		host_local.hostid = hostid;
 		host_local.disable_until = 0;
 		host_local.poller = ipmi_manager_get_host_poller(manager);
+		host_local.lastcheck = now;
 
 		host = (zbx_ipmi_manager_host_t *)zbx_hashset_insert(&manager->hosts, &host_local, sizeof(host_local));
 	}
-
-	host->lastcheck = now;
+	else
+		host->lastcheck = now;
 
 	return host;
 }

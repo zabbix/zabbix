@@ -13549,6 +13549,7 @@ zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const
 	if (NULL == session)
 	{
 		session_local.last_valueid = 0;
+		session_local.lastaccess = now;
 
 		WRLOCK_CACHE;
 		session_local.token = dc_strdup(token);
@@ -13557,8 +13558,8 @@ zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const
 				sizeof(session_local));
 		UNLOCK_CACHE;
 	}
-
-	session->lastaccess = now;
+	else
+		session->lastaccess = now;
 
 	return session;
 }
