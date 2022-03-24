@@ -609,8 +609,8 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 							" where hostid=" ZBX_FS_UI64,
 							DBsql_id_ins(proxy_hostid), hostid);
 
-					zbx_audit_host_update_json_update_proxy_hostid(host_proxy_hostid,
-							host_proxy_hostid, proxy_hostid);
+					zbx_audit_host_update_json_update_proxy_hostid(hostid, host_proxy_hostid,
+							proxy_hostid);
 				}
 
 				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
