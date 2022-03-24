@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('administration.miscconfig.edit.js.php');
@@ -201,4 +202,28 @@ $form = (new CForm())
 
 $widget
 	->addItem($form)
+	->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'connect_timeout' => DB::getDefault('config', 'connect_timeout'),
+		'default_inventory_mode' => DB::getDefault('config', 'default_inventory_mode'),
+		'iframe_sandboxing_enabled' => DB::getDefault('config', 'iframe_sandboxing_enabled'),
+		'iframe_sandboxing_exceptions' => DB::getDefault('config', 'iframe_sandboxing_exceptions'),
+		'item_test_timeout' => DB::getDefault('config', 'item_test_timeout'),
+		'login_attempts' => DB::getDefault('config', 'login_attempts'),
+		'login_block' => DB::getDefault('config', 'login_block'),
+		'media_type_test_timeout' => DB::getDefault('config', 'media_type_test_timeout'),
+		'report_test_timeout' => DB::getDefault('config', 'report_test_timeout'),
+		'script_timeout' => DB::getDefault('config', 'script_timeout'),
+		'snmptrap_logging' => DB::getDefault('config', 'snmptrap_logging'),
+		'socket_timeout' => DB::getDefault('config', 'socket_timeout'),
+		'uri_valid_schemes' => DB::getDefault('config', 'uri_valid_schemes'),
+		'url' => DB::getDefault('config', 'url'),
+		'validate_uri_schemes' => DB::getDefault('config', 'validate_uri_schemes'),
+		'vault_provider' => DB::getDefault('config', 'vault_provider'),
+		'x_frame_options' => DB::getDefault('config', 'x_frame_options')
+	]).');
+'))
+	->setOnDocumentReady()
 	->show();
