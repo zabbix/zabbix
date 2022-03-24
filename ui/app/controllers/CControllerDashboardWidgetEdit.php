@@ -44,13 +44,21 @@ class CControllerDashboardWidgetEdit extends CController {
 
 			if ($this->hasInput('type')) {
 				if (!CWidgetConfig::isWidgetTypeSupportedInContext($this->getInput('type'), $this->context)) {
+					error(_('Widget type is not supported in this context.'));
+
 					$ret = false;
 				}
 			}
 		}
 
 		if (!$ret) {
-			$this->setResponse((new CControllerResponseData([]))->disableView());
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
 		}
 
 		return $ret;
