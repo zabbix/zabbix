@@ -57,7 +57,8 @@ static int	DBpatch_6010002(void)
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	while (NULL != (row = DBfetch(result))) {
+	while (NULL != (row = DBfetch(result)))
+	{
 		row[1][zbx_strlen_utf8_nchars(row[1], 255)] = '\0';
 
 		descripton_esc = DBdyn_escape_field("triggers", "description", row[1]);
