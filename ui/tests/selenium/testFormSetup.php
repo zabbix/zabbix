@@ -188,31 +188,62 @@ class testFormSetup extends CWebTest {
 			$credentials_field = $form->getField('Store credentials in');
 			$this->assertEquals('Plain text', $credentials_field->getSelected());
 
-			$vault_fields = [
+			// All vault fields labels.
+			$labels = [
 				'Vault API endpoint',
 				'Vault secret path',
-				'Vault authentication token'
+				'Vault authentication token',
+				'Vault secret query string',
+				'Vault certificates'
 			];
-			foreach ($vault_fields as $field_name) {
-				$this->assertFalse($form->getField($field_name)->isVisible());
+			foreach ($labels as $label_name) {
+				$this->assertFalse($form->getField($label_name)->isVisible());
 			}
 
-			// Check layout when "Store credentials in" is set to "HashiCorp Vault".
-			$credentials_field->select('HashiCorp Vault');
-			$form->invalidate();
-			foreach (['User', 'Password'] as $field_name) {
-				$this->assertFalse($form->getField($field_name)->isVisible());
-			}
+			// HashiCorp and Cyberark vault fields.
+			$vaults = [
+				'HashiCorp Vault' => [
+					'Vault API endpoint' => 'https://localhost:8200',
+					'Vault secret path' => 'path/to/secret',
+					'Vault authentication token' => ''
+				],
+				'CyberArk Vault' => [
+					'Vault API endpoint' => 'https://localhost:1858',
+					'Vault secret query string' => 'AppID=foo&Query=Safe=bar;Object=buzz',
+					'SSL certificate file' => 'conf/certs/cyberark-cert.pem',
+					'SSL key file' => 'conf/certs/cyberark-key.pem'
+				]
+			];
 
-			foreach ($vault_fields as $field_name) {
-				$vault_maxlength = ($field_name === 'Vault authentication token') ? 2048 : 255;
-				$field = $form->getField($field_name);
-				$this->assertEquals($vault_maxlength, $field->getAttribute('maxlength'));
-				if ($field_name === 'Vault API endpoint') {
-					$this->assertEquals('https://localhost:8200', $field->getValue());
+			// Check layout when "Store credentials in" is set to "HashiCorp Vault" and "CyberArk Vault".
+			foreach ($vaults as $vault => $vault_fields) {
+				$credentials_field->select($vault);
+				$form->invalidate();
+
+				if ($vault === 'CyberArk Vault') {
+					$form->fill(['Vault certificates' => true]);
 				}
-				elseif ($field_name === 'Vault secret path') {
-					$this->assertEquals('path/to/secret', $field->getAttribute('placeholder'));
+
+				foreach (['User', 'Password'] as $credentials) {
+					$this->assertFalse($form->getField($credentials)->isVisible());
+				}
+
+				foreach ($vault_fields as $field_name => $parameter) {
+					$vault_maxlength = ($field_name === 'Vault API endpoint' || $field_name === 'Vault secret path') ? 255 : 2048;
+					$field = $form->getField($field_name);
+					$this->assertEquals($vault_maxlength, $field->getAttribute('maxlength'));
+					switch ($field_name) {
+						case 'Vault API endpoint':
+						case 'SSL certificate file':
+						case 'SSL key file':
+						case 'Vault authentication token':
+							$this->assertEquals($parameter, $field->getValue());
+							break;
+						case 'Vault secret query string':
+						case 'Vault secret path':
+							$this->assertEquals($parameter, $field->getAttribute('placeholder'));
+							break;
+					}
 				}
 			}
 
@@ -316,7 +347,7 @@ class testFormSetup extends CWebTest {
 			$xpath = 'xpath://span[text()='.CXPathHelper::escapeQuotes($field_name).']/../../div[@class="table-forms-td-right"]';
 			// Assert contains is used as Password length can differ.
 			if ($field_name === 'Database password') {
-				$this->assertStringContainsString($value, $this->query($xpath)->one()->getText());
+				$this->assertContains($value, $this->query($xpath)->one()->getText());
 			}
 			else {
 				$this->assertEquals($value, $this->query($xpath)->one()->getText());
@@ -344,7 +375,7 @@ class testFormSetup extends CWebTest {
 		// Check that Dashboard view is opened after completing the form.
 		$this->query('button:Finish')->one()->click();
 		$this->page->waitUntilReady();
-		$this->assertStringContainsString('index.php', $this->page->getCurrentURL());
+		$this->assertContains('index.php', $this->page->getCurrentURL());
 	}
 
 	public function getDbConnectionDetails() {
@@ -804,7 +835,7 @@ class testFormSetup extends CWebTest {
 
 		// Cancel setup form update.
 		$this->query('button:Cancel')->one()->click();
-		$this->assertStringContainsString('zabbix.php?action=dashboard.view', $this->page->getCurrentURL());
+		$this->assertContains('zabbix.php?action=dashboard.view', $this->page->getCurrentURL());
 	}
 
 	/**
@@ -817,7 +848,7 @@ class testFormSetup extends CWebTest {
 		$this->assertTrue($this->query('xpath://h1[text()='.CXPathHelper::escapeQuotes($title).']')->one()->isValid());
 		$this->checkSections($title);
 		if ($text) {
-			$this->assertStringContainsString($text, $this->query('xpath:.//p')->one()->getText());
+			$this->assertContains($text, $this->query('xpath:.//p')->one()->getText());
 		}
 	}
 
