@@ -67,7 +67,7 @@ class CVaultCyberArk extends CVault {
 		$secret_parser = new CVaultSecretParser(['provider' => ZBX_VAULT_TYPE_CYBERARK, 'with_key' => false]);
 
 		if ($secret_parser->parse($this->db_path) != CParser::PARSE_SUCCESS) {
-			$this->addError(_s('Invalid parameter "%1$s": %2$s.',  $this->db_path, $secret_parser->getError()));
+			$this->addError(_s('Provided secret query string "%1$s" is invalid.', $this->db_path));
 		}
 
 		return !$this->getErrors();
