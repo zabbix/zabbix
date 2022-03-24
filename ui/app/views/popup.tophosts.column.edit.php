@@ -123,7 +123,7 @@ $numeric_only_warning = new CSpan([
 $form_grid->addItem([
 	new CLabel([
 		_('Aggregation function'),
-		$numeric_only_warning->setId('aggregate-function-warning')
+		$numeric_only_warning->setId('tophosts-column-aggregate-function-warning')
 	], 'aggregate_function'),
 	new CFormField(
 		(new CSelect('aggregate_function'))
@@ -153,7 +153,7 @@ $form_grid->addItem([
 $form_grid->addItem([
 	new CLabel([
 		_('Display'),
-		$numeric_only_warning->setId('display-warning')
+		$numeric_only_warning->setId('tophosts-column-display-warning')
 	], 'display'),
 	new CFormField(
 		(new CRadioButtonList('display', (int) $data['display']))
@@ -246,7 +246,7 @@ $thresholds->addItem(
 $form_grid->addItem([
 	new CLabel([
 		_('Thresholds'),
-		$numeric_only_warning->setId('thresholds-warning')
+		$numeric_only_warning->setId('tophosts-column-thresholds-warning')
 	], 'thresholds_table'),
 	new CFormField($thresholds)
 ]);

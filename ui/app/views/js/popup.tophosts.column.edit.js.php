@@ -84,17 +84,12 @@ window.tophosts_column_edit_form = new class {
 
 		// Toggle warning icons for non-numeric items settings.
 		if (data_item_value) {
-			for (const element of this._$widget_form[0].querySelectorAll('#aggregate-function-warning')) {
-				element.style.display = no_aggregate_function ? 'none' : '';
-			}
-
-			for (const element of this._$widget_form[0].querySelectorAll('#display-warning')) {
-				element.style.display = display_as_is ? 'none' : '';
-			}
-
-			for (const element of this._$widget_form[0].querySelectorAll('#thresholds-warning')) {
-				element.style.display = this._$thresholds_table[0].rows.length > 2 ? '' : 'none';
-			}
+			document.getElementById('tophosts-column-aggregate-function-warning').style.display = no_aggregate_function
+				? 'none'
+				: '';
+			document.getElementById('tophosts-column-display-warning').style.display = display_as_is ? 'none' : '';
+			document.getElementById('tophosts-column-thresholds-warning').style.display =
+				this._$thresholds_table[0].rows.length > 2 ? '' : 'none';
 		}
 
 		// Toggle visibility of disabled form elements.
