@@ -396,20 +396,7 @@ class CWidget extends CBaseComponent {
 					}
 				})
 				.catch((exception) => {
-					let title;
-					let messages = [];
-
-					if (typeof exception === 'object' && 'error' in exception) {
-						title = exception.error.title;
-						messages = exception.error.messages;
-					}
-
-					title = title ?? t('Failed to update widget refresh rate.');
-
-					const message_box = makeMessageBox('bad', messages, title)[0];
-
-					clearMessages();
-					addMessage(message_box);
+					console.log('Could not update widget refresh rate:', exception);
 				});
 		}
 	}
@@ -595,8 +582,8 @@ class CWidget extends CBaseComponent {
 
 		new Promise((resolve) => resolve(this._promiseUpdate()))
 			.then(() => this._hidePreloader())
-			.catch((error) => {
-				console.log('Could not update widget:', error);
+			.catch((exception) => {
+				console.log('Could not update widget:', exception);
 
 				if (this._update_abort_controller.signal.aborted) {
 					this._hidePreloader();
