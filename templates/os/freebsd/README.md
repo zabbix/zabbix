@@ -4,7 +4,7 @@
 ## Overview
 
 For Zabbix version: 6.2 and higher  
-Official FreeBSD template. Requires agent of Zabbix 6.0 and newer.
+Official FreeBSD template. Requires agent of Zabbix 6.2 and newer.
 
 
 ## Setup

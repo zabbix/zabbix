@@ -156,7 +156,9 @@ $triggerData = isset($_REQUEST['triggerid'])
 	])
 	: null;
 
-$reportWidget = (new CWidget())->setTitle(_('Availability report'));
+$reportWidget = (new CWidget())
+	->setTitle(_('Availability report'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORT2));
 
 if ($triggerData) {
 	$triggerData = reset($triggerData);

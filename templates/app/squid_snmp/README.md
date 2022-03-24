@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 
 This template was tested on:
 
@@ -11,7 +11,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
 
 ### Setup Squid
 Enable SNMP support following [official documentation](https://wiki.squid-cache.org/Features/Snmp).
@@ -23,11 +23,11 @@ snmp_access allow <zbx_acl_name> <zabbix_server_ip>
 ```
 
 ### Setup Zabbix
-1\. [Import](https://www.zabbix.com/documentation/6.0/manual/xml_export_import/templates) the template [template_app_squid_snmp.yaml](template_app_squid_snmp.yaml) into Zabbix.
+1\. [Import](https://www.zabbix.com/documentation/6.2/manual/xml_export_import/templates) the template [template_app_squid_snmp.yaml](template_app_squid_snmp.yaml) into Zabbix.
 
 2\. Set values for {$SQUID.SNMP.COMMUNITY}, {$SQUID.SNMP.PORT} and {$SQUID.HTTP.PORT} as configured in squid.conf.
 
-3\. [Link](https://www.zabbix.com/documentation/6.0/manual/config/templates/linking) the imported template to a host with Squid.
+3\. [Link](https://www.zabbix.com/documentation/6.2/manual/config/templates/linking) the imported template to a host with Squid.
 
 4\. Add SNMPv2 interface to Squid host. Set **Port** as {$SQUID.SNMP.PORT} and **SNMP community** as {$SQUID.SNMP.COMMUNITY}.
 

@@ -27,7 +27,8 @@ $this->includeJsFile('administration.miscconfig.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Other configuration parameters'))
-	->setTitleSubmenu(getAdministrationGeneralSubmenu());
+	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_MISCCONFIG_EDIT));
 
 $from_list = (new CFormList())
 	->addRow(new CLabel(_('Frontend URL'), 'url'),

@@ -72,11 +72,13 @@ func customQueryHandler(ctx context.Context, conn PostgresClient,
 			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
 
-		for i, value := range values {
-			results[columns[i]] = value
+		setResult(results, values, columns)
+
+		jsonRes, err := json.Marshal(results)
+		if err != nil {
+			return nil, err
 		}
 
-		jsonRes, _ := json.Marshal(results)
 		data = append(data, strings.TrimSpace(string(jsonRes)))
 	}
 
@@ -86,4 +88,15 @@ func customQueryHandler(ctx context.Context, conn PostgresClient,
 	}
 
 	return "[" + strings.Join(data, ",") + "]", nil
+}
+
+func setResult(results map[string]interface{}, values []interface{}, columns []string) {
+	for i, value := range values {
+		switch v := value.(type) {
+		case []uint8:
+			results[columns[i]] = string(v)
+		default:
+			results[columns[i]] = value
+		}
+	}
 }

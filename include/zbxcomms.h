@@ -185,25 +185,6 @@ void	zbx_udp_close(zbx_socket_t *s);
 #define ZBX_DEFAULT_AGENT_PORT_STR	"10050"
 #define ZBX_DEFAULT_SERVER_PORT_STR	"10051"
 
-int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, const char *version, int protocol,
-		int timeout);
-
-#define zbx_send_response(sock, result, info, timeout) \
-		zbx_send_response_ext(sock, result, info, NULL, ZBX_TCP_PROTOCOL, timeout)
-
-#define zbx_send_response_same(sock, result, info, timeout) \
-		zbx_send_response_ext(sock, result, info, NULL, sock->protocol, timeout)
-
-#define zbx_send_proxy_response(sock, result, info, timeout) \
-		zbx_send_response_ext(sock, result, info, ZABBIX_VERSION, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, timeout)
-
-int	zbx_recv_response(zbx_socket_t *sock, int timeout, char **error);
-int	connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_t *addrs, int timeout,
-		int connect_timeout, unsigned int tls_connect, int retry_interval, int level);
-void	disconnect_server(zbx_socket_t *sock);
-
-int	get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
-int	put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
 
 #ifdef HAVE_IPV6
 #	define zbx_getnameinfo(sa, host, hostlen, serv, servlen, flags)		\
@@ -217,4 +198,8 @@ int	put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, si
 int	zbx_socket_start(char **error);
 #endif
 
-#endif
+int	zbx_comms_parse_response(char *xml, char *host, size_t host_len, char *key, size_t key_len,
+		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
+		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
+		char *severity, size_t severity_len);
+#endif // ZABBIX_COMMS_H

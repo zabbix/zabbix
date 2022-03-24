@@ -34,6 +34,7 @@
 #include "events.h"
 #include "../zbxvault/vault.h"
 #include "zbxavailability.h"
+#include "zbxcommshigh.h"
 
 extern char	*CONFIG_SERVER;
 extern char	*CONFIG_VAULTDBPATH;
@@ -4426,6 +4427,8 @@ int	proxy_get_history_count(void)
 	zbx_uint64_t	id;
 	int		count = 0;
 
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
 	proxy_get_lastid("proxy_history", "history_lastid", &id);
 
 	result = DBselect(
@@ -4438,6 +4441,8 @@ int	proxy_get_history_count(void)
 		count = atoi(row[0]);
 
 	DBfree_result(result);
+
+	DBclose();
 
 	return count;
 }

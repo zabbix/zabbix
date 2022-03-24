@@ -26,7 +26,7 @@
 #include "mutexs.h"
 #include "daemon.h"
 #include "zbxcompress.h"
-
+#include "zbxcommshigh.h"
 
 extern unsigned char	program_type;
 static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
@@ -283,7 +283,23 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 		DBbegin();
 
 		if (0 != history_lastid)
+		{
+			zbx_uint64_t	history_maxid;
+			DB_RESULT	result;
+			DB_ROW		row;
+
+			result = DBselect("select max(id) from proxy_history");
+
+			if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+				history_maxid = history_lastid;
+			else
+				ZBX_STR2UINT64(history_maxid, row[0]);
+
+			DBfree_result(result);
+
+			reset_proxy_history_count(history_maxid - history_lastid);
 			proxy_set_hist_lastid(history_lastid);
+		}
 
 		if (0 != discovery_lastid)
 			proxy_set_dhis_lastid(discovery_lastid);

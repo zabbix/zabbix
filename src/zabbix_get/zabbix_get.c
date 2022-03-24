@@ -18,7 +18,7 @@
 **/
 
 #include "common.h"
-#include "comms.h"
+#include "zbxcomms.h"
 #include "zbxgetopt.h"
 #include "zbxcrypto.h"
 

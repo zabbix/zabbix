@@ -183,11 +183,15 @@ if ($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]) {
 
 (new CWidget())
 	->setTitle(_('SLA'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::SLA_LIST))
 	->setControls(
 		(new CTag('nav', true,
-			(new CSimpleButton(_('Create SLA')))
-				->addClass('js-create-sla')
-				->setEnabled($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA])
+			(new CList())
+				->addItem(
+					(new CSimpleButton(_('Create SLA')))
+						->addClass('js-create-sla')
+						->setEnabled($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA])
+				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($filter)

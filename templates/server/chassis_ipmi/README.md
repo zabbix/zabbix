@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 Template for monitoring servers with BMC over IPMI that work without any external scripts.
 All metrics are collected at once, thanks to Zabbix's bulk data collection.
 It collects metrics by polling BMC remotely using an IPMI agent.
@@ -11,7 +11,7 @@ It collects metrics by polling BMC remotely using an IPMI agent.
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/ipmi) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/ipmi) for basic instructions.
 
 You can set {$IPMI.USER} and {$IPMI.PASSWORD} macros in the template for using on the host level.
 
