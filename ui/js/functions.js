@@ -725,22 +725,12 @@ function parseUrlString(url) {
  *
  * @return {jQuery}
  */
-function makeMessageBox(type, messages, title, show_close_box, show_details) {
+function makeMessageBox(type, messages, title = null, show_close_box = true, show_details = false) {
 	var classes = {good: 'msg-good', bad: 'msg-bad', warning: 'msg-warning'},
 		msg_class = classes[type];
 
 	if (typeof msg_class === 'undefined') {
 		return jQuery('<output>').text(Array.isArray(messages) ? messages.join(' ') : messages);
-	}
-
-	if (typeof title === 'undefined') {
-		title = null;
-	}
-	if (typeof show_close_box === 'undefined') {
-		show_close_box = true;
-	}
-	if (typeof show_details === 'undefined') {
-		show_details = false;
 	}
 
 	var	$list = jQuery('<ul>')
