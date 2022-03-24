@@ -258,7 +258,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 func (p *Plugin) executeSingle(path string) (device []byte, err error) {
 	device, err = p.executeSmartctl(fmt.Sprintf("-a %s -j", path), false)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
+		return nil, fmt.Errorf("Failed to execute smartctl: %w.", err)
 	}
 
 	return
