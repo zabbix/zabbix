@@ -1761,9 +1761,6 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 
 				dependent = (zbx_lld_item_t *)item->dependent_items.values[j];
 				dependent->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
-
-				*error = zbx_strdcatf(*error, "Cannot %s dependent item: master item is not discovered.\n",
-							(0 != dependent->itemid ? "update" : "create"));
 			}
 		}
 
