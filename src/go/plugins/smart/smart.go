@@ -21,6 +21,7 @@ package smart
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"zabbix.com/pkg/conf"
@@ -29,10 +30,12 @@ import (
 )
 
 const (
-	single = 1
-	all    = 0
+	twoParameters = 2
+	oneParameter  = 1
+	all           = 0
 
-	firstParameter = 0
+	firstParameter  = 0
+	secondParameter = 1
 
 	diskGet            = "smart.disk.get"
 	diskDiscovery      = "smart.disk.discovery"
@@ -123,7 +126,8 @@ func (p *Plugin) diskDiscovery() (jsonArray []byte, err error) {
 			DeviceType:   getType(dev.Info.DevType, dev.RotationRate, dev.SmartAttributes.Table),
 			Model:        dev.ModelName,
 			SerialNumber: dev.SerialNumber,
-			Path:         dev.Info.path,
+			Path:         dev.Info.name,
+			RaidType:     dev.Info.raidType,
 			Attributes:   getAttributes(dev),
 		})
 	}
@@ -138,8 +142,10 @@ func (p *Plugin) diskDiscovery() (jsonArray []byte, err error) {
 
 func (p *Plugin) diskGet(params []string) ([]byte, error) {
 	switch len(params) {
-	case single:
-		return p.diskGetSingle(params[firstParameter])
+	case twoParameters:
+		return p.diskGetSingle(params[firstParameter], params[secondParameter])
+	case oneParameter:
+		return p.diskGetSingle(params[firstParameter], "")
 	case all:
 		return p.diskGetAll()
 	default:
@@ -147,8 +153,14 @@ func (p *Plugin) diskGet(params []string) ([]byte, error) {
 	}
 }
 
-func (p *Plugin) diskGetSingle(path string) ([]byte, error) {
-	device, err := p.executeSingle(path)
+func (p *Plugin) diskGetSingle(path, raidType string) ([]byte, error) {
+	executable := path
+
+	if raidType != "" {
+		executable = fmt.Sprintf("%s -d %s", executable, raidType)
+	}
+
+	device, err := p.executeSingle(executable)
 	if err != nil {
 		return nil, err
 	}
@@ -269,6 +281,10 @@ func setSingleDiskFields(dev []byte) (out map[string]interface{}, err error) {
 	}
 
 	for _, a := range sd.SmartAttributes.Table {
+		if a.Name == unknownAttrName {
+			continue
+		}
+
 		out[strings.ToLower(a.Name)] = singleRequestAttribute{a.Raw.Value, a.Raw.Str}
 	}
 
@@ -374,13 +390,16 @@ func getAttributeType(devType string, rate int, tables []table) string {
 	return getTypeByRateAndAttr(rate, tables)
 }
 
-func getAttributes(in deviceParser) string {
-	tmp := make([]string, len(in.SmartAttributes.Table))
-	for i, table := range in.SmartAttributes.Table {
-		tmp[i] = table.Attrname
+func getAttributes(in deviceParser) (out string) {
+	for _, table := range in.SmartAttributes.Table {
+		if table.Attrname == unknownAttrName {
+			continue
+		}
+
+		out = out + " " + table.Attrname
 	}
 
-	return strings.Join(tmp, " ")
+	return strings.TrimSpace(out)
 }
 
 func getType(devType string, rate int, tables []table) string {

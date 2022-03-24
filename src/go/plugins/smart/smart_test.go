@@ -188,6 +188,77 @@ const (
 		  "current": 18
 		}
 	  }`
+
+	ssdUnknown = `
+	  {
+		  "json_format_version": [
+			1,
+			0
+		  ],
+		  "smartctl": {
+			"exit_status": 0
+		  },
+		  "device": {
+			"name": "/dev/sda",
+			"info_name": "/dev/sda",
+			"type": "ata",
+			"protocol": "ATA"
+		  },
+		  "model_name": "TS128GMTS800",
+		  "serial_number": "D486530350",
+		  "firmware_version": "O1225G",
+		  "rotation_rate": 0,
+		  "smart_status": {
+			"passed": true
+		  },
+		  "ata_smart_data": {
+			"self_test": {
+			  "status": {
+				"passed": true
+			  }
+			},
+			"capabilities": {
+			  "values": [
+				113,
+				2
+			  ],
+			  "self_tests_supported": true
+			}
+		  },
+		  "ata_smart_attributes": {
+			 "table": [
+			  {
+				 "name": "Raw_Read_Error_Rate",
+				"value": 100,
+				"raw": {
+				  "value": 0,
+				  "string": "0"
+				}
+			  },
+			  {
+				"name": "Unknown_Attribute",
+			   "value": 0,
+			   "raw": {
+				 "value": 0,
+				 "string": "0"
+			   }
+			 },
+			  {
+				 "name": "Reallocated_Sector_Ct",
+				"raw": {
+				  "value": 10,
+				  "string": "10"
+				}
+			  }
+			]
+		  },
+		  "power_on_time": {
+			"hours": 732
+		  },
+		   "temperature": {
+			"current": 18
+		  }
+		}`
 )
 
 var (
@@ -196,6 +267,7 @@ var (
 	table3    = table{"test3", 3, 33}
 	table4    = table{"test4", 4, 44}
 	attrTable = table{"Spin_Up_Time", 5, 55}
+	unknown   = table{"Unknown_Attribute", 0, 0}
 )
 
 func Test_setSingleDiskFields(t *testing.T) {
@@ -261,6 +333,33 @@ func Test_setSingleDiskFields(t *testing.T) {
 		{
 			"ssd_device",
 			args{[]byte(ssd)},
+			map[string]interface{}{
+				"critical_warning": 0,
+				"disk_type":        "ssd",
+				"error":            "",
+				"exit_status":      0,
+				"firmware_version": "O1225G",
+				"media_errors":     0,
+				"model_name":       "TS128GMTS800",
+				"percentage_used":  0,
+				"power_on_time":    732,
+				"self_test_passed": &selftestSuccess,
+				"serial_number":    "D486530350",
+				"temperature":      18,
+				"raw_read_error_rate": singleRequestAttribute{
+					Value: 0,
+					Raw:   "0",
+				},
+				"reallocated_sector_ct": singleRequestAttribute{
+					Value: 10,
+					Raw:   "10",
+				},
+			},
+			false,
+		},
+		{
+			"ssd_device_with_unknown_attribute",
+			args{[]byte(ssdUnknown)},
 			map[string]interface{}{
 				"critical_warning": 0,
 				"disk_type":        "ssd",
@@ -485,6 +584,11 @@ func Test_getAttributes(t *testing.T) {
 			"attributes_table_empty",
 			args{deviceParser{SmartAttributes: smartAttributes{Table: []table{}}}},
 			"",
+		},
+		{
+			"unknown_attributes_table_empty",
+			args{deviceParser{SmartAttributes: smartAttributes{Table: []table{table1, unknown, table2}}}},
+			"test1 test2",
 		},
 		{
 			"attributes_missing",

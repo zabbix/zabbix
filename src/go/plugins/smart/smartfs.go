@@ -42,7 +42,8 @@ const (
 	ssdType     = "ssd"
 	hddType     = "hdd"
 
-	spinUpAttrName = "Spin_Up_Time"
+	spinUpAttrName  = "Spin_Up_Time"
+	unknownAttrName = "Unknown_Attribute"
 
 	ataSmartAttrFieldName      = "ata_smart_attributes"
 	ataSmartAttrTableFieldName = "table"
@@ -69,6 +70,7 @@ type device struct {
 	Model        string `json:"{#MODEL}"`
 	SerialNumber string `json:"{#SN}"`
 	Path         string `json:"{#PATH}"`
+	RaidType     string `json:"{#RAIDTYPE}"`
 	Attributes   string `json:"{#ATTRIBUTES}"`
 }
 type jsonDevice struct {
@@ -162,7 +164,8 @@ type deviceInfo struct {
 	Name     string `json:"name"`
 	InfoName string `json:"info_name"`
 	DevType  string `json:"type"`
-	path     string `json:"-"`
+	name     string `json:"-"`
+	raidType string `json:"-"`
 }
 
 type smartctl struct {
@@ -274,7 +277,7 @@ func (r *runner) executeBase(basicDev []deviceInfo, jsonRunner bool) error {
 	return r.waitForExecution()
 }
 
-//executeRaids executes runners for raid devices (except megaraid) retrived from smartctl
+//executeRaids executes runners for raid devices (except megaraid) retrieved from smartctl
 func (r *runner) executeRaids(raids []deviceInfo, jsonRunner bool) {
 	raidTypes := []string{"3ware", "areca", "cciss", "sat"}
 
@@ -293,7 +296,7 @@ func (r *runner) executeRaids(raids []deviceInfo, jsonRunner bool) {
 	r.waitForRaidExecution(r.raidDone)
 }
 
-//executeMegaRaids executes runners for megaraid devices retrived from smartctl
+//executeMegaRaids executes runners for megaraid devices retrieved from smartctl
 func (r *runner) executeMegaRaids(megaraids []deviceInfo, jsonRunner bool) {
 	r.megaraids = make(chan raidParameters, len(megaraids))
 
@@ -458,7 +461,7 @@ func (r *runner) getBasicDevices(jsonRunner bool) {
 			return
 		}
 
-		dp.Info.path = name
+		dp.Info.name = name
 
 		r.mux.Lock()
 
@@ -533,12 +536,14 @@ runner:
 			}
 
 			if dp.SmartStatus != nil {
+				dp.Info.name = raid.name
+
 				if raid.rType == satType {
 					dp.Info.Name = fmt.Sprintf("%s %s", raid.name, raid.rType)
-					dp.Info.path = fmt.Sprintf("%s -d %s", raid.name, raid.rType)
+					dp.Info.raidType = raid.rType
 				} else {
 					dp.Info.Name = fmt.Sprintf("%s %s,%d", raid.name, raid.rType, i)
-					dp.Info.path = fmt.Sprintf("%s -d %s,%d", raid.name, raid.rType, i)
+					dp.Info.raidType = fmt.Sprintf("%s,%d", raid.rType, i)
 				}
 
 				if r.setRaidDevices(dp, device, raid.rType, jsonRunner) {
