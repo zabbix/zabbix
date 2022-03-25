@@ -369,7 +369,7 @@ class CDataHelper extends CAPIHelper {
 	 *  Add data to item.
 	 *
 	 * @param string $itemid		item id
-	 * @param array  $values		value that should be sent to item
+	 * @param array $values		value that should be sent to item
 	 * @param mixed $time			time when value was received
 	 */
 	public static function addItemData($itemid, $values, $time = null) {
@@ -394,19 +394,23 @@ class CDataHelper extends CAPIHelper {
 			case 1:
 				$history_table = 'history_str';
 				break;
+
 			case 2:
 				$history_table = 'history_log';
 				break;
+
 			case 4:
 				$history_table = 'history_text';
 				break;
+
 			default:
 				$history_table = 'history_uint';
 				break;
+
 		}
 
-		foreach (array_values($values) as $k => $value) {
-			$clock = is_array($time) ? $time[$k] : $time;
+		foreach (array_values($values) as $key => $value) {
+			$clock = is_array($time) ? $time[$key] : $time;
 			DBexecute('INSERT INTO '.$history_table.' (itemid, clock, value) VALUES ('.zbx_dbstr($itemid).', '
 					.zbx_dbstr($clock).', '.zbx_dbstr($value).')');
 		}
