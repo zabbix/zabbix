@@ -32,7 +32,6 @@
 #include "daemon.h"
 #include "zbxavailability.h"
 #include "zbxtrends.h"
-#include "../zbxalgo/vectorimpl.h"
 
 static zbx_mem_info_t	*hc_index_mem = NULL;
 static zbx_mem_info_t	*hc_mem = NULL;

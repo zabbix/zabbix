@@ -22,7 +22,6 @@
 #include "log.h"
 #include "logfiles.h"
 #include "zbxjson.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
 
 /* tags for agent persistent storage files */
 #define ZBX_PERSIST_TAG_FILENAME		"filename"

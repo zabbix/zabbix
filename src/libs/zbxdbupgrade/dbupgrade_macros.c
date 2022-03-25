@@ -21,7 +21,6 @@
 
 #include "db.h"
 #include "log.h"
-#include "../zbxalgo/vectorimpl.h"
 
 /* Function argument descriptors.                                                */
 /* Used in varargs list to describe following parameter mapping to old position. */

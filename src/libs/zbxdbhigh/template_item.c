@@ -22,7 +22,6 @@
 #include "db.h"
 #include "log.h"
 #include "dbcache.h"
-#include "../zbxalgo/vectorimpl.h"
 #include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_item.h"
 

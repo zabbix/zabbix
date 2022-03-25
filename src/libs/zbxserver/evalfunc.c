@@ -24,7 +24,6 @@
 #include "zbxregexp.h"
 #include "valuecache.h"
 #include "zbxtrends.h"
-#include "../zbxalgo/vectorimpl.h"
 #include "anomalystl.h"
 
 #include "evalfunc_common.h"

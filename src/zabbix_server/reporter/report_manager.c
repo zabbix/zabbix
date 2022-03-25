@@ -25,7 +25,6 @@
 #include "zbxreport.h"
 #include "../../libs/zbxcrypto/hmac_sha256.h"
 #include "sha256crypt.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
 #include "zbxalert.h"
 #include "zbxserver.h"
 #include "report_protocol.h"

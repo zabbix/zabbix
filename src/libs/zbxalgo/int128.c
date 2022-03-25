@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxtypes.h"
 #include "zbxalgo.h"
+
+#include "zbxtypes.h"
 
 #define UINT64_BIT_COUNT	(sizeof(zbx_uint64_t) << 3)
 #define UINT32_BIT_COUNT	(UINT64_BIT_COUNT >> 1)
