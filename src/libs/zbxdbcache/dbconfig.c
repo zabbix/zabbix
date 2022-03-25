@@ -2853,7 +2853,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, unsigned char synced)
 			zbx_vector_ptr_create_ext(&item->tags, __config_mem_malloc_func, __config_mem_realloc_func,
 					__config_mem_free_func);
 
-			if (ZBX_SYNCED_NEW_CONFIG_YES == synced)
+			if (ZBX_SYNCED_NEW_CONFIG_YES == synced && 0 == host->proxy_hostid)
 				flags |= ZBX_ITEM_NEW;
 		}
 		else
