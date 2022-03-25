@@ -244,7 +244,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			$main_interfaces = getRequest('mainInterfaces', []);
 
-			foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $type) {
+			foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $type) {
 				if (array_key_exists($type, $main_interfaces)
 						&& array_key_exists($main_interfaces[$type], $interfaces)) {
 					$interfaces[$main_interfaces[$type]]['main'] = INTERFACE_PRIMARY;
@@ -486,10 +486,10 @@ if (hasRequest('form')) {
 		}
 	}
 	else {
-		foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $type) {
+		foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $type) {
 			if (array_key_exists($type, $data['host_prototype']['main_interfaces'])) {
 				$interfaceid = $data['host_prototype']['main_interfaces'][$type];
-				$data['host_prototype']['interfaces'][$interfaceid]['main'] = '1';
+				$data['host_prototype']['interfaces'][$interfaceid]['main'] = INTERFACE_PRIMARY;
 			}
 		}
 		$data['host_prototype']['interfaces'] = array_values($data['host_prototype']['interfaces']);
