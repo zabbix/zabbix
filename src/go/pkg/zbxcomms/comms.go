@@ -288,13 +288,26 @@ func (c *Connection) RemoteIP() string {
 
 func Listen(address string, args ...interface{}) (c *Listener, err error) {
 	var tlsconfig *tls.Config
+
+	lc := net.ListenConfig{
+		Control: func(network, address string, conn syscall.RawConn) error {
+			var operr error
+			if err := conn.Control(func(fd uintptr) {
+				operr = syscall.SetsockoptInt(int(fd), syscall.SOL_SOCKET, ^syscall.SO_REUSEADDR, 1)
+			}); err != nil {
+				return err
+			}
+			return operr
+		},
+	}
+
 	if len(args) > 0 {
 		var ok bool
 		if tlsconfig, ok = args[0].(*tls.Config); !ok {
 			return nil, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0])
 		}
 	}
-	l, tmperr := net.Listen("tcp", address)
+	l, tmperr := lc.Listen("tcp", address)
 	if tmperr != nil {
 		return nil, fmt.Errorf("Listen failed: %s", tmperr.Error())
 	}
