@@ -272,7 +272,7 @@ class CUserMacro extends CApiService {
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
 			'value' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
 									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('globalmacro', 'value')],
-									['if' => ['field' => 'type', 'in' => ZBX_MACRO_TYPE_VAULT], 'type' => API_VAULT_SECRET, 'length' => DB::getFieldLength('globalmacro', 'value')]
+									['if' => ['field' => 'type', 'in' => ZBX_MACRO_TYPE_VAULT], 'type' => API_VAULT_SECRET, 'provider' => CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER), 'length' => DB::getFieldLength('globalmacro', 'value')]
 			]],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('globalmacro', 'description')]
 		]];
@@ -361,8 +361,10 @@ class CUserMacro extends CApiService {
 			}
 
 			if (array_key_exists('value', $globalmacro) && $globalmacro['type'] == ZBX_MACRO_TYPE_VAULT) {
-				if (!CApiInputValidator::validate(['type' => API_VAULT_SECRET], $globalmacro['value'],
-						'/'.($index + 1).'/value', $error)) {
+				if (!CApiInputValidator::validate([
+							'type' => API_VAULT_SECRET,
+							'provider' => CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER)
+						], $globalmacro['value'], '/'.($index + 1).'/value', $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 			}
@@ -463,7 +465,7 @@ class CUserMacro extends CApiService {
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
 			'value' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
 									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
-									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'length' => DB::getFieldLength('hostmacro', 'value')]
+									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'provider' => CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER), 'length' => DB::getFieldLength('hostmacro', 'value')]
 			]],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
 		]];
@@ -564,8 +566,10 @@ class CUserMacro extends CApiService {
 			}
 
 			if (array_key_exists('value', $hostmacro) && $hostmacro['type'] == ZBX_MACRO_TYPE_VAULT) {
-				if (!CApiInputValidator::validate(['type' => API_VAULT_SECRET], $hostmacro['value'],
-						'/'.($index + 1).'/value', $error)) {
+				if (!CApiInputValidator::validate([
+							'type' => API_VAULT_SECRET,
+							'provider' => CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER)
+						], $hostmacro['value'], '/'.($index + 1).'/value', $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 			}
