@@ -1162,7 +1162,7 @@ static void	zbx_check_db(void)
 			zabbix_log(LOG_LEVEL_WARNING, "database could be upgraded to use primary keys in history tables");
 		}
 
-		/* this parameter is specific to TimescaleDB, do not add it to json */
+		/* this parameter is specific to TimescaleDB, do not add it to json for other DBMS */
 		db_version_info.compression_availability = -1;
 
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
