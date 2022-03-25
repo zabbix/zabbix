@@ -24,6 +24,14 @@
  */
 class C44ImportConverter extends CConverter {
 
+
+	/**
+	 * Update types.
+	 */
+	const TYPE_ITEM = 1;
+	const TYPE_DISCOVERY_RULE = 2;
+	const TYPE_ITEM_PROTOTYPE = 3;
+
 	/**
 	 * Convert import data from 4.4 to 5.0 version.
 	 *
@@ -193,7 +201,7 @@ class C44ImportConverter extends CConverter {
 				if (array_key_exists('type', $item) && in_array($item['type'], $types)) {
 					$interfaceid = str_replace('if', '', $item['interface_ref']);
 
-					$interfaces[$interfaceid][] = $this->createHelperArray($item, 1);
+					$interfaces[$interfaceid][] = $this->createHelperArray($item, self::TYPE_ITEM);
 				}
 			}
 		}
@@ -204,7 +212,7 @@ class C44ImportConverter extends CConverter {
 				if (array_key_exists('type', $drule) && in_array($drule['type'], $types)) {
 					$interfaceid = str_replace('if', '', $drule['interface_ref']);
 
-					$interfaces[$interfaceid][] = $this->createHelperArray($drule, 2);
+					$interfaces[$interfaceid][] = $this->createHelperArray($drule, self::TYPE_DISCOVERY_RULE);
 				}
 
 				if (array_key_exists('item_prototypes', $drule)) {
@@ -213,7 +221,9 @@ class C44ImportConverter extends CConverter {
 						if (array_key_exists('type', $prototype) && in_array($prototype['type'], $types)) {
 							$interfaceid = str_replace('if', '', $prototype['interface_ref']);
 
-							$interfaces[$interfaceid][] = $this->createHelperArray($prototype, 3);
+							$interfaces[$interfaceid][] = $this->createHelperArray($prototype,
+								self::TYPE_ITEM_PROTOTYPE
+							);
 						}
 					}
 				}
@@ -295,25 +305,28 @@ class C44ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function updateInterfaceRef(array $host, array $updates): array {
-		if (array_key_exists('items', $host) && array_key_exists('1', $updates)) {
+		if (array_key_exists('items', $host) && array_key_exists(self::TYPE_ITEM, $updates)) {
 			foreach ($host['items'] as &$item) {
-				if (array_key_exists($item['key'], $updates[1])) {
-					$item['interface_ref'] = $updates[1][$item['key']];
+				if (array_key_exists($item['key'], $updates[self::TYPE_ITEM])) {
+					$item['interface_ref'] = $updates[self::TYPE_ITEM][$item['key']];
 				}
 			}
 			unset($item);
 		}
 
-		if (array_key_exists('discovery_rules', $host) && array_key_exists('2', $updates)) {
+		if (array_key_exists('discovery_rules', $host)) {
 			foreach ($host['discovery_rules'] as &$drule) {
-				if (array_key_exists($drule['key'], $updates[2])) {
-					$drule['interface_ref'] = $updates[2][$drule['key']];
+				if (array_key_exists(self::TYPE_DISCOVERY_RULE, $updates)) {
+					if (array_key_exists($drule['key'], $updates[self::TYPE_DISCOVERY_RULE])) {
+						$drule['interface_ref'] = $updates[self::TYPE_DISCOVERY_RULE][$drule['key']];
+					}
 				}
 
-				if (array_key_exists('item_prototypes', $drule) && array_key_exists('3', $updates)) {
+				if (array_key_exists('item_prototypes', $drule)
+						&& array_key_exists(self::TYPE_ITEM_PROTOTYPE, $updates)) {
 					foreach ($drule['item_prototypes'] as &$prototype) {
-						if (array_key_exists($prototype['key'], $updates[3])) {
-							$prototype['interface_ref'] = $updates[3][$prototype['key']];
+						if (array_key_exists($prototype['key'], $updates[self::TYPE_ITEM_PROTOTYPE])) {
+							$prototype['interface_ref'] = $updates[self::TYPE_ITEM_PROTOTYPE][$prototype['key']];
 						}
 					}
 					unset($prototype);
@@ -365,6 +378,7 @@ class C44ImportConverter extends CConverter {
 						if (array_key_exists($interfaceid, $interfaces)) {
 							// Clone interface and map it with parent interface.
 							$new_interfaces[$interfaceid][] = [
+								'interface_ref' => 'if'.(++$max_interfaceid),
 								'new' => true
 							] + $parent_interface;
 
