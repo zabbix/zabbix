@@ -371,7 +371,8 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *in
 	{
 		if (0 != (flags & ZBX_ITEM_NEW) &&
 				FAIL == zbx_custom_interval_is_scheduling(custom_intervals) &&
-				ITEM_TYPE_ZABBIX_ACTIVE != item->type)
+				ITEM_TYPE_ZABBIX_ACTIVE != item->type &&
+				ZBX_DEFAULT_ITEM_UPDATE_INTERVAL < simple_interval)
 		{
 			item->nextcheck = calculate_item_nextcheck(seed, item->type, ZBX_DEFAULT_ITEM_UPDATE_INTERVAL,
 					NULL, now);
