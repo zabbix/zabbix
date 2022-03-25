@@ -286,7 +286,7 @@ class testItem extends CAPITest {
 					'url' => '192.168.0.1'
 				],
 				'expected_error' => 'No interface found.'
-			],
+			]
 		] + $item_type_tests;
 	}
 
