@@ -37,6 +37,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		// Authorization.
 		'Login attempts' => 5,
 		'Login blocking interval' => '30s',
+		// Storage of secrets
+		'Vault provider' => 'HashiCorp Vault',
 		// Security.
 		'Validate URI schemes' => true,
 		'Valid URI schemes' => 'http,https,ftp,file,mailto,tel,ssh',
@@ -60,6 +62,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		// Authorization.
 		'login_attempts' => 5,
 		'login_block' => '30s',
+		// Storage of secrets
+		'vault_provider' => 0,
 		// Security.
 		'validate_uri_schemes' => 1,
 		'uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh',
@@ -83,6 +87,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		// Authorization.
 		'Login attempts' => 13,
 		'Login blocking interval' => '52s',
+		// Storage of secrets
+		'Vault provider' => 'CyberArk Vault',
 		// Security.
 		'Validate URI schemes' => true,
 		'Valid URI schemes' => 'custom_scheme',

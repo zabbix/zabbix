@@ -34,7 +34,7 @@ class CControllerWidgetHostAvailView extends CControllerWidget {
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
 
-		$interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI];
+		$interface_types = CItem::INTERFACE_TYPES_BY_PRIORITY;
 
 		// Sanitize non-existing interface types.
 		$fields['interface_type'] = array_values(array_intersect($interface_types, $fields['interface_type']));

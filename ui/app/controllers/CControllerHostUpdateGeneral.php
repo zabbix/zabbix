@@ -98,11 +98,12 @@ abstract class CControllerHostUpdateGeneral extends CController {
 			}
 
 			unset($interfaces[$key]['isNew']);
-			$interfaces[$key]['main'] = 0;
+			$interfaces[$key]['main'] = INTERFACE_SECONDARY;
 		}
 
 		$main_interfaces = $this->getInput('mainInterfaces', []);
-		foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $type) {
+
+		foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $type) {
 			if (array_key_exists($type, $main_interfaces) && array_key_exists($main_interfaces[$type], $interfaces)) {
 				$interfaces[$main_interfaces[$type]]['main'] = INTERFACE_PRIMARY;
 			}
