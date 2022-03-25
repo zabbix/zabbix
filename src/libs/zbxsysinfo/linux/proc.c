@@ -68,7 +68,7 @@ typedef struct
 	zbx_uint64_t	io_write_b;
 
 	zbx_uint64_t	vsize;
-	zbx_uint64_t	pmem;
+	double		pmem;
 	zbx_uint64_t	rss;
 	zbx_uint64_t	data;
 	zbx_uint64_t	exe;
@@ -1407,7 +1407,6 @@ out:
 	return ret;
 }
 
-//TODO: rever function header comment
 /******************************************************************************
  *                                                                            *
  * Purpose: frees process vector read by zbx_proc_get_processes function      *
@@ -1621,7 +1620,7 @@ static zbx_proc_data_t	*proc_get_data(FILE *f_status, FILE *f_stat, FILE *f_io, 
 		proc_data->size = proc_data->exe + proc_data->data + proc_data->stk;
 
 		if (SUCCEED == get_total_memory(&val) && 0 != val)
-			proc_data->pmem = proc_data->rss / val;
+			proc_data->pmem = proc_data->rss / (double)val;
 	}
 
 	read_value_from_proc_file(f_status, 0, "voluntary_ctxt_switches", PROC_VAL_TYPE_NUM, &proc_data->ctx_switches,
@@ -1709,7 +1708,10 @@ static zbx_proc_data_t	*proc_read_data(char *path, int zbx_proc_mode)
 	zbx_snprintf(tmp, sizeof(tmp), "%s/stat", path);
 
 	if (NULL == (f_stat = fopen(tmp, "r")))
+	{
+		zbx_fclose(f_status);
 		return NULL;
+	}
 
 	zbx_snprintf(tmp, sizeof(tmp), "%s/io", path);
 	f_io = fopen(tmp, "r");
@@ -1787,8 +1789,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (1 == invalid_user)
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid user"));
-		return SYSINFO_RET_FAIL;
+		zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+		goto out;
 	}
 
 	if (NULL == (dir = opendir("/proc")))
@@ -2013,7 +2015,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 
 			zbx_json_adduint64(&j, "vsize", pdata->vsize);
-			zbx_json_adduint64(&j, "pmem", pdata->pmem);
+			zbx_json_addfloat(&j, "pmem", pdata->pmem);
 			zbx_json_adduint64(&j, "rss", pdata->rss);
 			zbx_json_adduint64(&j, "data", pdata->data);
 			zbx_json_adduint64(&j, "exe", pdata->exe);
@@ -2055,10 +2057,10 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_close(&j);
 	}
 
-	zbx_json_close(&j);
 	zbx_proc_free_proc_data(&proc_data_ctx);
 	zbx_vector_ptr_destroy(&proc_data_ctx);
-
+out:
+	zbx_json_close(&j);
 	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
 	zbx_json_free(&j);
 
