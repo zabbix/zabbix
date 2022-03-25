@@ -2116,7 +2116,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 *
 	 * @dataProvider getBarScreenshotsData
 	 */
-	public function testDashboardTopHostsWidget_BarScreenshots($data) {
+	public function testDashboardTopHostsWidget_widgetAppearance($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_screenshots']);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->getWidget('Top hosts screenshots')->edit();
