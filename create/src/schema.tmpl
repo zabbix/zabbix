@@ -604,7 +604,7 @@ INDEX		|2		|discovery_groupid
 TABLE|triggers|triggerid|ZBX_TEMPLATE
 FIELD		|triggerid	|t_id		|	|NOT NULL	|0
 FIELD		|expression	|t_varchar(2048)|''	|NOT NULL	|0
-FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
+FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|value		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
@@ -1956,4 +1956,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|60100018	|60100018
+ROW		|1		|6010020	|6010020
