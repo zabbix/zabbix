@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"syscall"
 	"time"
 
 	"zabbix.com/pkg/log"
