@@ -1285,7 +1285,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$this->checkWidget($header, $data, 'create');
 		}
 		else {
-			COverlayDialogElement::find()->waitUntilReady()->one()->close();
+			COverlayDialogElement::find()->one()->close();
 			$dashboard->save();
 
 			// Check message that widget added.
@@ -1583,7 +1583,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #16 update first column to Item column and check available time shift values.
+			// #16 update first column to Item column and check time suffix - seconds.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1599,7 +1599,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #17
+			// #17 time suffix "minutes" is checked in this case.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1615,7 +1615,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #18
+			// #18 time suffix "hours" is checked in this case.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1631,7 +1631,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #19
+			// #19 time suffix "weeks" is checked in this case.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1749,7 +1749,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$this->checkWidget(self::$updated_name, $data, 'update');
 		}
 		else {
-			COverlayDialogElement::find()->waitUntilReady()->one()->close();
+			COverlayDialogElement::find()->one()->close();
 			$dashboard->save();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
@@ -1878,7 +1878,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$column_amount = count($data['column_fields']);
 			$table = $form->query('id:list_columns')->one()->asTable();
 
-			// It is required to subtract 1 to ignore header row
+			// It is required to subtract 1 to ignore header row.
 			$row_amount = $table->getRows()->count() - 1;
 
 			if ($action === 'create') {
