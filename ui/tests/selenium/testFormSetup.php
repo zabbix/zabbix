@@ -215,7 +215,7 @@ class testFormSetup extends CWebTest {
 				]
 			];
 
-			// Check layout when "Store credentials in" is set to "HashiCorp Vault" and "CyberArk Vault".
+			// Check layout when "Store credentials in" is set to "HashiCorp Vault" or "CyberArk Vault".
 			foreach ($vaults as $vault => $vault_fields) {
 				$credentials_field->select($vault);
 				$form->invalidate();
@@ -224,25 +224,19 @@ class testFormSetup extends CWebTest {
 					$form->fill(['Vault certificates' => true]);
 				}
 
-				foreach (['User', 'Password'] as $credentials) {
-					$this->assertFalse($form->getField($credentials)->isVisible());
+				foreach (['User', 'Password'] as $parameter) {
+					$this->assertFalse($form->getField($parameter)->isVisible());
 				}
 
 				foreach ($vault_fields as $field_name => $parameter) {
 					$vault_maxlength = ($field_name === 'Vault API endpoint' || $field_name === 'Vault secret path') ? 255 : 2048;
 					$field = $form->getField($field_name);
 					$this->assertEquals($vault_maxlength, $field->getAttribute('maxlength'));
-					switch ($field_name) {
-						case 'Vault API endpoint':
-						case 'SSL certificate file':
-						case 'SSL key file':
-						case 'Vault authentication token':
-							$this->assertEquals($parameter, $field->getValue());
-							break;
-						case 'Vault secret query string':
-						case 'Vault secret path':
-							$this->assertEquals($parameter, $field->getAttribute('placeholder'));
-							break;
+					if (in_array($field_name, ['Vault secret query string', 'Vault secret path'])) {
+						$this->assertEquals($parameter, $field->getAttribute('placeholder'));
+					}
+					else {
+						$this->assertEquals($parameter, $field->getValue());
 					}
 				}
 			}
