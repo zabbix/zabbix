@@ -790,7 +790,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					$item['description'] = getRequest('description', '');
 				}
 
-				if ($type == ITEM_TYPE_HTTPAGENT) {
+				if ($db_item['templateid'] == 0 && $type == ITEM_TYPE_HTTPAGENT) {
 					$item = prepareItemHttpAgentFormData($http_item) + $item;
 				}
 			}
