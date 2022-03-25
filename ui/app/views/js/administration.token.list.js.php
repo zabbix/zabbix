@@ -102,7 +102,7 @@
 						postMessageError(response.error.title);
 						postMessageDetails('error', response.error.messages);
 					}
-					else if('success' in response) {
+					else if ('success' in response) {
 						postMessageOk(response.success.title);
 
 						if ('messages' in response.success) {
