@@ -1,6 +1,7 @@
 Changes for 6.0.3rc1
 
 New features:
+.........T [ZBXNEXT-6781] added openweathermap template (vkhaliev)
 ..F....... [ZBXNEXT-7082] fixed PHP8 using deprecated function libxml_disable_entity_loader() (rdetlavs)
 ...G...... [ZBXNEXT-7452] added SNI support to TLS protocol for Agent 2 (asestakovs)
 ...G.....T [ZBXNEXT-7065] added queries metrics to postgresql by agent2 template (esneiders, vkhaliev)
@@ -8,6 +9,17 @@ New features:
 A.F....... [ZBXNEXT-7478] fixed optional parameters before required issue (acikuns, ashubin)
 
 Bug fixes:
+.......... [ZBX-20747] fixed service algorithm update in 6.0 database upgrade patch (wiper)
+A.F....... [ZBX-19118] made Host Interface field non-required for HTTP agent items (jfreibergs)
+........S. [ZBX-20740] fixed CUID size on 32 bit systems (wiper)
+........S. [ZBX-20786] fixed server termination when updating proxy hostid and audit is disabled (arimdjonoks)
+..F....... [ZBX-20675] fixed cancel button not working after cloning services and SLAs (averza)
+...G...... [ZBX-20634] fixed handling of multiline FTP response (ssimonenko)
+........S. [ZBX-20661] fixed crashes when setting HA failover delay with disabled auditlog or updating HA error status on exit (wiper)
+........S. [ZBX-20693] fixed crash in auditlog logic on 32bit debian/raspbian (wiper)
+...G...... [ZBX-20528] fixed issue with pgsql.custom.query json response failing for Zabbix agent 2 (esneiders)
+..F....... [ZBX-20399] fixed acknowledge problem popup window showing a fatal error after page refresh (Ivo)
+..F....... [ZBX-19851] fixed wrong green mark in maps properties for sharing (rlataria)
 ..F....... [ZBX-20319] fixed multiline details in audit log (rlataria)
 .D........ [ZBX-20762] fixed StartAlerters and StartEscalators range in configuration file comments (akozlovs)
 ........S. [ZBX-20651] fixed crash in availability manager on some platforms (vso)
