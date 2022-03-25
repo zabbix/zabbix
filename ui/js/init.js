@@ -314,6 +314,16 @@ jQuery(function($) {
 
 			xhr.done(function(resp) {
 				overlayPreloaderDestroy($preloader.prop('id'));
+
+				if ('error' in resp) {
+					const message_box = makeMessageBox('bad', resp.error.messages, resp.error.title);
+
+					clearMessages();
+					addMessage(message_box);
+
+					return;
+				}
+
 				showMenuPopup($obj, jQuery.extend({context: data.context}, resp.data), event, options);
 			});
 
