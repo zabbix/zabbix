@@ -2083,6 +2083,11 @@ fail:
 	return FAIL;
 }
 
+int	zbx_custom_interval_is_scheduling(const zbx_custom_interval_t *custom_intervals)
+{
+	return NULL == custom_intervals->scheduling ? FAIL : SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: frees custom update intervals                                     *

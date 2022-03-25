@@ -315,6 +315,7 @@ static zbx_uint64_t	get_item_nextcheck_seed(zbx_uint64_t itemid, zbx_uint64_t in
 #define ZBX_ITEM_KEY_CHANGED		0x04
 #define ZBX_ITEM_TYPE_CHANGED		0x08
 #define ZBX_ITEM_DELAY_CHANGED		0x10
+#define ZBX_ITEM_NEW			0x20
 
 static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface)
 {
@@ -333,6 +334,7 @@ static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *
 static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface, int flags, int now,
 		char **error)
 {
+#define ZBX_DEFAULT_ITEM_UPDATE_INTERVAL	60
 	zbx_uint64_t		seed;
 	int			simple_interval;
 	zbx_custom_interval_t	*custom_intervals;
@@ -367,16 +369,24 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *in
 	}
 	else
 	{
+
+		if (0 != (flags & ZBX_ITEM_NEW) &&
+				FAIL == zbx_custom_interval_is_scheduling(custom_intervals) &&
+				ITEM_TYPE_ZABBIX_ACTIVE != item->type)
+		{
+			zbx_custom_interval_free(custom_intervals);
+			simple_interval = ZBX_DEFAULT_ITEM_UPDATE_INTERVAL;
+		}
+
 		/* supported items and items that could not have been scheduled previously, but had */
 		/* their update interval fixed, should be scheduled using their update intervals */
-		item->nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval,
-				custom_intervals, now);
+		item->nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval, custom_intervals, now);
 	}
 
 	zbx_custom_interval_free(custom_intervals);
 
 	item->schedulable = 1;
-
+#undef ZBX_DEFAULT_ITEM_UPDATE_INTERVAL
 	return SUCCEED;
 }
 
@@ -2699,7 +2709,7 @@ static unsigned char	*config_decode_serialized_expression(const char *src)
 	return dst;
 }
 
-static void	DCsync_items(zbx_dbsync_t *sync, int flags)
+static void	DCsync_items(zbx_dbsync_t *sync, int flags, unsigned char synced)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -2839,6 +2849,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 			zbx_vector_ptr_create_ext(&item->tags, __config_mem_malloc_func, __config_mem_realloc_func,
 					__config_mem_free_func);
+
+			if (ZBX_SYNCED_NEW_CONFIG_YES == synced)
+				flags |= ZBX_ITEM_NEW;
 		}
 		else
 		{
@@ -5967,7 +5980,7 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
  * Purpose: Synchronize configuration data from database                      *
  *                                                                            *
  ******************************************************************************/
-void	DCsync_configuration(unsigned char mode)
+void	DCsync_configuration(unsigned char mode, unsigned char synced)
 {
 	int		i, flags;
 	double		sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, idsec, isec, tisec, pisec, tsec, dsec, fsec, expr_sec,
@@ -6232,7 +6245,7 @@ void	DCsync_configuration(unsigned char mode)
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
 
 	sec = zbx_time();
-	DCsync_items(&items_sync, flags);
+	DCsync_items(&items_sync, flags, synced);
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();

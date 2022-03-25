@@ -675,7 +675,10 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
 #define ZBX_ITEM_GET_PROCESS		(ZBX_ITEM_GET_MAINTENANCE|ZBX_ITEM_GET_MISC|ZBX_ITEM_GET_LOGTIMEFMT)
 
-void	DCsync_configuration(unsigned char mode);
+#define ZBX_SYNCED_NEW_CONFIG_NO	0
+#define ZBX_SYNCED_NEW_CONFIG_YES	1
+
+void	DCsync_configuration(unsigned char mode, unsigned char synced);
 void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths);
 int	init_configuration_cache(char **error);
 void	free_configuration_cache(void);
