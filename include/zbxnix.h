@@ -59,10 +59,6 @@ void	zbx_signal_process_by_pid(int pid, int flags, char **out);
 /* IPC start */
 #include "zbxtypes.h"
 
-#if defined(_WINDOWS)
-#	error "This module allowed only for Unix OS"
-#endif
-
 #include "mutexs.h"
 
 #define ZBX_NONEXISTENT_SHMID		(-1)
@@ -116,17 +112,12 @@ void	zbx_dshm_unlock(zbx_dshm_t *shm);
 /* pid start */
 #include "threads.h"
 
-#ifdef _WINDOWS
-#	error "This module allowed only for Unix OS"
-#endif
-
 int	zbx_create_pid_file(const char *pidfile);
 int	zbx_read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_error_len);
 void	zbx_drop_pid_file(const char *pidfile);
 /* pid end */
 
 /* sighandler start */
-#include "sysinc.h"
 
 void	zbx_set_common_signal_handlers(void);
 void	zbx_set_child_signal_handler(void);
