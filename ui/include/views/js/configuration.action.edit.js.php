@@ -791,9 +791,12 @@
 				overlay.unsetLoading();
 			})
 			.then((res) => {
-				if (res.errors) {
+				if ('error' in res) {
 					overlay.$dialogue.$body.find('output.msg-bad').remove();
-					overlay.$dialogue.$body.prepend(res.errors);
+
+					const message_box = makeMessageBox('bad', exception.error.messages, exception.error.title);
+
+					overlay.$dialogue.$body.prepend(message_box);
 
 					return overlay.unsetLoading();
 				}
