@@ -316,7 +316,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 									'interface_ref' => 'if1',
 								],
 								2 => [
-									'interface_ref' => 'if3',
+									'interface_ref' => 'if2',
 									'type' => 'SNMP',
 									'port' => '161',
 									'details' => [
@@ -332,14 +332,14 @@ class C44ImportConverterTest extends CImportConverterTest {
 							],
 							'items' => [
 								[
-									'interface_ref' => 'if3',
+									'interface_ref' => 'if2',
 									'key' => 'snmptrap.fallback',
 									'type' => 'SNMP_TRAP',
 									'name' => 'SNMp trap',
 									'delay' => 0
 								],
 								[
-									'interface_ref' => 'if3',
+									'interface_ref' => 'if2',
 									'key' => 'snmptrap[asd]',
 									'type' => 'SNMP_TRAP',
 									'name' => 'Snmp trap item',

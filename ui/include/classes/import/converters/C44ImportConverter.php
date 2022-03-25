@@ -365,7 +365,6 @@ class C44ImportConverter extends CConverter {
 						if (array_key_exists($interfaceid, $interfaces)) {
 							// Clone interface and map it with parent interface.
 							$new_interfaces[$interfaceid][] = [
-								'interface_ref' => 'if'.(++$max_interfaceid),
 								'new' => true
 							] + $parent_interface;
 
