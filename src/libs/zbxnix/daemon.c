@@ -29,7 +29,7 @@
 #include "sighandler.h"
 #include "sigcommon.h"
 
-#define ZBX_PID_FILE_TIMEOUT 50
+#define ZBX_PID_FILE_TIMEOUT 20
 #define ZBX_PID_FILE_SLEEP_TIME 100000
 
 char		*CONFIG_PID_FILE = NULL;
@@ -378,29 +378,17 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 
 	if (0 == (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
-		pid_t	child_pid, child_cpid;
+		pid_t	child_pid;
 
-		if (0 != (child_pid = zbx_fork()))
+		if(0 != (child_pid = zbx_fork()))
 		{
 			if (0 < child_pid)
-				waitpid(child_pid, NULL, 0);
-
-			exit(EXIT_SUCCESS);
-		}
-
-		setsid();
-
-		signal(SIGHUP, SIG_IGN);
-
-		if(0 != (child_cpid = zbx_fork()))
-		{
-			if (0 < child_cpid)
 			{
 				int		pid_file_timeout = ZBX_PID_FILE_TIMEOUT;
 				zbx_stat_t	stat_buff;
 
 				/* wait for the forked child to create pid file */
-				while (0 < pid_file_timeout && 0 <= waitpid(child_cpid, NULL, WNOHANG) &&
+				while (0 < pid_file_timeout && 0 == kill(child_pid, 0) &&
 						0 != zbx_stat(CONFIG_PID_FILE, &stat_buff))
 				{
 					pid_file_timeout--;
@@ -410,6 +398,13 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 
 			exit(EXIT_SUCCESS);
 		}
+
+		setsid();
+
+		signal(SIGHUP, SIG_IGN);
+
+		if (0 != zbx_fork())
+			exit(EXIT_SUCCESS);
 
 		if (-1 == chdir("/"))	/* this is to eliminate warning: ignoring return value of chdir */
 			assert(0);
