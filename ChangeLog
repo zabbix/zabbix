@@ -1797,6 +1797,10 @@ A.F....... [ZBXNEXT-7485] fixed debug_backtrace function usage for php8 (acikuns
 .........T [ZBXNEXT-7493] added garbage collector and memory pool discovery to generic Java template (vkhaliev)
 
 Bug fixes:
+A......... [ZBX-20681] fixed undefined index error when accessing module page with guest user (rlataria)
+.......PS. [ZBX-20518] fixed lastaccess update during proxy throttling (dgoloscapov)
+...G...... [ZBX-20634] fixed handling of multiline FTP response (ssimonenko)
+...G...... [ZBX-20528] fixed issue with pgsql.custom.query json response failing for Zabbix agent 2 (esneiders)
 .D........ [ZBX-20762] fixed StartAlerters and StartEscalators range in configuration file comments (akozlovs)
 ...G...... [ZBX-19311] fixed raid device discovery in smart plugin in Zabbix agent 2 (esneiders)
 ...G...... [ZBX-19407] removed redundant encoding check in get_codepage() for Windows (arimdjonoks)
