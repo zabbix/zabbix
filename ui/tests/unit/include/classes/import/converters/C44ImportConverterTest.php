@@ -382,6 +382,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 							],
 							'discovery_rules' => [
 								[
+									'interface_ref' => 'if1',
 									'name' => 'test',
 									'type' => 0,
 									'key' => 'vfs.file.contents[/tmp/discovery2.txt]</',
@@ -437,6 +438,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 							],
 							'discovery_rules' => [
 								[
+									'interface_ref' => 'if1',
 									'name' => 'test',
 									'type' => 0,
 									'key' => 'vfs.file.contents[/tmp/discovery2.txt]</',
