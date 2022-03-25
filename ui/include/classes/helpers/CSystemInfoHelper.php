@@ -46,7 +46,7 @@ class CSystemInfoHelper {
 
 		$dbversion_status = CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS);
 
-		if ($dbversion_status !== '') {
+		if ($dbversion_status !== null && $dbversion_status !== '') {
 			$dbversion_status = json_decode($dbversion_status, true);
 
 			if (array_key_exists('history_pk', $dbversion_status)) {

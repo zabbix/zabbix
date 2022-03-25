@@ -29,9 +29,10 @@
 #include "zbxalgo.h"
 #include "preproc.h"
 #include "../zbxcrypto/tls_tcp_active.h"
+#include "../zbxkvs/kvs.h"
 #include "zbxlld.h"
 #include "events.h"
-#include "zbxvault.h"
+#include "../zbxvault/vault.h"
 #include "zbxavailability.h"
 #include "zbxcommshigh.h"
 
@@ -894,7 +895,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 			if (ZBX_MACRO_VALUE_VAULT != type)
 				continue;
 
-			zbx_strsplit(row[2 + offset], ':', &path, &key);
+			zbx_strsplit_last(row[2 + offset], ':', &path, &key);
 
 			if (NULL == key)
 			{
@@ -1038,10 +1039,9 @@ static void	get_proxy_monitored_httptests(zbx_uint64_t proxy_hostid, zbx_vector_
 static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_json *j)
 {
 	int		i;
-	zbx_hashset_t	kvs;
+	zbx_kvs_t	kvs;
 
-	zbx_hashset_create_ext(&kvs, 100, zbx_vault_kv_hash, zbx_vault_kv_compare, zbx_vault_kv_clean,
-			ZBX_DEFAULT_SHMEM_MALLOC_FUNC, ZBX_DEFAULT_SHMEM_REALLOC_FUNC, ZBX_DEFAULT_SHMEM_FREE_FUNC);
+	zbx_kvs_create(&kvs, 100);
 
 	zbx_json_addobject(j, "macro.secrets");
 
@@ -1068,16 +1068,16 @@ static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_jso
 
 			kv_local.key = *ptr;
 
-			if (NULL != (kv = zbx_hashset_search(&kvs, &kv_local)))
+			if (NULL != (kv = zbx_kvs_search(&kvs, &kv_local)))
 				zbx_json_addstring(j, kv->key, kv->value, ZBX_JSON_TYPE_STRING);
 		}
 		zbx_json_close(j);
 
-		zbx_hashset_clear(&kvs);
+		zbx_kvs_clear(&kvs);
 	}
 
 	zbx_json_close(j);
-	zbx_hashset_destroy(&kvs);
+	zbx_kvs_destroy(&kvs);
 }
 
 /******************************************************************************

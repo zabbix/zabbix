@@ -1,3 +1,4 @@
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -17,27 +18,25 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ZBXVAULT_H
-#define ZABBIX_ZBXVAULT_H
 
-#include "common.h"
-#include "zbxalgo.h"
+/**
+ * Abstract vault access class.
+ */
+abstract class CVault {
 
-typedef struct
-{
-	char	*key;
-	char	*value;
+	/**
+	 * @var array
+	 */
+	private $errors = [];
+
+	abstract public function validateParameters(): bool;
+	abstract public function getCredentials(): ?array;
+
+	public function addError(string $error): void {
+		$this->errors[] = $error;
+	}
+
+	public function getErrors(): array {
+		return $this->errors;
+	}
 }
-zbx_kv_t;
-
-zbx_hash_t	zbx_vault_kv_hash(const void *data);
-int		zbx_vault_kv_compare(const void *d1, const void *d2);
-void		zbx_vault_kv_clean(void *data);
-
-int	zbx_vault_init_token_from_env(char **error);
-int	zbx_vault_init_db_credentials(char **error);
-int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error);
-int	zbx_vault_json_kvs_get(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_hashset_t *kvs,
-		char **error);
-
-#endif
