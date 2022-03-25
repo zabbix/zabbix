@@ -20,12 +20,13 @@
 #ifndef ZABBIX_ZBXNIX_H
 #define ZABBIX_ZBXNIX_H
 
+#include "sysinc.h"
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 int	zbx_coredump_disable(void);
 #endif
 
 /* daemon start */
-#include "sysinc.h"
 
 #if defined(_WINDOWS)
 #	error "This module allowed only for Unix OS"
