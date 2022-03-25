@@ -930,7 +930,7 @@ int DBcheck_capabilities_timescaledb(zbx_uint32_t db_version, struct zbx_json *j
 				version_info.min_version, version_info.max_version, version_info.min_supported_version);
 
 		version_info.history_pk = -1;	/* do not add to json */
-		version_info.compression_availability = compression_available; // TODO: compression_available is not available yet
+		version_info.compression_availability = compression_available;
 
 		zbx_db_version_json_create(json, &version_info);
 		zbx_free(version_info.friendly_current_version);
@@ -940,7 +940,6 @@ int DBcheck_capabilities_timescaledb(zbx_uint32_t db_version, struct zbx_json *j
 clean:
 	DBfree_result(result);
 out:
-	DBexecute("update config set compression_availability=%d", compression_available);
 	DBclose();
 
 	return ret;
