@@ -944,7 +944,6 @@ int DBcheck_capabilities_timescaledb(zbx_uint32_t db_version, struct zbx_json *j
 clean:
 	DBfree_result(result);
 out:
-	DBclose();
 
 	return ret;
 }

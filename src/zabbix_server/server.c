@@ -1134,12 +1134,12 @@ static void	zbx_check_db(void)
 	}
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
 	if(SUCCEED == DBfield_exists("config", "dbversion_status"))
 	{
 		should_build_db_version_json = 1;	/* yes */
 		zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
 	}
+	DBclose();
 
 	if (SUCCEED == result &&
 			(SUCCEED != DBcheck_capabilities(
@@ -1152,6 +1152,7 @@ static void	zbx_check_db(void)
 
 	if (should_build_db_version_json)
 	{
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
 		if (SUCCEED == DBpk_exists("history"))
 		{
 			db_version_info.history_pk = 1;
@@ -1172,9 +1173,9 @@ static void	zbx_check_db(void)
 
 		DBflush_version_requirements(db_version_json.buffer);
 		zbx_json_free(&db_version_json);
+		DBclose();
 	}
 
-	DBclose();
 	zbx_free(db_version_info.friendly_current_version);
 
 	if(SUCCEED != result)
