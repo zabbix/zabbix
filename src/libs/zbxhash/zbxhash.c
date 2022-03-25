@@ -45,6 +45,8 @@ void	zbx_md5buf2str(const md5_byte_t *md5, char *str)
 	*p = '\0';
 }
 
+#define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
+
 /******************************************************************************
  *                                                                            *
  * Purpose: creates semi-unique token based on the seed and current timestamp *
@@ -54,7 +56,7 @@ void	zbx_md5buf2str(const md5_byte_t *md5, char *str)
  * Return value: Hexadecimal token string, must be freed by caller            *
  *                                                                            *
  * Comments: if you change token creation algorithm do not forget to adjust   *
- *           ZBX_DATA_SESSION_TOKEN_SIZE definition                           *
+ *           zbx_get_token_len() function                                     *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_create_token(zbx_uint64_t seed)
@@ -84,6 +86,19 @@ char	*zbx_create_token(zbx_uint64_t seed)
 	*ptr = '\0';
 
 	return token;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Return value: number of characters in a token created by                   *
+ *               zbx_create_token()                                           *
+ *                                                                            *
+ * Comments: terminating '\0' byte is not included in the result              *
+ *                                                                            *
+ ******************************************************************************/
+size_t	zbx_get_token_len(void)
+{
+	return ZBX_DATA_SESSION_TOKEN_SIZE;
 }
 
 /******************************************************************************
