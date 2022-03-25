@@ -322,7 +322,7 @@ abstract class CItemGeneral extends CApiService {
 				// If a templated item is being assigned to an interface with a different type, ignore it.
 				$itemInterfaceType = itemTypeInterface($dbItems[$item['itemid']]['type']);
 
-				if (($itemInterfaceType !== INTERFACE_TYPE_ANY && $itemInterfaceType !== INTERFACE_TYPE_OPT)
+				if ($itemInterfaceType !== INTERFACE_TYPE_ANY && $itemInterfaceType !== INTERFACE_TYPE_OPT
 						&& $fullItem['templateid']
 						&& array_key_exists('interfaceid', $item) && array_key_exists($item['interfaceid'], $interfaces)
 						&& $interfaces[$item['interfaceid']]['type'] != $itemInterfaceType) {
