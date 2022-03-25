@@ -794,7 +794,7 @@
 				if ('error' in res) {
 					overlay.$dialogue.$body.find('output.msg-bad').remove();
 
-					const message_box = makeMessageBox('bad', exception.error.messages, exception.error.title);
+					const message_box = makeMessageBox('bad', res.error.messages, res.error.title);
 
 					overlay.$dialogue.$body.prepend(message_box);
 
