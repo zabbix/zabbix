@@ -20,6 +20,8 @@
 #ifndef ZABBIX_COMMS_H
 #define ZABBIX_COMMS_H
 
+#include "config.h"
+
 #ifdef _WINDOWS
 #	define ZBX_TCP_WRITE(s, b, bl)		((ssize_t)send((s), (b), (int)(bl), 0))
 #	define ZBX_TCP_READ(s, b, bl)		((ssize_t)recv((s), (b), (int)(bl), 0))
@@ -38,4 +40,4 @@
 #	define ZBX_SOCKET_ERROR		-1
 #endif
 
-#endif // ZABBIX_COMMS_H
+#endif /* ZABBIX_COMMS_H */

@@ -194,4 +194,4 @@ int	zbx_telnet_test_login(ZBX_SOCKET socket_fd);
 int	zbx_telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *password, AGENT_RESULT *result);
 int	zbx_telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *result, const char *encoding);
 
-#endif // ZABBIX_ZBXCOMMS_H
+#endif /* ZABBIX_ZBXCOMMS_H */
