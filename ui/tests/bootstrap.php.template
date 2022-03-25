@@ -26,6 +26,9 @@ define('PHPUNIT_CONFIG_DIR', '{CONFIG_DIR}');
 define('PHPUNIT_COMPONENT_DIR', '{COMPONENT_DIR}');
 define('PHPUNIT_PORT_PREFIX', '{PORT_PREFIX}');
 
+// Testing environment operating system. For example: "win" or "windows". Empty defaults to Linux.
+define('PHPUNIT_ENV_OS', '');
+
 /*
  * Defines directory with write permissions that will be used to store cached data source data.
  * This one is optional (can be omitted) and is used only for cases when multiple test execution
