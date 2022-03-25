@@ -80,9 +80,9 @@ class CEncryptHelper {
 	 * @return string
 	 */
 	public static function sign(string $data): string {
-		$key = self::getKey();
+		$key = self::getKey() ?? '';
 
-		return hash_hmac(self::SIGN_ALGO, $data, $key, false);
+		return hash_hmac(self::SIGN_ALGO, $data, $key);
 	}
 
 	/**

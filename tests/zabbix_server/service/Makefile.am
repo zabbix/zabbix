@@ -53,6 +53,9 @@ COMMON_LIBS = \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxvault/libzbxvault.a \
+	$(top_builddir)/src/libs/zbxcyberark/libzbxcyberark.a \
+	$(top_builddir)/src/libs/zbxhashicorp/libzbxhashicorp.a \
+	$(top_builddir)/src/libs/zbxkvs/libzbxkvs.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 	
