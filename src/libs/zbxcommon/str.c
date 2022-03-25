@@ -1427,6 +1427,8 @@ const char	*zbx_interface_type_string(zbx_interface_type_t type)
 			return "IPMI";
 		case INTERFACE_TYPE_JMX:
 			return "JMX";
+		case INTERFACE_TYPE_OPT:
+			return "optional";
 		case INTERFACE_TYPE_ANY:
 			return "any";
 		case INTERFACE_TYPE_UNKNOWN:
