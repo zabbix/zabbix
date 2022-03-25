@@ -179,7 +179,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 						[
 							'interfaces' => [
 								1 => [
-									'interface_ref' => 'if2',
+									'interface_ref' => 'if1',
 									'ip' => '127.0.0.1',
 									'type' => 'SNMP',
 									'dns' => '',
@@ -199,7 +199,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 									]
 								],
 								2 => [
-									'interface_ref' => 'if3',
+									'interface_ref' => 'if2',
 									'ip' => '127.0.0.1',
 									'type' => 'SNMP',
 									'dns' => '',
@@ -219,7 +219,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 									]
 								],
 								3 => [
-									'interface_ref' => 'if4',
+									'interface_ref' => 'if3',
 									'ip' => '127.0.0.1',
 									'type' => 'SNMP',
 									'dns' => '',
@@ -233,7 +233,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 									]
 								],
 								4 => [
-									'interface_ref' => 'if5',
+									'interface_ref' => 'if4',
 									'ip' => '127.0.0.1',
 									'type' => 'SNMP',
 									'dns' => '',
@@ -249,7 +249,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 							],
 							'items' => [
 								[
-									'interface_ref' => 'if3',
+									'interface_ref' => 'if2',
 									'key' => 'test1',
 									'type' => 'SNMP_AGENT',
 									'snmp_oid' => 'test'
@@ -257,13 +257,13 @@ class C44ImportConverterTest extends CImportConverterTest {
 							],
 							'discovery_rules' => [
 								[
-									'interface_ref' => 'if4',
+									'interface_ref' => 'if3',
 									'key' => 'test2',
 									'type' => 'SNMP_AGENT',
 									'snmp_oid' => 'test',
 									'item_prototypes' => [
 										[
-											'interface_ref' => 'if5',
+											'interface_ref' => 'if4',
 											'key' => 'test3',
 											'type' => 'SNMP_AGENT',
 											'snmp_oid' => 'test'
