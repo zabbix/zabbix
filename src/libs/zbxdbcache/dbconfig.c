@@ -369,18 +369,20 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *in
 	}
 	else
 	{
-
 		if (0 != (flags & ZBX_ITEM_NEW) &&
 				FAIL == zbx_custom_interval_is_scheduling(custom_intervals) &&
 				ITEM_TYPE_ZABBIX_ACTIVE != item->type)
 		{
-			zbx_custom_interval_free(custom_intervals);
-			simple_interval = ZBX_DEFAULT_ITEM_UPDATE_INTERVAL;
+			item->nextcheck = calculate_item_nextcheck(seed, item->type, ZBX_DEFAULT_ITEM_UPDATE_INTERVAL,
+					NULL, now);
 		}
-
-		/* supported items and items that could not have been scheduled previously, but had */
-		/* their update interval fixed, should be scheduled using their update intervals */
-		item->nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval, custom_intervals, now);
+		else
+		{
+			/* supported items and items that could not have been scheduled previously, but had */
+			/* their update interval fixed, should be scheduled using their update intervals */
+			item->nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval, custom_intervals,
+					now);
+		}
 	}
 
 	zbx_custom_interval_free(custom_intervals);
