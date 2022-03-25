@@ -324,7 +324,7 @@ abstract class CItemGeneral extends CApiService {
 
 				if (($itemInterfaceType !== INTERFACE_TYPE_ANY && $itemInterfaceType !== INTERFACE_TYPE_OPT)
 						&& $fullItem['templateid']
-						&& isset($item['interfaceid']) && isset($interfaces[$item['interfaceid']])
+						&& array_key_exists('interfaceid', $item) && array_key_exists($item['interfaceid'], $interfaces)
 						&& $interfaces[$item['interfaceid']]['type'] != $itemInterfaceType) {
 
 					unset($item['interfaceid']);
