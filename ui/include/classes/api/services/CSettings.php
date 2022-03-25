@@ -46,7 +46,7 @@ class CSettings extends CApiService {
 		'uri_valid_schemes', 'x_frame_options', 'iframe_sandboxing_enabled', 'iframe_sandboxing_exceptions',
 		'max_overview_table_size', 'connect_timeout', 'socket_timeout', 'media_type_test_timeout', 'script_timeout',
 		'item_test_timeout', 'url', 'report_test_timeout', 'auditlog_enabled', 'ha_failover_delay',
-		'geomaps_tile_provider', 'geomaps_tile_url', 'geomaps_max_zoom', 'geomaps_attribution'
+		'geomaps_tile_provider', 'geomaps_tile_url', 'geomaps_max_zoom', 'geomaps_attribution', 'vault_provider'
 	];
 
 	/**
@@ -115,6 +115,7 @@ class CSettings extends CApiService {
 		$db_settings = [];
 
 		$result = DBselect($this->createSelectQuery($this->tableName(), $options));
+
 		while ($row = DBfetch($result)) {
 			$db_settings[] = $row;
 		}
@@ -227,7 +228,8 @@ class CSettings extends CApiService {
 			'geomaps_tile_provider' =>			['type' => API_STRING_UTF8, 'in' => ','.implode(',', array_keys(getTileProviders()))],
 			'geomaps_tile_url' =>				['type' => API_URL, 'length' => DB::getFieldLength('config', 'geomaps_tile_url')],
 			'geomaps_max_zoom' =>				['type' => API_INT32, 'in' => '0:'.ZBX_GEOMAP_MAX_ZOOM],
-			'geomaps_attribution' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'geomaps_attribution')]
+			'geomaps_attribution' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'geomaps_attribution')],
+			'vault_provider' =>					['type' => API_INT32, 'flags' => API_NOT_EMPTY, 'in' => ZBX_VAULT_TYPE_HASHICORP.','.ZBX_VAULT_TYPE_CYBERARK]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $settings, '/', $error)) {
