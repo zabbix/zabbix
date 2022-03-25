@@ -34,6 +34,7 @@ var (
 
 	globalMemoryStatusEx             uintptr
 	getProcessIoCounters             uintptr
+	getProcessHandleCount            uintptr
 	getLogicalProcessorInformationEx uintptr
 	getActiveProcessorGroupCount     uintptr
 	getDiskFreeSpaceW                uintptr
@@ -58,6 +59,7 @@ func init() {
 	getActiveProcessorGroupCount = hKernel32.mustGetProcAddress("GetActiveProcessorGroupCount")
 	getDiskFreeSpaceW = hKernel32.mustGetProcAddress("GetDiskFreeSpaceW")
 	getVolumePathNameW = hKernel32.mustGetProcAddress("GetVolumePathNameW")
+	getProcessHandleCount = hKernel32.mustGetProcAddress("GetProcessHandleCount")
 }
 
 func GlobalMemoryStatusEx() (m *MEMORYSTATUSEX, err error) {
@@ -77,6 +79,15 @@ func GetProcessIoCounters(proc syscall.Handle) (ioc *IO_COUNTERS, err error) {
 		return nil, syserr
 	}
 	return
+}
+
+func GetProcessHandleCount(proc syscall.Handle) (pdwHandleCount int32, err error) {
+	var count int32
+	ret, _, syserr := syscall.Syscall(getProcessHandleCount, 2, uintptr(proc), uintptr(unsafe.Pointer(&count)), 0)
+	if ret == 0 {
+		return count, syserr
+	}
+	return count, nil
 }
 
 func GetLogicalProcessorInformationEx(relation int, info []byte) (size uint32, err error) {
@@ -166,3 +177,4 @@ func GetDiskFreeSpace(path string) (c CLUSTER, err error) {
 
 	return c, nil
 }
+
