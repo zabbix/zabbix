@@ -1221,6 +1221,7 @@ abstract class CItemGeneral extends CApiService {
 
 		$ins_items_rtdata = [];
 		$ins_items_discovery = [];
+		$host_statuses = [];
 
 		foreach ($items as &$item) {
 			$item['itemid'] = array_shift($itemids);
@@ -1230,6 +1231,7 @@ abstract class CItemGeneral extends CApiService {
 				$ins_items_rtdata[] = ['itemid' => $item['itemid']];
 			}
 
+			$host_statuses[] = $item['host_status'];
 			unset($item['host_status']);
 
 			if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
@@ -1258,6 +1260,11 @@ abstract class CItemGeneral extends CApiService {
 		self::updateTags($items);
 
 		self::addAuditLog(CAudit::ACTION_ADD, static::AUDIT_RESOURCE, $items);
+
+		foreach ($items as &$item) {
+			$item['host_status'] = array_shift($host_statuses);
+		}
+		unset($item);
 	}
 
 	/**
@@ -1319,7 +1326,7 @@ abstract class CItemGeneral extends CApiService {
 					$field_names += array_flip(['authtype']);
 				}
 
-				if ($db_item['host_status'] == HOST_STATUS_TEMPLATE && array_key_exists('interfaceid', $field_names)) {
+				if ($item['host_status'] == HOST_STATUS_TEMPLATE && array_key_exists('interfaceid', $field_names)) {
 					unset($field_names['interfaceid']);
 				}
 
@@ -1645,25 +1652,43 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected static function checkHostInterfaces(array $items, array $db_items = null): void {
 		foreach ($items as $i => $item) {
-			if (array_key_exists('interfaceid', $item)) {
-				if ($db_items !== null
-					&& bccomp($item['interfaceid'], $db_items[$item['itemid']]['interfaceid']) == 0) {
+			if ($db_items === null) {
+				if (!array_key_exists('interfaceid', $item)) {
 					unset($items[$i]);
 					continue;
 				}
 			}
-			elseif ($db_items === null) {
-				unset($items[$i]);
-				continue;
-			}
-			elseif ($item['type'] == $db_items[$item['itemid']]['type']
-				|| $db_items[$item['itemid']]['host_status'] == HOST_STATUS_TEMPLATE) {
-				unset($items[$i]);
-				continue;
-			}
+			else {
+				$db_item = $db_items[$item['itemid']];
 
-			if (array_key_exists('itemid', $item)) {
-				$items[$i]['interfaceid'] = $db_items[$item['itemid']]['interfaceid'];
+				if (!array_key_exists('interfaceid', $db_items[$item['itemid']])) {
+					unset($items[$i]);
+					continue;
+				}
+				else {
+					if ($item['type'] == $db_item['type']) {
+						if (!array_key_exists('interfaceid', $item)
+								|| bccomp($item['interfaceid'], $db_item['interfaceid']) == 0) {
+							unset($items[$i]);
+							continue;
+						}
+					}
+					else {
+						$interface_type = itemTypeInterface($item['type']);
+						$db_interface_type = itemTypeInterface($db_item['type']);
+
+						if ($interface_type === false
+								|| ($db_interface_type !== false
+									&& ($interface_type == INTERFACE_TYPE_ANY || $interface_type == $db_interface_type)
+									&& (!array_key_exists('interfaceid', $item)
+										|| bccomp($item['interfaceid'], $db_item['interfaceid']) == 0))) {
+							unset($items[$i]);
+							continue;
+						}
+
+						$item += ['interfaceid' => $db_item['interfaceid']];
+					}
+				}
 			}
 		}
 
@@ -1671,32 +1696,33 @@ abstract class CItemGeneral extends CApiService {
 			return;
 		}
 
-		$interfaceids = array_column($items, 'interfaceid', 'interfaceid');
-
 		$db_interfaces = DB::select('interface', [
 			'output' => ['interfaceid', 'hostid', 'type'],
-			'interfaceids' => $interfaceids,
+			'interfaceids' => array_unique(array_column($items, 'interfaceid')),
 			'preservekeys' => true
 		]);
 
-		if (count($db_interfaces) != count($interfaceids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		foreach ($items as $item) {
-			$hostid = ($db_items === null) ? $item['hostid'] : $db_items[$item['itemid']]['hostid'];
-
-			if (bccomp($db_interfaces[$item['interfaceid']]['hostid'], $hostid) != 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses host interface from non-parent host.'));
+		foreach ($items as $i => $item) {
+			if (!array_key_exists($item['interfaceid'], $db_interfaces)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i + 1).'/interfaceid', _('the host interface ID is expected')
+				));
 			}
 
-			$interface_type = itemTypeInterface(
-				array_key_exists('type', $item) ? $item['type'] : $db_items[$item['itemid']]['type']
-			);
+			if (bccomp($db_interfaces[$item['interfaceid']]['hostid'], $item['hostid']) != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i + 1).'/interfaceid', _('cannot be the host interface ID from another host')
+				));
+			}
 
-			if ($interface_type !== INTERFACE_TYPE_ANY
+			$interface_type = itemTypeInterface($item['type']);
+
+			if ($interface_type != INTERFACE_TYPE_ANY
 					&& $db_interfaces[$item['interfaceid']]['type'] != $interface_type) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses incorrect interface type.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i + 1).'/interfaceid',
+					_s('the host interface ID of type "%1$s" is expected', interfaceType2str($interface_type))
+				));
 			}
 		}
 	}
@@ -1894,9 +1920,7 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	private static function checkMasterItems(array $items, array $db_items): void {
 		$master_itemids = array_unique(array_column($items, 'master_itemid'));
-		$flags = array_key_exists('itemid', $items[key($items)])
-			? $db_items[$items[key($items)]['itemid']]['flags']
-			: $items[key($items)]['flags'];
+		$flags = $items[key($items)]['flags'];
 
 		if ($flags == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$db_master_items = DBfetchArrayAssoc(DBselect(
@@ -2204,11 +2228,11 @@ abstract class CItemGeneral extends CApiService {
 		));
 
 		$is_update = array_key_exists('itemid', $item);
-		$flags = $is_update ? $db_items[$item['itemid']]['flags'] : $item['flags'];
+		$flags = $item['flags'];
 		$key = $item['key_'];
 		$master_flags = $master_item_data['flags'];
 		$master_key = $master_item_data['key'];
-		$is_template = $master_item_data['status'] == HOST_STATUS_TEMPLATE;
+		$is_template = $item['host_status'] == HOST_STATUS_TEMPLATE;
 		$host = $master_item_data['host'];
 
 		return [$is_update, $flags, $key, $master_flags, $master_key, $is_template, $host];

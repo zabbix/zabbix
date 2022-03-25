@@ -89,6 +89,9 @@ abstract class CItemType {
 												ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT, ITEM_TYPE_SCRIPT
 											]);
 									}, 'type' => API_ID, 'flags' => API_REQUIRED],
+									['if' => static function () use ($db_item): bool {
+										return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
+									}, 'type' => API_ID],
 									['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'timeout' =>		['type' => API_MULTIPLE, 'rules' => [

@@ -659,7 +659,9 @@ class CItem extends CItemGeneral {
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
 
-		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'key_', 'master_itemid']);
+		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'key_', 'host_status', 'flags',
+			'master_itemid'
+		]);
 
 		self::validateUniqueness($items);
 
