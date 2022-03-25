@@ -1,9 +1,10 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-03-09 07:55+0300\n"
+"PO-Revision-Date: 2022-03-24 13:47+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -11,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.5.1.3\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1646805318.000000\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
@@ -2242,15 +2243,15 @@ msgstr "לא ניתן למחוק מארח"
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete hosts %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לא ניתן למחוק את המארח %1$s מכיוון שהתחזוקה \"%2$s\" חייבת להכיל לפחות מארח או קבוצת מארחים אחת."
+msgstr[1] "לא ניתן למחוק את המארחים %1$s מכיוון שהתחזוקה „%2$s” חייבת להכיל לפחות מארח או קבוצת מארחים אחת."
 
 #: include/classes/api/services/CHostGroup.php:849
 #, c-format
 msgid "Cannot delete host group %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete host groups %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לא ניתן למחוק את קבוצת המארחים %1$s מכיוון שהתחזוקה „%2$s” חייבת להכיל לפחות מארח או קבוצת מארחים אחת."
+msgstr[1] "לא ניתן למחוק את קבוצות המארחים %1$s מכיוון שהתחזוקה „%2$s” חייבת להכיל לפחות מארח או קבוצת מארחים אחת."
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -2769,85 +2770,85 @@ msgstr "לא ניתן לקשר תבנית"
 #: include/classes/api/services/CHostBase.php:520
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” למארח „%2$s” מכיוון שתבנית האב שלה „%3$s” תקושר פעמיים."
 
 #: include/classes/api/services/CHostBase.php:678
 #: include/classes/api/services/CHostBase.php:755
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” למארח „%2$s” עקב תלות בהקפצה „%3$s”."
 
 #: include/classes/api/services/CHostBase.php:805
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” למארח „%2$s” עקב הביטוי של ההקפצה „%3$s”."
 
 #: include/classes/api/services/CHostBase.php:517
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” לאבטיפוס המארח „%2$s” מכיוון שתבנית האב שלה „%3$s” תקושר פעמיים."
 
 #: include/classes/api/services/CHostBase.php:675
 #: include/classes/api/services/CHostBase.php:752
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” לאבטיפוס המארח „%2$s” עקב תלות בהקפצה „%3$s”."
 
 #: include/classes/api/services/CHostBase.php:802
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” לאבטיפוס המארח „%2$s” עקב הביטוי של ההקפצה „%3$s”."
 
 #: include/classes/api/services/CHostBase.php:381
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" because circular linkage (%3$s) will occurs."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” לתבנית „%2$s” מכיוון שזה יוביל לקישור מעגלי (%3$s)."
 
 #: include/classes/api/services/CHostBase.php:514
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” לתבנית „%2$s” מכיוון שתבנית האב שלה „%3$s” תקושר פעמיים."
 
 #: include/classes/api/services/CHostBase.php:672
 #: include/classes/api/services/CHostBase.php:749
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” לתבנית „%2$s” עקב תלות בהקפצה „%3$s”."
 
 #: include/classes/api/services/CHostBase.php:799
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" due to expression of trigger \"%3$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” לתבנית „%2$s” עקב הביטוי של ההקפצה „%3$s”."
 
 #: include/classes/api/services/CHostBase.php:705
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to host \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” ללא התבנית „%2$s” למארח „%3$s” עקב תלות בהקפצה „%4$s”."
 
 #: include/classes/api/services/CHostBase.php:832
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to host \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” ללא התבנית „%2$s” למארח „%3$s” עקב הביטוי של ההקפצה „%4$s”."
 
 #: include/classes/api/services/CHostBase.php:702
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to host prototype \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” ללא התבנית „%2$s” לאבטיפוס המארח „%3$s” עקב תלות בהקפצה „%4$s”."
 
 #: include/classes/api/services/CHostBase.php:829
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to host prototype \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” ללא התבנית „%2$s” לאבטיפוס המארח „%3$s” עקב הביטוי של ההקפצה „%4$s”."
 
 #: include/classes/api/services/CHostBase.php:699
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to template \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” ללא התבנית „%2$s” לתבנית „%3$s” עקב תלות בהקפצה „%4$s”."
 
 #: include/classes/api/services/CHostBase.php:826
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to template \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” ללא התבנית „%2$s” לתבנית „%3$s” עקב הביטוי של ההקפצה „%4$s”."
 
 #: app/controllers/CControllerModuleEdit.php:106
 #: include/classes/core/ZBase.php:674
@@ -3001,17 +3002,17 @@ msgstr "לא ניתן לנתק ולפנות תבנית"
 #: include/classes/api/services/CHostBase.php:256
 #, c-format
 msgid "Cannot unlink template \"%1$s\" without template \"%2$s\" from host \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "אי אפשר לנתק את התבנית „%1$s” ללא התבנית „%2$s” מהמארח „%3$s” עקב תלות בהקפצה „%4$s”."
 
 #: include/classes/api/services/CHostBase.php:300
 #, c-format
 msgid "Cannot unlink template \"%1$s\" without template \"%2$s\" from host \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "אי אפשר לנתק את התבנית „%1$s” ללא התבנית „%2$s” מהמארח „%3$s” עקב ביטוי של ההקפצה „%4$s”."
 
 #: include/classes/api/services/CHostBase.php:255
 #, c-format
 msgid "Cannot unlink template \"%1$s\" without template \"%2$s\" from template \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "אי אפשר לנתק את התבנית „%1$s” ללא התבנית „%2$s” מהתבנית „%3$s” עקב תלות בהקפצה „%4$s”."
 
 #: include/classes/api/services/CHostBase.php:299
 #, c-format
@@ -3124,7 +3125,7 @@ msgstr "לא ניתן לעדכן יחס"
 #: include/classes/api/services/CTrigger.php:836
 #, c-format
 msgid "Cannot update dependencies of inherited trigger \"%1$s\"."
-msgstr ""
+msgstr "לא ניתן לעדכן את התלויות של ההקפצה „%1$s” שהתקבלה בירושה."
 
 #: app/controllers/CControllerDiscoveryUpdate.php:48
 #: app/controllers/CControllerDiscoveryUpdate.php:102 host_discovery.php:734
@@ -3707,7 +3708,7 @@ msgstr "תוצאה משולבת"
 
 #: include/classes/widgets/views/widget.geomap.form.view.php:68
 msgid "Comma separated center coordinates and zoom level to display when the widget is initially loaded."
-msgstr ""
+msgstr "רשימה מופרדת בפסיקים של נקודות ציון ורמות תקריב להצגה עם טעינת הווידג׳ט לראשונה."
 
 #: app/views/administration.script.edit.php:175 include/actions.inc.php:1943
 #: include/views/administration.auditacts.list.php:105
@@ -4596,7 +4597,7 @@ msgstr "צ׳כית (cs_CZ)"
 #: jsLoader.php:400
 msgctxt "Default color option"
 msgid "D"
-msgstr ""
+msgstr "ב"
 
 #: jsLoader.php:183
 msgctxt "abbreviation of severity level"
@@ -6573,13 +6574,13 @@ msgstr "הדרת קבוצות מארחים"
 
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:94
 msgid "Excluded downtime"
-msgstr ""
+msgstr "זמן השבתה מוחרג"
 
 #: app/views/monitoring.widget.slareport.view.php:102
 #: app/views/popup.sla.edit.php:201 app/views/popup.sla.edit.php:212
 #: app/views/slareport.list.php:168
 msgid "Excluded downtimes"
-msgstr ""
+msgstr "זמני השבתה מוחרגים"
 
 #: app/controllers/CControllerAuditLogList.php:197 jsLoader.php:219
 msgid "Execute"
@@ -8063,12 +8064,12 @@ msgstr[1] "עודכנו אבות טיפוס של מארח"
 #: include/classes/api/services/CHostPrototype.php:999
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\" of host \"%3$s\"."
-msgstr ""
+msgstr "אבטיפוס מארח עם שם המארח „%1$s” כבר קיים בכלל הגילוי „%2$s” של המארח „%3$s”."
 
 #: include/classes/api/services/CHostPrototype.php:996
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\" of template \"%3$s\"."
-msgstr ""
+msgstr "אבטיפוס מארח עם שם המארח „%1$s” כבר קיים בכלל הגילוי „%2$s” של התבנית „%3$s”."
 
 #: include/classes/api/services/CHostPrototype.php:978
 #, c-format
@@ -8124,7 +8125,7 @@ msgstr "מארח עם המזהה „%1$s” אינו זמין."
 #: include/classes/api/services/CHostGeneral.php:127
 #, c-format
 msgid "Host with host name \"%1$s\" already exists."
-msgstr ""
+msgstr "מארח עם שם המארח „%1$s” כבר קיים."
 
 #: include/classes/api/services/CHost.php:2046
 #: include/classes/api/services/CHost.php:2328
@@ -8141,7 +8142,7 @@ msgstr "מארח עם אותו שם התצוגה „%1$s” כבר קיים."
 #: include/classes/api/services/CHostGeneral.php:147
 #, c-format
 msgid "Host with visible name \"%1$s\" already exists."
-msgstr ""
+msgstr "מארח עם השם הגלוי „%1$s” כבר קיים."
 
 #: app/controllers/CControllerHostView.php:125
 #: app/controllers/CControllerPopupGeneric.php:109
@@ -15284,7 +15285,7 @@ msgstr "SLA"
 #: include/classes/api/services/CSla.php:555
 #, c-format
 msgid "SLA \"%1$s\" SLO must have no more than 4 fractional digits."
-msgstr ""
+msgstr "ל־SLO של ה־SLA‏ „%1$s” לא יכולות להיות למעלה מ־4 ספרות אחרי הנקודה."
 
 #: include/classes/api/services/CSla.php:539
 #, c-format
@@ -16602,7 +16603,7 @@ msgstr "זמן ההתחלה חייב להיות פחות מזמן הסיום ע�
 #: include/classes/api/services/CSla.php:605
 #, c-format
 msgid "Start time must be less than end time for excluded downtime \"%2$s\" of SLA \"%1$s\"."
-msgstr ""
+msgstr "זמן ההתחלה חייב להקדים את זמן הסיום לזמן ההשבתה „%2$s” ב־SLA‏ „%1$s”."
 
 #: include/classes/validators/CLdapAuthValidator.php:81
 msgid "Starting TLS failed."
@@ -20404,7 +20405,7 @@ msgstr "baselinedev()‎ - מחזירה את מספר הסטיות בין תקו
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1060
 msgid "baselinewma() - Calculates baseline by averaging data periods in seasons"
-msgstr ""
+msgstr "baselinewma()‎ - מחשבת את קו הבסיס על ידי מיצוע פרקי הזמן בעונות"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
@@ -20575,7 +20576,7 @@ msgstr "לא יכול להיות קטן או שווה לערך המשתנה „%
 #: include/classes/api/services/CTemplate.php:1019
 #, c-format
 msgid "cannot be specified the value of parameter \"%1$s\""
-msgstr ""
+msgstr "אי אפשר לציין את ערך המשתנה „%1$s”"
 
 #: include/classes/api/services/CHostBase.php:111
 msgid "cannot be unlinked"
@@ -20587,11 +20588,11 @@ msgstr "לא ניתן להמיר ל־JSON, ערך התוצאה ארוך מדי"
 
 #: include/classes/api/services/CHostPrototype.php:2167
 msgid "cannot delete templated host prototype"
-msgstr ""
+msgstr "לא ניתן למחוק אבטיפוס מארח מתבנית"
 
 #: include/classes/api/services/CHostPrototype.php:1197
 msgid "cannot have more than one default interface of the same type"
-msgstr ""
+msgstr "לא יכול להיות יותר ממנשק בררת מחדל יחיד מאותו הסוג"
 
 #: include/classes/helpers/CElasticsearchHelper.php:87
 msgid "cannot perform Scroll API request, data could be truncated"
@@ -20604,12 +20605,12 @@ msgstr "לא ניתן לעדכן מאפיין של כלל גילוי מתבני�
 #: include/classes/validators/CApiInputValidator.php:3031
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of discovered object"
-msgstr ""
+msgstr "אי אפשר לעדכן את המשתנה readonly (לקריאה בלבד) „%1$s” של הפריט שהתגלה"
 
 #: include/classes/validators/CApiInputValidator.php:3025
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of inherited object"
-msgstr ""
+msgstr "אי אפשר לעדכן את המשתנה readonly (לקריאה בלבד) „%1$s” של הפריט שהתקבל בירושה"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
@@ -20651,7 +20652,7 @@ msgstr "צבע"
 
 #: app/controllers/CControllerSlaCreateUpdate.php:35
 msgid "comma separated list of time periods is expected for scheduled week days"
-msgstr ""
+msgstr "אמורה להיות רשימה של פרקי זמן, מופרדים בפסיקים, לימי השבוע המתוזמנים"
 
 #: app/partials/monitoring.latest.filter.php:176
 #: app/partials/monitoring.problem.filter.php:236
