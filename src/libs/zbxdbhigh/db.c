@@ -24,7 +24,6 @@
 #include "threads.h"
 #include "dbcache.h"
 #include "cfg.h"
-//#include "zbxcrypto.h"
 #include "zbxhash.h"
 
 #if defined(HAVE_POSTGRESQL)

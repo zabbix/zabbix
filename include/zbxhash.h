@@ -94,6 +94,7 @@ typedef struct md5_state_s
 } md5_state_t;
 
 #ifdef __cplusplus
+
 extern "C"
 {
 #endif
@@ -112,9 +113,10 @@ void zbx_md5_finish(md5_state_t *pms, md5_byte_t digest[16]);
 #endif
 
 /* ------------------ end of included md5.h file ------------------------- */
-void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
 
 #include "common.h"
+
+void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
 char	*zbx_create_token(zbx_uint64_t seed);
 size_t	zbx_get_token_len(void);
 char	*zbx_gen_uuid4(const char *seed);
