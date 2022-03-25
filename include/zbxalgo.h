@@ -21,6 +21,7 @@
 #define ZABBIX_ZBXALGO_H
 
 #include "common.h"
+#include "log.h"
 
 /* generic */
 
@@ -345,141 +346,9 @@ ZBX_VECTOR_DECL(ptr_pair, zbx_ptr_pair_t)
 ZBX_VECTOR_DECL(uint64_pair, zbx_uint64_pair_t)
 ZBX_VECTOR_DECL(dbl, double)
 
-/* this function is only for use with zbx_vector_XXX_clear_ext() */
-/* and only if the vector does not contain nested allocations */
-void	zbx_ptr_free(void *data);
-void	zbx_str_free(char *data);
-
-/* 128 bit unsigned integer handling */
-#define uset128(base, hi64, lo64)	(base)->hi = hi64; (base)->lo = lo64
-
-void	uinc128_64(zbx_uint128_t *base, zbx_uint64_t value);
-void	uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value);
-void	udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *dividend, zbx_uint64_t value);
-void	umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor);
-
-unsigned int	zbx_isqrt32(unsigned int value);
-
-char	*zbx_gen_uuid4(const char *seed);
-
-/* expression evaluation */
-
-#define ZBX_INFINITY	(1.0 / 0.0)	/* "Positive infinity" value used as a fatal error code */
-#define ZBX_UNKNOWN	(-1.0 / 0.0)	/* "Negative infinity" value used as a code for "Unknown" */
-
-#define ZBX_UNKNOWN_STR		"ZBX_UNKNOWN"	/* textual representation of ZBX_UNKNOWN */
-#define ZBX_UNKNOWN_STR_LEN	ZBX_CONST_STRLEN(ZBX_UNKNOWN_STR)
-
-int	evaluate(double *value, const char *expression, char *error, size_t max_error_len,
-		zbx_vector_ptr_t *unknown_msgs);
-int	evaluate_unknown(const char *expression, double *value, char *error, size_t max_error_len);
-double	evaluate_string_to_double(const char *in);
-
-/* forecasting */
-
-#define ZBX_MATH_ERROR	-1.0
-
-typedef enum
-{
-	FIT_LINEAR,
-	FIT_POLYNOMIAL,
-	FIT_EXPONENTIAL,
-	FIT_LOGARITHMIC,
-	FIT_POWER,
-	FIT_INVALID
-}
-zbx_fit_t;
-
-typedef enum
-{
-	MODE_VALUE,
-	MODE_MAX,
-	MODE_MIN,
-	MODE_DELTA,
-	MODE_AVG,
-	MODE_INVALID
-}
-zbx_mode_t;
-
-int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, unsigned *k, char **error);
-int	zbx_mode_code(char *mode_str, zbx_mode_t *mode, char **error);
-double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fit_t fit, unsigned k, zbx_mode_t mode);
-double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, zbx_fit_t fit, unsigned k);
-
-
-/* fifo queue of pointers */
-
-typedef struct
-{
-	void	**values;
-	int	alloc_num;
-	int	head_pos;
-	int	tail_pos;
-}
-zbx_queue_ptr_t;
-
-#define zbx_queue_ptr_empty(queue)	((queue)->head_pos == (queue)->tail_pos ? SUCCEED : FAIL)
-
-int	zbx_queue_ptr_values_num(zbx_queue_ptr_t *queue);
-void	zbx_queue_ptr_reserve(zbx_queue_ptr_t *queue, int num);
-void	zbx_queue_ptr_compact(zbx_queue_ptr_t *queue);
-void	zbx_queue_ptr_create(zbx_queue_ptr_t *queue);
-void	zbx_queue_ptr_destroy(zbx_queue_ptr_t *queue);
-void	zbx_queue_ptr_push(zbx_queue_ptr_t *queue, void *value);
-void	*zbx_queue_ptr_pop(zbx_queue_ptr_t *queue);
-void	zbx_queue_ptr_remove_value(zbx_queue_ptr_t *queue, const void *value);
-
-/* list item data */
-typedef struct list_item
-{
-	struct list_item	*next;
-	void			*data;
-}
-zbx_list_item_t;
-
-/* list data */
-typedef struct
-{
-	zbx_list_item_t		*head;
-	zbx_list_item_t		*tail;
-	zbx_mem_malloc_func_t	mem_malloc_func;
-	zbx_mem_realloc_func_t	mem_realloc_func;
-	zbx_mem_free_func_t	mem_free_func;
-}
-zbx_list_t;
-
-/* queue item data */
-typedef struct
-{
-	zbx_list_t		*list;
-	zbx_list_item_t		*current;
-	zbx_list_item_t		*next;
-}
-zbx_list_iterator_t;
-
-void	zbx_list_create(zbx_list_t *queue);
-void	zbx_list_create_ext(zbx_list_t *queue, zbx_mem_malloc_func_t mem_malloc_func, zbx_mem_free_func_t mem_free_func);
-void	zbx_list_destroy(zbx_list_t *list);
-void	zbx_list_append(zbx_list_t *list, void *value, zbx_list_item_t **inserted);
-void	zbx_list_insert_after(zbx_list_t *list, zbx_list_item_t *after, void *value, zbx_list_item_t **inserted);
-void	zbx_list_prepend(zbx_list_t *list, void *value, zbx_list_item_t **inserted);
-int	zbx_list_pop(zbx_list_t *list, void **value);
-int	zbx_list_peek(const zbx_list_t *list, void **value);
-void	zbx_list_iterator_init(zbx_list_t *list, zbx_list_iterator_t *iterator);
-int	zbx_list_iterator_next(zbx_list_iterator_t *iterator);
-int	zbx_list_iterator_peek(const zbx_list_iterator_t *iterator, void **value);
-void	zbx_list_iterator_clear(zbx_list_iterator_t *iterator);
-int	zbx_list_iterator_equal(const zbx_list_iterator_t *iterator1, const zbx_list_iterator_t *iterator2);
-int	zbx_list_iterator_isset(const zbx_list_iterator_t *iterator);
-void	zbx_list_iterator_update(zbx_list_iterator_t *iterator);
-
-/**/
-
 ZBX_PTR_VECTOR_DECL(tags, zbx_tag_t*)
 
 #define	ZBX_VECTOR_ARRAY_GROWTH_FACTOR	3/2
-
-#include "log.h"
 
 #define	ZBX_VECTOR_IMPL(__id, __type)										\
 														\
@@ -750,4 +619,133 @@ void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector,					\
 	}													\
 }
 /* vector implementation end */
+
+/* this function is only for use with zbx_vector_XXX_clear_ext() */
+/* and only if the vector does not contain nested allocations */
+void	zbx_ptr_free(void *data);
+void	zbx_str_free(char *data);
+
+/* 128 bit unsigned integer handling */
+#define uset128(base, hi64, lo64)	(base)->hi = hi64; (base)->lo = lo64
+
+void	uinc128_64(zbx_uint128_t *base, zbx_uint64_t value);
+void	uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value);
+void	udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *dividend, zbx_uint64_t value);
+void	umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor);
+
+unsigned int	zbx_isqrt32(unsigned int value);
+
+char	*zbx_gen_uuid4(const char *seed);
+
+/* expression evaluation */
+
+#define ZBX_INFINITY	(1.0 / 0.0)	/* "Positive infinity" value used as a fatal error code */
+#define ZBX_UNKNOWN	(-1.0 / 0.0)	/* "Negative infinity" value used as a code for "Unknown" */
+
+#define ZBX_UNKNOWN_STR		"ZBX_UNKNOWN"	/* textual representation of ZBX_UNKNOWN */
+#define ZBX_UNKNOWN_STR_LEN	ZBX_CONST_STRLEN(ZBX_UNKNOWN_STR)
+
+int	evaluate(double *value, const char *expression, char *error, size_t max_error_len,
+		zbx_vector_ptr_t *unknown_msgs);
+int	evaluate_unknown(const char *expression, double *value, char *error, size_t max_error_len);
+double	evaluate_string_to_double(const char *in);
+
+/* forecasting */
+
+#define ZBX_MATH_ERROR	-1.0
+
+typedef enum
+{
+	FIT_LINEAR,
+	FIT_POLYNOMIAL,
+	FIT_EXPONENTIAL,
+	FIT_LOGARITHMIC,
+	FIT_POWER,
+	FIT_INVALID
+}
+zbx_fit_t;
+
+typedef enum
+{
+	MODE_VALUE,
+	MODE_MAX,
+	MODE_MIN,
+	MODE_DELTA,
+	MODE_AVG,
+	MODE_INVALID
+}
+zbx_mode_t;
+
+int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, unsigned *k, char **error);
+int	zbx_mode_code(char *mode_str, zbx_mode_t *mode, char **error);
+double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fit_t fit, unsigned k, zbx_mode_t mode);
+double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, zbx_fit_t fit, unsigned k);
+
+
+/* fifo queue of pointers */
+
+typedef struct
+{
+	void	**values;
+	int	alloc_num;
+	int	head_pos;
+	int	tail_pos;
+}
+zbx_queue_ptr_t;
+
+#define zbx_queue_ptr_empty(queue)	((queue)->head_pos == (queue)->tail_pos ? SUCCEED : FAIL)
+
+int	zbx_queue_ptr_values_num(zbx_queue_ptr_t *queue);
+void	zbx_queue_ptr_reserve(zbx_queue_ptr_t *queue, int num);
+void	zbx_queue_ptr_compact(zbx_queue_ptr_t *queue);
+void	zbx_queue_ptr_create(zbx_queue_ptr_t *queue);
+void	zbx_queue_ptr_destroy(zbx_queue_ptr_t *queue);
+void	zbx_queue_ptr_push(zbx_queue_ptr_t *queue, void *value);
+void	*zbx_queue_ptr_pop(zbx_queue_ptr_t *queue);
+void	zbx_queue_ptr_remove_value(zbx_queue_ptr_t *queue, const void *value);
+
+/* list item data */
+typedef struct list_item
+{
+	struct list_item	*next;
+	void			*data;
+}
+zbx_list_item_t;
+
+/* list data */
+typedef struct
+{
+	zbx_list_item_t		*head;
+	zbx_list_item_t		*tail;
+	zbx_mem_malloc_func_t	mem_malloc_func;
+	zbx_mem_realloc_func_t	mem_realloc_func;
+	zbx_mem_free_func_t	mem_free_func;
+}
+zbx_list_t;
+
+/* queue item data */
+typedef struct
+{
+	zbx_list_t		*list;
+	zbx_list_item_t		*current;
+	zbx_list_item_t		*next;
+}
+zbx_list_iterator_t;
+
+void	zbx_list_create(zbx_list_t *queue);
+void	zbx_list_create_ext(zbx_list_t *queue, zbx_mem_malloc_func_t mem_malloc_func, zbx_mem_free_func_t mem_free_func);
+void	zbx_list_destroy(zbx_list_t *list);
+void	zbx_list_append(zbx_list_t *list, void *value, zbx_list_item_t **inserted);
+void	zbx_list_insert_after(zbx_list_t *list, zbx_list_item_t *after, void *value, zbx_list_item_t **inserted);
+void	zbx_list_prepend(zbx_list_t *list, void *value, zbx_list_item_t **inserted);
+int	zbx_list_pop(zbx_list_t *list, void **value);
+int	zbx_list_peek(const zbx_list_t *list, void **value);
+void	zbx_list_iterator_init(zbx_list_t *list, zbx_list_iterator_t *iterator);
+int	zbx_list_iterator_next(zbx_list_iterator_t *iterator);
+int	zbx_list_iterator_peek(const zbx_list_iterator_t *iterator, void **value);
+void	zbx_list_iterator_clear(zbx_list_iterator_t *iterator);
+int	zbx_list_iterator_equal(const zbx_list_iterator_t *iterator1, const zbx_list_iterator_t *iterator2);
+int	zbx_list_iterator_isset(const zbx_list_iterator_t *iterator);
+void	zbx_list_iterator_update(zbx_list_iterator_t *iterator);
+
 #endif
