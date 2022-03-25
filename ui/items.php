@@ -704,10 +704,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			$item = [];
 
-			if ($db_item['templateid'] == 0 && $type == ITEM_TYPE_HTTPAGENT) {
-				$item = prepareItemHttpAgentFormData($http_item) + $item;
-			}
-
 			if ($db_item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 				if ($db_item['templateid'] == 0) {
 					$value_type = getRequest('value_type', ITEM_VALUE_TYPE_FLOAT);
@@ -761,6 +757,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if ($db_item['params'] !== getRequest('params', '')) {
 						$item['params'] = getRequest('params', '');
 					}
+					if ($db_item['preprocessing'] !== $preprocessing) {
+						$item['preprocessing'] = $preprocessing;
+					}
 				}
 
 				if ($db_item['delay'] != $delay) {
@@ -790,8 +789,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['description'] !== getRequest('description', '')) {
 					$item['description'] = getRequest('description', '');
 				}
-				if ($db_item['preprocessing'] !== $preprocessing) {
-					$item['preprocessing'] = $preprocessing;
+
+				if ($type == ITEM_TYPE_HTTPAGENT) {
+					$item = prepareItemHttpAgentFormData($http_item) + $item;
 				}
 			}
 
