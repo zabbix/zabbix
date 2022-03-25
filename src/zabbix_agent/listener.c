@@ -19,7 +19,7 @@
 
 #include "listener.h"
 
-#include "comms.h"
+#include "zbxcomms.h"
 #include "zbxconf.h"
 #include "sysinfo.h"
 #include "log.h"

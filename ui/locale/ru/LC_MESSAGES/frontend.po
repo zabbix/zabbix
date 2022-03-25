@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-03-18 14:53+0000\n"
+"PO-Revision-Date: 2022-03-25 14:20+0000\n"
 "Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -886,7 +886,7 @@ msgstr "Добавить узел сети"
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
-msgstr ""
+msgstr "Добавить колонку элементов данных"
 
 #: app/partials/massupdate.macros.tab.php:95
 #: app/partials/massupdate.valuemaps.tab.php:37
@@ -4667,6 +4667,11 @@ msgstr "Имена пользовательских важностей влия�
 #: include/views/js/monitoring.sysmaps.js.php:118
 msgid "Custom size"
 msgstr "Пользовательский размер"
+
+#: app/views/administration.miscconfig.edit.php:104
+#: include/classes/setup/CSetupWizard.php:563
+msgid "CyberArk Vault"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:95
 msgid "Cycle"
@@ -14396,6 +14401,12 @@ msgstr "Prometheus в JSON"
 msgid "Properties"
 msgstr "Свойства"
 
+#: include/classes/vaults/CVaultCyberArk.php:64
+#: include/classes/vaults/CVaultHashiCorp.php:55
+#, c-format
+msgid "Provided API endpoint \"%1$s\" is invalid."
+msgstr ""
+
 #: app/controllers/CControllerMenuPopup.php:405
 #: app/controllers/CControllerMenuPopup.php:693
 #: app/controllers/CControllerWidgetUrlView.php:64
@@ -14404,6 +14415,21 @@ msgstr "Свойства"
 #, c-format
 msgid "Provided URL \"%1$s\" is invalid."
 msgstr "Указанный URL \"%1$s\" ошибочен."
+
+#: include/classes/vaults/CVaultHashiCorp.php:64
+#, c-format
+msgid "Provided authentication token \"%1$s\" is empty."
+msgstr ""
+
+#: include/classes/vaults/CVaultHashiCorp.php:60
+#, c-format
+msgid "Provided secret path \"%1$s\" is invalid."
+msgstr ""
+
+#: include/classes/vaults/CVaultCyberArk.php:70
+#, c-format
+msgid "Provided secret query string \"%1$s\" is invalid."
+msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:157
 #: app/views/administration.proxy.edit.php:29
@@ -16920,6 +16946,10 @@ msgstr "Остановить слайд-шоу"
 msgid "Stopped"
 msgstr "Остановлена"
 
+#: app/views/administration.miscconfig.edit.php:100
+msgid "Storage of secrets"
+msgstr ""
+
 #: app/views/popup.lldoperation.php:191 app/views/popup.lldoperation.php:212
 #: app/views/popup.massupdate.item.php:294
 #: app/views/popup.massupdate.item.php:310
@@ -16938,6 +16968,11 @@ msgstr "Хранение учётных данных в"
 #: include/classes/setup/CSetupWizard.php:657
 msgid "Stored in HashiCorp Vault secret"
 msgstr "Хранение в HashiCorp Vault секрете"
+
+#: include/classes/setup/CSetupWizard.php:757
+#: include/classes/setup/CSetupWizard.php:758
+msgid "Stored in Vault secret"
+msgstr ""
 
 #: include/hosts.inc.php:35
 msgid "Straight"
@@ -19070,6 +19105,10 @@ msgstr "Имя пользователя"
 msgid "Username and password"
 msgstr "Имя пользователя и пароль"
 
+#: include/classes/vaults/CVaultCyberArk.php:112
+msgid "Username and password must be stored in Vault secret keys \"UserName\" and \"Content\"."
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:206
 #: include/classes/setup/CSetupWizard.php:802
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
@@ -19533,10 +19572,19 @@ msgstr "API endpoint Хранилища"
 msgid "Vault authentication token"
 msgstr "Токен аутентификации Хранилища"
 
+#: include/classes/setup/CSetupWizard.php:618
+#: include/classes/setup/CSetupWizard.php:817
+msgid "Vault certificates"
+msgstr ""
+
 #: include/classes/core/ZBase.php:231
 #: include/classes/setup/CSetupWizard.php:203 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr "Ошибка подключения к Хранилищу."
+
+#: app/views/administration.miscconfig.edit.php:101
+msgid "Vault provider"
+msgstr ""
 
 #: include/classes/html/CMacroValue.php:158
 msgid "Vault secret"
@@ -19546,6 +19594,11 @@ msgstr "Секрет Хранилища"
 #: include/classes/setup/CSetupWizard.php:700
 msgid "Vault secret path"
 msgstr "Путь к секрету Хранилища"
+
+#: include/classes/setup/CSetupWizard.php:609
+#: include/classes/setup/CSetupWizard.php:813
+msgid "Vault secret query string"
+msgstr ""
 
 #: include/hosts.inc.php:249
 msgid "Vendor"
@@ -21380,6 +21433,15 @@ msgstr "макрос(ы)"
 msgid "mad() - Median absolute deviation"
 msgstr "mad() - Абсолютное отклонение среднего"
 
+#: include/classes/parsers/CVaultSecretParser.php:180
+msgid "mandatory key is missing"
+msgstr ""
+
+#: include/classes/parsers/CVaultSecretParser.php:177
+#, c-format
+msgid "mandatory parameter \"%1$s\" is missing"
+msgstr ""
+
 #: include/classes/validators/CHistFunctionValidator.php:93
 #, c-format
 msgid "mandatory parameter is missing in function \"%1$s\""
@@ -21562,7 +21624,7 @@ msgstr "нет данных"
 #: include/classes/api/services/CHostPrototype.php:1205
 #, c-format
 msgid "no default interface for \"%1$s\" type."
-msgstr ""
+msgstr "Для типа \"%1$s\" не существует интерфейса по умолчанию."
 
 #: include/classes/api/services/CEvent.php:773
 msgid "no permissions to acknowledge problems"

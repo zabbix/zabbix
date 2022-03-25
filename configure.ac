@@ -2113,6 +2113,9 @@ AC_OUTPUT([
 	src/libs/zbxembed/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/libs/zbxvault/Makefile
+	src/libs/zbxhashicorp/Makefile
+	src/libs/zbxcyberark/Makefile
+	src/libs/zbxkvs/Makefile
 	src/libs/zbxdiag/Makefile
 	src/libs/zbxtrends/Makefile
 	src/libs/zbxavailability/Makefile
