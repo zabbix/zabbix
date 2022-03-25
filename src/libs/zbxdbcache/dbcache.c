@@ -29,7 +29,7 @@
 #include "module.h"
 #include "export.h"
 #include "zbxhistory.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxavailability.h"
 #include "zbxtrends.h"
 #include "../zbxalgo/vectorimpl.h"

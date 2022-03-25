@@ -19,7 +19,7 @@
 
 #include "zbxserialize.h"
 #include "zbxjson.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxrtc.h"
 #include "rtc.h"
 #include "log.h"

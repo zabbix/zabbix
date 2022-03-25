@@ -24,4 +24,120 @@
 int	zbx_coredump_disable(void);
 #endif
 
+/* daemon start */
+#include "sysinc.h"
+
+#if defined(_WINDOWS)
+#	error "This module allowed only for Unix OS"
+#endif
+
+extern char			*CONFIG_PID_FILE;
+extern volatile sig_atomic_t	sig_exiting;
+
+#define ZBX_EXIT_NONE		0
+#define ZBX_EXIT_SUCCESS	1
+#define ZBX_EXIT_FAILURE	2
+
+int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags);
+void	zbx_daemon_stop(void);
+
+int	zbx_sigusr_send(int flags);
+void	zbx_set_sigusr_handler(void (*handler)(int flags));
+
+#define ZBX_IS_RUNNING()	(ZBX_EXIT_NONE == sig_exiting)
+#define ZBX_EXIT_STATUS()	(ZBX_EXIT_SUCCESS == sig_exiting ? SUCCEED : FAIL)
+
+#define ZBX_DO_EXIT()
+
+#define START_MAIN_ZABBIX_ENTRY(allow_root, user, flags)	zbx_daemon_start(allow_root, user, flags)
+
+void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **out);
+void	zbx_signal_process_by_pid(int pid, int flags, char **out);
+/* daemon end */
+
+/* IPC start */
+#include "zbxtypes.h"
+
+#if defined(_WINDOWS)
+#	error "This module allowed only for Unix OS"
+#endif
+
+#include "mutexs.h"
+
+#define ZBX_NONEXISTENT_SHMID		(-1)
+
+int	zbx_shm_create(size_t size);
+int	zbx_shm_destroy(int shmid);
+
+/* data copying callback function prototype */
+typedef void (*zbx_shm_copy_func_t)(void *dst, size_t size_dst, const void *src);
+
+/* dynamic shared memory data structure */
+typedef struct
+{
+	/* shared memory segment identifier */
+	int			shmid;
+
+	/* allocated size */
+	size_t			size;
+
+	/* callback function to copy data after shared memory reallocation */
+	zbx_shm_copy_func_t	copy_func;
+
+	zbx_mutex_t		lock;
+}
+zbx_dshm_t;
+
+/* local process reference to dynamic shared memory data */
+typedef struct
+{
+	/* shared memory segment identifier */
+	int	shmid;
+
+	/* shared memory base address */
+	void	*addr;
+}
+zbx_dshm_ref_t;
+
+int	zbx_dshm_create(zbx_dshm_t *shm, size_t shm_size, zbx_mutex_name_t mutex,
+		zbx_shm_copy_func_t copy_func, char **errmsg);
+
+int	zbx_dshm_destroy(zbx_dshm_t *shm, char **errmsg);
+
+int	zbx_dshm_realloc(zbx_dshm_t *shm, size_t size, char **errmsg);
+
+int	zbx_dshm_validate_ref(const zbx_dshm_t *shm, zbx_dshm_ref_t *shm_ref, char **errmsg);
+
+void	zbx_dshm_lock(zbx_dshm_t *shm);
+void	zbx_dshm_unlock(zbx_dshm_t *shm);
+/* IPC end*/
+
+/* pid start */
+#include "threads.h"
+
+#ifdef _WINDOWS
+#	error "This module allowed only for Unix OS"
+#endif
+
+int	zbx_create_pid_file(const char *pidfile);
+int	zbx_read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_error_len);
+void	zbx_drop_pid_file(const char *pidfile);
+/* pid end */
+
+/* sighandler start */
+#include "sysinc.h"
+
+void	zbx_set_common_signal_handlers(void);
+void	zbx_set_child_signal_handler(void);
+void	zbx_unset_child_signal_handler(void);
+void	zbx_set_metric_thread_signal_handler(void);
+void	zbx_block_signals(sigset_t *orig_mask);
+void	zbx_unblock_signals(const sigset_t *orig_mask);
+
+void	zbx_set_exit_on_terminate(void);
+void	zbx_unset_exit_on_terminate(void);
+/* sighandler end */
+
+int	zbx_parse_rtc_options(const char *opt, int *message);
+
 #endif	/* ZABBIX_ZBXNIX_H */

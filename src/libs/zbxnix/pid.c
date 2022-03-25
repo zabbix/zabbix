@@ -17,14 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "pid.h"
+#include "zbxnix.h"
 
 #include "common.h"
 #include "log.h"
+
 static FILE	*fpid = NULL;
 static int	fdpid = -1;
 
-int	create_pid_file(const char *pidfile)
+int	zbx_create_pid_file(const char *pidfile)
 {
 	int		fd;
 	zbx_stat_t	buf;
@@ -71,7 +72,7 @@ int	create_pid_file(const char *pidfile)
 	return SUCCEED;
 }
 
-int	read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_error_len)
+int	zbx_read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_error_len)
 {
 	int	ret = FAIL;
 	FILE	*f_pid;
@@ -92,7 +93,7 @@ int	read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_error
 	return ret;
 }
 
-void	drop_pid_file(const char *pidfile)
+void	zbx_drop_pid_file(const char *pidfile)
 {
 	struct flock	fl;
 

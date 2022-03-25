@@ -17,17 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "daemon.h"
+#include "zbxnix.h"
+
+#include "fatal.h"
+#include "sigcommon.h"
 
 #include "common.h"
-#include "pid.h"
 #include "cfg.h"
 #include "log.h"
 #include "control.h"
-
-#include "fatal.h"
-#include "sighandler.h"
-#include "sigcommon.h"
 
 char		*CONFIG_PID_FILE = NULL;
 static int	parent_pid = -1;
@@ -317,7 +315,7 @@ static void	set_daemon_signal_handlers(void)
  * Comments: it doesn't allow running under 'root' if allow_root is zero      *
  *                                                                            *
  ******************************************************************************/
-int	daemon_start(int allow_root, const char *user, unsigned int flags)
+int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags)
 {
 	struct passwd	*pwd;
 
@@ -392,10 +390,10 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 			exit(EXIT_FAILURE);
 	}
 
-	if (FAIL == create_pid_file(CONFIG_PID_FILE))
+	if (FAIL == zbx_create_pid_file(CONFIG_PID_FILE))
 		exit(EXIT_FAILURE);
 
-	atexit(daemon_stop);
+	atexit(zbx_daemon_stop);
 
 	parent_pid = (int)getpid();
 
@@ -410,7 +408,7 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 	return MAIN_ZABBIX_ENTRY(flags);
 }
 
-void	daemon_stop(void)
+void	zbx_daemon_stop(void)
 {
 	/* this function is registered using atexit() to be called when we terminate */
 	/* there should be nothing like logging or calls to exit() beyond this point */
@@ -418,7 +416,7 @@ void	daemon_stop(void)
 	if (parent_pid != (int)getpid())
 		return;
 
-	drop_pid_file(CONFIG_PID_FILE);
+	zbx_drop_pid_file(CONFIG_PID_FILE);
 }
 
 int	zbx_sigusr_send(int flags)
@@ -428,7 +426,7 @@ int	zbx_sigusr_send(int flags)
 #ifdef HAVE_SIGQUEUE
 	pid_t	pid;
 
-	if (SUCCEED == read_pid_file(CONFIG_PID_FILE, &pid, error, sizeof(error)))
+	if (SUCCEED == zbx_read_pid_file(CONFIG_PID_FILE, &pid, error, sizeof(error)))
 	{
 		union sigval	s;
 

@@ -20,7 +20,7 @@
 #include "alerter.h"
 
 #include "log.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxmedia.h"
 #include "zbxself.h"
 #include "zbxexec.h"

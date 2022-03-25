@@ -25,7 +25,6 @@
 
 #include "export.h"
 #include "zbxself.h"
-#include "sighandler.h"
 
 #include "cfg.h"
 #include "zbxdbupgrade.h"
@@ -34,7 +33,6 @@
 #include "mutexs.h"
 #include "zbxmodules.h"
 #include "zbxnix.h"
-#include "daemon.h"
 
 #include "alerter/alerter.h"
 #include "alerter/alert_manager.h"
@@ -1085,7 +1083,7 @@ int	main(int argc, char **argv)
 		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
-	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
+	return zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 }
 
 static void	zbx_check_db(void)

@@ -20,7 +20,7 @@
 #include "report_manager.h"
 
 #include "zbxself.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "base64.h"
 #include "zbxreport.h"
 #include "../../libs/zbxcrypto/hmac_sha256.h"
