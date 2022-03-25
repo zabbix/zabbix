@@ -936,6 +936,10 @@ int DBcheck_capabilities_timescaledb(zbx_uint32_t db_version, struct zbx_json *j
 		zbx_free(version_info.friendly_current_version);
 	}
 
+	/* force disabling compression if it is not supported */
+	if (!compression_available)
+		DBexecute("update config set compression_status=0");
+
 	ret = SUCCEED;
 clean:
 	DBfree_result(result);
