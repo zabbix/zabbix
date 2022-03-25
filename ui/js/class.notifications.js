@@ -418,9 +418,13 @@ ZBX_Notifications.prototype.handleTabFocusIn = function() {
  * @param {MouseEvent} e
  */
 ZBX_Notifications.prototype.handleCloseClicked = function(e) {
-	this.fetch('notifications.read', {ids: this.getEventIds()})
-		.catch(console.error)
-		.then(function(resp) {
+	this
+		.fetch('notifications.read', {ids: this.getEventIds()})
+		.then((resp) => {
+			if ('error' in resp) {
+				throw {error: resp.error};
+			}
+
 			resp.ids.forEach(function(id) {
 				this.removeById(id);
 				this.debounceRender();
@@ -428,7 +432,18 @@ ZBX_Notifications.prototype.handleCloseClicked = function(e) {
 
 			this.alarm.reset();
 			this.pushUpdates();
-		}.bind(this));
+		})
+		.catch((exception) => {
+			if (typeof exception === 'object' && 'error' in exception) {
+				const message_box = makeMessageBox('bad', exception.error.messages, exception.error.title);
+
+				clearMessages();
+				addMessage(message_box);
+			}
+			else {
+				console.log('Could not read notifications:', exception);
+			}
+		});
 };
 
 /**
@@ -453,14 +468,35 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function(e) {
  * @param {MouseEvent} e
  */
 ZBX_Notifications.prototype.handleMuteClicked = function(e) {
-	this.fetch('notifications.mute', {muted: this.alarm.muted ? 0 : 1})
-		.catch(console.error)
-		.then(function(resp) {
+	this
+		.fetch('notifications.mute', {muted: this.alarm.muted ? 0 : 1})
+		.then((resp) => {
+			if ('error' in resp) {
+				throw {error: resp.error};
+			}
+
 			this._cached_user_settings.muted = (resp.muted == 1);
 			this.alarm.consume({muted: this._cached_user_settings.muted});
 			this.pushUpdates();
 			this.render();
-		}.bind(this));
+		})
+		.catch((exception) => {
+			let title;
+			let messages = [];
+
+			if (typeof exception === 'object' && 'error' in exception) {
+				title = exception.error.title;
+				messages = exception.error.messages;
+			}
+			else {
+				title = t('Unexpected server error.');
+			}
+
+			const message_box = makeMessageBox('bad', messages, title);
+
+			clearMessages();
+			addMessage(message_box);
+		});
 };
 
 /**
@@ -552,9 +588,26 @@ ZBX_Notifications.prototype.mainLoop = function() {
 		return;
 	}
 
-	this.fetch('notifications.get', {known_eventids: this.getEventIds()})
-		.catch(console.error)
-		.then(this.handleMainLoopResp.bind(this));
+	this
+		.fetch('notifications.get', {known_eventids: this.getEventIds()})
+		.then((resp) => {
+			if ('error' in resp) {
+				throw {error: resp.error};
+			}
+
+			this.handleMainLoopResp(resp);
+		})
+		.catch((exception) => {
+			if (typeof exception === 'object' && 'error' in exception) {
+				const message_box = makeMessageBox('bad', exception.error.messages, exception.error.title);
+
+				clearMessages();
+				addMessage(message_box);
+			}
+			else {
+				console.log('Could not get notifications:', exception);
+			}
+		});
 };
 
 /**
