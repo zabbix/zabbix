@@ -28,6 +28,7 @@
 #include "discovery.h"
 #include "zbxalgo.h"
 #include "preproc.h"
+#include "zbxhash.h"
 #include "../zbxcrypto/tls_tcp_active.h"
 #include "../zbxkvs/kvs.h"
 #include "zbxlld.h"
@@ -3800,7 +3801,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 	{
 		size_t	token_len;
 
-		if (ZBX_DATA_SESSION_TOKEN_SIZE != (token_len = strlen(token)))
+		if (zbx_get_token_len() != (token_len = strlen(token)))
 		{
 			*info = zbx_dsprintf(*info, "invalid session token length %d", (int)token_len);
 			ret = FAIL;
@@ -4655,7 +4656,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		{
 			size_t	token_len;
 
-			if (ZBX_DATA_SESSION_TOKEN_SIZE != (token_len = strlen(value)))
+			if (zbx_get_token_len() != (token_len = strlen(value)))
 			{
 				*error = zbx_dsprintf(*error, "invalid session token length %d", (int)token_len);
 				ret = FAIL;

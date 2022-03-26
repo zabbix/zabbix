@@ -24,6 +24,7 @@
 #include "zbxserver.h"
 #include "zbxregexp.h"
 #include "cfg.h"
+#include "zbxhash.h"
 #include "../zbxcrypto/tls_tcp_active.h"
 #include "../zbxalgo/vectorimpl.h"
 #include "../zbxkvs/kvs.h"
