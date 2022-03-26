@@ -703,10 +703,10 @@ void	zbx_audit_host_prototype_update_json_update_group_details(zbx_uint64_t host
 
 #define PREPARE_AUDIT_TEMPLATE_ADD(funcname, auditentry)							\
 void	zbx_audit_##funcname##_update_json_add_parent_template(zbx_uint64_t hostid,				\
-		zbx_uint64_t hosttemplateid, zbx_uint64_t templateid)						\
+		zbx_uint64_t hosttemplateid, zbx_uint64_t templateid, int link_type)				\
 {														\
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_hostid[AUDIT_DETAILS_KEY_LEN],			\
-		audit_key_templateid[AUDIT_DETAILS_KEY_LEN];							\
+		audit_key_templateid[AUDIT_DETAILS_KEY_LEN], audit_key_link_type[AUDIT_DETAILS_KEY_LEN];	\
 														\
 	RETURN_IF_AUDIT_OFF();											\
 														\
@@ -715,12 +715,16 @@ void	zbx_audit_##funcname##_update_json_add_parent_template(zbx_uint64_t hostid,
 			"].hostid", hosttemplateid);								\
 	zbx_snprintf(audit_key_templateid, sizeof(audit_key_templateid), #auditentry".templates[" ZBX_FS_UI64	\
 			"].templateid", hosttemplateid);							\
+	zbx_snprintf(audit_key_link_type, sizeof(audit_key_link_type), #auditentry".templates[" ZBX_FS_UI64	\
+			"].link_type", hosttemplateid);								\
 														\
 	zbx_audit_update_json_append_no_value(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key);	\
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_hostid,	\
-			hostid, "hosts", "hostid");								\
+			hostid, "hosts_templates", "hostid");							\
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD,			\
-			audit_key_templateid, templateid, "hosts", "templateid");				\
+			audit_key_templateid, templateid, "hosts_templates", "templateid");			\
+	zbx_audit_update_json_append_int(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD,			\
+			audit_key_link_type, link_type, "hosts_templates", "link_type");			\
 }														\
 
 #define PREPARE_AUDIT_TEMPLATE_DELETE(funcname, auditentry)							\

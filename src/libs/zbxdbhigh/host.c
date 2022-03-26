@@ -3842,7 +3842,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 					host_prototype->lnk_templateids.values[j]);
 
 			zbx_audit_host_prototype_update_json_add_parent_template(host_prototype->hostid,
-					hosttemplateid, host_prototype->lnk_templateids.values[j]);
+					hosttemplateid, host_prototype->lnk_templateids.values[j], 0);
 
 			hosttemplateid++;
 		}
@@ -5630,11 +5630,13 @@ static void	DBcopy_template_httptests(zbx_uint64_t hostid, const zbx_vector_uint
  *                                                                            *
  * Parameters: hostid          - [IN] host identifier from database           *
  *             lnk_templateids - [IN] array of template IDs                   *
+ *             link_type       - [IN] link type 0 - manual, 1 - LLD automatic *
+ *             error           - [OUT] error message                          *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
  ******************************************************************************/
-int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids, char **error)
+int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids, int link_type, char **error)
 {
 	zbx_vector_uint64_t	templateids;
 	zbx_uint64_t		hosttemplateid;
@@ -5690,12 +5692,15 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 
 	db_insert_htemplates = zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 
-	zbx_db_insert_prepare(db_insert_htemplates, "hosts_templates",  "hosttemplateid", "hostid", "templateid", NULL);
+	zbx_db_insert_prepare(db_insert_htemplates, "hosts_templates",  "hosttemplateid", "hostid", "templateid",
+			"link_type", NULL);
 
 	for (i = 0; i < lnk_templateids->values_num; i++)
 	{
-		zbx_db_insert_add_values(db_insert_htemplates, hosttemplateid, hostid, lnk_templateids->values[i]);
-		zbx_audit_host_update_json_add_parent_template(hostid, hosttemplateid, lnk_templateids->values[i]);
+		zbx_db_insert_add_values(db_insert_htemplates, hosttemplateid, hostid, lnk_templateids->values[i],
+				link_type);
+		zbx_audit_host_update_json_add_parent_template(hostid, hosttemplateid, lnk_templateids->values[i],
+				link_type);
 
 		hosttemplateid++;
 	}

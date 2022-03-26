@@ -42,6 +42,12 @@ static int	DBpatch_6010001(void)
 #undef ZBX_MD5_SIZE
 }
 
+static int	DBpatch_6010002(void)
+{
+	const ZBX_FIELD	field = {"link_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts_templates", &field);
+}
 #endif
 
 DBPATCH_START(6010)
@@ -49,5 +55,6 @@ DBPATCH_START(6010)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(6010001, 0, 1)
+DBPATCH_ADD(6010002, 0, 1)
 
 DBPATCH_END()

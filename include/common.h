@@ -812,6 +812,9 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 
 #define ZBX_USER_ONLINE_TIME	600
 
+#define TEMPLATE_LINK_MANUAL	0
+#define TEMPLATE_LINK_LLD	1
+
 /* user role permissions */
 typedef enum
 {
