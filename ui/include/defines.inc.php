@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.2.0alpha1');
 define('ZABBIX_API_VERSION',	'6.2.0');
 define('ZABBIX_EXPORT_VERSION',	'6.2');
 
-define('ZABBIX_DB_VERSION',		6010002);
+define('ZABBIX_DB_VERSION',		6010004);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -168,7 +168,8 @@ define('ORACLE_UTF8_CHARSET', 'AL32UTF8');
 define('ORACLE_CESU8_CHARSET', 'UTF8');
 
 define('DB_STORE_CREDS_CONFIG', 0);
-define('DB_STORE_CREDS_VAULT', 1);
+define('DB_STORE_CREDS_VAULT_HASHICORP', 1);
+define('DB_STORE_CREDS_VAULT_CYBERARK',  2);
 
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
@@ -316,6 +317,7 @@ define('INTERFACE_PRIMARY',		1);
 define('INTERFACE_USE_DNS',	0);
 define('INTERFACE_USE_IP',	1);
 
+define('INTERFACE_TYPE_OPT',		-2);
 define('INTERFACE_TYPE_ANY',		-1);
 define('INTERFACE_TYPE_UNKNOWN',	0);
 define('INTERFACE_TYPE_AGENT',		1);
@@ -1454,7 +1456,11 @@ define('ZBX_MAX_PORT_NUMBER', 65535);
 
 define('ZBX_MACRO_TYPE_TEXT', 0); // Display macro value as text.
 define('ZBX_MACRO_TYPE_SECRET', 1); // Display masked macro value.
-define('ZBX_MACRO_TYPE_VAULT', 2); // Display macro value as text (path to secret in HashiCorp Vault).
+define('ZBX_MACRO_TYPE_VAULT', 2); // Display macro value as text (path to secret in Vault).
+
+define('ZBX_VAULT_TYPE_UNKNOWN', -1);
+define('ZBX_VAULT_TYPE_HASHICORP', 0);
+define('ZBX_VAULT_TYPE_CYBERARK',  1);
 
 define('ZBX_SECRET_MASK', '******'); // Placeholder for secret values.
 

@@ -737,7 +737,13 @@ abstract class CControllerPopupItemTest extends CController {
 				$output[] = 'details';
 			}
 
-			if (itemTypeInterface($this->item_type) === false) {
+			$item_type_interface = itemTypeInterface($this->item_type);
+
+			if ($item_type_interface == INTERFACE_TYPE_OPT && $inputs['interfaceid'] == 0) {
+				$item_type_interface = false;
+			}
+
+			if ($item_type_interface === false) {
 				$host_interfaces = API::HostInterface()->get([
 					'output' => $output,
 					'hostids' => $this->host['hostid'],
@@ -745,11 +751,7 @@ abstract class CControllerPopupItemTest extends CController {
 				]);
 				$host_interfaces = zbx_toHash($host_interfaces, 'type');
 
-				$ordered_interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX,
-					INTERFACE_TYPE_IPMI
-				];
-
-				foreach ($ordered_interface_types as $interface_type) {
+				foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $interface_type) {
 					if (array_key_exists($interface_type, $host_interfaces)) {
 						$interfaces[] = $host_interfaces[$interface_type];
 						break;

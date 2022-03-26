@@ -4313,7 +4313,7 @@ static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
 		{
 			type = get_interface_type_by_item_type((unsigned char)atoi(row[1]));
 
-			if (type != INTERFACE_TYPE_ANY && type != INTERFACE_TYPE_UNKNOWN)
+			if (type != INTERFACE_TYPE_ANY && type != INTERFACE_TYPE_UNKNOWN && type != INTERFACE_TYPE_OPT)
 			{
 				ZBX_STR2UINT64(interfaceid, row[0]);
 
