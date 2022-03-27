@@ -46,7 +46,12 @@ function mediatypeTestSend(overlay) {
 		success: function(ret) {
 			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 
-			if (typeof ret.messages !== 'undefined') {
+			if ('error' in ret) {
+				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);
+
+				message_box.insertBefore($form);
+			}
+			else if (typeof ret.messages !== 'undefined') {
 				jQuery(ret.messages).insertBefore($form);
 			}
 

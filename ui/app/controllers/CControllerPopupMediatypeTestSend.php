@@ -40,14 +40,13 @@ class CControllerPopupMediatypeTestSend extends CController {
 		$ret = $this->validateInput($fields) && $this->validateMediaType();
 
 		if (!$ret) {
-			$output = [];
-
-			if (($messages = getMessages(false, _('Media type test failed.'))) !== null) {
-				$output['messages'] = $messages->toString();
-			}
-
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'title' => _('Media type test failed.'),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
 			);
 		}
 
