@@ -184,6 +184,8 @@
 
 	.list-dashed {
 		li {
+			white-space: pre;
+
 			&:only-child {
 				margin-left: 0;
 			}
