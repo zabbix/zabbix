@@ -51,8 +51,10 @@ function mediatypeTestSend(overlay) {
 
 				message_box.insertBefore($form);
 			}
-			else if (typeof ret.messages !== 'undefined') {
-				jQuery(ret.messages).insertBefore($form);
+			else if ('success' in ret) {
+				const message_box = makeMessageBox('good', ret.success.messages, ret.success.title);
+
+				message_box.insertBefore($form);
 			}
 
 			if ('response' in ret) {

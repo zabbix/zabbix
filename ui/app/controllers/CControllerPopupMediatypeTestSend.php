@@ -41,12 +41,12 @@ class CControllerPopupMediatypeTestSend extends CController {
 
 		if (!$ret) {
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
+				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
 						'title' => _('Media type test failed.'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])]))->disableView()
+				])])
 			);
 		}
 
@@ -137,11 +137,9 @@ class CControllerPopupMediatypeTestSend extends CController {
 		$debug = $server->getDebug();
 
 		if ($result) {
-			$msg_title = null;
 			info(_('Media type test successful.'));
 		}
 		else {
-			$msg_title = _('Media type test failed.');
 			error($server->getError());
 		}
 
@@ -151,8 +149,14 @@ class CControllerPopupMediatypeTestSend extends CController {
 			]
 		];
 
-		if (($messages = getMessages($result, $msg_title)) !== null) {
-			$output['messages'] = $messages->toString();
+		if ($result) {
+			$output['success']['messages'] = array_column(get_and_clear_messages(), 'message');
+		}
+		else {
+			$output['error'] = [
+				'title' => _('Media type test failed.'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
 		if ($this->mediatype['type'] == MEDIA_TYPE_WEBHOOK) {
@@ -182,6 +186,6 @@ class CControllerPopupMediatypeTestSend extends CController {
 			}
 		}
 
-		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }
