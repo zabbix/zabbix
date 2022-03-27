@@ -844,8 +844,10 @@ insert_javascript_for_visibilitybox();
 			overlay.unsetLoading();
 		})
 		.done(function(ret) {
-			if (typeof ret.errors !== 'undefined') {
-				return jQuery(ret.errors).insertBefore(this.$form);
+			if ('error' in ret) {
+				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);
+
+				return message_box.insertBefore(this.$form);
 			}
 
 			if (!lldoverrides.overrides.data[ret.params.no]) {
@@ -1170,8 +1172,10 @@ insert_javascript_for_visibilitybox();
 			overlay.unsetLoading();
 		})
 		.done(function(ret) {
-			if (typeof ret.errors !== 'undefined') {
-				return jQuery(ret.errors).insertBefore(this.$form);
+			if ('error' in ret) {
+				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);
+
+				return message_box.insertBefore(this.$form);
 			}
 
 			if (!lldoverrides.operations.data[ret.params.no]) {
