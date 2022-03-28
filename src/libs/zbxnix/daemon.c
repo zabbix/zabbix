@@ -31,7 +31,7 @@
 
 #if defined(__linux) || defined(__linux__) || defined(linux)
 #define ZBX_PID_FILE_TIMEOUT 20
-#define ZBX_PID_FILE_SLEEP_TIME 100000
+#define ZBX_PID_FILE_SLEEP_TIME 100000000
 #endif
 
 char		*CONFIG_PID_FILE = NULL;
