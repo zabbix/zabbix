@@ -609,6 +609,8 @@ func (r *runner) getMegaRaidDevices(jsonRunner bool) {
 		}
 
 		dp.Info.Name = fmt.Sprintf("%s %s", raid.name, raid.rType)
+		dp.Info.name = raid.name
+		dp.Info.raidType = raid.rType
 
 		r.setRaidDevices(dp, device, raid.rType, jsonRunner)
 	}
