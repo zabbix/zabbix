@@ -167,7 +167,7 @@ func parseAnswers(answers []dns.RR) string {
 			out += getSRVString(rr)
 		}
 
-		if i != answersNum - 1 {
+		if i != answersNum-1 {
 			out += "\n"
 		}
 	}

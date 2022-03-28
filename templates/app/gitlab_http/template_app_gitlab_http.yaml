@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-27T19:00:06Z'
+  date: '2022-03-01T13:16:13Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -609,7 +609,7 @@ zabbix_export:
               expression: 'min(/GitLab by HTTP/gitlab.redis.client_exceptions.cache.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}'
               name: 'GitLab: Too many Redis cache client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)'
               priority: WARNING
-              description: '"Too many  Redis client exceptions during  to requests to  Redis instance cache."'
+              description: '"Too many  Redis client exceptions during the requests to  Redis instance cache."'
               tags:
                 -
                   tag: scope
@@ -645,7 +645,7 @@ zabbix_export:
               expression: 'min(/GitLab by HTTP/gitlab.redis.client_exceptions.queues.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}'
               name: 'GitLab: Too many Redis queues client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)'
               priority: WARNING
-              description: '"Too many  Redis client exceptions during  to requests to  Redis instance queues."'
+              description: '"Too many  Redis client exceptions during the requests to  Redis instance queues."'
               tags:
                 -
                   tag: scope
@@ -681,7 +681,7 @@ zabbix_export:
               expression: 'min(/GitLab by HTTP/gitlab.redis.client_exceptions.shared_state.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}'
               name: 'GitLab: Too many Redis shared_state client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)'
               priority: WARNING
-              description: '"Too many  Redis client exceptions during  to requests to  Redis instance shared_state."'
+              description: '"Too many  Redis client exceptions during the requests to  Redis instance shared_state."'
               tags:
                 -
                   tag: scope
@@ -1235,7 +1235,7 @@ zabbix_export:
                   tags:
                     -
                       tag: scope
-                      value: perfomance
+                      value: performance
             -
               uuid: 02b27e8a68884f399a8359ed6967d614
               name: 'GitLab: Running threads'
@@ -1387,7 +1387,7 @@ zabbix_export:
                   tags:
                     -
                       tag: scope
-                      value: perfomance
+                      value: performance
             -
               uuid: 44a12fd548b742069cae53a78f7f8ab0
               name: 'GitLab: Unicorn: Workers'

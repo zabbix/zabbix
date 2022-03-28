@@ -20,7 +20,6 @@
 #define ZABBIX_VMWARE_H
 
 #include "config.h"
-#include "zbxtypes.h"
 #include "threads.h"
 #include "zbxalgo.h"
 

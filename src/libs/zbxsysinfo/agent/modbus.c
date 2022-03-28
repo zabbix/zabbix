@@ -22,15 +22,16 @@
 #include "modbtype.h"
 
 #ifdef HAVE_LIBMODBUS
-#include <modbus.h>
 #include "mutexs.h"
 
+/* this block must be defined before <modbus.h> include */
 #ifdef _WINDOWS
 #	include "inttypes.h"
 #	ifdef HAVE_LIBMODBUS_STATIC
 #		define DLLBUILD
 #	endif
 #endif
+#include <modbus.h>
 
 zbx_mutex_t	modbus_lock = ZBX_MUTEX_NULL;
 
@@ -426,7 +427,7 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
 
 			endpoint->conn_info.serial.port = NULL;
 			zbx_strncpy_alloc(&endpoint->conn_info.serial.port, &alloc_len, &offset, ptr, tmp - ptr);
-			zbx_strsplit(++tmp, ':', &baudrate_str, &ptr);
+			zbx_strsplit_first(++tmp, ':', &baudrate_str, &ptr);
 			endpoint->conn_info.serial.baudrate = atoi(baudrate_str);
 			zbx_free(baudrate_str);
 

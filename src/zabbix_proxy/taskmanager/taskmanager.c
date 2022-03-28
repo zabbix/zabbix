@@ -17,19 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "taskmanager.h"
+
 #include "daemon.h"
 #include "zbxself.h"
 #include "zbxtasks.h"
 #include "log.h"
-#include "db.h"
-#include "dbcache.h"
 #include "zbxcrypto.h"
 #include "zbxdiag.h"
 #include "zbxrtc.h"
 
 #include "../../zabbix_server/scripts/scripts.h"
-#include "taskmanager.h"
 #include "../../zabbix_server/trapper/trapper_item_test.h"
 #include "../../zabbix_server/poller/checks_snmp.h"
 

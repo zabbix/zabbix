@@ -23,7 +23,9 @@
  * @var CView $this
  */
 
-$widget = (new CWidget())->setTitle(_('Host inventory'));
+$widget = (new CWidget())
+	->setTitle(_('Host inventory'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::INVENTORY_HOST_LIST));
 
 // Make an inventory field dropdown.
 $inventory_field_select = (new CSelect('filter_field'))

@@ -49,7 +49,7 @@ libzbxagent2sysinfo_a_CFLAGS = \
 	-DWITH_AGENT2_METRICS
 
 libzbxagent2sysinfo_a_SOURCES = \
-	sysinfo.c
+		sysinfo.c
 
 # SERVER version of sysinfo library
 libzbxserversysinfo_a_CFLAGS = \

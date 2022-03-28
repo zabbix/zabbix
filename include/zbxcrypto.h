@@ -20,6 +20,8 @@
 #ifndef ZABBIX_ZBXCRYPTO_H
 #define ZABBIX_ZBXCRYPTO_H
 
+#include "zbxtypes.h"
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
 #if defined(_WINDOWS)
@@ -41,4 +43,5 @@ void	zbx_tls_version(void);
 
 #endif	/* #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL) */
 
-#endif /* ZABBIX_DISK_H */
+int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len);
+#endif /* ZABBIX_CRYPTO_H */

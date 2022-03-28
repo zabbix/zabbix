@@ -24,7 +24,7 @@
 #include "zbxmockhelper.h"
 
 #include "common.h"
-#include "comms.h"
+#include "zbxcomms.h"
 
 void	zbx_mock_test_entry(void **state)
 {

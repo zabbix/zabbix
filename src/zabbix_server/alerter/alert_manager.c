@@ -17,20 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "alert_manager.h"
 
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
-#include "zbxipcservice.h"
-#include "zbxalgo.h"
 #include "zbxserver.h"
 #include "alerter_protocol.h"
-#include "alert_manager.h"
 #include "zbxmedia.h"
 #include "zbxembed.h"
 #include "zbxserialize.h"
-#include "zbxalert.h"
+#include "zbxxml.h"
 
 #define ZBX_AM_LOCATION_NOWHERE		0
 #define ZBX_AM_LOCATION_QUEUE		1
@@ -1108,7 +1105,7 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 		{
 			char	*am_esc;
 
-			am_esc = xml_escape_dyn(alert_message);
+			am_esc = zbx_xml_escape_dyn(alert_message);
 			alert_message = zbx_dsprintf(alert_message, "<html><pre>%s</pre></html>", am_esc);
 			zbx_free(am_esc);
 		}

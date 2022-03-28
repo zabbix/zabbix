@@ -504,6 +504,7 @@ $form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/itemte
 
 $output = [
 	'header' => $data['title'],
+	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_MASSUPDATE_ITEM),
 	'body' => $form->toString(),
 	'buttons' => [
 		[

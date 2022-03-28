@@ -1,4 +1,5 @@
-// +build  windows
+//go:build windows
+// +build windows
 
 /*
 ** Zabbix
@@ -39,11 +40,17 @@ func (p *Plugin) executeSmartctl(args string, strict bool) ([]byte, error) {
 
 	var err error
 
+	executable := fmt.Sprintf("%s %s", path, args)
+
+	p.Tracef("executing smartctl command: %s", executable)
+
 	if strict {
-		out, err = zbxcmd.ExecuteStrict(fmt.Sprintf("%s %s", path, args), time.Second*time.Duration(p.options.Timeout), "")
+		out, err = zbxcmd.ExecuteStrict(executable, time.Second*time.Duration(p.options.Timeout), "")
 	} else {
-		out, err = zbxcmd.Execute(fmt.Sprintf("%s %s", path, args), time.Second*time.Duration(p.options.Timeout), "")
+		out, err = zbxcmd.Execute(executable, time.Second*time.Duration(p.options.Timeout), "")
 	}
+
+	p.Tracef("command %s smartctl raw response: %s", executable, out)
 
 	return []byte(out), err
 }

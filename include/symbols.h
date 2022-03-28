@@ -20,9 +20,9 @@
 #ifndef ZABBIX_SYMBOLS_H
 #define ZABBIX_SYMBOLS_H
 
-#if defined(_WINDOWS) || defined(__MINGW32__)
-
 #include "sysinc.h"
+
+#if defined(_WINDOWS) || defined(__MINGW32__)
 
 /* some definitions which are not available on older MS Windows versions */
 typedef enum {

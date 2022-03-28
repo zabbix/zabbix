@@ -27,6 +27,10 @@ require_once dirname(__FILE__).'/js/configuration.item.prototype.list.js.php';
 
 $widget = (new CWidget())
 	->setTitle(_('Item prototypes'))
+	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
+		? CDocHelper::CONFIGURATION_HOST_ITEM_PROTOTYPE_LIST
+		: CDocHelper::CONFIGURATION_TEMPLATES_ITEM_PROTOTYPE_LIST
+	))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())->addItem(new CRedirectButton(_('Create item prototype'),
@@ -204,8 +208,9 @@ $itemForm->addItem([
 			'popup.massupdate.itemprototype' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
-						"return openMassupdatePopup('popup.massupdate.itemprototype', {}, {
-							dialogue_class: 'modal-popup-preprocessing'
+						"openMassupdatePopup('popup.massupdate.itemprototype', {}, {
+							dialogue_class: 'modal-popup-preprocessing',
+							trigger_element: this
 						});"
 					)
 					->addClass(ZBX_STYLE_BTN_ALT)

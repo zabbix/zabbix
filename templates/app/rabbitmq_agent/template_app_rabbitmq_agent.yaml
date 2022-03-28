@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-17T19:48:15Z'
+  date: '2022-03-05T06:43:34Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -2032,7 +2032,7 @@ zabbix_export:
                       value: notice
             -
               uuid: 701449b128cb42cdb971fc608ba9f29b
-              name: 'RabbitMQ: Healthcheck: local alarms in effect on the this node{#SINGLETON}'
+              name: 'RabbitMQ: Healthcheck: local alarms in effect on this node{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms{#SINGLETON}"]'
               history: 7d
               authtype: NONE
@@ -2122,7 +2122,7 @@ zabbix_export:
                 -
                   uuid: 19e392f9e48e4c8287e04751a2a73843
                   expression: 'last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-mirror-sync-critical{#SINGLETON}"])=0'
-                  name: 'RabbitMQ: There are queues that could potentially lose data if the this node goes offline.'
+                  name: 'RabbitMQ: There are queues that could potentially lose data if this node goes offline.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
@@ -2172,7 +2172,7 @@ zabbix_export:
                 -
                   uuid: e063b6dde6a0484ba1561861d8b1f0c1
                   expression: 'last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-quorum-critical{#SINGLETON}"])=0'
-                  name: 'RabbitMQ: There are queues that would lose their quorum and availability if the this node is shut down.'
+                  name: 'RabbitMQ: There are queues that would lose their quorum and availability if this node is shut down.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
@@ -2182,7 +2182,7 @@ zabbix_export:
                       value: notice
             -
               uuid: 0d1ad3daf2bb46dba2c9913c1684a0d4
-              name: 'RabbitMQ: Healthcheck: virtual hosts on the this node{#SINGLETON}'
+              name: 'RabbitMQ: Healthcheck: virtual hosts on this node{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/virtual-hosts{#SINGLETON}"]'
               history: 7d
               authtype: NONE

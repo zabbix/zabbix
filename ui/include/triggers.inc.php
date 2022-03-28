@@ -1044,8 +1044,7 @@ function analyzeExpression(string $expression, int $type, string &$error = null)
  * @return array  Array containing the trigger expression formula as the first element and an array describing the
  *                expression tree as the second.
  */
-function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNum, $level = 0, $operator = null,
-		$type) {
+function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNum, $level, $operator, $type) {
 	$treeList = [];
 	$outline = '';
 
@@ -2407,7 +2406,7 @@ function makeTriggerDependencies(array $dependencies, $freeze_on_click = true) {
 				$table->addRow($description);
 			}
 
-			$result[] = (new CSpan())
+			$result[] = (new CLink())
 				->addClass($class)
 				->addClass(ZBX_STYLE_CURSOR_POINTER)
 				->setHint($table, '', $freeze_on_click);

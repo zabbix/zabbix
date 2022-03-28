@@ -36,6 +36,7 @@ $web_layout_mode = $this->getLayoutMode();
 (new CWidget())
 	->setTitle(_('Web monitoring'))
 	->setWebLayoutMode($web_layout_mode)
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_WEB_VIEW))
 	->setControls(
 		(new CTag('nav', true, get_icon('kioskmode', ['mode' => $web_layout_mode])))
 			->setAttribute('aria-label', _('Content controls'))

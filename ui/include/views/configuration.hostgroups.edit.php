@@ -23,7 +23,9 @@
  * @var CView $this
  */
 
-$widget = (new CWidget())->setTitle(_('Host groups'));
+$widget = (new CWidget())
+	->setTitle(_('Host groups'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOSTGROUPS_EDIT));
 
 $form = (new CForm())
 	->setName('hostgroupForm')
