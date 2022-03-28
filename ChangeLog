@@ -25,6 +25,7 @@ A.F....... [ZBXNEXT-6470,ZBXNEXT-6959] implemented audit logging of host prototy
 .........T [ZBXNEXT-6624] added triggers, macros, changed filters and overrides in LLD rules (mchudinov)
 
 Bug fixes:
+A......... [ZBX-20681] fixed undefined index error when accessing module page with guest user (rlataria)
 A.F.....S. [ZBX-20650] fixed performance issue with importing templates and hosts (Sasha)
 .......... [ZBX-20747] fixed service algorithm update in 6.0 database upgrade patch (wiper)
 A.F....... [ZBX-19118] made Host Interface field non-required for HTTP agent items (jfreibergs)
