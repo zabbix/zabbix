@@ -1384,7 +1384,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#regular-expressions'
 				]
 			],
-			// #158 Administration -> General -> Regular expressions -> Ceate form view.
+			// #158 Administration -> General -> Regular expressions -> Create form view.
 			[
 				[
 					'url' => 'zabbix.php?action=regex.edit',
@@ -1652,14 +1652,14 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/user_profile#user-profile'
 				]
 			],
-			// #193 User setings -> Api tokens list view.
+			// #193 User settings -> Api tokens list view.
 			[
 				[
 					'url' => 'zabbix.php?action=user.token.list',
 					'doc_link' => '/en/manual/web_interface/user_profile#api-tokens'
 				]
 			],
-			// #194 User setings -> Api tokens -> Create Api token popup.
+			// #194 User settings -> Api tokens -> Create Api token popup.
 			[
 				[
 					'url' => 'zabbix.php?action=user.token.list',
@@ -1714,7 +1714,7 @@ class testDocumentationLinks extends CWebTest {
 	}
 
 	/**
-	 * Function finds the element that leads to the form wih doc link by the defined locator and clicks on it.
+	 * Function finds the element that leads to the form with doc link by the defined locator and clicks on it.
 	 *
 	 * @param string  $locator		locator of the element that needs to be clicked to open form with doc link
 	 */
