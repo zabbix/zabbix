@@ -1382,8 +1382,8 @@ class testSID extends CWebTest {
 		$url = (!str_contains($data['link'], 'tokenid') ? $data['link'] : $data['link'].self::$token_id);
 		$this->page->login()->open($url)->waitUntilReady();
 
-		if(array_key_exists('case', $data)) {
-			switch($data['case']) {
+		if (array_key_exists('case', $data)) {
+			switch ($data['case']) {
 				case 'token create':
 					$this->query('button:Create API token')->waitUntilClickable()->one()->click();
 					$dialog = COverlayDialogElement::find()->waitUntilReady()->one();

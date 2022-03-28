@@ -568,7 +568,6 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 			// Check alert when trying to refresh page.
 			$this->page->refresh();
 			$this->assertTrue($this->page->isAlertPresent());
-//			$this->assertEquals('Changes you made may not be saved.', $this->page->getAlertText());
 			$this->page->acceptAlert();
 
 			// Check that after accepting alert user remained on Proxies page.
