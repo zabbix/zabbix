@@ -409,9 +409,9 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 		return nil, errors.New("Too many parameters.")
 	}
 
-	var array []procStatus
-	//var threadArray []thread
-	var summaryArray []procSummary
+	array := make([]procStatus, 0)
+	//threadArray := make([]thread, 0)
+	summaryArray := make([]procSummary, 0)
 
 	var cmdlinePattern *regexp.Regexp
 	var regexpErr error

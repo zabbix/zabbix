@@ -67,9 +67,9 @@ func readProcStatus(pid uint64, proc *procStatus) (err error) {
 	proc.Pid = pid
 	proc.CtxSwitches = 0
 
-	pid_str := strconv.FormatUint(pid, 10)
+	pidStr := strconv.FormatUint(pid, 10)
 	var data []byte
-	if data, err = read2k("/proc/" + pid_str + "/status"); err != nil {
+	if data, err = read2k("/proc/" + pidStr + "/status"); err != nil {
 		return err
 	}
 
@@ -84,6 +84,8 @@ func readProcStatus(pid uint64, proc *procStatus) (err error) {
 		v := strings.TrimSpace(tmp[pos+1:])
 
 		switch k {
+		case "Name":
+			proc.TName = v
 		case "State":
 			if len(v) < 1 {
 				continue
@@ -130,6 +132,8 @@ func readProcStatus(pid uint64, proc *procStatus) (err error) {
 			trimUnit(v, &proc.Swap)
 		case "Threads":
 			setUint64(v, &proc.Threads)
+		case "Tgid":
+			setUint64(v, &proc.Tgid)
 		case "voluntary_ctxt_switches", "nonvoluntary_ctxt_switches":
 			if value, tmperr := strconv.ParseUint(v, 10, 64); tmperr == nil {
 				proc.CtxSwitches += value
@@ -137,7 +141,8 @@ func readProcStatus(pid uint64, proc *procStatus) (err error) {
 		}
 	}
 
-	proc.Name, proc.Cmdline, err = getProcessCmdline(pid_str, procInfoName)
+	proc.Size = proc.Exe + proc.Data + proc.Stk
+	proc.Name, proc.Cmdline, err = getProcessCmdline(pidStr, procInfoName)
 	if err != nil {
 		return err
 	}
@@ -155,11 +160,11 @@ func readProcStatus(pid uint64, proc *procStatus) (err error) {
 		proc.CpuTimeSystem = stat.stime
 	}
 
-	if fds, err := ioutil.ReadDir("/proc/" + pid_str + "/fd"); err == nil {
+	if fds, err := ioutil.ReadDir("/proc/" + pidStr + "/fd"); err == nil {
 		proc.Fds = uint64(len(fds))
 	}
 
-	if data, err = read2k("/proc/" + pid_str + "/io"); err != nil {
+	if data, err = read2k("/proc/" + pidStr + "/io"); err != nil {
 		return err
 	}
 

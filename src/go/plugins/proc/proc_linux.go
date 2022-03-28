@@ -145,7 +145,9 @@ type procInfo struct {
 type procStatus struct {
 	Pid           uint64  `json:"pid"`
 	PPid          uint64  `json:"ppid"`
+	Tgid          uint64  `json:"-"`
 	Name          string  `json:"name"`
+	TName         string  `json:"-"`
 	Cmdline       string  `json:"cmdline"`
 	Vsize         uint64  `json:"vsize"`
 	Pmem          float64 `json:"pmem"`
@@ -792,9 +794,9 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 	var uid int64
 	var pids []uint64
 	var err error
-	var array []procStatus
-	var threadArray []thread
-	var summaryArray []procSummary
+	array := make([]procStatus, 0)
+	threadArray := make([]thread, 0)
+	summaryArray := make([]procSummary, 0)
 
 	if pids, err = getPids(); err != nil {
 		return nil, fmt.Errorf("Cannot open /proc: %s", err)
@@ -869,14 +871,13 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 					continue
 			}
 
-
 			if cmdline != "" && regexpErr == nil && !cmdlinePattern.Match([]byte(data.Cmdline)) {
 				continue
 			}
 
 			array = append(array, data)
-			threadArray = append(threadArray, thread{data.Pid, data.PPid, data.Name, data.Pid,
-				data.Name, data.CpuTimeUser, data.CpuTimeSystem, data.State, data.CtxSwitches,
+			threadArray = append(threadArray, thread{data.Tgid, data.PPid, data.Name, data.Pid,
+				data.TName, data.CpuTimeUser, data.CpuTimeSystem, data.State, data.CtxSwitches,
 				data.IoReadsB, data.IoWritesB})
 		}
 	}
