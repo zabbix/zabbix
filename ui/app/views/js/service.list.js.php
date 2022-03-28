@@ -114,6 +114,7 @@
 				dialogueid: 'service_edit',
 				dialogue_class: 'modal-popup-medium'
 			});
+
 			const dialogue = overlay.$dialogue[0];
 
 			dialogue.addEventListener('dialogue.submit', (e) => {

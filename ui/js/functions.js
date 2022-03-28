@@ -729,10 +729,6 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 	var classes = {good: 'msg-good', bad: 'msg-bad', warning: 'msg-warning'},
 		msg_class = classes[type];
 
-	if (typeof msg_class === 'undefined') {
-		return jQuery('<output>').text(Array.isArray(messages) ? messages.join(' ') : messages);
-	}
-
 	if (show_details === null) {
 		show_details = type === 'bad' || type === 'good';
 	}
@@ -774,7 +770,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 			$msg_box.prepend($link_details);
 		}
 		jQuery('<span>')
-			.text(title)
+			.html(title)
 			.appendTo($msg_box);
 
 		$list.addClass('msg-details-border');
@@ -788,7 +784,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 		if (Array.isArray(messages)) {
 			jQuery.map(messages, function (message) {
 				jQuery('<li>')
-					.text(message)
+					.html(message)
 					.appendTo($list);
 				return null;
 			});
@@ -797,7 +793,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 		}
 		else {
 			jQuery('<li>')
-				.text(messages ? messages : ' ')
+				.html(messages ? messages : ' ')
 				.appendTo($list);
 
 			$msg_box.append($msg_details);
