@@ -71,9 +71,6 @@ function confirmSubmit(import_overlay, compare_overlay) {
 }
 
 function openImportComparePopup(overlay) {
-	// Remove error message.
-	overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
-
 	const form = document.getElementById('import-form');
 
 	const url = new Curl('zabbix.php', false);
@@ -102,6 +99,10 @@ function openImportComparePopup(overlay) {
 			}, overlay.$btn_submit);
 		})
 		.catch((exception) => {
+			document.getElementById('import_file').value = '';
+
+			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
+
 			let title;
 			let messages = [];
 
@@ -116,8 +117,6 @@ function openImportComparePopup(overlay) {
 			const message_box = makeMessageBox('bad', messages, title);
 
 			message_box.insertBefore(form);
-
-			document.getElementById('import_file').value = '';
 		})
 		.finally(() => {
 			overlay.unsetLoading();
@@ -125,9 +124,6 @@ function openImportComparePopup(overlay) {
 }
 
 function submitImportPopup(overlay) {
-	// Remove error message.
-	overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
-
 	const form = document.getElementById('import-form');
 
 	const url = new Curl('zabbix.php', false);
@@ -156,6 +152,10 @@ function submitImportPopup(overlay) {
 			location.href = location.href.split('#')[0];
 		})
 		.catch((exception) => {
+			document.getElementById('import_file').value = '';
+
+			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
+
 			let title;
 			let messages = [];
 
@@ -170,8 +170,6 @@ function submitImportPopup(overlay) {
 			const message_box = makeMessageBox('bad', messages, title);
 
 			message_box.insertBefore(form);
-
-			document.getElementById('import_file').value = '';
 		})
 		.finally(() => {
 			overlay.unsetLoading();

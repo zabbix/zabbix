@@ -176,8 +176,6 @@
 		},
 
 		save() {
-			clearMessages();
-
 			this.is_busy_saving = true;
 			this.updateBusy();
 
@@ -218,6 +216,8 @@
 					}
 				})
 				.catch((exception) => {
+					clearMessages();
+
 					let title;
 					let messages = [];
 

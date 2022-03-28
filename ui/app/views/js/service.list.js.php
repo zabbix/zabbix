@@ -29,33 +29,28 @@
 </script>
 
 <script>
-	const view = {
-		serviceid: null,
-		mode_switch_url: null,
-		parent_url: null,
-		delete_url: null,
-		refresh_url: null,
-		refresh_interval: null,
-		back_url: null,
-		is_refresh_paused: false,
-		is_refresh_pending: false,
+	const view = new class {
 
-		init({serviceid, mode_switch_url, parent_url, delete_url, refresh_url, refresh_interval, back_url = null}) {
+		constructor() {
+			this.is_refresh_paused = false;
+			this.is_refresh_pending = false;
+		}
+
+		init({serviceid, mode_switch_url, parent_url = null, refresh_url, refresh_interval, back_url = null}) {
 			this.serviceid = serviceid;
 			this.mode_switch_url = mode_switch_url;
 			this.parent_url = parent_url;
-			this.delete_url = delete_url;
 			this.refresh_url = refresh_url;
 			this.refresh_interval = refresh_interval;
 			this.back_url = back_url;
 
-			this.initViewModeSwitcher();
-			this.initTagFilter();
-			this.initActionButtons();
-			this.initRefresh();
-		},
+			this._initViewModeSwitcher();
+			this._initTagFilter();
+			this._initActions();
+			this._initRefresh();
+		}
 
-		initViewModeSwitcher() {
+		_initViewModeSwitcher() {
 			for (const element of document.getElementsByName('list_mode')) {
 				if (!element.checked) {
 					element.addEventListener('click', () => {
@@ -63,9 +58,9 @@
 					});
 				}
 			}
-		},
+		}
 
-		initTagFilter() {
+		_initTagFilter() {
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
 				.on('afteradd.dynamicRows', function() {
@@ -77,22 +72,22 @@
 			document.querySelectorAll('#filter-tags .form_row').forEach((row) => {
 				new CTagFilterItem(row);
 			});
-		},
+		}
 
-		initActionButtons() {
+		_initActions() {
 			document.addEventListener('click', (e) => {
 				if (e.target.matches('.js-create-service, .js-add-child-service')) {
 					const parameters = e.target.dataset.serviceid !== undefined
 						? {parent_serviceids: [e.target.dataset.serviceid]}
 						: {};
 
-					this.edit(parameters);
+					this._edit(parameters);
 				}
 				else if (e.target.classList.contains('js-edit-service')) {
-					this.edit({serviceid: e.target.dataset.serviceid});
+					this._edit({serviceid: e.target.dataset.serviceid});
 				}
 				else if (e.target.classList.contains('js-delete-service')) {
-					this.delete(e.target, [e.target.dataset.serviceid]);
+					this._delete(e.target, [e.target.dataset.serviceid]);
 				}
 				else if (e.target.classList.contains('js-massupdate-service')) {
 					openMassupdatePopup('popup.massupdate.service', {location_url: this.back_url}, {
@@ -101,19 +96,19 @@
 					});
 				}
 				else if (e.target.classList.contains('js-massdelete-service')) {
-					this.delete(e.target, Object.values(chkbxRange.getSelectedIds()));
+					this._delete(e.target, Object.values(chkbxRange.getSelectedIds()));
 				}
 			});
-		},
+		}
 
-		initRefresh() {
+		_initRefresh() {
 			if (this.refresh_interval > 0) {
-				setInterval(() => this.refresh(), this.refresh_interval);
+				setInterval(() => this._refresh(), this.refresh_interval);
 			}
-		},
+		}
 
-		edit(parameters = {}) {
-			this.pauseRefresh();
+		_edit(parameters = {}) {
+			this._pauseRefresh();
 
 			const overlay = PopUp('popup.service.edit', parameters, {
 				dialogueid: 'service_edit',
@@ -143,10 +138,10 @@
 				location.href = parameters.serviceid === this.serviceid ? this.parent_url : location.href;
 			});
 
-			dialogue.addEventListener('overlay.close', () => this.resumeRefresh(), {once: true});
-		},
+			dialogue.addEventListener('overlay.close', () => this._resumeRefresh(), {once: true});
+		}
 
-		delete(target, serviceids) {
+		_delete(target, serviceids) {
 			const confirmation = serviceids.length > 1
 				? <?= json_encode(_('Delete selected services?')) ?>
 				: <?= json_encode(_('Delete selected service?')) ?>;
@@ -157,7 +152,10 @@
 
 			target.classList.add('is-loading');
 
-			return fetch(this.delete_url, {
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'service.delete');
+
+			return fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({serviceids})
@@ -195,17 +193,17 @@
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
-		},
+		}
 
-		pauseRefresh() {
+		_pauseRefresh() {
 			this.is_refresh_paused = true;
-		},
+		}
 
-		resumeRefresh() {
+		_resumeRefresh() {
 			this.is_refresh_paused = false;
-		},
+		}
 
-		refresh() {
+		_refresh() {
 			if (this.is_refresh_paused || this.is_refresh_pending) {
 				return;
 			}
@@ -223,20 +221,33 @@
 			fetch(this.refresh_url)
 				.then((response) => response.json())
 				.then((response) => {
-					if ('errors' in response) {
-						clearMessages();
-						addMessage(response.errors);
-					}
-					else {
-						if ('messages' in response) {
-							clearMessages();
-							addMessage(response.messages);
-						}
-
+					if ('body' in response) {
 						service_list.outerHTML = response.body;
 
 						chkbxRange.init();
 					}
+
+					if ('error' in response) {
+						throw {error: response.error};
+					}
+				})
+				.catch((exception) => {
+					clearMessages();
+
+					let title;
+					let messages = [];
+
+					if (typeof exception === 'object' && 'error' in exception) {
+						title = exception.error.title;
+						messages = exception.error.messages;
+					}
+					else {
+						title = <?= json_encode(_('Unexpected server error.')) ?>;
+					}
+
+					const message_box = makeMessageBox('bad', messages, title);
+
+					addMessage(message_box);
 				})
 				.finally(() => {
 					service_list.classList.remove('is-loading', 'is-loading-fadein', 'delayed-15s');

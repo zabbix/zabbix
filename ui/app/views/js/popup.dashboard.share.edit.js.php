@@ -76,9 +76,9 @@ window.dashboard_share_edit_popup = {
 				addMessage(message_box);
 			})
 			.catch((exception) => {
-				for (const el of form.parentNode.children) {
-					if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
-						el.parentNode.removeChild(el);
+				for (const element of form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
 					}
 				}
 

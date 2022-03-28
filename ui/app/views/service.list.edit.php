@@ -157,10 +157,6 @@ $filter->addFilterTab(_('Filter'), [
 		'serviceid' => $data['service'] !== null ? $data['service']['serviceid'] : null,
 		'mode_switch_url' => $data['view_mode_url'],
 		'parent_url' => $data['parent_url'],
-		'delete_url' => (new CUrl('zabbix.php'))
-			->setArgument('action', 'service.delete')
-			->setArgumentSID()
-			->getUrl(),
 		'refresh_url' => $data['refresh_url'],
 		'refresh_interval' => $data['refresh_interval'],
 		'back_url' => $data['back_url']

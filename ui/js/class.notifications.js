@@ -481,6 +481,8 @@ ZBX_Notifications.prototype.handleMuteClicked = function(e) {
 			this.render();
 		})
 		.catch((exception) => {
+			clearMessages();
+
 			let title;
 			let messages = [];
 
@@ -494,7 +496,6 @@ ZBX_Notifications.prototype.handleMuteClicked = function(e) {
 
 			const message_box = makeMessageBox('bad', messages, title);
 
-			clearMessages();
 			addMessage(message_box);
 		});
 };
