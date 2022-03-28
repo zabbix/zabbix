@@ -281,7 +281,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 						[
 							'interfaces' => [
 								[
-									'interface_ref' => 'if1',
+									'interface_ref' => 'if1'
 								],
 								[
 									'interface_ref' => 'if2',
@@ -313,7 +313,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 						[
 							'interfaces' => [
 								0 => [
-									'interface_ref' => 'if1',
+									'interface_ref' => 'if1'
 								],
 								2 => [
 									'interface_ref' => 'if3',
@@ -356,7 +356,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 						[
 							'interfaces' => [
 								[
-									'interface_ref' => 'if1',
+									'interface_ref' => 'if1'
 								],
 								[
 									'interface_ref' => 'if2',
@@ -403,7 +403,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 						[
 							'interfaces' => [
 								0 => [
-									'interface_ref' => 'if1',
+									'interface_ref' => 'if1'
 								],
 								2 => [
 									'interface_ref' => 'if3',
