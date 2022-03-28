@@ -20,15 +20,18 @@
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 
+use Facebook\WebDriver\WebDriverKeys;
+
 /**
  * @backup profiles, module, services
  *
  * @onBefore prepareServiceData
- * @onBefore getCurrentZabbixVersion
  */
 class testDocumentationLinks extends CWebTest {
 
 	public function prepareServiceData() {
+		self::$version = substr(ZABBIX_VERSION, 0, 3);
+
 		CDataHelper::call('service.create', [
 			[
 				'name' => 'Service_1',
@@ -36,10 +39,6 @@ class testDocumentationLinks extends CWebTest {
 				'sortorder' => 1
 			]
 		]);
-	}
-
-	public function getCurrentZabbixVersion() {
-		self::$version = substr(ZABBIX_VERSION,0,3);
 	}
 
 	/**
@@ -72,10 +71,13 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.list',
-					'open_button' => 'button:Create dashboard',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard#creating-a-dashboard',
-					'cancel_locator' => 'id:dashboard-cancel',
-					'alert' => true
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create dashboard'
+						]
+					],
+					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard#creating-a-dashboard'
 				]
 			],
 			// #3 Widget edit form.
@@ -83,8 +85,12 @@ class testDocumentationLinks extends CWebTest {
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard/widgets',
-					'open_button' => 'xpath:(//button[@class="btn-widget-edit"])[1]',
-					'cancel_locator' => 'id:dashboard-cancel'
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'xpath:(//button[@class="btn-widget-edit"])[1]'
+						]
+					]
 				]
 			],
 			// TODO: Uncomment this test case and adjust documentation link when ZBX-20773 is merged.
@@ -93,10 +99,20 @@ class testDocumentationLinks extends CWebTest {
 //				[
 //					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
 //					'doc_link' => '/en/manual/config/reports#configuration',
-//					'open_button' => 'button:Edit dashboard',
-//					'second_open_button' => 'xpath://button[@id="dashboard-add"]',
-//					'select_option' => 'xpath://a[text()="Add page"]',
-//					'cancel_locator' => 'id:dashboard-cancel'
+//					'actions' => [
+//						[
+//							'callback' => 'openFormWithLink',
+//							'element' => 'button:Edit dashboard'
+//						],
+//						[
+//							'callback' => 'openFormWithLink',
+//							'element' => 'xpath://button[@id="dashboard-add"]'
+//						],
+//						[
+//							'callback' => 'openFormWithLink',
+//							'element' => 'xpath://a[text()="Add page"]'
+//						]
+//					]
 //				]
 //			],
 //			// #5 Edit dashboard sharing configuration popup.
@@ -104,7 +120,12 @@ class testDocumentationLinks extends CWebTest {
 //				[
 //					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
 //					'doc_link' => '/en/manual/config/reports#configuration',
-//					'open_button' => 'id:dashboard-actions',
+//					'actions' => [
+//						[
+//							'callback' => 'openFormWithLink',
+//							'element' => 'id:dashboard-actions'
+//						]
+//					],
 //					'select_option' => 'xpath://a[text()="Sharing"]'
 //				]
 //			],
@@ -133,7 +154,11 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=problem.view',
-					'open_button' => 'button:Mass update',
+					'actions' => [
+						[
+							'callback' => 'openMassUpdate'
+						]
+					],
 					'doc_link' => '/en/manual/acknowledges#updating-problems'
 				]
 			],
@@ -141,7 +166,12 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=problem.view',
-					'open_button' => 'link:No',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:No'
+						]
+					],
 					'doc_link' => '/en/manual/acknowledges#updating-problems'
 				]
 			],
@@ -156,7 +186,12 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=host.view',
-					'open_button' => 'button:Create host',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create host'
+						]
+					],
 					'doc_link' => '/en/manual/config/hosts/host#configuration'
 				]
 			],
@@ -221,7 +256,12 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'sysmaps.php',
-					'open_button' => 'button:Import',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Import'
+						]
+					],
 					'doc_link' => '/en/manual/xml_export_import/maps#importing'
 				]
 			],
@@ -265,7 +305,12 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=service.list.edit',
-					'open_button' => 'button:Create service',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create service'
+						]
+					],
 					'doc_link' => '/en/manual/web_interface/frontend_sections/services/service#service-configuration'
 				]
 			],
@@ -273,7 +318,11 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=service.list.edit',
-					'open_button' => 'button:Mass update',
+					'actions' => [
+						[
+							'callback' => 'openMassUpdate'
+						]
+					],
 					'doc_link' => '/en/manual/web_interface/frontend_sections/services/service#editing-services'
 				]
 			],
@@ -302,7 +351,12 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=sla.list',
-					'open_button' => 'button:Create SLA',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create SLA'
+						]
+					],
 					'doc_link' => '/en/manual/web_interface/frontend_sections/services/sla#configuration'
 				]
 			],
@@ -354,8 +408,16 @@ class testDocumentationLinks extends CWebTest {
 //				[
 //					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
 //					'doc_link' => '/en/manual/config/reports#configuration',
-//					'open_button' => 'xpath://button[@class="btn-action"]',
-//					'select_option' => 'xpath://a[text()="Create new report"]'
+//					'actions' => [
+//						[
+//							'callback' => 'openFormWithLink',
+//							'element' => 'xpath://button[@class="btn-action"]'
+//						],
+//						[
+//							'callback' => 'openFormWithLink',
+//							'element' => 'xpath://a[text()="Create new report"]'
+//						]
+//					],
 //				]
 //			],
 			// #40 Availability report view.
@@ -439,7 +501,12 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'templates.php',
-					'open_button' => 'button:Import',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Import'
+						]
+					],
 					'doc_link' => '/en/manual/xml_export_import/templates#importing'
 				]
 			],
@@ -447,7 +514,11 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'templates.php',
-					'open_button' => 'button:Mass update',
+					'actions' => [
+						[
+							'callback' => 'openMassUpdate'
+						]
+					],
 					'doc_link' => '/en/manual/config/templates/mass#using-mass-update'
 				]
 			],
@@ -477,7 +548,11 @@ class testDocumentationLinks extends CWebTest {
 //			[
 //				[
 //					'url' => 'items.php?filter_set=1&filter_hostids%5B0%5D=15000&context=template',
-//					'open_button' => 'button:Mass update',
+//					'actions' => [
+//						[
+//							'callback' => 'openMassUpdate'
+//						]
+//					],
 //					'doc_link' => '/en/manual/config/items/itemupdate#using-mass-update'
 //				]
 //			],
@@ -507,7 +582,11 @@ class testDocumentationLinks extends CWebTest {
 //			[
 //				[
 //					'url' => 'triggers.php?filter_set=1&filter_hostids%5B0%5D=15000&context=template',
-//					'open_button' => 'button:Mass update',
+//					'actions' => [
+//						[
+//							'callback' => 'openMassUpdate'
+//						]
+//					],
 //					'doc_link' => '/en/manual/config/triggers/update#using-mass-update'
 //				]
 //			],
@@ -543,10 +622,13 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=template.dashboard.list&templateid=10076&context=template',
-					'open_button' => 'button:Create dashboard',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard#creating-a-dashboard',
-					'cancel_locator' => 'id:dashboard-cancel',
-					'alert' => true
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create dashboard'
+						]
+					],
+					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard#creating-a-dashboard'
 				]
 			],
 			// #66 Template dashboards view mode.
@@ -561,8 +643,12 @@ class testDocumentationLinks extends CWebTest {
 				[
 					'url' => 'zabbix.php?action=template.dashboard.edit&dashboardid=50',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard/widgets',
-					'open_button' => 'xpath:(//button[@class="btn-widget-edit"])[1]',
-					'cancel_locator' => 'id:dashboard-cancel'
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'xpath:(//button[@class="btn-widget-edit"])[1]'
+						]
+					]
 				]
 			],
 			// TODO: Uncomment this test case and adjust documentation link when ZBX-20773 is merged.
@@ -571,9 +657,16 @@ class testDocumentationLinks extends CWebTest {
 //				[
 //					'url' => 'zabbix.php?action=template.dashboard.edit&dashboardid=50',
 //					'doc_link' => '/en/manual/config/reports#configuration',
-//					'open_button' => 'xpath://button[@id="dashboard-add"]',
-//					'select_option' => 'xpath://a[text()="Add page"]',
-//					'cancel_locator' => 'id:dashboard-cancel'
+//					'actions' => [
+//						[
+//							'callback' => 'openFormWithLink',
+//							'element' => 'xpath://button[@id="dashboard-add"]'
+//						],
+//						[
+//							'callback' => 'openFormWithLink',
+//							'element' => 'xpath://a[text()="Add page"]'
+//						],
+//					]
 //				]
 //			],
 			// #69 Template LLD rule list view.
@@ -616,7 +709,11 @@ class testDocumentationLinks extends CWebTest {
 //			[
 //				[
 //					'url' => 'disc_prototypes.php?parent_discoveryid=15011&context=template',
-//					'open_button' => 'button:Mass update',
+//					'actions' => [
+//						[
+//							'callback' => 'openMassUpdate'
+//						]
+//					],
 //					'doc_link' => '/en/manual/config/items/itemupdate#using-mass-update'
 //				]
 //			],
@@ -646,7 +743,11 @@ class testDocumentationLinks extends CWebTest {
 //			[
 //				[
 //					'url' => 'trigger_prototypes.php?parent_discoveryid=15011&context=template',
-//					'open_button' => 'button:Mass update',
+//					'actions' => [
+//						[
+//							'callback' => 'openMassUpdate'
+//						]
+//					],
 //					'doc_link' => '/en/manual/config/triggers/update#using-mass-update'
 //				]
 //			],
@@ -718,8 +819,16 @@ class testDocumentationLinks extends CWebTest {
 //			[
 //				[
 //					'url' => 'httpconf.php?form=update&hostid=15000&httptestid=15000&context=template',
-//					'open_button' => 'xpath://a[@id="tab_stepTab"]',
-//					'second_open_button' => 'xpath://div[@id="stepTab"]//button[text()="Add"]',
+//					'actions' => [
+//						[
+//							'callback' => 'openFormWithLink',
+//							'element' => 'xpath://a[@id="tab_stepTab"]'
+//						],
+//						[
+//							'callback' => 'openFormWithLink',
+//							'element' => 'xpath://div[@id="stepTab"]//button[text()="Add"]'
+//						],
+//					],
 //					'doc_link' => '/en/manual/web_monitoring#configuring-a-web-scenario'
 //				]
 //			],
@@ -734,6 +843,12 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=host.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create host'
+						]
+					],
 					'open_button' => 'button:Create host',
 					'doc_link' => '/en/manual/config/hosts/host#configuration'
 				]
@@ -742,7 +857,12 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=host.list',
-					'open_button' => 'xpath://a[text()="Simple form test host"]',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'xpath://a[text()="Simple form test host"]'
+						]
+					],
 					'doc_link' => '/en/manual/config/hosts/host#configuration'
 				]
 			],
@@ -758,7 +878,12 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=host.list',
-					'open_button' => 'button:Import',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Import'
+						]
+					],
 					'doc_link' => '/en/manual/xml_export_import/hosts#importing'
 				]
 			],
@@ -767,7 +892,11 @@ class testDocumentationLinks extends CWebTest {
 //			[
 //				[
 //					'url' => 'zabbix.php?action=host.list',
-//					'open_button' => 'button:Mass update',
+//					'actions' => [
+//						[
+//							'callback' => 'openMassUpdate'
+//						]
+//					],
 //					'doc_link' => '/en/manual/config/hosts/hostupdate#using-mass-update'
 //				]
 //			],
@@ -798,7 +927,11 @@ class testDocumentationLinks extends CWebTest {
 //			[
 //				[
 //					'url' => 'items.php?filter_set=1&filter_hostids%5B0%5D=40001&context=host',
-//					'open_button' => 'button:Mass update',
+//					'actions' => [
+//						[
+//							'callback' => 'openMassUpdate'
+//						]
+//					],
 //					'doc_link' => '/en/manual/config/items/itemupdate#using-mass-update'
 //				]
 //			],
@@ -828,7 +961,11 @@ class testDocumentationLinks extends CWebTest {
 //			[
 //				[
 //					'url' => 'triggers.php?filter_set=1&filter_hostids%5B0%5D=40001&context=host',
-//					'open_button' => 'button:Mass update',
+//					'actions' => [
+//						[
+//							'callback' => 'openMassUpdate'
+//						]
+//					],
 //					'doc_link' => '/en/manual/config/triggers/update#using-mass-update'
 //				]
 //			],
@@ -893,7 +1030,11 @@ class testDocumentationLinks extends CWebTest {
 //			[
 //				[
 //					'url' => 'disc_prototypes.php?cancel=1&parent_discoveryid=133800&context=host',
-//					'open_button' => 'button:Mass update',
+//					'actions' => [
+//						[
+//							'callback' => 'openMassUpdate'
+//						]
+//					],
 //					'doc_link' => '/en/manual/config/items/itemupdate#using-mass-update'
 //				]
 //			],
@@ -923,7 +1064,11 @@ class testDocumentationLinks extends CWebTest {
 //			[
 //				[
 //					'url' => 'trigger_prototypes.php?cancel=1&parent_discoveryid=133800&context=host',
-//					'open_button' => 'button:Mass update',
+//					'actions' => [
+//						[
+//							'callback' => 'openMassUpdate'
+//						]
+//					],
 //					'doc_link' => '/en/manual/config/triggers/update#using-mass-update'
 //				]
 //			],
@@ -995,8 +1140,16 @@ class testDocumentationLinks extends CWebTest {
 //			[
 //				[
 //					'url' => 'httpconf.php?form=update&hostid=40001&httptestid=94&context=host',
-//					'open_button' => 'xpath://a[@id="tab_stepTab"]',
-//					'second_open_button' => 'xpath://div[@id="stepTab"]//button[text()="Add"]',
+//					'actions' => [
+//						[
+//							'callback' => 'openFormWithLink',
+//							'element' => 'xpath://a[@id="tab_stepTab"]'
+//						],
+//						[
+//							'callback' => 'openFormWithLink',
+//							'element' => 'xpath://div[@id="stepTab"]//button[text()="Add"]'
+//						],
+//					],
 //					'doc_link' => '/en/manual/web_monitoring#configuring-a-web-scenario'
 //				]
 //			],
@@ -1285,9 +1438,16 @@ class testDocumentationLinks extends CWebTest {
 //			[
 //				[
 //					'url' => 'zabbix.php?action=module.list',
-//					'open_button' => 'button:Scan directory',
-//					'second_open_button' => 'link:1st Module name',
-//					'regular_form' => true,
+//					'actions' => [
+//						[
+//							'callback' => 'openFormWithLink',
+//							'element' => 'button:Scan directory'
+//						],
+//						[
+//							'callback' => 'openFormWithLink',
+//							'element' => 'link:1st Module name'
+//						],
+//					],
 //					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#modules'
 //				]
 //			],
@@ -1302,7 +1462,12 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=token.list',
-					'open_button' => 'button:Create API token',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create API token'
+						]
+					],
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#api-tokens'
 				]
 			],
@@ -1429,7 +1594,12 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=mediatype.list',
-					'open_button' => 'button:Import',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Import'
+						]
+					],
 					'doc_link' => '/en/manual/xml_export_import/media#importing'
 				]
 			],
@@ -1493,7 +1663,12 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=user.token.list',
-					'open_button' => 'button:Create API token',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create API token'
+						]
+					],
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#api-tokens'
 				]
 			]
@@ -1507,48 +1682,52 @@ class testDocumentationLinks extends CWebTest {
 		$this->page->login()->open($data['url']);
 		$this->page->waitUntilReady();
 
-		// Perform all necessary actions to get to the form with the documentation link.
-		if (array_key_exists('open_button',$data)) {
-			// Select all entries before pressing the Mass update button.
-			if ($data['open_button'] === 'button:Mass update') {
-				$all_entries = $this->query('xpath://input[contains(@id, "all_")]')->asCheckbox()->one()->set(true);
+		// Execute the corresponding callback function to open the form with doc link.
+		if (array_key_exists('actions', $data)) {
+			foreach ($data['actions'] as $action) {
+				call_user_func_array([$this, $action['callback']], [CTestArrayHelper::get($action, 'element', null)]);
 			}
-
-			$this->query($data['open_button'])->one()->click();
-
-			if (array_key_exists('second_open_button', $data)) {
-				$this->query($data['second_open_button'])->waitUntilVisible()->one()->click();
-			}
-
-			if (array_key_exists('select_option', $data)) {
-				$this->query($data['select_option'])->waitUntilVisible()->one()->click();
-			}
-
-			// Forms with doc links that are accessible through performing some actions can be located in regularar forms.
-			$location = array_key_exists('regular_form', $data) ? $this : COverlayDialogElement::find()->one()->waitUntilReady();
 		}
-		else {
-			$location = $this;
-		}
+
+		$dialog = COverlayDialogElement::find()->one(false);
+		$location = ($dialog->isValid()) ? $dialog->waitUntilReady() : $this;
 
 		// Get the documentation link and compare it with expected result.
 		$link = $location->query('class:icon-doc-link')->one();
 		$this->assertEquals(self::$path_start.self::$version.$data['doc_link'], $link->getAttribute('href'));
 
 		// If the link was located in a popup - close this popup.
-		if (array_key_exists('open_button', $data) && !array_key_exists('regular_form', $data)) {
+		if ($dialog->isValid()) {
 			$location->close();
 		}
 
-		// Cancel element creation/update if it impacts execution of next cases.
-		if (array_key_exists('cancel_locator', $data)) {
-			$this->query($data['cancel_locator'])->waitUntilClickable()->one()->click();
-		}
+		// Cancel element creation/update if it impacts execution of next cases and close alert.
+		$cancel_button = $this->query('id:dashboard-cancel')->one(false);
+		if ($cancel_button->isClickable()) {
+			$cancel_button->click();
 
-		// Close alert if it prevents cancellation of element creation/update.
-		if (CTestArrayHelper::get($data, 'alert')) {
-			$this->page->acceptAlert();
+			// Close alert if it prevents cancellation of element creation/update.
+			if ($this->page->isAlertPresent()) {
+				$this->page->acceptAlert();
+			}
 		}
+	}
+
+	/**
+	 * Function finds the element that leads to the form wih doc link by the defined locator and clicks on it.
+	 *
+	 * @param string  $locator		locator of the element that needs to be clicked to open form with doc link
+	 */
+	private function openFormWithLink($locator) {
+		$this->query($locator)->waitUntilPresent()->one()->click();
+	}
+
+	/*
+	 * Function opens the Mass update overlay dialog.
+	 */
+	private function openMassUpdate() {
+		$this->query('xpath://input[contains(@id, "all_")]')->asCheckbox()->one()->set(true);
+		$this->query('button:Mass update')->waitUntilClickable()->one()->click();
 	}
 
 	public static function getMapDocumentationLinkData() {
@@ -1574,7 +1753,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/visualization/maps/map#selecting-elements'
 				]
 			],
-			// #1 Edit shape form.
+			// #3 Edit shape form.
 			[
 				[
 					'element' => ['xpath://div[@data-id="100"]', 'xpath://div[@data-id="101"]'],
@@ -1593,13 +1772,13 @@ class testDocumentationLinks extends CWebTest {
 		// Checking element selection documentation links requires pressing control key when selecting elements.
 		if (is_array($data['element'])) {
 			$keyboard = CElementQuery::getDriver()->getKeyboard();
-			$keyboard->pressKey(\Facebook\WebDriver\WebDriverKeys::LEFT_CONTROL);
+			$keyboard->pressKey(WebDriverKeys::LEFT_CONTROL);
 
 			foreach ($data['element'] as $element) {
 				$this->query($element)->one()->click();
 			}
 
-			$keyboard->releaseKey(\Facebook\WebDriver\WebDriverKeys::LEFT_CONTROL);
+			$keyboard->releaseKey(WebDriverKeys::LEFT_CONTROL);
 		}
 		else {
 			$this->query($data['element'])->one()->click();
