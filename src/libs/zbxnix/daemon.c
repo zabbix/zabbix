@@ -29,8 +29,10 @@
 #include "sighandler.h"
 #include "sigcommon.h"
 
+#if defined(__linux) || defined(__linux__) || defined(linux)
 #define ZBX_PID_FILE_TIMEOUT 20
 #define ZBX_PID_FILE_SLEEP_TIME 100000
+#endif
 
 char		*CONFIG_PID_FILE = NULL;
 static int	parent_pid = -1;
@@ -382,6 +384,7 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 
 		if(0 != (child_pid = zbx_fork()))
 		{
+#if defined(__linux) || defined(__linux__) || defined(linux)
 			if (0 < child_pid)
 			{
 				int		pid_file_timeout = ZBX_PID_FILE_TIMEOUT;
@@ -395,7 +398,7 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 					nanosleep(&ts, NULL);
 				}
 			}
-
+#endif
 			exit(EXIT_SUCCESS);
 		}
 
