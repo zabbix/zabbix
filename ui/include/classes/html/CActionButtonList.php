@@ -84,12 +84,13 @@ class CActionButtonList extends CObject {
 						// Removing parameters not to conflict with the redirecting URL.
 						->removeAttribute('name')
 						->removeAttribute('value')
+						->setAttribute('data-button-redirect', $button_data['redirect'])
 						->onClick('var $_form = jQuery(this).closest("form");'.
 							// Save the original form action.
 							'if (!$_form.data("action")) {'.
 								'$_form.data("action", $_form.attr("action"));'.
 							'}'.
-							'$_form.attr("action", '.json_encode($button_data['redirect']).');'
+							'$_form.attr("action", this.dataset.buttonRedirect);'
 						);
 				}
 				else {

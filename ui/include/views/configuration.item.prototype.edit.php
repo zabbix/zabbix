@@ -548,36 +548,41 @@ if (!$readonly) {
 	$master_item[] = (new CButton('button', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->removeId()
-		->onClick(
-			'return PopUp("popup.generic", '.json_encode([
-				'srctbl' => 'items',
-				'srcfld1' => 'itemid',
-				'srcfld2' => 'name',
-				'dstfrm' => $form->getName(),
-				'dstfld1' => 'master_itemid',
-				'dstfld2' => 'master_itemname',
-				'only_hostid' => $data['hostid'],
-				'excludeids' => [$data['itemid']],
-				'with_webitems' => 1,
-				'normal_only' => 1
-			]).', {dialogue_class: "modal-popup-generic"});'
-		);
+		->setAttribute('data-hostid', $data['hostid'])
+		->setAttribute('data-excludeids', $data['itemid'])
+		->onClick('
+			PopUp("popup.generic", {
+				srctbl: "items",
+				srcfld1: "itemid",
+				srcfld2: "name",
+				dstfrm: "'.$form->getName().'",
+				dstfld1: "master_itemid",
+				dstfld2: "master_itemname",
+				only_hostid: this.dataset.hostid,
+				excludeids: [this.dataset.excludeids],
+				with_webitems: 1,
+				normal_only: 1
+			}, {dialogue_class: "modal-popup-generic"});
+		');
+
 	$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$master_item[] = (new CButton('button', _('Select prototype')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->removeId()
-		->onClick(
-			'return PopUp("popup.generic", '.json_encode([
-				'srctbl' => 'item_prototypes',
-				'srcfld1' => 'itemid',
-				'srcfld2' => 'name',
-				'dstfrm' => $form->getName(),
-				'dstfld1' => 'master_itemid',
-				'dstfld2' => 'master_itemname',
-				'parent_discoveryid' => $data['parent_discoveryid'],
-				'excludeids' => [$data['itemid']]
-			]).', {dialogue_class: "modal-popup-generic"});'
-		);
+		->setAttribute('data-discoveryid', $data['parent_discoveryid'])
+		->setAttribute('data-excludeids', $data['itemid'])
+		->onClick('
+			PopUp("popup.generic", {
+				srctbl: "item_prototypes",
+				srcfld1: "itemid",
+				srcfld2: "name",
+				dstfrm: "'.$form->getName().'",
+				dstfld1: "master_itemid",
+				dstfld2: "master_itemname",
+				parent_discoveryid: this.dataset.discoveryid,
+				excludeids: [this.dataset.excludeids]
+			}, {dialogue_class: "modal-popup-generic"});
+		');
 }
 
 $item_tab->addItem([

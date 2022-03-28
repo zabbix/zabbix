@@ -177,7 +177,7 @@ else {
 		(new CSimpleButton(_('Change password')))
 			->setEnabled($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== ZBX_GUEST_USER)
 			->setAttribute('autofocus', 'autofocus')
-			->onClick('javascript: submitFormWithParam("'.$user_form->getName().'", "change_password", "1");')
+			->onClick('submitFormWithParam("'.$user_form->getName().'", "change_password", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY)
 	);
 }
@@ -313,15 +313,6 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				->addClass(ZBX_STYLE_RED);
 		}
 
-		$parameters = [
-			'dstfrm' => $user_form->getName(),
-			'media' => $index,
-			'mediatypeid' => $media['mediatypeid'],
-			($media['mediatype'] == MEDIA_TYPE_EMAIL) ? 'sendto_emails' : 'sendto' => $media['sendto'],
-			'period' => $media['period'],
-			'severity' => $media['severity'],
-			'active' => $media['active']
-		];
 		$media_severity = [];
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
@@ -337,8 +328,11 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				);
 		}
 
+		$media_send_to_key = "sendto";
+
 		if ($media['mediatype'] == MEDIA_TYPE_EMAIL) {
 			$media['sendto'] = implode(', ', $media['sendto']);
+			$media_send_to_key = "sendto_emails";
 		}
 
 		if (mb_strlen($media['sendto']) > 50) {
@@ -358,10 +352,25 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 					new CHorList([
 						(new CButton(null, _('Edit')))
 							->addClass(ZBX_STYLE_BTN_LINK)
-							->onClick('return PopUp("popup.media", '.json_encode($parameters).');'),
+							->setAttribute('data-mediatypeid', $media['mediatypeid'])
+							->setAttribute('data-period', $media['period'])
+							->setAttribute('data-severity', $media['severity'])
+							->setAttribute('data-active', $media['active'])
+							->setAttribute('data-sendto',  $media['sendto'])
+							->onClick('
+								PopUp("popup.media",{
+									dstfrm:"'.$user_form->getName().'",
+									media:'.$index.',
+									mediatypeid:this.dataset.mediatypeid,
+									period:this.dataset.period,
+									severity:this.dataset.severity,
+									active:this.dataset.active,
+									'.$media_send_to_key.':this.dataset.sendto
+								});
+							'),
 						(new CButton(null, _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
-							->onClick('javascript: removeMedia('.$index.');')
+							->onClick('removeMedia('.$index.');')
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)
 			]))->setId('medias_'.$index)
@@ -372,7 +381,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 		(new CDiv([
 			$media_table_info,
 			(new CButton(null, _('Add')))
-				->onClick('return PopUp("popup.media", '.json_encode(['dstfrm' => $user_form->getName()]).');')
+				->onClick('PopUp("popup.media", '.json_encode(['dstfrm' => $user_form->getName()]).');')
 				->addClass(ZBX_STYLE_BTN_LINK)
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -690,12 +699,12 @@ if ($data['action'] !== 'user.edit') {
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('start', _('Play')))
 					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick("javascript: testUserSound('messages_sounds.recovery');")
+					->onClick("testUserSound('messages_sounds.recovery');")
 					->removeId(),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('stop', _('Stop')))
 					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick('javascript: AudioControl.stop();')
+					->onClick('AudioControl.stop();')
 					->removeId()
 			]
 		]);
@@ -725,12 +734,12 @@ if ($data['action'] !== 'user.edit') {
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('start', _('Play')))
 					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick("javascript: testUserSound('messages_sounds.".$severity."');")
+					->onClick("testUserSound('messages_sounds.".$severity."');")
 					->removeId(),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('stop', _('Stop')))
 					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick('javascript: AudioControl.stop();')
+					->onClick('AudioControl.stop();')
 					->removeId()
 			]
 		]);

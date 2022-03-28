@@ -108,10 +108,12 @@ if (count($data['tags']) > 0) {
 				return (new CSpan([
 					(new CLinkAction($element_name))
 						->addStyle($element_style)
-						->onClick('view.unsetSubfilter('.json_encode([
-							'subfilter_tags['.$tag.'][]',
-							$element['name']
-						]).')'),
+						->setAttribute('data-tag', $tag)
+						->setAttribute('data-element-name', $element['name'])
+						->onClick('view.unsetSubfilter([
+							`subfilter_tags[${this.dataset.tag}][]`,
+							this.dataset.elementName
+						])'),
 					' ',
 					new CSup($element['count'])
 				]))
@@ -119,13 +121,16 @@ if (count($data['tags']) > 0) {
 					->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
 			}
 			else {
+
 				return (new CSpan([
 					(new CLinkAction($element_name))
 						->addStyle($element_style)
-						->onClick('view.setSubfilter('.json_encode([
-							'subfilter_tags['.$tag.'][]',
-							$element['name']
-						]).')'),
+						->setAttribute('data-tag', $tag)
+						->setAttribute('data-element-name', $element['name'])
+						->onClick('view.setSubfilter([
+							`subfilter_tags[${this.dataset.tag}][]`,
+							this.dataset.elementName
+						])'),
 					' ',
 					new CSup(($subfilter_used ? '+' : '').$element['count'])
 				]))->addClass(ZBX_STYLE_SUBFILTER);

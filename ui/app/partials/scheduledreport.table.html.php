@@ -27,7 +27,8 @@ $table = (new CTableInfo())
 	->setHeader([
 		($data['source'] === 'scheduledreport-form')
 			? (new CColHeader((new CCheckBox('all_scheduledreports'))
-				->onClick("checkAll('".$data['source']."', 'all_scheduledreports', 'reportids');")
+				->setAttribute('data-source', $data['source'])
+				->onClick("checkAll(this.dataset.source, 'all_scheduledreports', 'reportids');")
 			))->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		($data['source'] === 'scheduledreport-form')

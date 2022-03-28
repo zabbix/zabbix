@@ -127,8 +127,9 @@ foreach ($this->data['groups'] as $group) {
 				->setArgument('action', 'host.edit')
 				->setArgument('hostid', $host['hostid'])
 			))
-				->onClick('view.editHost(event, '.json_encode($host['hostid']).')')
-				->addClass(ZBX_STYLE_LINK_ALT);
+			->setAttribute('data-hostid', $host['hostid'])
+			->onClick('view.editHost(event, this.dataset.hostid)')
+			->addClass(ZBX_STYLE_LINK_ALT);
 		}
 		else {
 			$host_output = new CSpan($host['name']);

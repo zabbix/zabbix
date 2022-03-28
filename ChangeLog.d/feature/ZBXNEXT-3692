@@ -1,0 +1,1 @@
+..F....... [ZBXNEXT-3692] refactored inline scripts for html onClick events to avoid potential XSS threats (rdetlavs)

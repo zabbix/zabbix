@@ -30,14 +30,13 @@ foreach ($data['graphs'] as $graph) {
 		->setArgument('action', HISTORY_GRAPH)
 		->setArgument('itemids', [$graph['itemid']]);
 
-	$on_click = "rm4favorites('itemid','".$graph['itemid']."')";
-
 	$table->addRow([
 		$data['allowed_ui_latest_data']
 			? new CLink($graph['label'], $url)
 			: $graph['label'],
 		(new CButton())
-			->onClick($on_click)
+			->setAttribute('data-itemid', $graph['itemid'])
+			->onClick("rm4favorites('itemid', this.dataset.itemid)")
 			->addClass(ZBX_STYLE_BTN_REMOVE)
 			->setAttribute('aria-label', _xs('Remove, %1$s', 'screen reader', $graph['label']))
 			->removeId()

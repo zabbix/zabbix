@@ -127,7 +127,9 @@ foreach ($data['auditlogs'] as $auditlog) {
 			new CDiv(zbx_nl2br($auditlog['short_details'])),
 			($auditlog['details_button'] == 1)
 				? (new CDiv (
-					(new CLinkAction(_('Details')))->onClick('openAuditDetails('.json_encode($auditlog['details']).')')
+					(new CLinkAction(_('Details')))
+						->setAttribute('data-auditlog-details', $auditlog['details'])
+						->onClick('openAuditDetails(this.dataset.auditlogDetails)')
 				))->addClass('audit-show-details-btn-wrapper')
 				: ''
 		]))->addClass('audit-details-wrapper')

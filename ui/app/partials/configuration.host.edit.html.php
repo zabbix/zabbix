@@ -173,9 +173,8 @@ else {
 							->addClass(ZBX_STYLE_BTN_LINK),
 						$data['clone_hostid'] === null
 							? (new CSimpleButton(_('Unlink and clear')))
-								->onClick('host_edit.unlinkAndClearTemplate(this, '.
-										json_encode($template['templateid']).')'
-								)
+								->setAttribute('data-templateid', $template['templateid'])
+								->onClick('host_edit.unlinkAndClearTemplate(this, this.dataset.templateid)')
 								->addClass(ZBX_STYLE_BTN_LINK)
 							: null
 					])

@@ -93,28 +93,26 @@ if ($data['linked_templates']) {
 
 		$clone_mode = ($data['form'] === 'clone' || $data['form'] === 'full_clone');
 
-		$unlink_parameters = array_map('json_encode', [
-			$form->getName(),
-			'unlink['.$template['templateid'].']',
-			'1'
-		]);
-
-		$unlink_clear_parameters = array_map('json_encode', [
-			$form->getName(),
-			'unlink_and_clear['.$template['templateid'].']',
-			'1'
-		]);
-
 		$linked_templates->addRow([
 			$template_link,
 			(new CCol(
 				new CHorList([
 					(new CSimpleButton(_('Unlink')))
-						->onClick('submitFormWithParam('.implode(', ', $unlink_parameters).');')
+						->setAttribute('data-templateid', $template['templateid'])
+						->onClick('
+							submitFormWithParam("'.$form->getName().'", `unlink[${this.dataset.templateid}]`, 1);
+						')
 						->addClass(ZBX_STYLE_BTN_LINK),
 					(array_key_exists($template['templateid'], $data['original_templates']) && !$clone_mode)
 						? (new CSimpleButton(_('Unlink and clear')))
-							->onClick('submitFormWithParam('.implode(', ', $unlink_clear_parameters).');')
+							->setAttribute('data-templateid', $template['templateid'])
+							->onClick('
+								submitFormWithParam(
+									"'.$form->getName().'",
+									`unlink_and_clear[${this.dataset.templateid}]`,
+									1
+								);
+							')
 							->addClass(ZBX_STYLE_BTN_LINK)
 						: null
 				])

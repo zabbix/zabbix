@@ -294,7 +294,9 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 					->setArgument('action', 'host.edit')
 					->setArgument('hostid', $db_host['hostid'])
 				)
-			)->onClick('view.editHost(event, '.json_encode($db_host['hostid']).')')
+			)
+			->setAttribute('data-hostid', $db_host['hostid'])
+			->onClick('view.editHost(event, this.dataset.hostid)')
 		);
 
 		if ($current_element === '') {
