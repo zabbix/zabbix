@@ -380,9 +380,9 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 
 	if (0 == (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
-		pid_t	child_pid = zbx_fork();
+		pid_t	child_pid;
 
-		if(0 != child_pid)
+		if(0 != (child_pid = zbx_fork()))
 		{
 #if defined(__linux__)
 			if (0 < child_pid)
@@ -398,6 +398,8 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 					nanosleep(&ts, NULL);
 				}
 			}
+#else
+			ZBX_UNUSED(child_pid);
 #endif
 			exit(EXIT_SUCCESS);
 		}
