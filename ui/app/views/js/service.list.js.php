@@ -124,7 +124,7 @@
 			dialogue.addEventListener('dialogue.submit', (e) => {
 				postMessageOk(e.detail.title);
 
-				if (e.detail.messages !== null) {
+				if ('messages' in e.detail) {
 					postMessageDetails('success', e.detail.messages);
 				}
 
@@ -136,11 +136,11 @@
 
 				postMessageOk(e.detail.title);
 
-				if (e.detail.messages !== null) {
+				if ('messages' in e.detail) {
 					postMessageDetails('success', e.detail.messages);
 				}
 
-				location.href = options.serviceid === this.serviceid ? this.parent_url : location.href;
+				location.href = parameters.serviceid === this.serviceid ? this.parent_url : location.href;
 			});
 
 			dialogue.addEventListener('overlay.close', () => this.resumeRefresh(), {once: true});

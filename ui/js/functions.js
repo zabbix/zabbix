@@ -717,20 +717,24 @@ function parseUrlString(url) {
 /**
  * Message formatting function.
  *
- * @param {string}       type            Message type. ('good'|'bad'|'warning')
- * @param {string|array} messages        Array with details messages or message string with normal font.
- * @param {string|null}  title           Larger font title.
- * @param {boolean}      show_close_box  Show close button.
- * @param {boolean}      show_details    Show details on opening.
+ * @param {string}        type            Message type. ('good'|'bad'|'warning')
+ * @param {string|array}  messages        Array with details messages or message string with normal font.
+ * @param {string|null}   title           Larger font title.
+ * @param {boolean}       show_close_box  Show close button.
+ * @param {boolean|null}  show_details    Show details on opening.
  *
  * @return {jQuery}
  */
-function makeMessageBox(type, messages, title = null, show_close_box = true, show_details = false) {
+function makeMessageBox(type, messages, title = null, show_close_box = true, show_details = null) {
 	var classes = {good: 'msg-good', bad: 'msg-bad', warning: 'msg-warning'},
 		msg_class = classes[type];
 
 	if (typeof msg_class === 'undefined') {
 		return jQuery('<output>').text(Array.isArray(messages) ? messages.join(' ') : messages);
+	}
+
+	if (show_details === null) {
+		show_details = type === 'bad' || type === 'good';
 	}
 
 	var	$list = jQuery('<ul>')

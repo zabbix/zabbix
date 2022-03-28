@@ -92,9 +92,12 @@ class CControllerServiceUpdate extends CController {
 
 		if (!$ret) {
 			$this->setResponse(
-				(new CControllerResponseData([
-					'main_block' => json_encode(['errors' => getMessages()->toString()])
-				]))->disableView()
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'title' => _('Cannot update service'),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
 			);
 		}
 
@@ -184,18 +187,19 @@ class CControllerServiceUpdate extends CController {
 		$result = API::Service()->update($service);
 
 		if ($result) {
-			$output = ['title' => _('Service updated')];
+			$output['success']['title'] = _('Service updated');
 
-			if ($messages = CMessageHelper::getMessages()) {
-				$output['messages'] = array_column($messages, 'message');
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
 			}
 		}
 		else {
-			$output = [
-				'errors' => makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())->toString()
+			$output['error'] = [
+				'title' => _('Cannot update service'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}
 
-		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

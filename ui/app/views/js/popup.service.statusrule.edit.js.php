@@ -17,17 +17,10 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-
-/**
- * @var CView $this
- */
 ?>
 
-window.service_status_rule_edit_popup = {
-	overlay: null,
-	dialogue: null,
-	form: null,
+
+window.service_status_rule_edit_popup = new class {
 
 	init() {
 		this.overlay = overlays_stack.getById('service_status_rule_edit');
@@ -38,7 +31,7 @@ window.service_status_rule_edit_popup = {
 
 		type_selector.addEventListener('change', (e) => this.typeChange(e.target.value));
 		this.typeChange(type_selector.value)
-	},
+	}
 
 	typeChange(type) {
 		const label = document.getElementById('service-status-rule-limit-value-label');
@@ -63,15 +56,9 @@ window.service_status_rule_edit_popup = {
 				unit.style.display = 'none';
 				break;
 		}
-	},
+	}
 
 	submit() {
-		for (const el of this.form.parentNode.children) {
-			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
-				el.parentNode.removeChild(el);
-			}
-		}
-
 		this.overlay.setLoading();
 
 		const curl = new Curl('zabbix.php', false);
@@ -85,26 +72,33 @@ window.service_status_rule_edit_popup = {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				if ('errors' in response) {
-					throw {html_string: response.errors};
+				if ('error' in response) {
+					throw {error: response.error};
 				}
 
-				overlayDialogueDestroy('service_status_rule_edit');
+				overlayDialogueDestroy(this.overlay.dialogueid);
 
 				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
 			})
-			.catch((error) => {
-				let message_box;
+			.catch((exception) => {
+				for (const el of this.form.parentNode.children) {
+					if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+						el.parentNode.removeChild(el);
+					}
+				}
 
-				if (typeof error === 'object' && 'html_string' in error) {
-					message_box = new DOMParser().parseFromString(error.html_string, 'text/html').body.
-						firstElementChild;
+				let title;
+				let messages = [];
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
 				}
 				else {
-					const error = <?= json_encode(_('Unexpected server error.')) ?>;
-
-					message_box = makeMessageBox('bad', [], error)[0];
+					title = <?= json_encode(_('Unexpected server error.')) ?>;
 				}
+
+				const message_box = makeMessageBox('bad', messages, title)[0];
 
 				this.form.parentNode.insertBefore(message_box, this.form);
 			})
