@@ -440,11 +440,11 @@ zbx_list_item_t;
 /* list data */
 typedef struct
 {
-	zbx_list_item_t			*head;
-	zbx_list_item_t			*tail;
-	zbx_mem_malloc_func_t		mem_malloc_func;
-	zbx_mem_realloc_func_t		mem_realloc_func;
-	zbx_mem_free_func_t		mem_free_func;
+	zbx_list_item_t		*head;
+	zbx_list_item_t		*tail;
+	zbx_mem_malloc_func_t	mem_malloc_func;
+	zbx_mem_realloc_func_t	mem_realloc_func;
+	zbx_mem_free_func_t	mem_free_func;
 }
 zbx_list_t;
 

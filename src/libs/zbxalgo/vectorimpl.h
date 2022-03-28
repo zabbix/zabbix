@@ -32,7 +32,7 @@ static void	__vector_ ## __id ## _ensure_free_space(zbx_vector_ ## __id ## _t *v
 	{													\
 		vector->values_num = 0;										\
 		vector->values_alloc = 32;									\
-		vector->values = (__type *)vector->mem_malloc_func(NULL, (size_t)vector->values_alloc *	\
+		vector->values = (__type *)vector->mem_malloc_func(NULL, (size_t)vector->values_alloc *		\
 				sizeof(__type));								\
 	}													\
 	else if (vector->values_num == vector->values_alloc)							\
