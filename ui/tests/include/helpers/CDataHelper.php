@@ -390,24 +390,13 @@ class CDataHelper extends CAPIHelper {
 
 		// Check item value type to set correct history table where to insert data.
 		$value_type = CDBHelper::getValue('SELECT value_type FROM items where itemid='.zbx_dbstr($itemid));
-		switch ($value_type) {
-			case 1:
-				$history_table = 'history_str';
-				break;
+		$suffixes = ['', '_str', '_log', '_uint', '_text'];
 
-			case 2:
-				$history_table = 'history_log';
-				break;
-
-			case 4:
-				$history_table = 'history_text';
-				break;
-
-			default:
-				$history_table = 'history_uint';
-				break;
-
+		if (!array_key_exists($value_type, $suffixes)) {
+			throw new Exception('Unsupported item value type: '.$value_type);
 		}
+
+		$history_table = 'history'.$suffixes[$value_type];
 
 		foreach (array_values($values) as $key => $value) {
 			$clock = is_array($time) ? $time[$key] : $time;
