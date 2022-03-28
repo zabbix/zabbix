@@ -1805,7 +1805,7 @@ static void	preprocessor_init_manager(zbx_preprocessing_manager_t *manager)
 	zbx_list_create(&manager->direct_queue);
 	zbx_hashset_create_ext(&manager->item_config, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
 			(zbx_clean_func_t)preproc_item_clear,
-			ZBX_DEFAULT_SHMEM_MALLOC_FUNC, ZBX_DEFAULT_SHMEM_REALLOC_FUNC, ZBX_DEFAULT_SHMEM_FREE_FUNC);
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 	zbx_hashset_create(&manager->linked_items, 0, preproc_item_link_hash, preproc_item_link_compare);
 	zbx_hashset_create(&manager->history_cache, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);

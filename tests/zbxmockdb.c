@@ -295,7 +295,7 @@ int	__wrap_DBcommit(void)
 void	zbx_mockdb_init(void)
 {
 	zbx_hashset_create_ext(&mockdb.queries, 0, mockdb_query_hash, mockdb_query_compare, mockdb_query_clear,
-			ZBX_DEFAULT_SHMEM_MALLOC_FUNC, ZBX_DEFAULT_SHMEM_REALLOC_FUNC, ZBX_DEFAULT_SHMEM_FREE_FUNC);
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 }
 
 void	zbx_mockdb_destroy(void)

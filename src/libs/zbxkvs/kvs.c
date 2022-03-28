@@ -43,7 +43,7 @@ static void	zbx_kv_clean(void *data)
 void	zbx_kvs_create(zbx_kvs_t *kvs, size_t init_size)
 {
 	zbx_hashset_create_ext(kvs, init_size, zbx_kv_hash, zbx_kv_compare, zbx_kv_clean,
-			ZBX_DEFAULT_SHMEM_MALLOC_FUNC, ZBX_DEFAULT_SHMEM_REALLOC_FUNC, ZBX_DEFAULT_SHMEM_FREE_FUNC);
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 }
 
 void	zbx_kvs_clear(zbx_kvs_t *kvs)

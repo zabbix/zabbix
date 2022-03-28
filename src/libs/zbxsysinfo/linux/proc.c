@@ -1268,7 +1268,7 @@ out:
  ******************************************************************************/
 void	zbx_proc_free_processes(zbx_vector_ptr_t *processes)
 {
-	zbx_vector_ptr_clear_ext(processes, (zbx_shmem_free_func_t)zbx_sysinfo_proc_free);
+	zbx_vector_ptr_clear_ext(processes, (zbx_mem_free_func_t)zbx_sysinfo_proc_free);
 }
 
 /******************************************************************************

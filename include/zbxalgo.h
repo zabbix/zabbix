@@ -70,17 +70,17 @@ int	zbx_default_dbl_compare_func(const void *d1, const void *d2);
 #define ZBX_DEFAULT_UINT64_PAIR_COMPARE_FUNC	zbx_default_uint64_pair_compare_func
 #define ZBX_DEFAULT_DBL_COMPARE_FUNC		zbx_default_dbl_compare_func
 
-typedef void *(*zbx_shmem_malloc_func_t)(void *old, size_t size);
-typedef void *(*zbx_shmem_realloc_func_t)(void *old, size_t size);
-typedef void (*zbx_shmem_free_func_t)(void *ptr);
+typedef void *(*zbx_mem_malloc_func_t)(void *old, size_t size);
+typedef void *(*zbx_mem_realloc_func_t)(void *old, size_t size);
+typedef void (*zbx_mem_free_func_t)(void *ptr);
 
-void	*zbx_default_shmem_malloc_func(void *old, size_t size);
-void	*zbx_default_shmem_realloc_func(void *old, size_t size);
-void	zbx_default_shmem_free_func(void *ptr);
+void	*zbx_default_mem_malloc_func(void *old, size_t size);
+void	*zbx_default_mem_realloc_func(void *old, size_t size);
+void	zbx_default_mem_free_func(void *ptr);
 
-#define ZBX_DEFAULT_SHMEM_MALLOC_FUNC	zbx_default_shmem_malloc_func
-#define ZBX_DEFAULT_SHMEM_REALLOC_FUNC	zbx_default_shmem_realloc_func
-#define ZBX_DEFAULT_SHMEM_FREE_FUNC	zbx_default_shmem_free_func
+#define ZBX_DEFAULT_MEM_MALLOC_FUNC	zbx_default_mem_malloc_func
+#define ZBX_DEFAULT_MEM_REALLOC_FUNC	zbx_default_mem_realloc_func
+#define ZBX_DEFAULT_MEM_FREE_FUNC	zbx_default_mem_free_func
 
 typedef void (*zbx_clean_func_t)(void *data);
 
@@ -143,9 +143,9 @@ typedef struct
 	zbx_hash_func_t		hash_func;
 	zbx_compare_func_t	compare_func;
 	zbx_clean_func_t	clean_func;
-	zbx_shmem_malloc_func_t	shmem_malloc_func;
-	zbx_shmem_realloc_func_t	shmem_realloc_func;
-	zbx_shmem_free_func_t	shmem_free_func;
+	zbx_mem_malloc_func_t	mem_malloc_func;
+	zbx_mem_realloc_func_t	mem_realloc_func;
+	zbx_mem_free_func_t	mem_free_func;
 }
 zbx_hashset_t;
 
@@ -158,9 +158,9 @@ void	zbx_hashset_create_ext(zbx_hashset_t *hs, size_t init_size,
 				zbx_hash_func_t hash_func,
 				zbx_compare_func_t compare_func,
 				zbx_clean_func_t clean_func,
-				zbx_shmem_malloc_func_t shmem_malloc_func,
-				zbx_shmem_realloc_func_t shmem_realloc_func,
-				zbx_shmem_free_func_t shmem_free_func);
+				zbx_mem_malloc_func_t mem_malloc_func,
+				zbx_mem_realloc_func_t mem_realloc_func,
+				zbx_mem_free_func_t mem_free_func);
 void	zbx_hashset_destroy(zbx_hashset_t *hs);
 
 int	zbx_hashset_reserve(zbx_hashset_t *hs, int num_slots_req);
@@ -212,9 +212,9 @@ typedef struct
 	int			num_data;
 	zbx_hash_func_t		hash_func;
 	zbx_compare_func_t	compare_func;
-	zbx_shmem_malloc_func_t	shmem_malloc_func;
-	zbx_shmem_realloc_func_t	shmem_realloc_func;
-	zbx_shmem_free_func_t	shmem_free_func;
+	zbx_mem_malloc_func_t	mem_malloc_func;
+	zbx_mem_realloc_func_t	mem_realloc_func;
+	zbx_mem_free_func_t	mem_free_func;
 }
 zbx_hashmap_t;
 
@@ -222,9 +222,9 @@ void	zbx_hashmap_create(zbx_hashmap_t *hm, size_t init_size);
 void	zbx_hashmap_create_ext(zbx_hashmap_t *hm, size_t init_size,
 				zbx_hash_func_t hash_func,
 				zbx_compare_func_t compare_func,
-				zbx_shmem_malloc_func_t shmem_malloc_func,
-				zbx_shmem_realloc_func_t shmem_realloc_func,
-				zbx_shmem_free_func_t shmem_free_func);
+				zbx_mem_malloc_func_t mem_malloc_func,
+				zbx_mem_realloc_func_t mem_realloc_func,
+				zbx_mem_free_func_t mem_free_func);
 void	zbx_hashmap_destroy(zbx_hashmap_t *hm);
 
 int	zbx_hashmap_get(zbx_hashmap_t *hm, zbx_uint64_t key);
@@ -262,17 +262,17 @@ typedef struct
 	/* are not supported (process will exit() if NULL return value is encountered). If     */
 	/* using zbx_mem_info_t and the associated memory functions then ensure that allow_oom */
 	/* is always set to 0.                                                                 */
-	zbx_shmem_malloc_func_t	shmem_malloc_func;
-	zbx_shmem_realloc_func_t	shmem_realloc_func;
-	zbx_shmem_free_func_t	shmem_free_func;
+	zbx_mem_malloc_func_t	mem_malloc_func;
+	zbx_mem_realloc_func_t	mem_realloc_func;
+	zbx_mem_free_func_t	mem_free_func;
 }
 zbx_binary_heap_t;
 
 void			zbx_binary_heap_create(zbx_binary_heap_t *heap, zbx_compare_func_t compare_func, int options);
 void			zbx_binary_heap_create_ext(zbx_binary_heap_t *heap, zbx_compare_func_t compare_func, int options,
-							zbx_shmem_malloc_func_t shmem_malloc_func,
-							zbx_shmem_realloc_func_t shmem_realloc_func,
-							zbx_shmem_free_func_t shmem_free_func);
+							zbx_mem_malloc_func_t mem_malloc_func,
+							zbx_mem_realloc_func_t mem_realloc_func,
+							zbx_mem_free_func_t mem_free_func);
 void			zbx_binary_heap_destroy(zbx_binary_heap_t *heap);
 
 int			zbx_binary_heap_empty(zbx_binary_heap_t *heap);
@@ -293,17 +293,17 @@ typedef struct													\
 	__type			*values;									\
 	int			values_num;									\
 	int			values_alloc;									\
-	zbx_shmem_malloc_func_t	shmem_malloc_func;								\
-	zbx_shmem_realloc_func_t	shmem_realloc_func;							\
-	zbx_shmem_free_func_t	shmem_free_func;								\
+	zbx_mem_malloc_func_t	mem_malloc_func;								\
+	zbx_mem_realloc_func_t	mem_realloc_func;								\
+	zbx_mem_free_func_t	mem_free_func;									\
 }														\
 zbx_vector_ ## __id ## _t;											\
 														\
 void	zbx_vector_ ## __id ## _create(zbx_vector_ ## __id ## _t *vector);					\
 void	zbx_vector_ ## __id ## _create_ext(zbx_vector_ ## __id ## _t *vector,					\
-						zbx_shmem_malloc_func_t shmem_malloc_func,			\
-						zbx_shmem_realloc_func_t shmem_realloc_func,			\
-						zbx_shmem_free_func_t shmem_free_func);				\
+						zbx_mem_malloc_func_t mem_malloc_func,				\
+						zbx_mem_realloc_func_t mem_realloc_func,			\
+						zbx_mem_free_func_t mem_free_func);				\
 void	zbx_vector_ ## __id ## _destroy(zbx_vector_ ## __id ## _t *vector);					\
 														\
 void	zbx_vector_ ## __id ## _append(zbx_vector_ ## __id ## _t *vector, __type value);			\
@@ -442,9 +442,9 @@ typedef struct
 {
 	zbx_list_item_t			*head;
 	zbx_list_item_t			*tail;
-	zbx_shmem_malloc_func_t		shmem_malloc_func;
-	zbx_shmem_realloc_func_t	shmem_realloc_func;
-	zbx_shmem_free_func_t		shmem_free_func;
+	zbx_mem_malloc_func_t		mem_malloc_func;
+	zbx_mem_realloc_func_t		mem_realloc_func;
+	zbx_mem_free_func_t		mem_free_func;
 }
 zbx_list_t;
 
@@ -458,8 +458,8 @@ typedef struct
 zbx_list_iterator_t;
 
 void	zbx_list_create(zbx_list_t *queue);
-void	zbx_list_create_ext(zbx_list_t *queue, zbx_shmem_malloc_func_t shmem_malloc_func,
-		zbx_shmem_free_func_t shmem_free_func);
+void	zbx_list_create_ext(zbx_list_t *queue, zbx_mem_malloc_func_t mem_malloc_func,
+		zbx_mem_free_func_t mem_free_func);
 void	zbx_list_destroy(zbx_list_t *list);
 void	zbx_list_append(zbx_list_t *list, void *value, zbx_list_item_t **inserted);
 void	zbx_list_insert_after(zbx_list_t *list, zbx_list_item_t *after, void *value, zbx_list_item_t **inserted);

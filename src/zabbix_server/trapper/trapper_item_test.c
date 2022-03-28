@@ -370,7 +370,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 					*info = zbx_strdup(NULL, *pvalue);
 		}
 
-		zbx_vector_ptr_clear_ext(&add_results, (zbx_shmem_free_func_t)zbx_free_result_ptr);
+		zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_result_ptr);
 		zbx_vector_ptr_destroy(&add_results);
 	}
 

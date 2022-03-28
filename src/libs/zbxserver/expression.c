@@ -5292,7 +5292,7 @@ static void	substitute_functions(zbx_vector_ptr_t *triggers, const zbx_vector_ui
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_hashset_create_ext(&funcs, triggers->values_num, func_hash_func, func_compare_func, func_clean,
-			ZBX_DEFAULT_SHMEM_MALLOC_FUNC, ZBX_DEFAULT_SHMEM_REALLOC_FUNC, ZBX_DEFAULT_SHMEM_FREE_FUNC);
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_populate_function_items(&functionids, &funcs, &ifuncs, triggers);
 

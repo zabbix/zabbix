@@ -25,17 +25,17 @@
  * Purpose: create singly linked list (with custom memory functions)          *
  *                                                                            *
  * Parameters: queue           - [IN] the list                                *
- *             shmem_malloc_func - [IN] callback for malloc                   *
- *             shmem_free_func   - [IN] callback for free                     *
+ *             mem_malloc_func - [IN] callback for malloc                     *
+ *             mem_free_func   - [IN] callback for free                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_list_create_ext(zbx_list_t *queue, zbx_shmem_malloc_func_t shmem_malloc_func,
-		zbx_shmem_free_func_t shmem_free_func)
+void	zbx_list_create_ext(zbx_list_t *queue, zbx_mem_malloc_func_t mem_malloc_func,
+		zbx_mem_free_func_t mem_free_func)
 {
 	memset(queue, 0, sizeof(*queue));
 
-	queue->shmem_malloc_func = shmem_malloc_func;
-	queue->shmem_free_func = shmem_free_func;
+	queue->mem_malloc_func = mem_malloc_func;
+	queue->mem_free_func = mem_free_func;
 }
 
 /******************************************************************************
@@ -47,7 +47,7 @@ void	zbx_list_create_ext(zbx_list_t *queue, zbx_shmem_malloc_func_t shmem_malloc
  ******************************************************************************/
 void	zbx_list_create(zbx_list_t *queue)
 {
-	zbx_list_create_ext(queue, ZBX_DEFAULT_SHMEM_MALLOC_FUNC, ZBX_DEFAULT_SHMEM_FREE_FUNC);
+	zbx_list_create_ext(queue, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 }
 
 /******************************************************************************
@@ -78,7 +78,7 @@ static void	list_create_item(zbx_list_t *list, void *value, zbx_list_item_t **cr
 
 	ZBX_UNUSED(list);
 
-	item = (zbx_list_item_t *)list->shmem_malloc_func(NULL, sizeof(zbx_list_item_t));
+	item = (zbx_list_item_t *)list->mem_malloc_func(NULL, sizeof(zbx_list_item_t));
 	item->next = NULL;
 	item->data = value;
 
@@ -184,7 +184,7 @@ int	zbx_list_pop(zbx_list_t *list, void **value)
 		*value = head->data;
 
 	list->head = list->head->next;
-	list->shmem_free_func(head);
+	list->mem_free_func(head);
 
 	if (NULL == list->head)
 		list->tail = NULL;

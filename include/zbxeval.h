@@ -215,7 +215,7 @@ int	zbx_eval_parse_expression(zbx_eval_context_t *ctx, const char *expression, z
 void	zbx_eval_init(zbx_eval_context_t *ctx);
 void	zbx_eval_clear(zbx_eval_context_t *ctx);
 int	zbx_eval_status(const zbx_eval_context_t *ctx);
-size_t	zbx_eval_serialize(const zbx_eval_context_t *ctx, zbx_shmem_malloc_func_t malloc_func, unsigned char **data);
+size_t	zbx_eval_serialize(const zbx_eval_context_t *ctx, zbx_mem_malloc_func_t malloc_func, unsigned char **data);
 void	zbx_eval_deserialize(zbx_eval_context_t *ctx, const char *expression, zbx_uint64_t rules,
 		const unsigned char *data);
 void	zbx_eval_compose_expression(const zbx_eval_context_t *ctx, char **expression);

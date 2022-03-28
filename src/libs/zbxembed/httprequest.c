@@ -652,7 +652,7 @@ static duk_ret_t	get_headers_as_arrays(duk_context *ctx, zbx_es_httprequest_t *r
 	}
 
 out:
-	zbx_vector_ptr_clear_ext(&headers, (zbx_shmem_free_func_t)cached_headers_free);
+	zbx_vector_ptr_clear_ext(&headers, (zbx_mem_free_func_t)cached_headers_free);
 	zbx_vector_ptr_destroy(&headers);
 	return 1;
 }

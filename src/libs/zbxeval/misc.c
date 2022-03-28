@@ -158,7 +158,7 @@ static zbx_uint32_t	deserialize_variant(const unsigned char *ptr,  zbx_variant_t
  * Return value: The size of serialized data.                                 *
  *                                                                            *
  ******************************************************************************/
-size_t	zbx_eval_serialize(const zbx_eval_context_t *ctx, zbx_shmem_malloc_func_t malloc_func,
+size_t	zbx_eval_serialize(const zbx_eval_context_t *ctx, zbx_mem_malloc_func_t malloc_func,
 		unsigned char **data)
 {
 	int		i;
@@ -167,7 +167,7 @@ size_t	zbx_eval_serialize(const zbx_eval_context_t *ctx, zbx_shmem_malloc_func_t
 	zbx_uint32_t	len, len_offset;
 
 	if (NULL == malloc_func)
-		malloc_func = ZBX_DEFAULT_SHMEM_MALLOC_FUNC;
+		malloc_func = ZBX_DEFAULT_MEM_MALLOC_FUNC;
 
 	ptr += zbx_serialize_uint31_compact(ptr, ctx->stack.values_num);
 

@@ -32,14 +32,14 @@ static void	__vector_ ## __id ## _ensure_free_space(zbx_vector_ ## __id ## _t *v
 	{													\
 		vector->values_num = 0;										\
 		vector->values_alloc = 32;									\
-		vector->values = (__type *)vector->shmem_malloc_func(NULL, (size_t)vector->values_alloc *	\
+		vector->values = (__type *)vector->mem_malloc_func(NULL, (size_t)vector->values_alloc *	\
 				sizeof(__type));								\
 	}													\
 	else if (vector->values_num == vector->values_alloc)							\
 	{													\
 		vector->values_alloc = MAX(vector->values_alloc + 1, vector->values_alloc *			\
 				ZBX_VECTOR_ARRAY_GROWTH_FACTOR);						\
-		vector->values = (__type *)vector->shmem_realloc_func(vector->values,				\
+		vector->values = (__type *)vector->mem_realloc_func(vector->values,				\
 				(size_t)vector->values_alloc * sizeof(__type));					\
 	}													\
 }														\
@@ -47,38 +47,38 @@ static void	__vector_ ## __id ## _ensure_free_space(zbx_vector_ ## __id ## _t *v
 void	zbx_vector_ ## __id ## _create(zbx_vector_ ## __id ## _t *vector)					\
 {														\
 	zbx_vector_ ## __id ## _create_ext(vector,								\
-						ZBX_DEFAULT_SHMEM_MALLOC_FUNC,					\
-						ZBX_DEFAULT_SHMEM_REALLOC_FUNC,					\
-						ZBX_DEFAULT_SHMEM_FREE_FUNC);					\
+						ZBX_DEFAULT_MEM_MALLOC_FUNC,					\
+						ZBX_DEFAULT_MEM_REALLOC_FUNC,					\
+						ZBX_DEFAULT_MEM_FREE_FUNC);					\
 }														\
 														\
 void	zbx_vector_ ## __id ## _create_ext(zbx_vector_ ## __id ## _t *vector,					\
-						zbx_shmem_malloc_func_t shmem_malloc_func,			\
-						zbx_shmem_realloc_func_t shmem_realloc_func,			\
-						zbx_shmem_free_func_t shmem_free_func)				\
+						zbx_mem_malloc_func_t mem_malloc_func,				\
+						zbx_mem_realloc_func_t mem_realloc_func,			\
+						zbx_mem_free_func_t mem_free_func)				\
 {														\
 	vector->values = NULL;											\
 	vector->values_num = 0;											\
 	vector->values_alloc = 0;										\
 														\
-	vector->shmem_malloc_func = shmem_malloc_func;								\
-	vector->shmem_realloc_func = shmem_realloc_func;							\
-	vector->shmem_free_func = shmem_free_func;								\
+	vector->mem_malloc_func = mem_malloc_func;								\
+	vector->mem_realloc_func = mem_realloc_func;								\
+	vector->mem_free_func = mem_free_func;									\
 }														\
 														\
 void	zbx_vector_ ## __id ## _destroy(zbx_vector_ ## __id ## _t *vector)					\
 {														\
 	if (NULL != vector->values)										\
 	{													\
-		vector->shmem_free_func(vector->values);							\
+		vector->mem_free_func(vector->values);								\
 		vector->values = NULL;										\
 		vector->values_num = 0;										\
 		vector->values_alloc = 0;									\
 	}													\
 														\
-	vector->shmem_malloc_func = NULL;									\
-	vector->shmem_realloc_func = NULL;									\
-	vector->shmem_free_func = NULL;										\
+	vector->mem_malloc_func = NULL;										\
+	vector->mem_realloc_func = NULL;									\
+	vector->mem_free_func = NULL;										\
 }														\
 														\
 void	zbx_vector_ ## __id ## _append(zbx_vector_ ## __id ## _t *vector, __type value)				\
@@ -265,7 +265,7 @@ void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t s
 	if ((int)size > vector->values_alloc)									\
 	{													\
 		vector->values_alloc = (int)size;								\
-		vector->values = (__type *)vector->shmem_realloc_func(vector->values,				\
+		vector->values = (__type *)vector->mem_realloc_func(vector->values,				\
 				(size_t)vector->values_alloc * sizeof(__type));					\
 	}													\
 }														\

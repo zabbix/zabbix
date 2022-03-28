@@ -763,7 +763,7 @@ static void	vmware_free_perfdata(zbx_vmware_perf_data_t *data)
 	zbx_free(data->id);
 	zbx_free(data->type);
 	zbx_free(data->error);
-	zbx_vector_ptr_clear_ext(&data->values, (zbx_shmem_free_func_t)vmware_free_perfvalue);
+	zbx_vector_ptr_clear_ext(&data->values, (zbx_mem_free_func_t)vmware_free_perfvalue);
 	zbx_vector_ptr_destroy(&data->values);
 
 	zbx_free(data);
@@ -1051,7 +1051,7 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 	zbx_vector_ptr_clear_ext(&vm->devs, (zbx_clean_func_t)vmware_dev_shared_free);
 	zbx_vector_ptr_destroy(&vm->devs);
 
-	zbx_vector_ptr_clear_ext(&vm->file_systems, (zbx_shmem_free_func_t)vmware_fs_shared_free);
+	zbx_vector_ptr_clear_ext(&vm->file_systems, (zbx_mem_free_func_t)vmware_fs_shared_free);
 	zbx_vector_ptr_destroy(&vm->file_systems);
 
 	if (NULL != vm->uuid)
@@ -1205,7 +1205,7 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
  ******************************************************************************/
 static void	vmware_shared_perf_entity_clean(zbx_vmware_perf_entity_t *entity)
 {
-	zbx_vector_ptr_clear_ext(&entity->counters, (zbx_shmem_free_func_t)vmware_perf_counter_shared_free);
+	zbx_vector_ptr_clear_ext(&entity->counters, (zbx_mem_free_func_t)vmware_perf_counter_shared_free);
 	zbx_vector_ptr_destroy(&entity->counters);
 
 	vmware_shared_strfree(entity->query_instance);
@@ -1742,7 +1742,7 @@ static void	vmware_vm_free(zbx_vmware_vm_t *vm)
 	zbx_vector_ptr_clear_ext(&vm->devs, (zbx_clean_func_t)vmware_dev_free);
 	zbx_vector_ptr_destroy(&vm->devs);
 
-	zbx_vector_ptr_clear_ext(&vm->file_systems, (zbx_shmem_free_func_t)vmware_fs_free);
+	zbx_vector_ptr_clear_ext(&vm->file_systems, (zbx_mem_free_func_t)vmware_fs_free);
 	zbx_vector_ptr_destroy(&vm->file_systems);
 
 	zbx_free(vm->uuid);
@@ -5348,7 +5348,7 @@ out:
 	zbx_free(version);
 	zbx_free(fullname);
 
-	zbx_vector_ptr_clear_ext(&counters, (zbx_shmem_free_func_t)vmware_counter_free);
+	zbx_vector_ptr_clear_ext(&counters, (zbx_mem_free_func_t)vmware_counter_free);
 	zbx_vector_ptr_destroy(&counters);
 
 	return ret;
@@ -6298,7 +6298,7 @@ out:
 
 	zbx_vmware_unlock();
 
-	zbx_vector_ptr_clear_ext(&perfdata, (zbx_shmem_free_func_t)vmware_free_perfdata);
+	zbx_vector_ptr_clear_ext(&perfdata, (zbx_mem_free_func_t)vmware_free_perfdata);
 	zbx_vector_ptr_destroy(&perfdata);
 
 	zbx_vector_ptr_destroy(&hist_entities);

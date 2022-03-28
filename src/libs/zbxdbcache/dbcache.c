@@ -1348,7 +1348,7 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 	zbx_vector_uint64_create(&item_info_ids);
 	zbx_hashset_create_ext(&items_info, itemids->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)zbx_item_info_clean,
-			ZBX_DEFAULT_SHMEM_MALLOC_FUNC, ZBX_DEFAULT_SHMEM_REALLOC_FUNC, ZBX_DEFAULT_SHMEM_FREE_FUNC);
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -1416,7 +1416,7 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 
 	zbx_hashset_create_ext(&hosts_info, hostids.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)zbx_host_info_clean,
-			ZBX_DEFAULT_SHMEM_MALLOC_FUNC, ZBX_DEFAULT_SHMEM_REALLOC_FUNC, ZBX_DEFAULT_SHMEM_FREE_FUNC);
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	db_get_hosts_info_by_hostid(&hosts_info, &hostids);
 
@@ -3047,7 +3047,7 @@ static void	sync_proxy_history(int *total_num, int *more)
 		}
 
 		zbx_vector_ptr_clear(&history_items);
-		zbx_vector_ptr_clear_ext(&item_diff, zbx_default_shmem_free_func);
+		zbx_vector_ptr_clear_ext(&item_diff, zbx_default_mem_free_func);
 
 		/* Exit from sync loop if we have spent too much time here */
 		/* unless we are doing full sync. This is done to allow    */

@@ -85,14 +85,14 @@ void	DCsync_maintenances(zbx_dbsync_t *sync)
 			maintenance->running_since = 0;
 			maintenance->running_until = 0;
 
-			zbx_vector_uint64_create_ext(&maintenance->groupids, config->maintenances.shmem_malloc_func,
-					config->maintenances.shmem_realloc_func, config->maintenances.shmem_free_func);
-			zbx_vector_uint64_create_ext(&maintenance->hostids, config->maintenances.shmem_malloc_func,
-					config->maintenances.shmem_realloc_func, config->maintenances.shmem_free_func);
-			zbx_vector_ptr_create_ext(&maintenance->tags, config->maintenances.shmem_malloc_func,
-					config->maintenances.shmem_realloc_func, config->maintenances.shmem_free_func);
-			zbx_vector_ptr_create_ext(&maintenance->periods, config->maintenances.shmem_malloc_func,
-					config->maintenances.shmem_realloc_func, config->maintenances.shmem_free_func);
+			zbx_vector_uint64_create_ext(&maintenance->groupids, config->maintenances.mem_malloc_func,
+					config->maintenances.mem_realloc_func, config->maintenances.mem_free_func);
+			zbx_vector_uint64_create_ext(&maintenance->hostids, config->maintenances.mem_malloc_func,
+					config->maintenances.mem_realloc_func, config->maintenances.mem_free_func);
+			zbx_vector_ptr_create_ext(&maintenance->tags, config->maintenances.mem_malloc_func,
+					config->maintenances.mem_realloc_func, config->maintenances.mem_free_func);
+			zbx_vector_ptr_create_ext(&maintenance->periods, config->maintenances.mem_malloc_func,
+					config->maintenances.mem_realloc_func, config->maintenances.mem_free_func);
 		}
 
 		ZBX_STR2UCHAR(maintenance->type, row[1]);
@@ -1433,7 +1433,7 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 
 	zbx_hashset_create_ext(&host_event_maintenances, maintenanceids->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)host_event_maintenance_clean,
-			ZBX_DEFAULT_SHMEM_MALLOC_FUNC, ZBX_DEFAULT_SHMEM_REALLOC_FUNC, ZBX_DEFAULT_SHMEM_FREE_FUNC);
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 	/* event tags must be sorted by name to perform maintenance tag matching */
 
 	for (i = 0; i < event_queries->values_num; i++)

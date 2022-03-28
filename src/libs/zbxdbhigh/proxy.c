@@ -2108,7 +2108,7 @@ int	get_interface_availability_data(struct zbx_json *json, int *ts)
 
 	ret = SUCCEED;
 out:
-	zbx_vector_ptr_clear_ext(&interfaces, (zbx_shmem_free_func_t)zbx_interface_availability_free);
+	zbx_vector_ptr_clear_ext(&interfaces, (zbx_mem_free_func_t)zbx_interface_availability_free);
 	zbx_vector_ptr_destroy(&interfaces);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));

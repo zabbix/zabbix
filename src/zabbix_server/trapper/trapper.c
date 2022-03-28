@@ -529,12 +529,12 @@ static void	zbx_status_counters_init(void)
 
 static void	zbx_status_counters_free(void)
 {
-	zbx_vector_ptr_clear_ext(&hosts_monitored.counters, zbx_default_shmem_free_func);
-	zbx_vector_ptr_clear_ext(&hosts_not_monitored.counters, zbx_default_shmem_free_func);
-	zbx_vector_ptr_clear_ext(&items_active_normal.counters, zbx_default_shmem_free_func);
-	zbx_vector_ptr_clear_ext(&items_active_notsupported.counters, zbx_default_shmem_free_func);
-	zbx_vector_ptr_clear_ext(&items_disabled.counters, zbx_default_shmem_free_func);
-	zbx_vector_ptr_clear_ext(&required_performance.counters, zbx_default_shmem_free_func);
+	zbx_vector_ptr_clear_ext(&hosts_monitored.counters, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&hosts_not_monitored.counters, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&items_active_normal.counters, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&items_active_notsupported.counters, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&items_disabled.counters, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&required_performance.counters, zbx_default_mem_free_func);
 
 	zbx_vector_ptr_destroy(&hosts_monitored.counters);
 	zbx_vector_ptr_destroy(&hosts_not_monitored.counters);

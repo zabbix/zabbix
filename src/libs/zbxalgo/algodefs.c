@@ -347,17 +347,17 @@ int	zbx_default_dbl_compare_func(const void *d1, const void *d2)
 
 /* default memory management functions */
 
-void	*zbx_default_shmem_malloc_func(void *old, size_t size)
+void	*zbx_default_mem_malloc_func(void *old, size_t size)
 {
 	return zbx_malloc(old, size);
 }
 
-void	*zbx_default_shmem_realloc_func(void *old, size_t size)
+void	*zbx_default_mem_realloc_func(void *old, size_t size)
 {
 	return zbx_realloc(old, size);
 }
 
-void	zbx_default_shmem_free_func(void *ptr)
+void	zbx_default_mem_free_func(void *ptr)
 {
 	zbx_free(ptr);
 }

@@ -1723,7 +1723,7 @@ exit:
 
 void	DBregister_host_clean(zbx_vector_ptr_t *autoreg_hosts)
 {
-	zbx_vector_ptr_clear_ext(autoreg_hosts, (zbx_shmem_free_func_t)autoreg_host_free);
+	zbx_vector_ptr_clear_ext(autoreg_hosts, (zbx_mem_free_func_t)autoreg_host_free);
 }
 
 /******************************************************************************

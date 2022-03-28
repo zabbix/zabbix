@@ -3513,7 +3513,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		zbx_strpool_release(item->delay);
 
 		if (NULL != item->triggers)
-			config->items.shmem_free_func(item->triggers);
+			config->items.mem_free_func(item->triggers);
 
 		zbx_vector_ptr_destroy(&item->tags);
 
@@ -5779,7 +5779,7 @@ static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_ex
 		}
 	}
 
-	config->items.shmem_free_func(item->triggers);
+	config->items.mem_free_func(item->triggers);
 	item->triggers = NULL;
 }
 
@@ -5863,7 +5863,7 @@ static void	dc_trigger_update_cache(void)
 
 			item = (ZBX_DC_ITEM *)itemtrigs.values[i].first;
 			item->update_triggers = 0;
-			item->triggers = (ZBX_DC_TRIGGER **)config->items.shmem_realloc_func(item->triggers,
+			item->triggers = (ZBX_DC_TRIGGER **)config->items.mem_realloc_func(item->triggers,
 					(size_t)(j - i + 1) * sizeof(ZBX_DC_TRIGGER *));
 
 			for (k = i; k < j; k++)
@@ -12612,8 +12612,8 @@ void	zbx_dc_correlation_rules_init(zbx_correlation_rules_t *rules)
 {
 	zbx_vector_ptr_create(&rules->correlations);
 	zbx_hashset_create_ext(&rules->conditions, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
-			(zbx_clean_func_t)corr_condition_clean, ZBX_DEFAULT_SHMEM_MALLOC_FUNC,
-			ZBX_DEFAULT_SHMEM_REALLOC_FUNC, ZBX_DEFAULT_SHMEM_FREE_FUNC);
+			(zbx_clean_func_t)corr_condition_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
+			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	rules->sync_ts = 0;
 }
