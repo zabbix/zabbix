@@ -1281,20 +1281,20 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.22rc1
 
 New features:
-...G.....T [ZBXNEXT-7065] added queries metrics to postgresql by agent2 template (esneiders, vkhaliev)
-.........T [ZBXNEXT-7023] updated regular expressions for services discovery in windows templates (vkhaliev)
-A.F....... [ZBXNEXT-7485] fixed debug_backtrace function usage for php8 (acikuns)
+...G.....T [ZBXNEXT-7065] added queries metrics to the PostgreSQL by agent 2 template (esneiders, vkhaliev)
+.........T [ZBXNEXT-7023] updated regular expressions for services discovery in Windows templates (vkhaliev)
+A.F....... [ZBXNEXT-7485] fixed debug_backtrace function usage for PHP8 (acikuns)
 .........T [ZBXNEXT-7493] added garbage collector and memory pool discovery to generic Java template (vkhaliev)
 
 Bug fixes:
 A......... [ZBX-20681] fixed undefined index error when accessing module page with guest user (rlataria)
 .......PS. [ZBX-20518] fixed lastaccess update during proxy throttling (dgoloscapov)
 ...G...... [ZBX-20634] fixed handling of multiline FTP response (ssimonenko)
-...G...... [ZBX-20528] fixed issue with pgsql.custom.query json response failing for Zabbix agent 2 (esneiders)
+...G...... [ZBX-20528] fixed issue with pgsql.custom.query JSON response failing for Zabbix agent 2 (esneiders)
 .D........ [ZBX-20762] fixed StartAlerters and StartEscalators range in configuration file comments (akozlovs)
-...G...... [ZBX-19311] fixed raid device discovery in smart plugin in Zabbix agent 2 (esneiders)
-...G...... [ZBX-19407] removed redundant encoding check in get_codepage() for Windows (arimdjonoks)
-...G...... [ZBX-20539] fixed TLS parameters for mysql and postgresql in Zabbix agent 2 (esneiders)
+...G...... [ZBX-19311] fixed raid device discovery in the Smart plugin for Zabbix agent 2 (esneiders)
+...G...... [ZBX-19407] removed the redundant encoding check in get_codepage() for Windows (arimdjonoks)
+...G...... [ZBX-20539] fixed TLS parameters for MySQL and PostgreSQL in Zabbix agent 2 (esneiders)
 .........T [ZBX-20728] removed duplicate entries in tmpl files (abakaldin)
 ...G...... [ZBX-20390] fixed Oracle Solaris vm.memory.size[available] item kstats memory read (arimdjonoks)
 ..F....... [ZBX-19223] fixed disabled hosts not listed in latest data view (averza)
