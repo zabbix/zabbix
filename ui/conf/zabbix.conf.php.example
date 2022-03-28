@@ -20,9 +20,14 @@ $DB['VERIFY_HOST']		= false;
 $DB['CIPHER_LIST']		= '';
 
 // Vault configuration. Used if database credentials are stored in Vault secrets manager.
+$DB['VAULT']			= '';
 $DB['VAULT_URL']		= '';
 $DB['VAULT_DB_PATH']	= '';
 $DB['VAULT_TOKEN']		= '';
+$DB['VAULT_CERT_FILE']	= '';
+$DB['VAULT_KEY_FILE']	= '';
+// Uncomment to bypass local caching of credentials.
+// $DB['VAULT_CACHE']	= true;
 
 // Use IEEE754 compatible value range for 64-bit Numeric (float) history values.
 // This option is enabled by default for new Zabbix installations.

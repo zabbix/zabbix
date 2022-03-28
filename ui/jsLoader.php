@@ -27,6 +27,9 @@ setupLocale(array_key_exists('lang', $_GET) ? (string) $_GET['lang'] : 'en_GB');
 
 require_once dirname(__FILE__).'/include/js.inc.php';
 
+require_once dirname(__FILE__).'/include/defines.inc.php';
+require_once dirname(__FILE__).'/include/classes/helpers/CCookieHelper.php';
+
 // available scripts 'scriptFileName' => 'path relative to js/'
 $available_js = [
 	'common.js' => '',
@@ -415,7 +418,6 @@ $translate_strings = [
 	],
 	'macrovalue.js' => [
 		'Set new value' => _('Set new value'),
-		'path/to/secret:key' => _('path/to/secret:key'),
 		'value' => _('value')
 	],
 	'popup.condition.common.js' => [
@@ -461,9 +463,6 @@ if (empty($_GET['files'])) {
 		'textareaflexible.js',
 		'init.js'
 	];
-
-	require_once dirname(__FILE__).'/include/defines.inc.php';
-	require_once dirname(__FILE__).'/include/classes/helpers/CCookieHelper.php';
 
 	if (CCookieHelper::has(ZBX_SESSION_NAME)) {
 		$session = json_decode(base64_decode(CCookieHelper::get(ZBX_SESSION_NAME)), true);

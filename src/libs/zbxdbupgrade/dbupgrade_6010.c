@@ -29,7 +29,7 @@ extern unsigned char	program_type;
 
 #ifndef HAVE_SQLITE3
 
-static int	DBpatch_6010001(void)
+static int	DBpatch_6010000(void)
 {
 #define ZBX_MD5_SIZE	32
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
@@ -42,12 +42,68 @@ static int	DBpatch_6010001(void)
 #undef ZBX_MD5_SIZE
 }
 
+static int	DBpatch_6010001(void)
+{
+	const ZBX_FIELD	field = {"vault_provider", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6010002(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = SUCCEED;
+	char		*sql = NULL, *descripton_esc;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	result = DBselect(
+		"select triggerid,description"
+		" from triggers"
+		" where " ZBX_DB_CHAR_LENGTH(description) ">%d", 255);
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		row[1][zbx_strlen_utf8_nchars(row[1], 255)] = '\0';
+
+		descripton_esc = DBdyn_escape_field("triggers", "description", row[1]);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"update triggers set description='%s' where triggerid=%s;\n", descripton_esc, row[0]);
+		zbx_free(descripton_esc);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_6010003(void)
+{
+	const ZBX_FIELD	old_field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("triggers", &field, &old_field);
+}
 #endif
 
 DBPATCH_START(6010)
 
 /* version, duplicates flag, mandatory flag */
 
+DBPATCH_ADD(6010000, 0, 1)
 DBPATCH_ADD(6010001, 0, 1)
+DBPATCH_ADD(6010002, 0, 1)
+DBPATCH_ADD(6010003, 0, 1)
 
 DBPATCH_END()
