@@ -20,6 +20,7 @@ OBJS = \
 	$(OUTPUTDIR)\fatal.o \
 	$(OUTPUTDIR)\disk.o \
 	$(OUTPUTDIR)\iprange.o \
+	$(OUTPUTDIR)\zbxhash.o \
 	$(OUTPUTDIR)\md5.o \
 	$(OUTPUTDIR)\sysinfo.o \
 	$(OUTPUTDIR)\vector.o \
@@ -129,7 +130,10 @@ $(OUTPUTDIR)\disk.o: $(TOPDIR)\src\libs\zbxwin32\disk.c
 $(OUTPUTDIR)\threads.o: $(TOPDIR)\src\libs\zbxsys\threads.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
-$(OUTPUTDIR)\md5.o: $(TOPDIR)\src\libs\zbxcrypto\md5.c
+$(OUTPUTDIR)\zbxhash.o: $(TOPDIR)\src\libs\zbxhash\zbxhash.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\md5.o: $(TOPDIR)\src\libs\zbxhash\md5.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\json_parser.o: $(TOPDIR)\src\libs\zbxjson\json_parser.c

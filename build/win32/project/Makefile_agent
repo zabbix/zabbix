@@ -52,8 +52,9 @@ OBJS = \
 	..\..\..\src\libs\zbxcompress\compress.o \
 	..\..\..\src\libs\zbxconf\cfg.o \
 	..\..\..\src\libs\zbxcrypto\base64.o \
-	..\..\..\src\libs\zbxcrypto\md5.o \
+	..\..\..\src\libs\zbxhash\md5.o \
 	..\..\..\src\libs\zbxcrypto\sha256crypt.o \
+	..\..\..\src\libs\zbxcrypto\crypto.o \
 	..\..\..\src\libs\zbxjson\json.o \
 	..\..\..\src\libs\zbxjson\json_parser.o \
 	..\..\..\src\libs\zbxjson\jsonpath.o \
@@ -62,6 +63,7 @@ OBJS = \
 	..\..\..\src\libs\zbxsys\symbols.o \
 	..\..\..\src\libs\zbxsys\threads.o \
 	..\..\..\src\libs\zbxexec\execute.o \
+	..\..\..\src\libs\zbxhash\zbxhash.o \
 	..\..\..\src\libs\zbxhttp\http.o \
 	..\..\..\src\libs\zbxhttp\punycode.o \
 	..\..\..\src\libs\zbxhttp\urlencode.o \

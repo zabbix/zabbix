@@ -9,6 +9,7 @@ DIST_SUBDIRS = \
 	zbxalgo \
 	zbxmedia \
 	zbxcrypto \
+	zbxhash \
 	zbxcommon \
 	zbxcomms \
 	zbxcommshigh \
@@ -107,6 +108,7 @@ endif
 endif
 
 SUBDIRS = \
+	zbxhash \
 	zbxcrypto \
 	zbxcommon \
 	zbxlog \
