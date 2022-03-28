@@ -1,9 +1,9 @@
 Changes for 5.4.12rc1
 
 New features:
-...G.....T [ZBXNEXT-7065] added queries metrics to postgresql by agent2 template (esneiders, vkhaliev)
-A.F....... [ZBXNEXT-7485] fixed debug_backtrace function usage for php8 (acikuns)
-.D.G...... [ZBXNEXT-7116] added ability to force active checks after restart on Zabbix agent2 (vso)
+...G.....T [ZBXNEXT-7065] added queries metrics to the PostgreSQL by agent 2 template (esneiders, vkhaliev)
+A.F....... [ZBXNEXT-7485] fixed debug_backtrace function usage for PHP8 (acikuns)
+.D.G...... [ZBXNEXT-7116] added the ability to force active checks after restart to Zabbix agent 2 (vso)
 
 Bug fixes:
 ..F....... [ZBX-19223] fixed disabled hosts not listed in latest data view (averza)
