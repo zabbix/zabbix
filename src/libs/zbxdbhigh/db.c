@@ -870,6 +870,11 @@ int DBcheck_capabilities_timescaledb(zbx_uint32_t db_version, struct zbx_json *j
 	}
 	else if (ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION > timescaledb_version)
 	{
+		/* It is not possible to check compression support for TimescaleDB 1.x, */
+		/* and we assume that compression is supported. */
+		/* This should be implemented this way to keep comression enabled at Zabbix setups with TimescaleDB 1.x, */
+		/* which actually support compression. */
+		compression_available = 1; /* enable */
 		zabbix_log(LOG_LEVEL_WARNING, "TimescaleDB version %d is not officially supported.", timescaledb_version);
 		zabbix_log(LOG_LEVEL_WARNING, "Recommended version should be at least %s %s.",
 				ZBX_TIMESCALEDB_LICENSE_TIMESCALE_FRIENDLY, ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION_FRIENDLY);
