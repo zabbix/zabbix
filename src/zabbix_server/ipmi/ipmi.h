@@ -21,8 +21,8 @@
 #define ZABBIX_IPMI_H
 
 #include "dbcache.h"
-#include "zbxtypes.h"
-#include "config.h"
+#include "common/zbxtypes.h"
+#include "common/zbxconfig.h"
 
 #ifdef HAVE_OPENIPMI
 

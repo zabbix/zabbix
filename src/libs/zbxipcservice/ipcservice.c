@@ -6,7 +6,7 @@
 #	include <event.h>
 #endif
 
-#include "zbxtypes.h"
+#include "common/zbxtypes.h"
 #include "zbxalgo.h"
 #include "log.h"
 #include "zbxipcservice.h"

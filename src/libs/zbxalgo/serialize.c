@@ -18,7 +18,7 @@
 **/
 
 #include "string.h"
-#include "zbxtypes.h"
+#include "common/zbxtypes.h"
 #include "zbxserialize.h"
 
 /******************************************************************************

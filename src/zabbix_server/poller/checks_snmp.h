@@ -20,7 +20,7 @@
 #ifndef ZABBIX_CHECKS_SNMP_H
 #define ZABBIX_CHECKS_SNMP_H
 
-#include "config.h"
+#include "common/zbxconfig.h"
 #include "module.h"
 #include "dbcache.h"
 

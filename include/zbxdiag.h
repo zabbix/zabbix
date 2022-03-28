@@ -21,7 +21,7 @@
 #ifndef ZABBIX_ZBXDIAG_H
 #define ZABBIX_ZBXDIAG_H
 
-#include "zbxtypes.h"
+#include "common/zbxtypes.h"
 #include "zbxjson.h"
 
 typedef enum

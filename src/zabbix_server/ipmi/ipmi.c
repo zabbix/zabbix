@@ -19,7 +19,7 @@
 
 #include "ipmi.h"
 
-#include "config.h"
+#include "common/zbxconfig.h"
 
 #ifdef HAVE_OPENIPMI
 

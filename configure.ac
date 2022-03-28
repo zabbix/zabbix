@@ -27,7 +27,7 @@ AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
 AC_PROG_MAKE_SET
 
-AM_CONFIG_HEADER(include/config.h)
+AM_CONFIG_HEADER(include/common/zbxconfig.h)
 
 AC_CANONICAL_HOST
 

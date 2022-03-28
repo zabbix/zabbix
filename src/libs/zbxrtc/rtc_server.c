@@ -21,7 +21,7 @@
 #include "zbxdiag.h"
 #include "zbxjson.h"
 #include "zbxha.h"
-#include "zbxtypes.h"
+#include "common/zbxtypes.h"
 #include "common.h"
 
 #include "rtc.h"

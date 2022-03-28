@@ -18,7 +18,7 @@
 **/
 
 #include "common.h"
-#include "zbxtypes.h"
+#include "common/zbxtypes.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #include "symbols.h"

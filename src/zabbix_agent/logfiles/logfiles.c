@@ -27,7 +27,7 @@
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "symbols.h"
-#	include "zbxtypes.h"	/* ssize_t */
+#	include "common/zbxtypes.h"	/* ssize_t */
 #endif /* _WINDOWS */
 
 #define MAX_LEN_MD5	512	/* maximum size of the first and the last blocks of the file to calculate MD5 sum for */

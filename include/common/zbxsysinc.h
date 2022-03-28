@@ -20,7 +20,7 @@
 #ifndef ZABBIX_SYSINC_H
 #define ZABBIX_SYSINC_H
 
-#include "config.h"
+#include "zbxconfig.h"
 
 #ifdef HAVE_STDIO_H
 #	include <stdio.h>

@@ -20,7 +20,7 @@
 #ifndef ZABBIX_SERVICE_H
 #define ZABBIX_SERVICE_H
 
-#include "zbxtypes.h"
+#include "common/zbxtypes.h"
 #include "db.h"
 #include "zbxipcservice.h"
 

@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ZBXKSTAT_H
 #define ZABBIX_ZBXKSTAT_H
 
-#include "zbxtypes.h"
+#include "common/zbxtypes.h"
 
 #if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
 

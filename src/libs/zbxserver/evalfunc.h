@@ -20,7 +20,7 @@
 #ifndef ZABBIX_EVALFUNC_H
 #define ZABBIX_EVALFUNC_H
 
-#include "zbxtypes.h"
+#include "common/zbxtypes.h"
 #include "dbcache.h"
 
 int	zbx_evaluatable_for_notsupported(const char *fn);

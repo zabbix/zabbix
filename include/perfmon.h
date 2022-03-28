@@ -20,7 +20,7 @@
 #ifndef ZABBIX_PERFMON_H
 #define ZABBIX_PERFMON_H
 
-#include "sysinc.h"
+#include "common/zbxsysinc.h"
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 #	error "This module is only available for Windows OS"
