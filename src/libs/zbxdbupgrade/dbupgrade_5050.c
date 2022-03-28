@@ -23,6 +23,7 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
+#include "zbxhash.h"
 
 extern unsigned char	program_type;
 

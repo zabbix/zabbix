@@ -23,7 +23,6 @@
 #include "sysinc.h"
 #include "module.h"
 #include "version.h"
-#include "md5.h"
 
 #if defined(__MINGW32__)
 #	define __try
@@ -1685,8 +1684,6 @@ int	zbx_validate_value_dbl(double value, int dbl_precision);
 void	zbx_update_env(double time_now);
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
 		int *nextcheck, int *scheduling, char **error);
-#define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
-char	*zbx_create_token(zbx_uint64_t seed);
 
 #define ZBX_MAINTENANCE_IDLE		0
 #define ZBX_MAINTENANCE_RUNNING		1
@@ -1787,7 +1784,4 @@ typedef enum
 	ERR_Z3008
 }
 zbx_err_codes_t;
-
-void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
-int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len);
 #endif

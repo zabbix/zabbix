@@ -22,6 +22,7 @@
 #include "log.h"
 #include "logfiles.h"
 #include "zbxjson.h"
+#include "zbxcrypto.h"
 
 /* tags for agent persistent storage files */
 #define ZBX_PERSIST_TAG_FILENAME		"filename"
