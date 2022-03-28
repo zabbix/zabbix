@@ -1,1 +1,0 @@
-...G...... [ZBX-20528] fixed issue with pgsql.custom.query json response failing for Zabbix agent 2 (esneiders)
