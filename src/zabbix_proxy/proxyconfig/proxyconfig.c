@@ -40,7 +40,7 @@ extern char		*CONFIG_HOSTNAME;
 extern char		*CONFIG_SOURCE_IP;
 extern unsigned int	configured_tls_connect_mode;
 
-static void	process_configuration_sync(size_t *data_size, unsigned char *synced)
+static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced)
 {
 	zbx_socket_t		sock;
 	struct	zbx_json_parse	jp, jp_kvs_paths = {0};
@@ -154,7 +154,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	double			sec;
 	zbx_ipc_async_socket_t	rtc;
 	int			sleeptime;
-	unsigned char		synced = ZBX_SYNCED_NEW_CONFIG_NO;
+	zbx_synced_new_config_t	synced = ZBX_SYNCED_NEW_CONFIG_NO;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;

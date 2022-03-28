@@ -2712,7 +2712,7 @@ static unsigned char	*config_decode_serialized_expression(const char *src)
 	return dst;
 }
 
-static void	DCsync_items(zbx_dbsync_t *sync, int flags, unsigned char synced)
+static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t synced)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -5983,7 +5983,7 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
  * Purpose: Synchronize configuration data from database                      *
  *                                                                            *
  ******************************************************************************/
-void	DCsync_configuration(unsigned char mode, unsigned char synced)
+void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 {
 	int		i, flags;
 	double		sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, idsec, isec, tisec, pisec, tsec, dsec, fsec, expr_sec,

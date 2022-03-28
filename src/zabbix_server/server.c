@@ -288,7 +288,7 @@ int	CONFIG_SERVER_STARTUP_TIME	= 0;	/* zabbix server startup time */
 
 int	CONFIG_PROXYPOLLER_FORKS	= 1;	/* parameters for passive proxies */
 
-/* how often Zabbix server sends configuration data to proxy, in seconds */
+/* how often Zabbix server sends configuration data to passive proxy, in seconds */
 int	CONFIG_PROXYCONFIG_FREQUENCY	= SEC_PER_MIN * 5;
 int	CONFIG_PROXYDATA_FREQUENCY	= 1;	/* 1s */
 

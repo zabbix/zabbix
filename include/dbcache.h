@@ -655,6 +655,13 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 #define ZBX_DBSYNC_UPDATE	1
 #define ZBX_SYNC_SECRETS	2
 
+typedef enum
+{
+	ZBX_SYNCED_NEW_CONFIG_NO,
+	ZBX_SYNCED_NEW_CONFIG_YES
+}
+zbx_synced_new_config_t;
+
 #define ZBX_ITEM_GET_MISC		0x001
 #define ZBX_ITEM_GET_DELAY		0x002
 #define ZBX_ITEM_GET_EMPTY_ERROR	0x004
@@ -675,10 +682,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
 #define ZBX_ITEM_GET_PROCESS		(ZBX_ITEM_GET_MAINTENANCE|ZBX_ITEM_GET_MISC|ZBX_ITEM_GET_LOGTIMEFMT)
 
-#define ZBX_SYNCED_NEW_CONFIG_NO	0
-#define ZBX_SYNCED_NEW_CONFIG_YES	1
-
-void	DCsync_configuration(unsigned char mode, unsigned char synced);
+void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced);
 void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths);
 int	init_configuration_cache(char **error);
 void	free_configuration_cache(void);
