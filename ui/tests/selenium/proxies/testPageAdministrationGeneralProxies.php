@@ -657,9 +657,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 		else {
 			$this->assertMessage(TEST_GOOD, $data['title'], CTestArrayHelper::get($data, 'message', null));
 
-			/*
-			 * Check DB. Status = 5 for Active proxy, status = 6 for Passive proxy.
-			 */
+			// Check DB. Status 5 stands for Active proxy and status 6 - for Passive proxy.
 			$db_proxies = CDBHelper::getColumn('SELECT * FROM hosts WHERE status IN (5,6)', 'host');
 
 			foreach ($data['proxies'] as $proxy) {
