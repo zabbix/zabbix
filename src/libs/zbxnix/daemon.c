@@ -386,12 +386,13 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 			{
 				int		pid_file_timeout = ZBX_PID_FILE_TIMEOUT;
 				zbx_stat_t	stat_buff;
+				struct timespec	ts = {0, ZBX_PID_FILE_SLEEP_TIME};
 
 				/* wait for the forked child to create pid file */
 				while (0 < pid_file_timeout && 0 != zbx_stat(CONFIG_PID_FILE, &stat_buff))
 				{
 					pid_file_timeout--;
-					usleep(ZBX_PID_FILE_SLEEP_TIME);
+					nanosleep(&ts, NULL);
 				}
 			}
 
