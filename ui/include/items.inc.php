@@ -1196,26 +1196,41 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 
 	$has_hidden_hosts = (count($db_hosts) > ZBX_MAX_TABLE_COLUMNS);
 	$db_hosts = array_slice($db_hosts, 0, ZBX_MAX_TABLE_COLUMNS, true);
+	$host_names = array_column($db_hosts, 'name', 'name');
 
 	$data = array_slice($data, 0, ZBX_MAX_TABLE_COLUMNS, true);
 	$items_left = ZBX_MAX_TABLE_COLUMNS;
 	$itemids = [];
-	array_walk($data, function (array &$item_columns) use (&$itemids, &$items_left) {
+
+	foreach ($data as &$item_columns) {
 		if ($items_left != 0) {
 			$item_columns = array_slice($item_columns, 0, min(ZBX_MAX_TABLE_COLUMNS, $items_left));
 			$items_left -= count($item_columns);
 		}
 		else {
 			$item_columns = null;
-			return;
+			break;
 		}
 
-		array_walk($item_columns, function (array &$item_column) use (&$itemids) {
+		foreach ($item_columns as &$item_column) {
 			CArrayHelper::ksort($item_column);
 			$item_column = array_slice($item_column, 0, ZBX_MAX_TABLE_COLUMNS, true);
-			$itemids += array_column($item_column, 'itemid', 'itemid');
-		});
-	});
+
+			foreach ($item_column as $host_name => $item) {
+				if (array_key_exists($host_name, $host_names)) {
+					$itemids[$item['itemid']] = true;
+				}
+				else {
+					unset($item_column[$host_name]);
+				}
+			}
+		}
+		unset($item_column);
+
+		$item_columns = array_filter($item_columns);
+	}
+	unset($item_columns);
+
 	$data = array_filter($data);
 
 	$has_hidden_items = (count($db_items) != count($itemids));
