@@ -7,7 +7,7 @@ For Zabbix version: 6.0 and higher
 The template for monitoring S.M.A.R.T. attributes of physical disk that works without any external scripts.
 It collects metrics by Zabbix agent 2 version 5.0 and later with Smartmontools version 7.1 and later.
 Disk discovery LLD rule finds all HDD, SSD, NVMe disks with S.M.A.R.T. enabled. Attribute discovery LLD rule have pre-defined Vendor Specific Attributes
-for each disk, and will be discovered if attribute present.
+for each disk, and will be discovered if attribute is present.
 
 
 This template was tested on:

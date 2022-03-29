@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-24T16:09:53Z'
+  date: '2022-03-29T17:42:45Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -11,7 +11,7 @@ zabbix_export:
       template: 'SMART by Zabbix agent 2 active'
       name: 'SMART by Zabbix agent 2 active'
       description: |
-        The template for monitoring S.M.A.R.T. attributes of physical disk that works without any external scripts. It collects metrics by Zabbix agent 2 version 5.0 and later with Smartmontools version 7.1 and later. Disk discovery LLD rule finds all HDD, SSD, NVMe disks with S.M.A.R.T. enabled. Attribute discovery LLD rule have pre-defined Vendor Specific Attributes for each disk, and will be discovered if attribute present.
+        The template for monitoring S.M.A.R.T. attributes of physical disk that works without any external scripts. It collects metrics by Zabbix agent 2 version 5.0 and later with Smartmontools version 7.1 and later. Disk discovery LLD rule finds all HDD, SSD, NVMe disks with S.M.A.R.T. enabled. Attribute discovery LLD rule have pre-defined Vendor Specific Attributes for each disk, and will be discovered if attribute is present.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/415662-discussion-thread-for-official-zabbix-smart-disk-monitoring
         
