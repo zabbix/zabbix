@@ -112,8 +112,6 @@ class HostInterfaceManager {
 
 				this.interfaces[value.interfaceid] = value;
 			});
-
-		return this;
 	}
 
 	/**
