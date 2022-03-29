@@ -48,7 +48,7 @@ INSERT INTO tplgrp (groupid,name) VALUES (52005,'API template group with templat
 INSERT INTO tplgrp (groupid,name) VALUES (52006,'API template group with template 2');
 INSERT INTO tplgrp (groupid,name) VALUES (52007,'API template group to delete 2');
 INSERT INTO tplgrp (groupid,name) VALUES (52008,'API template group to delete 3');
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50020, 'API Template', 'API Template', 3, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (50020, 'API Template 2', 'API Template 2', 3, '');
 INSERT INTO template_group (templategroupid, hostid, groupid) VALUES (55001, 50020, 52005);
 INSERT INTO template_group (templategroupid, hostid, groupid) VALUES (55002, 50020, 52006);
 

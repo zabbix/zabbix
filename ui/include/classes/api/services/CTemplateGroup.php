@@ -45,7 +45,7 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function get(array $params): array {
+	public function get(array $params) {
 		$result = [];
 
 		$sqlParts = [
@@ -61,19 +61,19 @@ class CTemplateGroup extends CApiService {
 			'templateids'							=> ['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'graphids'								=> ['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'triggerids'							=> ['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'templated_hosts'						=> ['type' => API_FLAG, 'flags' => API_DEPRECATED],
-			'with_templates'						=> ['type' => API_FLAG, 'default' => false],
-			'with_items'							=> ['type' => API_FLAG, 'default' => false],
-			'with_item_prototypes'					=> ['type' => API_FLAG, 'default' => false],
-			'with_simple_graph_items'				=> ['type' => API_FLAG, 'default' => false],
-			'with_simple_graph_item_prototypes'		=> ['type' => API_FLAG, 'default' => false],
-			'with_monitored_items'					=> ['type' => API_FLAG, 'default' => false],
-			'with_triggers'							=> ['type' => API_FLAG, 'default' => false],
-			'with_monitored_triggers'				=> ['type' => API_FLAG, 'default' => false],
-			'with_httptests'						=> ['type' => API_FLAG, 'default' => false],
-			'with_monitored_httptests'				=> ['type' => API_FLAG, 'default' => false],
-			'with_graphs'							=> ['type' => API_FLAG, 'default' => false],
-			'with_graph_prototypes'					=> ['type' => API_FLAG, 'default' => false],
+			'templated_hosts'						=> ['type' => API_BOOLEAN, 'flags' => API_DEPRECATED],
+			'with_templates'						=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_items'							=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_item_prototypes'					=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_simple_graph_items'				=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_simple_graph_item_prototypes'		=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_monitored_items'					=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_triggers'							=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_monitored_triggers'				=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_httptests'						=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_monitored_httptests'				=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_graphs'							=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_graph_prototypes'					=> ['type' => API_BOOLEAN, 'default' => false],
 			'editable'								=> ['type' => API_BOOLEAN, 'default' => false],
 			'nopermissions'							=> ['type' => API_BOOLEAN, 'default' => false],
 			// filter
@@ -84,16 +84,16 @@ class CTemplateGroup extends CApiService {
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 			]],
 			'searchByAny'							=> ['type' => API_BOOLEAN, 'default' => false],
-			'startSearch'							=> ['type' => API_FLAG, 'default' => false],
-			'excludeSearch'							=> ['type' => API_FLAG, 'default' => false],
+			'startSearch'							=> ['type' => API_BOOLEAN, 'default' => false],
+			'excludeSearch'							=> ['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled'				=> ['type' => API_BOOLEAN, 'default' => false],
 			// output
 			'output'								=> ['type' => API_OUTPUT, 'in' => implode(',', ['groupid', 'name']), 'default' => API_OUTPUT_EXTEND],
 			'selectTemplates'						=> ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'default' => null],
 			'selectGroupDiscovery'					=> ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'selectDiscoveryRule'					=> ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'countOutput'							=> ['type' => API_FLAG, 'default' => false],
-			'groupCount'							=> ['type' => API_FLAG, 'default' => false],
+			'countOutput'							=> ['type' => API_BOOLEAN, 'default' => false],
+			'groupCount'							=> ['type' => API_BOOLEAN, 'default' => false],
 			'preservekeys'							=> ['type' => API_BOOLEAN, 'default' => false],
 			'sortfield'								=> ['type' => API_STRING_UTF8, 'default' => ''],
 			'sortorder'								=> ['type' => API_SORTORDER, 'default' => []],
@@ -101,16 +101,17 @@ class CTemplateGroup extends CApiService {
 			'limitSelects'							=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
 		]];
 
-		if (!CApiInputValidator::validate($api_input_rules, $params, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
 		if (array_key_exists('templated_hosts', $params)) {
 			if (array_key_exists('with_templates', $params)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'templated_hosts'));
 			}
 
 			$params['with_templates'] = $params['templated_hosts'];
+			unset( $params['templated_hosts']);
+		}
+
+		if (!CApiInputValidator::validate($api_input_rules, $params, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		// editable + PERMISSION CHECK

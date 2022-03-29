@@ -42,14 +42,14 @@ $filter = (new CFilter())
 	->addFilterTab(_('Filter'), [
 		(new CFormList())
 			->addRow(
-				(new CLabel(_('Host groups'), 'filter_groups__ms')),
+				(new CLabel(_('Template groups'), 'filter_groups__ms')),
 				(new CMultiSelect([
 					'name' => 'filter_groups[]',
-					'object_name' => 'hostGroup',
+					'object_name' => 'templateGroup',
 					'data' => $data['filter']['groups'],
 					'popup' => [
 						'parameters' => [
-							'srctbl' => 'host_groups',
+							'srctbl' => 'template_group',
 							'srcfld1' => 'groupid',
 							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_groups_',

@@ -34,6 +34,20 @@ function isReadableHostGroups(array $groupids) {
 }
 
 /**
+ * Check if user has read permissions for template groups.
+ *
+ * @param array $groupids
+ *
+ * @return bool
+ */
+function isReadableTemplateGroups(array $groupids) {
+	return count($groupids) == API::TemplateGroup()->get([
+			'countOutput' => true,
+			'groupids' => $groupids
+		]);
+}
+
+/**
  * Check if user has write permissions for host groups.
  *
  * @param array $groupids
@@ -84,6 +98,47 @@ function getSubGroups(array $groupids, array &$ms_groups = null, array $options 
 			'startSearch' => true,
 			'preservekeys' => true
 		] + $options);
+	}
+
+	return array_keys($db_groups);
+}
+
+/**
+ * Get sub-groups of selected template groups.
+ *
+ * @param array $template_groupids
+ * @param array $ms_template_groups  [OUT] the list of groups for multiselect.
+ * @param array $options    additional API options to select template groups.
+ *
+ * @return array
+ */
+function getTemplateSubGroups(array $template_groupids, array &$ms_template_groups = null, array $options = []) {
+	$db_groups = $template_groupids
+		? API::TemplateGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $template_groupids,
+				'preservekeys' => true
+			] + $options)
+		: [];
+
+	if ($ms_template_groups !== null) {
+		$ms_template_groups = CArrayHelper::renameObjectsKeys($db_groups, ['groupid' => 'id']);
+	}
+
+	$db_groups_names = [];
+
+	foreach ($db_groups as $db_group) {
+		$db_groups_names[] = $db_group['name'].'/';
+	}
+
+	if ($db_groups_names) {
+		$db_groups += API::TemplateGroup()->get([
+				'output' => ['groupid'],
+				'search' => ['name' => $db_groups_names],
+				'searchByAny' => true,
+				'startSearch' => true,
+				'preservekeys' => true
+			] + $options);
 	}
 
 	return array_keys($db_groups);

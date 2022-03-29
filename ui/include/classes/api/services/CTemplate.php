@@ -333,7 +333,7 @@ class CTemplate extends CHostGeneral {
 
 		$this->checkTemplatesLinks($templates);
 
-		$this->updateGroups($templates);
+		$this->updateTemplateGroups($templates);
 		$this->updateTagsNew($templates);
 		$this->updateMacros($templates);
 		$this->updateTemplates($templates);
@@ -439,13 +439,11 @@ class CTemplate extends CHostGeneral {
 			DB::update('hosts', $upd_templates);
 		}
 
-		$this->updateGroups($templates, $db_templates);
+		$this->updateTemplateGroups($templates, $db_templates);
 		$this->updateTagsNew($templates, $db_templates);
 		$this->updateMacros($templates, $db_templates);
 		$this->updateTemplates($templates, $db_templates);
-
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE, $templates, $db_templates);
-
 		return ['templateids' => array_column($templates, 'templateid')];
 	}
 
@@ -499,7 +497,6 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$this->addAffectedObjects($templates, $db_templates);
-
 		$this->checkDuplicates($templates, $db_templates);
 		$this->checkGroups($templates, $db_templates);
 		$this->checkTemplates($templates, $db_templates);
@@ -733,7 +730,7 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Add given host groups, macros and templates to given templates.
+	 * Add given template groups, macros and templates to given templates.
 	 *
 	 * @param array $data
 	 *
@@ -744,7 +741,7 @@ class CTemplate extends CHostGeneral {
 
 		$templates = $this->getObjectsByData($data, $db_templates);
 
-		$this->updateGroups($templates, $db_templates);
+		$this->updateTemplateGroups($templates, $db_templates);
 		$this->updateMacros($templates, $db_templates);
 		$this->updateTemplates($templates, $db_templates);
 
@@ -754,7 +751,7 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Replace host groups, macros and templates on the given templates.
+	 * Replace template groups, macros and templates on the given templates.
 	 *
 	 * @param array $data
 	 *
@@ -765,7 +762,7 @@ class CTemplate extends CHostGeneral {
 
 		$templates = $this->getObjectsByData($data, $db_templates);
 
-		$this->updateGroups($templates, $db_templates);
+		$this->updateTemplateGroups($templates, $db_templates);
 		$this->updateMacros($templates, $db_templates);
 		$this->updateTemplates($templates, $db_templates);
 
@@ -775,7 +772,7 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Remove given host groups, macros and templates from given templates.
+	 * Remove given template groups, macros and templates from given templates.
 	 *
 	 * @param array $data
 	 *
@@ -786,7 +783,7 @@ class CTemplate extends CHostGeneral {
 
 		$templates = $this->getObjectsByData($data, $db_templates);
 
-		$this->updateGroups($templates, $db_templates);
+		$this->updateTemplateGroups($templates, $db_templates);
 		$this->updateMacros($templates, $db_templates);
 		$this->updateTemplates($templates, $db_templates);
 

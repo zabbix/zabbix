@@ -57,7 +57,7 @@ if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 	if (getRequest('hostgroupid') && !isReadableHostGroups([getRequest('hostgroupid')])) {
 		access_deny();
 	}
-	if (getRequest('filter_groups') && !isReadableHostGroups([getRequest('filter_groups')])) {
+	if (getRequest('filter_groups') && !isReadableTemplateGroups([getRequest('filter_groups')])) {
 		access_deny();
 	}
 	if (getRequest('filter_templateid') && !isReadableTemplates([getRequest('filter_templateid')])) {
@@ -219,13 +219,15 @@ else {
 	// Make filter fields.
 	if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 		// Sanitize $data['filter']['groups'] and prepare "Template group" select options.
-		$groups = API::HostGroup()->get([
+		$groups = API::TemplateGroup()->get([
 			'output' => ['name'],
 			'templated_hosts' => true,
 			'with_triggers' => true,
 			'preservekeys' => true
 		]);
-		$groups = enrichParentGroups($groups);
+
+		$groups = enrichParentTemplateGroups($groups);
+
 		CArrayHelper::sort($groups, ['name']);
 
 		if (!array_key_exists($data['filter']['groups'], $groups)) {

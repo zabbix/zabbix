@@ -62,42 +62,44 @@ class CHostGroup extends CApiService {
 			'graphids'								=> ['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'triggerids'							=> ['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'maintenanceids'						=> ['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'with_monitored_hosts'					=> ['type' => API_FLAG, 'default' => false],
-			'monitored_hosts'						=> ['type' => API_FLAG, 'flags' => API_DEPRECATED],
-			'with_hosts'							=> ['type' => API_FLAG, 'default' => false],
-			'real_hosts'							=> ['type' => API_FLAG, 'flags' => API_DEPRECATED],
-			'with_host_and_templates'				=> ['type' => API_FLAG, 'flags' => API_DEPRECATED],
-			'with_items'							=> ['type' => API_FLAG, 'default' => false],
-			'with_item_prototypes'					=> ['type' => API_FLAG, 'default' => false],
-			'with_simple_graph_items'				=> ['type' => API_FLAG, 'default' => false],
-			'with_simple_graph_item_prototypes'		=> ['type' => API_FLAG, 'default' => false],
-			'with_monitored_items'					=> ['type' => API_FLAG, 'default' => false],
-			'with_triggers'							=> ['type' => API_FLAG, 'default' => false],
-			'with_monitored_triggers'				=> ['type' => API_FLAG, 'default' => false],
-			'with_httptests'						=> ['type' => API_FLAG, 'default' => false],
-			'with_monitored_httptests'				=> ['type' => API_FLAG, 'default' => false],
-			'with_graphs'							=> ['type' => API_FLAG, 'default' => false],
-			'with_graph_prototypes'					=> ['type' => API_FLAG, 'default' => false],
+			'monitored_hosts'						=> ['type' => API_BOOLEAN, 'flags' => API_DEPRECATED],
+			'with_monitored_hosts'					=> ['type' => API_BOOLEAN, 'default' => false],
+			'real_hosts'							=> ['type' => API_BOOLEAN, 'flags' => API_DEPRECATED],
+			'with_hosts'							=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_hosts_and_templates'				=> ['type' => API_BOOLEAN, 'flags' => API_DEPRECATED],
+			'templated_hosts'						=> ['type' => API_BOOLEAN, 'flags' => API_DEPRECATED],
+			'with_items'							=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_item_prototypes'					=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_simple_graph_items'				=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_simple_graph_item_prototypes'		=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_monitored_items'					=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_triggers'							=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_monitored_triggers'				=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_httptests'						=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_monitored_httptests'				=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_graphs'							=> ['type' => API_BOOLEAN, 'default' => false],
+			'with_graph_prototypes'					=> ['type' => API_BOOLEAN, 'default' => false],
 			'editable'								=> ['type' => API_BOOLEAN, 'default' => false],
 			'nopermissions'							=> ['type' => API_BOOLEAN, 'default' => false],
 			// filter
 			'filter'								=> ['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'flags' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 			]],
 			'search'								=> ['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 			]],
 			'searchByAny'							=> ['type' => API_BOOLEAN, 'default' => false],
-			'startSearch'							=> ['type' => API_FLAG, 'default' => false],
-			'excludeSearch'							=> ['type' => API_FLAG, 'default' => false],
+			'startSearch'							=> ['type' => API_BOOLEAN, 'default' => false],
+			'excludeSearch'							=> ['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled'				=> ['type' => API_BOOLEAN, 'default' => false],
 			// output
 			'output'								=> ['type' => API_OUTPUT, 'in' => implode(',', ['groupid', 'name', 'flags']), 'default' => API_OUTPUT_EXTEND],
 			'selectHosts'							=> ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'default' => null],
 			'selectGroupDiscovery'					=> ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'selectDiscoveryRule'					=> ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'countOutput'							=> ['type' => API_FLAG, 'default' => false],
-			'groupCount'							=> ['type' => API_FLAG, 'default' => false],
+			'countOutput'							=> ['type' => API_BOOLEAN, 'default' => false],
+			'groupCount'							=> ['type' => API_BOOLEAN, 'default' => false],
 			'preservekeys'							=> ['type' => API_BOOLEAN, 'default' => false],
 			'sortfield'								=> ['type' => API_STRING_UTF8, 'default' => ''],
 			'sortorder'								=> ['type' => API_SORTORDER, 'default' => []],
@@ -105,16 +107,13 @@ class CHostGroup extends CApiService {
 			'limitSelects'							=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
 		]];
 
-		if (!CApiInputValidator::validate($api_input_rules, $params, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
 		if (array_key_exists('real_hosts', $params)) {
 			if (array_key_exists('with_hosts', $params)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'real_hosts'));
 			}
 
 			$params['with_hosts'] = $params['real_hosts'];
+			unset($params['real_hosts']);
 		}
 
 		if (array_key_exists('monitored_hosts', $params)) {
@@ -123,10 +122,24 @@ class CHostGroup extends CApiService {
 			}
 
 			$params['with_monitored_hosts'] = $params['monitored_hosts'];
+			unset($params['monitored_hosts']);
 		}
 
 		if (array_key_exists('with_host_and_templates', $params)) {
+			if (array_key_exists('with_hosts', $params)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'with_host_and_templates'));
+			}
+
+			$params['with_hosts'] = $params['with_host_and_templates'];
+			unset($params['with_host_and_templates']);
+		}
+
+		if (array_key_exists('templated_hosts', $params)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'with_host_and_templates'));
+		}
+
+		if (!CApiInputValidator::validate($api_input_rules, $params, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		// editable + PERMISSION CHECK
