@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-01T09:26:54Z'
+  date: '2022-03-29T12:40:47Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1518,13 +1518,13 @@ zabbix_export:
                   expression: 'min(/PFSense SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/PFSense SNMP/net.if.in.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
-                  name: 'PFSense: High input error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+                  name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High input error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors in: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
                   dependencies:
                     -
-                      name: 'PFSense: Link down'
+                      name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
                       expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
                   tags:
                     -
@@ -1868,13 +1868,13 @@ zabbix_export:
                   expression: 'min(/PFSense SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/PFSense SNMP/net.if.out.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
-                  name: 'PFSense: High output error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+                  name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High output error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors out: {ITEM.LASTVALUE2}'
                   priority: WARNING
                   description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
                   dependencies:
                     -
-                      name: 'PFSense: Link down'
+                      name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
                       expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
                   tags:
                     -
@@ -2124,7 +2124,7 @@ zabbix_export:
                 -
                   uuid: d4392162d62541aeb148718ddd7f5d57
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
-                  name: 'PFSense: Link down'
+                  name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -2183,13 +2183,13 @@ zabbix_export:
               recovery_expression: |
                 (change(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])>0 and last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}],#2)>0) or
                 (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)
-              name: 'PFSense: Ethernet has changed to lower speed than it was before'
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.'
               dependencies:
                 -
-                  name: 'PFSense: Link down'
+                  name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
               tags:
                 -
@@ -2202,13 +2202,13 @@ zabbix_export:
                 last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/PFSense SNMP/net.if.in[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])'
-              name: 'PFSense: High inbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'In: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
               dependencies:
                 -
-                  name: 'PFSense: Link down'
+                  name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
               tags:
                 -
@@ -2221,13 +2221,13 @@ zabbix_export:
                 last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/PFSense SNMP/net.if.out[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])'
-              name: 'PFSense: High outbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'Out: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
               dependencies:
                 -
-                  name: 'PFSense: Link down'
+                  name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
               tags:
                 -
@@ -2236,7 +2236,7 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: 4679de2da218418e9564f0cc5a13e31a
-              name: 'PFSense: Inbound packet filter traffic interface [{#IFNAME}({#IFALIAS})]'
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Inbound packet filter traffic'
               graph_items:
                 -
                   color: 1A7C11
@@ -2291,7 +2291,7 @@ zabbix_export:
                     key: 'net.if.in.block.v6.pps[{#SNMPINDEX}]'
             -
               uuid: 3acc01b7ad11441ca2ea4dab13274efa
-              name: 'PFSense: Network traffic interface [{#IFNAME}({#IFALIAS})]'
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Network traffic'
               graph_items:
                 -
                   drawtype: GRADIENT_LINE
@@ -2336,7 +2336,7 @@ zabbix_export:
                     key: 'net.if.in.discards[{#SNMPINDEX}]'
             -
               uuid: 58b7aa7618274c9e9285d4c0b63c2ca8
-              name: 'PFSense: Outbound packet filter traffic interface [{#IFNAME}({#IFALIAS})]'
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Outbound packet filter traffic'
               graph_items:
                 -
                   color: 1A7C11
@@ -2480,7 +2480,7 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: 68683d3f206245639c89bda5da17e0d3
-              name: 'PFSense: Disk [{#DEVNAME}] read/write rates'
+              name: 'PFSense: [{#DEVNAME}]: Disk read/write rates'
               graph_items:
                 -
                   color: 1A7C11
@@ -2552,7 +2552,7 @@ zabbix_export:
                 -
                   uuid: 55324e1072f34c5fbc67a7f0566f64d6
                   expression: 'min(/PFSense SNMP/vfs.fs.inode.pfree[{#SNMPINDEX}],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
-                  name: 'PFSense: {#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
+                  name: 'PFSense: [{#FSNAME}]: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -2565,7 +2565,7 @@ zabbix_export:
                 -
                   uuid: 48917b7fd7cd4e16a7746ce9cf88a7b6
                   expression: 'min(/PFSense SNMP/vfs.fs.inode.pfree[{#SNMPINDEX}],5m)<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}'
-                  name: 'PFSense: {#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)'
+                  name: 'PFSense: [{#FSNAME}]: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)'
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: |
@@ -2573,7 +2573,7 @@ zabbix_export:
                     As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.
                   dependencies:
                     -
-                      name: 'PFSense: {#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
+                      name: 'PFSense: [{#FSNAME}]: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
                       expression: 'min(/PFSense SNMP/vfs.fs.inode.pfree[{#SNMPINDEX}],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
                   tags:
                     -
@@ -2650,14 +2650,14 @@ zabbix_export:
               expression: |
                 last(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                 ((last(/PFSense SNMP/vfs.fs.total[{#SNMPINDEX}])-last(/PFSense SNMP/vfs.fs.used[{#SNMPINDEX}]))<5G or timeleft(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}],1h,100)<1d)
-              name: 'PFSense: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"PFSense"}%)'
+              name: 'PFSense: [{#FSNAME}]: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
               description: |
-                Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"PFSense"}.
-                 Second condition should be one of the following:
-                 - The disk free space is less than 5G.
-                 - The disk will be full in less than 24 hours.
+                Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.
+                Second condition should be one of the following:
+                  - The disk free space is less than 5G.
+                  - The disk will be full in less than 24 hours."
               manual_close: 'YES'
               tags:
                 -
@@ -2671,18 +2671,18 @@ zabbix_export:
               expression: |
                 last(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
                 ((last(/PFSense SNMP/vfs.fs.total[{#SNMPINDEX}])-last(/PFSense SNMP/vfs.fs.used[{#SNMPINDEX}]))<10G or timeleft(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}],1h,100)<1d)
-              name: 'PFSense: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"PFSense"}%)'
+              name: 'PFSense: [{#FSNAME}]: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
               description: |
-                Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"PFSense"}.
-                 Second condition should be one of the following:
-                 - The disk free space is less than 10G.
-                 - The disk will be full in less than 24 hours.
+                Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.
+                Second condition should be one of the following:
+                  - The disk free space is less than 5G.
+                  - The disk will be full in less than 24 hours."
               manual_close: 'YES'
               dependencies:
                 -
-                  name: 'PFSense: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"PFSense"}%)'
+                  name: 'PFSense: [{#FSNAME}]: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
                   expression: |
                     last(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                     ((last(/PFSense SNMP/vfs.fs.total[{#SNMPINDEX}])-last(/PFSense SNMP/vfs.fs.used[{#SNMPINDEX}]))<5G or timeleft(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}],1h,100)<1d)
@@ -2696,7 +2696,7 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: af57ea943b0f45f6b03028ef48c07605
-              name: 'PFSense: Disk [{#FSNAME}] space usage'
+              name: 'PFSense: [{#FSNAME}]: Disk space usage'
               width: '600'
               height: '340'
               type: PIE
