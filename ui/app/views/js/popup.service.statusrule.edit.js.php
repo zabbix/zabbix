@@ -27,33 +27,41 @@ window.service_status_rule_edit_popup = new class {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
-		const type_selector = document.getElementById('service-status-rule-type');
+		document
+			.getElementById('service-status-rule-type')
+			.addEventListener('change', (e) => this._update());
 
-		type_selector.addEventListener('change', (e) => this.typeChange(e.target.value));
-		this.typeChange(type_selector.value)
+		this._update();
 	}
 
-	typeChange(type) {
-		const label = document.getElementById('service-status-rule-limit-value-label');
-		const unit = document.getElementById('service-status-rule-limit-value-unit');
+	_update() {
+		const type = document.getElementById('service-status-rule-type').value;
+
+		const limit_value_label = document.getElementById('service-status-rule-limit-value-label');
+		const limit_value_unit = document.getElementById('service-status-rule-limit-value-unit');
 
 		switch (type) {
 			case '<?= ZBX_SERVICE_STATUS_RULE_TYPE_N_GE ?>':
 			case '<?= ZBX_SERVICE_STATUS_RULE_TYPE_N_L ?>':
-				label.innerText = 'N';
-				unit.style.display = 'none';
+				limit_value_label.innerText = 'N';
+				limit_value_unit.style.display = 'none';
+
 				break;
+
 			case '<?= ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE ?>':
 			case '<?= ZBX_SERVICE_STATUS_RULE_TYPE_NP_L ?>':
 			case '<?= ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE ?>':
 			case '<?= ZBX_SERVICE_STATUS_RULE_TYPE_WP_L ?>':
-				label.innerText = 'N';
-				unit.style.display = '';
+				limit_value_label.innerText = 'N';
+				limit_value_unit.style.display = '';
+
 				break;
+
 			case '<?= ZBX_SERVICE_STATUS_RULE_TYPE_W_GE ?>':
 			case '<?= ZBX_SERVICE_STATUS_RULE_TYPE_W_L ?>':
-				label.innerText = 'W';
-				unit.style.display = 'none';
+				limit_value_label.innerText = 'W';
+				limit_value_unit.style.display = 'none';
+
 				break;
 		}
 	}
