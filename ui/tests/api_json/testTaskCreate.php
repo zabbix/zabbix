@@ -1180,7 +1180,7 @@ class testTaskCreate extends CAPITest {
 
 	/**
 	 * Test valid items and create tasks for them. Then create same tasks again for same items and expect task IDs to be
-	 * the same. No new records sould be added in for "check now". However diagnostic info does not have that check in
+	 * the same. No new records should be added in for "check now". However diagnostic info does not have that check in
 	 * API and will create new record for diagnostic info tasks. Those task IDs are collected and then removed
 	 * when data is cleared.
 	 *
