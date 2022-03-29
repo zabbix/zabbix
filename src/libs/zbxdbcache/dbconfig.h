@@ -908,8 +908,10 @@ void	DCdump_configuration(void);
 void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found);
 
 /* string pool */
-void	zbx_strpool_release(const char *str);
-int	DCstrpool_replace(int found, const char **curr, const char *new_str);
+const char	*dc_strpool_intern(const char *str);
+const char	*dc_strpool_acquire(const char *str);
+void	dc_strpool_release(const char *str);
+int	dc_strpool_replace(int found, const char **curr, const char *new_str);
 
 /* host groups */
 void	dc_get_nested_hostgroupids(zbx_uint64_t groupid, zbx_vector_uint64_t *nested_groupids);
