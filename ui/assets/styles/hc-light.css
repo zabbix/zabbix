@@ -2148,7 +2148,7 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
       border-top-width: 1px;
       border-top-style: dashed; }
   .msg-details .list-dashed li {
-    white-space: pre; }
+    white-space: pre-line; }
     .msg-details .list-dashed li:only-child {
       margin-left: 0; }
 
