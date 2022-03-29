@@ -408,10 +408,9 @@ class HostInterfaceManager {
 
 		this.data[interfaceid].useip = use_ip;
 
-		[...elem.querySelectorAll('input[name$="[ip]"], input[name$="[dns]"]')].map((el) => {
+		[...elem.querySelectorAll('input[name$="[ip]"], input[name$="[dns]"]')].map((el) =>
 			el.removeAttribute('aria-required')
-			return el;
-		});
+		);
 
 		elem
 			.querySelector((use_ip == HostInterfaceManager.INTERFACE_USE_IP) ? '[name$="[ip]"]' : '[name$="[dns]"]')
