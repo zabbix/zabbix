@@ -215,7 +215,7 @@ class CControllerPopupTestTriggerExpr extends CController {
 			'eHTMLTree' => $expression_html_tree,
 			'results' => $results,
 			'outline' => $outline,
-			'message' => getMessages(false, $message_title),
+			'messages' => getMessages(false, $message_title),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

@@ -1575,9 +1575,9 @@ class CControllerPopupTriggerExpr extends CController {
 				error(_('Cannot insert trigger expression'));
 			}
 
-			if (($messages = getMessages()) !== null) {
+			if ($messages = get_and_clear_messages()) {
 				$output = [
-					'errors' => $messages->toString()
+					'error' => array_column($messages, 'message')
 				];
 			}
 			else {
@@ -1596,7 +1596,7 @@ class CControllerPopupTriggerExpr extends CController {
 			$this->setResponse(new CControllerResponseData(
 				$data + [
 					'title' => _('Condition'),
-					'errors' => hasErrorMessages() ? getMessages() : null,
+					'messages' => hasErrorMessages() ? getMessages() : null,
 					'user' => [
 						'debug_mode' => $this->getDebugMode()
 					]
