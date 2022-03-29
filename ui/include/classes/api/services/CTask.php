@@ -181,7 +181,7 @@ class CTask extends CApiService {
 
 	/**
 	 * Validates the input for create method and return valid item IDs. Meaning that if dependent item ID was given, try
-	 * to find a valid master item. If valid master items were found return those item IDs..
+	 * to find a valid master item. If valid master items were found return those item IDs.
 	 *
 	 * @param array $tasks  Tasks to validate.
 	 *

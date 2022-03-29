@@ -794,7 +794,7 @@ class testTaskCreate extends CAPITest {
 			],
 
 			// Check "itemid" field.
-			'Test mssing itemid' => [
+			'Test missing itemid' => [
 				'task' => [
 					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
 					'request' => []

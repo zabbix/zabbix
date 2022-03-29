@@ -130,7 +130,7 @@
 			for (const [id, value] of Object.entries(access)) {
 				const checkbox = document.getElementById(id);
 
-				// The current CRRoleHelper set up doesn't allow to set readonly for each checkbox individually.
+				// The current CRoleHelper set up doesn't allow to set readonly for each checkbox individually.
 				if (id === '<?= CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW ?>') {
 					checkbox.readOnly = (user_type == <?= USER_TYPE_SUPER_ADMIN ?>);
 				}
