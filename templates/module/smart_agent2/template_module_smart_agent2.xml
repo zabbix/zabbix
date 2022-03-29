@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-24T10:21:04Z</date>
+   <date>2022-03-29T19:44:40Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -11,7 +11,7 @@
       <template>
          <template>Template Module SMART by Zabbix agent 2</template>
          <name>Template Module SMART by Zabbix agent 2</name>
-         <description>The template for monitoring S.M.A.R.T. attributes of physical disk that works without any external scripts. It collects metrics by Zabbix agent 2 version 5.0 and later with Smartmontools version 7.1 and later. Disk discovery LLD rule finds all HDD, SSD, NVMe disks with S.M.A.R.T. enabled. Attribute discovery LLD rule finds all Vendor Specific Attributes for each disk. If you want to skip some attributes, please set regular expressions with disk names in {$SMART.DISK.NAME.MATCHES} and with attribute IDs in {$SMART.ATTRIBUTE.ID.MATCHES} macros on the host level.&#13;
+         <description>The template for monitoring S.M.A.R.T. attributes of physical disk that works without any external scripts. It collects metrics by Zabbix agent 2 version 5.0 and later with Smartmontools version 7.1 and later. Disk discovery LLD rule finds all HDD, SSD, NVMe disks with S.M.A.R.T. enabled. Attribute discovery LLD rule have pre-defined Vendor Specific Attributes for each disk, and will be discovered if attribute is present.&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/415662-discussion-thread-for-official-zabbix-smart-disk-monitoring&#13;
 &#13;
@@ -26,123 +26,272 @@ Template tooling version used: 0.39</description>
                <name>Zabbix raw items</name>
             </application>
          </applications>
-         <items>
-            <item>
-               <name>SMART: Get attributes</name>
-               <key>smart.disk.get</key>
-               <history>0</history>
-               <trends>0</trends>
-               <value_type>TEXT</value_type>
-               <applications>
-                  <application>
-                     <name>Zabbix raw items</name>
-                  </application>
-               </applications>
-            </item>
-         </items>
          <discovery_rules>
-            <discovery_rule>
-               <name>Attribute discovery</name>
-               <key>smart.attribute.discovery</key>
-               <delay>1h</delay>
-               <description>Discovery SMART Vendor Specific Attributes of disks.</description>
-               <item_prototypes>
-                  <item_prototype>
-                     <name>SMART [{#NAME}]: ID {#ID} {#ATTRNAME} raw value</name>
-                     <type>DEPENDENT</type>
-                     <key>smart.disk.attr.raw[{#NAME},{#ID}]</key>
-                     <delay>0</delay>
-                     <history>7d</history>
-                     <trends>0</trends>
-                     <value_type>CHAR</value_type>
-                     <application_prototypes>
-                        <application_prototype>
-                           <name>{#DISKTYPE} {#NAME}</name>
-                        </application_prototype>
-                     </application_prototypes>
-                     <preprocessing>
-                        <step>
-                           <type>JSONPATH</type>
-                           <params>$[?(@.disk_name=='{#NAME}')].ata_smart_attributes.table[?(@.id=={#ID})].raw.string.first()</params>
-                        </step>
-                        <step>
-                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>6h</params>
-                        </step>
-                     </preprocessing>
-                     <master_item>
-                        <key>smart.disk.get</key>
-                     </master_item>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>SMART [{#NAME}]: ID {#ID} {#ATTRNAME}</name>
-                     <type>DEPENDENT</type>
-                     <key>smart.disk.error[{#NAME},{#ID}]</key>
-                     <delay>0</delay>
-                     <history>7d</history>
-                     <application_prototypes>
-                        <application_prototype>
-                           <name>{#DISKTYPE} {#NAME}</name>
-                        </application_prototype>
-                     </application_prototypes>
-                     <preprocessing>
-                        <step>
-                           <type>JSONPATH</type>
-                           <params>$[?(@.disk_name=='{#NAME}')].ata_smart_attributes.table[?(@.id=={#ID})].value.first()</params>
-                        </step>
-                        <step>
-                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>6h</params>
-                        </step>
-                     </preprocessing>
-                     <master_item>
-                        <key>smart.disk.get</key>
-                     </master_item>
-                     <trigger_prototypes>
-                        <trigger_prototype>
-                           <expression>{last()} &lt;= {#THRESH}</expression>
-                           <name>SMART [{#NAME}]: Attribute {#ID} {#ATTRNAME} is failed</name>
-                           <priority>WARNING</priority>
-                           <description>The value should be greater than THRESH.</description>
-                        </trigger_prototype>
-                     </trigger_prototypes>
-                  </item_prototype>
-               </item_prototypes>
-               <overrides>
-                  <override>
-                     <name>ID filter</name>
-                     <step>1</step>
-                     <filter>
-                        <conditions>
-                           <condition>
-                              <macro>{#ID}</macro>
-                              <value>{$SMART.ATTRIBUTE.ID.MATCHES}</value>
-                              <formulaid>A</formulaid>
-                           </condition>
-                           <condition>
-                              <macro>{#NAME}</macro>
-                              <value>{$SMART.DISK.NAME.MATCHES}</value>
-                              <formulaid>B</formulaid>
-                           </condition>
-                        </conditions>
-                     </filter>
-                     <operations>
-                        <operation>
-                           <operationobject>ITEM_PROTOTYPE</operationobject>
-                           <operator>REGEXP</operator>
-                           <status>ENABLED</status>
-                           <discover>NO_DISCOVER</discover>
-                        </operation>
-                     </operations>
-                  </override>
-               </overrides>
-            </discovery_rule>
             <discovery_rule>
                <name>Disk discovery</name>
                <key>smart.disk.discovery</key>
                <delay>1h</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#NAME}</macro>
+                        <value>{$SMART.DISK.NAME.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#NAME}</macro>
+                        <value>{$SMART.DISK.NAME.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <description>Discovery SMART disks.</description>
                <item_prototypes>
+                  <item_prototype>
+                     <name>SMART [{#NAME}]: Bad_Block_Rate</name>
+                     <type>DEPENDENT</type>
+                     <key>smart.disk.attribute.bad_block_rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <discover>NO_DISCOVER</discover>
+                     <description>Percentage of used reserve blocks divided by total reserve blocks.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.bad_block_rate.value</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>smart.disk.get[{#PATH},"{#RAIDTYPE}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>SMART [{#NAME}]: Power_Cycle_Count</name>
+                     <type>DEPENDENT</type>
+                     <key>smart.disk.attribute.power_cycle_count[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <discover>NO_DISCOVER</discover>
+                     <description>This attribute indicates the count of full hard disk power on/off cycles.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.power_cycle_count.value</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>smart.disk.get[{#PATH},"{#RAIDTYPE}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>SMART [{#NAME}]: Program_Fail_Count_Chip</name>
+                     <type>DEPENDENT</type>
+                     <key>smart.disk.attribute.program_fail_count_chip[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <discover>NO_DISCOVER</discover>
+                     <description>The total number of flash program operation failures since the drive was deployed.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.program_fail_count_chip.value</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>smart.disk.get[{#PATH},"{#RAIDTYPE}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>SMART [{#NAME}]: Raw_Read_Error_Rate</name>
+                     <type>DEPENDENT</type>
+                     <key>smart.disk.attribute.raw_read_error_rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <discover>NO_DISCOVER</discover>
+                     <description>Stores data related to the rate of hardware read errors that occurred when reading data from a disk surface. The raw value has different structure for different vendors and is often not meaningful as a decimal number. For some drives, this number may increase during normal operation without necessarily signifying errors.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.raw_read_error_rate.value</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>smart.disk.get[{#PATH},"{#RAIDTYPE}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>SMART [{#NAME}]: Reallocated_Sector_Ct</name>
+                     <type>DEPENDENT</type>
+                     <key>smart.disk.attribute.reallocated_sector_ct[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <discover>NO_DISCOVER</discover>
+                     <description>Disk discovered attribute.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.reallocated_sector_ct.value</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>smart.disk.get[{#PATH},"{#RAIDTYPE}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>SMART [{#NAME}]: Reported_Uncorrect</name>
+                     <type>DEPENDENT</type>
+                     <key>smart.disk.attribute.reported_uncorrect[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <discover>NO_DISCOVER</discover>
+                     <description>The count of errors that could not be recovered using hardware ECC.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.reported_uncorrect.value</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>smart.disk.get[{#PATH},"{#RAIDTYPE}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>SMART [{#NAME}]: Seek_Error_Rate</name>
+                     <type>DEPENDENT</type>
+                     <key>smart.disk.attribute.seek_error_rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <discover>NO_DISCOVER</discover>
+                     <description>Rate of seek errors of the magnetic heads. If there is a partial failure in the mechanical positioning system, then seek errors will arise. Such a failure may be due to numerous factors, such as damage to a servo, or thermal widening of the hard disk. The raw value has different structure for different vendors and is often not meaningful as a decimal number. For some drives, this number may increase during normal operation without necessarily signifying errors.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.seek_error_rate.value</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>smart.disk.get[{#PATH},"{#RAIDTYPE}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>SMART [{#NAME}]: Spin_Up_Time</name>
+                     <type>DEPENDENT</type>
+                     <key>smart.disk.attribute.spin_up_time[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <discover>NO_DISCOVER</discover>
+                     <description>Average time of spindle spin up (from zero RPM to fully operational [milliseconds]).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.spin_up_time.value</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>smart.disk.get[{#PATH},"{#RAIDTYPE}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>SMART [{#NAME}]: Start_Stop_Count</name>
+                     <type>DEPENDENT</type>
+                     <key>smart.disk.attribute.start_stop_count[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <discover>NO_DISCOVER</discover>
+                     <description>A tally of spindle start/stop cycles. The spindle turns on, and hence the count is increased, both when the hard disk is turned on after having before been turned entirely off (disconnected from power source) and when the hard disk returns from having previously been put to sleep mode.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.start_stop_count.value</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>smart.disk.get[{#PATH},"{#RAIDTYPE}"]</key>
+                     </master_item>
+                  </item_prototype>
                   <item_prototype>
                      <name>SMART [{#NAME}]: Critical warning</name>
                      <type>DEPENDENT</type>
@@ -158,7 +307,7 @@ Template tooling version used: 0.39</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.disk_name=='{#NAME}')].nvme_smart_health_information_log.critical_warning.first()</params>
+                           <params>$.critical_warning</params>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -166,8 +315,82 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get</key>
+                        <key>smart.disk.get[{#PATH},"{#RAIDTYPE}"]</key>
                      </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>SMART [{#NAME}]: Smartctl error</name>
+                     <type>DEPENDENT</type>
+                     <key>smart.disk.error[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <description>This metric will contain smartctl errors.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.error</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>smart.disk.get[{#PATH},"{#RAIDTYPE}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>SMART [{#NAME}]: Exit status</name>
+                     <type>DEPENDENT</type>
+                     <key>smart.disk.es[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>The exit statuses of smartctl are defined by a bitmask but in decimal value. The eight different bits in the exit status have the following  meanings  for  ATA disks; some of these values may also be returned for SCSI disks.&#13;
+Bit 0: Command line did not parse.&#13;
+Bit 1: Device  open failed, device did not return an IDENTIFY DEVICE structure, or device is in a low-power mode (see '-n' option above).&#13;
+Bit 2: Some SMART or other ATA command to the disk failed, or there was a checksum error in a SMART data  structure  (see '-b' option above).&#13;
+Bit 3: SMART status check returned "DISK FAILING".&#13;
+Bit 4: We found prefail Attributes &lt;= threshold.&#13;
+Bit 5: SMART  status  check returned "DISK OK" but we found that some (usage or prefail) Attributes have been &lt;= threshold at some time in the past.&#13;
+Bit 6: The device error log contains records of errors.&#13;
+Bit 7: The device self-test log contains records of errors. [ATA only] Failed self-tests outdated by a newer successful extended self-test are ignored.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.exit_status</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>smart.disk.get[{#PATH},"{#RAIDTYPE}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>SMART [{#NAME}]: Get disk attributes</name>
+                     <key>smart.disk.get[{#PATH},"{#RAIDTYPE}"]</key>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
                   </item_prototype>
                   <item_prototype>
                      <name>SMART [{#NAME}]: Power on hours</name>
@@ -184,7 +407,7 @@ Template tooling version used: 0.39</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.disk_name=='{#NAME}')].power_on_time.hours.first()</params>
+                           <params>$.power_on_time</params>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -192,7 +415,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get</key>
+                        <key>smart.disk.get[{#PATH},"{#RAIDTYPE}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -210,7 +433,7 @@ Template tooling version used: 0.39</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.disk_name=='{#NAME}')].nvme_smart_health_information_log.media_errors.first()</params>
+                           <params>$.media_errors</params>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -218,7 +441,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get</key>
+                        <key>smart.disk.get[{#PATH},"{#RAIDTYPE}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -237,7 +460,7 @@ Template tooling version used: 0.39</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.disk_name=='{#NAME}')].model_name.first()</params>
+                           <params>$.model_name</params>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -245,7 +468,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get</key>
+                        <key>smart.disk.get[{#PATH},"{#RAIDTYPE}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -264,7 +487,7 @@ Template tooling version used: 0.39</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.disk_name=='{#NAME}')].nvme_smart_health_information_log.percentage_used.first()</params>
+                           <params>$.percentage_used</params>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -272,7 +495,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get</key>
+                        <key>smart.disk.get[{#PATH},"{#RAIDTYPE}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -298,7 +521,7 @@ Template tooling version used: 0.39</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.disk_name=='{#NAME}')].serial_number.first()</params>
+                           <params>$.serial_number</params>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -306,7 +529,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get</key>
+                        <key>smart.disk.get[{#PATH},"{#RAIDTYPE}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -334,7 +557,7 @@ Template tooling version used: 0.39</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.disk_name=='{#NAME}')].temperature.current.first()</params>
+                           <params>$.temperature</params>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -342,7 +565,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get</key>
+                        <key>smart.disk.get[{#PATH},"{#RAIDTYPE}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -380,7 +603,7 @@ Template tooling version used: 0.39</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.disk_name=='{#NAME}')].ata_smart_data.self_test.status.passed.first()</params>
+                           <params>$.self_test_passed</params>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -388,7 +611,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get</key>
+                        <key>smart.disk.get[{#PATH},"{#RAIDTYPE}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -445,29 +668,227 @@ Template tooling version used: 0.39</description>
                         </operation>
                      </operations>
                   </override>
+                  <override>
+                     <name>Raw_Read_Error_Rate</name>
+                     <step>3</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#ATTRIBUTES}</macro>
+                              <value>Raw_Read_Error_Rate</value>
+                              <formulaid>A</formulaid>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>ITEM_PROTOTYPE</operationobject>
+                           <operator>REGEXP</operator>
+                           <value>Raw_Read_Error_Rate</value>
+                           <status>ENABLED</status>
+                           <discover>DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+                  <override>
+                     <name>Spin_Up_Time</name>
+                     <step>4</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#ATTRIBUTES}</macro>
+                              <value>Spin_Up_Time</value>
+                              <formulaid>A</formulaid>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>ITEM_PROTOTYPE</operationobject>
+                           <operator>REGEXP</operator>
+                           <value>Spin_Up_Time</value>
+                           <status>ENABLED</status>
+                           <discover>DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+                  <override>
+                     <name>Start_Stop_Count</name>
+                     <step>5</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#ATTRIBUTES}</macro>
+                              <value>Start_Stop_Count</value>
+                              <formulaid>A</formulaid>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>ITEM_PROTOTYPE</operationobject>
+                           <operator>REGEXP</operator>
+                           <value>Start_Stop_Count</value>
+                           <status>ENABLED</status>
+                           <discover>DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+                  <override>
+                     <name>Power_Cycle_Count</name>
+                     <step>6</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#ATTRIBUTES}</macro>
+                              <value>Power_Cycle_Count</value>
+                              <formulaid>A</formulaid>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>ITEM_PROTOTYPE</operationobject>
+                           <operator>REGEXP</operator>
+                           <value>Power_Cycle_Count</value>
+                           <status>ENABLED</status>
+                           <discover>DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+                  <override>
+                     <name>Reported_Uncorrect</name>
+                     <step>7</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#ATTRIBUTES}</macro>
+                              <value>Reported_Uncorrect</value>
+                              <formulaid>A</formulaid>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>ITEM_PROTOTYPE</operationobject>
+                           <operator>REGEXP</operator>
+                           <value>Reported_Uncorrect</value>
+                           <status>ENABLED</status>
+                           <discover>DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+                  <override>
+                     <name>Seek_Error_Rate</name>
+                     <step>8</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#ATTRIBUTES}</macro>
+                              <value>Seek_Error_Rate</value>
+                              <formulaid>A</formulaid>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>ITEM_PROTOTYPE</operationobject>
+                           <operator>REGEXP</operator>
+                           <value>Seek_Error_Rate</value>
+                           <status>ENABLED</status>
+                           <discover>DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+                  <override>
+                     <name>Bad_Block_Rate</name>
+                     <step>9</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#ATTRIBUTES}</macro>
+                              <value>Bad_Block_Rate</value>
+                              <formulaid>A</formulaid>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>ITEM_PROTOTYPE</operationobject>
+                           <operator>REGEXP</operator>
+                           <value>Bad_Block_Rate</value>
+                           <status>ENABLED</status>
+                           <discover>DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+                  <override>
+                     <name>Program_Fail_Count_Chip</name>
+                     <step>10</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#ATTRIBUTES}</macro>
+                              <value>Program_Fail_Count_Chip</value>
+                              <formulaid>A</formulaid>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>ITEM_PROTOTYPE</operationobject>
+                           <operator>REGEXP</operator>
+                           <value>Program_Fail_Count_Chip</value>
+                           <status>ENABLED</status>
+                           <discover>DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+                  <override>
+                     <name>Reallocated_Sector_Ct</name>
+                     <step>11</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#ATTRIBUTES}</macro>
+                              <value>Reallocated_Sector_Ct</value>
+                              <formulaid>A</formulaid>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>ITEM_PROTOTYPE</operationobject>
+                           <operator>REGEXP</operator>
+                           <value>Reallocated_Sector_Ct</value>
+                           <status>ENABLED</status>
+                           <discover>DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
                </overrides>
             </discovery_rule>
          </discovery_rules>
          <macros>
             <macro>
-               <macro>{$SMART.ATTRIBUTE.ID.MATCHES}</macro>
-               <value>CHANGE_IF_NEEDED</value>
-               <description>This macro is used in overrides of attribute discovery for filtering IDs. It can be overridden on the host or linked template level.</description>
+               <macro>{$SMART.DISK.NAME.MATCHES}</macro>
+               <value>^.*$</value>
+               <description>This macro is used in the filter of attribute and disk discoveries. It can be overridden on the host or linked on the template level.</description>
             </macro>
             <macro>
-               <macro>{$SMART.DISK.NAME.MATCHES}</macro>
+               <macro>{$SMART.DISK.NAME.NOT_MATCHES}</macro>
                <value>CHANGE_IF_NEEDED</value>
-               <description>This macro is used in overrides of attribute discovery for filtering IDs. It can be overridden on the host or linked template level.</description>
+               <description>This macro is used in the filter of attribute and disk discoveries. It can be overridden on the host or linked on the template level.</description>
             </macro>
             <macro>
                <macro>{$SMART.TEMPERATURE.MAX.CRIT}</macro>
                <value>65</value>
-               <description>This macro is used for trigger expression. It can be overridden on the host or linked template level.</description>
+               <description>This macro is used for trigger expression. It can be overridden on the host or linked on the template level.</description>
             </macro>
             <macro>
                <macro>{$SMART.TEMPERATURE.MAX.WARN}</macro>
                <value>50</value>
-               <description>This macro is used for trigger expression. It can be overridden on the host or linked template level.</description>
+               <description>This macro is used for trigger expression. It can be overridden on the host or linked on the template level.</description>
             </macro>
          </macros>
       </template>
