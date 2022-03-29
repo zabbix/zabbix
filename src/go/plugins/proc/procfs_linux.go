@@ -142,7 +142,12 @@ func readProcStatus(pid uint64, proc *procStatus) (err error) {
 	}
 
 	proc.Size = proc.Exe + proc.Data + proc.Stk
-	proc.Name, proc.Cmdline, err = getProcessCmdline(pidStr, procInfoName)
+
+	proc.Name, err = getProcessName(pidStr)
+	if err != nil {
+		return err
+	}
+	_, proc.Cmdline, err = getProcessCmdline(pidStr, procInfoName)
 	if err != nil {
 		return err
 	}
@@ -164,24 +169,22 @@ func readProcStatus(pid uint64, proc *procStatus) (err error) {
 		proc.Fds = uint64(len(fds))
 	}
 
-	if data, err = read2k("/proc/" + pidStr + "/io"); err != nil {
-		return err
-	}
+	if data, err = read2k("/proc/" + pidStr + "/io"); err == nil {
+		s = strings.Split(string(data), "\n")
+		for _, tmp := range s {
+			if pos = strings.IndexRune(tmp, ':'); pos == -1 {
+				continue
+			}
 
-	s = strings.Split(string(data), "\n")
-	for _, tmp := range s {
-		if pos = strings.IndexRune(tmp, ':'); pos == -1 {
-			continue
-		}
+			k := tmp[:pos]
+			v := strings.TrimSpace(tmp[pos+1:])
 
-		k := tmp[:pos]
-		v := strings.TrimSpace(tmp[pos+1:])
-
-		switch k {
-		case "read_bytes":
-			setUint64(v, &proc.IoReadsB)
-		case "write_bytes":
-			setUint64(v, &proc.IoWritesB)
+			switch k {
+			case "read_bytes":
+				setUint64(v, &proc.IoReadsB)
+			case "write_bytes":
+				setUint64(v, &proc.IoWritesB)
+			}
 		}
 	}
 

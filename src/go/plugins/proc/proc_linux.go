@@ -877,7 +877,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 
 			array = append(array, data)
 			threadArray = append(threadArray, thread{data.Tgid, data.PPid, data.Name, data.Pid,
-				data.TName, data.CpuTimeUser, data.CpuTimeSystem, data.State, data.CtxSwitches,
+				data.Name, data.CpuTimeUser, data.CpuTimeSystem, data.State, data.CtxSwitches,
 				data.IoReadsB, data.IoWritesB})
 		}
 	}
@@ -897,16 +897,12 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 		}
 	case "summary":
 		var processed []string
+		processes:
 		for i, proc := range array {
-			var found bool
 			for _, j := range processed {
 				if j == proc.Name {
-					found = true
-					break
+					continue processes
 				}
-			}
-			if found == true {
-				continue
 			}
 
 			procSum := procSummary{proc.Name, 1, proc.Vsize, proc.Pmem, proc.Rss, proc.Data,
