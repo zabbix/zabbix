@@ -825,7 +825,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 				if uid, err = getProcessUserID(strconv.FormatUint(pid, 10)); err == nil {
 					var u *user.User
 					u, err = user.Lookup(userName)
-					if err == nil && u.Uid != strconv.FormatInt(uid, 10) {
+					if err != nil || u.Uid != strconv.FormatInt(uid, 10) {
 						continue
 					}
 				}
