@@ -13551,9 +13551,9 @@ zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const
 	{
 		session_local.last_valueid = 0;
 		session_local.lastaccess = now;
+		session_local.token = dc_strdup(token);
 
 		WRLOCK_CACHE;
-		session_local.token = dc_strdup(token);
 
 		session = (zbx_data_session_t *)zbx_hashset_insert(&config->data_sessions, &session_local,
 				sizeof(session_local));
