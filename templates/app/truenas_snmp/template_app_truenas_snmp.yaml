@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-28T18:50:38Z'
+  date: '2022-03-29T12:16:36Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -609,7 +609,7 @@ zabbix_export:
               value: network
           triggers:
             -
-              uuid: d06bdb79a48c438798286a89680eb3e1
+              uuid: 207abb1786ea4a39a7d569e54ee7cdb2
               expression: 'max(/TrueNAS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'TrueNAS: No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
