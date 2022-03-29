@@ -27,6 +27,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"syscall"
@@ -142,14 +143,16 @@ func readProcStatus(pid uint64, proc *procStatus) (err error) {
 	}
 
 	proc.Size = proc.Exe + proc.Data + proc.Stk
-
-	proc.Name, err = getProcessName(pidStr)
-	if err != nil {
-		return err
-	}
 	_, proc.Cmdline, err = getProcessCmdline(pidStr, procInfoName)
 	if err != nil {
 		return err
+	}
+
+	f := strings.Fields(proc.Cmdline)
+	if len(f) > 0 {
+		proc.Name = filepath.Base(f[0])
+	} else {
+		proc.Name = proc.TName
 	}
 
 	var mem uint64
