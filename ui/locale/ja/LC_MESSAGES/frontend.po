@@ -4505,6 +4505,11 @@ msgstr "カスタム深刻度の名前はすべての言語に影響するため
 msgid "Custom size"
 msgstr "カスタムサイズ"
 
+#: app/views/administration.miscconfig.edit.php:104
+#: include/classes/setup/CSetupWizard.php:563
+msgid "CyberArk Vault"
+msgstr ""
+
 #: app/partials/scheduledreport.formgrid.html.php:95
 msgid "Cycle"
 msgstr "周期"
@@ -14167,6 +14172,12 @@ msgstr "PrometheusからJSON"
 msgid "Properties"
 msgstr "プロパティ"
 
+#: include/classes/vaults/CVaultCyberArk.php:64
+#: include/classes/vaults/CVaultHashiCorp.php:55
+#, c-format
+msgid "Provided API endpoint \"%1$s\" is invalid."
+msgstr ""
+
 #: app/controllers/CControllerMenuPopup.php:405
 #: app/controllers/CControllerMenuPopup.php:693
 #: app/controllers/CControllerWidgetUrlView.php:64
@@ -14175,6 +14186,21 @@ msgstr "プロパティ"
 #, c-format
 msgid "Provided URL \"%1$s\" is invalid."
 msgstr "指定されたURL \"%1$s\"は正しくありません。"
+
+#: include/classes/vaults/CVaultHashiCorp.php:64
+#, c-format
+msgid "Provided authentication token \"%1$s\" is empty."
+msgstr ""
+
+#: include/classes/vaults/CVaultHashiCorp.php:60
+#, c-format
+msgid "Provided secret path \"%1$s\" is invalid."
+msgstr ""
+
+#: include/classes/vaults/CVaultCyberArk.php:70
+#, c-format
+msgid "Provided secret query string \"%1$s\" is invalid."
+msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:157
 #: app/views/administration.proxy.edit.php:29
@@ -16671,6 +16697,10 @@ msgstr "スライドショーの停止"
 msgid "Stopped"
 msgstr "停止中"
 
+#: app/views/administration.miscconfig.edit.php:100
+msgid "Storage of secrets"
+msgstr ""
+
 #: app/views/popup.lldoperation.php:191 app/views/popup.lldoperation.php:212
 #: app/views/popup.massupdate.item.php:294
 #: app/views/popup.massupdate.item.php:310
@@ -16689,6 +16719,11 @@ msgstr "資格情報保存先"
 #: include/classes/setup/CSetupWizard.php:657
 msgid "Stored in HashiCorp Vault secret"
 msgstr "HashiCorp Vaultのシークレット内に保存"
+
+#: include/classes/setup/CSetupWizard.php:757
+#: include/classes/setup/CSetupWizard.php:758
+msgid "Stored in Vault secret"
+msgstr ""
 
 #: include/hosts.inc.php:35
 msgid "Straight"
@@ -18797,6 +18832,10 @@ msgstr "ユーザー名"
 msgid "Username and password"
 msgstr "ユーザー名とパスワード"
 
+#: include/classes/vaults/CVaultCyberArk.php:112
+msgid "Username and password must be stored in Vault secret keys \"UserName\" and \"Content\"."
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:206
 #: include/classes/setup/CSetupWizard.php:802
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
@@ -19260,10 +19299,19 @@ msgstr "VaultのAPIエンドポイント"
 msgid "Vault authentication token"
 msgstr "Vaultの認証トークン"
 
+#: include/classes/setup/CSetupWizard.php:618
+#: include/classes/setup/CSetupWizard.php:817
+msgid "Vault certificates"
+msgstr ""
+
 #: include/classes/core/ZBase.php:231
 #: include/classes/setup/CSetupWizard.php:203 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr "Vaultへの接続に失敗しました。"
+
+#: app/views/administration.miscconfig.edit.php:101
+msgid "Vault provider"
+msgstr ""
 
 #: include/classes/html/CMacroValue.php:158
 msgid "Vault secret"
@@ -19273,6 +19321,11 @@ msgstr "Vaultのシークレット"
 #: include/classes/setup/CSetupWizard.php:700
 msgid "Vault secret path"
 msgstr "Vaultのシークレットパス"
+
+#: include/classes/setup/CSetupWizard.php:609
+#: include/classes/setup/CSetupWizard.php:813
+msgid "Vault secret query string"
+msgstr ""
 
 #: include/hosts.inc.php:249
 msgid "Vendor"
@@ -21102,6 +21155,15 @@ msgstr "マクロ"
 #: app/controllers/CControllerPopupTriggerExpr.php:770
 msgid "mad() - Median absolute deviation"
 msgstr "mad() - 中央絶対偏差"
+
+#: include/classes/parsers/CVaultSecretParser.php:180
+msgid "mandatory key is missing"
+msgstr ""
+
+#: include/classes/parsers/CVaultSecretParser.php:177
+#, c-format
+msgid "mandatory parameter \"%1$s\" is missing"
+msgstr ""
 
 #: include/classes/validators/CHistFunctionValidator.php:93
 #, c-format
