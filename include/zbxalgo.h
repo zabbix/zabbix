@@ -183,6 +183,7 @@ zbx_hashset_iter_t;
 void	zbx_hashset_iter_reset(zbx_hashset_t *hs, zbx_hashset_iter_t *iter);
 void	*zbx_hashset_iter_next(zbx_hashset_iter_t *iter);
 void	zbx_hashset_iter_remove(zbx_hashset_iter_t *iter);
+void	zbx_hashset_copy(zbx_hashset_t *dst, const zbx_hashset_t *src, size_t size);
 
 /* hashmap */
 
