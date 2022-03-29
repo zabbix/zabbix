@@ -512,7 +512,7 @@ class HostInterfaceManager {
 	}
 
 	makeReadonly() {
-		[...document.querySelectorAll('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_ROW)].map((row) => {
+		[...document.querySelectorAll('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_ROW)].forEach((row) => {
 			[...row.querySelectorAll('input, z-select')].map((el) => {
 				this.setReadonly(el);
 			});
