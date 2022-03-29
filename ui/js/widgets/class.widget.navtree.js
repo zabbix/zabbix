@@ -840,6 +840,16 @@ class CWidgetNavTree extends CWidget {
 			},
 			dataType: 'json',
 			success: (resp) => {
+				if ('error' in resp) {
+					clearMessages();
+
+					const message_box = makeMessageBox('bad', resp.error.messages, resp.error.title);
+
+					addMessage(message_box);
+
+					return;
+				}
+
 				if (resp.debug !== undefined) {
 					resp.body += resp.debug;
 				}
@@ -881,8 +891,12 @@ class CWidgetNavTree extends CWidget {
 											msg.remove();
 										})
 
-										if (typeof resp.errors === 'object' && resp.errors.length > 0) {
-											form.insertAdjacentHTML('afterbegin', resp.errors);
+										if ('error' in resp) {
+											const message_box = makeMessageBox('bad', resp.error.messages,
+												resp.error.title
+											)[0];
+
+											form.insertAdjacentElement('afterbegin', message_box);
 
 											return false;
 										}
