@@ -100,6 +100,7 @@ func (u *URI) String() string {
 	return u.string(u.rawQuery)
 }
 
+// NoQueryString reassembles the URI to a valid URI string with no query.
 func (u *URI) NoQueryString() string {
 	return u.string("")
 }
