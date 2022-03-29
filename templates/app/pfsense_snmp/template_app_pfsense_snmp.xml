@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-03-29T20:04:04Z</date>
+   <date>2022-03-29T21:27:51Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -100,7 +100,7 @@ Template tooling version used: 0.39</description>
                      <name>PFSense: High ICMP ping loss</name>
                      <opdata>Loss: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
-                     <description>ICMP packets loss detected</description>
+                     <description>ICMP packets loss detected.</description>
                      <dependencies>
                         <dependency>
                            <name>PFSense: Unavailable by ICMP ping</name>
@@ -843,7 +843,7 @@ System uptime in 'N days, hh:mm:ss' format.</description>
                      <expression>{last()}&lt;10m</expression>
                      <name>PFSense: has been restarted (uptime &lt; 10m)</name>
                      <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
+                     <description>Uptime is less than 10 minutes.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
@@ -1372,7 +1372,7 @@ return JSON.stringify([{"{#CPU.COUNT}": value, "{#SNMPINDEX}": 0, "{#SINGLETON}"
                      <key>net.if.in.block.v4.bps[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <units>bps</units>
-                     <description>BEGEMOT-PF-MIB&#13;
+                     <description>MIB: BEGEMOT-PF-MIB&#13;
 IPv4 bits per second blocked coming in on this interface.</description>
                      <applications>
                         <application>
@@ -1397,7 +1397,7 @@ IPv4 bits per second blocked coming in on this interface.</description>
                      <key>net.if.in.block.v4.pps[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <units>pps</units>
-                     <description>BEGEMOT-PF-MIB&#13;
+                     <description>MIB: BEGEMOT-PF-MIB&#13;
 The number of IPv4 packets blocked coming in on this interface.</description>
                      <applications>
                         <application>
@@ -1418,7 +1418,7 @@ The number of IPv4 packets blocked coming in on this interface.</description>
                      <key>net.if.in.block.v6.bps[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <units>bps</units>
-                     <description>BEGEMOT-PF-MIB&#13;
+                     <description>MIB: BEGEMOT-PF-MIB&#13;
 IPv6 bits per second blocked coming in on this interface.</description>
                      <applications>
                         <application>
@@ -1443,7 +1443,7 @@ IPv6 bits per second blocked coming in on this interface.</description>
                      <key>net.if.in.block.v6.pps[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <units>pps</units>
-                     <description>BEGEMOT-PF-MIB&#13;
+                     <description>MIB: BEGEMOT-PF-MIB&#13;
 The number of IPv6 packets blocked coming in on this interface.</description>
                      <applications>
                         <application>
@@ -1525,7 +1525,7 @@ For packet-oriented interfaces, the number of inbound packets that contained err
                      <key>net.if.in.pass.v4.bps[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <units>bps</units>
-                     <description>BEGEMOT-PF-MIB&#13;
+                     <description>MIB: BEGEMOT-PF-MIB&#13;
 IPv4 bits per second passed coming in on this interface.</description>
                      <applications>
                         <application>
@@ -1550,7 +1550,7 @@ IPv4 bits per second passed coming in on this interface.</description>
                      <key>net.if.in.pass.v4.pps[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <units>pps</units>
-                     <description>BEGEMOT-PF-MIB&#13;
+                     <description>MIB: BEGEMOT-PF-MIB&#13;
 The number of IPv4 packets passed coming in on this interface.</description>
                      <applications>
                         <application>
@@ -1571,7 +1571,7 @@ The number of IPv4 packets passed coming in on this interface.</description>
                      <key>net.if.in.pass.v6.bps[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <units>bps</units>
-                     <description>BEGEMOT-PF-MIB&#13;
+                     <description>MIB: BEGEMOT-PF-MIB&#13;
 IPv6 bits per second passed coming in on this interface.</description>
                      <applications>
                         <application>
@@ -1596,7 +1596,7 @@ IPv6 bits per second passed coming in on this interface.</description>
                      <key>net.if.in.pass.v6.pps[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <units>pps</units>
-                     <description>BEGEMOT-PF-MIB&#13;
+                     <description>MIB: BEGEMOT-PF-MIB&#13;
 The number of IPv6 packets passed coming in on this interface.</description>
                      <applications>
                         <application>
@@ -1642,7 +1642,7 @@ The total number of octets received on the interface, including framing characte
                      <key>net.if.out.block.v4.bps[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <units>bps</units>
-                     <description>BEGEMOT-PF-MIB&#13;
+                     <description>MIB: BEGEMOT-PF-MIB&#13;
 IPv4 bits per second blocked going out on this interface.</description>
                      <applications>
                         <application>
@@ -1667,7 +1667,7 @@ IPv4 bits per second blocked going out on this interface.</description>
                      <key>net.if.out.block.v4.pps[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <units>pps</units>
-                     <description>BEGEMOT-PF-MIB&#13;
+                     <description>MIB: BEGEMOT-PF-MIB&#13;
 The number of IPv4 packets blocked going out on this interface.</description>
                      <applications>
                         <application>
@@ -1688,7 +1688,7 @@ The number of IPv4 packets blocked going out on this interface.</description>
                      <key>net.if.out.block.v6.bps[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <units>bps</units>
-                     <description>BEGEMOT-PF-MIB&#13;
+                     <description>MIB: BEGEMOT-PF-MIB&#13;
 IPv6 bits per second blocked going out on this interface.</description>
                      <applications>
                         <application>
@@ -1713,7 +1713,7 @@ IPv6 bits per second blocked going out on this interface.</description>
                      <key>net.if.out.block.v6.pps[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <units>pps</units>
-                     <description>BEGEMOT-PF-MIB&#13;
+                     <description>MIB: BEGEMOT-PF-MIB&#13;
 The number of IPv6 packets blocked going out on this interface.</description>
                      <applications>
                         <application>
@@ -1795,7 +1795,7 @@ For packet-oriented interfaces, the number of outbound packets that contained er
                      <key>net.if.out.pass.v4.bps[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <units>bps</units>
-                     <description>BEGEMOT-PF-MIB&#13;
+                     <description>MIB: BEGEMOT-PF-MIB&#13;
 IPv4 bits per second passed going out on this interface.</description>
                      <applications>
                         <application>
@@ -1820,7 +1820,7 @@ IPv4 bits per second passed going out on this interface.</description>
                      <key>net.if.out.pass.v4.pps[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <units>pps</units>
-                     <description>BEGEMOT-PF-MIB&#13;
+                     <description>MIB: BEGEMOT-PF-MIB&#13;
 The number of IPv4 packets passed going out on this interface.</description>
                      <applications>
                         <application>
@@ -1841,7 +1841,7 @@ The number of IPv4 packets passed going out on this interface.</description>
                      <key>net.if.out.pass.v6.bps[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <units>bps</units>
-                     <description>BEGEMOT-PF-MIB&#13;
+                     <description>MIB: BEGEMOT-PF-MIB&#13;
 IPv6 bits per second passed going out on this interface.</description>
                      <applications>
                         <application>
@@ -1866,7 +1866,7 @@ IPv6 bits per second passed going out on this interface.</description>
                      <key>net.if.out.pass.v6.pps[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <units>pps</units>
-                     <description>BEGEMOT-PF-MIB&#13;
+                     <description>MIB: BEGEMOT-PF-MIB&#13;
 The number of IPv6 packets passed going out on this interface.</description>
                      <applications>
                         <application>
@@ -1911,7 +1911,7 @@ The total number of octets transmitted out of the interface, including framing c
                      <snmp_oid>.1.3.6.1.4.1.12325.1.200.1.8.2.1.6["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]</snmp_oid>
                      <key>net.if.rules.refs[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <description>BEGEMOT-PF-MIB&#13;
+                     <description>MIB: BEGEMOT-PF-MIB&#13;
 The number of rules referencing this interface.</description>
                      <applications>
                         <application>
@@ -2297,7 +2297,7 @@ and&#13;
                      </condition>
                   </conditions>
                </filter>
-               <description>Block devices are discovered from UCD-DISKIO-MIB::diskIOTable (http://net-snmp.sourceforge.net/docs/mibs/ucdDiskIOMIB.html#diskIOTable)</description>
+               <description>Block devices are discovered from UCD-DISKIO-MIB::diskIOTable (http://net-snmp.sourceforge.net/docs/mibs/ucdDiskIOMIB.html#diskIOTable).</description>
                <item_prototypes>
                   <item_prototype>
                      <name>PFSense: [{#DEVNAME}]: Disk read rate</name>
