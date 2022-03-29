@@ -866,14 +866,14 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 
 				if (isset($constructor['elementError'])) {
 					$count = CTestArrayHelper::get($constructor, 'element_count', 1);
-					$this->assertEquals($count, $this->query('xpath://span[@class="icon-info status-red"]')->all()->count());
+					$this->assertEquals($count, $this->query('xpath://a[@class="icon-info status-red"]')->all()->count());
 					$text = $this->query('xpath://tr[1]//div[@class="hint-box"]')->one()->getText();
 					foreach ($constructor['errors'] as $error) {
 						$this->assertStringContainsString($error, $text);
 					}
 				}
 				else {
-					$this->zbxTestAssertElementNotPresentXpath('//span[@class="icon-info status-red"]');
+					$this->zbxTestAssertElementNotPresentXpath('//a[@class="icon-info status-red"]');
 				}
 			}
 		}

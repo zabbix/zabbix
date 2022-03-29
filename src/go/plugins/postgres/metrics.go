@@ -47,6 +47,7 @@ const (
 	keyLocks                           = "pgsql.locks"
 	keyOldestXid                       = "pgsql.oldest.xid"
 	keyPing                            = "pgsql.ping"
+	keyQueries                         = "pgsql.queries"
 	keyReplicationCount                = "pgsql.replication.count"
 	keyReplicationLagB                 = "pgsql.replication.lag.b"
 	keyReplicationLagSec               = "pgsql.replication.lag.sec"
@@ -107,7 +108,8 @@ func getHandlerFunc(key string) handlerFunc {
 		return locksHandler
 	case keyOldestXid:
 		return oldestXIDHandler
-
+	case keyQueries:
+		return queriesHandler
 	default:
 		return nil
 	}
@@ -241,6 +243,11 @@ var metrics = metric.MetricSet{
 	keyPing: metric.New("Tests if connection is alive or not.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
 			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
+
+	keyQueries: metric.New("Returns queries statistic.",
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase,
+			metric.NewParam("TimePeriod", "Execution time limit for count of slow queries.").SetRequired(),
+			paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyReplicationCount: metric.New("Returns number of standby servers.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,

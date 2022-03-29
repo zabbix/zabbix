@@ -1,6 +1,6 @@
 # ManageEngine ServiceDesk webhook
 
-This guide describes how to integrate Zabbix 5.4 installation with ManageEngine ServiceDesk (both on-premise and on-demand) using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.<br>
+This guide describes how to integrate Zabbix 6.2 installation with ManageEngine ServiceDesk (both on-premise and on-demand) using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.<br>
 Please note that recovery and update operations are supported only for trigger-based events.
 
 ## Setting up ManageEngine ServiceDesk
@@ -83,7 +83,7 @@ Examples:<br>
 `udf_field_string:udf_char1`
 
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/6.0/manual/config/notifications) and [ManageEngine ServiceDesk](https://www.manageengine.com/products/service-desk/support.html) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/6.2/manual/config/notifications) and [ManageEngine ServiceDesk](https://www.manageengine.com/products/service-desk/support.html) documentations.
 
 ## Supported versions
-Zabbix 6.0 and higher
+Zabbix 6.2 and higher

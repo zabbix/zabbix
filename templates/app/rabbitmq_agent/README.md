@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 The template to monitor RabbitMQ by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -17,7 +17,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
 Enable the RabbitMQ management plugin. See [RabbitMQ's documentation](https://www.rabbitmq.com/management.html) to enable it.
 
@@ -39,7 +39,7 @@ In the case of a single-node installation, you can assign the `cluster` template
 
 If you use another API endpoint, then don't forget to change `{$RABBITMQ.API.CLUSTER_HOST}` macro.
 
-Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.0/manual/installation/install_from_packages).
+Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.2/manual/installation/install_from_packages).
 
 
 ## Zabbix configuration
@@ -134,7 +134,7 @@ You can also provide feedback, discuss the template or ask for help with it at [
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 The template to monitor RabbitMQ by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -166,7 +166,7 @@ Login and password are also set in macros:
 - {$RABBITMQ.API.PASSWORD}
 
 If you use another API endpoint, then don't forget to change `{$RABBITMQ.API.HOST}` macro.
-Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.0/manual/installation/install_from_packages).
+Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.2/manual/installation/install_from_packages).
 
 
 ## Zabbix configuration
@@ -226,9 +226,9 @@ There are no template links in this template.
 |RabbitMQ |RabbitMQ: CPU utilization |<p>Process CPU utilization percentage.</p> |ZABBIX_PASSIVE |proc.cpu.util["{$RABBITMQ.PROCESS_NAME}"] |
 |RabbitMQ |RabbitMQ: Service ping |<p>-</p> |ZABBIX_PASSIVE |net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |RabbitMQ |RabbitMQ: Service response time |<p>-</p> |ZABBIX_PASSIVE |net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"] |
-|RabbitMQ |RabbitMQ: Healthcheck: local alarms in effect on the this node{#SINGLETON} |<p>Responds a 200 OK if there are no local alarms in effect on the target node, otherwise responds with a 503 Service Unavailable.</p> |ZABBIX_PASSIVE |web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms{#SINGLETON}"]<p>**Preprocessing**:</p><p>- REGEX: `HTTP\/1\.1\b\s(\d+) \1`</p><p>- JAVASCRIPT: `switch(value){  case '200': return 1  case '503': return 0  default: 2}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|RabbitMQ |RabbitMQ: Healthcheck: local alarms in effect on this node{#SINGLETON} |<p>Responds a 200 OK if there are no local alarms in effect on the target node, otherwise responds with a 503 Service Unavailable.</p> |ZABBIX_PASSIVE |web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms{#SINGLETON}"]<p>**Preprocessing**:</p><p>- REGEX: `HTTP\/1\.1\b\s(\d+) \1`</p><p>- JAVASCRIPT: `switch(value){  case '200': return 1  case '503': return 0  default: 2}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |RabbitMQ |RabbitMQ: Healthcheck: expiration date on the certificates{#SINGLETON} |<p>Checks the expiration date on the certificates for every listener configured to use TLS. Responds a 200 OK if all certificates are valid (have not expired), otherwise responds with a 503 Service Unavailable.</p> |ZABBIX_PASSIVE |web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/certificate-expiration/1/months{#SINGLETON}"]<p>**Preprocessing**:</p><p>- REGEX: `HTTP\/1\.1\b\s(\d+) \1`</p><p>- JAVASCRIPT: `switch(value){  case '200': return 1  case '503': return 0  default: 2}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|RabbitMQ |RabbitMQ: Healthcheck: virtual hosts on the this node{#SINGLETON} |<p>Responds a 200 OK if all virtual hosts and running on the target node, otherwise responds with a 503 Service Unavailable.</p> |ZABBIX_PASSIVE |web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/virtual-hosts{#SINGLETON}"]<p>**Preprocessing**:</p><p>- REGEX: `HTTP\/1\.1\b\s(\d+) \1`</p><p>- JAVASCRIPT: `switch(value){  case '200': return 1  case '503': return 0  default: 2}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|RabbitMQ |RabbitMQ: Healthcheck: virtual hosts on this node{#SINGLETON} |<p>Responds a 200 OK if all virtual hosts and running on the target node, otherwise responds with a 503 Service Unavailable.</p> |ZABBIX_PASSIVE |web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/virtual-hosts{#SINGLETON}"]<p>**Preprocessing**:</p><p>- REGEX: `HTTP\/1\.1\b\s(\d+) \1`</p><p>- JAVASCRIPT: `switch(value){  case '200': return 1  case '503': return 0  default: 2}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |RabbitMQ |RabbitMQ: Healthcheck: classic mirrored queues without synchronized mirrors online{#SINGLETON} |<p>Checks if there are classic mirrored queues without synchronized mirrors online (queues that would potentially lose data if the target node is shut down). Responds a 200 OK if there are no such classic mirrored queues, otherwise responds with a 503 Service Unavailable.</p> |ZABBIX_PASSIVE |web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-mirror-sync-critical{#SINGLETON}"]<p>**Preprocessing**:</p><p>- REGEX: `HTTP\/1\.1\b\s(\d+) \1`</p><p>- JAVASCRIPT: `switch(value){  case '200': return 1  case '503': return 0  default: 2}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |RabbitMQ |RabbitMQ: Healthcheck: queues with minimum online quorum{#SINGLETON} |<p>Checks if there are quorum queues with minimum online quorum (queues that would lose their quorum and availability if the target node is shut down). Responds a 200 OK if there are no such quorum queues, otherwise responds with a 503 Service Unavailable.</p> |ZABBIX_PASSIVE |web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-quorum-critical{#SINGLETON}"]<p>**Preprocessing**:</p><p>- REGEX: `HTTP\/1\.1\b\s(\d+) \1`</p><p>- JAVASCRIPT: `switch(value){  case '200': return 1  case '503': return 0  default: 2}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |RabbitMQ |RabbitMQ: Healthcheck{#SINGLETON} |<p>Runs basic healthchecks in the current node. Checks that the rabbit application is running, channels and queues can be listed successfully, and that no alarms are in effect.</p> |ZABBIX_PASSIVE |web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/healthchecks/node{#SINGLETON}"]<p>**Preprocessing**:</p><p>- REGEX: `\n\s?\n(.*) \1`</p><p>- JSONPATH: `$.status`</p><p>- BOOL_TO_DECIMAL</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
@@ -270,8 +270,8 @@ There are no template links in this template.
 |RabbitMQ: There are active alarms in the node |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms{#SINGLETON}"])=0` |AVERAGE | |
 |RabbitMQ: There are valid TLS certificates expiring in the next month |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/certificate-expiration/1/months{#SINGLETON}"])=0` |AVERAGE | |
 |RabbitMQ: There are not running virtual hosts |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/virtual-hosts{#SINGLETON}"])=0` |AVERAGE | |
-|RabbitMQ: There are queues that could potentially lose data if the this node goes offline. |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-mirror-sync-critical{#SINGLETON}"])=0` |AVERAGE | |
-|RabbitMQ: There are queues that would lose their quorum and availability if the this node is shut down. |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-quorum-critical{#SINGLETON}"])=0` |AVERAGE | |
+|RabbitMQ: There are queues that could potentially lose data if this node goes offline. |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-mirror-sync-critical{#SINGLETON}"])=0` |AVERAGE | |
+|RabbitMQ: There are queues that would lose their quorum and availability if this node is shut down. |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-quorum-critical{#SINGLETON}"])=0` |AVERAGE | |
 |RabbitMQ: Node healthcheck failed |<p>https://www.rabbitmq.com/monitoring.html#health-checks</p> |`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/healthchecks/node{#SINGLETON}"])=0` |AVERAGE | |
 |RabbitMQ: Too many messages in queue [{#VHOST}][{#QUEUE}] (over {$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"} for 5m) |<p>-</p> |`min(/RabbitMQ node by Zabbix agent/rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"],5m)>{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}` |WARNING | |
 |RabbitMQ: Failed to fetch nodes data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`nodata(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"],30m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Process is not running</p><p>- RabbitMQ: Service is down</p> |

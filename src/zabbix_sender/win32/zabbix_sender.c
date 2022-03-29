@@ -17,12 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "zbxjson.h"
-#include "comms.h"
-#include "cfg.h"
-
 #include "zabbix_sender.h"
+
+#include "zbxjson.h"
+#include "zbxcomms.h"
+#include "cfg.h"
 
 const char	*progname = NULL;
 const char	title_message[] = "";
@@ -104,7 +103,7 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 	}
 	zbx_json_close(&json);
 
-	if (SUCCEED == (ret = connect_to_server(&sock, source, &zbx_addrs, GET_SENDER_TIMEOUT, 30,
+	if (SUCCEED == (ret = zbx_connect_to_server(&sock, source, &zbx_addrs, GET_SENDER_TIMEOUT, 30,
 		ZBX_TCP_SEC_UNENCRYPTED, 0, 0)))
 	{
 		if (SUCCEED == (ret = zbx_tcp_send(&sock, json.buffer)))

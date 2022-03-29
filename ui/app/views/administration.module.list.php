@@ -26,6 +26,7 @@ if ($data['uncheck']) {
 $widget = (new CWidget())
 	->setTitle(_('Modules'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_MODULE_LIST))
 	->setControls(
 		(new CTag('nav', true,
 			(new CForm())

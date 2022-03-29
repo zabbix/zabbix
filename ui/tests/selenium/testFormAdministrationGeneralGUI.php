@@ -90,7 +90,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			$this->assertEquals($limit, $this->query('id', $id)->one()->getAttribute('maxlength'));
 		}
 
-		$this->query('xpath://span[@class="icon-info status-red"]')->one()->click();
+		$this->query('xpath://a[@class="icon-info status-red"]')->one()->click();
 		$this->assertEquals(
 			'You are not able to choose some of the languages,'.
 				' because locales for them are not installed on the web server.',

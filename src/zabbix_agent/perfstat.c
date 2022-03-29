@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "stats.h"
 #include "perfstat.h"
+
+#include "stats.h"
 #include "alias.h"
 #include "log.h"
 #include "mutexs.h"

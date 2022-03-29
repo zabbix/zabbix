@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-27T14:13:28Z'
+  date: '2022-03-01T13:18:30Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -191,7 +191,7 @@ zabbix_export:
               expression: 'last(/Apache Kafka by JMX/jmx["kafka.log:type=LogManager,name=OfflineLogDirectoryCount","Value"]) > 0'
               name: 'Kafka: There are offline log directories'
               priority: WARNING
-              description: 'The offline log directory count metric indicate the number of log directories which are offline (due to an hardware failure for example) so that the broker cannot store incoming messages anymore.'
+              description: 'The offline log directory count metric indicate the number of log directories which are offline (due to a hardware failure for example) so that the broker cannot store incoming messages anymore.'
               tags:
                 -
                   tag: scope

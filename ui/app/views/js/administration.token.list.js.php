@@ -24,10 +24,135 @@
  */
 ?>
 
-<script type="text/javascript">
-	$(() => {
-		$('#filter-expires-state')
-			.on('change', ({target: {checked}}) => $('#filter-expires-days').prop('disabled', !checked))
-			.trigger('change');
-	});
+<script>
+	const view = {
+
+		init() {
+			this.initActionButtons();
+			this.expiresDaysHandler();
+		},
+
+		initActionButtons() {
+			document.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-create-token')) {
+					this.createToken();
+				}
+				else if (e.target.classList.contains('js-edit-token')) {
+					this.editToken(e.target.dataset.tokenid);
+				}
+				else if (e.target.classList.contains('js-massdelete-token')) {
+					this.massDeleteToken(e.target, Object.values(chkbxRange.getSelectedIds()));
+				}
+			});
+		},
+
+		expiresDaysHandler() {
+			const filter_expires_state = document.getElementById('filter-expires-state');
+			const filter_expires_days = document.getElementById('filter-expires-days');
+
+			filter_expires_days.disabled = !filter_expires_state.checked;
+		},
+
+		createToken() {
+			this.openTokenPopup({admin_mode: '1'});
+		},
+
+		editToken(tokenid) {
+			const token_data = {tokenid, admin_mode: '1'};
+			this.openTokenPopup(token_data);
+		},
+
+		openTokenPopup(token_data) {
+			const overlay = PopUp('popup.token.edit', token_data, {
+				dialogueid: 'token_edit',
+				dialogue_class: 'modal-popup-generic'
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.tokenSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.tokenDelete, {once: true});
+		},
+
+		massDeleteToken(target, tokenids) {
+			const confirmation = tokenids.length > 1
+				? <?= json_encode(_('Delete selected tokens?')) ?>
+				: <?= json_encode(_('Delete selected token?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return;
+			}
+
+			target.classList.add('is-loading');
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'token.delete');
+
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					tokenids: chkbxRange.getSelectedIds()
+				})
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					const keepids = ('keepids' in response) ? response.keepids : [];
+
+					if ('error' in response) {
+						postMessageError(response.error.title);
+						postMessageDetails('error', response.error.messages);
+					}
+					else if('success' in response) {
+						postMessageOk(response.success.title);
+
+						if ('messages' in response.success) {
+							postMessageDetails('success', response.success.messages);
+						}
+					}
+
+					uncheckTableRows('token', keepids);
+					location.href = location.href;
+				})
+				.catch(() => {
+					const title = <?= json_encode(_('Unexpected server error.')) ?>;
+					const message_box = makeMessageBox('bad', [], title)[0];
+
+					clearMessages();
+					addMessage(message_box);
+				})
+				.finally(() => {
+					target.classList.remove('is-loading');
+				});
+		},
+
+		events: {
+			tokenSuccess(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				location.href = location.href;
+			},
+
+			tokenDelete(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				uncheckTableRows('token');
+				location.href = location.href;
+			}
+		}
+	};
 </script>

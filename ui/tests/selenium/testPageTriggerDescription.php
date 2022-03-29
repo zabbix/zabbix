@@ -93,7 +93,7 @@ class testPageTriggerDescription extends CWebTest {
 		$row = $table->findRow('Problem', $data['Trigger name'], true);
 
 		if (CTestArrayHelper::get($data, 'description', false)) {
-			$row->query('xpath:.//span[contains(@class, "icon-description")]')->one()->click();
+			$row->query('xpath:.//a[contains(@class, "icon-description")]')->one()->click();
 			$overlay = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->one()->waitUntilReady();
 			$this->assertEquals($data['description'], $overlay->getText());
 

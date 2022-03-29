@@ -2,7 +2,7 @@
 
 SUBDIRS = \
 	logfiles
-	
+
 EXTRA_DIST = \
 	eventlog.c \
 	eventlog.h \
@@ -57,9 +57,11 @@ zabbix_agentd_LDADD = \
 	$(top_builddir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_builddir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_builddir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
+	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_builddir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_builddir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_builddir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_builddir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_builddir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_builddir)/src/libs/zbxcompress/libzbxcompress.a \
