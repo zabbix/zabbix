@@ -1069,7 +1069,7 @@ function getDataOverviewCellData(array $db_items, array $data, int $show_suppres
  *
  * @return array
  */
-function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?string $application = ''): array {
+function getDataOverviewItems(?array $groupids = null, ?array $hostids, ?string $application = ''): array {
 	if ($application !== '') {
 		$db_applications = API::Application()->get([
 			'output' => ['hostid'],
@@ -1093,8 +1093,9 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 			'applicationids' => $applicationids,
 			'monitored_hosts' => true,
 			'with_monitored_items' => true,
-			'preservekeys' => true,
-			'limit' => ZBX_MAX_TABLE_COLUMNS + 1
+			'sortfield' => ['name'],
+			'limit' => ZBX_MAX_TABLE_COLUMNS + 1,
+			'preservekeys' => true
 		]);
 		$hostids = array_keys($db_hosts);
 	}
@@ -1128,7 +1129,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 		['field' => 'itemid', 'order' => ZBX_SORT_UP]
 	]);
 
-	return [$db_items, $hostids];
+	return $db_items;
 }
 
 /**
@@ -1141,7 +1142,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
  * @return array
  */
 function getDataOverview(?array $groupids, ?array $hostids, array $filter): array {
-	[$db_items, $hostids] = getDataOverviewItems($groupids, $hostids, $filter['application']);
+	$db_items = getDataOverviewItems($groupids, $hostids, $filter['application']);
 
 	$data = [];
 	$item_counter = [];
@@ -1210,6 +1211,7 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 		}
 
 		array_walk($item_columns, function (array &$item_column) use (&$itemids) {
+			CArrayHelper::ksort($item_column);
 			$item_column = array_slice($item_column, 0, ZBX_MAX_TABLE_COLUMNS, true);
 			$itemids += array_column($item_column, 'itemid', 'itemid');
 		});

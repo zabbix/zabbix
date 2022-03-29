@@ -208,6 +208,18 @@ class CArrayHelper {
 	}
 
 	/**
+	 * Sort array by keys in ascending order.
+	 * Performs case-insensitive string comparisons using a "natural order" algorithm.
+	 *
+	 * @param array $array
+	 */
+	public static function ksort(array &$array): void {
+		uksort($array, static function ($key1, $key2): int {
+			return strnatcasecmp((string) $key1, (string) $key2);
+		});
+	}
+
+	/**
 	 * Unset values that are contained in $a2 from $a1. Skip arrays and keys given in $skipKeys.
 	 *
 	 * @param array $a1         array to modify
