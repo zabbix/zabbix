@@ -178,7 +178,7 @@ class MysqlDbBackend extends DbBackend {
 		}
 
 		try {
-			$resource->real_connect($host, $user, $password, $dbname, $port, null, $tls_mode);
+			@$resource->real_connect($host, $user, $password, $dbname, $port, null, $tls_mode);
 		}
 		catch (mysqli_sql_exception $e) {
 			$this->setError($e->getMessage());
