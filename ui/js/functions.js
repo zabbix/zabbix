@@ -717,11 +717,11 @@ function parseUrlString(url) {
 /**
  * Message formatting function.
  *
- * @param {string}        type            Message type. ('good'|'bad'|'warning')
- * @param {string|array}  messages        Array with details messages or message string with normal font.
- * @param {string|null}   title           Larger font title.
- * @param {boolean}       show_close_box  Show close button.
- * @param {boolean|null}  show_details    Show details on opening.
+ * @param {string}       type            Message type. ('good'|'bad'|'warning')
+ * @param {array}        messages        Error messages.
+ * @param {string|null}  title           Error title.
+ * @param {boolean}      show_close_box  Show close button.
+ * @param {boolean|null} show_details    Show details on opening.
  *
  * @return {jQuery}
  */
@@ -730,7 +730,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 		msg_class = classes[type];
 
 	if (show_details === null) {
-		show_details = type === 'bad' || type === 'good';
+		show_details = type === 'bad' || type === 'warning';
 	}
 
 	var	$list = jQuery('<ul>')
@@ -780,24 +780,15 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 		}
 	}
 
-	if (messages.length > 0) {
-		if (Array.isArray(messages)) {
-			jQuery.map(messages, function (message) {
-				jQuery('<li>')
-					.html(message)
-					.appendTo($list);
-				return null;
-			});
-
-			$msg_box.append($msg_details);
-		}
-		else {
+	if (Array.isArray(messages) && messages.length > 0) {
+		jQuery.map(messages, function (message) {
 			jQuery('<li>')
-				.html(messages ? messages : ' ')
+				.html(message)
 				.appendTo($list);
+			return null;
+		});
 
-			$msg_box.append($msg_details);
-		}
+		$msg_box.append($msg_details);
 	}
 
 	if (show_close_box) {

@@ -611,7 +611,15 @@ class CWidget extends CBaseComponent {
 			signal: this._update_abort_controller.signal
 		})
 			.then((response) => response.json())
-			.then((response) => this._processUpdateResponse(response));
+			.then((response) => {
+				if ('error' in response) {
+					this._processUpdateErrorResponse(response.error);
+
+					return;
+				}
+
+				this._processUpdateResponse(response);
+			});
 	}
 
 	_getUpdateRequestData() {
@@ -638,6 +646,10 @@ class CWidget extends CBaseComponent {
 			info: response.info,
 			debug: response.debug
 		});
+	}
+
+	_processUpdateErrorResponse(error) {
+		this._setErrorContents({error});
 	}
 
 	// Widget view methods.
@@ -739,10 +751,14 @@ class CWidget extends CBaseComponent {
 		this._content_body.innerHTML = '';
 
 		if (messages !== undefined) {
-			this._content_body.insertAdjacentHTML('beforeend', messages);
+			const message_box = makeMessageBox('bad', messages)[0];
+
+			this._content_body.insertAdjacentElement('beforeend', message_box);
 		}
 
-		this._content_body.insertAdjacentHTML('beforeend', body);
+		if (body !== undefined) {
+			this._content_body.insertAdjacentHTML('beforeend', body);
+		}
 
 		if (debug !== undefined) {
 			this._content_body.insertAdjacentHTML('beforeend', debug);
@@ -753,6 +769,17 @@ class CWidget extends CBaseComponent {
 		if (info !== undefined) {
 			this._addInfoButtons(info);
 		}
+	}
+
+	_setErrorContents({error}) {
+		this._setHeaderName(this._defaults.name);
+
+		const message_box = makeMessageBox('bad', error.messages, error.title)[0];
+
+		this._content_body.innerHTML = '';
+		this._content_body.appendChild(message_box);
+
+		this._removeInfoButtons();
 	}
 
 	_addInfoButtons(buttons) {

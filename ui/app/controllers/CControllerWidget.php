@@ -127,7 +127,7 @@ abstract class CControllerWidget extends CController {
 		if (!$ret) {
 			$output = [
 				'name' => $this->getDefaultName(),
-				'messages' => getMessages()->toString()
+				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 
 			$this->setResponse(

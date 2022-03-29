@@ -604,6 +604,7 @@ class ZBase {
 		catch (Exception $e) {
 			switch ($router->getLayout()) {
 				case 'layout.json':
+				case 'layout.widget':
 					echo (new CView('layout.json', [
 						'main_block' => json_encode([
 							'error' => [
@@ -758,6 +759,7 @@ class ZBase {
 
 		switch ($router->getLayout()) {
 			case 'layout.json':
+			case 'layout.widget':
 				echo (new CView('layout.json', [
 					'main_block' => json_encode([
 						'error' => [

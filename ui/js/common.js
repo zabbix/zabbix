@@ -363,7 +363,7 @@ function PopUp(action, parameters, {
 		.then(function(resp) {
 			if ('error' in resp) {
 				overlay.setProperties({
-					content: makeMessageBox('bad', resp.error.messages ?? [], resp.error.title ?? '', false, true)
+					content: makeMessageBox('bad', resp.error.messages, resp.error.title, false)
 				});
 			}
 			else {

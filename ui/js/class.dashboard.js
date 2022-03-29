@@ -679,7 +679,7 @@ class CDashboard extends CBaseComponent {
 					title = t('Failed to paste widget.');
 				}
 
-				const message_box = makeMessageBox('bad', messages, title)[0];
+				const message_box = makeMessageBox('bad', messages, title);
 
 				addMessage(message_box);
 			})
@@ -1177,8 +1177,8 @@ class CDashboard extends CBaseComponent {
 						}
 					}
 
-					const message_box = makeMessageBox('warning',
-						t('Cannot add widget: not enough free space on the dashboard.'), null, false
+					const message_box = makeMessageBox('warning', [],
+						t('Cannot add widget: not enough free space on the dashboard.')
 					)[0];
 
 					form.parentNode.insertBefore(message_box, form);
@@ -1440,7 +1440,7 @@ class CDashboard extends CBaseComponent {
 		this._warning_message_box = makeMessageBox('warning', [], sprintf(
 			t('Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.'),
 			this._max_dashboard_pages
-		), true, false);
+		));
 
 		addMessage(this._warning_message_box);
 	}
@@ -1448,8 +1448,8 @@ class CDashboard extends CBaseComponent {
 	_warnDashboardPageExhausted() {
 		this._clearWarnings();
 
-		this._warning_message_box = makeMessageBox(
-			'warning', [], t('Cannot add widget: not enough free space on the dashboard.'), true, false
+		this._warning_message_box = makeMessageBox('warning', [],
+			t('Cannot add widget: not enough free space on the dashboard.')
 		);
 
 		addMessage(this._warning_message_box);
