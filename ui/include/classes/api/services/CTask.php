@@ -36,6 +36,7 @@ class CTask extends CApiService {
 	private $item_cache = [];
 
 	const RESULT_STATUS_ERROR = -1;
+
 	/**
 	 * Get results of requested ZBX_TM_TASK_DATA task.
 	 *
