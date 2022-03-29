@@ -322,7 +322,6 @@ func (c *ConnManager) GetConnection(uri uri.URI, details tlsconfig.Details) (con
 	conn = c.get(uri)
 
 	if conn == nil {
-		fmt.Println("creating connection")
 		conn, err = c.create(uri, details)
 	}
 
