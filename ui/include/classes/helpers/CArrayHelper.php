@@ -214,9 +214,7 @@ class CArrayHelper {
 	 * @param array $array
 	 */
 	public static function ksort(array &$array): void {
-		uksort($array, static function ($key1, $key2): int {
-			return strnatcasecmp((string) $key1, (string) $key2);
-		});
+		uksort($array, 'strnatcasecmp');
 	}
 
 	/**
