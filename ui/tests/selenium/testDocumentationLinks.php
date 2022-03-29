@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
- * @backup profiles, module, services
+ * @backup profiles, module, services, token
  *
  * @onBefore prepareServiceData
  */
@@ -32,11 +32,20 @@ class testDocumentationLinks extends CWebTest {
 	public function prepareServiceData() {
 		self::$version = substr(ZABBIX_VERSION, 0, 3);
 
+		// Create a service.
 		CDataHelper::call('service.create', [
 			[
 				'name' => 'Service_1',
 				'algorithm' => 1,
 				'sortorder' => 1
+			]
+		]);
+
+		// Create an API token.
+		CDataHelper::call('token.create', [
+			[
+				'name' => 'Admin token',
+				'userid' => 1
 			]
 		]);
 	}
@@ -80,7 +89,24 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard#creating-a-dashboard'
 				]
 			],
-			// #3 Widget edit form.
+			// #3 Widget Create popup.
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard/widgets'
+				]
+			],
+			// #4 Widget edit form.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -94,7 +120,7 @@ class testDocumentationLinks extends CWebTest {
 				]
 			],
 			// TODO: Uncomment this test case and adjust documentation link when ZBX-20773 is merged.
-//			// #4 Add dashboard page configuration popup.
+//			// #5 Add dashboard page configuration popup.
 //			[
 //				[
 //					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -115,7 +141,7 @@ class testDocumentationLinks extends CWebTest {
 //					]
 //				]
 //			],
-//			// #5 Edit dashboard sharing configuration popup.
+//			// #6 Edit dashboard sharing configuration popup.
 //			[
 //				[
 //					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -129,28 +155,28 @@ class testDocumentationLinks extends CWebTest {
 //					'select_option' => 'xpath://a[text()="Sharing"]'
 //				]
 //			],
-			// #6 Global search view.
+			// #7 Global search view.
 			[
 				[
 					'url' => 'zabbix.php?action=search&search=zabbix',
 					'doc_link' => '/en/manual/web_interface/global_search'
 				]
 			],
-			// #7 Problems view.
+			// #8 Problems view.
 			[
 				[
 					'url' => 'zabbix.php?action=problem.view',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/problems'
 				]
 			],
-			// #8 Event details view.
+			// #9 Event details view.
 			[
 				[
 					'url' => 'tr_events.php?triggerid=100028&eventid=95',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/problems#viewing-details'
 				]
 			],
-			// #9 Problems Mass update popup.
+			// #10 Problems Mass update popup.
 			[
 				[
 					'url' => 'zabbix.php?action=problem.view',
@@ -162,7 +188,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/acknowledges#updating-problems'
 				]
 			],
-			// #10 Problems acknowledge popup.
+			// #11 Problems acknowledge popup.
 			[
 				[
 					'url' => 'zabbix.php?action=problem.view',
@@ -175,14 +201,14 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/acknowledges#updating-problems'
 				]
 			],
-			// #11 Monitoring -> Hosts view.
+			// #12 Monitoring -> Hosts view.
 			[
 				[
 					'url' => 'zabbix.php?action=host.view',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/hosts'
 				]
 			],
-			// #12 Create host popup in Monitoring -> Hosts view.
+			// #13 Create host popup in Monitoring -> Hosts view.
 			[
 				[
 					'url' => 'zabbix.php?action=host.view',
@@ -195,28 +221,28 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/hosts/host#configuration'
 				]
 			],
-			// #13 Monitoring -> Graphs view.
+			// #14 Monitoring -> Graphs view.
 			[
 				[
 					'url' => 'zabbix.php?action=charts.view',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/hosts/graphs'
 				]
 			],
-			// #14 Monitoring -> Web monitoring view.
+			// #15 Monitoring -> Web monitoring view.
 			[
 				[
 					'url' => 'zabbix.php?action=web.view',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/hosts/web'
 				]
 			],
-			// #15 Monitoring -> Host dashboards view (dashboards of Zabbix server host).
+			// #16 Monitoring -> Host dashboards view (dashboards of Zabbix server host).
 			[
 				[
 					'url' => 'zabbix.php?action=host.dashboard.view&hostid=10084',
 					'doc_link' => '/en/manual/config/visualization/host_screens'
 				]
 			],
-			// #16 Latest data view.
+			// #17 Latest data view.
 			[
 				[
 					'url' => 'zabbix.php?action=latest.view',
@@ -224,35 +250,35 @@ class testDocumentationLinks extends CWebTest {
 				]
 			],
 			// TODO: Uncomment this test case and adjust documentation link when ZBX-20773 is merged.
-//			// #17 Speccific item graph from latest data view.
+//			// #18 Speccific item graph from latest data view.
 //			[
 //				[
 //					'url' => 'history.php?action=showgraph&itemids%5B%5D=42237',
 //					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/latest_data'
 //				]
 //			],
-//			// #18 Specific item history from latest data view.
+//			// #19 Specific item history from latest data view.
 //			[
 //				[
 //					'url' => 'history.php?action=showvalues&itemids%5B%5D=42242',
 //					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/latest_data'
 //				]
 //			],
-			// #19 Maps list view.
+			// #20 Maps list view.
 			[
 				[
 					'url' => 'sysmaps.php',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/maps'
 				]
 			],
-			// #20 Create map form.
+			// #21 Create map form.
 			[
 				[
 					'url' => 'sysmaps.php?form=Create+map',
 					'doc_link' => '/en/manual/config/visualization/maps/map#creating-a-map'
 				]
 			],
-			// #21 Map import popup.
+			// #22 Map import popup.
 			[
 				[
 					'url' => 'sysmaps.php',
@@ -265,14 +291,14 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/xml_export_import/maps#importing'
 				]
 			],
-			// #22 View map view.
+			// #23 View map view.
 			[
 				[
 					'url' => 'zabbix.php?action=map.view&sysmapid=1',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/maps#viewing-maps'
 				]
 			],
-			// #23 Edit map view.
+			// #24 Edit map view.
 			[
 				[
 					'url' => 'sysmap.php?sysmapid=1',
@@ -280,28 +306,28 @@ class testDocumentationLinks extends CWebTest {
 				]
 			],
 
-			// #24 Monitoring -> Discovery view.
+			// #25 Monitoring -> Discovery view.
 			[
 				[
 					'url' => 'zabbix.php?action=discovery.view',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/discovery'
 				]
 			],
-			// #25 Monitoring -> Services in view mode.
+			// #26 Monitoring -> Services in view mode.
 			[
 				[
 					'url' => 'zabbix.php?action=service.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/services/service#viewing-services'
 				]
 			],
-			// #26 Monitoring -> Services in edit mode.
+			// #27 Monitoring -> Services in edit mode.
 			[
 				[
 					'url' => 'zabbix.php?action=service.list.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/services/service#editing-services'
 				]
 			],
-			// #27 Service configuration form popup.
+			// #28 Service configuration form popup.
 			[
 				[
 					'url' => 'zabbix.php?action=service.list.edit',
@@ -314,7 +340,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/services/service#service-configuration'
 				]
 			],
-			// #28 Service mass update popup.
+			// #29 Service mass update popup.
 			[
 				[
 					'url' => 'zabbix.php?action=service.list.edit',
@@ -326,28 +352,28 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/services/service#editing-services'
 				]
 			],
-			// #29 List of service actions.
+			// #30 List of service actions.
 			[
 				[
 					'url' => 'actionconf.php?eventsource=4',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/services/service_actions'
 				]
 			],
-			// #30 Service action configuration form.
+			// #31 Service action configuration form.
 			[
 				[
 					'url' => 'actionconf.php?eventsource=4&form=Create+action',
 					'doc_link' => '/en/manual/config/notifications/action#configuring-an-action'
 				]
 			],
-			// #31 SLA list view.
+			// #32 SLA list view.
 			[
 				[
 					'url' => 'zabbix.php?action=sla.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/services/sla#overview'
 				]
 			],
-			// #32 SLA create form popup.
+			// #33 SLA create form popup.
 			[
 				[
 					'url' => 'zabbix.php?action=sla.list',
@@ -360,42 +386,42 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/services/sla#configuration'
 				]
 			],
-			// #33 SLA report view.
+			// #34 SLA report view.
 			[
 				[
 					'url' => 'zabbix.php?action=slareport.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/services/sla_report#overview'
 				]
 			],
-			// #34 Inventory overview view.
+			// #35 Inventory overview view.
 			[
 				[
 					'url' => 'hostinventoriesoverview.php',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/inventory/overview'
 				]
 			],
-			// #35 Inventory hosts view.
+			// #36 Inventory hosts view.
 			[
 				[
 					'url' => 'hostinventories.php',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/inventory/hosts'
 				]
 			],
-			// #36 System information report view.
+			// #37 System information report view.
 			[
 				[
 					'url' => 'zabbix.php?action=report.status',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/reports/status_of_zabbix'
 				]
 			],
-			// #37 Scheduled reports list view.
+			// #38 Scheduled reports list view.
 			[
 				[
 					'url' => 'zabbix.php?action=scheduledreport.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/reports/scheduled'
 				]
 			],
-			// #38 Scheduled report configuration form.
+			// #39 Scheduled report configuration form.
 			[
 				[
 					'url' => 'zabbix.php?action=scheduledreport.edit',
@@ -403,7 +429,7 @@ class testDocumentationLinks extends CWebTest {
 				]
 			],
 			// TODO: Uncomment this test case and adjust documentation link when ZBX-20773 is merged.
-//			// #39 Add scheduled report configuration popup from Dashboard view.
+//			// #40 Add scheduled report configuration popup from Dashboard view.
 //			[
 //				[
 //					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -420,84 +446,84 @@ class testDocumentationLinks extends CWebTest {
 //					],
 //				]
 //			],
-			// #40 Availability report view.
+			// #41 Availability report view.
 			[
 				[
 					'url' => 'report2.php',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/reports/availability'
 				]
 			],
-			// #41 Triggers top 100 report view.
+			// #42 Triggers top 100 report view.
 			[
 				[
 					'url' => 'toptriggers.php',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/reports/triggers_top'
 				]
 			],
-			// #42 Audit log view.
+			// #43 Audit log view.
 			[
 				[
 					'url' => 'zabbix.php?action=auditlog.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/reports/audit'
 				]
 			],
-			// #43 Action log view.
+			// #44 Action log view.
 			[
 				[
 					'url' => 'auditacts.php',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/reports/action_log'
 				]
 			],
-			// #44 Notifications report view.
+			// #45 Notifications report view.
 			[
 				[
 					'url' => 'report4.php',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/reports/notifications'
 				]
 			],
-			// #45 Host groups list view.
+			// #46 Host groups list view.
 			[
 				[
 					'url' => 'hostgroups.php',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hostgroups'
 				]
 			],
-			// #46 Create host group view.
+			// #47 Create host group view.
 			[
 				[
 					'url' => 'hostgroups.php?form=create',
 					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
 				]
 			],
-			// #47 Update host group view.
+			// #48 Update host group view.
 			[
 				[
 					'url' => 'hostgroups.php?form=update&groupid=5',
 					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
 				]
 			],
-			// #48 Template list view.
+			// #49 Template list view.
 			[
 				[
 					'url' => 'templates.php',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/templates'
 				]
 			],
-			// #49 Create template view.
+			// #50 Create template view.
 			[
 				[
 					'url' => 'templates.php?form=create',
 					'doc_link' => '/en/manual/config/templates/template#creating-a-template'
 				]
 			],
-			// #50 Update template view.
+			// #51 Update template view.
 			[
 				[
 					'url' => 'templates.php?form=update&templateid=10050',
 					'doc_link' => '/en/manual/config/templates/template#creating-a-template'
 				]
 			],
-			// #51 Template import popup.
+			// #52 Template import popup.
 			[
 				[
 					'url' => 'templates.php',
@@ -510,7 +536,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/xml_export_import/templates#importing'
 				]
 			],
-			// #52 Template mass update popup.
+			// #53 Template mass update popup.
 			[
 				[
 					'url' => 'templates.php',
@@ -522,29 +548,43 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/templates/mass#using-mass-update'
 				]
 			],
-			// #53 Template items list view.
+			// #54 Template items list view.
 			[
 				[
 					'url' => 'items.php?context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/templates/items'
 				]
 			],
-			// #54 Template item create form.
+			// #55 Template item create form.
 			[
 				[
 					'url' => 'items.php?form=create&hostid=15000&context=template',
 					'doc_link' => '/en/manual/config/items/item#configuration'
 				]
 			],
-			// #55 Template item update form.
+			// #56 Template item update form.
 			[
 				[
 					'url' => 'items.php?form=update&hostid=15000&itemid=15000&context=template',
 					'doc_link' => '/en/manual/config/items/item#configuration'
 				]
 			],
+			// TODO: Uncomment this test case when ZBX-20773 is merged.
+//			// #57 Template item test form.
+//			[
+//				[
+//					'url' => 'items.php?form=update&hostid=15000&itemid=15000&context=template',
+//					'actions' => [
+//						[
+//							'callback' => 'openFormWithLink',
+//							'element' => 'button:Test'
+//						]
+//					],
+//					'doc_link' => '/en/manual/config/items/item#testing'
+//				]
+//			],
 			// TODO: Uncomment this test case when ZBX-20782 is merged.
-//			// #56 Template item Mass update popup.
+//			// #58 Template item Mass update popup.
 //			[
 //				[
 //					'url' => 'items.php?filter_set=1&filter_hostids%5B0%5D=15000&context=template',
@@ -556,21 +596,21 @@ class testDocumentationLinks extends CWebTest {
 //					'doc_link' => '/en/manual/config/items/itemupdate#using-mass-update'
 //				]
 //			],
-			// #57 Template trigger list view.
+			// #59 Template trigger list view.
 			[
 				[
 					'url' => 'triggers.php?context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/templates/triggers'
 				]
 			],
-			// #58 Template trigger create form.
+			// #60 Template trigger create form.
 			[
 				[
 					'url' => 'triggers.php?hostid=15000&form=create&context=template',
 					'doc_link' => '/en/manual/config/triggers/trigger#configuration'
 				]
 			],
-			// #59 Template trigger update form.
+			// #61 Template trigger update form.
 			[
 				[
 					'url' => 'triggers.php?form=update&triggerid=99000&context=template',
@@ -578,7 +618,7 @@ class testDocumentationLinks extends CWebTest {
 				]
 			],
 			// TODO: Uncomment this test case when ZBX-20782 is merged.
-//			// #60 Template trigger Mass update popup.
+//			// #62 Template trigger Mass update popup.
 //			[
 //				[
 //					'url' => 'triggers.php?filter_set=1&filter_hostids%5B0%5D=15000&context=template',
@@ -590,35 +630,35 @@ class testDocumentationLinks extends CWebTest {
 //					'doc_link' => '/en/manual/config/triggers/update#using-mass-update'
 //				]
 //			],
-			// #61 Template graph list view.
+			// #63 Template graph list view.
 			[
 				[
 					'url' => 'graphs.php?context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/templates/graphs'
 				]
 			],
-			// #62 Template graph create form.
+			// #64 Template graph create form.
 			[
 				[
 					'url' => 'graphs.php?hostid=15000&form=create&context=template',
 					'doc_link' => '/en/manual/config/visualization/graphs/custom#configuring-custom-graphs'
 				]
 			],
-			// #63 Template graph update form.
+			// #65 Template graph update form.
 			[
 				[
 					'url' => 'graphs.php?form=update&graphid=15000&context=template&filter_hostids%5B0%5D=15000',
 					'doc_link' => '/en/manual/config/visualization/graphs/custom#configuring-custom-graphs'
 				]
 			],
-			// #64 Template dashboards list view.
+			// #66 Template dashboards list view.
 			[
 				[
 					'url' => 'zabbix.php?action=template.dashboard.list&templateid=10076&context=template',
 					'doc_link' => '/en/manual/config/visualization/host_screens'
 				]
 			],
-			// #65 Template dashboard create popup.
+			// #67 Template dashboard create popup.
 			[
 				[
 					'url' => 'zabbix.php?action=template.dashboard.list&templateid=10076&context=template',
@@ -631,28 +671,41 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard#creating-a-dashboard'
 				]
 			],
-			// #66 Template dashboards view mode.
+			// #68 Template dashboards view mode.
 			[
 				[
 					'url' => 'zabbix.php?action=template.dashboard.edit&dashboardid=50',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard#creating-a-dashboard'
 				]
 			],
-			// #67 Template dashboard widget edit popup.
+			// #69 Template dashboard widget create popup.
 			[
 				[
 					'url' => 'zabbix.php?action=template.dashboard.edit&dashboardid=50',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard/widgets',
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
 							'element' => 'xpath:(//button[@class="btn-widget-edit"])[1]'
 						]
-					]
+					],
+					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard/widgets'
+				]
+			],
+			// #70 Template dashboard widget edit popup.
+			[
+				[
+					'url' => 'zabbix.php?action=template.dashboard.edit&dashboardid=50',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard/widgets'
 				]
 			],
 			// TODO: Uncomment this test case and adjust documentation link when ZBX-20773 is merged.
-//			// #68 Add Template dashboard page configuration popup.
+//			// #71 Add Template dashboard page configuration popup.
 //			[
 //				[
 //					'url' => 'zabbix.php?action=template.dashboard.edit&dashboardid=50',
@@ -669,43 +722,71 @@ class testDocumentationLinks extends CWebTest {
 //					]
 //				]
 //			],
-			// #69 Template LLD rule list view.
+			// #72 Template LLD rule list view.
 			[
 				[
 					'url' => 'host_discovery.php?context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/templates/discovery'
 				]
 			],
-			// #70 Template LLD rule configuration form.
+			// #73 Template LLD rule configuration form.
 			[
 				[
 					'url' => 'host_discovery.php?form=create&hostid=15000&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
 				]
 			],
-			// #71 Template LLD item prototype list view.
+			// TODO: Uncomment this test case when ZBX-20773 is merged.
+//			// #74 Template LLD rule test form.
+//			[
+//				[
+//					'url' => 'host_discovery.php?form=update&itemid=15011&context=template',
+//					'actions' => [
+//						[
+//							'callback' => 'openFormWithLink',
+//							'element' => 'button:Test'
+//						]
+//					],
+//					'doc_link' => '/en/manual/config/items/item#testing'
+//				]
+//			],
+			// #75 Template LLD item prototype list view.
 			[
 				[
 					'url' => 'disc_prototypes.php?parent_discoveryid=15011&context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/templates/discovery/item_prototypes'
 				]
 			],
-			// #72 Template LLD item prototype create form.
+			// #76 Template LLD item prototype create form.
 			[
 				[
 					'url' => 'disc_prototypes.php?form=create&parent_discoveryid=15011&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/item_prototypes'
 				]
 			],
-			// #73 Template LLD item prototype edit form.
+			// #77 Template LLD item prototype edit form.
 			[
 				[
 					'url' => 'disc_prototypes.php?form=update&parent_discoveryid=15011&itemid=15021&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/item_prototypes'
 				]
 			],
+			// TODO: Uncomment this test case when ZBX-20773 is merged.
+//			// #78 Template LLD item prototype test form.
+//			[
+//				[
+//					'url' => 'items.php?form=update&hostid=40001&itemid=99102&context=host',
+//					'actions' => [
+//						[
+//							'callback' => 'openFormWithLink',
+//							'element' => 'button:Test'
+//						]
+//					],
+//					'doc_link' => '/en/manual/config/items/item#testing'
+//				]
+//			],
 			// TODO: Uncomment this test case when ZBX-20782 is merged.
-//			// #74 Template LLD item prototype mass update popup.
+//			// #79 Template LLD item prototype mass update popup.
 //			[
 //				[
 //					'url' => 'disc_prototypes.php?parent_discoveryid=15011&context=template',
@@ -717,21 +798,21 @@ class testDocumentationLinks extends CWebTest {
 //					'doc_link' => '/en/manual/config/items/itemupdate#using-mass-update'
 //				]
 //			],
-			// #75 Template LLD trigger prototype list view.
+			// #80 Template LLD trigger prototype list view.
 			[
 				[
 					'url' => 'trigger_prototypes.php?parent_discoveryid=15011&context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/templates/discovery/trigger_prototypes'
 				]
 			],
-			// #76 Template LLD trigger prototype create form.
+			// #81 Template LLD trigger prototype create form.
 			[
 				[
 					'url' => 'trigger_prototypes.php?parent_discoveryid=15011&form=create&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
-			// #77 Template LLD trigger prototype edit form.
+			// #82 Template LLD trigger prototype edit form.
 			[
 				[
 					'url' => 'trigger_prototypes.php?form=update&parent_discoveryid=15011&triggerid=99008&context=template',
@@ -739,7 +820,7 @@ class testDocumentationLinks extends CWebTest {
 				]
 			],
 			// TODO: Uncomment this test case when ZBX-20782 is merged.
-//			// #78 Template LLD trigger prototype mass update popup.
+//			// #83 Template LLD trigger prototype mass update popup.
 //			[
 //				[
 //					'url' => 'trigger_prototypes.php?parent_discoveryid=15011&context=template',
@@ -751,63 +832,63 @@ class testDocumentationLinks extends CWebTest {
 //					'doc_link' => '/en/manual/config/triggers/update#using-mass-update'
 //				]
 //			],
-			// #79 Template LLD graph prototype list view.
+			// #84 Template LLD graph prototype list view.
 			[
 				[
 					'url' => 'graphs.php?parent_discoveryid=15011&context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/templates/discovery/graph_prototypes'
 				]
 			],
-			// #80 Template LLD graph prototype create form.
+			// #85 Template LLD graph prototype create form.
 			[
 				[
 					'url' => 'graphs.php?form=create&parent_discoveryid=15011&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/graph_prototypes'
 				]
 			],
-			// #81 Template LLD graph prototype edit form.
+			// #86 Template LLD graph prototype edit form.
 			[
 				[
 					'url' => 'graphs.php?form=update&parent_discoveryid=15011&graphid=15008&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/graph_prototypes'
 				]
 			],
-			// #82 Template LLD host prototype list view.
+			// #87 Template LLD host prototype list view.
 			[
 				[
 					'url' => 'host_prototypes.php?parent_discoveryid=15011&context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/templates/discovery/host_prototypes'
 				]
 			],
-			// #83 Template LLD host prototype create form.
+			// #88 Template LLD host prototype create form.
 			[
 				[
 					'url' => 'host_prototypes.php?form=create&parent_discoveryid=15011&context=template',
 					'doc_link' => '/en/manual/vm_monitoring#host-prototypes'
 				]
 			],
-			// #84 Template LLD host prototype edit form.
+			// #89 Template LLD host prototype edit form.
 			[
 				[
 					'url' => 'host_prototypes.php?form=update&parent_discoveryid=15011&hostid=99000&context=template',
 					'doc_link' => '/en/manual/vm_monitoring#host-prototypes'
 				]
 			],
-			// #85 Template Web scenario list view.
+			// #90 Template Web scenario list view.
 			[
 				[
 					'url' => 'httpconf.php?context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/templates/web'
 				]
 			],
-			// #86 Template Web scenario create form.
+			// #91 Template Web scenario create form.
 			[
 				[
 					'url' => 'httpconf.php?form=create&hostid=15000&context=template',
 					'doc_link' => '/en/manual/web_monitoring#configuring-a-web-scenario'
 				]
 			],
-			// #87 Template Web scenario edit form.
+			// #92 Template Web scenario edit form.
 			[
 				[
 					'url' => 'httpconf.php?form=update&hostid=15000&httptestid=15000&context=template',
@@ -815,7 +896,7 @@ class testDocumentationLinks extends CWebTest {
 				]
 			],
 			// TODO: Uncomment this test case and adjust documentation link when ZBX-20773 is merged.
-//			// #87 Template Web scenario step configuration form popup.
+//			// #93 Template Web scenario step configuration form popup.
 //			[
 //				[
 //					'url' => 'httpconf.php?form=update&hostid=15000&httptestid=15000&context=template',
@@ -832,14 +913,14 @@ class testDocumentationLinks extends CWebTest {
 //					'doc_link' => '/en/manual/web_monitoring#configuring-a-web-scenario'
 //				]
 //			],
-			// #88 Host list view.
+			// #94 Host list view.
 			[
 				[
 					'url' => 'zabbix.php?action=host.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hosts'
 				]
 			],
-			// #89 Create host popup.
+			// #95 Create host popup.
 			[
 				[
 					'url' => 'zabbix.php?action=host.list',
@@ -853,7 +934,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/hosts/host#configuration'
 				]
 			],
-			// #90 Edit host popup.
+			// #96 Edit host popup.
 			[
 				[
 					'url' => 'zabbix.php?action=host.list',
@@ -867,14 +948,14 @@ class testDocumentationLinks extends CWebTest {
 				]
 			],
 			// TODO: Uncomment this test case and adjust documentation link when ZBX-20773 is merged.
-//			// 91 Create host form view (standalone).
+//			// 97 Create host form view (standalone).
 //			[
 //				[
 //					'url' => 'zabbix.php?action=host.edit',
 //					'doc_link' => '/en/manual/config/hosts/host#configuration'
 //				]
 //			],
-			// #92 Host import popup.
+			// #98 Host import popup.
 			[
 				[
 					'url' => 'zabbix.php?action=host.list',
@@ -888,7 +969,7 @@ class testDocumentationLinks extends CWebTest {
 				]
 			],
 			// TODO: Uncomment this test case when ZBX-20782 is merged.
-//			// #93 Host mass update popup.
+//			// #99 Host mass update popup.
 //			[
 //				[
 //					'url' => 'zabbix.php?action=host.list',
@@ -900,21 +981,21 @@ class testDocumentationLinks extends CWebTest {
 //					'doc_link' => '/en/manual/config/hosts/hostupdate#using-mass-update'
 //				]
 //			],
-			// #94 Host items list view.
+			// #100 Host items list view.
 			[
 				[
 					'url' => 'items.php?context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hosts/items'
 				]
 			],
-			// #95 Host item create form.
+			// #101 Host item create form.
 			[
 				[
 					'url' => 'items.php?form=create&hostid=40001&context=host',
 					'doc_link' => '/en/manual/config/items/item#configuration'
 				]
 			],
-			// #96 Host item update form.
+			// #102 Host item update form.
 			[
 				[
 					'url' => 'items.php?form=update&hostid=40001&itemid=99102&context=host',
@@ -922,8 +1003,22 @@ class testDocumentationLinks extends CWebTest {
 
 				]
 			],
+			// TODO: Uncomment this test case when ZBX-20773 is merged.
+//			// #103 Host item test form.
+//			[
+//				[
+//					'url' => 'items.php?form=update&hostid=40001&itemid=99102&context=host',
+//					'actions' => [
+//						[
+//							'callback' => 'openFormWithLink',
+//							'element' => 'button:Test'
+//						]
+//					],
+//					'doc_link' => '/en/manual/config/items/item#testing'
+//				]
+//			],
 			// TODO: Uncomment this test case when ZBX-20782 is merged.
-//			// #97 Host item Mass update popup.
+//			// #104 Host item Mass update popup.
 //			[
 //				[
 //					'url' => 'items.php?filter_set=1&filter_hostids%5B0%5D=40001&context=host',
@@ -935,21 +1030,21 @@ class testDocumentationLinks extends CWebTest {
 //					'doc_link' => '/en/manual/config/items/itemupdate#using-mass-update'
 //				]
 //			],
-			// #98 Host trigger list view.
+			// #105 Host trigger list view.
 			[
 				[
 					'url' => 'triggers.php?context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hosts/triggers'
 				]
 			],
-			// #99 Host trigger create form.
+			// #106 Host trigger create form.
 			[
 				[
 					'url' => 'triggers.php?hostid=40001&form=create&context=host',
 					'doc_link' => '/en/manual/config/triggers/trigger#configuration'
 				]
 			],
-			// #100 Host trigger update form.
+			// #107 Host trigger update form.
 			[
 				[
 					'url' => 'triggers.php?form=update&triggerid=14000&context=host',
@@ -957,7 +1052,7 @@ class testDocumentationLinks extends CWebTest {
 				]
 			],
 			// TODO: Uncomment this test case when ZBX-20782 is merged.
-//			// #101 Host trigger Mass update popup.
+//			// #108 Host trigger Mass update popup.
 //			[
 //				[
 //					'url' => 'triggers.php?filter_set=1&filter_hostids%5B0%5D=40001&context=host',
@@ -969,64 +1064,92 @@ class testDocumentationLinks extends CWebTest {
 //					'doc_link' => '/en/manual/config/triggers/update#using-mass-update'
 //				]
 //			],
-			// #102 Host graph list view.
+			// #109 Host graph list view.
 			[
 				[
 					'url' => 'graphs.php?context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hosts/graphs'
 				]
 			],
-			// #103 Host graph create form.
+			// #110 Host graph create form.
 			[
 				[
 					'url' => 'graphs.php?hostid=40001&form=create&context=host',
 					'doc_link' => '/en/manual/config/visualization/graphs/custom#configuring-custom-graphs'
 				]
 			],
-			// #104 Host graph update form.
+			// #111 Host graph update form.
 			[
 				[
 					'url' => 'graphs.php?form=update&graphid=300000&context=host&filter_hostids%5B0%5D=40001',
 					'doc_link' => '/en/manual/config/visualization/graphs/custom#configuring-custom-graphs'
 				]
 			],
-			// #105 Host LLD rule list view.
+			// #112 Host LLD rule list view.
 			[
 				[
 					'url' => 'host_discovery.php?context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hosts/discovery'
 				]
 			],
-			// #106 Host LLD rule configuration form.
+			// #113 Host LLD rule configuration form.
 			[
 				[
 					'url' => 'host_discovery.php?form=create&hostid=40001&context=host',
 					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
 				]
 			],
-			// #107 Host LLD item prototype list view.
+			// TODO: Uncomment this test case when ZBX-20773 is merged.
+//			// #114 Host LLD rule test form.
+//			[
+//				[
+//					'url' => 'host_discovery.php?form=update&itemid=90001&context=host',
+//					'actions' => [
+//						[
+//							'callback' => 'openFormWithLink',
+//							'element' => 'button:Test'
+//						]
+//					],
+//					'doc_link' => '/en/manual/config/items/item#testing'
+//				]
+//			],
+			// #115 Host LLD item prototype list view.
 			[
 				[
 					'url' => 'disc_prototypes.php?parent_discoveryid=133800&context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hosts/discovery/item_prototypes'
 				]
 			],
-			// #108 Host LLD item prototype create form.
+			// #116 Host LLD item prototype create form.
 			[
 				[
 					'url' => 'disc_prototypes.php?form=create&parent_discoveryid=133800&context=host',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/item_prototypes'
 				]
 			],
-			// #109 Host LLD item prototype edit form.
+			// #117 Host LLD item prototype edit form.
 			[
 				[
 					'url' => 'disc_prototypes.php?form=update&parent_discoveryid=133800&itemid=23800&context=host',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/item_prototypes'
 				]
 			],
+			// TODO: Uncomment this test case when ZBX-20773 is merged.
+//			// #118 Host LLD item prototype test form.
+//			[
+//				[
+//					'url' => 'disc_prototypes.php?form=update&parent_discoveryid=133800&itemid=23800&context=host',
+//					'actions' => [
+//						[
+//							'callback' => 'openFormWithLink',
+//							'element' => 'button:Test'
+//						]
+//					],
+//					'doc_link' => '/en/manual/config/items/item#testing'
+//				]
+//			],
 			// TODO: Uncomment this test case when ZBX-20782 is merged.
-//			// #110 Host LLD item prototype mass update popup.
+//			// #119 Host LLD item prototype mass update popup.
 //			[
 //				[
 //					'url' => 'disc_prototypes.php?cancel=1&parent_discoveryid=133800&context=host',
@@ -1038,21 +1161,21 @@ class testDocumentationLinks extends CWebTest {
 //					'doc_link' => '/en/manual/config/items/itemupdate#using-mass-update'
 //				]
 //			],
-			// #111 Host LLD trigger prototype list view.
+			// #120 Host LLD trigger prototype list view.
 			[
 				[
 					'url' => 'trigger_prototypes.php?parent_discoveryid=133800&context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hosts/discovery/trigger_prototypes'
 				]
 			],
-			// #112 Host LLD trigger prototype create form.
+			// #121 Host LLD trigger prototype create form.
 			[
 				[
 					'url' => 'trigger_prototypes.php?parent_discoveryid=133800&form=create&context=host',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
-			// #113 Host LLD trigger prototype edit form.
+			// #122 Host LLD trigger prototype edit form.
 			[
 				[
 					'url' => 'trigger_prototypes.php?form=update&parent_discoveryid=133800&triggerid=99518&context=host',
@@ -1060,7 +1183,7 @@ class testDocumentationLinks extends CWebTest {
 				]
 			],
 			// TODO: Uncomment this test case when ZBX-20782 is merged.
-//			// #114 Host LLD trigger prototype mass update popup.
+//			// #123 Host LLD trigger prototype mass update popup.
 //			[
 //				[
 //					'url' => 'trigger_prototypes.php?cancel=1&parent_discoveryid=133800&context=host',
@@ -1072,63 +1195,63 @@ class testDocumentationLinks extends CWebTest {
 //					'doc_link' => '/en/manual/config/triggers/update#using-mass-update'
 //				]
 //			],
-			// #115 Host LLD graph prototype list view.
+			// #124 Host LLD graph prototype list view.
 			[
 				[
 					'url' => 'graphs.php?parent_discoveryid=133800&context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hosts/discovery/graph_prototypes'
 				]
 			],
-			// #116 Host LLD graph prototype create form.
+			// #125 Host LLD graph prototype create form.
 			[
 				[
 					'url' => 'graphs.php?form=create&parent_discoveryid=133800&context=host',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/graph_prototypes'
 				]
 			],
-			// #117 Host LLD graph prototype edit form.
+			// #126 Host LLD graph prototype edit form.
 			[
 				[
 					'url' => 'graphs.php?form=update&parent_discoveryid=133800&graphid=600000&context=host',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/graph_prototypes'
 				]
 			],
-			// #118 Host LLD host prototype list view.
+			// #127 Host LLD host prototype list view.
 			[
 				[
 					'url' => 'host_prototypes.php?parent_discoveryid=90001&context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hosts/discovery/host_prototypes'
 				]
 			],
-			// #119 Host LLD host prototype create form.
+			// #128 Host LLD host prototype create form.
 			[
 				[
 					'url' => 'host_prototypes.php?form=create&parent_discoveryid=90001&context=host',
 					'doc_link' => '/en/manual/vm_monitoring#host-prototypes'
 				]
 			],
-			// #120 Host LLD host prototype edit form.
+			// #129 Host LLD host prototype edit form.
 			[
 				[
 					'url' => 'host_prototypes.php?form=update&parent_discoveryid=90001&hostid=99200&context=host',
 					'doc_link' => '/en/manual/vm_monitoring#host-prototypes'
 				]
 			],
-			// #121 Host Web scenario list view.
+			// #130 Host Web scenario list view.
 			[
 				[
 					'url' => 'httpconf.php?filter_set=1&filter_hostids%5B0%5D=40001&context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hosts/web'
 				]
 			],
-			// #122 Host Web scenario create form.
+			// #131 Host Web scenario create form.
 			[
 				[
 					'url' => 'httpconf.php?form=create&hostid=40001&context=host',
 					'doc_link' => '/en/manual/web_monitoring#configuring-a-web-scenario'
 				]
 			],
-			// #123 Host Web scenario edit form.
+			// #132 Host Web scenario edit form.
 			[
 				[
 					'url' => 'httpconf.php?form=update&hostid=40001&httptestid=94&context=host',
@@ -1136,7 +1259,7 @@ class testDocumentationLinks extends CWebTest {
 				]
 			],
 			// TODO: Uncomment this test case and adjust documentation link when ZBX-20773 is merged.
-//			// #124 Host Web scenario step configuration form popup.
+//			// #133 Host Web scenario step configuration form popup.
 //			[
 //				[
 //					'url' => 'httpconf.php?form=update&hostid=40001&httptestid=94&context=host',
@@ -1153,280 +1276,286 @@ class testDocumentationLinks extends CWebTest {
 //					'doc_link' => '/en/manual/web_monitoring#configuring-a-web-scenario'
 //				]
 //			],
-			// #125 Maintenance list view.
+			// #134 Maintenance list view.
 			[
 				[
 					'url' => 'maintenance.php',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/maintenance'
 				]
 			],
-			// #126 Create maintenance form view.
+			// #135 Create maintenance form view.
 			[
 				[
 					'url' => 'maintenance.php?form=create',
 					'doc_link' => '/en/manual/maintenance#configuration'
 				]
 			],
-			// #127 Edit maintenance form view.
+			// #136 Edit maintenance form view.
 			[
 				[
 					'url' => 'maintenance.php?form=update&maintenanceid=4',
 					'doc_link' => '/en/manual/maintenance#configuration'
 				]
 			],
-			// #128 Trigger actions list view.
+			// #137 Trigger actions list view.
 			[
 				[
 					'url' => 'actionconf.php?eventsource=0',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/actions'
 				]
 			],
-			// #129 Create trigger action form view.
+			// #138 Create trigger action form view.
 			[
 				[
 					'url' => 'actionconf.php?eventsource=0&form=Create+action',
 					'doc_link' => '/en/manual/config/notifications/action#configuring-an-action'
 				]
 			],
-			// #130 Edit trigger action form view.
+			// #139 Edit trigger action form view.
 			[
 				[
 					'url' => 'actionconf.php?eventsource=0&form=update&actionid=3',
 					'doc_link' => '/en/manual/config/notifications/action#configuring-an-action'
 				]
 			],
-			// #131 Discovery actions list view.
+			// #140 Discovery actions list view.
 			[
 				[
 					'url' => 'actionconf.php?eventsource=1',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/actions'
 				]
 			],
-			// #132 Create discovery action form view.
+			// #141 Create discovery action form view.
 			[
 				[
 					'url' => 'actionconf.php?eventsource=1&form=Create+action',
 					'doc_link' => '/en/manual/config/notifications/action#configuring-an-action'
 				]
 			],
-			// #133 Edit discovery action form view.
+			// #142 Edit discovery action form view.
 			[
 				[
 					'url' => 'actionconf.php?eventsource=1&form=update&actionid=2',
 					'doc_link' => '/en/manual/config/notifications/action#configuring-an-action'
 				]
 			],
-			// #134 Autoregistration actions list view.
+			// #143 Autoregistration actions list view.
 			[
 				[
 					'url' => 'actionconf.php?eventsource=2',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/actions'
 				]
 			],
-			// #135 Create autoregistration action form view.
+			// #144 Create autoregistration action form view.
 			[
 				[
 					'url' => 'actionconf.php?eventsource=2&form=Create+action',
 					'doc_link' => '/en/manual/config/notifications/action#configuring-an-action'
 				]
 			],
-			// #136 Edit autoregistration action form view.
+			// #145 Edit autoregistration action form view.
 			[
 				[
 					'url' => 'actionconf.php?eventsource=2&form=update&actionid=9',
 					'doc_link' => '/en/manual/config/notifications/action#configuring-an-action'
 				]
 			],
-			// #137 Internal actions list view.
+			// #146 Internal actions list view.
 			[
 				[
 					'url' => 'actionconf.php?eventsource=3',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/actions'
 				]
 			],
-			// #138 Create internal action form view.
+			// #147 Create internal action form view.
 			[
 				[
 					'url' => 'actionconf.php?eventsource=3&form=Create+action',
 					'doc_link' => '/en/manual/config/notifications/action#configuring-an-action'
 				]
 			],
-			// #139 Edit internal action form view.
+			// #148 Edit internal action form view.
 			[
 				[
 					'url' => 'actionconf.php?eventsource=3&form=update&actionid=4',
 					'doc_link' => '/en/manual/config/notifications/action#configuring-an-action'
 				]
 			],
-			// #140 Event correlation list view.
+			// #149 Event correlation list view.
 			[
 				[
 					'url' => 'zabbix.php?action=correlation.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/correlation'
 				]
 			],
-			// #141 Create event correlation form view.
+			// #150 Create event correlation form view.
 			[
 				[
 					'url' => 'zabbix.php?action=correlation.edit',
 					'doc_link' => '/en/manual/config/event_correlation/global#configuration'
 				]
 			],
-			// #142 Edit event correlation form view.
+			// #151 Edit event correlation form view.
 			[
 				[
 					'url' => 'zabbix.php?correlationid=99002&action=correlation.edit',
 					'doc_link' => '/en/manual/config/event_correlation/global#configuration'
 				]
 			],
-			// #143 Network discovery list view.
+			// #152 Network discovery list view.
 			[
 				[
 					'url' => 'zabbix.php?action=discovery.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/discovery'
 				]
 			],
-			// #144 Create network discovery form view.
+			// #153 Create network discovery form view.
 			[
 				[
 					'url' => 'zabbix.php?action=discovery.edit',
 					'doc_link' => '/en/manual/discovery/network_discovery/rule#rule-attributes'
 				]
 			],
-			// #145 Edit network discovery form view.
+			// #154 Edit network discovery form view.
 			[
 				[
 					'url' => 'zabbix.php?action=discovery.edit&druleid=2',
 					'doc_link' => '/en/manual/discovery/network_discovery/rule#rule-attributes'
 				]
 			],
-			// #146 Administration -> General -> GUI view.
+			// #155 Administration -> General -> GUI view.
 			[
 				[
 					'url' => 'zabbix.php?action=gui.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#gui'
 				]
 			],
-			// #147 Administration -> General -> Autoregistration view.
+			// #156 Administration -> General -> Autoregistration view.
 			[
 				[
 					'url' => 'zabbix.php?action=autoreg.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#autoregistration'
 				]
 			],
-			// #148 Administration -> General -> Housekeeping view.
+			// #157 Administration -> General -> Housekeeping view.
 			[
 				[
 					'url' => 'zabbix.php?action=housekeeping.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#housekeeper'
 				]
 			],
-			// #149 Administration -> General -> Audit log view.
+			// #158 Administration -> General -> Audit log view.
 			[
 				[
 					'url' => 'zabbix.php?action=audit.settings.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#audit-log'
 				]
 			],
-			// #150 Administration -> General -> Images -> Icon view.
+			// #159 Administration -> General -> Images -> Icon view.
 			[
 				[
 					'url' => 'zabbix.php?action=image.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#images'
 				]
 			],
-			// #151 Administration -> General -> Images -> Background view.
+			// #160 Administration -> General -> Images -> Background view.
 			[
 				[
 					'url' => 'zabbix.php?action=image.list&imagetype=2',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#images'
 				]
 			],
-			// #152 Administration -> General -> Images -> Create image view.
+			// #161 Administration -> General -> Images -> Create image view.
 			[
 				[
 					'url' => 'zabbix.php?action=image.edit&imagetype=1',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#images'
 				]
 			],
-			// #153 Administration -> General -> Images -> Edit image view.
+			// #162 Administration -> General -> Images -> Edit image view.
 			[
 				[
 					'url' => 'zabbix.php?action=image.edit&imageid=2',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#images'
 				]
 			],
-			// #154 Administration -> General -> Icon mapping list view.
+			// #163 Administration -> General -> Images -> Create background view.
+			[
+				[
+					'url' => 'zabbix.php?action=image.list&imagetype=2',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create background'
+						]
+					],
+					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#images'
+				]
+			],
+			// #164 Administration -> General -> Icon mapping list view.
 			[
 				[
 					'url' => 'zabbix.php?action=iconmap.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#icon-mapping'
 				]
 			],
-			// #155 Administration -> General -> Icon mapping -> Create form view.
+			// #165 Administration -> General -> Icon mapping -> Create form view.
 			[
 				[
 					'url' => 'zabbix.php?action=iconmap.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#icon-mapping'
 				]
 			],
-			// #156 Administration -> General -> Icon mapping -> Edit form view.
+			// #166 Administration -> General -> Icon mapping -> Edit form view.
 			[
 				[
 					'url' => 'zabbix.php?action=iconmap.edit&iconmapid=101',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#icon-mapping'
 				]
 			],
-			// #157 Administration -> General -> Regular expressions list view.
+			// #167 Administration -> General -> Regular expressions list view.
 			[
 				[
 					'url' => 'zabbix.php?action=regex.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#regular-expressions'
 				]
 			],
-			// #158 Administration -> General -> Regular expressions -> Create form view.
+			// #168 Administration -> General -> Regular expressions -> Create form view.
 			[
 				[
 					'url' => 'zabbix.php?action=regex.edit',
 					'doc_link' => '/en/manual/regular_expressions#global-regular-expressions'
 				]
 			],
-			// #159 Administration -> General -> Regular expressions -> Edit form view.
+			// #169 Administration -> General -> Regular expressions -> Edit form view.
 			[
 				[
 					'url' => 'zabbix.php?action=regex.edit&regexid=3',
 					'doc_link' => '/en/manual/regular_expressions#global-regular-expressions'
 				]
 			],
-			// #160 Administration -> General -> Macros view.
+			// #170 Administration -> General -> Macros view.
 			[
 				[
 					'url' => 'zabbix.php?action=macros.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#macros'
 				]
 			],
-			// #161 Administration -> General -> Trigger displaying options view.
+			// #171 Administration -> General -> Trigger displaying options view.
 			[
 				[
 					'url' => 'zabbix.php?action=trigdisplay.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#trigger-displaying-options'
 				]
 			],
-			// #162 Administration -> General -> Geographical maps view.
+			// #172 Administration -> General -> Geographical maps view.
 			[
 				[
 					'url' => 'zabbix.php?action=geomaps.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#geographical-maps'
 				]
 			],
-			// #163 Administration -> General -> Geographical maps view.
-			[
-				[
-					'url' => 'zabbix.php?action=geomaps.edit',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#geographical-maps'
-				]
-			],
-			// #164 Administration -> General -> Modules list view.
+			// #173 Administration -> General -> Modules list view.
 			[
 				[
 					'url' => 'zabbix.php?action=module.list',
@@ -1434,7 +1563,7 @@ class testDocumentationLinks extends CWebTest {
 				]
 			],
 			// TODO: Uncomment this test case and adjust documentation link when ZBX-20773 is merged.
-//			// #165 Administration -> General -> Module edit view.
+//			// #174 Administration -> General -> Module edit view.
 //			[
 //				[
 //					'url' => 'zabbix.php?action=module.list',
@@ -1451,14 +1580,14 @@ class testDocumentationLinks extends CWebTest {
 //					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#modules'
 //				]
 //			],
-			// #166 Administration -> General -> Api tokens list view.
+			// #175 Administration -> General -> Api tokens list view.
 			[
 				[
 					'url' => 'zabbix.php?action=token.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#api-tokens'
 				]
 			],
-			// #167 Administration -> General -> Api tokens -> Create Api token popup.
+			// #176 Administration -> General -> Api tokens -> Create Api token popup.
 			[
 				[
 					'url' => 'zabbix.php?action=token.list',
@@ -1471,126 +1600,139 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#api-tokens'
 				]
 			],
-			// #168 Administration -> General -> Other view.
+			// #177 Administration -> General -> Api tokens -> Edit Api token popup.
+			[
+				[
+					'url' => 'zabbix.php?action=token.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:Admin token'
+						]
+					],
+					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#api-tokens'
+				]
+			],
+			// #178 Administration -> General -> Other view.
 			[
 				[
 					'url' => 'zabbix.php?action=miscconfig.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#other-parameters'
 				]
 			],
-			// #169 Administration -> Proxy list view.
+			// #179 Administration -> Proxy list view.
 			[
 				[
 					'url' => 'zabbix.php?action=proxy.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/proxies'
 				]
 			],
-			// #170 Administration -> Create proxy view.
+			// #180 Administration -> Create proxy view.
 			[
 				[
 					'url' => 'zabbix.php?action=proxy.edit',
 					'doc_link' => '/en/manual/distributed_monitoring/proxies#configuration'
 				]
 			],
-			// #171 Administration -> Proxies -> Edit proxy view.
+			// #181 Administration -> Proxies -> Edit proxy view.
 			[
 				[
 					'url' => 'zabbix.php?action=proxy.edit&proxyid=20000',
 					'doc_link' => '/en/manual/distributed_monitoring/proxies#configuration'
 				]
 			],
-			// #172 Administration -> Authentication view.
+			// #182 Administration -> Authentication view.
 			[
 				[
 					'url' => 'zabbix.php?action=authentication.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/authentication'
 				]
 			],
-			// #173 Administration -> User groups list view.
+			// #183 Administration -> User groups list view.
 			[
 				[
 					'url' => 'zabbix.php?action=usergroup.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/user_groups'
 				]
 			],
-			// #174 Administration -> User groups -> Create user group view.
+			// #184 Administration -> User groups -> Create user group view.
 			[
 				[
 					'url' => 'zabbix.php?action=usergroup.edit',
 					'doc_link' => '/en/manual/config/users_and_usergroups/usergroup#configuration'
 				]
 			],
-			// #175 Administration -> User groups -> Edit user group view.
+			// #185 Administration -> User groups -> Edit user group view.
 			[
 				[
 					'url' => 'zabbix.php?action=usergroup.edit&usrgrpid=7',
 					'doc_link' => '/en/manual/config/users_and_usergroups/usergroup#configuration'
 				]
 			],
-			// #176 Administration -> User roles list view.
+			// #186 Administration -> User roles list view.
 			[
 				[
 					'url' => 'zabbix.php?action=userrole.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/user_roles'
 				]
 			],
-			// #177 Administration -> User roles -> Create form view.
+			// #187 Administration -> User roles -> Create form view.
 			[
 				[
 					'url' => '/zabbix.php?action=userrole.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/user_roles#default-user-roles'
 				]
 			],
-			// #178 Administration -> User roles -> Edit form view.
+			// #188 Administration -> User roles -> Edit form view.
 			[
 				[
 					'url' => 'zabbix.php?action=userrole.edit&roleid=3',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/user_roles#default-user-roles'
 				]
 			],
-			// #179 Administration -> Users list view.
+			// #189 Administration -> Users list view.
 			[
 				[
 					'url' => 'zabbix.php?action=user.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/users'
 				]
 			],
-			// #180 Administration -> Users -> Create form view.
+			// #190 Administration -> Users -> Create form view.
 			[
 				[
 					'url' => 'zabbix.php?action=user.edit',
 					'doc_link' => '/en/manual/config/users_and_usergroups/user'
 				]
 			],
-			// #181 Administration -> Users -> Edit form view.
+			// #191 Administration -> Users -> Edit form view.
 			[
 				[
 					'url' => 'zabbix.php?action=user.edit&userid=1',
 					'doc_link' => '/en/manual/config/users_and_usergroups/user'
 				]
 			],
-			// #182 Administration -> Media type list view.
+			// #192 Administration -> Media type list view.
 			[
 				[
 					'url' => 'zabbix.php?action=mediatype.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/mediatypes'
 				]
 			],
-			// #183 Administration -> Media type -> Create form view.
+			// #193 Administration -> Media type -> Create form view.
 			[
 				[
 					'url' => 'zabbix.php?action=mediatype.edit',
 					'doc_link' => '/en/manual/config/notifications/media#common-parameters'
 				]
 			],
-			// #184 Administration -> Media type -> Edit form view.
+			// #194 Administration -> Media type -> Edit form view.
 			[
 				[
 					'url' => 'zabbix.php?action=mediatype.edit&mediatypeid=1',
 					'doc_link' => '/en/manual/config/notifications/media#common-parameters'
 				]
 			],
-			// #185 Administration -> Media type -> Import view.
+			// #195 Administration -> Media type -> Import view.
 			[
 				[
 					'url' => 'zabbix.php?action=mediatype.list',
@@ -1603,63 +1745,63 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/xml_export_import/media#importing'
 				]
 			],
-			// #186 Administration -> Scripts list view.
+			// #196 Administration -> Scripts list view.
 			[
 				[
 					'url' => 'zabbix.php?action=script.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/scripts'
 				]
 			],
-			// #187 Administration -> Scripts -> Create form view.
+			// #197 Administration -> Scripts -> Create form view.
 			[
 				[
 					'url' => 'zabbix.php?action=script.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/scripts#configuring-a-global-script'
 				]
 			],
-			// #188 Administration -> Scripts -> Edit form view.
+			// #198 Administration -> Scripts -> Edit form view.
 			[
 				[
 					'url' => 'zabbix.php?action=script.edit&scriptid=2',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/scripts#configuring-a-global-script'
 				]
 			],
-			// #189 Administration -> Queue overview view.
+			// #199 Administration -> Queue overview view.
 			[
 				[
 					'url' => 'zabbix.php?action=queue.overview',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/queue#overview-by-item-type'
 				]
 			],
-			// #190 Administration -> Queue overview by proxy view.
+			// #200 Administration -> Queue overview by proxy view.
 			[
 				[
 					'url' => 'zabbix.php?action=queue.overview.proxy',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/queue#overview-by-proxy'
 				]
 			],
-			// #191 Administration -> Queue details view.
+			// #201 Administration -> Queue details view.
 			[
 				[
 					'url' => 'zabbix.php?action=queue.details',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/queue#list-of-waiting-items'
 				]
 			],
-			// #192 User profile view.
+			// #202 User profile view.
 			[
 				[
 					'url' => 'zabbix.php?action=userprofile.edit',
 					'doc_link' => '/en/manual/web_interface/user_profile#user-profile'
 				]
 			],
-			// #193 User settings -> Api tokens list view.
+			// #203 User settings -> Api tokens list view.
 			[
 				[
 					'url' => 'zabbix.php?action=user.token.list',
 					'doc_link' => '/en/manual/web_interface/user_profile#api-tokens'
 				]
 			],
-			// #194 User settings -> Api tokens -> Create Api token popup.
+			// #204 User settings -> Api tokens -> Create Api token popup.
 			[
 				[
 					'url' => 'zabbix.php?action=user.token.list',
@@ -1667,6 +1809,19 @@ class testDocumentationLinks extends CWebTest {
 						[
 							'callback' => 'openFormWithLink',
 							'element' => 'button:Create API token'
+						]
+					],
+					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#api-tokens'
+				]
+			],
+			// #205 User settings -> Api tokens -> Edit Api token popup.
+			[
+				[
+					'url' => 'zabbix.php?action=user.token.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:Admin token'
 						]
 					],
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#api-tokens'
@@ -1679,8 +1834,7 @@ class testDocumentationLinks extends CWebTest {
 	 * @dataProvider getGeneralDocumentationLinkData
 	 */
 	public function testDocumentationLinks_checkGeneralLinks($data) {
-		$this->page->login()->open($data['url']);
-		$this->page->waitUntilReady();
+		$this->page->login()->open($data['url'])->waitUntilReady();
 
 		// Execute the corresponding callback function to open the form with doc link.
 		if (array_key_exists('actions', $data)) {
@@ -1746,14 +1900,14 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/visualization/maps/map#adding-shapes'
 				]
 			],
-			// #2 Edit shape form.
+			// #2 Edit element selection.
 			[
 				[
 					'element' => ['xpath://div[@data-id="7"]', 'xpath://div[@data-id="5"]'],
 					'doc_link' => '/en/manual/config/visualization/maps/map#selecting-elements'
 				]
 			],
-			// #3 Edit shape form.
+			// #3 Edit shape selection.
 			[
 				[
 					'element' => ['xpath://div[@data-id="100"]', 'xpath://div[@data-id="101"]'],
@@ -1762,12 +1916,12 @@ class testDocumentationLinks extends CWebTest {
 			]
 		];
 	}
+
 	/**
 	 * @dataProvider getMapDocumentationLinkData
 	 */
 	public function testDocumentationLinks_checkMapElementLinks($data) {
-		$this->page->login()->open('sysmap.php?sysmapid=3');
-		$this->page->waitUntilReady();
+		$this->page->login()->open('sysmap.php?sysmapid=3')->waitUntilReady();
 
 		// Checking element selection documentation links requires pressing control key when selecting elements.
 		if (is_array($data['element'])) {
@@ -1785,6 +1939,7 @@ class testDocumentationLinks extends CWebTest {
 		}
 
 		$dialog = $this->query('id:map-window')->one()->waitUntilVisible();
+
 		// Maps contain headers for all map elements, so only the visible one should be checked.
 		$link = $dialog->query('class:icon-doc-link')->all()->filter(new CElementFilter(CElementFilter::VISIBLE))->first();
 
