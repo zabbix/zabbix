@@ -1591,6 +1591,7 @@ static zbx_proc_data_t	*proc_get_data(FILE *f_status, FILE *f_stat, FILE *f_io, 
 	zbx_uint64_t	val;
 	char		buf[MAX_STRING_LEN], *ptr, *state;
 	int		n = 0, offset;
+	long		hz;
 
 	proc_data = (zbx_proc_data_t *)zbx_malloc(NULL, sizeof(zbx_proc_data_t));
 	memset(proc_data, 0, sizeof(zbx_proc_data_t));
@@ -1663,6 +1664,8 @@ static zbx_proc_data_t	*proc_get_data(FILE *f_status, FILE *f_stat, FILE *f_io, 
 	if (NULL == fgets(buf, (int)sizeof(buf), f_stat) || NULL == (ptr = strrchr(buf, ')')))
 		goto out;
 
+	hz = sysconf(_SC_CLK_TCK);
+
 	while ('\0' != *ptr)
 	{
 		if (' ' != *ptr++)
@@ -1677,13 +1680,15 @@ static zbx_proc_data_t	*proc_get_data(FILE *f_status, FILE *f_stat, FILE *f_io, 
 				ptr += offset;
 				break;
 			case 12:
-				if (FAIL == (offset = proc_read_value(ptr, &proc_data->cputime_user)))
+				if (0 >= hz || FAIL == (offset = proc_read_value(ptr, &proc_data->cputime_user)))
 					goto out;
 
+				proc_data->cputime_user /= (zbx_uint64_t)hz;
 				ptr += offset;
 				break;
 			case 13:
 				proc_read_value(ptr, &proc_data->cputime_system);
+				proc_data->cputime_system /= (zbx_uint64_t)hz;
 				goto out;
 		}
 	}
