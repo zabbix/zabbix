@@ -156,11 +156,11 @@ class CControllerPopupMassupdateService extends CController {
 				}
 			}
 			else {
-				CMessageHelper::setErrorTitle(_('Cannot update services'));
-
 				$output = [
-					'errors' => makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())
-						->toString()
+					'error' => [
+						'title' => _('Cannot update services'),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
 				];
 			}
 
