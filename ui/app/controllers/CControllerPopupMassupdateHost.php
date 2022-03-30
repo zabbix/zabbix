@@ -461,7 +461,12 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					}
 				}
 				else {
-					$output = ['errors' => getMessages(false, _('Cannot update hosts'))->toString()];
+					$output = [
+						'error' => [
+							'title' => _('Cannot update hosts'),
+							'messages' => array_column(get_and_clear_messages(), 'message')
+						]
+					];
 				}
 
 				$this->setResponse(

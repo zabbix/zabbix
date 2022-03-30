@@ -479,9 +479,12 @@ function submitPopup(overlay) {
 			$('head').append(response.script_inline);
 		}
 
-		if ('errors' in response) {
+		if ('error' in response) {
 			overlay.unsetLoading();
-			$(response.errors).insertBefore(form);
+
+			const message_box = makeMessageBox('bad', response.error.messages, response.error.title);
+
+			message_box.insertBefore(form);
 		}
 		else {
 			postMessageOk(response.title);
