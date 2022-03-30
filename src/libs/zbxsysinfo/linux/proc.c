@@ -1829,7 +1829,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if ('\0' != *cmdline)
 		{
 			char	*p, *pdel;
-			size_t	alloc_len = 0, offset = 0;
+			size_t	alloc_len = 0, offset = 0, len, sz;
 
 			if (NULL == (p = strrchr(cmdline, '/')))
 				p = cmdline;
@@ -1837,11 +1837,17 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 				p++;
 
 			if (NULL != (pdel = strchr(p, ' ')))
-				l = (size_t)(pdel - p);
+				len = (size_t)(pdel - p);
 			else
-				l = strlen(p);
+				len = strlen(p);
 
-			zbx_strncpy_alloc(&pname, &alloc_len, &offset, p, l);
+			zbx_strncpy_alloc(&pname, &alloc_len, &offset, p, len);
+
+			for (sz = 0, l -= 2; sz < l; sz++)
+			{
+				if ('\0' == cmdline[sz])
+					cmdline[sz] = ' ';
+			}
 		}
 		else
 			read_value_from_proc_file(f_status, 0, "Name", PROC_VAL_TYPE_TEXT, NULL, &pname);
@@ -1878,7 +1884,6 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 					{
 						proc_data->pid = pid;
 						proc_data->tid = tid;
-						proc_data->cmdline = zbx_strdup(NULL, cmdline);
 						proc_data->name = zbx_strdup(NULL, pname);
 						zbx_vector_ptr_append(&proc_data_ctx, proc_data);
 					}
