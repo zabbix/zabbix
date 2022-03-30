@@ -23,8 +23,8 @@
  * @var CView $this
  */
 
-if ($data['clock']['critical_error'] !== null) {
-	$item = (new CTableInfo())->setNoDataMessage($data['clock']['critical_error']);
+if ($data['clock_data']['critical_error'] !== null) {
+	$item = (new CTableInfo())->setNoDataMessage($data['clock_data']['critical_error']);
 
 	$output = [
 		'name' => $data['name'],
@@ -32,16 +32,66 @@ if ($data['clock']['critical_error'] !== null) {
 	];
 }
 else {
+	if ($data['clock_data']['type'] == WIDGET_CLOCK_TYPE_DIGITAL) {
+		$rows = [];
+		$clock = $data['clock_data'];
+		$show = $clock['show'];
+		$styles = $data['styles'];
+
+		if ($clock['is_enabled']) {
+			foreach ($show as $field) {
+				$div = new CDiv();
+
+				switch ($field) {
+					case WIDGET_CLOCK_SHOW_DATE:
+						$div->addClass('clock-date');
+						if ($clock['date'] !== null) {
+							$div->addItem($clock['date']);
+						}
+						$style_group = 'date';
+						break;
+					case WIDGET_CLOCK_SHOW_TIME:
+						$div->addClass('clock-time');
+						$div->addItem('00:00:00');
+						$style_group = 'time';
+						break;
+					case WIDGET_CLOCK_SHOW_TIMEZONE:
+						$div->addClass('clock-time-zone');
+						if ($clock['time_zone'] !== null && $clock['time_zone'] !== TIMEZONE_DEFAULT_LOCAL) {
+							$div->addItem($clock['time_zone']);
+						}
+						$style_group = 'timezone';
+						break;
+				}
+
+				if (array_key_exists($style_group, $styles)) {
+					$div = addTextFormatting($div, $styles[$style_group]);
+				}
+
+				$rows[] = $div;
+			}
+		}
+		else {
+			$rows[] = (new CDiv())->addItem('00:00:00')->addClass('clock-disabled');
+		}
+
+		$content = (new CDiv($rows))->addClass('digital-clock');
+
+		if ($clock['bg_color'] !== '') {
+			$content->addStyle('background-color: #'.$clock['bg_color']);
+		}
+
+		$body = $content->toString();
+	}
+	else {
+		$body = (new CClock())
+			->setEnabled($data['clock_data']['is_enabled'])
+			->toString();
+	}
 	$output = [
 		'name' => $data['name'],
-		'body' =>
-			(new CClock())
-				->setEnabled($data['clock']['is_enabled'])
-				->toString(),
-		'clock_data' => [
-			'time' => $data['clock']['time'],
-			'time_zone_offset' => $data['clock']['time_zone_offset']
-		]
+		'body' => $body,
+		'clock_data' => $data['clock_data']
 	];
 }
 
@@ -55,3 +105,17 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 }
 
 echo json_encode($output);
+
+function addTextFormatting(CDiv $div, array $styles): CDiv {
+	$div->addStyle(sprintf('--widget-clock-font: %1$s;', number_format($styles['size'] / 100, 2)));
+
+	if ($styles['bold']) {
+		$div->addClass('bold');
+	}
+
+	if ($styles['color'] !== '') {
+		$div->addStyle(sprintf('color: #%1$s;', $styles['color']));
+	}
+
+	return $div;
+}
