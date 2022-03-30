@@ -1616,7 +1616,7 @@ static zbx_proc_data_t	*proc_get_data(FILE *f_status, FILE *f_stat, FILE *f_io, 
 		proc_data->size = proc_data->exe + proc_data->data + proc_data->stk;
 
 		if (SUCCEED == get_total_memory(&val) && 0 != val)
-			proc_data->pmem = (double)proc_data->rss / (double)val;
+			proc_data->pmem = (double)proc_data->rss / (double)val * 100.0;
 	}
 	else
 		read_value_from_proc_file(f_status, 0, "Name", PROC_VAL_TYPE_TEXT, NULL, &proc_data->tname);
