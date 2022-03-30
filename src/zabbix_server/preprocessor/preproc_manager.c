@@ -1300,9 +1300,10 @@ static void	preprocessor_update_history(zbx_preprocessing_manager_t *manager, zb
 			zbx_preproc_history_t	history_local;
 
 			history_local.itemid = itemid;
+			zbx_vector_ptr_create(&history_local.history);
+
 			vault = (zbx_preproc_history_t *)zbx_hashset_insert(&manager->history_cache, &history_local,
 					sizeof(history_local));
-			zbx_vector_ptr_create(&vault->history);
 		}
 
 		zbx_vector_ptr_append_array(&vault->history, history->values, history->values_num);
