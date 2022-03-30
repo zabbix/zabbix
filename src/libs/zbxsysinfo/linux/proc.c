@@ -1596,10 +1596,7 @@ static zbx_proc_data_t	*proc_get_data(FILE *f_status, FILE *f_stat, FILE *f_io, 
 	memset(proc_data, 0, sizeof(zbx_proc_data_t));
 
 	if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode)
-	{
 		read_value_from_proc_file(f_status, 0, "PPid", PROC_VAL_TYPE_NUM, &proc_data->ppid, NULL);
-		read_value_from_proc_file(f_status, 0, "Name", PROC_VAL_TYPE_TEXT, NULL, &proc_data->tname);
-	}
 
 	if (ZBX_PROC_MODE_THREAD != zbx_proc_mode)
 	{
@@ -1615,13 +1612,14 @@ static zbx_proc_data_t	*proc_get_data(FILE *f_status, FILE *f_stat, FILE *f_io, 
 		read_value_from_proc_file(f_status, 0, "VmLib", PROC_VAL_TYPE_BYTE, &proc_data->lib, NULL);
 		read_value_from_proc_file(f_status, 0, "VmPTE", PROC_VAL_TYPE_BYTE, &proc_data->pte, NULL);
 		read_value_from_proc_file(f_status, 0, "VmSwap", PROC_VAL_TYPE_BYTE, &proc_data->swap, NULL);
-		read_value_from_proc_file(f_status, 0, "VmPeak", PROC_VAL_TYPE_BYTE, &proc_data->peak, NULL);
 		read_value_from_proc_file(f_status, 0, "Threads", PROC_VAL_TYPE_NUM, &proc_data->threads, NULL);
 		proc_data->size = proc_data->exe + proc_data->data + proc_data->stk;
 
 		if (SUCCEED == get_total_memory(&val) && 0 != val)
-			proc_data->pmem = proc_data->rss / (double)val;
+			proc_data->pmem = (double)proc_data->rss / (double)val;
 	}
+	else
+		read_value_from_proc_file(f_status, 0, "Name", PROC_VAL_TYPE_TEXT, NULL, &proc_data->tname);
 
 	read_value_from_proc_file(f_status, 0, "voluntary_ctxt_switches", PROC_VAL_TYPE_NUM, &proc_data->ctx_switches,
 			NULL);
@@ -1990,69 +1988,76 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		zbx_json_addobject(&j, NULL);
 
-		if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode)
+		if (ZBX_PROC_MODE_PROCESS == zbx_proc_mode)
 		{
 			zbx_json_adduint64(&j, "pid", pdata->pid);
 			zbx_json_adduint64(&j, "ppid", pdata->ppid);
-		}
-
-		zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
-
-		if (ZBX_PROC_MODE_SUMMARY == zbx_proc_mode)
-			zbx_json_adduint64(&j, "processes", pdata->processes);
-
-		if (ZBX_PROC_MODE_THREAD == zbx_proc_mode)
-		{
-			zbx_json_adduint64(&j, "tid", pdata->tid);
-			zbx_json_addstring(&j, "tname", ZBX_NULL2EMPTY_STR(pdata->tname), ZBX_JSON_TYPE_STRING);
-		}
-		else
-		{
-			if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode)
-			{
-				zbx_json_addstring(&j, "cmdline", ZBX_NULL2EMPTY_STR(pdata->cmdline),
-						ZBX_JSON_TYPE_STRING);
-			}
-
+			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "cmdline", ZBX_NULL2EMPTY_STR(pdata->cmdline), ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&j, "vsize", pdata->vsize);
 			zbx_json_addfloat(&j, "pmem", pdata->pmem);
 			zbx_json_adduint64(&j, "rss", pdata->rss);
 			zbx_json_adduint64(&j, "data", pdata->data);
 			zbx_json_adduint64(&j, "exe", pdata->exe);
-
-			if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode)
-				zbx_json_adduint64(&j, "hwm", pdata->hwm);
-
+			zbx_json_adduint64(&j, "hwm", pdata->hwm);
 			zbx_json_adduint64(&j, "lck", pdata->lck);
 			zbx_json_adduint64(&j, "lib", pdata->lib);
-
-			if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode)
-				zbx_json_adduint64(&j, "peak", pdata->peak);
-
+			zbx_json_adduint64(&j, "peak", pdata->peak);
 			zbx_json_adduint64(&j, "pin", pdata->pin);
 			zbx_json_adduint64(&j, "pte", pdata->pte);
 			zbx_json_adduint64(&j, "size", pdata->size);
 			zbx_json_adduint64(&j, "stk", pdata->stk);
 			zbx_json_adduint64(&j, "swap", pdata->swap);
-		}
-
-		zbx_json_adduint64(&j, "cputime_user", pdata->cputime_user);
-		zbx_json_adduint64(&j, "cputime_system", pdata->cputime_system);
-
-		if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode)
+			zbx_json_adduint64(&j, "cputime_user", pdata->cputime_user);
+			zbx_json_adduint64(&j, "cputime_system", pdata->cputime_system);
 			zbx_json_addstring(&j, "state", ZBX_NULL2EMPTY_STR(pdata->state), ZBX_JSON_TYPE_STRING);
-
-		zbx_json_adduint64(&j, "ctx_switches", pdata->ctx_switches);
-
-		if (ZBX_PROC_MODE_THREAD != zbx_proc_mode)
-		{
+			zbx_json_adduint64(&j, "ctx_switches", pdata->ctx_switches);
 			zbx_json_adduint64(&j, "threads", pdata->threads);
 			zbx_json_adduint64(&j, "page_faults", pdata->page_faults);
 			zbx_json_adduint64(&j, "fds", pdata->fds);
+			zbx_json_adduint64(&j, "io_read_b", pdata->io_read_b);
+			zbx_json_adduint64(&j, "io_write_b", pdata->io_write_b);
 		}
-
-		zbx_json_adduint64(&j, "io_read_b", pdata->io_read_b);
-		zbx_json_adduint64(&j, "io_write_b", pdata->io_write_b);
+		else if (ZBX_PROC_MODE_THREAD == zbx_proc_mode)
+		{
+			zbx_json_adduint64(&j, "pid", pdata->pid);
+			zbx_json_adduint64(&j, "ppid", pdata->ppid);
+			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
+			zbx_json_adduint64(&j, "tid", pdata->tid);
+			zbx_json_addstring(&j, "tname", ZBX_NULL2EMPTY_STR(pdata->tname), ZBX_JSON_TYPE_STRING);
+			zbx_json_adduint64(&j, "cputime_user", pdata->cputime_user);
+			zbx_json_adduint64(&j, "cputime_system", pdata->cputime_system);
+			zbx_json_addstring(&j, "state", ZBX_NULL2EMPTY_STR(pdata->state), ZBX_JSON_TYPE_STRING);
+			zbx_json_adduint64(&j, "ctx_switches", pdata->ctx_switches);
+			zbx_json_adduint64(&j, "page_faults", pdata->page_faults);
+			zbx_json_adduint64(&j, "io_read_b", pdata->io_read_b);
+			zbx_json_adduint64(&j, "io_write_b", pdata->io_write_b);
+		}
+		else
+		{
+			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
+			zbx_json_adduint64(&j, "processes", pdata->processes);
+			zbx_json_adduint64(&j, "vsize", pdata->vsize);
+			zbx_json_addfloat(&j, "pmem", pdata->pmem);
+			zbx_json_adduint64(&j, "rss", pdata->rss);
+			zbx_json_adduint64(&j, "data", pdata->data);
+			zbx_json_adduint64(&j, "exe", pdata->exe);
+			zbx_json_adduint64(&j, "lck", pdata->lck);
+			zbx_json_adduint64(&j, "lib", pdata->lib);
+			zbx_json_adduint64(&j, "pin", pdata->pin);
+			zbx_json_adduint64(&j, "pte", pdata->pte);
+			zbx_json_adduint64(&j, "size", pdata->size);
+			zbx_json_adduint64(&j, "stk", pdata->stk);
+			zbx_json_adduint64(&j, "swap", pdata->swap);
+			zbx_json_adduint64(&j, "cputime_user", pdata->cputime_user);
+			zbx_json_adduint64(&j, "cputime_system", pdata->cputime_system);
+			zbx_json_adduint64(&j, "ctx_switches", pdata->ctx_switches);
+			zbx_json_adduint64(&j, "threads", pdata->threads);
+			zbx_json_adduint64(&j, "page_faults", pdata->page_faults);
+			zbx_json_adduint64(&j, "fds", pdata->fds);
+			zbx_json_adduint64(&j, "io_read_b", pdata->io_read_b);
+			zbx_json_adduint64(&j, "io_write_b", pdata->io_write_b);
+		}
 
 		zbx_json_close(&j);
 	}
