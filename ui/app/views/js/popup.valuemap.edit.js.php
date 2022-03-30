@@ -109,7 +109,7 @@ function submitValueMap(overlay) {
 				messages = exception.error.messages;
 			}
 			else {
-				title = <?= json_encode('Unexpected server error.') ?>;
+				title = <?= json_encode(_('Unexpected server error.')) ?>;
 			}
 
 			const message_box = makeMessageBox('bad', messages, title)[0];

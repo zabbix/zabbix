@@ -92,30 +92,37 @@ window.tophosts_column_edit_form = new class {
 		})
 			.then(response => response.json())
 			.then(response => {
-				if ('errors' in response) {
-					throw {html_string: response.errors};
+				if ('error' in response) {
+					throw {error: response.error};
 				}
 
 				overlayDialogueDestroy(overlay.dialogueid);
 
 				overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 			})
-			.catch((error) => {
-				overlay.$dialogue.find('.msg-bad, .msg-good').remove();
+			.catch((exception) => {
+				const form = this._$widget_form[0];
 
-				let message_box;
+				for (const element of form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
+				}
 
-				if (typeof error === 'object' && 'html_string' in error) {
-					message_box = new DOMParser().parseFromString(error.html_string, 'text/html').body.
-						firstElementChild;
+				let title;
+				let messages = [];
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
 				}
 				else {
-					const error = <?= json_encode(_('Unexpected server error.')) ?>;
-
-					message_box = makeMessageBox('bad', [], error)[0];
+					title = <?= json_encode(_('Unexpected server error.')) ?>;
 				}
 
-				this._$widget_form.before(message_box, this);
+				const message_box = makeMessageBox('bad', messages, title)[0];
+
+				form.parentNode.insertBefore(message_box, form);
 			})
 			.finally(() => {
 				overlay.unsetLoading();
