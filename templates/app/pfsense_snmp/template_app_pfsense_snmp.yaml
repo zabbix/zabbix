@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-29T20:58:29Z'
+  date: '2022-03-30T11:30:23Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -161,7 +161,7 @@ zabbix_export:
               name: 'PFSense: DHCP server is not running'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Please check DHCP server settings https://docs.netgate.com/pfsense/en/latest/services/dhcp/index.html.'
+              description: 'Please check DHCP server settings https://docs.netgate.com/pfsense/en/latest/services/dhcp/index.html'
               tags:
                 -
                   tag: scope
@@ -196,7 +196,7 @@ zabbix_export:
               name: 'PFSense: DNS server is not running'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Please check DNS server settings https://docs.netgate.com/pfsense/en/latest/services/dns/index.html.'
+              description: 'Please check DNS server settings https://docs.netgate.com/pfsense/en/latest/services/dns/index.html'
               tags:
                 -
                   tag: scope
@@ -456,7 +456,7 @@ zabbix_export:
               name: 'PFSense: Source tracking table usage more than {$SOURCE.TRACKING.TABLE.UTIL.MAX}.'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'Please check the number of sticky connections https://docs.netgate.com/pfsense/en/latest/monitoring/status/firewall-states-sources.html.'
+              description: 'Please check the number of sticky connections https://docs.netgate.com/pfsense/en/latest/monitoring/status/firewall-states-sources.html'
               tags:
                 -
                   tag: scope
@@ -510,7 +510,7 @@ zabbix_export:
               name: 'PFSense: State table usage more than {$STATE.TABLE.UTIL.MAX}.'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'Please check the number of connections https://docs.netgate.com/pfsense/en/latest/config/advanced-firewall-nat.html#config-advanced-firewall-maxstates.'
+              description: 'Please check the number of connections https://docs.netgate.com/pfsense/en/latest/config/advanced-firewall-nat.html#config-advanced-firewall-maxstates'
               tags:
                 -
                   tag: scope
