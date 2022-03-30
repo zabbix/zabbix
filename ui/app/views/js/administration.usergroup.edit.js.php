@@ -195,6 +195,9 @@
 
 					addMessage(message_box);
 				}
+				else if ('messages' in resp) {
+					addMessage(resp.messages);
+				}
 
 				if (resp.body) {
 					var	html = resp.body;
