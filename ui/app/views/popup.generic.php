@@ -550,22 +550,25 @@ switch ($data['popup_type']) {
 				$graphtype
 			]);
 
-			$prefix = $graph['hosts'][0]['name'];
-			if ($data['popup_type'] === 'graph_prototypes') {
-				$hostname_by_hostid = [];
-				foreach ($graph['hosts'] as $host) {
-					$hostname_by_hostid[$host['hostid']] = $host['name'];
+			if ($options['patternselect']) {
+				$graph_name = $graph['name'];
+			}
+			else {
+				if ($data['popup_type'] === 'graphs') {
+					$host_name = $graph['hosts'][0]['name'];
+				}
+				else {
+					$host_names = array_column($graph['hosts'], 'name', 'hostid');
+					$host_name = $host_names[$graph['discoveryRule']['hostid']];
 				}
 
-				$prefix = $hostname_by_hostid[$graph['discoveryRule']['hostid']];
+				$graph_name = $host_name.NAME_DELIMITER.$graph['name'];
 			}
 
 			// For returned data array.
 			$graph = [
 				'id' => $graph['graphid'],
-				'name' => $options['patternselect']
-					? $graph['name']
-					: $prefix.NAME_DELIMITER.$graph['name']
+				'name' => $graph_name
 			];
 		}
 		unset($graph);
