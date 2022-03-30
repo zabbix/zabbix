@@ -1868,7 +1868,7 @@ class testDocumentationLinks extends CWebTest {
 	}
 
 	/**
-	 * Function finds the element that leads to the form with doc link by the defined locator and clicks on it.
+	 * Find and click on the element that leads to the form with the link.
 	 *
 	 * @param string  $locator		locator of the element that needs to be clicked to open form with doc link
 	 */
@@ -1877,7 +1877,7 @@ class testDocumentationLinks extends CWebTest {
 	}
 
 	/*
-	 * Function opens the Mass update overlay dialog.
+	 * Open the Mass update overlay dialog.
 	 */
 	private function openMassUpdate() {
 		$this->query('xpath://input[contains(@id, "all_")]')->asCheckbox()->one()->set(true);
