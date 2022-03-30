@@ -210,7 +210,7 @@ static int	DBpatch_6010015(void)
 #define DBPATCH_HSTGRP_GROUPIDS	DBPATCH_GROUPIDS("<>")
 
 
-static int	DBpatch_hstgrp2tplgrp_copy()
+static int	DBpatch_hstgrp2tplgrp_copy(void)
 {
 
 	zbx_db_insert_t	db_insert;
@@ -238,7 +238,7 @@ static int	DBpatch_hstgrp2tplgrp_copy()
 	return ret;
 }
 
-static int	DBpatch_hosts_groups2template_group_move()
+static int	DBpatch_hosts_groups2template_group_move(void)
 {
 
 	zbx_db_insert_t		db_insert;
@@ -297,7 +297,7 @@ static int	DBpatch_hosts_groups2template_group_move()
 	return ret;
 }
 
-static int	DBpatch_rights2right_tplgrp_copy()
+static int	DBpatch_rights2right_tplgrp_copy(void)
 {
 
 	zbx_db_insert_t		db_insert;
@@ -317,7 +317,8 @@ static int	DBpatch_rights2right_tplgrp_copy()
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t	groupid, permission, id;
+		int		permission;
+		zbx_uint64_t	groupid, id;
 
 		ZBX_STR2UINT64(groupid, row[0]);
 		permission = atoi(row[1]);
@@ -333,7 +334,7 @@ static int	DBpatch_rights2right_tplgrp_copy()
 	return ret;
 }
 
-static int	DBpatch_hstgrp_del()
+static int	DBpatch_hstgrp_del(void)
 {
 
 	DB_RESULT		result;
