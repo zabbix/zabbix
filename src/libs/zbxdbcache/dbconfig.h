@@ -848,6 +848,7 @@ typedef struct
 	zbx_hashset_t		gmacros_m;		/* macro */
 	zbx_hashset_t		hmacros;
 	zbx_hashset_t		hmacros_hm;		/* hostid, macro */
+	zbx_hashset_t		user_macros;
 	zbx_hashset_t		interfaces;
 	zbx_hashset_t		interfaces_snmp;
 	zbx_hashset_t		interfaces_ht;		/* hostid, type */

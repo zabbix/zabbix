@@ -35,6 +35,7 @@
 #include "actions.h"
 #include "zbxtrends.h"
 #include "zbxserialize.h"
+#include "user_macro.h"
 
 int	sync_in_progress = 0;
 
@@ -7117,6 +7118,9 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->htmpls, 0);
 	CREATE_HASHSET(config->gmacros, 0);
 	CREATE_HASHSET(config->hmacros, 0);
+
+	CREATE_HASHSET_EXT(config->user_macros, 0, um_macro_hash, um_macro_compare);
+
 	CREATE_HASHSET(config->interfaces, 10);
 	CREATE_HASHSET(config->interfaces_snmp, 0);
 	CREATE_HASHSET(config->interface_snmpitems, 0);

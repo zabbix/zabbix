@@ -8,7 +8,8 @@ SERVER_tests = \
 	is_item_processed_by_server \
 	dc_item_poller_type_update \
 	dc_expand_user_macros_in_func_params \
-	dc_function_calculate_nextcheck
+	dc_function_calculate_nextcheck \
+	um_cache_sync
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -198,5 +199,23 @@ dc_function_calculate_nextcheck_SOURCES = \
 dc_function_calculate_nextcheck_LDADD = \
 	$(CACHE_LIBS) @SERVER_LIBS@
 dc_function_calculate_nextcheck_LDFLAGS = @SERVER_LDFLAGS@
+
+um_cache_sync_CFLAGS = \
+	-I@top_srcdir@/tests \
+	-I@top_srcdir@/src/libs
+um_cache_sync_SOURCES = \
+	um_cache_sync.c \
+	um_cache_mock.c \
+	um_cache_mock.h \
+	$(top_srcdir)/src/libs/zbxdbcache/user_macro.c \
+	$(top_srcdir)/src/libs/zbxdbcache/user_macro.h
+um_cache_sync_LDADD = \
+	$(CACHE_LIBS) @SERVER_LIBS@
+um_cache_sync_LDFLAGS = @SERVER_LDFLAGS@ \
+	-Wl,--wrap=__zbx_mem_malloc \
+	-Wl,--wrap=__zbx_mem_realloc \
+	-Wl,--wrap=__zbx_mem_free
+
+
 
 endif
