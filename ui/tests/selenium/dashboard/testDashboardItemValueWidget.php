@@ -68,7 +68,7 @@ class testDashboardItemValueWidget extends CWebTest {
 								'height' => 4,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => 4,
 										'name' => 'itemid',
 										'value' => 42230
 									],
@@ -91,16 +91,6 @@ class testDashboardItemValueWidget extends CWebTest {
 										'type' => 0,
 										'name' => 'desc_v_pos',
 										'value' => 0
-									],
-									[
-										'type' => 0,
-										'name' => 'value_h_pos',
-										'value' => 1
-									],
-									[
-										'type' => 0,
-										'name' => 'value_v_pos',
-										'value' => 1
 									],
 									[
 										'type' => 0,
@@ -143,7 +133,7 @@ class testDashboardItemValueWidget extends CWebTest {
 								'height' => 4,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => 4,
 										'name' => 'itemid',
 										'value' => 42230
 									]
@@ -155,6 +145,178 @@ class testDashboardItemValueWidget extends CWebTest {
 			]
 		]);
 		self::$dashboardid = $response['dashboardids'][0];
+	}
+
+		/**
+	 * Test to check Item Value Widget.
+	 * Check authentication form fields layout.
+	 */
+	public function testDashboardItemValueWidget_FormLayout() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+		$dialogue = $dashboard->edit()->addWidget();
+		$form = $dialogue->asForm();
+		$form->fill(['Type' => 'Item value']);
+
+		// Check default values with default Advanced configuration (false).
+		$default_values = [
+			'Name' => '',
+			'Refresh interval' => 'Default (1 minute)',
+			'id:show_header' => true,
+			'id:show_1' => true,
+			'id:show_2' => true,
+			'id:show_3' => true,
+			'id:show_4' => true,
+			'Advanced configuration' => false,
+			'id:dynamic' => false
+		];
+
+		foreach ($default_values as $field => $value) {
+			$this->assertEquals($value, $form->getField($field)->getValue());
+		}
+
+		// Check checkboxes dependency on Advanced configuration checkbox.
+		$description = [
+			'id:description',
+			'id:desc_h_pos',
+			'id:desc_v_pos',
+			'id:desc_size',
+			'id:desc_bold',
+			// TODO: uncomment after DEV-2154 is ready.
+//			'id:desc_color'
+		];
+
+		$values = [
+			'id:decimal_places',
+			'id:decimal_size',
+			'id:value_h_pos',
+			'id:value_size',
+			'id:value_v_pos',
+			'id:value_bold',
+			// TODO: uncomment after DEV-2154 is ready.
+//			'id:value_color'
+		];
+
+		$units = [
+			'id:units',
+			'id:units_pos',
+			'id:units_size',
+			'id:units_bold',
+			// TODO: uncomment after DEV-2154 is ready.
+//			'id:units_color'
+		];
+
+		$time = [
+			'id:time_h_pos',
+			'id:time_v_pos',
+			'id:time_size',
+			'id:time_bold',
+			// TODO: uncomment after DEV-2154 is ready.
+//			'id:time_color'
+		];
+
+		$indicator_colors = [
+			// TODO: uncomment after DEV-2154 is ready.
+//			'id:up_color',
+//			'id:down_color',
+//			'id:updown_color',
+		];
+
+		foreach ([false, true] as $advanced_config) {
+			$form->fill(['Advanced configuration' => $advanced_config]);
+
+			// Check that dynamic item checkbox is not depending on Advanced configuration checkbox state.
+			$dynamic_field = $form->getField('Dynamic item');
+			$this->assertTrue($dynamic_field->isVisible());
+			$this->assertTrue($dynamic_field->isEnabled());
+
+			// Merge all Advanced fields into one array.
+			$fields = array_merge($description, $values, $units, $time, $indicator_colors
+					// TODO: uncomment after DEV-2154 is ready.
+//					['lbl_bg_color']
+			);
+
+			// Check fields visibility depending on Advanced configuration checkbox state.
+			foreach ($fields as $field) {
+				$this->assertTrue($form->getField($field)->isVisible($advanced_config));
+			}
+
+			// Check advanced fields when Advanced configuration is true.
+			if ($advanced_config){
+				// Check hintbox.
+				$form->query('class:icon-help-hint')->one()->click();
+				$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
+
+				// Assert text.
+				$this->assertEquals("Supported macros:".
+						"\n{HOST.*}".
+						"\n{ITEM.*}".
+						"\n{INVENTORY.*}".
+						"\nUser macros", $hint->one()->getText());
+
+				// Close the hint-box.
+				$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+				$hint->waitUntilNotPresent();
+
+				// Check default values with Advanced configuration = true.
+				$default_values_advanced = [
+					'id:description' => '{ITEM.NAME}',
+					'id:desc_h_pos' => 'Center',
+					'id:desc_v_pos' => 'Bottom',
+					'id:desc_size' => 15,
+					'id:desc_bold' => false,
+					'id:decimal_places' => 2,
+					'id:decimal_size' => 35,
+					'id:value_h_pos' => 'Center',
+					'id:value_v_pos' => 'Middle',
+					'id:value_size' => 45,
+					'id:value_bold' => true,
+					'id:units' => '',
+					'id:units_pos' => 'After value',
+					'id:units_size' => 35,
+					'id:units_bold' => true
+				];
+
+				foreach ($default_values_advanced as $field => $value) {
+					$this->assertEquals($value, $form->getField($field)->getValue());
+				}
+
+				// Check fields' lengths.
+				$field_lenghts = [
+					'Name' =>  255,
+					'id:description' => 255,
+					'id:desc_size' => 3,
+					'id:decimal_places' => 2,
+					'id:decimal_size' => 3,
+					'id:value_size' => 3,
+					'id:units' => 255,
+					'id:units_size' => 3
+				];
+
+				foreach ($field_lenghts as $field => $length) {
+					$this->assertEquals($length, $form->getField($field)->getAttribute('maxlength'));
+				}
+
+				// Check fields editability depending on "Show" checkboxes.
+				$config_editability = [
+					'id:show_1' => $description,
+					'id:show_2' => $values,
+					'id:units_show' => $units,
+					'id:show_3' => $time,
+					'id:show_4' => $indicator_colors
+				];
+
+				foreach ($config_editability as $config => $elements) {
+					foreach ([false, true] as $state) {
+						$form->fill([$config => $state]);
+
+						foreach ($elements as $element)  {
+							$this->assertTrue($form->getField($element)->isEnabled($state));
+						}
+					}
+				}
+			}
+		}
 	}
 
 	public static function getWidgetData() {
@@ -360,7 +522,6 @@ class testDashboardItemValueWidget extends CWebTest {
 						// Change indicator checkbox.
 						'id:show_4' => false,
 						'Advanced configuration' => true,
-						// Description field.
 						'id:description' => 'Несколько слов. Dāži vārdi.',
 						// Description horizontal position.
 						'id:desc_h_pos' => 'Right',
@@ -401,7 +562,6 @@ class testDashboardItemValueWidget extends CWebTest {
 						'id:units_pos' => 'Below value',
 						// Value units size in % relative to the size of the widget.
 						'id:units_size' => '100',
-						// Value units bold font checkbox.
 						'id:units_bold' => true
 					]
 				]
@@ -423,7 +583,6 @@ class testDashboardItemValueWidget extends CWebTest {
 						// Change indicator checkbox.
 						'id:show_4' => true,
 						'Advanced configuration' => true,
-						// Description field.
 						'id:description' => 'Some description here.',
 						// Description horizontal position.
 						'id:desc_h_pos' => 'Left',
@@ -443,15 +602,12 @@ class testDashboardItemValueWidget extends CWebTest {
 						'id:decimal_size' => '32',
 						// Value size in % relative to the size of the widget.
 						'id:value_size' => '46',
-						// Value font bold checkbox.
 						'id:value_bold' => true,
-						// Value units type.
 						'id:units' => 's',
 						// Value units position.
 						'id:units_pos' => 'Before value',
 						// Value units size in % relative to the size of the widget.
 						'id:units_size' => '36',
-						// Value units bold font checkbox.
 						'id:units_bold' => true,
 						// Time horizontal position.
 						'id:time_h_pos' => 'Left',
@@ -459,9 +615,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'id:time_v_pos' => 'Bottom',
 						// Time size in % relative to the size of the widget.
 						'id:time_size' => '13',
-						// Time bold font checkbox.
 						'id:time_bold' => true,
-						// Dynamic item checkbox.
 						'Dynamic item' => true
 					]
 				]
@@ -484,13 +638,11 @@ class testDashboardItemValueWidget extends CWebTest {
 						// Change indicator checkbox.
 						'id:show_4' => true,
 						'Advanced configuration' => true,
-						// Value units type.
 						'id:units' => 'B',
 						// Value units position.
 						'id:units_pos' => 'Below value',
 						// Value units size in % relative to the size of the widget.
 						'id:units_size' => '99',
-						// Value font bold checkbox.
 						'id:units_bold' => true
 					],
 					'colors' => [
@@ -510,102 +662,6 @@ class testDashboardItemValueWidget extends CWebTest {
 	}
 
 	/**
-	 * Test to check Item Value Widget.
-	 * Check authentication form fields layout.
-	 */
-	public function testDashboardItemValueWidget_FormLayout() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
-		$dialogue = $dashboard->edit()->addWidget();
-		$form = $dialogue->asForm();
-		$form->fill(['Type' => 'Item value']);
-
-		// Check checkboxes dependencies.
-		// Advanced configuration checkbox.
-		foreach ([false, true] as $show_description) {
-			$form->fill(['Advanced configuration' => $show_description]);
-			$this->assertTrue($form->getField('Description')->isVisible($show_description));
-
-			foreach (['desc_h_pos', 'desc_v_pos', 'desc_size', 'lbl_desc_color', 'decimal_places', 'decimal_size',
-				'value_h_pos', 'value_size', 'value_v_pos', 'lbl_value_color', 'units', 'units_pos',
-				'units_size', 'units_size', 'lbl_units_color', 'time_h_pos', 'time_size', 'time_v_pos',
-				'lbl_time_color', 'lbl_up_color', 'lbl_down_color', 'lbl_updown_color', 'lbl_bg_color'] as  $id)  {
-				$this->assertTrue($form->query('id', $id)->one()->isVisible($show_description));
-			}
-
-			foreach (['desc_bold', 'value_bold', 'units_show', 'time_bold'] as  $id)  {
-				$this->assertTrue($form->query('id', $id)->one()->isEnabled($show_description));
-			}
-
-			if ($show_description){
-
-				// Summon the hint-box.
-				$form->query('class:icon-help-hint')->one()->click();
-				$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
-
-				// Assert text.
-				$this->assertEquals("Supported macros:".
-						"\n{HOST.*}".
-						"\n{ITEM.*}".
-						"\n{INVENTORY.*}".
-						"\nUser macros", $hint->one()->getText());
-
-				// Close the hint-box.
-				$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
-				$hint->waitUntilNotPresent();
-			}
-		}
-
-		// Description checkbox.
-		foreach ([false, true] as $description) {
-			$form->fill(['id:show_1' => $description]);
-
-			foreach (['description', 'desc_h_pos_0', 'desc_h_pos_1', 'desc_h_pos_2', 'desc_v_pos_0',
-				'desc_v_pos_1', 'desc_v_pos_2', 'desc_size', 'desc_bold', 'desc_color'] as  $id)  {
-				$this->assertTrue($form->query('id', $id)->one()->isEnabled($description));
-			}
-		}
-
-		// Value checkbox.
-		foreach ([false, true] as $value) {
-			$form->fill(['id:show_2' => $value]);
-
-			foreach (['decimal_places', 'decimal_size', 'value_h_pos_0', 'value_h_pos_1', 'value_h_pos_2',
-				'value_size', 'value_v_pos_0', 'value_v_pos_1', 'value_v_pos_2', 'value_bold', 'value_color'] as  $id)  {
-				$this->assertTrue($form->query('id', $id)->one()->isEnabled($value));
-			}
-		}
-
-		// Units checkbox.
-		foreach ([false, true] as $units) {
-			$form->fill(['id:units_show' => $units]);
-
-			foreach (['units', 'label-units_pos', 'units_size', 'units_bold', 'units_color'] as  $id)  {
-				$this->assertTrue($form->query('id', $id)->one()->isEnabled($units));
-			}
-		}
-
-		// Time checkbox.
-		foreach ([false, true] as $time) {
-			$form->fill(['id:show_3' => $time]);
-
-			foreach (['time_h_pos_0', 'time_h_pos_1', 'time_h_pos_2', 'time_v_pos_0', 'time_v_pos_1', 'time_v_pos_2',
-				'time_size', 'time_bold', 'time_color'] as  $id)  {
-				$this->assertTrue($form->query('id', $id)->one()->isEnabled($time));
-			}
-		}
-
-		// Change indicator checkbox.
-		foreach ([false, true] as $indicator) {
-			$form->fill(['id:show_4' => $indicator]);
-
-			foreach (['up_color', 'down_color', 'updown_color'] as  $id)  {
-				$this->assertTrue($form->query('id', $id)->one()->isEnabled($indicator));
-			}
-		}
-	}
-
-	/**
 	 * @backupOnce dashboard
 	 * @dataProvider getWidgetData
 	 */
@@ -613,97 +669,11 @@ class testDashboardItemValueWidget extends CWebTest {
 		$this->checkWidgetForm($data);
 	}
 
-	public function testDashboardItemValueWidget_CancelCreate() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
-		$dashboard = CDashboardElement::find()->one();
-		$old_widget_count = $dashboard->getWidgets()->count();
-		$old_hash = CDBHelper::getHash($this->sql);
-		$dialogue = $dashboard->edit()->addWidget();
-		$form = $dialogue->asForm();
-		$form->fill([
-			'Type' => 'Item value',
-			'Name' => 'Widget to cancel',
-			'Item' => 'Available memory in %'
-		]);
-		$dialogue->query('button', 'Cancel')->one()->click();
-		$dashboard->save();
-		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
-	}
-
 	/**
 	 * @dataProvider getWidgetData
 	 */
 	public function testDashboardItemValueWidget_Update($data) {
 		$this->checkWidgetForm($data, true);
-	}
-
-	public function testDashboardItemValueWidget_SimpleUpdate() {
-		$this->checkUpdateUnchanged();
-	}
-
-	public function testDashboardItemValueWidget_CancelUpdate() {
-		$this->checkUpdateUnchanged(true);
-	}
-
-
-	public function testDashboardItemValueWidget_Delete() {
-		$name = 'Widget to delete';
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
-		$dashboard = CDashboardElement::find()->one()->edit();
-		$old_widget_count = $dashboard->getWidgets()->count();
-		$this->assertEquals(true, $dashboard->getWidget($name)->isEditable());
-		$dashboard->deleteWidget($name);
-		$dashboard->save();
-		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-		$this->assertEquals($old_widget_count - 1, $dashboard->getWidgets()->count());
-		$this->assertEquals('', CDBHelper::getRow('SELECT * from widget WHERE name = '.zbx_dbstr('Widget to delete')));
-	}
-
-	/**
-	 * Function for checking widget refresh interval.
-	 *
-	 * @param array $data	data provider
-	 * @param string $header	name of existing widget
-	 */
-	private function checkRefreshInterval($data, $header) {
-		$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (1 minute)')
-			? '15 minutes'
-			: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
-		$this->assertEquals($refresh, CDashboardElement::find()->one()->getWidget($header)->getRefreshInterval());
-	}
-
-	/**
-	 * Function for checking editing widget form without changes.
-	 *
-	 * @param boolean $cancel	is updating canceled
-	 */
-	private function checkUpdateUnchanged($cancel = false) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
-		$old_hash = CDBHelper::getHash($this->sql);
-		$header = self::$old_name;
-		$widget = $dashboard->getWidget($header);
-		$form = $widget->edit()->asForm();
-		$original_values = $form->getFields()->asValues();
-
-		if ($cancel) {
-			$form->fill([
-				'Type' => 'Item value',
-				'Name' => 'Widget to cancel',
-				'Item' => 'Available memory in %'
-			]);
-			COverlayDialogElement::find()->waitUntilReady()->one()->query('button', 'Cancel')->one()->click();
-		}
-		else {
-
-		$form->fill(['Type' => 'Item value']);
-		$form->submit();
-		}
-
-		$this->page->waitUntilReady();
-		$this->assertEquals($original_values, $widget->edit()->getFields()->asValues());
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
 
 	/**
@@ -773,12 +743,142 @@ class testDashboardItemValueWidget extends CWebTest {
 			}
 
 			// Check that new widget interval.
-			$this->checkRefreshInterval($data, $header);
+			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (1 minute)')
+				? '15 minutes'
+				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
+			$this->assertEquals($refresh, CDashboardElement::find()->one()->getWidget($header)->getRefreshInterval());
 
 			// Write new name to update widget for update scenario.
 			if ($update) {
 				self::$old_name = $header;
 			}
 		}
+	}
+
+	public function testDashboardItemValueWidget_SimpleUpdate() {
+		$this->checkNoChanges();
+	}
+
+	public static function getCancelData() {
+		return [
+			// Cancel creating widget with saving the dashboard.
+			[
+				[
+					'cancel_form' => true,
+					'create_widget' => true,
+					'save_dashboard' => true
+				]
+			],
+			// Cancel updating widget with saving the dashboard.
+			[
+				[
+					'cancel_form' => true,
+					'create_widget' => false,
+					'save_dashboard' => true
+				]
+			],
+			// Create widget without saving the dashboard.
+			[
+				[
+					'cancel_form' => false,
+					'create_widget' => true,
+					'save_dashboard' => false
+				]
+			],
+			// Update widget without saving the dashboard.
+			[
+				[
+					'cancel_form' => false,
+					'create_widget' => false,
+					'save_dashboard' => false
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCancelData
+	 */
+	public function testDashboardItemValueWidget_Cancel($data) {
+		$this->checkNoChanges($data['cancel_form'], $data['create_widget'], $data['save_dashboard']);
+	}
+
+	/**
+	 * Function for checking canceling form or submitting without any changes.
+	 *
+	 * @param boolean $cancel            true if cancel scenario, false if form is submitted
+	 * @param boolean $create            true if create scenario, false if update
+	 * @param boolean $save_dashboard    true if dashboard will be saved, false if not
+	 */
+	private function checkNoChanges($cancel = false, $create = false, $save_dashboard = true) {
+		$old_hash = CDBHelper::getHash($this->sql);
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$dashboard = CDashboardElement::find()->one();
+		$old_widget_count = $dashboard->getWidgets()->count();
+
+		$form = $create
+			? $dashboard->edit()->addWidget()->asForm()
+			: $dashboard->getWidget(self::$old_name)->edit();
+
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+
+		if (!$create) {
+			$values = $form->getFields()->asValues();
+		}
+		else {
+			$form->fill(['Type' => 'Item value']);
+		}
+
+		if ($cancel || !$save_dashboard) {
+			$form->fill([
+				'Name' => 'Widget to cancel',
+				'Item' => 'Available memory in %'
+			]);
+		}
+
+		if ($cancel) {
+			$dialog->query('button:Cancel')->one()->click();
+		}
+		else {
+			$form->submit();
+		}
+
+		COverlayDialogElement::ensureNotPresent();
+
+		if (!$cancel) {
+			$dashboard->getWidget(!$save_dashboard ? 'Widget to cancel' : self::$old_name)->waitUntilReady();
+		}
+
+		if ($save_dashboard) {
+			$dashboard->save();
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		}
+		else {
+			$dashboard->cancelEditing();
+		}
+
+		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
+
+		// Check that updating widget form values did not change in frontend.
+		if (!$create && !$save_dashboard) {
+			$this->assertEquals($values, $dashboard->getWidget(self::$old_name)->edit()->getFields()->asValues());
+		}
+
+		// Check that DB hash is not changed.
+		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+	}
+
+	public function testDashboardItemValueWidget_Delete() {
+		$name = 'Widget to delete';
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$dashboard = CDashboardElement::find()->one()->edit();
+		$old_widget_count = $dashboard->getWidgets()->count();
+		$this->assertEquals(true, $dashboard->getWidget($name)->isEditable());
+		$dashboard->deleteWidget($name);
+		$dashboard->save();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		$this->assertEquals($old_widget_count - 1, $dashboard->getWidgets()->count());
+		$this->assertEquals('', CDBHelper::getRow('SELECT * from widget WHERE name = '.zbx_dbstr('Widget to delete')));
 	}
 }
