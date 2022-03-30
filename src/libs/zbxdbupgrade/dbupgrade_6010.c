@@ -102,7 +102,7 @@ static int	DBpatch_6010004(void)
 			{"host_rtdata", "hostid", 0,
 				{
 					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"available_active", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"availability_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
