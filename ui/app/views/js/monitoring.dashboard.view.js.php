@@ -198,22 +198,20 @@
 						throw {error: response.error};
 					}
 
-					if ('success' in response) {
-						postMessageOk(response.success.title);
+					postMessageOk(response.success.title);
 
-						if ('messages' in response.success) {
-							postMessageDetails('success', response.success.messages);
-						}
-
-						const curl = new Curl('zabbix.php', false);
-
-						curl.setArgument('action', 'dashboard.view');
-						curl.setArgument('dashboardid', response.dashboardid);
-
-						this.disableNavigationWarning();
-
-						location.replace(curl.getUrl());
+					if ('messages' in response.success) {
+						postMessageDetails('success', response.success.messages);
 					}
+
+					this.disableNavigationWarning();
+
+					const curl = new Curl('zabbix.php', false);
+
+					curl.setArgument('action', 'dashboard.view');
+					curl.setArgument('dashboardid', response.dashboardid);
+
+					location.replace(curl.getUrl());
 				})
 				.catch((exception) => {
 					clearMessages();

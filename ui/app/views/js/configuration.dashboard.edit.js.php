@@ -115,14 +115,10 @@
 		},
 
 		save() {
-			clearMessages();
-
 			this.is_busy_saving = true;
 			this.updateBusy();
 
 			const request_data = ZABBIX.Dashboard.save();
-
-			request_data.sharing = this.dashboard.sharing;
 
 			const curl = new Curl('zabbix.php');
 
@@ -135,28 +131,38 @@
 			})
 				.then((response) => response.json())
 				.then((response) => {
-					if ('errors' in response) {
-						throw {html_string: response.errors};
+					if ('error' in response) {
+						throw {error: response.error};
 					}
 
-					if ('system-message-ok' in response) {
-						postMessageOk(response['system-message-ok']);
+					postMessageOk(response.success.title);
+
+					if ('messages' in response.success) {
+						postMessageDetails('success', response.success.messages);
 					}
 
 					this.disableNavigationWarning();
 					this.cancelEditing();
 				})
-				.catch((error) => {
-					if (typeof error === 'object' && 'html_string' in error) {
-						addMessage(error.html_string);
+				.catch((exception) => {
+					clearMessages();
+
+					let title;
+					let messages = [];
+
+					if (typeof exception === 'object' && 'error' in exception) {
+						title = exception.error.title;
+						messages = exception.error.messages;
 					}
 					else {
-						const message = this.dashboard.dashboardid === null
+						title = this.dashboard.dashboardid === null
 							? <?= json_encode(_('Failed to create dashboard')) ?>
 							: <?= json_encode(_('Failed to update dashboard')) ?>;
-
-						addMessage(makeMessageBox('bad', [], message));
 					}
+
+					const message_box = makeMessageBox('bad', messages, title);
+
+					addMessage(message_box);
 				})
 				.finally(() => {
 					this.is_busy_saving = false;

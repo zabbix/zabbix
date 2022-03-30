@@ -150,6 +150,8 @@ class CControllerDashboardUpdate extends CController {
 			$error_title = _('Failed to create dashboard');
 		}
 
+		$output = [];
+
 		if ($result) {
 			$output['success']['title'] = $success_title;
 
