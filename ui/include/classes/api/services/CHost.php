@@ -1265,16 +1265,14 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Additionally allows to remove interfaces from hosts.
-	 *
-	 * Checks write permissions for hosts.
-	 *
-	 * Additional supported $data parameters are:
-	 * - interfaces  - an array of interfaces to delete from the hosts
-	 *
-	 * @throws APIException if the input is invalid.
+	 * Removes templates and interfaces from hosts.
 	 *
 	 * @param array $data
+	 * @param array $data['interfaces']         Interfaces to delete from the hosts.
+	 * @param array $data['templateids']        Templates to unlink from host.
+	 * @param array $data['templateids_clear']  Templates to unlink and clear from host.
+	 *
+	 * @throws APIException if the input is invalid.
 	 *
 	 * @return array
 	 */
@@ -1302,6 +1300,42 @@ class CHost extends CHostGeneral {
 		}
 
 		$data['templateids'] = [];
+
+		if (array_key_exists('templateids_link', $data) && $data['templateids_link']
+				|| array_key_exists('templateids_clear', $data) && $data['templateids_clear']) {
+			// If unlink or clear is requested, get existing host templates to determine the link type.
+			$hosts_templates = $this->get([
+				'selectParentTemplates' => ['templateid', 'link_type'],
+				'hostids' => $data['hostids'],
+				'preserveKeys' => true,
+				'nopermissions' => true
+			]);
+
+			$prohibited_templateids = [];
+
+			foreach ($hosts_templates as $host_templates) {
+				if ($host_templates['parentTemplates']) {
+					foreach ($host_templates['parentTemplates'] as $template) {
+						if ($template['link_type'] == TEMPLATE_LINK_LLD) {
+							$prohibited_templateids[$template['templateid']] = true;
+						}
+					}
+				}
+			}
+
+			// Some templates may not be allowed to unlink. Remove IDs from both lists.
+			if ($prohibited_templateids) {
+				foreach (['templateids_link', 'templateids_clear'] as $field) {
+					if (array_key_exists($field, $data) && $data[$field]) {
+						foreach ($data[$field] as $idx => $templateid) {
+							if (array_key_exists($templateid, $prohibited_templateids)) {
+								unset($data[$field][$idx]);
+							}
+						}
+					}
+				}
+			}
+		}
 
 		return parent::massRemove($data);
 	}
@@ -2191,7 +2225,7 @@ class CHost extends CHostGeneral {
 		]);
 
 		$update_discovered_validator = new CUpdateDiscoveredValidator([
-			'allowed' => ['hostid', 'status', 'inventory', 'description'],
+			'allowed' => ['hostid', 'status', 'inventory', 'description', 'templates', 'templates_clear'],
 			'messageAllowedField' => _('Cannot update "%2$s" for a discovered host "%1$s".')
 		]);
 

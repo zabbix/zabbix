@@ -300,6 +300,9 @@ define('HOST_STATUS_PROXY_PASSIVE',	6);
 define('HOST_DISCOVER',		0);
 define('HOST_NO_DISCOVER',	1);
 
+define('TEMPLATE_LINK_MANUAL',	0);
+define('TEMPLATE_LINK_LLD',		1);
+
 define('HOST_ENCRYPTION_NONE',			1);
 define('HOST_ENCRYPTION_PSK',			2);
 define('HOST_ENCRYPTION_CERTIFICATE',	4);
