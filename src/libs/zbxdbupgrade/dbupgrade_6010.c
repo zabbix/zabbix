@@ -420,6 +420,16 @@ static int	DBpatch_6010020(void)
 {
 	return DBdrop_field("hstgrp", "internal");
 }
+
+static int	DBpatch_6010021(void)
+{
+	return DBdrop_index("hstgrp", "hstgrp_1");
+}
+
+static int	DBpatch_6010022(void)
+{
+	return DBcreate_index("hstgrp", "hstgrp_1", "name", 1);
+}
 #endif
 
 DBPATCH_START(6010)
@@ -447,5 +457,7 @@ DBPATCH_ADD(6010017, 0, 1)
 DBPATCH_ADD(6010018, 0, 1)
 DBPATCH_ADD(6010019, 0, 1)
 DBPATCH_ADD(6010020, 0, 1)
+DBPATCH_ADD(6010021, 0, 1)
+DBPATCH_ADD(6010022, 0, 1)
 
 DBPATCH_END()
