@@ -306,7 +306,7 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 				(new CUrl('zabbix.php'))->setArgument('action', 'host.list'))), $host
 			]))
 			->addItem($status)
-			->addItem(getHostAvailabilityTable($db_host['interfaces']));
+			->addItem(getHostAvailabilityTable($db_host['interfaces'], $db_host['hostid']), $db_host['hostid']);
 
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_host['hostDiscovery']['ts_delete'] != 0) {
 			$info_icons = [getHostLifetimeIndicator(time(), $db_host['hostDiscovery']['ts_delete'])];
@@ -595,7 +595,7 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
  *
  * @return CHostAvailability
  */
-function getHostAvailabilityTable($host_interfaces): CHostAvailability {
+function getHostAvailabilityTable($host_interfaces, $hostid): CHostAvailability {
 	$interfaces = [];
 
 	foreach ($host_interfaces as $interface) {
@@ -614,7 +614,15 @@ function getHostAvailabilityTable($host_interfaces): CHostAvailability {
 		];
 	}
 
-	return (new CHostAvailability())->setInterfaces($interfaces);
+	$host_rtdata = DB::find('host_rtdata');
+	$availability_status = 0;
+	foreach ($host_rtdata as $item) {
+		if ($item['hostid'] == $hostid) {
+			$availability_status = $item['availability_status'];
+		}
+	}
+
+	return (new CHostAvailability())->setInterfaces($interfaces, $availability_status);
 }
 
 /**

@@ -54,12 +54,20 @@ class CHostAvailability extends CTag {
 	 *
 	 * @return CHostAvailability
 	 */
-	public function setInterfaces(array $interfaces): CHostAvailability {
+	public function setInterfaces(array $interfaces, $availability_status): CHostAvailability {
+
+		if (!$availability_status) {
+			return $this;
+		}
 		$this->type_interfaces = array_fill_keys(array_keys(static::LABELS), []);
 
 		foreach ($interfaces as $interface) {
 			$this->type_interfaces[$interface['type']][] = $interface;
 		}
+
+		$active_checks = array('type'=>'1','available'=>$availability_status,'interface'=>'Active checks',
+			'description'=>NULL, 'error'=>'');
+		$this->type_interfaces[1][] = $active_checks;
 
 		return $this;
 	}
