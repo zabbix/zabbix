@@ -496,7 +496,7 @@ static int	proxy_process_host_data(DC_PROXY *proxy, const char *answer, zbx_time
 
 	if (FAIL == zbx_json_open(answer, &jp))
 		return FAIL;
-	
+
 	if (FAIL == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_HOST_DATA, &jp_hostdata))
 		return FAIL;
 
