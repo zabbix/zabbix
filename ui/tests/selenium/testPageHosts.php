@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/FilterTrait.php';
+require_once dirname(__FILE__).'/traits/TagTrait.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 /**
@@ -31,7 +31,7 @@ class testPageHosts extends CLegacyWebTest {
 	public $HostIp = '127.0.0.1';
 	public $HostPort = '10050';
 
-	use FilterTrait;
+	use TagTrait;
 	use TableTrait;
 
 	public static function allHosts() {

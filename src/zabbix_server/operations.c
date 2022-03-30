@@ -17,15 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "comms.h"
-#include "db.h"
+#include "operations.h"
+
 #include "log.h"
-#include "dbcache.h"
 #include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_host.h"
-
-#include "operations.h"
 
 typedef enum
 {
@@ -612,9 +608,9 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 							" set proxy_hostid=%s"
 							" where hostid=" ZBX_FS_UI64,
 							DBsql_id_ins(proxy_hostid), hostid);
-					zbx_audit_update_json_append_uint64(hostid, AUDIT_HOST_ID,
-							AUDIT_DETAILS_ACTION_ADD, "host.proxy_hostid", proxy_hostid,
-							"hosts", "proxy_hostid");
+
+					zbx_audit_host_update_json_update_proxy_hostid(hostid, host_proxy_hostid,
+							proxy_hostid);
 				}
 
 				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);

@@ -23,7 +23,9 @@
  * @var CView $this
  */
 
-$auditWidget = (new CWidget())->setTitle(_('Action log'));
+$auditWidget = (new CWidget())
+	->setTitle(_('Action log'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUDITACTS_LIST));
 
 // create filter
 $filterColumn = new CFormList();

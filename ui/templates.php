@@ -328,7 +328,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				throw new Exception();
 			}
 
-			if (!copyItems($cloneTemplateId, $input_templateid)) {
+			if (!copyItems($cloneTemplateId, $input_templateid, true)) {
 				throw new Exception();
 			}
 

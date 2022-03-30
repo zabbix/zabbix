@@ -19,8 +19,6 @@
 
 #include "evalfunc.h"
 
-#include "common.h"
-#include "db.h"
 #include "log.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
@@ -2625,6 +2623,7 @@ static int	trends_eval_stl(const char *table, zbx_uint64_t itemid, int start, in
 		zbx_history_record_t	val;
 
 		val.timestamp.sec = period_counter;
+		val.timestamp.ns = 0;
 
 		if (FAIL == zbx_trends_eval_avg(table, itemid, period_counter, period_counter, &tmp_res, NULL))
 		{

@@ -17,14 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "db.h"
+#include "lld.h"
+
 #include "log.h"
-#include "zbxalgo.h"
 #include "zbxserver.h"
 #include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_host.h"
-
-#include "lld.h"
 
 typedef struct
 {
@@ -4308,7 +4306,7 @@ static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
 		{
 			type = get_interface_type_by_item_type((unsigned char)atoi(row[1]));
 
-			if (type != INTERFACE_TYPE_ANY && type != INTERFACE_TYPE_UNKNOWN)
+			if (type != INTERFACE_TYPE_ANY && type != INTERFACE_TYPE_UNKNOWN && type != INTERFACE_TYPE_OPT)
 			{
 				ZBX_STR2UINT64(interfaceid, row[0]);
 

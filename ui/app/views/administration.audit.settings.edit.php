@@ -27,7 +27,8 @@ $this->includeJsFile('administration.audit.settings.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Audit log'))
-	->setTitleSubmenu(getAdministrationGeneralSubmenu());
+	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUDIT_SETTINGS_EDIT));
 
 $form = (new CForm())
 	->setId('audit-settings')

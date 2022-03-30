@@ -24,7 +24,9 @@
  * @var array $data
  */
 
-$widget = (new CWidget())->setTitle(_('Item prototypes'));
+$widget = (new CWidget())
+	->setTitle(_('Item prototypes'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_ITEM_PROTOTYPE_EDIT));
 
 if (!empty($data['hostid'])) {
 	$widget->setNavigation(getHostNavigation('items', $data['hostid'], $data['parent_discoveryid']));
@@ -585,15 +587,15 @@ $item_tab->addItem([
 	(new CFormField($master_item))->setId('js-item-master-item-field')
 ]);
 
-// Append interfaces to form list.
-$select_interface = getInterfaceSelect($data['interfaces'])
-	->setId('interface-select')
-	->setValue($data['interfaceid'])
-	->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
-	->setFocusableElementId('interfaceid')
-	->setAriaRequired();
-
 if ($data['display_interfaces']) {
+	$select_interface = getInterfaceSelect($data['interfaces'])
+		->setId('interface-select')
+		->setValue($data['interfaceid'])
+		->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
+		->setFocusableElementId('interfaceid')
+		->setAriaRequired()
+		->setReadonly($readonly);
+
 	$item_tab->addItem([
 		(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))
 			->setAsteriskMark()

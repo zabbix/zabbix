@@ -19,7 +19,7 @@
 
 #include "ntp.h"
 
-#include "comms.h"
+#include "zbxcomms.h"
 #include "log.h"
 #include "common.h"
 

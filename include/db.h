@@ -20,7 +20,6 @@
 #ifndef ZABBIX_DB_H
 #define ZABBIX_DB_H
 
-#include "common.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "dbschema.h"
@@ -603,8 +602,6 @@ void	zbx_db_save_trigger_changes(const zbx_vector_ptr_t *trigger_diff);
 void	zbx_trigger_diff_free(zbx_trigger_diff_t *diff);
 void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t triggerid, unsigned char priority,
 		zbx_uint64_t flags, unsigned char value, unsigned char state, int lastchange, const char *error);
-
-int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error);
 
 char	*DBdyn_escape_field(const char *table_name, const char *field_name, const char *src);
 char	*DBdyn_escape_string(const char *src);

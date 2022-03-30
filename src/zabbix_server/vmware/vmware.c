@@ -19,15 +19,12 @@
 
 #include "vmware.h"
 
-#include "mutexs.h"
-
-/* LIBXML2 is used */
+#include "zbxxml.h"
 #ifdef HAVE_LIBXML2
-#	include <libxml/parser.h>
-#	include <libxml/tree.h>
 #	include <libxml/xpath.h>
 #endif
 
+#include "mutexs.h"
 #include "memalloc.h"
 #include "log.h"
 #include "daemon.h"
@@ -93,13 +90,6 @@ ZBX_MEM_FUNC_IMPL(__vm, vmware_mem)
 static zbx_vmware_t	*vmware = NULL;
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-
-/* according to libxml2 changelog XML_PARSE_HUGE option was introduced in version 2.7.0 */
-#if 20700 <= LIBXML_VERSION	/* version 2.7.0 */
-#	define ZBX_XML_PARSE_OPTS	XML_PARSE_HUGE
-#else
-#	define ZBX_XML_PARSE_OPTS	0
-#endif
 
 #define ZBX_VMWARE_COUNTERS_INIT_SIZE	500
 
@@ -562,14 +552,6 @@ typedef struct
 	size_t	offset;
 }
 ZBX_HTTPPAGE;
-
-static int	zbx_xml_read_values(xmlDoc *xdoc, const char *xpath, zbx_vector_str_t *values);
-static int	zbx_xml_node_read_values(xmlDoc *xdoc, xmlNode *node, const char *xpath, zbx_vector_str_t *values);
-static int	zbx_xml_try_read_value(const char *data, size_t len, const char *xpath, xmlDoc **xdoc, char **value,
-		char **error);
-static int	zbx_xml_doc_read_num(xmlDoc *xdoc, const char *xpath, int *num);
-static char	*zbx_xml_node_read_value(xmlDoc *doc, xmlNode *node, const char *xpath);
-static char	*zbx_xml_doc_read_value(xmlDoc *xdoc, const char *xpath);
 
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
@@ -1949,8 +1931,8 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 		}
 	}
 
-	username_esc = xml_escape_dyn(service->username);
-	password_esc = xml_escape_dyn(service->password);
+	username_esc = zbx_xml_escape_dyn(service->username);
+	password_esc = zbx_xml_escape_dyn(service->password);
 
 	if (ZBX_VMWARE_TYPE_UNKNOWN == service->type)
 	{
@@ -2077,7 +2059,7 @@ static int	zbx_property_collection_next(zbx_property_collection_iter *iter, xmlD
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() continue retrieving properties with token: '%s'", __func__,
 			iter->token);
 
-	token_esc = xml_escape_dyn(iter->token);
+	token_esc = zbx_xml_escape_dyn(iter->token);
 	zbx_snprintf(post, sizeof(post), ZBX_POST_CONTINUE_RETRIEVE_PROPERTIES, iter->property_collector, token_esc);
 	zbx_free(token_esc);
 
@@ -2178,7 +2160,7 @@ static int	vmware_service_get_perf_counter_refreshrate(zbx_vmware_service_t *ser
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type: %s id: %s", __func__, type, id);
 
-	id_esc = xml_escape_dyn(id);
+	id_esc = zbx_xml_escape_dyn(id);
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VCENTER_PERF_COUNTERS_REFRESH_RATE,
 			vmware_service_objects[service->type].performance_manager, type, id_esc);
 	zbx_free(id_esc);
@@ -2714,7 +2696,7 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 		zbx_strlcat(props, "</ns0:pathSet>", sizeof(props));
 	}
 
-	vmid_esc = xml_escape_dyn(vmid);
+	vmid_esc = zbx_xml_escape_dyn(vmid);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_VM_STATUS_EX,
 			vmware_service_objects[service->type].property_collector, props, vmid_esc);
@@ -2753,7 +2735,7 @@ static int	vmware_service_get_vm_folder(xmlDoc *xdoc, char **vm_folder)
 	{
 		char	*id_esc;
 
-		id_esc = xml_escape_dyn(id);
+		id_esc = zbx_xml_escape_dyn(id);
 		zbx_free(id);
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_GET_FOLDER_NAME("%s"), id_esc);
 
@@ -2999,7 +2981,7 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datastore:'%s'", __func__, id);
 
-	id_esc = xml_escape_dyn(id);
+	id_esc = zbx_xml_escape_dyn(id);
 
 	if (ZBX_VMWARE_TYPE_VSPHERE == service->type && NULL != service->version &&
 			ZBX_VMWARE_DS_REFRESH_VERSION > service->major_version && SUCCEED !=
@@ -3156,7 +3138,7 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 		zbx_strlcat(props, "</ns0:pathSet>", sizeof(props));
 	}
 
-	hvid_esc = xml_escape_dyn(hvid);
+	hvid_esc = zbx_xml_escape_dyn(hvid);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_HV_DETAILS, vmware_service_objects[service->type].property_collector,
 			props, hvid_esc, hvid_esc, hvid_esc, hvid_esc);
@@ -3376,7 +3358,7 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 		char	*tmp, *hvid_esc;
 
 		zbx_vector_str_clear_ext(&scsi_luns, zbx_str_free);
-		hvid_esc = xml_escape_dyn(hvid);
+		hvid_esc = zbx_xml_escape_dyn(hvid);
 		tmp = zbx_dsprintf(NULL, ZBX_POST_HV_MP_DETAILS,
 				vmware_service_objects[service->type].property_collector, scsi_req, hvid_esc);
 		zbx_free(hvid_esc);
@@ -4239,7 +4221,7 @@ static int	vmware_service_reset_event_history_collector(CURL *easyhandle, const 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	event_session_esc = xml_escape_dyn(event_session);
+	event_session_esc = zbx_xml_escape_dyn(event_session);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_RESET_EVENT_COLLECTOR, event_session_esc);
 
@@ -4288,7 +4270,7 @@ static int	vmware_service_read_previous_events(CURL *easyhandle, const char *eve
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() soap_count: %d", __func__, soap_count);
 
-	event_session_esc = xml_escape_dyn(event_session);
+	event_session_esc = zbx_xml_escape_dyn(event_session);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_READ_PREVIOUS_EVENTS, event_session_esc, soap_count);
 
@@ -4344,7 +4326,7 @@ static int	vmware_service_get_event_latestpage(const zbx_vmware_service_t *servi
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	event_session_esc = xml_escape_dyn(event_session);
+	event_session_esc = zbx_xml_escape_dyn(event_session);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_READ_EVENT_LATEST_PAGE,
 			vmware_service_objects[service->type].property_collector, event_session_esc);
@@ -4390,7 +4372,7 @@ static int	vmware_service_destroy_event_session(CURL *easyhandle, const char *ev
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	event_session_esc = xml_escape_dyn(event_session);
+	event_session_esc = zbx_xml_escape_dyn(event_session);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_DESTROY_EVENT_COLLECTOR, event_session_esc);
 
@@ -5065,7 +5047,7 @@ static int	vmware_service_get_cluster_status(CURL *easyhandle, const char *clust
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() clusterid:'%s'", __func__, clusterid);
 
-	clusterid_esc = xml_escape_dyn(clusterid);
+	clusterid_esc = zbx_xml_escape_dyn(clusterid);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_CLUSTER_STATUS, clusterid_esc);
 
@@ -6073,7 +6055,7 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
 
 			entity = (zbx_vmware_perf_entity_t *)entities->values[i];
 
-			id_esc = xml_escape_dyn(entity->id);
+			id_esc = zbx_xml_escape_dyn(entity->id);
 
 			/* add entity performance counter request */
 			zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:querySpec>"
@@ -6834,270 +6816,3 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats)
 
 	return SUCCEED;
 }
-
-#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-
-/*
- * XML support
- */
-/******************************************************************************
- *                                                                            *
- * Purpose: libxml2 callback function for error handle                        *
- *                                                                            *
- * Parameters: user_data - [IN/OUT] the user context                          *
- *             err       - [IN] the libxml2 error message                     *
- *                                                                            *
- ******************************************************************************/
-static void	libxml_handle_error(void *user_data, xmlErrorPtr err)
-{
-	ZBX_UNUSED(user_data);
-	ZBX_UNUSED(err);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieve a value from xml data and return status of operation     *
- *                                                                            *
- * Parameters: data   - [IN] XML data                                         *
- *             len    - [IN] XML data length (optional)                       *
- *             xpath  - [IN] XML XPath                                        *
- *             xdoc   - [OUT] parsed xml document                             *
- *             value  - [OUT] selected xml node value                         *
- *             error  - [OUT] error of xml or xpath formats                   *
- *                                                                            *
- * Return: SUCCEED - select xpath successfully, result stored in 'value'      *
- *         FAIL - failed select xpath expression                              *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_xml_try_read_value(const char *data, size_t len, const char *xpath, xmlDoc **xdoc, char **value,
-		char **error)
-{
-	xmlXPathContext	*xpathCtx;
-	xmlXPathObject	*xpathObj;
-	xmlNodeSetPtr	nodeset;
-	xmlChar		*val;
-	int		ret = FAIL;
-
-	if (NULL == data)
-		goto out;
-
-	xmlSetStructuredErrorFunc(NULL, &libxml_handle_error);
-
-	if (NULL == (*xdoc = xmlReadMemory(data, (0 == len ? strlen(data) : len), ZBX_VM_NONAME_XML, NULL,
-			ZBX_XML_PARSE_OPTS)))
-	{
-		if (NULL != error)
-			*error = zbx_dsprintf(*error, "Received response has no valid XML data.");
-
-		xmlSetStructuredErrorFunc(NULL, NULL);
-		goto out;
-	}
-
-	xpathCtx = xmlXPathNewContext(*xdoc);
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
-	{
-		if (NULL != error)
-			*error = zbx_dsprintf(*error, "Invalid xpath expression: \"%s\".", xpath);
-
-		goto clean;
-	}
-
-	ret = SUCCEED;
-
-	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-		goto clean;
-
-	nodeset = xpathObj->nodesetval;
-
-	if (NULL != (val = xmlNodeListGetString(*xdoc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
-	{
-		*value = zbx_strdup(*value, (const char *)val);
-		xmlFree(val);
-	}
-clean:
-	xmlXPathFreeObject(xpathObj);
-	xmlSetStructuredErrorFunc(NULL, NULL);
-	xmlXPathFreeContext(xpathCtx);
-	xmlResetLastError();
-out:
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieve a value from xml data relative to the specified node     *
- *                                                                            *
- * Parameters: doc    - [IN] the XML document                                 *
- *             node   - [IN] the XML node                                     *
- *             xpath  - [IN] the XML XPath                                    *
- *                                                                            *
- * Return: The allocated value string or NULL if the xml data does not        *
- *         contain the value specified by xpath.                              *
- *                                                                            *
- ******************************************************************************/
-static char	*zbx_xml_node_read_value(xmlDoc *doc, xmlNode *node, const char *xpath)
-{
-	xmlXPathContext	*xpathCtx;
-	xmlXPathObject	*xpathObj;
-	xmlNodeSetPtr	nodeset;
-	xmlChar		*val;
-	char		*value = NULL;
-
-	xpathCtx = xmlXPathNewContext(doc);
-
-	xpathCtx->node = node;
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
-		goto clean;
-
-	if (XPATH_STRING == xpathObj->type)
-	{
-		value = zbx_strdup(NULL, (const char *)xpathObj->stringval);
-		goto clean;
-	}
-
-	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-		goto clean;
-
-	nodeset = xpathObj->nodesetval;
-
-	if (NULL != (val = xmlNodeListGetString(doc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
-	{
-		value = zbx_strdup(NULL, (const char *)val);
-		xmlFree(val);
-	}
-clean:
-	xmlXPathFreeObject(xpathObj);
-	xmlXPathFreeContext(xpathCtx);
-
-	return value;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieve a value from xml document relative to the root node      *
- *                                                                            *
- * Parameters: xdoc   - [IN] the XML document                                 *
- *             xpath  - [IN] the XML XPath                                    *
- *                                                                            *
- * Return: The allocated value string or NULL if the xml data does not        *
- *         contain the value specified by xpath.                              *
- *                                                                            *
- ******************************************************************************/
-static char	*zbx_xml_doc_read_value(xmlDoc *xdoc, const char *xpath)
-{
-	xmlNode	*root_element;
-
-	root_element = xmlDocGetRootElement(xdoc);
-	return zbx_xml_node_read_value(xdoc, root_element, xpath);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieves numeric xpath value                                     *
- *                                                                            *
- * Parameters: xdoc  - [IN] xml document                                      *
- *             xpath - [IN] xpath                                             *
- *             num   - [OUT] numeric value                                    *
- *                                                                            *
- * Return value: SUCCEED - the count was retrieved successfully               *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_xml_doc_read_num(xmlDoc *xdoc, const char *xpath, int *num)
-{
-	int		ret = FAIL;
-	xmlXPathContext	*xpathCtx;
-	xmlXPathObject	*xpathObj;
-
-	xpathCtx = xmlXPathNewContext(xdoc);
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
-		goto out;
-
-	if (XPATH_NUMBER == xpathObj->type)
-	{
-		*num = (int)xpathObj->floatval;
-		ret = SUCCEED;
-	}
-
-	xmlXPathFreeObject(xpathObj);
-out:
-	xmlXPathFreeContext(xpathCtx);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: populate array of values from an xml data                         *
- *                                                                            *
- * Parameters: xdoc   - [IN] XML document                                     *
- *             xpath  - [IN] XML XPath                                        *
- *             values - [OUT] list of requested values                        *
- *                                                                            *
- * Return: Upon successful completion the function return SUCCEED.            *
- *         Otherwise, FAIL is returned.                                       *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_xml_read_values(xmlDoc *xdoc, const char *xpath, zbx_vector_str_t *values)
-{
-	return zbx_xml_node_read_values(xdoc, NULL, xpath, values);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: populate array of values from an xml data                         *
- *                                                                            *
- * Parameters: xdoc   - [IN] XML document                                     *
- *             node   - [IN] the XML node                                     *
- *             xpath  - [IN] XML XPath                                        *
- *             values - [OUT] list of requested values                        *
- *                                                                            *
- * Return: Upon successful completion the function return SUCCEED.            *
- *         Otherwise, FAIL is returned.                                       *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_xml_node_read_values(xmlDoc *xdoc, xmlNode *node, const char *xpath, zbx_vector_str_t *values)
-{
-	xmlXPathContext	*xpathCtx;
-	xmlXPathObject	*xpathObj;
-	xmlNodeSetPtr	nodeset;
-	xmlChar		*val;
-	int		i, ret = FAIL;
-
-	if (NULL == xdoc)
-		goto out;
-
-	xpathCtx = xmlXPathNewContext(xdoc);
-
-	if (NULL != node)
-		xpathCtx->node = node;
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
-		goto clean;
-
-	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-		goto clean;
-
-	nodeset = xpathObj->nodesetval;
-
-	for (i = 0; i < nodeset->nodeNr; i++)
-	{
-		if (NULL != (val = xmlNodeListGetString(xdoc, nodeset->nodeTab[i]->xmlChildrenNode, 1)))
-		{
-			zbx_vector_str_append(values, zbx_strdup(NULL, (const char *)val));
-			xmlFree(val);
-		}
-	}
-
-	ret = SUCCEED;
-clean:
-	xmlXPathFreeObject(xpathObj);
-	xmlXPathFreeContext(xpathCtx);
-out:
-	return ret;
-}
-
-#endif

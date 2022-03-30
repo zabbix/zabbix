@@ -296,6 +296,11 @@ $fields = [
 	'sortorder' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'), null]
 ];
 
+if (getRequest('type') == ITEM_TYPE_HTTPAGENT && getRequest('interfaceid') == INTERFACE_TYPE_OPT) {
+	unset($fields['interfaceid']);
+	unset($_REQUEST['interfaceid']);
+}
+
 $valid_input = check_fields($fields);
 
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
@@ -590,6 +595,32 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$preprocessing = getRequest('preprocessing', []);
 		$preprocessing = normalizeItemPreprocessingSteps($preprocessing);
 
+		if ($type == ITEM_TYPE_HTTPAGENT) {
+			$http_item = [
+				'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
+				'url' => getRequest('url'),
+				'query_fields' => getRequest('query_fields', []),
+				'posts' => getRequest('posts'),
+				'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
+				'follow_redirects' => (int) getRequest('follow_redirects'),
+				'post_type' => (int) getRequest('post_type'),
+				'http_proxy' => getRequest('http_proxy'),
+				'headers' => getRequest('headers', []),
+				'retrieve_mode' => (int) getRequest('retrieve_mode'),
+				'request_method' => (int) getRequest('request_method'),
+				'output_format' => (int) getRequest('output_format'),
+				'allow_traps' => (int) getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
+				'ssl_cert_file' => getRequest('ssl_cert_file'),
+				'ssl_key_file' => getRequest('ssl_key_file'),
+				'ssl_key_password' => getRequest('ssl_key_password'),
+				'verify_peer' => (int) getRequest('verify_peer'),
+				'verify_host' => (int) getRequest('verify_host'),
+				'authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
+				'username' => getRequest('http_username', ''),
+				'password' => getRequest('http_password', '')
+			];
+		}
+
 		if (hasRequest('add')) {
 			$item = [
 				'hostid' => getRequest('hostid'),
@@ -624,29 +655,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			];
 
 			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-				$http_item = [
-					'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
-					'url' => getRequest('url'),
-					'query_fields' => getRequest('query_fields', []),
-					'posts' => getRequest('posts'),
-					'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
-					'follow_redirects' => (int) getRequest('follow_redirects'),
-					'post_type' => (int) getRequest('post_type'),
-					'http_proxy' => getRequest('http_proxy'),
-					'headers' => getRequest('headers', []),
-					'retrieve_mode' => (int) getRequest('retrieve_mode'),
-					'request_method' => (int) getRequest('request_method'),
-					'output_format' => (int) getRequest('output_format'),
-					'allow_traps' => (int) getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
-					'ssl_cert_file' => getRequest('ssl_cert_file'),
-					'ssl_key_file' => getRequest('ssl_key_file'),
-					'ssl_key_password' => getRequest('ssl_key_password'),
-					'verify_peer' => (int) getRequest('verify_peer'),
-					'verify_host' => (int) getRequest('verify_host'),
-					'authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
-					'username' => getRequest('http_username', ''),
-					'password' => getRequest('http_password', '')
-				];
 				$item = prepareItemHttpAgentFormData($http_item) + $item;
 			}
 
@@ -677,6 +685,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			$result = (bool) API::Item()->create($item);
 		}
+		// Update
 		else {
 			$db_items = API::Item()->get([
 				'output' => ['name', 'type', 'key_', 'interfaceid', 'snmp_oid', 'authtype', 'username', 'password',
@@ -727,29 +736,32 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if ($db_item['logtimefmt'] !== getRequest('logtimefmt', '')) {
 						$item['logtimefmt'] = getRequest('logtimefmt', '');
 					}
+					if (bccomp($db_item['interfaceid'], getRequest('interfaceid', 0)) != 0) {
+						$item['interfaceid'] = getRequest('interfaceid', 0);
+					}
+					if ($db_item['authtype'] != getRequest('authtype', ITEM_AUTHTYPE_PASSWORD)) {
+						$item['authtype'] = getRequest('authtype', ITEM_AUTHTYPE_PASSWORD);
+					}
+					if ($db_item['username'] !== getRequest('username', '')) {
+						$item['username'] = getRequest('username', '');
+					}
+					if ($db_item['password'] !== getRequest('password', '')) {
+						$item['password'] = getRequest('password', '');
+					}
+					if ($db_item['publickey'] !== getRequest('publickey', '')) {
+						$item['publickey'] = getRequest('publickey', '');
+					}
+					if ($db_item['privatekey'] !== getRequest('privatekey', '')) {
+						$item['privatekey'] = getRequest('privatekey', '');
+					}
+					if ($db_item['params'] !== getRequest('params', '')) {
+						$item['params'] = getRequest('params', '');
+					}
+					if ($db_item['preprocessing'] !== $preprocessing) {
+						$item['preprocessing'] = $preprocessing;
+					}
 				}
 
-				if (bccomp($db_item['interfaceid'], getRequest('interfaceid', 0)) != 0) {
-					$item['interfaceid'] = getRequest('interfaceid', 0);
-				}
-				if ($db_item['authtype'] != getRequest('authtype', ITEM_AUTHTYPE_PASSWORD)) {
-					$item['authtype'] = getRequest('authtype', ITEM_AUTHTYPE_PASSWORD);
-				}
-				if ($db_item['username'] !== getRequest('username', '')) {
-					$item['username'] = getRequest('username', '');
-				}
-				if ($db_item['password'] !== getRequest('password', '')) {
-					$item['password'] = getRequest('password', '');
-				}
-				if ($db_item['publickey'] !== getRequest('publickey', '')) {
-					$item['publickey'] = getRequest('publickey', '');
-				}
-				if ($db_item['privatekey'] !== getRequest('privatekey', '')) {
-					$item['privatekey'] = getRequest('privatekey', '');
-				}
-				if ($db_item['params'] !== getRequest('params', '')) {
-					$item['params'] = getRequest('params', '');
-				}
 				if ($db_item['delay'] != $delay) {
 					$item['delay'] = $delay;
 				}
@@ -777,33 +789,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['description'] !== getRequest('description', '')) {
 					$item['description'] = getRequest('description', '');
 				}
-				if ($db_item['preprocessing'] !== $preprocessing) {
-					$item['preprocessing'] = $preprocessing;
-				}
-				if (getRequest('type') == ITEM_TYPE_HTTPAGENT) {
-					$http_item = [
-						'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
-						'url' => getRequest('url'),
-						'query_fields' => getRequest('query_fields', []),
-						'posts' => getRequest('posts'),
-						'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
-						'follow_redirects' => (int) getRequest('follow_redirects'),
-						'post_type' => (int) getRequest('post_type'),
-						'http_proxy' => getRequest('http_proxy'),
-						'headers' => getRequest('headers', []),
-						'retrieve_mode' => (int) getRequest('retrieve_mode'),
-						'request_method' => (int) getRequest('request_method'),
-						'output_format' => (int) getRequest('output_format'),
-						'allow_traps' => (int) getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
-						'ssl_cert_file' => getRequest('ssl_cert_file'),
-						'ssl_key_file' => getRequest('ssl_key_file'),
-						'ssl_key_password' => getRequest('ssl_key_password'),
-						'verify_peer' => (int) getRequest('verify_peer'),
-						'verify_host' => (int) getRequest('verify_host'),
-						'authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
-						'username' => getRequest('http_username', ''),
-						'password' => getRequest('http_password', '')
-					];
+
+				if ($db_item['templateid'] == 0 && $type == ITEM_TYPE_HTTPAGENT) {
 					$item = prepareItemHttpAgentFormData($http_item) + $item;
 				}
 			}
@@ -855,6 +842,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			CArrayHelper::sort($db_item['tags'], ['tag', 'value']);
 			CArrayHelper::sort($tags, ['tag', 'value']);
+
 			if (array_values($db_item['tags']) !== array_values($tags)) {
 				$item['tags'] = $tags;
 			}

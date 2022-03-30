@@ -27,7 +27,9 @@ $this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('administration.script.edit.js.php');
 
-$widget = (new CWidget())->setTitle(_('Scripts'));
+$widget = (new CWidget())
+	->setTitle(_('Scripts'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_SCRIPT_EDIT));
 
 $row_template = (new CTag('script', true))
 	->setId('parameters-row')

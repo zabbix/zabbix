@@ -28,6 +28,7 @@ $this->includeJsFile('configuration.hostgroup.list.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Host groups'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOSTGROUPS_LIST))
 	->setControls((new CTag('nav', true, (new CList())
 		->addItem(CWebUser::getType() == USER_TYPE_SUPER_ADMIN
 			? (new CSimpleButton(_('Create host group')))

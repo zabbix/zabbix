@@ -19,7 +19,7 @@
 
 #include "zabbix_stats.h"
 
-#include "comms.h"
+#include "zbxcomms.h"
 #include "zbxjson.h"
 #include "sysinfo.h"
 #include "common.h"
