@@ -190,8 +190,10 @@
 			return function(resp) {
 				clearMessages();
 
-				if (resp.messages) {
-					addMessage(resp.messages);
+				if ('error' in resp) {
+					const message_box = makeMessageBox('bad', resp.error.messages, resp.error.title);
+
+					addMessage(message_box);
 				}
 
 				if (resp.body) {
