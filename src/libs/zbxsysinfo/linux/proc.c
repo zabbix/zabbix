@@ -58,8 +58,8 @@ typedef struct
 	char		*state;
 	zbx_uint64_t	processes;
 
-	zbx_uint64_t	cputime_user;
-	zbx_uint64_t	cputime_system;
+	double		cputime_user;
+	double		cputime_system;
 	zbx_uint64_t	ctx_switches;
 	zbx_uint64_t	threads;
 	zbx_uint64_t	page_faults;
@@ -310,7 +310,7 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
  ******************************************************************************/
 static int	read_value_from_proc_file(FILE *f, long pos, const char *label, int type, zbx_uint64_t *num, char **str)
 {
-	char	buf[MAX_STRING_LEN], *p_value, *p_unit;
+	char	buf[MAX_STRING_LEN], *p_value, *p_unit = NULL;
 	size_t	label_len;
 	int	ret = NOTSUPPORTED;
 
@@ -1680,15 +1680,16 @@ static zbx_proc_data_t	*proc_get_data(FILE *f_status, FILE *f_stat, FILE *f_io, 
 				ptr += offset;
 				break;
 			case 12:
-				if (0 >= hz || FAIL == (offset = proc_read_value(ptr, &proc_data->cputime_user)))
+				if (0 >= hz || FAIL == (offset = proc_read_value(ptr, &val)))
 					goto out;
 
-				proc_data->cputime_user /= (zbx_uint64_t)hz;
+				proc_data->cputime_user = (double)val / (double)hz;
 				ptr += offset;
 				break;
 			case 13:
-				proc_read_value(ptr, &proc_data->cputime_system);
-				proc_data->cputime_system /= (zbx_uint64_t)hz;
+				if (FAIL != proc_read_value(ptr, &val))
+					proc_data->cputime_system = (double)val / (double)hz;
+
 				goto out;
 		}
 	}
@@ -1807,7 +1808,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	while (NULL != (entries = readdir(dir)))
 	{
 		char		tmp[MAX_STRING_LEN];
-		zbx_uint64_t	pid;
+		unsigned int	pid;
 		size_t		l;
 
 		zbx_fclose(f_cmd);
@@ -2018,8 +2019,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_adduint64(&j, "size", pdata->size);
 			zbx_json_adduint64(&j, "stk", pdata->stk);
 			zbx_json_adduint64(&j, "swap", pdata->swap);
-			zbx_json_adduint64(&j, "cputime_user", pdata->cputime_user);
-			zbx_json_adduint64(&j, "cputime_system", pdata->cputime_system);
+			zbx_json_addfloat(&j, "cputime_user", pdata->cputime_user);
+			zbx_json_addfloat(&j, "cputime_system", pdata->cputime_system);
 			zbx_json_addstring(&j, "state", ZBX_NULL2EMPTY_STR(pdata->state), ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&j, "ctx_switches", pdata->ctx_switches);
 			zbx_json_adduint64(&j, "threads", pdata->threads);
@@ -2035,8 +2036,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&j, "tid", pdata->tid);
 			zbx_json_addstring(&j, "tname", ZBX_NULL2EMPTY_STR(pdata->tname), ZBX_JSON_TYPE_STRING);
-			zbx_json_adduint64(&j, "cputime_user", pdata->cputime_user);
-			zbx_json_adduint64(&j, "cputime_system", pdata->cputime_system);
+			zbx_json_addfloat(&j, "cputime_user", pdata->cputime_user);
+			zbx_json_addfloat(&j, "cputime_system", pdata->cputime_system);
 			zbx_json_addstring(&j, "state", ZBX_NULL2EMPTY_STR(pdata->state), ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&j, "ctx_switches", pdata->ctx_switches);
 			zbx_json_adduint64(&j, "page_faults", pdata->page_faults);
@@ -2059,8 +2060,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_adduint64(&j, "size", pdata->size);
 			zbx_json_adduint64(&j, "stk", pdata->stk);
 			zbx_json_adduint64(&j, "swap", pdata->swap);
-			zbx_json_adduint64(&j, "cputime_user", pdata->cputime_user);
-			zbx_json_adduint64(&j, "cputime_system", pdata->cputime_system);
+			zbx_json_addfloat(&j, "cputime_user", pdata->cputime_user);
+			zbx_json_addfloat(&j, "cputime_system", pdata->cputime_system);
 			zbx_json_adduint64(&j, "ctx_switches", pdata->ctx_switches);
 			zbx_json_adduint64(&j, "threads", pdata->threads);
 			zbx_json_adduint64(&j, "page_faults", pdata->page_faults);

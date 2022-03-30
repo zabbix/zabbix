@@ -609,8 +609,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			if (FALSE != GetProcessTimes(hProcess, &ftCreate, &ftExit, &ftKernel, &ftUser))
 			{
-				proc_data->cputime_system = ConvertProcessTime(&ftKernel);
-				proc_data->cputime_user = ConvertProcessTime(&ftUser);
+				proc_data->cputime_system = ConvertProcessTime(&ftKernel) / 1000.0;
+				proc_data->cputime_user = ConvertProcessTime(&ftUser) / 1000.0;
 			}
 
 			if (NULL != zbx_GetGuiResources)
@@ -704,8 +704,8 @@ next:
 		{
 			zbx_json_adduint64(&j, "vmsize", (zbx_uint64_t)proc_data->vmsize);
 			zbx_json_adduint64(&j, "wkset", (zbx_uint64_t)proc_data->wkset);
-			zbx_json_adduint64(&j, "cputime_user", (zbx_uint64_t)proc_data->cputime_user);
-			zbx_json_adduint64(&j, "cputime_system", (zbx_uint64_t)proc_data->cputime_system);
+			zbx_json_addfloat(&j, "cputime_user", (zbx_uint64_t)proc_data->cputime_user);
+			zbx_json_addfloat(&j, "cputime_system", (zbx_uint64_t)proc_data->cputime_system);
 			zbx_json_adduint64(&j, "threads", proc_data->threads);
 			zbx_json_adduint64(&j, "page_faults", (zbx_uint64_t)proc_data->page_faults);
 			zbx_json_adduint64(&j, "io_read_b", (zbx_uint64_t)proc_data->io_read_b);
