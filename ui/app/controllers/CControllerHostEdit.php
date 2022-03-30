@@ -147,7 +147,7 @@ class CControllerHostEdit extends CController {
 					],
 					'selectInventory' => array_column(getHostInventories(), 'db_field'),
 					'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type'],
-					'selectParentTemplates' => ['templateid', 'name'],
+					'selectParentTemplates' => ['templateid', 'name', 'link_type'],
 					'selectTags' => ['tag', 'value'],
 					'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 					'hostids' => $this->getInput('hostid')
