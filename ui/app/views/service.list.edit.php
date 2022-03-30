@@ -155,6 +155,8 @@ $filter->addFilterTab(_('Filter'), [
 (new CScriptTag('
 	view.init('.json_encode([
 		'serviceid' => $data['service'] !== null ? $data['service']['serviceid'] : null,
+		'path' => $data['path'],
+		'is_filtered' => $data['is_filtered'],
 		'mode_switch_url' => $data['view_mode_url'],
 		'parent_url' => $data['parent_url'],
 		'refresh_url' => $data['refresh_url'],

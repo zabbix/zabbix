@@ -36,8 +36,11 @@
 			this.is_refresh_pending = false;
 		}
 
-		init({serviceid, mode_switch_url, parent_url = null, refresh_url, refresh_interval, back_url = null}) {
+		init({serviceid, path = null, is_filtered = null, mode_switch_url, parent_url = null, refresh_url,
+				refresh_interval, back_url = null}) {
 			this.serviceid = serviceid;
+			this.path = path;
+			this.is_filtered = is_filtered;
 			this.mode_switch_url = mode_switch_url;
 			this.parent_url = parent_url;
 			this.refresh_url = refresh_url;
@@ -128,7 +131,7 @@
 			});
 
 			dialogue.addEventListener('dialogue.delete', (e) => {
-				uncheckTableRows('service');
+				this._uncheckTableRows();
 
 				postMessageOk(e.detail.title);
 
@@ -170,7 +173,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						uncheckTableRows('service', response.error.keepids);
+						this._uncheckTableRows(response.error.keepids);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
@@ -179,7 +182,7 @@
 							postMessageDetails('success', response.success.messages);
 						}
 
-						uncheckTableRows('service');
+						this._uncheckTableRows();
 					}
 
 					location.href = location.href;
@@ -194,6 +197,14 @@
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
+		}
+
+		_uncheckTableRows(keepids = []) {
+			const page = this.is_filtered
+				? 'service'
+				: 'service_' + this.path.concat(this.serviceid !== null ? [this.serviceid] : []).join('_');
+
+			uncheckTableRows(page, keepids);
 		}
 
 		_pauseRefresh() {
