@@ -29,7 +29,7 @@ package tls
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
-#include "config.h"
+#include "common/zbxconfig.h"
 
 #define TLS_UNUSED(var)	(void)(var)
 

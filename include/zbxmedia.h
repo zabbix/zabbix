@@ -20,7 +20,8 @@
 #ifndef ZABBIX_ZBXMEDIA_H
 #define ZABBIX_ZBXMEDIA_H
 
-#include "common/zbxsysinc.h" /* using "config.h" would be better, but it causes warnings when compiled with Net-SNMP */
+#include "common/zbxsysinc.h"	/* using "common/zbxconfig.h" would be better, but it causes warnings */
+				/* when compiled with Net-SNMP */
 
 #define ZBX_MEDIA_CONTENT_TYPE_TEXT	0
 #define ZBX_MEDIA_CONTENT_TYPE_HTML	1
