@@ -10,7 +10,7 @@ RESOURCE_RC = resource.rc
 DESC_H = $(PROJECTNAME)_desc.h
 RESOURCE_RES = $(PROJECTNAME).res
 
-INCS = /I $(PROJECTDIR) /I .\ /I ..\include /I ..\..\..\include /I ..\..\..\include\common
+INCS = /I $(PROJECTDIR) /I .\ /I ..\include  /I ..\include\common /I ..\..\..\include /I ..\..\..\include\common
 
 !IF "$(CPU)" == "i386" || "$(CPU)" == "x86"
 COMMON_FLAGS = /D _WIN32_WINNT=0x0501
