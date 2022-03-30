@@ -20,12 +20,8 @@
 #ifndef ZABBIX_ZBXSERVER_H
 #define ZABBIX_ZBXSERVER_H
 
-#include "common.h"
-#include "db.h"
 #include "dbcache.h"
-#include "zbxjson.h"
 #include "zbxvariant.h"
-#include "zbxeval.h"
 
 #define MACRO_TYPE_MESSAGE_NORMAL	0x00000001
 #define MACRO_TYPE_MESSAGE_RECOVERY	0x00000002

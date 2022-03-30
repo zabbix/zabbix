@@ -19,12 +19,9 @@
 
 #include "trigger_housekeeper.h"
 
-#include "common.h"
 #include "log.h"
 #include "zbxself.h"
-#include "zbxservice.h"
 #include "daemon.h"
-#include "zbxalgo.h"
 #include "service_protocol.h"
 #include "zbxrtc.h"
 

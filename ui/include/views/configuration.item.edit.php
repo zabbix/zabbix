@@ -607,6 +607,15 @@ if ($data['display_interfaces']) {
 					->setId('js-item-interface-field')
 			]);
 		}
+		else {
+			$item_tab->addItem([
+				(new CLabel(_('Host interface'), 'interface'))->setId('js-item-interface-label'),
+				(new CFormField(
+					(new CTextBox('interface', interfaceType2str(INTERFACE_TYPE_OPT), true))
+						->setAttribute('disabled', 'disabled')
+				))->setId('js-item-interface-field')
+			]);
+		}
 	}
 	else {
 		$select_interface = getInterfaceSelect($data['interfaces'])
@@ -615,6 +624,10 @@ if ($data['display_interfaces']) {
 			->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
 			->setFocusableElementId('interfaceid')
 			->setAriaRequired();
+
+		if ($readonly) {
+			$select_interface->setAttribute('readonly', 'readonly');
+		}
 
 		$item_tab->addItem([
 			(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))

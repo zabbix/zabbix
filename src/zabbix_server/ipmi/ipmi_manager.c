@@ -21,7 +21,8 @@
 
 #ifdef HAVE_OPENIPMI
 
-#include "dbcache.h"
+#include "ipmi_manager.h"
+
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
@@ -32,8 +33,6 @@
 #include "ipmi.h"
 #include "../poller/poller.h"
 #include "zbxavailability.h"
-
-#include "ipmi_manager.h"
 
 #define ZBX_IPMI_MANAGER_DELAY	1
 
