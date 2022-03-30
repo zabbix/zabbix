@@ -305,7 +305,6 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/visualization/maps/map#overview'
 				]
 			],
-
 			// #25 Monitoring -> Discovery view.
 			[
 				[
