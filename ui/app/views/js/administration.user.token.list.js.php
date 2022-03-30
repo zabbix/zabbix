@@ -96,21 +96,25 @@
 			})
 				.then((response) => response.json())
 				.then((response) => {
-					const keepids = ('keepids' in response) ? response.keepids : [];
-
 					if ('error' in response) {
-						postMessageError(response.error.title);
+						if ('title' in response.error) {
+							postMessageError(response.error.title);
+						}
+
 						postMessageDetails('error', response.error.messages);
+
+						uncheckTableRows('user.token', 'keepids' in response ? response.keepids : []);
 					}
-					else if('success' in response) {
+					else if ('success' in response) {
 						postMessageOk(response.success.title);
 
 						if ('messages' in response.success) {
 							postMessageDetails('success', response.success.messages);
 						}
+
+						uncheckTableRows('user.token');
 					}
 
-					uncheckTableRows('user.token', keepids);
 					location.href = location.href;
 				})
 				.catch(() => {
