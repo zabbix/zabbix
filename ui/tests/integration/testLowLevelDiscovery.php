@@ -207,7 +207,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 			array_push($templateids, $response['result']['templateids'][0]);
 		}
 
-		//Create host prototype
+		// Create host prototype
 		$response = $this->call('hostprototype.create', [
 			'host' => 'host_{#KEY}',
 			'groupLinks' => [
