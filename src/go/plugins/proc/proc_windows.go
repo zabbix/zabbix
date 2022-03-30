@@ -203,16 +203,6 @@ type thread struct {
 	PPid          uint32  `json:"ppid"`
 	Name          string  `json:"name"`
 	Tid	      uint32  `json:"tid"`
-	/*
-	CpuTimeUser   float64 `json:"cputime_user"`
-	CpuTimeSystem float64 `json:"cputime_system"`
-	IoOtherB      uint64  `json:"io_other_b"`
-	IoReadsOp     uint64  `json:"io_read_op"`
-	IoWritesOp    uint64  `json:"io_write_op"`
-	IoOtherOp     uint64  `json:"io_other_op"`
-	GdiObj        uint32  `json:"gdiobj"`
-	UserObj       uint32  `json:"userobj"`
-	*/
 }
 
 var attrMap map[string]infoAttr = map[string]infoAttr{
