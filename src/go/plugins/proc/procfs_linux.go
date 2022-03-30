@@ -21,6 +21,11 @@
 
 package proc
 
+/*
+#include <unistd.h>
+*/
+import "C"
+
 import (
 	"bytes"
 	"fmt"
@@ -164,8 +169,8 @@ func readProcStatus(pid uint64, proc *procStatus) (err error) {
 	var stat cpuUtil
 	getProcCpuUtil(int64(pid), &stat)
 	if stat.err == nil {
-		proc.CpuTimeUser = stat.utime
-		proc.CpuTimeSystem = stat.stime
+		proc.CpuTimeUser = float64(stat.utime) / float64(C.sysconf(C._SC_CLK_TCK))
+		proc.CpuTimeSystem = float64(stat.stime) / float64(C.sysconf(C._SC_CLK_TCK))
 	}
 
 	if fds, err := ioutil.ReadDir("/proc/" + pidStr + "/fd"); err == nil {

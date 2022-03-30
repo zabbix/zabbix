@@ -163,8 +163,8 @@ type procStatus struct {
 	Size          uint64  `json:"size"`
 	Stk           uint64  `json:"stk"`
 	Swap          uint64  `json:"swap"`
-	CpuTimeUser   uint64  `json:"cputime_user"`
-	CpuTimeSystem uint64  `json:"cputime_system"`
+	CpuTimeUser   float64 `json:"cputime_user"`
+	CpuTimeSystem float64 `json:"cputime_system"`
 	State         string  `json:"state"`
 	CtxSwitches   uint64  `json:"ctx_switches"`
 	Threads       uint64  `json:"threads"`
@@ -189,8 +189,8 @@ type procSummary struct {
         Size          uint64  `json:"size"`
         Stk           uint64  `json:"stk"`
         Swap          uint64  `json:"swap"`
-        CpuTimeUser   uint64  `json:"cputime_user"`
-        CpuTimeSystem uint64  `json:"cputime_system"`
+        CpuTimeUser   float64 `json:"cputime_user"`
+        CpuTimeSystem float64 `json:"cputime_system"`
         CtxSwitches   uint64  `json:"ctx_switches"`
         Threads       uint64  `json:"threads"`
         PageFaults    uint64  `json:"page_faults"`
@@ -200,17 +200,17 @@ type procSummary struct {
 }
 
 type thread struct {
-	Pid           uint64 `json:"pid"`
-	PPid          uint64 `json:"ppid"`
-	Name          string `json:"name"`
-	Tid           uint64 `json:"tid"`
-	TName         string `json:"tname"`
-	CpuTimeUser   uint64 `json:"cputime_user"`
-	CpuTimeSystem uint64 `json:"cputime_system"`
-	State         string `json:"state"`
-	CtxSwitches   uint64 `json:"ctx_switches"`
-	IoReadsB      uint64 `json:"io_read_b"`
-	IoWritesB     uint64 `json:"io_write_b"`
+	Pid           uint64  `json:"pid"`
+	PPid          uint64  `json:"ppid"`
+	Name          string  `json:"name"`
+	Tid           uint64  `json:"tid"`
+	TName         string  `json:"tname"`
+	CpuTimeUser   float64 `json:"cputime_user"`
+	CpuTimeSystem float64 `json:"cputime_system"`
+	State         string  `json:"state"`
+	CtxSwitches   uint64  `json:"ctx_switches"`
+	IoReadsB      uint64  `json:"io_read_b"`
+	IoWritesB     uint64  `json:"io_write_b"`
 }
 
 type cpuUtil struct {
@@ -883,7 +883,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 				continue
 			}
 
-			array = append(array, data)
+			//array = append(array, data)
 			threadArray = append(threadArray, thread{data.Tgid, data.PPid, data.Name, data.Pid,
 				data.TName, data.CpuTimeUser, data.CpuTimeSystem, data.State, data.CtxSwitches,
 				data.IoReadsB, data.IoWritesB})
