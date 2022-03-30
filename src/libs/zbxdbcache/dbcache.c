@@ -1898,6 +1898,9 @@ static void	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
 			zbx_variant_set_str(&value_var, hdata->value.log->value);
 			hdata->value.log->value = NULL;
 			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return;
 	}
 
 	dc_history_set_value(hdata, item->value_type, &value_var);
