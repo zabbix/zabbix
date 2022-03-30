@@ -17,19 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "dbcache.h"
+#include "preproc_manager.h"
+
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
-#include "sysinfo.h"
-#include "zbxipcservice.h"
 #include "zbxlld.h"
 #include "preprocessing.h"
-#include "zbxalgo.h"
 #include "preproc_history.h"
-
-#include "preproc_manager.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -1305,9 +1300,10 @@ static void	preprocessor_update_history(zbx_preprocessing_manager_t *manager, zb
 			zbx_preproc_history_t	history_local;
 
 			history_local.itemid = itemid;
+			zbx_vector_ptr_create(&history_local.history);
+
 			vault = (zbx_preproc_history_t *)zbx_hashset_insert(&manager->history_cache, &history_local,
 					sizeof(history_local));
-			zbx_vector_ptr_create(&vault->history);
 		}
 
 		zbx_vector_ptr_append_array(&vault->history, history->values, history->values_num);

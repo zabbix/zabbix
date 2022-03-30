@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 The template to monitor PHP-FPM by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -22,7 +22,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
 1. Open the php-fpm configuration file and enable the status page as shown.
     ```

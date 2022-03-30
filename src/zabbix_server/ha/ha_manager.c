@@ -17,19 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "ha.h"
+#include "zbxha.h"
+
 #include "db.h"
-#include "log.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "threads.h"
-#include "zbxjson.h"
 #include "mutexs.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 #include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_ha.h"
 #include "../../libs/zbxaudit/audit_settings.h"
-#include "zbxha.h"
-#include "ha.h"
 
 #define ZBX_HA_POLL_PERIOD	5
 
@@ -506,7 +505,7 @@ static int	ha_is_available(const zbx_ha_info_t *info, int lastaccess, int db_tim
  * Return value: SUCCEED - server can be started in active mode               *
  *               FAIL    - server cannot be started based on node registry    *
  *                                                                            *
- * Comments: Sets error status on on configuration errors.                    *
+ * Comments: Sets error status on configuration errors.                       *
  *                                                                            *
  ******************************************************************************/
 static int	ha_check_standalone_config(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int db_time)
@@ -543,7 +542,7 @@ static int	ha_check_standalone_config(zbx_ha_info_t *info, zbx_vector_ha_node_t 
  * Return value: SUCCEED - server can be started in returned mode             *
  *               FAIL    - server cannot be started based on node registry    *
  *                                                                            *
- * Comments: Sets error status on on configuration errors.                    *
+ * Comments: Sets error status on configuration errors.                       *
  *                                                                            *
  ******************************************************************************/
 static int	ha_check_cluster_config(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int db_time, int *activate)
@@ -919,7 +918,7 @@ static int	ha_check_active_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes
 	}
 
 	/* 1) No active nodes - set this node as active.                */
-	/* 2) This node is active - update it's status as it might have */
+	/* 2) This node is active - update its status as it might have  */
 	/*    switched itself to standby mode in the case of prolonged  */
 	/*    database connection loss.                                 */
 	if (i == nodes->values_num || SUCCEED == zbx_cuid_compare(nodes->values[i]->ha_nodeid, info->ha_nodeid))
@@ -982,7 +981,13 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 
 	if (SUCCEED != zbx_cuid_compare(ha_sessionid, node->ha_sessionid))
 	{
-		ha_set_error(info, "the server HA registry record has changed ownership");
+		if ('\0' == *info->name)
+		{
+			ha_set_error(info, "multiple servers have been started without configuring \"HANodeName\" "
+					"parameter");
+		}
+		else
+			ha_set_error(info, "the server HA registry record has changed ownership");
 		goto out;
 	}
 
@@ -1330,8 +1335,7 @@ static void	ha_set_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client,
 		ZBX_STR2UINT64(configid, row[0]);
 		zbx_audit_init(info->auditlog);
 		zbx_audit_settings_create_entry(AUDIT_ACTION_UPDATE, configid);
-		zbx_audit_update_json_update_int(configid, AUDIT_CONFIG_ID, "settings.ha_failover_delay", atoi(row[1]),
-				delay);
+		zbx_audit_settings_update_field_int(configid, "settings.ha_failover_delay", atoi(row[1]), delay);
 		ha_flush_audit(info);
 	}
 	else
@@ -1513,7 +1517,6 @@ int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, int *ha_
 
 				if (ZBX_NODE_STATUS_ERROR == *ha_status)
 				{
-					zbx_ipc_message_free(message);
 					ret = FAIL;
 					goto out;
 				}

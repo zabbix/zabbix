@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 The template to monitor SAN NetApp AFF A700 cluster by Zabbix HTTP agent.
 
 
@@ -14,7 +14,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 1\. Create a host for AFF A700 with cluster management IP as the Zabbix agent interface.
 

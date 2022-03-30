@@ -49,7 +49,7 @@ class testFormSetup extends CWebTest {
 		$this->page->login()->open('setup.php')->waitUntilReady();
 
 		// Check Welcome section.
-		$this->assertEquals("Welcome to\nZabbix 6.0", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
+		$this->assertEquals("Welcome to\nZabbix 6.2", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 		$this->checkSections('Welcome');
 		$form = $this->query('xpath://form')->asForm()->one();
 		$language_field = $form->getField('Default language');
@@ -64,7 +64,7 @@ class testFormSetup extends CWebTest {
 		// Check that default language can be changed.
 		$language_field->fill('Russian (ru_RU)');
 		$this->page->refresh()->waitUntilReady();
-		$this->assertEquals("Добро пожаловать в\nZabbix 6.0", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
+		$this->assertEquals("Добро пожаловать в\nZabbix 6.2", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 
 		$this->checkButtons('russian');
 		$this->assertScreenshotExcept($form, $this->query('id:default-lang')->one(), 'Welcome_Rus');
@@ -188,31 +188,56 @@ class testFormSetup extends CWebTest {
 			$credentials_field = $form->getField('Store credentials in');
 			$this->assertEquals('Plain text', $credentials_field->getSelected());
 
-			$vault_fields = [
+			// All vault fields labels.
+			$labels = [
 				'Vault API endpoint',
 				'Vault secret path',
-				'Vault authentication token'
+				'Vault authentication token',
+				'Vault secret query string',
+				'Vault certificates'
 			];
-			foreach ($vault_fields as $field_name) {
-				$this->assertFalse($form->getField($field_name)->isVisible());
+			foreach ($labels as $label_name) {
+				$this->assertFalse($form->getField($label_name)->isVisible());
 			}
 
-			// Check layout when "Store credentials in" is set to "HashiCorp Vault".
-			$credentials_field->select('HashiCorp Vault');
-			$form->invalidate();
-			foreach (['User', 'Password'] as $field_name) {
-				$this->assertFalse($form->getField($field_name)->isVisible());
-			}
+			// HashiCorp and Cyberark vault fields.
+			$vaults = [
+				'HashiCorp Vault' => [
+					'Vault API endpoint' => 'https://localhost:8200',
+					'Vault secret path' => 'path/to/secret',
+					'Vault authentication token' => ''
+				],
+				'CyberArk Vault' => [
+					'Vault API endpoint' => 'https://localhost:1858',
+					'Vault secret query string' => 'AppID=foo&Query=Safe=bar;Object=buzz',
+					'SSL certificate file' => 'conf/certs/cyberark-cert.pem',
+					'SSL key file' => 'conf/certs/cyberark-key.pem'
+				]
+			];
 
-			foreach ($vault_fields as $field_name) {
-				$vault_maxlength = ($field_name === 'Vault authentication token') ? 2048 : 255;
-				$field = $form->getField($field_name);
-				$this->assertEquals($vault_maxlength, $field->getAttribute('maxlength'));
-				if ($field_name === 'Vault API endpoint') {
-					$this->assertEquals('https://localhost:8200', $field->getValue());
+			// Check layout when "Store credentials in" is set to "HashiCorp Vault" or "CyberArk Vault".
+			foreach ($vaults as $vault => $vault_fields) {
+				$credentials_field->select($vault);
+				$form->invalidate();
+
+				if ($vault === 'CyberArk Vault') {
+					$form->fill(['Vault certificates' => true]);
 				}
-				elseif ($field_name === 'Vault secret path') {
-					$this->assertEquals('path/to/secret', $field->getAttribute('placeholder'));
+
+				foreach (['User', 'Password'] as $parameter) {
+					$this->assertFalse($form->getField($parameter)->isVisible());
+				}
+
+				foreach ($vault_fields as $field_name => $parameter) {
+					$vault_maxlength = ($field_name === 'Vault API endpoint' || $field_name === 'Vault secret path') ? 255 : 2048;
+					$field = $form->getField($field_name);
+					$this->assertEquals($vault_maxlength, $field->getAttribute('maxlength'));
+					if (in_array($field_name, ['Vault secret query string', 'Vault secret path'])) {
+						$this->assertEquals($parameter, $field->getAttribute('placeholder'));
+					}
+					else {
+						$this->assertEquals($parameter, $field->getValue());
+					}
 				}
 			}
 
@@ -271,7 +296,7 @@ class testFormSetup extends CWebTest {
 		// Check layout via screenshot for dark theme.
 		$this->assertScreenshotExcept($form, $this->query('id:label-default-timezone')->one(), 'GUISettings_Dark');
 
-		// Complite the setup and check in DB that the default timezone was applied.
+		// Complete the setup and check in DB that the default timezone was applied.
 		$this->query('button:Next step')->one()->click();
 		$this->query('button:Next step')->one()->click();
 		$this->query('button:Finish')->one()->click();
@@ -282,7 +307,7 @@ class testFormSetup extends CWebTest {
 	public function testFormSetup_summarySection() {
 		$this->openSpecifiedSection('Pre-installation summary');
 
-		// Check that Zabbix server name sield is not displayed if its not populated.
+		// Check that Zabbix server name field is not displayed if it is not populated.
 		$this->assertFalse($this->query('xpath://span[text()="Zabbix server name"]')->one(false)->isValid());
 		$this->query('button:Back')->one()->click();
 		// Fill in the Zabbix server name field and proceed with checking Pre-installation summary.
@@ -798,7 +823,7 @@ class testFormSetup extends CWebTest {
 		$this->query('button:Back')->one()->click();
 		$this->assertEquals('Check of pre-requisites', $this->query('xpath://h1')->one()->getText());
 		$this->query('button:Back')->one()->click();
-		$this->assertEquals("Welcome to\nZabbix 6.0", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
+		$this->assertEquals("Welcome to\nZabbix 6.2", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 		$this->checkSections('Welcome');
 		$this->checkButtons('first section');
 

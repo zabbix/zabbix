@@ -559,7 +559,7 @@ class testDashboardPages extends CWebTest {
 	 * Check default page names adding new pages.
 	 */
 	public function testDashboardPages_EmptyPagesName() {
-		// Check that first page do not has any name.
+		// Check that first page does not have any names.
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for pages empty name'])
 				->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();

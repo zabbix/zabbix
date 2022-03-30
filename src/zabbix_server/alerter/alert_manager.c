@@ -17,20 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "alert_manager.h"
 
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
-#include "zbxipcservice.h"
-#include "zbxalgo.h"
 #include "zbxserver.h"
 #include "alerter_protocol.h"
-#include "alert_manager.h"
 #include "zbxmedia.h"
 #include "zbxembed.h"
 #include "zbxserialize.h"
-#include "zbxalert.h"
+#include "zbxxml.h"
 
 #define ZBX_AM_LOCATION_NOWHERE		0
 #define ZBX_AM_LOCATION_QUEUE		1
@@ -79,7 +76,7 @@ extern char	*CONFIG_ALERT_SCRIPTS_PATH;
  *     alertpools
  *         alerts
  *
- * Media type queue is sorted by the timestamp of the miminum item of its alertpool queue.
+ * Media type queue is sorted by the timestamp of the minimum item of its alertpool queue.
  * Alert pool queue is sorted by the timestamp of the minimum item of its alerts queue.
  * Alerts queue is sorted by the alert scheduled send timestamp.
  *
@@ -163,7 +160,7 @@ zbx_am_dispatch_t;
 /* alerter data */
 typedef struct
 {
-	/* the connected aleter client */
+	/* the connected alerter client */
 	zbx_ipc_client_t	*client;
 
 	zbx_am_alert_t		*alert;
@@ -1108,7 +1105,7 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 		{
 			char	*am_esc;
 
-			am_esc = xml_escape_dyn(alert_message);
+			am_esc = zbx_xml_escape_dyn(alert_message);
 			alert_message = zbx_dsprintf(alert_message, "<html><pre>%s</pre></html>", am_esc);
 			zbx_free(am_esc);
 		}
@@ -2202,8 +2199,8 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 
 			if (NULL == (source = zbx_hashset_search(&sources, &source_local)))
 			{
+				source_local.alerts_num = 0;
 				source = zbx_hashset_insert(&sources, &source_local, sizeof(source_local));
-				source->alerts_num = 0;
 				zbx_vector_ptr_append(&view, source);
 			}
 			source->alerts_num++;

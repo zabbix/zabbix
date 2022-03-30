@@ -78,6 +78,7 @@ static int	db_auto_increment;
 static MYSQL			*conn = NULL;
 static zbx_uint32_t		ZBX_MYSQL_SVERSION = ZBX_DBVERSION_UNDEFINED;
 static int			ZBX_MARIADB_SFORK = OFF;
+static char			*ZBX_CHARSET = NULL;
 #elif defined(HAVE_ORACLE)
 #include "zbxalgo.h"
 
@@ -379,6 +380,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_MYSQL)
+	const char	*charset;
 #if LIBMYSQL_VERSION_ID >= 80000	/* my_bool type is removed in MySQL 8.0 */
 	bool		mysql_reconnect = 1;
 #else
@@ -569,6 +571,11 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (ZBX_DB_OK == ret && 0 != mysql_options(conn, MYSQL_OPT_RECONNECT, &mysql_reconnect))
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL reconnect option.");
+
+	charset = NULL == ZBX_CHARSET ? "utf8" : ZBX_CHARSET;
+	/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
+	if (ZBX_DB_OK == ret && 0 != mysql_set_character_set(conn, charset))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set MySQL character set to \"%s\"", charset);
 
 	if (ZBX_DB_OK == ret && 0 != mysql_autocommit(conn, 1))
 	{
@@ -2855,8 +2862,6 @@ out:
 #if defined(HAVE_MYSQL)
 void zbx_db_set_character_set(const char *char_set)
 {
-	/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
-	if (0 != mysql_set_character_set(conn, char_set))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set MySQL character set to \"%s\"", char_set);
+	ZBX_CHARSET = zbx_strdup(ZBX_CHARSET, char_set);
 }
 #endif

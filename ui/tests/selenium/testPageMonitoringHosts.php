@@ -20,7 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
-require_once dirname(__FILE__).'/traits/FilterTrait.php';
+require_once dirname(__FILE__).'/traits/TagTrait.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  */
 class testPageMonitoringHosts extends CWebTest {
 
-	use FilterTrait;
+	use TagTrait;
 	use TableTrait;
 
 	/**
@@ -781,7 +781,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->page->login()->open('zabbix.php?port=10051&action=host.view&groupids%5B%5D=4');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:evaltype_0' => $data['tag_options']['type']]);
-		$this->setFilterSelector('id:tags_0');
+		$this->setTagSelector('id:tags_0');
 		$this->setTags($data['tag_options']['tags']);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();

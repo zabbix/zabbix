@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/FilterTrait.php';
+require_once dirname(__FILE__).'/../traits/TagTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testDashboardGraphWidget extends CWebTest {
 
-	use FilterTrait;
+	use TagTrait;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -1931,7 +1931,7 @@ class testDashboardGraphWidget extends CWebTest {
 				case 'Problems':
 					$form->fill(CTestArrayHelper::get($data['Problems'], 'fields', []));
 					if (array_key_exists('tags', $data['Problems'])) {
-						$this->setFilterSelector('id:tags_table_tags');
+						$this->setTagSelector('id:tags_table_tags');
 						$this->setTags($data['Problems']['tags']);
 					}
 					break;
@@ -1985,7 +1985,7 @@ class testDashboardGraphWidget extends CWebTest {
 
 				$form->fill($data_set);
 
-				// Open next dataset, if it exist on frontend.
+				// Open next dataset, if it exists on frontend.
 				if ($i !== $last) {
 					if ($i + 1 < $count_sets) {
 						$i += 2;

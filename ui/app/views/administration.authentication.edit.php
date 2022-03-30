@@ -321,6 +321,7 @@ $saml_tab = (new CFormList('list_saml'))
 
 (new CWidget())
 	->setTitle(_('Authentication'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUTHENTICATION_EDIT))
 	->addItem((new CForm())
 		->addVar('action', $data['action_submit'])
 		->addVar('db_authentication_type', $data['db_authentication_type'])

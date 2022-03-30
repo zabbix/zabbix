@@ -91,10 +91,10 @@ To utilize the media type, we will create a Zabbix user to represent iLert. We w
 
 8\. Use the iLert User in any Actions of your choice. The text from "Action Operations" will be sent to "iLert Alert" when a problem happens.
 ​
-For more information use the [Zabbix](https://www.zabbix.com/documentation/6.0/manual/config/notifications) and [iLert](https://docs.ilert.com/integrations/zabbix/native) documentations.
+For more information use the [Zabbix](https://www.zabbix.com/documentation/6.2/manual/config/notifications) and [iLert](https://docs.ilert.com/integrations/zabbix/native) documentations.
 ​
 
 ## Supported Versions
 
 ​
-Zabbix >=4.4, iLert API v1.
+Zabbix >=6.2, iLert API v1.

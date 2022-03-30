@@ -17,17 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "zbxserialize.h"
-#include "db.h"
-
 #include "avail_protocol.h"
+
+#include "zbxserialize.h"
 
 void	zbx_availability_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_interface_availability_t *interface_availability)
 {
-	zbx_uint32_t	data_len = 0;
-	size_t		error_len;
+	zbx_uint32_t	data_len = 0, error_len;
 	unsigned char	*ptr;
 
 	zbx_serialize_prepare_value(data_len, interface_availability->interfaceid);

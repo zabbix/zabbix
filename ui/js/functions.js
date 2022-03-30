@@ -501,7 +501,7 @@ function overlayDialogueDestroy(dialogueid) {
  *
  * @param {object} params                                   Modal window params.
  * @param {string} params.title                             Modal window title.
- * @param {string} params.class                             Modal window CSS class, ofthen based on .modal-popup*.
+ * @param {string} params.class                             Modal window CSS class, often based on .modal-popup*.
  * @param {object} params.content                           Window content.
  * @param {object} params.footer                           	Window footer content.
  * @param {object} params.controls                          Window controls.

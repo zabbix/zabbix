@@ -20,6 +20,8 @@
 #ifndef ZABBIX_IPC_H
 #define ZABBIX_IPC_H
 
+#include "zbxtypes.h"
+
 #if defined(_WINDOWS)
 #	error "This module allowed only for Unix OS"
 #endif

@@ -1,6 +1,8 @@
 /* SHA512-based Unix crypt implementation.
 Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 
+#include "sha512crypt.h"
+
 #ifdef __linux__
 	#include <endian.h>
 #elif __hpux
@@ -17,10 +19,6 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-
-#include "common.h"
-
-#include "sha512crypt.h"
 
 /* Structure to save state of computation between the single steps.  */
 struct sha512_ctx

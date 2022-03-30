@@ -17,15 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "db.h"
+
 #include "log.h"
-#include "common.h"
 #include "events.h"
 #include "threads.h"
 #include "dbcache.h"
-#include "zbxalgo.h"
 #include "cfg.h"
-
-#include "db.h"
+#include "zbxhash.h"
 
 #if defined(HAVE_POSTGRESQL)
 #	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
@@ -500,53 +499,6 @@ DB_RESULT	DBselectN(const char *query, int n)
 	}
 
 	return rc;
-}
-
-int	DBget_row_count(const char *table_name)
-{
-	int		count = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table_name:'%s'", __func__, table_name);
-
-	result = DBselect("select count(*) from %s", table_name);
-
-	if (NULL != (row = DBfetch(result)))
-		count = atoi(row[0]);
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, count);
-
-	return count;
-}
-
-int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*host_esc;
-	int		ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	host_esc = DBdyn_escape_string(hostname);
-	result = DBselect("select lastaccess from hosts where host='%s' and status in (%d,%d)",
-			host_esc, HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE);
-	zbx_free(host_esc);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		*lastaccess = atoi(row[0]);
-		ret = SUCCEED;
-	}
-	else
-		*error = zbx_dsprintf(*error, "Proxy \"%s\" does not exist.", hostname);
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
 }
 
 #ifdef HAVE_MYSQL
@@ -1933,7 +1885,7 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample, const char *
 		if (num > nums.values[i])
 			continue;
 
-		if (num < nums.values[i])	/* found, all other will be bigger */
+		if (num < nums.values[i])	/* found, all others will be bigger */
 			break;
 
 		num++;

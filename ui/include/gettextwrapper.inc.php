@@ -211,15 +211,16 @@ function _params($format, array $arguments) {
  *
  * @return bool    Whether locale could be switched; always true for en_GB.
  */
-function setupLocale(string $language, ?string &$error = ''): bool {
+function setupLocale(?string $language, ?string &$error = ''): bool {
 	$numeric_locales = [
 		'C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'
 	];
-	$locale_variants = zbx_locale_variants($language);
+	$locale_variants = $language === null ? zbx_locale_variants(ZBX_DEFAULT_LANG) : zbx_locale_variants($language);
 	$locale_set = false;
 	$error = '';
 
-	init_mbstrings();
+	ini_set('default_charset', 'UTF-8');
+	ini_set('mbstring.detect_order', 'UTF-8, ISO-8859-1, JIS, SJIS');
 
 	// Since LC_MESSAGES may be unavailable on some systems, try to set all of the locales and then make adjustments.
 	foreach ($locale_variants as $locale) {

@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "evalfunc_common.h"
+
 #include "common.h"
 #include "log.h"
 #include "zbxtrends.h"
-
-#include "evalfunc_common.h"
 
 const char	*zbx_type_string(zbx_value_type_t type)
 {

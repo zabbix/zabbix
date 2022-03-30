@@ -52,8 +52,8 @@ size_t	zbx_curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 	return size * nmemb;
 }
 
-int	zbx_http_prepare_callbacks(CURL *easyhandle, zbx_http_response_t *header,
-		zbx_http_response_t *body, void *header_cb, void *body_cb, char *errbuf, char **error)
+int	zbx_http_prepare_callbacks(CURL *easyhandle, zbx_http_response_t *header, zbx_http_response_t *body,
+		zbx_curl_cb_t header_cb, zbx_curl_cb_t body_cb, char *errbuf, char **error)
 {
 	CURLcode	err;
 
@@ -130,7 +130,7 @@ int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char
 		}
 	}
 
-	if ('\0' != *ssl_cert_file)
+	if (NULL != ssl_cert_file && '\0' != *ssl_cert_file)
 	{
 		char	*file_name;
 
@@ -154,7 +154,7 @@ int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char
 		}
 	}
 
-	if ('\0' != *ssl_key_file)
+	if (NULL != ssl_key_file && '\0' != *ssl_key_file)
 	{
 		char	*file_name;
 
@@ -280,7 +280,8 @@ char	*zbx_http_parse_header(char **headers)
 	return NULL;
 }
 
-int	zbx_http_get(const char *url, const char *header, long timeout, char **out, long *response_code, char **error)
+int	zbx_http_get(const char *url, const char *header, long timeout, const char *ssl_cert_file,
+		const char *ssl_key_file, char **out, long *response_code, char **error)
 {
 	CURL			*easyhandle;
 	CURLcode		err;
@@ -305,7 +306,7 @@ int	zbx_http_get(const char *url, const char *header, long timeout, char **out, 
 		goto clean;
 	}
 
-	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, "", "", "", 1, 1, error))
+	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, ssl_cert_file, ssl_key_file, "", 1, 1, error))
 		goto clean;
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, "Zabbix " ZABBIX_VERSION)))

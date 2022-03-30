@@ -20,7 +20,7 @@
 #ifndef ZABBIX_PROXYCFG_H
 #define ZABBIX_PROXYCFG_H
 
-#include "comms.h"
+#include "zbxcomms.h"
 #include "zbxjson.h"
 
 extern int	CONFIG_TIMEOUT;

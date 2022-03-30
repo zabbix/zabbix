@@ -17,30 +17,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "dbcache.h"
+
 #include "common.h"
 #include "log.h"
-#include "threads.h"
-
-#include "db.h"
-#include "ipc.h"
 #include "mutexs.h"
 #include "zbxserver.h"
-#include "proxy.h"
 #include "events.h"
-#include "memalloc.h"
 #include "valuecache.h"
 #include "zbxmodules.h"
 #include "module.h"
 #include "export.h"
-#include "zbxjson.h"
 #include "zbxhistory.h"
 #include "daemon.h"
 #include "zbxavailability.h"
 #include "zbxtrends.h"
-#include "zbxalgo.h"
 #include "../zbxalgo/vectorimpl.h"
-
-#include "dbcache.h"
 
 static zbx_mem_info_t	*hc_index_mem = NULL;
 static zbx_mem_info_t	*hc_mem = NULL;
@@ -131,7 +123,8 @@ typedef struct
 
 	unsigned char		db_trigger_queue_lock;
 
-	zbx_hc_proxyqueue_t     proxyqueue;
+	zbx_hc_proxyqueue_t	proxyqueue;
+	int			proxy_history_count;
 }
 ZBX_DC_CACHE;
 
@@ -1905,6 +1898,9 @@ static void	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
 			zbx_variant_set_str(&value_var, hdata->value.log->value);
 			hdata->value.log->value = NULL;
 			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return;
 	}
 
 	dc_history_set_value(hdata, item->value_type, &value_var);
@@ -2317,13 +2313,13 @@ static int	DBmass_add_history(ZBX_DC_HISTORY *history, int history_num)
  *                                                                            *
  * Purpose: helper function for DCmass_proxy_add_history()                    *
  *                                                                            *
- * Comment: this function is meant for items with value_type other other than *
+ * Comment: this function is meant for items with value_type other than       *
  *          ITEM_VALUE_TYPE_LOG not containing meta information in result     *
  *                                                                            *
  ******************************************************************************/
 static void	dc_add_proxy_history(ZBX_DC_HISTORY *history, int history_num)
 {
-	int		i, now;
+	int		i, now, history_count = 0;
 	unsigned int	flags;
 	char		buffer[64], *pvalue;
 	zbx_db_insert_t	db_insert;
@@ -2373,9 +2369,11 @@ static void	dc_add_proxy_history(ZBX_DC_HISTORY *history, int history_num)
 			pvalue = (char *)"";
 		}
 
+		history_count++;
 		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, pvalue, flags, now);
 	}
 
+	change_proxy_history_count(history_count);
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 }
@@ -2384,13 +2382,13 @@ static void	dc_add_proxy_history(ZBX_DC_HISTORY *history, int history_num)
  *                                                                            *
  * Purpose: helper function for DCmass_proxy_add_history()                    *
  *                                                                            *
- * Comment: this function is meant for items with value_type other other than *
+ * Comment: this function is meant for items with value_type other than       *
  *          ITEM_VALUE_TYPE_LOG containing meta information in result         *
  *                                                                            *
  ******************************************************************************/
 static void	dc_add_proxy_history_meta(ZBX_DC_HISTORY *history, int history_num)
 {
-	int		i, now;
+	int		i, now, history_count = 0;
 	char		buffer[64], *pvalue;
 	zbx_db_insert_t	db_insert;
 
@@ -2440,10 +2438,12 @@ static void	dc_add_proxy_history_meta(ZBX_DC_HISTORY *history, int history_num)
 			pvalue = (char *)"";
 		}
 
+		history_count++;
 		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, pvalue, h->lastlogsize, h->mtime,
 				flags, now);
 	}
 
+	change_proxy_history_count(history_count);
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 }
@@ -2458,7 +2458,7 @@ static void	dc_add_proxy_history_meta(ZBX_DC_HISTORY *history, int history_num)
  ******************************************************************************/
 static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 {
-	int		i, now;
+	int		i, now, history_count = 0;
 	zbx_db_insert_t	db_insert;
 
 	now = (int)time(NULL);
@@ -2511,8 +2511,10 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 			zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, unset_if_novalue, "",
 					unset_if_novalue, "", unset_if_novalue, h->lastlogsize, h->mtime, flags, now);
 		}
+		history_count++;
 	}
 
+	change_proxy_history_count(history_count);
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 }
@@ -2524,7 +2526,7 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
  ******************************************************************************/
 static void	dc_add_proxy_history_notsupported(ZBX_DC_HISTORY *history, int history_num)
 {
-	int		i, now;
+	int		i, now, history_count = 0;
 	zbx_db_insert_t	db_insert;
 
 	now = (int)time(NULL);
@@ -2538,10 +2540,12 @@ static void	dc_add_proxy_history_notsupported(ZBX_DC_HISTORY *history, int histo
 		if (ITEM_STATE_NOTSUPPORTED != h->state)
 			continue;
 
+		history_count++;
 		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, ZBX_NULL2EMPTY_STR(h->value.err),
 				(int)h->state, now);
 	}
 
+	change_proxy_history_count(history_count);
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 }
@@ -4382,7 +4386,7 @@ static void	hc_pop_items(zbx_vector_ptr_t *history_items)
  *                                                                            *
  * Purpose: gets item history values                                          *
  *                                                                            *
- * Parameters: history       - [OUT] the history valeus                       *
+ * Parameters: history       - [OUT] the history values                       *
  *             history_items - [IN] the history items                         *
  *                                                                            *
  ******************************************************************************/
@@ -4592,6 +4596,8 @@ int	init_database_cache(char **error)
 
 	cache->db_trigger_queue_lock = 1;
 
+	cache->proxy_history_count = 0;
+
 	if (NULL == sql)
 		sql = (char *)zbx_malloc(sql, sql_alloc);
 out:
@@ -4600,6 +4606,49 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: change proxy_history_count by count                               *
+ *                                                                            *
+ ******************************************************************************/
+void	change_proxy_history_count(int change_count)
+{
+	LOCK_CACHE;
+
+	cache->proxy_history_count += change_count;
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: change proxy_history_count by count                               *
+ *                                                                            *
+ ******************************************************************************/
+void	reset_proxy_history_count(int reset)
+{
+	LOCK_CACHE;
+
+	cache->proxy_history_count = reset;
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get proxy_history_count value                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	get_proxy_history_count(void)
+{
+	int	proxy_history_count;
+
+	LOCK_CACHE;
+	proxy_history_count = cache->proxy_history_count;
+	UNLOCK_CACHE;
+
+	return proxy_history_count;
+}
 /******************************************************************************
  *                                                                            *
  * Purpose: writes updates and new data from pool and cache data to database  *

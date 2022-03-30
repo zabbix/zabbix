@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "pid.h"
+
+#include "common.h"
 #include "log.h"
-#include "threads.h"
 static FILE	*fpid = NULL;
 static int	fdpid = -1;
 

@@ -17,23 +17,25 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "proxy.h"
+
 #include "db.h"
 #include "log.h"
 #include "sysinfo.h"
 #include "zbxserver.h"
 #include "zbxtasks.h"
 
-#include "proxy.h"
-#include "dbcache.h"
 #include "discovery.h"
 #include "zbxalgo.h"
 #include "preproc.h"
+#include "zbxhash.h"
 #include "../zbxcrypto/tls_tcp_active.h"
+#include "../zbxkvs/kvs.h"
 #include "zbxlld.h"
 #include "events.h"
-#include "zbxvault.h"
+#include "../zbxvault/vault.h"
 #include "zbxavailability.h"
+#include "zbxcommshigh.h"
 
 extern char	*CONFIG_SERVER;
 extern char	*CONFIG_VAULTDBPATH;
@@ -894,7 +896,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 			if (ZBX_MACRO_VALUE_VAULT != type)
 				continue;
 
-			zbx_strsplit(row[2 + offset], ':', &path, &key);
+			zbx_strsplit_last(row[2 + offset], ':', &path, &key);
 
 			if (NULL == key)
 			{
@@ -1038,10 +1040,9 @@ static void	get_proxy_monitored_httptests(zbx_uint64_t proxy_hostid, zbx_vector_
 static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_json *j)
 {
 	int		i;
-	zbx_hashset_t	kvs;
+	zbx_kvs_t	kvs;
 
-	zbx_hashset_create_ext(&kvs, 100, zbx_vault_kv_hash, zbx_vault_kv_compare, zbx_vault_kv_clean,
-			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+	zbx_kvs_create(&kvs, 100);
 
 	zbx_json_addobject(j, "macro.secrets");
 
@@ -1068,16 +1069,16 @@ static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_jso
 
 			kv_local.key = *ptr;
 
-			if (NULL != (kv = zbx_hashset_search(&kvs, &kv_local)))
+			if (NULL != (kv = zbx_kvs_search(&kvs, &kv_local)))
 				zbx_json_addstring(j, kv->key, kv->value, ZBX_JSON_TYPE_STRING);
 		}
 		zbx_json_close(j);
 
-		zbx_hashset_clear(&kvs);
+		zbx_kvs_clear(&kvs);
 	}
 
 	zbx_json_close(j);
-	zbx_hashset_destroy(&kvs);
+	zbx_kvs_destroy(&kvs);
 }
 
 /******************************************************************************
@@ -3473,7 +3474,7 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 	double			sec;
 	DC_ITEM			*items;
 	char			*error = NULL;
-	zbx_uint64_t		itemids[ZBX_HISTORY_VALUES_MAX];
+	zbx_uint64_t		itemids[ZBX_HISTORY_VALUES_MAX], last_valueid = 0;
 	zbx_agent_value_t	values[ZBX_HISTORY_VALUES_MAX];
 	zbx_timespec_t		unique_shift = {0, 0};
 
@@ -3519,14 +3520,24 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 
 		total_num += read_num;
 
-		if (NULL != session)
-			session->last_valueid = values[values_num - 1].id;
+		last_valueid = values[values_num - 1].id;
 
 		DCconfig_clean_items(items, errcodes, values_num);
 		zbx_agent_values_clean(values, values_num);
 
 		if (NULL == pnext)
 			break;
+	}
+
+	if (NULL != session && 0 != last_valueid)
+	{
+		if (session->last_valueid > last_valueid)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "received id:" ZBX_FS_UI64 " is less than last id:"
+					ZBX_FS_UI64, last_valueid, session->last_valueid);
+		}
+		else
+			session->last_valueid = last_valueid;
 	}
 
 	zbx_free(errcodes);
@@ -3790,7 +3801,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 	{
 		size_t	token_len;
 
-		if (ZBX_DATA_SESSION_TOKEN_SIZE != (token_len = strlen(token)))
+		if (zbx_get_token_len() != (token_len = strlen(token)))
 		{
 			*info = zbx_dsprintf(*info, "invalid session token length %d", (int)token_len);
 			ret = FAIL;
@@ -4276,7 +4287,7 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 	char			host[HOST_HOST_LEN_MAX], ip[INTERFACE_IP_LEN_MAX], dns[INTERFACE_DNS_LEN_MAX],
 				tmp[MAX_STRING_LEN], *host_metadata = NULL;
 	unsigned short		port;
-	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
+	size_t			host_metadata_alloc = 1;	/* for at least NUL-terminating string */
 	zbx_vector_ptr_t	autoreg_hosts;
 	zbx_conn_flags_t	flags = ZBX_CONN_DEFAULT;
 
@@ -4405,7 +4416,7 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get the number of values waiting to be sent to the sever          *
+ * Purpose: get the number of values waiting to be sent to the server         *
  *                                                                            *
  * Return value: the number of history values                                 *
  *                                                                            *
@@ -4416,6 +4427,8 @@ int	proxy_get_history_count(void)
 	DB_ROW		row;
 	zbx_uint64_t	id;
 	int		count = 0;
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	proxy_get_lastid("proxy_history", "history_lastid", &id);
 
@@ -4429,6 +4442,8 @@ int	proxy_get_history_count(void)
 		count = atoi(row[0]);
 
 	DBfree_result(result);
+
+	DBclose();
 
 	return count;
 }
@@ -4641,7 +4656,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		{
 			size_t	token_len;
 
-			if (ZBX_DATA_SESSION_TOKEN_SIZE != (token_len = strlen(value)))
+			if (zbx_get_token_len() != (token_len = strlen(value)))
 			{
 				*error = zbx_dsprintf(*error, "invalid session token length %d", (int)token_len);
 				ret = FAIL;

@@ -28,6 +28,7 @@
 #include "zbxjson.h"
 #include "../zbxalgo/vectorimpl.h"
 #include "sysinfo.h"
+#include "zbxhash.h"
 
 /*
  * 5.4 development database patches
@@ -5914,7 +5915,7 @@ static int	DBpatch_5030192(void)
 				continue;
 			}
 
-			if (FAIL == zbx_eval_parse_expression(&ctx, trigger_expr, ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION,
+			if (FAIL == zbx_eval_parse_expression(&ctx, trigger_expr, ZBX_EVAL_PARSE_TRIGGER_EXPRESSION,
 					&error))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression for %s: %s",

@@ -23,7 +23,9 @@
  * @var CView $this
  */
 
-$auditWidget = (new CWidget())->setTitle(_('Action log'));
+$auditWidget = (new CWidget())
+	->setTitle(_('Action log'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUDITACTS_LIST));
 
 // create filter
 $filterColumn = new CFormList();
@@ -92,17 +94,17 @@ foreach ($this->data['alerts'] as $alert) {
 		? [
 			bold(_('Subject').':'),
 			BR(),
-			$alert['subject'],
+			(new CDiv($alert['subject']))->addClass(ZBX_STYLE_WORDBREAK),
 			BR(),
 			BR(),
 			bold(_('Message').':'),
 			BR(),
-			zbx_nl2br($alert['message'])
+			(new CDiv(zbx_nl2br($alert['message'])))->addClass(ZBX_STYLE_WORDBREAK)
 		]
 		: [
 			bold(_('Command').':'),
 			BR(),
-			zbx_nl2br($alert['message'])
+			(new CDiv(zbx_nl2br($alert['message'])))->addClass(ZBX_STYLE_WORDBREAK)
 		];
 
 	$info_icons = [];

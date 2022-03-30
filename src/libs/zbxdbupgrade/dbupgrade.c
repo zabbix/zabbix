@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "dbupgrade.h"
+
 #include "common.h"
 #include "db.h"
 #include "log.h"
 #include "zbxdbupgrade.h"
-
-#include "dbupgrade.h"
 
 typedef struct
 {
@@ -782,7 +782,7 @@ extern zbx_dbpatch_t	DBPATCH_VERSION(5030)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(5040)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(5050)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(6000)[];
-/*extern zbx_dbpatch_t	DBPATCH_VERSION(6010)[];*/
+extern zbx_dbpatch_t	DBPATCH_VERSION(6010)[];
 
 static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(2010), "2.2 development"},
@@ -809,7 +809,7 @@ static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(5040), "5.4 maintenance"},
 	{DBPATCH_VERSION(5050), "6.0 development"},
 	{DBPATCH_VERSION(6000), "6.0 maintenance"},
-/*	{DBPATCH_VERSION(6010), "6.2 development"},*/
+	{DBPATCH_VERSION(6010), "6.2 development"},
 	{NULL}
 };
 

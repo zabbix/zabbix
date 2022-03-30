@@ -345,6 +345,7 @@ function PopUp(action, parameters, {
 		overlay = overlayDialogue({
 			dialogueid,
 			title: '',
+			doc_url: '',
 			content: jQuery('<div>', {'height': '68px', class: 'is-loading'}),
 			class: 'modal-popup ' + dialogue_class,
 			buttons: [],
@@ -386,6 +387,7 @@ function PopUp(action, parameters, {
 
 				overlay.setProperties({
 					title: resp.header,
+					doc_url: resp.doc_url,
 					content: resp.body,
 					controls: resp.controls,
 					buttons: buttons,

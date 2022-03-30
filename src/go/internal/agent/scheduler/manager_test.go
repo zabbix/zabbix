@@ -1893,7 +1893,7 @@ func Test_getCapacity(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getCapacity(tt.args.optsRaw, "test"); got != tt.want {
+			if got, _ := getPluginOptions(tt.args.optsRaw, "test"); got != tt.want {
 				t.Errorf("getCapacity() = %v, want %v", got, tt.want)
 			}
 		})

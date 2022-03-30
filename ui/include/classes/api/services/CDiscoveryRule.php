@@ -661,10 +661,13 @@ class CDiscoveryRule extends CItemGeneral {
 		return true;
 	}
 
-	public function syncTemplates($data) {
-		$data['templateids'] = zbx_toArray($data['templateids']);
-		$data['hostids'] = zbx_toArray($data['hostids']);
-
+	/**
+	 * @param array $templateids
+	 * @param array $hostids
+	 *
+	 * @return array Array of discovery rule IDs.
+	 */
+	public function syncTemplates(array $templateids, array $hostids): array {
 		$output = [];
 		foreach ($this->fieldRules as $field_name => $rules) {
 			if (!array_key_exists('system', $rules) && !array_key_exists('host', $rules)) {
@@ -674,11 +677,11 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$tpl_items = $this->get([
 			'output' => $output,
-			'hostids' => $data['templateids'],
 			'selectFilter' => ['formula', 'evaltype', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
+			'hostids' => $templateids,
 			'preservekeys' => true,
 			'nopermissions' => true
 		]);
@@ -703,9 +706,9 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 		unset($item);
 
-		$this->inherit($tpl_items, $data['hostids']);
+		$this->inherit($tpl_items, $hostids);
 
-		return true;
+		return array_keys($tpl_items);
 	}
 
 	/**
@@ -2190,7 +2193,7 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// copy host prototypes
-		$this->copyHostPrototypes($discoveryid, $dstDiscovery);
+		$this->copyHostPrototypes($discoveryid, $dstDiscovery['itemid']);
 
 		return true;
 	}
@@ -2515,59 +2518,88 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	/**
-	 * Copies all of the host prototypes from the source discovery to the target
-	 * discovery rule.
+	 * Copy all of the host prototypes from the source discovery rule to the target discovery rule.
 	 *
-	 * @throws APIException if prototype saving fails.
+	 * @param string $src_discoveryid
+	 * @param string $dst_discoveryid
 	 *
-	 * @param int   $srcid          The source discovery rule id to copy from.
-	 * @param array $dstDiscovery   The target discovery rule to copy to.
-	 *
-	 * @return array
+	 * @throws APIException
 	 */
-	protected function copyHostPrototypes($srcid, array $dstDiscovery) {
-		$prototypes = API::HostPrototype()->get([
-			'discoveryids' => $srcid,
-			'output' => ['host', 'name', 'status', 'inventory_mode', 'discover', 'custom_interfaces'],
+	protected function copyHostPrototypes(string $src_discoveryid, string $dst_discoveryid): void {
+		$src_host_prototypes = API::HostPrototype()->get([
+			'output' => ['host', 'name', 'custom_interfaces', 'status', 'discover', 'inventory_mode'],
+			'selectInterfaces' => ['type', 'useip', 'ip', 'dns', 'port', 'main', 'details'],
 			'selectGroupLinks' => ['groupid'],
 			'selectGroupPrototypes' => ['name'],
-			'selectInterfaces' => ['type', 'useip', 'ip', 'dns', 'port', 'main', 'details'],
 			'selectTemplates' => ['templateid'],
 			'selectTags' => ['tag', 'value'],
 			'selectMacros' => ['macro', 'type', 'value', 'description'],
-			'preservekeys' => true
+			'discoveryids' => $src_discoveryid
 		]);
 
-		$rs = [];
-		if ($prototypes) {
-			foreach ($prototypes as &$prototype) {
-				$prototype['ruleid'] = $dstDiscovery['itemid'];
-				unset($prototype['hostid'], $prototype['inventory']['hostid']);
-
-				foreach ($prototype['groupLinks'] as &$groupLinks) {
-					unset($groupLinks['group_prototypeid']);
-				}
-				unset($groupLinks);
-
-				foreach ($prototype['groupPrototypes'] as &$groupPrototype) {
-					unset($groupPrototype['group_prototypeid']);
-				}
-				unset($groupPrototype);
-
-				foreach ($prototype['macros'] as &$macro) {
-					$macro['type'] = ($macro['type'] == ZBX_MACRO_TYPE_SECRET) ? ZBX_MACRO_TYPE_TEXT : $macro['type'];
-					$macro += ['value' => ''];
-				}
-				unset($macro);
-			}
-			unset($prototype);
-
-			$rs = API::HostPrototype()->create($prototypes);
-			if (!$rs) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone host prototypes.'));
-			}
+		if (!$src_host_prototypes) {
+			return;
 		}
-		return $rs;
+
+		$dst_host_prototypes = [];
+
+		foreach ($src_host_prototypes as $i => $src_host_prototype) {
+			unset($src_host_prototypes[$i]);
+
+			$dst_host_prototype = ['ruleid' => $dst_discoveryid] + array_intersect_key($src_host_prototype, array_flip([
+				'host', 'name', 'custom_interfaces', 'status', 'discover', 'inventory_mode', 'groupLinks',
+				'groupPrototypes', 'templates', 'tags'
+			]));
+
+			if ($src_host_prototype['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM) {
+				foreach ($src_host_prototype['interfaces'] as $src_interface) {
+					$dst_interface =
+						array_intersect_key($src_interface, array_flip(['type', 'useip', 'ip', 'dns', 'port', 'main']));
+
+					if ($src_interface['type'] == INTERFACE_TYPE_SNMP) {
+						switch ($src_interface['details']['version']) {
+							case SNMP_V1:
+							case SNMP_V2C:
+								$dst_interface['details'] = array_intersect_key($src_interface['details'],
+									array_flip(['version', 'bulk', 'community'])
+								);
+								break;
+
+							case SNMP_V3:
+								$field_names = array_flip(['version', 'bulk', 'contextname', 'securityname',
+									'securitylevel'
+								]);
+
+								if ($src_interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
+									$field_names += array_flip(['authprotocol', 'authpassphrase']);
+								}
+								elseif ($src_interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+									$field_names +=
+										array_flip(['authprotocol', 'authpassphrase', 'privprotocol', 'privpassphrase']);
+								}
+
+								$dst_interface['details'] = array_intersect_key($src_interface['details'], $field_names);
+								break;
+						}
+					}
+
+					$dst_host_prototype['interfaces'][] = $dst_interface;
+				}
+			}
+
+			foreach ($src_host_prototype['macros'] as $src_macro) {
+				if ($src_macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+					$dst_host_prototype['macros'][] = ['type' => ZBX_MACRO_TYPE_TEXT, 'value' => ''] + $src_macro;
+				}
+				else {
+					$dst_host_prototype['macros'][] = $src_macro;
+				}
+			}
+
+			$dst_host_prototypes[] = $dst_host_prototype;
+		}
+
+		API::HostPrototype()->create($dst_host_prototypes);
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {

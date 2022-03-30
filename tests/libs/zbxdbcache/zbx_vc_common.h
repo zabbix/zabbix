@@ -20,6 +20,10 @@
 #ifndef ZBX_VC_COMMON_H
 #define ZBX_VC_COMMON_H
 
+#include "zbxalgo.h"
+#include "zbxhistory.h"
+#include "zbxmockdata.h"
+
 typedef void	(*zbx_vc_test_add_values_setup_cb)(zbx_mock_handle_t *handle, zbx_vector_ptr_t *history, int *err,
 		const char **data, int *ret_flush);
 typedef void	(*zbx_vc_test_get_value_setup_cb)(zbx_mock_handle_t *handle, zbx_uint64_t *itemid,

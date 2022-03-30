@@ -27,6 +27,7 @@
 if ($data['eventsource'] == EVENT_SOURCE_SERVICE) {
 	$title = _('Service actions');
 	$submenu = null;
+	$doc_url = CDocHelper::CONFIGURATION_SERVICES_ACTION_LIST;
 }
 else {
 	$submenu_source = [
@@ -38,6 +39,7 @@ else {
 
 	$title = array_key_exists($data['eventsource'], $submenu_source) ? $submenu_source[$data['eventsource']] : null;
 	$submenu = [];
+	$doc_url = CDocHelper::CONFIGURATION_ACTION_LIST;
 
 	foreach ($submenu_source as $value => $label) {
 		$url = (new CUrl('actionconf.php'))
@@ -53,6 +55,7 @@ $current_url = (new CUrl('actionconf.php'))->setArgument('eventsource', $data['e
 $widget = (new CWidget())
 	->setTitle($title)
 	->setTitleSubmenu($submenu ? ['main_section' => ['items' => $submenu]] : null)
+	->setDocUrl(CDocHelper::getUrl($doc_url))
 	->setControls((new CTag('nav', true,
 		(new CForm('get'))
 			->cleanItems()

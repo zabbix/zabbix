@@ -9,6 +9,7 @@ DIST_SUBDIRS = \
 	zbxalgo \
 	zbxmedia \
 	zbxcrypto \
+	zbxhash \
 	zbxcommon \
 	zbxcomms \
 	zbxcommshigh \
@@ -32,6 +33,9 @@ DIST_SUBDIRS = \
 	zbxembed \
 	zbxprometheus \
 	zbxvault \
+	zbxcyberark \
+	zbxhashicorp \
+	zbxkvs \
 	zbxdiag \
 	zbxtrends \
 	zbxavailability \
@@ -61,6 +65,9 @@ SERVER_SUBDIRS = \
 	zbxembed \
 	zbxprometheus \
 	zbxvault \
+	zbxcyberark \
+	zbxhashicorp \
+	zbxkvs \
 	zbxdiag \
 	zbxtrends \
 	zbxavailability \
@@ -88,6 +95,9 @@ PROXY_SUBDIRS = \
 	zbxembed \
 	zbxprometheus \
 	zbxvault \
+	zbxcyberark \
+	zbxhashicorp \
+	zbxkvs \
 	zbxdiag \
 	zbxtrends \
 	zbxavailability \
@@ -98,6 +108,7 @@ endif
 endif
 
 SUBDIRS = \
+	zbxhash \
 	zbxcrypto \
 	zbxcommon \
 	zbxlog \
@@ -115,6 +126,7 @@ SUBDIRS = \
 	zbxregexp \
 	zbxipcservice \
 	zbxcompress \
+	zbxxml \
 	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS) \
 	$(AGENT_SUBDIRS)

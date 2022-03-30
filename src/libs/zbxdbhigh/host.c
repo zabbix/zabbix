@@ -828,10 +828,11 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct type"
 				" from items"
-				" where type not in (%d,%d,%d,%d,%d,%d,%d)"
+				" where type not in (%d,%d,%d,%d,%d,%d,%d,%d)"
 					" and",
 				ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
-				ITEM_TYPE_HTTPTEST, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT);
+				ITEM_TYPE_HTTPTEST, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
+				ITEM_TYPE_HTTPAGENT);
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				templateids->values, templateids->values_num);
 
@@ -1539,7 +1540,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete template web scenatios from host                           *
+ * Purpose: delete template web scenarios from host                           *
  *                                                                            *
  * Parameters: hostid      - [IN] host identifier from database               *
  *             templateids - [IN] array of template IDs                       *
@@ -5812,7 +5813,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete hosts from database, check if there are any host           *
+ * Purpose: delete hosts from database, check if there are any hosts          *
  *          prototypes and delete them first                                  *
  *                                                                            *
  * Parameters: hostids   - [IN] host identifiers from database                *

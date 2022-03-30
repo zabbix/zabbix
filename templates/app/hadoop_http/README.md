@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 The template for monitoring Hadoop over HTTP that works without any external scripts.
 It collects metrics by polling the Hadoop API remotely using an HTTP agent and JSONPath preprocessing.
 Zabbix server (or proxy) execute direct requests to ResourceManager, NodeManagers, NameNode, DataNodes APIs.
@@ -16,7 +16,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 You should define the IP address (or FQDN) and Web-UI port for the ResourceManager in {$HADOOP.RESOURCEMANAGER.HOST} and {$HADOOP.RESOURCEMANAGER.PORT} macros and for the NameNode in {$HADOOP.NAMENODE.HOST} and {$HADOOP.NAMENODE.PORT} macros respectively. Macros can be set in the template or overridden at the host level.
 
