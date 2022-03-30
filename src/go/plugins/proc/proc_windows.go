@@ -199,10 +199,11 @@ type procSummary struct {
 }
 
 type thread struct {
-	Pid           uint64  `json:"pid"`
-	PPid          uint64  `json:"ppid"`
+	Pid           uint32  `json:"pid"`
+	PPid          uint32  `json:"ppid"`
 	Name          string  `json:"name"`
-	Tid	      uint64  `json:"tid"`
+	Tid	      uint32  `json:"tid"`
+	/*
 	CpuTimeUser   float64 `json:"cputime_user"`
 	CpuTimeSystem float64 `json:"cputime_system"`
 	IoOtherB      uint64  `json:"io_other_b"`
@@ -211,6 +212,7 @@ type thread struct {
 	IoOtherOp     uint64  `json:"io_other_op"`
 	GdiObj        uint32  `json:"gdiobj"`
 	UserObj       uint32  `json:"userobj"`
+	*/
 }
 
 var attrMap map[string]infoAttr = map[string]infoAttr{
@@ -410,7 +412,7 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 	}
 
 	array := make([]procStatus, 0)
-	//threadArray := make([]thread, 0)
+	threadArray := make([]thread, 0)
 	summaryArray := make([]procSummary, 0)
 
 	var cmdlinePattern *regexp.Regexp
@@ -419,86 +421,104 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 		cmdlinePattern, regexpErr = regexp.Compile(cmdline)
 	}
 
-	if mode != "thread" {
-		hs, err := syscall.CreateToolhelp32Snapshot(syscall.TH32CS_SNAPPROCESS, 0)
-		if err != nil {
-			return nil, errors.New("Cannot get process table snapshot")
+	hs, err := syscall.CreateToolhelp32Snapshot(syscall.TH32CS_SNAPPROCESS, 0)
+	if err != nil {
+		return nil, errors.New("Cannot get process table snapshot")
+	}
+	defer syscall.CloseHandle(hs)
+
+	var procerr error
+	var pe syscall.ProcessEntry32
+	pe.Size = uint32(unsafe.Sizeof(pe))
+	var pids []uint32
+
+	for procerr = syscall.Process32First(hs, &pe); procerr == nil; procerr = syscall.Process32Next(hs, &pe) {
+		procName := windows.UTF16ToString(pe.ExeFile[:])
+		if name != "" && procName != name {
+			continue
 		}
-		defer syscall.CloseHandle(hs)
 
-		var procerr error
-		var pe syscall.ProcessEntry32
-		pe.Size = uint32(unsafe.Sizeof(pe))
+		if mode != "summary" && cmdline != "" && regexpErr == nil &&
+			!cmdlinePattern.Match([]byte(procName)) {
+					continue
+		}
 
-		for procerr = syscall.Process32First(hs, &pe); procerr == nil; procerr = syscall.Process32Next(hs, &pe) {
-			procName := windows.UTF16ToString(pe.ExeFile[:])
-			if name != "" && procName != name {
+		if userName != "" {
+			var uname string
+			if uname, err = getProcessUsername(pe.ProcessID); err == nil && uname != userName {
 				continue
 			}
+		}
 
-			if mode != "summary" && cmdline != "" && regexpErr == nil &&
-				!cmdlinePattern.Match([]byte(procName)) {
-					continue
-			}
+		proc := procStatus{Pid: pe.ProcessID, PPid: pe.ParentProcessID, Name: procName, Cmdline: procName,
+			Threads: pe.Threads,
+		}
 
-			if userName != "" {
-				var uname string
-				if uname, err = getProcessUsername(pe.ProcessID); err == nil && uname != userName {
-					continue
+		// process might not exist anymore already, skipping silently
+		h, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, pe.ProcessID)
+		if err != nil {
+			continue
+		}
+		defer syscall.CloseHandle(h)
+
+		if count, err := win32.GetProcessHandleCount(h); err == nil {
+			proc.Handles = count
+		}
+
+		if m, err := win32.GetProcessMemoryInfo(h); err == nil {
+			proc.Vmsize = float64(m.PagefileUsage) / 1024
+			proc.Wkset = float64(m.WorkingSetSize) / 1024
+			proc.PageFaults = m.PageFaultCount
+		}
+
+		if ioc, err := win32.GetProcessIoCounters(h); err == nil {
+			proc.IoReadsB = ioc.ReadTransferCount
+			proc.IoWritesB = ioc.WriteTransferCount
+			proc.IoOtherB = ioc.OtherTransferCount
+			proc.IoReadsOp = ioc.ReadOperationCount
+			proc.IoWritesOp = ioc.WriteOperationCount
+			proc.IoOtherOp = ioc.OtherOperationCount
+		}
+
+		var creationTime, exitTime, kernelTime, userTime syscall.Filetime
+		if err = syscall.GetProcessTimes(h, &creationTime, &exitTime, &kernelTime, &userTime); err == nil {
+			proc.CpuTimeUser = float64((uint64(userTime.HighDateTime)<<32 | uint64(kernelTime.LowDateTime)) / 1e4)
+			proc.CpuTimeSystem = float64((uint64(kernelTime.HighDateTime)<<32 | uint64(kernelTime.LowDateTime)) / 1e4)
+		}
+
+		proc.GdiObj = win32.GetGuiResources(h, win32.GR_GDIOBJECTS)
+		proc.UserObj = win32.GetGuiResources(h, win32.GR_USEROBJECTS)
+
+		array = append(array, proc)
+		pids = append(pids, pe.ProcessID)
+	}
+	if mode == "thread" {
+		ht, err := windows.CreateToolhelp32Snapshot(syscall.TH32CS_SNAPTHREAD, 0)
+		if err != nil {
+			return nil, errors.New("Cannot get thread table snapshot")
+		}
+
+		var te windows.ThreadEntry32
+		te.Size = uint32(unsafe.Sizeof(te))
+		for procerr = windows.Thread32First(ht, &te); procerr == nil; procerr = windows.Thread32Next(ht, &te) {
+			for _, proc := range array {
+				if te.OwnerProcessID == proc.Pid {
+					threadArray = append(threadArray, thread{proc.Pid, proc.PPid, proc.Name, te.ThreadID})
+					break
 				}
 			}
-
-			proc := procStatus{Pid: pe.ProcessID, PPid: pe.ParentProcessID, Name: procName, Cmdline: procName,
-				Threads: pe.Threads,
-			}
-
-			// process might not exist anymore already, skipping silently
-			h, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, pe.ProcessID)
-			if err != nil {
-				continue
-			}
-			defer syscall.CloseHandle(h)
-
-			if count, err := win32.GetProcessHandleCount(h); err == nil {
-				proc.Handles = count
-			}
-
-			if m, err := win32.GetProcessMemoryInfo(h); err == nil {
-				proc.Vmsize = float64(m.PagefileUsage) / 1024
-				proc.Wkset = float64(m.WorkingSetSize) / 1024
-				proc.PageFaults = m.PageFaultCount
-			}
-
-			if ioc, err := win32.GetProcessIoCounters(h); err == nil {
-				proc.IoReadsB = ioc.ReadTransferCount
-				proc.IoWritesB = ioc.WriteTransferCount
-				proc.IoOtherB = ioc.OtherTransferCount
-				proc.IoReadsOp = ioc.ReadOperationCount
-				proc.IoWritesOp = ioc.WriteOperationCount
-				proc.IoOtherOp = ioc.OtherOperationCount
-			}
-
-			var creationTime, exitTime, kernelTime, userTime syscall.Filetime
-			if err = syscall.GetProcessTimes(h, &creationTime, &exitTime, &kernelTime, &userTime); err == nil {
-				proc.CpuTimeUser = float64((uint64(userTime.HighDateTime)<<32 | uint64(kernelTime.LowDateTime)) / 1e4)
-				proc.CpuTimeSystem = float64((uint64(kernelTime.HighDateTime)<<32 | uint64(kernelTime.LowDateTime)) / 1e4)
-			}
-
-			proc.GdiObj = win32.GetGuiResources(h, win32.GR_GDIOBJECTS)
-			proc.UserObj = win32.GetGuiResources(h, win32.GR_USEROBJECTS)
-
-			array = append(array, proc)
-		}
-	} else { // mode is "thread"
-		hs, err := syscall.CreateToolhelp32Snapshot(syscall.TH32CS_SNAPTHREAD, 0)
-		if err != nil {
-			return nil, errors.New("Cannot get process table snapshot")
-		}
-		defer syscall.CloseHandle(hs)
+                }
+		defer windows.CloseHandle(ht)
 	}
 	switch mode {
 	case "process", "":
 		if jsonArray, err := json.Marshal(array); err == nil {
+			return string(jsonArray), nil
+		} else {
+			return nil, fmt.Errorf("Cannot create JSON array: %s", err)
+		}
+	case "thread":
+		if jsonArray, err := json.Marshal(threadArray); err == nil {
 			return string(jsonArray), nil
 		} else {
 			return nil, fmt.Errorf("Cannot create JSON array: %s", err)

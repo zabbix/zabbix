@@ -634,7 +634,11 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 				continue
 			}
 
-			value = float64(vmRSS) / float64(mem) * 100.00
+			if mem != 0 {
+				value = float64(vmRSS) / float64(mem) * 100.00
+			} else {
+				value = 0
+			}
 		case "size":
 			vmData, found, err := procfs.ByteFromProcFileData(data, "VmData")
 			if err != nil {
@@ -697,7 +701,11 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 	}
 
 	if mode == "avg" {
-		return memSize / float64(count), nil
+		if count != 0 {
+			return memSize / float64(count), nil
+		} else {
+			return 0, errors.New("Total memory reported is 0.")
+		}
 	}
 
 	if memtype != "pmem" {
@@ -877,7 +885,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 
 			array = append(array, data)
 			threadArray = append(threadArray, thread{data.Tgid, data.PPid, data.Name, data.Pid,
-				data.Name, data.CpuTimeUser, data.CpuTimeSystem, data.State, data.CtxSwitches,
+				data.TName, data.CpuTimeUser, data.CpuTimeSystem, data.State, data.CtxSwitches,
 				data.IoReadsB, data.IoWritesB})
 		}
 	}
