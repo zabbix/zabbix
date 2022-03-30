@@ -169,7 +169,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						uncheckTableRows('sla', response.error.keepids);
+						uncheckTableRows('sla', 'keepids' in response ? response.keepids : []);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
