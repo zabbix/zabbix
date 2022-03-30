@@ -103,7 +103,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						uncheckTableRows('user.token', 'keepids' in response ? response.keepids : []);
+						uncheckTableRows('user.token', response.keepids ?? []);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);

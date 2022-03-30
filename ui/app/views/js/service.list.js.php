@@ -173,7 +173,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						this._uncheckTableRows(response.error.keepids);
+						this._uncheckTableRows(response.keepids ?? []);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
@@ -199,7 +199,7 @@
 				});
 		}
 
-		_uncheckTableRows(keepids = []) {
+		_uncheckTableRows(keepids) {
 			const page = this.is_filtered
 				? 'service'
 				: 'service_' + this.path.concat(this.serviceid !== null ? [this.serviceid] : []).join('_');
