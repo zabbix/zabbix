@@ -209,6 +209,7 @@ type thread struct {
 	CpuTimeSystem float64 `json:"cputime_system"`
 	State         string  `json:"state"`
 	CtxSwitches   uint64  `json:"ctx_switches"`
+	PageFaults    uint64  `json:"page_faults"`
 	IoReadsB      uint64  `json:"io_read_b"`
 	IoWritesB     uint64  `json:"io_write_b"`
 }
@@ -886,7 +887,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 			//array = append(array, data)
 			threadArray = append(threadArray, thread{data.Tgid, data.PPid, data.Name, data.Pid,
 				data.TName, data.CpuTimeUser, data.CpuTimeSystem, data.State, data.CtxSwitches,
-				data.IoReadsB, data.IoWritesB})
+				data.PageFaults, data.IoReadsB, data.IoWritesB})
 		}
 	}
 
