@@ -753,7 +753,7 @@ class CWidget extends CBaseComponent {
 		if (messages !== undefined) {
 			const message_box = makeMessageBox('bad', messages)[0];
 
-			this._content_body.insertAdjacentElement('beforeend', message_box);
+			this._content_body.appendChild(message_box);
 		}
 
 		if (body !== undefined) {

@@ -47,7 +47,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 		}
 
 		if ($messages = get_and_clear_messages()) {
-			$data = ['messages' => array_column($messages, 'message')];
+			$data['error']['messages'] = array_column($messages, 'message');
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));

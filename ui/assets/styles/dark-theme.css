@@ -1110,6 +1110,10 @@ footer {
   .dashboard-grid-widget-content .msg-good,
   .dashboard-grid-widget-content .msg-warning {
     margin: 0 10px; }
+  .dashboard-grid-widget-content.no-padding .msg-bad,
+  .dashboard-grid-widget-content.no-padding .msg-good,
+  .dashboard-grid-widget-content.no-padding .msg-warning {
+    margin: 8px 10px; }
 
 .dashboard-grid-widget-mask {
   position: absolute;
