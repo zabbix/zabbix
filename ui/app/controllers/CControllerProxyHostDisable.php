@@ -79,6 +79,8 @@ class CControllerProxyHostDisable extends CController {
 
 		$result = !$update || API::Host()->update($update);
 
+		$output = [];
+
 		if ($result) {
 			$output['success']['title'] = _n('Host disabled', 'Hosts disabled', count($update));
 

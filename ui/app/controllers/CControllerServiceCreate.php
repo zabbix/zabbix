@@ -170,6 +170,8 @@ class CControllerServiceCreate extends CController {
 
 		$result = API::Service()->create($service);
 
+		$output = [];
+
 		if ($result) {
 			$output['success']['title'] = _('Service created');
 

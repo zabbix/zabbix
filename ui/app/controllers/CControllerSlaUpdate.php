@@ -124,6 +124,8 @@ class CControllerSlaUpdate extends CControllerSlaCreateUpdate {
 
 		$result = API::Sla()->update($sla);
 
+		$output = [];
+
 		if ($result) {
 			$output['success']['title'] = _('SLA updated');
 

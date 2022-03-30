@@ -36,6 +36,7 @@ class CControllerProxyDelete extends CController {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
+						'title' => _('Cannot delete proxies'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 				])])
@@ -60,11 +61,11 @@ class CControllerProxyDelete extends CController {
 	}
 
 	protected function doAction() {
-		$output = [];
-
 		$proxyids = $this->getInput('proxyids');
 
 		$result = API::Proxy()->delete($proxyids);
+
+		$output = [];
 
 		if ($result) {
 			$output['success']['title'] = _n('Proxy deleted', 'Proxies deleted', count($proxyids));
@@ -74,6 +75,11 @@ class CControllerProxyDelete extends CController {
 			}
 		}
 		else {
+			$output['error'] = [
+				'title' => _n('Cannot delete proxy', 'Cannot delete proxies', count($proxyids)),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
+
 			$proxies = API::Proxy()->get([
 				'output' => [],
 				'proxyids' => $proxyids,
@@ -81,11 +87,7 @@ class CControllerProxyDelete extends CController {
 				'preservekeys' => true
 			]);
 
-			$output['error'] = [
-				'title' => _n('Cannot delete proxy', 'Cannot delete proxies', count($proxyids)),
-				'messages' => array_column(get_and_clear_messages(), 'message'),
-				'keepids' => array_keys($proxies)
-			];
+			$output['keepids'] = array_keys($proxies);
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));

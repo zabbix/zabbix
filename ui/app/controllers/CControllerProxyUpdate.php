@@ -110,6 +110,7 @@ class CControllerProxyUpdate extends CController {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
+						'title' => _('Cannot update proxy'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 				])])
@@ -158,6 +159,8 @@ class CControllerProxyUpdate extends CController {
 
 		$result = API::Proxy()->update($proxy);
 
+		$output = [];
+
 		if ($result) {
 			$output['success']['title'] = _('Proxy updated');
 
@@ -172,6 +175,6 @@ class CControllerProxyUpdate extends CController {
 			];
 		}
 
-		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

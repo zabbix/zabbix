@@ -113,6 +113,8 @@ class CControllerSlaCreate extends CControllerSlaCreateUpdate {
 
 		$result = API::Sla()->create($sla);
 
+		$output = [];
+
 		if ($result) {
 			$output['success']['title'] = _('SLA created');
 

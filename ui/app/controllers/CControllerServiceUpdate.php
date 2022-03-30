@@ -186,6 +186,8 @@ class CControllerServiceUpdate extends CController {
 
 		$result = API::Service()->update($service);
 
+		$output = [];
+
 		if ($result) {
 			$output['success']['title'] = _('Service updated');
 

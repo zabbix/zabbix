@@ -79,6 +79,8 @@ class CControllerProxyHostEnable extends CController {
 
 		$result = !$update || API::Host()->update($update);
 
+		$output = [];
+
 		if ($result) {
 			$output['success']['title'] = _n('Host enabled', 'Hosts enabled', count($update));
 

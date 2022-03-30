@@ -178,7 +178,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						uncheckTableRows('proxy', 'keepids' in response.error ? response.error.keepids : []);
+						uncheckTableRows('proxy', response.keepids ?? []);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
