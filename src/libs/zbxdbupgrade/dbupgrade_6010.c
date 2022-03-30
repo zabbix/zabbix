@@ -95,6 +95,29 @@ static int	DBpatch_6010003(void)
 
 	return DBmodify_field_type("triggers", &field, &old_field);
 }
+
+static int	DBpatch_6010004(void)
+{
+	const ZBX_TABLE	table =
+			{"host_rtdata", "hostid", 0,
+				{
+					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"available_active", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6010005(void)
+{
+	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("host_rtdata", 1, &field);
+}
+
 #endif
 
 DBPATCH_START(6010)
@@ -105,5 +128,7 @@ DBPATCH_ADD(6010000, 0, 1)
 DBPATCH_ADD(6010001, 0, 1)
 DBPATCH_ADD(6010002, 0, 1)
 DBPATCH_ADD(6010003, 0, 1)
+DBPATCH_ADD(6010004, 0, 1)
+DBPATCH_ADD(6010005, 0, 1)
 
 DBPATCH_END()

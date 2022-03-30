@@ -20,15 +20,17 @@
 #include "avail_protocol.h"
 
 #include "zbxserialize.h"
+#include "zbxavailability.h"
+#include "log.h"
+#include "zbxjson.h"
 
-void	zbx_availability_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset,
+void	zbx_availability_serialize_interface(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_interface_availability_t *interface_availability)
 {
 	zbx_uint32_t	data_len = 0, error_len;
 	unsigned char	*ptr;
 
 	zbx_serialize_prepare_value(data_len, interface_availability->interfaceid);
-
 	zbx_serialize_prepare_value(data_len, interface_availability->agent.flags);
 	zbx_serialize_prepare_value(data_len, interface_availability->agent.available);
 	zbx_serialize_prepare_value(data_len, interface_availability->agent.errors_from);
@@ -36,7 +38,7 @@ void	zbx_availability_serialize(unsigned char **data, size_t *data_alloc, size_t
 	zbx_serialize_prepare_str_len(data_len, interface_availability->agent.error, error_len);
 
 	if (NULL == *data)
-		*data = (unsigned char *)zbx_malloc(NULL, (*data_alloc = MAX(1024, data_len)));
+		*data = (unsigned char *)zbx_calloc(NULL, (*data_alloc = MAX(1024, data_len)), 1);
 
 	while (data_len > *data_alloc - *data_offset)
 	{
@@ -52,6 +54,63 @@ void	zbx_availability_serialize(unsigned char **data, size_t *data_alloc, size_t
 	ptr += zbx_serialize_value(ptr, interface_availability->agent.errors_from);
 	ptr += zbx_serialize_value(ptr, interface_availability->agent.disable_until);
 	zbx_serialize_str(ptr, interface_availability->agent.error, error_len);
+}
+
+zbx_uint32_t	zbx_availability_serialize_active_heartbeat(unsigned char **data, zbx_uint64_t hostid, int heartbeat_freq)
+{
+	zbx_uint32_t	data_len = 0;
+	unsigned char	*ptr;
+
+	zbx_serialize_prepare_value(data_len, hostid);
+	zbx_serialize_prepare_value(data_len, heartbeat_freq);
+
+	ptr = *data = (unsigned char *)zbx_calloc(NULL, data_len, 1);
+
+	ptr += zbx_serialize_value(ptr, hostid);
+	ptr += zbx_serialize_value(ptr, heartbeat_freq);
+
+	return data_len;
+}
+
+zbx_uint32_t	zbx_availability_serialize_active_disabled_hosts(unsigned char **data, zbx_vector_uint64_t *hostids)
+{
+	zbx_uint32_t	data_len = 0;
+	int		i;
+	unsigned char	*ptr;
+
+	zbx_serialize_prepare_value(data_len, hostids->values_num);
+
+	for (i = 0; i < hostids->values_num; i++)
+		zbx_serialize_prepare_value(data_len, hostids->values[i]);
+
+	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_len);
+	ptr += zbx_serialize_value(ptr, hostids->values_num);
+
+	for (i = 0; i < hostids->values_num; i++)
+		ptr += zbx_serialize_value(ptr, hostids->values[i]);
+
+	return data_len;
+}
+
+void	zbx_availability_deserialize_active_disabled_hosts(const unsigned char *data, zbx_vector_uint64_t *hostids)
+{
+	int	values_num, i;
+
+	data += zbx_deserialize_value(data, &values_num);
+
+	if (0 == values_num)
+		return;
+
+	zbx_vector_uint64_reserve(hostids, (size_t)values_num);
+
+	for (i = 0; i < values_num; i++)
+	{
+		zbx_uint64_t	id;
+
+		data += zbx_deserialize_value(data, &id);
+
+		zbx_vector_uint64_append(hostids, id);
+	}
 }
 
 void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
@@ -78,4 +137,96 @@ void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
 		data += zbx_deserialize_value(data, &interface_availability->agent.disable_until);
 		data += zbx_deserialize_str(data, &interface_availability->agent.error, deserialize_error_len);
 	}
+}
+
+void	zbx_availability_deserialize_active_hb(const unsigned char *data, zbx_host_active_avail_t *avail)
+{
+	data += zbx_deserialize_uint64(data, &avail->hostid);
+	zbx_deserialize_int(data, &avail->heartbeat_freq);
+}
+
+zbx_uint32_t	zbx_availability_serialize_hostdata(unsigned char **data, zbx_hashset_t *queue)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_host_active_avail_t	*host;
+	zbx_uint32_t		data_len = 0;
+	unsigned char		*ptr;
+
+	if (0 == queue->num_data)
+		return 0;
+
+	zbx_serialize_prepare_value(data_len, queue->num_data);
+
+	data_len += (sizeof(zbx_uint64_t) + sizeof(int)) * queue->num_data;
+
+	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_len);
+	ptr += zbx_serialize_value(ptr, queue->num_data);
+
+	zbx_hashset_iter_reset(queue, &iter);
+
+	while (NULL != (host = (zbx_host_active_avail_t *)zbx_hashset_iter_next(&iter)))
+	{
+		ptr += zbx_serialize_value(ptr, host->hostid);
+		ptr += zbx_serialize_value(ptr, host->active_status);
+	}
+
+	return data_len;
+}
+
+void	zbx_availability_deserialize_hostdata(const unsigned char *data, zbx_vector_ptr_t *hostdata)
+{
+	int	values_num, i;
+
+	data += zbx_deserialize_value(data, &values_num);
+
+	if (0 == values_num)
+		return;
+
+	for (i = 0; i < values_num; i++)
+	{
+		zbx_proxy_hostdata_t	*h = (zbx_proxy_hostdata_t *)zbx_malloc(NULL, sizeof(zbx_proxy_hostdata_t));
+
+		data += zbx_deserialize_uint64(data, &h->hostid);
+		data += zbx_deserialize_int(data, &h->status);
+
+		zbx_vector_ptr_append(hostdata, h);
+	}
+}
+
+zbx_uint32_t	zbx_availability_serialize_active_status_request(unsigned char **data, zbx_uint64_t hostid)
+{
+	zbx_uint32_t	data_len = 0;
+	unsigned char	*ptr;
+
+	zbx_serialize_prepare_value(data_len, hostid);
+
+	ptr = *data = (unsigned char *)zbx_calloc(NULL, data_len, 1);
+
+	ptr += zbx_serialize_value(ptr, hostid);
+
+	return data_len;
+}
+
+zbx_uint32_t	zbx_availability_serialize_active_status_response(unsigned char **data, int status)
+{
+	zbx_uint32_t	data_len = 0;
+	unsigned char	*ptr;
+
+	zbx_serialize_prepare_value(data_len, status);
+
+	ptr = *data = (unsigned char *)zbx_calloc(NULL, data_len, 1);
+
+	ptr += zbx_serialize_value(ptr, status);
+
+	return data_len;
+}
+
+void	zbx_availability_deserialize_active_status_request(const unsigned char *data, zbx_uint64_t *hostid)
+{
+	zbx_deserialize_uint64(data, hostid);
+}
+
+void	zbx_availability_deserialize_active_status_response(const unsigned char *data, int *status)
+{
+	zbx_deserialize_int(data, status);
 }

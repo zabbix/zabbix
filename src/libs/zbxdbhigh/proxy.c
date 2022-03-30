@@ -4704,6 +4704,50 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_TASKS, &jp_data))
 		process_tasks_contents(&jp_data);
 
+	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HOST_DATA, &jp_data))
+	{
+		const char		*ptr;
+		zbx_vector_ptr_t	host_avails;
+		struct zbx_json_parse	jp_host;
+		char			buffer[1024];
+
+		zbx_vector_ptr_create(&host_avails);
+
+		for (ptr = NULL; NULL != (ptr = zbx_json_next(&jp_data, ptr));)
+		{
+			zbx_host_active_avail_t	*avail;
+
+			if (SUCCEED != zbx_json_brackets_open(ptr, &jp_host))
+				continue;
+
+			if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_HOSTID, buffer, sizeof(buffer), NULL))
+			{
+				avail = (zbx_host_active_avail_t *)zbx_malloc(NULL, sizeof(zbx_host_active_avail_t));
+				avail->hostid = atoi(buffer);
+			}
+			else
+				continue;
+
+			if (FAIL == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_ACTIVE_STATUS, buffer, sizeof(buffer), NULL))
+			{
+				zbx_free(avail);
+				continue;
+			}
+
+			avail->active_status = atoi(buffer);
+
+			zbx_vector_ptr_append(&host_avails, avail);
+		}
+
+		if (0 != host_avails.values_num)
+		{
+			zbx_db_update_active_check_availabilities(&host_avails, ZBX_ACTIVE_CHECK_AVAILS_DATA_VECTOR);
+
+			zbx_vector_ptr_clear_ext(&host_avails, zbx_ptr_free);
+			zbx_vector_ptr_destroy(&host_avails);
+		}
+	}
+
 out:
 	zbx_free(error_step);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));

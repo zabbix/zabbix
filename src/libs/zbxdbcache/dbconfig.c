@@ -35,6 +35,8 @@
 #include "actions.h"
 #include "zbxtrends.h"
 #include "zbxserialize.h"
+#include "avail_protocol.h"
+#include "zbxavailability.h"
 
 int	sync_in_progress = 0;
 
@@ -612,6 +614,7 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
 		return;
 
 	proxy->nextcheck = proxy->proxy_tasks_nextcheck;
+	proxy->nextcheck = proxy->proxy_hostdata_nextcheck;
 	if (proxy->proxy_data_nextcheck < proxy->nextcheck)
 		proxy->nextcheck = proxy->proxy_data_nextcheck;
 	if (proxy->proxy_config_nextcheck < proxy->nextcheck)
@@ -1133,12 +1136,15 @@ static void	DCsync_hosts(zbx_dbsync_t *sync)
 	zbx_ptr_pair_t	*psk_owner, psk_owner_local;
 	zbx_hashset_t	psk_owners;
 #endif
+	zbx_vector_uint64_t	disabled_hostids;
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_create(&psk_owners, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 #endif
 	now = time(NULL);
+
+	zbx_vector_uint64_create(&disabled_hostids);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -1171,6 +1177,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync)
 					zbx_hashset_remove_direct(&config->hosts_h, host_h);
 				}
 			}
+
 
 			host_h_local.host = row[2];
 			host_h = (ZBX_DC_HOST_H *)zbx_hashset_search(&config->hosts_h, &host_h_local);
@@ -1435,7 +1442,12 @@ done:
 
 			/* reset host status if host status has been changed (e.g., if host has been disabled) */
 			if (status != host->status)
+			{
+				if (HOST_STATUS_NOT_MONITORED == status)
+					zbx_vector_uint64_append(&disabled_hostids, hostid);
+
 				reset_availability = 1;
+			}
 
 			/* reset host status if host proxy assignment has been changed */
 			if (proxy_hostid != host->proxy_hostid)
@@ -1527,6 +1539,8 @@ done:
 						hostid, CONFIG_PROXYDATA_FREQUENCY, now);
 				proxy->proxy_tasks_nextcheck = (int)calculate_proxy_nextcheck(
 						hostid, ZBX_TASK_UPDATE_FREQUENCY, now);
+				proxy->proxy_hostdata_nextcheck = (int)calculate_proxy_nextcheck(
+						hostid, ZBX_AVAIL_HOSTDATA_FREQUENCY, now);
 
 				DCupdate_proxy_queue(proxy);
 			}
@@ -1619,6 +1633,18 @@ done:
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_destroy(&psk_owners);
 #endif
+
+	if (0 != disabled_hostids.values_num)
+	{
+		unsigned char	*data = NULL;
+		zbx_uint32_t	data_len = 0;
+
+		data_len = zbx_availability_serialize_active_disabled_hosts(&data, &disabled_hostids);
+		zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_DISABLED_HOSTS, data, data_len, NULL);
+		zbx_free(data);
+	}
+
+	zbx_vector_uint64_destroy(&disabled_hostids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -10590,6 +10616,7 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, const ZBX_DC_PROXY *src_proxy)
 	dst_proxy->hostid = src_proxy->hostid;
 	dst_proxy->proxy_config_nextcheck = src_proxy->proxy_config_nextcheck;
 	dst_proxy->proxy_data_nextcheck = src_proxy->proxy_data_nextcheck;
+	dst_proxy->proxy_hostdata_nextcheck = src_proxy->proxy_hostdata_nextcheck;
 	dst_proxy->proxy_tasks_nextcheck = src_proxy->proxy_tasks_nextcheck;
 	dst_proxy->last_cfg_error_time = src_proxy->last_cfg_error_time;
 	dst_proxy->version = src_proxy->version;
@@ -10789,6 +10816,11 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int pr
 			{
 				dc_proxy->proxy_tasks_nextcheck = (int)calculate_proxy_nextcheck(
 						hostid, ZBX_TASK_UPDATE_FREQUENCY, now);
+			}
+			if (0 != (update_nextcheck & ZBX_PROXY_DATA_NEXTCHECK))
+			{
+				dc_proxy->proxy_hostdata_nextcheck = (int)calculate_proxy_nextcheck(
+						hostid, ZBX_AVAIL_HOSTDATA_FREQUENCY, now);
 			}
 
 			DCupdate_proxy_queue(dc_proxy);

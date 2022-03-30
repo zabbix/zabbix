@@ -27,6 +27,8 @@
 #include "daemon.h"
 #include "zbxcompress.h"
 #include "zbxcommshigh.h"
+#include "avail_protocol.h"
+#include "zbxavailability.h"
 
 extern unsigned char	program_type;
 static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
@@ -335,6 +337,45 @@ clean:
 
 	zbx_json_free(&j);
 	UNLOCK_PROXY_HISTORY;
+out:
+	zbx_free(buffer);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+void	zbx_send_host_data(zbx_socket_t *sock, zbx_timespec_t *ts, zbx_vector_ptr_t *hostdata)
+{
+	struct zbx_json	j;
+	int		i;
+	char		*error = NULL, *buffer = NULL;
+	size_t		buffer_size, reserved;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
+
+	zbx_availability_serialize_json_hostdata(hostdata, &j);
+
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
+	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts->sec);
+	zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, ts->ns);
+
+	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
+	{
+		zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
+		goto out;
+	}
+
+	reserved = j.buffer_size;
+
+	if (FAIL == send_data_to_server(sock, &buffer, buffer_size, reserved, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send host data to server at \"%s\": %s", sock->peer, error);
+		zbx_free(error);
+	}
+
+	zbx_json_free(&j);
 out:
 	zbx_free(buffer);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

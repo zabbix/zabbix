@@ -32,6 +32,8 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts);
 
 int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info, int upload_status);
 
+void	zbx_send_host_data(zbx_socket_t *sock, zbx_timespec_t *ts, zbx_vector_ptr_t *hostdata);
+
 int	init_proxy_history_lock(char **error);
 void	free_proxy_history_lock(void);
 
