@@ -128,7 +128,7 @@ class testItemTest extends CWebTest {
 				// Check "Execute now" button only in host case item saved form and then change type.
 				if ($i === 0) {
 					if ($check_now) {
-						$execute_button = $this->query('id:check_now')->waitUntilVisible()->one();
+						$execute_button = $this->query('button:Execute now')->waitUntilVisible()->one();
 						$this->assertTrue($execute_button->isEnabled($enabled));
 					}
 
