@@ -59,7 +59,7 @@ class CWidgetClock extends CWidget {
 		super._registerEvents();
 
 		this._events.resize = () => {
-			const padding = 23;
+			const padding = 25;
 			const header_height = this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER ? 0 : 33;
 
 			this._target.style.setProperty(
@@ -242,8 +242,8 @@ class CWidgetClock extends CWidget {
 			else {
 				let offset = now.getTimezoneOffset();
 				let offset_hours = (offset > 0 ? '(UTC-' : '(UTC+');
-				offset = Math.abs(offset);
 
+				offset = Math.abs(offset);
 				offset_hours += Math.floor(offset / 60).toString().padStart(2, 0)
 					+ ':' + (offset % 60).toString().padStart(2, 0) + ')';
 

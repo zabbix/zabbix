@@ -112,17 +112,20 @@ class CControllerWidgetClockView extends CControllerWidget {
 
 	protected function showDate(array $fields): bool {
 		return ($fields['clock_type'] === WIDGET_CLOCK_TYPE_DIGITAL
-			&& in_array(WIDGET_CLOCK_SHOW_DATE, $fields['show']));
+			&& in_array(WIDGET_CLOCK_SHOW_DATE, $fields['show'])
+		);
 	}
 
 	protected function showTime(array $fields): bool {
 		return ($fields['clock_type'] === WIDGET_CLOCK_TYPE_ANALOG
-			|| in_array(WIDGET_CLOCK_SHOW_TIMEZONE, $fields['show']));
+			|| in_array(WIDGET_CLOCK_SHOW_TIMEZONE, $fields['show'])
+		);
 	}
 
 	protected function showTimeZone(array $fields): bool {
 		return ($fields['clock_type'] === WIDGET_CLOCK_TYPE_DIGITAL
-			&& in_array(WIDGET_CLOCK_SHOW_TIMEZONE, $fields['show']));
+			&& in_array(WIDGET_CLOCK_SHOW_TIMEZONE, $fields['show'])
+		);
 	}
 
 	protected function makeTimeFromDateTime(DateTime $date): array {
