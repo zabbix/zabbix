@@ -21,6 +21,7 @@
 #include "db.h"
 #include "dbupgrade.h"
 #include "zbxalgo.h"
+#include "../../libs/zbxalgo/vectorimpl.h"
 
 extern unsigned char	program_type;
 
@@ -209,30 +210,107 @@ static int	DBpatch_6010015(void)
 #define DBPATCH_TPLGRP_GROUPIDS	DBPATCH_GROUPIDS("=")
 #define DBPATCH_HSTGRP_GROUPIDS	DBPATCH_GROUPIDS("<>")
 
+typedef struct
+{
+	zbx_uint64_t	groupid;
+	char		*name;
+	char		*uuid;
+}
+tplgrp_t;
+
+ZBX_PTR_VECTOR_DECL(tplgrp, tplgrp_t *)
+ZBX_PTR_VECTOR_IMPL(tplgrp, tplgrp_t *)
+
+static void	DBpatch_tplgrp_free(tplgrp_t *tplgrp)
+{
+	zbx_free(tplgrp->name);
+	zbx_free(tplgrp->uuid);
+}
+
+static int	DBpatch_tplgrp_startfrom(const zbx_vector_tplgrp_t *tplgrps, const char *name)
+{
+	int	i, sz;
+
+	for (i = 0; i < tplgrps->values_num; i++)
+	{
+		sz = (int)MIN(strlen(tplgrps->values[i]->name), strlen(name));
+
+		if (0 == strncmp(tplgrps->values[i]->name, name, sz))
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static void	DBpatch_hstgrp_empty_append(zbx_vector_tplgrp_t *tplgrps)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	result = DBselect(
+			"select g.groupid,g.name,g.uuid from hstgrp g"
+			" left join hosts_groups hg on hg.groupid=g.groupid"
+			" left join group_prototype p on p.groupid=g.groupid"
+			" where hg.groupid is null and p.groupid is null"
+			" order by length(g.name) asc");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		tplgrp_t	*tplgrp;
+
+		if (FAIL == DBpatch_tplgrp_startfrom(tplgrps, row[1]))
+			continue;
+
+		tplgrp = (tplgrp_t *)zbx_malloc(NULL, sizeof(tplgrp_t));
+		ZBX_STR2UINT64(tplgrp->groupid, row[0]);
+		tplgrp->name = zbx_strdup(NULL, row[1]);
+		tplgrp->uuid = zbx_strdup(NULL, row[2]);
+		zbx_vector_tplgrp_append(tplgrps, tplgrp);
+	}
+	DBfree_result(result);
+}
 
 static int	DBpatch_hstgrp2tplgrp_copy(void)
 {
 
-	zbx_db_insert_t	db_insert;
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		ret;
+	zbx_db_insert_t		db_insert;
+	zbx_vector_tplgrp_t	tplgrps;
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			i, ret;
 
+	zbx_vector_tplgrp_create(&tplgrps);
 	zbx_db_insert_prepare(&db_insert, "tplgrp", "groupid", "name", "uuid", NULL);
 
 	result = DBselect(
-			"select o.name,o.uuid from hstgrp o"
+			"select o.groupid,o.name,o.uuid from hstgrp o"
 			" where o.groupid in (" DBPATCH_TPLGRP_GROUPIDS
 			") order by o.groupid asc");
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), row[0], row[1]);
+		tplgrp_t	*tplgrp;
+
+		tplgrp = (tplgrp_t *)zbx_malloc(NULL, sizeof(tplgrp_t));
+		ZBX_STR2UINT64(tplgrp->groupid, row[0]);
+		tplgrp->name = zbx_strdup(NULL, row[1]);
+		tplgrp->uuid = zbx_strdup(NULL, row[2]);
+		zbx_vector_tplgrp_append(&tplgrps, tplgrp);
 	}
 	DBfree_result(result);
 
+	DBpatch_hstgrp_empty_append(&tplgrps);
+	zbx_vector_tplgrp_sort(&tplgrps, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	for (i = 0 ; i < tplgrps.values_num; i++)
+	{
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), tplgrps.values[i]->name, tplgrps.values[i]->uuid);
+	}
+
 	zbx_db_insert_autoincrement(&db_insert, "groupid");
 	ret = zbx_db_insert_execute(&db_insert);
+	zbx_vector_tplgrp_clear_ext(&tplgrps, DBpatch_tplgrp_free);
+	zbx_vector_tplgrp_destroy(&tplgrps);
 	zbx_db_insert_clean(&db_insert);
 
 	return ret;
