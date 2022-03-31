@@ -95,6 +95,108 @@ static int	DBpatch_6010003(void)
 
 	return DBmodify_field_type("triggers", &field, &old_field);
 }
+
+static int	DBpatch_6010004(void)
+{
+	const ZBX_TABLE	table =
+			{"users_directory", "userdirectoryid", 0,
+				{
+					{"userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"description", "", NULL, NULL, 255, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"host", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"port", "389", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"base_dn", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"bind_dn", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"bind_password", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"search_attribute", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"search_filter", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"case_sensitive", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6010005(void)
+{
+	const ZBX_FIELD	field = {"ldap_defaultid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6010006(void)
+{
+	const ZBX_FIELD	field = {"ldap_defaultid", NULL, "users_directory", "userdirectoryid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("config", 3, &field);
+}
+
+static int	DBpatch_6010007(void)
+{
+	const ZBX_FIELD	field = {"ldap_serverid", "0", NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBadd_field("usrgrp", &field);
+}
+
+static int	DBpatch_6010008(void)
+{
+	// Create users_directory row from config.ldap_* fields data when config.ldap_configured == 1
+	if (ZBX_DB_OK > DBexecute("insert into users_directory "
+			"(userdirectoryid, name, description, host, port, base_dn, bind_dn, bind_password, search_attribute, case_sensitive) "
+			"select 1, 'Default LDAP server', '', ldap_host, ldap_port, ldap_base_dn, ldap_bind_dn, ldap_bind_password, ldap_search_attribute, ldap_case_sensitive "
+			"  from config where ldap_configured=1 limit 1"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6010009(void)
+{
+	// Set config.ldap_defaultid when config.ldap_configured == 1
+	if (ZBX_DB_OK > DBexecute("update config set ldap_defaultid=1 where ldap_configured=1 limit 1"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6010010(void)
+{
+	return DBdrop_field("config", "ldap_host");
+}
+
+static int	DBpatch_6010011(void)
+{
+	return DBdrop_field("config", "ldap_port");
+}
+
+static int	DBpatch_6010012(void)
+{
+	return DBdrop_field("config", "ldap_base_dn");
+}
+
+static int	DBpatch_6010013(void)
+{
+	return DBdrop_field("config", "ldap_bind_dn");
+}
+
+static int	DBpatch_6010014(void)
+{
+	return DBdrop_field("config", "ldap_bind_password");
+}
+
+static int	DBpatch_6010015(void)
+{
+	return DBdrop_field("config", "ldap_search_attribute");
+}
+
+static int	DBpatch_6010016(void)
+{
+	return DBdrop_field("config", "ldap_case_sensitive");
+}
+
 #endif
 
 DBPATCH_START(6010)
@@ -105,5 +207,18 @@ DBPATCH_ADD(6010000, 0, 1)
 DBPATCH_ADD(6010001, 0, 1)
 DBPATCH_ADD(6010002, 0, 1)
 DBPATCH_ADD(6010003, 0, 1)
+DBPATCH_ADD(6010004, 0, 1)
+DBPATCH_ADD(6010005, 0, 1)
+DBPATCH_ADD(6010006, 0, 1)
+DBPATCH_ADD(6010007, 0, 1)
+DBPATCH_ADD(6010008, 0, 1)
+DBPATCH_ADD(6010009, 0, 1)
+DBPATCH_ADD(6010010, 0, 1)
+DBPATCH_ADD(6010011, 0, 1)
+DBPATCH_ADD(6010012, 0, 1)
+DBPATCH_ADD(6010013, 0, 1)
+DBPATCH_ADD(6010014, 0, 1)
+DBPATCH_ADD(6010015, 0, 1)
+DBPATCH_ADD(6010016, 0, 1)
 
 DBPATCH_END()

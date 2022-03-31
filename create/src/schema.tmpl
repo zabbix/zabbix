@@ -341,6 +341,7 @@ FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|gui_access	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|users_status	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|debug_mode	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|ldap_serverid	|t_id	|'0'	|NOT NULL	|0
 UNIQUE		|1		|name
 
 TABLE|users_groups|id|ZBX_DATA
@@ -483,12 +484,6 @@ FIELD		|work_period	|t_varchar(255)	|'1-5,09:00-18:00'|NOT NULL|0
 FIELD		|alert_usrgrpid	|t_id		|	|NULL		|0			|1|usrgrp	|usrgrpid	|RESTRICT
 FIELD		|default_theme	|t_varchar(128)	|'blue-theme'|NOT NULL	|ZBX_NODATA
 FIELD		|authentication_type|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|ldap_host	|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
-FIELD		|ldap_port	|t_integer	|389	|NOT NULL	|ZBX_NODATA
-FIELD		|ldap_base_dn	|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
-FIELD		|ldap_bind_dn	|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
-FIELD		|ldap_bind_password|t_varchar(128)|''	|NOT NULL	|ZBX_NODATA
-FIELD		|ldap_search_attribute|t_varchar(128)|''|NOT NULL	|ZBX_NODATA
 FIELD		|discovery_groupid|t_id		|	|NOT NULL	|ZBX_PROXY		|2|hstgrp	|groupid	|RESTRICT
 FIELD		|max_in_table	|t_integer	|'50'	|NOT NULL	|ZBX_NODATA
 FIELD		|search_limit	|t_integer	|'1000'	|NOT NULL	|ZBX_NODATA
@@ -540,7 +535,6 @@ FIELD		|http_login_form	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|http_strip_domains	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|http_case_sensitive	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|ldap_configured		|t_integer		|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|ldap_case_sensitive	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|db_extension	|t_varchar(32)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|autoreg_tls_accept	|t_integer	|'1'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|compression_status	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
@@ -594,8 +588,10 @@ FIELD		|geomaps_tile_url	|t_varchar(1024)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|geomaps_max_zoom	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|geomaps_attribution|t_varchar(1024)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|vault_provider	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|ldap_defaultid	|t_id	|NULL |NULL	|0		|3|users_directory	|userdirectoryid|RESTRICT
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
+INDEX		|3		|ldap_defaultid
 
 TABLE|triggers|triggerid|ZBX_TEMPLATE
 FIELD		|triggerid	|t_id		|	|NOT NULL	|0
@@ -1933,8 +1929,21 @@ FIELD		|operator		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|value			|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1			|slaid
 
+TABLE|users_directory|userdirectoryid|ZBX_DATA
+FIELD		|userdirectoryid	|t_id			|		|NOT NULL	|0
+FIELD		|name				|t_varchar(128)	|''		|NOT NULL	|0
+FIELD		|description		|t_shorttext	|''		|NOT NULL	|0
+FIELD		|host				|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|port				|t_integer		|389	|NOT NULL	|0
+FIELD		|base_dn			|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|bind_dn			|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|bind_password		|t_varchar(128)	|''		|NOT NULL	|0
+FIELD		|search_attribute	|t_varchar(128)	|''		|NOT NULL	|0
+FIELD		|search_filter		|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|case_sensitive		|t_integer		|'1'	|NOT NULL	|0
+
 TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6010003	|6010003
+ROW		|1		|6010016	|6010016
