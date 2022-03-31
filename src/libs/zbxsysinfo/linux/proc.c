@@ -1588,11 +1588,11 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 static zbx_proc_data_t	*proc_get_data(FILE *f_status, FILE *f_stat, FILE *f_io, int zbx_proc_mode)
 {
-	zbx_proc_data_t	*proc_data;
 	zbx_uint64_t	val;
 	char		buf[MAX_STRING_LEN], *ptr, *state;
-	int		n = 0, offset;
+	int		offset, n = 0;
 	long		hz;
+	zbx_proc_data_t	*proc_data;
 
 	proc_data = (zbx_proc_data_t *)zbx_malloc(NULL, sizeof(zbx_proc_data_t));
 	memset(proc_data, 0, sizeof(zbx_proc_data_t));
@@ -1702,8 +1702,8 @@ out:
 static zbx_proc_data_t	*proc_read_data(char *path, int zbx_proc_mode)
 {
 	char		tmp[MAX_STRING_LEN];
-	zbx_proc_data_t	*proc_data;
 	FILE		*f_status, *f_stat, *f_io;
+	zbx_proc_data_t	*proc_data;
 
 	zbx_snprintf(tmp, sizeof(tmp), "%s/status", path);
 
@@ -1732,16 +1732,15 @@ static zbx_proc_data_t	*proc_read_data(char *path, int zbx_proc_mode)
 
 int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			*procname, *proccomm, *param;
-	char			*pname = NULL, *cmdline = NULL;
+	char			*procname, *proccomm, *param, *prname = NULL, *cmdline = NULL;
+	int			invalid_user = 0, zbx_proc_mode, i;
 	DIR			*dir;
+	FILE			*f_cmd = NULL, *f_status = NULL, *f_stat = NULL, *f_io = NULL;
 	struct dirent		*entries;
 	struct passwd		*usrinfo;
-	FILE			*f_cmd = NULL, *f_status = NULL, *f_stat = NULL, *f_io = NULL;
-	int			invalid_user = 0, zbx_proc_mode, i;
+	struct zbx_json		j;
 	zbx_proc_data_t		*proc_data;
 	zbx_vector_ptr_t	proc_data_ctx;
-	struct zbx_json		j;
 
 	if (4 < request->nparam)
 	{
@@ -1815,7 +1814,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_fclose(f_cmd);
 		zbx_fclose(f_status);
 		zbx_free(cmdline);
-		zbx_free(pname);
+		zbx_free(prname);
 
 		if (FAIL == is_uint32(entries->d_name, &pid))
 			continue;
@@ -1833,39 +1832,44 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (SUCCEED != get_cmdline(f_cmd, &cmdline, &l))
 			continue;
 
+		read_value_from_proc_file(f_status, 0, "Name", PROC_VAL_TYPE_TEXT, NULL, &prname);
+
 		if ('\0' != *cmdline)
 		{
-			char	*p, *pdel;
-			size_t	alloc_len = 0, offset = 0, len, sz;
+			char	*p, *pend, sep;
+			size_t	len;
+
+			if (NULL != (pend = strpbrk(cmdline, " :")))
+			{
+				sep = *pend;
+				*pend = '\0';
+			}
 
 			if (NULL == (p = strrchr(cmdline, '/')))
 				p = cmdline;
 			else
 				p++;
 
-			if (NULL != (pdel = strchr(p, ' ')))
-				len = (size_t)(pdel - p);
-			else
-				len = strlen(p);
+			if (NULL == prname || (strlen(p) > (len = strlen(prname)) && 0 == strncmp(p, prname, len)))
+				prname = zbx_strdup(prname, p);
 
-			zbx_strncpy_alloc(&pname, &alloc_len, &offset, p, len);
+			if (NULL != pend)
+				*pend = sep;
 
-			for (sz = 0, l -= 2; sz < l; sz++)
+			for (len = 0, l -= 2; len < l; len++)
 			{
-				if ('\0' == cmdline[sz])
-					cmdline[sz] = ' ';
+				if ('\0' == cmdline[len])
+					cmdline[len] = ' ';
 			}
 		}
-		else
-			read_value_from_proc_file(f_status, 0, "Name", PROC_VAL_TYPE_TEXT, NULL, &pname);
 
-		if (NULL != procname && '\0' != *procname && 0 != strcmp(pname, procname))
+		if (NULL == prname || (NULL != procname && '\0' != *procname && 0 != strcmp(prname, procname)))
 			continue;
 
 		if (FAIL == check_user(f_status, usrinfo))
 			continue;
 
-		if (FAIL == check_proccomm(f_cmd, proccomm))
+		if (NULL != proccomm && '\0' != *proccomm && NULL == zbx_regexp_match(cmdline, proccomm, NULL))
 			continue;
 
 		if (ZBX_PROC_MODE_THREAD == zbx_proc_mode)
@@ -1891,7 +1895,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 					{
 						proc_data->pid = pid;
 						proc_data->tid = tid;
-						proc_data->name = zbx_strdup(NULL, pname);
+						proc_data->name = zbx_strdup(NULL, prname);
 						zbx_vector_ptr_append(&proc_data_ctx, proc_data);
 					}
 				}
@@ -1917,7 +1921,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 				proc_data->pid = pid;
 				proc_data->cmdline = cmdline;
-				proc_data->name = pname;
+				proc_data->name = prname;
 
 				zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/fd", entries->d_name);
 
@@ -1928,11 +1932,12 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 					if (2 <= proc_data->fds)
 						proc_data->fds -= 2;
+
+					closedir(fddir);
 				}
-				closedir(fddir);
 
 				zbx_vector_ptr_append(&proc_data_ctx, proc_data);
-				cmdline = pname = NULL;
+				cmdline = prname = NULL;
 			}
 		}
 	}
@@ -1943,7 +1948,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	closedir(dir);
 
 	zbx_free(cmdline);
-	zbx_free(pname);
+	zbx_free(prname);
 
 	if (ZBX_PROC_MODE_SUMMARY == zbx_proc_mode)
 	{
