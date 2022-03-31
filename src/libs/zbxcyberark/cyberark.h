@@ -17,24 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_TELNET_H
-#define ZABBIX_TELNET_H
+#ifndef ZABBIX_CYBERARK_H
+#define ZABBIX_CYBERARK_H
 
-#include "module.h"
-#include "comms.h"
+#include "../zbxkvs/kvs.h"
 
-#define WAIT_READ	0
-#define WAIT_WRITE	1
+#define ZBX_CYBERARK_NAME		"CyberArk"
+#define ZBX_CYBERARK_DBUSER_KEY		"UserName"
+#define ZBX_CYBERARK_DBPASSWORD_KEY	"Content"
 
-#define CMD_IAC		255
-#define CMD_WILL	251
-#define CMD_WONT	252
-#define CMD_DO		253
-#define CMD_DONT	254
-#define OPT_SGA		3
-
-int	telnet_test_login(ZBX_SOCKET socket_fd);
-int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *password, AGENT_RESULT *result);
-int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *result, const char *encoding);
-
+int	zbx_cyberark_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,
+		const char *ssl_key_file, const char *path, long timeout, zbx_kvs_t *kvs, char **error);
 #endif

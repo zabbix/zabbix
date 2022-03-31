@@ -1,3 +1,4 @@
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -17,11 +18,25 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_XML_H
-#define ZABBIX_XML_H
 
-#include "zbxembed.h"
+/**
+ * Abstract vault access class.
+ */
+abstract class CVault {
 
-int	zbx_es_init_xml(zbx_es_t *es, char **error);
+	/**
+	 * @var array
+	 */
+	private $errors = [];
 
-#endif
+	abstract public function validateParameters(): bool;
+	abstract public function getCredentials(): ?array;
+
+	public function addError(string $error): void {
+		$this->errors[] = $error;
+	}
+
+	public function getErrors(): array {
+		return $this->errors;
+	}
+}

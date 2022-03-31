@@ -27,6 +27,7 @@
 #include "zbxmedia.h"
 #include "zbxembed.h"
 #include "zbxserialize.h"
+#include "zbxxml.h"
 
 #define ZBX_AM_LOCATION_NOWHERE		0
 #define ZBX_AM_LOCATION_QUEUE		1
@@ -1104,7 +1105,7 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 		{
 			char	*am_esc;
 
-			am_esc = xml_escape_dyn(alert_message);
+			am_esc = zbx_xml_escape_dyn(alert_message);
 			alert_message = zbx_dsprintf(alert_message, "<html><pre>%s</pre></html>", am_esc);
 			zbx_free(am_esc);
 		}
@@ -2198,8 +2199,8 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 
 			if (NULL == (source = zbx_hashset_search(&sources, &source_local)))
 			{
+				source_local.alerts_num = 0;
 				source = zbx_hashset_insert(&sources, &source_local, sizeof(source_local));
-				source->alerts_num = 0;
 				zbx_vector_ptr_append(&view, source);
 			}
 			source->alerts_num++;

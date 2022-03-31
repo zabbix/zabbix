@@ -28,6 +28,7 @@
 #include "proxydata.h"
 #include "daemon.h"
 #include "zbxcrypto.h"
+#include "zbxcommshigh.h"
 #include "../../libs/zbxserver/zabbix_stats.h"
 #include "../poller/checks_snmp.h"
 #include "trapper_auth.h"
@@ -1103,7 +1104,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 
 		if ('<' == *s)	/* XML protocol */
 		{
-			comms_parse_response(s, host, sizeof(host), key, sizeof(key), value_dec,
+			zbx_comms_parse_response(s, host, sizeof(host), key, sizeof(key), value_dec,
 					sizeof(value_dec), lastlogsize, sizeof(lastlogsize), timestamp,
 					sizeof(timestamp), source, sizeof(source), severity, sizeof(severity));
 

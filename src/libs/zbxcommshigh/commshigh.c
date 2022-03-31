@@ -17,14 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "comms.h"
+#include "zbxcommshigh.h"
 
 #include "common.h"
 #include "zbxjson.h"
 #include "log.h"
+
 #if !defined(_WINDOWS) && !defined(__MINGW32)
 #include "daemon.h"
 #endif
+
 #include "zbxalgo.h"
 #include "cfg.h"
 
@@ -64,13 +66,13 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 	return ret;
 }
 
-int	connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_t *addrs, int timeout,
+int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_t *addrs, int timeout,
 		int connect_timeout, unsigned int tls_connect, int retry_interval, int level)
 {
 	int	res;
 	char	*tls_arg1, *tls_arg2;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In connect_to_server() [%s]:%d [timeout:%d, connection timeout:%d]",
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s]:%d [timeout:%d, connection timeout:%d]", __func__,
 			((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port, timeout,
 			connect_timeout);
 
@@ -131,7 +133,7 @@ int	connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_
 	return res;
 }
 
-void	disconnect_server(zbx_socket_t *sock)
+void	zbx_disconnect_from_server(zbx_socket_t *sock)
 {
 	zbx_tcp_close(sock);
 }
@@ -144,7 +146,7 @@ void	disconnect_server(zbx_socket_t *sock)
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-int	get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error)
+int	zbx_get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error)
 {
 	int		ret = FAIL;
 
@@ -181,7 +183,7 @@ exit:
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-int	put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error)
+int	zbx_put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error)
 {
 	int	ret = FAIL;
 

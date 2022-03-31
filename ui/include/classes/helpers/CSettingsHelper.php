@@ -85,6 +85,7 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	public const GEOMAPS_MAX_ZOOM = 'geomaps_max_zoom';
 	public const GEOMAPS_ATTRIBUTION = 'geomaps_attribution';
 	public const HA_FAILOVER_DELAY = 'ha_failover_delay';
+	public const VAULT_PROVIDER = 'vault_provider';
 
 	/**
 	 * Settings API object parameters array.

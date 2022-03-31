@@ -20,24 +20,12 @@
 #ifndef ZABBIX_ZBXVAULT_H
 #define ZABBIX_ZBXVAULT_H
 
-#include "common.h"
-#include "zbxalgo.h"
+#include "../zbxkvs/kvs.h"
 
-typedef struct
-{
-	char	*key;
-	char	*value;
-}
-zbx_kv_t;
+int	zbx_vault_init(char **error);
+int	zbx_vault_kvs_get(const char *path, zbx_kvs_t *kvs, char **error);
+int	zbx_vault_db_credentials_get(char **dbuser, char **dbpassword, char **error);
 
-zbx_hash_t	zbx_vault_kv_hash(const void *data);
-int		zbx_vault_kv_compare(const void *d1, const void *d2);
-void		zbx_vault_kv_clean(void *data);
-
-int	zbx_vault_init_token_from_env(char **error);
-int	zbx_vault_init_db_credentials(char **error);
-int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error);
-int	zbx_vault_json_kvs_get(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_hashset_t *kvs,
-		char **error);
+int	zbx_vault_token_from_env_get(char **token, char **error);
 
 #endif

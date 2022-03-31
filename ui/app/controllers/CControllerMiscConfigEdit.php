@@ -44,7 +44,8 @@ class CControllerMiscConfigEdit extends CController {
 			'media_type_test_timeout' =>		'db config.media_type_test_timeout',
 			'script_timeout' =>					'db config.script_timeout',
 			'item_test_timeout' =>				'db config.item_test_timeout',
-			'report_test_timeout' =>			'db config.report_test_timeout'
+			'report_test_timeout' =>			'db config.report_test_timeout',
+			'vault_provider' =>					'db config.vault_provider'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -113,6 +114,10 @@ class CControllerMiscConfigEdit extends CController {
 				CSettingsHelper::SCHEDULED_REPORT_TEST_TIMEOUT
 			))
 		];
+
+		$data['vault_provider'] = $this->getInput('vault_provider',
+			CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER)
+		);
 
 		$data['discovery_group_data'] = API::HostGroup()->get([
 			'output' => ['groupid', 'name'],

@@ -24,7 +24,7 @@
 #include "zbxmockhelper.h"
 
 #include "common.h"
-#include "comms.h"
+#include "zbxcomms.h"
 
 static void	mock_accept(zbx_socket_t *s)
 {

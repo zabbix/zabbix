@@ -23,5 +23,6 @@
 #include "zbxtypes.h"
 
 void	zbx_audit_settings_create_entry(int audit_action, zbx_uint64_t configid);
+void	zbx_audit_settings_update_field_int(zbx_uint64_t configid, const char *key, int old_value, int new_value);
 
 #endif

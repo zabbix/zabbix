@@ -61,7 +61,7 @@ abstract class CController {
 	 *
 	 * @var array|null
 	 */
-	private $raw_input;
+	private static $raw_input;
 
 	/**
 	 * Validated input parameters.
@@ -242,13 +242,13 @@ abstract class CController {
 	 * @return bool
 	 */
 	protected function validateInput(array $validation_rules): bool {
-		if ($this->raw_input === null) {
+		if (self::$raw_input === null) {
 			$this->validation_result = self::VALIDATION_FATAL_ERROR;
 
 			return false;
 		}
 
-		$validator = new CNewValidator($this->raw_input, $validation_rules);
+		$validator = new CNewValidator(self::$raw_input, $validation_rules);
 
 		foreach ($validator->getAllErrors() as $error) {
 			info($error);
@@ -262,7 +262,7 @@ abstract class CController {
 			$this->validation_result = $validator->isError() ? self::VALIDATION_ERROR : self::VALIDATION_OK;
 		}
 
-		return $this->validation_result == self::VALIDATION_OK;
+		return ($this->validation_result == self::VALIDATION_OK);
 	}
 
 	/**
@@ -416,11 +416,11 @@ abstract class CController {
 			return false;
 		}
 
-		if (!is_array($this->raw_input) || !array_key_exists('sid', $this->raw_input)) {
+		if (!is_array(self::$raw_input) || !array_key_exists('sid', self::$raw_input)) {
 			return false;
 		}
 
-		return $this->raw_input['sid'] === $sessionid;
+		return (self::$raw_input['sid'] === $sessionid);
 	}
 
 	/**
@@ -433,16 +433,15 @@ abstract class CController {
 	private function populateRawInput(): void {
 		switch ($this->getPostContentType()) {
 			case self::POST_CONTENT_TYPE_FORM:
-				$this->raw_input = $this->getFormInput();
+				self::$raw_input = $this->getFormInput();
 				break;
 
 			case self::POST_CONTENT_TYPE_JSON:
-				$this->raw_input = $this->getJsonInput();
+				self::$raw_input = $this->getJsonInput();
 				break;
 
 			default:
-				$this->raw_input = null;
-				break;
+				self::$raw_input = null;
 		}
 	}
 
@@ -462,6 +461,7 @@ abstract class CController {
 			if ($this->checkPermissions() !== true) {
 				access_deny(ACCESS_DENY_PAGE);
 			}
+
 			$this->doAction();
 		}
 

@@ -48,8 +48,8 @@ class CWebTest extends CTest {
 
 	// Screenshot taken on test failure.
 	private $screenshot = null;
-	// Browser errors captured during test.
-	private $errors = null;
+	// Errors captured during the test.
+	private $errors = [];
 	// Failed test URL.
 	private $current_url = null;
 	// Browser errors captured during test.
@@ -74,6 +74,10 @@ class CWebTest extends CTest {
 	protected function onNotSuccessfulTest($exception): void {
 		if ($this->browser_errors !== null && $exception instanceof Exception) {
 			CExceptionHelper::setMessage($exception, $exception->getMessage()."\n\n".$this->browser_errors);
+		}
+
+		if ($this->errors !== [] && $exception instanceof Exception) {
+			CExceptionHelper::setMessage($exception, $exception->getMessage()."\n\n".implode("\n",$this->errors));
 		}
 
 		if ($this->screenshot !== null && $exception instanceof Exception) {
@@ -123,6 +127,12 @@ class CWebTest extends CTest {
 			}
 			else {
 				$this->browser_errors = $errors;
+			}
+		}
+
+		if ($this->errors) {
+			if (!$this->hasFailed() && $this->getStatus() !== null) {
+				$this->fail('Test case errors.');
 			}
 		}
 
@@ -194,6 +204,7 @@ class CWebTest extends CTest {
 			self::$shared_page = new CPage();
 		}
 
+		$this->errors = [];
 		$this->page = self::$shared_page;
 
 		// Test case level annotations.
@@ -412,59 +423,67 @@ class CWebTest extends CTest {
 			$this->fail('Cannot get unique name of the screenshot.');
 		}
 
-		$name = md5($function.$id).'.png';
-		$screenshot = CImageHelper::getImageWithoutRegions($this->page->takeScreenshot($element),
-				$this->getNormalizedRegions($element, $regions)
-		);
+		try {
+			$name = md5($function.$id).'.png';
+			$screenshot = CImageHelper::getImageWithoutRegions($this->page->takeScreenshot($element),
+					$this->getNormalizedRegions($element, $regions)
+			);
 
-		if (($reference = @file_get_contents(PHPUNIT_REFERENCE_DIR.$class.'/'.$name)) === false) {
-			if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.'ref_'.$name, $screenshot) !== false) {
+			if (($reference = @file_get_contents(PHPUNIT_REFERENCE_DIR.$class.'/'.$name)) === false) {
+				if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.'ref_'.$name, $screenshot) !== false) {
+					static::$screenshot_data[] = [
+						'class'		=> $class,
+						'function'	=> $function,
+						'id'		=> $id,
+						'delta'		=> null,
+						'error'		=> 'Reference screenshot is not set.'
+					];
+
+					throw new Exception("Reference screenshot is not set.\nCurrent screenshot saved: ".
+							PHPUNIT_SCREENSHOT_URL.'ref_'.$name
+					);
+				}
+
+				$this->fail('Reference screenshot is not set and cannot be created.');
+			}
+
+			$compare = CImageHelper::compareImages($reference, $screenshot);
+
+			if ($compare['match'] === false) {
 				static::$screenshot_data[] = [
 					'class'		=> $class,
 					'function'	=> $function,
 					'id'		=> $id,
-					'delta'		=> null,
-					'error'		=> 'Reference screenshot is not set.'
+					'delta'		=> $compare['delta'],
+					'error'		=> $compare['error']
 				];
 
-				$this->fail("Reference screenshot is not set.\nCurrent screenshot saved: ".
-						PHPUNIT_SCREENSHOT_URL.'ref_'.$name
-				);
-			}
-
-			$this->fail('Reference screenshot is not set and cannot be created.');
-		}
-
-		$compare = CImageHelper::compareImages($reference, $screenshot);
-
-		if ($compare['match'] === false) {
-			static::$screenshot_data[] = [
-				'class'		=> $class,
-				'function'	=> $function,
-				'id'		=> $id,
-				'delta'		=> $compare['delta'],
-				'error'		=> $compare['error']
-			];
-
-			if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.'ref_'.$name, $screenshot) === false) {
-				$this->fail($message."\n".'Cannot save current screenshot.');
-			}
-
-			if ($compare['ref'] !== null
-					&& file_put_contents(PHPUNIT_SCREENSHOT_DIR.'src_'.$name, $compare['ref']) === false) {
-				$this->fail($message."\n".'Cannot save reference screenshot.');
-			}
-
-			if ($compare['diff'] !== null) {
-				if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.'diff_'.$name, $compare['diff']) === false) {
-					$this->fail($message."\n".'Cannot save screenshot diff.');
+				if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.'ref_'.$name, $screenshot) === false) {
+					$this->fail($message."\n".'Cannot save current screenshot.');
 				}
 
-				$this->fail($message."\n".'Diff: '.PHPUNIT_SCREENSHOT_URL.'diff_'.$name);
+				if ($compare['ref'] !== null
+						&& file_put_contents(PHPUNIT_SCREENSHOT_DIR.'src_'.$name, $compare['ref']) === false) {
+					$this->fail($message."\n".'Cannot save reference screenshot.');
+				}
+
+				if ($compare['diff'] !== null) {
+					if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.'diff_'.$name, $compare['diff']) === false) {
+						$this->fail($message."\n".'Cannot save screenshot diff.');
+					}
+
+					throw new Exception($message."\n".'Diff: '.PHPUNIT_SCREENSHOT_URL.'diff_'.$name);
+				}
+				else {
+					throw new Exception($message.' ('.$compare['error'].")\nReference saved: ".PHPUNIT_SCREENSHOT_URL.'ref_'.$name);
+				}
 			}
-			else {
-				$this->fail($message.' ('.$compare['error'].")\nReference saved: ".PHPUNIT_SCREENSHOT_URL.'ref_'.$name);
-			}
+		}
+		catch (PHPUnit_Framework_AssertionFailedError $failure) {
+			throw $failure;
+		}
+		catch (Exception $e) {
+			$this->addCaseError($e->getMessage());
 		}
 
 		try {
@@ -601,5 +620,14 @@ class CWebTest extends CTest {
 		} catch (Exception $exception) {
 			return false;
 		}
+	}
+
+	/**
+	 * Adds test case error to the error list. Case errors are reported at the end of the test.
+	 *
+	 * @param string $error    error message
+	 */
+	public function addCaseError($error) {
+		$this->errors[] = $error;
 	}
 }

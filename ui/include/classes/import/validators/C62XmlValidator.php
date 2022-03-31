@@ -2037,15 +2037,15 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate date and time format.
 	 *
-	 * @param string $data         Import data.
-	 * @param array  $parent_data  Data's parent array.
-	 * @param string $path         XML path (for error reporting).
+	 * @param string      $data         Import data.
+	 * @param array|null  $parent_data  Data's parent array.
+	 * @param string      $path         XML path (for error reporting).
 	 *
 	 * @throws Exception if the date or time is invalid.
 	 *
 	 * @return string
 	 */
-	public function validateDateTime($data, array $parent_data = null, $path) {
+	public function validateDateTime($data, ?array $parent_data, $path) {
 		if (!preg_match('/^20[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01])T(2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]Z$/', $data)) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('YYYY-MM-DDThh:mm:ssZ', 'XML date and time format'))));
 		}
@@ -2056,7 +2056,7 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Checking the map element for requirement.
 	 *
-	 * @param array $parent_data  Data's parent array.
+	 * @param array|null $parent_data  Data's parent array.
 	 *
 	 * @throws Exception if the check is failed.
 	 *
@@ -2079,15 +2079,15 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate map elements.
 	 *
-	 * @param array|string $data         Import data.
-	 * @param array        $parent_data  Data's parent array.
-	 * @param string       $path         XML path.
+	 * @param array|string      $data         Import data.
+	 * @param array|null        $parent_data  Data's parent array.
+	 * @param string            $path         XML path.
 	 *
 	 * @throws Exception if the map elements are invalid.
 	 *
 	 * @return array|string
 	 */
-	public function validateMapElements($data, array $parent_data = null, $path) {
+	public function validateMapElements($data, ?array $parent_data, $path) {
 		$rules = $this->getMapElementsExtendedRules($parent_data);
 
 		return $this->doValidate($rules, $data, $path);
@@ -2111,15 +2111,15 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate "ymin_item_1" tag.
 	 *
-	 * @param string $data         Import data.
-	 * @param array  $parent_data  Data's parent array.
-	 * @param string $path         XML path.
+	 * @param string      $data         Import data.
+	 * @param array|null  $parent_data  Data's parent array.
+	 * @param string      $path         XML path.
 	 *
 	 * @throws Exception if the element is invalid.
 	 *
 	 * @return array
 	 */
-	public function validateYMinItem($data, array $parent_data = null, $path) {
+	public function validateYMinItem($data, ?array $parent_data, $path) {
 		if (array_key_exists('ymin_type_1', $parent_data)) {
 			if (($parent_data['ymin_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE || $parent_data['ymin_type_1'] == CXmlConstantName::ITEM)) {
 				$rules = ['type' => XML_ARRAY, 'rules' => [
@@ -2141,15 +2141,15 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate "ymax_item_1" tag.
 	 *
-	 * @param string $data         Import data.
-	 * @param array  $parent_data  Data's parent array.
-	 * @param string $path         XML path.
+	 * @param string      $data         Import data.
+	 * @param array|null  $parent_data  Data's parent array.
+	 * @param string      $path         XML path.
 	 *
 	 * @throws Exception if the element is invalid.
 	 *
 	 * @return array
 	 */
-	public function validateYMaxItem($data, array $parent_data = null, $path) {
+	public function validateYMaxItem($data, ?array $parent_data, $path) {
 		if (array_key_exists('ymax_type_1', $parent_data)) {
 			if (($parent_data['ymax_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE || $parent_data['ymax_type_1'] == CXmlConstantName::ITEM)) {
 				$rules = ['type' => XML_ARRAY, 'rules' => [
@@ -2171,15 +2171,15 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate media type "parameters" tag.
 	 *
-	 * @param string $data         Import data.
-	 * @param array  $parent_data  Data's parent array.
-	 * @param string $path         XML path.
+	 * @param string      $data         Import data.
+	 * @param array|null  $parent_data  Data's parent array.
+	 * @param string      $path         XML path.
 	 *
 	 * @throws Exception if the element is invalid.
 	 *
 	 * @return array
 	 */
-	public function validateMediaTypeParameters($data, array $parent_data, $path) {
+	public function validateMediaTypeParameters($data, ?array $parent_data, $path) {
 		$rules = $this->getMediaTypeParametersExtendedRules($parent_data);
 
 		return $this->doValidate($rules, $data, $path);
@@ -2199,15 +2199,15 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate "posts" tag of http test step.
 	 *
-	 * @param array|string $data         Import data.
-	 * @param array        $parent_data  Data's parent array.
-	 * @param string       $path         XML path.
+	 * @param array|string  $data         Import data.
+	 * @param array|null    $parent_data  Data's parent array.
+	 * @param string        $path         XML path.
 	 *
 	 * @throws Exception if the element is invalid.
 	 *
 	 * @return array
 	 */
-	public function validateHttpPosts($data, array $parent_data = null, $path) {
+	public function validateHttpPosts($data, ?array $parent_data, $path) {
 		if (is_array($data)) {
 			// Posts can be an HTTP pair array.
 			$rules = ['type' => XML_INDEXED_ARRAY, 'prefix' => 'post_field', 'rules' => [
@@ -2228,15 +2228,15 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate master item.
 	 *
-	 * @param string $data         Import data.
-	 * @param array  $parent_data  Data's parent array.
-	 * @param string $path         XML path.
+	 * @param string      $data         Import data.
+	 * @param array|null  $parent_data  Data's parent array.
+	 * @param string      $path         XML path.
 	 *
 	 * @throws Exception if the element is invalid.
 	 *
 	 * @return array
 	 */
-	public function validateMasterItem($data, array $parent_data = null, $path) {
+	public function validateMasterItem($data, ?array $parent_data, $path) {
 		$prefix = substr(strrchr($path, '/'), 1);
 		$rules = ['type' => XML_ARRAY | XML_REQUIRED, 'prefix' => $prefix, 'rules' => ['key' => ['type' => XML_STRING]]];
 
@@ -2250,15 +2250,15 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate authtype.
 	 *
-	 * @param string $data         Import data.
-	 * @param array  $parent_data  Data's parent array.
-	 * @param string $path         XML path.
+	 * @param string      $data         Import data.
+	 * @param array|null  $parent_data  Data's parent array.
+	 * @param string      $path         XML path.
 	 *
 	 * @throws Exception if the element is invalid.
 	 *
 	 * @return array
 	 */
-	public function validateAuthType($data, array $parent_data = null, $path) {
+	public function validateAuthType($data, ?array $parent_data, $path) {
 		$rules = $this->getAuthTypeExtendedRules($parent_data);
 
 		return $this->doValidate($rules, $data, $path);
@@ -2267,15 +2267,15 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate graph_items tag.
 	 *
-	 * @param array  $data         Import data.
-	 * @param array  $parent_data  Data's parent array.
-	 * @param string $path         XML path.
+	 * @param array       $data         Import data.
+	 * @param array|null  $parent_data  Data's parent array.
+	 * @param string      $path         XML path.
 	 *
 	 * @throws Exception if the element is invalid.
 	 *
 	 * @return array
 	 */
-	public function validateGraphItems(array $data, array $parent_data = null, $path) {
+	public function validateGraphItems(array $data, ?array $parent_data, $path) {
 		if (!$data) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('the tag "%1$s" is missing', 'graph_item')));
 		}
@@ -2286,15 +2286,15 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate preprocessing step error handler.
 	 *
-	 * @param string|array $data         Import data.
-	 * @param array        $parent_data  Data's parent array.
-	 * @param string       $path         XML path.
+	 * @param string|array  $data         Import data.
+	 * @param array|null    $parent_data  Data's parent array.
+	 * @param string        $path         XML path.
 	 *
 	 * @throws Exception if the element is invalid.
 	 *
 	 * @return string|array
 	 */
-	public function validatePreprocErrHandler($data, array $parent_data, $path) {
+	public function validatePreprocErrHandler($data, ?array $parent_data, $path) {
 		$in = $this->ITEM_PREPROCESSING_ERROR_HANDLER;
 
 		if ($parent_data['type'] == CXmlConstantName::CHECK_NOT_SUPPORTED) {
@@ -2309,15 +2309,15 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	/**
 	 * Validate widget field "value" tag.
 	 *
-	 * @param string|array $data         Import data.
-	 * @param array        $parent_data  Data's parent array.
-	 * @param string       $path         XML path.
+	 * @param string|array  $data         Import data.
+	 * @param array|null    $parent_data  Data's parent array.
+	 * @param string        $path         XML path.
 	 *
 	 * @throws Exception if the element is invalid.
 	 *
 	 * @return string|array
 	 */
-	public function validateWidgetFieldValue($data, array $parent_data = null, string $path) {
+	public function validateWidgetFieldValue($data, ?array $parent_data, string $path) {
 		$rules = $this->getWidgetFieldValueExtendedRules($parent_data);
 
 		return $this->doValidate($rules, $data, $path);

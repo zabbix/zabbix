@@ -5469,55 +5469,55 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/numeric": a number has too many fractional digits.'
 			],
 			[
-				['type' => API_VAULT_SECRET, 'length' => 18],
+				['type' => API_VAULT_SECRET, 'provider' => ZBX_VAULT_TYPE_HASHICORP, 'length' => 18],
 				'path/to/secret:key',
 				'/1/secret',
 				'path/to/secret:key'
 			],
 			[
-				['type' => API_VAULT_SECRET, 'length' => 27],
+				['type' => API_VAULT_SECRET, 'provider' => ZBX_VAULT_TYPE_HASHICORP, 'length' => 27],
 				'mount%2Fpoint/to/secret:key',
 				'/1/secret',
 				'mount%2Fpoint/to/secret:key'
 			],
 			[
-				['type' => API_VAULT_SECRET, 'length' => 17],
+				['type' => API_VAULT_SECRET, 'provider' => ZBX_VAULT_TYPE_HASHICORP, 'length' => 17],
 				'path/to/secret:key',
 				'/1/secret',
 				'Invalid parameter "/1/secret": value is too long.'
 			],
 			[
-				['type' => API_VAULT_SECRET],
+				['type' => API_VAULT_SECRET, 'provider' => ZBX_VAULT_TYPE_HASHICORP],
 				'/pathtosecret:key',
 				'/1/secret',
 				'Invalid parameter "/1/secret": incorrect syntax near "/pathtosecret:key".'
 			],
 			[
-				['type' => API_VAULT_SECRET],
+				['type' => API_VAULT_SECRET, 'provider' => ZBX_VAULT_TYPE_HASHICORP],
 				'',
 				'/1/secret',
 				'Invalid parameter "/1/secret": cannot be empty.'
 			],
 			[
-				['type' => API_VAULT_SECRET],
+				['type' => API_VAULT_SECRET, 'provider' => ZBX_VAULT_TYPE_HASHICORP],
 				true,
 				'/1/secret',
 				'Invalid parameter "/1/secret": a character string is expected.'
 			],
 			[
-				['type' => API_VAULT_SECRET],
+				['type' => API_VAULT_SECRET, 'provider' => ZBX_VAULT_TYPE_HASHICORP],
 				[],
 				'/1/secret',
 				'Invalid parameter "/1/secret": a character string is expected.'
 			],
 			[
-				['type' => API_VAULT_SECRET],
+				['type' => API_VAULT_SECRET, 'provider' => ZBX_VAULT_TYPE_HASHICORP],
 				null,
 				'/1/secret',
 				'Invalid parameter "/1/secret": a character string is expected.'
 			],
 			[
-				['type' => API_VAULT_SECRET],
+				['type' => API_VAULT_SECRET, 'provider' => ZBX_VAULT_TYPE_HASHICORP],
 				// broken UTF-8 byte sequence
 				'{$MACRO: '."\xd1".'ontext}',
 				'/1/secret',

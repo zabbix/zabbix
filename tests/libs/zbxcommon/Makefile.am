@@ -81,8 +81,10 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
@@ -203,7 +205,7 @@ zbx_json_to_xml_LDADD += @SERVER_LIBS@
 
 zbx_json_to_xml_LDFLAGS = @SERVER_LDFLAGS@
 
-zbx_json_to_xml_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_json_to_xml_CFLAGS = $(COMMON_COMPILER_FLAGS) @LIBXML2_CFLAGS@
 
 
 zbx_xml_to_json_SOURCES = \
@@ -217,7 +219,7 @@ zbx_xml_to_json_LDADD += @SERVER_LIBS@
 
 zbx_xml_to_json_LDFLAGS = @SERVER_LDFLAGS@
 
-zbx_xml_to_json_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_xml_to_json_CFLAGS = $(COMMON_COMPILER_FLAGS) @LIBXML2_CFLAGS@
 
 
 zbx_token_find_SOURCES = \
