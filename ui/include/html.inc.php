@@ -578,24 +578,12 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
 /**
  * Create HTML helper element for host interfaces availability.
  *
- * @param array $host_interfaces                                Array of arrays of host interfaces.
- * @param int   $host_interfaces[]['type']                      Interface type.
- * @param int   $host_interfaces[]['available']                 Interface availability.
- * @param int   $host_interfaces[]['useip']                     Interface use IP or DNS.
- * @param int   $host_interfaces[]['ip']                        Interface IP address.
- * @param int   $host_interfaces[]['dns']                       Interface domain name.
- * @param int   $host_interfaces[]['port']                      Interface port.
- * @param int   $host_interfaces[]['details']['version']        Interface SNMP version.
- * @param int   $host_interfaces[]['details']['contextname']    Interface context name for SNMP version 3.
- * @param int   $host_interfaces[]['details']['community']      Interface community for SNMP non version 3 interface.
- * @param int   $host_interfaces[]['details']['securitylevel']  Security level for SNMP version 3 interface.
- * @param int   $host_interfaces[]['details']['authprotocol']   Authentication protocol for SNMP version 3 interface.
- * @param int   $host_interfaces[]['details']['privprotocol']   Privacy protocol for SNMP version 3 interface.
- * @param int   $host_interfaces[]['error']                     Interface error message.
+ * @param array  $host_interfaces
+ * @param string $hostid
  *
  * @return CHostAvailability
  */
-function getHostAvailabilityTable($host_interfaces, $hostid): CHostAvailability {
+function getHostAvailabilityTable(array $host_interfaces, string $hostid): CHostAvailability {
 	$interfaces = [];
 
 	foreach ($host_interfaces as $interface) {
@@ -614,12 +602,18 @@ function getHostAvailabilityTable($host_interfaces, $hostid): CHostAvailability 
 		];
 	}
 
-	$host_rtdata = DB::find('host_rtdata');
 	$availability_status = 0;
-	foreach ($host_rtdata as $item) {
-		if ($item['hostid'] == $hostid) {
-			$availability_status = $item['availability_status'];
-		}
+
+	$host_availability_status = DB::select('host_rtdata', [
+		'output' => ['availability_status'],
+		'filter' => [
+			'hostid' => [$hostid]
+		],
+		'limit' => 1
+	]);
+
+	if ($host_availability_status) {
+		$availability_status = $host_availability_status[0]['availability_status'];
 	}
 
 	return (new CHostAvailability())->setInterfaces($interfaces, $availability_status);

@@ -45,29 +45,25 @@ class CHostAvailability extends CTag {
 	/**
 	 * Set host interfaces.
 	 *
-	 * @param array  $interfaces                 Array of arrays with all host interfaces.
-	 * @param int    $interfaces[]['type']       Type of interface, INTERFACE_TYPE_* constant.
-	 * @param string $interfaces[]['interface']  Hint table 'Interface' column value.
-	 * @param string $interfaces[]['detail']     Hint table 'Interface' column additional details string.
-	 * @param int    $interfaces[]['available']  Hint table 'Status' column value, INTERFACE_AVAILABLE_* constant.
-	 * @param string $interfaces[]['error']      Hint table 'Error' column value.
+	 * @param array  $interfaces
+	 * @param string $availability_status
 	 *
 	 * @return CHostAvailability
 	 */
-	public function setInterfaces(array $interfaces, $availability_status): CHostAvailability {
-
-		if (!$availability_status) {
-			return $this;
-		}
+	public function setInterfaces(array $interfaces, string $availability_status): CHostAvailability {
 		$this->type_interfaces = array_fill_keys(array_keys(static::LABELS), []);
 
 		foreach ($interfaces as $interface) {
 			$this->type_interfaces[$interface['type']][] = $interface;
 		}
 
-		$active_checks = array('type'=>'1','available'=>$availability_status,'interface'=>'Active checks',
-			'description'=>NULL, 'error'=>'');
-		$this->type_interfaces[1][] = $active_checks;
+		$this->type_interfaces[INTERFACE_TYPE_AGENT][] = [
+			'type' => INTERFACE_TYPE_AGENT,
+			'available' => $availability_status,
+			'interface' => _('Active checks'),
+			'description' => null,
+			'error' => ''
+		];
 
 		return $this;
 	}
