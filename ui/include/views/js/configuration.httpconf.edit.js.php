@@ -1162,8 +1162,12 @@
 			overlay.unsetLoading();
 		})
 		.done(function(ret) {
-			if (typeof ret.errors !== 'undefined') {
-				return jQuery(ret.errors).insertBefore(this.$form);
+			if ('error' in ret) {
+				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);
+
+				message_box.insertBefore(this.$form);
+
+				return;
 			}
 
 			if (!httpconf.steps.data[ret.params.no]) {
