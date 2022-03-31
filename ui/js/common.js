@@ -709,24 +709,27 @@ function validate_trigger_expression(overlay) {
 		success: function(ret) {
 			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 
-			if (typeof ret.errors !== 'undefined') {
-				jQuery(ret.errors).insertBefore($form);
+			if ('error' in ret) {
+				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);
+
+				message_box.insertBefore($form);
+
+				return;
+			}
+
+			var form = window.document.forms[ret.dstfrm];
+			var obj = (typeof form !== 'undefined')
+				? jQuery(form).find('#' + ret.dstfld1).get(0)
+				: document.getElementById(ret.dstfld1);
+
+			if (ret.dstfld1 === 'expression' || ret.dstfld1 === 'recovery_expression') {
+				jQuery(obj).val(jQuery(obj).val() + ret.expression);
 			}
 			else {
-				var form = window.document.forms[ret.dstfrm];
-				var obj = (typeof form !== 'undefined')
-					? jQuery(form).find('#' + ret.dstfld1).get(0)
-					: document.getElementById(ret.dstfld1);
-
-				if (ret.dstfld1 === 'expression' || ret.dstfld1 === 'recovery_expression') {
-					jQuery(obj).val(jQuery(obj).val() + ret.expression);
-				}
-				else {
-					jQuery(obj).val(ret.expression);
-				}
-
-				overlayDialogueDestroy(overlay.dialogueid);
+				jQuery(obj).val(ret.expression);
 			}
+
+			overlayDialogueDestroy(overlay.dialogueid);
 		},
 		dataType: 'json',
 		type: 'POST'
