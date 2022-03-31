@@ -7,6 +7,9 @@
   - macroid: 14
     macro: "{$NODE}"
     value: "00"
+  - macroid: 23
+    macro: "{$NODE:zero}"
+    value: "00-0"
   - macroid: 15
     macro: "{$BASE}"
     value: "000"

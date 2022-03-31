@@ -164,6 +164,7 @@ tests/libs/zbxdbcache/dc_expand_user_macros_in_func_params
 tests/libs/zbxdbcache/dc_item_poller_type_update
 tests/libs/zbxdbcache/dc_maintenance_match_tags
 tests/libs/zbxdbcache/is_item_processed_by_server
+tests/libs/zbxdbcache/um_cache_resolve
 tests/libs/zbxdbcache/um_cache_sync
 tests/libs/zbxdbcache/zbx_vc_add_values
 tests/libs/zbxdbcache/zbx_vc_get_value

@@ -65,4 +65,7 @@ void	um_macro_release(zbx_um_macro_t *macro);
 zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_dbsync_t *gmacros, zbx_dbsync_t *hmacros,
 		zbx_dbsync_t *htmpls);
 
+void	um_cache_resolve(zbx_um_cache_t *cache, zbx_uint64_t *hostids, int hostids_num, const char *macro,
+		char **value);
+
 #endif
