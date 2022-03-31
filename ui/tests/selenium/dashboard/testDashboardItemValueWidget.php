@@ -222,6 +222,12 @@ class testDashboardItemValueWidget extends CWebTest {
 //			'id:updown_color',
 		];
 
+		// Merge all Advanced fields into one array.
+			$fields = array_merge($description, $values, $units, $time, $indicator_colors
+					// TODO: uncomment after DEV-2154 is ready.
+//					['lbl_bg_color']
+			);
+
 		foreach ([false, true] as $advanced_config) {
 			$form->fill(['Advanced configuration' => $advanced_config]);
 
@@ -229,12 +235,6 @@ class testDashboardItemValueWidget extends CWebTest {
 			$dynamic_field = $form->getField('Dynamic item');
 			$this->assertTrue($dynamic_field->isVisible());
 			$this->assertTrue($dynamic_field->isEnabled());
-
-			// Merge all Advanced fields into one array.
-			$fields = array_merge($description, $values, $units, $time, $indicator_colors
-					// TODO: uncomment after DEV-2154 is ready.
-//					['lbl_bg_color']
-			);
 
 			// Check fields visibility depending on Advanced configuration checkbox state.
 			foreach ($fields as $field) {
