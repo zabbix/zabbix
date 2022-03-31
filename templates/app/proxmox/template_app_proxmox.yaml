@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-27T23:52:42Z'
+  date: '2022-03-31T06:54:02Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -15,6 +15,63 @@ zabbix_export:
         -
           name: Templates/Applications
       items:
+        -
+          uuid: 75f8f8c507774f529ade4bc4255f5fd2
+          name: 'Proxmox: API service status'
+          type: SCRIPT
+          key: proxmox.api.available
+          delay: 5m
+          history: 7d
+          params: |
+            try {
+              var params = JSON.parse(value);
+              var req = new HttpRequest();
+              req.addHeader('Authorization: PVEAPIToken=' + params.token + '=' + params.secret);
+              req.get(encodeURI('https://' + params.url + ':' + params.port + '/api2/json/version'));  
+            } catch (error) {
+                Zabbix.log(3, "Proxmox API failed: " + params.url + " Error: " + error);
+                if (!Number.isInteger(error))
+                    return 520;
+            }
+            return req.getStatus();
+          description: 'Get API service status.'
+          valuemap:
+            name: 'HTTP response status code'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          timeout: 10s
+          parameters:
+            -
+              name: token
+              value: '{$PVE.TOKEN.ID}'
+            -
+              name: secret
+              value: '{$PVE.TOKEN.SECRET}'
+            -
+              name: url
+              value: '{HOST.CONN}'
+            -
+              name: port
+              value: '{$PVE.URL.PORT}'
+          tags:
+            -
+              tag: component
+              value: system
+          triggers:
+            -
+              uuid: 7ef8290fd6e242339d0e56d5e8eedb1a
+              expression: 'last(/Proxmox VE by HTTP/proxmox.api.available) <> 200'
+              name: 'Proxmox: API service not available'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'The API service is not available. Check your network and authorization settings.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 4fe4fa1323cd481f8aff3bfb716eeae2
           name: 'Proxmox: Get cluster resources'
@@ -41,18 +98,6 @@ zabbix_export:
             -
               tag: component
               value: raw
-          triggers:
-            -
-              uuid: 7ef8290fd6e242339d0e56d5e8eedb1a
-              expression: 'last(/Proxmox VE by HTTP/proxmox.cluster.resources) = "Error getting data"'
-              name: 'Proxmox: API service not available'
-              opdata: 'Current value: {ITEM.LASTVALUE1}'
-              priority: HIGH
-              description: 'The API service is not available. Check your network and authorization settings.'
-              tags:
-                -
-                  tag: scope
-                  value: availability
         -
           uuid: 6e6a5046b8154bafad375813ca210e1f
           name: 'Proxmox: Get cluster status'
@@ -63,6 +108,13 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Get cluster status information.'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: 'Error getting data'
           url: 'https://{HOST.CONN}:{$PVE.URL.PORT}/api2/json/cluster/status'
           headers:
             -
@@ -2090,6 +2142,241 @@ zabbix_export:
             -
               value: '0'
               newvalue: 'No'
+        -
+          uuid: 87034fae192c44dba6c8bb568cd90bbd
+          name: 'HTTP response status code'
+          mappings:
+            -
+              value: '100'
+              newvalue: Continue
+            -
+              value: '101'
+              newvalue: 'Switching Protocols'
+            -
+              value: '102'
+              newvalue: Processing
+            -
+              value: '200'
+              newvalue: OK
+            -
+              value: '201'
+              newvalue: Created
+            -
+              value: '202'
+              newvalue: Accepted
+            -
+              value: '203'
+              newvalue: 'Non-Authoritative Information'
+            -
+              value: '204'
+              newvalue: 'No Content'
+            -
+              value: '205'
+              newvalue: 'Reset Content'
+            -
+              value: '206'
+              newvalue: 'Partial Content'
+            -
+              value: '207'
+              newvalue: Multi-Status
+            -
+              value: '208'
+              newvalue: 'Already Reported'
+            -
+              value: '226'
+              newvalue: 'IM Used'
+            -
+              value: '300'
+              newvalue: 'Multiple Choices'
+            -
+              value: '301'
+              newvalue: 'Moved Permanently'
+            -
+              value: '302'
+              newvalue: Found
+            -
+              value: '303'
+              newvalue: 'See Other'
+            -
+              value: '304'
+              newvalue: 'Not Modified'
+            -
+              value: '305'
+              newvalue: 'Use Proxy'
+            -
+              value: '306'
+              newvalue: 'Switch Proxy'
+            -
+              value: '307'
+              newvalue: 'Temporary Redirect'
+            -
+              value: '308'
+              newvalue: 'Permanent Redirect/Resume Incomplete'
+            -
+              value: '400'
+              newvalue: 'Bad Request'
+            -
+              value: '401'
+              newvalue: Unauthorized
+            -
+              value: '402'
+              newvalue: 'Payment Required'
+            -
+              value: '403'
+              newvalue: Forbidden
+            -
+              value: '404'
+              newvalue: 'Not Found'
+            -
+              value: '405'
+              newvalue: 'Method Not Allowed'
+            -
+              value: '406'
+              newvalue: 'Not Acceptable'
+            -
+              value: '407'
+              newvalue: 'Proxy Authentication Required'
+            -
+              value: '408'
+              newvalue: 'Request Timeout'
+            -
+              value: '409'
+              newvalue: Conflict
+            -
+              value: '410'
+              newvalue: Gone
+            -
+              value: '411'
+              newvalue: 'Length Required'
+            -
+              value: '412'
+              newvalue: 'Precondition Failed'
+            -
+              value: '413'
+              newvalue: 'Payload Too Large'
+            -
+              value: '414'
+              newvalue: 'Request-URI Too Long'
+            -
+              value: '415'
+              newvalue: 'Unsupported Media Type'
+            -
+              value: '416'
+              newvalue: 'Requested Range Not Satisfiable'
+            -
+              value: '417'
+              newvalue: 'Expectation Failed'
+            -
+              value: '418'
+              newvalue: 'I''m a Teapot'
+            -
+              value: '419'
+              newvalue: 'Authentication Timeout'
+            -
+              value: '420'
+              newvalue: 'Method Failure/Enhance Your Calm'
+            -
+              value: '421'
+              newvalue: 'Misdirected Request'
+            -
+              value: '422'
+              newvalue: 'Unprocessable Entity'
+            -
+              value: '423'
+              newvalue: Locked
+            -
+              value: '424'
+              newvalue: 'Failed Dependency'
+            -
+              value: '426'
+              newvalue: 'Upgrade Required'
+            -
+              value: '428'
+              newvalue: 'Precondition Required'
+            -
+              value: '429'
+              newvalue: 'Too Many Requests'
+            -
+              value: '431'
+              newvalue: 'Request Header Fields Too Large'
+            -
+              value: '440'
+              newvalue: 'Login Timeout'
+            -
+              value: '444'
+              newvalue: 'No Response'
+            -
+              value: '449'
+              newvalue: 'Retry With'
+            -
+              value: '450'
+              newvalue: 'Blocked by Windows Parental Controls'
+            -
+              value: '451'
+              newvalue: 'Unavailable for Legal Reasons/Redirect'
+            -
+              value: '494'
+              newvalue: 'Request Header Too Large'
+            -
+              value: '495'
+              newvalue: 'Cert Error'
+            -
+              value: '496'
+              newvalue: 'No Cert'
+            -
+              value: '497'
+              newvalue: 'HTTP to HTTPS'
+            -
+              value: '498'
+              newvalue: 'Token Expired/Invalid'
+            -
+              value: '499'
+              newvalue: 'Client Closed Request/Token Required'
+            -
+              value: '500'
+              newvalue: 'Internal Server Error'
+            -
+              value: '501'
+              newvalue: 'Not Implemented'
+            -
+              value: '502'
+              newvalue: 'Bad Gateway'
+            -
+              value: '503'
+              newvalue: 'Service Unavailable'
+            -
+              value: '504'
+              newvalue: 'Gateway Timeout'
+            -
+              value: '505'
+              newvalue: 'HTTP Version Not Supported'
+            -
+              value: '506'
+              newvalue: 'Variant Also Negotiates'
+            -
+              value: '507'
+              newvalue: 'Insufficient Storage'
+            -
+              value: '508'
+              newvalue: 'Loop Detected'
+            -
+              value: '509'
+              newvalue: 'Bandwidth Limit Exceeded'
+            -
+              value: '510'
+              newvalue: 'Not Extended'
+            -
+              value: '511'
+              newvalue: 'Network Authentication Required'
+            -
+              value: '520'
+              newvalue: 'Unknown Error'
+            -
+              value: '598'
+              newvalue: 'Network Read Timeout Error'
+            -
+              value: '599'
+              newvalue: 'Network Connect Timeout Error'
         -
           uuid: 99c0bc65efb34d298586320bdcf14209
           name: 'Node online'

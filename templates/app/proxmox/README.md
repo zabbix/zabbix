@@ -4,7 +4,7 @@
 ## Overview
 
 For Zabbix version: 6.0 and higher  
-Proxmox VE uses a REST like API. The concept is described in (Resource Oriented Architectur - ROA).
+Proxmox VE uses a REST like API. The concept is described in (Resource Oriented Architecture - ROA).
 
 We choose JSON as primary data format, and the whole API is formally defined using JSON Schema.
 
@@ -87,6 +87,7 @@ There are no template links in this template.
 |Network interfaces |Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Outgoing data, rate |<p>Outgoing data rate.</p> |DEPENDENT |proxmox.qemu.netout[{#QEMU.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.netout`</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `8`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Network interfaces |Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Incoming data, rate |<p>Incoming data rate.</p> |DEPENDENT |proxmox.lxc.netin[{#LXC.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.netin`</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `8`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Network interfaces |Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Outgoing data, rate |<p>Outgoing data rate.</p> |DEPENDENT |proxmox.lxc.netout[{#LXC.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.netout`</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `8`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Status |Proxmox: API service status |<p>Get API service status.</p> |SCRIPT |proxmox.api.available<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p><p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Status |Proxmox: Cluster [{#RESOURCE.NAME}]: Quorate |<p>Indicates if there is a majority of nodes online to make decisions.</p> |DEPENDENT |proxmox.cluster.quorate[{#RESOURCE.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.[?(@.name == '{#RESOURCE.NAME}' && @.type == 'cluster')].quorate.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Status |Proxmox: Node [{#NODE.NAME}]: Status |<p>Indicates if the node is online or offline.</p> |DEPENDENT |proxmox.node.online[{#NODE.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.[?(@.name == '{#NODE.NAME}' && @.type == 'node')].online.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Status |Proxmox: Node [{#NODE.NAME}]: Uptime |<p>System uptime in 'N days, hh:mm:ss' format.</p> |DEPENDENT |proxmox.node.uptime[{#NODE.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.uptime`</p> |
@@ -107,7 +108,7 @@ There are no template links in this template.
 |Storage |Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Disk write, rate |<p>Disk write.</p> |DEPENDENT |proxmox.lxc.diskwrite[{#LXC.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.diskwrite`</p><p>- CHANGE_PER_SECOND</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Storage |Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Disk read, rate |<p>Disk read.</p> |DEPENDENT |proxmox.lxc.diskread[{#LXC.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.diskread`</p><p>- CHANGE_PER_SECOND</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Zabbix raw items |Proxmox: Get cluster resources |<p>Resources index.</p> |HTTP_AGENT |proxmox.cluster.resources<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> Error getting data`</p> |
-|Zabbix raw items |Proxmox: Get cluster status |<p>Get cluster status information.</p> |HTTP_AGENT |proxmox.cluster.status |
+|Zabbix raw items |Proxmox: Get cluster status |<p>Get cluster status information.</p> |HTTP_AGENT |proxmox.cluster.status<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> Error getting data`</p> |
 |Zabbix raw items |Proxmox: Node [{#NODE.NAME}]: Status |<p>Read node status.</p> |HTTP_AGENT |proxmox.node.status[{#NODE.NAME}] |
 |Zabbix raw items |Proxmox: Node [{#NODE.NAME}]: RRD statistics |<p>Read node RRD statistics.</p> |HTTP_AGENT |proxmox.node.rrd[{#NODE.NAME}]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `var rrd_data = JSON.parse(value).data; return JSON.stringify(rrd_data[rrd_data.length - 1]) `</p> |
 |Zabbix raw items |Proxmox: Node [{#NODE.NAME}]: Time |<p>Read server time and time zone settings.</p> |HTTP_AGENT |proxmox.node.time[{#NODE.NAME}] |
@@ -126,6 +127,7 @@ There are no template links in this template.
 |Proxmox: Node [{#NODE.NAME}] high memory usage (over {$PVE.MEMORY.PUSE.MAX.WARN:"{#NODE.NAME}"}% use) |<p>Memory usage.</p> |`min(/Proxmox VE by HTTP/proxmox.node.memused[{#NODE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.memtotal[{#NODE.NAME}]) * 100 >{$PVE.MEMORY.PUSE.MAX.WARN:"{#NODE.NAME}"}` |WARNING | |
 |Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})] high memory usage (over {$PVE.VM.MEMORY.PUSE.MAX.WARN:"{#QEMU.ID}"}% use) |<p>Memory usage.</p> |`min(/Proxmox VE by HTTP/proxmox.qemu.mem[{#QEMU.ID}],5m) / last(/Proxmox VE by HTTP/proxmox.qemu.maxmem[{#QEMU.ID}]) * 100 >{$PVE.VM.MEMORY.PUSE.MAX.WARN:"{#QEMU.ID}"}` |WARNING | |
 |Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})] high memory usage (over {$PVE.LXC.MEMORY.PUSE.MAX.WARN:"{#LXC.ID}"}% use) |<p>Memory usage.</p> |`min(/Proxmox VE by HTTP/proxmox.lxc.mem[{#LXC.ID}],5m) / last(/Proxmox VE by HTTP/proxmox.lxc.maxmem[{#LXC.ID}]) * 100 >{$PVE.LXC.MEMORY.PUSE.MAX.WARN:"{#LXC.ID}"}` |WARNING | |
+|Proxmox: API service not available |<p>The API service is not available. Check your network and authorization settings.</p> |`last(/Proxmox VE by HTTP/proxmox.api.available) <> 200` |HIGH | |
 |Proxmox: Cluster [{#RESOURCE.NAME}] not quorum |<p>Proxmox VE use a quorum-based technique to provide a consistent state among all cluster nodes.</p> |`last(/Proxmox VE by HTTP/proxmox.cluster.quorate[{#RESOURCE.NAME}]) <> 1` |HIGH | |
 |Proxmox: Node [{#NODE.NAME}] offline |<p>Node offline.</p> |`last(/Proxmox VE by HTTP/proxmox.node.online[{#NODE.NAME}]) <> 1` |HIGH | |
 |Proxmox: Node [{#NODE.NAME}]: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/Proxmox VE by HTTP/proxmox.node.uptime[{#NODE.NAME}])<10m` |INFO |<p>Manual close: YES</p> |
@@ -136,7 +138,6 @@ There are no template links in this template.
 |Proxmox: Node [{#NODE.NAME}] high root filesystem space usage (over {$PVE.ROOT.PUSE.MAX.WARN:"{#NODE.NAME}"}% use) |<p>Root filesystem space usage.</p> |`min(/Proxmox VE by HTTP/proxmox.node.rootused[{#NODE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.roottotal[{#NODE.NAME}]) * 100 >{$PVE.ROOT.PUSE.MAX.WARN:"{#NODE.NAME}"}` |WARNING | |
 |Proxmox: Node [{#NODE.NAME}] high root filesystem space usage (over {$PVE.SWAP.PUSE.MAX.WARN:"{#NODE.NAME}"}% use) |<p>This trigger is ignored, if there is no swap configured.</p> |`min(/Proxmox VE by HTTP/proxmox.node.swapused[{#NODE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.swaptotal[{#NODE.NAME}]) * 100 > {$PVE.SWAP.PUSE.MAX.WARN:"{#NODE.NAME}"} and last(/Proxmox VE by HTTP/proxmox.node.swaptotal[{#NODE.NAME}]) > 0` |WARNING | |
 |Proxmox: Storage [{#NODE.NAME}/{#STORAGE.NAME}] high filesystem space usage (over {$PVE.STORAGE.PUSE.MAX.WARN:"{#NODE.NAME}/{#STORAGE.NAME}"}% use) |<p>Root filesystem space usage.</p> |`min(/Proxmox VE by HTTP/proxmox.node.disk[{#NODE.NAME},{#STORAGE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.maxdisk[{#NODE.NAME},{#STORAGE.NAME}]) * 100 >{$PVE.STORAGE.PUSE.MAX.WARN:"{#NODE.NAME}/{#STORAGE.NAME}"}` |WARNING | |
-|Proxmox: API service not available |<p>The API service is not available. Check your network and authorization settings.</p> |`last(/Proxmox VE by HTTP/proxmox.cluster.resources) = "Error getting data"` |HIGH | |
 
 ## Feedback
 
