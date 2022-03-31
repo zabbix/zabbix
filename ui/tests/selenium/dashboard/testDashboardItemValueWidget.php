@@ -157,6 +157,7 @@ class testDashboardItemValueWidget extends CWebTest {
 		$dialogue = $dashboard->edit()->addWidget();
 		$form = $dialogue->asForm();
 		$form->fill(['Type' => 'Item value']);
+		$form->invalidate();
 
 		// Check default values with default Advanced configuration (false).
 		$default_values = [
@@ -223,10 +224,10 @@ class testDashboardItemValueWidget extends CWebTest {
 		];
 
 		// Merge all Advanced fields into one array.
-			$fields = array_merge($description, $values, $units, $time, $indicator_colors
-					// TODO: uncomment after DEV-2154 is ready.
+		$fields = array_merge($description, $values, $units, $time, $indicator_colors
+				// TODO: uncomment after DEV-2154 is ready.
 //					['lbl_bg_color']
-			);
+		);
 
 		foreach ([false, true] as $advanced_config) {
 			$form->fill(['Advanced configuration' => $advanced_config]);
@@ -493,6 +494,21 @@ class testDashboardItemValueWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Item value',
+						'Item' => [
+							'values' => 'Available memory',
+							'context' => [
+								'values' => 'ЗАББИКС Сервер',
+								'context' => 'Zabbix servers'
+							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Item value',
 						'Name' => 'Any name',
 						'Refresh interval' => 'No refresh',
 						'Item' => 'Available memory in %'
@@ -686,18 +702,15 @@ class testDashboardItemValueWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
-		if ($update) {
-			// Update widget.
-			$widget = $dashboard->getWidget(self::$old_name);
-			$form = $widget->edit()->asForm();
-			$original_values = $form->getFields()->asValues();
-			$form->fill($data['fields']);
-		}
-		else {
-			// Add a widget.
-			$form = $dashboard->edit()->addWidget()->asForm();
-			$form->fill($data['fields']);
-			$original_values = $form->getFields()->asValues();
+		$form = ($update)
+			? $dashboard->getWidget(self::$old_name)->edit()->asForm()
+			: $dashboard->edit()->addWidget()->asForm();
+
+		COverlayDialogElement::find()->one()->waitUntilReady();
+		$form->fill($data['fields']);
+
+		if ($update && !CTestArrayHelper::get($data['fields'], 'Name')) {
+			$form->fill(['Name' => '']);
 		}
 
 		if (array_key_exists('colors', $data)) {
@@ -706,6 +719,8 @@ class testDashboardItemValueWidget extends CWebTest {
 				$this->query('xpath://div[@class="overlay-dialogue color-picker-dialogue"]')->asColorPicker()->one()->fill($color);
 			}
 		}
+
+		$values = $form->getFields()->asValues();
 
 		$form->submit();
 		$this->page->waitUntilReady();
@@ -716,31 +731,45 @@ class testDashboardItemValueWidget extends CWebTest {
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM widget ORDER BY widgetid'));
 		}
 		else {
-			// Make sure that the widget is present before saving the dashboard.
-			$header = CTestArrayHelper::get($data['fields'], 'Name', 'Item');
-			$dashboard->getWidget($header);
+			COverlayDialogElement::ensureNotPresent();
 
-			if ($update) {
-				$this->assertNotEquals($original_values, $dashboard->getWidget($header)->edit()->asForm()->getFields()->asValues());
-			}
-			else {
-				$this->assertEquals($original_values, $dashboard->getWidget($header)->edit()->asForm()->getFields()->asValues());
-			}
+			$header = CTestArrayHelper::get($data['fields'], 'Name')
+					? $data['fields']['Name']
+					: $data['fields']['Item']['context']['values'].': '.$data['fields']['Item']['values'];
 
-			$form->submit();
+			$dashboard->getWidget($header)->waitUntilReady();
 			$dashboard->save();
-
-			// Check that Dashboard has been saved and that widget has been added.
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-			$this->assertEquals(($update ? $old_widget_count : $old_widget_count + 1), $dashboard->getWidgets()->count());
+			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
+			$saved_form = $dashboard->getWidget($header)->edit();
 
-			// Check that widget created in DB.
-			$this->assertEquals(1, CDBHelper::getCount('SELECT null from widget WHERE name = '.zbx_dbstr($data['fields']['Name'])));
+			// Check widget form fields and values in frontend.
+			$this->assertEquals($values, $saved_form->getFields()->asValues());
+
+			if (array_key_exists('show_header', $data['fields'])) {
+				$saved_form->checkValue(['id:show_header' => $data['fields']['show_header']]);
+			}
+
+			// Check that widget is saved in DB for correct dashboard and correct dashboard page..
+			$this->assertEquals(1,
+					CDBHelper::getCount('SELECT * FROM widget w'.
+						' WHERE EXISTS ('.
+							'SELECT NULL'.
+							' FROM dashboard_page dp'.
+							' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
+								' AND dp.dashboardid='.self::$dashboardid.
+								' AND w.name ='.zbx_dbstr(CTestArrayHelper::get($data['fields'], 'Name', '')).')'
+			));
 
 			// Check that original widget was not left in DB.
 			if ($update) {
 				$this->assertEquals(0, CDBHelper::getCount('SELECT null from widget WHERE name = '.zbx_dbstr(self::$old_name)));
 			}
+
+			$saved_form->submit();
+			COverlayDialogElement::ensureNotPresent();
+			$dashboard->save();
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 			// Check that new widget interval.
 			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (1 minute)')
