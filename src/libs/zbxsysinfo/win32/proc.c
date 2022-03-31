@@ -26,6 +26,7 @@
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
+#include "../../zbxalgo/vectorimpl.h"
 
 #define MAX_PROCESSES	4096
 #define MAX_NAME	256
@@ -56,7 +57,10 @@ typedef struct
 	double		gdiobj;
 	double		userobj;
 }
-zbx_proc_data_t;
+proc_data_t;
+
+ZBX_PTR_VECTOR_DECL(proc_data_ptr, proc_data_t *);
+ZBX_PTR_VECTOR_IMPL(proc_data_ptr, proc_data_t *);
 
 /* function 'zbx_get_process_username' require 'userName' with size 'MAX_NAME' */
 static int	zbx_get_process_username(HANDLE hProcess, char *userName)
@@ -454,28 +458,23 @@ int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-static void	proc_data_free(zbx_proc_data_t *proc_data)
+static void	proc_data_free(proc_data_t *proc_data)
 {
 	zbx_free(proc_data->name);
 	zbx_free(proc_data);
 }
 
-static void	proc_free_proc_data(zbx_vector_ptr_t *proc_data)
-{
-	zbx_vector_ptr_clear_ext(proc_data, (zbx_mem_free_func_t)proc_data_free);
-}
-
 int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int			zbx_proc_mode, i;
-	zbx_proc_data_t		*proc_data;
-	zbx_vector_ptr_t	proc_data_ctx;
-	struct zbx_json		j;
-	HANDLE			hProcessSnap, hThreadSnap;
-	PROCESSENTRY32		pe32;
-	DWORD			access;
-	const OSVERSIONINFOEX	*vi;
-	char			*param, *procName, *userName, *procComm, baseName[MAX_PATH], uname[MAX_NAME];
+	int				zbx_proc_mode, i;
+	struct zbx_json			j;
+	HANDLE				hProcessSnap, hThreadSnap;
+	PROCESSENTRY32			pe32;
+	DWORD				access;
+	const OSVERSIONINFOEX		*vi;
+	char				*param, *procName, *userName, *procComm, baseName[MAX_PATH], uname[MAX_NAME];
+	proc_data_t			*proc_data;
+	zbx_vector_proc_data_ptr_t	proc_data_ctx;
 
 	if (4 < request->nparam)
 	{
@@ -536,7 +535,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	zbx_vector_ptr_create(&proc_data_ctx);
+	zbx_vector_proc_data_ptr_create(&proc_data_ctx);
 
 	do
 	{
@@ -569,15 +568,15 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				if (te32.th32OwnerProcessID == pe32.th32ProcessID)
 				{
-					proc_data = (zbx_proc_data_t *)zbx_malloc(NULL, sizeof(zbx_proc_data_t));
-					memset(proc_data, 0, sizeof(zbx_proc_data_t));
+					proc_data = (proc_data_t *)zbx_malloc(NULL, sizeof(proc_data_t));
+					memset(proc_data, 0, sizeof(proc_data_t));
 
 					proc_data->pid = pe32.th32ProcessID;
 					proc_data->ppid = pe32.th32ParentProcessID;
 					proc_data->name = zbx_strdup(NULL, baseName);
 					proc_data->tid = te32.th32ThreadID;
 
-					zbx_vector_ptr_append(&proc_data_ctx, proc_data);
+					zbx_vector_proc_data_ptr_append(&proc_data_ctx, proc_data);
 				}
 			}
 			while (TRUE == Thread32Next(hThreadSnap, &te32));
@@ -589,8 +588,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			IO_COUNTERS		ioCounters;
 			FILETIME		ftCreate, ftExit, ftKernel, ftUser;
 
-			proc_data = (zbx_proc_data_t *)zbx_malloc(NULL, sizeof(zbx_proc_data_t));
-			memset(proc_data, 0, sizeof(zbx_proc_data_t));
+			proc_data = (proc_data_t *)zbx_malloc(NULL, sizeof(proc_data_t));
+			memset(proc_data, 0, sizeof(proc_data_t));
 
 			proc_data->pid = pe32.th32ProcessID;
 			proc_data->ppid = pe32.th32ParentProcessID;
@@ -630,7 +629,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 				proc_data->io_other_op = (double)((__int64)ioCounters.OtherOperationCount);
 			}
 
-			zbx_vector_ptr_append(&proc_data_ctx, proc_data);
+			zbx_vector_proc_data_ptr_append(&proc_data_ctx, proc_data);
 		}
 next:
 		CloseHandle(hProcess);
@@ -648,12 +647,12 @@ next:
 
 		for (i = 0; i < proc_data_ctx.values_num; i++)
 		{
-			proc_data = (zbx_proc_data_t *)proc_data_ctx.values[i];
+			proc_data = proc_data_ctx.values[i];
 			proc_data->processes = 1;
 
 			for (k = i + 1; k < proc_data_ctx.values_num; k++)
 			{
-				zbx_proc_data_t	*pdata_cmp = (zbx_proc_data_t *)proc_data_ctx.values[k];
+				proc_data_t	*pdata_cmp = proc_data_ctx.values[k];
 
 				if (0 == strcmp(proc_data->name, pdata_cmp->name))
 				{
@@ -675,7 +674,7 @@ next:
 					proc_data->io_other_op += pdata_cmp->io_other_op;
 
 					proc_data_free(pdata_cmp);
-					zbx_vector_ptr_remove(&proc_data_ctx, k--);
+					zbx_vector_proc_data_ptr_remove(&proc_data_ctx, k--);
 				}
 			}
 		}
@@ -685,7 +684,7 @@ next:
 
 	for (i = 0; i < proc_data_ctx.values_num; i++)
 	{
-		proc_data = (zbx_proc_data_t *)proc_data_ctx.values[i];
+		proc_data = proc_data_ctx.values[i];
 
 		zbx_json_addobject(&j, NULL);
 
@@ -704,8 +703,8 @@ next:
 		{
 			zbx_json_adduint64(&j, "vmsize", (zbx_uint64_t)proc_data->vmsize);
 			zbx_json_adduint64(&j, "wkset", (zbx_uint64_t)proc_data->wkset);
-			zbx_json_addfloat(&j, "cputime_user", (zbx_uint64_t)proc_data->cputime_user);
-			zbx_json_addfloat(&j, "cputime_system", (zbx_uint64_t)proc_data->cputime_system);
+			zbx_json_addfloat(&j, "cputime_user", proc_data->cputime_user);
+			zbx_json_addfloat(&j, "cputime_system", proc_data->cputime_system);
 			zbx_json_adduint64(&j, "threads", proc_data->threads);
 			zbx_json_adduint64(&j, "page_faults", (zbx_uint64_t)proc_data->page_faults);
 			zbx_json_adduint64(&j, "io_read_b", (zbx_uint64_t)proc_data->io_read_b);
@@ -724,8 +723,8 @@ next:
 	}
 
 	zbx_json_close(&j);
-	proc_free_proc_data(&proc_data_ctx);
-	zbx_vector_ptr_destroy(&proc_data_ctx);
+	zbx_vector_proc_data_ptr_clear_ext(&proc_data_ctx, proc_data_free);
+	zbx_vector_proc_data_ptr_destroy(&proc_data_ctx);
 
 	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
 	zbx_json_free(&j);
