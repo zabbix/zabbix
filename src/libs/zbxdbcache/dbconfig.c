@@ -24,14 +24,16 @@
 #include "zbxserver.h"
 #include "zbxregexp.h"
 #include "cfg.h"
+#include "zbxhash.h"
 #include "../zbxcrypto/tls_tcp_active.h"
 #include "../zbxalgo/vectorimpl.h"
+#include "../zbxkvs/kvs.h"
+#include "../zbxvault/vault.h"
 #include "base64.h"
 #include "db.h"
 #include "dbsync.h"
 #include "actions.h"
 #include "zbxtrends.h"
-#include "zbxvault.h"
 #include "zbxserialize.h"
 
 int	sync_in_progress = 0;
@@ -95,6 +97,7 @@ static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_ex
 static unsigned char	macro_env = ZBX_MACRO_ENV_NONSECURE;
 extern char		*CONFIG_VAULTDBPATH;
 extern char		*CONFIG_VAULTTOKEN;
+extern char		*CONFIG_VAULT;
 /******************************************************************************
  *                                                                            *
  * Purpose: copies string into configuration cache shared memory              *
@@ -844,7 +847,7 @@ static void	config_kvs_path_remove(const char *value, zbx_dc_kv_t *kv)
 	if (0 != --kv->refcount)
 		return;
 
-	zbx_strsplit(value, ':', &path, &key);
+	zbx_strsplit_last(value, ':', &path, &key);
 	zbx_free(key);
 
 	zbx_strpool_release(kv->key);
@@ -1404,7 +1407,7 @@ done:
 		if ((HOST_STATUS_PROXY_PASSIVE == status && 0 != (ZBX_TCP_SEC_UNENCRYPTED & host->tls_connect)) ||
 				(HOST_STATUS_PROXY_ACTIVE == status && 0 != (ZBX_TCP_SEC_UNENCRYPTED & host->tls_accept)))
 		{
-			if (NULL != CONFIG_VAULTTOKEN)
+			if (NULL != CONFIG_VAULTTOKEN || NULL != CONFIG_VAULT)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "connection with Zabbix proxy \"%s\" should not be"
 						" unencrypted when using Vault", host->host);
@@ -1823,7 +1826,7 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 		{
 			zbx_free(path);
 			zbx_free(key);
-			zbx_strsplit(row[2], ':', &path, &key);
+			zbx_strsplit_last(row[2], ':', &path, &key);
 			if (NULL == key)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot parse user macro \"%s\" Vault location \"%s\":"
@@ -1980,7 +1983,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 		{
 			zbx_free(path);
 			zbx_free(key);
-			zbx_strsplit(row[3], ':', &path, &key);
+			zbx_strsplit_last(row[3], ':', &path, &key);
 			if (NULL == key)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\" Vault location"
@@ -2106,7 +2109,7 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 {
 	zbx_dc_kvs_path_t	*dc_kvs_path;
 	zbx_dc_kv_t		*dc_kv;
-	zbx_hashset_t		kvs;
+	zbx_kvs_t		kvs;
 	zbx_hashset_iter_t	iter;
 	int			i, j;
 	zbx_vector_ptr_pair_t	diff;
@@ -2114,8 +2117,7 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_pair_create(&diff);
-	zbx_hashset_create_ext(&kvs, 100, zbx_vault_kv_hash, zbx_vault_kv_compare, zbx_vault_kv_clean,
-			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+	zbx_kvs_create(&kvs, 100);
 
 	for (i = 0; i < config->kvs_paths.values_num; i++)
 	{
@@ -2125,7 +2127,7 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 
 		if (NULL != jp_kvs_paths)
 		{
-			if (FAIL == zbx_vault_json_kvs_get(dc_kvs_path->path, jp_kvs_paths, &kvs, &error))
+			if (FAIL == zbx_kvs_from_json_by_path_get(dc_kvs_path->path, jp_kvs_paths, &kvs, &error))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s",
 						dc_kvs_path->path, error);
@@ -2148,7 +2150,7 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 			zbx_ptr_pair_t	pair;
 
 			kv_local.key = (char *)dc_kv->key;
-			if (NULL != (kv = zbx_hashset_search(&kvs, &kv_local)))
+			if (NULL != (kv = zbx_kvs_search(&kvs, &kv_local)))
 			{
 				if (0 == zbx_strcmp_null(dc_kv->value, kv->value))
 					continue;
@@ -2186,11 +2188,11 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 		}
 
 		zbx_vector_ptr_pair_clear(&diff);
-		zbx_hashset_clear(&kvs);
+		zbx_kvs_clear(&kvs);
 	}
 
 	zbx_vector_ptr_pair_destroy(&diff);
-	zbx_hashset_destroy(&kvs);
+	zbx_kvs_destroy(&kvs);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -5400,25 +5402,28 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 
 		if (NULL == preprocitem || itemid != preprocitem->itemid)
 		{
-			if (NULL == (preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_search(&config->preprocitems, &itemid)))
+			if (NULL == (preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_search(&config->preprocitems,
+					&itemid)))
 			{
 				ZBX_DC_PREPROCITEM	preprocitem_local;
 
 				preprocitem_local.itemid = itemid;
+				preprocitem_local.update_time = timestamp;
 
-				preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_insert(&config->preprocitems, &preprocitem_local,
-						sizeof(preprocitem_local));
-
-				zbx_vector_ptr_create_ext(&preprocitem->preproc_ops, __config_mem_malloc_func,
+				zbx_vector_ptr_create_ext(&preprocitem_local.preproc_ops, __config_mem_malloc_func,
 						__config_mem_realloc_func, __config_mem_free_func);
-			}
 
-			preprocitem->update_time = timestamp;
+				preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_insert(&config->preprocitems,
+						&preprocitem_local, sizeof(preprocitem_local));
+			}
+			else
+				preprocitem->update_time = timestamp;
 		}
 
 		ZBX_STR2UINT64(item_preprocid, row[0]);
 
-		op = (zbx_dc_preproc_op_t *)DCfind_id(&config->preprocops, item_preprocid, sizeof(zbx_dc_preproc_op_t), &found);
+		op = (zbx_dc_preproc_op_t *)DCfind_id(&config->preprocops, item_preprocid, sizeof(zbx_dc_preproc_op_t),
+				&found);
 
 		ZBX_STR2UCHAR(op->type, row[2]);
 		DCstrpool_replace(found, &op->params, row[3]);
@@ -5442,7 +5447,8 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 		if (NULL == (op = (zbx_dc_preproc_op_t *)zbx_hashset_search(&config->preprocops, &rowid)))
 			continue;
 
-		if (NULL != (preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_search(&config->preprocitems, &op->itemid)))
+		if (NULL != (preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_search(&config->preprocitems,
+				&op->itemid)))
 		{
 			if (FAIL != (index = zbx_vector_ptr_search(&preprocitem->preproc_ops, op,
 					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
@@ -13544,16 +13550,18 @@ zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const
 
 	if (NULL == session)
 	{
+		session_local.last_valueid = 0;
+		session_local.lastaccess = now;
+		session_local.token = dc_strdup(token);
+
 		WRLOCK_CACHE;
+
 		session = (zbx_data_session_t *)zbx_hashset_insert(&config->data_sessions, &session_local,
 				sizeof(session_local));
-		session->token = dc_strdup(token);
 		UNLOCK_CACHE;
-
-		session->last_valueid = 0;
 	}
-
-	session->lastaccess = now;
+	else
+		session->lastaccess = now;
 
 	return session;
 }

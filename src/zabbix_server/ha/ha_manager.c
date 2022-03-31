@@ -981,7 +981,13 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 
 	if (SUCCEED != zbx_cuid_compare(ha_sessionid, node->ha_sessionid))
 	{
-		ha_set_error(info, "the server HA registry record has changed ownership");
+		if ('\0' == *info->name)
+		{
+			ha_set_error(info, "multiple servers have been started without configuring \"HANodeName\" "
+					"parameter");
+		}
+		else
+			ha_set_error(info, "the server HA registry record has changed ownership");
 		goto out;
 	}
 
@@ -1329,9 +1335,7 @@ static void	ha_set_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client,
 		ZBX_STR2UINT64(configid, row[0]);
 		zbx_audit_init(info->auditlog);
 		zbx_audit_settings_create_entry(ZBX_AUDIT_ACTION_UPDATE, configid);
-		// todo uncomment later
-		//zbx_audit_update_json_update_int(configid, AUDIT_CONFIG_ID, "settings.ha_failover_delay", atoi(row[1]),
-		//		delay);
+		zbx_audit_settings_update_field_int(configid, "settings.ha_failover_delay", atoi(row[1]), delay);
 		ha_flush_audit(info);
 	}
 	else
@@ -1513,7 +1517,6 @@ int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, int *ha_
 
 				if (ZBX_NODE_STATUS_ERROR == *ha_status)
 				{
-					zbx_ipc_message_free(message);
 					ret = FAIL;
 					goto out;
 				}

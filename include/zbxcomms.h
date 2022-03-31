@@ -17,34 +17,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_COMMS_H
-#define ZABBIX_COMMS_H
+#ifndef ZABBIX_ZBXCOMMS_H
+#define ZABBIX_ZBXCOMMS_H
 
 #include "zbxalgo.h"
 
 #ifdef _WINDOWS
-#	define ZBX_TCP_WRITE(s, b, bl)		((ssize_t)send((s), (b), (int)(bl), 0))
-#	define ZBX_TCP_READ(s, b, bl)		((ssize_t)recv((s), (b), (int)(bl), 0))
-#	define zbx_socket_close(s)		if (ZBX_SOCKET_ERROR != (s)) closesocket(s)
 #	define zbx_socket_last_error()		WSAGetLastError()
-#	define zbx_bind(s, a, l)		(bind((s), (a), (int)(l)))
-#	define zbx_sendto(fd, b, n, f, a, l)	(sendto((fd), (b), (int)(n), (f), (a), (l)))
 
-#	define ZBX_PROTO_AGAIN			WSAEINTR
 #	define ZBX_PROTO_ERROR			SOCKET_ERROR
-#	define ZBX_SOCKET_ERROR			INVALID_SOCKET
 #	define ZBX_SOCKET_TO_INT(s)		((int)(s))
 #else
-#	define ZBX_TCP_WRITE(s, b, bl)		((ssize_t)write((s), (b), (bl)))
-#	define ZBX_TCP_READ(s, b, bl)		((ssize_t)read((s), (b), (bl)))
-#	define zbx_socket_close(s)		if (ZBX_SOCKET_ERROR != (s)) close(s)
 #	define zbx_socket_last_error()		errno
-#	define zbx_bind(s, a, l)		(bind((s), (a), (l)))
-#	define zbx_sendto(fd, b, n, f, a, l)	(sendto((fd), (b), (n), (f), (a), (l)))
 
-#	define ZBX_PROTO_AGAIN		EINTR
 #	define ZBX_PROTO_ERROR		-1
-#	define ZBX_SOCKET_ERROR		-1
 #	define ZBX_SOCKET_TO_INT(s)	(s)
 #endif
 
@@ -84,7 +70,7 @@ typedef struct
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_context_t		*tls_ctx;
 #endif
-	unsigned int 			connection_type;	/* type of connection actually established: */
+	unsigned int			connection_type;	/* type of connection actually established: */
 								/* ZBX_TCP_SEC_UNENCRYPTED, ZBX_TCP_SEC_TLS_PSK or */
 								/* ZBX_TCP_SEC_TLS_CERT */
 	int				timeout;
@@ -126,7 +112,8 @@ void	zbx_socket_timeout_set(zbx_socket_t *s, int timeout);
 const char	*zbx_tcp_connection_type_name(unsigned int type);
 
 #define zbx_tcp_send(s, d)				zbx_tcp_send_ext((s), (d), strlen(d), 0, ZBX_TCP_PROTOCOL, 0)
-#define zbx_tcp_send_to(s, d, timeout)			zbx_tcp_send_ext((s), (d), strlen(d), 0, ZBX_TCP_PROTOCOL, timeout)
+#define zbx_tcp_send_to(s, d, timeout)			zbx_tcp_send_ext((s), (d), strlen(d), 0,	\
+									ZBX_TCP_PROTOCOL, timeout)
 #define zbx_tcp_send_bytes_to(s, d, len, timeout)	zbx_tcp_send_ext((s), (d), len, 0, ZBX_TCP_PROTOCOL, timeout)
 #define zbx_tcp_send_raw(s, d)				zbx_tcp_send_ext((s), (d), strlen(d), 0, 0, 0)
 
@@ -185,25 +172,6 @@ void	zbx_udp_close(zbx_socket_t *s);
 #define ZBX_DEFAULT_AGENT_PORT_STR	"10050"
 #define ZBX_DEFAULT_SERVER_PORT_STR	"10051"
 
-int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, const char *version, int protocol,
-		int timeout);
-
-#define zbx_send_response(sock, result, info, timeout) \
-		zbx_send_response_ext(sock, result, info, NULL, ZBX_TCP_PROTOCOL, timeout)
-
-#define zbx_send_response_same(sock, result, info, timeout) \
-		zbx_send_response_ext(sock, result, info, NULL, sock->protocol, timeout)
-
-#define zbx_send_proxy_response(sock, result, info, timeout) \
-		zbx_send_response_ext(sock, result, info, ZABBIX_VERSION, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, timeout)
-
-int	zbx_recv_response(zbx_socket_t *sock, int timeout, char **error);
-int	connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_t *addrs, int timeout,
-		int connect_timeout, unsigned int tls_connect, int retry_interval, int level);
-void	disconnect_server(zbx_socket_t *sock);
-
-int	get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
-int	put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
 
 #ifdef HAVE_IPV6
 #	define zbx_getnameinfo(sa, host, hostlen, serv, servlen, flags)		\
@@ -222,4 +190,8 @@ int	zbx_comms_parse_response(char *xml, char *host, size_t host_len, char *key, 
 		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
 		char *severity, size_t severity_len);
 
-#endif
+int	zbx_telnet_test_login(ZBX_SOCKET socket_fd);
+int	zbx_telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *password, AGENT_RESULT *result);
+int	zbx_telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *result, const char *encoding);
+
+#endif /* ZABBIX_ZBXCOMMS_H */
