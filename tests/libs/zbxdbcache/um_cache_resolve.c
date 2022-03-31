@@ -77,7 +77,8 @@ void	zbx_mock_test_entry(void **state)
 
 	mock_get_hostids(&hostids, zbx_mock_get_parameter_handle("in.hostids"));
 
-	um_cache_resolve(cache, hostids.values, hostids.values_num, zbx_mock_get_parameter_string("in.macro"), &value);
+	um_cache_resolve(cache, hostids.values, hostids.values_num, zbx_mock_get_parameter_string("in.macro"),
+			ZBX_MACRO_ENV_SECURE, &value);
 
 	ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 

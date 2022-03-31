@@ -25,13 +25,12 @@
 #include "dbsync.h"
 #include "dbconfig.h"
 #include "user_macro.h"
+#include "zbxregexp.h"
 
 extern zbx_mem_info_t	*config_mem;
 ZBX_MEM_FUNC_IMPL(__config, config_mem)
 
 ZBX_PTR_VECTOR_IMPL(um_macro, zbx_um_macro_t *)
-
-ZBX_PTR_VECTOR_DECL(um_host, zbx_um_host_t *)
 ZBX_PTR_VECTOR_IMPL(um_host, zbx_um_host_t *)
 
 /*********************************************************************************
@@ -73,6 +72,9 @@ static int	um_macro_compare_by_name_context(const void *d1, const void *d2)
 
 	if (0 != (ret = strcmp(m1->name, m2->name)))
 		return ret;
+
+	/* CONDITION_OPERATOR_EQUAL (0) has higher priority than CONDITION_OPERATOR_REGEXP (8) */
+	ZBX_RETURN_IF_NOT_EQUAL(m1->context_op, m2->context_op);
 
 	return zbx_strcmp_null(m1->context, m2->context);
 }
@@ -355,6 +357,9 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 	zbx_um_macro_t		**pmacro;
 	zbx_um_host_t		*host;
 	zbx_vector_um_host_t	hosts;
+	zbx_hashset_t		*user_macros;
+
+	user_macros = (2 == offset ? &config->hmacros : &config->gmacros);
 
 	zbx_vector_um_host_create(&hosts);
 
@@ -380,9 +385,10 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 
 		if (2 == offset)
 			ZBX_STR2UINT64(hostid, row[1]);
+
 		host = NULL;
 
-		if (NULL != (pmacro = (zbx_um_macro_t **)zbx_hashset_search(&config->user_macros, &pmacroid)))
+		if (NULL != (pmacro = (zbx_um_macro_t **)zbx_hashset_search(user_macros, &pmacroid)))
 		{
 			host = um_cache_acquire_host(cache, (*pmacro)->hostid);
 
@@ -410,7 +416,7 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 			macro = (zbx_um_macro_t *)__config_mem_malloc_func(NULL, sizeof(zbx_um_macro_t));
 			macro->macroid = rowid;
 			macro->refcount = 1;
-			pmacro = zbx_hashset_insert(&config->user_macros, &macro, sizeof(macro));
+			pmacro = zbx_hashset_insert(user_macros, &macro, sizeof(macro));
 		}
 
 		(*pmacro)->hostid = hostid;
@@ -439,7 +445,7 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 	/* handle removed macros */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
-		if (NULL == (pmacro = (zbx_um_macro_t **)zbx_hashset_search(&config->user_macros, &pmacroid)))
+		if (NULL == (pmacro = (zbx_um_macro_t **)zbx_hashset_search(user_macros, &pmacroid)))
 			continue;
 
 		if (NULL != (host = um_cache_acquire_host(cache, (*pmacro)->hostid)))
@@ -448,7 +454,7 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 			zbx_vector_um_host_append(&hosts, host);
 		}
 		um_macro_release(*pmacro);
-		zbx_hashset_remove_direct(&config->user_macros, pmacro);
+		zbx_hashset_remove_direct(user_macros, pmacro);
 	}
 
 	/* sort macros, remove unused hosts */
@@ -566,14 +572,52 @@ zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_dbsync_t *gmacros, zbx_
 	return cache;
 }
 
+#define ZBX_UM_MATCH_FAIL	(-1)
+#define ZBX_UM_MATCH_FULL	0
+#define ZBX_UM_MATCH_NAME	1
+
 /*********************************************************************************
  *                                                                               *
- * Purpose: get macro value from host                                            *
+ * Purpose: match user macro against macro name and context                      *
+ *                                                                               *
+ *********************************************************************************/
+static int	um_macro_match(const zbx_um_macro_t *macro, const char *name, const char *context)
+{
+	if (0 != strcmp(macro->name, name))
+		return ZBX_UM_MATCH_FAIL;
+
+	if (NULL == macro->context)
+		return NULL == context ? ZBX_UM_MATCH_FULL : ZBX_UM_MATCH_NAME;
+
+	if (NULL != context)
+	{
+		switch (macro->context_op)
+		{
+			case CONDITION_OPERATOR_EQUAL:
+				if (0 == strcmp(macro->context, context))
+					return ZBX_UM_MATCH_FULL;
+				break;
+			case CONDITION_OPERATOR_REGEXP:
+				if (NULL != zbx_regexp_match(context, macro->context, NULL))
+					return ZBX_UM_MATCH_FULL;
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				break;
+		}
+	}
+
+	return ZBX_UM_MATCH_NAME;
+}
+
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: get user macro from host                                             *
  *                                                                               *
  * Parameters: host    - [IN] the host                                           *
  *             name    - [IN] the macro name ({$NAME})                           *
  *             context - [IN] the macro context                                  *
- *             value   - [OUT] the macro value                                   *
+ *             macro   - [OUT] the macro                                         *
  *                                                                               *
  * Return value: SUCCEED - the macro with specified context was found            *
  *               FAIL    - the macro was not found, but value will contain base  *
@@ -581,41 +625,37 @@ zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_dbsync_t *gmacros, zbx_
  *                         was found                                             *
  *                                                                               *
  *********************************************************************************/
-static int	um_host_get_macro(zbx_um_host_t *host, const char *name, const char *context, const char **value)
+static int	um_host_get_macro(zbx_um_host_t *host, const char *name, const char *context,
+		const zbx_um_macro_t **macro)
 {
-	zbx_um_macro_t	macro_local, *pmacro = &macro_local;
-	int		i;
+	zbx_um_macro_t	macro_local;
+	int		i, ret;
 
 	if (0 == host->macros.values_num)
 		return FAIL;
 
 	macro_local.name = name;
-	macro_local.context = context;
+	macro_local.context = NULL;
+	macro_local.context_op = 0;
 
 	i = zbx_vector_um_macro_nearestindex(&host->macros, &macro_local, um_macro_compare_by_name_context);
 
-	if (i < host->macros.values_num && 0 == um_macro_compare_by_name_context(&pmacro, &host->macros.values[i]))
-	{
-		*value = host->macros.values[i]->value;
-		return SUCCEED;
-	}
-
-	if (NULL == context)
+	if (i >= host->macros.values_num)
 		return FAIL;
 
-	if (NULL != *value)
-		return SUCCEED;
-
-	for (i = i - 1; i >= 0; i--)
+	for (; i < host->macros.values_num; i++)
 	{
-		if (0 != strcmp(host->macros.values[i]->name, name))
+		if (ZBX_UM_MATCH_FAIL == (ret = um_macro_match(host->macros.values[i], name, context)))
 			return FAIL;
 
-		if (NULL == host->macros.values[i]->context && NULL == *value)
+		if (ZBX_UM_MATCH_FULL == ret)
 		{
-			*value = host->macros.values[i]->value;
-			return FAIL;
+			*macro = host->macros.values[i];
+			return SUCCEED;
 		}
+
+		if (NULL == host->macros.values[i]->context && NULL == *macro)
+			*macro = host->macros.values[i];
 	}
 
 	return FAIL;
@@ -623,7 +663,7 @@ static int	um_host_get_macro(zbx_um_host_t *host, const char *name, const char *
 
 /*********************************************************************************
  *                                                                               *
- * Purpose: resolve user macro in the scope of specified hosts                   *
+ * Purpose: get user macro in the scope of specified hosts                       *
  *                                                                               *
  * Return value: SUCCEED - the macro with specified context was found            *
  *               FAIL    - the macro was not found, but value will contain base  *
@@ -631,8 +671,8 @@ static int	um_host_get_macro(zbx_um_host_t *host, const char *name, const char *
  *                         was found                                             *
  *                                                                               *
  *********************************************************************************/
-static int	um_cache_resolve_macro(zbx_um_cache_t *cache, zbx_uint64_t *hostids, int hostids_num, const char *name,
-		const char *context, const char **value)
+static int	um_cache_get_host_macro(zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num,
+		const char *name, const char *context, const zbx_um_macro_t **macro)
 {
 	int			i, ret = SUCCEED;
 	zbx_vector_uint64_t	templateids;
@@ -642,11 +682,11 @@ static int	um_cache_resolve_macro(zbx_um_cache_t *cache, zbx_uint64_t *hostids, 
 
 	for (i = 0; i < hostids_num; i++)
 	{
-		zbx_uint64_t	*phostid = &hostids[i];
+		const zbx_uint64_t	*phostid = &hostids[i];
 
 		if (NULL != (phost = (zbx_um_host_t **)zbx_hashset_search(&cache->hosts, &phostid)))
 		{
-			if (SUCCEED == um_host_get_macro(*phost, name, context, value))
+			if (SUCCEED == um_host_get_macro(*phost, name, context, macro))
 				goto out;
 
 			zbx_vector_uint64_append_array(&templateids, (*phost)->templateids.values,
@@ -655,7 +695,7 @@ static int	um_cache_resolve_macro(zbx_um_cache_t *cache, zbx_uint64_t *hostids, 
 	}
 
 	if (0 != templateids.values_num)
-		ret = um_cache_resolve_macro(cache, templateids.values, templateids.values_num, name, context, value);
+		ret = um_cache_get_host_macro(cache, templateids.values, templateids.values_num, name, context, macro);
 	else
 		ret = FAIL;
 out:
@@ -666,17 +706,17 @@ out:
 
 /*********************************************************************************
  *                                                                               *
- * Purpose: resolve user macro (host/global)                                     *
+ * Purpose: get user macro (host/global)                                         *
  *                                                                               *
  * Parameters: cache       - [IN] the user macro cache                           *
  *             hostids     - [IN] the host identifiers                           *
  *             hostids_num - [IN] the number of host identifiers                 *
  *             macro       - [IN] the macro with optional context                *
- *             value       - [OUT] macro value in cache - do not change          *
+ *             um_macro    - [OUT] the cached macro                              *
  *                                                                               *
  *********************************************************************************/
-static void	um_cache_resolve_const(zbx_um_cache_t *cache, zbx_uint64_t *hostids, int hostids_num, const char *macro,
-		const char **value)
+static void	um_cache_get_macro(zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num,
+		const char *macro, const zbx_um_macro_t **um_macro)
 {
 	char		*name = NULL, *context = NULL;
 	unsigned char	context_op;
@@ -684,11 +724,22 @@ static void	um_cache_resolve_const(zbx_um_cache_t *cache, zbx_uint64_t *hostids,
 	if (SUCCEED != zbx_user_macro_parse_dyn(macro, &name, &context, NULL, &context_op))
 		return;
 
-	if (SUCCEED != um_cache_resolve_macro(cache, hostids, hostids_num, name, context,value))
+	/* User macros should be expanded according to the following priority: */
+	/*                                                                     */
+	/*  1) host context macro                                              */
+	/*  2) global context macro                                            */
+	/*  3) host base (default) macro                                       */
+	/*  4) global base (default) macro                                     */
+	/*                                                                     */
+	/* We try to expand host macros first. If there is no perfect match on */
+	/* the host level, we try to expand global macros, passing the default */
+	/* macro value found on the host level, if any.                        */
+
+	if (SUCCEED != um_cache_get_host_macro(cache, hostids, hostids_num, name, context, um_macro))
 	{
 		zbx_uint64_t	hostid = 0;
 
-		um_cache_resolve_macro(cache, &hostid, 1, name, context, value);
+		um_cache_get_host_macro(cache, &hostid, 1, name, context, um_macro);
 	}
 
 	zbx_free(name);
@@ -706,13 +757,108 @@ static void	um_cache_resolve_const(zbx_um_cache_t *cache, zbx_uint64_t *hostids,
  *             value       - [OUT] macro value, must be freed by the caller      *
  *                                                                               *
  *********************************************************************************/
-void	um_cache_resolve(zbx_um_cache_t *cache, zbx_uint64_t *hostids, int hostids_num, const char *macro,
-		char **value)
+void	um_cache_resolve_const(zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num, const char *macro,
+		const char **value)
 {
-	const char	*value_const = NULL;
+	const zbx_um_macro_t	*um_macro = NULL;
 
-	um_cache_resolve_const(cache, hostids, hostids_num, macro, &value_const);
+	um_cache_get_macro(cache, hostids, hostids_num, macro, &um_macro);
 
-	if (NULL != value_const)
-		*value = zbx_strdup(NULL, value_const);
+	if (NULL != um_macro)
+		*value = um_macro->value;
+}
+
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: resolve user macro (host/global)                                     *
+ *                                                                               *
+ * Parameters: cache       - [IN] the user macro cache                           *
+ *             hostids     - [IN] the host identifiers                           *
+ *             hostids_num - [IN] the number of host identifiers                 *
+ *             macro       - [IN] the macro with optional context                *
+ *             env         - [IN] the environment flag:                          *
+ *                                  0 - secure                                   *
+ *                                  1 - non-secure (secure macros are resolved   *
+ *                                                  to ***** )                   *
+ *             value       - [OUT] macro value, must be freed by the caller      *
+ *                                                                               *
+ *********************************************************************************/
+void	um_cache_resolve(zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num, const char *macro,
+		int env, char **value)
+{
+	const zbx_um_macro_t	*um_macro = NULL;
+
+	um_cache_get_macro(cache, hostids, hostids_num, macro, &um_macro);
+
+	if (NULL != um_macro)
+	{
+		if (ZBX_MACRO_ENV_NONSECURE == env && (ZBX_MACRO_VALUE_SECRET == um_macro->type ||
+				ZBX_MACRO_VALUE_VAULT == um_macro->type))
+		{
+			*value = zbx_strdup(*value, ZBX_MACRO_SECRET_MASK);
+		}
+		else
+		{
+			*value = NULL != um_macro->value ? zbx_strdup(NULL, um_macro->value) : NULL;
+		}
+	}
+}
+
+void	um_cache_dump(zbx_um_cache_t *cache)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_um_host_t		*host;
+	zbx_vector_uint64_t	ids;
+	int			i;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() hosts:%d refcount:%u", __func__, cache->hosts.num_data, cache->refcount);
+
+	zbx_vector_uint64_create(&ids);
+
+	zbx_hashset_iter_reset(&cache->hosts, &iter);
+	while (NULL != (host = (zbx_um_host_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " refcount:%u", host->hostid, host->refcount);
+
+		zabbix_log(LOG_LEVEL_TRACE, "  macros:");
+
+		for (i = 0; i < host->macros.values_num; i++)
+		{
+			zbx_um_macro_t	*macro = host->macros.values[i];
+			const char	*value;
+
+			switch (macro->type)
+			{
+				case ZBX_MACRO_VALUE_SECRET:
+				case ZBX_MACRO_VALUE_VAULT:
+					value = ZBX_MACRO_SECRET_MASK;
+					break;
+				default:
+					value = macro->value;
+					break;
+			}
+
+			zabbix_log(LOG_LEVEL_TRACE, "    macroid:" ZBX_FS_UI64 " name:'%s' context:'%s' op:'%d'"
+					" value:'%s' type:%d refcount:%d", macro->macroid, macro->name,
+					ZBX_NULL2EMPTY_STR(macro->context), macro->context_op,
+					ZBX_NULL2EMPTY_STR(value), macro->type, macro->refcount);
+		}
+
+		if (0 != host->templateids.values_num)
+		{
+			zbx_vector_uint64_append_array(&ids, host->templateids.values, host->templateids.values_num);
+			zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+			zabbix_log(LOG_LEVEL_TRACE, "  templateids:");
+
+			for (i = 0; i < ids.values_num; i++)
+				zabbix_log(LOG_LEVEL_TRACE, "    " ZBX_FS_UI64, ids.values[i]);
+
+			zbx_vector_uint64_clear(&ids);
+		}
+	}
+
+	zbx_vector_uint64_destroy(&ids);
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }

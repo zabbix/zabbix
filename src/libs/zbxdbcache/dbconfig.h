@@ -23,6 +23,7 @@
 #include "mutexs.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
+#include "user_macro.h"
 
 typedef struct
 {
@@ -404,13 +405,6 @@ ZBX_DC_IPMIHOST;
 
 typedef struct
 {
-	zbx_uint64_t		hostid;
-	zbx_vector_uint64_t	templateids;
-}
-ZBX_DC_HTMPL;
-
-typedef struct
-{
 	const char	*key;
 	const char	*value;
 	int		refcount;
@@ -423,46 +417,6 @@ typedef struct
 	zbx_hashset_t	kvs;
 }
 zbx_dc_kvs_path_t;
-
-typedef struct
-{
-	zbx_uint64_t	globalmacroid;
-	const char	*macro;
-	const char	*context;
-	const char	*value;
-	zbx_dc_kv_t	*kv;
-	unsigned char	type;
-	unsigned char	context_op;
-}
-ZBX_DC_GMACRO;
-
-typedef struct
-{
-	const char		*macro;
-	zbx_vector_ptr_t	gmacros;
-}
-ZBX_DC_GMACRO_M;
-
-typedef struct
-{
-	zbx_uint64_t	hostmacroid;
-	zbx_uint64_t	hostid;
-	const char	*macro;
-	const char	*context;
-	const char	*value;
-	zbx_dc_kv_t	*kv;
-	unsigned char	type;
-	unsigned char	context_op;
-}
-ZBX_DC_HMACRO;
-
-typedef struct
-{
-	zbx_uint64_t		hostid;
-	const char		*macro;
-	zbx_vector_ptr_t	hmacros;
-}
-ZBX_DC_HMACRO_HM;
 
 typedef struct
 {
@@ -843,12 +797,8 @@ typedef struct
 							/* locking cache and therefore it cannot be updated by      */
 							/* by history syncers when new data is received.	    */
 	zbx_hashset_t		ipmihosts;
-	zbx_hashset_t		htmpls;
 	zbx_hashset_t		gmacros;
-	zbx_hashset_t		gmacros_m;		/* macro */
 	zbx_hashset_t		hmacros;
-	zbx_hashset_t		hmacros_hm;		/* hostid, macro */
-	zbx_hashset_t		user_macros;
 	zbx_hashset_t		interfaces;
 	zbx_hashset_t		interfaces_snmp;
 	zbx_hashset_t		interfaces_ht;		/* hostid, type */
@@ -884,6 +834,7 @@ typedef struct
 	ZBX_DC_CONFIG_TABLE	*config;
 	ZBX_DC_STATUS		*status;
 	zbx_hashset_t		strpool;
+	zbx_um_cache_t		*um_cache;
 	char			autoreg_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];	/* autoregistration PSK */
 	char			autoreg_psk[HOST_TLS_PSK_LEN_MAX];
 }

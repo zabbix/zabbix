@@ -296,4 +296,23 @@ in:
 out:
   result: SUCCEED
   value: 5
+---
+test case: Resolve {$M:regex:123} 
+include: &include um_cache_resolve.inc.yaml
+in:
+  config: *include
+  macro: '{$M:123}'
+  hostids: [1]
+out:
+  result: SUCCEED
+  value: xyz
+---
+test case: Resolve {$M:regex:abc} 
+include: &include um_cache_resolve.inc.yaml
+in:
+  config: *include
+  macro: '{$M:abc}'
+  hostids: [1]
+out:
+  result: FAIL
 ...

@@ -39,12 +39,25 @@ static void	um_mock_macro_free(zbx_um_mock_macro_t *macro)
 	zbx_free(macro);
 }
 
-static void	um_mock_macro_init(zbx_um_mock_macro_t *macro, zbx_uint64_t hostid, zbx_mock_handle_t handle)
+static void	um_mock_macro_init(zbx_um_mock_macro_t *macro, zbx_uint64_t hostid, zbx_mock_handle_t hmacro)
 {
-	macro->macroid = zbx_mock_get_object_member_uint64(handle, "macroid");
+	zbx_mock_handle_t	handle;
+	const char		*str;
+	zbx_mock_error_t	err;
+
+	macro->macroid = zbx_mock_get_object_member_uint64(hmacro, "macroid");
 	macro->hostid = hostid;
-	macro->macro = zbx_strdup(NULL, zbx_mock_get_object_member_string(handle, "macro"));
-	macro->value = zbx_strdup(NULL, zbx_mock_get_object_member_string(handle, "value"));
+	macro->macro = zbx_strdup(NULL, zbx_mock_get_object_member_string(hmacro, "macro"));
+
+	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hmacro, "value", &handle))
+	{
+		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, &str)))
+			fail_msg("Cannot read macro value: %s", zbx_mock_error_string(err));
+
+		macro->value = zbx_strdup(NULL, str);
+	}
+	else
+		macro->value = NULL;
 }
 
 /*********************************************************************************
@@ -234,15 +247,15 @@ static int	um_mock_compare_macros_by_content(const zbx_um_mock_macro_t *m1, cons
 {
 	int		ret;
 	char		*name1 = NULL, *name2 = NULL, *context1 = NULL, *context2 = NULL;
-	unsigned char	op;
+	unsigned char	context_op1, context_op2;
 
-	if (SUCCEED != zbx_user_macro_parse_dyn(m1->macro, &name1, &context1, NULL, &op))
+	if (SUCCEED != zbx_user_macro_parse_dyn(m1->macro, &name1, &context1, NULL, &context_op1))
 	{
 		ret = -1;
 		goto out;
 	}
 
-	if (SUCCEED != zbx_user_macro_parse_dyn(m2->macro, &name2, &context2, NULL, &op))
+	if (SUCCEED != zbx_user_macro_parse_dyn(m2->macro, &name2, &context2, NULL, &context_op2))
 	{
 		ret = 1;
 		goto out;
@@ -253,6 +266,19 @@ static int	um_mock_compare_macros_by_content(const zbx_um_mock_macro_t *m1, cons
 
 	if (0 != (ret = zbx_strcmp_null(context1, context2)))
 		goto out;
+
+	if (context_op1 > context_op2)
+	{
+		ret = 1;
+		goto out;
+	}
+
+	if (context_op1 < context_op2)
+	{
+		ret = -1;
+		goto out;
+	}
+
 
 	ret = strcmp(m1->value, m2->value);
 out:
@@ -537,7 +563,8 @@ void	um_mock_config_init()
 	config = (ZBX_DC_CONFIG *)zbx_malloc(NULL, sizeof(ZBX_DC_CONFIG));
 	memset(config, 0, sizeof(ZBX_DC_CONFIG));
 
-	zbx_hashset_create(&config->user_macros, 100, um_macro_hash, um_macro_compare);
+	zbx_hashset_create(&config->gmacros, 100, um_macro_hash, um_macro_compare);
+	zbx_hashset_create(&config->hmacros, 100, um_macro_hash, um_macro_compare);
 	zbx_hashset_create(&config->strpool, 100, mock_strpool_hash, mock_strpool_compare);
 }
 
@@ -551,11 +578,16 @@ void	um_mock_config_destroy()
 	zbx_hashset_iter_t	iter;
 	zbx_um_macro_t		**pmacro;
 
-	zbx_hashset_iter_reset(&config->user_macros, &iter);
+	zbx_hashset_iter_reset(&config->gmacros, &iter);
 	while (NULL != (pmacro = (zbx_um_macro_t **)zbx_hashset_iter_next(&iter)))
 		um_macro_release(*pmacro);
 
-	zbx_hashset_destroy(&config->user_macros);
+	zbx_hashset_iter_reset(&config->hmacros, &iter);
+	while (NULL != (pmacro = (zbx_um_macro_t **)zbx_hashset_iter_next(&iter)))
+		um_macro_release(*pmacro);
+
+	zbx_hashset_destroy(&config->gmacros);
+	zbx_hashset_destroy(&config->hmacros);
 	zbx_hashset_destroy(&config->strpool);
 
 	zbx_free(config);

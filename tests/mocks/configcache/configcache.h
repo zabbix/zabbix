@@ -23,12 +23,12 @@
 #include "common.h"
 #include "zbxalgo.h"
 #include "dbconfig.h"
+#include "../zbxalgo/vectorimpl.h"
 
 typedef struct
 {
 	ZBX_DC_CONFIG		dc;
-	zbx_vector_ptr_t	host_macros;
-	zbx_vector_ptr_t	global_macros;
+	zbx_vector_um_host_t	um_hosts;
 	zbx_vector_ptr_t	hosts;
 
 	zbx_uint64_t		initialized;

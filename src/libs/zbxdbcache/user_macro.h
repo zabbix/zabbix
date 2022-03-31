@@ -22,7 +22,8 @@
 
 #include "common.h"
 #include "zbxalgo.h"
-#include "dbsync.h"
+
+typedef struct zbx_dbsync zbx_dbsync_t;
 
 typedef struct
 {
@@ -48,6 +49,8 @@ typedef struct
 }
 zbx_um_host_t;
 
+ZBX_PTR_VECTOR_DECL(um_host, zbx_um_host_t *)
+
 typedef struct
 {
 	zbx_hashset_t	hosts;
@@ -65,7 +68,11 @@ void	um_macro_release(zbx_um_macro_t *macro);
 zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_dbsync_t *gmacros, zbx_dbsync_t *hmacros,
 		zbx_dbsync_t *htmpls);
 
-void	um_cache_resolve(zbx_um_cache_t *cache, zbx_uint64_t *hostids, int hostids_num, const char *macro,
-		char **value);
+void	um_cache_resolve_const(zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num, const char *macro,
+		const char **value);
+void	um_cache_resolve(zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num, const char *macro,
+		int env, char **value);
+
+void	um_cache_dump(zbx_um_cache_t *cache);
 
 #endif

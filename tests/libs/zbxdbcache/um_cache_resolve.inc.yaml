@@ -1,6 +1,9 @@
 ---
 - hostid: 1
   macros:
+  - macroid: 17
+    macro: "{$M:regex:[0-9]+}"
+    value: "xyz"
   - macroid: 16
     macro: "{$M5}"
     value: "5"

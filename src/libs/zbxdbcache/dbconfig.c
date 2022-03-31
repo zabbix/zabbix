@@ -630,158 +630,6 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
 		zbx_binary_heap_update_direct(&config->pqueue, &elem);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: adds global macro index                                           *
- *                                                                            *
- * Parameters: gmacro_index - [IN/OUT] a global macro index hashset           *
- *             gmacro       - [IN] the macro to index                         *
- *                                                                            *
- * Return value: The macro index record.                                      *
- *                                                                            *
- ******************************************************************************/
-static ZBX_DC_GMACRO_M	*config_gmacro_add_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACRO *gmacro)
-{
-	ZBX_DC_GMACRO_M	*gmacro_m, gmacro_m_local;
-
-	gmacro_m_local.macro = gmacro->macro;
-
-	if (NULL == (gmacro_m = (ZBX_DC_GMACRO_M *)zbx_hashset_search(gmacro_index, &gmacro_m_local)))
-	{
-		gmacro_m_local.macro = dc_strpool_acquire(gmacro->macro);
-		zbx_vector_ptr_create_ext(&gmacro_m_local.gmacros, __config_mem_malloc_func, __config_mem_realloc_func,
-				__config_mem_free_func);
-
-		gmacro_m = (ZBX_DC_GMACRO_M *)zbx_hashset_insert(gmacro_index, &gmacro_m_local, sizeof(ZBX_DC_GMACRO_M));
-	}
-
-	zbx_vector_ptr_append(&gmacro_m->gmacros, gmacro);
-	return gmacro_m;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: removes global macro index                                        *
- *                                                                            *
- * Parameters: gmacro_index - [IN/OUT] a global macro index hashset           *
- *             gmacro       - [IN] the macro to remove                        *
- *                                                                            *
- ******************************************************************************/
-static ZBX_DC_GMACRO_M	*config_gmacro_remove_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACRO *gmacro)
-{
-	ZBX_DC_GMACRO_M	*gmacro_m, gmacro_m_local;
-	int		index;
-
-	gmacro_m_local.macro = gmacro->macro;
-
-	if (NULL != (gmacro_m = (ZBX_DC_GMACRO_M *)zbx_hashset_search(gmacro_index, &gmacro_m_local)))
-	{
-		if (FAIL != (index = zbx_vector_ptr_search(&gmacro_m->gmacros, gmacro, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
-			zbx_vector_ptr_remove(&gmacro_m->gmacros, index);
-	}
-	return gmacro_m;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: comparison function to sort global macro vector by context        *
- *          operator, value and macro name                                    *
- *                                                                            *
- ******************************************************************************/
-static int	config_gmacro_context_compare(const void *d1, const void *d2)
-{
-	const ZBX_DC_GMACRO	*m1 = *(const ZBX_DC_GMACRO **)d1;
-	const ZBX_DC_GMACRO	*m2 = *(const ZBX_DC_GMACRO **)d2;
-
-	/* macros without context have higher priority than macros with */
-	if (NULL == m1->context)
-		return NULL == m2->context ? 0 : -1;
-
-	if (NULL == m2->context)
-		return 1;
-
-	/* CONDITION_OPERATOR_EQUAL (0) has higher priority than CONDITION_OPERATOR_REGEXP (8) */
-	ZBX_RETURN_IF_NOT_EQUAL(m1->context_op, m2->context_op);
-
-	return strcmp(m1->context, m2->context);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: adds host macro index                                             *
- *                                                                            *
- * Parameters: hmacro_index - [IN/OUT] a host macro index hashset             *
- *             hmacro       - [IN] the macro to index                         *
- *                                                                            *
- ******************************************************************************/
-static ZBX_DC_HMACRO_HM	*config_hmacro_add_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACRO *hmacro)
-{
-	ZBX_DC_HMACRO_HM	*hmacro_hm, hmacro_hm_local;
-
-	hmacro_hm_local.hostid = hmacro->hostid;
-	hmacro_hm_local.macro = hmacro->macro;
-
-	if (NULL == (hmacro_hm = (ZBX_DC_HMACRO_HM *)zbx_hashset_search(hmacro_index, &hmacro_hm_local)))
-	{
-		hmacro_hm_local.macro = dc_strpool_acquire(hmacro->macro);
-		zbx_vector_ptr_create_ext(&hmacro_hm_local.hmacros, __config_mem_malloc_func, __config_mem_realloc_func,
-				__config_mem_free_func);
-
-		hmacro_hm = (ZBX_DC_HMACRO_HM *)zbx_hashset_insert(hmacro_index, &hmacro_hm_local, sizeof(ZBX_DC_HMACRO_HM));
-	}
-
-	zbx_vector_ptr_append(&hmacro_hm->hmacros, hmacro);
-	return hmacro_hm;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: removes host macro index                                          *
- *                                                                            *
- * Parameters: hmacro_index - [IN/OUT] a host macro index hashset             *
- *             hmacro       - [IN] the macro name to remove                   *
- *                                                                            *
- ******************************************************************************/
-static ZBX_DC_HMACRO_HM	*config_hmacro_remove_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACRO *hmacro)
-{
-	ZBX_DC_HMACRO_HM	*hmacro_hm, hmacro_hm_local;
-	int			index;
-
-	hmacro_hm_local.hostid = hmacro->hostid;
-	hmacro_hm_local.macro = hmacro->macro;
-
-	if (NULL != (hmacro_hm = (ZBX_DC_HMACRO_HM *)zbx_hashset_search(hmacro_index, &hmacro_hm_local)))
-	{
-		if (FAIL != (index = zbx_vector_ptr_search(&hmacro_hm->hmacros, hmacro, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
-			zbx_vector_ptr_remove(&hmacro_hm->hmacros, index);
-	}
-	return hmacro_hm;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: comparison function to sort host macro vector by context          *
- *          operator, value and macro name                                    *
- *                                                                            *
- ******************************************************************************/
-static int	config_hmacro_context_compare(const void *d1, const void *d2)
-{
-	const ZBX_DC_HMACRO	*m1 = *(const ZBX_DC_HMACRO **)d1;
-	const ZBX_DC_HMACRO	*m2 = *(const ZBX_DC_HMACRO **)d2;
-
-	/* macros without context have higher priority than macros with */
-	if (NULL == m1->context)
-		return NULL == m2->context ? 0 : -1;
-
-	if (NULL == m2->context)
-		return 1;
-
-	/* CONDITION_OPERATOR_EQUAL (0) has higher priority than CONDITION_OPERATOR_REGEXP (8) */
-	ZBX_RETURN_IF_NOT_EQUAL(m1->context_op, m2->context_op);
-
-	return strcmp(m1->context, m2->context);
-}
-
 static int	dc_compare_kvs_path(const void *d1, const void *d2)
 {
 	const zbx_dc_kvs_path_t	*ptr1 = *((const zbx_dc_kvs_path_t **)d1);
@@ -1698,410 +1546,6 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 
 		zbx_hashset_remove_direct(&config->host_inventories_auto, host_inventory_auto);
 	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-static void	DCsync_htmpls(zbx_dbsync_t *sync)
-{
-	char			**row;
-	zbx_uint64_t		rowid;
-	unsigned char		tag;
-
-	ZBX_DC_HTMPL		*htmpl = NULL;
-
-	int			found, i, index, ret;
-	zbx_uint64_t		_hostid = 0, hostid, templateid;
-	zbx_vector_ptr_t	sort;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_vector_ptr_create(&sort);
-
-	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
-	{
-		/* removed rows will be always added at the end */
-		if (ZBX_DBSYNC_ROW_REMOVE == tag)
-			break;
-
-		ZBX_STR2UINT64(hostid, row[0]);
-		ZBX_STR2UINT64(templateid, row[1]);
-
-		if (_hostid != hostid || 0 == _hostid)
-		{
-			_hostid = hostid;
-
-			htmpl = (ZBX_DC_HTMPL *)DCfind_id(&config->htmpls, hostid, sizeof(ZBX_DC_HTMPL), &found);
-
-			if (0 == found)
-			{
-				zbx_vector_uint64_create_ext(&htmpl->templateids,
-						__config_mem_malloc_func,
-						__config_mem_realloc_func,
-						__config_mem_free_func);
-				zbx_vector_uint64_reserve(&htmpl->templateids, 1);
-			}
-
-			zbx_vector_ptr_append(&sort, htmpl);
-		}
-
-		zbx_vector_uint64_append(&htmpl->templateids, templateid);
-	}
-
-	/* remove deleted host templates from cache */
-	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
-	{
-		ZBX_STR2UINT64(hostid, row[0]);
-
-		if (NULL == (htmpl = (ZBX_DC_HTMPL *)zbx_hashset_search(&config->htmpls, &hostid)))
-			continue;
-
-		ZBX_STR2UINT64(templateid, row[1]);
-
-		if (-1 == (index = zbx_vector_uint64_search(&htmpl->templateids, templateid,
-				ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-		{
-			continue;
-		}
-
-		if (1 == htmpl->templateids.values_num)
-		{
-			zbx_vector_uint64_destroy(&htmpl->templateids);
-			zbx_hashset_remove_direct(&config->htmpls, htmpl);
-		}
-		else
-		{
-			zbx_vector_uint64_remove_noorder(&htmpl->templateids, index);
-			zbx_vector_ptr_append(&sort, htmpl);
-		}
-	}
-
-	/* sort the changed template lists */
-
-	zbx_vector_ptr_sort(&sort, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-	zbx_vector_ptr_uniq(&sort, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-	for (i = 0; i < sort.values_num; i++)
-	{
-		htmpl = (ZBX_DC_HTMPL *)sort.values[i];
-		zbx_vector_uint64_sort(&htmpl->templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	}
-
-	zbx_vector_ptr_destroy(&sort);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-static void	DCsync_gmacros(zbx_dbsync_t *sync)
-{
-	char			**row;
-	zbx_uint64_t		rowid;
-	unsigned char		tag, context_op, type;
-	ZBX_DC_GMACRO		*gmacro;
-	int			found, context_existed, update_index, ret, i;
-	zbx_uint64_t		globalmacroid;
-	char			*macro = NULL, *context = NULL, *path = NULL, *key = NULL;
-	zbx_vector_ptr_t	indexes;
-	ZBX_DC_GMACRO_M		*gmacro_m;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_vector_ptr_create(&indexes);
-
-	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
-	{
-		/* removed rows will be always added at the end */
-		if (ZBX_DBSYNC_ROW_REMOVE == tag)
-			break;
-
-		ZBX_STR2UINT64(globalmacroid, row[0]);
-		ZBX_STR2UCHAR(type, row[3]);
-
-		if (SUCCEED != zbx_user_macro_parse_dyn(row[1], &macro, &context, NULL, &context_op))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot parse user macro \"%s\"", row[1]);
-			continue;
-		}
-
-		if (ZBX_MACRO_VALUE_VAULT == type)
-		{
-			zbx_free(path);
-			zbx_free(key);
-			zbx_strsplit_last(row[2], ':', &path, &key);
-			if (NULL == key)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot parse user macro \"%s\" Vault location \"%s\":"
-						" missing separator \":\"", row[1], row[2]);
-				continue;
-			}
-
-			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && NULL != CONFIG_VAULTDBPATH &&
-					0 == strcasecmp(CONFIG_VAULTDBPATH, path) &&
-					(0 == strcasecmp(key, ZBX_PROTO_TAG_PASSWORD)
-							|| 0 == strcasecmp(key, ZBX_PROTO_TAG_USERNAME)))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot parse macro \"%s\" Vault location \"%s\":"
-						" database credentials should not be used with Vault macros",
-						row[1], row[2]);
-				continue;
-			}
-		}
-
-		gmacro = (ZBX_DC_GMACRO *)DCfind_id(&config->gmacros, globalmacroid, sizeof(ZBX_DC_GMACRO), &found);
-
-		/* see whether we should and can update gmacros_m index at this point */
-		update_index = 0;
-
-		if (0 == found || 0 != strcmp(gmacro->macro, macro) || 0 != zbx_strcmp_null(gmacro->context, context) ||
-				gmacro->context_op != context_op)
-		{
-			if (1 == found)
-			{
-				gmacro_m = config_gmacro_remove_index(&config->gmacros_m, gmacro);
-				zbx_vector_ptr_append(&indexes, gmacro_m);
-			}
-
-			update_index = 1;
-		}
-
-		if (0 != found && NULL != gmacro->kv)
-			config_kvs_path_remove(gmacro->value, gmacro->kv);
-
-		if (ZBX_MACRO_VALUE_VAULT == type)
-			gmacro->kv = config_kvs_path_add(path, key);
-		else
-			gmacro->kv = NULL;
-
-		/* store new information in macro structure */
-		gmacro->type = type;
-		gmacro->context_op = context_op;
-		dc_strpool_replace(found, &gmacro->macro, macro);
-		dc_strpool_replace(found, &gmacro->value, row[2]);
-
-		context_existed = (1 == found && NULL != gmacro->context);
-
-		if (NULL == context)
-		{
-			/* release the context if it was removed from the macro */
-			if (1 == context_existed)
-				dc_strpool_release(gmacro->context);
-
-			gmacro->context = NULL;
-		}
-		else
-		{
-			/* replace the existing context (1) or add context to macro (0) */
-			dc_strpool_replace(context_existed, &gmacro->context, context);
-		}
-
-		/* update gmacros_m index using new data */
-		if (1 == update_index)
-		{
-			gmacro_m = config_gmacro_add_index(&config->gmacros_m, gmacro);
-			zbx_vector_ptr_append(&indexes, gmacro_m);
-		}
-	}
-
-	/* remove deleted global macros from cache */
-	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
-	{
-		if (NULL == (gmacro = (ZBX_DC_GMACRO *)zbx_hashset_search(&config->gmacros, &rowid)))
-			continue;
-
-		if (NULL != gmacro->kv)
-			config_kvs_path_remove(gmacro->value, gmacro->kv);
-
-		gmacro_m = config_gmacro_remove_index(&config->gmacros_m, gmacro);
-		zbx_vector_ptr_append(&indexes, gmacro_m);
-
-		dc_strpool_release(gmacro->macro);
-		dc_strpool_release(gmacro->value);
-
-		if (NULL != gmacro->context)
-			dc_strpool_release(gmacro->context);
-
-		zbx_hashset_remove_direct(&config->gmacros, gmacro);
-	}
-
-	zbx_vector_ptr_sort(&indexes, ZBX_DEFAULT_PTR_COMPARE_FUNC);
-	zbx_vector_ptr_uniq(&indexes, ZBX_DEFAULT_PTR_COMPARE_FUNC);
-
-	for (i = 0; i < indexes.values_num; i++)
-	{
-		gmacro_m = (ZBX_DC_GMACRO_M *)indexes.values[i];
-		if (0 == gmacro_m->gmacros.values_num)
-		{
-			dc_strpool_release(gmacro_m->macro);
-			zbx_vector_ptr_destroy(&gmacro_m->gmacros);
-			zbx_hashset_remove_direct(&config->gmacros_m, gmacro_m);
-		}
-		else
-			zbx_vector_ptr_sort(&gmacro_m->gmacros, config_gmacro_context_compare);
-	}
-
-	zbx_free(key);
-	zbx_free(path);
-	zbx_free(context);
-	zbx_free(macro);
-	zbx_vector_ptr_destroy(&indexes);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-static void	DCsync_hmacros(zbx_dbsync_t *sync)
-{
-	char			**row;
-	zbx_uint64_t		rowid;
-	unsigned char		tag, context_op, type;
-	ZBX_DC_HMACRO		*hmacro;
-	int			found, context_existed, update_index, ret, i;
-	zbx_uint64_t		hostmacroid, hostid;
-	char			*macro = NULL, *context = NULL, *path = NULL, *key = NULL;
-	zbx_vector_ptr_t	indexes;
-	ZBX_DC_HMACRO_HM	*hmacro_hm;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_vector_ptr_create(&indexes);
-
-	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
-	{
-		/* removed rows will be always added at the end */
-		if (ZBX_DBSYNC_ROW_REMOVE == tag)
-			break;
-
-		ZBX_STR2UINT64(hostmacroid, row[0]);
-		ZBX_STR2UINT64(hostid, row[1]);
-		ZBX_STR2UCHAR(type, row[4]);
-
-		if (SUCCEED != zbx_user_macro_parse_dyn(row[2], &macro, &context, NULL, &context_op))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\"", row[1], row[2]);
-			continue;
-		}
-
-		if (ZBX_MACRO_VALUE_VAULT == type)
-		{
-			zbx_free(path);
-			zbx_free(key);
-			zbx_strsplit_last(row[3], ':', &path, &key);
-			if (NULL == key)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\" Vault location"
-						" \"%s\": missing separator \":\"", row[1], row[2], row[3]);
-				continue;
-			}
-
-			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && NULL != CONFIG_VAULTDBPATH &&
-					0 == strcasecmp(CONFIG_VAULTDBPATH, path) &&
-					(0 == strcasecmp(key, ZBX_PROTO_TAG_PASSWORD)
-							|| 0 == strcasecmp(key, ZBX_PROTO_TAG_USERNAME)))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\" Vault location"
-						" \"%s\": database credentials should not be used with Vault macros",
-						row[1], row[2], row[3]);
-				continue;
-			}
-		}
-
-		hmacro = (ZBX_DC_HMACRO *)DCfind_id(&config->hmacros, hostmacroid, sizeof(ZBX_DC_HMACRO), &found);
-
-		/* see whether we should and can update hmacros_hm index at this point */
-		update_index = 0;
-
-		if (0 == found || hmacro->hostid != hostid || 0 != strcmp(hmacro->macro, macro) ||
-				0 != zbx_strcmp_null(hmacro->context, context) || hmacro->context_op != context_op)
-		{
-			if (1 == found)
-			{
-				hmacro_hm = config_hmacro_remove_index(&config->hmacros_hm, hmacro);
-				zbx_vector_ptr_append(&indexes, hmacro_hm);
-			}
-
-			update_index = 1;
-		}
-
-		if (0 != found && NULL != hmacro->kv)
-			config_kvs_path_remove(hmacro->value, hmacro->kv);
-
-		if (ZBX_MACRO_VALUE_VAULT == type)
-			hmacro->kv = config_kvs_path_add(path, key);
-		else
-			hmacro->kv = NULL;
-
-		/* store new information in macro structure */
-		hmacro->hostid = hostid;
-		hmacro->type = type;
-		hmacro->context_op = context_op;
-		dc_strpool_replace(found, &hmacro->macro, macro);
-		dc_strpool_replace(found, &hmacro->value, row[3]);
-
-		context_existed = (1 == found && NULL != hmacro->context);
-
-		if (NULL == context)
-		{
-			/* release the context if it was removed from the macro */
-			if (1 == context_existed)
-				dc_strpool_release(hmacro->context);
-
-			hmacro->context = NULL;
-		}
-		else
-		{
-			/* replace the existing context (1) or add context to macro (0) */
-			dc_strpool_replace(context_existed, &hmacro->context, context);
-		}
-
-		/* update hmacros_hm index using new data */
-		if (1 == update_index)
-		{
-			hmacro_hm = config_hmacro_add_index(&config->hmacros_hm, hmacro);
-			zbx_vector_ptr_append(&indexes, hmacro_hm);
-		}
-	}
-
-	/* remove deleted host macros from buffer */
-	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
-	{
-		if (NULL == (hmacro = (ZBX_DC_HMACRO *)zbx_hashset_search(&config->hmacros, &rowid)))
-			continue;
-
-		if (NULL != hmacro->kv)
-			config_kvs_path_remove(hmacro->value, hmacro->kv);
-
-		hmacro_hm = config_hmacro_remove_index(&config->hmacros_hm, hmacro);
-		zbx_vector_ptr_append(&indexes, hmacro_hm);
-
-		dc_strpool_release(hmacro->macro);
-		dc_strpool_release(hmacro->value);
-
-		if (NULL != hmacro->context)
-			dc_strpool_release(hmacro->context);
-
-		zbx_hashset_remove_direct(&config->hmacros, hmacro);
-	}
-
-	zbx_vector_ptr_sort(&indexes, ZBX_DEFAULT_PTR_COMPARE_FUNC);
-	zbx_vector_ptr_uniq(&indexes, ZBX_DEFAULT_PTR_COMPARE_FUNC);
-
-	for (i = 0; i < indexes.values_num; i++)
-	{
-		hmacro_hm = (ZBX_DC_HMACRO_HM *)indexes.values[i];
-		if (0 == hmacro_hm->hmacros.values_num)
-		{
-			dc_strpool_release(hmacro_hm->macro);
-			zbx_vector_ptr_destroy(&hmacro_hm->hmacros);
-			zbx_hashset_remove_direct(&config->hmacros_hm, hmacro_hm);
-		}
-		else
-			zbx_vector_ptr_sort(&hmacro_hm->hmacros, config_hmacro_context_compare);
-	}
-
-	zbx_free(key);
-	zbx_free(path);
-	zbx_free(context);
-	zbx_free(macro);
-	zbx_vector_ptr_destroy(&indexes);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -5980,7 +5424,7 @@ void	DCsync_configuration(unsigned char mode)
 			correlation_sec, correlation_sec2, corr_condition_sec, corr_condition_sec2, corr_operation_sec,
 			corr_operation_sec2, hgroups_sec, hgroups_sec2, itempp_sec, itempp_sec2, itemscrp_sec,
 			itemscrp_sec2, total, total2, update_sec, maintenance_sec, maintenance_sec2, item_tag_sec,
-			item_tag_sec2;
+			item_tag_sec2, um_cache_sec2;
 
 	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
 			template_items_sync, prototype_items_sync, item_discovery_sync, triggers_sync, tdep_sync,
@@ -6094,16 +5538,8 @@ void	DCsync_configuration(unsigned char mode)
 
 	START_SYNC;
 	sec = zbx_time();
-	DCsync_htmpls(&htmpl_sync);
-	htsec2 = zbx_time() - sec;
-
-	sec = zbx_time();
-	DCsync_gmacros(&gmacro_sync);
-	gmsec2 = zbx_time() - sec;
-
-	sec = zbx_time();
-	DCsync_hmacros(&hmacro_sync);
-	hmsec2 = zbx_time() - sec;
+	config->um_cache = um_cache_sync(config->um_cache, &gmacro_sync, &hmacro_sync, &htmpl_sync);
+	um_cache_sec2 = zbx_time() - sec;
 
 	sec = zbx_time();
 	DCsync_host_tags(&host_tag_sync);
@@ -6570,16 +6006,10 @@ void	DCsync_configuration(unsigned char mode)
 				config->ipmihosts.num_data, config->ipmihosts.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() host_invent: %d (%d slots)", __func__,
 				config->host_inventories.num_data, config->host_inventories.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() htmpls     : %d (%d slots)", __func__,
-				config->htmpls.num_data, config->htmpls.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() gmacros    : %d (%d slots)", __func__,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() glob macros: %d (%d slots)", __func__,
 				config->gmacros.num_data, config->gmacros.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() gmacros_m  : %d (%d slots)", __func__,
-				config->gmacros_m.num_data, config->gmacros_m.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacros    : %d (%d slots)", __func__,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() host macros: %d (%d slots)", __func__,
 				config->hmacros.num_data, config->hmacros.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacros_hm : %d (%d slots)", __func__,
-				config->hmacros_hm.num_data, config->hmacros_hm.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() kvs_paths : %d", __func__, config->kvs_paths.values_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : %d (%d slots)", __func__,
 				config->interfaces.num_data, config->interfaces.num_slots);
@@ -6788,47 +6218,6 @@ static int	__config_host_h_compare(const void *d1, const void *d2)
 	const ZBX_DC_HOST_H	*host_h_2 = (const ZBX_DC_HOST_H *)d2;
 
 	return host_h_1->host == host_h_2->host ? 0 : strcmp(host_h_1->host, host_h_2->host);
-}
-
-static zbx_hash_t	__config_gmacro_m_hash(const void *data)
-{
-	const ZBX_DC_GMACRO_M	*gmacro_m = (const ZBX_DC_GMACRO_M *)data;
-
-	zbx_hash_t		hash;
-
-	hash = ZBX_DEFAULT_STRING_HASH_FUNC(gmacro_m->macro);
-
-	return hash;
-}
-
-static int	__config_gmacro_m_compare(const void *d1, const void *d2)
-{
-	const ZBX_DC_GMACRO_M	*gmacro_m_1 = (const ZBX_DC_GMACRO_M *)d1;
-	const ZBX_DC_GMACRO_M	*gmacro_m_2 = (const ZBX_DC_GMACRO_M *)d2;
-
-	return gmacro_m_1->macro == gmacro_m_2->macro ? 0 : strcmp(gmacro_m_1->macro, gmacro_m_2->macro);
-}
-
-static zbx_hash_t	__config_hmacro_hm_hash(const void *data)
-{
-	const ZBX_DC_HMACRO_HM	*hmacro_hm = (const ZBX_DC_HMACRO_HM *)data;
-
-	zbx_hash_t		hash;
-
-	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&hmacro_hm->hostid);
-	hash = ZBX_DEFAULT_STRING_HASH_ALGO(hmacro_hm->macro, strlen(hmacro_hm->macro), hash);
-
-	return hash;
-}
-
-static int	__config_hmacro_hm_compare(const void *d1, const void *d2)
-{
-	const ZBX_DC_HMACRO_HM	*hmacro_hm_1 = (const ZBX_DC_HMACRO_HM *)d1;
-	const ZBX_DC_HMACRO_HM	*hmacro_hm_2 = (const ZBX_DC_HMACRO_HM *)d2;
-
-	ZBX_RETURN_IF_NOT_EQUAL(hmacro_hm_1->hostid, hmacro_hm_2->hostid);
-
-	return hmacro_hm_1->macro == hmacro_hm_2->macro ? 0 : strcmp(hmacro_hm_1->macro, hmacro_hm_2->macro);
 }
 
 static zbx_hash_t	__config_interface_ht_hash(const void *data)
@@ -7115,11 +6504,9 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->host_inventories, 0);
 	CREATE_HASHSET(config->host_inventories_auto, 0);
 	CREATE_HASHSET(config->ipmihosts, 0);
-	CREATE_HASHSET(config->htmpls, 0);
-	CREATE_HASHSET(config->gmacros, 0);
-	CREATE_HASHSET(config->hmacros, 0);
 
-	CREATE_HASHSET_EXT(config->user_macros, 0, um_macro_hash, um_macro_compare);
+	CREATE_HASHSET_EXT(config->gmacros, 0, um_macro_hash, um_macro_compare);
+	CREATE_HASHSET_EXT(config->hmacros, 0, um_macro_hash, um_macro_compare);
 
 	CREATE_HASHSET(config->interfaces, 10);
 	CREATE_HASHSET(config->interfaces_snmp, 0);
@@ -7149,8 +6536,6 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET_EXT(config->items_hk, 100, __config_item_hk_hash, __config_item_hk_compare);
 	CREATE_HASHSET_EXT(config->hosts_h, 10, __config_host_h_hash, __config_host_h_compare);
 	CREATE_HASHSET_EXT(config->hosts_p, 0, __config_host_h_hash, __config_host_h_compare);
-	CREATE_HASHSET_EXT(config->gmacros_m, 0, __config_gmacro_m_hash, __config_gmacro_m_compare);
-	CREATE_HASHSET_EXT(config->hmacros_hm, 0, __config_hmacro_hm_hash, __config_hmacro_hm_compare);
 	CREATE_HASHSET_EXT(config->interfaces_ht, 10, __config_interface_ht_hash, __config_interface_ht_compare);
 	CREATE_HASHSET_EXT(config->interface_snmpaddrs, 0, __config_interface_addr_hash, __config_interface_addr_compare);
 	CREATE_HASHSET_EXT(config->regexps, 0, __config_regexp_hash, __config_regexp_compare);
@@ -7219,6 +6604,8 @@ int	init_configuration_cache(char **error)
 	config->sync_start_ts = 0;
 
 	config->internal_actions = 0;
+
+	config->um_cache = um_cache_create();
 
 	/* maintenance data are used only when timers are defined (server) */
 	if (0 != CONFIG_TIMER_FORKS)
@@ -10804,201 +10191,16 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int pr
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	dc_get_host_macro_value(const ZBX_DC_HMACRO *macro, char **value)
-{
-	if (ZBX_MACRO_ENV_NONSECURE == macro_env && (ZBX_MACRO_VALUE_SECRET == macro->type ||
-			ZBX_MACRO_VALUE_VAULT == macro->type))
-	{
-		*value = zbx_strdup(*value, ZBX_MACRO_SECRET_MASK);
-	}
-	else if (ZBX_MACRO_VALUE_VAULT == macro->type)
-	{
-		if (NULL == macro->kv->value)
-			*value = zbx_strdup(*value, ZBX_MACRO_SECRET_MASK);
-		else
-			*value = zbx_strdup(*value, macro->kv->value);
-	}
-	else
-		*value = zbx_strdup(*value, macro->value);
-}
-
-static int	dc_match_macro_context(const char *context, const char *pattern, unsigned char op)
-{
-	switch (op)
-	{
-		case CONDITION_OPERATOR_EQUAL:
-			return 0 == zbx_strcmp_null(context, pattern) ? SUCCEED : FAIL;
-		case CONDITION_OPERATOR_REGEXP:
-			if (NULL == context)
-				return FAIL;
-			return NULL != zbx_regexp_match(context, pattern, NULL) ? SUCCEED : FAIL;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
-	}
-}
-
-static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const char *macro, const char *context,
-		char **value, char **value_default)
-{
-	int			i, j;
-	const ZBX_DC_HMACRO_HM	*hmacro_hm;
-	ZBX_DC_HMACRO_HM	hmacro_hm_local;
-	const ZBX_DC_HTMPL	*htmpl;
-	zbx_vector_uint64_t	templateids;
-	const ZBX_DC_HMACRO	*hmacro;
-
-	if (0 == host_num)
-		return;
-
-	hmacro_hm_local.macro = macro;
-
-	for (i = 0; i < host_num; i++)
-	{
-		hmacro_hm_local.hostid = hostids[i];
-
-		if (NULL != (hmacro_hm = (const ZBX_DC_HMACRO_HM *)zbx_hashset_search(&config->hmacros_hm, &hmacro_hm_local)))
-		{
-			for (j = 0; j < hmacro_hm->hmacros.values_num; j++)
-			{
-				hmacro = (const ZBX_DC_HMACRO *)hmacro_hm->hmacros.values[j];
-
-				if (SUCCEED == dc_match_macro_context(context, hmacro->context, hmacro->context_op))
-				{
-					dc_get_host_macro_value(hmacro, value);
-					return;
-				}
-			}
-			/* Check for the default (without context) macro value. If macro has a value without */
-			/* context it will be the first element in the macro index vector.                   */
-			hmacro = (const ZBX_DC_HMACRO *)hmacro_hm->hmacros.values[0];
-			if (NULL == *value_default && NULL != context && NULL == hmacro->context)
-				dc_get_host_macro_value(hmacro, value_default);
-		}
-	}
-
-	zbx_vector_uint64_create(&templateids);
-	zbx_vector_uint64_reserve(&templateids, 32);
-
-	for (i = 0; i < host_num; i++)
-	{
-		if (NULL != (htmpl = (const ZBX_DC_HTMPL *)zbx_hashset_search(&config->htmpls, &hostids[i])))
-		{
-			for (j = 0; j < htmpl->templateids.values_num; j++)
-				zbx_vector_uint64_append(&templateids, htmpl->templateids.values[j]);
-		}
-	}
-
-	if (0 != templateids.values_num)
-	{
-		zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		dc_get_host_macro(templateids.values, templateids.values_num, macro, context, value, value_default);
-	}
-
-	zbx_vector_uint64_destroy(&templateids);
-}
-
-static void	dc_get_global_macro_value(const ZBX_DC_GMACRO *macro, char **value)
-{
-	if (ZBX_MACRO_ENV_NONSECURE == macro_env && (ZBX_MACRO_VALUE_SECRET == macro->type ||
-			ZBX_MACRO_VALUE_VAULT == macro->type))
-	{
-		*value = zbx_strdup(*value, ZBX_MACRO_SECRET_MASK);
-	}
-	else if (ZBX_MACRO_VALUE_VAULT == macro->type)
-	{
-		if (NULL == macro->kv->value)
-			*value = zbx_strdup(*value, ZBX_MACRO_SECRET_MASK);
-		else
-			*value = zbx_strdup(*value, macro->kv->value);
-	}
-	else
-		*value = zbx_strdup(*value, macro->value);
-}
-
-static void	dc_get_global_macro(const char *macro, const char *context, char **value, char **value_default)
-{
-	int			i;
-	const ZBX_DC_GMACRO_M	*gmacro_m;
-	ZBX_DC_GMACRO_M		gmacro_m_local;
-	const ZBX_DC_GMACRO	*gmacro;
-
-	gmacro_m_local.macro = macro;
-
-	if (NULL != (gmacro_m = (const ZBX_DC_GMACRO_M *)zbx_hashset_search(&config->gmacros_m, &gmacro_m_local)))
-	{
-		for (i = 0; i < gmacro_m->gmacros.values_num; i++)
-		{
-			gmacro = (const ZBX_DC_GMACRO *)gmacro_m->gmacros.values[i];
-
-			if (SUCCEED == dc_match_macro_context(context, gmacro->context, gmacro->context_op))
-			{
-				dc_get_global_macro_value(gmacro, value);
-				break;
-			}
-		}
-
-		/* Check for the default (without context) macro value. If macro has a value without */
-		/* context it will be the first element in the macro index vector.                   */
-		gmacro = (const ZBX_DC_GMACRO *)gmacro_m->gmacros.values[0];
-		if (NULL == *value_default && NULL != context && NULL == gmacro->context)
-			dc_get_global_macro_value(gmacro, value_default);
-	}
-}
-
-static void	dc_get_user_macro(const zbx_uint64_t *hostids, int hostids_num, const char *macro, const char *context,
-		char **replace_to)
-{
-	char	*value = NULL, *value_default = NULL;
-
-	/* User macros should be expanded according to the following priority: */
-	/*                                                                     */
-	/*  1) host context macro                                              */
-	/*  2) global context macro                                            */
-	/*  3) host base (default) macro                                       */
-	/*  4) global base (default) macro                                     */
-	/*                                                                     */
-	/* We try to expand host macros first. If there is no perfect match on */
-	/* the host level, we try to expand global macros, passing the default */
-	/* macro value found on the host level, if any.                        */
-
-	dc_get_host_macro(hostids, hostids_num, macro, context, &value, &value_default);
-
-	if (NULL == value)
-		dc_get_global_macro(macro, context, &value, &value_default);
-
-	if (NULL != value)
-	{
-		zbx_free(*replace_to);
-		*replace_to = value;
-
-		zbx_free(value_default);
-	}
-	else if (NULL != value_default)
-	{
-		zbx_free(*replace_to);
-		*replace_to = value_default;
-	}
-}
-
 void	DCget_user_macro(const zbx_uint64_t *hostids, int hostids_num, const char *macro, char **replace_to)
 {
-	char	*name = NULL, *context = NULL;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s'", __func__, macro);
-
-	if (SUCCEED != zbx_user_macro_parse_dyn(macro, &name, &context, NULL, NULL))
-		goto out;
 
 	RDLOCK_CACHE;
 
-	dc_get_user_macro(hostids, hostids_num, name, context, replace_to);
+	um_cache_resolve(config->um_cache, hostids, hostids_num, macro, macro_env, replace_to);
 
 	UNLOCK_CACHE;
 
-	zbx_free(context);
-	zbx_free(name);
-out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -11028,8 +10230,7 @@ int	dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *h
 		char **value, char **error)
 {
 	zbx_token_t	token;
-	int		len;
-	char		*str = NULL, *name = NULL, *context = NULL, *macro_value = NULL;
+	char		*str = NULL;
 	size_t		str_alloc = 0, str_offset = 0, pos = 0, last_pos = 0;
 
 	if ('\0' == *text)
@@ -11040,24 +10241,19 @@ int	dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *h
 
 	for (; SUCCEED == zbx_token_find(text, pos, &token, ZBX_TOKEN_SEARCH_BASIC) && token.loc.r < text_len; pos++)
 	{
-		if (ZBX_TOKEN_USER_MACRO != token.type)
-			continue;
+		const char	*macro_value = NULL;
 
-		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.loc.l, &name, &context, &len, NULL))
+		if (ZBX_TOKEN_USER_MACRO != token.type)
 			continue;
 
 		if (last_pos < token.loc.l)
 			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
 
-		dc_get_user_macro(hostids, hostids_num, name, context, &macro_value);
-
-		zbx_free(name);
-		zbx_free(context);
+		um_cache_resolve_const(config->um_cache, hostids, hostids_num, text + token.loc.l, &macro_value);
 
 		if (NULL != macro_value)
 		{
 			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, macro_value);
-			zbx_free(macro_value);
 		}
 		else
 		{
@@ -11137,8 +10333,8 @@ int	zbx_dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_
 char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num)
 {
 	zbx_token_t	token;
-	int		pos = 0, len, last_pos = 0;
-	char		*str = NULL, *name = NULL, *context = NULL, *value = NULL;
+	int		pos = 0, last_pos = 0;
+	char		*str = NULL, *name = NULL, *context = NULL;
 	size_t		str_alloc = 0, str_offset = 0;
 
 	if ('\0' == *text)
@@ -11146,20 +10342,17 @@ char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids
 
 	for (; SUCCEED == zbx_token_find(text, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
 	{
+		const char	*value = NULL;
+
 		if (ZBX_TOKEN_USER_MACRO != token.type)
 			continue;
 
-		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.loc.l, &name, &context, &len, NULL))
-			continue;
-
 		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
-		dc_get_user_macro(hostids, hostids_num, name, context, &value);
+		um_cache_resolve_const(config->um_cache, hostids, hostids_num, text + token.loc.l, &value);
 
 		if (NULL != value)
 		{
 			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, value);
-			zbx_free(value);
-
 		}
 		else
 		{
