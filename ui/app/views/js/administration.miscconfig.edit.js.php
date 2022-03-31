@@ -17,88 +17,81 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-
-/**
- * @var CView $this
- */
-
-$default_inventory_mode = DB::getDefault('config', 'default_inventory_mode');
 ?>
 
+
 <script type="text/javascript">
-	$(document).ready(function() {
-		$('#validate_uri_schemes').change(function() {
-			$('#uri_valid_schemes').prop('disabled', !this.checked);
-		});
+	const view = new class {
 
-		$('#iframe_sandboxing_enabled').change(function() {
-			$('#iframe_sandboxing_exceptions').prop('disabled', !this.checked);
-		});
+		init({connect_timeout, default_inventory_mode, iframe_sandboxing_enabled, iframe_sandboxing_exceptions,
+				item_test_timeout, login_attempts, login_block, media_type_test_timeout, report_test_timeout,
+				script_timeout, snmptrap_logging, socket_timeout, uri_valid_schemes, url, validate_uri_schemes,
+				vault_provider, x_frame_options}) {
+			$('#validate_uri_schemes').change(function() {
+				$('#uri_valid_schemes').prop('disabled', !this.checked);
+			});
 
-		$("#resetDefaults").click(function() {
-			overlayDialogue({
-				'title': <?= json_encode(_('Reset confirmation')) ?>,
-				'class': 'position-middle',
-				'content': $('<span>').text(<?= json_encode(_('Reset all fields to default values?')) ?>),
-				'buttons': [
-					{
-						'title': <?= json_encode(_('Cancel')) ?>,
-						'cancel': true,
-						'class': '<?= ZBX_STYLE_BTN_ALT ?>',
-						'action': function() {}
-					},
-					{
-						'title': <?= json_encode(_('Reset defaults')) ?>,
-						'focused': true,
-						'action': function() {
-							$('main')
-								.prev('.msg-bad')
-								.remove();
+			$('#iframe_sandboxing_enabled').change(function() {
+				$('#iframe_sandboxing_exceptions').prop('disabled', !this.checked);
+			});
 
-							$('#url').val("<?= DB::getDefault('config', 'url') ?>");
-							$('#discovery_groupid').multiSelect('clean');
-							$('#default_inventory_mode input[value=<?= $default_inventory_mode ?>]')
-								.prop('checked', true);
-							$('#alert_usrgrpid').multiSelect('clean');
-							$('#snmptrap_logging').prop('checked',
-								<?= (DB::getDefault('config', 'snmptrap_logging') == 0) ? 'false' : 'true' ?>
-							);
+			$("#resetDefaults").click(function() {
+				overlayDialogue({
+					'title': <?= json_encode(_('Reset confirmation')) ?>,
+					'class': 'position-middle',
+					'content': $('<span>').text(<?= json_encode(_('Reset all fields to default values?')) ?>),
+					'buttons': [
+						{
+							'title': <?= json_encode(_('Cancel')) ?>,
+							'cancel': true,
+							'class': '<?= ZBX_STYLE_BTN_ALT ?>',
+							'action': function() {}
+						},
+						{
+							'title': <?= json_encode(_('Reset defaults')) ?>,
+							'focused': true,
+							'action': function() {
+								$('main')
+									.prev('.msg-bad')
+									.remove();
 
-							// authorization
-							$('#login_attempts').val("<?= DB::getDefault('config', 'login_attempts') ?>");
-							$('#login_block').val("<?= DB::getDefault('config', 'login_block') ?>");
+								$('#url').val(url);
+								$('#discovery_groupid').multiSelect('clean');
+								$(`#default_inventory_mode input[value=${default_inventory_mode}]`)
+									.prop('checked', true);
+								$('#alert_usrgrpid').multiSelect('clean');
+								$('#snmptrap_logging').prop('checked', snmptrap_logging == 0 ? 'false' : 'true');
 
-							// security
-							$('#validate_uri_schemes')
-								.prop('checked',
-									<?= (DB::getDefault('config', 'validate_uri_schemes') == 0) ? 'false' : 'true' ?>
-								)
-								.change();
-							$('#uri_valid_schemes').val("<?= DB::getDefault('config', 'uri_valid_schemes') ?>");
-							$('#x_frame_options').val("<?= DB::getDefault('config', 'x_frame_options') ?>");
-							$('#iframe_sandboxing_enabled')
-								.prop('checked',
-									<?= (DB::getDefault('config', 'iframe_sandboxing_enabled') == 0) ? 'false' : 'true' ?>
-								)
-								.change();
-							$('#iframe_sandboxing_exceptions').val(
-								"<?= DB::getDefault('config', 'iframe_sandboxing_exceptions') ?>"
-							);
+								// Authorization.
+								$('#login_attempts').val(login_attempts);
+								$('#login_block').val(login_block);
 
-							// communication with Zabbix server
-							$('#socket_timeout').val("<?= DB::getDefault('config', 'socket_timeout') ?>");
-							$('#connect_timeout').val("<?= DB::getDefault('config', 'connect_timeout') ?>");
-							$('#media_type_test_timeout').val(
-								"<?= DB::getDefault('config', 'media_type_test_timeout') ?>"
-							);
-							$('#script_timeout').val("<?= DB::getDefault('config', 'script_timeout') ?>");
-							$('#item_test_timeout').val("<?= DB::getDefault('config', 'item_test_timeout') ?>");
-							$('#report_test_timeout').val("<?= DB::getDefault('config', 'report_test_timeout') ?>");
+								// Storage of secrets.
+								$(`#vault_provider input[value=${vault_provider}]`).prop('checked', true);
+
+								// Security.
+								$('#validate_uri_schemes')
+									.prop('checked', validate_uri_schemes == 0 ? 'false' : 'true')
+									.change();
+								$('#uri_valid_schemes').val(uri_valid_schemes);
+								$('#x_frame_options').val(x_frame_options);
+								$('#iframe_sandboxing_enabled')
+									.prop('checked', iframe_sandboxing_enabled == 0 ? 'false' : 'true')
+									.change();
+								$('#iframe_sandboxing_exceptions').val(iframe_sandboxing_exceptions);
+
+								// Communication with Zabbix server.
+								$('#socket_timeout').val(socket_timeout);
+								$('#connect_timeout').val(connect_timeout);
+								$('#media_type_test_timeout').val(media_type_test_timeout);
+								$('#script_timeout').val(script_timeout);
+								$('#item_test_timeout').val(item_test_timeout);
+								$('#report_test_timeout').val(report_test_timeout);
+							}
 						}
-					}
-				]
-			}, this);
-		});
-	});
+					]
+				}, this);
+			});
+		}
+	}
 </script>

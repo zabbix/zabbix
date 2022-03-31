@@ -1,3 +1,4 @@
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -17,24 +18,25 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_TELNET_H
-#define ZABBIX_TELNET_H
 
-#include "module.h"
-#include "comms.h"
+/**
+ * Abstract vault access class.
+ */
+abstract class CVault {
 
-#define WAIT_READ	0
-#define WAIT_WRITE	1
+	/**
+	 * @var array
+	 */
+	private $errors = [];
 
-#define CMD_IAC		255
-#define CMD_WILL	251
-#define CMD_WONT	252
-#define CMD_DO		253
-#define CMD_DONT	254
-#define OPT_SGA		3
+	abstract public function validateParameters(): bool;
+	abstract public function getCredentials(): ?array;
 
-int	telnet_test_login(ZBX_SOCKET socket_fd);
-int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *password, AGENT_RESULT *result);
-int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *result, const char *encoding);
+	public function addError(string $error): void {
+		$this->errors[] = $error;
+	}
 
-#endif
+	public function getErrors(): array {
+		return $this->errors;
+	}
+}

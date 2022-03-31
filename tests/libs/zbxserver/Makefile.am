@@ -89,6 +89,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
+	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
@@ -108,6 +109,9 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_srcdir)/src/libs/zbxvault/libzbxvault.a \
+	$(top_builddir)/src/libs/zbxcyberark/libzbxcyberark.a \
+	$(top_builddir)/src/libs/zbxhashicorp/libzbxhashicorp.a \
+	$(top_builddir)/src/libs/zbxkvs/libzbxkvs.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxaudit/libzbxaudit.a
 

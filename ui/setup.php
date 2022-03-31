@@ -53,10 +53,14 @@ $fields = [
 	'cert_file' =>			[T_ZBX_STR, O_OPT, null,	null, 				null],
 	'ca_file' =>			[T_ZBX_STR, O_OPT, null,	null, 				null],
 	'cipher_list' =>		[T_ZBX_STR, O_OPT, null,	null, 				null],
-	'creds_storage' =>		[T_ZBX_INT, O_OPT, null,	IN([DB_STORE_CREDS_CONFIG, DB_STORE_CREDS_VAULT]),			null],
+	'creds_storage' =>		[T_ZBX_INT, O_OPT, null,	IN([DB_STORE_CREDS_CONFIG, DB_STORE_CREDS_VAULT_HASHICORP, DB_STORE_CREDS_VAULT_CYBERARK]), null],
 	'vault_url' =>			[T_ZBX_STR, O_OPT, null,	null,				null],
 	'vault_db_path' =>		[T_ZBX_STR, O_OPT, null,	null,				null],
+	'vault_query_string' =>	[T_ZBX_STR, O_OPT, null,	null,				null],
 	'vault_token' =>		[T_ZBX_STR, O_OPT, null,	null,				null],
+	'vault_certificates' =>	[T_ZBX_INT, O_OPT, null,	IN([0,1]),			null],
+	'vault_cert_file' =>	[T_ZBX_STR, O_OPT, null,	null,				null],
+	'vault_key_file' =>		[T_ZBX_STR, O_OPT, null,	null,				null],
 	'zbx_server_name' =>	[T_ZBX_STR, O_OPT, null,	null,				null],
 	'default_timezone' =>	[T_ZBX_STR, O_OPT, null,	null,				null],
 	'default_theme' =>		[T_ZBX_STR, O_OPT, null,	null,				null],
@@ -183,10 +187,21 @@ $sub_footer = (new CDiv([_('Licensed under'), ' ', $link]))->addClass(ZBX_STYLE_
 
 (new CTag('body', true,
 	(new CDiv([
-		(new CTag('main', true, [$setup_wizard, $sub_footer])), makePageFooter()])
-	)->addClass(ZBX_STYLE_LAYOUT_WRAPPER)
+		(new CTag('main', true, [$setup_wizard, $sub_footer])),
+		makePageFooter()
+	]))->addClass(ZBX_STYLE_LAYOUT_WRAPPER)
 ))
 	->setAttribute('lang', substr($default_lang, 0, strpos($default_lang, '_')))
+	->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'step' => $setup_wizard->getStep(),
+		'hashicorp_endpoint_default' => CVaultHashiCorp::API_ENDPOINT_DEFAULT,
+		'cyberark_endpoint_default' => CVaultCyberArk::API_ENDPOINT_DEFAULT
+	]).');
+'))
+	->setOnDocumentReady()
 	->show();
 ?>
 </html>

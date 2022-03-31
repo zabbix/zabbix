@@ -17,27 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ZBXVAULT_H
-#define ZABBIX_ZBXVAULT_H
+#ifndef ZABBIX_CYBERARK_H
+#define ZABBIX_CYBERARK_H
 
-#include "common.h"
-#include "zbxalgo.h"
+#include "../zbxkvs/kvs.h"
 
-typedef struct
-{
-	char	*key;
-	char	*value;
-}
-zbx_kv_t;
+#define ZBX_CYBERARK_NAME		"CyberArk"
+#define ZBX_CYBERARK_DBUSER_KEY		"UserName"
+#define ZBX_CYBERARK_DBPASSWORD_KEY	"Content"
 
-zbx_hash_t	zbx_vault_kv_hash(const void *data);
-int		zbx_vault_kv_compare(const void *d1, const void *d2);
-void		zbx_vault_kv_clean(void *data);
-
-int	zbx_vault_init_token_from_env(char **error);
-int	zbx_vault_init_db_credentials(char **error);
-int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error);
-int	zbx_vault_json_kvs_get(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_hashset_t *kvs,
-		char **error);
-
+int	zbx_cyberark_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,
+		const char *ssl_key_file, const char *path, long timeout, zbx_kvs_t *kvs, char **error);
 #endif

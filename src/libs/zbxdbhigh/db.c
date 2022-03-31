@@ -24,6 +24,7 @@
 #include "threads.h"
 #include "dbcache.h"
 #include "cfg.h"
+#include "zbxhash.h"
 
 #if defined(HAVE_POSTGRESQL)
 #	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"

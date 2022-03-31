@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/../../include/forms.inc.php';
 
 class CControllerPopupMassupdateItem extends CController {
 
+	private $opt_interfaceid_expected = false;
+
 	protected function checkInput() {
 		$fields = [
 			'allow_traps' => 'in '.implode(',', [HTTPCHECK_ALLOW_TRAPS_ON, HTTPCHECK_ALLOW_TRAPS_OFF]),
@@ -65,10 +67,46 @@ class CControllerPopupMassupdateItem extends CController {
 			'visible' => 'array'
 		];
 
+		$this->opt_interfaceid_expected = (getRequest('interfaceid') == INTERFACE_TYPE_OPT);
+
+		if ($this->opt_interfaceid_expected) {
+			unset($fields['interfaceid']);
+			unset($_REQUEST['interfaceid']);
+		}
+
 		$ret = $this->validateInput($fields);
+
+		if ($ret && $this->opt_interfaceid_expected) {
+			if ($this->hasInput('type')) {
+				$item_types = [$this->getInput('type')];
+			}
+			else {
+				$options = [
+					'output' => ['type'],
+					'itemids' => $this->getInput('ids')
+				];
+				$item_types = (bool) $this->getInput('prototype')
+					? API::ItemPrototype()->get($options)
+					: API::Item()->get($options);
+
+				$item_types = array_column($item_types, 'type', 'type');
+			}
+
+			foreach ($item_types as $item_type) {
+				if (itemTypeInterface($item_type) != INTERFACE_TYPE_OPT) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Host interface'),
+						interfaceType2str(INTERFACE_TYPE_OPT)
+					));
+					$ret = false;
+
+					break;
+				}
+			}
+		}
 
 		if (!$ret) {
 			$output = [];
+
 			if (($messages = getMessages()) !== null) {
 				$output['errors'] = $messages->toString();
 			}
@@ -167,7 +205,7 @@ class CControllerPopupMassupdateItem extends CController {
 			'username' => '',
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
 			'valuemapid' => 0,
-			'interfaceid' => ''
+			'interfaceid' => $this->opt_interfaceid_expected ? 0 : ''
 		];
 		$this->getInputs($input, array_keys($input));
 

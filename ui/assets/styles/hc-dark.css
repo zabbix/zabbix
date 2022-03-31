@@ -2279,7 +2279,8 @@ div.digital-clock {
       background-color: white !important;
       transition: none; }
     .radio-list-control input[type="radio"][disabled] + label {
-      transition: none; }
+      transition: none;
+      cursor: default; }
   .radio-list-control + .icon-info {
     margin-left: 5px; }
 

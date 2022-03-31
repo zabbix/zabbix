@@ -15,6 +15,7 @@ zabbix_get_LDADD = \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_builddir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_builddir)/src/libs/zbxcrypto/libzbxcrypto.a \
+	$(top_builddir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_builddir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_builddir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_builddir)/src/libs/zbxcompress/libzbxcompress.a\
