@@ -223,11 +223,13 @@ class testDashboardItemValueWidget extends CWebTest {
 //			'id:updown_color',
 		];
 
+		$background_color = [
+			// TODO: uncomment after DEV-2154 is ready.
+//			'lbl_bg_color'
+		];
+
 		// Merge all Advanced fields into one array.
-		$fields = array_merge($description, $values, $units, $time, $indicator_colors
-				// TODO: uncomment after DEV-2154 is ready.
-//					['lbl_bg_color']
-		);
+		$fields = array_merge($description, $values, $units, $time, $indicator_colors, $background_color);
 
 		foreach ([false, true] as $advanced_config) {
 			$form->fill(['Advanced configuration' => $advanced_config]);
@@ -738,19 +740,24 @@ class testDashboardItemValueWidget extends CWebTest {
 					: $data['fields']['Item']['context']['values'].': '.$data['fields']['Item']['values'];
 
 			$dashboard->getWidget($header)->waitUntilReady();
+
+			// Save Dashboard to ensure that widget is correctly saved.
 			$dashboard->save();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
-			$saved_form = $dashboard->getWidget($header)->edit();
 
-			// Check widget form fields and values in frontend.
+			// Check widget count.
+			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
+
+			// Check new widget form fields and values in frontend.
+			$saved_form = $dashboard->getWidget($header)->edit();
 			$this->assertEquals($values, $saved_form->getFields()->asValues());
 
+			// As form is quite complex, show_header field should be checked separately.
 			if (array_key_exists('show_header', $data['fields'])) {
 				$saved_form->checkValue(['id:show_header' => $data['fields']['show_header']]);
 			}
 
-			// Check that widget is saved in DB for correct dashboard and correct dashboard page..
+			// Check that widget is saved in DB for correct dashboard and correct dashboard page.
 			$this->assertEquals(1,
 					CDBHelper::getCount('SELECT * FROM widget w'.
 						' WHERE EXISTS ('.
@@ -766,12 +773,13 @@ class testDashboardItemValueWidget extends CWebTest {
 				$this->assertEquals(0, CDBHelper::getCount('SELECT null from widget WHERE name = '.zbx_dbstr(self::$old_name)));
 			}
 
+			// Close widget popup and check update interval.
 			$saved_form->submit();
 			COverlayDialogElement::ensureNotPresent();
 			$dashboard->save();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
-			// Check that new widget interval.
+			// Check new widget update interval.
 			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (1 minute)')
 				? '15 minutes'
 				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
