@@ -20,7 +20,7 @@
 #ifndef ZABBIX_COMPRESS_H
 #define ZABBIX_COMPRESS_H
 
-#include "common/zbxtypes.h"
+#include "zbxtypes.h"
 
 int	zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out);
 int	zbx_uncompress(const char *in, size_t size_in, char *out, size_t *size_out);

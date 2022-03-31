@@ -20,7 +20,7 @@
 #ifndef ZABBIX_JSON_PARSER_H
 #define ZABBIX_JSON_PARSER_H
 
-#include "common/zbxtypes.h"
+#include "zbxtypes.h"
 
 zbx_int64_t	zbx_json_validate(const char *start, char **error);
 

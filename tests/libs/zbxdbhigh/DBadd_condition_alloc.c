@@ -21,7 +21,7 @@
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
 
-#include "common/zbxconfig.h"
+#include "zbxconfig.h"
 #include "common.h"
 #include "zbxalgo.h"
 #include "zbxregexp.h"

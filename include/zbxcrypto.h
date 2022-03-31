@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ZBXCRYPTO_H
 #define ZABBIX_ZBXCRYPTO_H
 
-#include "common/zbxtypes.h"
+#include "zbxtypes.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 

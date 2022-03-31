@@ -20,7 +20,7 @@
 #ifndef ZABBIX_SETPROCTITLE_H
 #define ZABBIX_SETPROCTITLE_H
 
-#include "common/zbxsysinc.h"
+#include "zbxsysinc.h"
 
 #if defined(__linux__)				/* Linux */
 #       define PS_OVERWRITE_ARGV

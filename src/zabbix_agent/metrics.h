@@ -20,7 +20,7 @@
 #ifndef ZABBIX_METRICS_H
 #define ZABBIX_METRICS_H
 
-#include "common/zbxtypes.h"
+#include "zbxtypes.h"
 
 /* define minimal and maximal values of lines to send by agent */
 /* per second for checks `log' and `eventlog', used to parse key parameters */

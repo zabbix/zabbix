@@ -20,12 +20,12 @@
 #ifndef ZABBIX_PROCSTAT_H
 #define ZABBIX_PROCSTAT_H
 
-#include "common/zbxconfig.h"
+#include "zbxconfig.h"
 
 #ifdef ZBX_PROCSTAT_COLLECTOR
 
 #include "zbxalgo.h"
-#include "common/zbxtypes.h"
+#include "zbxtypes.h"
 
 #define ZBX_PROCSTAT_CPU_USER			0x01
 #define ZBX_PROCSTAT_CPU_SYSTEM			0x02

@@ -20,7 +20,7 @@
 #ifndef ZABBIX_PROC_H
 #define ZABBIX_PROC_H
 
-#include "common/zbxtypes.h"
+#include "zbxtypes.h"
 
 int	byte_value_from_proc_file(FILE *f, const char *label, const char *guard, zbx_uint64_t *bytes);
 

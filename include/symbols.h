@@ -20,7 +20,7 @@
 #ifndef ZABBIX_SYMBOLS_H
 #define ZABBIX_SYMBOLS_H
 
-#include "common/zbxsysinc.h"
+#include "zbxsysinc.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 

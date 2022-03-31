@@ -22,7 +22,7 @@
 
 #include "common.h"
 #include "db.h"
-#include "common/zbxtypes.h"
+#include "zbxtypes.h"
 #include "zbxalgo.h"
 
 typedef struct _zbx_template_item_preproc_t zbx_template_item_preproc_t;

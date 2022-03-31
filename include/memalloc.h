@@ -20,7 +20,7 @@
 #ifndef ZABBIX_MEMALLOC_H
 #define ZABBIX_MEMALLOC_H
 
-#include "common/zbxtypes.h"
+#include "zbxtypes.h"
 
 #define MEM_MIN_ALLOC	24	/* should be a multiple of 8 and at least (2 * ZBX_PTR_SIZE) */
 

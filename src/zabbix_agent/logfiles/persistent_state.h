@@ -22,7 +22,7 @@
 
 #include "common.h"	/* for SEC_PER_DAY */
 #include "zbxhash.h"	/* for MD5_DIGEST_SIZE, md5_byte_t */
-#include "common/zbxtypes.h"	/* for zbx_uint64_t struct st_logfile; */
+#include "zbxtypes.h"	/* for zbx_uint64_t struct st_logfile; */
 #include "zbxalgo.h"
 
 struct st_logfile;

@@ -20,7 +20,7 @@
 #ifndef ZABBIX_COMMON_H
 #define ZABBIX_COMMON_H
 
-#include "common/zbxsysinc.h"
+#include "zbxsysinc.h"
 #include "module.h"
 #include "version.h"
 

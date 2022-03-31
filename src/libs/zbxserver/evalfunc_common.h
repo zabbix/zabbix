@@ -20,7 +20,7 @@
 #ifndef ZABBIX_EVALFUNC_COMMON_H
 #define ZABBIX_EVALFUNC_COMMON_H
 
-#include "common/zbxtypes.h"
+#include "zbxtypes.h"
 
 typedef enum
 {

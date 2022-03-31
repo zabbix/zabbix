@@ -18,7 +18,7 @@
 **/
 
 #include "zbxtrends.h"
-#include "common/zbxtypes.h"
+#include "zbxtypes.h"
 
 #ifndef ZABBIX_TRENDS_H
 #define ZABBIX_TRENDS_H

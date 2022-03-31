@@ -20,7 +20,7 @@
 #ifndef ZABBIX_VALUECACHE_H
 #define ZABBIX_VALUECACHE_H
 
-#include "common/zbxtypes.h"
+#include "zbxtypes.h"
 #include "zbxalgo.h"
 #include "zbxhistory.h"
 #include "memalloc.h"

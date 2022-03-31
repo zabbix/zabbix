@@ -20,7 +20,7 @@
 #ifndef ZABBIX_EVENTLOG_H
 #define ZABBIX_EVENTLOG_H
 
-#include "common/zbxconfig.h"
+#include "zbxconfig.h"
 #include "logfiles/logfiles.h"
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)

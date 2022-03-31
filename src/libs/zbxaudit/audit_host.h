@@ -20,7 +20,7 @@
 #ifndef ZABBIX_AUDIT_HOST_H
 #define ZABBIX_AUDIT_HOST_H
 
-#include "common/zbxtypes.h"
+#include "zbxtypes.h"
 #include "zbxalgo.h"
 
 #define PREPARE_AUDIT_SNMP_INTERFACE_H(funcname)								\

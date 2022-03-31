@@ -20,8 +20,8 @@
 #ifndef ZABBIX_XML_H
 #define ZABBIX_XML_H
 
-#include "common/zbxconfig.h"
-#include "common/zbxtypes.h"
+#include "zbxconfig.h"
+#include "zbxtypes.h"
 #include "zbxalgo.h"
 
 #ifdef HAVE_LIBXML2

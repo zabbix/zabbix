@@ -20,7 +20,7 @@
 #ifndef ZABBIX_MODULE_H
 #define ZABBIX_MODULE_H
 
-#include "common/zbxtypes.h"
+#include "zbxtypes.h"
 
 #define ZBX_MODULE_OK	0
 #define ZBX_MODULE_FAIL	-1
