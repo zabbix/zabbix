@@ -1920,6 +1920,17 @@ static int	DBpatch_5050147(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_5050148(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update services set algorithm=case algorithm when 1 then 2 when 2 then 1 else 0 end"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -2059,5 +2070,6 @@ DBPATCH_ADD(5050144, 0, 1)
 DBPATCH_ADD(5050145, 0, 1)
 DBPATCH_ADD(5050146, 0, 1)
 DBPATCH_ADD(5050147, 0, 1)
+DBPATCH_ADD(5050148, 0, 1)
 
 DBPATCH_END()
