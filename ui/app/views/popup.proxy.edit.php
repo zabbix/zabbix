@@ -269,6 +269,7 @@ else {
 
 $output = [
 	'header' => $title,
+	'doc_url' => CDocHelper::getUrl(CDocHelper::ADMINISTRATION_PROXY_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().

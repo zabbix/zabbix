@@ -203,6 +203,7 @@ $form->addItem(
 
 (new CWidget())
 	->setTitle(_('Proxies'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_PROXY_LIST))
 	->setControls(
 		(new CTag('nav', true,
 			(new CSimpleButton(_('Create proxy')))
