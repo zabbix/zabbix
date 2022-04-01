@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-30T09:36:24Z'
+  date: '2022-04-01T09:26:10Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -796,15 +796,51 @@ zabbix_export:
               value: zfs
         -
           uuid: a504d960680346ad863c5f2117301200
-          name: 'TrueNAS: ZIL operations'
+          name: 'TrueNAS: ZIL operations 1 second'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.50536.1.6.1.0
-          key: truenas.zfs.zil.ops
+          key: truenas.zfs.zil.ops1
           history: 7d
           value_type: FLOAT
           description: |
             MIB: FREENAS-MIB
             The ops column parsed from the command zilstat 1 1.
+          tags:
+            -
+              tag: component
+              value: log
+            -
+              tag: component
+              value: zfs
+        -
+          uuid: d82112c728704383b873289f0b8bbce6
+          name: 'TrueNAS: ZIL operations 5 seconds'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.50536.1.6.2.0
+          key: truenas.zfs.zil.ops5
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: FREENAS-MIB
+            The ops column parsed from the command zilstat 5 1.
+          tags:
+            -
+              tag: component
+              value: log
+            -
+              tag: component
+              value: zfs
+        -
+          uuid: 598dda71f21a410a82ba5b96e1564166
+          name: 'TrueNAS: ZIL operations 10 seconds'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.50536.1.6.3.0
+          key: truenas.zfs.zil.ops10
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: FREENAS-MIB
+            The ops column parsed from the command zilstat 10 1.
           tags:
             -
               tag: component
