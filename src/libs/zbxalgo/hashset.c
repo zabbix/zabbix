@@ -49,7 +49,9 @@ static int	zbx_hashset_init_slots(zbx_hashset_t *hs, size_t init_size)
 
 		if (NULL == (hs->slots = (ZBX_HASHSET_ENTRY_T **)hs->mem_malloc_func(NULL, hs->num_slots *
 				sizeof(ZBX_HASHSET_ENTRY_T *))))
+		{
 			return FAIL;
+		}
 
 		memset(hs->slots, 0, hs->num_slots * sizeof(ZBX_HASHSET_ENTRY_T *));
 	}
@@ -224,11 +226,8 @@ void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, s
 		/* recalculate new slot */
 		slot = hash % hs->num_slots;
 
-		if (NULL == (entry = (ZBX_HASHSET_ENTRY_T *)hs->mem_malloc_func(NULL, ZBX_HASHSET_ENTRY_OFFSET +
-				size)))
-		{
+		if (NULL == (entry = (ZBX_HASHSET_ENTRY_T *)hs->mem_malloc_func(NULL, ZBX_HASHSET_ENTRY_OFFSET + size)))
 			return NULL;
-		}
 
 		memcpy((char *)entry->data + offset, (const char *)data + offset, size - offset);
 		entry->hash = hash;

@@ -26,7 +26,7 @@
 
 #define ZBX_SHMEM_MIN_BUCKET_SIZE	SHMEM_MIN_ALLOC
 #define SHMEM_MAX_BUCKET_SIZE		256 /* starting from this size all free chunks are put into the same bucket */
-#define ZBX_SHMEM_BUCKET_COUNT	((SHMEM_MAX_BUCKET_SIZE - ZBX_SHMEM_MIN_BUCKET_SIZE) / 8 + 1)
+#define ZBX_SHMEM_BUCKET_COUNT		((SHMEM_MAX_BUCKET_SIZE - ZBX_SHMEM_MIN_BUCKET_SIZE) / 8 + 1)
 
 typedef struct
 {

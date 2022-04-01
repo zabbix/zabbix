@@ -56,8 +56,7 @@ static void	zbx_hashmap_init_slots(zbx_hashmap_t *hm, size_t init_size)
 	if (0 < init_size)
 	{
 		hm->num_slots = next_prime(init_size);
-		hm->slots = (ZBX_HASHMAP_SLOT_T *)hm->mem_malloc_func(NULL, hm->num_slots *
-				sizeof(ZBX_HASHMAP_SLOT_T));
+		hm->slots = (ZBX_HASHMAP_SLOT_T *)hm->mem_malloc_func(NULL, hm->num_slots * sizeof(ZBX_HASHMAP_SLOT_T));
 		memset(hm->slots, 0, hm->num_slots * sizeof(ZBX_HASHMAP_SLOT_T));
 	}
 	else

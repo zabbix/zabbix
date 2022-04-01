@@ -29,8 +29,7 @@
  *             mem_free_func   - [IN] callback for free                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_list_create_ext(zbx_list_t *queue, zbx_mem_malloc_func_t mem_malloc_func,
-		zbx_mem_free_func_t mem_free_func)
+void	zbx_list_create_ext(zbx_list_t *queue, zbx_mem_malloc_func_t mem_malloc_func, zbx_mem_free_func_t mem_free_func)
 {
 	memset(queue, 0, sizeof(*queue));
 

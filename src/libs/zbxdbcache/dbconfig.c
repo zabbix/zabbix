@@ -724,10 +724,11 @@ static ZBX_DC_HMACRO_HM	*config_hmacro_add_index(zbx_hashset_t *hmacro_index, ZB
 	if (NULL == (hmacro_hm = (ZBX_DC_HMACRO_HM *)zbx_hashset_search(hmacro_index, &hmacro_hm_local)))
 	{
 		hmacro_hm_local.macro = zbx_strpool_acquire(hmacro->macro);
-		zbx_vector_ptr_create_ext(&hmacro_hm_local.hmacros, __config_shmem_malloc_func, __config_shmem_realloc_func,
-				__config_shmem_free_func);
+		zbx_vector_ptr_create_ext(&hmacro_hm_local.hmacros, __config_shmem_malloc_func,
+				__config_shmem_realloc_func, __config_shmem_free_func);
 
-		hmacro_hm = (ZBX_DC_HMACRO_HM *)zbx_hashset_insert(hmacro_index, &hmacro_hm_local, sizeof(ZBX_DC_HMACRO_HM));
+		hmacro_hm = (ZBX_DC_HMACRO_HM *)zbx_hashset_insert(hmacro_index, &hmacro_hm_local,
+				sizeof(ZBX_DC_HMACRO_HM));
 	}
 
 	zbx_vector_ptr_append(&hmacro_hm->hmacros, hmacro);
@@ -3691,8 +3692,8 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 			trigger->locked = 0;
 			trigger->timer_revision = 0;
 
-			zbx_vector_ptr_create_ext(&trigger->tags, __config_shmem_malloc_func, __config_shmem_realloc_func,
-					__config_shmem_free_func);
+			zbx_vector_ptr_create_ext(&trigger->tags, __config_shmem_malloc_func,
+					__config_shmem_realloc_func, __config_shmem_free_func);
 			trigger->topoindex = 1;
 			trigger->itemids = NULL;
 		}
@@ -7222,8 +7223,8 @@ int	init_configuration_cache(char **error)
 	if (0 != CONFIG_TIMER_FORKS)
 	{
 		config->maintenance_update = ZBX_MAINTENANCE_UPDATE_FALSE;
-		config->maintenance_update_flags = (zbx_uint64_t *)__config_shmem_malloc_func(NULL, sizeof(zbx_uint64_t) *
-				ZBX_MAINTENANCE_UPDATE_FLAGS_NUM());
+		config->maintenance_update_flags = (zbx_uint64_t *)__config_shmem_malloc_func(NULL,
+				sizeof(zbx_uint64_t) * ZBX_MAINTENANCE_UPDATE_FLAGS_NUM());
 		memset(config->maintenance_update_flags, 0, sizeof(zbx_uint64_t) * ZBX_MAINTENANCE_UPDATE_FLAGS_NUM());
 	}
 
