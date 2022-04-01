@@ -397,7 +397,7 @@ function getSelementInfo(array $i, int $host_count = 0, int $show_unack = null):
 			: $i['problem_title'];
 	}
 
-	$all_hosts_in_maintenance = $i['maintenance'] && $host_count == $i['disabled'] + $i['maintenance'];
+	$all_hosts_in_maintenance = $i['maintenance'] && ($host_count == $i['disabled'] + $i['maintenance']);
 
 	if ($i['maintenance']) {
 		if (!$has_problem && $all_hosts_in_maintenance) {
