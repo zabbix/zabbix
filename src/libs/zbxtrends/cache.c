@@ -73,7 +73,7 @@ static int		alloc_num = 0;
  *   2) indexing hashset slots pointer array, allocated during cache initialization
  *   3) slots array, allocated during cache initialization and used for hashset entry allocations
  */
-static zbx_mem_info_t	*tfc_mem = NULL;
+static zbx_shmem_info_t	*tfc_mem = NULL;
 
 static zbx_mutex_t	tfc_lock = ZBX_MUTEX_NULL;
 

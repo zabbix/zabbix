@@ -34,9 +34,9 @@
 #include "zbxtrends.h"
 #include "../zbxalgo/vectorimpl.h"
 
-static zbx_mem_info_t	*hc_index_mem = NULL;
-static zbx_mem_info_t	*hc_mem = NULL;
-static zbx_mem_info_t	*trend_mem = NULL;
+static zbx_shmem_info_t	*hc_index_mem = NULL;
+static zbx_shmem_info_t	*hc_mem = NULL;
+static zbx_shmem_info_t	*trend_mem = NULL;
 
 #define	LOCK_CACHE	zbx_mutex_lock(cache_lock)
 #define	UNLOCK_CACHE	zbx_mutex_unlock(cache_lock)

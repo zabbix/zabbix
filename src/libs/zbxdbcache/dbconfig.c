@@ -81,9 +81,9 @@ int	sync_in_progress = 0;
  ******************************************************************************/
 typedef int (*zbx_value_validator_func_t)(const char *macro, const char *value, char **error);
 
-ZBX_DC_CONFIG	*config = NULL;
-zbx_rwlock_t	config_lock = ZBX_RWLOCK_NULL;
-static zbx_mem_info_t	*config_mem;
+ZBX_DC_CONFIG		*config = NULL;
+zbx_rwlock_t		config_lock = ZBX_RWLOCK_NULL;
+static zbx_shmem_info_t	*config_mem;
 
 extern unsigned char	program_type;
 extern int		CONFIG_TIMER_FORKS;

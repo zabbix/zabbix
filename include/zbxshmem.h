@@ -48,7 +48,7 @@ typedef struct
 	const char	*mem_descr;
 	const char	*mem_param;
 }
-zbx_mem_info_t;
+zbx_shmem_info_t;
 
 typedef struct
 {
@@ -63,9 +63,9 @@ typedef struct
 }
 zbx_mem_stats_t;
 
-int	zbx_shmem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, const char *param, int allow_oom,
-		char **error);
-void	zbx_shmem_destroy(zbx_mem_info_t *info);
+int	zbx_shmem_create(zbx_shmem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
+		int allow_oom, char **error);
+void	zbx_shmem_destroy(zbx_shmem_info_t *info);
 
 #define	zbx_shmem_malloc(info, old, size) __zbx_shmem_malloc(__FILE__, __LINE__, info, old, size)
 #define	zbx_shmem_realloc(info, old, size) __zbx_shmem_realloc(__FILE__, __LINE__, info, old, size)
@@ -78,14 +78,14 @@ do							\
 }							\
 while (0)
 
-void	*__zbx_shmem_malloc(const char *file, int line, zbx_mem_info_t *info, const void *old, size_t size);
-void	*__zbx_shmem_realloc(const char *file, int line, zbx_mem_info_t *info, void *old, size_t size);
-void	__zbx_shmem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr);
+void	*__zbx_shmem_malloc(const char *file, int line, zbx_shmem_info_t *info, const void *old, size_t size);
+void	*__zbx_shmem_realloc(const char *file, int line, zbx_shmem_info_t *info, void *old, size_t size);
+void	__zbx_shmem_free(const char *file, int line, zbx_shmem_info_t *info, void *ptr);
 
-void	zbx_shmem_clear(zbx_mem_info_t *info);
+void	zbx_shmem_clear(zbx_shmem_info_t *info);
 
-void	zbx_shmem_get_stats(const zbx_mem_info_t *info, zbx_mem_stats_t *stats);
-void	zbx_shmem_dump_stats(int level, zbx_mem_info_t *info);
+void	zbx_shmem_get_stats(const zbx_shmem_info_t *info, zbx_mem_stats_t *stats);
+void	zbx_shmem_dump_stats(int level, zbx_shmem_info_t *info);
 
 size_t		zbx_shmem_required_size(int chunks_num, const char *descr, const char *param);
 zbx_uint64_t	zbx_shmem_required_chunk_size(zbx_uint64_t size);

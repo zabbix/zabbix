@@ -83,7 +83,7 @@ extern char				*CONFIG_SOURCE_IP;
 
 static zbx_mutex_t	vmware_lock = ZBX_MUTEX_NULL;
 
-static zbx_mem_info_t	*vmware_mem = NULL;
+static zbx_shmem_info_t	*vmware_mem = NULL;
 
 ZBX_SHMEM_FUNC_IMPL(__vm, vmware_mem)
 

@@ -58,7 +58,7 @@
 
 #define ZBX_VC_LOW_MEMORY_ITEM_PRINT_LIMIT	25
 
-static zbx_mem_info_t	*vc_mem = NULL;
+static zbx_shmem_info_t	*vc_mem = NULL;
 
 zbx_rwlock_t	vc_lock = ZBX_RWLOCK_NULL;
 
