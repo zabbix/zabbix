@@ -1,4 +1,3 @@
-//go:build linux
 // +build linux
 
 /*
@@ -145,10 +144,10 @@ type procInfo struct {
 
 type procStatus struct {
 	Pid           uint64  `json:"pid"`
-	PPid          uint64  `json:"ppid"`
+	Ppid          uint64  `json:"ppid"`
 	Tgid          uint64  `json:"-"`
 	Name          string  `json:"name"`
-	TName         string  `json:"-"`
+	ThreadName    string  `json:"-"`
 	Cmdline       string  `json:"cmdline"`
 	Vsize         uint64  `json:"vsize"`
 	Pmem          float64 `json:"pmem"`
@@ -202,10 +201,10 @@ type procSummary struct {
 
 type thread struct {
 	Pid           uint64  `json:"pid"`
-	PPid          uint64  `json:"ppid"`
+	Ppid          uint64  `json:"ppid"`
 	Name          string  `json:"name"`
 	Tid           uint64  `json:"tid"`
-	TName         string  `json:"tname"`
+	ThreadName    string  `json:"tname"`
 	CpuTimeUser   float64 `json:"cputime_user"`
 	CpuTimeSystem float64 `json:"cputime_system"`
 	State         string  `json:"state"`
@@ -779,6 +778,7 @@ func (p *PluginExport) exportProcNum(params []string) (interface{}, error) {
 
 func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 	var name, userName, cmdline, mode string
+	var uid uint64
 	switch len(params) {
 	case 4:
 		mode = params[3]
@@ -793,6 +793,13 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 		fallthrough
 	case 2:
 		userName = params[1]
+		if userName != "" {
+			if u, err := user.Lookup(userName); err != nil {
+				return nil, errors.New("Cannot obtain user information.")
+			} else {
+				uid, err = strconv.ParseUint(u.Uid, 10, 64)
+			}
+		}
 		fallthrough
 	case 1:
 		name = params[0]
@@ -801,55 +808,49 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 		return nil, errors.New("Too many parameters.")
 	}
 
-	var uid int64
-	var pids []uint64
-	var err error
 	array := make([]procStatus, 0)
 	threadArray := make([]thread, 0)
 	summaryArray := make([]procSummary, 0)
 
+	var pids []string
+	var err error
 	if pids, err = getPids(); err != nil {
 		return nil, fmt.Errorf("Cannot open /proc: %s", err)
 	}
 
-	var cmdlinePattern *regexp.Regexp
-	var regexpErr error
-	if cmdline != "" {
-		cmdlinePattern, regexpErr = regexp.Compile(cmdline)
+	query, _, err := p.prepareQuery(&procQuery{name, userName, cmdline, ""})
+	if err != nil {
+		p.Debugf("Failed to prepare query: %s", err.Error())
+		return nil, err
 	}
 
 	if mode != "thread" {
 		for _, pid := range pids {
 			data := procStatus{}
+			// a process might not exist anymore, continue silently or ignore errors
+			if err := getProcessStatus(pid, &data); err != nil {
+				continue
+			}
+			getProcessNames(pid, &data)
+			getProcessIo(pid, &data)
+			getProcessFds(pid, &data)
+			getProcessCalculatedMetrics(pid, &data)
 
-			// a process might not exist anymore, continuing silently on errors
-			if err := readProcStatus(pid, &data); err != nil {
+			processUserID, err := getProcessUserID(pid)
+			if err != nil {
 				continue
 			}
 
-			if name != "" && data.Name != name {
-				continue
+			pi := procInfo{int64(data.Pid), data.Name, processUserID, "", data.Name, ""}
+			if mode != "summary" {
+				pi.cmdline = cmdline
 			}
-
-			if userName != "" {
-				if uid, err = getProcessUserID(strconv.FormatUint(pid, 10)); err == nil {
-					var u *user.User
-					u, err = user.Lookup(userName)
-					if err != nil || u.Uid != strconv.FormatInt(uid, 10) {
-						continue
-					}
-				}
+			if query.match(&pi) {
+				array = append(array, data)
 			}
-
-			if mode != "summary" && cmdline != "" && regexpErr == nil &&
-				!cmdlinePattern.Match([]byte(data.Cmdline)) {
-					continue
-			}
-
-			array = append(array, data)
 		}
 	} else {
-		var threadIds []uint64
+		var threadIds []string
 		for _, pid := range pids {
 			tids, err := getThreadIds(pid)
 			if err == nil {
@@ -858,39 +859,22 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 		}
 		for _, tid := range threadIds {
 			data := procStatus{}
-			if err := readProcStatus(tid, &data); err != nil {
+			if err := getProcessStatus(tid, &data); err != nil {
 				continue
 			}
+			getProcessNames(tid, &data)
+			getProcessIo(tid, &data)
+			getProcessFds(tid, &data)
+			getProcessCalculatedMetrics(tid, &data)
 
-			if name != "" && data.Name != name {
-				continue
-			}
-
-			if userName != "" {
-				if uid, err = getProcessUserID(strconv.FormatUint(tid, 10)); err == nil {
-					var u *user.User
-					u, err = user.Lookup(userName)
-					if err == nil && u.Uid != strconv.FormatInt(uid, 10) {
-						continue
-					}
+			pi := procInfo{int64(data.Pid), data.Name, int64(uid), data.Cmdline, data.Name, ""}
+			if query.match(&pi) {
+				threadArray = append(threadArray, thread{data.Tgid, data.Ppid, data.Name, data.Pid,
+					data.ThreadName, data.CpuTimeUser, data.CpuTimeSystem, data.State, data.CtxSwitches,
+					data.PageFaults, data.IoReadsB, data.IoWritesB})
 				}
 			}
-
-			if mode != "summary" && cmdline != "" && regexpErr == nil &&
-				!cmdlinePattern.Match([]byte(data.Cmdline)) {
-					continue
-			}
-
-			if cmdline != "" && regexpErr == nil && !cmdlinePattern.Match([]byte(data.Cmdline)) {
-				continue
-			}
-
-			//array = append(array, data)
-			threadArray = append(threadArray, thread{data.Tgid, data.PPid, data.Name, data.Pid,
-				data.TName, data.CpuTimeUser, data.CpuTimeSystem, data.State, data.CtxSwitches,
-				data.PageFaults, data.IoReadsB, data.IoWritesB})
 		}
-	}
 
 	switch mode {
 	case "process", "":

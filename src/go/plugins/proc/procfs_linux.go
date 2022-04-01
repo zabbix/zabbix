@@ -1,4 +1,3 @@
-//go:build linux
 // +build linux
 
 /*
@@ -70,13 +69,11 @@ func getProcessName(pid string) (name string, err error) {
 	return string(data[left+1 : right]), nil
 }
 
-func readProcStatus(pid uint64, proc *procStatus) (err error) {
-	proc.Pid = pid
-	proc.CtxSwitches = 0
+func getProcessStatus(pid string, proc *procStatus) (err error) {
+	proc.Pid, _ = strconv.ParseUint(pid, 10, 64)
 
-	pidStr := strconv.FormatUint(pid, 10)
 	var data []byte
-	if data, err = read2k("/proc/" + pidStr + "/status"); err != nil {
+	if data, err = read2k("/proc/" + pid + "/status"); err != nil {
 		return err
 	}
 
@@ -92,7 +89,7 @@ func readProcStatus(pid uint64, proc *procStatus) (err error) {
 
 		switch k {
 		case "Name":
-			proc.TName = v
+			proc.ThreadName = v
 		case "State":
 			if len(v) < 1 {
 				continue
@@ -112,7 +109,7 @@ func readProcStatus(pid uint64, proc *procStatus) (err error) {
 				proc.State = "other"
 			}
 		case "PPid":
-			setUint64(v, &proc.PPid)
+			setUint64(v, &proc.Ppid)
 		case "VmSize":
 			trimUnit(v, &proc.Vsize)
 		case "VmRSS":
@@ -147,41 +144,15 @@ func readProcStatus(pid uint64, proc *procStatus) (err error) {
 			}
 		}
 	}
+	return nil
+}
 
-	proc.Size = proc.Exe + proc.Data + proc.Stk
-	_, proc.Cmdline, err = getProcessCmdline(pidStr, procInfoName)
-	if err != nil {
-		return err
-	}
-
-	f := strings.Fields(proc.Cmdline)
-	if len(f) > 0 {
-		proc.Name = filepath.Base(f[0])
-	} else {
-		proc.Name = proc.TName
-	}
-
-	var mem uint64
-	mem, err = procfs.GetMemory("MemTotal")
-	if err == nil {
-		proc.Pmem = float64(proc.Rss) / float64(mem) * 100.00
-	}
-
-	var stat cpuUtil
-	getProcCpuUtil(int64(pid), &stat)
-	if stat.err == nil {
-		proc.CpuTimeUser = float64(stat.utime) / float64(C.sysconf(C._SC_CLK_TCK))
-		proc.CpuTimeSystem = float64(stat.stime) / float64(C.sysconf(C._SC_CLK_TCK))
-	}
-
-	if fds, err := ioutil.ReadDir("/proc/" + pidStr + "/fd"); err == nil {
-		proc.Fds = uint64(len(fds))
-	}
-
-	if data, err = read2k("/proc/" + pidStr + "/io"); err == nil {
-		s = strings.Split(string(data), "\n")
+func getProcessIo(pid string, proc *procStatus) (err error) {
+	var pos int
+	if data, err := read2k("/proc/" + pid + "/io"); err == nil {
+		s := strings.Split(string(data), "\n")
 		for _, tmp := range s {
-			if pos = strings.IndexRune(tmp, ':'); pos == -1 {
+			if pos := strings.IndexRune(tmp, ':'); pos == -1 {
 				continue
 			}
 
@@ -195,8 +166,59 @@ func readProcStatus(pid uint64, proc *procStatus) (err error) {
 				setUint64(v, &proc.IoWritesB)
 			}
 		}
+	} else {
+		return err
+	}
+	return nil
+}
+
+func getProcessFds(pid string, proc *procStatus) (err error) {
+	if fds, err := ioutil.ReadDir("/proc/" + pid + "/fd"); err == nil {
+		proc.Fds = uint64(len(fds))
+		return nil
+	} else {
+		return err
+	}
+}
+
+func getProcessCalculatedMetrics(pid string, proc *procStatus) (err error) {
+	proc.Size = proc.Exe + proc.Data + proc.Stk
+
+	var mem uint64
+	mem, err = procfs.GetMemory("MemTotal")
+	if err == nil {
+		proc.Pmem = float64(proc.Rss) / float64(mem) * 100.00
+	} else {
+		return err
 	}
 
+	var stat cpuUtil
+	pidInt, err := strconv.ParseInt(pid, 10, 64)
+	if err != nil {
+		return err
+	}
+	getProcCpuUtil(pidInt, &stat)
+	if stat.err == nil {
+		proc.CpuTimeUser = float64(stat.utime) / float64(C.sysconf(C._SC_CLK_TCK))
+		proc.CpuTimeSystem = float64(stat.stime) / float64(C.sysconf(C._SC_CLK_TCK))
+	} else {
+		return err
+	}
+	return nil
+}
+
+func getProcessNames(pid string, proc *procStatus) (err error) {
+	_, proc.Cmdline, err = getProcessCmdline(pid, procInfoName)
+	if err != nil {
+		return err
+	}
+
+	f := strings.Fields(proc.Cmdline)
+	if len(f) > 0 {
+		proc.Name = strings.TrimSuffix(filepath.Base(f[0]), ":")
+	} else {
+		proc.Name = strings.TrimSuffix(proc.ThreadName, ":")
+	}
 	return nil
 }
 
@@ -335,7 +357,7 @@ func getProcesses(flags int) (processes []*procInfo, err error) {
 	return processes, nil
 }
 
-func getProcfsIds(path string) (pids []uint64, err error) {
+func getProcfsIds(path string) (pids []string, err error) {
 	dir, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -348,21 +370,21 @@ func getProcfsIds(path string) (pids []uint64, err error) {
 	}
 
 	for _, name := range names {
-		pid, err := strconv.ParseUint(name, 10, 64)
+		_, err := strconv.ParseUint(name, 10, 64)
 		if err == nil {
-			pids = append(pids, pid)
+			pids = append(pids, name)
 		}
 	}
 
 	return pids, nil
 }
 
-func getPids() (pids []uint64, err error) {
+func getPids() (pids []string, err error) {
 	return getProcfsIds("/proc")
 }
 
-func getThreadIds(pid uint64) (pids []uint64, err error) {
-	return getProcfsIds("/proc/" + strconv.FormatUint(pid, 10) + "/task")
+func getThreadIds(pid string) (pids []string, err error) {
+	return getProcfsIds("/proc/" + pid + "/task")
 }
 
 func trimUnit(v string, p *uint64) () {
