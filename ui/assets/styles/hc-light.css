@@ -4528,7 +4528,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       margin: -9px -6px 0 38px;
       line-height: 18px; }
       .overlay-dialogue .dashboard-widget-head .icon-doc-link::after {
-        font-size: 15px; }
+        font-size: 14px; }
   .overlay-dialogue.modal {
     position: fixed;
     overflow: hidden;
@@ -4539,8 +4539,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
         margin-right: -26px; }
       .overlay-dialogue.modal .dashboard-widget-head .overlay-close-btn {
         position: static;
-        margin: -9px -6px 0 38px;
-        font-size: 24px; }
+        margin: -8px -6px 0 30px;
+        font-size: 24px;
+        font-weight: normal; }
     .overlay-dialogue.modal .overlay-dialogue-body {
       overflow: auto;
       overflow-x: hidden;

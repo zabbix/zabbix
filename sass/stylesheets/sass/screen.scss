@@ -3047,7 +3047,7 @@ $form-icon-btn: (
 			line-height: 18px;
 
 			&::after {
-				font-size: 15px;
+				font-size: 14px;
 			}
 		}
 	}
@@ -3066,8 +3066,9 @@ $form-icon-btn: (
 
 			.overlay-close-btn {
 				position: static;
-				margin: -9px -6px 0 38px;
+				margin: -8px -6px 0 30px;
 				font-size: 24px;
+				font-weight: normal;
 			}
 		}
 
