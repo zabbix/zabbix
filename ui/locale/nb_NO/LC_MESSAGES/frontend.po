@@ -393,8 +393,8 @@ msgid "Access denied!"
 msgstr "Tilgang nektet!"
 
 #: app/views/hintbox.eventlist.php:76
-#: app/views/monitoring.widget.problems.view.php:64 include/actions.inc.php:157
-#: include/blocks.inc.php:763
+#: app/views/monitoring.widget.problems.view.php:64
+#: include/actions.inc.php:157 include/blocks.inc.php:763
 #: include/classes/screens/CScreenHostTriggers.php:230
 #: include/classes/screens/CScreenProblem.php:874
 #: include/classes/screens/CScreenProblem.php:899
@@ -548,8 +548,8 @@ msgstr "Handling oppdatert"
 #: include/classes/screens/CScreenProblem.php:900
 #: include/classes/screens/CScreenProblem.php:1147
 #: include/classes/screens/CScreenProblem.php:1208 include/events.inc.php:251
-#: include/forms.inc.php:1229 include/menu.inc.php:116 include/menu.inc.php:146
-#: include/views/configuration.action.edit.php:28
+#: include/forms.inc.php:1229 include/menu.inc.php:116
+#: include/menu.inc.php:146 include/views/configuration.action.edit.php:28
 #: include/views/configuration.discovery.edit.php:77
 #: include/views/monitoring.screen.list.php:89
 #: include/views/monitoring.slideconf.list.php:75
@@ -980,7 +980,8 @@ msgid "And"
 msgstr "Og"
 
 #: app/partials/popup.operations.php:378 app/views/monitoring.host.view.php:52
-#: app/views/monitoring.problem.view.php:242 app/views/popup.lldoverride.php:67
+#: app/views/monitoring.problem.view.php:242
+#: app/views/popup.lldoverride.php:67
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:80
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:80
 #: include/classes/widgets/forms/CWidgetFormProblems.php:95
@@ -1003,7 +1004,8 @@ msgstr "Og/Eller"
 #: app/views/administration.user.list.php:74
 #: app/views/monitoring.host.view.php:141
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:34
-#: include/triggers.inc.php:1829 include/views/configuration.action.list.php:70
+#: include/triggers.inc.php:1829
+#: include/views/configuration.action.list.php:70
 #: include/views/configuration.correlation.list.php:48
 #: include/views/configuration.discovery.list.php:48
 #: include/views/configuration.host.list.php:147
@@ -1011,7 +1013,8 @@ msgstr "Og/Eller"
 msgid "Any"
 msgstr "Noen"
 
-#: app/views/js/administration.regex.edit.js.php:163 include/regexp.inc.php:223
+#: app/views/js/administration.regex.edit.js.php:163
+#: include/regexp.inc.php:223
 msgid "Any character string included"
 msgstr "En hvilken som helst tegnstreng er inkludert"
 
@@ -1077,7 +1080,8 @@ msgstr "Applikasjon med applikasjonsid \"%1$s\" eksisterer ikke."
 #: app/controllers/CControllerPopupGeneric.php:176 app/views/search.php:38
 #: app/views/search.php:60 app/views/search.php:64 app/views/search.php:228
 #: app/views/search.php:246 app/views/search.php:250 include/forms.inc.php:674
-#: include/html.inc.php:346 include/views/configuration.application.edit.php:27
+#: include/html.inc.php:346
+#: include/views/configuration.application.edit.php:27
 #: include/views/configuration.application.list.php:157
 #: include/views/configuration.host.list.php:184
 #: include/views/configuration.host.list.php:400
@@ -1634,8 +1638,8 @@ msgstr ""
 #: app/views/js/administration.trigseverity.edit.js.php:37
 #: app/views/monitoring.dashboard.view.php:114
 #: include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:114 include/views/conf.import.php:131
-#: include/views/js/conf.import.js.php:42
+#: include/classes/setup/CSetupWizard.php:114
+#: include/views/conf.import.php:131 include/views/js/conf.import.js.php:42
 #: include/views/monitoring.slideconf.edit.php:281 jsLoader.php:122
 #: jsLoader.php:139 jsLoader.php:243 jsLoader.php:324 jsLoader.php:336
 msgid "Cancel"
@@ -3125,11 +3129,13 @@ msgstr ""
 msgid "Character"
 msgstr "Karakter"
 
-#: app/views/js/administration.regex.edit.js.php:159 include/regexp.inc.php:222
+#: app/views/js/administration.regex.edit.js.php:159
+#: include/regexp.inc.php:222
 msgid "Character string included"
 msgstr "Karakterstreng inkludert"
 
-#: app/views/js/administration.regex.edit.js.php:167 include/regexp.inc.php:224
+#: app/views/js/administration.regex.edit.js.php:167
+#: include/regexp.inc.php:224
 msgid "Character string not included"
 msgstr "Tegnstreng er ikke inkludert"
 
@@ -3820,7 +3826,8 @@ msgstr ""
 #: app/views/monitoring.dashboard.view.php:118
 #: app/views/monitoring.discovery.view.php:41
 #: app/views/monitoring.host.view.php:39
-#: app/views/monitoring.latest.view.php:39 app/views/monitoring.map.view.php:71
+#: app/views/monitoring.latest.view.php:39
+#: app/views/monitoring.map.view.php:71
 #: app/views/monitoring.problem.view.php:368
 #: app/views/monitoring.web.view.php:40 app/views/report.services.php:76
 #: httpdetails.php:192 include/classes/html/widget/CWidget.php:102
@@ -4965,7 +4972,8 @@ msgstr "Distribusjonsstatus"
 #: app/views/administration.module.list.php:76
 #: app/views/administration.proxy.edit.php:82
 #: app/views/administration.script.edit.php:73
-#: app/views/popup.triggerwizard.php:131 app/views/reports.auditlog.list.php:92
+#: app/views/popup.triggerwizard.php:131
+#: app/views/reports.auditlog.list.php:92
 #: include/classes/screens/CScreenEvents.php:32 include/events.inc.php:235
 #: include/views/configuration.correlation.edit.php:132
 #: include/views/configuration.host.discovery.edit.php:553
@@ -5267,8 +5275,9 @@ msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:207
 #: app/views/monitoring.discovery.view.php:49
-#: app/views/monitoring.widget.discovery.view.php:32 include/actions.inc.php:52
-#: include/forms.inc.php:959 include/views/configuration.discovery.edit.php:137
+#: app/views/monitoring.widget.discovery.view.php:32
+#: include/actions.inc.php:52 include/forms.inc.php:959
+#: include/views/configuration.discovery.edit.php:137
 msgid "Discovery rule"
 msgstr "Discovery regel"
 
@@ -5375,8 +5384,8 @@ msgstr "Vis problemer"
 msgid "Display stacked graph"
 msgstr "Vis stablet graf"
 
-#: app/controllers/CControllerHintboxActionlist.php:94 app/views/search.php:154
-#: app/views/search.php:223 app/views/search.php:308
+#: app/controllers/CControllerHintboxActionlist.php:94
+#: app/views/search.php:154 app/views/search.php:223 app/views/search.php:308
 #: include/actions.inc.php:1749 include/actions.inc.php:1822
 #: include/classes/helpers/CPagerHelper.php:148 jsLoader.php:332 queue.php:309
 #, c-format
@@ -6450,7 +6459,8 @@ msgstr "Fylt område"
 #: app/views/monitoring.web.view.php:46 app/views/reports.auditlog.list.php:81
 #: hostinventoriesoverview.php:153 include/classes/html/CFilter.php:394
 #: include/classes/widgets/forms/CWidgetFormMap.php:56
-#: include/forms.inc.php:728 include/views/administration.auditacts.list.php:53
+#: include/forms.inc.php:728
+#: include/views/administration.auditacts.list.php:53
 #: include/views/configuration.action.list.php:62
 #: include/views/configuration.application.list.php:28
 #: include/views/configuration.correlation.list.php:40
@@ -7146,7 +7156,8 @@ msgstr "Hebraisk (he_IL)"
 #: include/views/js/monitoring.sysmaps.js.php:453
 #: include/views/monitoring.screen.constructor.edit.php:818
 #: include/views/monitoring.sysmap.edit.php:104
-#: include/views/monitoring.sysmap.list.php:66 screenedit.php:68 sysmaps.php:42
+#: include/views/monitoring.sysmap.list.php:66 screenedit.php:68
+#: sysmaps.php:42
 msgid "Height"
 msgstr "Høyde"
 
@@ -7454,7 +7465,8 @@ msgstr "Vertsgruppe med ID \"%1$s\" er ikke tilgjengelig."
 #: app/controllers/CControllerUsergroupGrouprightAdd.php:36
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/partials/common.filter.trigger.php:50
-#: app/partials/popup.operations.php:338 app/views/monitoring.host.view.php:106
+#: app/partials/popup.operations.php:338
+#: app/views/monitoring.host.view.php:106
 #: app/views/monitoring.latest.view.php:49
 #: app/views/monitoring.problem.view.php:103
 #: app/views/monitoring.web.view.php:48
@@ -9508,11 +9520,12 @@ msgstr "Ugyldig intern datalagringsperiode: %1$s."
 
 #: app/controllers/CControllerPopupLldOperation.php:177
 #: app/controllers/CControllerPopupLldOperation.php:182
-#: app/controllers/CControllerPopupLldOperation.php:195 disc_prototypes.php:370
-#: disc_prototypes.php:375 disc_prototypes.php:388 disc_prototypes.php:715
-#: disc_prototypes.php:720 disc_prototypes.php:733 host_discovery.php:429
-#: host_discovery.php:435 host_discovery.php:448 items.php:528 items.php:533
-#: items.php:546 items.php:933 items.php:938 items.php:951
+#: app/controllers/CControllerPopupLldOperation.php:195
+#: disc_prototypes.php:370 disc_prototypes.php:375 disc_prototypes.php:388
+#: disc_prototypes.php:715 disc_prototypes.php:720 disc_prototypes.php:733
+#: host_discovery.php:429 host_discovery.php:435 host_discovery.php:448
+#: items.php:528 items.php:533 items.php:546 items.php:933 items.php:938
+#: items.php:951
 #, c-format
 msgid "Invalid interval \"%1$s\"."
 msgstr "Ugyldig intervall \"%1$s\"."
@@ -10054,7 +10067,8 @@ msgstr "Element med nøkkel \"%1$s\" eksisterer allerede på \"%2$s\"."
 #: app/views/search.php:67 app/views/search.php:71 app/views/search.php:228
 #: app/views/search.php:253 app/views/search.php:257
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:31
-#: include/html.inc.php:360 include/views/configuration.application.list.php:85
+#: include/html.inc.php:360
+#: include/views/configuration.application.list.php:85
 #: include/views/configuration.application.list.php:129
 #: include/views/configuration.graph.edit.php:458
 #: include/views/configuration.host.discovery.list.php:186
@@ -11796,15 +11810,16 @@ msgstr "Neste steg"
 #: app/views/administration.user.list.php:130
 #: app/views/hintbox.eventlist.php:161
 #: app/views/monitoring.widget.problems.view.php:243
-#: app/views/popup.condition.common.php:662 app/views/popup.lldoperation.php:85
-#: app/views/popup.lldoperation.php:97 include/actions.inc.php:33
-#: include/blocks.inc.php:619 include/blocks.inc.php:697
-#: include/blocks.inc.php:864
+#: app/views/popup.condition.common.php:662
+#: app/views/popup.lldoperation.php:85 app/views/popup.lldoperation.php:97
+#: include/actions.inc.php:33 include/blocks.inc.php:619
+#: include/blocks.inc.php:697 include/blocks.inc.php:864
 #: include/classes/screens/CScreenHostTriggers.php:271
 #: include/classes/screens/CScreenProblem.php:1091
 #: include/classes/screens/CScreenProblem.php:1229 include/events.inc.php:173
 #: include/events.inc.php:354 include/triggers.inc.php:1224
-#: include/triggers.inc.php:1229 include/views/configuration.graph.list.php:192
+#: include/triggers.inc.php:1229
+#: include/views/configuration.graph.list.php:192
 #: include/views/configuration.host.prototype.list.php:131
 #: include/views/configuration.host.prototype.list.php:144
 #: include/views/configuration.httpconf.list.php:166
@@ -12159,7 +12174,8 @@ msgstr "Ingen tillatelser for systemtilgang."
 #: app/controllers/CControllerWidgetPlainTextView.php:78
 #: app/views/monitoring.widget.graph.view.php:27 disc_prototypes.php:1201
 #: disc_prototypes.php:1431 host_discovery.php:766
-#: hostinventoriesoverview.php:74 include/classes/api/services/CAction.php:1590
+#: hostinventoriesoverview.php:74
+#: include/classes/api/services/CAction.php:1590
 #: include/classes/api/services/CAction.php:1969
 #: include/classes/api/services/CAction.php:2984
 #: include/classes/api/services/CApplication.php:304
@@ -12746,9 +12762,10 @@ msgstr "Av"
 #: app/partials/js/massupdate.macros.tab.js.php:148
 #: app/views/administration.user.list.php:138
 #: app/views/js/popup.mediatypetest.edit.js.php:115
-#: app/views/monitoring.widget.web.view.php:30 app/views/report.services.php:80
-#: app/views/report.services.php:81 app/views/report.services.php:82
-#: app/views/report.services.php:83 include/classes/html/CTriggersInfo.php:76
+#: app/views/monitoring.widget.web.view.php:30
+#: app/views/report.services.php:80 app/views/report.services.php:81
+#: app/views/report.services.php:82 app/views/report.services.php:83
+#: include/classes/html/CTriggersInfo.php:76
 #: include/views/configuration.triggers.list.php:85
 #: include/views/js/common.item.edit.js.php:317
 #: include/views/js/configuration.httpconf.edit.js.php:103
@@ -12993,7 +13010,8 @@ msgid "Options"
 msgstr "Alternativer"
 
 #: app/partials/popup.operations.php:380 app/views/monitoring.host.view.php:53
-#: app/views/monitoring.problem.view.php:243 app/views/popup.lldoverride.php:69
+#: app/views/monitoring.problem.view.php:243
+#: app/views/popup.lldoverride.php:69
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:81
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:81
 #: include/classes/widgets/forms/CWidgetFormProblems.php:96
@@ -13957,7 +13975,8 @@ msgstr "Egenskaper"
 #: app/controllers/CControllerMenuPopup.php:332
 #: app/controllers/CControllerMenuPopup.php:611
 #: app/controllers/CControllerWidgetUrlView.php:56
-#: app/views/hintbox.eventlist.php:44 include/classes/screens/CScreenUrl.php:70
+#: app/views/hintbox.eventlist.php:44
+#: include/classes/screens/CScreenUrl.php:70
 #, c-format
 msgid "Provided URL \"%1$s\" is invalid."
 msgstr ""
@@ -14670,11 +14689,13 @@ msgstr "Resultat"
 msgid "Result converted to %1$s"
 msgstr ""
 
-#: app/views/js/administration.regex.edit.js.php:175 include/regexp.inc.php:226
+#: app/views/js/administration.regex.edit.js.php:175
+#: include/regexp.inc.php:226
 msgid "Result is FALSE"
 msgstr "Resultatet er FALSE"
 
-#: app/views/js/administration.regex.edit.js.php:171 include/regexp.inc.php:225
+#: app/views/js/administration.regex.edit.js.php:171
+#: include/regexp.inc.php:225
 msgid "Result is TRUE"
 msgstr "Resultatet er TRUE"
 
@@ -15672,7 +15693,8 @@ msgctxt "screen reader"
 msgid "Severity changed"
 msgstr ""
 
-#: include/actions.inc.php:1780 include/classes/screens/CScreenProblem.php:1205
+#: include/actions.inc.php:1780
+#: include/classes/screens/CScreenProblem.php:1205
 msgid "Severity changes"
 msgstr ""
 
@@ -16175,7 +16197,8 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:35
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:36
 #: include/events.inc.php:247 include/forms.inc.php:243
-#: include/forms.inc.php:689 include/views/administration.auditacts.list.php:67
+#: include/forms.inc.php:689
+#: include/views/administration.auditacts.list.php:67
 #: include/views/configuration.action.list.php:68
 #: include/views/configuration.action.list.php:91
 #: include/views/configuration.correlation.list.php:46
@@ -17702,7 +17725,8 @@ msgstr "Enheter"
 #: app/views/monitoring.widget.hostavail.view.php:66
 #: app/views/monitoring.widget.hostavail.view.php:104
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:118
-#: include/actions.inc.php:1075 include/classes/screens/CScreenHostsInfo.php:89
+#: include/actions.inc.php:1075
+#: include/classes/screens/CScreenHostsInfo.php:89
 #: include/classes/screens/CScreenHttpTestDetails.php:116
 #: include/correlation.inc.php:127 include/discovery.inc.php:115
 #: include/discovery.inc.php:151 include/events.inc.php:44
@@ -18929,7 +18953,8 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:444
 #: include/views/monitoring.screen.constructor.edit.php:815
 #: include/views/monitoring.sysmap.edit.php:99
-#: include/views/monitoring.sysmap.list.php:65 screenedit.php:67 sysmaps.php:41
+#: include/views/monitoring.sysmap.list.php:65 screenedit.php:67
+#: sysmaps.php:41
 msgid "Width"
 msgstr "Bredde"
 
@@ -19166,14 +19191,16 @@ msgstr "Årlig"
 #: app/views/administration.valuemap.list.php:82
 #: app/views/hintbox.eventlist.php:161
 #: app/views/monitoring.widget.problems.view.php:243
-#: app/views/popup.condition.common.php:663 app/views/popup.lldoperation.php:84
-#: app/views/popup.lldoperation.php:96 include/actions.inc.php:32
-#: include/blocks.inc.php:619 include/blocks.inc.php:864
+#: app/views/popup.condition.common.php:663
+#: app/views/popup.lldoperation.php:84 app/views/popup.lldoperation.php:96
+#: include/actions.inc.php:32 include/blocks.inc.php:619
+#: include/blocks.inc.php:864
 #: include/classes/screens/CScreenHostTriggers.php:271
 #: include/classes/screens/CScreenProblem.php:1091
 #: include/classes/screens/CScreenProblem.php:1229 include/events.inc.php:173
 #: include/events.inc.php:354 include/triggers.inc.php:1223
-#: include/triggers.inc.php:1228 include/views/configuration.graph.list.php:192
+#: include/triggers.inc.php:1228
+#: include/views/configuration.graph.list.php:192
 #: include/views/configuration.host.prototype.list.php:131
 #: include/views/configuration.host.prototype.list.php:144
 #: include/views/configuration.httpconf.list.php:166
@@ -19756,7 +19783,8 @@ msgstr "kan ikke endres"
 #: include/classes/validators/CEventCorrCondValidator.php:80
 #: include/classes/validators/CEventCorrCondValidator.php:87
 #: include/classes/validators/CEventCorrCondValidator.php:96
-#: include/classes/validators/CNewValidator.php:97 include/validate.inc.php:332
+#: include/classes/validators/CNewValidator.php:97
+#: include/validate.inc.php:332
 msgid "cannot be empty"
 msgstr "kan ikke være tomt"
 
