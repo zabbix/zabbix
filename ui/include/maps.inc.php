@@ -613,7 +613,7 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 
 		$triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'status', 'value', 'priority', 'description', 'expression'],
-			'selectHosts' => ['hostid', 'maintenance_status'],
+			'selectHosts' => ['hostid', 'status', 'maintenance_status'],
 			'triggerids' => array_keys($all_triggerid_to_selementids),
 			'filter' => ['state' => null],
 			'preservekeys' => true
@@ -654,7 +654,7 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 	if ($monitored_hostids) {
 		$triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'status', 'value', 'priority', 'description', 'expression'],
-			'selectHosts' => ['hostid', 'maintenance_status'],
+			'selectHosts' => ['hostid', 'status', 'maintenance_status'],
 			'selectItems' => ['itemid'],
 			'hostids' => array_keys($monitored_hostids),
 			'filter' => ['state' => null],
@@ -755,10 +755,11 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 						$trigger_hosts[$host['hostid']] = true;
 						$host_count++;
 
-						if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
+						if ($host['status'] == HOST_STATUS_MONITORED
+								&& $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
 								&& ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER
-								|| ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP
-									&& array_key_exists(SYSMAP_ELEMENT_TYPE_TRIGGER, $trigger['source'])))) {
+									|| ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP
+										&& array_key_exists(SYSMAP_ELEMENT_TYPE_TRIGGER, $trigger['source'])))) {
 							$i['maintenance']++;
 						}
 					}
