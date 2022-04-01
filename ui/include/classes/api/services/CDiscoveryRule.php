@@ -1370,7 +1370,7 @@ class CDiscoveryRule extends CItemGeneral {
 							// If same "lld_macro" is found in DB, update only "path" if necessary.
 
 							if (array_key_exists('path', $lld_macro_path)
-									&& $lld_macro_path['path'] !== $lld_macro_path['path']) {
+									&& $lld_macro_path['path'] !== $db_lld_macro_path['path']) {
 								$fields_to_update['path'] = $lld_macro_path['path'];
 							}
 						}
