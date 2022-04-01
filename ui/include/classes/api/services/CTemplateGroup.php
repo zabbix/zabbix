@@ -78,7 +78,8 @@ class CTemplateGroup extends CApiService {
 			'nopermissions'							=> ['type' => API_BOOLEAN, 'default' => false],
 			// filter
 			'filter'								=> ['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'uuid' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 			]],
 			'search'								=> ['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
@@ -88,7 +89,7 @@ class CTemplateGroup extends CApiService {
 			'excludeSearch'							=> ['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled'				=> ['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output'								=> ['type' => API_OUTPUT, 'in' => implode(',', ['groupid', 'name']), 'default' => API_OUTPUT_EXTEND],
+			'output'								=> ['type' => API_OUTPUT, 'in' => implode(',', ['groupid', 'name', 'uuid']), 'default' => API_OUTPUT_EXTEND],
 			'selectTemplates'						=> ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'default' => null],
 			'selectGroupDiscovery'					=> ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'selectDiscoveryRule'					=> ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'default' => null],

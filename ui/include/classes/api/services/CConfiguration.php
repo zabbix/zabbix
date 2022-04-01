@@ -40,12 +40,13 @@ class CConfiguration extends CApiService {
 			'format' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CExportWriterFactory::YAML, CExportWriterFactory::XML, CExportWriterFactory::JSON, CExportWriterFactory::RAW])],
 			'prettyprint' => ['type' => API_BOOLEAN, 'default' => false],
 			'options' =>	['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
-				'groups' =>		['type' => API_IDS],
-				'hosts' =>		['type' => API_IDS],
-				'images' =>		['type' => API_IDS],
-				'maps' =>		['type' => API_IDS],
-				'mediaTypes' =>	['type' => API_IDS],
-				'templates' =>	['type' => API_IDS]
+				'host_groups' =>		['type' => API_IDS],
+				'hosts' =>				['type' => API_IDS],
+				'images' =>				['type' => API_IDS],
+				'maps' =>				['type' => API_IDS],
+				'mediaTypes' =>			['type' => API_IDS],
+				'template_groups' =>	['type' => API_IDS],
+				'templates' =>			['type' => API_IDS]
 			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $params, '/', $error)) {
@@ -103,7 +104,11 @@ class CConfiguration extends CApiService {
 					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
 					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'groups' =>				['type' => API_OBJECT, 'fields' => [
+				'host_groups' =>				['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+				]],
+				'template_groups' =>				['type' => API_OBJECT, 'fields' => [
 					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
 					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
 				]],
@@ -204,7 +209,7 @@ class CConfiguration extends CApiService {
 			->setStrict(true)
 			->validate($data, '/');
 
-		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4', '5.0', '5.2', '5.4'] as $version) {
+		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4', '5.0', '5.2', '5.4', '6.0'] as $version) {
 			if ($data['zabbix_export']['version'] !== $version) {
 				continue;
 			}
@@ -274,7 +279,7 @@ class CConfiguration extends CApiService {
 			->setPreview(true)
 			->validate($data, '/');
 
-		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4', '5.0', '5.2', '5.4'] as $version) {
+		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4', '5.0', '5.2', '5.4', '6.0'] as $version) {
 			if ($data['zabbix_export']['version'] !== $version) {
 				continue;
 			}
@@ -306,7 +311,7 @@ class CConfiguration extends CApiService {
 
 		$import = $adapter->getData();
 		$imported_uuids = [];
-		foreach (['groups', 'templates'] as $first_level) {
+		foreach (['groups', 'template_groups', 'templates'] as $first_level) {
 			if (array_key_exists($first_level, $import)) {
 				$imported_uuids[$first_level] = array_column($import[$first_level], 'uuid');
 			}
@@ -316,13 +321,37 @@ class CConfiguration extends CApiService {
 		foreach ($imported_uuids as $entity => $uuids) {
 			switch ($entity) {
 				case 'groups':
-					$imported_ids['groups'] = API::HostGroup()->get([
+					if (array_key_exists('templates', $imported_uuids)) {
+						$imported_ids['groups'] = API::TemplateGroup()->get([
+							'filter' => [
+								'uuid' => $uuids
+							],
+							'preservekeys' => true
+						]);
+						$imported_ids['template_groups'] = array_keys($imported_ids['groups']);
+						unset($imported_ids['groups']);
+					}
+					else {
+						$imported_ids['groups'] = API::HostGroup()->get([
+							'filter' => [
+								'uuid' => $uuids
+							],
+							'preservekeys' => true
+						]);
+						$imported_ids['host_groups'] = array_keys($imported_ids['groups']);
+						unset($imported_ids['groups']);
+					}
+
+					break;
+
+				case 'template_groups':
+					$imported_ids['template_groups'] = API::TemplateGroup()->get([
 						'filter' => [
 							'uuid' => $uuids
 						],
 						'preservekeys' => true
 					]);
-					$imported_ids['groups'] = array_keys($imported_ids['groups']);
+					$imported_ids['template_groups'] = array_keys($imported_ids['template_groups']);
 
 					break;
 

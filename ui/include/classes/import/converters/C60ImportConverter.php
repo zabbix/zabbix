@@ -34,6 +34,25 @@ class C60ImportConverter extends CConverter {
 	public function convert(array $data): array {
 		$data['zabbix_export']['version'] = '6.2';
 
+		if (array_key_exists('hosts', $data['zabbix_export'])
+			&& array_key_exists('groups', $data['zabbix_export'])) {
+			$data['zabbix_export']['host_groups'] = $data['zabbix_export']['groups'];
+			unset($data['zabbix_export']['groups']);
+		}
+
+		if (array_key_exists('templates', $data['zabbix_export'])
+			&& array_key_exists('groups', $data['zabbix_export'])) {
+			$data['zabbix_export']['template_groups'] = $data['zabbix_export']['groups'];
+			unset($data['zabbix_export']['groups']);
+		}
+
+		if (array_key_exists('groups', $data['zabbix_export'])
+			&& !array_key_exists('templates', $data['zabbix_export'])
+			&& !array_key_exists('hosts', $data['zabbix_export'])) {
+			$data['zabbix_export']['host_groups'] = $data['zabbix_export']['groups'];
+			unset($data['zabbix_export']['groups']);
+		}
+
 		return $data;
 	}
 }

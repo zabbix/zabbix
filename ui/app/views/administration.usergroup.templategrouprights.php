@@ -28,7 +28,7 @@ $output = [
 		'templategroup_rights' => $data['templategroup_rights']
 	]))->getOutput()
 ];
-sdff($output);
+
 if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();
 }

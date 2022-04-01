@@ -139,15 +139,27 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format groups.
+	 * Format template groups.
 	 *
 	 * @param array $schema  Tag schema from validation class.
 	 * @param array $groups  Export data.
 	 */
-	public function buildGroups(array $schema, array $groups) {
+	public function buildTemplateGroups(array $schema, array $groups) {
 		$groups = $this->formatGroups($groups);
 
-		$this->data['groups'] = $this->build($schema, $groups, 'groups');
+		$this->data['template_groups'] = $this->build($schema, $groups, 'template_groups');
+	}
+
+	/**
+	 * Format host groups.
+	 *
+	 * @param array $schema  Tag schema from validation class.
+	 * @param array $groups  Export data.
+	 */
+	public function buildHostGroups(array $schema, array $groups) {
+		$groups = $this->formatGroups($groups);
+
+		$this->data['host_groups'] = $this->build($schema, $groups, 'host_groups');
 	}
 
 	/**

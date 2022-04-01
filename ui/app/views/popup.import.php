@@ -26,7 +26,8 @@
 $rules_table = new CTable();
 
 $titles = [
-	'groups' => _('Groups'),
+	'template_groups' => _('Template groups'),
+	'host_groups' => _('Host groups'),
 	'hosts' => _('Hosts'),
 	'templates' => _('Templates'),
 	'valueMaps' => _('Value mappings'),

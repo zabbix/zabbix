@@ -84,7 +84,8 @@ class CHostGroup extends CApiService {
 			// filter
 			'filter'								=> ['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'flags' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+				'flags' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'uuid' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 			]],
 			'search'								=> ['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
@@ -94,7 +95,7 @@ class CHostGroup extends CApiService {
 			'excludeSearch'							=> ['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled'				=> ['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output'								=> ['type' => API_OUTPUT, 'in' => implode(',', ['groupid', 'name', 'flags']), 'default' => API_OUTPUT_EXTEND],
+			'output'								=> ['type' => API_OUTPUT, 'in' => implode(',', ['groupid', 'name', 'flags', 'uuid']), 'default' => API_OUTPUT_EXTEND],
 			'selectHosts'							=> ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'default' => null],
 			'selectGroupDiscovery'					=> ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'selectDiscoveryRule'					=> ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'default' => null],

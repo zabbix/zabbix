@@ -30,7 +30,8 @@ class CImportReferencer {
 	 */
 	public $interfaces_cache = [];
 
-	protected $groups = [];
+	protected $template_groups = [];
+	protected $host_groups = [];
 	protected $templates = [];
 	protected $hosts = [];
 	protected $items = [];
@@ -50,6 +51,8 @@ class CImportReferencer {
 	protected $httpsteps = [];
 
 	protected $db_groups;
+	protected $db_template_groups;
+	protected $db_host_groups;
 	protected $db_templates;
 	protected $db_hosts;
 	protected $db_items;
@@ -69,18 +72,18 @@ class CImportReferencer {
 	protected $db_httpsteps;
 
 	/**
-	 * Get group ID by group UUID.
+	 * Get template group ID by group UUID.
 	 *
 	 * @param string $uuid
 	 *
 	 * @return string|null
 	 */
-	public function findGroupidByUuid(string $uuid): ?string {
-		if ($this->db_groups === null) {
-			$this->selectGroups();
+	public function findTemplateGroupidByUuid(string $uuid): ?string {
+		if ($this->db_template_groups === null) {
+			$this->selectTemplateGroups();
 		}
 
-		foreach ($this->db_groups as $groupid => $group) {
+		foreach ($this->db_template_groups as $groupid => $group) {
 			if ($group['uuid'] === $uuid) {
 				return $groupid;
 			}
@@ -90,18 +93,60 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get group ID by group name.
+	 * Get host group ID by group UUID.
+	 *
+	 * @param string $uuid
+	 *
+	 * @return string|null
+	 */
+	public function findHostGroupidByUuid(string $uuid): ?string {
+		if ($this->db_host_groups === null) {
+			$this->selectHostGroups();
+		}
+
+		foreach ($this->db_host_groups as $groupid => $group) {
+			if ($group['uuid'] === $uuid) {
+				return $groupid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get template group ID by group name.
 	 *
 	 * @param string $name
 	 *
 	 * @return string|null
 	 */
-	public function findGroupidByName(string $name): ?string {
-		if ($this->db_groups === null) {
-			$this->selectGroups();
+	public function findTemplateGroupidByName(string $name): ?string {
+		if ($this->db_template_groups === null) {
+			$this->selectTemplateGroups();
 		}
 
-		foreach ($this->db_groups as $groupid => $group) {
+		foreach ($this->db_template_groups as $groupid => $group) {
+			if ($group['name'] === $name) {
+				return $groupid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get host group ID by group name.
+	 *
+	 * @param string $name
+	 *
+	 * @return string|null
+	 */
+	public function findHostGroupidByName(string $name): ?string {
+		if ($this->db_host_groups === null) {
+			$this->selectHostGroups();
+		}
+
+		foreach ($this->db_host_groups as $groupid => $group) {
 			if ($group['name'] === $name) {
 				return $groupid;
 			}
@@ -667,22 +712,44 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add group names that need association with a database group ID.
+	 * Add template group names that need association with a database group ID.
 	 *
 	 * @param array $groups
 	 */
-	public function addGroups(array $groups): void {
-		$this->groups = $groups;
+	public function addTemplateGroups(array $groups): void {
+		$this->template_groups = $groups;
 	}
 
 	/**
-	 * Add group name association with group ID.
+	 * Add host group names that need association with a database group ID.
+	 *
+	 * @param array $groups
+	 */
+	public function addHostGroups(array $groups): void {
+		$this->host_groups = $groups;
+	}
+
+	/**
+	 * Add template group name association with group ID.
 	 *
 	 * @param string $groupid
 	 * @param array  $group
 	 */
-	public function setDbGroup(string $groupid, array $group): void {
-		$this->db_groups[$groupid] = [
+	public function setDbTemplateGroup(string $groupid, array $group): void {
+		$this->db_template_groups[$groupid] = [
+			'uuid' => $group['uuid'],
+			'name' => $group['name']
+		];
+	}
+
+	/**
+	 * Add host group name association with group ID.
+	 *
+	 * @param string $groupid
+	 * @param array  $group
+	 */
+	public function setDbHostGroup(string $groupid, array $group): void {
+		$this->db_host_groups[$groupid] = [
 			'uuid' => $group['uuid'],
 			'name' => $group['name']
 		];
@@ -921,26 +988,49 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Select group ids for previously added group names.
+	 * Select template group ids for previously added group names.
 	 */
-	protected function selectGroups(): void {
-		$this->db_groups = [];
+	protected function selectTemplateGroups(): void {
+		$this->db_template_groups = [];
 
-		if (!$this->groups) {
+		if (!$this->template_groups) {
 			return;
 		}
 
-		$this->db_groups = API::HostGroup()->get([
+		$this->db_template_groups = API::TemplateGroup()->get([
 			'output' => ['name', 'uuid'],
 			'filter' => [
-				'uuid' => array_column($this->groups, 'uuid'),
-				'name' => array_keys($this->groups)
+				'uuid' => array_column($this->template_groups, 'uuid'),
+				'name' => array_keys($this->template_groups)
 			],
 			'searchByAny' => true,
 			'preservekeys' => true
 		]);
 
-		$this->groups = [];
+		$this->template_groups = [];
+	}
+
+	/**
+	 * Select host group ids for previously added group names.
+	 */
+	protected function selectHostGroups(): void {
+		$this->db_host_groups = [];
+
+		if (!$this->host_groups) {
+			return;
+		}
+
+		$this->db_host_groups = API::HostGroup()->get([
+			'output' => ['name', 'uuid'],
+			'filter' => [
+				'uuid' => array_column($this->host_groups, 'uuid'),
+				'name' => array_keys($this->host_groups)
+			],
+			'searchByAny' => true,
+			'preservekeys' => true
+		]);
+
+		$this->host_groups = [];
 	}
 
 	/**
