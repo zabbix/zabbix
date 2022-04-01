@@ -143,7 +143,9 @@ There are no template links in this template.
 |TrueNAS |TrueNAS: L2ARC read rate |<p>MIB: FREENAS-MIB</p><p>Read rate from L2 cache in bytes per second.</p> |SNMP |truenas.zfs.l2arc.read<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |TrueNAS |TrueNAS: L2ARC write rate |<p>MIB: FREENAS-MIB</p><p>Write rate from L2 cache in bytes per second.</p> |SNMP |truenas.zfs.l2arc.write<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |TrueNAS |TrueNAS: L2ARC size |<p>MIB: FREENAS-MIB</p><p>L2ARC size in bytes.</p> |SNMP |truenas.zfs.l2arc.size<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|TrueNAS |TrueNAS: ZIL operations |<p>MIB: FREENAS-MIB</p><p>The ops column parsed from the command zilstat 1 1.</p> |SNMP |truenas.zfs.zil.ops |
+|TrueNAS |TrueNAS: ZIL operations 1 second |<p>MIB: FREENAS-MIB</p><p>The ops column parsed from the command zilstat 1 1.</p> |SNMP |truenas.zfs.zil.ops1 |
+|TrueNAS |TrueNAS: ZIL operations 5 seconds |<p>MIB: FREENAS-MIB</p><p>The ops column parsed from the command zilstat 5 1.</p> |SNMP |truenas.zfs.zil.ops5 |
+|TrueNAS |TrueNAS: ZIL operations 10 seconds |<p>MIB: FREENAS-MIB</p><p>The ops column parsed from the command zilstat 10 1.</p> |SNMP |truenas.zfs.zil.ops10 |
 |TrueNAS |TrueNAS: Pool [{#POOLNAME}]: Total space |<p>MIB: FREENAS-MIB</p><p>The size of the storage pool in bytes.</p> |SNMP |truenas.zpool.size.total[{#POOLNAME}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `{#POOL_ALLOC_UNITS}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |TrueNAS |TrueNAS: Pool [{#POOLNAME}]: Used space |<p>MIB: FREENAS-MIB</p><p>The used size of the storage pool in bytes.</p> |SNMP |truenas.zpool.used[{#POOLNAME}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `{#POOL_ALLOC_UNITS}`</p> |
 |TrueNAS |TrueNAS: Pool [{#POOLNAME}]: Available space |<p>MIB: FREENAS-MIB</p><p>The available size of the storage pool in bytes.</p> |SNMP |truenas.zpool.avail[{#POOLNAME}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `{#POOL_ALLOC_UNITS}`</p> |
