@@ -728,7 +728,7 @@ void	zbx_shmem_clear(zbx_shmem_info_t *info)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	zbx_shmem_get_stats(const zbx_shmem_info_t *info, zbx_mem_stats_t *stats)
+void	zbx_shmem_get_stats(const zbx_shmem_info_t *info, zbx_shmem_stats_t *stats)
 {
 	void		*chunk;
 	int		i;
@@ -763,7 +763,7 @@ void	zbx_shmem_get_stats(const zbx_shmem_info_t *info, zbx_mem_stats_t *stats)
 
 void	zbx_shmem_dump_stats(int level, zbx_shmem_info_t *info)
 {
-	zbx_mem_stats_t	stats;
+	zbx_shmem_stats_t	stats;
 	int		i;
 
 	zbx_shmem_get_stats(info, &stats);

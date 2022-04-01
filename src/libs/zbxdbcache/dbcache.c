@@ -4816,7 +4816,7 @@ void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num)
  * Purpose: get shared memory allocator statistics                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index)
+void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index)
 {
 	LOCK_CACHE;
 

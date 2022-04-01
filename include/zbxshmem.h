@@ -61,7 +61,7 @@ typedef struct
 	unsigned int	free_chunks;
 	unsigned int	used_chunks;
 }
-zbx_mem_stats_t;
+zbx_shmem_stats_t;
 
 int	zbx_shmem_create(zbx_shmem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
 		int allow_oom, char **error);
@@ -84,7 +84,7 @@ void	__zbx_shmem_free(const char *file, int line, zbx_shmem_info_t *info, void *
 
 void	zbx_shmem_clear(zbx_shmem_info_t *info);
 
-void	zbx_shmem_get_stats(const zbx_shmem_info_t *info, zbx_mem_stats_t *stats);
+void	zbx_shmem_get_stats(const zbx_shmem_info_t *info, zbx_shmem_stats_t *stats);
 void	zbx_shmem_dump_stats(int level, zbx_shmem_info_t *info);
 
 size_t		zbx_shmem_required_size(int chunks_num, const char *descr, const char *param);

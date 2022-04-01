@@ -2738,11 +2738,11 @@ void	zbx_vc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, in
  * Purpose: get value cache shared memory statistics                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vc_get_mem_stats(zbx_mem_stats_t *mem)
+void	zbx_vc_get_mem_stats(zbx_shmem_stats_t *mem)
 {
 	if (ZBX_VC_DISABLED == vc_state)
 	{
-		memset(mem, 0, sizeof(zbx_mem_stats_t));
+		memset(mem, 0, sizeof(zbx_shmem_stats_t));
 		return;
 	}
 
