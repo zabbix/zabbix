@@ -650,17 +650,13 @@ class CHost extends CHostGeneral {
 
 		foreach ($hosts as $index => &$host) {
 			$host['hostid'] = $hostids[$index];
+			$hosts_rtdata[$index] = ['hostid' => $hostids[$index]];
 
 			foreach ($host['groups'] as $group) {
 				$hosts_groups[] = [
 					'hostid' => $host['hostid'],
 					'groupid' => $group['groupid']
 				];
-			}
-
-			if (array_key_exists('rtdata', $host)) {
-				$hosts_rtdata[$key] = [];
-				unset($host['rtdata']);
 			}
 
 			if (array_key_exists('tags', $host)) {
@@ -729,14 +725,7 @@ class CHost extends CHostGeneral {
 			DB::insert('host_inventory', $hosts_inventory, false);
 		}
 
-		$hostids = DB::insert('hosts', $hosts);
-
-		foreach ($hosts_rtdata as $key => &$value) {
-			$value['hostid'] = $hostids[$key];
-		}
-		unset($value);
-
-		DB::insert('host_rtdata', $hosts_rtdata, false);
+		DB::insertBatch('host_rtdata', $hosts_rtdata, false);
 
 		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_HOST, $hosts);
 
