@@ -139,6 +139,8 @@ define('ZBX_AUTH_FORM_ZABBIX',	0);
 define('ZBX_AUTH_FORM_HTTP',	1);
 define('ZBX_AUTH_CASE_INSENSITIVE',	0);
 define('ZBX_AUTH_CASE_SENSITIVE',	1);
+define('ZBX_AUTH_START_TLS_OFF',	0);
+define('ZBX_AUTH_START_TLS_ON',		1);
 
 // password policy
 define('PASSWD_CHECK_CASE', 0x01);

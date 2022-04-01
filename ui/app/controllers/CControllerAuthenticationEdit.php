@@ -33,8 +33,6 @@ class CControllerAuthenticationEdit extends CController {
 	protected function checkInput() {
 		$fields = [
 			'form_refresh' =>				'string',
-			'ldap_test_user' =>				'string',
-			'ldap_test_password' =>			'string',
 			'change_bind_password' =>		'in 0,1',
 			'db_authentication_type' =>		'string',
 			'authentication_type' =>		'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
@@ -42,14 +40,7 @@ class CControllerAuthenticationEdit extends CController {
 			'http_login_form' =>			'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
 			'http_strip_domains' =>			'db config.http_strip_domains',
 			'http_case_sensitive' =>		'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'ldap_case_sensitive' =>		'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'ldap_configured' =>			'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
-			'ldap_host' =>					'db config.ldap_host',
-			'ldap_port' =>					'int32',
-			'ldap_base_dn' =>				'db config.ldap_base_dn',
-			'ldap_bind_dn' =>				'db config.ldap_bind_dn',
-			'ldap_search_attribute' =>		'db config.ldap_search_attribute',
-			'ldap_bind_password' =>			'db config.ldap_bind_password',
 			'saml_auth_enabled' =>			'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
 			'saml_idp_entityid' =>			'db config.saml_idp_entityid',
 			'saml_sso_url' =>				'db config.saml_sso_url',
@@ -95,8 +86,6 @@ class CControllerAuthenticationEdit extends CController {
 			'action_submit' => 'authentication.update',
 			'action_passw_change' => 'authentication.edit',
 			'ldap_error' => ($ldap_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $ldap_status['error'],
-			'ldap_test_password' => '',
-			'ldap_test_user' => CWebUser::$data['username'],
 			'saml_error' => ($openssl_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $openssl_status['error'],
 			'change_bind_password' => 0,
 			'form_refresh' => 0
@@ -108,14 +97,7 @@ class CControllerAuthenticationEdit extends CController {
 			CAuthenticationHelper::HTTP_LOGIN_FORM,
 			CAuthenticationHelper::HTTP_STRIP_DOMAINS,
 			CAuthenticationHelper::HTTP_CASE_SENSITIVE,
-			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
 			CAuthenticationHelper::LDAP_CONFIGURED,
-			CAuthenticationHelper::LDAP_HOST,
-			CAuthenticationHelper::LDAP_PORT,
-			CAuthenticationHelper::LDAP_BASE_DN,
-			CAuthenticationHelper::LDAP_BIND_DN,
-			CAuthenticationHelper::LDAP_SEARCH_ATTRIBUTE,
-			CAuthenticationHelper::LDAP_BIND_PASSWORD,
 			CAuthenticationHelper::SAML_AUTH_ENABLED,
 			CAuthenticationHelper::SAML_IDP_ENTITYID,
 			CAuthenticationHelper::SAML_SSO_URL,
@@ -140,7 +122,6 @@ class CControllerAuthenticationEdit extends CController {
 		}
 
 		if ($this->hasInput('form_refresh')) {
-			$data['ldap_bind_password'] = '';
 			$this->getInputs($data, [
 				'form_refresh',
 				'change_bind_password',
@@ -150,16 +131,7 @@ class CControllerAuthenticationEdit extends CController {
 				'http_login_form',
 				'http_strip_domains',
 				'http_case_sensitive',
-				'ldap_case_sensitive',
 				'ldap_configured',
-				'ldap_host',
-				'ldap_port',
-				'ldap_base_dn',
-				'ldap_bind_dn',
-				'ldap_search_attribute',
-				'ldap_bind_password',
-				'ldap_test_user',
-				'ldap_test_password',
 				'saml_auth_enabled',
 				'saml_idp_entityid',
 				'saml_sso_url',
@@ -184,13 +156,62 @@ class CControllerAuthenticationEdit extends CController {
 		else {
 			$data += $auth;
 			$data['db_authentication_type'] = $data['authentication_type'];
-			$data['change_bind_password'] = ($data['ldap_bind_password'] === '') ? 1 : 0;
 		}
 
 		$data['ldap_enabled'] = ($ldap_status['result'] == CFrontendSetup::CHECK_OK
 				&& $data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED);
 		$data['saml_enabled'] = ($openssl_status['result'] == CFrontendSetup::CHECK_OK
 				&& $data['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED);
+
+		// TODO: remove this.
+		$data['ldap_servers'] = [
+			[
+				'userdirectoryid' => 1,
+				'name' => 'ldap1',
+				'host' => '127.0.0.1',
+				'port' => '89',
+				'base_dn' => 1,
+				'search_attribute' => 1,
+				'userfilter' => '(%{attr}=%{user})',
+				'start_tls' => 1,
+				'bind_dn' => '',
+				'bind_password' => '',
+				'case_sensitive' => '',
+				'description' => '',
+				'user_groups' => 5
+			],
+			[
+				'userdirectoryid' => 2,
+				'name' => 'ldap2',
+				'host' => '127.0.0.1',
+				'port' => '89',
+				'base_dn' => 1,
+				'search_attribute' => 1,
+				'userfilter' => '(%{attr}=%{user})',
+				'start_tls' => 1,
+				'bind_dn' => '',
+				'bind_password' => '123456',
+				'case_sensitive' => '',
+				'description' => '',
+				'user_groups' => 0
+			],
+			[
+				'userdirectoryid' => 3,
+				'name' => 'ldap3',
+				'host' => '127.0.0.1',
+				'port' => '89',
+				'base_dn' => 1,
+				'search_attribute' => 1,
+				'userfilter' => '(%{attr}=%{user})',
+				'start_tls' => 1,
+				'bind_dn' => '',
+				'bind_password' => '',
+				'case_sensitive' => '',
+				'description' => '',
+				'user_groups' => 3
+			]
+		];
+		$data['ldap_defaultid'] = 2;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of authentication'));
