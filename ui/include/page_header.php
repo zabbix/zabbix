@@ -124,7 +124,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		$pageTitle .= ' ['._s('refreshed every %1$s sec.', CWebUser::getRefresh()).']';
 	}
 
-	$pageHeader = new CPageHeader($pageTitle, CWebUser::getLang());
+	$pageHeader = new CPageHeader($pageTitle);
 	$is_standard_page = (!defined('ZBX_PAGE_NO_MENU') || $page['web_layout_mode'] == ZBX_LAYOUT_KIOSKMODE);
 
 	$theme = ZBX_DEFAULT_THEME;
@@ -177,7 +177,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 
 	$pageHeader->display();
 
-	echo '<body>';
+	echo '<body lang="'.CWebUser::getLang().'">';
 }
 
 define('PAGE_HEADER_LOADED', 1);

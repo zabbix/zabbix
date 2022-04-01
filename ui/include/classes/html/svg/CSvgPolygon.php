@@ -22,7 +22,7 @@
 class CSvgPolygon extends CSvgTag {
 
 	public function __construct($points) {
-		parent::__construct('polygon');
+		parent::__construct('polygon', true);
 
 		$p = '';
 

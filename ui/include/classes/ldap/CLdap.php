@@ -171,6 +171,8 @@ class CLdap {
 			}
 
 			$this->bound = 1;
+
+			return true;
 		}
 		else {
 			// see if we can find the user
@@ -191,9 +193,11 @@ class CLdap {
 			}
 
 			$this->bound = 1;
+
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	private function getUserData($user) {

@@ -499,7 +499,8 @@ if (isset($_REQUEST['form'])) {
 		$data['retries'] = $db_httptest['retries'];
 		$data['status'] = $db_httptest['status'];
 		$data['templates'] = makeHttpTestTemplatesHtml($db_httptest['httptestid'],
-			getHttpTestParentTemplates($db_httptests), CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			getHttpTestParentTemplates($db_httptests), CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
+			$data['context']
 		);
 
 		$data['agent'] = ZBX_AGENT_OTHER;

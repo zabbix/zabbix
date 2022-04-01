@@ -40,6 +40,7 @@ function DBconnect(&$error) {
 	$DB['TRANSACTION_NO_FAILED_SQLS'] = true; // true - if no statements failed in transaction, false - there are failed statements
 	$DB['SELECT_COUNT'] = 0; // stats
 	$DB['EXECUTE_COUNT'] = 0;
+	$DB['DB'] = null;
 
 	if (!isset($DB['TYPE'])) {
 		$error = 'Unknown database type.';

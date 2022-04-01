@@ -50,6 +50,7 @@ class CSvgGraphAnnotation extends CSvgTag {
 	private $color;
 
 	public function __construct($type) {
+		$this->data_info = null;
 		$this->color = '';
 		$this->type = $type;
 	}

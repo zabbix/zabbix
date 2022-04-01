@@ -22,7 +22,7 @@
 class CSvg extends CSvgTag {
 
 	public function __construct() {
-		parent::__construct('svg');
+		parent::__construct('svg', true);
 
 		$this
 			->setAttribute('id', str_replace('.', '', uniqid('svg_', true)))

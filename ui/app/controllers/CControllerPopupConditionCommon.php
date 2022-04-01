@@ -57,15 +57,14 @@ abstract class CControllerPopupConditionCommon extends CController {
 
 	protected function doAction() {
 		if ($this->hasInput('validate')) {
-			$this->setResponse(
+			return $this->setResponse(
 				(new CControllerResponseData(
 					['main_block' => json_encode($this->getManuallyValidatedFields())]
 				))->disableView()
 			);
 		}
-		else {
-			$this->setResponse(new CControllerResponseData($this->getControllerResponseData()));
-		}
+
+		return $this->setResponse(new CControllerResponseData($this->getControllerResponseData()));
 	}
 
 	/**

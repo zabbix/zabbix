@@ -514,7 +514,9 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 
 	// output
 	if (count($item_params['tags']) > 1) {
-		$tags_output = prepareTagsSubfilterOutput($item_params['tags'], $filter_data['subfilter_tags']);
+		$tags_output = prepareTagsSubfilterOutput($item_params['tags'], $filter_data['subfilter_tags'],
+			'subfilter_tags'
+		);
 		$table_subfilter->addRow([$tags_output]);
 	}
 
@@ -919,7 +921,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		}
 
 		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES), $data['context']
 		);
 	}
 
@@ -1742,7 +1744,7 @@ function getTriggerFormData(array $data) {
 		// Get templates.
 		$data['templates'] = makeTriggerTemplatesHtml($trigger['triggerid'],
 			getTriggerParentTemplates([$trigger], $flag), $flag,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES), $data['context']
 		);
 
 		if ($data['show_inherited_tags']) {

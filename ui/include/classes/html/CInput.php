@@ -38,6 +38,7 @@ class CInput extends CTag {
 		}
 
 		$this->setAttribute('value', $value);
+		return $this;
 	}
 
 	public function setType($type) {

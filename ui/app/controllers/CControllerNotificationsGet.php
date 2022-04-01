@@ -51,7 +51,11 @@ class CControllerNotificationsGet extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData(['main_block' => json_encode(['error' => true])]));
+			return $this->setResponse(
+				new CControllerResponseData([
+					'main_block' => json_encode(['error' => true])
+				])
+			);
 		}
 
 		return $ret;
@@ -63,8 +67,7 @@ class CControllerNotificationsGet extends CController {
 
 	protected function doAction() {
 		if (!$this->settings['enabled']) {
-			$this->setResponse(new CControllerResponseData(['main_block' => $this->makeResponseData()]));
-			return;
+			return $this->setResponse(new CControllerResponseData(['main_block' => $this->makeResponseData()]));
 		}
 
 		// Server returns only basic details for events already known by client-side.

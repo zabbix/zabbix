@@ -30,7 +30,7 @@ class CSvgGraphGrid extends CSvgTag {
 	protected $color;
 
 	public function __construct(array $points_value, array $points_time) {
-		parent::__construct('g');
+		parent::__construct('g', true);
 
 		$this
 			->setAttribute('shape-rendering', 'crispEdges')

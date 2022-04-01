@@ -33,6 +33,7 @@ class CWidgetFieldHostPatternSelect extends CWidgetField {
 		parent::__construct($name, $label);
 
 		$this->setDefault([]);
+		$this->placeholder = null;
 
 		/*
 		 * Set validation rules bypassing a parent::setSaveType to skip validation of length.

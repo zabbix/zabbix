@@ -110,8 +110,7 @@ class CControllerImageUpdate extends CController {
 			$response->setFormData($this->getInputAll());
 			CMessageHelper::setErrorTitle(_('Cannot update image'));
 
-			$this->setResponse($response);
-			return;
+			return $this->setResponse($response);
 		}
 
 		if ($this->hasInput('imageid')) {
