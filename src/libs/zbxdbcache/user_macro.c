@@ -492,6 +492,7 @@ static void	um_macro_register_kvs(zbx_um_macro_t *macro, const char *location)
 		mkv = (zbx_dc_macro_kv_t *)zbx_hashset_insert(macro_kv, &mkv_local, sizeof(mkv_local));
 	}
 
+	kv->update = 1;
 	mkv->kv = kv;
 	mkv->kv_path = kvs_path;
 	zbx_vector_uint64_pair_append(&kv->macros, pair);
@@ -1101,7 +1102,7 @@ zbx_um_cache_t	*um_cache_set_value_to_macros(zbx_um_cache_t *cache, const zbx_ve
 void	um_cache_dump(zbx_um_cache_t *cache)
 {
 	zbx_hashset_iter_t	iter;
-	zbx_um_host_t		*host;
+	zbx_um_host_t		**phost;
 	zbx_vector_uint64_t	ids;
 	int			i;
 
@@ -1110,15 +1111,15 @@ void	um_cache_dump(zbx_um_cache_t *cache)
 	zbx_vector_uint64_create(&ids);
 
 	zbx_hashset_iter_reset(&cache->hosts, &iter);
-	while (NULL != (host = (zbx_um_host_t *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (phost = (zbx_um_host_t **)zbx_hashset_iter_next(&iter)))
 	{
-		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " refcount:%u", host->hostid, host->refcount);
+		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " refcount:%u", (*phost)->hostid, (*phost)->refcount);
 
 		zabbix_log(LOG_LEVEL_TRACE, "  macros:");
 
-		for (i = 0; i < host->macros.values_num; i++)
+		for (i = 0; i < (*phost)->macros.values_num; i++)
 		{
-			zbx_um_macro_t	*macro = host->macros.values[i];
+			zbx_um_macro_t	*macro = (*phost)->macros.values[i];
 			const char	*value;
 
 			switch (macro->type)
@@ -1138,9 +1139,10 @@ void	um_cache_dump(zbx_um_cache_t *cache)
 					ZBX_NULL2EMPTY_STR(value), macro->type, macro->refcount);
 		}
 
-		if (0 != host->templateids.values_num)
+		if (0 != (*phost)->templateids.values_num)
 		{
-			zbx_vector_uint64_append_array(&ids, host->templateids.values, host->templateids.values_num);
+			zbx_vector_uint64_append_array(&ids, (*phost)->templateids.values,
+					(*phost)->templateids.values_num);
 			zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 			zabbix_log(LOG_LEVEL_TRACE, "  templateids:");

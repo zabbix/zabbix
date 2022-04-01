@@ -287,12 +287,12 @@ static void	DCdump_kvs_paths(void)
 		{
 			int	j;
 
-			zabbix_log(LOG_LEVEL_TRACE, "  key:'%s", kvs->key);
+			zabbix_log(LOG_LEVEL_TRACE, "  key:'%s'", kvs->key);
 
-			for (j = 0; j < kvs->macros.values_num; i++)
+			for (j = 0; j < kvs->macros.values_num; j++)
 			{
 				zabbix_log(LOG_LEVEL_TRACE, "    hostid:" ZBX_FS_UI64 " macroid:" ZBX_FS_UI64,
-						kvs->macros.values[i].first, kvs->macros.values[i].second);
+						kvs->macros.values[j].first, kvs->macros.values[j].second);
 			}
 		}
 	}

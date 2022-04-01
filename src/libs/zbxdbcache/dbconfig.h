@@ -408,6 +408,7 @@ typedef struct
 	const char			*key;
 	const char			*value;
 	zbx_vector_uint64_pair_t	macros;
+	unsigned char			update;
 }
 zbx_dc_kv_t;
 

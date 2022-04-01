@@ -990,7 +990,15 @@ static int	dbsync_compare_global_macro(const zbx_um_macro_t *gmacro, const DB_RO
 		return FAIL;
 
 	if (ZBX_MACRO_VALUE_VAULT == atoi(dbrow[3]))
-		um_macro_check_vault_location(gmacro, dbrow[2]);
+	{
+		if (FAIL == um_macro_check_vault_location(gmacro, dbrow[2]))
+			return FAIL;
+	}
+	else
+	{
+		if (FAIL == dbsync_compare_str(dbrow[2], gmacro->value))
+			return FAIL;
+	}
 
 	if (SUCCEED != zbx_user_macro_parse_dyn(dbrow[1], &macro, &context, NULL, NULL))
 		return FAIL;
@@ -1105,7 +1113,15 @@ static int	dbsync_compare_host_macro(const zbx_um_macro_t *hmacro, const DB_ROW 
 		return FAIL;
 
 	if (ZBX_MACRO_VALUE_VAULT == atoi(dbrow[4]))
-		um_macro_check_vault_location(hmacro, dbrow[3]);
+	{
+		if (FAIL == um_macro_check_vault_location(hmacro, dbrow[3]))
+			return FAIL;
+	}
+	else
+	{
+		if (FAIL == dbsync_compare_str(dbrow[3], hmacro->value))
+			return FAIL;
+	}
 
 	if (FAIL == dbsync_compare_uint64(dbrow[1], hmacro->hostid))
 		return FAIL;

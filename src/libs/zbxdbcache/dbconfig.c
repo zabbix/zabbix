@@ -1461,6 +1461,7 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+
 void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 {
 	zbx_dc_kvs_path_t	*dc_kvs_path;
@@ -1508,7 +1509,7 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 			kv_local.key = (char *)dc_kv->key;
 			if (NULL != (kv = zbx_kvs_search(&kvs, &kv_local)))
 			{
-				if (0 == zbx_strcmp_null(dc_kv->value, kv->value))
+				if (0 == zbx_strcmp_null(dc_kv->value, kv->value) && 0 == dc_kv->update)
 					continue;
 			}
 			else if (NULL == dc_kv->value)
@@ -1542,6 +1543,8 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 
 				config->um_cache = um_cache_set_value_to_macros(config->um_cache, &dc_kv->macros,
 						dc_kv->value);
+
+				dc_kv->update = 0;
 			}
 
 			FINISH_SYNC;
