@@ -32,6 +32,7 @@ typedef struct
 	const char	*name;
 	const char	*context;
 	const char	*value;
+	void		*kv;
 	zbx_uint32_t	refcount;
 	unsigned char	type;
 	unsigned char	context_op;
@@ -67,11 +68,16 @@ void	um_macro_release(zbx_um_macro_t *macro);
 
 zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_dbsync_t *gmacros, zbx_dbsync_t *hmacros,
 		zbx_dbsync_t *htmpls);
+zbx_um_cache_t	*um_cache_set_value_to_macros(zbx_um_cache_t *cache, const zbx_vector_uint64_pair_t *host_macro_ids,
+		const char *value);
+
+int	um_macro_check_vault_location(const zbx_um_macro_t *macro, const char *location);
 
 void	um_cache_resolve_const(zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num, const char *macro,
 		const char **value);
 void	um_cache_resolve(zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num, const char *macro,
 		int env, char **value);
+
 
 void	um_cache_dump(zbx_um_cache_t *cache);
 

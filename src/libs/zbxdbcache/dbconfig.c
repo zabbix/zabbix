@@ -96,7 +96,6 @@ static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_ex
 
 /* by default the macro environment is non-secure and all secret macros are masked with ****** */
 static unsigned char	macro_env = ZBX_MACRO_ENV_NONSECURE;
-extern char		*CONFIG_VAULTDBPATH;
 extern char		*CONFIG_VAULTTOKEN;
 extern char		*CONFIG_VAULT;
 /******************************************************************************
@@ -525,6 +524,9 @@ const char	*dc_strpool_intern(const char *str)
 	void		*record;
 	zbx_uint32_t	*refcount;
 
+	if (NULL == str)
+		return NULL;
+
 	record = zbx_hashset_search(&config->strpool, str - REFCOUNT_FIELD_SIZE);
 
 	if (NULL == record)
@@ -552,6 +554,9 @@ void	dc_strpool_release(const char *str)
 const char	*dc_strpool_acquire(const char *str)
 {
 	zbx_uint32_t	*refcount;
+
+	if (NULL == str)
+		return NULL;
 
 	refcount = (zbx_uint32_t *)(str - REFCOUNT_FIELD_SIZE);
 	(*refcount)++;
@@ -628,100 +633,6 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
 	}
 	else
 		zbx_binary_heap_update_direct(&config->pqueue, &elem);
-}
-
-static int	dc_compare_kvs_path(const void *d1, const void *d2)
-{
-	const zbx_dc_kvs_path_t	*ptr1 = *((const zbx_dc_kvs_path_t **)d1);
-	const zbx_dc_kvs_path_t	*ptr2 = *((const zbx_dc_kvs_path_t **)d2);
-
-	return strcmp(ptr1->path, ptr2->path);
-}
-
-static zbx_hash_t	dc_kv_hash(const void *data)
-{
-	return ZBX_DEFAULT_STRING_HASH_FUNC(((zbx_dc_kv_t *)data)->key);
-}
-
-static int	dc_kv_compare(const void *d1, const void *d2)
-{
-	return strcmp(((zbx_dc_kv_t *)d1)->key, ((zbx_dc_kv_t *)d2)->key);
-}
-
-static zbx_dc_kv_t	*config_kvs_path_add(const char *path, const char *key)
-{
-	zbx_dc_kvs_path_t	*kvs_path, kvs_path_local;
-	zbx_dc_kv_t		*kv, kv_local;
-	int			i;
-
-	kvs_path_local.path = path;
-
-	if (FAIL == (i = zbx_vector_ptr_search(&config->kvs_paths, &kvs_path_local, dc_compare_kvs_path)))
-	{
-		kvs_path = (zbx_dc_kvs_path_t *)__config_mem_malloc_func(NULL, sizeof(zbx_dc_kvs_path_t));
-		dc_strpool_replace(0, &kvs_path->path, path);
-		zbx_vector_ptr_append(&config->kvs_paths, kvs_path);
-
-		zbx_hashset_create_ext(&kvs_path->kvs, 0, dc_kv_hash, dc_kv_compare, NULL,
-				__config_mem_malloc_func, __config_mem_realloc_func, __config_mem_free_func);
-		kv = NULL;
-	}
-	else
-	{
-		kvs_path = (zbx_dc_kvs_path_t *)config->kvs_paths.values[i];
-		kv_local.key = key;
-		kv = (zbx_dc_kv_t *)zbx_hashset_search(&kvs_path->kvs, &kv_local);
-	}
-
-	if (NULL == kv)
-	{
-		dc_strpool_replace(0, &kv_local.key, key);
-		kv_local.value = NULL;
-		kv_local.refcount = 0;
-
-		kv = (zbx_dc_kv_t *)zbx_hashset_insert(&kvs_path->kvs, &kv_local, sizeof(zbx_dc_kv_t));
-	}
-
-	kv->refcount++;
-
-	return kv;
-}
-
-static void	config_kvs_path_remove(const char *value, zbx_dc_kv_t *kv)
-{
-	zbx_dc_kvs_path_t	*kvs_path, kvs_path_local;
-	int			i;
-	char			*path, *key;
-
-	if (0 != --kv->refcount)
-		return;
-
-	zbx_strsplit_last(value, ':', &path, &key);
-	zbx_free(key);
-
-	dc_strpool_release(kv->key);
-	if (NULL != kv->value)
-		dc_strpool_release(kv->value);
-
-	kvs_path_local.path = path;
-
-	if (FAIL == (i = zbx_vector_ptr_search(&config->kvs_paths, &kvs_path_local, dc_compare_kvs_path)))
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		goto clean;
-	}
-	kvs_path = (zbx_dc_kvs_path_t *)config->kvs_paths.values[i];
-
-	zbx_hashset_remove_direct(&kvs_path->kvs, kv);
-
-	if (0 == kvs_path->kvs.num_data)
-	{
-		dc_strpool_release(kvs_path->path);
-		__config_mem_free_func(kvs_path);
-		zbx_vector_ptr_remove_noorder(&config->kvs_paths, i);
-	}
-clean:
-	zbx_free(path);
 }
 
 /******************************************************************************
@@ -1622,11 +1533,15 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 				if (NULL != kv)
 				{
 					dc_strpool_replace(dc_kv->value != NULL ? 1 : 0, &dc_kv->value, kv->value);
-					continue;
+				}
+				else
+				{
+					dc_strpool_release(dc_kv->value);
+					dc_kv->value = NULL;
 				}
 
-				dc_strpool_release(dc_kv->value);
-				dc_kv->value = NULL;
+				config->um_cache = um_cache_set_value_to_macros(config->um_cache, &dc_kv->macros,
+						dc_kv->value);
 			}
 
 			FINISH_SYNC;
@@ -5418,13 +5333,13 @@ void	DCsync_configuration(unsigned char mode)
 {
 	int		i, flags;
 	double		sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, idsec, isec, tisec, pisec, tsec, dsec, fsec, expr_sec,
-			csec2, hsec2, hisec2, htsec2, gmsec2, hmsec2, ifsec2, idsec2, isec2, tisec2, pisec2, tsec2, dsec2, fsec2, expr_sec2,
+			csec2, hsec2, hisec2, ifsec2, idsec2, isec2, tisec2, pisec2, tsec2, dsec2, fsec2, expr_sec2,
 			action_sec, action_sec2, action_op_sec, action_op_sec2, action_condition_sec,
 			action_condition_sec2, trigger_tag_sec, trigger_tag_sec2, host_tag_sec, host_tag_sec2,
 			correlation_sec, correlation_sec2, corr_condition_sec, corr_condition_sec2, corr_operation_sec,
 			corr_operation_sec2, hgroups_sec, hgroups_sec2, itempp_sec, itempp_sec2, itemscrp_sec,
 			itemscrp_sec2, total, total2, update_sec, maintenance_sec, maintenance_sec2, item_tag_sec,
-			item_tag_sec2, um_cache_sec2;
+			item_tag_sec2, um_cache_sec;
 
 	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
 			template_items_sync, prototype_items_sync, item_discovery_sync, triggers_sync, tdep_sync,
@@ -5539,7 +5454,7 @@ void	DCsync_configuration(unsigned char mode)
 	START_SYNC;
 	sec = zbx_time();
 	config->um_cache = um_cache_sync(config->um_cache, &gmacro_sync, &hmacro_sync, &htmpl_sync);
-	um_cache_sec2 = zbx_time() - sec;
+	um_cache_sec = zbx_time() - sec;
 
 	sec = zbx_time();
 	DCsync_host_tags(&host_tag_sync);
@@ -5858,10 +5773,10 @@ void	DCsync_configuration(unsigned char mode)
 				action_sec + action_op_sec + action_condition_sec + trigger_tag_sec + correlation_sec +
 				corr_condition_sec + corr_operation_sec + hgroups_sec + itempp_sec + maintenance_sec +
 				item_tag_sec;
-		total2 = csec2 + hsec2 + hisec2 + htsec2 + gmsec2 + hmsec2 + ifsec2 + idsec2 + isec2 + tisec2 + pisec2 + tsec2 + dsec2 + fsec2 +
+		total2 = csec2 + hsec2 + hisec2 + ifsec2 + idsec2 + isec2 + tisec2 + pisec2 + tsec2 + dsec2 + fsec2 +
 				expr_sec2 + action_op_sec2 + action_sec2 + action_condition_sec2 + trigger_tag_sec2 +
 				correlation_sec2 + corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2 +
-				itempp_sec2 + maintenance_sec2 + item_tag_sec2 + update_sec;
+				itempp_sec2 + maintenance_sec2 + item_tag_sec2 + update_sec + um_cache_sec;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
@@ -5883,17 +5798,13 @@ void	DCsync_configuration(unsigned char mode)
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, hisec, hisec2, hi_sync.add_num, hi_sync.update_num,
 				hi_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() templates  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() globmacros : sql:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, htsec, htsec2, htmpl_sync.add_num, htmpl_sync.update_num,
-				htmpl_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() globmacros : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, gmsec, gmsec2, gmacro_sync.add_num, gmacro_sync.update_num,
+				__func__, gmsec, gmacro_sync.add_num, gmacro_sync.update_num,
 				gmacro_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() hostmacros : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() hostmacros : sql:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, hmsec, hmsec2, hmacro_sync.add_num, hmacro_sync.update_num,
+				__func__, hmsec, hmacro_sync.add_num, hmacro_sync.update_num,
 				hmacro_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
@@ -5985,6 +5896,7 @@ void	DCsync_configuration(unsigned char mode)
 				__func__, maintenance_sec, maintenance_sec2, maintenance_sync.add_num,
 				maintenance_sync.update_num, maintenance_sync.remove_num);
 
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() macro cache: " ZBX_FS_DBL " sec.", __func__, um_cache_sec);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() reindex    : " ZBX_FS_DBL " sec.", __func__, update_sec);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() total sql  : " ZBX_FS_DBL " sec.", __func__, total);
@@ -6524,8 +6436,11 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->hostgroups, 0);
 	zbx_vector_ptr_create_ext(&config->hostgroups_name, __config_mem_malloc_func, __config_mem_realloc_func,
 			__config_mem_free_func);
+
 	zbx_vector_ptr_create_ext(&config->kvs_paths, __config_mem_malloc_func, __config_mem_realloc_func,
 			__config_mem_free_func);
+	CREATE_HASHSET(config->gmacro_kv, 0);
+	CREATE_HASHSET(config->hmacro_kv, 0);
 
 	CREATE_HASHSET(config->preprocops, 0);
 

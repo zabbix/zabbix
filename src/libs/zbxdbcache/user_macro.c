@@ -33,6 +33,11 @@ ZBX_MEM_FUNC_IMPL(__config, config_mem)
 ZBX_PTR_VECTOR_IMPL(um_macro, zbx_um_macro_t *)
 ZBX_PTR_VECTOR_IMPL(um_host, zbx_um_host_t *)
 
+#define ZBX_MACRO_NO_KVS_VALUE	"*UNKNOWN*"
+
+extern char	*CONFIG_VAULTDBPATH;
+extern unsigned char	program_type;
+
 /*********************************************************************************
  *                                                                               *
  * Purpose: create duplicate user macro cache                                    *
@@ -127,7 +132,8 @@ zbx_um_cache_t	*um_cache_create()
 
 	cache = (zbx_um_cache_t *)__config_mem_malloc_func(NULL, sizeof(zbx_um_cache_t));
 	cache->refcount = 1;
-	zbx_hashset_create(&cache->hosts, 10, um_host_hash, um_host_compare);
+	zbx_hashset_create_ext(&cache->hosts, 10, um_host_hash, um_host_compare,NULL,
+			__config_mem_malloc_func, __config_mem_realloc_func, __config_mem_free_func);
 
 	return cache;
 }
@@ -204,11 +210,12 @@ static zbx_um_macro_t	*um_macro_dup(zbx_um_macro_t *macro)
 	dup->macroid = macro->macroid;
 	dup->hostid = macro->hostid;
 	dup->name = dc_strpool_acquire(macro->name);
-	dup->context = (NULL != macro->context ? dc_strpool_acquire(macro->context) : NULL);
+	dup->context = dc_strpool_acquire(macro->context);
 	dup->value = dc_strpool_acquire(macro->value);
 	dup->type = macro->type;
 	dup->context_op = macro->context_op;
 	dup->refcount = 1;
+	dup->kv = macro->kv;
 
 	return dup;
 }
@@ -338,6 +345,217 @@ static void	um_host_remove_macro(zbx_um_host_t *host, zbx_um_macro_t *macro)
 
 #define ZBX_UM_INDEX_UPDATE	(ZBX_UM_MACRO_UPDATE_HOSTID | ZBX_UM_MACRO_UPDATE_NAME)
 
+static int	dc_compare_kvs_path(const void *d1, const void *d2)
+{
+	const zbx_dc_kvs_path_t	*ptr1 = *((const zbx_dc_kvs_path_t **)d1);
+	const zbx_dc_kvs_path_t	*ptr2 = *((const zbx_dc_kvs_path_t **)d2);
+
+	return strcmp(ptr1->path, ptr2->path);
+}
+
+static zbx_hash_t	dc_kv_hash(const void *data)
+{
+	return ZBX_DEFAULT_STRING_HASH_FUNC(((zbx_dc_kv_t *)data)->key);
+}
+
+static int	dc_kv_compare(const void *d1, const void *d2)
+{
+	return strcmp(((zbx_dc_kv_t *)d1)->key, ((zbx_dc_kv_t *)d2)->key);
+}
+
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: remove kvs path from configuration cache                             *
+ *                                                                               *
+ *********************************************************************************/
+static void	dc_kvs_path_remove(zbx_dc_kvs_path_t *kvs_path)
+{
+	zbx_dc_kvs_path_t	kvs_path_local;
+	int			i;
+
+	kvs_path_local.path = kvs_path->path;
+
+	if (FAIL != (i = zbx_vector_ptr_search(&config->kvs_paths, &kvs_path_local, dc_compare_kvs_path)))
+		zbx_vector_ptr_remove_noorder(&config->kvs_paths, i);
+
+	zbx_hashset_destroy(&kvs_path->kvs);
+	dc_strpool_release(kvs_path->path);
+
+	__config_mem_free_func(kvs_path);
+}
+
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: remove macro from key-value storage, releasing unused storage        *
+ *          elements when necessary                                              *
+ *                                                                               *
+ *********************************************************************************/
+static void	um_macro_kv_remove(zbx_um_macro_t *macro, zbx_dc_macro_kv_t *mkv)
+{
+	int			i;
+	zbx_uint64_pair_t	pair = {macro->hostid, macro->macroid};
+
+	if (FAIL != (i = zbx_vector_uint64_pair_search(&mkv->kv->macros, pair, ZBX_DEFAULT_UINT64_PAIR_COMPARE_FUNC)))
+	{
+		zbx_vector_uint64_pair_remove_noorder(&mkv->kv->macros, i);
+		if (0 == mkv->kv->macros.values_num)
+		{
+			zbx_hashset_remove_direct(&mkv->kv_path->kvs, mkv->kv);
+			if (0 == mkv->kv_path->kvs.num_data)
+				dc_kvs_path_remove(mkv->kv_path);
+		}
+	}
+}
+
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: register vault macro in key value storage                            *
+ *                                                                               *
+ *********************************************************************************/
+static void	um_macro_register_kvs(zbx_um_macro_t *macro, const char *location)
+{
+	zbx_dc_kvs_path_t	*kvs_path, kvs_path_local;
+	zbx_dc_kv_t		*kv, kv_local;
+	int			i;
+	zbx_uint64_pair_t	pair = {macro->hostid, macro->macroid};
+	char			*path, *key;
+	zbx_hashset_t		*macro_kv = (0 == macro->hostid ? &config->gmacro_kv : &config->hmacro_kv);
+	zbx_dc_macro_kv_t	*mkv;
+
+	zbx_strsplit_first(location, ':', &path, &key);
+
+	if (NULL == key)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"" ZBX_FS_UI64 "\" macro \"" ZBX_FS_UI64 "\""
+				" Vault location \"%s\": missing separator \":\"",
+				macro->hostid, macro->macroid, location);
+		goto out;
+	}
+
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && NULL != CONFIG_VAULTDBPATH &&
+			0 == strcasecmp(CONFIG_VAULTDBPATH, path) &&
+			(0 == strcasecmp(key, ZBX_PROTO_TAG_PASSWORD)
+					|| 0 == strcasecmp(key, ZBX_PROTO_TAG_USERNAME)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"" ZBX_FS_UI64 "\" macro \"" ZBX_FS_UI64 "\""
+				" Vault location \"%s\": database credentials should not be used with Vault macros",
+				macro->hostid, macro->macroid, location);
+
+		zbx_free(path);
+		zbx_free(key);
+
+		goto out;
+	}
+
+	kvs_path_local.path = path;
+
+	if (FAIL == (i = zbx_vector_ptr_search(&config->kvs_paths, &kvs_path_local, dc_compare_kvs_path)))
+	{
+		kvs_path = (zbx_dc_kvs_path_t *)__config_mem_malloc_func(NULL, sizeof(zbx_dc_kvs_path_t));
+		kvs_path->path = dc_strpool_intern(path);
+		zbx_hashset_create_ext(&kvs_path->kvs, 0, dc_kv_hash, dc_kv_compare, NULL,
+				__config_mem_malloc_func, __config_mem_realloc_func, __config_mem_free_func);
+
+		zbx_vector_ptr_append(&config->kvs_paths, kvs_path);
+		kv = NULL;
+	}
+	else
+	{
+		kvs_path = (zbx_dc_kvs_path_t *)config->kvs_paths.values[i];
+		kv_local.key = key;
+		kv = (zbx_dc_kv_t *)zbx_hashset_search(&kvs_path->kvs, &kv_local);
+	}
+
+	if (NULL == kv)
+	{
+		kv_local.key = dc_strpool_intern(key);
+		kv_local.value = NULL;
+		zbx_vector_uint64_pair_create(&kv_local.macros);
+
+		kv = (zbx_dc_kv_t *)zbx_hashset_insert(&kvs_path->kvs, &kv_local, sizeof(zbx_dc_kv_t));
+	}
+
+	if (NULL != (mkv = zbx_hashset_search(macro_kv, &macro->macroid)))
+	{
+		/* no kvs location changes - skip updates */
+		if (mkv->kv == kv)
+			goto out;
+
+		/* remove from old kv location */
+		um_macro_kv_remove(macro, mkv);
+	}
+	else
+	{
+		zbx_dc_macro_kv_t	mkv_local;
+
+		mkv_local.macroid = macro->macroid;
+		mkv = (zbx_dc_macro_kv_t *)zbx_hashset_insert(macro_kv, &mkv_local, sizeof(mkv_local));
+	}
+
+	mkv->kv = kv;
+	mkv->kv_path = kvs_path;
+	zbx_vector_uint64_pair_append(&kv->macros, pair);
+out:
+	zbx_free(path);
+	zbx_free(key);
+}
+
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: deregister vault macro from key value storage, releasing unused      *
+ *          storage elements when necessary                                      *
+ *                                                                               *
+ *********************************************************************************/
+static void	um_macro_deregister_kvs(zbx_um_macro_t *macro)
+{
+	zbx_hashset_t	*macro_kv = (0 == macro->hostid ? &config->gmacro_kv : &config->hmacro_kv);
+
+	zbx_dc_macro_kv_t	*mkv;
+
+	if (NULL != (mkv = zbx_hashset_search(macro_kv, &macro->macroid)))
+	{
+		um_macro_kv_remove(macro, mkv);
+		zbx_hashset_remove_direct(macro_kv, mkv);
+	}
+}
+
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: check if the macro vault location has not changed                    *
+ *                                                                               *
+ *********************************************************************************/
+int	um_macro_check_vault_location(const zbx_um_macro_t *macro, const char *location)
+{
+	zbx_hashset_t		*macro_kv = (0 == macro->hostid ? &config->gmacro_kv : &config->hmacro_kv);
+	zbx_dc_macro_kv_t	*mkv;
+	char			*path, *key;
+	int			i, ret = FAIL;
+	zbx_dc_kvs_path_t	*kvs_path, kvs_path_local;
+	zbx_dc_kv_t		*kv, kv_local;
+
+	if (NULL == (mkv = zbx_hashset_search(macro_kv, &macro->macroid)))
+		return FAIL;
+
+	zbx_strsplit_first(location, ':', &path, &key);
+
+	kvs_path_local.path = path;
+	if (FAIL == (i = zbx_vector_ptr_search(&config->kvs_paths, &kvs_path_local, dc_compare_kvs_path)))
+		goto out;
+
+	kvs_path = (zbx_dc_kvs_path_t *)config->kvs_paths.values[i];
+	kv_local.key = key;
+
+	kv = (zbx_dc_kv_t *)zbx_hashset_search(&kvs_path->kvs, &kv_local);
+	if (kv == mkv->kv)
+		ret = SUCCEED;
+out:
+	zbx_free(path);
+	zbx_free(key);
+
+	return ret;
+}
+
+
 /*********************************************************************************
  *                                                                               *
  * Purpose: sync global/host user macros                                         *
@@ -352,7 +570,7 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 {
 	unsigned char		tag;
 	int			ret, i;
-	zbx_uint64_t		rowid, hostid = 0, *pmacroid = &rowid;
+	zbx_uint64_t		rowid, macroid, hostid = 0, *pmacroid = &macroid;
 	char			**row;
 	zbx_um_macro_t		**pmacro;
 	zbx_um_host_t		*host;
@@ -367,7 +585,7 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 	{
 		char		*name = NULL, *context = NULL;
 		const char	*dc_name, *dc_context, *dc_value;
-		unsigned char	context_op;
+		unsigned char	context_op, type;
 		zbx_um_macro_t	*macro;
 
 		/* removed rows will be always at the end of sync list */
@@ -377,14 +595,20 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 		if (SUCCEED != zbx_user_macro_parse_dyn(row[offset], &name, &context, NULL, &context_op))
 			continue;
 
+		ZBX_STR2UINT64(macroid, row[0]);
+
 		dc_name = dc_strpool_intern(name);
-		dc_context = (NULL != context ? dc_strpool_intern(context) : NULL);
-		dc_value = dc_strpool_intern(row[offset + 1]);
+		dc_context = dc_strpool_intern(context);
 		zbx_free(name);
 		zbx_free(context);
 
 		if (2 == offset)
 			ZBX_STR2UINT64(hostid, row[1]);
+
+		ZBX_STR2UCHAR(type, row[offset + 2]);
+
+		if (ZBX_MACRO_VALUE_VAULT != type)
+			dc_value = dc_strpool_intern(row[offset + 1]);
 
 		host = NULL;
 
@@ -409,22 +633,34 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 			dc_strpool_release((*pmacro)->name);
 			if (NULL != (*pmacro)->context)
 				dc_strpool_release((*pmacro)->context);
-			dc_strpool_release((*pmacro)->value);
+
+			/* release macro value if it was not stored in vault */
+			if (ZBX_MACRO_VALUE_VAULT != (*pmacro)->type)
+			{
+				dc_strpool_release((*pmacro)->value);
+				(*pmacro)->value = NULL;
+			}
 		}
 		else
 		{
 			macro = (zbx_um_macro_t *)__config_mem_malloc_func(NULL, sizeof(zbx_um_macro_t));
-			macro->macroid = rowid;
+			macro->macroid = macroid;
 			macro->refcount = 1;
+			macro->value = NULL;
+			macro->kv = NULL;
 			pmacro = zbx_hashset_insert(user_macros, &macro, sizeof(macro));
 		}
 
 		(*pmacro)->hostid = hostid;
 		(*pmacro)->name = dc_name;
 		(*pmacro)->context = dc_context;
-		(*pmacro)->value = dc_value;
-		(*pmacro)->type = atoi(row[offset + 2]);
+		ZBX_STR2UCHAR((*pmacro)->type, row[offset + 2]);
 		(*pmacro)->context_op = context_op;
+
+		if (ZBX_MACRO_VALUE_VAULT == type)
+			um_macro_register_kvs(*pmacro, row[offset + 1]);
+		else
+			(*pmacro)->value = dc_value;
 
 		if (NULL == host || host->hostid != hostid)
 		{
@@ -447,6 +683,9 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 	{
 		if (NULL == (pmacro = (zbx_um_macro_t **)zbx_hashset_search(user_macros, &pmacroid)))
 			continue;
+
+		if (ZBX_MACRO_VALUE_VAULT == (*pmacro)->type)
+			um_macro_deregister_kvs(*pmacro);
 
 		if (NULL != (host = um_cache_acquire_host(cache, (*pmacro)->hostid)))
 		{
@@ -495,7 +734,7 @@ static void	um_cache_sync_hosts(zbx_um_cache_t *cache, zbx_dbsync_t *sync)
 {
 	unsigned char	tag;
 	int		ret;
-	zbx_uint64_t	rowid, templateid;
+	zbx_uint64_t	rowid, hostid, templateid;
 	char		**row;
 	zbx_um_host_t	*host;
 
@@ -505,8 +744,10 @@ static void	um_cache_sync_hosts(zbx_um_cache_t *cache, zbx_dbsync_t *sync)
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
 			break;
 
-		if (NULL == (host = um_cache_acquire_host(cache, rowid)))
-			host = um_cache_create_host(cache, rowid);
+		ZBX_STR2UINT64(hostid, row[0]);
+
+		if (NULL == (host = um_cache_acquire_host(cache, hostid)))
+			host = um_cache_create_host(cache, hostid);
 
 		ZBX_DBROW2UINT64(templateid, row[1]);
 		zbx_vector_uint64_append(&host->templateids, templateid);
@@ -556,8 +797,11 @@ static void	um_cache_sync_hosts(zbx_um_cache_t *cache, zbx_dbsync_t *sync)
 zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_dbsync_t *gmacros, zbx_dbsync_t *hmacros,
 		zbx_dbsync_t *htmpls)
 {
-	if (0 == gmacros->rows.values_num && 0 == hmacros->rows.values_num && 0 == htmpls->rows.values_num)
+	if (ZBX_DBSYNC_INIT != gmacros->mode && ZBX_DBSYNC_INIT != hmacros->mode && ZBX_DBSYNC_INIT != htmpls->mode &&
+			gmacros->rows.values_num && 0 == hmacros->rows.values_num && 0 == htmpls->rows.values_num)
+	{
 		return cache;
+	}
 
 	if (SUCCEED == um_cache_is_locked(cache))
 	{
@@ -765,7 +1009,7 @@ void	um_cache_resolve_const(zbx_um_cache_t *cache, const zbx_uint64_t *hostids, 
 	um_cache_get_macro(cache, hostids, hostids_num, macro, &um_macro);
 
 	if (NULL != um_macro)
-		*value = um_macro->value;
+		*value = (NULL != um_macro->value ? um_macro->value : ZBX_MACRO_NO_KVS_VALUE);
 }
 
 /*********************************************************************************
@@ -799,9 +1043,59 @@ void	um_cache_resolve(zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int ho
 		}
 		else
 		{
-			*value = NULL != um_macro->value ? zbx_strdup(NULL, um_macro->value) : NULL;
+			*value = zbx_strdup(NULL, (NULL != um_macro->value ? um_macro->value : ZBX_MACRO_NO_KVS_VALUE));
 		}
 	}
+}
+
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: set value to the specified macros                                    *
+ *                                                                               *
+ * Parameters: cache          - [IN] the user macro cache                        *
+ *             host_macro_ids - [IN] a vector of hostid,macroid pairs            *
+ *             value          - [IN] the new value (stored in string pool)       *
+ *                                                                               *
+ *********************************************************************************/
+zbx_um_cache_t	*um_cache_set_value_to_macros(zbx_um_cache_t *cache, const zbx_vector_uint64_pair_t *host_macro_ids,
+		const char *value)
+{
+	int	i;
+
+	if (SUCCEED == um_cache_is_locked(cache))
+	{
+		um_cache_release(cache);
+		cache = um_cache_dup(cache);
+	}
+
+	for (i = 0; i < host_macro_ids->values_num; i++)
+	{
+		zbx_um_macro_t		**pmacro;
+		zbx_uint64_pair_t	*pair = &host_macro_ids->values[i];
+		zbx_hashset_t		*user_macros = (0 != pair->first ? &config->hmacros : &config->gmacros);
+		zbx_uint64_t		*pmacroid = &pair->second;
+		zbx_um_host_t		*host;
+
+		if (NULL == (pmacro = (zbx_um_macro_t **)zbx_hashset_search(user_macros, &pmacroid)))
+			continue;
+
+		if (NULL == (host = um_cache_acquire_host(cache, (*pmacro)->hostid)))
+			continue;
+
+		if (SUCCEED == um_macro_is_locked(*pmacro))
+		{
+			um_host_remove_macro(host, *pmacro);
+			um_macro_release(*pmacro);
+			*pmacro = um_macro_dup(*pmacro);
+		}
+
+		if (NULL != (*pmacro)->value)
+			dc_strpool_release((*pmacro)->value);
+
+		(*pmacro)->value = dc_strpool_acquire(value);
+	}
+
+	return cache;
 }
 
 void	um_cache_dump(zbx_um_cache_t *cache)

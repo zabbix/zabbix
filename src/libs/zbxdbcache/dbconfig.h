@@ -405,9 +405,9 @@ ZBX_DC_IPMIHOST;
 
 typedef struct
 {
-	const char	*key;
-	const char	*value;
-	int		refcount;
+	const char			*key;
+	const char			*value;
+	zbx_vector_uint64_pair_t	macros;
 }
 zbx_dc_kv_t;
 
@@ -746,6 +746,14 @@ zbx_dc_timer_trigger_t;
 
 typedef struct
 {
+	zbx_uint64_t		macroid;
+	zbx_dc_kv_t		*kv;
+	zbx_dc_kvs_path_t	*kv_path;
+}
+zbx_dc_macro_kv_t;
+
+typedef struct
+{
 	/* timestamp of the last host availability diff sent to sever, used only by proxies */
 	int			availability_diff_ts;
 	int			proxy_lastaccess_ts;
@@ -818,6 +826,8 @@ typedef struct
 	zbx_hashset_t		hostgroups;
 	zbx_vector_ptr_t	hostgroups_name;	/* host groups sorted by name */
 	zbx_vector_ptr_t	kvs_paths;
+	zbx_hashset_t		gmacro_kv;
+	zbx_hashset_t		hmacro_kv;
 	zbx_hashset_t		preprocops;
 	zbx_hashset_t		itemscript_params;
 	zbx_hashset_t		maintenances;

@@ -905,7 +905,7 @@ int	zbx_dbsync_compare_host_templates(zbx_dbsync_t *sync)
 	DB_ROW			dbrow;
 	DB_RESULT		result;
 	zbx_hashset_iter_t	iter;
-	zbx_um_host_t		*host;
+	zbx_um_host_t		**phost;
 	zbx_hashset_t		htmpls;
 	int			i;
 	zbx_uint64_pair_t	ht_local, *ht;
@@ -932,13 +932,13 @@ int	zbx_dbsync_compare_host_templates(zbx_dbsync_t *sync)
 
 	/* index all host->template links */
 	zbx_hashset_iter_reset(&dbsync_env.cache->um_cache->hosts, &iter);
-	while (NULL != (host = (zbx_um_host_t *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (phost = (zbx_um_host_t **)zbx_hashset_iter_next(&iter)))
 	{
-		ht_local.first = host->hostid;
+		ht_local.first = (*phost)->hostid;
 
-		for (i = 0; i < host->templateids.values_num; i++)
+		for (i = 0; i < (*phost)->templateids.values_num; i++)
 		{
-			ht_local.second = host->templateids.values[i];
+			ht_local.second = (*phost)->templateids.values[i];
 			zbx_hashset_insert(&htmpls, &ht_local, sizeof(ht_local));
 		}
 	}
@@ -989,8 +989,8 @@ static int	dbsync_compare_global_macro(const zbx_um_macro_t *gmacro, const DB_RO
 	if (FAIL == dbsync_compare_uchar(dbrow[3], gmacro->type))
 		return FAIL;
 
-	if (FAIL == dbsync_compare_str(dbrow[2], gmacro->value))
-		return FAIL;
+	if (ZBX_MACRO_VALUE_VAULT == atoi(dbrow[3]))
+		um_macro_check_vault_location(gmacro, dbrow[2]);
 
 	if (SUCCEED != zbx_user_macro_parse_dyn(dbrow[1], &macro, &context, NULL, NULL))
 		return FAIL;
@@ -1035,8 +1035,8 @@ int	zbx_dbsync_compare_global_macros(zbx_dbsync_t *sync)
 	DB_RESULT		result;
 	zbx_hashset_t		ids;
 	zbx_hashset_iter_t	iter;
-	zbx_uint64_t		rowid;
-	zbx_um_macro_t		*macro;
+	zbx_uint64_t		rowid, *prowid = &rowid;
+	zbx_um_macro_t		**pmacro;
 
 	if (NULL == (result = DBselect(
 			"select globalmacroid,macro,value,type"
@@ -1063,9 +1063,9 @@ int	zbx_dbsync_compare_global_macros(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(rowid, dbrow[0]);
 		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
 
-		if (NULL == (macro = (zbx_um_macro_t *)zbx_hashset_search(&dbsync_env.cache->gmacros, &rowid)))
+		if (NULL == (pmacro = (zbx_um_macro_t **)zbx_hashset_search(&dbsync_env.cache->gmacros, &prowid)))
 			tag = ZBX_DBSYNC_ROW_ADD;
-		else if (FAIL == dbsync_compare_global_macro(macro, dbrow))
+		else if (FAIL == dbsync_compare_global_macro(*pmacro, dbrow))
 			tag = ZBX_DBSYNC_ROW_UPDATE;
 
 		if (ZBX_DBSYNC_ROW_NONE != tag)
@@ -1073,10 +1073,10 @@ int	zbx_dbsync_compare_global_macros(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_iter_reset(&dbsync_env.cache->gmacros, &iter);
-	while (NULL != (macro = (zbx_um_macro_t *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (pmacro = (zbx_um_macro_t **)zbx_hashset_iter_next(&iter)))
 	{
-		if (NULL == zbx_hashset_search(&ids, &macro->macroid))
-			dbsync_add_row(sync, macro->macroid, ZBX_DBSYNC_ROW_REMOVE, NULL);
+		if (NULL == zbx_hashset_search(&ids, &(*pmacro)->macroid))
+			dbsync_add_row(sync, (*pmacro)->macroid, ZBX_DBSYNC_ROW_REMOVE, NULL);
 	}
 
 	zbx_hashset_destroy(&ids);
@@ -1104,8 +1104,8 @@ static int	dbsync_compare_host_macro(const zbx_um_macro_t *hmacro, const DB_ROW 
 	if (FAIL == dbsync_compare_uchar(dbrow[4], hmacro->type))
 		return FAIL;
 
-	if (FAIL == dbsync_compare_str(dbrow[3], hmacro->value))
-		return FAIL;
+	if (ZBX_MACRO_VALUE_VAULT == atoi(dbrow[4]))
+		um_macro_check_vault_location(hmacro, dbrow[3]);
 
 	if (FAIL == dbsync_compare_uint64(dbrow[1], hmacro->hostid))
 		return FAIL;
@@ -1153,8 +1153,8 @@ int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync)
 	DB_RESULT		result;
 	zbx_hashset_t		ids;
 	zbx_hashset_iter_t	iter;
-	zbx_uint64_t		rowid;
-	zbx_um_macro_t		*macro;
+	zbx_uint64_t		rowid, *prowid = &rowid;
+	zbx_um_macro_t		**pmacro;
 
 	if (NULL == (result = DBselect(
 			"select m.hostmacroid,m.hostid,m.macro,m.value,m.type"
@@ -1183,9 +1183,9 @@ int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(rowid, dbrow[0]);
 		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
 
-		if (NULL == (macro = (zbx_um_macro_t *)zbx_hashset_search(&dbsync_env.cache->hmacros, &rowid)))
+		if (NULL == (pmacro = (zbx_um_macro_t **)zbx_hashset_search(&dbsync_env.cache->hmacros, &prowid)))
 			tag = ZBX_DBSYNC_ROW_ADD;
-		else if (FAIL == dbsync_compare_host_macro(macro, dbrow))
+		else if (FAIL == dbsync_compare_host_macro(*pmacro, dbrow))
 			tag = ZBX_DBSYNC_ROW_UPDATE;
 
 		if (ZBX_DBSYNC_ROW_NONE != tag)
@@ -1193,10 +1193,10 @@ int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_iter_reset(&dbsync_env.cache->hmacros, &iter);
-	while (NULL != (macro = (zbx_um_macro_t *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (pmacro = (zbx_um_macro_t **)zbx_hashset_iter_next(&iter)))
 	{
-		if (NULL == zbx_hashset_search(&ids, &macro->macroid))
-			dbsync_add_row(sync, macro->macroid, ZBX_DBSYNC_ROW_REMOVE, NULL);
+		if (NULL == zbx_hashset_search(&ids, &(*pmacro)->macroid))
+			dbsync_add_row(sync, (*pmacro)->macroid, ZBX_DBSYNC_ROW_REMOVE, NULL);
 	}
 
 	zbx_hashset_destroy(&ids);

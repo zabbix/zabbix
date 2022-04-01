@@ -284,7 +284,17 @@ static void	DCdump_kvs_paths(void)
 
 		zbx_hashset_iter_reset(&kvs_path->kvs, &iter);
 		while (NULL != (kvs = (zbx_dc_kv_t *)zbx_hashset_iter_next(&iter)))
-			zabbix_log(LOG_LEVEL_TRACE, "  key:'%s' refcount:%d", kvs->key, kvs->refcount);
+		{
+			int	j;
+
+			zabbix_log(LOG_LEVEL_TRACE, "  key:'%s", kvs->key);
+
+			for (j = 0; j < kvs->macros.values_num; i++)
+			{
+				zabbix_log(LOG_LEVEL_TRACE, "    hostid:" ZBX_FS_UI64 " macroid:" ZBX_FS_UI64,
+						kvs->macros.values[i].first, kvs->macros.values[i].second);
+			}
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
