@@ -680,7 +680,7 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 	}
 
 	/* handle removed macros */
-	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	for (macroid = rowid; SUCCEED == ret; ret = zbx_dbsync_next(sync, &macroid, &row, &tag))
 	{
 		if (NULL == (pmacro = (zbx_um_macro_t **)zbx_hashset_search(user_macros, &pmacroid)))
 			continue;

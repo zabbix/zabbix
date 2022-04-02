@@ -156,9 +156,9 @@ char	*um_mock_format_macro(const char *name, const char *context)
 		}
 		else
 			zbx_strcpy_alloc(&macro, &macro_alloc, &macro_offset, context);
-	}
 
-	zbx_chrcpy_alloc(&macro, &macro_alloc, &macro_offset, '}');
+		zbx_chrcpy_alloc(&macro, &macro_alloc, &macro_offset, '}');
+	}
 
 	return macro;
 }
