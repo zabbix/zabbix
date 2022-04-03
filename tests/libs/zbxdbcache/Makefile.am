@@ -10,7 +10,8 @@ SERVER_tests = \
 	dc_expand_user_macros_in_func_params \
 	dc_function_calculate_nextcheck \
 	um_cache_sync \
-	um_cache_resolve
+	um_cache_resolve \
+	um_cache_resolve_cont
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -207,9 +208,7 @@ um_cache_sync_CFLAGS = \
 um_cache_sync_SOURCES = \
 	um_cache_sync.c \
 	um_cache_mock.c \
-	um_cache_mock.h \
-	$(top_srcdir)/src/libs/zbxdbcache/user_macro.c \
-	$(top_srcdir)/src/libs/zbxdbcache/user_macro.h
+	um_cache_mock.h
 um_cache_sync_LDADD = \
 	$(CACHE_LIBS) @SERVER_LIBS@
 um_cache_sync_LDFLAGS = @SERVER_LDFLAGS@ \
@@ -223,12 +222,24 @@ um_cache_resolve_CFLAGS = \
 um_cache_resolve_SOURCES = \
 	um_cache_resolve.c \
 	um_cache_mock.c \
-	um_cache_mock.h \
-	$(top_srcdir)/src/libs/zbxdbcache/user_macro.c \
-	$(top_srcdir)/src/libs/zbxdbcache/user_macro.h
+	um_cache_mock.h
 um_cache_resolve_LDADD = \
 	$(CACHE_LIBS) @SERVER_LIBS@
 um_cache_resolve_LDFLAGS = @SERVER_LDFLAGS@ \
+	-Wl,--wrap=__zbx_mem_malloc \
+	-Wl,--wrap=__zbx_mem_realloc \
+	-Wl,--wrap=__zbx_mem_free
+
+um_cache_resolve_cont_CFLAGS = \
+	-I@top_srcdir@/tests \
+	-I@top_srcdir@/src/libs
+um_cache_resolve_cont_SOURCES = \
+	um_cache_resolve_cont.c \
+	um_cache_mock.c \
+	um_cache_mock.h 
+um_cache_resolve_cont_LDADD = \
+	$(CACHE_LIBS) @SERVER_LIBS@
+um_cache_resolve_cont_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=__zbx_mem_malloc \
 	-Wl,--wrap=__zbx_mem_realloc \
 	-Wl,--wrap=__zbx_mem_free

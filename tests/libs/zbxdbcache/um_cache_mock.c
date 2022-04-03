@@ -32,6 +32,9 @@ ZBX_PTR_VECTOR_IMPL(um_mock_macro, zbx_um_mock_macro_t *)
 ZBX_PTR_VECTOR_DECL(um_mock_host, zbx_um_mock_host_t *)
 ZBX_PTR_VECTOR_IMPL(um_mock_host, zbx_um_mock_host_t *)
 
+ZBX_PTR_VECTOR_IMPL(um_mock_kv, zbx_um_mock_kv_t *)
+ZBX_PTR_VECTOR_IMPL(um_mock_kvset, zbx_um_mock_kvset_t *)
+
 static void	um_mock_macro_free(zbx_um_mock_macro_t *macro)
 {
 	zbx_free(macro->macro);
@@ -58,6 +61,23 @@ static void	um_mock_macro_init(zbx_um_mock_macro_t *macro, zbx_uint64_t hostid, 
 	}
 	else
 		macro->value = NULL;
+
+	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hmacro, "type", &handle))
+	{
+		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, &str)))
+			fail_msg("Cannot read macro type: %s", zbx_mock_error_string(err));
+
+		if (0 == strcmp(str, "ZBX_MACRO_VALUE_TEXT"))
+			macro->type = ZBX_MACRO_VALUE_TEXT;
+		else if (0 == strcmp(str, "ZBX_MACRO_VALUE_SECRET"))
+			macro->type = ZBX_MACRO_VALUE_SECRET;
+		else if (0 == strcmp(str, "ZBX_MACRO_VALUE_VAULT"))
+			macro->type = ZBX_MACRO_VALUE_VAULT;
+		else
+			fail_msg("unknown macro type '%s'", str);
+	}
+	else
+		macro->type = ZBX_MACRO_VALUE_TEXT;
 }
 
 /*********************************************************************************
@@ -102,26 +122,78 @@ static void	um_mock_host_init(zbx_um_mock_host_t *host, zbx_mock_handle_t handle
 
 /*********************************************************************************
  *                                                                               *
+ * Purpose: initialize mock kv path                                              *
+ *                                                                               *
+ *********************************************************************************/
+static void	um_mock_kvset_init(zbx_um_mock_kvset_t *kvset, zbx_mock_handle_t handle)
+{
+	zbx_mock_handle_t	hvalues, hvalue;
+	zbx_mock_error_t	err;
+
+	kvset->path = zbx_mock_get_object_member_string(handle, "path");
+	zbx_vector_um_mock_kv_create(&kvset->kvs);
+
+	hvalues = zbx_mock_get_object_member_handle(handle, "values");
+	while (ZBX_MOCK_END_OF_VECTOR != (err = (zbx_mock_vector_element(hvalues, &hvalue))))
+	{
+		zbx_um_mock_kv_t	*kv;
+
+		kv = (zbx_um_mock_kv_t *)zbx_malloc(NULL, sizeof(zbx_um_mock_kv_t));
+		kv->key = zbx_mock_get_object_member_string(hvalue, "key");
+		kv->value = zbx_mock_get_object_member_string(hvalue, "value");
+		zbx_vector_um_mock_kv_append(&kvset->kvs, kv);
+	}
+}
+
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: free mock mock kv path                                               *
+ *                                                                               *
+ *********************************************************************************/
+static void	um_mock_kvset_free(zbx_um_mock_kvset_t *kvset)
+{
+	zbx_vector_um_mock_kv_clear_ext(&kvset->kvs, (zbx_um_mock_kv_free_func_t)zbx_ptr_free);
+	zbx_vector_um_mock_kv_destroy(&kvset->kvs);
+	zbx_free(kvset);
+}
+
+/*********************************************************************************
+ *                                                                               *
  * Purpose: initialize mock user macro cache from test data                      *
  *                                                                               *
  *********************************************************************************/
 void	um_mock_cache_init(zbx_um_mock_cache_t *cache, zbx_mock_handle_t handle)
 {
-	zbx_mock_handle_t	hhost;
+	zbx_mock_handle_t	hhost, hhosts, hvault, hset;
 	zbx_mock_error_t	err;
 
 	zbx_hashset_create(&cache->hosts, 10, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_um_mock_kvset_create(&cache->kvsets);
 
 	if (-1 == handle)
 		return;
 
-	while (ZBX_MOCK_END_OF_VECTOR != (err = (zbx_mock_vector_element(handle, &hhost))))
+	hhosts = zbx_mock_get_object_member_handle(handle, "hosts");
+
+	while (ZBX_MOCK_END_OF_VECTOR != (err = (zbx_mock_vector_element(hhosts, &hhost))))
 	{
 		zbx_um_mock_host_t	host_local;
 
 		um_mock_host_init(&host_local, hhost);
 		zbx_hashset_insert(&cache->hosts, &host_local, sizeof(host_local));
 	}
+
+	hvault = zbx_mock_get_object_member_handle(handle, "vault");
+
+	while (ZBX_MOCK_END_OF_VECTOR != (err = (zbx_mock_vector_element(hvault, &hset))))
+	{
+		zbx_um_mock_kvset_t	*kvset;
+
+		kvset = (zbx_um_mock_kvset_t *)zbx_malloc(NULL, sizeof(zbx_um_mock_kvset_t));
+		um_mock_kvset_init(kvset, hset);
+		zbx_vector_um_mock_kvset_append(&cache->kvsets, kvset);
+	}
+
 }
 
 /*********************************************************************************
@@ -176,6 +248,8 @@ void	um_mock_cache_init_from_config(zbx_um_mock_cache_t *cache, zbx_um_cache_t *
 	zbx_hashset_create(&cache->hosts, (size_t)cfg->hosts.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
+	zbx_vector_um_mock_kvset_create(&cache->kvsets);
+
 	zbx_hashset_iter_reset(&cfg->hosts, &iter);
 	while (NULL != (phost = (zbx_um_host_t **)zbx_hashset_iter_next(&iter)))
 	{
@@ -198,6 +272,7 @@ void	um_mock_cache_init_from_config(zbx_um_mock_cache_t *cache, zbx_um_cache_t *
 			macro->macro = um_mock_format_macro((*phost)->macros.values[i]->name,
 					(*phost)->macros.values[i]->context);
 			macro->value = zbx_strdup(NULL, (*phost)->macros.values[i]->value);
+			macro->type = (*phost)->macros.values[i]->type;
 
 			zbx_vector_um_mock_macro_append(&host_local.macros, macro);
 		}
@@ -205,6 +280,8 @@ void	um_mock_cache_init_from_config(zbx_um_mock_cache_t *cache, zbx_um_cache_t *
 		zbx_hashset_insert(&cache->hosts, &host_local, sizeof(host_local));
 	}
 }
+
+
 
 /*********************************************************************************
  *                                                                               *
@@ -224,6 +301,9 @@ void	um_mock_cache_clear(zbx_um_mock_cache_t *cache)
 		zbx_vector_uint64_destroy(&host->templateids);
 	}
 	zbx_hashset_destroy(&cache->hosts);
+
+	zbx_vector_um_mock_kvset_clear_ext(&cache->kvsets, um_mock_kvset_free);
+	zbx_vector_um_mock_kvset_destroy(&cache->kvsets);
 }
 
 static int	um_mock_compare_macros_by_id(const void *d1, const void *d2)
@@ -279,6 +359,8 @@ static int	um_mock_compare_macros_by_content(const zbx_um_mock_macro_t *m1, cons
 		goto out;
 	}
 
+	if (0 != (ret = (int)m1->type - (int)m2->type))
+		goto out;
 
 	ret = strcmp(m1->value, m2->value);
 out:
@@ -331,7 +413,7 @@ static void	um_mock_dbsync_add_macro(zbx_dbsync_t *sync, unsigned char tag, cons
 		*prow++ = zbx_dsprintf(NULL, ZBX_FS_UI64, macro->hostid);
 	*prow++ = zbx_strdup(NULL, macro->macro);
 	*prow++ = zbx_strdup(NULL, macro->value);
-	*prow++ = zbx_strdup(NULL, "0");
+	*prow++ = zbx_dsprintf(NULL, "%u", macro->type);
 
 	zbx_vector_ptr_append(&sync->rows, row);
 
@@ -566,6 +648,24 @@ void	um_mock_config_init()
 	zbx_hashset_create(&config->gmacros, 100, um_macro_hash, um_macro_compare);
 	zbx_hashset_create(&config->hmacros, 100, um_macro_hash, um_macro_compare);
 	zbx_hashset_create(&config->strpool, 100, mock_strpool_hash, mock_strpool_compare);
+
+	zbx_vector_ptr_create(&config->kvs_paths);
+
+	zbx_hashset_create(&config->gmacro_kv, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create(&config->hmacro_kv, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+static void	um_mock_kv_path_free(zbx_dc_kvs_path_t *kvspath)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_dc_kv_t		*kv;
+
+	zbx_hashset_iter_reset(&kvspath->kvs, &iter);
+	while (NULL != (kv = (zbx_dc_kv_t *)zbx_hashset_iter_next(&iter)))
+		zbx_vector_uint64_pair_destroy(&kv->macros);
+
+	zbx_hashset_destroy(&kvspath->kvs);
+	zbx_free(kvspath);
 }
 
 /*********************************************************************************
@@ -586,6 +686,11 @@ void	um_mock_config_destroy()
 	while (NULL != (pmacro = (zbx_um_macro_t **)zbx_hashset_iter_next(&iter)))
 		um_macro_release(*pmacro);
 
+	zbx_vector_ptr_clear_ext(&config->kvs_paths, (zbx_ptr_free_func_t)um_mock_kv_path_free);
+	zbx_vector_ptr_destroy(&config->kvs_paths);
+
+	zbx_hashset_destroy(&config->gmacro_kv);
+	zbx_hashset_destroy(&config->hmacro_kv);
 	zbx_hashset_destroy(&config->gmacros);
 	zbx_hashset_destroy(&config->hmacros);
 	zbx_hashset_destroy(&config->strpool);
@@ -672,16 +777,16 @@ static void	um_mock_host_dump(const zbx_um_mock_host_t *host)
 	int		i;
 	const char	*separator;
 
-	printf("hostid: " ZBX_FS_UI64 "\n\tmacros:\n", host->hostid);
+	printf("\thostid: " ZBX_FS_UI64 "\n\t\tmacros:\n", host->hostid);
 
 	for (i = 0; i < host->macros.values_num; i++)
 	{
-		printf("\t\t" ZBX_FS_UI64 " => %s:%s\n", host->macros.values[i]->macroid,
+		printf("\t\t\t" ZBX_FS_UI64 " => %s:%s\n", host->macros.values[i]->macroid,
 				host->macros.values[i]->macro, host->macros.values[i]->value);
 	}
 
 	separator = "";
-	printf("\n\ttemplates: [");
+	printf("\n\t\ttemplates: [");
 	for (i = 0; i < host->templateids.values_num; i++)
 	{
 		printf("%s" ZBX_FS_UI64 , separator, host->templateids.values[i]);
@@ -690,15 +795,30 @@ static void	um_mock_host_dump(const zbx_um_mock_host_t *host)
 	printf("]\n");
 }
 
+static void	um_mock_kvset_dump(zbx_um_mock_kvset_t *kvset)
+{
+	int	i;
+
+	printf("\tpath:%s\n", kvset->path);
+
+	for (i = 0; i < kvset->kvs.values_num; i++)
+		printf("\t\t%s:%s\n", kvset->kvs.values[i]->key, kvset->kvs.values[i]->value);
+}
+
 void	um_mock_cache_dump(zbx_um_mock_cache_t *cache)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_um_mock_host_t	*host;
+	int			i;
 
-	printf("\n");
+	printf("\nhosts:\n");
 	zbx_hashset_iter_reset(&cache->hosts, &iter);
 	while (NULL != (host = (zbx_um_mock_host_t *)zbx_hashset_iter_next(&iter)))
 		um_mock_host_dump(host);
+
+	printf("vault:\n");
+	for (i = 0; i < cache->kvsets.values_num; i++)
+		um_mock_kvset_dump(cache->kvsets.values[i]);
 
 	printf("---\n");
 }

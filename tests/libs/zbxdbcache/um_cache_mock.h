@@ -27,6 +27,7 @@ typedef struct
 {
 	zbx_uint64_t	macroid;
 	zbx_uint64_t	hostid;
+	unsigned char	type;
 	char		*macro;
 	char		*value;
 }
@@ -44,7 +45,26 @@ zbx_um_mock_host_t;
 
 typedef struct
 {
-	zbx_hashset_t	hosts;
+	const char	*key;
+	const char	*value;
+}
+zbx_um_mock_kv_t;
+
+ZBX_PTR_VECTOR_DECL(um_mock_kv, zbx_um_mock_kv_t *)
+
+typedef struct
+{
+	const char		*path;
+	zbx_vector_um_mock_kv_t	kvs;
+}
+zbx_um_mock_kvset_t;
+
+ZBX_PTR_VECTOR_DECL(um_mock_kvset, zbx_um_mock_kvset_t *)
+
+typedef struct
+{
+	zbx_hashset_t			hosts;
+	zbx_vector_um_mock_kvset_t	kvsets;
 }
 zbx_um_mock_cache_t;
 

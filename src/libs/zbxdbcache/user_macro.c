@@ -151,7 +151,8 @@ void	um_macro_release(zbx_um_macro_t *macro)
 	dc_strpool_release(macro->name);
 	if (NULL != macro->context)
 		dc_strpool_release(macro->context);
-	dc_strpool_release(macro->value);
+	if (NULL != macro->value)
+		dc_strpool_release(macro->value);
 
 	__config_mem_free_func(macro);
 }
@@ -400,6 +401,7 @@ static void	um_macro_kv_remove(zbx_um_macro_t *macro, zbx_dc_macro_kv_t *mkv)
 		zbx_vector_uint64_pair_remove_noorder(&mkv->kv->macros, i);
 		if (0 == mkv->kv->macros.values_num)
 		{
+			zbx_vector_uint64_pair_destroy(&mkv->kv->macros);
 			zbx_hashset_remove_direct(&mkv->kv_path->kvs, mkv->kv);
 			if (0 == mkv->kv_path->kvs.num_data)
 				dc_kvs_path_remove(mkv->kv_path);
@@ -483,6 +485,12 @@ static void	um_macro_register_kvs(zbx_um_macro_t *macro, const char *location)
 
 		/* remove from old kv location */
 		um_macro_kv_remove(macro, mkv);
+
+		if (NULL != macro->value)
+		{
+			dc_strpool_release(macro->value);
+			macro->value = NULL;
+		}
 	}
 	else
 	{
@@ -635,11 +643,16 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 			if (NULL != (*pmacro)->context)
 				dc_strpool_release((*pmacro)->context);
 
-			/* release macro value if it was not stored in vault */
 			if (ZBX_MACRO_VALUE_VAULT != (*pmacro)->type)
 			{
+				/* release macro value if it was not stored in vault */
 				dc_strpool_release((*pmacro)->value);
 				(*pmacro)->value = NULL;
+			}
+			else
+			{
+				if (ZBX_MACRO_VALUE_VAULT != type)
+					um_macro_deregister_kvs(*pmacro);
 			}
 		}
 		else
@@ -655,7 +668,7 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 		(*pmacro)->hostid = hostid;
 		(*pmacro)->name = dc_name;
 		(*pmacro)->context = dc_context;
-		ZBX_STR2UCHAR((*pmacro)->type, row[offset + 2]);
+		(*pmacro)->type = type;
 		(*pmacro)->context_op = context_op;
 
 		if (ZBX_MACRO_VALUE_VAULT == type)
@@ -1061,7 +1074,10 @@ void	um_cache_resolve(zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int ho
 zbx_um_cache_t	*um_cache_set_value_to_macros(zbx_um_cache_t *cache, const zbx_vector_uint64_pair_t *host_macro_ids,
 		const char *value)
 {
-	int	i;
+	int			i;
+	zbx_vector_um_host_t	hosts;
+
+	zbx_vector_um_host_create(&hosts);
 
 	if (SUCCEED == um_cache_is_locked(cache))
 	{
@@ -1088,13 +1104,26 @@ zbx_um_cache_t	*um_cache_set_value_to_macros(zbx_um_cache_t *cache, const zbx_ve
 			um_host_remove_macro(host, *pmacro);
 			um_macro_release(*pmacro);
 			*pmacro = um_macro_dup(*pmacro);
+
+			(*pmacro)->refcount++;
+			zbx_vector_um_macro_append(&host->macros, *pmacro);
 		}
 
 		if (NULL != (*pmacro)->value)
 			dc_strpool_release((*pmacro)->value);
 
 		(*pmacro)->value = dc_strpool_acquire(value);
+
+		zbx_vector_um_host_append(&hosts, host);
 	}
+
+	zbx_vector_um_host_sort(&hosts, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	zbx_vector_um_host_uniq(&hosts, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+
+	for (i = 0; i < hosts.values_num; i++)
+		zbx_vector_um_macro_sort(&hosts.values[i]->macros, um_macro_compare_by_name_context);
+
+	zbx_vector_um_host_destroy(&hosts);
 
 	return cache;
 }

@@ -1461,7 +1461,6 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-
 void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 {
 	zbx_dc_kvs_path_t	*dc_kvs_path;
