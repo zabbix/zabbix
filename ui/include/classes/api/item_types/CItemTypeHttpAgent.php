@@ -39,11 +39,11 @@ class CItemTypeHttpAgent extends CItemType {
 			'url' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'url')],
 			'query_fields' =>		['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []],
 			'request_method' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD]), 'default' => DB::getDefault('items', 'request_method')],
-			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | $is_item_prototype ? API_ALLOW_LLD_MACRO : 0, 'in' => '1:'.SEC_PER_MIN, 'length' => DB::getFieldLength('items', 'timeout')],
+			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'in' => '1:'.SEC_PER_MIN, 'length' => DB::getFieldLength('items', 'timeout')],
 			'post_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]), 'default' => DB::getDefault('items', 'post_type')],
 			'posts' =>				['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_RAW], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'posts')],
-										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_JSON], 'type' => API_JSON, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | $is_item_prototype ? API_ALLOW_LLD_MACRO : 0, 'macros_n' => ['{HOST.IP}', '{HOST.CONN}', '{HOST.DNS}', '{HOST.HOST}', '{HOST.NAME}', '{ITEM.ID}', '{ITEM.KEY}', '{ITEM.KEY.ORIG}'], 'length' => DB::getFieldLength('items', 'posts')],
+										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_JSON], 'type' => API_JSON, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'macros_n' => ['{HOST.IP}', '{HOST.CONN}', '{HOST.DNS}', '{HOST.HOST}', '{HOST.NAME}', '{ITEM.ID}', '{ITEM.KEY}', '{ITEM.KEY.ORIG}'], 'length' => DB::getFieldLength('items', 'posts')],
 										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_XML], 'type' => API_XML, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'posts')]
 			]],
 			'headers' =>			['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []],
@@ -96,21 +96,21 @@ class CItemTypeHttpAgent extends CItemType {
 			]],
 			'query_fields' =>		['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []],
 			'request_method' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD])],
-			'timeout' =>			self::getUpdateFieldRule('timeout', $db_item),
+			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'in' => '1:'.SEC_PER_MIN, 'length' => DB::getFieldLength('items', 'timeout')],
 			'post_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML])],
 			'posts' =>				['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_RAW], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'posts')],
 										['if' => static function (array $data) use ($db_item): bool {
 											return $data['post_type'] == ZBX_POSTTYPE_JSON && $data['post_type'] != $db_item['post_type'];
-										}, 'type' => API_JSON, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | $is_item_prototype ? API_ALLOW_LLD_MACRO : 0, 'macros_n' => ['{HOST.IP}', '{HOST.CONN}', '{HOST.DNS}', '{HOST.HOST}', '{HOST.NAME}', '{ITEM.ID}', '{ITEM.KEY}', '{ITEM.KEY.ORIG}'], 'length' => DB::getFieldLength('items', 'posts')],
-										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_JSON], 'type' => API_JSON, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | $is_item_prototype ? API_ALLOW_LLD_MACRO : 0, 'macros_n' => ['{HOST.IP}', '{HOST.CONN}', '{HOST.DNS}', '{HOST.HOST}', '{HOST.NAME}', '{ITEM.ID}', '{ITEM.KEY}', '{ITEM.KEY.ORIG}'], 'length' => DB::getFieldLength('items', 'posts')],
+										}, 'type' => API_JSON, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'macros_n' => ['{HOST.IP}', '{HOST.CONN}', '{HOST.DNS}', '{HOST.HOST}', '{HOST.NAME}', '{ITEM.ID}', '{ITEM.KEY}', '{ITEM.KEY.ORIG}'], 'length' => DB::getFieldLength('items', 'posts')],
+										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_JSON], 'type' => API_JSON, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'macros_n' => ['{HOST.IP}', '{HOST.CONN}', '{HOST.DNS}', '{HOST.HOST}', '{HOST.NAME}', '{ITEM.ID}', '{ITEM.KEY}', '{ITEM.KEY.ORIG}'], 'length' => DB::getFieldLength('items', 'posts')],
 										['if' => static function (array $data) use ($db_item): bool {
 											return $data['post_type'] == ZBX_POSTTYPE_XML && $data['post_type'] != $db_item['post_type'];
 										}, 'type' => API_XML, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'posts')],
 										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_XML], 'type' => API_XML, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'posts')]
 			]],
 			'headers' =>			['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []],
-			'status_codes' =>		['type' => API_INT32_RANGES, 'flags' => API_ALLOW_USER_MACRO | $is_item_prototype ? API_ALLOW_LLD_MACRO : 0, 'length' => DB::getFieldLength('items', 'status_codes')],
+			'status_codes' =>		['type' => API_INT32_RANGES, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'status_codes')],
 			'follow_redirects' =>	['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON])],
 			'retrieve_mode' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'request_method', 'in' => HTTPCHECK_REQUEST_HEAD], 'type' => API_INT32, 'in' => HTTPTEST_STEP_RETRIEVE_MODE_HEADERS],
