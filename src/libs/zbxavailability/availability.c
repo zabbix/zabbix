@@ -20,7 +20,6 @@
 #include "zbxavailability.h"
 #include "log.h"
 #include "zbxipcservice.h"
-#include "avail_protocol.h"
 
 void	zbx_availability_flush(unsigned char *data, zbx_uint32_t size)
 {
@@ -37,12 +36,13 @@ void	zbx_availability_flush(unsigned char *data, zbx_uint32_t size)
 			exit(EXIT_FAILURE);
 		}
 	}
-
+#define ZBX_IPC_AVAILABILITY_REQUEST	1
 	if (FAIL == zbx_ipc_socket_write(&socket, ZBX_IPC_AVAILABILITY_REQUEST, data, size))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to availability manager service");
 		exit(EXIT_FAILURE);
 	}
+#undef ZBX_IPC_AVAILABILITY_REQUEST
 }
 
 void	zbx_availabilities_flush(const zbx_vector_availability_ptr_t *interface_availabilities)

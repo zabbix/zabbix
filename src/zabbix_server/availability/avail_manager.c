@@ -26,8 +26,6 @@
 #include "daemon.h"
 #include "sighandler.h"
 #include "dbcache.h"
-#include "avail_protocol.h"
-
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;

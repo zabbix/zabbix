@@ -24,9 +24,12 @@
 #include "db.h"
 
 #define ZBX_IPC_SERVICE_AVAILABILITY	"availability"
-#define ZBX_IPC_AVAILABILITY_REQUEST	1
 
 void	zbx_availability_flush(unsigned char *data, zbx_uint32_t size);
 void	zbx_availabilities_flush(const zbx_vector_availability_ptr_t *interface_availabilities);
 
+void	zbx_availability_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset,
+		const zbx_interface_availability_t *interface_availability);
+void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
+		zbx_vector_availability_ptr_t  *interface_availabilities);
 #endif /* ZABBIX_AVAILABILITY_H */
