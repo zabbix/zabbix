@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-04T08:59:02Z'
+  date: '2022-04-04T11:00:59Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -2408,6 +2408,29 @@ zabbix_export:
                 -
                   tag: volume
                   value: '{#ZVOL_NAME}'
+          graph_prototypes:
+            -
+              uuid: 18746b4b3cfb4d1baf06df7b05a047f9
+              name: 'TrueNAS: ZFS volume [{#ZVOL_NAME}]: Space usage'
+              width: '600'
+              height: '340'
+              type: PIE
+              show_3d: 'YES'
+              graph_items:
+                -
+                  color: '969696'
+                  calc_fnc: LAST
+                  type: GRAPH_SUM
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'truenas.zvol.size.total[{#ZVOL_NAME}]'
+                -
+                  sortorder: '1'
+                  color: C80000
+                  calc_fnc: LAST
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'truenas.zvol.used[{#ZVOL_NAME}]'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
