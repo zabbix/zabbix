@@ -64,7 +64,7 @@ $url = (new CUrl('items.php'))
 $itemForm = (new CForm('post', $url))
 	->setName('items')
 	->addVar('checkbox_hash', $data['checkbox_hash'])
-	->addVar('context', $data['context']);
+	->addVar('context', $data['context'], 'form_context');
 
 if (!empty($data['hostid'])) {
 	$itemForm->addVar('hostid', $data['hostid']);
