@@ -20,7 +20,6 @@
 #include "dbupgrade.h"
 #include "dbupgrade_macros.h"
 
-#include "common.h"
 #include "db.h"
 #include "log.h"
 #include "zbxhash.h"
