@@ -844,7 +844,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 
 			pi := procInfo{int64(data.Pid), data.Name, processUserID, "", data.Name, ""}
 			if mode != "summary" {
-				pi.cmdline = cmdline
+				pi.cmdline = data.Cmdline
 			}
 			if query.match(&pi) {
 				array = append(array, data)
