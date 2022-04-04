@@ -202,7 +202,7 @@ type thread struct {
 	Pid           uint32  `json:"pid"`
 	PPid          uint32  `json:"ppid"`
 	Name          string  `json:"name"`
-	Tid	      uint32  `json:"tid"`
+	Tid           uint32  `json:"tid"`
 }
 
 var attrMap map[string]infoAttr = map[string]infoAttr{
