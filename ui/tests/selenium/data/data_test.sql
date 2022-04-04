@@ -2689,6 +2689,36 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050620, 10730, 1, 'tags.value.1', 0, 'value2');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050621, 10730, 1, 'default.view', 0, '56.94417950974463, 24.231017685433184,17');
 
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (101101, 13000, 'tophosts', 'Test copy Top hosts', 0, 28, 10, 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (9050622, 101101, 2, 'groupids', 0, 50011);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_hostid) VALUES (9050623, 101101, 3, 'hostids', 0, 50012);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050624, 101101, 1, 'tags.tag.0', 0, 'tag_name');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050625, 101101, 0, 'tags.operator.0', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050626, 101101, 1, 'tags.value.0', 0, 'tag_value');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050627, 101101, 1, 'columns.name.0', 0, 'Item name');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050628, 101101, 0, 'columns.data.0', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050629, 101101, 1, 'columns.item.0', 0, '3_item');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050630, 101101, 1, 'columns.timeshift.0', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050631, 101101, 0, 'columns.aggregate_function.0', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050632, 101101, 1, 'columns.aggregate_interval.0', 0, '1h');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050633, 101101, 1, 'columns.min.0', 0, '10');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050634, 101101, 1, 'columns.max.0', 0, '50');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050635, 101101, 0, 'columns.display.0', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050636, 101101, 0, 'columns.history.0', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050637, 101101, 1, 'columns.base_color.0', 0, 'FF0000');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050638, 101101, 1, 'columnsthresholds.color.0.0', 0, 'FF465C');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050639, 101101, 1, 'columnsthresholds.threshold.0.0', 0, '100');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050640, 101101, 1, 'columns.name.1', 0, 'Host name');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050641, 101101, 0, 'columns.data.1', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050642, 101101, 0, 'columns.aggregate_function.1', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050643, 101101, 1, 'columns.base_color.1', 0, 'BF00FF');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050644, 101101, 1, 'columns.name.2', 0, 'Text name');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050645, 101101, 0, 'columns.data.2', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050646, 101101, 0, 'columns.aggregate_function.2', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050647, 101101, 1, 'columns.base_color.2', 0, '00BFFF');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050648, 101101, 1, 'columns.text.2', 0, 'text_here');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050649, 101101, 0, 'column', 0);
+
 -- Dashboard for Graph Prototype widget
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1400, 'Dashboard for Graph Prototype widget', 1, 1);
 INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1400, 1400);

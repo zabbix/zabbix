@@ -1,24 +1,44 @@
+Changes for 6.0.3
+
+6.0.3rc1 was released as 6.0.3 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.3rc1
 
 New features:
+.........T [ZBXNEXT-6781] added openweathermap template (vkhaliev)
 ..F....... [ZBXNEXT-7082] fixed PHP8 using deprecated function libxml_disable_entity_loader() (rdetlavs)
-...G...... [ZBXNEXT-7452] added SNI support to TLS protocol for Agent 2 (asestakovs)
-...G.....T [ZBXNEXT-7065] added queries metrics to postgresql by agent2 template (esneiders, vkhaliev)
-.........T [ZBXNEXT-7023] updated regular expressions for services discovery in windows templates (vkhaliev)
+...G...... [ZBXNEXT-7452] added SNI support to the TLS protocol for agent 2 (asestakovs)
+...G.....T [ZBXNEXT-7065] added queries metrics to the PostgreSQL by agent 2 template (esneiders, vkhaliev)
+.........T [ZBXNEXT-7023] updated regular expressions for services discovery in Windows templates (vkhaliev)
 A.F....... [ZBXNEXT-7478] fixed optional parameters before required issue (acikuns, ashubin)
 
 Bug fixes:
-..F....... [ZBX-20319] fixed multiline details in audit log (rlataria)
-.D........ [ZBX-20762] fixed StartAlerters and StartEscalators range in configuration file comments (akozlovs)
+A......... [ZBX-20681] fixed undefined index error when accessing module page with guest user (rlataria)
+A.F.....S. [ZBX-20650] fixed performance issue with importing templates and hosts (Sasha)
+.......... [ZBX-20747] fixed service algorithm update in 6.0 database upgrade patch (wiper)
+A.F....... [ZBX-19118] made Host interface field non-required for HTTP agent items (jfreibergs)
+........S. [ZBX-20740] fixed CUID size on 32-bit systems (wiper)
+........S. [ZBX-20786] fixed server termination when updating proxy hostid and audit is disabled (arimdjonoks)
+..F....... [ZBX-20675] fixed cancel button not working after cloning services and SLAs (averza)
+...G...... [ZBX-20634] fixed handling of multiline FTP response (ssimonenko)
+........S. [ZBX-20661] fixed crashes when setting HA failover delay with disabled auditlog or updating HA error status on exit (wiper)
+........S. [ZBX-20693] fixed crash in auditlog logic on 32-bit Debian/Raspbian (wiper)
+...G...... [ZBX-20528] fixed issue with pgsql.custom.query JSON response failing for Zabbix agent 2 (esneiders)
+..F....... [ZBX-20399] fixed acknowledge problem popup window showing a fatal error after page refresh (Ivo)
+..F....... [ZBX-19851] fixed wrong green mark in maps properties for sharing (rlataria)
+..F....... [ZBX-20319] fixed multiline details in the audit log (rlataria)
+.D........ [ZBX-20762] fixed StartAlerters and StartEscalators range in the configuration file comments (akozlovs)
 ........S. [ZBX-20651] fixed crash in availability manager on some platforms (vso)
-...G...... [ZBX-19311] fixed raid device discovery in smart plugin in Zabbix agent 2 (esneiders)
+...G...... [ZBX-19311] fixed raid device discovery in the Smart plugin for Zabbix agent 2 (esneiders)
 .......PS. [ZBX-20518] fixed lastaccess update during proxy throttling (dgoloscapov)
 ........S. [ZBX-20503] fixed queue overview updates for active agent items (dgoloscapov)
-..F....... [ZBX-20621] fixed value trimming in Administration -> Geographical maps configuration (miks)
-...G...... [ZBX-20539] fixed TLS parameters for mysql and postgresql in Zabbix agent 2 (esneiders)
-...G...... [ZBX-19407] removed redundant encoding check in get_codepage() for Windows (arimdjonoks)
+..F....... [ZBX-20621] fixed value trimming in the Administration -> Geographical maps configuration (miks)
+...G...... [ZBX-20539] fixed TLS parameters for MySQL and PostgreSQL in Zabbix agent 2 (esneiders)
+...G...... [ZBX-19407] removed the redundant encoding check in get_codepage() for Windows (arimdjonoks)
 ...G...... [ZBX-20390] fixed Oracle Solaris vm.memory.size[available] item kstats memory read (arimdjonoks)
 .........T [ZBX-20521] corrected missed typos in templates and README (drasihov)
+A......... [ZBX-20698] fixed import from 2.0-4.4 to 5.0 and above with SNMP interfaces (acikuns)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.2
@@ -508,18 +528,24 @@ Bug fixes:
 .........T [ZBX-19395] changed version in links of the templates and the media (mchudinov)
 
 --------------------------------------------------------------------------------
+Changes for 5.4.12
+
+5.4.12rc1 was released as 5.4.12 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.4.12rc1
 
 New features:
-...G.....T [ZBXNEXT-7065] added queries metrics to postgresql by agent2 template (esneiders, vkhaliev)
-A.F....... [ZBXNEXT-7485] fixed debug_backtrace function usage for php8 (acikuns)
-.D.G...... [ZBXNEXT-7116] added ability to force active checks after restart on Zabbix agent2 (vso)
+...G.....T [ZBXNEXT-7065] added queries metrics to the PostgreSQL by agent 2 template (esneiders, vkhaliev)
+A.F....... [ZBXNEXT-7485] fixed debug_backtrace function usage for PHP8 (acikuns)
+.D.G...... [ZBXNEXT-7116] added the ability to force active checks after restart to Zabbix agent 2 (vso)
 
 Bug fixes:
 ..F....... [ZBX-19223] fixed disabled hosts not listed in latest data view (averza)
 ..F....... [ZBX-20640] fixed X-axis field placement in different rows in Axis tab in Graph widget (acikuns)
 ..F....... [ZBX-20049] implemented keyboard control for info icons (acikuns, ashubin)
 ........S. [ZBX-19965] fixed database upgrade for SNMP interfaces (akozlovs)
+A......... [ZBX-20698] fixed import from 2.0-4.4 to 5.0 and above with SNMP interfaces (acikuns)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.11
@@ -1788,19 +1814,28 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.22
+
+5.0.22rc1 was released as 5.0.22 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.22rc1
 
 New features:
-...G.....T [ZBXNEXT-7065] added queries metrics to postgresql by agent2 template (esneiders, vkhaliev)
-.........T [ZBXNEXT-7023] updated regular expressions for services discovery in windows templates (vkhaliev)
-A.F....... [ZBXNEXT-7485] fixed debug_backtrace function usage for php8 (acikuns)
+...G.....T [ZBXNEXT-7065] added queries metrics to the PostgreSQL by agent 2 template (esneiders, vkhaliev)
+.........T [ZBXNEXT-7023] updated regular expressions for services discovery in Windows templates (vkhaliev)
+A.F....... [ZBXNEXT-7485] fixed debug_backtrace function usage for PHP8 (acikuns)
 .........T [ZBXNEXT-7493] added garbage collector and memory pool discovery to generic Java template (vkhaliev)
 
 Bug fixes:
+A......... [ZBX-20681] fixed undefined index error when accessing module page with guest user (rlataria)
+.......PS. [ZBX-20518] fixed lastaccess update during proxy throttling (dgoloscapov)
+...G...... [ZBX-20634] fixed handling of multiline FTP response (ssimonenko)
+...G...... [ZBX-20528] fixed issue with pgsql.custom.query JSON response failing for Zabbix agent 2 (esneiders)
 .D........ [ZBX-20762] fixed StartAlerters and StartEscalators range in configuration file comments (akozlovs)
-...G...... [ZBX-19311] fixed raid device discovery in smart plugin in Zabbix agent 2 (esneiders)
-...G...... [ZBX-19407] removed redundant encoding check in get_codepage() for Windows (arimdjonoks)
-...G...... [ZBX-20539] fixed TLS parameters for mysql and postgresql in Zabbix agent 2 (esneiders)
+...G...... [ZBX-19311] fixed raid device discovery in the Smart plugin for Zabbix agent 2 (esneiders)
+...G...... [ZBX-19407] removed the redundant encoding check in get_codepage() for Windows (arimdjonoks)
+...G...... [ZBX-20539] fixed TLS parameters for MySQL and PostgreSQL in Zabbix agent 2 (esneiders)
 .........T [ZBX-20728] removed duplicate entries in tmpl files (abakaldin)
 ...G...... [ZBX-20390] fixed Oracle Solaris vm.memory.size[available] item kstats memory read (arimdjonoks)
 ..F....... [ZBX-19223] fixed disabled hosts not listed in latest data view (averza)
@@ -1808,6 +1843,7 @@ Bug fixes:
 ..F....... [ZBX-20640] fixed X-axis field placement in different rows in Axis tab in Graph widget (acikuns)
 ..F....... [ZBX-20049] implemented keyboard control for info icons (acikuns, ashubin)
 ........S. [ZBX-19965] fixed database upgrade for SNMP interfaces (akozlovs)
+A......... [ZBX-20698] fixed import from 2.0-4.4 to 5.0 and above with SNMP interfaces (acikuns)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.21
