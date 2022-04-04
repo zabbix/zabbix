@@ -470,7 +470,7 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 
 		var creationTime, exitTime, kernelTime, userTime syscall.Filetime
 		if err = syscall.GetProcessTimes(h, &creationTime, &exitTime, &kernelTime, &userTime); err == nil {
-			proc.CpuTimeUser = float64(uint64(userTime.HighDateTime)<<32 | uint64(kernelTime.LowDateTime)) / 1e7
+			proc.CpuTimeUser = float64(uint64(userTime.HighDateTime)<<32 | uint64(userTime.LowDateTime)) / 1e7
 			proc.CpuTimeSystem = float64(uint64(kernelTime.HighDateTime)<<32 | uint64(kernelTime.LowDateTime)) / 1e7
 		}
 
