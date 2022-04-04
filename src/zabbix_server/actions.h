@@ -20,7 +20,6 @@
 #ifndef ZABBIX_ACTIONS_H
 #define ZABBIX_ACTIONS_H
 
-#include "common.h"
 #include "db.h"
 
 #define ZBX_ACTION_RECOVERY_NONE	0

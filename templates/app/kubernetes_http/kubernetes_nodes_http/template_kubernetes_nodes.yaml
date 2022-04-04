@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-14T14:27:43Z'
+  date: '2022-03-17T17:30:09Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -18,7 +18,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -279,7 +279,7 @@ zabbix_export:
           parameters:
             -
               name: api_endpoint
-              value: '{$KUBE.API.ENDPOINT}'
+              value: '{$KUBE.API.ENDPOINT.URL}'
             -
               name: token
               value: '{$KUBE.API.TOKEN}'
@@ -423,7 +423,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
           master_item:
             key: kube.nodes
           tags:
@@ -478,7 +478,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 3h
               master_item:
                 key: kube.nodes
               tags:
@@ -507,7 +507,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 3h
               master_item:
                 key: kube.nodes
               tags:
@@ -672,7 +672,7 @@ zabbix_export:
               key: 'kube.node.conditions.diskpressure[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'True if pressure exists on the disk size — that is, if the disk capacity is low; otherwise False.'
+              description: 'True if pressure exists on the disk size - that is, if the disk capacity is low; otherwise False.'
               valuemap:
                 name: 'Node conditions'
               preprocessing:
@@ -700,7 +700,7 @@ zabbix_export:
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.conditions.diskpressure[{#NAME}])=1'
                   name: 'Node [{#NAME}] Conditions: Pressure exists on the disk size (state: {ITEM.VALUE})'
                   priority: WARNING
-                  description: 'True — pressure exists on the disk size — that is, if the disk capacity is low; otherwise False.'
+                  description: 'True - pressure exists on the disk size - that is, if the disk capacity is low; otherwise False.'
                   tags:
                     -
                       tag: scope
@@ -712,7 +712,7 @@ zabbix_export:
               key: 'kube.node.conditions.memorypressure[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'True if pressure exists on the node memory — that is, if the node memory is low; otherwise False.'
+              description: 'True if pressure exists on the node memory - that is, if the node memory is low; otherwise False.'
               valuemap:
                 name: 'Node conditions'
               preprocessing:
@@ -740,7 +740,7 @@ zabbix_export:
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.conditions.memorypressure[{#NAME}])=1'
                   name: 'Node [{#NAME}] Conditions: Pressure exists on the node memory (state: {ITEM.VALUE})'
                   priority: WARNING
-                  description: 'True — pressure exists on the node memory — that is, if the node memory is low; otherwise False'
+                  description: 'True - pressure exists on the node memory - that is, if the node memory is low; otherwise False'
                   tags:
                     -
                       tag: scope
@@ -780,7 +780,7 @@ zabbix_export:
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.conditions.networkunavailable[{#NAME}])=1'
                   name: 'Node [{#NAME}] Conditions: Network is not correctly configured (state: {ITEM.VALUE})'
                   priority: WARNING
-                  description: 'True — the network for the node is not correctly configured, otherwise False'
+                  description: 'True - the network for the node is not correctly configured, otherwise False'
                   tags:
                     -
                       tag: scope
@@ -792,7 +792,7 @@ zabbix_export:
               key: 'kube.node.conditions.pidpressure[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'True if pressure exists on the processes — that is, if there are too many processes on the node; otherwise False.'
+              description: 'True if pressure exists on the processes - that is, if there are too many processes on the node; otherwise False.'
               valuemap:
                 name: 'Node conditions'
               preprocessing:
@@ -820,7 +820,7 @@ zabbix_export:
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.conditions.pidpressure[{#NAME}])=1'
                   name: 'Node [{#NAME}] Conditions: Pressure exists on the processes (state: {ITEM.VALUE})'
                   priority: WARNING
-                  description: 'True — pressure exists on the processes — that is, if there are too many processes on the node; otherwise False'
+                  description: 'True - pressure exists on the processes - that is, if there are too many processes on the node; otherwise False'
                   tags:
                     -
                       tag: scope
@@ -861,8 +861,8 @@ zabbix_export:
                   name: 'Node [{#NAME}] Conditions: Is not in Ready state (state: {ITEM.VALUE})'
                   priority: WARNING
                   description: |
-                    False — if the node is not healthy and is not accepting pods.
-                    Unknown — if the node controller has not heard from the node in the last node-monitor-grace-period (default is 40 seconds).
+                    False - if the node is not healthy and is not accepting pods.
+                    Unknown - if the node controller has not heard from the node in the last node-monitor-grace-period (default is 40 seconds).
                   tags:
                     -
                       tag: scope
@@ -1492,6 +1492,7 @@ zabbix_export:
                 value: '{$KUBE.LLD.FILTER.POD.NAMESPACE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+          lifetime: '0'
           item_prototypes:
             -
               uuid: ed4ea3dbbce74404a5039aa9918b8e2b
@@ -1851,7 +1852,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
       tags:
         -
           tag: class
@@ -1861,9 +1862,9 @@ zabbix_export:
           value: 'kubernetes nodes'
       macros:
         -
-          macro: '{$KUBE.API.ENDPOINT}'
-          value: '<PUT YOUR KUBERNETES API ENDPOINT>'
-          description: 'Kubernetes API endpoint in the format <scheme>://<host>:<port>/api'
+          macro: '{$KUBE.API.ENDPOINT.URL}'
+          value: 'https://localhost:6443/api'
+          description: 'Kubernetes API endpoint URL in the format <scheme>://<host>:<port>/api'
         -
           macro: '{$KUBE.API.TOKEN}'
           description: 'Service account bearer token'
@@ -1915,8 +1916,8 @@ zabbix_export:
           description: 'Labels to filter nodes (regex in values are supported)'
         -
           macro: '{$KUBE.NODES.ENDPOINT.NAME}'
-          value: zabbix-agent
-          description: 'Kubenetes nodes endpoint name'
+          value: zabbix-zabbix-helm-chrt-agent
+          description: 'Kubernetes nodes endpoint name. See kubectl -n monitoring get ep'
         -
           macro: '{$KUBE.POD.FILTER.ANNOTATIONS}'
           description: 'Annotations to filter pods (regex in values are supported)'
