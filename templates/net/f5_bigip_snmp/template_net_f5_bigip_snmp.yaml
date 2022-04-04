@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:44:41Z'
+  date: '2022-04-04T10:26:17Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -293,7 +293,8 @@ zabbix_export:
             -
               uuid: 8a55167ddebb43f2ac8f6d028aef87c2
               expression: 'last(/F5 Big-IP SNMP/bigip.serialnumber,#1)<>last(/F5 Big-IP SNMP/bigip.serialnumber,#2) and length(last(/F5 Big-IP SNMP/bigip.serialnumber))>0'
-              name: 'F5 BIG-IP: Chassis has been replaced (new serial number received)'
+              name: 'F5 BIG-IP: Chassis has been replaced'
+              event_name: 'Chassis has been replaced (new serial number received)'
               priority: INFO
               description: 'Chassis serial number has changed. Ack to close'
               manual_close: 'YES'
@@ -462,7 +463,8 @@ zabbix_export:
             -
               uuid: 551fd3b77d144ed58f138865e4862901
               expression: 'last(/F5 Big-IP SNMP/bigip.uptime)<10m'
-              name: 'F5 BIG-IP: has been restarted (uptime < 10m)'
+              name: 'F5 BIG-IP: has been restarted'
+              event_name: 'has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -868,7 +870,8 @@ zabbix_export:
                 -
                   uuid: 452167aafe594e3faa3748e6dc470fb1
                   expression: 'last(/F5 Big-IP SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.HIGH}'
-                  name: 'F5 BIG-IP: Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.HIGH} °C'
+                  name: 'F5 BIG-IP: Chassis temperature'
+                  event_name: 'Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.HIGH} °C'
                   opdata: '{ITEM.LASTVALUE}'
                   priority: HIGH
                   tags:
@@ -878,12 +881,13 @@ zabbix_export:
                 -
                   uuid: 00c0212fcb8049309bf0b3de2b2363b4
                   expression: 'last(/F5 Big-IP SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.WARN}'
-                  name: 'F5 BIG-IP: Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.WARN} °C'
+                  name: 'F5 BIG-IP: Chassis temperature'
+                  event_name: 'Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.WARN} °C'
                   opdata: '{ITEM.LASTVALUE}'
                   priority: WARNING
                   dependencies:
                     -
-                      name: 'F5 BIG-IP: Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.HIGH} °C'
+                      name: 'F5 BIG-IP: Chassis temperature'
                       expression: 'last(/F5 Big-IP SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.HIGH}'
                   tags:
                     -
@@ -1443,7 +1447,8 @@ zabbix_export:
                   expression: 'last(/F5 Big-IP SNMP/bigip.cpu.usageratio.5m[{#HOST.ID},{#CPU.ID}])>{$BIGIP.CPU.UTIL.WARN.MAX}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/F5 Big-IP SNMP/bigip.cpu.usageratio.5m[{#HOST.ID},{#CPU.ID}])<{$BIGIP.CPU.UTIL.WARN.MIN}'
-                  name: 'F5 BIG-IP: High CPU utilization (over {$BIGIP.CPU.UTIL.WARN.MAX}% for 5m)'
+                  name: 'F5 BIG-IP: High CPU utilization'
+                  event_name: 'High CPU utilization (over {$BIGIP.CPU.UTIL.WARN.MAX}% for 5m)'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
                   tags:
@@ -2675,7 +2680,8 @@ zabbix_export:
             -
               uuid: 2d9214768b684ba880703d738ac52099
               expression: 'last(/F5 Big-IP SNMP/bigip.net.in.error[{#IF.NAME}])>last(/F5 Big-IP SNMP/bigip.net.in.error[{#IF.NAME}],#2) or last(/F5 Big-IP SNMP/bigip.net.out.error[{#IF.NAME}])>last(/F5 Big-IP SNMP/bigip.net.out.error[{#IF.NAME}],#2)'
-              name: 'F5 BIG-IP: There are errors on the network interface ({#IF.NAME})'
+              name: 'F5 BIG-IP: There are errors on the network interface'
+              event_name: 'There are errors on the network interface ({#IF.NAME})'
               priority: AVERAGE
               tags:
                 -

@@ -72,10 +72,10 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|WildFly: Version has changed (new version: {ITEM.VALUE}) |<p>WildFly version has changed. Ack to close.</p> |`last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"],#1)<>last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"],#2) and length(last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"]))>0` |INFO |<p>Manual close: YES</p> |
-|WildFly: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/WildFly Domain by JMX/jmx["java.lang:type=Runtime","Uptime"])<10m` |INFO |<p>Manual close: YES</p> |
-|WildFly domain: Server {#SERVER}: Server status has changed (new status: {ITEM.VALUE}) |<p>Server status has changed. Ack to close.</p> |`last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status],#1)<>last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status],#2) and length(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status]))>0` |WARNING |<p>Manual close: YES</p> |
-|WildFly domain: Server {#SERVER}: Server group has changed (new group: {ITEM.VALUE}) |<p>Server group has changed. Ack to close.</p> |`last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group],#1)<>last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group],#2) and length(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group]))>0` |INFO |<p>Manual close: YES</p> |
+|WildFly: Version has changed |<p>WildFly version has changed. Ack to close.</p> |`last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"],#1)<>last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"],#2) and length(last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"]))>0` |INFO |<p>Manual close: YES</p> |
+|WildFly: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/WildFly Domain by JMX/jmx["java.lang:type=Runtime","Uptime"])<10m` |INFO |<p>Manual close: YES</p> |
+|WildFly domain: Server {#SERVER}: Server status has changed |<p>Server status has changed. Ack to close.</p> |`last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status],#1)<>last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status],#2) and length(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status]))>0` |WARNING |<p>Manual close: YES</p> |
+|WildFly domain: Server {#SERVER}: Server group has changed |<p>Server group has changed. Ack to close.</p> |`last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group],#1)<>last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group],#2) and length(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group]))>0` |INFO |<p>Manual close: YES</p> |
 
 ## Feedback
 

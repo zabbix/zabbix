@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-18T09:49:27Z'
+  date: '2022-04-04T10:40:24Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -497,7 +497,8 @@ zabbix_export:
                 -
                   uuid: 3b7e55f13c6a4ba2930709d5c51c8a09
                   expression: 'min(/OpenWeatherMap by HTTP/openweathermap.temp[{#ID}],#3)>{$TEMP.CRIT.HIGH}'
-                  name: '[{#LOCATION}, {#COUNTRY}]: Temperature is too high (over {$TEMP.CRIT.HIGH} for 30m)'
+                  name: '[{#LOCATION}, {#COUNTRY}]: Temperature is too high'
+                  event_name: 'Temperature is too high (over {$TEMP.CRIT.HIGH} for 30m)'
                   opdata: 'Current temp: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Temperature value is too high.'
@@ -509,7 +510,8 @@ zabbix_export:
                 -
                   uuid: 7c98d2784a2e42faa76e67348a0df7ff
                   expression: 'max(/OpenWeatherMap by HTTP/openweathermap.temp[{#ID}],#3)<{$TEMP.CRIT.LOW}'
-                  name: '[{#LOCATION}, {#COUNTRY}]: Temperature is too low (below {$TEMP.CRIT.LOW} for 30m)'
+                  name: '[{#LOCATION}, {#COUNTRY}]: Temperature is too low'
+                  event_name: 'Temperature is too low (below {$TEMP.CRIT.LOW} for 30m)'
                   opdata: 'Current temp: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Temperature value is too low.'
@@ -656,11 +658,11 @@ zabbix_export:
               lld_macro: '{#COUNTRY}'
               path: $.sys.country
             -
-              lld_macro: '{#ID}'
-              path: $.id
-            -
               lld_macro: '{#LOCATION}'
               path: $.name
+            -
+              lld_macro: '{#ID}'
+              path: $.id
             -
               lld_macro: '{#TEMP.UNIT}'
               path: $.temp_unit
@@ -736,70 +738,53 @@ zabbix_export:
           name: 'Wind direction'
           mappings:
             -
-              type: IN_RANGE
               value: '0 - 11.24'
               newvalue: 'N'
             -
-              type: IN_RANGE
               value: '11.25 - 33.74'
               newvalue: NNE
             -
-              type: IN_RANGE
               value: '33.75 - 56.24'
               newvalue: NE
             -
-              type: IN_RANGE
               value: '56.25 - 78.74'
               newvalue: ENE
             -
-              type: IN_RANGE
               value: '78.75 - 101.24'
               newvalue: E
             -
-              type: IN_RANGE
               value: '101.25 - 123.74'
               newvalue: ESE
             -
-              type: IN_RANGE
               value: '123.75 - 146.24'
               newvalue: SE
             -
-              type: IN_RANGE
               value: '146.25 - 168.74'
               newvalue: SSE
             -
-              type: IN_RANGE
               value: '168.75 - 191.24'
               newvalue: S
             -
-              type: IN_RANGE
               value: '191.25 - 213.74'
               newvalue: SSW
             -
-              type: IN_RANGE
               value: '213.75 - 236.24'
               newvalue: SW
             -
-              type: IN_RANGE
               value: '236.25 - 258.74'
               newvalue: WSW
             -
-              type: IN_RANGE
               value: '258.75 - 281.24'
               newvalue: W
             -
-              type: IN_RANGE
               value: '281.25 - 303.74'
               newvalue: WNW
             -
-              type: IN_RANGE
               value: '303.75 - 326.24'
               newvalue: NW
             -
-              type: IN_RANGE
               value: '326.25 - 348.74'
               newvalue: NNW
             -
-              type: IN_RANGE
               value: '348.75 - 379.99'
               newvalue: 'N'

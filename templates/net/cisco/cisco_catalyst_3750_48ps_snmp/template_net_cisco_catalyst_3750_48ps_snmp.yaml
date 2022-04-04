@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-01T09:25:41Z'
+  date: '2022-04-04T10:24:55Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -289,7 +289,8 @@ zabbix_export:
             -
               uuid: b881ec6269d54e25810ed2ec2dfe3385
               expression: 'last(/Cisco Catalyst 3750V2-48PS SNMP/system.name,#1)<>last(/Cisco Catalyst 3750V2-48PS SNMP/system.name,#2) and length(last(/Cisco Catalyst 3750V2-48PS SNMP/system.name))>0'
-              name: 'System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -355,7 +356,7 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 -
-                  name: 'System name has changed (new name: {ITEM.VALUE})'
+                  name: 'System name has changed'
                   expression: 'last(/Cisco Catalyst 3750V2-48PS SNMP/system.name,#1)<>last(/Cisco Catalyst 3750V2-48PS SNMP/system.name,#2) and length(last(/Cisco Catalyst 3750V2-48PS SNMP/system.name))>0'
               tags:
                 -
@@ -386,7 +387,8 @@ zabbix_export:
             -
               uuid: 904571e51fbc4cd0a3a25800e16ec495
               expression: 'last(/Cisco Catalyst 3750V2-48PS SNMP/system.uptime)<10m'
-              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -459,7 +461,8 @@ zabbix_export:
                 -
                   uuid: f3318a22b4ff436f9021dbd181ecee58
                   expression: 'min(/Cisco Catalyst 3750V2-48PS SNMP/system.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
-                  name: '#{#SNMPINDEX}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  name: '#{#SNMPINDEX}: High CPU utilization'
+                  event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -531,7 +534,8 @@ zabbix_export:
                 -
                   uuid: b1087409b7c84ad5b587e6f6fc37dfe0
                   expression: 'last(/Cisco Catalyst 3750V2-48PS SNMP/system.hw.serialnumber[{#SNMPINDEX}],#1)<>last(/Cisco Catalyst 3750V2-48PS SNMP/system.hw.serialnumber[{#SNMPINDEX}],#2) and length(last(/Cisco Catalyst 3750V2-48PS SNMP/system.hw.serialnumber[{#SNMPINDEX}]))>0'
-                  name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
+                  name: '{#ENT_NAME}: Device has been replaced'
+                  event_name: 'Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   tags:
@@ -671,7 +675,8 @@ zabbix_export:
                 -
                   uuid: 14f0fcd6447746d2af5de080c36e9888
                   expression: 'min(/Cisco Catalyst 3750V2-48PS SNMP/vm.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
-                  name: '{#SNMPVALUE}: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: '{#SNMPVALUE}: High memory utilization'
+                  event_name: 'High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
                   tags:
@@ -820,7 +825,8 @@ zabbix_export:
                   expression: 'min(/Cisco Catalyst 3750V2-48PS SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco Catalyst 3750V2-48PS SNMP/net.if.in.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
-                  name: 'Interface {#IFNAME}({#IFALIAS}): High input error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+                  name: 'Interface {#IFNAME}({#IFALIAS}): High input error rate'
+                  event_name: 'High input error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors in: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
@@ -922,7 +928,8 @@ zabbix_export:
                   expression: 'min(/Cisco Catalyst 3750V2-48PS SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco Catalyst 3750V2-48PS SNMP/net.if.out.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
-                  name: 'Interface {#IFNAME}({#IFALIAS}): High output error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+                  name: 'Interface {#IFNAME}({#IFALIAS}): High output error rate'
+                  event_name: 'High output error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors out: {ITEM.LASTVALUE2}'
                   priority: WARNING
                   description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
@@ -1109,7 +1116,8 @@ zabbix_export:
                 last(/Cisco Catalyst 3750V2-48PS SNMP/net.if.speed[{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Cisco Catalyst 3750V2-48PS SNMP/net.if.in[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Cisco Catalyst 3750V2-48PS SNMP/net.if.speed[{#SNMPINDEX}])'
-              name: 'Interface {#IFNAME}({#IFALIAS}): High inbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High inbound bandwidth usage'
+              event_name: 'High inbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'In: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -1128,7 +1136,8 @@ zabbix_export:
                 last(/Cisco Catalyst 3750V2-48PS SNMP/net.if.speed[{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Cisco Catalyst 3750V2-48PS SNMP/net.if.out[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Cisco Catalyst 3750V2-48PS SNMP/net.if.speed[{#SNMPINDEX}])'
-              name: 'Interface {#IFNAME}({#IFALIAS}): High outbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High outbound bandwidth usage'
+              event_name: 'High outbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'Out: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'

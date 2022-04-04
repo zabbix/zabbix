@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-07T14:35:13Z'
+  date: '2022-04-04T10:40:55Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -577,7 +577,8 @@ zabbix_export:
             -
               uuid: 1d0903401af64d93ac16761808d672ca
               expression: 'min(/PostgreSQL by Zabbix agent 2/pgsql.connections.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}'
-              name: 'Connections sum: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m)'
+              name: 'Connections sum: Total number of connections is too high'
+              event_name: 'Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m)'
               priority: AVERAGE
               tags:
                 -
@@ -1228,7 +1229,8 @@ zabbix_export:
             -
               uuid: 5fbabc5f60b74a369a13a260d25cce3c
               expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.uptime["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]) < 600'
-              name: 'PostgreSQL: Service has been restarted (uptime={ITEM.LASTVALUE})'
+              name: 'PostgreSQL: Service has been restarted'
+              event_name: 'Service has been restarted (uptime={ITEM.LASTVALUE})'
               priority: AVERAGE
               tags:
                 -
@@ -1552,7 +1554,8 @@ zabbix_export:
                 -
                   uuid: 05ac4216e1a941df8880224ffd38b806
                   expression: 'min(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}'
-                  name: 'DB {#DBNAME}: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m)'
+                  name: 'DB {#DBNAME}: Too many recovery conflicts'
+                  event_name: 'Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: AVERAGE
                   description: |
                     The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.
@@ -1592,7 +1595,8 @@ zabbix_export:
                 -
                   uuid: dd948e3ec19c419e8c9a62ace8d1695f
                   expression: 'min(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}'
-                  name: 'DB {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
+                  name: 'DB {#DBNAME}: Deadlock occurred'
+                  event_name: 'Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: HIGH
                   tags:
                     -
@@ -2154,7 +2158,8 @@ zabbix_export:
                 -
                   uuid: 2bb34a2a7dee451cb5419a146d883601
                   expression: 'min(/PostgreSQL by Zabbix agent 2/pgsql.queries.query.slow_count["{#DBNAME}"],5m)>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}'
-                  name: 'DB {#DBNAME}: Too many slow queries (over {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"} in 5m)'
+                  name: 'DB {#DBNAME}: Too many slow queries'
+                  event_name: 'Too many slow queries (over {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: WARNING
                   tags:
                     -
@@ -2644,11 +2649,11 @@ zabbix_export:
         -
           macro: '{$PG.QUERY_ETIME.MAX.WARN}'
           value: '30'
-          description: 'Execution time limit for count of slow queries'
+          description: 'Execution time limit for count of slow queries.'
         -
           macro: '{$PG.SLOW_QUERIES.MAX.WARN}'
           value: '5'
-          description: 'Slow queries count threshold for a trigger'
+          description: 'Slow queries count threshold for a trigger.'
         -
           macro: '{$PG.URI}'
           value: 'tcp://localhost:5432'

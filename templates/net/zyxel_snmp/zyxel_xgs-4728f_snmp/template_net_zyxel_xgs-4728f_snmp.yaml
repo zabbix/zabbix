@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T19:42:19Z'
+  date: '2022-04-04T10:51:07Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -107,7 +107,8 @@ zabbix_export:
             -
               uuid: 20f368f955f74fc9b8380b1bbff7e057
               expression: 'min(/ZYXEL XGS-4728F SNMP/zyxel.4728f.cpuusage,5m)>{$CPU.UTIL.CRIT}'
-              name: 'ZYXEL XGS-4728F: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'ZYXEL XGS-4728F: High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -304,7 +305,8 @@ zabbix_export:
             -
               uuid: 4df7c31c3079411baabd4ae66e580652
               expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.serialnumber,#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.serialnumber,#2) and length(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.serialnumber))>0'
-              name: 'ZYXEL XGS-4728F: Device has been replaced (new serial number received)'
+              name: 'ZYXEL XGS-4728F: Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
@@ -340,7 +342,8 @@ zabbix_export:
             -
               uuid: 36b9a7d3d3fb45f782a5ea05de6816f9
               expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.uptime)<10m'
-              name: 'ZYXEL XGS-4728F: has been restarted (uptime < 10m)'
+              name: 'ZYXEL XGS-4728F: has been restarted'
+              event_name: 'has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -435,7 +438,8 @@ zabbix_export:
                 -
                   uuid: 90b328c3b56c417eb938091338bd07fc
                   expression: 'min(/ZYXEL XGS-4728F SNMP/zyxel.4728f.memory[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
-                  name: 'ZYXEL XGS-4728F: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: 'ZYXEL XGS-4728F: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool'
+                  event_name: 'High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
                   tags:
@@ -1318,7 +1322,8 @@ zabbix_export:
                 -
                   uuid: 632be557ffed439e98425eaa59361e50
                   expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}]))>0'
-                  name: 'ZYXEL XGS-4728F: SFP {#SNMPINDEX} has been replaced (new serial number received)'
+                  name: 'ZYXEL XGS-4728F: SFP {#SNMPINDEX} has been replaced'
+                  event_name: 'SFP {#SNMPINDEX} has been replaced (new serial number received)'
                   priority: INFO
                   description: 'SFP {#SNMPINDEX} serial number has changed. Ack to close'
                   manual_close: 'YES'
