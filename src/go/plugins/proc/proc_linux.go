@@ -320,7 +320,7 @@ func (p *Plugin) Collect() (err error) {
 
 	now := time.Now()
 	for pid, stat := range stats {
-		getProcCpuUtil(pid, stat)
+		getProcCpuUtil(fmt.Sprintf("%d", pid), stat)
 		if stat.err != nil {
 			p.Debugf("cannot get process %d CPU utilization statistics: %s", pid, stat.err)
 		}
@@ -836,6 +836,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 			getProcessIo(pid, &data)
 			getProcessFds(pid, &data)
 			getProcessCalculatedMetrics(pid, &data)
+			getProcessCpuTimes(pid, &data)
 
 			processUserID, err := getProcessUserID(pid)
 			if err != nil {
@@ -863,10 +864,12 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 			if err := getProcessStatus(tid, &data); err != nil {
 				continue
 			}
+			procPath := fmt.Sprintf("%d", data.Tgid) + "/task/" + tid
 			getProcessNames(tid, &data)
-			getProcessIo(fmt.Sprintf("%d", data.Tgid) + "/task/" + tid, &data)
+			getProcessIo(procPath, &data)
 			getProcessFds(tid, &data)
 			getProcessCalculatedMetrics(tid, &data)
+			getProcessCpuTimes(procPath, &data)
 
 			pi := procInfo{int64(data.Pid), data.Name, int64(uid), data.Cmdline, data.Name, ""}
 			if query.match(&pi) {

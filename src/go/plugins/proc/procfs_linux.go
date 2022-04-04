@@ -192,13 +192,12 @@ func getProcessCalculatedMetrics(pid string, proc *procStatus) (err error) {
 	} else {
 		return err
 	}
+	return nil
+}
 
+func getProcessCpuTimes(pid string, proc *procStatus) (err error) {
 	var stat cpuUtil
-	pidInt, err := strconv.ParseInt(pid, 10, 64)
-	if err != nil {
-		return err
-	}
-	getProcCpuUtil(pidInt, &stat)
+	getProcCpuUtil(pid, &stat)
 	if stat.err == nil {
 		proc.CpuTimeUser = float64(stat.utime) / float64(C.sysconf(C._SC_CLK_TCK))
 		proc.CpuTimeSystem = float64(stat.stime) / float64(C.sysconf(C._SC_CLK_TCK))
@@ -278,19 +277,19 @@ func getProcessCmdline(pid string, flags int) (arg0 string, cmdline string, err 
 	return arg0, string(data), nil
 }
 
-func getProcCpuUtil(pid int64, stat *cpuUtil) {
+func getProcCpuUtil(pid string, stat *cpuUtil) {
 	var data []byte
-	if data, stat.err = read2k(fmt.Sprintf("/proc/%d/stat", pid)); stat.err != nil {
+	if data, stat.err = read2k("/proc/" + pid + "/stat"); stat.err != nil {
 		return
 	}
 	var pos int
 	if pos = bytes.LastIndexByte(data, ')'); pos == -1 || len(data[pos:]) < 2 {
-		stat.err = fmt.Errorf("cannot find CPU statistic starting position in /proc/%d/stat", pid)
+		stat.err = fmt.Errorf("cannot find CPU statistic starting position in /proc/%s/stat", pid)
 		return
 	}
 	stats := bytes.Split(data[pos+2:], []byte{' '})
 	if len(stats) < 20 {
-		stat.err = fmt.Errorf("cannot parse CPU statistics in /proc/%d/stat", pid)
+		stat.err = fmt.Errorf("cannot parse CPU statistics in /proc/%s/stat", pid)
 		return
 	}
 	if stat.utime, stat.err = strconv.ParseUint(string(stats[11]), 10, 64); stat.err != nil {
