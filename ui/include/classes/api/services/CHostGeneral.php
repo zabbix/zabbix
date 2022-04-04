@@ -1398,13 +1398,15 @@ abstract class CHostGeneral extends CHostBase {
 
 				if ($hosts_templates) {
 					// Select also template ID if not selected. It can be removed from results if not requested.
-					$template_options = array_merge($options['selectParentTemplates'], ['templateid']);
+					$template_options = $this->outputIsRequested('templateid', $options['selectParentTemplates'])
+						? $options['selectParentTemplates']
+						: array_merge($options['selectParentTemplates'], ['templateid']);
 
 					/*
 					 * Since templates API doest have "link_type" field, remove it from request, so that template.get
 					 * validation may pass successfully.
 					 */
-					if ($this->outputIsRequested('link_type', $template_options)
+					if ($this->outputIsRequested('link_type', $template_options && is_array($template_options))
 							&& ($key = array_search('link_type', $template_options)) !== false) {
 						unset($template_options[$key]);
 					}
