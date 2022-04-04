@@ -47,8 +47,11 @@ static int	zbx_hashset_init_slots(zbx_hashset_t *hs, size_t init_size)
 	{
 		hs->num_slots = next_prime(init_size);
 
-		if (NULL == (hs->slots = (ZBX_HASHSET_ENTRY_T **)hs->mem_malloc_func(NULL, hs->num_slots * sizeof(ZBX_HASHSET_ENTRY_T *))))
+		if (NULL == (hs->slots = (ZBX_HASHSET_ENTRY_T **)hs->mem_malloc_func(NULL, hs->num_slots *
+				sizeof(ZBX_HASHSET_ENTRY_T *))))
+		{
 			return FAIL;
+		}
 
 		memset(hs->slots, 0, hs->num_slots * sizeof(ZBX_HASHSET_ENTRY_T *));
 	}
