@@ -1629,14 +1629,26 @@ class testDocumentationLinks extends CWebTest {
 			// #180 Administration -> Create proxy view.
 			[
 				[
-					'url' => 'zabbix.php?action=proxy.edit',
+					'url' => 'zabbix.php?action=proxy.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create proxy'
+						]
+					],
 					'doc_link' => '/en/manual/distributed_monitoring/proxies#configuration'
 				]
 			],
 			// #181 Administration -> Proxies -> Edit proxy view.
 			[
 				[
-					'url' => 'zabbix.php?action=proxy.edit&proxyid=20000',
+					'url' => 'zabbix.php?action=proxy.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:Active proxy 1'
+						]
+					],
 					'doc_link' => '/en/manual/distributed_monitoring/proxies#configuration'
 				]
 			],

@@ -380,14 +380,12 @@ class testPageAdministrationMediaTypes extends CWebTest {
 						'Send to' => 'zabbix@zabbix.com',
 						'Subject' => ''
 					],
-					'error' => [
-						'Connection to Zabbix server "localhost" refused. Possible reasons:',
-						'1. Incorrect server IP/DNS in the "zabbix.conf.php";',
-						'2. Security environment (for example, SELinux) is blocking the connection;',
-						'3. Zabbix server daemon not running;',
-						'4. Firewall is blocking TCP connection.',
-						'Connection refused'
-					]
+					'error' => "Connection to Zabbix server \"localhost\" refused. Possible reasons:\n".
+							"1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n".
+							"2. Security environment (for example, SELinux) is blocking the connection;\n".
+							"3. Zabbix server daemon not running;\n".
+							"4. Firewall is blocking TCP connection.\n".
+							"Connection refused"
 				]
 			],
 			// Message validation.
@@ -419,14 +417,12 @@ class testPageAdministrationMediaTypes extends CWebTest {
 						'Send to' => 'abcd',
 						'Message' => 'new message'
 					],
-					'error' => [
-						'Connection to Zabbix server "localhost" refused. Possible reasons:',
-						'1. Incorrect server IP/DNS in the "zabbix.conf.php";',
-						'2. Security environment (for example, SELinux) is blocking the connection;',
-						'3. Zabbix server daemon not running;',
-						'4. Firewall is blocking TCP connection.',
-						'Connection refused'
-					]
+					'error' => "Connection to Zabbix server \"localhost\" refused. Possible reasons:\n".
+							"1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n".
+							"2. Security environment (for example, SELinux) is blocking the connection;\n".
+							"3. Zabbix server daemon not running;\n".
+							"4. Firewall is blocking TCP connection.\n".
+							"Connection refused"
 				]
 			],
 			// 	Script media type.
@@ -436,14 +432,12 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'form' => [
 						'Send to' => '/../"'
 					],
-					'error' => [
-						'Connection to Zabbix server "localhost" refused. Possible reasons:',
-						'1. Incorrect server IP/DNS in the "zabbix.conf.php";',
-						'2. Security environment (for example, SELinux) is blocking the connection;',
-						'3. Zabbix server daemon not running;',
-						'4. Firewall is blocking TCP connection.',
-						'Connection refused'
-					]
+					'error' => "Connection to Zabbix server \"localhost\" refused. Possible reasons:\n".
+							"1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n".
+							"2. Security environment (for example, SELinux) is blocking the connection;\n".
+							"3. Zabbix server daemon not running;\n".
+							"4. Firewall is blocking TCP connection.\n".
+							"Connection refused"
 				]
 			],
 			// 	Webhook media type.
@@ -452,14 +446,12 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'name' => 'Reference webhook',
 					'webhook' => true,
 					'parameters' => ['HTTPProxy', 'Message', 'Subject', 'To', 'URL', 'Response'],
-					'error' => [
-						'Connection to Zabbix server "localhost" refused. Possible reasons:',
-						'1. Incorrect server IP/DNS in the "zabbix.conf.php";',
-						'2. Security environment (for example, SELinux) is blocking the connection;',
-						'3. Zabbix server daemon not running;',
-						'4. Firewall is blocking TCP connection.',
-						'Connection refused'
-					]
+					'error' => "Connection to Zabbix server \"localhost\" refused. Possible reasons:\n".
+							"1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n".
+							"2. Security environment (for example, SELinux) is blocking the connection;\n".
+							"3. Zabbix server daemon not running;\n".
+							"4. Firewall is blocking TCP connection.\n".
+							"Connection refused"
 				]
 			]
 		];
@@ -497,12 +489,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$message = $form->getOverlayMessage();
 		$this->assertTrue($message->isBad());
 		$this->assertEquals('Media type test failed.', $message->getTitle());
-		if (is_array($data['error'])) {
-			$this->assertEquals($data['error'], $message->getLines()->asText());
-		}
-		else {
-			$this->assertTrue($message->hasLine($data['error']));
-		}
+		$this->assertTrue($message->hasLine($data['error']));
 
 		if (CTestArrayHelper::get($data, 'webhook', false)) {
 			$form->checkValue(['Response' => 'false']);
