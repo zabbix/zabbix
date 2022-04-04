@@ -21,6 +21,7 @@
 
 #include "log.h"
 #include "zbxipcservice.h"
+#include "../zbxalgo/vectorimpl.h"
 
 void	zbx_availability_flush(unsigned char *data, zbx_uint32_t size)
 {
@@ -60,6 +61,85 @@ void	zbx_availabilities_flush(const zbx_vector_availability_ptr_t *interface_ava
 
 	zbx_availability_flush(data, data_offset);
 	zbx_free(data);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initializes interface availability data                           *
+ *                                                                            *
+ * Parameters: availability - [IN/OUT] interface availability data            *
+ *             interfaceid  - [IN]                                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_interface_availability_init(zbx_interface_availability_t *availability, zbx_uint64_t interfaceid)
+{
+	memset(availability, 0, sizeof(zbx_interface_availability_t));
+	availability->interfaceid = interfaceid;
+}
+
+/********************************************************************************
+ *                                                                              *
+ * Purpose: releases resources allocated to store interface availability data   *
+ *                                                                              *
+ * Parameters: ia - [IN] interface availability data                            *
+ *                                                                              *
+ ********************************************************************************/
+void	zbx_interface_availability_clean(zbx_interface_availability_t *ia)
+{
+	zbx_free(ia->agent.error);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: frees interface availability data                                 *
+ *                                                                            *
+ * Parameters: availability - [IN] interface availability data                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_interface_availability_free(zbx_interface_availability_t *availability)
+{
+	zbx_interface_availability_clean(availability);
+	zbx_free(availability);
+}
+
+ZBX_PTR_VECTOR_IMPL(availability_ptr, zbx_interface_availability_t *)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initializes agent availability with the specified data            *
+ *                                                                            *
+ * Parameters: agent         - [IN/OUT] agent availability data               *
+ *             available     - [IN] the availability data                     *
+ *             error         - [IN] the availability error                    *
+ *             errors_from   - [IN] error starting timestamp                  *
+ *             disable_until - [IN] disable until timestamp                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_agent_availability_init(zbx_agent_availability_t *agent, unsigned char available, const char *error,
+		int errors_from, int disable_until)
+{
+	agent->flags = ZBX_FLAGS_AGENT_STATUS;
+	agent->available = available;
+	agent->error = zbx_strdup(NULL, error);
+	agent->errors_from = errors_from;
+	agent->disable_until = disable_until;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks interface availability if agent availability field is set  *
+ *                                                                            *
+ * Parameters: ia - [IN] interface availability data                          *
+ *                                                                            *
+ * Return value: SUCCEED - an agent availability field is set                 *
+ *               FAIL - no agent availability field is set                    *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_interface_availability_is_set(const zbx_interface_availability_t *ia)
+{
+	if (ZBX_FLAGS_AGENT_STATUS_NONE != ia->agent.flags)
+		return SUCCEED;
+
+	return FAIL;
 }
 
 /******************************************************************************

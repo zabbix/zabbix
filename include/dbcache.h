@@ -832,11 +832,6 @@ void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags);
 int	DCget_interfaces_availability(zbx_vector_ptr_t *interfaces, int *ts);
 void	DCtouch_interfaces_availability(const zbx_vector_uint64_t *interfaceids);
 
-void	zbx_interface_availability_init(zbx_interface_availability_t *availability, zbx_uint64_t interfaceid);
-void	zbx_interface_availability_clean(zbx_interface_availability_t *ia);
-void	zbx_interface_availability_free(zbx_interface_availability_t *availability);
-int	zbx_interface_availability_is_set(const zbx_interface_availability_t *ia);
-
 void	zbx_set_availability_diff_ts(int ts);
 
 void	zbx_dc_correlation_rules_init(zbx_correlation_rules_t *rules);

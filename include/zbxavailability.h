@@ -66,16 +66,23 @@ zbx_interface_availability_t;
 
 ZBX_PTR_VECTOR_DECL(availability_ptr, zbx_interface_availability_t *)
 
-void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t *interface_availabilities);
-
 #define ZBX_IPC_SERVICE_AVAILABILITY	"availability"
 
 void	zbx_availability_flush(unsigned char *data, zbx_uint32_t size);
 void	zbx_availabilities_flush(const zbx_vector_availability_ptr_t *interface_availabilities);
 
+void	zbx_interface_availability_init(zbx_interface_availability_t *availability, zbx_uint64_t interfaceid);
+void	zbx_interface_availability_clean(zbx_interface_availability_t *ia);
+void	zbx_interface_availability_free(zbx_interface_availability_t *availability);
+void	zbx_agent_availability_init(zbx_agent_availability_t *agent, unsigned char available, const char *error,
+		int errors_from, int disable_until);
+
+int	zbx_interface_availability_is_set(const zbx_interface_availability_t *ia);
+
+void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t *interface_availabilities);
+
 void	zbx_availability_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_interface_availability_t *interface_availability);
 void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
 		zbx_vector_availability_ptr_t  *interface_availabilities);
-
 #endif /* ZABBIX_AVAILABILITY_H */
