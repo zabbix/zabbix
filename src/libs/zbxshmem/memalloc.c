@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "memalloc.h"
+#include "zbxshmem.h"
 
 #include "common.h"
 #include "log.h"
@@ -44,7 +44,7 @@
  *                                                                            *
  *                     8-aligned               8-aligned                      *
  *                                                                            *
- *     when a chunk is used, `size' fields have MEM_FLG_USED bit set          *
+ *     when a chunk is used, `size' fields have SHMEM_FLG_USED bit set        *
  *                                                                            *
  *     when a chunk is free, the first 2 * ZBX_PTR_SIZE bytes of allocatable  *
  *     memory contain pointers to the previous and next chunks, in that order *
@@ -55,7 +55,7 @@
  *                                                                            *
  *         - size is kept on both left and right ends for quick merging       *
  *           (when freeing a chunk, we can quickly see if the previous        *
- *           and next chunks are free, those will not have MEM_FLG_USED)      *
+ *           and next chunks are free, those will not have SHMEM_FLG_USED)    *
  *                                                                            *
  * (*) free chunks are stored in doubly-linked lists according to their sizes *
  *                                                                            *
@@ -80,7 +80,7 @@
  *     |                                                                |     *
  *                                                                            *
  *  lo_bound             `size' fields in chunk B                   hi_bound  *
- *  (aligned)            have MEM_FLG_USED bit set                 (aligned)  *
+ *  (aligned)            have SHMEM_FLG_USED bit set               (aligned)  *
  *                                                                            *
  ******************************************************************************/
 
@@ -101,22 +101,22 @@ static void	mem_set_next_chunk(void *chunk, void *next);
 static void	**mem_ptr_to_prev_field(void *chunk);
 static void	**mem_ptr_to_next_field(void *chunk, void **first_chunk);
 
-static void	mem_link_chunk(zbx_mem_info_t *info, void *chunk);
-static void	mem_unlink_chunk(zbx_mem_info_t *info, void *chunk);
+static void	mem_link_chunk(zbx_shmem_info_t *info, void *chunk);
+static void	mem_unlink_chunk(zbx_shmem_info_t *info, void *chunk);
 
-static void	*__mem_malloc(zbx_mem_info_t *info, zbx_uint64_t size);
-static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size);
-static void	__mem_free(zbx_mem_info_t *info, void *ptr);
+static void	*__mem_malloc(zbx_shmem_info_t *info, zbx_uint64_t size);
+static void	*__mem_realloc(zbx_shmem_info_t *info, void *old, zbx_uint64_t size);
+static void	__mem_free(zbx_shmem_info_t *info, void *ptr);
 
-#define MEM_SIZE_FIELD		sizeof(zbx_uint64_t)
+#define SHMEM_SIZE_FIELD	sizeof(zbx_uint64_t)
 
-#define MEM_FLG_USED		((__UINT64_C(1))<<63)
+#define SHMEM_FLG_USED		((__UINT64_C(1))<<63)
 
-#define FREE_CHUNK(ptr)		(((*(zbx_uint64_t *)(ptr)) & MEM_FLG_USED) == 0)
-#define CHUNK_SIZE(ptr)		((*(zbx_uint64_t *)(ptr)) & ~MEM_FLG_USED)
+#define FREE_CHUNK(ptr)		(((*(zbx_uint64_t *)(ptr)) & SHMEM_FLG_USED) == 0)
+#define CHUNK_SIZE(ptr)		((*(zbx_uint64_t *)(ptr)) & ~SHMEM_FLG_USED)
 
-#define MEM_MIN_SIZE		__UINT64_C(128)
-#define MEM_MAX_SIZE		__UINT64_C(0x1000000000)	/* 64 GB */
+#define SHMEM_MIN_SIZE		__UINT64_C(128)
+#define SHMEM_MAX_SIZE		__UINT64_C(0x1000000000)	/* 64 GB */
 
 /* helper functions */
 
@@ -141,64 +141,64 @@ static void	*ALIGNPTR(void *ptr)
 
 static zbx_uint64_t	mem_proper_alloc_size(zbx_uint64_t size)
 {
-	if (size >= MEM_MIN_ALLOC)
+	if (size >= SHMEM_MIN_ALLOC)
 		return size + ((8 - (size & 7)) & 7);	/* allocate in multiples of 8... */
 	else
-		return MEM_MIN_ALLOC;			/* ...and at least MEM_MIN_ALLOC */
+		return SHMEM_MIN_ALLOC;			/* ...and at least SHMEM_MIN_ALLOC */
 }
 
 static int	mem_bucket_by_size(zbx_uint64_t size)
 {
-	if (size < MEM_MIN_BUCKET_SIZE)
+	if (size < ZBX_SHMEM_MIN_BUCKET_SIZE)
 		return 0;
-	if (size < MEM_MAX_BUCKET_SIZE)
-		return (size - MEM_MIN_BUCKET_SIZE) >> 3;
-	return MEM_BUCKET_COUNT - 1;
+	if (size < SHMEM_MAX_BUCKET_SIZE)
+		return (size - ZBX_SHMEM_MIN_BUCKET_SIZE) >> 3;
+	return ZBX_SHMEM_BUCKET_COUNT - 1;
 }
 
 static void	mem_set_chunk_size(void *chunk, zbx_uint64_t size)
 {
 	*(zbx_uint64_t *)chunk = size;
-	*(zbx_uint64_t *)((char *)chunk + MEM_SIZE_FIELD + size) = size;
+	*(zbx_uint64_t *)((char *)chunk + SHMEM_SIZE_FIELD + size) = size;
 }
 
 static void	mem_set_used_chunk_size(void *chunk, zbx_uint64_t size)
 {
-	*(zbx_uint64_t *)chunk = MEM_FLG_USED | size;
-	*(zbx_uint64_t *)((char *)chunk + MEM_SIZE_FIELD + size) = MEM_FLG_USED | size;
+	*(zbx_uint64_t *)chunk = SHMEM_FLG_USED | size;
+	*(zbx_uint64_t *)((char *)chunk + SHMEM_SIZE_FIELD + size) = SHMEM_FLG_USED | size;
 }
 
 static void	*mem_get_prev_chunk(void *chunk)
 {
-	return *(void **)((char *)chunk + MEM_SIZE_FIELD);
+	return *(void **)((char *)chunk + SHMEM_SIZE_FIELD);
 }
 
 static void	mem_set_prev_chunk(void *chunk, void *prev)
 {
-	*(void **)((char *)chunk + MEM_SIZE_FIELD) = prev;
+	*(void **)((char *)chunk + SHMEM_SIZE_FIELD) = prev;
 }
 
 static void	*mem_get_next_chunk(void *chunk)
 {
-	return *(void **)((char *)chunk + MEM_SIZE_FIELD + ZBX_PTR_SIZE);
+	return *(void **)((char *)chunk + SHMEM_SIZE_FIELD + ZBX_PTR_SIZE);
 }
 
 static void	mem_set_next_chunk(void *chunk, void *next)
 {
-	*(void **)((char *)chunk + MEM_SIZE_FIELD + ZBX_PTR_SIZE) = next;
+	*(void **)((char *)chunk + SHMEM_SIZE_FIELD + ZBX_PTR_SIZE) = next;
 }
 
 static void	**mem_ptr_to_prev_field(void *chunk)
 {
-	return (NULL != chunk ? (void **)((char *)chunk + MEM_SIZE_FIELD) : NULL);
+	return (NULL != chunk ? (void **)((char *)chunk + SHMEM_SIZE_FIELD) : NULL);
 }
 
 static void	**mem_ptr_to_next_field(void *chunk, void **first_chunk)
 {
-	return (NULL != chunk ? (void **)((char *)chunk + MEM_SIZE_FIELD + ZBX_PTR_SIZE) : first_chunk);
+	return (NULL != chunk ? (void **)((char *)chunk + SHMEM_SIZE_FIELD + ZBX_PTR_SIZE) : first_chunk);
 }
 
-static void	mem_link_chunk(zbx_mem_info_t *info, void *chunk)
+static void	mem_link_chunk(zbx_shmem_info_t *info, void *chunk)
 {
 	int	index;
 
@@ -213,7 +213,7 @@ static void	mem_link_chunk(zbx_mem_info_t *info, void *chunk)
 	info->buckets[index] = chunk;
 }
 
-static void	mem_unlink_chunk(zbx_mem_info_t *info, void *chunk)
+static void	mem_unlink_chunk(zbx_shmem_info_t *info, void *chunk)
 {
 	int	index;
 	void	*prev_chunk, *next_chunk;
@@ -234,7 +234,7 @@ static void	mem_unlink_chunk(zbx_mem_info_t *info, void *chunk)
 
 /* private memory functions */
 
-static void	*__mem_malloc(zbx_mem_info_t *info, zbx_uint64_t size)
+static void	*__mem_malloc(zbx_shmem_info_t *info, zbx_uint64_t size)
 {
 	int		index;
 	void		*chunk;
@@ -246,12 +246,12 @@ static void	*__mem_malloc(zbx_mem_info_t *info, zbx_uint64_t size)
 
 	index = mem_bucket_by_size(size);
 
-	while (index < MEM_BUCKET_COUNT - 1 && NULL == info->buckets[index])
+	while (index < ZBX_SHMEM_BUCKET_COUNT - 1 && NULL == info->buckets[index])
 		index++;
 
 	chunk = info->buckets[index];
 
-	if (index == MEM_BUCKET_COUNT - 1)
+	if (index == ZBX_SHMEM_BUCKET_COUNT - 1)
 	{
 		/* otherwise, find a chunk big enough according to first-fit strategy */
 
@@ -292,7 +292,7 @@ static void	*__mem_malloc(zbx_mem_info_t *info, zbx_uint64_t size)
 
 	/* either use the full chunk or split it */
 
-	if (chunk_size < size + 2 * MEM_SIZE_FIELD + MEM_MIN_ALLOC)
+	if (chunk_size < size + 2 * SHMEM_SIZE_FIELD + SHMEM_MIN_ALLOC)
 	{
 		info->used_size += chunk_size;
 		info->free_size -= chunk_size;
@@ -304,8 +304,8 @@ static void	*__mem_malloc(zbx_mem_info_t *info, zbx_uint64_t size)
 		void		*new_chunk;
 		zbx_uint64_t	new_chunk_size;
 
-		new_chunk = (void *)((char *)chunk + MEM_SIZE_FIELD + size + MEM_SIZE_FIELD);
-		new_chunk_size = chunk_size - size - 2 * MEM_SIZE_FIELD;
+		new_chunk = (void *)((char *)chunk + SHMEM_SIZE_FIELD + size + SHMEM_SIZE_FIELD);
+		new_chunk_size = chunk_size - size - 2 * SHMEM_SIZE_FIELD;
 		mem_set_chunk_size(new_chunk, new_chunk_size);
 		mem_link_chunk(info, new_chunk);
 
@@ -319,7 +319,7 @@ static void	*__mem_malloc(zbx_mem_info_t *info, zbx_uint64_t size)
 	return chunk;
 }
 
-static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size)
+static void	*__mem_realloc(zbx_shmem_info_t *info, void *old, zbx_uint64_t size)
 {
 	void		*chunk, *new_chunk, *next_chunk;
 	zbx_uint64_t	chunk_size, new_chunk_size;
@@ -327,10 +327,10 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size)
 
 	size = mem_proper_alloc_size(size);
 
-	chunk = (void *)((char *)old - MEM_SIZE_FIELD);
+	chunk = (void *)((char *)old - SHMEM_SIZE_FIELD);
 	chunk_size = CHUNK_SIZE(chunk);
 
-	next_chunk = (void *)((char *)chunk + MEM_SIZE_FIELD + chunk_size + MEM_SIZE_FIELD);
+	next_chunk = (void *)((char *)chunk + SHMEM_SIZE_FIELD + chunk_size + SHMEM_SIZE_FIELD);
 	next_free = (next_chunk < info->hi_bound && FREE_CHUNK(next_chunk));
 
 	if (size <= chunk_size)
@@ -347,7 +347,7 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size)
 			info->used_size -= chunk_size - size;
 			info->free_size += chunk_size - size;
 
-			new_chunk = (void *)((char *)chunk + MEM_SIZE_FIELD + size + MEM_SIZE_FIELD);
+			new_chunk = (void *)((char *)chunk + SHMEM_SIZE_FIELD + size + SHMEM_SIZE_FIELD);
 			new_chunk_size = CHUNK_SIZE(next_chunk) + (chunk_size - size);
 
 			mem_unlink_chunk(info, next_chunk);
@@ -362,10 +362,10 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size)
 			/* split the current one */
 
 			info->used_size -= chunk_size - size;
-			info->free_size += chunk_size - size - 2 * MEM_SIZE_FIELD;
+			info->free_size += chunk_size - size - 2 * SHMEM_SIZE_FIELD;
 
-			new_chunk = (void *)((char *)chunk + MEM_SIZE_FIELD + size + MEM_SIZE_FIELD);
-			new_chunk_size = chunk_size - size - 2 * MEM_SIZE_FIELD;
+			new_chunk = (void *)((char *)chunk + SHMEM_SIZE_FIELD + size + SHMEM_SIZE_FIELD);
+			new_chunk_size = chunk_size - size - 2 * SHMEM_SIZE_FIELD;
 
 			mem_set_chunk_size(new_chunk, new_chunk_size);
 			mem_link_chunk(info, new_chunk);
@@ -376,18 +376,18 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size)
 		return chunk;
 	}
 
-	if (next_free && chunk_size + 2 * MEM_SIZE_FIELD + CHUNK_SIZE(next_chunk) >= size)
+	if (next_free && chunk_size + 2 * SHMEM_SIZE_FIELD + CHUNK_SIZE(next_chunk) >= size)
 	{
 		info->used_size -= chunk_size;
-		info->free_size += chunk_size + 2 * MEM_SIZE_FIELD;
+		info->free_size += chunk_size + 2 * SHMEM_SIZE_FIELD;
 
-		chunk_size += 2 * MEM_SIZE_FIELD + CHUNK_SIZE(next_chunk);
+		chunk_size += 2 * SHMEM_SIZE_FIELD + CHUNK_SIZE(next_chunk);
 
 		mem_unlink_chunk(info, next_chunk);
 
 		/* either use the full next_chunk or split it */
 
-		if (chunk_size < size + 2 * MEM_SIZE_FIELD + MEM_MIN_ALLOC)
+		if (chunk_size < size + 2 * SHMEM_SIZE_FIELD + SHMEM_MIN_ALLOC)
 		{
 			info->used_size += chunk_size;
 			info->free_size -= chunk_size;
@@ -396,8 +396,8 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size)
 		}
 		else
 		{
-			new_chunk = (void *)((char *)chunk + MEM_SIZE_FIELD + size + MEM_SIZE_FIELD);
-			new_chunk_size = chunk_size - size - 2 * MEM_SIZE_FIELD;
+			new_chunk = (void *)((char *)chunk + SHMEM_SIZE_FIELD + size + SHMEM_SIZE_FIELD);
+			new_chunk_size = chunk_size - size - 2 * SHMEM_SIZE_FIELD;
 			mem_set_chunk_size(new_chunk, new_chunk_size);
 			mem_link_chunk(info, new_chunk);
 
@@ -412,7 +412,7 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size)
 	}
 	else if (NULL != (new_chunk = __mem_malloc(info, size)))
 	{
-		memcpy((char *)new_chunk + MEM_SIZE_FIELD, (char *)chunk + MEM_SIZE_FIELD, chunk_size);
+		memcpy((char *)new_chunk + SHMEM_SIZE_FIELD, (char *)chunk + SHMEM_SIZE_FIELD, chunk_size);
 
 		__mem_free(info, old);
 
@@ -427,17 +427,17 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size)
 		new_chunk_size = chunk_size;
 
 		if (0 != next_free)
-			new_chunk_size += CHUNK_SIZE(next_chunk) + 2 * MEM_SIZE_FIELD;
+			new_chunk_size += CHUNK_SIZE(next_chunk) + 2 * SHMEM_SIZE_FIELD;
 
-		if (info->lo_bound < chunk && FREE_CHUNK((char *)chunk - MEM_SIZE_FIELD))
-			new_chunk_size += CHUNK_SIZE((char *)chunk - MEM_SIZE_FIELD) + 2 * MEM_SIZE_FIELD;
+		if (info->lo_bound < chunk && FREE_CHUNK((char *)chunk - SHMEM_SIZE_FIELD))
+			new_chunk_size += CHUNK_SIZE((char *)chunk - SHMEM_SIZE_FIELD) + 2 * SHMEM_SIZE_FIELD;
 
 		if (size > new_chunk_size)
 			return NULL;
 
 		tmp = zbx_malloc(tmp, chunk_size);
 
-		memcpy(tmp, (char *)chunk + MEM_SIZE_FIELD, chunk_size);
+		memcpy(tmp, (char *)chunk + SHMEM_SIZE_FIELD, chunk_size);
 
 		__mem_free(info, old);
 
@@ -447,7 +447,7 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size)
 			exit(EXIT_FAILURE);
 		}
 
-		memcpy((char *)new_chunk + MEM_SIZE_FIELD, tmp, chunk_size);
+		memcpy((char *)new_chunk + SHMEM_SIZE_FIELD, tmp, chunk_size);
 
 		zbx_free(tmp);
 
@@ -455,14 +455,14 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size)
 	}
 }
 
-static void	__mem_free(zbx_mem_info_t *info, void *ptr)
+static void	__mem_free(zbx_shmem_info_t *info, void *ptr)
 {
 	void		*chunk;
 	void		*prev_chunk, *next_chunk;
 	zbx_uint64_t	chunk_size;
 	int		prev_free, next_free;
 
-	chunk = (void *)((char *)ptr - MEM_SIZE_FIELD);
+	chunk = (void *)((char *)ptr - SHMEM_SIZE_FIELD);
 	chunk_size = CHUNK_SIZE(chunk);
 
 	info->used_size -= chunk_size;
@@ -470,19 +470,19 @@ static void	__mem_free(zbx_mem_info_t *info, void *ptr)
 
 	/* see if we can merge with previous and next chunks */
 
-	next_chunk = (void *)((char *)chunk + MEM_SIZE_FIELD + chunk_size + MEM_SIZE_FIELD);
+	next_chunk = (void *)((char *)chunk + SHMEM_SIZE_FIELD + chunk_size + SHMEM_SIZE_FIELD);
 
-	prev_free = (info->lo_bound < chunk && FREE_CHUNK((char *)chunk - MEM_SIZE_FIELD));
+	prev_free = (info->lo_bound < chunk && FREE_CHUNK((char *)chunk - SHMEM_SIZE_FIELD));
 	next_free = (next_chunk < info->hi_bound && FREE_CHUNK(next_chunk));
 
 	if (prev_free && next_free)
 	{
-		info->free_size += 4 * MEM_SIZE_FIELD;
+		info->free_size += 4 * SHMEM_SIZE_FIELD;
 
-		prev_chunk = (char *)chunk - MEM_SIZE_FIELD - CHUNK_SIZE((char *)chunk - MEM_SIZE_FIELD) -
-				MEM_SIZE_FIELD;
+		prev_chunk = (char *)chunk - SHMEM_SIZE_FIELD - CHUNK_SIZE((char *)chunk - SHMEM_SIZE_FIELD) -
+				SHMEM_SIZE_FIELD;
 
-		chunk_size += 4 * MEM_SIZE_FIELD + CHUNK_SIZE(prev_chunk) + CHUNK_SIZE(next_chunk);
+		chunk_size += 4 * SHMEM_SIZE_FIELD + CHUNK_SIZE(prev_chunk) + CHUNK_SIZE(next_chunk);
 
 		mem_unlink_chunk(info, prev_chunk);
 		mem_unlink_chunk(info, next_chunk);
@@ -493,12 +493,12 @@ static void	__mem_free(zbx_mem_info_t *info, void *ptr)
 	}
 	else if (prev_free)
 	{
-		info->free_size += 2 * MEM_SIZE_FIELD;
+		info->free_size += 2 * SHMEM_SIZE_FIELD;
 
-		prev_chunk = (void *)((char *)chunk - MEM_SIZE_FIELD - CHUNK_SIZE((char *)chunk - MEM_SIZE_FIELD) -
-				MEM_SIZE_FIELD);
+		prev_chunk = (void *)((char *)chunk - SHMEM_SIZE_FIELD - CHUNK_SIZE((char *)chunk - SHMEM_SIZE_FIELD) -
+				SHMEM_SIZE_FIELD);
 
-		chunk_size += 2 * MEM_SIZE_FIELD + CHUNK_SIZE(prev_chunk);
+		chunk_size += 2 * SHMEM_SIZE_FIELD + CHUNK_SIZE(prev_chunk);
 
 		mem_unlink_chunk(info, prev_chunk);
 
@@ -508,9 +508,9 @@ static void	__mem_free(zbx_mem_info_t *info, void *ptr)
 	}
 	else if (next_free)
 	{
-		info->free_size += 2 * MEM_SIZE_FIELD;
+		info->free_size += 2 * SHMEM_SIZE_FIELD;
 
-		chunk_size += 2 * MEM_SIZE_FIELD + CHUNK_SIZE(next_chunk);
+		chunk_size += 2 * SHMEM_SIZE_FIELD + CHUNK_SIZE(next_chunk);
 
 		mem_unlink_chunk(info, next_chunk);
 
@@ -526,8 +526,8 @@ static void	__mem_free(zbx_mem_info_t *info, void *ptr)
 
 /* public memory interface */
 
-int	zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, const char *param, int allow_oom,
-		char **error)
+int	zbx_shmem_create(zbx_shmem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
+		int allow_oom, char **error)
 {
 	int	shm_id, index, ret = FAIL;
 	void	*base;
@@ -546,10 +546,10 @@ int	zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, 
 		goto out;
 	}
 
-	if (!(MEM_MIN_SIZE <= size && size <= MEM_MAX_SIZE))
+	if (!(SHMEM_MIN_SIZE <= size && size <= SHMEM_MAX_SIZE))
 	{
 		*error = zbx_dsprintf(*error, "requested size " ZBX_FS_SIZE_T " not within bounds [" ZBX_FS_UI64
-				" <= size <= " ZBX_FS_UI64 "]", (zbx_fs_size_t)size, MEM_MIN_SIZE, MEM_MAX_SIZE);
+				" <= size <= " ZBX_FS_UI64 "]", (zbx_fs_size_t)size, SHMEM_MIN_SIZE, SHMEM_MAX_SIZE);
 		goto out;
 	}
 
@@ -571,9 +571,9 @@ int	zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, 
 
 	ret = SUCCEED;
 
-	/* allocate zbx_mem_info_t structure, its buckets, and description inside shared memory */
+	/* allocate zbx_shmem_info_t structure, its buckets, and description inside shared memory */
 
-	*info = (zbx_mem_info_t *)ALIGN8(base);
+	*info = (zbx_shmem_info_t *)ALIGN8(base);
 	(*info)->base = base;
 	(*info)->shm_id = shm_id;
 	(*info)->orig_size = size;
@@ -582,9 +582,9 @@ int	zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, 
 	base = (void *)(*info + 1);
 
 	(*info)->buckets = (void **)ALIGNPTR(base);
-	memset((*info)->buckets, 0, MEM_BUCKET_COUNT * ZBX_PTR_SIZE);
-	size -= (char *)((*info)->buckets + MEM_BUCKET_COUNT) - (char *)base;
-	base = (void *)((*info)->buckets + MEM_BUCKET_COUNT);
+	memset((*info)->buckets, 0, ZBX_SHMEM_BUCKET_COUNT * ZBX_PTR_SIZE);
+	size -= (char *)((*info)->buckets + ZBX_SHMEM_BUCKET_COUNT) - (char *)base;
+	base = (void *)((*info)->buckets + ZBX_SHMEM_BUCKET_COUNT);
 
 	zbx_strlcpy((char *)base, descr, size);
 	(*info)->mem_descr = (char *)base;
@@ -603,7 +603,7 @@ int	zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, 
 	(*info)->hi_bound = ALIGN8((char *)base + size - 8);
 
 	(*info)->total_size = (zbx_uint64_t)((char *)((*info)->hi_bound) - (char *)((*info)->lo_bound) -
-			2 * MEM_SIZE_FIELD);
+			2 * SHMEM_SIZE_FIELD);
 
 	index = mem_bucket_by_size((*info)->total_size);
 	(*info)->buckets[index] = (*info)->lo_bound;
@@ -615,8 +615,8 @@ int	zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, 
 	(*info)->free_size = (*info)->total_size;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "valid user addresses: [%p, %p] total size: " ZBX_FS_SIZE_T,
-			(void *)((char *)(*info)->lo_bound + MEM_SIZE_FIELD),
-			(void *)((char *)(*info)->hi_bound - MEM_SIZE_FIELD),
+			(void *)((char *)(*info)->lo_bound + SHMEM_SIZE_FIELD),
+			(void *)((char *)(*info)->hi_bound - SHMEM_SIZE_FIELD),
 			(zbx_fs_size_t)(*info)->total_size);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -624,12 +624,12 @@ out:
 	return ret;
 }
 
-void	zbx_mem_destroy(zbx_mem_info_t *info)
+void	zbx_shmem_destroy(zbx_shmem_info_t *info)
 {
 	(void)shmdt(info->base);
 }
 
-void	*__zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const void *old, size_t size)
+void	*__zbx_shmem_malloc(const char *file, int line, zbx_shmem_info_t *info, const void *old, size_t size)
 {
 	void	*chunk;
 
@@ -640,7 +640,7 @@ void	*__zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const v
 		exit(EXIT_FAILURE);
 	}
 
-	if (0 == size || size > MEM_MAX_SIZE)
+	if (0 == size || size > SHMEM_MAX_SIZE)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): asking for a bad number of bytes (" ZBX_FS_SIZE_T
 				")", file, line, __func__, (zbx_fs_size_t)size);
@@ -658,19 +658,19 @@ void	*__zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const v
 				file, line, __func__, (zbx_fs_size_t)size);
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): please increase %s configuration parameter",
 				file, line, __func__, info->mem_param);
-		zbx_mem_dump_stats(LOG_LEVEL_CRIT, info);
+		zbx_shmem_dump_stats(LOG_LEVEL_CRIT, info);
 		zbx_backtrace();
 		exit(EXIT_FAILURE);
 	}
 
-	return (void *)((char *)chunk + MEM_SIZE_FIELD);
+	return (void *)((char *)chunk + SHMEM_SIZE_FIELD);
 }
 
-void	*__zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *old, size_t size)
+void	*__zbx_shmem_realloc(const char *file, int line, zbx_shmem_info_t *info, void *old, size_t size)
 {
 	void	*chunk;
 
-	if (0 == size || size > MEM_MAX_SIZE)
+	if (0 == size || size > SHMEM_MAX_SIZE)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): asking for a bad number of bytes (" ZBX_FS_SIZE_T
 				")", file, line, __func__, (zbx_fs_size_t)size);
@@ -691,15 +691,15 @@ void	*__zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *
 				file, line, __func__, (zbx_fs_size_t)size);
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): please increase %s configuration parameter",
 				file, line, __func__, info->mem_param);
-		zbx_mem_dump_stats(LOG_LEVEL_CRIT, info);
+		zbx_shmem_dump_stats(LOG_LEVEL_CRIT, info);
 		zbx_backtrace();
 		exit(EXIT_FAILURE);
 	}
 
-	return (void *)((char *)chunk + MEM_SIZE_FIELD);
+	return (void *)((char *)chunk + SHMEM_SIZE_FIELD);
 }
 
-void	__zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr)
+void	__zbx_shmem_free(const char *file, int line, zbx_shmem_info_t *info, void *ptr)
 {
 	if (NULL == ptr)
 	{
@@ -710,13 +710,13 @@ void	__zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr)
 	__mem_free(info, ptr);
 }
 
-void	zbx_mem_clear(zbx_mem_info_t *info)
+void	zbx_shmem_clear(zbx_shmem_info_t *info)
 {
 	int	index;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	memset(info->buckets, 0, MEM_BUCKET_COUNT * ZBX_PTR_SIZE);
+	memset(info->buckets, 0, ZBX_SHMEM_BUCKET_COUNT * ZBX_PTR_SIZE);
 	index = mem_bucket_by_size(info->total_size);
 	info->buckets[index] = info->lo_bound;
 	mem_set_chunk_size(info->buckets[index], info->total_size);
@@ -728,7 +728,7 @@ void	zbx_mem_clear(zbx_mem_info_t *info)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	zbx_mem_get_stats(const zbx_mem_info_t *info, zbx_mem_stats_t *stats)
+void	zbx_shmem_get_stats(const zbx_shmem_info_t *info, zbx_shmem_stats_t *stats)
 {
 	void		*chunk;
 	int		i;
@@ -738,7 +738,7 @@ void	zbx_mem_get_stats(const zbx_mem_info_t *info, zbx_mem_stats_t *stats)
 	stats->max_chunk_size = __UINT64_C(0);
 	stats->min_chunk_size = __UINT64_C(0xffffffffffffffff);
 
-	for (i = 0; i < MEM_BUCKET_COUNT; i++)
+	for (i = 0; i < ZBX_SHMEM_BUCKET_COUNT; i++)
 	{
 		counter = 0;
 		chunk = info->buckets[i];
@@ -756,27 +756,27 @@ void	zbx_mem_get_stats(const zbx_mem_info_t *info, zbx_mem_stats_t *stats)
 	}
 
 	stats->overhead = info->total_size - info->used_size - info->free_size;
-	stats->used_chunks = stats->overhead / (2 * MEM_SIZE_FIELD) + 1 - stats->free_chunks;
+	stats->used_chunks = stats->overhead / (2 * SHMEM_SIZE_FIELD) + 1 - stats->free_chunks;
 	stats->free_size = info->free_size;
 	stats->used_size = info->used_size;
 }
 
-void	zbx_mem_dump_stats(int level, zbx_mem_info_t *info)
+void	zbx_shmem_dump_stats(int level, zbx_shmem_info_t *info)
 {
-	zbx_mem_stats_t	stats;
+	zbx_shmem_stats_t	stats;
 	int		i;
 
-	zbx_mem_get_stats(info, &stats);
+	zbx_shmem_get_stats(info, &stats);
 
 	zabbix_log(level, "=== memory statistics for %s ===", info->mem_descr);
 
-	for (i = 0; i < MEM_BUCKET_COUNT; i++)
+	for (i = 0; i < ZBX_SHMEM_BUCKET_COUNT; i++)
 	{
 		if (0 == stats.chunks_num[i])
 			continue;
 
-		zabbix_log(level, "free chunks of size %2s %3d bytes: %8u", i == MEM_BUCKET_COUNT - 1 ? ">=" : "",
-			MEM_MIN_BUCKET_SIZE + 8 * i, stats.chunks_num[i]);
+		zabbix_log(level, "free chunks of size %2s %3d bytes: %8u", i == ZBX_SHMEM_BUCKET_COUNT - 1 ? ">=" : "",
+			ZBX_SHMEM_MIN_BUCKET_SIZE + 8 * i, stats.chunks_num[i]);
 	}
 
 	zabbix_log(level, "min chunk size: %10llu bytes", (unsigned long long)stats.min_chunk_size);
@@ -795,7 +795,7 @@ void	zbx_mem_dump_stats(int level, zbx_mem_info_t *info)
 	zabbix_log(level, "================================");
 }
 
-size_t	zbx_mem_required_size(int chunks_num, const char *descr, const char *param)
+size_t	zbx_shmem_required_size(int chunks_num, const char *descr, const char *param)
 {
 	size_t	size = 0;
 
@@ -806,27 +806,27 @@ size_t	zbx_mem_required_size(int chunks_num, const char *descr, const char *para
 	/* that we will be able to get ourselves 'chunks_num' pieces of memory with a */
 	/* total size of 'size', given that we also have to store 'descr' and 'param'? */
 
-	size += 7;					/* ensure we allocate enough to 8-align zbx_mem_info_t */
-	size += sizeof(zbx_mem_info_t);
+	size += 7;					/* ensure we allocate enough to 8-align zbx_shmem_info_t */
+	size += sizeof(zbx_shmem_info_t);
 	size += ZBX_PTR_SIZE - 1;			/* ensure we allocate enough to align bucket pointers */
-	size += ZBX_PTR_SIZE * MEM_BUCKET_COUNT;
+	size += ZBX_PTR_SIZE * ZBX_SHMEM_BUCKET_COUNT;
 	size += strlen(descr) + 1;
 	size += strlen(param) + 1;
-	size += (MEM_SIZE_FIELD - 1) + 8;		/* ensure we allocate enough to align the first chunk */
-	size += (MEM_SIZE_FIELD - 1) + 8;		/* ensure we allocate enough to align right size field */
+	size += (SHMEM_SIZE_FIELD - 1) + 8;		/* ensure we allocate enough to align the first chunk */
+	size += (SHMEM_SIZE_FIELD - 1) + 8;		/* ensure we allocate enough to align right size field */
 
-	size += (chunks_num - 1) * MEM_SIZE_FIELD * 2;	/* each additional chunk requires 16 bytes of overhead */
-	size += chunks_num * (MEM_MIN_ALLOC - 1);	/* each chunk has size of at least MEM_MIN_ALLOC bytes */
+	size += (chunks_num - 1) * SHMEM_SIZE_FIELD * 2;/* each additional chunk requires 16 bytes of overhead */
+	size += chunks_num * (SHMEM_MIN_ALLOC - 1);	/* each chunk has size of at least SHMEM_MIN_ALLOC bytes */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() size:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)size);
 
 	return size;
 }
 
-zbx_uint64_t	zbx_mem_required_chunk_size(zbx_uint64_t size)
+zbx_uint64_t	zbx_shmem_required_chunk_size(zbx_uint64_t size)
 {
 	if (0 == size)
 		return 0;
 
-	return mem_proper_alloc_size(size) + MEM_SIZE_FIELD * 2;
+	return mem_proper_alloc_size(size) + SHMEM_SIZE_FIELD * 2;
 }
