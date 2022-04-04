@@ -430,7 +430,7 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 
 		if mode != "summary" && cmdline != "" && regexpErr == nil &&
 			!cmdlinePattern.Match([]byte(procName)) {
-					continue
+			continue
 		}
 
 		if userName != "" {
@@ -481,6 +481,7 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 		array = append(array, proc)
 		pids = append(pids, pe.ProcessID)
 	}
+
 	if mode == "thread" {
 		ht, err := windows.CreateToolhelp32Snapshot(syscall.TH32CS_SNAPTHREAD, 0)
 		if err != nil {
@@ -499,6 +500,7 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
                 }
 		defer windows.CloseHandle(ht)
 	}
+
 	switch mode {
 	case "process", "":
 		if jsonArray, err := json.Marshal(array); err == nil {

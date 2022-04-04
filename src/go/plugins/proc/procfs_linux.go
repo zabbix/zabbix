@@ -187,23 +187,25 @@ func getProcessCalculatedMetrics(pid string, proc *procStatus) (err error) {
 
 	var mem uint64
 	mem, err = procfs.GetMemory("MemTotal")
-	if err == nil {
-		proc.Pmem = float64(proc.Rss) / float64(mem) * 100.00
-	} else {
+	if err != nil {
 		return err
 	}
+
+	proc.Pmem = float64(proc.Rss) / float64(mem) * 100.00
+
 	return nil
 }
 
 func getProcessCpuTimes(pid string, proc *procStatus) (err error) {
 	var stat cpuUtil
 	getProcCpuUtil(pid, &stat)
-	if stat.err == nil {
-		proc.CpuTimeUser = float64(stat.utime) / float64(C.sysconf(C._SC_CLK_TCK))
-		proc.CpuTimeSystem = float64(stat.stime) / float64(C.sysconf(C._SC_CLK_TCK))
-	} else {
-		return err
+	if stat.err != nil {
+		return stat.err
 	}
+
+	proc.CpuTimeUser = float64(stat.utime) / float64(C.sysconf(C._SC_CLK_TCK))
+	proc.CpuTimeSystem = float64(stat.stime) / float64(C.sysconf(C._SC_CLK_TCK))
+
 	return nil
 }
 
