@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-01T09:26:10Z'
+  date: '2022-04-04T08:59:02Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1940,22 +1940,6 @@ zabbix_export:
                   value: '{#DATASET_NAME}'
           trigger_prototypes:
             -
-              uuid: f0e37c1f63aa4e3090c0dc8c4f0dfe9b
-              expression: 'min(/TrueNAS SNMP/truenas.dataset.pused[{#DATASET_NAME}],5m) > {$DATASET.PUSED.MAX.CRIT:"{#DATASET_NAME}"} and last(/TrueNAS SNMP/truenas.dataset.avail[{#DATASET_NAME}]) < {$DATASET.FREE.MIN.CRIT:"{#POOLNAME}"}'
-              name: 'TrueNAS: Dataset [{#DATASET_NAME}]: High space usage (more than {$DATASET.PUSED.MAX.CRIT:"{#DATASET_NAME}"}% used)'
-              opdata: 'Current usage: {ITEM.LASTVALUE1}'
-              priority: AVERAGE
-              description: |
-                Two conditions should match: First, space utilization should be above {$DATASET.PUSED.MAX.CRIT:"{#DATASET_NAME}"}%.
-                Second condition: The dataset free space is less than {$DATASET.FREE.MIN.CRIT:"{#POOLNAME}"}.
-              tags:
-                -
-                  tag: scope
-                  value: capacity
-                -
-                  tag: scope
-                  value: performance
-            -
               uuid: f759e058ef5345d884662f51db0c222e
               expression: 'min(/TrueNAS SNMP/truenas.dataset.pused[{#DATASET_NAME}],5m) > {$DATASET.PUSED.MAX.WARN:"{#DATASET_NAME}"} and last(/TrueNAS SNMP/truenas.dataset.avail[{#DATASET_NAME}]) < {$DATASET.FREE.MIN.WARN:"{#POOLNAME}"}'
               name: 'TrueNAS: Dataset [{#DATASET_NAME}]: High space usage (more than {$DATASET.PUSED.MAX.WARN:"{#DATASET_NAME}"}% used)'
@@ -1966,8 +1950,24 @@ zabbix_export:
                 Second condition: The dataset free space is less than {$DATASET.FREE.MIN.WARN:"{#POOLNAME}"}.
               dependencies:
                 -
-                  name: 'TrueNAS: Dataset [{#DATASET_NAME}]: High space usage (more than {$DATASET.PUSED.MAX.CRIT:"{#DATASET_NAME}"}% used)'
+                  name: 'TrueNAS: Dataset [{#DATASET_NAME}]: Very high space usage (more than {$DATASET.PUSED.MAX.CRIT:"{#DATASET_NAME}"}% used)'
                   expression: 'min(/TrueNAS SNMP/truenas.dataset.pused[{#DATASET_NAME}],5m) > {$DATASET.PUSED.MAX.CRIT:"{#DATASET_NAME}"} and last(/TrueNAS SNMP/truenas.dataset.avail[{#DATASET_NAME}]) < {$DATASET.FREE.MIN.CRIT:"{#POOLNAME}"}'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: f0e37c1f63aa4e3090c0dc8c4f0dfe9b
+              expression: 'min(/TrueNAS SNMP/truenas.dataset.pused[{#DATASET_NAME}],5m) > {$DATASET.PUSED.MAX.CRIT:"{#DATASET_NAME}"} and last(/TrueNAS SNMP/truenas.dataset.avail[{#DATASET_NAME}]) < {$DATASET.FREE.MIN.CRIT:"{#POOLNAME}"}'
+              name: 'TrueNAS: Dataset [{#DATASET_NAME}]: Very high space usage (more than {$DATASET.PUSED.MAX.CRIT:"{#DATASET_NAME}"}% used)'
+              opdata: 'Current usage: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: |
+                Two conditions should match: First, space utilization should be above {$DATASET.PUSED.MAX.CRIT:"{#DATASET_NAME}"}%.
+                Second condition: The dataset free space is less than {$DATASET.FREE.MIN.CRIT:"{#POOLNAME}"}.
               tags:
                 -
                   tag: scope
@@ -2247,22 +2247,6 @@ zabbix_export:
                   value: '{#POOLNAME}'
           trigger_prototypes:
             -
-              uuid: ab01140b8a724c1cbb79be032de8c8b5
-              expression: 'min(/TrueNAS SNMP/truenas.zpool.pused[{#POOLNAME}],5m) > {$ZPOOL.PUSED.MAX.CRIT:"{#POOLNAME}"} and last(/TrueNAS SNMP/truenas.zpool.avail[{#POOLNAME}]) < {$ZPOOL.FREE.MIN.CRIT:"{#POOLNAME}"}'
-              name: 'TrueNAS: Pool [{#POOLNAME}]: High space usage (more than {$ZPOOL.PUSED.MAX.CRIT:"{#POOLNAME}"}% used)'
-              opdata: 'Current usage: {ITEM.LASTVALUE1}'
-              priority: AVERAGE
-              description: |
-                Two conditions should match: First, space utilization should be above {$ZPOOL.PUSED.MAX.CRIT:"{#POOLNAME}"}%.
-                Second condition: The pool free space is less than {$ZPOOL.FREE.MIN.CRIT:"{#POOLNAME}"}.
-              tags:
-                -
-                  tag: scope
-                  value: capacity
-                -
-                  tag: scope
-                  value: performance
-            -
               uuid: 18eef491c14b4f768400b4acca5c7e80
               expression: 'min(/TrueNAS SNMP/truenas.zpool.pused[{#POOLNAME}],5m) > {$ZPOOL.PUSED.MAX.WARN:"{#POOLNAME}"} and last(/TrueNAS SNMP/truenas.zpool.avail[{#POOLNAME}]) < {$ZPOOL.FREE.MIN.WARN:"{#POOLNAME}"}'
               name: 'TrueNAS: Pool [{#POOLNAME}]: High space usage (more than {$ZPOOL.PUSED.MAX.WARN:"{#POOLNAME}"}% used)'
@@ -2273,8 +2257,24 @@ zabbix_export:
                 Second condition: The pool free space is less than {$ZPOOL.FREE.MIN.WARN:"{#POOLNAME}"}.
               dependencies:
                 -
-                  name: 'TrueNAS: Pool [{#POOLNAME}]: High space usage (more than {$ZPOOL.PUSED.MAX.CRIT:"{#POOLNAME}"}% used)'
+                  name: 'TrueNAS: Pool [{#POOLNAME}]: Very high space usage (more than {$ZPOOL.PUSED.MAX.CRIT:"{#POOLNAME}"}% used)'
                   expression: 'min(/TrueNAS SNMP/truenas.zpool.pused[{#POOLNAME}],5m) > {$ZPOOL.PUSED.MAX.CRIT:"{#POOLNAME}"} and last(/TrueNAS SNMP/truenas.zpool.avail[{#POOLNAME}]) < {$ZPOOL.FREE.MIN.CRIT:"{#POOLNAME}"}'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: ab01140b8a724c1cbb79be032de8c8b5
+              expression: 'min(/TrueNAS SNMP/truenas.zpool.pused[{#POOLNAME}],5m) > {$ZPOOL.PUSED.MAX.CRIT:"{#POOLNAME}"} and last(/TrueNAS SNMP/truenas.zpool.avail[{#POOLNAME}]) < {$ZPOOL.FREE.MIN.CRIT:"{#POOLNAME}"}'
+              name: 'TrueNAS: Pool [{#POOLNAME}]: Very high space usage (more than {$ZPOOL.PUSED.MAX.CRIT:"{#POOLNAME}"}% used)'
+              opdata: 'Current usage: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: |
+                Two conditions should match: First, space utilization should be above {$ZPOOL.PUSED.MAX.CRIT:"{#POOLNAME}"}%.
+                Second condition: The pool free space is less than {$ZPOOL.FREE.MIN.CRIT:"{#POOLNAME}"}.
               tags:
                 -
                   tag: scope
