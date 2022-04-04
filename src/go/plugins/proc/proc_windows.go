@@ -187,6 +187,7 @@ type procSummary struct {
 	CpuTimeSystem float64 `json:"cputime_system"`
 	Threads       uint32  `json:"threads"`
 	PageFaults    uint32  `json:"page_faults"`
+	Handles       int32   `json:"handles"`
 	IoReadsB      uint64  `json:"io_read_b"`
 	IoWritesB     uint64  `json:"io_write_b"`
 	IoReadsOp     uint64  `json:"io_read_op"`
@@ -523,9 +524,9 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 
 			procSum := procSummary{proc.Name, 1, proc.Vmsize, proc.Wkset,
 				proc.CpuTimeUser, proc.CpuTimeSystem, proc.Threads,
-				proc.PageFaults, proc.IoReadsB, proc.IoWritesB, proc.IoOtherB,
-				proc.IoReadsOp, proc.IoWritesOp, proc.IoOtherOp,
-				proc.GdiObj, proc.UserObj}
+				proc.PageFaults, proc.Handles, proc.IoReadsB,
+				proc.IoWritesB, proc.IoOtherB, proc.IoReadsOp, proc.IoWritesOp,
+				proc.IoOtherOp, proc.GdiObj, proc.UserObj}
 
 			if len(array) > i + 1 {
 				for _, procCmp := range array[i + 1:] {
@@ -537,6 +538,7 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 						procSum.CpuTimeSystem += procCmp.CpuTimeSystem
 						procSum.Threads += procCmp.Threads
 						procSum.PageFaults += procCmp.PageFaults
+						procSum.Handles += procCmp.Handles
 						procSum.IoReadsB += procCmp.IoReadsB
 						procSum.IoWritesB += procCmp.IoWritesB
 						procSum.IoReadsOp += procCmp.IoReadsOp
