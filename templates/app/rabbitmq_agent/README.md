@@ -13,7 +13,7 @@ Template `RabbitMQ Cluster` — collects metrics by polling [RabbitMQ management
 
 This template was tested on:
 
-- RabbitMQ, version 3.5.7, 3.7.17, 3.7.18, 3.8.5, 3.8.12
+- RabbitMQ, version 3.5.7, 3.7.17, 3.7.18, 3.7.7, 3.8.5, 3.8.12
 
 ## Setup
 
