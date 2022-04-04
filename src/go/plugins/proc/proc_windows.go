@@ -525,8 +525,8 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 			procSum := procSummary{proc.Name, 1, proc.Vmsize, proc.Wkset,
 				proc.CpuTimeUser, proc.CpuTimeSystem, proc.Threads,
 				proc.PageFaults, proc.Handles, proc.IoReadsB,
-				proc.IoWritesB, proc.IoOtherB, proc.IoReadsOp, proc.IoWritesOp,
-				proc.IoOtherOp, proc.GdiObj, proc.UserObj}
+				proc.IoWritesB, proc.IoReadsOp, proc.IoWritesOp,
+				proc.IoOtherB, proc.IoOtherOp, proc.GdiObj, proc.UserObj}
 
 			if len(array) > i + 1 {
 				for _, procCmp := range array[i + 1:] {
