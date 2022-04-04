@@ -178,4 +178,3 @@ func GetDiskFreeSpace(path string) (c CLUSTER, err error) {
 
 	return c, nil
 }
-
