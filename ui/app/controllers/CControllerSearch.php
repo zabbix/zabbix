@@ -73,9 +73,11 @@ class CControllerSearch extends CController {
 			'search' => _('Search pattern is empty'),
 			'admin' => $this->admin,
 			'hosts' => [],
-			'groups' => [],
+			'template_groups' => [],
+			'host_groups' => [],
 			'templates' => [],
-			'total_groups_cnt' => 0,
+			'total_host_groups_cnt' => 0,
+			'total_template_groups_cnt' => 0,
 			'total_hosts_cnt' => 0,
 			'total_templates_cnt' => 0,
 			'allowed_ui_hosts' => $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS),
@@ -83,12 +85,14 @@ class CControllerSearch extends CController {
 			'allowed_ui_latest_data' => $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
 			'allowed_ui_problems' => $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 			'allowed_ui_conf_templates' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
-			'allowed_ui_conf_host_groups' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOST_GROUPS)
+			'allowed_ui_conf_host_groups' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOST_GROUPS),
+			'allowed_ui_conf_template_groups' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATE_GROUPS)
 		];
 
 		if ($this->search !== '') {
 			list($data['hosts'], $data['total_hosts_cnt']) = $this->getHostsData();
-			list($data['groups'], $data['total_groups_cnt']) = $this->getHostGroupsData();
+			list($data['template_groups'], $data['total_template_groups_cnt']) = $this->getTemplateGroupsData();
+			list($data['host_groups'], $data['total_host_groups_cnt']) = $this->getHostGroupsData();
 
 			if ($this->admin) {
 				list($data['templates'], $data['total_templates_cnt'])  = $this->getTemplatesData();
@@ -166,7 +170,6 @@ class CControllerSearch extends CController {
 		$groups = API::HostGroup()->get([
 			'output' => ['name'],
 			'selectHosts' => API_OUTPUT_COUNT,
-			'selectTemplates' => API_OUTPUT_COUNT,
 			'search' => ['name' => $this->search],
 			'limit' => $this->limit,
 			'preservekeys' => true
@@ -192,6 +195,47 @@ class CControllerSearch extends CController {
 		unset($group);
 
 		$total_count = API::HostGroup()->get([
+			'search' => ['name' => $this->search],
+			'countOutput' => true
+		]);
+
+		return [$groups, $total_count];
+	}
+
+	/**
+	 * Gathers template group data, sorts according to search pattern and sets editable flag if necessary.
+	 *
+	 * @return array  Returns template groups, group count and total count all together.
+	 */
+	protected function getTemplateGroupsData() {
+		$groups = API::TemplateGroup()->get([
+			'output' => ['name'],
+			'selectTemplates' => API_OUTPUT_COUNT,
+			'search' => ['name' => $this->search],
+			'limit' => $this->limit,
+			'preservekeys' => true
+		]);
+
+		if (!$groups) {
+			return [[], 0];
+		}
+
+		CArrayHelper::sort($groups, ['name']);
+		$groups = CArrayHelper::sortByPattern($groups, 'name', $this->search, $this->limit);
+
+		$rw_groups = API::TemplateGroup()->get([
+			'output' => [],
+			'groupids' => array_keys($groups),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($groups as $groupid => &$group) {
+			$group['editable'] = ($this->admin && array_key_exists($groupid, $rw_groups));
+		}
+		unset($group);
+
+		$total_count = API::TemplateGroup()->get([
 			'search' => ['name' => $this->search],
 			'countOutput' => true
 		]);

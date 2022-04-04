@@ -26,6 +26,26 @@
 
 <script>
 	const view = {
+		init() {
+
+			document.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-edit-templategroup')) {
+					this.editTemplateGroup({groupid: e.target.dataset.groupid});
+				}
+				else if (e.target.classList.contains('js-edit-hostgroup')) {
+					this.editHostGroup({groupid: e.target.dataset.groupid});
+				}
+				else if (e.target.closest('a')) {
+					if (e.target.closest('a').classList.contains('js-edit-templategroup')) {
+						this.editTemplateGroup({groupid: e.target.closest('a').dataset.groupid});
+					}
+					if (e.target.closest('a').classList.contains('js-edit-hostgroup')) {
+						this.editHostGroup({groupid: e.target.closest('a').dataset.groupid});
+					}
+				}
+			});
+		},
+
 		editHost(e, hostid) {
 			e.preventDefault();
 			const host_data = {hostid};
@@ -46,6 +66,40 @@
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+		},
+
+		editTemplateGroup(parameters = {}) {
+			const overlay = PopUp('popup.templategroup.edit', parameters, {
+				dialogueid: 'templategroup_edit',
+				dialogue_class: 'modal-popup-static'
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				postMessageOk(e.detail.title);
+
+				if (e.detail.messages !== null) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
+		},
+
+		editHostGroup(parameters = {}) {
+			const overlay = PopUp('popup.hostgroup.edit', parameters, {
+				dialogueid: 'hostgroup_edit',
+				dialogue_class: 'modal-popup-static'
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				postMessageOk(e.detail.title);
+
+				if (e.detail.messages !== null) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
 		},
 
 		events: {

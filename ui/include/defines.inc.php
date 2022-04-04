@@ -1580,6 +1580,7 @@ define('WIDGET_HAT_EVENTLIST',			'hat_eventlist');
 define('WIDGET_SEARCH_HOSTS',			'search_hosts');
 define('WIDGET_SEARCH_HOSTGROUP',		'search_hostgroup');
 define('WIDGET_SEARCH_TEMPLATES',		'search_templates');
+define('WIDGET_SEARCH_TEMPLATEGROUP',	'search_templategroup');
 
 // dashboard widget dynamic state
 define('WIDGET_SIMPLE_ITEM',	0);
