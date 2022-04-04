@@ -919,6 +919,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 						procSum.Pin += procCmp.Pin
 						procSum.Pte += procCmp.Pte
 						procSum.Size += procCmp.Size
+						procSum.Stk += procCmp.Stk
 						procSum.Swap += procCmp.Swap
 						procSum.CpuTimeUser += procCmp.CpuTimeUser
 						procSum.CpuTimeSystem += procCmp.CpuTimeSystem

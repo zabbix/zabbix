@@ -161,7 +161,6 @@ type procStatus struct {
 	Pid           uint32   `json:"pid"`
 	PPid          uint32   `json:"ppid"`
 	Name          string   `json:"name"`
-	Cmdline       string   `json:"cmdline"`
 	Vmsize        float64  `json:"vmsize"`
 	Wkset         float64  `json:"wkset"`
 	CpuTimeUser   float64  `json:"cputime_user"`
@@ -171,9 +170,9 @@ type procStatus struct {
 	Handles       int32    `json:"handles"`
 	IoReadsB      uint64   `json:"io_read_b"`
 	IoWritesB     uint64   `json:"io_write_b"`
-	IoOtherB      uint64   `json:"io_other_b"`
 	IoReadsOp     uint64   `json:"io_read_op"`
 	IoWritesOp    uint64   `json:"io_write_op"`
+	IoOtherB      uint64   `json:"io_other_b"`
 	IoOtherOp     uint64   `json:"io_other_op"`
 	GdiObj	      uint32   `json:"gdiobj"`
 	UserObj       uint32   `json:"userobj"`
@@ -190,9 +189,9 @@ type procSummary struct {
 	PageFaults    uint32  `json:"page_faults"`
 	IoReadsB      uint64  `json:"io_read_b"`
 	IoWritesB     uint64  `json:"io_write_b"`
-	IoOtherB      uint64  `json:"io_other_b"`
 	IoReadsOp     uint64  `json:"io_read_op"`
 	IoWritesOp    uint64  `json:"io_write_op"`
+	IoOtherB      uint64  `json:"io_other_b"`
 	IoOtherOp     uint64  `json:"io_other_op"`
 	GdiObj        uint32  `json:"gdiobj"`
 	UserObj       uint32  `json:"userobj"`
@@ -440,9 +439,7 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 			}
 		}
 
-		proc := procStatus{Pid: pe.ProcessID, PPid: pe.ParentProcessID, Name: procName, Cmdline: procName,
-			Threads: pe.Threads,
-		}
+		proc := procStatus{Pid: pe.ProcessID, PPid: pe.ParentProcessID, Name: procName, Threads: pe.Threads}
 
 		// process might not exist anymore already, skipping silently
 		h, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, pe.ProcessID)
@@ -545,6 +542,8 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 						procSum.IoWritesOp += procCmp.IoWritesOp
 						procSum.IoOtherB += procCmp.IoOtherB
 						procSum.IoOtherOp += procCmp.IoOtherOp
+						procSum.GdiObj += procCmp.GdiObj
+						procSum.UserObj += procCmp.UserObj
 					}
 				}
 			}
