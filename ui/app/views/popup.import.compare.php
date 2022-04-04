@@ -170,13 +170,13 @@ else {
 		'script_inline' => trim($this->readJsFile('popup.import.compare.js.php')),
 		'body' => !$data['diff']
 			? (new CTableInfo())
-					->setNoDataMessage(_('No changes.'))
-					->toString()
+				->setNoDataMessage(_('No changes.'))
+				->toString()
 			: (new CForm())
-				->addClass('import-compare')
 				->addVar('import_overlayid', $data['import_overlayid'])
-				->addItem(drawToc($data['diff_toc']))
-				->addItem(drawDiff($data['diff']))
+				->addItem(
+					(new CDiv([drawToc($data['diff_toc']), drawDiff($data['diff'])]))->addClass('import-compare')
+				)
 				->toString(),
 		'buttons' => $buttons,
 		'no_changes' => !$data['diff']

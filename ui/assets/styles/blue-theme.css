@@ -6878,7 +6878,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 
 .import-compare {
   display: flex;
-  max-height: calc(100vh - 190px); }
+  max-height: calc(100vh - 220px); }
   .import-compare .toc {
     flex: 20%;
     overflow-y: auto;
