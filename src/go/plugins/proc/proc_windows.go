@@ -434,7 +434,8 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 
 		if userName != "" {
 			var uname string
-			if uname, err = getProcessUsername(pe.ProcessID); err == nil && uname != userName {
+			if uname, err = getProcessUsername(pe.ProcessID); err == nil &&
+				uname != strings.ToUpper(userName) {
 				continue
 			}
 		}
