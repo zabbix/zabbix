@@ -796,8 +796,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 		userName = params[1]
 		if userName != "" {
 			if u, err := user.Lookup(userName); err != nil {
-				jsonArray, _ := json.Marshal(make([]int, 0))
-				return string(jsonArray), nil
+				return "[]", nil
 			} else {
 				uid, err = strconv.ParseUint(u.Uid, 10, 64)
 			}
