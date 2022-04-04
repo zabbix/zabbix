@@ -515,16 +515,12 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 		}
 	case "summary":
 		var processed []string
+		processes:
 		for i, proc := range array {
-			var found bool
 			for _, j := range processed {
 				if j == proc.Name {
-					found = true
-					break
+					continue processes
 				}
-			}
-			if found == true {
-				continue
 			}
 
 			procSum := procSummary{proc.Name, 1, proc.Vmsize, proc.Wkset,
