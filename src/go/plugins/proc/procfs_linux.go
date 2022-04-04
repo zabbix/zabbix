@@ -1,4 +1,5 @@
 //go:build linux
+// +build linux
 
 /*
 ** Zabbix
@@ -152,7 +153,7 @@ func getProcessIo(pid string, proc *procStatus) (err error) {
 	if data, err := read2k("/proc/" + pid + "/io"); err == nil {
 		s := strings.Split(string(data), "\n")
 		for _, tmp := range s {
-			if pos := strings.IndexRune(tmp, ':'); pos == -1 {
+			if pos = strings.IndexRune(tmp, ':'); pos == -1 {
 				continue
 			}
 

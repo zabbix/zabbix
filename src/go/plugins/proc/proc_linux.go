@@ -1,4 +1,5 @@
 //go:build linux
+// +build linux
 
 /*
 ** Zabbix
@@ -863,7 +864,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 				continue
 			}
 			getProcessNames(tid, &data)
-			getProcessIo(tid, &data)
+			getProcessIo(fmt.Sprintf("%d", data.Tgid) + "/task/" + tid, &data)
 			getProcessFds(tid, &data)
 			getProcessCalculatedMetrics(tid, &data)
 
