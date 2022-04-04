@@ -390,6 +390,9 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 		fallthrough
 	case 3:
 		cmdline = params[2]
+		if cmdline != "" && mode == "summary" {
+			return nil, errors.New("Invalid fourth parameter")
+		}
 		fallthrough
 	case 2:
 		userName = params[1]
