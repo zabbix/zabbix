@@ -341,8 +341,9 @@ FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|gui_access	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|users_status	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|debug_mode	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|ldap_serverid	|t_id	|'0'	|NOT NULL	|0
+FIELD		|userdirectoryid	|t_id	|NULL	|NULL	|0 |2|userdirectory	|	|RESTRICT
 UNIQUE		|1		|name
+INDEX	    |2	|userdirectoryid
 
 TABLE|users_groups|id|ZBX_DATA
 FIELD		|id		|t_id		|	|NOT NULL	|0
@@ -588,10 +589,10 @@ FIELD		|geomaps_tile_url	|t_varchar(1024)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|geomaps_max_zoom	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|geomaps_attribution|t_varchar(1024)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|vault_provider	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|ldap_defaultid	|t_id	|NULL |NULL	|0		|3|users_directory	|userdirectoryid|RESTRICT
+FIELD		|ldap_userdirectoryid	|t_id	|NULL |NULL	|0		|3|userdirectory	|userdirectoryid|RESTRICT
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
-INDEX		|3		|ldap_defaultid
+INDEX		|3		|ldap_userdirectoryid
 
 TABLE|triggers|triggerid|ZBX_TEMPLATE
 FIELD		|triggerid	|t_id		|	|NOT NULL	|0
@@ -1929,7 +1930,7 @@ FIELD		|operator		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|value			|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1			|slaid
 
-TABLE|users_directory|userdirectoryid|ZBX_DATA
+TABLE|userdirectory|userdirectoryid
 FIELD		|userdirectoryid	|t_id			|		|NOT NULL	|0
 FIELD		|name				|t_varchar(128)	|''		|NOT NULL	|0
 FIELD		|description		|t_shorttext	|''		|NOT NULL	|0

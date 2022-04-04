@@ -99,7 +99,7 @@ static int	DBpatch_6010003(void)
 static int	DBpatch_6010004(void)
 {
 	const ZBX_TABLE	table =
-			{"users_directory", "userdirectoryid", 0,
+			{"userdirectory", "userdirectoryid", 0,
 				{
 					{"userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
@@ -122,21 +122,21 @@ static int	DBpatch_6010004(void)
 
 static int	DBpatch_6010005(void)
 {
-	const ZBX_FIELD	field = {"ldap_defaultid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+	const ZBX_FIELD	field = {"ldap_userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_6010006(void)
 {
-	const ZBX_FIELD	field = {"ldap_defaultid", NULL, "users_directory", "userdirectoryid", 0, ZBX_TYPE_ID, 0, 0};
+	const ZBX_FIELD	field = {"ldap_userdirectoryid", NULL, "userdirectory", "userdirectoryid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("config", 3, &field);
 }
 
 static int	DBpatch_6010007(void)
 {
-	const ZBX_FIELD	field = {"ldap_serverid", "0", NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("usrgrp", &field);
 }
@@ -144,7 +144,7 @@ static int	DBpatch_6010007(void)
 static int	DBpatch_6010008(void)
 {
 	// Create users_directory row from config.ldap_* fields data when config.ldap_configured == 1
-	if (ZBX_DB_OK > DBexecute("insert into users_directory "
+	if (ZBX_DB_OK > DBexecute("insert into userdirectory "
 			"(userdirectoryid, name, description, host, port, base_dn, bind_dn, bind_password, search_attribute, case_sensitive) "
 			"select 1, 'Default LDAP server', '', ldap_host, ldap_port, ldap_base_dn, ldap_bind_dn, ldap_bind_password, ldap_search_attribute, ldap_case_sensitive "
 			"  from config where ldap_configured=1 limit 1"))
@@ -155,8 +155,8 @@ static int	DBpatch_6010008(void)
 
 static int	DBpatch_6010009(void)
 {
-	// Set config.ldap_defaultid when config.ldap_configured == 1
-	if (ZBX_DB_OK > DBexecute("update config set ldap_defaultid=1 where ldap_configured=1 limit 1"))
+	// Set config.ldap_userdirectoryid when config.ldap_configured == 1
+	if (ZBX_DB_OK > DBexecute("update config set ldap_userdirectoryid=1 where ldap_configured=1 limit 1"))
 		return FAIL;
 
 	return SUCCEED;
