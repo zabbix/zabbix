@@ -66,8 +66,6 @@ class CHostGroup extends CApiService {
 			'with_monitored_hosts'					=> ['type' => API_BOOLEAN, 'default' => false],
 			'real_hosts'							=> ['type' => API_BOOLEAN, 'flags' => API_DEPRECATED],
 			'with_hosts'							=> ['type' => API_BOOLEAN, 'default' => false],
-			'with_hosts_and_templates'				=> ['type' => API_BOOLEAN, 'flags' => API_DEPRECATED],
-			'templated_hosts'						=> ['type' => API_BOOLEAN, 'flags' => API_DEPRECATED],
 			'with_items'							=> ['type' => API_BOOLEAN, 'default' => false],
 			'with_item_prototypes'					=> ['type' => API_BOOLEAN, 'default' => false],
 			'with_simple_graph_items'				=> ['type' => API_BOOLEAN, 'default' => false],
@@ -124,19 +122,6 @@ class CHostGroup extends CApiService {
 
 			$params['with_monitored_hosts'] = $params['monitored_hosts'];
 			unset($params['monitored_hosts']);
-		}
-
-		if (array_key_exists('with_host_and_templates', $params)) {
-			if (array_key_exists('with_hosts', $params)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'with_host_and_templates'));
-			}
-
-			$params['with_hosts'] = $params['with_host_and_templates'];
-			unset($params['with_host_and_templates']);
-		}
-
-		if (array_key_exists('templated_hosts', $params)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'with_host_and_templates'));
 		}
 
 		if (!CApiInputValidator::validate($api_input_rules, $params, '/', $error)) {

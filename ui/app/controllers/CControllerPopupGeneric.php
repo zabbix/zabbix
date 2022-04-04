@@ -1152,9 +1152,6 @@ class CControllerPopupGeneric extends CController {
 				if (array_key_exists('real_hosts', $this->page_options)) {
 					$options['with_hosts'] = true;
 				}
-				elseif ($this->hasInput('templated_hosts')) {
-					$options['with_templates'] = true;
-				}
 
 				if ($this->hasInput('with_httptests')) {
 					$options['with_httptests'] = true;

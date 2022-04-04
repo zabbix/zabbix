@@ -213,7 +213,7 @@ function addElementNames(array &$selements) {
 	$groups = $groupids
 		? API::HostGroup()->get([
 			'output' => ['name'],
-			'hostgroupids' => $groupids,
+			'groupids' => $groupids,
 			'preservekeys' => true
 		])
 		: [];

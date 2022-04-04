@@ -82,7 +82,7 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 			'output' => ['groupid', 'name'],
 			'groupids' => $filter_groupids,
 			'hostids' => $filter_hostids,
-			'monitored_hosts' => true,
+			'with_monitored_hosts' => true,
 			'preservekeys' => true
 		]);
 

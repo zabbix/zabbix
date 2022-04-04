@@ -838,7 +838,7 @@ class CTemplate extends CHostGeneral {
 		if (array_key_exists('groups', $data) && $data['groups']) {
 			$groupids = array_column($data['groups'], 'groupid');
 
-			$count = API::HostGroup()->get([
+			$count = API::TemplateGroup()->get([
 				'countOutput' => true,
 				'groupids' => $groupids,
 				'editable' => true
@@ -953,7 +953,7 @@ class CTemplate extends CHostGeneral {
 		if (array_key_exists('groups', $data)) {
 			$groupids = array_column($data['groups'], 'groupid');
 
-			$count = API::HostGroup()->get([
+			$count = API::TemplateGroup()->get([
 				'countOutput' => true,
 				'groupids' => $groupids
 			]);
@@ -984,7 +984,7 @@ class CTemplate extends CHostGeneral {
 			}
 
 			if ($edit_groupids) {
-				$count = API::HostGroup()->get([
+				$count = API::TemplateGroup()->get([
 					'countOutput' => true,
 					'groupids' => array_keys($edit_groupids),
 					'editable' => true
@@ -1094,7 +1094,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		if (array_key_exists('groupids', $data) && $data['groupids']) {
-			$count = API::HostGroup()->get([
+			$count = API::TemplateGroup()->get([
 				'countOutput' => true,
 				'groupids' => $data['groupids'],
 				'editable' => true
@@ -1106,7 +1106,7 @@ class CTemplate extends CHostGeneral {
 				);
 			}
 
-			CHostGroup::checkObjectsWithoutGroups('templates', $db_templates, $data['groupids']);
+			CTemplateGroup::checkObjectsWithoutGroups($db_templates, $data['groupids']);
 
 			$this->massAddAffectedObjects('groups', $data['groupids'], $db_templates);
 		}

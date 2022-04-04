@@ -309,7 +309,7 @@ else {
 		// Sanitize $data['filter']['hostgroupid'] and prepare "Host Group" select options.
 		$host_groups = API::HostGroup()->get([
 			'output' => ['name'],
-			'monitored_hosts' => true,
+			'with_monitored_hosts' => true,
 			'preservekeys' => true
 		]);
 		$host_groups = enrichParentGroups($host_groups);
@@ -411,7 +411,7 @@ else {
 			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => $data['filter']['groups'],
-				'monitored_hosts' => true,
+				'with_monitored_hosts' => true,
 				'preservekeys' => true
 			]), ['groupid' => 'id'])
 			: [];
