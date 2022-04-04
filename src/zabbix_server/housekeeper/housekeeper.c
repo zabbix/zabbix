@@ -362,9 +362,10 @@ static void	hk_history_item_update(zbx_hk_history_rule_t *rules, zbx_hk_history_
  ******************************************************************************/
 static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*tmp = NULL;
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*tmp = NULL;
+	zbx_dc_um_handle_t	*um_handle;
 
 	result = DBselect(
 			"select i.itemid,i.value_type,i.history,i.trends,h.hostid"
@@ -374,6 +375,8 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 				" and h.status in (%d,%d)",
 			ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED,
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -443,6 +446,8 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 		}
 	}
 	DBfree_result(result);
+
+	zbx_dc_close_user_macros(um_handle);
 
 	zbx_free(tmp);
 }

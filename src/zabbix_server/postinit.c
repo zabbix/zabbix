@@ -346,12 +346,14 @@ static int	process_event_update(const DB_TRIGGER *trigger, char **sql, size_t *s
  ******************************************************************************/
 static int	update_event_names(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	DB_TRIGGER	trigger;
-	int		ret = SUCCEED, historical, triggers_num, processed_num = 0, completed, last_completed = 0;
-	char		*sql;
-	size_t		sql_alloc = 4096, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	DB_TRIGGER		trigger;
+	int			ret = SUCCEED, historical, triggers_num, processed_num = 0, completed,
+			last_completed = 0;
+	char			*sql;
+	size_t			sql_alloc = 4096, sql_offset = 0;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_WARNING, "starting event name update forced by database upgrade");
 
@@ -368,6 +370,8 @@ static int	update_event_names(void)
 				"recovery_mode,value"
 			" from triggers"
 			" order by triggerid");
+
+	um_handle = zbx_dc_open_user_macros();
 
 	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
 	{
@@ -398,6 +402,8 @@ static int	update_event_names(void)
 			last_completed = completed;
 		}
 	}
+
+	zbx_dc_close_user_macros(um_handle);
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 

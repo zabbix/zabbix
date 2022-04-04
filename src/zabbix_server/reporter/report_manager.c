@@ -1838,6 +1838,7 @@ static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int
 	zbx_uint64_t		access_userid;
 	zbx_rm_batch_t		*batch, batch_local;
 	zbx_vector_ptr_pair_t	params;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() reportid:" ZBX_FS_UI64 , __func__, report->reportid);
 
@@ -1845,6 +1846,8 @@ static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int
 
 	zbx_vector_ptr_create(&jobs);
 	zbx_vector_ptr_pair_create(&params);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	for (i = 0; i < report->params.values_num; i++)
 	{
@@ -1861,6 +1864,8 @@ static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int
 
 		zbx_vector_ptr_pair_append(&params, pair);
 	}
+
+	zbx_dc_close_user_macros(um_handle);
 
 	DBbegin();
 

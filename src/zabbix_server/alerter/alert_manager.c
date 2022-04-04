@@ -1376,7 +1376,10 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 
 	if (0 == access(*cmd, X_OK))
 	{
-		char	*pstart, *pend;
+		char			*pstart, *pend;
+		zbx_dc_um_handle_t	*um_handle;
+
+		um_handle = zbx_dc_open_user_macros();
 
 		db_alert.sendto = (NULL != alert->sendto ? alert->sendto : zbx_strdup(NULL, ""));
 		db_alert.subject = (NULL != alert->subject ? alert->subject : zbx_strdup(NULL, ""));
@@ -1405,6 +1408,8 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 			zbx_free(db_alert.subject);
 		if (db_alert.message != alert->message)
 			zbx_free(db_alert.message);
+
+		zbx_dc_close_user_macros(um_handle);
 
 		ret = SUCCEED;
 	}

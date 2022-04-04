@@ -494,9 +494,10 @@ out:
  ******************************************************************************/
 static int	process_proxy(void)
 {
-	DC_PROXY	proxy, proxy_old;
-	int		num, i;
-	time_t		now;
+	DC_PROXY		proxy, proxy_old;
+	int			num, i;
+	time_t			now;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -504,6 +505,8 @@ static int	process_proxy(void)
 		goto exit;
 
 	now = time(NULL);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	for (i = 0; i < num; i++)
 	{
@@ -582,6 +585,8 @@ error:
 
 		DCrequeue_proxy(proxy.hostid, update_nextcheck, ret);
 	}
+
+	zbx_dc_close_user_macros(um_handle);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 

@@ -625,7 +625,6 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	CURLcode	err;
 	zbx_httpstep_t	httpstep;
 #endif
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() httptestid:" ZBX_FS_UI64 " name:'%s'",
 			__func__, httptest->httptest.httptestid, httptest->httptest.name);
 
@@ -1037,13 +1036,16 @@ httptest_error:
  ******************************************************************************/
 int	process_httptests(int httppoller_num, int now)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_httptest_t	httptest;
-	DC_HOST		host;
-	int		httptests_count = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_httptest_t		httptest;
+	DC_HOST			host;
+	int			httptests_count = 0;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	/* create macro cache to use in http tests */
 	zbx_vector_ptr_pair_create(&httptest.macros);
@@ -1154,6 +1156,8 @@ int	process_httptests(int httppoller_num, int now)
 	zbx_vector_ptr_pair_destroy(&httptest.macros);
 
 	DBfree_result(result);
+
+	zbx_dc_close_user_macros(um_handle);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 

@@ -73,9 +73,9 @@ zbx_um_cache_t	*um_cache_set_value_to_macros(zbx_um_cache_t *cache, const zbx_ve
 
 int	um_macro_check_vault_location(const zbx_um_macro_t *macro, const char *location);
 
-void	um_cache_resolve_const(zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num, const char *macro,
-		const char **value);
-void	um_cache_resolve(zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num, const char *macro,
+void	um_cache_resolve_const(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num,
+		const char *macro, const char **value);
+void	um_cache_resolve(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num, const char *macro,
 		int env, char **value);
 
 

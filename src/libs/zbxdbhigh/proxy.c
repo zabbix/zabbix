@@ -3887,8 +3887,16 @@ int	process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 int	process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info)
 {
 	zbx_host_rights_t	rights = {0};
+	int			ret;
+	zbx_dc_um_handle_t	*um_handle;
 
-	return process_client_history_data(sock, jp, ts, sender_item_validator, &rights, info);
+	um_handle = zbx_dc_open_user_macros();
+
+	ret = process_client_history_data(sock, jp, ts, sender_item_validator, &rights, info);
+
+	zbx_dc_close_user_macros(um_handle);
+
+	return ret;
 }
 
 static void	zbx_drule_ip_free(zbx_drule_ip_t *ip)

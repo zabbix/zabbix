@@ -767,6 +767,7 @@ void	DCget_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_
 
 #define ZBX_MACRO_ENV_SECURE	0
 #define ZBX_MACRO_ENV_NONSECURE	1
+#define ZBX_MACRO_ENV_DEFAULT	2
 
 #define ZBX_MACRO_VALUE_TEXT	0
 #define ZBX_MACRO_VALUE_SECRET	1
@@ -774,7 +775,6 @@ void	DCget_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_
 
 #define ZBX_MACRO_SECRET_MASK	"******"
 
-void	DCget_user_macro(const zbx_uint64_t *hostids, int hostids_num, const char *macro, char **replace_to);
 char	*zbx_dc_expand_func_params_user_macros(zbx_uint64_t hostid, const char *params);
 
 int	DCinterface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, zbx_agent_availability_t *in,
@@ -1001,8 +1001,6 @@ void	zbx_dc_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags);
 void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t functionids_num,
 		zbx_vector_ptr_t *item_tags);
 
-unsigned char	zbx_dc_set_macro_env(unsigned char env);
-
 const char	*zbx_dc_get_instanceid(void);
 
 char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t hostid);
@@ -1051,4 +1049,18 @@ void	zbx_db_trigger_explain_expression(const DB_TRIGGER *trigger, char **express
 void	zbx_db_trigger_get_function_value(const DB_TRIGGER *trigger, int index, char **value,
 		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
 		char **), int recovery);
+
+/* external user macro cache API */
+
+typedef struct zbx_dc_um_handle_t zbx_dc_um_handle_t;
+
+zbx_dc_um_handle_t	*zbx_dc_open_user_macros(void);
+zbx_dc_um_handle_t	*zbx_dc_open_user_macros_secure(void);
+zbx_dc_um_handle_t	*zbx_dc_open_user_macros_masked(void);
+
+void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *handle);
+
+void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *handle, const zbx_uint64_t *hostids, int hostids_num,
+		const char *macro, char **value);
+
 #endif

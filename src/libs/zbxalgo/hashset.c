@@ -236,7 +236,7 @@ void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, s
 	return entry->data;
 }
 
-void	*zbx_hashset_search(zbx_hashset_t *hs, const void *data)
+void	*zbx_hashset_search(const zbx_hashset_t *hs, const void *data)
 {
 	int			slot;
 	zbx_hash_t		hash;

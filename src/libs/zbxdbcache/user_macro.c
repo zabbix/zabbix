@@ -883,7 +883,7 @@ static int	um_macro_match(const zbx_um_macro_t *macro, const char *name, const c
  *                         was found                                             *
  *                                                                               *
  *********************************************************************************/
-static int	um_host_get_macro(zbx_um_host_t *host, const char *name, const char *context,
+static int	um_host_get_macro(const zbx_um_host_t *host, const char *name, const char *context,
 		const zbx_um_macro_t **macro)
 {
 	zbx_um_macro_t	macro_local;
@@ -929,12 +929,12 @@ static int	um_host_get_macro(zbx_um_host_t *host, const char *name, const char *
  *                         was found                                             *
  *                                                                               *
  *********************************************************************************/
-static int	um_cache_get_host_macro(zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num,
+static int	um_cache_get_host_macro(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num,
 		const char *name, const char *context, const zbx_um_macro_t **macro)
 {
 	int			i, ret = SUCCEED;
 	zbx_vector_uint64_t	templateids;
-	zbx_um_host_t		**phost;
+	const zbx_um_host_t	* const *phost;
 
 	zbx_vector_uint64_create(&templateids);
 
@@ -942,7 +942,7 @@ static int	um_cache_get_host_macro(zbx_um_cache_t *cache, const zbx_uint64_t *ho
 	{
 		const zbx_uint64_t	*phostid = &hostids[i];
 
-		if (NULL != (phost = (zbx_um_host_t **)zbx_hashset_search(&cache->hosts, &phostid)))
+		if (NULL != (phost = (const zbx_um_host_t * const *)zbx_hashset_search(&cache->hosts, &phostid)))
 		{
 			if (SUCCEED == um_host_get_macro(*phost, name, context, macro))
 				goto out;
@@ -973,7 +973,7 @@ out:
  *             um_macro    - [OUT] the cached macro                              *
  *                                                                               *
  *********************************************************************************/
-static void	um_cache_get_macro(zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num,
+static void	um_cache_get_macro(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num,
 		const char *macro, const zbx_um_macro_t **um_macro)
 {
 	char		*name = NULL, *context = NULL;
@@ -1015,8 +1015,8 @@ static void	um_cache_get_macro(zbx_um_cache_t *cache, const zbx_uint64_t *hostid
  *             value       - [OUT] macro value, must be freed by the caller      *
  *                                                                               *
  *********************************************************************************/
-void	um_cache_resolve_const(zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num, const char *macro,
-		const char **value)
+void	um_cache_resolve_const(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num,
+		const char *macro, const char **value)
 {
 	const zbx_um_macro_t	*um_macro = NULL;
 
@@ -1041,24 +1041,36 @@ void	um_cache_resolve_const(zbx_um_cache_t *cache, const zbx_uint64_t *hostids, 
  *             value       - [OUT] macro value, must be freed by the caller      *
  *                                                                               *
  *********************************************************************************/
-void	um_cache_resolve(zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num, const char *macro,
+void	um_cache_resolve(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num, const char *macro,
 		int env, char **value)
 {
 	const zbx_um_macro_t	*um_macro = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s'", __func__, macro);
 
 	um_cache_get_macro(cache, hostids, hostids_num, macro, &um_macro);
 
 	if (NULL != um_macro)
 	{
-		if (ZBX_MACRO_ENV_NONSECURE == env && (ZBX_MACRO_VALUE_SECRET == um_macro->type ||
-				ZBX_MACRO_VALUE_VAULT == um_macro->type))
-		{
+		if (ZBX_MACRO_ENV_NONSECURE == env && ZBX_MACRO_VALUE_TEXT != um_macro->type)
 			*value = zbx_strdup(*value, ZBX_MACRO_SECRET_MASK);
-		}
 		else
-		{
 			*value = zbx_strdup(NULL, (NULL != um_macro->value ? um_macro->value : ZBX_MACRO_NO_KVS_VALUE));
+	}
+
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+	{
+		const char	*out = NULL;
+
+		if (NULL != um_macro)
+		{
+			if (ZBX_MACRO_VALUE_TEXT == um_macro->type)
+				out = um_macro->value;
+			else
+				out = (NULL == um_macro->value ? ZBX_MACRO_SECRET_MASK : ZBX_MACRO_NO_KVS_VALUE);
 		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s", __func__, ZBX_NULL2EMPTY_STR(out));
 	}
 }
 

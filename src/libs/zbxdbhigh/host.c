@@ -5871,15 +5871,18 @@ clean:
 zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip,
 		const char *ip, const char *dns, unsigned short port, zbx_conn_flags_t flags)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*ip_esc, *dns_esc, *tmp = NULL;
-	zbx_uint64_t	interfaceid = 0;
-	unsigned char	main_ = 1, db_main, db_useip;
-	unsigned short	db_port;
-	const char	*db_ip, *db_dns;
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*ip_esc, *dns_esc, *tmp = NULL;
+	zbx_uint64_t		interfaceid = 0;
+	unsigned char		main_ = 1, db_main, db_useip;
+	unsigned short		db_port;
+	const char		*db_ip, *db_dns;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	result = DBselect(
 			"select interfaceid,useip,ip,dns,port,main"
@@ -5989,6 +5992,8 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned c
 	zbx_free(dns_esc);
 	zbx_free(ip_esc);
 out:
+	zbx_dc_close_user_macros(um_handle);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64, __func__, interfaceid);
 
 	return interfaceid;

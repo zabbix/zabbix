@@ -610,8 +610,11 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 	if (0 != itemids.values_num)
 	{
-		DC_ITEM		*dc_items;
-		int		*errcodes, delay;
+		DC_ITEM			*dc_items;
+		int			*errcodes, delay;
+		zbx_dc_um_handle_t	*um_handle;
+
+		um_handle = zbx_dc_open_user_macros();
 
 		dc_items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
 		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * itemids.values_num);
@@ -679,6 +682,8 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 		zbx_free(errcodes);
 		zbx_free(dc_items);
+
+		zbx_dc_close_user_macros(um_handle);
 	}
 
 	zbx_json_close(&json);

@@ -1910,7 +1910,10 @@ void	zbx_expression_eval_resolve_item_hosts(zbx_expression_eval_t *eval, const D
  ******************************************************************************/
 void	zbx_expression_eval_resolve_filter_macros(zbx_expression_eval_t *eval, const DC_ITEM *item)
 {
-	int	i;
+	int			i;
+	zbx_dc_um_handle_t	*um_handle;
+
+	um_handle = zbx_dc_open_user_macros();
 
 	for (i = 0; i < eval->queries.values_num; i++)
 	{
@@ -1919,6 +1922,8 @@ void	zbx_expression_eval_resolve_filter_macros(zbx_expression_eval_t *eval, cons
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL, NULL, NULL, NULL,
 				&query->ref.filter, MACRO_TYPE_QUERY_FILTER, NULL, 0);
 	}
+
+	zbx_dc_close_user_macros(um_handle);
 }
 
 typedef struct

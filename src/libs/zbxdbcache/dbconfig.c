@@ -94,8 +94,6 @@ ZBX_MEM_FUNC_IMPL(__config, config_mem)
 static void	dc_maintenance_precache_nested_groups(void);
 static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_exclude);
 
-/* by default the macro environment is non-secure and all secret macros are masked with ****** */
-static unsigned char	macro_env = ZBX_MACRO_ENV_NONSECURE;
 extern char		*CONFIG_VAULTTOKEN;
 extern char		*CONFIG_VAULT;
 /******************************************************************************
@@ -10108,19 +10106,6 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int pr
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	DCget_user_macro(const zbx_uint64_t *hostids, int hostids_num, const char *macro, char **replace_to)
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s'", __func__, macro);
-
-	RDLOCK_CACHE;
-
-	um_cache_resolve(config->um_cache, hostids, hostids_num, macro, macro_env, replace_to);
-
-	UNLOCK_CACHE;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: expand user macros in the specified text value                    *
@@ -12958,23 +12943,6 @@ int	DCget_proxy_lastaccess_by_name(const char *name, int *lastaccess, char **err
 
 /******************************************************************************
  *                                                                            *
- * Purpose: sets user macro environment security level                        *
- *                                                                            *
- * Parameter: env - [IN] the security level (see ZBX_MACRO_ENV_* defines)     *
- *                                                                            *
- * Comments: The security level affects how the secret macros are resolved -  *
- *           as they values or '******'.                                      *
- *                                                                            *
- ******************************************************************************/
-unsigned char	zbx_dc_set_macro_env(unsigned char env)
-{
-	unsigned char	old_env = macro_env;
-	macro_env = env;
-	return old_env;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: returns server/proxy instance id                                  *
  *                                                                            *
  * Return value: the instance id                                              *
@@ -13122,6 +13090,117 @@ int	zbx_dc_maintenance_has_tags(void)
 	UNLOCK_CACHE;
 
 	return ret;
+}
+
+/* external user macro cache API */
+
+struct zbx_dc_um_handle_t
+{
+	zbx_dc_um_handle_t	*prev;
+	unsigned char		macro_env;
+};
+
+static zbx_dc_um_handle_t	*dc_um_handle = NULL;
+static zbx_um_cache_t		*dc_um_cache = NULL;
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: open handle for user macro resolving in the specified security    *
+ *          level                                                             *
+ *                                                                            *
+ * Parameters: macro_env - [IN] - the macro resolving environment:            *
+ *                                  ZBX_MACRO_ENV_NONSECURE                   *
+ *                                  ZBX_MACRO_ENV_SECURE                      *
+ *                                  ZBX_MACRO_ENV_DEFAULT (last opened or     *
+ *                                    nonsecure evironment)                   *
+ *                                                                            *
+ * Return value: the handle for macro resolving, must be closed with          *
+ *        zbx_dc_close_user_macros()                                          *
+ *                                                                            *
+ * Comments: First handle will lock user macro cache in configuration cache.  *
+ *           Consequent openings within the same process without closing will *
+ *           reuse the locked cache until all opened caches are closed.       *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_dc_um_handle_t	*dc_open_user_macros(unsigned char macro_env)
+{
+	zbx_dc_um_handle_t	*handle;
+
+	handle = (zbx_dc_um_handle_t *)zbx_malloc(NULL, sizeof(zbx_dc_um_handle_t));
+
+	if (NULL != dc_um_handle)
+	{
+		if (ZBX_MACRO_ENV_DEFAULT == macro_env)
+			macro_env = dc_um_handle->macro_env;
+	}
+	else
+	{
+		if (ZBX_MACRO_ENV_DEFAULT == macro_env)
+			macro_env = ZBX_MACRO_ENV_NONSECURE;
+	}
+
+	handle->macro_env = macro_env;
+	handle->prev = dc_um_handle;
+	dc_um_handle = handle;
+
+	return handle;
+}
+
+zbx_dc_um_handle_t	*zbx_dc_open_user_macros(void)
+{
+	return dc_open_user_macros(ZBX_MACRO_ENV_DEFAULT);
+}
+
+zbx_dc_um_handle_t	*zbx_dc_open_user_macros_secure(void)
+{
+	return dc_open_user_macros(ZBX_MACRO_ENV_SECURE);
+}
+
+zbx_dc_um_handle_t	*zbx_dc_open_user_macros_masked(void)
+{
+	return dc_open_user_macros(ZBX_MACRO_ENV_NONSECURE);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: closes user macro resolving handle                                *
+ *                                                                            *
+ * Comments: Closing the last opened handle within process will release locked*
+ *           user macro cache in the configuration cache.                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *handle)
+{
+	if (NULL == handle->prev && NULL != dc_um_cache)
+	{
+		WRLOCK_CACHE;
+		um_cache_release(dc_um_cache);
+		UNLOCK_CACHE;
+
+		dc_um_cache = NULL;
+	}
+
+	dc_um_handle = handle->prev;
+	zbx_free(handle);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: resolve user macro using the specified hosts                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *handle, const zbx_uint64_t *hostids, int hostids_num,
+		const char *macro, char **value)
+{
+	if (NULL == dc_um_cache)
+	{
+		WRLOCK_CACHE;
+		dc_um_cache = config->um_cache;
+		dc_um_cache->refcount++;
+		UNLOCK_CACHE;
+	}
+
+	um_cache_resolve(dc_um_cache, hostids, hostids_num, macro, handle->macro_env, value);
 }
 
 #ifdef HAVE_TESTS
