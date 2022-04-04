@@ -626,12 +626,10 @@ void	zbx_ptr_free(void *data);
 void	zbx_str_free(char *data);
 
 /* 128 bit unsigned integer handling */
-#define uset128(base, hi64, lo64)	(base)->hi = hi64; (base)->lo = lo64
-
-void	uinc128_64(zbx_uint128_t *base, zbx_uint64_t value);
-void	uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value);
-void	udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *dividend, zbx_uint64_t value);
-void	umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor);
+void	zbx_uinc128_64(zbx_uint128_t *base, zbx_uint64_t value);
+void	zbx_uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value);
+void	zbx_udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *dividend, zbx_uint64_t value);
+void	zbx_umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor);
 
 unsigned int	zbx_isqrt32(unsigned int value);
 
