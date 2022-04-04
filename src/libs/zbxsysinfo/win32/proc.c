@@ -707,6 +707,7 @@ next:
 			zbx_json_addfloat(&j, "cputime_system", proc_data->cputime_system);
 			zbx_json_adduint64(&j, "threads", proc_data->threads);
 			zbx_json_adduint64(&j, "page_faults", (zbx_uint64_t)proc_data->page_faults);
+			zbx_json_adduint64(&j, "handles", (zbx_uint64_t)proc_data->handles);
 			zbx_json_adduint64(&j, "io_read_b", (zbx_uint64_t)proc_data->io_read_b);
 			zbx_json_adduint64(&j, "io_write_b", (zbx_uint64_t)proc_data->io_write_b);
 			zbx_json_adduint64(&j, "io_read_op", (zbx_uint64_t)proc_data->io_read_op);
