@@ -880,19 +880,8 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 			}
 		}
 
+	var jsonArray []byte
 	switch mode {
-	case "process", "":
-		if jsonArray, err := json.Marshal(array); err == nil {
-			return string(jsonArray), nil
-		} else {
-			return nil, fmt.Errorf("Cannot create JSON array: %s", err)
-		}
-	case "thread":
-		if jsonArray, err := json.Marshal(threadArray); err == nil {
-			return string(jsonArray), nil
-		} else {
-			return nil, fmt.Errorf("Cannot create JSON array: %s", err)
-		}
 	case "summary":
 		var processed []string
 		processes:
@@ -938,13 +927,18 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 			processed = append(processed, proc.Name)
 			summaryArray = append(summaryArray, procSum)
 		}
-		if jsonArray, err := json.Marshal(summaryArray); err == nil {
-			return string(jsonArray), nil
-		} else {
-			return nil, fmt.Errorf("Cannot create JSON array: %s", err)
-		}
+		jsonArray, err = json.Marshal(summaryArray)
+	case "thread":
+		jsonArray, err = json.Marshal(threadArray)
+	default:
+		jsonArray, err = json.Marshal(array)
 	}
-	return nil, nil
+
+	if err != nil {
+		return nil, fmt.Errorf("Cannot create JSON array: %s", err)
+	}
+
+	return string(jsonArray), nil
 }
 
 func getMax(a, b float64) float64 {

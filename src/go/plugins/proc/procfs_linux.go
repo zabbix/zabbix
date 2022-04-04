@@ -210,7 +210,7 @@ func getProcessCpuTimes(pid string, proc *procStatus) (err error) {
 }
 
 func getProcessNames(pid string, proc *procStatus) (err error) {
-	_, proc.Cmdline, err = getProcessCmdline(pid, procInfoName)
+	_, proc.Cmdline, err = getProcessCmdline(pid, 0)
 	if err != nil {
 		return err
 	}
