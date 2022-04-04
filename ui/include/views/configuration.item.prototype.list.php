@@ -48,7 +48,7 @@ $url = (new CUrl('disc_prototypes.php'))
 // create form
 $itemForm = (new CForm('post', $url))
 	->setName('items')
-	->addVar('parent_discoveryid', $data['parent_discoveryid'])
+	->addVar('parent_discoveryid', $data['parent_discoveryid'], 'form_parent_discoveryid')
 	->addVar('context', $data['context'], 'form_context');
 
 // create table
