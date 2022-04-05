@@ -2069,7 +2069,7 @@ AC_OUTPUT([
 	src/libs/Makefile
 	src/libs/zbxlog/Makefile
 	src/libs/zbxalgo/Makefile
-	src/libs/zbxmemory/Makefile
+	src/libs/zbxshmem/Makefile
 	src/libs/zbxhash/Makefile
 	src/libs/zbxcrypto/Makefile
 	src/libs/zbxconf/Makefile
