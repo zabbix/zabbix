@@ -20,8 +20,10 @@
 #ifndef ZABBIX_PID_H
 #define ZABBIX_PID_H
 
-#ifndef _WINDOWS
-#	error "This module is only available for Windows OS"
+#include "sysinc.h"
+
+#ifdef _WINDOWS
+#	error "This module allowed only for Unix OS"
 #endif
 
 #include "threads.h"
