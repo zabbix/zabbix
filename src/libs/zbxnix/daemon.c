@@ -26,6 +26,7 @@
 #include "cfg.h"
 #include "log.h"
 #include "control.h"
+#include "pid.h"
 
 char		*CONFIG_PID_FILE = NULL;
 static int	parent_pid = -1;
@@ -390,7 +391,7 @@ int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags)
 			exit(EXIT_FAILURE);
 	}
 
-	if (FAIL == zbx_create_pid_file(CONFIG_PID_FILE))
+	if (FAIL == create_pid_file(CONFIG_PID_FILE))
 		exit(EXIT_FAILURE);
 
 	atexit(zbx_daemon_stop);
@@ -416,7 +417,7 @@ void	zbx_daemon_stop(void)
 	if (parent_pid != (int)getpid())
 		return;
 
-	zbx_drop_pid_file(CONFIG_PID_FILE);
+	drop_pid_file(CONFIG_PID_FILE);
 }
 
 int	zbx_sigusr_send(int flags)
@@ -426,7 +427,7 @@ int	zbx_sigusr_send(int flags)
 #ifdef HAVE_SIGQUEUE
 	pid_t	pid;
 
-	if (SUCCEED == zbx_read_pid_file(CONFIG_PID_FILE, &pid, error, sizeof(error)))
+	if (SUCCEED == read_pid_file(CONFIG_PID_FILE, &pid, error, sizeof(error)))
 	{
 		union sigval	s;
 

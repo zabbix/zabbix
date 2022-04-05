@@ -1462,7 +1462,7 @@ int	main(int argc, char **argv)
 			break;
 	}
 
-	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
+	ZBX_START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 
 	exit(EXIT_SUCCESS);
 }

@@ -17,34 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SERVICE_H
-#define ZABBIX_SERVICE_H
-
-#ifndef _WINDOWS
-#	error "This module is only available for Windows OS"
-#endif
+#ifndef ZABBIX_PID_H
+#define ZABBIX_PID_H
 
 #include "threads.h"
 
-extern ZBX_THREAD_HANDLE	*threads;
-
-void	service_start(int flags);
-
-int	ZabbixCreateService(const char *path, int multiple_agents);
-int	ZabbixRemoveService(void);
-int	ZabbixStartService(void);
-int	ZabbixStopService(void);
-
-void	set_parent_signal_handler(void);
-
-int	application_status;	/* required for closing application from service */
-
-#define ZBX_APP_STOPPED	0
-#define ZBX_APP_RUNNING	1
-
-#define ZBX_IS_RUNNING()	(ZBX_APP_RUNNING == application_status)
-#define ZBX_DO_EXIT()		application_status = ZBX_APP_STOPPED
-
-#define ZBX_START_MAIN_ZABBIX_ENTRY(allow_root, user, flags)	service_start(flags)
-
-#endif /* ZABBIX_SERVICE_H */
+int	create_pid_file(const char *pidfile);
+int	read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_error_len);
+void	drop_pid_file(const char *pidfile);
+#endif /* ZABBIX_FATAL_H */

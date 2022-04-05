@@ -22,6 +22,11 @@
 
 #include "sysinc.h"
 
+/* IPC start */
+#include "zbxtypes.h"
+#include "mutexs.h"
+/* IPC end */
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 int	zbx_coredump_disable(void);
 #endif
@@ -50,17 +55,13 @@ void	zbx_set_sigusr_handler(void (*handler)(int flags));
 
 #define ZBX_DO_EXIT()
 
-#define START_MAIN_ZABBIX_ENTRY(allow_root, user, flags)	zbx_daemon_start(allow_root, user, flags)
+#define ZBX_START_MAIN_ZABBIX_ENTRY(allow_root, user, flags)	zbx_daemon_start(allow_root, user, flags)
 
 void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **out);
 void	zbx_signal_process_by_pid(int pid, int flags, char **out);
 /* daemon end */
 
 /* IPC start */
-#include "zbxtypes.h"
-
-#include "mutexs.h"
-
 #define ZBX_NONEXISTENT_SHMID		(-1)
 
 int	zbx_shm_create(size_t size);
@@ -109,16 +110,7 @@ void	zbx_dshm_lock(zbx_dshm_t *shm);
 void	zbx_dshm_unlock(zbx_dshm_t *shm);
 /* IPC end*/
 
-/* pid start */
-#include "threads.h"
-
-int	zbx_create_pid_file(const char *pidfile);
-int	zbx_read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_error_len);
-void	zbx_drop_pid_file(const char *pidfile);
-/* pid end */
-
 /* sighandler start */
-
 void	zbx_set_common_signal_handlers(void);
 void	zbx_set_child_signal_handler(void);
 void	zbx_unset_child_signal_handler(void);
@@ -131,5 +123,4 @@ void	zbx_unset_exit_on_terminate(void);
 /* sighandler end */
 
 int	zbx_parse_rtc_options(const char *opt, int *message);
-
 #endif	/* ZABBIX_ZBXNIX_H */

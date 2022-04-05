@@ -25,7 +25,7 @@
 static FILE	*fpid = NULL;
 static int	fdpid = -1;
 
-int	zbx_create_pid_file(const char *pidfile)
+int	create_pid_file(const char *pidfile)
 {
 	int		fd;
 	zbx_stat_t	buf;
@@ -72,7 +72,7 @@ int	zbx_create_pid_file(const char *pidfile)
 	return SUCCEED;
 }
 
-int	zbx_read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_error_len)
+int	read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_error_len)
 {
 	int	ret = FAIL;
 	FILE	*f_pid;
@@ -93,7 +93,7 @@ int	zbx_read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_e
 	return ret;
 }
 
-void	zbx_drop_pid_file(const char *pidfile)
+void	drop_pid_file(const char *pidfile)
 {
 	struct flock	fl;
 
