@@ -268,16 +268,16 @@ class CDBHelper {
 			}
 			$server = ($DB['SERVER'] !== '') ? ' -h'.$DB['SERVER'] : '';
 
-			$cmd .= 'pg_dump'.$server;
+			$cmd .= ' pg_dump'.$server;
 
 			if ($DB['PORT'] !== '' && $DB['PORT'] != 0) {
-				$cmd .= '-p'.$DB['PORT'];
+				$cmd .= ' -p'.$DB['PORT'];
 			}
 
 			$db_name = $DB['DATABASE'];
 			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
 
-			$cmd .= '-U'.$DB['USER'].' -Fd -j5 -t'.implode(' -t', $tables).' -d'.$db_name.' -f'.$file;
+			$cmd .= ' -U'.$DB['USER'].' -Fd -j5 -t'.implode(' -t', $tables).' -d'.$db_name.' -f'.$file;
 
 			exec($cmd, $output, $result_code);
 
@@ -315,16 +315,16 @@ class CDBHelper {
 			}
 			$server = ($DB['SERVER'] !== '') ? ' -h'.$DB['SERVER'] : '';
 
-			$cmd .= 'pg_restore'.$server;
+			$cmd .= ' pg_restore'.$server;
 
 			if ($DB['PORT'] !== '' && $DB['PORT'] != 0) {
-				$cmd .= '-p'.$DB['PORT'];
+				$cmd .= ' -p'.$DB['PORT'];
 			}
 
 			$db_name = $DB['DATABASE'];
 			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
 
-			$cmd .= '-U'.$DB['USER'].' -Fd -j5 --clean -d'.$db_name.' '.$file;
+			$cmd .= ' -U'.$DB['USER'].' -Fd -j5 --clean -d'.$db_name.' '.$file;
 			exec($cmd, $output, $result_code);
 
 			if ($result_code != 0) {
