@@ -636,11 +636,7 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 				continue
 			}
 
-			if mem != 0 {
-				value = float64(vmRSS) / float64(mem) * 100.00
-			} else {
-				value = 0
-			}
+			value = float64(vmRSS) / float64(mem) * 100.00
 		case "size":
 			vmData, found, err := procfs.ByteFromProcFileData(data, "VmData")
 			if err != nil {
@@ -703,11 +699,7 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 	}
 
 	if mode == "avg" {
-		if count != 0 {
-			return memSize / float64(count), nil
-		} else {
-			return 0, errors.New("Total memory reported is 0.")
-		}
+		return memSize / float64(count), nil
 	}
 
 	if memtype != "pmem" {
