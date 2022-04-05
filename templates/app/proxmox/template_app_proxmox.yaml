@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-31T06:54:02Z'
+  date: '2022-04-05T05:13:10Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -157,7 +157,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: proxmox.cluster.status
               tags:
@@ -224,7 +224,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.lxc.status[{#LXC.ID}]'
               tags:
@@ -244,7 +244,8 @@ zabbix_export:
                 -
                   uuid: c0436342a19d4d6482fac70d2f04f530
                   expression: 'min(/Proxmox VE by HTTP/proxmox.lxc.cpu[{#LXC.ID}],5m) > {$PVE.LXC.CPU.PUSE.MAX.WARN:"{#LXC.ID}"}'
-                  name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})] high CPU usage (over {$PVE.LXC.CPU.PUSE.MAX.WARN:"{#LXC.ID}"}% use)'
+                  name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})] high CPU usage'
+                  event_name: 'LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})] high CPU usage (over {$PVE.LXC.CPU.PUSE.MAX.WARN:"{#LXC.ID}"}% use)'
                   opdata: 'Current use: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU usage.'
@@ -274,7 +275,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.lxc.status[{#LXC.ID}]'
               tags:
@@ -312,7 +313,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.lxc.status[{#LXC.ID}]'
               tags:
@@ -346,7 +347,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.lxc.status[{#LXC.ID}]'
               tags:
@@ -380,7 +381,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.lxc.status[{#LXC.ID}]'
               tags:
@@ -422,7 +423,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.lxc.status[{#LXC.ID}]'
               tags:
@@ -464,7 +465,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.lxc.status[{#LXC.ID}]'
               tags:
@@ -523,7 +524,8 @@ zabbix_export:
                 -
                   uuid: 0e55935a79b94bc096b6213d500f4f59
                   expression: 'last(/Proxmox VE by HTTP/proxmox.lxc.uptime[{#LXC.ID}])<10m'
-                  name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME}]: has been restarted (uptime < 10m)'
+                  name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME}]: has been restarted'
+                  event_name: 'LXC [{#NODE.NAME}/{#LXC.NAME}]: has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
@@ -567,7 +569,8 @@ zabbix_export:
             -
               uuid: f59e43f9de01419897aec1b9d4539b48
               expression: 'min(/Proxmox VE by HTTP/proxmox.lxc.mem[{#LXC.ID}],5m) / last(/Proxmox VE by HTTP/proxmox.lxc.maxmem[{#LXC.ID}]) * 100 >{$PVE.LXC.MEMORY.PUSE.MAX.WARN:"{#LXC.ID}"}'
-              name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})] high memory usage (over {$PVE.LXC.MEMORY.PUSE.MAX.WARN:"{#LXC.ID}"}% use)'
+              name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})] high memory usage'
+              event_name: 'LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})] high memory usage (over {$PVE.LXC.MEMORY.PUSE.MAX.WARN:"{#LXC.ID}"}% use)'
               opdata: 'Current use: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Memory usage.'
@@ -688,7 +691,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.node.rrd[{#NODE.NAME}]'
               tags:
@@ -702,7 +705,8 @@ zabbix_export:
                 -
                   uuid: 84041dcb7c84426dad538ab32375fdb1
                   expression: 'min(/Proxmox VE by HTTP/proxmox.node.cpu[{#NODE.NAME}],5m) > {$PVE.CPU.PUSE.MAX.WARN:"{#NODE.NAME}"}'
-                  name: 'Proxmox: Node [{#NODE.NAME}] high CPU usage (over {$PVE.CPU.PUSE.MAX.WARN:"{#NODE.NAME}"}% use)'
+                  name: 'Proxmox: Node [{#NODE.NAME}] high CPU usage'
+                  event_name: 'Node [{#NODE.NAME}] high CPU usage (over {$PVE.CPU.PUSE.MAX.WARN:"{#NODE.NAME}"}% use)'
                   opdata: 'Current use: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU usage.'
@@ -732,7 +736,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.node.rrd[{#NODE.NAME}]'
               tags:
@@ -802,7 +806,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.node.rrd[{#NODE.NAME}]'
               tags:
@@ -853,7 +857,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.node.rrd[{#NODE.NAME}]'
               tags:
@@ -881,7 +885,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.node.rrd[{#NODE.NAME}]'
               tags:
@@ -913,7 +917,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.node.rrd[{#NODE.NAME}]'
               tags:
@@ -945,7 +949,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.node.rrd[{#NODE.NAME}]'
               tags:
@@ -973,7 +977,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: proxmox.cluster.status
               tags:
@@ -1051,7 +1055,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.node.rrd[{#NODE.NAME}]'
               tags:
@@ -1079,7 +1083,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.node.rrd[{#NODE.NAME}]'
               tags:
@@ -1104,7 +1108,7 @@ zabbix_export:
                   parameters:
                     - |
                       var rrd_data = JSON.parse(value).data;
-                      return JSON.stringify(rrd_data[rrd_data.length - 1])
+                      return JSON.stringify(rrd_data[rrd_data.length - 2])
               url: 'https://{HOST.CONN}:{$PVE.URL.PORT}/api2/json/nodes/{#NODE.NAME}/rrddata'
               query_fields:
                 -
@@ -1157,7 +1161,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.node.rrd[{#NODE.NAME}]'
               tags:
@@ -1185,7 +1189,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.node.rrd[{#NODE.NAME}]'
               tags:
@@ -1266,7 +1270,8 @@ zabbix_export:
                 -
                   uuid: 529b69b98a86409d914d3464569b7901
                   expression: 'last(/Proxmox VE by HTTP/proxmox.node.uptime[{#NODE.NAME}])<10m'
-                  name: 'Proxmox: Node [{#NODE.NAME}]: has been restarted (uptime < 10m)'
+                  name: 'Proxmox: Node [{#NODE.NAME}]: has been restarted'
+                  event_name: 'Node [{#NODE.NAME}]: has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
@@ -1301,7 +1306,8 @@ zabbix_export:
             -
               uuid: a0445b4e1ffd451595ecea0468b4a6a6
               expression: 'min(/Proxmox VE by HTTP/proxmox.node.memused[{#NODE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.memtotal[{#NODE.NAME}]) * 100 >{$PVE.MEMORY.PUSE.MAX.WARN:"{#NODE.NAME}"}'
-              name: 'Proxmox: Node [{#NODE.NAME}] high memory usage (over {$PVE.MEMORY.PUSE.MAX.WARN:"{#NODE.NAME}"}% use)'
+              name: 'Proxmox: Node [{#NODE.NAME}] high memory usage'
+              event_name: 'Node [{#NODE.NAME}] high memory usage (over {$PVE.MEMORY.PUSE.MAX.WARN:"{#NODE.NAME}"}% use)'
               opdata: 'Current use: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Memory usage.'
@@ -1312,7 +1318,8 @@ zabbix_export:
             -
               uuid: 3f88526e10a14319983fe14621ef10f9
               expression: 'min(/Proxmox VE by HTTP/proxmox.node.rootused[{#NODE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.roottotal[{#NODE.NAME}]) * 100 >{$PVE.ROOT.PUSE.MAX.WARN:"{#NODE.NAME}"}'
-              name: 'Proxmox: Node [{#NODE.NAME}] high root filesystem space usage (over {$PVE.ROOT.PUSE.MAX.WARN:"{#NODE.NAME}"}% use)'
+              name: 'Proxmox: Node [{#NODE.NAME}] high root filesystem space usage'
+              event_name: 'Node [{#NODE.NAME}] high root filesystem space usage (over {$PVE.ROOT.PUSE.MAX.WARN:"{#NODE.NAME}"}% use)'
               opdata: 'Current use: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Root filesystem space usage.'
@@ -1323,7 +1330,8 @@ zabbix_export:
             -
               uuid: f38ccc2e0e40430e801bf98b488e12e4
               expression: 'min(/Proxmox VE by HTTP/proxmox.node.swapused[{#NODE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.swaptotal[{#NODE.NAME}]) * 100 > {$PVE.SWAP.PUSE.MAX.WARN:"{#NODE.NAME}"} and last(/Proxmox VE by HTTP/proxmox.node.swaptotal[{#NODE.NAME}]) > 0'
-              name: 'Proxmox: Node [{#NODE.NAME}] high root filesystem space usage (over {$PVE.SWAP.PUSE.MAX.WARN:"{#NODE.NAME}"}% use)'
+              name: 'Proxmox: Node [{#NODE.NAME}] high root filesystem space usage'
+              event_name: 'Node [{#NODE.NAME}] high root filesystem space usage (over {$PVE.SWAP.PUSE.MAX.WARN:"{#NODE.NAME}"}% use)'
               opdata: 'Current use: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'This trigger is ignored, if there is no swap configured.'
@@ -1469,7 +1477,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.qemu.status[{#QEMU.ID}]'
               tags:
@@ -1489,7 +1497,8 @@ zabbix_export:
                 -
                   uuid: 84ed68d7cf2b48a48fc44e9c7a0d9b92
                   expression: 'min(/Proxmox VE by HTTP/proxmox.qemu.cpu[{#QEMU.ID}],5m) > {$PVE.VM.CPU.PUSE.MAX.WARN:"{#QEMU.ID}"}'
-                  name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})] high CPU usage (over {$PVE.VM.CPU.PUSE.MAX.WARN:"{#QEMU.ID}"}% use)'
+                  name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})] high CPU usage'
+                  event_name: 'VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})] high CPU usage (over {$PVE.VM.CPU.PUSE.MAX.WARN:"{#QEMU.ID}"}% use)'
                   opdata: 'Current use: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU usage.'
@@ -1519,7 +1528,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.qemu.status[{#QEMU.ID}]'
               tags:
@@ -1557,7 +1566,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.qemu.status[{#QEMU.ID}]'
               tags:
@@ -1591,7 +1600,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.qemu.status[{#QEMU.ID}]'
               tags:
@@ -1625,7 +1634,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.qemu.status[{#QEMU.ID}]'
               tags:
@@ -1667,7 +1676,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.qemu.status[{#QEMU.ID}]'
               tags:
@@ -1709,7 +1718,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
               master_item:
                 key: 'proxmox.qemu.status[{#QEMU.ID}]'
               tags:
@@ -1768,7 +1777,8 @@ zabbix_export:
                 -
                   uuid: d4ba1faeb67940a192c1b50460793813
                   expression: 'last(/Proxmox VE by HTTP/proxmox.qemu.uptime[{#QEMU.ID}])<10m'
-                  name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME}]: has been restarted (uptime < 10m)'
+                  name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME}]: has been restarted'
+                  event_name: 'VM [{#NODE.NAME}/{#QEMU.NAME}]: has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
@@ -1812,7 +1822,8 @@ zabbix_export:
             -
               uuid: 5305bf2b71aa4b74917379c6e1b3c065
               expression: 'min(/Proxmox VE by HTTP/proxmox.qemu.mem[{#QEMU.ID}],5m) / last(/Proxmox VE by HTTP/proxmox.qemu.maxmem[{#QEMU.ID}]) * 100 >{$PVE.VM.MEMORY.PUSE.MAX.WARN:"{#QEMU.ID}"}'
-              name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})] high memory usage (over {$PVE.VM.MEMORY.PUSE.MAX.WARN:"{#QEMU.ID}"}% use)'
+              name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})] high memory usage'
+              event_name: 'VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})] high memory usage (over {$PVE.VM.MEMORY.PUSE.MAX.WARN:"{#QEMU.ID}"}% use)'
               opdata: 'Current use: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Memory usage.'
@@ -1959,7 +1970,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 12h
+                    - 10m
               master_item:
                 key: proxmox.cluster.resources
               tags:
@@ -1989,7 +2000,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 12h
+                    - 10m
               master_item:
                 key: proxmox.cluster.resources
               tags:
@@ -2037,7 +2048,8 @@ zabbix_export:
             -
               uuid: 404d9a8a6fa54d8c880006c9ec32f55a
               expression: 'min(/Proxmox VE by HTTP/proxmox.node.disk[{#NODE.NAME},{#STORAGE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.maxdisk[{#NODE.NAME},{#STORAGE.NAME}]) * 100 >{$PVE.STORAGE.PUSE.MAX.WARN:"{#NODE.NAME}/{#STORAGE.NAME}"}'
-              name: 'Proxmox: Storage [{#NODE.NAME}/{#STORAGE.NAME}] high filesystem space usage (over {$PVE.STORAGE.PUSE.MAX.WARN:"{#NODE.NAME}/{#STORAGE.NAME}"}% use)'
+              name: 'Proxmox: Storage [{#NODE.NAME}/{#STORAGE.NAME}] high filesystem space usage'
+              event_name: 'Storage [{#NODE.NAME}/{#STORAGE.NAME}] high filesystem space usage (over {$PVE.STORAGE.PUSE.MAX.WARN:"{#NODE.NAME}/{#STORAGE.NAME}"}% use)'
               opdata: 'Current use: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Root filesystem space usage.'
