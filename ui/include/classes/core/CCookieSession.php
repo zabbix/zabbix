@@ -46,7 +46,7 @@ class CCookieSession implements SessionHandlerInterface {
 	 *
 	 * @return boolean
 	 */
-	public function close() {
+	public function close(): bool {
 		echo ob_get_clean();
 
 		return true;
@@ -59,7 +59,7 @@ class CCookieSession implements SessionHandlerInterface {
 	 *
 	 * @return boolean
 	 */
-	public function destroy($session_id) {
+	public function destroy(string $session_id): bool {
 		CCookieHelper::unset(self::COOKIE_NAME);
 
 		return true;
@@ -68,12 +68,12 @@ class CCookieSession implements SessionHandlerInterface {
 	/**
 	 * @inheritDoc
 	 *
-	 * @param integer $maxlifetime
+	 * @param int $max_lifetime
 	 *
-	 * @return integer
+	 * @return int
 	 */
-	public function gc($maxlifetime) {
-		return true;
+	public function gc(int $max_lifetime): int {
+		return 0;
 	}
 
 	/**
@@ -84,7 +84,7 @@ class CCookieSession implements SessionHandlerInterface {
 	 *
 	 * @return boolean
 	 */
-	public function open($save_path, $session_name) {
+	public function open(string $save_path, string $session_name): bool {
 		ob_start();
 
 		return session_status() === PHP_SESSION_ACTIVE;
@@ -97,7 +97,7 @@ class CCookieSession implements SessionHandlerInterface {
 	 *
 	 * @return string
 	 */
-	public function read($session_id) {
+	public function read(string $session_id): string {
 		$session_data = json_decode($this->parseData(), true);
 
 		if (!is_array($session_data)) {
@@ -119,7 +119,7 @@ class CCookieSession implements SessionHandlerInterface {
 	 *
 	 * @return boolean
 	 */
-	public function write($session_id, $session_data) {
+	public function write(string $session_id, string $session_data): bool {
 		session_decode($session_data);
 		$session_data = $this->prepareData(CSessionHelper::getAll());
 
