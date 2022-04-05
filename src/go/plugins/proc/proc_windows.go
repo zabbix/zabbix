@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"encoding/json"
 	"errors"
-	"regexp"
 	"strings"
 	"syscall"
 	"unsafe"
