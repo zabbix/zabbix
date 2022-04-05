@@ -20,7 +20,6 @@
 #ifndef ZABBIX_DBUPGRADE_MACROS_H
 #define ZABBIX_DBUPGRADE_MACROS_H
 
-#include "common.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
 

@@ -17,10 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-
 #include "zbxalgo.h"
-#include "vectorimpl.h"
+
+#include "common.h"
 
 ZBX_VECTOR_IMPL(uint64, zbx_uint64_t)
 ZBX_PTR_VECTOR_IMPL(str, char *)
