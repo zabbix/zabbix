@@ -25,7 +25,7 @@
 #include "zbxserialize.h"
 #include "threads.h"
 #include "mutexs.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
+
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_ha.h"
 #include "audit/zbxaudit_settings.h"

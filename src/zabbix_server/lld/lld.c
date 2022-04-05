@@ -394,7 +394,7 @@ static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_
  *                                                                            *
  * Comments: 1) replace {item_condition} references with action condition     *
  *              evaluation results (1 or 0)                                   *
- *           2) call evaluate() to calculate the final result                 *
+ *           2) call zbx_evaluate() to calculate the final result                 *
  *                                                                            *
  ******************************************************************************/
 static int	filter_evaluate_expression(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
@@ -427,7 +427,7 @@ static int	filter_evaluate_expression(const lld_filter_t *filter, const struct z
 		}
 	}
 
-	if (SUCCEED == evaluate(&result, expression, error, sizeof(error), NULL))
+	if (SUCCEED == zbx_evaluate(&result, expression, error, sizeof(error), NULL))
 		ret = (SUCCEED != zbx_double_compare(result, 0) ? SUCCEED : FAIL);
 
 	zbx_free(expression);

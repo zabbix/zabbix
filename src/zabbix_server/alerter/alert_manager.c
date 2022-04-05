@@ -19,7 +19,7 @@
 
 #include "alert_manager.h"
 
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
 #include "log.h"
 #include "zbxserver.h"
@@ -34,8 +34,8 @@
 
 #define ZBX_UPDATE_STR(dst, src)			\
 	if (NULL == src)				\
-		zbx_free(dst); 				\
-	else if (NULL == dst || 0 != strcmp(dst, src)) 	\
+		zbx_free(dst);				\
+	else if (NULL == dst || 0 != strcmp(dst, src))	\
 		dst = zbx_strdup(dst, src);
 
 #define ZBX_AM_DB_POLL_DELAY	1

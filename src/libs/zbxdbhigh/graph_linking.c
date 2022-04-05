@@ -22,7 +22,6 @@
 #include "db.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_graph.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
 
 typedef struct
 {

@@ -29,7 +29,6 @@
 #include "audit/zbxaudit.h"
 #include "trigger_linking.h"
 #include "graph_linking.h"
-#include "../zbxalgo/vectorimpl.h"
 
 #include "db.h"
 

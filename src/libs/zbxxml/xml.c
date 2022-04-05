@@ -28,8 +28,6 @@
 #	include <libxml/xpath.h>
 #endif
 
-#include "../zbxalgo/vectorimpl.h"
-
 typedef struct _zbx_xml_node_t zbx_xml_node_t;
 
 ZBX_PTR_VECTOR_DECL(xml_node_ptr, zbx_xml_node_t *)

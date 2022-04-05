@@ -21,7 +21,7 @@
 
 #include "log.h"
 #include "zbxself.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "service_protocol.h"
 #include "zbxrtc.h"
 
