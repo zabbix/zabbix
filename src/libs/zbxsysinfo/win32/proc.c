@@ -487,7 +487,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	procComm = get_rparam(request, 2);
 	param = get_rparam(request, 3);
 
-	if (NULL != procComm || '\0' != *procComm)
+	if (NULL != procComm && '\0' != *procComm)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		return SYSINFO_RET_FAIL;
