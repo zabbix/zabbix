@@ -147,15 +147,15 @@ class testDashboardItemValueWidget extends CWebTest {
 		self::$dashboardid = $response['dashboardids'][0];
 	}
 
-		/**
+	/**
 	 * Test to check Item Value Widget.
 	 * Check authentication form fields layout.
 	 */
 	public function testDashboardItemValueWidget_FormLayout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
-		$dialogue = $dashboard->edit()->addWidget();
-		$form = $dialogue->asForm();
+		$dialog = $dashboard->edit()->addWidget();
+		$form = $dialog->asForm();
 		$form->fill(['Type' => 'Item value']);
 		$form->invalidate();
 
