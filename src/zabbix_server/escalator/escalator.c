@@ -22,7 +22,6 @@
 #include "daemon.h"
 #include "zbxserver.h"
 #include "zbxself.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
 #include "../actions.h"
 #include "../scripts/scripts.h"
 #include "zbxcrypto.h"

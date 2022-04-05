@@ -17,27 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "dbupgrade.h"
+#ifndef ZABBIX_ALGO_H
+#define ZABBIX_ALGO_H
 
-extern unsigned char	program_type;
+int	next_prime(int n);
 
-/*
- * 5.4 maintenance database patches
- */
-
-#ifndef HAVE_SQLITE3
-
-static int	DBpatch_5040000(void)
-{
-	return SUCCEED;
-}
-
-#endif
-
-DBPATCH_START(5040)
-
-/* version, duplicates flag, mandatory flag */
-
-DBPATCH_ADD(5040000, 0, 1)
-
-DBPATCH_END()
+#endif /* ZABBIX_ALGO_H */

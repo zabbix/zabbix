@@ -24,7 +24,6 @@
 #include "log.h"
 #include "alerter_protocol.h"
 #include "service_protocol.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
 #include "dbcache.h"
 
 #define ZBX_POLL_INTERVAL	1

@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxalgo.h"
+
 #include "common.h"
 #include "log.h"
-
-#include "zbxalgo.h"
 
 static void	swap(zbx_binary_heap_t *heap, int index_1, int index_2);
 

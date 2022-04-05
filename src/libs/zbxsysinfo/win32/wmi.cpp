@@ -25,7 +25,6 @@ extern "C"
 #	include "sysinfo.h"
 #	include "log.h"
 #	include "zbxalgo.h"
-#	include "../../zbxalgo/vectorimpl.h"
 #	include "zbxjson.h"
 #	include "cfg.h"
 }
