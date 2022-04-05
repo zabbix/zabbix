@@ -21,7 +21,6 @@
 
 #include "log.h"
 #include "zbxipcservice.h"
-#include "../zbxalgo/vectorimpl.h"
 
 void	zbx_availability_flush(unsigned char *data, zbx_uint32_t size)
 {
