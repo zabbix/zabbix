@@ -12,9 +12,9 @@ INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (5
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50031,50009,1,3,1,'127.0.0.1','','623');
 INSERT INTO interface_snmp (interfaceid, version, bulk, community, securityname, securitylevel, authpassphrase, privpassphrase, authprotocol, privprotocol, contextname) VALUES (50029, 2, 1, '{$SNMP_COMMUNITY}', '', 0, '', '', 0, 0, '');
 INSERT INTO hstgrp (groupid,name) VALUES (50012,'API group for hosts');
-INSERT INTO hstgrp (groupid,name) VALUES (50013,'API group for templates');
+INSERT INTO tplgrp (groupid,name) VALUES (52013,'API group for templates');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50009, 50009, 50012);
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50011, 50010, 50013);
+INSERT INTO template_group (templategroupid, hostid, groupid) VALUES (50011, 50010, 52013);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50003, 50009, 50010);
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (400660, 50009, 50022, 0, 2,'API discovery rule','vfs.fs.discovery',30,90,0,'','',1,'','');
 INSERT INTO hstgrp (groupid,name) VALUES (50005,'API host group for update');

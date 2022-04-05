@@ -21,6 +21,15 @@
 
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
+/**
+ * @backup tplgrp
+ * @backup hstgrp
+ * @backup hosts
+ * @backup hosts_groups
+ * @backup template_group
+ * @backup valuemap
+ *
+ */
 class testConfiguration extends CAPITest {
 
 	public static function export_fail_data() {
@@ -62,7 +71,7 @@ class testConfiguration extends CAPITest {
 			[
 				'export' => [
 					'options' => [
-						'groups' => [
+						'host_groups' => [
 							'50012'
 						]
 					],
@@ -74,7 +83,7 @@ class testConfiguration extends CAPITest {
 			[
 				'export' => [
 					'options' => [
-						'groups' => [
+						'host_groups' => [
 							'50009'
 						],
 						'group' => [
@@ -141,7 +150,8 @@ class testConfiguration extends CAPITest {
 
 	public static function export_string_ids() {
 		return [
-			['groups'],
+			['host_groups'],
+			['template_groups'],
 			['hosts'],
 			['images'],
 			['maps'],
@@ -175,7 +185,7 @@ class testConfiguration extends CAPITest {
 			[
 				[
 					'options' => [
-							'groups' => []
+							'host_groups' => []
 					],
 					'prettyprint' => true
 				]
@@ -183,7 +193,7 @@ class testConfiguration extends CAPITest {
 			[
 				[
 					'options' => [
-							'groups' => ['11111111111111']
+							'host_groups' => ['11111111111111']
 					],
 					'prettyprint' => true
 				]
@@ -191,7 +201,15 @@ class testConfiguration extends CAPITest {
 			[
 				[
 					'options' => [
-							'groups' => ['50012']
+							'host_groups' => ['50012']
+					],
+					'prettyprint' => true
+				]
+			],
+			[
+				[
+					'options' => [
+						'template_groups' => ['52013']
 					],
 					'prettyprint' => true
 				]
@@ -207,8 +225,16 @@ class testConfiguration extends CAPITest {
 			[
 				[
 					'options' => [
-						'groups' => ['50012'],
+						'host_groups' => ['50012'],
 						'hosts' => ['50009']
+					]
+				]
+			],
+			[
+				[
+					'options' => [
+						'template_groups' => ['52013'],
+						'templates' => ['50010']
 					]
 				]
 			],
@@ -253,7 +279,7 @@ class testConfiguration extends CAPITest {
 			[
 				'import' => [
 					'rules' => [
-						'groups' => [
+						'host_groups' => [
 							'createMissing' => true
 						]
 					],
@@ -273,7 +299,7 @@ class testConfiguration extends CAPITest {
 			[
 				'import' => [
 					'rules' => [
-						'groups' => [
+						'host_groups' => [
 							'createMissing' => true
 						]
 					],
@@ -285,7 +311,7 @@ class testConfiguration extends CAPITest {
 				'import' => [
 					'format' => '',
 					'rules' => [
-						'groups' => [
+						'host_groups' => [
 							'createMissing' => true
 						]
 					],
@@ -309,7 +335,7 @@ class testConfiguration extends CAPITest {
 				'import' => [
 					'format' => 'json',
 					'rules' => [
-						'groups' => [
+						'host_groups' => [
 							'createMissing' => true
 						]
 					],
@@ -322,7 +348,7 @@ class testConfiguration extends CAPITest {
 				'import' => [
 					'format' => 'json',
 					'rules' => [
-						'groups' => [
+						'host_groups' => [
 							'createMissing' => true
 						]
 					],
@@ -355,7 +381,7 @@ class testConfiguration extends CAPITest {
 				'import' => [
 					'format' => 'json',
 					'rules' => [
-						'groups' => [
+						'host_groups' => [
 							'createMissing' => true
 						],
 						'users' => [
@@ -370,7 +396,7 @@ class testConfiguration extends CAPITest {
 				'import' => [
 					'format' => 'json',
 					'rules' => [
-						'groups' => [
+						'host_groups' => [
 							'createMissing' => true
 						]
 					]
@@ -400,7 +426,12 @@ class testConfiguration extends CAPITest {
 				'unexpected' => []
 			]],
 			[[
-				'parameter' => 'groups',
+				'parameter' => 'host_groups',
+				'expected' => ['createMissing', 'updateExisting'],
+				'unexpected' => ['deleteMissing']
+			]],
+			[[
+				'parameter' => 'template_groups',
 				'expected' => ['createMissing', 'updateExisting'],
 				'unexpected' => ['deleteMissing']
 			]],
@@ -662,7 +693,7 @@ class testConfiguration extends CAPITest {
 		$result = $this->call('configuration.import', [
 				'format' => $data['format'],
 				'rules' => [
-					'groups' => [
+					'host_groups' => [
 						'createMissing' => true
 					]
 				],
@@ -685,7 +716,7 @@ class testConfiguration extends CAPITest {
 			[
 				'format' => 'xml',
 				'rules' => [
-					'groups' => [
+					'host_groups' => [
 						'createMissing' => true
 					]
 				],
@@ -704,7 +735,7 @@ class testConfiguration extends CAPITest {
 			[
 				'format' => 'json',
 				'rules' => [
-					'groups' => [
+					'host_groups' => [
 						'createMissing' => true
 					]
 				],
@@ -715,7 +746,7 @@ class testConfiguration extends CAPITest {
 			[
 				'format' => 'yaml',
 				'rules' => [
-					'groups' => [
+					'host_groups' => [
 						'createMissing' => true
 					]
 				],
@@ -726,7 +757,7 @@ class testConfiguration extends CAPITest {
 			[
 				'format' => 'yaml',
 				'rules' => [
-					'groups' => [
+					'host_groups' => [
 						'createMissing' => true
 					]
 				],
@@ -737,7 +768,7 @@ class testConfiguration extends CAPITest {
 			[
 				'format' => 'yaml',
 				'rules' => [
-					'groups' => [
+					'host_groups' => [
 						'createMissing' => true
 					]
 				],
@@ -748,7 +779,7 @@ class testConfiguration extends CAPITest {
 			[
 				'format' => 'yaml',
 				'rules' => [
-					'groups' => [
+					'host_groups' => [
 						'createMissing' => true
 					]
 				],
@@ -759,7 +790,7 @@ class testConfiguration extends CAPITest {
 			[
 				'format' => 'yaml',
 				'rules' => [
-					'groups' => [
+					'host_groups' => [
 						'createMissing' => true
 					]
 				],
@@ -770,7 +801,7 @@ class testConfiguration extends CAPITest {
 			[
 				'format' => 'yaml',
 				'rules' => [
-					'groups' => [
+					'host_groups' => [
 						'createMissing' => true
 					]
 				],
@@ -781,7 +812,7 @@ class testConfiguration extends CAPITest {
 			[
 				'format' => 'yaml',
 				'rules' => [
-					'groups' => [
+					'host_groups' => [
 						'createMissing' => true
 					]
 				],
@@ -846,9 +877,10 @@ class testConfiguration extends CAPITest {
 
 	public static function import_users() {
 		return [
+			// test for host groups
 			[
 				'format' => 'xml',
-				'parameter' => 'groups',
+				'parameter' => 'host_groups',
 				'source' => '<?xml version="1.0" encoding="UTF-8"?>
 								<zabbix_export>
 								<version>3.2</version>
@@ -864,17 +896,61 @@ class testConfiguration extends CAPITest {
 			],
 			[
 				'format' => 'json',
-				'parameter' => 'groups',
+				'parameter' => 'host_groups',
 				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T12:29:57Z","groups":[{"name":"API host group json import as non Super Admin"}]}}',
 				'sql' => 'select * from hstgrp where name=\'API host group json import as non Super Admin\'',
 				'expected_error' => 'No permissions to call "hostgroup.create".'
 			],
 			[
 				'format' => 'yaml',
-				'parameter' => 'groups',
+				'parameter' => 'host_groups',
 				'source' => "---\nzabbix_export:\n  version: \"4.0\"\n  date: \"2020-08-03T12:41:17Z\"\n  groups:\n  - name: API host group yaml import as non Super Admin\n...\n",
 				'sql' => 'select * from hstgrp where name=\'API host group yaml import as non Super Admin\'',
 				'expected_error' => 'No permissions to call "hostgroup.create".'
+			],
+				// test for template groups
+			[
+			'format' => 'xml',
+			'parameter' => 'template_groups',
+			'source' => '<?xml version="1.0" encoding="UTF-8"?>
+						<zabbix_export>
+							<version>5.4</version>
+							<date>2022-04-05T13:50:12Z</date>
+							<groups>
+								<group>
+									<uuid>1b086ec667184dff8015c7f7bb5c5978</uuid>
+									<name>API template group xml import as non Super Admin</name>
+								</group>
+							</groups>
+							<templates>
+								<template>
+									<uuid>17e68f86419d40a18bb3b1d1a876d231</uuid>
+									<template>API xml import template as non Super Admin</template>
+									<name>API xml import template as non Super Admin</name>
+									<groups>
+										<group>
+											<name>API template group xml import as non Super Admin</name>
+										</group>
+									</groups>
+							</template>
+							</templates>
+						</zabbix_export>',
+			'sql' => 'select * from tplgrp where name=\'API template group xml import as non Super Admin\'',
+			'expected_error' => 'No permissions to call "templategroup.create".'
+			],
+			[
+				'format' => 'json',
+				'parameter' => 'template_groups',
+				'source' => '{"zabbix_export": {"version": "5.4","date": "2022-04-05T13:57:36Z","groups": [{"uuid": "1b086ec667184dff8015c7f7bb5c5978","name": "API template group xml import as non Super Admin"}],"templates": [{"uuid": "17e68f86419d40a18bb3b1d1a876d231","template": "API xml import template as non Super Admin","name": "API xml import template as non Super Admin","groups": [{"name": "API template group xml import as non Super Admin"}]}]}}',
+				'sql' => 'select * from tplgrp where name=\'API template group json import as non Super Admin\'',
+				'expected_error' => 'No permissions to call "templategroup.create".'
+			],
+			[
+				'format' => 'yaml',
+				'parameter' => 'template_groups',
+				'source' => "{zabbix_export: {version: '5.4', date: '2022-04-05T13:59:57Z', groups: [{uuid: 1b086ec667184dff8015c7f7bb5c5978, name: API template group xml import as non Super Admin}], templates: [{uuid: 17e68f86419d40a18bb3b1d1a876d231, template: API xml import template as non Super Admin, name: API xml import template as non Super Admin, groups: [{name: API template group xml import as non Super Admin}]}]}}",
+				'sql' => 'select * from tplgrp where name=\'API template group yaml import as non Super Admin\'',
+				'expected_error' => 'No permissions to call "templategroup.create".'
 			]
 		];
 	}
@@ -891,7 +967,8 @@ class testConfiguration extends CAPITest {
 					'format' => $format,
 					'rules' => [
 						$parameter => [
-							'createMissing' => true
+							'createMissing' => true,
+							'updateExisting' => false
 						]
 					],
 					'source' => $source

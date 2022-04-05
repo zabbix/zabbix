@@ -351,7 +351,7 @@ class testTemplateGroup extends CAPITest {
 					'52005',
 					'52006'
 				],
-				'expected_error' => 'Template "API Template" cannot be without template group.'
+				'expected_error' => 'Template "API Template 2" cannot be without template group.'
 			],
 			[
 				'templategroup' => [
