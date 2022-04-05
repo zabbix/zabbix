@@ -10332,13 +10332,48 @@ char	*dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int h
  ******************************************************************************/
 char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t hostid)
 {
-	char	*resolved_text;
+	zbx_token_t		token;
+	int			pos = 0, last_pos = 0;
+	char			*str = NULL, *name = NULL, *context = NULL;
+	size_t			str_alloc = 0, str_offset = 0;
+	zbx_dc_um_handle_t	*um_handle;
 
-	RDLOCK_CACHE;
-	resolved_text = dc_expand_user_macros(text, &hostid, 1);
-	UNLOCK_CACHE;
+	if ('\0' == *text)
+		return zbx_strdup(NULL, text);
 
-	return resolved_text;
+	um_handle = zbx_dc_open_user_macros();
+
+	for (; SUCCEED == zbx_token_find(text, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
+	{
+		char	*value = NULL;
+
+		if (ZBX_TOKEN_USER_MACRO != token.type)
+			continue;
+
+		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
+		zbx_dc_get_user_macro(um_handle, text + token.loc.l, &hostid, 1, &value);
+
+		if (NULL != value)
+		{
+			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, value);
+			zbx_free(value);
+		}
+		else
+		{
+			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + token.loc.l,
+					token.loc.r - token.loc.l + 1);
+		}
+
+		zbx_free(name);
+		zbx_free(context);
+
+		pos = token.loc.r;
+		last_pos = pos + 1;
+	}
+
+	zbx_strcpy_alloc(&str, &str_alloc, &str_offset, text + last_pos);
+
+	return str;
 }
 
 /******************************************************************************
@@ -13107,35 +13142,6 @@ void	zbx_get_host_interfaces_availability(zbx_uint64_t hostid, zbx_agent_availab
 
 }
 
-/*********************************************************************************
- *                                                                               *
- * Purpose: resolve user macros in parsed expression                             *
- *                                                                               *
- * Parameters: ctx - [IN] the expression evaluation context                      *
- *                                                                               *
- ********************************************************************************/
-void	zbx_dc_eval_expand_user_macros(zbx_eval_context_t *ctx)
-{
-	zbx_vector_uint64_t	hostids, functionids;
-
-	zbx_vector_uint64_create(&hostids);
-	zbx_vector_uint64_create(&functionids);
-
-	zbx_eval_get_functionids(ctx, &functionids);
-	zbx_vector_uint64_sort(&functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(&functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	RDLOCK_CACHE;
-
-	dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
-	(void)zbx_eval_expand_user_macros(ctx, hostids.values, hostids.values_num, dc_expand_user_macros_len, NULL);
-
-	UNLOCK_CACHE;
-
-	zbx_vector_uint64_destroy(&functionids);
-	zbx_vector_uint64_destroy(&hostids);
-}
-
 int	zbx_dc_maintenance_has_tags(void)
 {
 	int	ret;
@@ -13244,8 +13250,8 @@ void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *handle)
  * Purpose: resolve user macro using the specified hosts                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *handle, const zbx_uint64_t *hostids, int hostids_num,
-		const char *macro, char **value)
+void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *handle, const char *macro, const zbx_uint64_t *hostids,
+		int hostids_num, char **value)
 {
 	if (NULL == dc_um_cache)
 	{

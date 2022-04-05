@@ -1011,7 +1011,6 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t hostid);
 int	zbx_dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *hostids, int hostids_num,
 		char **value, char **error);
 
-
 /* diagnostic data */
 void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num);
 void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index);
@@ -1045,8 +1044,6 @@ void	zbx_get_host_interfaces_availability(zbx_uint64_t	hostid, zbx_agent_availab
 
 int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
 
-void	zbx_dc_eval_expand_user_macros(zbx_eval_context_t *ctx);
-
 void	zbx_db_trigger_explain_expression(const DB_TRIGGER *trigger, char **expression,
 		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
 		char **), int recovery);
@@ -1064,7 +1061,6 @@ zbx_dc_um_handle_t	*zbx_dc_open_user_macros_masked(void);
 
 void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *handle);
 
-void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *handle, const zbx_uint64_t *hostids, int hostids_num,
-		const char *macro, char **value);
-
+void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *handle, const char *macro, const zbx_uint64_t *hostids,
+		int hostids_num, char **value);
 #endif

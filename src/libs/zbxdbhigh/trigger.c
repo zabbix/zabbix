@@ -327,6 +327,8 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const DB_TRIGGER *trigger, zbx_
 	char			*error = NULL;
 	zbx_uint32_t		flag = 1 << state;
 	zbx_vector_uint64_t	functionids;
+	zbx_dc_um_handle_t	*um_handle;
+	int			ret;
 
 	if (NULL == trigger->cache)
 	{
@@ -368,8 +370,22 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const DB_TRIGGER *trigger, zbx_
 			break;
 		case ZBX_TRIGGER_CACHE_EVAL_CTX_MACROS:
 			if (NULL == db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX))
-					return NULL;
-			zbx_dc_eval_expand_user_macros(&cache->eval_ctx);
+				return NULL;
+
+			if (NULL == db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_HOSTIDS))
+				return NULL;
+
+			um_handle = zbx_dc_open_user_macros();
+
+			ret = zbx_eval_expand_user_macros(&cache->eval_ctx, cache->hostids.values,
+					cache->hostids.values_num, (zbx_macro_resolve_func_t)zbx_dc_get_user_macro,
+					um_handle, NULL);
+
+			zbx_dc_close_user_macros(um_handle);
+
+			if (SUCCEED != ret)
+				return NULL;
+
 			break;
 		case ZBX_TRIGGER_CACHE_HOSTIDS:
 			zbx_vector_uint64_create(&cache->hostids);

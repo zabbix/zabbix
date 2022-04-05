@@ -1764,23 +1764,9 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
  ******************************************************************************/
 static char	**dbsync_item_preproc_row(char **row)
 {
-#define ZBX_DBSYNC_ITEM_COLUMN_CALCITEM	0x08
-
-	zbx_uint64_t	hostid;
-	unsigned char	flags = 0, type;
-
-	/* return the original row if user macros are not used in target columns */
+	unsigned char	type;
 
 	ZBX_STR2UCHAR(type, row[3]);
-
-	if (ITEM_TYPE_CALCULATED == type)
-		flags |= ZBX_DBSYNC_ITEM_COLUMN_CALCITEM;
-
-	if (0 == flags)
-		return row;
-
-	/* get associated host identifier */
-	ZBX_STR2UINT64(hostid, row[1]);
 
 	/* expand user macros */
 
@@ -1788,20 +1774,15 @@ static char	**dbsync_item_preproc_row(char **row)
 	{
 		zbx_eval_context_t	ctx;
 		char			*error = NULL;
+		zbx_uint64_t		hostid;
+
+		/* get associated host identifier */
+		ZBX_STR2UINT64(hostid, row[1]);
 
 		if (FAIL == zbx_eval_parse_expression(&ctx, row[11], ZBX_EVAL_PARSE_CALC_EXPRESSION, &error))
 		{
 			zbx_eval_set_exception(&ctx, zbx_dsprintf(NULL, "Cannot parse formula: %s", error));
 			zbx_free(error);
-		}
-		else
-		{
-			if (SUCCEED != zbx_eval_expand_user_macros(&ctx, &hostid, 1, dc_expand_user_macros_len, &error))
-			{
-				zbx_eval_clear(&ctx);
-				zbx_eval_set_exception(&ctx, zbx_dsprintf(NULL, "Cannot evaluate formula: %s", error));
-				zbx_free(error);
-			}
 		}
 
 		row[49] = encode_expression(&ctx);
@@ -2203,7 +2184,6 @@ static int	dbsync_compare_trigger(const ZBX_DC_TRIGGER *trigger, const DB_ROW db
  ******************************************************************************/
 static char	**dbsync_trigger_preproc_row(char **row)
 {
-	zbx_vector_uint64_t	hostids, functionids;
 	zbx_eval_context_t	ctx, ctx_r;
 	char			*error = NULL;
 	unsigned char		mode, timer = ZBX_TRIGGER_TIMER_DEFAULT, flags;
@@ -2213,9 +2193,6 @@ static char	**dbsync_trigger_preproc_row(char **row)
 	if (ZBX_FLAG_DISCOVERY_PROTOTYPE == flags)
 		return row;
 
-	zbx_vector_uint64_create(&hostids);
-	zbx_vector_uint64_create(&functionids);
-
 	if (FAIL == zbx_eval_parse_expression(&ctx, row[2], ZBX_EVAL_TRIGGER_EXPRESSION, &error))
 	{
 		zbx_eval_set_exception(&ctx, zbx_dsprintf(NULL, "cannot parse trigger expression: %s", error));
@@ -2223,8 +2200,6 @@ static char	**dbsync_trigger_preproc_row(char **row)
 	}
 	else
 	{
-		zbx_eval_get_functionids(&ctx, &functionids);
-
 		if (SUCCEED == zbx_eval_check_timer_functions(&ctx))
 			timer |= ZBX_TRIGGER_TIMER_EXPRESSION;
 	}
@@ -2241,26 +2216,8 @@ static char	**dbsync_trigger_preproc_row(char **row)
 		}
 		else
 		{
-			zbx_eval_get_functionids(&ctx_r, &functionids);
-
 			if (SUCCEED == zbx_eval_check_timer_functions(&ctx_r))
 				timer |= ZBX_TRIGGER_TIMER_RECOVERY_EXPRESSION;
-		}
-	}
-
-	zbx_vector_uint64_sort(&functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(&functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
-
-	if (NULL != ctx.expression)
-	{
-		if (SUCCEED != zbx_eval_expand_user_macros(&ctx, hostids.values, hostids.values_num,
-				dc_expand_user_macros_len, &error))
-		{
-			zbx_eval_clear(&ctx);
-			zbx_eval_set_exception(&ctx, zbx_dsprintf(NULL, "cannot evaluate expression: %s", error));
-			zbx_free(error);
 		}
 	}
 
@@ -2269,25 +2226,11 @@ static char	**dbsync_trigger_preproc_row(char **row)
 
 	if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == mode)
 	{
-		if (NULL != ctx_r.expression)
-		{
-			if (SUCCEED != zbx_eval_expand_user_macros(&ctx_r, hostids.values, hostids.values_num,
-					dc_expand_user_macros_len, &error))
-			{
-				zbx_eval_clear(&ctx_r);
-				zbx_eval_set_exception(&ctx_r, zbx_dsprintf(NULL, "cannot evaluate recovery"
-						" expression: %s", error));
-				zbx_free(error);
-			}
-		}
 		row[17] = encode_expression(&ctx_r);
 		zbx_eval_clear(&ctx_r);
 	}
 
 	row[18] = zbx_dsprintf(NULL, "%d", timer);
-
-	zbx_vector_uint64_destroy(&functionids);
-	zbx_vector_uint64_destroy(&hostids);
 
 	return row;
 }
