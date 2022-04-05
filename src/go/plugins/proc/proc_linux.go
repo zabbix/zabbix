@@ -178,26 +178,26 @@ type procStatus struct {
 type procSummary struct {
 	Name          string  `json:"name"`
 	Processes     int     `json:"processes"`
-        Vsize         uint64  `json:"vsize"`
-        Pmem          float64 `json:"pmem"`
-        Rss           uint64  `json:"rss"`
-        Data          uint64  `json:"data"`
-        Exe           uint64  `json:"exe"`
-        Lck           uint64  `json:"lck"`
-        Lib           uint64  `json:"lib"`
-        Pin           uint64  `json:"pin"`
-        Pte           uint64  `json:"pte"`
-        Size          uint64  `json:"size"`
-        Stk           uint64  `json:"stk"`
-        Swap          uint64  `json:"swap"`
-        CpuTimeUser   float64 `json:"cputime_user"`
-        CpuTimeSystem float64 `json:"cputime_system"`
-        CtxSwitches   uint64  `json:"ctx_switches"`
-        Threads       uint64  `json:"threads"`
-        PageFaults    uint64  `json:"page_faults"`
-        Fds           uint64  `json:"fds"`
-        IoReadsB      uint64  `json:"io_read_b"`
-        IoWritesB     uint64  `json:"io_write_b"`
+	Vsize         uint64  `json:"vsize"`
+	Pmem          float64 `json:"pmem"`
+	Rss           uint64  `json:"rss"`
+	Data          uint64  `json:"data"`
+	Exe           uint64  `json:"exe"`
+	Lck           uint64  `json:"lck"`
+	Lib           uint64  `json:"lib"`
+	Pin           uint64  `json:"pin"`
+	Pte           uint64  `json:"pte"`
+	Size          uint64  `json:"size"`
+	Stk           uint64  `json:"stk"`
+	Swap          uint64  `json:"swap"`
+	CpuTimeUser   float64 `json:"cputime_user"`
+	CpuTimeSystem float64 `json:"cputime_system"`
+	CtxSwitches   uint64  `json:"ctx_switches"`
+	Threads       uint64  `json:"threads"`
+	PageFaults    uint64  `json:"page_faults"`
+	Fds           uint64  `json:"fds"`
+	IoReadsB      uint64  `json:"io_read_b"`
+	IoWritesB     uint64  `json:"io_write_b"`
 }
 
 type thread struct {
