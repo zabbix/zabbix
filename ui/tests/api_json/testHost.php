@@ -61,7 +61,15 @@ class testHost extends CAPITest {
 			// Discovered host to test host.get with limitSelects option.
 			'discovered_limit_selects' => null
 		],
-		'templateids' => null,
+		'templateids' => [
+			'api_test_hosts_f_tpl' => null,
+			'api_test_hosts_c_tpl' => null,
+			'api_test_hosts_a_tpl' => null,
+			'api_test_hosts_e_tpl' => null,
+			'api_test_hosts_b_tpl' => null,
+			'api_test_hosts_d_tpl' => null,
+			'api_test_hosts_tpl_with_item' => null
+		],
 		'maintenanceids' => null,
 		// Created hosts during host.create test (deleted at the end).
 		'created' => []
@@ -365,14 +373,20 @@ class testHost extends CAPITest {
 		];
 		$templates = CDataHelper::call('template.create', $templates_data);
 		$this->assertArrayHasKey('templateids', $templates);
-		self::$data['templateids'] = $templates['templateids'];
+		self::$data['templateids']['api_test_hosts_f_tpl'] = $templates['templateids'][0];
+		self::$data['templateids']['api_test_hosts_c_tpl'] = $templates['templateids'][1];
+		self::$data['templateids']['api_test_hosts_a_tpl'] = $templates['templateids'][2];
+		self::$data['templateids']['api_test_hosts_e_tpl'] = $templates['templateids'][3];
+		self::$data['templateids']['api_test_hosts_b_tpl'] = $templates['templateids'][4];
+		self::$data['templateids']['api_test_hosts_d_tpl'] = $templates['templateids'][5];
+		self::$data['templateids']['api_test_hosts_tpl_with_item'] = $templates['templateids'][6];
 
 		/*
 		 * Create item for that one template. Item IDs do not matter, because there is only one and it will removed
 		 * after tests are complete together with this template.
 		 */
 		$items = CDataHelper::call('item.create', [
-			'hostid' => $templates['templateids'][6],
+			'hostid' => self::$data['templateids']['api_test_hosts_tpl_with_item'],
 			'name' => 'API test hosts - template item',
 			'key_' => 'api_test_hosts_tpl_item',
 			'type' => ITEM_TYPE_TRAPPER,
@@ -421,10 +435,10 @@ class testHost extends CAPITest {
 				// First two templates.
 				'templates' => [
 					[
-						'templateid' => self::$data['templateids'][0]
+						'templateid' => self::$data['templateids']['api_test_hosts_f_tpl']
 					],
 					[
-						'templateid' => self::$data['templateids'][1]
+						'templateid' => self::$data['templateids']['api_test_hosts_c_tpl']
 					]
 				]
 			],
@@ -440,10 +454,10 @@ class testHost extends CAPITest {
 				// First two templates. Third and fourth templates are manualy added.
 				'templates' => [
 					[
-						'templateid' => self::$data['templateids'][0]
+						'templateid' => self::$data['templateids']['api_test_hosts_f_tpl']
 					],
 					[
-						'templateid' => self::$data['templateids'][1]
+						'templateid' => self::$data['templateids']['api_test_hosts_c_tpl']
 					]
 				]
 			],
@@ -459,7 +473,7 @@ class testHost extends CAPITest {
 				// Template that has item.
 				'templates' => [
 					[
-						'templateid' => $templates['templateids'][5]
+						'templateid' => self::$data['templateids'][ 'api_test_hosts_tpl_with_item']
 					]
 				]
 			],
@@ -472,10 +486,25 @@ class testHost extends CAPITest {
 					]
 				],
 
-				// Does not matter if templates are manually added or automatically.
+				// Does not matter if templates are manually added or automatically. Important is the order.
 				'templates' => [
 					[
-						'templateid' => $templates['templateids'][5]
+						'templateid' => self::$data['templateids'][ 'api_test_hosts_f_tpl']
+					],
+					[
+						'templateid' => self::$data['templateids'][ 'api_test_hosts_c_tpl']
+					],
+					[
+						'templateid' => self::$data['templateids'][ 'api_test_hosts_a_tpl']
+					],
+					[
+						'templateid' => self::$data['templateids'][ 'api_test_hosts_e_tpl']
+					],
+					[
+						'templateid' => self::$data['templateids'][ 'api_test_hosts_b_tpl']
+					],
+					[
+						'templateid' => self::$data['templateids'][ 'api_test_hosts_d_tpl']
 					]
 				]
 			]
@@ -519,11 +548,14 @@ class testHost extends CAPITest {
 				'where' => ['hostid' => $hosts['hostids'][$idx]]
 			];
 
-			if (array_key_exists('templates', $host_discovery) && $host_discovery['templates']) {
+			if (array_key_exists('templates', $host_prototype) && $host_prototype['templates']) {
 				foreach ($host_prototype['templates'] as $template) {
 					$upd_hosts_templates[] = [
 						'values' => ['link_type' => TEMPLATE_LINK_LLD],
-						'where' => ['hostid' => $hosts['hostids'][$idx], 'templateid' => $template['templateid']]
+						'where' => [
+							'hostid' => $hosts['hostids'][$idx],
+							'templateid' => $template['templateid']
+						]
 					];
 				}
 			}
@@ -551,24 +583,24 @@ class testHost extends CAPITest {
 			// Host contains only manual templates.
 			[
 				'hostid' => self::$data['hostids']['discovered_manual_templates'],
-				'templateid' => self::$data['templateids'][2],
+				'templateid' => self::$data['templateids']['api_test_hosts_a_tpl'],
 				'link_type' => TEMPLATE_LINK_MANUAL
 			],
 			[
 				'hostid' => self::$data['hostids']['discovered_manual_templates'],
-				'templateid' => self::$data['templateids'][3],
+				'templateid' => self::$data['templateids']['api_test_hosts_e_tpl'],
 				'link_type' => TEMPLATE_LINK_MANUAL
 			],
 
 			// Host contains automatically added templates and manually added templates.
 			[
 				'hostid' => self::$data['hostids']['discovered_auto_and_manual_templates'],
-				'templateid' => self::$data['templateids'][2],
+				'templateid' => self::$data['templateids']['api_test_hosts_a_tpl'],
 				'link_type' => TEMPLATE_LINK_MANUAL
 			],
 			[
 				'hostid' => self::$data['hostids']['discovered_auto_and_manual_templates'],
-				'templateid' => self::$data['templateids'][3],
+				'templateid' => self::$data['templateids']['api_test_hosts_e_tpl'],
 				'link_type' => TEMPLATE_LINK_MANUAL
 			]
 		];
@@ -888,7 +920,7 @@ class testHost extends CAPITest {
 			'Test host.get tag as extend' => [
 				'params' => [
 					'hostids' => 'tags',
-					'selectTags' => 'extend'
+					'selectTags' => API_OUTPUT_EXTEND
 				],
 				'expected_result' => [
 					'tags' => [
@@ -951,11 +983,16 @@ class testHost extends CAPITest {
 		}
 	}
 
+	/**
+	 * Data provider for host.get to check field presence and exclusion.
+	 *
+	 * @return array
+	 */
 	public static function getHostGetFieldPresenceData() {
 		return [
 			'Check if {"output": "extend"} includes "inventory_mode" and excludes write-only properties' => [
 				'request' => [
-					'output' => 'extend',
+					'output' => API_OUTPUT_EXTEND,
 					'hostids' => 'write_only'
 				],
 				'expected_result' => [
@@ -1001,7 +1038,7 @@ class testHost extends CAPITest {
 	}
 
 	/**
-	 * Test host.get and field presence.
+	 * Test host.get and field presence and exclusion.
 	 *
 	 * @dataProvider getHostGetFieldPresenceData
 	 */
@@ -1010,7 +1047,7 @@ class testHost extends CAPITest {
 		$request['hostids'] = self::$data['hostids']['write_only'];
 		$expected_result['hostid'] = self::$data['hostids']['write_only'];
 
-		$result = $this->call('host.get', $request, null);
+		$result = $this->call('host.get', $request);
 
 		foreach ($result['result'] as $host) {
 			foreach ($expected_result as $key => $value) {
@@ -1026,6 +1063,2005 @@ class testHost extends CAPITest {
 	}
 
 	/**
+	 * Data provider for host.update to check how templates are replaced.
+	 *
+	 * @return array
+	 */
+	public static function getHostUpdateTemplatesData() {
+		return [
+			'Test host.update - host has no templates' => [
+				'request' => [
+					'hostid' => 'discovered_no_templates',
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+
+			// Replace the templates.
+			'Test host.update - host has manual templates' => [
+				'request' => [
+					'hostid' => 'discovered_manual_templates',
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+
+			// Try to replace with manual templates, but it's not possible. They will remain auto.
+			'Test host.update - host has auto templates (same)' => [
+				'request' => [
+					'hostid' => 'discovered_auto_templates',
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						]
+					]
+				]
+			],
+
+			// Try to replace the templates, but only manual templates are added, since original ones are auto.
+			'Test host.update - host has auto templates (different)' => [
+				'request' => [
+					'hostid' => 'discovered_auto_templates',
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_a_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_e_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_a_tpl',
+							'host' => 'api_test_hosts_a_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_e_tpl',
+							'host' => 'api_test_hosts_e_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+
+			// Try to replace the templates, but only manual templates are replaced. Auto templates remain.
+			'Test host.update - host has manual and auto templates' => [
+				'request' => [
+					'hostid' => 'discovered_auto_and_manual_templates',
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_b_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_d_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_b_tpl',
+							'host' => 'api_test_hosts_b_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_d_tpl',
+							'host' => 'api_test_hosts_d_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+
+			/*
+			 * Possibly incorrect behavior in API in case templates that are added are same as the ones that should be
+			 * cleared. Currenlty templates that are added take priority. They do not cancel each other out.
+			 */
+			'Test host.update with clear - host has no templates (same)' => [
+				'request' => [
+					'hostid' => 'discovered_no_templates',
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					],
+					'templates_clear' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+			'Test host.update with clear - host has no templates (different)' => [
+				'request' => [
+					'hostid' => 'discovered_no_templates',
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					],
+					'templates_clear' => [
+						[
+							'templateid' => 'api_test_hosts_a_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_e_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+			'Test host.update with clear only - host has no templates' => [
+				'request' => [
+					'hostid' => 'discovered_no_templates',
+					'templates_clear' => [
+						[
+							'templateid' => 'api_test_hosts_a_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_e_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => []
+				]
+			],
+			'Test host.update with clear - host has manual templates (same)' => [
+				'request' => [
+					'hostid' => 'discovered_manual_templates',
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					],
+					'templates_clear' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+			'Test host.update with clear non-existing - host has manual templates' => [
+				'request' => [
+					'hostid' => 'discovered_manual_templates',
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_a_tpl'
+						]
+					],
+					'templates_clear' => [
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_e_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_a_tpl',
+							'host' => 'api_test_hosts_a_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+			'Test host.update with clear existing - host has manual templates' => [
+				'request' => [
+					'hostid' => 'discovered_manual_templates',
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_a_tpl'
+						]
+					],
+					'templates_clear' => [
+						[
+							'templateid' => 'api_test_hosts_e_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_a_tpl',
+							'host' => 'api_test_hosts_a_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+			'Test host.update with clear non-existing - host has auto templates' => [
+				'request' => [
+					'hostid' => 'discovered_auto_templates',
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						]
+					],
+					'templates_clear' => [
+						[
+							'templateid' => 'api_test_hosts_e_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						]
+					]
+				]
+			],
+			'Test host.update with clear existing - host has auto templates' => [
+				'request' => [
+					'hostid' => 'discovered_auto_templates',
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					],
+					'templates_clear' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						]
+					]
+				]
+			],
+			'Test host.update with clear - host has auto templates' => [
+				'request' => [
+					'hostid' => 'discovered_auto_templates',
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_a_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_e_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						]
+					],
+					'templates_clear' => [
+						[
+							'templateid' => 'api_test_hosts_a_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_a_tpl',
+							'host' => 'api_test_hosts_a_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_e_tpl',
+							'host' => 'api_test_hosts_e_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test host.update by adding new templates and replacing templates.
+	 *
+	 * @dataProvider getHostUpdateTemplatesData
+	 */
+	public function testHost_UpdateTemplates($request, $expected_result) {
+		// Replace ID placeholders with real IDs.
+		$request['hostid'] = self::$data['hostids'][$request['hostid']];
+
+		foreach (['templates', 'templates_clear'] as $field) {
+			if (array_key_exists($field, $request)) {
+				foreach ($request[$field] as &$template) {
+					$template['templateid'] = self::$data['templateids'][$template['templateid']];
+				}
+				unset($template);
+			}
+		}
+
+		foreach ($expected_result['parentTemplates'] as &$template) {
+			$template['templateid'] = self::$data['templateids'][$template['templateid']];
+		}
+		unset($template);
+
+		$hosts_old = $this->store([$request['hostid']]);
+
+		// Update templates on hosts.
+		$hosts_upd = $this->call('host.update', $request);
+		$this->assertArrayHasKey('hostids', $hosts_upd['result']);
+
+		// Check data after update.
+		$hosts = $this->call('host.get', [
+			'output' => ['hostid', 'host'],
+			'selectParentTemplates' => ['templateid', 'host', 'link_type'],
+			'hostids' => $request['hostid']
+		]);
+		$host = reset($hosts['result']);
+
+		$this->assertSame($expected_result['parentTemplates'], $host['parentTemplates'],
+			'host.update with templates failed for host "'.$host['host'].'".'
+		);
+
+		$this->revert($hosts_old);
+	}
+
+	/**
+	 * Data provider for host.massupdate to check how templates are replaced.
+	 *
+	 * @return array
+	 */
+	public static function getHostMassUpdateTemplatesData() {
+		return [
+			'Test host.massupdate - host has no templates' => [
+				'request' => [
+					'hosts' => [
+						[
+							'hostid' => 'discovered_no_templates'
+						]
+					],
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+
+			// Replace the templates.
+			'Test host.massupdate - host has manual templates' => [
+				'request' => [
+					'hosts' => [
+						[
+							'hostid' => 'discovered_manual_templates'
+						]
+					],
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+
+			// Try to replace with manual templates, but it's not possible. They will remain auto.
+			'Test host.massupdate - host has auto templates (same)' => [
+				'request' => [
+					'hosts' => [
+						[
+							'hostid' => 'discovered_auto_templates'
+						]
+					],
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						]
+					]
+				]
+			],
+
+			// Try to replace the templates, but only manual templates are added, since original ones are auto.
+			'Test host.massupdate - host has auto templates (different)' => [
+				'request' => [
+					'hosts' => [
+						[
+							'hostid' => 'discovered_auto_templates'
+						]
+					],
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_a_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_e_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_a_tpl',
+							'host' => 'api_test_hosts_a_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_e_tpl',
+							'host' => 'api_test_hosts_e_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+
+			// Try to replace the templates, but only manual templates are replaced. Auto templates remain.
+			'Test host.massupdate - host has manual and auto templates' => [
+				'request' => [
+					'hosts' => [
+						[
+							'hostid' => 'discovered_auto_and_manual_templates'
+						]
+					],
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_b_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_d_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_b_tpl',
+							'host' => 'api_test_hosts_b_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_d_tpl',
+							'host' => 'api_test_hosts_d_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+
+			/*
+			 * Possibly incorrect behavior in API in case templates that are added are same as the ones that should be
+			 * cleared. Currenlty templates that are added take priority. They do not cancel each other out.
+			 */
+			'Test host.massupdate with clear - host has no templates (same)' => [
+				'request' => [
+					'hosts' => [
+						[
+							'hostid' => 'discovered_no_templates'
+						]
+					],
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					],
+					'templates_clear' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+			'Test host.massupdate with clear - host has no templates (different)' => [
+				'request' => [
+					'hosts' => [
+						[
+							'hostid' => 'discovered_no_templates'
+						]
+					],
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					],
+					'templates_clear' => [
+						[
+							'templateid' => 'api_test_hosts_a_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_e_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+			'Test host.massupdate with clear only - host has no templates' => [
+				'request' => [
+					'hosts' => [
+						[
+							'hostid' => 'discovered_no_templates'
+						]
+					],
+					'templates_clear' => [
+						[
+							'templateid' => 'api_test_hosts_a_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_e_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => []
+				]
+			],
+			'Test host.massupdate with clear - host has manual templates (same)' => [
+				'request' => [
+					'hosts' => [
+						[
+							'hostid' => 'discovered_manual_templates'
+						]
+					],
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					],
+					'templates_clear' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+			'Test host.massupdate with clear non-existing - host has manual templates' => [
+				'request' => [
+					'hosts' => [
+						[
+							'hostid' => 'discovered_manual_templates'
+						]
+					],
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_a_tpl'
+						]
+					],
+					'templates_clear' => [
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_e_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_a_tpl',
+							'host' => 'api_test_hosts_a_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+			'Test host.massupdate with clear existing - host has manual templates' => [
+				'request' => [
+					'hosts' => [
+						[
+							'hostid' => 'discovered_manual_templates'
+						]
+					],
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_a_tpl'
+						]
+					],
+					'templates_clear' => [
+						[
+							'templateid' => 'api_test_hosts_e_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_a_tpl',
+							'host' => 'api_test_hosts_a_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+			'Test host.massupdate with clear non-existing - host has auto templates' => [
+				'request' => [
+					'hosts' => [
+						[
+							'hostid' => 'discovered_auto_templates'
+						]
+					],
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						]
+					],
+					'templates_clear' => [
+						[
+							'templateid' => 'api_test_hosts_e_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						]
+					]
+				]
+			],
+			'Test host.massupdate with clear existing - host has auto templates' => [
+				'request' => [
+					'hosts' => [
+						[
+							'hostid' => 'discovered_auto_templates'
+						]
+					]	,
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					],
+					'templates_clear' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						]
+					]
+				]
+			],
+			'Test host.massupdate with clear - host has auto templates' => [
+				'request' => [
+					'hosts' => [
+						[
+							'hostid' => 'discovered_auto_templates'
+						]
+					],
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_a_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_e_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						]
+					],
+					'templates_clear' => [
+						[
+							'templateid' => 'api_test_hosts_a_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_a_tpl',
+							'host' => 'api_test_hosts_a_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_e_tpl',
+							'host' => 'api_test_hosts_e_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+			'Test host.massupdate with clear - host has manual and auto templates' => [
+				'request' => [
+					'hosts' => [
+						[
+							'hostid' => 'discovered_auto_and_manual_templates'
+						]
+					],
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_e_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_b_tpl'
+						]
+					],
+					'templates_clear' => [
+						[
+							'templateid' => 'api_test_hosts_a_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_d_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_e_tpl',
+							'host' => 'api_test_hosts_e_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_b_tpl',
+							'host' => 'api_test_hosts_b_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test host.massupdate by adding new templates and replacing templates.
+	 *
+	 * @dataProvider getHostMassUpdateTemplatesData
+	 */
+	public function testHost_MassUpdateTemplates($request, $expected_result) {
+		// Replace ID placeholders with real IDs.
+		$hostids = [];
+
+		foreach ($request['hosts'] as &$host) {
+			$host['hostid'] = self::$data['hostids'][$host['hostid']];
+			$hostids[] = $host['hostid'];
+		}
+		unset($host);
+
+		foreach (['templates', 'templates_clear'] as $field) {
+			if (array_key_exists($field, $request)) {
+				foreach ($request[$field] as &$template) {
+					$template['templateid'] = self::$data['templateids'][$template['templateid']];
+				}
+				unset($template);
+			}
+		}
+
+		foreach ($expected_result['parentTemplates'] as &$template) {
+			$template['templateid'] = self::$data['templateids'][$template['templateid']];
+		}
+		unset($template);
+
+		$hosts_old = $this->store($hostids);
+
+		// Update templates on hosts.
+		$hosts_upd = $this->call('host.massupdate', $request);
+		$this->assertArrayHasKey('hostids', $hosts_upd['result']);
+
+		// Check data after update.
+		$hosts = $this->call('host.get', [
+			'output' => ['hostid', 'host'],
+			'selectParentTemplates' => ['templateid', 'host', 'link_type'],
+			'hostids' => $hostids
+		]);
+		$hosts = $hosts['result'];
+
+		foreach ($hosts as $host) {
+			$this->assertSame($expected_result['parentTemplates'], $host['parentTemplates'],
+				'host.massupdate with templates failed for host "'.$host['host'].'".'
+			);
+		}
+
+		$this->revert($hosts_old);
+	}
+
+	/**
+	 * Data provider for host.massadd to check how templates are added.
+	 *
+	 * @return array
+	 */
+	public static function getHostMassAddTemplatesData() {
+		return [
+			'Test host.massadd - host has no templates' => [
+				'request' => [
+					'hosts' => [
+						[
+							'hostid' => 'discovered_no_templates'
+						]
+					],
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+
+			// Add templates to exising manual templates.
+			'Test host.massadd - host has manual templates' => [
+				'request' => [
+					'hosts' => [
+						[
+							'hostid' => 'discovered_manual_templates'
+						]
+					],
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_a_tpl',
+							'host' => 'api_test_hosts_a_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_e_tpl',
+							'host' => 'api_test_hosts_e_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+
+			// Add same templates to exising auto templates. Not possible, since those templates are already auto.
+			'Test host.massadd - host has auto templates (same)' => [
+				'request' => [
+					'hosts' => [
+						[
+							'hostid' => 'discovered_auto_templates'
+						]
+					],
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						]
+					]
+				]
+			],
+
+			// Add different templates to exising auto templates.
+			'Test host.massadd - host has auto templates (different)' => [
+				'request' => [
+					'hosts' => [
+						[
+							'hostid' => 'discovered_auto_templates'
+						]
+					],
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_a_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_e_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_a_tpl',
+							'host' => 'api_test_hosts_a_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_e_tpl',
+							'host' => 'api_test_hosts_e_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+
+			// Add templates to exising auto and manual templates.
+			'Test host.massadd - host has manual and auto templates' => [
+				'request' => [
+					'hosts' => [
+						[
+							'hostid' => 'discovered_auto_and_manual_templates'
+						]
+					],
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_b_tpl'
+						],
+						[
+							'templateid' => 'api_test_hosts_d_tpl'
+						]
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_a_tpl',
+							'host' => 'api_test_hosts_a_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_e_tpl',
+							'host' => 'api_test_hosts_e_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_b_tpl',
+							'host' => 'api_test_hosts_b_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						],
+						[
+							'templateid' => 'api_test_hosts_d_tpl',
+							'host' => 'api_test_hosts_d_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test host.massadd by adding new templates to exising manual and auto templates.
+	 *
+	 * @dataProvider getHostMassAddTemplatesData
+	 */
+	public function testHost_MassAddTemplates($request, $expected_result) {
+		// Replace ID placeholders with real IDs.
+		$hostids = [];
+
+		foreach ($request['hosts'] as &$host) {
+			$host['hostid'] = self::$data['hostids'][$host['hostid']];
+			$hostids[] = $host['hostid'];
+		}
+		unset($host);
+
+		foreach ($request['templates'] as &$template) {
+			$template['templateid'] = self::$data['templateids'][$template['templateid']];
+		}
+		unset($template);
+
+		foreach ($expected_result['parentTemplates'] as &$template) {
+			$template['templateid'] = self::$data['templateids'][$template['templateid']];
+		}
+		unset($template);
+
+		$hosts_old = $this->store($hostids);
+
+		// Add templates on hosts.
+		$hosts_upd = $this->call('host.massadd', $request);
+		$this->assertArrayHasKey('hostids', $hosts_upd['result']);
+
+		// Check data after update.
+		$hosts = $this->call('host.get', [
+			'output' => ['hostid', 'host'],
+			'selectParentTemplates' => ['templateid', 'host', 'link_type'],
+			'hostids' => $hostids
+		]);
+		$hosts = $hosts['result'];
+
+		foreach ($hosts as $host) {
+			$this->assertSame($expected_result['parentTemplates'], $host['parentTemplates'],
+				'host.massadd with templates failed for host "'.$host['host'].'".'
+			);
+		}
+
+		$this->revert($hosts_old);
+	}
+
+	/**
+	 * Data provider for host.massremove to check how templates are removed.
+	 *
+	 * @return array
+	 */
+	public static function getHostMassRemoveTemplatesData() {
+		return [
+			'Test host.massremove - host has no templates' => [
+				'request' => [
+					'hostids' => [
+						'discovered_no_templates'
+					],
+					'templateids' => [
+						'api_test_hosts_f_tpl',
+						'api_test_hosts_c_tpl'
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => []
+				]
+			],
+			'Test host.massremove - host has manual templates' => [
+				'request' => [
+					'hostids' => [
+						'discovered_manual_templates'
+					],
+					'templateids' => [
+						'api_test_hosts_a_tpl'
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_e_tpl',
+							'host' => 'api_test_hosts_e_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			],
+			'Test host.massremove - host has auto templates' => [
+				'request' => [
+					'hostids' => [
+						'discovered_auto_templates'
+					],
+					'templateids' => [
+						'api_test_hosts_f_tpl'
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						]
+					]
+				]
+			],
+			'Test host.massremove - host has manual and auto templates' => [
+				'request' => [
+					'hostids' => [
+						'discovered_auto_and_manual_templates'
+					],
+					'templateids' => [
+						'api_test_hosts_f_tpl',
+						'api_test_hosts_a_tpl'
+					]
+				],
+				'expected_result' => [
+					'parentTemplates' => [
+						[
+							'templateid' => 'api_test_hosts_f_tpl',
+							'host' => 'api_test_hosts_f_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_c_tpl',
+							'host' => 'api_test_hosts_c_tpl',
+							'link_type' => (string) TEMPLATE_LINK_LLD
+						],
+						[
+							'templateid' => 'api_test_hosts_e_tpl',
+							'host' => 'api_test_hosts_e_tpl',
+							'link_type' => (string) TEMPLATE_LINK_MANUAL
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test host.massremove to remove the templates from hosts.
+	 *
+	 * @dataProvider getHostMassRemoveTemplatesData
+	 */
+	public function testHost_MassRemoveTemplates($request, $expected_result) {
+		// Replace ID placeholders with real IDs.
+		foreach ($request['hostids'] as &$hostid) {
+			$hostid = self::$data['hostids'][$hostid];
+		}
+		unset($hostid);
+
+		foreach ($request['templateids'] as &$templateid) {
+			$templateid = self::$data['templateids'][$templateid];
+		}
+		unset($templateid);
+
+		foreach ($expected_result['parentTemplates'] as &$template) {
+			$template['templateid'] = self::$data['templateids'][$template['templateid']];
+		}
+		unset($template);
+
+		$hosts_old = $this->store($request['hostids']);
+
+		// Add templates on hosts.
+		$hosts_upd = $this->call('host.massremove', $request);
+		$this->assertArrayHasKey('hostids', $hosts_upd['result']);
+
+		// Check data after update.
+		$hosts = $this->call('host.get', [
+			'output' => ['hostid', 'host'],
+			'selectParentTemplates' => ['templateid', 'host', 'link_type'],
+			'hostids' => $request['hostids']
+		]);
+		$hosts = $hosts['result'];
+
+		foreach ($hosts as $host) {
+			$this->assertSame($expected_result['parentTemplates'], $host['parentTemplates'],
+				'host.massremove with templates failed for host "'.$host['host'].'".'
+			);
+		}
+
+		$this->revert($hosts_old);
+	}
+
+	/**
+	 * Data provider for host.update to check inheritance.
+	 *
+	 * @return array
+	 */
+	public static function getHostInheritanceData() {
+		return [
+			'Test host.update inheritance - host has no templates' => [
+				'request' => [
+					'hostid' => 'discovered_no_templates',
+					// Add template and then check if results match.
+					'templates' => [
+						[
+							'templateid' => 'api_test_hosts_tpl_with_item'
+						]
+					]
+				],
+				'expected_results' => [
+					'update' => [
+						'item_keys' => [
+							'api_test_hosts_tpl_item'
+						]
+					],
+					'unlink' => [
+						'item_keys' => [
+							'api_test_hosts_tpl_item'
+						]
+					],
+					'clear' => [
+						'item_keys' => []
+					]
+				]
+			],
+			'Test host.update inheritance - host has auto templates' => [
+				'request' => [
+					'hostid' => 'discovered_clear',
+					// This does not matter because auto templates cannot be replaced.
+					'templates' => []
+				],
+				'expected_results' => [
+					'update' => [
+						'item_keys' => [
+							'api_test_hosts_tpl_item'
+						]
+					],
+					'unlink' => [
+						'item_keys' => [
+							'api_test_hosts_tpl_item'
+						]
+					],
+					'clear' => [
+						'item_keys' => [
+							'api_test_hosts_tpl_item'
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test host.update and check if item(s) exist on host after template has been added. Test unlink and check if items
+	 * remain on host. Test clear and check if items are removed from host as well.
+	 *
+	 * @dataProvider getHostInheritanceData
+	 */
+	public function testHost_Inheritance($host, $expected_results) {
+		// Replace ID placeholder with real ID.
+		$host['hostid'] = self::$data['hostids'][$host['hostid']];
+
+		foreach ($host['templates'] as &$template) {
+			$template['templateid'] = self::$data['templateids'][$template['templateid']];
+		}
+		unset($template);
+
+		$hosts_old = $this->store([$host['hostid']]);
+
+		// Add/replace templates on host and check if items are inherited on host.
+		$this->call('host.update', $host);
+		$item_keys = $this->getItemKeysOnHost($host['hostid']);
+		$this->assertSame($expected_results['update']['item_keys'], $item_keys,
+			'Updating templates failed: mismatching results on host with ID "'.$host['hostid'].'".'
+		);
+
+		// Then unlink the template from host and check if item still exists on host.
+		$this->revert($hosts_old);
+		$item_keys = $this->getItemKeysOnHost($host['hostid']);
+		$this->assertSame($expected_results['unlink']['item_keys'], $item_keys,
+			'Unlinking templates failed: mismatching results on host with ID "'.$host['hostid'].'".'
+		);
+
+		// Add/replace templates on host again to make the link and check if items are still on host.
+		$this->call('host.update', $host);
+		$item_keys = $this->getItemKeysOnHost($host['hostid']);
+		$this->assertSame($expected_results['update']['item_keys'], $item_keys,
+			'Re-updating templates failed: mismatching results on host with ID "'.$host['hostid'].'".'
+		);
+
+		// Then clear the template from host and check if items no longer exist on host.
+		$hosts = $this->call('host.get', [
+			'output' => ['hostid', 'host'],
+			'selectParentTemplates' => ['templateid'],
+			'hostids' => [$host['hostid']]
+		]);
+		$this->revert($hosts['result'], true);
+		$item_keys = $this->getItemKeysOnHost($host['hostid']);
+		$this->assertSame($expected_results['clear']['item_keys'], $item_keys,
+			'Clearing templates failed: mismatching results on host with ID "'.$host['hostid'].'".'
+		);
+	}
+
+	/**
+	 * Data provider for host.get to check templates.
+	 *
+	 * @return array
+	 */
+	public static function getHostGetTemplatesData() {
+		return [
+			'Test host.get - host has no templates' => [
+				'request' => [
+					'output' => ['hostid'],
+					'hostids' => [
+						'discovered_no_templates'
+					],
+					'selectParentTemplates' => [
+						'templateid', 'host', 'link_type'
+					]
+				],
+				'expected_results' => [
+					[
+						'hostid' => 'discovered_no_templates',
+						'parentTemplates' => []
+					]
+				]
+			],
+			'Test host.get - host has manual templates' => [
+				'request' => [
+					'output' => ['hostid'],
+					'hostids' => [
+						'discovered_manual_templates'
+					],
+					'selectParentTemplates' => [
+						'templateid', 'host', 'link_type'
+					]
+				],
+				'expected_results' => [
+					[
+						'hostid' => 'discovered_manual_templates',
+						'parentTemplates' => [
+							[
+								'templateid' => 'api_test_hosts_a_tpl',
+								'host' => 'api_test_hosts_a_tpl',
+								'link_type' => (string) TEMPLATE_LINK_MANUAL
+							],
+							[
+								'templateid' => 'api_test_hosts_e_tpl',
+								'host' => 'api_test_hosts_e_tpl',
+								'link_type' => (string) TEMPLATE_LINK_MANUAL
+							]
+						]
+					]
+				]
+			],
+			'Test host.get - host has auto templates' => [
+				'request' => [
+					'output' => ['hostid'],
+					'hostids' => [
+						'discovered_auto_templates'
+					],
+					'selectParentTemplates' => [
+						'templateid', 'host', 'link_type'
+					]
+				],
+				'expected_results' => [
+					[
+						'hostid' => 'discovered_auto_templates',
+						'parentTemplates' => [
+							[
+								'templateid' => 'api_test_hosts_f_tpl',
+								'host' => 'api_test_hosts_f_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							],
+							[
+								'templateid' => 'api_test_hosts_c_tpl',
+								'host' => 'api_test_hosts_c_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							]
+						]
+					]
+				]
+			],
+			'Test host.get - host has auto and manual templates' => [
+				'request' => [
+					'output' => ['hostid'],
+					'hostids' => [
+						'discovered_auto_and_manual_templates'
+					],
+					'selectParentTemplates' => [
+						'templateid', 'host', 'link_type'
+					]
+				],
+				'expected_results' => [
+					[
+						'hostid' => 'discovered_auto_and_manual_templates',
+						'parentTemplates' => [
+							[
+								'templateid' => 'api_test_hosts_f_tpl',
+								'host' => 'api_test_hosts_f_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							],
+							[
+								'templateid' => 'api_test_hosts_c_tpl',
+								'host' => 'api_test_hosts_c_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							],
+							[
+								'templateid' => 'api_test_hosts_a_tpl',
+								'host' => 'api_test_hosts_a_tpl',
+								'link_type' => (string) TEMPLATE_LINK_MANUAL
+							],
+							[
+								'templateid' => 'api_test_hosts_e_tpl',
+								'host' => 'api_test_hosts_e_tpl',
+								'link_type' => (string) TEMPLATE_LINK_MANUAL
+							]
+						]
+					]
+				]
+			],
+			'Test host.get with limits null' => [
+				'request' => [
+					'output' => ['hostid'],
+					'hostids' => [
+						'discovered_limit_selects'
+					],
+					'selectParentTemplates' => [
+						'templateid', 'host', 'link_type'
+					],
+					'limitSelects' => null
+				],
+				'expected_results' => [
+					[
+						'hostid' => 'discovered_limit_selects',
+						'parentTemplates' => [
+							[
+								'templateid' => 'api_test_hosts_f_tpl',
+								'host' => 'api_test_hosts_f_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							],
+							[
+								'templateid' => 'api_test_hosts_c_tpl',
+								'host' => 'api_test_hosts_c_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							],
+							[
+								'templateid' => 'api_test_hosts_a_tpl',
+								'host' => 'api_test_hosts_a_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							],
+							[
+								'templateid' => 'api_test_hosts_e_tpl',
+								'host' => 'api_test_hosts_e_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							],
+							[
+								'templateid' => 'api_test_hosts_b_tpl',
+								'host' => 'api_test_hosts_b_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							],
+							[
+								'templateid' => 'api_test_hosts_d_tpl',
+								'host' => 'api_test_hosts_d_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							]
+						]
+					]
+				]
+			],
+			'Test host.get with limits zero' => [
+				'request' => [
+					'output' => ['hostid'],
+					'hostids' => [
+						'discovered_limit_selects'
+					],
+					'selectParentTemplates' => [
+						'templateid', 'host', 'link_type'
+					],
+					'limitSelects' => '0'
+				],
+				'expected_results' => [
+					[
+						'hostid' => 'discovered_limit_selects',
+						'parentTemplates' => [
+							[
+								'templateid' => 'api_test_hosts_a_tpl',
+								'host' => 'api_test_hosts_a_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							],
+							[
+								'templateid' => 'api_test_hosts_b_tpl',
+								'host' => 'api_test_hosts_b_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							],
+							[
+								'templateid' => 'api_test_hosts_c_tpl',
+								'host' => 'api_test_hosts_c_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							],
+							[
+								'templateid' => 'api_test_hosts_d_tpl',
+								'host' => 'api_test_hosts_d_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							],
+							[
+								'templateid' => 'api_test_hosts_e_tpl',
+								'host' => 'api_test_hosts_e_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							],
+							[
+								'templateid' => 'api_test_hosts_f_tpl',
+								'host' => 'api_test_hosts_f_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							]
+						]
+					]
+				]
+			],
+			'Test host.get with limits three' => [
+				'request' => [
+					'output' => ['hostid'],
+					'hostids' => [
+						'discovered_limit_selects'
+					],
+					'selectParentTemplates' => [
+						'templateid', 'host', 'link_type'
+					],
+					'limitSelects' => '3'
+				],
+				'expected_results' => [
+					[
+						'hostid' => 'discovered_limit_selects',
+						'parentTemplates' => [
+							[
+								'templateid' => 'api_test_hosts_a_tpl',
+								'host' => 'api_test_hosts_a_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							],
+							[
+								'templateid' => 'api_test_hosts_b_tpl',
+								'host' => 'api_test_hosts_b_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							],
+							[
+								'templateid' => 'api_test_hosts_c_tpl',
+								'host' => 'api_test_hosts_c_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							]
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test host.get to check if hosts have the necessary templates and order.
+	 *
+	 * @dataProvider getHostGetTemplatesData
+	 */
+	public function testHost_GetTemplates($request, $expected_results) {
+		// Replace ID placeholder with real ID.
+		foreach ($request['hostids'] as &$hostid) {
+			$hostid = self::$data['hostids'][$hostid];
+		}
+		unset($hostid);
+
+		foreach ($expected_results as &$result) {
+			$result['hostid'] = self::$data['hostids'][$result['hostid']];
+
+			foreach ($result['parentTemplates'] as &$template) {
+				$template['templateid'] = self::$data['templateids'][$template['templateid']];
+			}
+			unset($template);
+		}
+		unset($result);
+
+		$host = $this->call('host.get', $request);
+
+		$this->assertSame($expected_results, $host['result']);
+	}
+
+	/**
+	 * Get a list of items keys on host.
+	 *
+	 * @param string $hostid
+	 */
+	private function getItemKeysOnHost(string $hostid) {
+		$items_new = $this->call('item.get', [
+			'output' => ['key_'],
+			'hostids' => $hostid
+		]);
+		$items_new = $items_new['result'];
+
+		$items = [];
+		foreach ($items_new as $item) {
+			$items[] = $item['key_'];
+		}
+
+		return $items;
+	}
+
+	/**
+	 * Get the original host value.
+	 *
+	 * @param array $hostids
+	 *
+	 * @return array
+	 */
+	private function store(array $hostids) {
+		// Get data before update.
+		$hosts_old = $this->call('host.get', [
+			'output' => ['hostid', 'host'],
+			'selectParentTemplates' => ['templateid'],
+			'hostids' => $hostids
+		]);
+
+		return $hosts_old['result'];
+	}
+
+	/**
+	 * Revert hosts back to original state before the update to test other cases like massupdate, massremove etc.
+	 *
+	 * @param array  $hosts                       Array of hosts.
+	 * @param string $hosts[]['hostid']           Host ID that will have the data reverted.
+	 * @param string $hosts[]['host']             Host technical name in case of error.
+	 * @param string $hosts[]['parentTemplates']  Array of host original templates.
+	 */
+	private function revert(array $hosts, $clear = false) {
+		foreach ($hosts as &$host) {
+			if ($clear) {
+				$host['templates_clear'] = $host['parentTemplates'];
+			}
+			else {
+				$host['templates'] = $host['parentTemplates'];
+			}
+			unset($host['parentTemplates']);
+
+			$name = $host['host'];
+			unset($host['host']);
+
+			$host_upd = $this->call('host.update', $host);
+
+			$this->assertArrayHasKey('hostids', $host_upd['result'], 'host.update failded for host "'.$name.'"');
+		}
+		unset($host);
+	}
+
+	/**
 	 * Delete all created data after test.
 	 */
 	public static function clearData() {
@@ -1036,7 +3072,7 @@ class testHost extends CAPITest {
 		$hostids = array_values(self::$data['hostids']);
 		$hostids = array_merge($hostids, self::$data['created']);
 		CDataHelper::call('host.delete', $hostids);
-		CDataHelper::call('template.delete', self::$data['templateids']);
+		CDataHelper::call('template.delete', array_values(self::$data['templateids']));
 
 		// Delete host group.
 		CDataHelper::call('hostgroup.delete', [self::$data['hostgroupid']]);
