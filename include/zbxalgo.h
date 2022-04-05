@@ -260,8 +260,8 @@ typedef struct
 	/* The binary heap is designed to work correctly only with memory allocation functions */
 	/* that return pointer to the allocated memory or quit. Functions that can return NULL */
 	/* are not supported (process will exit() if NULL return value is encountered). If     */
-	/* using zbx_mem_info_t and the associated memory functions then ensure that allow_oom */
-	/* is always set to 0.                                                                 */
+	/* using zbx_shmem_info_t and the associated memory functions then ensure that         */
+	/* allow_oom is always set to 0.                                                       */
 	zbx_mem_malloc_func_t	mem_malloc_func;
 	zbx_mem_realloc_func_t	mem_realloc_func;
 	zbx_mem_free_func_t	mem_free_func;
@@ -269,8 +269,8 @@ typedef struct
 zbx_binary_heap_t;
 
 void			zbx_binary_heap_create(zbx_binary_heap_t *heap, zbx_compare_func_t compare_func, int options);
-void			zbx_binary_heap_create_ext(zbx_binary_heap_t *heap, zbx_compare_func_t compare_func, int options,
-							zbx_mem_malloc_func_t mem_malloc_func,
+void			zbx_binary_heap_create_ext(zbx_binary_heap_t *heap, zbx_compare_func_t compare_func,
+							int options, zbx_mem_malloc_func_t mem_malloc_func,
 							zbx_mem_realloc_func_t mem_realloc_func,
 							zbx_mem_free_func_t mem_free_func);
 void			zbx_binary_heap_destroy(zbx_binary_heap_t *heap);
@@ -359,8 +359,6 @@ void	udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *dividend, zbx_uint64
 void	umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor);
 
 unsigned int	zbx_isqrt32(unsigned int value);
-
-char	*zbx_gen_uuid4(const char *seed);
 
 /* expression evaluation */
 
@@ -458,7 +456,8 @@ typedef struct
 zbx_list_iterator_t;
 
 void	zbx_list_create(zbx_list_t *queue);
-void	zbx_list_create_ext(zbx_list_t *queue, zbx_mem_malloc_func_t mem_malloc_func, zbx_mem_free_func_t mem_free_func);
+void	zbx_list_create_ext(zbx_list_t *queue, zbx_mem_malloc_func_t mem_malloc_func,
+		zbx_mem_free_func_t mem_free_func);
 void	zbx_list_destroy(zbx_list_t *list);
 void	zbx_list_append(zbx_list_t *list, void *value, zbx_list_item_t **inserted);
 void	zbx_list_insert_after(zbx_list_t *list, zbx_list_item_t *after, void *value, zbx_list_item_t **inserted);
