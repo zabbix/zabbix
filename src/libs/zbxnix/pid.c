@@ -18,6 +18,7 @@
 **/
 
 #include "zbxnix.h"
+#include "pid.h"
 
 #include "common.h"
 #include "log.h"
