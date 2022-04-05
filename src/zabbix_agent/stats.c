@@ -29,7 +29,7 @@
 /* defined in sysinfo lib */
 extern int get_cpu_num_win32(void);
 #else
-#	include "daemon.h"
+#	include "zbxnix.h"
 #endif
 
 ZBX_COLLECTOR_DATA	*collector = NULL;

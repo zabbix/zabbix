@@ -27,7 +27,7 @@
 #include "mutexs.h"
 #include "zbxshmem.h"
 #include "log.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
 
 /*

@@ -103,8 +103,6 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 #	include "perfstat.h"
 #else
 #	include "zbxnix.h"
-#	include "sighandler.h"
-#	include "daemon.h"
 #endif
 #include "active.h"
 #include "listener.h"
@@ -114,7 +112,7 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
 #elif defined(ZABBIX_DAEMON)
-#	include "daemon.h"
+#	include "zbxnix.h"
 #endif
 
 #include "setproctitle.h"
@@ -360,7 +358,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				break;
 #ifndef _WINDOWS
 			case 'R':
-				if (SUCCEED != parse_rtc_options(zbx_optarg, &t->data))
+				if (SUCCEED != zbx_parse_rtc_options(zbx_optarg, &t->data))
 					exit(EXIT_FAILURE);
 
 				t->task = ZBX_TASK_RUNTIME_CONTROL;
@@ -1464,7 +1462,7 @@ int	main(int argc, char **argv)
 			break;
 	}
 
-	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
+	ZBX_START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 
 	exit(EXIT_SUCCESS);
 }

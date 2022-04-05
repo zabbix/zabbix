@@ -19,7 +19,7 @@
 
 #include "heart.h"
 
-#include "daemon.h"
+#include "zbxnix.h"
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxself.h"

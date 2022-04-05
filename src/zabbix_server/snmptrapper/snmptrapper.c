@@ -20,7 +20,7 @@
 #include "snmptrapper.h"
 
 #include "zbxself.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "log.h"
 #include "proxy.h"
 #include "zbxserver.h"

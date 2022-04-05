@@ -19,7 +19,7 @@
 
 #include "escalator.h"
 
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxserver.h"
 #include "zbxself.h"
 #include "../actions.h"
