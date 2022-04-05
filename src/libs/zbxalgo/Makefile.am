@@ -11,6 +11,7 @@ endif
 endif
 
 libzbxalgo_a_SOURCES = \
+	algo.h \
 	algodefs.c \
 	binaryheap.c \
 	$(EVALUATE_C) \

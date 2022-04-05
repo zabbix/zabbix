@@ -27,11 +27,7 @@
 
 typedef zbx_uint32_t zbx_hash_t;
 
-zbx_hash_t	zbx_hash_lookup2(const void *data, size_t len, zbx_hash_t seed);
 zbx_hash_t	zbx_hash_modfnv(const void *data, size_t len, zbx_hash_t seed);
-zbx_hash_t	zbx_hash_murmur2(const void *data, size_t len, zbx_hash_t seed);
-zbx_hash_t	zbx_hash_sdbm(const void *data, size_t len, zbx_hash_t seed);
-zbx_hash_t	zbx_hash_djb2(const void *data, size_t len, zbx_hash_t seed);
 zbx_hash_t	zbx_hash_splittable64(const void *data);
 
 #define ZBX_DEFAULT_HASH_ALGO		zbx_hash_modfnv
@@ -101,9 +97,6 @@ typedef void (*zbx_clean_func_t)(void *data);
 		else				\
 			return +1;		\
 	}
-
-int	is_prime(int n);
-int	next_prime(int n);
 
 /* pair */
 
@@ -745,4 +738,4 @@ int	zbx_list_iterator_equal(const zbx_list_iterator_t *iterator1, const zbx_list
 int	zbx_list_iterator_isset(const zbx_list_iterator_t *iterator);
 void	zbx_list_iterator_update(zbx_list_iterator_t *iterator);
 
-#endif
+#endif /* ZABBIX_ZBXALGO_H */

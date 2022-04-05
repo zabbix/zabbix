@@ -18,6 +18,7 @@
 **/
 
 #include "zbxalgo.h"
+#include "algodefs.h"
 
 #include "common.h"
 #include "log.h"
