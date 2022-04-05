@@ -52,14 +52,17 @@ typedef struct
 	zbx_uint64_t	ssize;
 	zbx_uint64_t	swap;
 }
-zbx_proc_data_t;
+proc_data_t;
+
+ZBX_PTR_VECTOR_DECL(proc_data_ptr, proc_data_t *);
+ZBX_PTR_VECTOR_IMPL(proc_data_ptr, proc_data_t *);
 
 /******************************************************************************
  *                                                                            *
  * Purpose: frees process data structure                                      *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_proc_data_free(zbx_proc_data_t *proc_data)
+static void	proc_data_free(proc_data_t *proc_data)
 {
 	zbx_free(proc_data->name);
 	zbx_free(proc_data->cmdline);
@@ -68,23 +71,10 @@ static void	zbx_proc_data_free(zbx_proc_data_t *proc_data)
 	zbx_free(proc_data);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: frees process vector read by proc_get_data function               *
- *                                                                            *
- * Parameters: processes - [IN/OUT] the process data vector to free           *
- *                                                                            *
- ******************************************************************************/
-static void	zbx_proc_free_proc_data(zbx_vector_ptr_t *proc_data)
-{
-	zbx_vector_ptr_clear_ext(proc_data, (zbx_mem_free_func_t)zbx_proc_data_free);
-}
-
 static char	*proc_argv(pid_t pid)
 {
 	size_t		sz = 0;
-	int		mib[4], ret;
-	int		i, len;
+	int		mib[4], i;
 	static char	*argv = NULL;
 	static size_t	argv_alloc = 0;
 
@@ -408,12 +398,12 @@ static char	*get_state(struct kinfo_proc2 *proc)
 
 int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			*procname, *proccomm, *param, *args;
-	int			invalid_user = 0, count, i, k, zbx_proc_mode, pagesize, op, arg;
-	struct passwd		*usrinfo;
-	zbx_vector_ptr_t	proc_data_ctx;
-	struct zbx_json		j;
-	struct kinfo_proc2	*proc = NULL;
+	char				*procname, *proccomm, *param, *args;
+	int				invalid_user = 0, count, i, k, zbx_proc_mode, pagesize, op, arg;
+	struct passwd			*usrinfo;
+	zbx_vector_proc_data_ptr_t	proc_data_ctx;
+	struct zbx_json			j;
+	struct kinfo_proc2		*proc = NULL;
 
 	if (4 < request->nparam)
 	{
@@ -491,11 +481,11 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	zbx_vector_ptr_create(&proc_data_ctx);
+	zbx_vector_proc_data_ptr_create(&proc_data_ctx);
 
 	for (i = 0; i < count; i++)
 	{
-		zbx_proc_data_t		*proc_data;
+		proc_data_t		*proc_data;
 
 		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, proc[i].p_comm))
 			continue;
@@ -505,8 +495,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (NULL != proccomm && '\0' != *proccomm && NULL == zbx_regexp_match(args, proccomm, NULL))
 			continue;
 
-		proc_data = (zbx_proc_data_t *)zbx_malloc(NULL, sizeof(zbx_proc_data_t));
-		memset(proc_data, 0, sizeof(zbx_proc_data_t));
+		proc_data = (proc_data_t *)zbx_malloc(NULL, sizeof(proc_data_t));
+		memset(proc_data, 0, sizeof(proc_data_t));
 
 		proc_data->pid = proc[i].p_pid;
 		proc_data->ppid = proc[i].p_ppid;
@@ -528,20 +518,20 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		proc_data->io_write_op = proc[i].p_uru_inblock;
 		proc_data->swap = proc[i].p_uru_nswap;
 
-		zbx_vector_ptr_append(&proc_data_ctx, proc_data);
+		zbx_vector_proc_data_ptr_append(&proc_data_ctx, proc_data);
 	}
 
 	if (ZBX_PROC_MODE_SUMMARY == zbx_proc_mode)
 	{
 		for (i = 0; i < proc_data_ctx.values_num; i++)
 		{
-			zbx_proc_data_t	*pdata = (zbx_proc_data_t *)proc_data_ctx.values[i];
+			proc_data_t	*pdata = proc_data_ctx.values[i];
 
 			pdata->processes = 1;
 
 			for (k = i + 1; k < proc_data_ctx.values_num; k++)
 			{
-				zbx_proc_data_t	*pdata_cmp = (zbx_proc_data_t *)proc_data_ctx.values[k];
+				proc_data_t	*pdata_cmp = proc_data_ctx.values[k];
 
 				if (0 == strcmp(pdata->name, pdata_cmp->name))
 				{
@@ -560,8 +550,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 					pdata->io_read_op += pdata_cmp->io_read_op;
 					pdata->io_write_op += pdata_cmp->io_write_op;
 
-					zbx_proc_data_free(pdata_cmp);
-					zbx_vector_ptr_remove(&proc_data_ctx, k--);
+					proc_data_free(pdata_cmp);
+					zbx_vector_proc_data_ptr_remove(&proc_data_ctx, k--);
 				}
 			}
 		}
@@ -571,9 +561,9 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	for (i = 0; i < proc_data_ctx.values_num; i++)
 	{
-		zbx_proc_data_t	*pdata;
+		proc_data_t	*pdata;
 
-		pdata = (zbx_proc_data_t *)proc_data_ctx.values[i];
+		pdata = proc_data_ctx.values[i];
 
 		zbx_json_addobject(&j, NULL);
 
@@ -621,8 +611,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_close(&j);
 	}
 
-	zbx_proc_free_proc_data(&proc_data_ctx);
-	zbx_vector_ptr_destroy(&proc_data_ctx);
+	zbx_vector_proc_data_ptr_clear_ext(&proc_data_ctx, proc_data_free);
+	zbx_vector_proc_data_ptr_destroy(&proc_data_ctx);
 out:
 	zbx_json_close(&j);
 	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
