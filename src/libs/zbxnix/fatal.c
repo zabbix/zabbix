@@ -19,7 +19,7 @@
 
 #include "fatal.h"
 
-#include "zbxconfig.h"
+#include "config.h"
 
 #ifdef HAVE_SIGNAL_H
 #	if !defined(_GNU_SOURCE)

@@ -20,7 +20,7 @@
 #ifndef ZABBIX_PROCSTAT_H
 #define ZABBIX_PROCSTAT_H
 
-#include "zbxconfig.h"
+#include "config.h"
 
 #ifdef ZBX_PROCSTAT_COLLECTOR
 

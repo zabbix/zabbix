@@ -22,7 +22,7 @@
 
 #include "dbcache.h"
 #include "zbxtypes.h"
-#include "zbxconfig.h"
+#include "config.h"
 
 #ifdef HAVE_OPENIPMI
 

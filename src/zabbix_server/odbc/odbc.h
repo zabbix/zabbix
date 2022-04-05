@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ZBXODBC_H
 #define ZABBIX_ZBXODBC_H
 
-#include "zbxconfig.h"
+#include "config.h"
 
 #ifdef HAVE_UNIXODBC
 

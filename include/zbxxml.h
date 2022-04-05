@@ -20,7 +20,7 @@
 #ifndef ZABBIX_XML_H
 #define ZABBIX_XML_H
 
-#include "zbxconfig.h"
+#include "config.h"
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 

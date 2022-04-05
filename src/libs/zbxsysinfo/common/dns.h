@@ -21,7 +21,7 @@
 #define ZABBIX_SYSINFO_COMMON_DNS_H
 
 #include "module.h"
-#include "zbxconfig.h"
+#include "config.h"
 
 #if defined(HAVE_RES_QUERY) || defined(_WINDOWS) || defined(__MINGW32__)
 

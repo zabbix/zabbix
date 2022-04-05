@@ -19,7 +19,7 @@
 
 #include "checks_simple_vmware.h"
 
-#include "zbxconfig.h"
+#include "config.h"
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 

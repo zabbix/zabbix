@@ -75,8 +75,8 @@ etc/zabbix_agent2.d/plugins.d/redis.conf
 etc/zabbix_agent2.d/plugins.d/smart.conf
 m4/conf_tests.m4
 frontend.mo
-include/common/zbxconfig.h
-include/common/zbxconfig.h.in
+include/common/config.h
+include/common/config.h.in
 include/stamp-h1
 misc/images/inkscape.log.txt
 misc/images/pngcrush.log.txt
