@@ -27,7 +27,6 @@
 #include "zbxeval.h"
 #include "valuecache.h"
 #include "macrofunc.h"
-#include "../zbxalgo/vectorimpl.h"
 #include "zbxxml.h"
 
 typedef struct

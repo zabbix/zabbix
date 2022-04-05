@@ -23,8 +23,7 @@
 #include "zbxself.h"
 #include "zbxavailability.h"
 #include "zbxipcservice.h"
-#include "daemon.h"
-#include "sighandler.h"
+#include "zbxnix.h"
 #include "dbcache.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

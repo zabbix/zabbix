@@ -26,7 +26,6 @@
 #include "cfg.h"
 #include "zbxhash.h"
 #include "../zbxcrypto/tls_tcp_active.h"
-#include "../zbxalgo/vectorimpl.h"
 #include "../zbxkvs/kvs.h"
 #include "../zbxvault/vault.h"
 #include "base64.h"
