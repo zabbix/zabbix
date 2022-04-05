@@ -2170,13 +2170,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		item->flags = (unsigned char)atoi(row[18]);
 		ZBX_DBROW2UINT64(interfaceid, row[19]);
 
-		if (SUCCEED != is_time_suffix(row[22], &item->history_sec, ZBX_LENGTH_UNLIMITED))
-			item->history_sec = ZBX_HK_PERIOD_MAX;
-
-		if (0 != item->history_sec && ZBX_HK_OPTION_ENABLED == config->config->hk.history_global)
-			item->history_sec = config->config->hk.history;
-
-		item->history = (0 != item->history_sec);
+		dc_strpool_replace(found, &item->history_period, row[22]);
 
 		ZBX_STR2UCHAR(item->inventory_link, row[24]);
 		ZBX_DBROW2UINT64(item->valuemapid, row[25]);
@@ -2255,19 +2249,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
 		{
-			int	trends_sec;
-
 			numitem = (ZBX_DC_NUMITEM *)DCfind_id(&config->numitems, itemid, sizeof(ZBX_DC_NUMITEM), &found);
 
-			if (SUCCEED != is_time_suffix(row[23], &trends_sec, ZBX_LENGTH_UNLIMITED))
-				trends_sec = ZBX_HK_PERIOD_MAX;
-
-			if (0 != trends_sec && ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global)
-				trends_sec = config->config->hk.trends;
-
-			numitem->trends = (0 != trends_sec);
-			numitem->trends_sec = trends_sec;
-
+			dc_strpool_replace(found, &numitem->trends_period, row[23]);
 			dc_strpool_replace(found, &numitem->units, row[26]);
 		}
 		else if (NULL != (numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &itemid)))
@@ -6991,13 +6975,16 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 	dst_item->lastlogsize = src_item->lastlogsize;
 	dst_item->mtime = src_item->mtime;
 
-	dst_item->history = src_item->history;
-
 	dst_item->inventory_link = src_item->inventory_link;
 	dst_item->valuemapid = src_item->valuemapid;
 	dst_item->status = src_item->status;
 
-	dst_item->history_sec = src_item->history_sec;
+	if (0 != (mode & ZBX_ITEM_GET_HOUSEKEEPING))
+		dst_item->history_period = zbx_strdup(NULL, src_item->history_period);
+	else
+		dst_item->history_period = NULL;
+	dst_item->trends_period = NULL;
+
 	strscpy(dst_item->key_orig, src_item->key);
 
 	if (ZBX_ITEM_GET_MISC & mode)
@@ -7021,8 +7008,8 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 			{
 				numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &src_item->itemid);
 
-				dst_item->trends = numitem->trends;
-				dst_item->trends_sec = numitem->trends_sec;
+				if (0 != (mode & ZBX_ITEM_GET_HOUSEKEEPING))
+					dst_item->trends_period = zbx_strdup(NULL, numitem->trends_period);
 
 				/* allocate after lock */
 				if (0 != (ZBX_ITEM_GET_EMPTY_UNITS & mode) || '\0' != *numitem->units)
@@ -7342,6 +7329,8 @@ void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
 
 		zbx_free(items[i].delay);
 		zbx_free(items[i].error);
+		zbx_free(items[i].history_period);
+		zbx_free(items[i].trends_period);
 	}
 }
 
@@ -7481,7 +7470,7 @@ void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errco
 		}
 
 		DCget_host(&items[i].host, dc_host, ZBX_ITEM_GET_ALL);
-		DCget_item(&items[i], dc_item, ZBX_ITEM_GET_ALL);
+		DCget_item(&items[i], dc_item, ZBX_ITEM_GET_DEFAULT);
 		errcodes[i] = SUCCEED;
 	}
 
@@ -7536,11 +7525,48 @@ void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, 
 		}
 
 		DCget_host(&items[i].host, dc_host, ZBX_ITEM_GET_ALL);
-		DCget_item(&items[i], dc_item, ZBX_ITEM_GET_ALL);
+		DCget_item(&items[i], dc_item, ZBX_ITEM_GET_DEFAULT);
 		errcodes[i] = SUCCEED;
 	}
 
 	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: convert item history/trends housekeeping period to numeric values *
+ *          expanding user macros and applying global housekeeping settings   *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, DC_ITEM *item)
+{
+	if (NULL != item->trends_period)
+	{
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
+				NULL, NULL, &item->trends_period, MACRO_TYPE_COMMON, NULL, 0);
+
+		if (SUCCEED != is_time_suffix(item->trends_period, &item->trends_sec, ZBX_LENGTH_UNLIMITED))
+			item->trends_sec = ZBX_HK_PERIOD_MAX;
+
+		if (0 != item->trends_sec && ZBX_HK_OPTION_ENABLED == config_hk->history_global)
+			item->trends_sec = config_hk->trends;
+
+		item->trends = (0 != item->trends_sec);
+	}
+
+	if (NULL != item->history_period)
+	{
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
+				NULL, NULL, &item->history_period, MACRO_TYPE_COMMON, NULL, 0);
+
+		if (SUCCEED != is_time_suffix(item->history_period, &item->history_sec, ZBX_LENGTH_UNLIMITED))
+			item->history_sec = ZBX_HK_PERIOD_MAX;
+
+		if (0 != item->history_sec && ZBX_HK_OPTION_ENABLED == config_hk->history_global)
+			item->history_sec = config_hk->history;
+
+		item->history = (0 != item->history_sec);
+	}
 }
 
 void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num,
@@ -7549,6 +7575,8 @@ void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *i
 	size_t			i;
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_HOST	*dc_host = NULL;
+	zbx_config_hk_t		config_hk;
+	zbx_dc_um_handle_t	*um_handle;
 
 	memset(items, 0, sizeof(DC_ITEM) * (size_t)num);
 	memset(errcodes, 0, sizeof(int) * (size_t)num);
@@ -7574,9 +7602,14 @@ void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *i
 
 		DCget_host(&items[i].host, dc_host, mode);
 		DCget_item(&items[i], dc_item, mode);
+
+		if (0 != (mode & ZBX_ITEM_GET_HOUSEKEEPING))
+			config_hk = config->config->hk;
 	}
 
 	UNLOCK_CACHE;
+
+	um_handle = zbx_dc_open_user_macros();
 
 	/* avoid unnecessary allocations inside lock if there are no error or units */
 	for (i = 0; i < num; i++)
@@ -7594,7 +7627,12 @@ void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *i
 			if (NULL == items[i].units)
 				items[i].units = zbx_strdup(NULL, "");
 		}
+
+		if (0 != (mode & ZBX_ITEM_GET_HOUSEKEEPING))
+			dc_items_convert_hk_periods(&config_hk, &items[i]);
 	}
+
+	zbx_dc_close_user_macros(um_handle);
 }
 
 /******************************************************************************
@@ -8882,7 +8920,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM **items)
 		dc_item_prev = dc_item;
 		dc_item->location = ZBX_LOC_POLLER;
 		DCget_host(&(*items)[num].host, dc_host, ZBX_ITEM_GET_ALL);
-		DCget_item(&(*items)[num], dc_item, ZBX_ITEM_GET_ALL);
+		DCget_item(&(*items)[num], dc_item, ZBX_ITEM_GET_DEFAULT);
 		num++;
 	}
 
@@ -8973,7 +9011,7 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 
 		dc_item->location = ZBX_LOC_POLLER;
 		DCget_host(&items[num].host, dc_host, ZBX_ITEM_GET_ALL);
-		DCget_item(&items[num], dc_item, ZBX_ITEM_GET_ALL);
+		DCget_item(&items[num], dc_item, ZBX_ITEM_GET_DEFAULT);
 		num++;
 	}
 
@@ -9074,7 +9112,7 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 		}
 
 		DCget_host(&(*items)[items_num].host, dc_host, ZBX_ITEM_GET_ALL);
-		DCget_item(&(*items)[items_num], dc_item, ZBX_ITEM_GET_ALL);
+		DCget_item(&(*items)[items_num], dc_item, ZBX_ITEM_GET_DEFAULT);
 		items_num++;
 	}
 unlock:

@@ -3834,7 +3834,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 			session = zbx_dc_get_or_create_data_session(hostid, token);
 
 		if (SUCCEED != (ret = process_history_data_by_itemids(sock, validator_func, validator_args, &jp_data,
-				session, NULL, info, ZBX_ITEM_GET_ALL)))
+				session, NULL, info, ZBX_ITEM_GET_DEFAULT)))
 		{
 			goto out;
 		}

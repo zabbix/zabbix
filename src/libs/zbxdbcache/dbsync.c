@@ -1422,7 +1422,6 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	ZBX_DC_HTTPITEM		*httpitem;
 	ZBX_DC_SCRIPTITEM	*scriptitem;
 	unsigned char		value_type, type;
-	int			history_sec, trends_sec;
 
 	if (FAIL == dbsync_compare_uint64(dbrow[1], item->hostid))
 		return FAIL;
@@ -1449,16 +1448,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	if (FAIL == dbsync_compare_uint64(dbrow[19], item->interfaceid))
 		return FAIL;
 
-	if (SUCCEED != is_time_suffix(dbrow[22], &history_sec, ZBX_LENGTH_UNLIMITED))
-		history_sec = ZBX_HK_PERIOD_MAX;
-
-	if (0 != history_sec && ZBX_HK_OPTION_ENABLED == dbsync_env.cache->config->hk.history_global)
-		history_sec = dbsync_env.cache->config->hk.history;
-
-	if (item->history != (0 != history_sec))
-		return FAIL;
-
-	if (history_sec != item->history_sec)
+	if (FAIL == dbsync_compare_str(dbrow[22], item->history_period))
 		return FAIL;
 
 	if (FAIL == dbsync_compare_uchar(dbrow[24], item->inventory_link))
@@ -1483,16 +1473,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		if (NULL == numitem)
 			return FAIL;
 
-		if (SUCCEED != is_time_suffix(dbrow[23], &trends_sec, ZBX_LENGTH_UNLIMITED))
-			trends_sec = ZBX_HK_PERIOD_MAX;
-
-		if (0 != trends_sec && ZBX_HK_OPTION_ENABLED == dbsync_env.cache->config->hk.trends_global)
-			trends_sec = dbsync_env.cache->config->hk.trends;
-
-		if (numitem->trends != (0 != trends_sec))
-			return FAIL;
-
-		if (numitem->trends_sec != trends_sec)
+		if (FAIL == dbsync_compare_str(dbrow[23], numitem->trends_period))
 			return FAIL;
 
 		if (FAIL == dbsync_compare_str(dbrow[26], numitem->units))
@@ -1783,9 +1764,6 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
  ******************************************************************************/
 static char	**dbsync_item_preproc_row(char **row)
 {
-#define ZBX_DBSYNC_ITEM_COLUMN_DELAY	0x01
-#define ZBX_DBSYNC_ITEM_COLUMN_HISTORY	0x02
-#define ZBX_DBSYNC_ITEM_COLUMN_TRENDS	0x04
 #define ZBX_DBSYNC_ITEM_COLUMN_CALCITEM	0x08
 
 	zbx_uint64_t	hostid;
@@ -1794,12 +1772,6 @@ static char	**dbsync_item_preproc_row(char **row)
 	/* return the original row if user macros are not used in target columns */
 
 	ZBX_STR2UCHAR(type, row[3]);
-
-	if (SUCCEED == dbsync_check_row_macros(row, 23))
-		flags |= ZBX_DBSYNC_ITEM_COLUMN_HISTORY;
-
-	if (SUCCEED == dbsync_check_row_macros(row, 24))
-		flags |= ZBX_DBSYNC_ITEM_COLUMN_TRENDS;
 
 	if (ITEM_TYPE_CALCULATED == type)
 		flags |= ZBX_DBSYNC_ITEM_COLUMN_CALCITEM;
@@ -1811,12 +1783,6 @@ static char	**dbsync_item_preproc_row(char **row)
 	ZBX_STR2UINT64(hostid, row[1]);
 
 	/* expand user macros */
-
-	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_HISTORY))
-		row[22] = dc_expand_user_macros(row[22], &hostid, 1);
-
-	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_TRENDS))
-		row[23] = dc_expand_user_macros(row[23], &hostid, 1);
 
 	if (ITEM_TYPE_CALCULATED == type)
 	{
@@ -1844,9 +1810,6 @@ static char	**dbsync_item_preproc_row(char **row)
 
 	return row;
 
-#undef ZBX_DBSYNC_ITEM_COLUMN_DELAY
-#undef ZBX_DBSYNC_ITEM_COLUMN_HISTORY
-#undef ZBX_DBSYNC_ITEM_COLUMN_TRENDS
 }
 
 /******************************************************************************

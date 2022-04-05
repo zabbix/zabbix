@@ -361,7 +361,7 @@ static void	DCdump_interfaces(void)
 
 static void	DCdump_numitem(const ZBX_DC_NUMITEM *numitem)
 {
-	zabbix_log(LOG_LEVEL_TRACE, "  units:'%s' trends:%d", numitem->units, numitem->trends);
+	zabbix_log(LOG_LEVEL_TRACE, "  units:'%s' trends:%s", numitem->units, numitem->trends_period);
 }
 
 static void	DCdump_snmpitem(const ZBX_DC_SNMPITEM *snmpitem)
@@ -567,7 +567,7 @@ static void	DCdump_items(void)
 		zabbix_log(LOG_LEVEL_TRACE, "  lastlogsize:" ZBX_FS_UI64 " mtime:%d", item->lastlogsize, item->mtime);
 		zabbix_log(LOG_LEVEL_TRACE, "  delay:'%s' nextcheck:%d", item->delay, item->nextcheck);
 		zabbix_log(LOG_LEVEL_TRACE, "  data_expected_from:%d", item->data_expected_from);
-		zabbix_log(LOG_LEVEL_TRACE, "  history:%d history_sec:%d", item->history, item->history_sec);
+		zabbix_log(LOG_LEVEL_TRACE, "  history:%s", item->history_period);
 		zabbix_log(LOG_LEVEL_TRACE, "  poller_type:%u location:%u", item->poller_type, item->location);
 		zabbix_log(LOG_LEVEL_TRACE, "  inventory_link:%u", item->inventory_link);
 		zabbix_log(LOG_LEVEL_TRACE, "  priority:%u schedulable:%u", item->queue_priority, item->schedulable);

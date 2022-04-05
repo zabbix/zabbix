@@ -173,6 +173,7 @@ zbx_graph_item_type;
 #	define ITEM_HEADERS_LEN		65535
 #endif
 
+
 #define ITEM_PARAMETER_NAME_LEN		255
 #define ITEM_PARAMETER_VALUE_LEN	2048
 

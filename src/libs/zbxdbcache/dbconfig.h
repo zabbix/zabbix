@@ -98,12 +98,11 @@ typedef struct
 	const char		*port;
 	const char		*error;
 	const char		*delay;
+	const char		*history_period;
 	ZBX_DC_TRIGGER		**triggers;
 	int			nextcheck;
 	int			mtime;
 	int			data_expected_from;
-	int			history_sec;
-	unsigned char		history;
 	unsigned char		type;
 	unsigned char		value_type;
 	unsigned char		poller_type;
@@ -157,8 +156,7 @@ typedef struct
 {
 	zbx_uint64_t	itemid;
 	const char	*units;
-	unsigned char	trends;
-	int		trends_sec;
+	const char	*trends_period;
 }
 ZBX_DC_NUMITEM;
 
