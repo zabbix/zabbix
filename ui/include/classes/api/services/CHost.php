@@ -1307,7 +1307,7 @@ class CHost extends CHostGeneral {
 			$hosts_templates = $this->get([
 				'selectParentTemplates' => ['templateid', 'link_type'],
 				'hostids' => $data['hostids'],
-				'preserveKeys' => true,
+				'preservekeys' => true,
 				'nopermissions' => true
 			]);
 

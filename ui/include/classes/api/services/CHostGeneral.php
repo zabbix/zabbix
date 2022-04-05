@@ -1385,7 +1385,7 @@ abstract class CHostGeneral extends CHostBase {
 			if ($options['selectParentTemplates'] != API_OUTPUT_COUNT) {
 				$templates = [];
 
-				// Get template IDs for each host and addition field from relation table if necessary.
+				// Get template IDs for each host and additional field from relation table if necessary.
 				$hosts_templates = DBfetchArray(DBselect(
 					'SELECT ht.hostid,ht.templateid'.
 						($this->outputIsRequested('link_type', $options['selectParentTemplates'])
@@ -1403,7 +1403,7 @@ abstract class CHostGeneral extends CHostBase {
 						: array_merge($options['selectParentTemplates'], ['templateid']);
 
 					/*
-					 * Since templates API doest have "link_type" field, remove it from request, so that template.get
+					 * Since templates API does not have "link_type" field, remove it from request, so that template.get
 					 * validation may pass successfully.
 					 */
 					if ($this->outputIsRequested('link_type', $template_options && is_array($template_options))
