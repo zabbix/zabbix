@@ -5291,7 +5291,7 @@ svg {
 .icon-count {
 	font-size: 12px;
 	padding: 3px 5px 2px;
-	color: $btn-font-color;
+	color: $btn-font-color !important;
 	background-color: $indicator-count-color;
 	border-radius: 3px;
 	margin: 1px 5px;

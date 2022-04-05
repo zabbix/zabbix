@@ -6154,7 +6154,7 @@ svg {
 .icon-count {
   font-size: 12px;
   padding: 3px 5px 2px;
-  color: #f2f2f2;
+  color: #f2f2f2 !important;
   background-color: #768d99;
   border-radius: 3px;
   margin: 1px 5px; }
