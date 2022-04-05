@@ -393,7 +393,7 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 		}
 		fallthrough
 	case 2:
-		userName = params[1]
+		userName = strings.ToUpper(params[1])
 		fallthrough
 	case 1:
 		name = params[0]
@@ -426,7 +426,7 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 		if userName != "" {
 			var uname string
 			if uname, err = getProcessUsername(pe.ProcessID); err == nil &&
-				strings.ToUpper(uname) != strings.ToUpper(userName) {
+				strings.ToUpper(uname) != userName {
 				continue
 			}
 		}
