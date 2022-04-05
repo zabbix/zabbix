@@ -378,8 +378,11 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 
 	if (0 != itemids.values_num)
 	{
-		DC_ITEM		*dc_items;
-		int		*errcodes;
+		DC_ITEM			*dc_items;
+		int			*errcodes;
+		zbx_dc_um_handle_t	*um_handle;
+
+		um_handle = zbx_dc_open_user_macros();
 
 		dc_items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
 		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * itemids.values_num);
@@ -403,6 +406,9 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 			if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 				continue;
 
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL,
+					NULL, NULL, NULL, NULL, NULL, &dc_items[i].delay, MACRO_TYPE_COMMON, NULL, 0);
+
 			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
 				continue;
 
@@ -414,6 +420,8 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 
 		zbx_free(errcodes);
 		zbx_free(dc_items);
+
+		zbx_dc_close_user_macros(um_handle);
 	}
 
 	zbx_vector_uint64_destroy(&itemids);
@@ -635,6 +643,9 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 			if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 				continue;
+
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL,
+					NULL, NULL, NULL, NULL, NULL, &dc_items[i].delay, MACRO_TYPE_COMMON, NULL, 0);
 
 			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
 				continue;

@@ -337,7 +337,8 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *in
 	zbx_uint64_t		seed;
 	int			simple_interval;
 	zbx_custom_interval_t	*custom_intervals;
-	int			disable_until;
+	int			disable_until, ret;
+	char			*delay_s;
 
 	if (0 == (flags & ZBX_ITEM_COLLECTED) && 0 != item->nextcheck &&
 			0 == (flags & ZBX_ITEM_KEY_CHANGED) && 0 == (flags & ZBX_ITEM_TYPE_CHANGED) &&
@@ -348,7 +349,11 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *in
 
 	seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, item->type, item->key);
 
-	if (SUCCEED != zbx_interval_preproc(item->delay, &simple_interval, &custom_intervals, error))
+	delay_s = dc_expand_user_macros(item->delay, &item->hostid, 1);
+	ret = zbx_interval_preproc(delay_s, &simple_interval, &custom_intervals, error);
+	zbx_free(delay_s);
+
+	if (SUCCEED != ret)
 	{
 		/* Polling items with invalid update intervals repeatedly does not make sense because they */
 		/* can only be healed by editing configuration (either update interval or macros involved) */
@@ -10232,7 +10237,7 @@ int	zbx_dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_
  *           This function must be used only by configuration syncer          *
  *                                                                            *
  ******************************************************************************/
-char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num)
+char	*dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int hostids_num)
 {
 	zbx_token_t	token;
 	int		pos = 0, last_pos = 0;
@@ -10342,6 +10347,8 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 	{
 		const ZBX_DC_HOST	*dc_host;
 		const ZBX_DC_INTERFACE	*dc_interface;
+		char			*delay_s;
+		int			ret;
 
 		if (ITEM_STATUS_ACTIVE != dc_item->status)
 			continue;
@@ -10377,7 +10384,12 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 			case ITEM_TYPE_ZABBIX_ACTIVE:
 				if (dc_host->data_expected_from > (data_expected_from = dc_item->data_expected_from))
 					data_expected_from = dc_host->data_expected_from;
-				if (SUCCEED != zbx_interval_preproc(dc_item->delay, &delay, NULL, NULL))
+
+				delay_s = dc_expand_user_macros(dc_item->delay, &dc_item->hostid, 1);
+				ret = zbx_interval_preproc(delay_s, &delay, NULL, NULL);
+				zbx_free(delay_s);
+
+				if (SUCCEED != ret)
 					continue;
 				if (data_expected_from + delay > now)
 					continue;
@@ -10580,8 +10592,11 @@ static void	dc_status_update(void)
 				if (HOST_STATUS_MONITORED == dc_host->status)
 				{
 					int	delay;
+					char	*delay_s;
 
-					if (SUCCEED == zbx_interval_preproc(dc_item->delay, &delay, NULL, NULL) &&
+					delay_s = dc_expand_user_macros(dc_item->delay, &dc_item->hostid, 1);
+
+					if (SUCCEED == zbx_interval_preproc(delay_s, &delay, NULL, NULL) &&
 							0 != delay)
 					{
 						config->status->required_performance += 1.0 / delay;
@@ -10589,6 +10604,8 @@ static void	dc_status_update(void)
 						if (NULL != dc_proxy)
 							dc_proxy->required_performance += 1.0 / delay;
 					}
+
+					zbx_free(delay_s);
 
 					switch (dc_item->state)
 					{

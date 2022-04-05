@@ -1795,9 +1795,6 @@ static char	**dbsync_item_preproc_row(char **row)
 
 	ZBX_STR2UCHAR(type, row[3]);
 
-	if (SUCCEED == dbsync_check_row_macros(row, 8))
-		flags |= ZBX_DBSYNC_ITEM_COLUMN_DELAY;
-
 	if (SUCCEED == dbsync_check_row_macros(row, 23))
 		flags |= ZBX_DBSYNC_ITEM_COLUMN_HISTORY;
 
@@ -1814,9 +1811,6 @@ static char	**dbsync_item_preproc_row(char **row)
 	ZBX_STR2UINT64(hostid, row[1]);
 
 	/* expand user macros */
-
-	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_DELAY))
-		row[8] = dc_expand_user_macros(row[8], &hostid, 1);
 
 	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_HISTORY))
 		row[22] = dc_expand_user_macros(row[22], &hostid, 1);
