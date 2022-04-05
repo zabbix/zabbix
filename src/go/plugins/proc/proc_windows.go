@@ -378,7 +378,7 @@ func (p *Plugin) exportProcInfo(params []string) (result interface{}, err error)
 }
 
 func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
-	var name, userName, cmdline, mode string
+	var name, userName, mode string
 	switch len(params) {
 	case 4:
 		mode = params[3]
@@ -389,9 +389,8 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 		}
 		fallthrough
 	case 3:
-		cmdline = params[2]
-		if cmdline != "" && mode == "summary" {
-			return nil, errors.New("Invalid fourth parameter")
+		if params[2] != "" {
+			return nil, errors.New("Invalid third parameter")
 		}
 		fallthrough
 	case 2:
@@ -408,12 +407,6 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 	threadArray := make([]thread, 0)
 	summaryArray := make([]procSummary, 0)
 
-	var cmdlinePattern *regexp.Regexp
-	var regexpErr error
-	if cmdline != "" {
-		cmdlinePattern, regexpErr = regexp.Compile(cmdline)
-	}
-
 	hs, err := syscall.CreateToolhelp32Snapshot(syscall.TH32CS_SNAPPROCESS, 0)
 	if err != nil {
 		return nil, errors.New("Cannot get process table snapshot")
@@ -428,11 +421,6 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 	for procerr = syscall.Process32First(hs, &pe); procerr == nil; procerr = syscall.Process32Next(hs, &pe) {
 		procName := windows.UTF16ToString(pe.ExeFile[:])
 		if name != "" && procName != name {
-			continue
-		}
-
-		if mode != "summary" && cmdline != "" && regexpErr == nil &&
-			!cmdlinePattern.Match([]byte(procName)) {
 			continue
 		}
 
