@@ -182,7 +182,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			'id:desc_h_pos',
 			'id:desc_v_pos',
 			'id:desc_size',
-			'id:desc_bold',
+			'id:desc_bold'
 			// TODO: uncomment after DEV-2154 is ready.
 //			'id:desc_color'
 		];
@@ -193,7 +193,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			'id:value_h_pos',
 			'id:value_size',
 			'id:value_v_pos',
-			'id:value_bold',
+			'id:value_bold'
 			// TODO: uncomment after DEV-2154 is ready.
 //			'id:value_color'
 		];
@@ -202,7 +202,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			'id:units',
 			'id:units_pos',
 			'id:units_size',
-			'id:units_bold',
+			'id:units_bold'
 			// TODO: uncomment after DEV-2154 is ready.
 //			'id:units_color'
 		];
@@ -211,7 +211,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			'id:time_h_pos',
 			'id:time_v_pos',
 			'id:time_size',
-			'id:time_bold',
+			'id:time_bold'
 			// TODO: uncomment after DEV-2154 is ready.
 //			'id:time_color'
 		];
