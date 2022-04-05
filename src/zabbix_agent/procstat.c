@@ -21,7 +21,7 @@
 
 #include "log.h"
 #include "stats.h"
-#include "ipc.h"
+#include "zbxnix.h"
 
 
 #ifdef ZBX_PROCSTAT_COLLECTOR

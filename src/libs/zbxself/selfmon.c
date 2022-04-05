@@ -24,7 +24,7 @@
 
 #ifndef _WINDOWS
 #	include "mutexs.h"
-#	include "ipc.h"
+#	include "zbxnix.h"
 #	include "log.h"
 
 #	define MAX_HISTORY	60
