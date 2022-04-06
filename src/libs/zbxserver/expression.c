@@ -5472,7 +5472,9 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t 
 	{
 		char	*error = NULL;
 
-		if (SUCCEED != expand_trigger_macros((DC_TRIGGER *)triggers->values[i], &event, um_handle, &error))
+		tr = (DC_TRIGGER *)triggers->values[i];
+
+		if (SUCCEED != expand_trigger_macros(tr, &event, um_handle, &error))
 		{
 			tr->new_error = zbx_dsprintf(tr->new_error, "Cannot evaluate expression: %s", error);
 			tr->new_value = TRIGGER_VALUE_UNKNOWN;
