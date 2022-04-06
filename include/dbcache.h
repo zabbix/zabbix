@@ -204,7 +204,6 @@ typedef struct
 	zbx_uint64_t	functionid;
 	zbx_uint64_t	triggerid;
 	zbx_uint64_t	itemid;
-	zbx_uint64_t	hostid;
 	char		*function;
 	char		*parameter;
 	unsigned char	type;
