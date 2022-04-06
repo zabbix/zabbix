@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ZAUDIT_H
-#define ZABBIX_ZAUDIT_H
+#ifndef ZABBIX_ZBXAUDIT_H
+#define ZABBIX_ZBXAUDIT_H
 
 #include "zbxtypes.h"
 
@@ -37,4 +37,4 @@ void	zbx_audit_clean(void);
 void	zbx_audit_flush(void);
 int	zbx_audit_flush_once(void);
 
-#endif	/* ZABBIX_ZAUDIT_H */
+#endif	/* ZABBIX_ZBXAUDIT_H */
