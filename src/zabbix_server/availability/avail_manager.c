@@ -24,7 +24,6 @@
 #include "zbxavailability.h"
 #include "zbxipcservice.h"
 #include "zbxnix.h"
-#include "dbcache.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
