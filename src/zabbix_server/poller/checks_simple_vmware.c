@@ -2829,6 +2829,8 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 
 		for (i = 0; i < hv->vms.values_num; i++)
 		{
+			zbx_vmware_datastore_t	*datastore = NULL;
+
 			vm = (zbx_vmware_vm_t *)hv->vms.values[i];
 
 			if (NULL == (vm_name = vm->props[ZBX_VMWARE_VMPROP_NAME]))
@@ -2836,6 +2838,26 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 
 			if (NULL == (hv_name = hv->props[ZBX_VMWARE_HVPROP_NAME]))
 				continue;
+
+			for (i = 0; NULL != vm->props[ZBX_VMWARE_VMPROP_DATASTOREID] &&
+				i < service->data->datastores.values_num; i++)
+			{
+				if (0 != strcmp(vm->props[ZBX_VMWARE_VMPROP_DATASTOREID],
+						service->data->datastores.values[i]->id))
+				{
+					continue;
+				}
+
+				datastore = service->data->datastores.values[i];
+				break;
+			}
+
+			if (NULL == datastore)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() Unknown datastore id:%s", __func__,
+						ZBX_NULL2EMPTY_STR(vm->props[ZBX_VMWARE_VMPROP_DATASTOREID]));
+				continue;
+			}
 
 			zbx_json_addobject(&json_data, NULL);
 			zbx_json_addstring(&json_data, "{#VM.UUID}", vm->uuid, ZBX_JSON_TYPE_STRING);
@@ -2860,6 +2882,8 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			zbx_json_addstring(&json_data, "{#VM.FOLDER}",
 					ZBX_NULL2EMPTY_STR(vm->props[ZBX_VMWARE_VMPROP_FOLDER]), ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&json_data, "{#VM.SNAPSHOT.COUNT}", vm->snapshot_count);
+			zbx_json_addstring(&json_data, "{#DATASTORE.NAME}", datastore->name, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "{#DATASTORE.UUID}", datastore->uuid, ZBX_JSON_TYPE_STRING);
 
 			zbx_json_close(&json_data);
 		}

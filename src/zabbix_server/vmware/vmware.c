@@ -387,7 +387,9 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 	ZBX_VMPROPMAP("parent"),				/* ZBX_VMWARE_VMPROP_FOLDER */
 	{"layoutEx</ns0:pathSet><ns0:pathSet>snapshot",		/* ZBX_VMWARE_VMPROP_SNAPSHOT */
 			ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE("snapshot"),
-			vmware_service_get_vm_snapshot}
+			vmware_service_get_vm_snapshot},
+	ZBX_VMPROPMAP("datastore")				/* ZBX_VMWARE_VMPROP_DATASTOREID */
+
 };
 
 #define ZBX_XPATH_OBJECTS_BY_TYPE(type)									\
@@ -3028,15 +3030,12 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 
 	if (NULL != vm->props[ZBX_VMWARE_VMPROP_SNAPSHOT])
 	{
-		struct zbx_json_parse	jp, jp_values;
-		size_t			count_alloc = 0;
-		char			*count;
+		struct zbx_json_parse	jp;
+		char			count[ZBX_MAX_UINT64_LEN];
 
 		zbx_json_open(vm->props[ZBX_VMWARE_VMPROP_SNAPSHOT], &jp);
-		zbx_json_brackets_open(jp.start, &jp_values);
-		zbx_json_value_by_name_dyn(&jp_values, "count", &count, &count_alloc, NULL);
+		zbx_json_value_by_name(&jp, "count", count, sizeof(count), NULL);
 		vm->snapshot_count = (unsigned int)atoi(count);
-		zbx_free(count);
 	}
 
 	vmware_vm_get_nic_devices(vm, details);

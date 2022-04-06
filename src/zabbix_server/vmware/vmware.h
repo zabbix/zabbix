@@ -390,8 +390,9 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_VMPROP_GUESTFULLNAME			19
 #define ZBX_VMWARE_VMPROP_FOLDER			20
 #define ZBX_VMWARE_VMPROP_SNAPSHOT			21
+#define ZBX_VMWARE_VMPROP_DATASTOREID			22
 
-#define ZBX_VMWARE_VMPROPS_NUM				22
+#define ZBX_VMWARE_VMPROPS_NUM				23
 
 /* vmware service types */
 #define ZBX_VMWARE_TYPE_UNKNOWN	0
