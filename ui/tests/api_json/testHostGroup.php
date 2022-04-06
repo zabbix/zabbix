@@ -495,4 +495,85 @@ class testHostGroup extends CAPITest {
 		$this->authorize($user['user'], $user['password']);
 		$this->call($method, $hostgroups, $expected_error);
 	}
+
+	public static function hostgroup_get() {
+		return [
+			[
+				'params' => [
+					'output' => ['groupid'],
+					'groupids' => ['50005', '50006'],
+					'monitored_hosts' => true
+				],
+				'expected_result' => [
+					'groupid' => '50005'
+				],
+				'expected_error' => null
+			],
+			[
+				'params' => [
+					'output' => ['groupid'],
+					'groupids' => ['50005', '50006'],
+					'monitored_hosts' => true,
+					'with_monitored_hosts' => true
+				],
+				'expected_result' => false,
+				'expected_error' => 'Parameter "monitored_hosts" is deprecated.'
+			],
+			[
+				'params' => [
+					'output' => ['groupid'],
+					'groupids' => ['50005', '50006'],
+					'real_hosts' => true
+				],
+				'expected_result' => [
+					'groupid' => '50005'
+				],
+				'expected_error' => null
+			],
+			[
+				'params' => [
+					'output' => ['groupid'],
+					'groupids' => ['50005', '50006'],
+					'real_hosts' => true,
+					'with_hosts' => true
+				],
+				'expected_result' => false,
+				'expected_error' => 'Parameter "real_hosts" is deprecated.'
+			],
+			[
+				'params' => [
+					'output' => ['groupid'],
+					'groupids' => ['50005', '50006'],
+					'templated_hosts' => true
+				],
+				'expected_result' => false,
+				'expected_error' => 'Invalid parameter "/": unexpected parameter "templated_hosts".'
+			],
+			[
+				'params' => [
+					'output' => ['groupid'],
+					'groupids' => ['50005', '50006'],
+					'with_hosts_and_templates' => true
+				],
+				'expected_result' => false,
+				'expected_error' => 'Invalid parameter "/": unexpected parameter "with_hosts_and_templates".'
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider hostgroup_get
+	 */
+	public function testHostGroup_Get($params, $expected_result, $expected_error) {
+		$result = $this->call('hostgroup.get', $params, $expected_error);
+
+		if ($expected_error === null) {
+			foreach ($result['result'] as $hostgroup) {
+				foreach ($expected_result as $field => $expected_value){
+					$this->assertArrayHasKey($field, $hostgroup, 'Field should be present.');
+					$this->assertEquals($hostgroup[$field], $expected_value, 'Returned value should match.');
+				}
+			}
+		}
+	}
 }
