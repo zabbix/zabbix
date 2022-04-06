@@ -24,7 +24,7 @@
 
 #ifndef _WINDOWS
 #	include "diskdevices.h"
-#	include "ipc.h"
+#	include "zbxnix.h"
 #endif
 
 #include "cpustat.h"

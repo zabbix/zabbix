@@ -24,7 +24,7 @@
 
 #include "zbxtasks.h"
 #include "zbxmutexs.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxcompress.h"
 #include "zbxcommshigh.h"
 

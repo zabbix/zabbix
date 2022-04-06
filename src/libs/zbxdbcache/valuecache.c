@@ -21,7 +21,6 @@
 
 #include "log.h"
 #include "dbcache.h"
-#include "vectorimpl.h"
 #include "zbxmutexs.h"
 
 /*

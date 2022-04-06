@@ -29,10 +29,9 @@
 #include "module.h"
 #include "export.h"
 #include "zbxhistory.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxavailability.h"
 #include "zbxtrends.h"
-#include "../zbxalgo/vectorimpl.h"
 
 static zbx_shmem_info_t	*hc_index_mem = NULL;
 static zbx_shmem_info_t	*hc_mem = NULL;
@@ -409,7 +408,7 @@ static void	dc_insert_trends_in_db(ZBX_DC_TREND *trends, int trends_num, unsigne
 			zbx_uint128_t	avg;
 
 			/* calculate the trend average value */
-			udiv128_64(&avg, &trend->value_avg.ui64, trend->num);
+			zbx_udiv128_64(&avg, &trend->value_avg.ui64, trend->num);
 
 			zbx_db_insert_add_values(&db_insert, trend->itemid, trend->clock, trend->num,
 					trend->value_min.ui64, avg.lo, trend->value_max.ui64);
@@ -544,9 +543,9 @@ static void	dc_trends_update_uint(ZBX_DC_TREND *trend, DB_ROW row, int num, size
 		trend->value_max.ui64 = value_max.ui64;
 
 	/* calculate the trend average value */
-	umul64_64(&avg, num, value_avg.ui64);
-	uinc128_128(&trend->value_avg.ui64, &avg);
-	udiv128_64(&avg, &trend->value_avg.ui64, trend->num + num);
+	zbx_umul64_64(&avg, num, value_avg.ui64);
+	zbx_uinc128_128(&trend->value_avg.ui64, &avg);
+	zbx_udiv128_64(&avg, &trend->value_avg.ui64, trend->num + num);
 
 	trend->num += num;
 
@@ -819,7 +818,7 @@ static void	DCadd_trend(const ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, in
 				trend->value_min.ui64 = history->value.ui64;
 			if (trend->num == 0 || history->value.ui64 > trend->value_max.ui64)
 				trend->value_max.ui64 = history->value.ui64;
-			uinc128_64(&trend->value_avg.ui64, history->value.ui64);
+			zbx_uinc128_64(&trend->value_avg.ui64, history->value.ui64);
 			break;
 	}
 	trend->num++;
@@ -1189,7 +1188,7 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
 				zbx_json_adduint64(&json, ZBX_PROTO_TAG_MIN, trend->value_min.ui64);
-				udiv128_64(&avg, &trend->value_avg.ui64, trend->num);
+				zbx_udiv128_64(&avg, &trend->value_avg.ui64, trend->num);
 				zbx_json_adduint64(&json, ZBX_PROTO_TAG_AVG, avg.lo);
 				zbx_json_adduint64(&json, ZBX_PROTO_TAG_MAX, trend->value_max.ui64);
 				break;
