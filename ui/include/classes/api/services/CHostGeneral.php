@@ -1406,7 +1406,7 @@ abstract class CHostGeneral extends CHostBase {
 					 * Since templates API does not have "link_type" field, remove it from request, so that template.get
 					 * validation may pass successfully.
 					 */
-					if ($this->outputIsRequested('link_type', $template_options && is_array($template_options))
+					if ($this->outputIsRequested('link_type', $template_options) && is_array($template_options)
 							&& ($key = array_search('link_type', $template_options)) !== false) {
 						unset($template_options[$key]);
 					}
