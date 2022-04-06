@@ -814,7 +814,12 @@ class CRole extends CApiService {
 			'api' => [],
 			'api.access' => ZBX_ROLE_RULE_ENABLED,
 			'api.mode' => ZBX_ROLE_RULE_API_MODE_DENY,
-			'actions' => [],
+			'actions' => [
+				[
+					'name' => 'invoke_execute_now',
+					'status' => 0
+				]
+			],
 			'actions.default_access' => ZBX_ROLE_RULE_ENABLED
 		];
 
@@ -1140,7 +1145,6 @@ class CRole extends CApiService {
 					'value' => $action_rule_status
 				];
 			}
-
 		}
 
 		$compiled_rules[] = [
