@@ -678,7 +678,7 @@ class testHost extends CAPITest {
 		$sql_hosts = 'SELECT NULL FROM hosts';
 		$old_hash_hosts = CDBHelper::getHash($sql_hosts);
 
-		$result = $this->call('host.delete', $hostids, $expected_error);
+		$this->call('host.delete', $hostids, $expected_error);
 
 		if ($expected_error === null) {
 			$this->assertNotSame($old_hash_hosts, CDBHelper::getHash($sql_hosts));
