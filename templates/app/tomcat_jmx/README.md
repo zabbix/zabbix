@@ -47,7 +47,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Global request processors discovery |<p>Discovery for GlobalRequesProcessor</p> |JMX |jmx.discovery[beans,"Catalina:type=GlobalRequestProcessor,name=*"]<p>**Filter**:</p>AND <p>- A: {#JMXNAME} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"GlobalRequesProcessor"}`</p><p>- B: {#JMXNAME} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"GlobalRequesProcessor"}`</p> |
+|Global request processors discovery |<p>Discovery for GlobalRequestProcessor</p> |JMX |jmx.discovery[beans,"Catalina:type=GlobalRequestProcessor,name=*"]<p>**Filter**:</p>AND <p>- A: {#JMXNAME} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"GlobalRequestProcessor"}`</p><p>- B: {#JMXNAME} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"GlobalRequestProcessor"}`</p> |
 |Protocol handlers discovery |<p>Discovery for ProtocolHandler</p> |JMX |jmx.discovery[attributes,"Catalina:type=ProtocolHandler,port=*"]<p>**Filter**:</p>AND <p>- A: {#JMXATTR} MATCHES_REGEX `^name$`</p> |
 |Thread pools discovery |<p>Discovery for ThreadPool</p> |JMX |jmx.discovery[beans,"Catalina:type=ThreadPool,name=*"]<p>**Filter**:</p>AND <p>- A: {#JMXNAME} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"ThreadPool"}`</p><p>- B: {#JMXNAME} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"ThreadPool"}`</p> |
 |Contexts discovery |<p>Discovery for contexts</p> |JMX |jmx.discovery[beans,"Catalina:type=Manager,host=*,context=*"]<p>**Filter**:</p>AND <p>- A: {#JMXHOST} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"Manager"}`</p><p>- B: {#JMXHOST} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"Manager"}`</p> |

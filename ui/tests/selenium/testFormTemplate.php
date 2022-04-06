@@ -259,7 +259,7 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template_clone'"));
 
 		$template = CDBHelper::getRow("select hostid from hosts where host like '".$cloned_template_name."'");
-		$this->assertEquals(66, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
+		$this->assertEquals(67, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(11, CDBHelper::getCount("SELECT applicationid FROM applications WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostgroupid FROM hosts_groups WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(0, CDBHelper::getCount("SELECT screenid FROM screens WHERE templateid='".$template['hostid']."'"));
@@ -279,7 +279,7 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template_clone'"));
 
 		$template = CDBHelper::getRow("select hostid from hosts where host like '".$cloned_template_name."'");
-		$this->assertEquals(66, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
+		$this->assertEquals(67, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(11, CDBHelper::getCount("SELECT applicationid FROM applications WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostgroupid FROM hosts_groups WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(1, CDBHelper::getCount("SELECT screenid FROM screens WHERE templateid='".$template['hostid']."'"));

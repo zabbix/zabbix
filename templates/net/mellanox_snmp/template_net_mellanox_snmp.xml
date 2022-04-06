@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-10-27T14:33:35Z</date>
+   <date>2022-03-03T14:14:40Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -847,7 +847,7 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                      <trends>0d</trends>
                      <description>MIB: IF-MIB&#13;
 The type of interface.&#13;
-Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),&#13;
+Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),&#13;
 through updating the syntax of the IANAifType textual convention.</description>
                      <application_prototypes>
                         <application_prototype>

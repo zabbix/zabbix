@@ -101,7 +101,6 @@ abstract class CControllerLatest extends CController {
 			'output' => ['hostid', 'name', 'status'],
 			'groupids' => $groupids,
 			'hostids' => $filter['hostids'] ? $filter['hostids'] : null,
-			'monitored_hosts' => true,
 			'preservekeys' => true
 		]);
 

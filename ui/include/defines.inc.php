@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.0.21rc1');
-define('ZABBIX_API_VERSION',	'5.0.21');
+define('ZABBIX_VERSION',		'5.0.23rc1');
+define('ZABBIX_API_VERSION',	'5.0.23');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
 define('ZABBIX_DB_VERSION',		5000000);
 
@@ -1696,7 +1696,7 @@ define('ZBX_STYLE_ICON_DEPEND_UP', 'icon-depend-up');
 define('ZBX_STYLE_ICON_DESCRIPTION', 'icon-description');
 define('ZBX_STYLE_ICON_INFO', 'icon-info');
 define('ZBX_STYLE_ICON_INVISIBLE', 'icon-invisible');
-define('ZBX_STYLE_ICON_MAINT', 'icon-maint');
+define('ZBX_STYLE_ICON_MAINTENANCE', 'icon-maintenance');
 define('ZBX_STYLE_ICON_WZRD_ACTION', 'icon-wzrd-action');
 define('ZBX_STYLE_ACTION_COMMAND', 'icon-action-command');
 define('ZBX_STYLE_ACTION_ICON_CLOSE', 'icon-action-close');

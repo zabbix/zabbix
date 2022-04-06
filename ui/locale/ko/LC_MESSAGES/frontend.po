@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-21 19:52+0200\n"
+"POT-Creation-Date: 2022-03-04 19:52+0200\n"
 "PO-Revision-Date: 2020-06-04 05:05+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -440,7 +440,7 @@ msgstr "대응 완료된 해결 이벤트"
 #: include/views/configuration.item.prototype.massupdate.php:254
 #: include/views/configuration.maintenance.edit.php:81
 #: include/views/configuration.services.edit.php:125
-#: include/views/configuration.services.edit.php:178
+#: include/views/configuration.services.edit.php:179
 #: include/views/configuration.template.edit.php:126
 #: include/views/configuration.template.massupdate.php:150
 #: include/views/configuration.trigger.prototype.edit.php:187
@@ -655,9 +655,9 @@ msgstr "종료시간"
 #: include/views/configuration.maintenance.edit.php:121
 #: include/views/configuration.maintenance.edit.php:197
 #: include/views/configuration.maintenance.edit.php:268
-#: include/views/configuration.services.edit.php:163
-#: include/views/configuration.services.edit.php:338
-#: include/views/configuration.services.edit.php:375
+#: include/views/configuration.services.edit.php:164
+#: include/views/configuration.services.edit.php:339
+#: include/views/configuration.services.edit.php:376
 #: include/views/configuration.template.edit.php:238
 #: include/views/configuration.template.list.php:67
 #: include/views/configuration.template.massupdate.php:55
@@ -4864,7 +4864,7 @@ msgstr "구분 문자"
 msgid "Deny"
 msgstr "거부"
 
-#: include/views/configuration.services.edit.php:355
+#: include/views/configuration.services.edit.php:356
 #: include/views/configuration.trigger.prototype.edit.php:585
 #: include/views/configuration.trigger.prototype.edit.php:619
 #: include/views/configuration.trigger.prototype.massupdate.php:185
@@ -4883,7 +4883,7 @@ msgid "Dependent item"
 msgstr "의존 아이템"
 
 #: app/views/popup.generic.php:313 include/triggers.inc.php:2554
-#: include/views/configuration.services.edit.php:160
+#: include/views/configuration.services.edit.php:161
 #: include/views/configuration.trigger.prototype.list.php:87
 #: include/views/configuration.triggers.list.php:241
 msgid "Depends on"
@@ -5383,8 +5383,8 @@ msgstr "설정 파일 다운로드"
 #: app/views/report.services.php:80 app/views/report.services.php:81
 #: app/views/report.services.php:82 app/views/report.services.php:83
 #: include/classes/screens/CScreenDiscovery.php:120
-#: include/views/configuration.services.edit.php:191
-#: include/views/configuration.services.edit.php:243
+#: include/views/configuration.services.edit.php:192
+#: include/views/configuration.services.edit.php:244
 msgid "Downtime"
 msgstr "정지 시간"
 
@@ -6529,8 +6529,8 @@ msgstr "금"
 
 #: app/views/report.services.php:82 include/classes/html/CFilter.php:282
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:79
-#: include/views/configuration.services.edit.php:257
-#: include/views/configuration.services.edit.php:305
+#: include/views/configuration.services.edit.php:258
+#: include/views/configuration.services.edit.php:306
 #: include/views/js/monitoring.sysmaps.js.php:732 report4.php:191
 #: services.php:47 services.php:182
 msgid "From"
@@ -9350,7 +9350,7 @@ msgstr "Internet Explorer"
 #: include/views/configuration.item.prototype.edit.php:563
 #: include/views/configuration.item.prototype.list.php:58
 #: include/views/configuration.item.prototype.massupdate.php:252
-#: include/views/configuration.services.edit.php:178
+#: include/views/configuration.services.edit.php:179
 msgid "Interval"
 msgstr "갱신 간격"
 
@@ -10789,7 +10789,7 @@ msgstr "데이터수집을 하는 메인터넌스"
 msgid "Maintenance without data collection"
 msgstr "데이터수집을 하지 않는 메인터넌스"
 
-#: include/html.inc.php:987
+#: include/html.inc.php:985
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "메인테넌스 : %1$s"
@@ -11683,7 +11683,7 @@ msgstr ""
 msgid "New regular expression"
 msgstr "정규표현식 작성"
 
-#: include/views/configuration.services.edit.php:335
+#: include/views/configuration.services.edit.php:336
 msgid "New service time"
 msgstr "새 서비스 시간"
 
@@ -12374,8 +12374,8 @@ msgid "Not supported"
 msgstr "취득 불가"
 
 #: app/views/popup.services.php:71
-#: include/views/configuration.services.edit.php:178
-#: include/views/configuration.services.edit.php:251
+#: include/views/configuration.services.edit.php:179
+#: include/views/configuration.services.edit.php:252
 msgid "Note"
 msgstr "설명"
 
@@ -12710,8 +12710,8 @@ msgstr "호스트 그룹이 설정되지 않은 오브젝트가 남아있습니�
 msgid "One time only"
 msgstr "한번만"
 
-#: include/views/configuration.services.edit.php:197
-#: include/views/configuration.services.edit.php:244
+#: include/views/configuration.services.edit.php:198
+#: include/views/configuration.services.edit.php:245
 msgid "One-time downtime"
 msgstr "일시적인 정지 시간"
 
@@ -13474,7 +13474,7 @@ msgstr "기간"
 
 #: app/views/popup.maintenance.period.php:69
 #: include/views/configuration.maintenance.edit.php:81
-#: include/views/configuration.services.edit.php:236
+#: include/views/configuration.services.edit.php:237
 msgid "Period type"
 msgstr "기간의 타입"
 
@@ -14283,7 +14283,7 @@ msgstr "원격 명령"
 #: include/views/configuration.maintenance.edit.php:166
 #: include/views/configuration.maintenance.edit.php:186
 #: include/views/configuration.services.edit.php:142
-#: include/views/configuration.services.edit.php:216
+#: include/views/configuration.services.edit.php:217
 #: include/views/configuration.template.list.php:57
 #: include/views/configuration.template.massupdate.php:57
 #: include/views/configuration.template.massupdate.php:146
@@ -14322,8 +14322,8 @@ msgstr "원격 명령"
 #: include/views/js/configuration.host.prototype.edit.js.php:33
 #: include/views/js/configuration.httpconf.edit.js.php:52
 #: include/views/js/configuration.httpconf.edit.js.php:77
-#: include/views/js/configuration.item.list.js.php:51
-#: include/views/js/configuration.item.list.js.php:66
+#: include/views/js/configuration.item.list.js.php:54
+#: include/views/js/configuration.item.list.js.php:72
 #: include/views/js/configuration.item.massupdate.js.php:51
 #: include/views/js/configuration.maintenance.edit.js.php:40
 #: include/views/js/configuration.services.edit.js.php:112
@@ -15419,7 +15419,7 @@ msgstr "서버 시간"
 
 #: app/controllers/CControllerAuditLogList.php:203
 #: app/views/popup.services.php:46 include/actions.inc.php:76
-#: include/views/configuration.services.edit.php:354 services.php:352
+#: include/views/configuration.services.edit.php:355 services.php:352
 #: srv_status.php:144
 msgid "Service"
 msgstr "서비스"
@@ -15482,7 +15482,7 @@ msgstr "서비스 포트"
 msgid "Service start time must be less than end time."
 msgstr "서비스시작시간은 종료시간보다 빠르게 설정해주십시오."
 
-#: include/views/configuration.services.edit.php:227
+#: include/views/configuration.services.edit.php:228
 msgid "Service times"
 msgstr "서비스 시간"
 
@@ -16281,7 +16281,7 @@ msgstr "일"
 msgid "Support"
 msgstr "지원"
 
-#: include/html.inc.php:982
+#: include/html.inc.php:980
 #, c-format
 msgid "Suppressed till: %1$s"
 msgstr "억제기한: %1$s"
@@ -16881,8 +16881,8 @@ msgid "Thursday"
 msgstr "목"
 
 #: app/views/report.services.php:82
-#: include/views/configuration.services.edit.php:264
-#: include/views/configuration.services.edit.php:319 report4.php:191
+#: include/views/configuration.services.edit.php:265
+#: include/views/configuration.services.edit.php:320 report4.php:191
 #: services.php:48 services.php:191
 msgid "Till"
 msgstr "종료"
@@ -16907,9 +16907,9 @@ msgstr "종료"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:201
 #: include/events.inc.php:168 include/events.inc.php:245
 #: include/views/administration.auditacts.list.php:62
-#: include/views/configuration.services.edit.php:309
-#: include/views/configuration.services.edit.php:323
-#: include/views/configuration.services.edit.php:356
+#: include/views/configuration.services.edit.php:310
+#: include/views/configuration.services.edit.php:324
+#: include/views/configuration.services.edit.php:357
 msgid "Time"
 msgstr "시각"
 
@@ -17412,7 +17412,7 @@ msgstr "2개의 타입요소를 선택할 필요가 있습니다"
 #: include/views/configuration.item.prototype.massupdate.php:41
 #: include/views/configuration.item.prototype.massupdate.php:251
 #: include/views/configuration.maintenance.list.php:83
-#: include/views/configuration.services.edit.php:178
+#: include/views/configuration.services.edit.php:179
 #: include/views/inventory.host.list.php:86
 #: include/views/js/monitoring.sysmaps.js.php:88
 #: include/views/js/monitoring.sysmaps.js.php:397
@@ -17833,7 +17833,7 @@ msgstr "Up"
 #: include/views/configuration.item.prototype.edit.php:743
 #: include/views/configuration.item.prototype.massupdate.php:543
 #: include/views/configuration.maintenance.edit.php:258
-#: include/views/configuration.services.edit.php:369
+#: include/views/configuration.services.edit.php:370
 #: include/views/configuration.template.edit.php:221
 #: include/views/configuration.template.massupdate.php:176
 #: include/views/configuration.trigger.prototype.edit.php:632
@@ -17906,8 +17906,8 @@ msgid "Upper level maps"
 msgstr "상위레벨 맵"
 
 #: include/classes/screens/CScreenDiscovery.php:120
-#: include/views/configuration.services.edit.php:185
-#: include/views/configuration.services.edit.php:242
+#: include/views/configuration.services.edit.php:186
+#: include/views/configuration.services.edit.php:243
 msgid "Uptime"
 msgstr "가동 시간"
 
@@ -19042,8 +19042,8 @@ msgstr "Y2"
 #: app/views/popup.maintenance.period.php:150
 #: include/views/configuration.maintenance.edit.php:61
 #: include/views/configuration.maintenance.edit.php:67
-#: include/views/configuration.services.edit.php:260
-#: include/views/configuration.services.edit.php:267
+#: include/views/configuration.services.edit.php:261
+#: include/views/configuration.services.edit.php:268
 msgid "YYYY-MM-DD hh:mm"
 msgstr "YYYY-MM-DD hh:mm"
 
@@ -19899,8 +19899,8 @@ msgctxt "hour short"
 msgid "h"
 msgstr "h"
 
-#: include/views/configuration.services.edit.php:286
-#: include/views/configuration.services.edit.php:296
+#: include/views/configuration.services.edit.php:287
+#: include/views/configuration.services.edit.php:297
 msgid "hh"
 msgstr "hh"
 
@@ -20196,8 +20196,8 @@ msgstr "min() - 기간T 안의 최소치"
 msgid "minimum length is %1$s characters"
 msgstr "%1$s 문자 이상 입력해주세요"
 
-#: include/views/configuration.services.edit.php:291
-#: include/views/configuration.services.edit.php:301
+#: include/views/configuration.services.edit.php:292
+#: include/views/configuration.services.edit.php:302
 msgid "mm"
 msgstr "mm"
 
@@ -20442,7 +20442,7 @@ msgstr ""
 msgid "selected"
 msgstr "선택"
 
-#: include/views/configuration.services.edit.php:254
+#: include/views/configuration.services.edit.php:255
 msgid "short description"
 msgstr "짧은 설명"
 

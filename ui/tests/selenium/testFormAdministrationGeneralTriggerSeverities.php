@@ -58,17 +58,11 @@ class testFormAdministrationGeneralTriggerSeverities extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentId('lbl_severity_color_4');
 		$this->zbxTestAssertElementPresentId('lbl_severity_color_5');
 		$this->zbxTestAssertAttribute("//input[@id='severity_name_0']", "maxlength", '32');
-		$this->zbxTestAssertAttribute("//input[@id='severity_name_0']", "size", '20');
 		$this->zbxTestAssertAttribute("//input[@id='severity_name_1']", "maxlength", '32');
-		$this->zbxTestAssertAttribute("//input[@id='severity_name_1']", "size", '20');
 		$this->zbxTestAssertAttribute("//input[@id='severity_name_2']", "maxlength", '32');
-		$this->zbxTestAssertAttribute("//input[@id='severity_name_2']", "size", '20');
 		$this->zbxTestAssertAttribute("//input[@id='severity_name_3']", "maxlength", '32');
-		$this->zbxTestAssertAttribute("//input[@id='severity_name_3']", "size", '20');
 		$this->zbxTestAssertAttribute("//input[@id='severity_name_4']", "maxlength", '32');
-		$this->zbxTestAssertAttribute("//input[@id='severity_name_4']", "size", '20');
 		$this->zbxTestAssertAttribute("//input[@id='severity_name_5']", "maxlength", '32');
-		$this->zbxTestAssertAttribute("//input[@id='severity_name_5']", "size", '20');
 
 		// checking values in this report
 		$this->zbxTestAssertElementValue('severity_name_0', $allValues['severity_name_0']);

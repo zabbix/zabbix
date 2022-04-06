@@ -1,12 +1,13 @@
 ## Process this file with automake to produce Makefile.in
 
 EXTRA_DIST = .	
-	
+
 BUILD_TIME=`date +%H:%M:%S`
 BUILD_DATE=`date +"%b %_d %Y"`
 GOOS=`go env GOOS`
 GOARCH=`go env GOARCH`
 PKG=zabbix.com/pkg/version
+NEW_FROM_REV=""
 
 GOLDFLAGS = -X ${PKG}.titleMessage=zabbix_agent2
 GOLDFLAGS += -X '${PKG}.compileDate=${BUILD_DATE}'
@@ -32,4 +33,7 @@ install:
 
 check:
 	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go test ./...
-
+style:
+	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" golangci-lint run --new-from-rev=$(NEW_FROM_REV)  ./...
+format:
+	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go fmt ./...

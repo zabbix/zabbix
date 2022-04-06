@@ -100,9 +100,10 @@ class CControllerPopupDiscoveryCheck extends CController {
 				$params['key_'] = $data['snmp_oid'];
 			}
 
-			return $this->setResponse(
+			$this->setResponse(
 				(new CControllerResponseData(['main_block' => json_encode(['params' => $params])]))->disableView()
 			);
+			return;
 		}
 
 		$output = [

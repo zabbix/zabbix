@@ -140,9 +140,10 @@ foreach ($this->data['children'] as $child) {
 			!empty($child['trigger']) ? $child['trigger'] : '',
 			(new CCol(
 				(new CButton('remove', _('Remove')))
-					->onClick('javascript: removeDependentChild(\''.$child['serviceid'].'\');')
-					->addClass(ZBX_STYLE_BTN_LINK)
 					->removeId()
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setAttribute('data-serviceid', $child['serviceid'])
+					->onClick('removeDependentChild(this.dataset.serviceid);')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->setId('children_'.$child['serviceid'])
 	);

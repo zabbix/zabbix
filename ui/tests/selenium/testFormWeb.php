@@ -222,7 +222,6 @@ class testFormWeb extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestAssertVisibleId('name');
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'maxlength', 64);
-		$this->zbxTestAssertAttribute("//input[@id='name']", 'size', 20);
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestAssertAttribute("//input[@id='name']", 'readonly');
 		}
@@ -235,18 +234,15 @@ class testFormWeb extends CLegacyWebTest {
 		$this->zbxTestTextPresent('New application');
 		$this->zbxTestAssertVisibleId('new_application');
 		$this->zbxTestAssertAttribute("//input[@id='new_application']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='new_application']", 'size', 20);
 
 		$this->zbxTestTextPresent('Update interval');
 		$this->zbxTestAssertVisibleId('delay');
 		$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='delay']", 'size', 20);
 		$this->zbxTestAssertElementValue('delay', '1m');
 
 		$this->zbxTestTextPresent('Attempts');
 		$this->zbxTestAssertVisibleId('retries');
 		$this->zbxTestAssertAttribute("//input[@id='retries']", 'maxlength', 2);
-		$this->zbxTestAssertAttribute("//input[@id='retries']", 'size', 20);
 		$this->zbxTestAssertElementValue('retries', 1);
 
 		$this->zbxTestTextPresent('Agent');
@@ -275,7 +271,6 @@ class testFormWeb extends CLegacyWebTest {
 		$this->zbxTestTextPresent('HTTP proxy');
 		$this->zbxTestAssertVisibleId('http_proxy');
 		$this->zbxTestAssertAttribute("//input[@id='http_proxy']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='http_proxy']", 'size', 20);
 		$this->zbxTestAssertAttribute("//input[@id='http_proxy']", 'placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]');
 
 		$this->zbxTestTextPresent('Variables');
@@ -337,12 +332,10 @@ class testFormWeb extends CLegacyWebTest {
 			$this->zbxTestTextPresent('User');
 			$this->zbxTestAssertVisibleId('http_user');
 			$this->zbxTestAssertAttribute("//input[@id='http_user']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='http_user']", 'size', 20);
 
 			$this->zbxTestTextPresent('Password');
 			$this->zbxTestAssertVisibleId('http_password');
 			$this->zbxTestAssertAttribute("//input[@id='http_password']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='http_password']", 'size', 20);
 		}
 		else {
 			$this->zbxTestTextNotVisible(['User', 'Password'], $this->query('id:authenticationTab')->one());

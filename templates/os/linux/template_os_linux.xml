@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-02-01T17:42:35Z</date>
+   <date>2022-03-03T14:05:38Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -926,7 +926,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <key>kernel.maxfiles</key>
                <delay>1h</delay>
                <history>7d</history>
-               <description>It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.</description>
+               <description>It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.</description>
                <applications>
                   <application>
                      <name>General</name>
@@ -951,7 +951,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <key>kernel.maxproc</key>
                <delay>1h</delay>
                <history>7d</history>
-               <description>It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.</description>
+               <description>It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.</description>
                <applications>
                   <application>
                      <name>General</name>
