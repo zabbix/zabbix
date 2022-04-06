@@ -1617,8 +1617,12 @@ static proc_data_t	*proc_get_data(FILE *f_status, FILE *f_stat, FILE *f_io, int 
 
 	read_value_from_proc_file(f_status, 0, "voluntary_ctxt_switches", PROC_VAL_TYPE_NUM, &proc_data->ctx_switches,
 			NULL);
-	read_value_from_proc_file(f_status, 0, "nonvoluntary_ctxt_switches", PROC_VAL_TYPE_NUM, &val, NULL);
-	proc_data->ctx_switches += val;
+
+	if (SUCCEED == read_value_from_proc_file(f_status, 0, "nonvoluntary_ctxt_switches", PROC_VAL_TYPE_NUM, &val,
+			NULL))
+	{
+		proc_data->ctx_switches += val;
+	}
 
 	if (NULL != f_io)
 	{
