@@ -134,5 +134,5 @@ SUBDIRS = \
 	$(AGENT_SUBDIRS)
 
 EXTRA_DIST = \
-	symbols \
+	zbxsymbols \
 	zbxwin32
