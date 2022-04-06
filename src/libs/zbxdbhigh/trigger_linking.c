@@ -22,8 +22,8 @@
 #include "db.h"
 #include "zbxeval.h"
 #include "log.h"
-#include "../../libs/zbxaudit/audit.h"
-#include "../../libs/zbxaudit/audit_trigger.h"
+#include "audit/zbxaudit.h"
+#include "audit/zbxaudit_trigger.h"
 #include "trigger_dep_linking.h"
 
 typedef struct
@@ -860,7 +860,7 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 	{
 		d = "";
 
-		zbx_audit_trigger_create_entry(AUDIT_ACTION_UPDATE, found->triggerid, found->description,
+		zbx_audit_trigger_create_entry(ZBX_AUDIT_ACTION_UPDATE, found->triggerid, found->description,
 				(int)found->flags);
 
 		if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE))
@@ -1161,7 +1161,7 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 
 		zbx_vector_uint64_append(new_triggerids, triggerid);
 
-		zbx_audit_trigger_create_entry(AUDIT_ACTION_ADD, triggerid, trigger_copy_template->description,
+		zbx_audit_trigger_create_entry(ZBX_AUDIT_ACTION_ADD, triggerid, trigger_copy_template->description,
 				(int)trigger_copy_template->flags);
 		zbx_audit_trigger_update_json_add_data(triggerid, trigger_copy_template->templateid,
 				trigger_copy_template->recovery_mode, trigger_copy_template->status,
