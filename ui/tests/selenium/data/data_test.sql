@@ -2739,7 +2739,7 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905072, 10074, 0, 'value_v_pos', 0);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905073, 10074, 0, 'dynamic', 1);
 
--- Dashboard for Paste widgets
+-- Dashboard for Paste widgets in Copy widgets test
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1310, 'Dashboard for Paste widgets', 1, 1);
 INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (13100, 1310);
 
