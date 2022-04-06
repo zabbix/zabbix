@@ -3411,7 +3411,7 @@ void	zbx_db_update_active_check_availabilities(void *data, int data_type)
 			.sql = NULL
 		};
 
-	zbx_db_insert_prepare(&insert, "host_rtdata", "hostid", "availability_status", NULL);
+	zbx_db_insert_prepare(&insert, "host_rtdata", "hostid", "available", NULL);
 
 	if (ZBX_ACTIVE_CHECK_AVAILS_DATA_HASHSET == data_type)
 	{

@@ -605,7 +605,7 @@ function getHostAvailabilityTable(array $host_interfaces, string $hostid): CHost
 	$availability_status = 0;
 
 	$host_availability_status = DB::select('host_rtdata', [
-		'output' => ['availability_status'],
+		'output' => ['available'],
 		'filter' => [
 			'hostid' => [$hostid]
 		],
@@ -613,7 +613,7 @@ function getHostAvailabilityTable(array $host_interfaces, string $hostid): CHost
 	]);
 
 	if ($host_availability_status) {
-		$availability_status = $host_availability_status[0]['availability_status'];
+		$availability_status = $host_availability_status[0]['available'];
 	}
 
 	return (new CHostAvailability())->setInterfaces($interfaces, $availability_status);

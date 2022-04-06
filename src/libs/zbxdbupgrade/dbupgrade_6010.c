@@ -20,6 +20,7 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "log.h"
 
 extern unsigned char	program_type;
 
@@ -102,7 +103,7 @@ static int	DBpatch_6010004(void)
 			{"host_rtdata", "hostid", 0,
 				{
 					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"availability_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"available", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -118,6 +119,35 @@ static int	DBpatch_6010005(void)
 	return DBadd_foreign_key("host_rtdata", 1, &field);
 }
 
+static int	DBpatch_6010006(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	hostid;
+	zbx_db_insert_t	insert;
+	int		ret;
+
+	zbx_db_insert_prepare(&insert, "host_rtdata", "hostid", "available", NULL);
+
+	result = DBselect("select hostid from hosts where flags != %i and uuid=''", ZBX_FLAG_DISCOVERY_PROTOTYPE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(hostid, row[0]);
+		zbx_db_insert_add_values(&insert, hostid, INTERFACE_AVAILABLE_UNKNOWN);
+	}
+	DBfree_result(result);
+
+	if (0 != insert.rows.values_num)
+		ret = zbx_db_insert_execute(&insert);
+	else
+		ret = SUCCEED;
+
+	zbx_db_insert_clean(&insert);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(6010)
@@ -130,5 +160,6 @@ DBPATCH_ADD(6010002, 0, 1)
 DBPATCH_ADD(6010003, 0, 1)
 DBPATCH_ADD(6010004, 0, 1)
 DBPATCH_ADD(6010005, 0, 1)
+DBPATCH_ADD(6010006, 0, 1)
 
 DBPATCH_END()

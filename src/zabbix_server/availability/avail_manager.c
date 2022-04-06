@@ -245,7 +245,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
-	if (ZBX_DB_OK > DBexecute("update host_rtdata set availability_status=%i", INTERFACE_AVAILABLE_UNKNOWN))
+	if (ZBX_DB_OK > DBexecute("update host_rtdata set available=%i", INTERFACE_AVAILABLE_UNKNOWN))
 		zabbix_log(LOG_LEVEL_WARNING, "Failed to reset availability status for active checks");
 
 	while (ZBX_IS_RUNNING())
