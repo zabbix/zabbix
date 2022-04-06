@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -18,35 +17,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_ZBXAUDIT_H
+#define ZABBIX_ZBXAUDIT_H
 
-class CCol extends CTag {
+#include "zbxtypes.h"
 
-	protected $tag = 'td';
+#define ZBX_AUDIT_ACTION_ADD		0
+#define ZBX_AUDIT_ACTION_UPDATE		1
+#define ZBX_AUDIT_ACTION_DELETE		2
+#define ZBX_AUDIT_ACTION_EXECUTE	7
 
-	public function __construct($item = null) {
-		parent::__construct($this->tag, true);
-		$this->addItem($item);
-	}
+int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
+		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
+		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *username, const char *clientip,
+		const char *output, const char *error);
 
-	public function setRowSpan($value) {
-		$this->setAttribute('rowspan', $value);
+void	zbx_audit_init(int audit_mode_set);
+void	zbx_audit_clean(void);
+void	zbx_audit_flush(void);
+int	zbx_audit_flush_once(void);
 
-		return $this;
-	}
-
-	public function getColSpan() {
-		return $this->getAttribute('colspan') ?? 1;
-	}
-
-	public function setColSpan($value) {
-		$this->setAttribute('colspan', $value);
-
-		return $this;
-	}
-
-	public function setWidth($value) {
-		$this->setAttribute('width', $value);
-
-		return $this;
-	}
-}
+#endif	/* ZABBIX_ZBXAUDIT_H */
