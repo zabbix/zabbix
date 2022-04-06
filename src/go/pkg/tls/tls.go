@@ -291,6 +291,7 @@ static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
 
 	if (1 != (res = SSL_CTX_set1_groups(ctx, grp_list, ARRSIZE(grp_list))))
 		ret = -1;
+#undef ARRSIZE
 #else
 	EC_KEY	*ecdh;
 
