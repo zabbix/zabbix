@@ -23,6 +23,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup tplgrp
+ * @backup template_group
  */
 class testTemplateGroup extends CAPITest {
 	public static function templategroup_create() {
@@ -433,6 +434,42 @@ class testTemplateGroup extends CAPITest {
 					'52002'
 				],
 				'expected_error' => 'No permissions to call "templategroup.delete".'
+			],
+			[
+			'method' => 'templategroup.massAdd',
+			'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
+			'templategroup' => [
+				'groups' => [
+					['groupid' => '52002'],
+					['groupid' => '52003']
+				],
+				'templates' => [
+					['templateid' => '10358'],
+					['templateid' => '10362']
+				]
+			],
+			'expected_error' => 'No permissions to call "templategroup.massAdd".'
+			],
+			[
+				'method' => 'templategroup.massUpdate',
+				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
+				'templategroup' => [
+					'groups' => [
+						['groupid' => '52002'],
+						['groupid' => '52003']
+					],
+					'templates' => []
+				],
+				'expected_error' => 'No permissions to call "templategroup.massUpdate".'
+			],
+			[
+				'method' => 'templategroup.massRemove',
+				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
+				'templategroup' => [
+					'groupids' => ['52005'],
+					'templates' => ['50020']
+				],
+				'expected_error' => 'No permissions to call "templategroup.massRemove".'
 			]
 		];
 	}
@@ -443,6 +480,344 @@ class testTemplateGroup extends CAPITest {
 	public function testTemplateGroup_UserPermissions($method, $user, $templategroups, $expected_error) {
 		$this->authorize($user['user'], $user['password']);
 		$this->call($method, $templategroups, $expected_error);
+	}
+
+	public static function templategroup_massAdd() {
+		return [
+			[
+				'templategroup' => [
+					'groups' => [
+						['groupid' => '52002'],
+						['groupid' => '52003']
+					]
+				],
+				'expected_error' => 'At least one template must be specified.'
+			],
+			[
+				'templategroup' => [
+					'groups' => [
+						['groupid' => '5200222']
+					],
+					'templates' => [
+						['templateid' => '10358'],
+						['templateid' => '10362']
+					]
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			[
+				'templategroup' => [
+					'groups' => [
+						['groupid' => '52002'],
+						['groupid' => '52003']
+					],
+					'templates' => [
+						['templateid' => '1035888']
+					]
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			[
+				'templategroup' => [
+					'groups' => [
+						['groupid' => '52002'],
+						['groupid' => '52003']
+					],
+					'hosts' => [
+						['hostid' => '1035888']
+					]
+				],
+				'expected_error' => 'Invalid parameter "/": unexpected parameter "hosts".'
+			],
+			[
+				'templategroup' => [
+					'groups' => [
+						['groupid' => '52002'],
+						['groupid' => '52003']
+					],
+					'templates' => [
+						['hostid' => '1035888']
+					]
+				],
+				'expected_error' => 'Invalid parameter "/templates/1": unexpected parameter "hostid".'
+			],
+			[
+				'templategroup' => [
+					'groups' => [
+						['groupid' => '']
+					],
+					'templates' => [
+						['templateid' => '10358'],
+						['templateid' => '10362']
+					]
+				],
+				'expected_error' => 'Invalid parameter "/groups/1/groupid": a number is expected.'
+			],
+			// Check successfully create.
+			[
+				'templategroup' => [
+					'groups' => [
+						['groupid' => '52002'],
+						['groupid' => '52003']
+					],
+					'templates' => [
+						['templateid' => '10358'],
+						['templateid' => '10362']
+					]
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider templategroup_massAdd
+	 */
+	public function testTemplateGroup_massAdd($templategroup, $expected_error) {
+		$result = $this->call('templategroup.massAdd', $templategroup, $expected_error);
+
+		if ($expected_error === null) {
+			foreach ($result['result']['groupids'] as $key => $id) {
+				foreach($templategroup['templates'] as $templateid) {
+					$dbResult = DBSelect(
+						'select * from template_group where groupid=' . zbx_dbstr($id)
+						.'and hostid=' .zbx_dbstr($templateid['templateid'])
+					);
+					$dbRow = DBFetch($dbResult);
+					$this->assertEquals($dbRow['groupid'], $templategroup['groups'][$key]['groupid']);
+				}
+
+			}
+		}
+	}
+
+	public static function templategroup_massUpdate() {
+		return [
+			[
+				'templategroup' => [
+					'groups' => [
+						'groupid' => '52005',
+						'name' => 'non existent parameter'
+					],
+					'templates' => [
+						'templateid' => '50010'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/groups/1": unexpected parameter "name".'
+			],
+			// Check missig parameters.
+			[
+				'templategroup' => [
+					'templates' => [
+						'templateid' => '50010'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/": the parameter "groups" is missing.'
+			],
+			[
+				'templategroup' => [
+					'groups' => [],
+					'templates' => [
+						'templateid' => '50010'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/groups": cannot be empty.'
+			],
+			[
+				'templategroup' => [
+					'groups' => [
+						'groupid' => '52005'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/": the parameter "templates" is missing.'
+			],
+			[
+				'templategroup' => [
+					'groups' => [
+						'groupid' => '',
+					],
+					'templates' => [
+						'templateid' => '50010'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/groups/1/groupid": a number is expected.'
+			],
+			[
+				'templategroup' => [
+					'groups' => [
+						'groupid' => '12345',
+					],
+					'templates' => [
+						'templateid' => '50010'
+					]
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			[
+				'templategroup' => [
+					'groups' => [
+						'groupid' => '52005',
+					],
+					'templates' => [
+						'templateid' => '12345'
+					]
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			[
+				'templategroup' => [
+					'groups' => [
+						'groupid' => '52013',
+					],
+					'templates' => [
+						'templateid' => '50020'
+					]
+				],
+				'expected_error' => 'Template "API Template" cannot be without template group.'
+			],
+			// Check successfully update.
+			[
+				'templategroup' => [
+					'groups' => [
+						'groupid' => '52005',
+					],
+					'templates' => [
+						'templateid' => '50010'
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'templategroup' => [
+					'groups' => [
+						'groupid' => '52013',
+					],
+					'templates' => []
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider templategroup_massUpdate
+	 */
+	public function testTemplateGroup_massUpdate($templategroup, $expected_error) {
+		$result = $this->call('templategroup.massUpdate', $templategroup, $expected_error);
+
+		if ($expected_error === null) {
+			foreach ($result['result']['groupids'] as $id) {
+				if (array_key_exists('templateid', $templategroup['templates'])) {
+					$dbResult = DBSelect(
+						'select * from template_group where groupid=' . zbx_dbstr($id)
+						.'and hostid=' .zbx_dbstr($templategroup['templates']['templateid'])
+					);
+					$dbRow = DBFetch($dbResult);
+					$this->assertEquals($dbRow['groupid'], $templategroup['groups']['groupid']);
+				}
+				else {
+					$dbResult = DBSelect('select * from template_group where groupid=' . zbx_dbstr($id));
+					$dbRow = DBFetch($dbResult);
+					$this->assertEquals($dbRow['groupid'], false);
+				}
+			}
+		}
+	}
+
+	public static function templategroup_massRemove() {
+		return [
+			[
+				'templategroup' => [
+					'groupids' => [],
+					'templateids' => ['50020']
+				],
+				'expected_error' => 'Invalid parameter "/groupids": cannot be empty.'
+			],
+			[
+				'templategroup' => [
+					'groupids' => ['52006'],
+					'templateids' => []
+				],
+				'expected_error' => 'Invalid parameter "/templateids": cannot be empty.'
+			],
+			[
+				'templategroup' => [
+					'groupids' => [''],
+					'templateids' => ['50020']
+				],
+				'expected_error' => 'Invalid parameter "/groupids/1": a number is expected.'
+			],
+			[
+				'templategroup' => [
+					'groupids' => ['52006'],
+					'templateids' => ['']
+				],
+				'expected_error' => 'Invalid parameter "/templateids/1": a number is expected.'
+			],
+			[
+				'templategroup' => [
+					'groupids' => ['12345'],
+					'templateids' => ['50020']
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			[
+				'templategroup' => [
+					'groupids' => ['52006'],
+					'templateids' => ['12345']
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			[
+				'templategroup' => [
+					'groupids' => ['52006', '12345'],
+					'templateids' => ['50020']
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			[
+				'templategroup' => [
+					'groupids' => ['52006', ''],
+					'templateids' => ['50020']
+				],
+				'expected_error' => 'Invalid parameter "/groupids/2": a number is expected.'
+			],
+			[
+				'templategroup' => [
+					'groupids' => ['52005'],
+					'templateids' => ['50010']
+				],
+				'expected_error' => 'Template "API Template" cannot be without template group.'
+			],
+			[
+				'templategroup' => [
+					'groupids' => ['52002'],
+					'templateids' => ['10358']
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider templategroup_massRemove
+	 */
+	public function testTemplateGroup_massRemove($templategroup, $expected_error) {
+		$result = $this->call('templategroup.massRemove', $templategroup, $expected_error);
+
+		if ($expected_error === null) {
+			foreach ($result['result']['groupids'] as $key => $id) {
+				foreach($templategroup['templateids'] as $templateid) {
+					$dbResult = DBSelect(
+						'select * from template_group where groupid=' . zbx_dbstr($id)
+						.'and hostid=' .zbx_dbstr($templateid)
+					);
+					$dbRow = DBFetch($dbResult);
+					$this->assertEquals($dbRow['groupid'], false);
+				}
+
+			}
+		}
 	}
 }
 
