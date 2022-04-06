@@ -22,6 +22,7 @@
 #include "zbxregexp.h"
 #include "log.h"
 #include "zbxjson.h"
+#include "../../zbxalgo/vectorimpl.h"
 
 #include <sys/sysctl.h>
 
@@ -553,8 +554,8 @@ out:
 	return SYSINFO_RET_OK;
 }
 
-static int	get_kinfo_proc(struct ZBX_STRUCT_KINFO_PROC **proc, struct passwd *usrinfo, int pid, int count_only,
-		int *count, char **error)
+static int	get_kinfo_proc(struct ZBX_STRUCT_KINFO_PROC **proc, struct passwd *usrinfo, int pid, int *count,
+		char **error)
 {
 	int	mib[ZBX_KINFO_MIBS_NUM];
 	size_t	sz = 0;
@@ -595,21 +596,18 @@ static int	get_kinfo_proc(struct ZBX_STRUCT_KINFO_PROC **proc, struct passwd *us
 		return FAIL;
 	}
 
-	if (0 == count_only)
-	{
-		*proc = (struct ZBX_STRUCT_KINFO_PROC *)zbx_malloc(*proc, sz);
+	*proc = (struct ZBX_STRUCT_KINFO_PROC *)zbx_malloc(NULL, sz);
 #ifdef KERN_PROC2
-		mib[5] = (int)(sz / sizeof(struct kinfo_proc2));
+	mib[5] = (int)(sz / sizeof(struct kinfo_proc2));
 #endif
 
-		if (0 != sysctl(mib, ZBX_KINFO_MIBS_NUM, *proc, &sz, NULL, 0))
-		{
-			if (NULL != error)
-				*error = zbx_dsprintf(*error, "Cannot obtain process information: %s", zbx_strerror(errno));
+	if (0 != sysctl(mib, ZBX_KINFO_MIBS_NUM, *proc, &sz, NULL, 0))
+	{
+		if (NULL != error)
+			*error = zbx_dsprintf(*error, "Cannot obtain process information: %s", zbx_strerror(errno));
 
-			zbx_free(proc);
-			return FAIL;
-		}
+		zbx_free(proc);
+		return FAIL;
 	}
 
 	*count = sz / sizeof(struct ZBX_STRUCT_KINFO_PROC);
@@ -704,7 +702,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	pagesize = getpagesize();
 
-	if (SUCCEED != get_kinfo_proc(&proc, usrinfo, -1, 0, &count, &error))
+	if (SUCCEED != get_kinfo_proc(&proc, usrinfo, -1, &count, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
@@ -714,8 +712,9 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	for (i = 0; i < count; i++)
 	{
-		proc_data_t	*proc_data;
-		int		count_thread;
+		proc_data_t			*proc_data;
+		int				count_thread;
+		struct ZBX_STRUCT_KINFO_PROC	*proc_thread;
 
 		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, proc[i].ZBX_P_COMM))
 			continue;
@@ -730,13 +729,14 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (ZBX_PROC_MODE_THREAD == zbx_proc_mode)
 		{
-			struct ZBX_STRUCT_KINFO_PROC	*proc_thread = NULL;
-
-			if (SUCCEED != get_kinfo_proc(&proc_thread, NULL, proc[i].ZBX_P_PID, 0, &count_thread, NULL))
+			if (SUCCEED != get_kinfo_proc(&proc_thread, NULL, proc[i].ZBX_P_PID, &count_thread, NULL))
 				continue;
 
 			for (k = 0; k < count_thread; k++)
 			{
+				if (-1 == proc_thread[k].ZBX_P_TID)
+					continue;
+
 				proc_data = (proc_data_t *)zbx_malloc(NULL, sizeof(proc_data_t));
 				memset(proc_data, 0, sizeof(proc_data_t));
 
@@ -782,8 +782,12 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			proc_data->io_write_op = proc[i].ZBX_P_INBLOCK;
 			proc_data->swap = proc[i].ZBX_P_SWAP;
 
-			if (SUCCEED == get_kinfo_proc(NULL, NULL, proc[i].ZBX_P_PID, 1, &count_thread, NULL))
-				proc_data->threads = count_thread;
+			if (SUCCEED == get_kinfo_proc(&proc_thread, NULL, proc[i].ZBX_P_PID, &count_thread, NULL) &&
+					1 < count_thread)
+			{
+				proc_data->threads = count_thread - 1;
+				zbx_free(proc_thread);
+			}
 
 			zbx_vector_proc_data_ptr_append(&proc_data_ctx, proc_data);
 		}
@@ -885,7 +889,6 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_adduint64(&j, "ssize", pdata->ssize);
 			zbx_json_adduint64(&j, "cputime_user", pdata->cputime_user);
 			zbx_json_adduint64(&j, "cputime_system", pdata->cputime_system);
-			zbx_json_addstring(&j, "state", ZBX_NULL2EMPTY_STR(pdata->state), ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&j, "ctx_switches", pdata->ctx_switches);
 			zbx_json_adduint64(&j, "threads", pdata->threads);
 			zbx_json_adduint64(&j, "page_faults", pdata->page_faults);
