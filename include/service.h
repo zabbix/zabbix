@@ -24,7 +24,7 @@
 #	error "This module is only available for Windows OS"
 #endif
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 extern ZBX_THREAD_HANDLE	*threads;
 

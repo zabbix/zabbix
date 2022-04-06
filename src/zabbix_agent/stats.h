@@ -20,7 +20,7 @@
 #ifndef ZABBIX_STATS_H
 #define ZABBIX_STATS_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 #ifndef _WINDOWS
 #	include "diskdevices.h"

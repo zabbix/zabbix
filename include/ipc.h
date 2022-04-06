@@ -26,7 +26,7 @@
 #	error "This module allowed only for Unix OS"
 #endif
 
-#include "mutexs.h"
+#include "zbxmutexs.h"
 
 #define ZBX_NONEXISTENT_SHMID		(-1)
 

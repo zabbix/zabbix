@@ -21,7 +21,7 @@
 #include "log.h"
 #include "zbxgetopt.h"
 #include "zbxembed.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 
 const char	*progname;
 const char	title_message[] = "zabbix_js";

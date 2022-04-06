@@ -109,7 +109,7 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 #include "active.h"
 #include "listener.h"
 
-#include "symbols.h"
+#include "zbxsymbols.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"

@@ -20,7 +20,7 @@
 #ifndef ZABBIX_PID_H
 #define ZABBIX_PID_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 #ifdef _WINDOWS
 #	error "This module allowed only for Unix OS"

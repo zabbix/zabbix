@@ -24,7 +24,7 @@
 #include "sysinfo.h"
 #include "logfiles/logfiles.h"
 #include "zbxcommshigh.h"
-#include "threads.h"
+#include "zbxthreads.h"
 #include "zbxjson.h"
 #include "alias.h"
 #include "zbxregexp.h"

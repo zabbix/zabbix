@@ -20,7 +20,7 @@
 #include "zbxexec.h"
 
 #include "common.h"
-#include "threads.h"
+#include "zbxthreads.h"
 #include "log.h"
 
 /* the size of temporary buffer used to read from output stream */

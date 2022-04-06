@@ -21,7 +21,7 @@
 
 #include "common.h"
 #include "log.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "zbxserver.h"
 #include "events.h"
 #include "valuecache.h"

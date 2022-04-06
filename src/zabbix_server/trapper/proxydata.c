@@ -23,7 +23,7 @@
 #include "proxy.h"
 
 #include "zbxtasks.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "daemon.h"
 #include "zbxcompress.h"
 #include "zbxcommshigh.h"
