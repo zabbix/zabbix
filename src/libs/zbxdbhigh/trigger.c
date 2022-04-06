@@ -309,6 +309,7 @@ typedef enum
 	ZBX_TRIGGER_CACHE_EVAL_CTX,
 	ZBX_TRIGGER_CACHE_EVAL_CTX_R,
 	ZBX_TRIGGER_CACHE_EVAL_CTX_MACROS,
+	ZBX_TRIGGER_CACHE_EVAL_CTX_R_MACROS,
 	ZBX_TRIGGER_CACHE_HOSTIDS,
 }
 zbx_trigger_cache_state_t;
@@ -378,6 +379,25 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const DB_TRIGGER *trigger, zbx_
 			um_handle = zbx_dc_open_user_macros();
 
 			ret = zbx_eval_expand_user_macros(&cache->eval_ctx, cache->hostids.values,
+					cache->hostids.values_num, (zbx_macro_resolve_func_t)zbx_dc_get_user_macro,
+					um_handle, NULL);
+
+			zbx_dc_close_user_macros(um_handle);
+
+			if (SUCCEED != ret)
+				return NULL;
+
+			break;
+		case ZBX_TRIGGER_CACHE_EVAL_CTX_R_MACROS:
+			if (NULL == db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX_R))
+				return NULL;
+
+			if (NULL == db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_HOSTIDS))
+				return NULL;
+
+			um_handle = zbx_dc_open_user_macros();
+
+			ret = zbx_eval_expand_user_macros(&cache->eval_ctx_r, cache->hostids.values,
 					cache->hostids.values_num, (zbx_macro_resolve_func_t)zbx_dc_get_user_macro,
 					um_handle, NULL);
 
@@ -774,8 +794,11 @@ void	zbx_db_trigger_get_expression(const DB_TRIGGER *trigger, char **expression)
 {
 	zbx_trigger_cache_t	*cache;
 
-	if (NULL == (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX)))
+	if (NULL == db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX) ||
+			NULL == (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX_MACROS)))
+	{
 		*expression = zbx_strdup(NULL, trigger->expression);
+	}
 	else
 		db_trigger_get_expression(&cache->eval_ctx, expression);
 }
@@ -792,8 +815,11 @@ void	zbx_db_trigger_get_recovery_expression(const DB_TRIGGER *trigger, char **ex
 {
 	zbx_trigger_cache_t	*cache;
 
-	if (NULL == (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX_R)))
+	if (NULL == db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX_R) ||
+			NULL == (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX_R_MACROS)))
+	{
 		*expression = zbx_strdup(NULL, trigger->recovery_expression);
+	}
 	else
 		db_trigger_get_expression(&cache->eval_ctx_r, expression);
 }
@@ -813,14 +839,15 @@ static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value, int (
 
 		if (SUCCEED == err_item)
 		{
-			char		*error = NULL;
+			char		*error = NULL, *parameter = NULL;
 			zbx_variant_t	var;
 			zbx_timespec_t	ts;
 
+			parameter = zbx_dc_expand_user_macros_in_func_params(function.parameter, item.host.hostid);
 			zbx_timespec(&ts);
 
-			if (SUCCEED == eval_func_cb(&var, &item, function.function,
-					function.parameter, &ts, &error) && ZBX_VARIANT_NONE != var.type)
+			if (SUCCEED == eval_func_cb(&var, &item, function.function, parameter, &ts, &error) &&
+					ZBX_VARIANT_NONE != var.type)
 			{
 				*value = zbx_strdup(NULL, zbx_variant_value_desc(&var));
 				zbx_variant_clear(&var);
@@ -828,6 +855,7 @@ static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value, int (
 			else
 				zbx_free(error);
 
+			zbx_free(parameter);
 			DCconfig_clean_items(&item, &err_item, 1);
 		}
 

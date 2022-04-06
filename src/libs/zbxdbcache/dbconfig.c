@@ -93,6 +93,9 @@ ZBX_SHMEM_FUNC_IMPL(__config, config_mem)
 static void	dc_maintenance_precache_nested_groups(void);
 static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_exclude);
 
+static char	*dc_expand_user_macros_impl(zbx_um_cache_t *um_cache, const char *text, const zbx_uint64_t *hostids,
+		int hostids_num);
+
 extern char		*CONFIG_VAULTTOKEN;
 extern char		*CONFIG_VAULT;
 /******************************************************************************
@@ -3260,7 +3263,8 @@ static int	dc_function_calculate_trends_nextcheck(time_t from, const char *perio
 	return FAIL;
 }
 
-static int	dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, time_t from, zbx_uint64_t seed)
+static int	dc_function_calculate_nextcheck(zbx_um_cache_t *um_cache, const zbx_trigger_timer_t *timer, time_t from,
+		zbx_uint64_t seed)
 {
 	if (ZBX_TRIGGER_TIMER_FUNCTION_TIME == timer->type || ZBX_TRIGGER_TIMER_TRIGGER == timer->type)
 	{
@@ -3305,20 +3309,29 @@ static int	dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, tim
 			int	ret = FAIL;
 			char	*error = NULL, *period_shift, *param = NULL;
 
-			if (NULL != (param = zbx_function_get_param_dyn(timer->parameter, 1)) &&
-					NULL != (period_shift = strchr(param, ':')))
+			if (NULL != (param = zbx_function_get_param_dyn(timer->parameter, 1)))
 			{
-				period_shift++;
-				ret = dc_function_calculate_trends_nextcheck(from, period_shift, timer->trend_base,
-						&nextcheck, &error);
+				char	*period;
+
+				period = dc_expand_user_macros_impl(um_cache, param, &timer->hostid, 1);
+
+				if (NULL != (period_shift = strchr(param, ':')))
+				{
+					period_shift++;
+					ret = dc_function_calculate_trends_nextcheck(from, period_shift,
+							timer->trend_base, &nextcheck, &error);
+				}
+
+				zbx_free(period);
 			}
-			else
-				error = zbx_dsprintf(NULL, "invalid first parameter");
 
 			zbx_free(param);
 
 			if (FAIL == ret)
 			{
+				if (NULL == error)
+					error = zbx_strdup(NULL, "invalid first parameter");
+
 				zabbix_log(LOG_LEVEL_WARNING, "cannot calculate trend function \"" ZBX_FS_UI64
 						"\" schedule: %s", timer->objectid, error);
 				zbx_free(error);
@@ -3347,6 +3360,7 @@ static zbx_trigger_timer_t	*dc_trigger_function_timer_create(ZBX_DC_FUNCTION *fu
 	zbx_trigger_timer_t	*timer;
 	zbx_time_unit_t		trend_base;
 	zbx_uint32_t		type;
+	ZBX_DC_ITEM		*item;
 
 	if (ZBX_FUNCTION_TYPE_TRENDS == function->type)
 	{
@@ -3360,6 +3374,9 @@ static zbx_trigger_timer_t	*dc_trigger_function_timer_create(ZBX_DC_FUNCTION *fu
 			return NULL;
 		}
 		type = ZBX_TRIGGER_TIMER_FUNCTION_TREND;
+
+		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &function->itemid)))
+			return NULL;
 	}
 	else
 	{
@@ -3379,9 +3396,16 @@ static zbx_trigger_timer_t	*dc_trigger_function_timer_create(ZBX_DC_FUNCTION *fu
 	function->timer_revision = function->revision;
 
 	if (ZBX_FUNCTION_TYPE_TRENDS == function->type)
+	{
 		dc_strpool_replace(0, &timer->parameter, function->parameter);
+		timer->hostid = item->hostid;
+
+	}
 	else
+	{
 		timer->parameter = NULL;
+		timer->hostid = 0;
+	}
 
 	return timer;
 }
@@ -3502,7 +3526,8 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 		}
 		else
 		{
-			if (0 == (ts.sec = dc_function_calculate_nextcheck(timer, now, timer->triggerid)))
+			if (0 == (ts.sec = dc_function_calculate_nextcheck(config->um_cache, timer, now,
+					timer->triggerid)))
 			{
 				dc_trigger_timer_free(timer);
 				function->timer_revision = 0;
@@ -3530,7 +3555,7 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 		if (NULL == (timer = dc_trigger_timer_create(trigger)))
 			continue;
 
-		if (0 == (ts.sec = dc_function_calculate_nextcheck(timer, now, timer->triggerid)))
+		if (0 == (ts.sec = dc_function_calculate_nextcheck(config->um_cache, timer, now, timer->triggerid)))
 		{
 			dc_trigger_timer_free(timer);
 			trigger->timer_revision = 0;
@@ -7879,6 +7904,38 @@ void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t 
 	UNLOCK_CACHE;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get hostids for functions                                         *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_get_hostids_by_functions(DC_FUNCTION *functions, int *errcodes, size_t functions_num,
+		zbx_vector_uint64_t *hostids)
+{
+	size_t			i;
+
+	zbx_vector_uint64_reserve(hostids, functions_num);
+
+	RDLOCK_CACHE;
+
+	for (i = 0; i < functions_num; i++)
+	{
+		zbx_uint64_t	hostid = 0;
+
+		if (SUCCEED == errcodes[i])
+		{
+			const ZBX_DC_ITEM	*item;
+
+			if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &functions[i].itemid)))
+				hostid = item->hostid;
+		}
+
+		zbx_vector_uint64_append(hostids, hostid);
+	}
+
+	UNLOCK_CACHE;
+}
+
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num)
 {
 	size_t	i;
@@ -8430,35 +8487,6 @@ static void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers)
 		else
 			dc_schedule_trigger_timer(timer, &timer->eval_ts, &timer->exec_ts);
 	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: reschedule trigger timers while locking configuration cache       *
- *                                                                            *
- * Comments: Triggers are unlocked by DCconfig_unlock_triggers()              *
- *                                                                            *
- ******************************************************************************/
-void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
-{
-	int	i;
-
-	/* calculate new execution/evaluation time for the evaluated triggers */
-	/* (timers with reset execution time)                                 */
-	for (i = 0; i < timers->values_num; i++)
-	{
-		zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)timers->values[i];
-
-		if (0 == timer->exec_ts.sec)
-		{
-			if (0 != (timer->exec_ts.sec = dc_function_calculate_nextcheck(timer, now, timer->triggerid)))
-				timer->eval_ts = timer->exec_ts;
-		}
-	}
-
-	WRLOCK_CACHE;
-	dc_reschedule_trigger_timers(timers);
-	UNLOCK_CACHE;
 }
 
 /******************************************************************************
@@ -10263,23 +10291,8 @@ int	zbx_dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: expand user macros in the specified text value                    *
- * WARNING - DO NOT USE FOR TRIGGERS, for triggers use the dedicated function *
- *                                                                            *
- * Parameters: text           - [IN] the text value to expand                 *
- *             hostids        - [IN] an array of related hostids              *
- *             hostids_num    - [IN] the number of hostids                    *
- *                                                                            *
- * Return value: The text value with expanded user macros. Unknown or invalid *
- *               macros will be left unresolved.                              *
- *                                                                            *
- * Comments: The returned value must be freed by the caller.                  *
- *           This function must be used only by configuration syncer          *
- *                                                                            *
- ******************************************************************************/
-char	*dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int hostids_num)
+static char	*dc_expand_user_macros_impl(zbx_um_cache_t *um_cache, const char *text, const zbx_uint64_t *hostids,
+		int hostids_num)
 {
 	zbx_token_t	token;
 	int		pos = 0, last_pos = 0;
@@ -10297,7 +10310,7 @@ char	*dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int h
 			continue;
 
 		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
-		um_cache_resolve_const(config->um_cache, hostids, hostids_num, text + token.loc.l, &value);
+		um_cache_resolve_const(um_cache, hostids, hostids_num, text + token.loc.l, &value);
 
 		if (NULL != value)
 		{
@@ -10320,64 +10333,25 @@ char	*dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int h
 
 	return str;
 }
-
 /******************************************************************************
  *                                                                            *
  * Purpose: expand user macros in the specified text value                    *
+ * WARNING - DO NOT USE FOR TRIGGERS, for triggers use the dedicated function *
  *                                                                            *
  * Parameters: text           - [IN] the text value to expand                 *
- *             hostid         - [IN] related hostid                           *
+ *             hostids        - [IN] an array of related hostids              *
+ *             hostids_num    - [IN] the number of hostids                    *
  *                                                                            *
  * Return value: The text value with expanded user macros. Unknown or invalid *
  *               macros will be left unresolved.                              *
  *                                                                            *
  * Comments: The returned value must be freed by the caller.                  *
+ *           This function must be used only by configuration syncer          *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t hostid)
+char	*dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int hostids_num)
 {
-	zbx_token_t		token;
-	int			pos = 0, last_pos = 0;
-	char			*str = NULL, *name = NULL, *context = NULL;
-	size_t			str_alloc = 0, str_offset = 0;
-	zbx_dc_um_handle_t	*um_handle;
-
-	if ('\0' == *text)
-		return zbx_strdup(NULL, text);
-
-	um_handle = zbx_dc_open_user_macros();
-
-	for (; SUCCEED == zbx_token_find(text, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
-	{
-		char	*value = NULL;
-
-		if (ZBX_TOKEN_USER_MACRO != token.type)
-			continue;
-
-		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
-		zbx_dc_get_user_macro(um_handle, text + token.loc.l, &hostid, 1, &value);
-
-		if (NULL != value)
-		{
-			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, value);
-			zbx_free(value);
-		}
-		else
-		{
-			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + token.loc.l,
-					token.loc.r - token.loc.l + 1);
-		}
-
-		zbx_free(name);
-		zbx_free(context);
-
-		pos = token.loc.r;
-		last_pos = pos + 1;
-	}
-
-	zbx_strcpy_alloc(&str, &str_alloc, &str_offset, text + last_pos);
-
-	return str;
+	return dc_expand_user_macros_impl(config->um_cache, text, hostids, hostids_num);
 }
 
 /******************************************************************************
@@ -13059,19 +13033,12 @@ const char	*zbx_dc_get_instanceid(void)
  * Return value: The function parameters with expanded user macros.           *
  *                                                                            *
  ******************************************************************************/
-char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t itemid)
+char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid)
 {
-	const char	*ptr;
-	size_t		params_len;
-	char		*buf;
-	size_t		buf_alloc, buf_offset = 0, sep_pos;
-	ZBX_DC_ITEM	*item;
-
-	if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
-		return zbx_strdup(NULL, params);
-
-	if ('\0' == *params)
-		return zbx_strdup(NULL, params);
+	const char		*ptr;
+	size_t			params_len;
+	char			*buf;
+	size_t			buf_alloc, buf_offset = 0, sep_pos;
 
 	buf_alloc = params_len = strlen(params);
 	buf = zbx_malloc(NULL, buf_alloc);
@@ -13080,12 +13047,12 @@ char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t item
 	{
 		size_t	param_pos, param_len;
 		int	quoted;
-		char	*param, *resolved_param;
+		char	*param, *resolved_param = NULL;
 
 		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
 
 		param = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
-		resolved_param = dc_expand_user_macros(param, &item->hostid, 1);
+		resolved_param = zbx_dc_expand_user_macros(param, &hostid, 1);
 
 		if (SUCCEED == zbx_function_param_quote(&resolved_param, quoted))
 			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, resolved_param);
@@ -13167,7 +13134,7 @@ struct zbx_dc_um_handle_t
 	unsigned char		macro_env;
 };
 
-static zbx_dc_um_handle_t	*dc_um_handle = NULL;
+static zbx_dc_um_handle_t      *dc_um_handle = NULL;
 static zbx_um_cache_t		*dc_um_cache = NULL;
 
 /******************************************************************************
@@ -13253,7 +13220,7 @@ void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *handle)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: resolve user macro using the specified hosts                      *
+ * Purpose: get user macro using the specified hosts                          *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *handle, const char *macro, const zbx_uint64_t *hostids,
@@ -13268,6 +13235,69 @@ void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *handle, const char *macro, 
 	}
 
 	um_cache_resolve(dc_um_cache, hostids, hostids_num, macro, handle->macro_env, value);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: expand user macros in the specified text value                    *
+ *                                                                            *
+ * Parameters: text        - [IN] the text value to expand                    *
+ *             hostids     - [IN] an array of host identifiers                *
+ *             hostids_num - [IN] the number of host identifiers              *
+ *                                                                            *
+ * Return value: The text value with expanded user macros. Unknown or invalid *
+ *               macros will be left unresolved.                              *
+ *                                                                            *
+ * Comments: The returned value must be freed by the caller.                  *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int hostids_num)
+{
+	if (NULL == dc_um_cache)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return zbx_strdup(NULL, text);
+	}
+
+	return dc_expand_user_macros_impl(dc_um_cache, text, hostids, hostids_num);
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: reschedule trigger timers while locking configuration cache       *
+ *                                                                            *
+ * Comments: Triggers are unlocked by DCconfig_unlock_triggers()              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
+{
+	int			i;
+	zbx_dc_um_handle_t	*um_handle;
+
+	um_handle = zbx_dc_open_user_macros();
+
+	/* calculate new execution/evaluation time for the evaluated triggers */
+	/* (timers with reset execution time)                                 */
+	for (i = 0; i < timers->values_num; i++)
+	{
+		zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)timers->values[i];
+
+		if (0 == timer->exec_ts.sec)
+		{
+			if (0 != (timer->exec_ts.sec = dc_function_calculate_nextcheck(dc_um_cache, timer, now,
+					timer->triggerid)))
+			{
+				timer->eval_ts = timer->exec_ts;
+			}
+		}
+	}
+
+	zbx_dc_close_user_macros(um_handle);
+
+	WRLOCK_CACHE;
+	dc_reschedule_trigger_timers(timers);
+	UNLOCK_CACHE;
 }
 
 #ifdef HAVE_TESTS

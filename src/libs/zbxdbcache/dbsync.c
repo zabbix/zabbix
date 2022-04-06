@@ -2428,43 +2428,6 @@ static int	dbsync_compare_function(const ZBX_DC_FUNCTION *function, const DB_ROW
 
 /******************************************************************************
  *                                                                            *
- * Purpose: applies necessary preprocessing before row is compared/used       *
- *                                                                            *
- * Parameter: row - [IN] the row to preprocess                                *
- *                                                                            *
- * Return value: the preprocessed row                                         *
- *                                                                            *
- * Comments: The row preprocessing can be used to expand user macros in       *
- *           some columns.                                                    *
- *                                                                            *
- ******************************************************************************/
-static char	**dbsync_function_preproc_row(char **row)
-{
-	const char	*row3;
-
-	/* first parameter is /host/key placeholder $, don't cache it */
-	if (NULL == (row3 = strchr(row[3], ',')))
-		row3 = "";
-	else
-		row3++;
-
-	/* return the original row if user macros are not used in target columns */
-	if (SUCCEED == dbsync_check_row_macros(row, 3))
-	{
-		zbx_uint64_t	itemid;
-		/* get associated host identifier */
-		ZBX_STR2UINT64(itemid, row[0]);
-
-		row[3] = dc_expand_user_macros_in_func_params(row3, itemid);
-	}
-	else
-		row[3] = zbx_strdup(NULL, row3);
-
-	return row;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: compares functions table with cached configuration data           *
  *                                                                            *
  * Parameter: sync - [OUT] the changeset                                      *
@@ -2486,7 +2449,7 @@ int	zbx_dbsync_compare_functions(zbx_dbsync_t *sync)
 	if (NULL == (result = DBselect("select itemid,functionid,name,parameter,triggerid from functions")))
 		return FAIL;
 
-	dbsync_prepare(sync, 5, dbsync_function_preproc_row);
+	dbsync_prepare(sync, 5, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

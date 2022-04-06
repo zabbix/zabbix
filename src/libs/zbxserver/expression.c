@@ -596,7 +596,7 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 
 				if (SUCCEED == errcode)
 				{
-					*replace_to = zbx_dc_expand_user_macros(row[5], dc_item.host.hostid);
+					*replace_to = zbx_dc_expand_user_macros(row[5], &dc_item.host.hostid, 1);
 					ret = SUCCEED;
 				}
 
@@ -4995,14 +4995,17 @@ static void	func_clean(void *ptr)
 static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, zbx_hashset_t *funcs,
 		zbx_hashset_t *ifuncs, const zbx_vector_ptr_t *triggers)
 {
-	int		i, j;
-	DC_TRIGGER	*tr;
-	DC_FUNCTION	*functions = NULL;
-	int		*errcodes = NULL;
-	zbx_ifunc_t	ifunc_local;
-	zbx_func_t	*func, func_local;
+	int			i, j;
+	DC_TRIGGER		*tr;
+	DC_FUNCTION		*functions = NULL;
+	int			*errcodes = NULL;
+	zbx_ifunc_t		ifunc_local;
+	zbx_func_t		*func, func_local;
+	zbx_vector_uint64_t	hostids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() functionids_num:%d", __func__, functionids->values_num);
+
+	zbx_vector_uint64_create(&hostids);
 
 	zbx_variant_set_none(&func_local.value);
 	func_local.error = NULL;
@@ -5011,6 +5014,7 @@ static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, 
 	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids->values_num);
 
 	DCconfig_get_functions_by_functionids(functions, functionids->values, errcodes, functionids->values_num);
+	DCconfig_get_hostids_by_functions(functions, errcodes, functionids->values_num, &hostids);
 
 	for (i = 0; i < functionids->values_num; i++)
 	{
@@ -5032,16 +5036,17 @@ static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, 
 		}
 
 		func_local.function = functions[i].function;
-		func_local.parameter = functions[i].parameter;
+		func_local.parameter = zbx_dc_expand_user_macros_in_func_params(functions[i].parameter, hostids.values[i]);
 
 		if (NULL == (func = (zbx_func_t *)zbx_hashset_search(funcs, &func_local)))
 		{
 			func = (zbx_func_t *)zbx_hashset_insert(funcs, &func_local, sizeof(func_local));
 			func->function = zbx_strdup(NULL, func_local.function);
-			func->parameter = zbx_strdup(NULL, func_local.parameter);
 			func->type = functions[i].type;
 			zbx_variant_set_none(&func->value);
 		}
+		else
+			zbx_free(func_local.parameter);
 
 		ifunc_local.functionid = functions[i].functionid;
 		ifunc_local.func = func;
@@ -5052,6 +5057,8 @@ static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, 
 
 	zbx_free(errcodes);
 	zbx_free(functions);
+
+	zbx_vector_uint64_destroy(&hostids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ifuncs_num:%d", __func__, ifuncs->num_data);
 }
@@ -5482,9 +5489,9 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t 
 		}
 	}
 
-	zbx_dc_close_user_macros(um_handle);
-
 	substitute_functions(triggers, history_itemids, history_items, history_errcodes);
+
+	zbx_dc_close_user_macros(um_handle);
 
 	/* calculate new trigger values based on their recovery modes and expression evaluations */
 	for (i = 0; i < triggers->values_num; i++)

@@ -204,6 +204,7 @@ typedef struct
 	zbx_uint64_t	functionid;
 	zbx_uint64_t	triggerid;
 	zbx_uint64_t	itemid;
+	zbx_uint64_t	hostid;
 	char		*function;
 	char		*parameter;
 	unsigned char	type;
@@ -697,6 +698,8 @@ void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *i
 void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp);
 void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
+void	DCconfig_get_hostids_by_functions(DC_FUNCTION *functions, int *errcodes, size_t functions_num,
+		zbx_vector_uint64_t *hostids);
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);
 void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num);
 int	DCconfig_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zbx_vector_uint64_t *triggerids);
@@ -778,8 +781,6 @@ void	DCget_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_
 #define ZBX_MACRO_VALUE_VAULT	2
 
 #define ZBX_MACRO_SECRET_MASK	"******"
-
-char	*zbx_dc_expand_func_params_user_macros(zbx_uint64_t hostid, const char *params);
 
 int	DCinterface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, zbx_agent_availability_t *in,
 		zbx_agent_availability_t *out);
@@ -1007,7 +1008,7 @@ void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t
 
 const char	*zbx_dc_get_instanceid(void);
 
-char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t hostid);
+char	*zbx_dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int hostids_num);
 int	zbx_dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *hostids, int hostids_num,
 		char **value, char **error);
 
@@ -1020,6 +1021,7 @@ typedef struct
 {
 	zbx_uint64_t		objectid;
 	zbx_uint64_t		triggerid;
+	zbx_uint64_t		hostid;
 	zbx_uint32_t		type;
 	zbx_time_unit_t		trend_base;
 	unsigned char		lock;		/* 1 if the timer has locked trigger, 0 otherwise */
@@ -1063,4 +1065,7 @@ void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *handle);
 
 void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *handle, const char *macro, const zbx_uint64_t *hostids,
 		int hostids_num, char **value);
+
+char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
+
 #endif
