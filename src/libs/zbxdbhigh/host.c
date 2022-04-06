@@ -21,12 +21,12 @@
 #include "log.h"
 #include "dbcache.h"
 #include "zbxserver.h"
-#include "../../libs/zbxaudit/audit_host.h"
-#include "../../libs/zbxaudit/audit_item.h"
-#include "../../libs/zbxaudit/audit_trigger.h"
-#include "../../libs/zbxaudit/audit_httptest.h"
-#include "../../libs/zbxaudit/audit_graph.h"
-#include "../../libs/zbxaudit/audit.h"
+#include "audit/zbxaudit_host.h"
+#include "audit/zbxaudit_item.h"
+#include "audit/zbxaudit_trigger.h"
+#include "audit/zbxaudit_httptest.h"
+#include "audit/zbxaudit_graph.h"
+#include "audit/zbxaudit.h"
 #include "trigger_linking.h"
 #include "graph_linking.h"
 
@@ -1821,7 +1821,7 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_ve
 		goto clean;
 	}
 
-	zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, hostid, hostname);
+	zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_UPDATE, hostid, hostname);
 
 	DBdelete_template_httptests(hostid, del_templateids);
 	DBdelete_template_graphs(hostid, del_templateids);
@@ -2415,7 +2415,7 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
 						ZBX_STR2UINT64(hosttemplateid, row[2]);
 						zbx_vector_uint64_append(del_hosttemplateids, hosttemplateid);
 
-						zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE,
+						zbx_audit_host_prototype_create_entry(ZBX_AUDIT_ACTION_UPDATE,
 								host_prototype->hostid, host_prototype->host);
 
 						zbx_audit_host_prototype_update_json_delete_parent_template(
@@ -2926,7 +2926,7 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
 					{
 						zbx_vector_uint64_append(del_macroids, hostmacroid);
 
-						zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE,
+						zbx_audit_host_prototype_create_entry(ZBX_AUDIT_ACTION_UPDATE,
 								host_prototype->hostid, host_prototype->host);
 
 						zbx_audit_host_prototype_update_json_delete_hostmacro(
@@ -3082,7 +3082,7 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 			{
 				zbx_vector_uint64_append(del_tagids, tagid);
 
-				zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE, host_prototype_local->hostid,
+				zbx_audit_host_prototype_create_entry(ZBX_AUDIT_ACTION_UPDATE, host_prototype_local->hostid,
 						host_prototype_local->host);
 				zbx_audit_host_prototype_update_json_delete_tag(host_prototype_local->hostid, tagid);
 			}
@@ -3295,7 +3295,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 						{
 							zbx_vector_uint64_append(del_interfaceids, interfaceid);
 
-							zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE,
+							zbx_audit_host_prototype_create_entry(ZBX_AUDIT_ACTION_UPDATE,
 									host_prototype->hostid, host_prototype->host);
 
 							zbx_audit_host_prototype_update_json_delete_interface(
@@ -3317,7 +3317,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 						{
 							zbx_vector_uint64_append(del_interfaceids, interfaceid);
 
-							zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE,
+							zbx_audit_host_prototype_create_entry(ZBX_AUDIT_ACTION_UPDATE,
 									host_prototype->hostid, host_prototype->host);
 
 							zbx_audit_host_prototype_update_json_delete_interface(
@@ -3526,7 +3526,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 		}
 		else
 		{
-			zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE, host_prototype->hostid,
+			zbx_audit_host_prototype_create_entry(ZBX_AUDIT_ACTION_UPDATE, host_prototype->hostid,
 					host_prototype->host);
 
 			if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_INVENTORY_MODE))
@@ -3745,7 +3745,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 					(int)ZBX_FLAG_DISCOVERY_PROTOTYPE, host_prototype->templateid,
 					(int)host_prototype->discover, (int)host_prototype->custom_interfaces);
 
-			zbx_audit_host_prototype_create_entry(AUDIT_ACTION_ADD, host_prototype->hostid,
+			zbx_audit_host_prototype_create_entry(ZBX_AUDIT_ACTION_ADD, host_prototype->hostid,
 					host_prototype->host);
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host_prototype->hostid, host_prototype->itemid);
@@ -5019,7 +5019,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 				zbx_vector_uint64_append(&httpupdstepids, httpstep->hoststepid);
 			}
 
-			zbx_audit_httptest_create_entry(AUDIT_ACTION_UPDATE, httptest->httptestid, httptest->name);
+			zbx_audit_httptest_create_entry(ZBX_AUDIT_ACTION_UPDATE, httptest->httptestid, httptest->name);
 		}
 	}
 
@@ -5198,7 +5198,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 		{
 			httptest->httptestid = httptestid++;
 
-			zbx_audit_httptest_create_entry(AUDIT_ACTION_ADD, httptest->httptestid, httptest->name);
+			zbx_audit_httptest_create_entry(ZBX_AUDIT_ACTION_ADD, httptest->httptestid, httptest->name);
 
 			zbx_db_insert_add_values(&db_insert_htest, httptest->httptestid, httptest->name,
 					httptest->delay, (int)httptest->status, httptest->agent,
@@ -5263,7 +5263,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 		{
 			const char	*d = ",";
 
-			zbx_audit_httptest_create_entry(AUDIT_ACTION_UPDATE, httptest->httptestid, httptest->name);
+			zbx_audit_httptest_create_entry(ZBX_AUDIT_ACTION_UPDATE, httptest->httptestid, httptest->name);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update httptest"
 					" set templateid=" ZBX_FS_UI64, httptest->templateid);

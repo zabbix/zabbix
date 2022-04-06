@@ -25,9 +25,9 @@
 #include "zbxserialize.h"
 #include "zbxthreads.h"
 #include "zbxmutexs.h"
-#include "../../libs/zbxaudit/audit.h"
-#include "../../libs/zbxaudit/audit_ha.h"
-#include "../../libs/zbxaudit/audit_settings.h"
+#include "audit/zbxaudit.h"
+#include "audit/zbxaudit_ha.h"
+#include "audit/zbxaudit_settings.h"
 
 #define ZBX_HA_POLL_PERIOD	5
 
@@ -689,7 +689,7 @@ static void	ha_db_create_node(zbx_ha_info_t *info)
 			nodeid.str, name_esc, ZBX_NODE_STATUS_STOPPED))
 	{
 		zbx_audit_init(info->auditlog);
-		zbx_audit_ha_create_entry(AUDIT_ACTION_ADD, nodeid.str, info->name);
+		zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_ADD, nodeid.str, info->name);
 		zbx_audit_ha_add_create_fields(nodeid.str, info->name, ZBX_NODE_STATUS_STOPPED);
 		ha_flush_audit(info);
 	}
@@ -743,7 +743,7 @@ static int	ha_db_check_unavailable_nodes(zbx_ha_info_t *info, zbx_vector_ha_node
 		{
 			zbx_vector_str_append(&unavailable_nodes, nodes->values[i]->ha_nodeid.str);
 
-			zbx_audit_ha_create_entry(AUDIT_ACTION_UPDATE, nodes->values[i]->ha_nodeid.str,
+			zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_UPDATE, nodes->values[i]->ha_nodeid.str,
 					nodes->values[i]->name);
 			zbx_audit_ha_update_field_int(nodes->values[i]->ha_nodeid.str, ZBX_AUDIT_HA_STATUS,
 					nodes->values[i]->status, ZBX_NODE_STATUS_UNAVAILABLE);
@@ -832,7 +832,7 @@ static void	ha_db_register_node(zbx_ha_info_t *info)
 	ha_get_external_address(&address, &port);
 
 	zbx_audit_init(info->auditlog);
-	zbx_audit_ha_create_entry(AUDIT_ACTION_UPDATE, info->ha_nodeid.str, info->name);
+	zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_UPDATE, info->ha_nodeid.str, info->name);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update ha_node set lastaccess="
 				ZBX_DB_TIMESTAMP() ",ha_sessionid='%s'", ha_sessionid.str);
@@ -1044,7 +1044,7 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",status=%d", ha_status);
 
-		zbx_audit_ha_create_entry(AUDIT_ACTION_UPDATE, node->ha_nodeid.str, node->name);
+		zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_UPDATE, node->ha_nodeid.str, node->name);
 		zbx_audit_ha_update_field_int(node->ha_nodeid.str, ZBX_AUDIT_HA_STATUS, node->status,
 				ha_status);
 	}
@@ -1058,7 +1058,7 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 		ha_db_execute(info, "update ha_node set status=%d where ha_nodeid='%s'",
 				ZBX_NODE_STATUS_UNAVAILABLE, last_active->ha_nodeid.str);
 
-		zbx_audit_ha_create_entry(AUDIT_ACTION_UPDATE, last_active->ha_nodeid.str, last_active->name);
+		zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_UPDATE, last_active->ha_nodeid.str, last_active->name);
 		zbx_audit_ha_update_field_int(last_active->ha_nodeid.str, ZBX_AUDIT_HA_STATUS, last_active->status,
 				ZBX_NODE_STATUS_UNAVAILABLE);
 	}
@@ -1231,7 +1231,7 @@ static int	ha_remove_node_impl(zbx_ha_info_t *info, const char *node, char **res
 	else
 	{
 		zbx_audit_init(info->auditlog);
-		zbx_audit_ha_create_entry(AUDIT_ACTION_DELETE, nodes.values[i]->ha_nodeid.str,
+		zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_DELETE, nodes.values[i]->ha_nodeid.str,
 				nodes.values[i]->name);
 		ha_flush_audit(info);
 	}
@@ -1355,7 +1355,7 @@ static void	ha_set_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client,
 
 		ZBX_STR2UINT64(configid, row[0]);
 		zbx_audit_init(info->auditlog);
-		zbx_audit_settings_create_entry(AUDIT_ACTION_UPDATE, configid);
+		zbx_audit_settings_create_entry(ZBX_AUDIT_ACTION_UPDATE, configid);
 		zbx_audit_settings_update_field_int(configid, "settings.ha_failover_delay", atoi(row[1]), delay);
 		ha_flush_audit(info);
 	}
@@ -1443,7 +1443,7 @@ static void	ha_db_update_exit_status(zbx_ha_info_t *info)
 			ZBX_NODE_STATUS_STOPPED, info->ha_nodeid.str))
 	{
 		zbx_audit_init(info->auditlog);
-		zbx_audit_ha_create_entry(AUDIT_ACTION_UPDATE, info->ha_nodeid.str, info->name);
+		zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_UPDATE, info->ha_nodeid.str, info->name);
 		zbx_audit_ha_update_field_int(info->ha_nodeid.str, ZBX_AUDIT_HA_STATUS, info->ha_status, ZBX_NODE_STATUS_STOPPED);
 		ha_flush_audit(info);
 	}

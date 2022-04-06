@@ -1,6 +1,3 @@
-//go:build !windows
-// +build !windows
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -20,40 +17,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package smart
+#ifndef ZABBIX_ZBXAUDIT_H
+#define ZABBIX_ZBXAUDIT_H
 
-import (
-	"fmt"
-	"time"
+#include "zbxtypes.h"
 
-	"zabbix.com/pkg/zbxcmd"
-)
+#define ZBX_AUDIT_ACTION_ADD		0
+#define ZBX_AUDIT_ACTION_UPDATE		1
+#define ZBX_AUDIT_ACTION_DELETE		2
+#define ZBX_AUDIT_ACTION_EXECUTE	7
 
-func (p *Plugin) executeSmartctl(args string, strict bool) ([]byte, error) {
-	path := "smartctl"
+int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
+		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
+		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *username, const char *clientip,
+		const char *output, const char *error);
 
-	if p.options.Path != "" {
-		path = p.options.Path
-	}
+void	zbx_audit_init(int audit_mode_set);
+void	zbx_audit_clean(void);
+void	zbx_audit_flush(void);
+int	zbx_audit_flush_once(void);
 
-	var out string
-	var err error
-
-	executable := fmt.Sprintf("sudo -n %s %s", path, args)
-
-	p.Tracef("executing smartctl command: %s", executable)
-
-	if strict {
-		out, err = zbxcmd.ExecuteStrict(executable, time.Second*time.Duration(p.options.Timeout), "")
-	} else {
-		out, err = zbxcmd.Execute(executable, time.Second*time.Duration(p.options.Timeout), "")
-	}
-
-	p.Tracef("command %s smartctl raw response: %s", executable, out)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return []byte(out), nil
-}
+#endif	/* ZABBIX_ZBXAUDIT_H */

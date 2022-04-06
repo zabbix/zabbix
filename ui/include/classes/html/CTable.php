@@ -111,7 +111,7 @@ class CTable extends CTag {
 			$value = new CRowHeader($value);
 		}
 
-		$this->colnum = $value->itemsCount();
+		$this->colnum = $value->getColSpan();
 
 		$value = new CTag('thead', true, $value);
 		$this->header = $value->toString();
