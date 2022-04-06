@@ -268,7 +268,7 @@ switch ($data['method']) {
 			case 'graph_prototypes':
 				$options = [
 					'output' => ['graphid', 'name'],
-					'selectHosts' => ['name'],
+					'selectHosts' => ['hostid', 'name'],
 					'hostids' => array_key_exists('hostid', $data) ? $data['hostid'] : null,
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
@@ -277,6 +277,8 @@ switch ($data['method']) {
 				];
 
 				if ($data['object_name'] === 'graph_prototypes') {
+					$options['selectDiscoveryRule'] = ['hostid'];
+
 					$records = API::GraphPrototype()->get($options);
 				}
 				else {
@@ -290,10 +292,18 @@ switch ($data['method']) {
 				}
 
 				foreach ($records as $record) {
+					if ($data['object_name'] === 'graphs') {
+						$host_name = $record['hosts'][0]['name'];
+					}
+					else {
+						$host_names = array_column($record['hosts'], 'name', 'hostid');
+						$host_name = $host_names[$record['discoveryRule']['hostid']];
+					}
+
 					$result[] = [
 						'id' => $record['graphid'],
 						'name' => $record['name'],
-						'prefix' => $record['hosts'][0]['name'].NAME_DELIMITER
+						'prefix' => $host_name.NAME_DELIMITER
 					];
 				}
 				break;
