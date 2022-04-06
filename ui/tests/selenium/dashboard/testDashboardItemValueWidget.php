@@ -154,9 +154,9 @@ class testDashboardItemValueWidget extends CWebTest {
 	public function testDashboardItemValueWidget_FormLayout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
-		$dialog = $dashboard->edit()->addWidget()->waitUntilReady();
-		$form = $dialog->asForm();
+		$form = $dashboard->edit()->addWidget()->waitUntilReady()->asForm();
 		$form->fill(['Type' => 'Item value']);
+		$form->waitUntilReloaded();
 		$form->invalidate();
 
 		// Check default values with default Advanced configuration (false).

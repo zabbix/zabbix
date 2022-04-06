@@ -533,7 +533,7 @@ class testDashboardCopyWidgets extends CWebTest {
 				break;
 
 			case 'another page':
-				$this->copyWidgets($data, self::$dashboardid_with_widgets, null,   false, false, true, true);
+				$this->copyWidgets($data, self::$dashboardid_with_widgets, null, false, false, true, true);
 				break;
 
 			case 'another dashboard':
