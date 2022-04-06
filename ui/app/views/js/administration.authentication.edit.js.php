@@ -25,33 +25,38 @@
 ?>
 
 <script>
-	const view = {
-		ldap_server_list_tempalte: null,
-		db_authentication_type: null,
-		ldap_defaultid: null,
-		form: null,
+	const view = new class {
+
+		constructor() {
+			this.template_ldap_server_row = null;
+			this.template_ldap_server_row_with_password = null;
+			this.form = null;
+			this.db_authentication_type = null;
+			this.ldap_defaultid = null;
+		}
 
 		init({ldap_servers, ldap_defaultid, db_authentication_type}) {
 			this.form = document.getElementById('authentication-form');
 			this.db_authentication_type = db_authentication_type;
 			this.ldap_defaultid = ldap_defaultid;
 
-			this.initTemplates();
-			this.addEventListeners();
+			this._initTemplates();
+			this._addEventListeners();
 
 			// Parse LDAP servers.
 			for (const ldap of ldap_servers) {
+				// TODO VM: why this needs to be checked for each entry, instead of using them sequencively.
 				ldap.row_index = 0;
 
 				while (document.querySelector(`#ldap-servers [data-row_index="${ldap.row_index}"]`) !== null) {
 					ldap.row_index++;
 				}
 
-				this.parseLdapServer(ldap);
+				this.appendLdapServer(ldap);
 			}
-		},
+		}
 
-		addEventListeners() {
+		_addEventListeners() {
 			document
 				.getElementById('ldap-servers')
 				.addEventListener('click', (e) => {
@@ -67,7 +72,7 @@
 				});
 
 			document.getElementById('http_auth_enabled').addEventListener('change', (e) => {
-				[...this.form.querySelectorAll('[name^=http_]')].forEach(field => {
+				this.form.querySelectorAll('[name^=http_]').forEach(field => {
 					if (!field.isSameNode(e.target)) {
 						field.disabled = !e.target.checked;
 					}
@@ -75,7 +80,7 @@
 			});
 
 			document.getElementById('saml_auth_enabled').addEventListener('change', (e) => {
-				[...this.form.querySelectorAll('[name^=saml_]')].forEach(field => {
+				this.form.querySelectorAll('[name^=saml_]').forEach(field => {
 					if (!field.isSameNode(e.target)) {
 						field.disabled = !e.target.checked;
 					}
@@ -83,13 +88,15 @@
 			});
 
 			this.form.addEventListener('submit', this.authFormSubmit);
-		},
+		}
 
 		authFormSubmit() {
-			const fields = document.querySelectorAll('#saml_idp_entityid, #saml_sso_url, #saml_slo_url,' +
-				'#saml_username_attribute, #saml_sp_entityid, #saml_nameid_format'
-			);
-			[...fields].forEach(field => field.value = field.value.trim());
+			const fields_to_trim = ['#saml_idp_entityid', '#saml_sso_url', '#saml_slo_url', '#saml_username_attribute',
+				'#saml_sp_entityid', '#saml_nameid_format'
+			];
+			document.querySelectorAll(fields_to_trim.join(', ')).forEach((elem) => {
+				elem.value = elem.value.trim();
+			});
 
 			const auth_type = document.querySelector('[name=authentication_type]:checked').value;
 			const warning_msg = <?= json_encode(
@@ -97,15 +104,18 @@
 			) ?>;
 
 			return (auth_type == this.db_authentication_type || confirm(warning_msg));
-		},
+		}
 
-		parseLdapServer(ldap, row_index = null) {
+		appendLdapServer(ldap) {
 			ldap.is_default = (ldap.userdirectoryid == this.ldap_defaultid) ? 'checked' : '';
+			const template = "bind_password" in ldap
+				? this.template_ldap_server_row_with_password
+				: this.template_ldap_server_row;
 
 			document
 				.querySelector('#ldap-servers tbody')
-				.insertAdjacentHTML('beforeend', this.ldap_server_list_tempalte.evaluate(ldap));
-		},
+				.insertAdjacentHTML('beforeend', template.evaluate(ldap));
+		}
 
 		editLdapServer(row = null) {
 			let popup_params;
@@ -124,10 +134,22 @@
 					userfilter: row.querySelector(`[name="ldap_server[${row_index}][userfilter]"`).value,
 					start_tls: row.querySelector(`[name="ldap_server[${row_index}][start_tls]"`).checked ? 1 : 0,
 					bind_dn: row.querySelector(`[name="ldap_server[${row_index}][bind_dn]"`).value,
-					bind_password: row.querySelector(`[name="ldap_server[${row_index}][bind_password]"`).value,
-					case_sensitive: row.querySelector(`[name="ldap_server[${row_index}][case_sensitive]"`).checked ? 1 : 0,
+					case_sensitive: row.querySelector(`[name="ldap_server[${row_index}][case_sensitive]"`).checked
+						? 1
+						: 0,
 					description: row.querySelector(`[name="ldap_server[${row_index}][description]"`).value
 				};
+
+				const userdirecotryid_input = row.querySelector(`[name="ldap_server[${row_index}][userdirectoryid]"`);
+				const bind_password_input = row.querySelector(`[name="ldap_server[${row_index}][bind_password]"`);
+
+				if (userdirecotryid_input !== null) {
+					popup_params['userdirectoryid'] = userdirecotryid_input.value;
+				}
+
+				if (bind_password_input !== null) {
+					popup_params['bind_password'] = bind_password_input.value;
+				}
 			}
 			else {
 				let row_index = 0;
@@ -147,20 +169,32 @@
 			const overlay = PopUp('popup.ldap.edit', popup_params, {dialogueid: 'ldap_edit'});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				const template = "bind_password" in e.detail
+					? this.template_ldap_server_row_with_password
+					: this.template_ldap_server_row;
+
 				if (row === null) {
 					document
 						.querySelector('#ldap-servers tbody')
-						.insertAdjacentHTML('beforeend', this.ldap_server_list_tempalte.evaluate(e.detail));
+						.insertAdjacentHTML('beforeend', template.evaluate(e.detail));
 				}
 				else {
-					row.insertAdjacentHTML('afterend', this.ldap_server_list_tempalte.evaluate(e.detail));
+					e.detail.is_default = (e.detail.userdirectoryid == this.ldap_defaultid) ? 'checked' : '';
+					e.detail.user_groups = row.querySelector('.js-ldap-usergroups').textContent;
+
+					row.insertAdjacentHTML('afterend', template.evaluate(e.detail));
 					row.remove();
 				}
 			});
-		},
+		}
 
-		initTemplates() {
-			this.ldap_server_list_tempalte = new Template(`
+		_initTemplates() {
+			this.template_ldap_server_row = new Template(this._templateLdapServerRow());
+			this.template_ldap_server_row_with_password = new Template(this._templateLdapServerRow(true));
+		}
+
+		_templateLdapServerRow(has_bind_password = false) {
+			return `
 				<tr data-row_index="#{row_index}">
 					<td>
 						<a href="#" class="wordwrap js-edit">#{name}</a>
@@ -172,13 +206,15 @@
 						<input type="hidden" name="ldap_server[#{row_index}][search_attribute]" value="#{search_attribute}">
 						<input type="hidden" name="ldap_server[#{row_index}][userfilter]" value="#{userfilter}">
 						<input type="hidden" name="ldap_server[#{row_index}][start_tls]" value="#{start_tls}">
-						<input type="hidden" name="ldap_server[#{row_index}][bind_dn]" value="#{bind_dn}">
-						<input type="hidden" name="ldap_server[#{row_index}][bind_password]" value="#{bind_password}">
+						<input type="hidden" name="ldap_server[#{row_index}][bind_dn]" value="#{bind_dn}">` +
+						(has_bind_password
+							? `<input type="hidden" name="ldap_server[#{row_index}][bind_password]" value="#{bind_password}">`
+							: '') + `
 						<input type="hidden" name="ldap_server[#{row_index}][case_sensitive]" value="#{case_sensitive}">
 						<input type="hidden" name="ldap_server[#{row_index}][description]" value="#{description}">
 					</td>
 					<td>#{host}</td>
-					<td>#{user_groups}</td>
+					<td class="js-ldap-usergroups">#{user_groups}</td>
 					<td>
 						<input type="radio" name="ldap_defaultid" value="#{userdirectoryid}" #{is_default}>
 					</td>
@@ -186,7 +222,7 @@
 						<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
 					</td>
 				</tr>
-			`);
+			`;
 		}
 	};
 </script>

@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('administration.authentication.edit.js.php');
@@ -135,6 +136,7 @@ $http_tab = (new CFormList('list_http'))
 	);
 
 // LDAP configuration fields.
+// TODO VM: move this to popup
 if ($data['change_bind_password']) {
 	$password_box = [
 		new CVar('change_bind_password', 1),
@@ -152,42 +154,47 @@ else {
 	];
 }
 
-$ldap_servers = (new CTable())
-	->setHeader(
-		(new CRowHeader([
-			_('Name'),
-			_('Host'),
-			_('User groups'),
-			_('Default'),
-			''
-		]))->addClass(ZBX_STYLE_GREY)
-	)
-	->addItem(
-		(new CTag('tfoot', true))
-			->addItem(
-				(new CCol(
-					(new CSimpleButton(_('Add')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('js-add')
-				))->setColSpan(5)
-			)
-	)
-	->setId('ldap-servers');
-
-$ldap_tab = (new CFormList('list_ldap'))
-	->addRow(new CLabel(_('Enable LDAP authentication'), 'ldap_configured'),
-		$data['ldap_error']
-			? (new CLabel($data['ldap_error']))->addClass(ZBX_STYLE_RED)
-			: (new CCheckBox('ldap_configured', ZBX_AUTH_LDAP_ENABLED))
-				->setChecked($data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED)
-				->setUncheckedValue(ZBX_AUTH_LDAP_DISABLED)
-	)
-	->addRow(
-		new CLabel(_('Servers')),
-		(new CDiv($ldap_servers))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	);
+$ldap_tab = (new CFormGrid())
+	->addItem([
+		new CLabel(_('Enable LDAP authentication'), 'ldap_configured'),
+		new CFormField(
+			$data['ldap_error']
+				? (new CLabel($data['ldap_error']))->addClass(ZBX_STYLE_RED)
+				: (new CCheckBox('ldap_configured', ZBX_AUTH_LDAP_ENABLED))
+					->setChecked($data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED)
+					->setUncheckedValue(ZBX_AUTH_LDAP_DISABLED)
+		)
+	])
+	->addItem([
+		(new CLabel(_('Servers')))->setAsteriskMark(),
+		new CFormField(
+			(new CDiv(
+				(new CTable())
+					->setId('ldap-servers')
+					->setHeader(
+						(new CRowHeader([
+							_('Name'),
+							_('Host'),
+							_('User groups'),
+							_('Default'),
+							''
+						]))->addClass(ZBX_STYLE_GREY)
+					)
+					->addItem(
+						(new CTag('tfoot', true))
+							->addItem(
+								(new CCol(
+									(new CSimpleButton(_('Add')))
+										->addClass(ZBX_STYLE_BTN_LINK)
+										->addClass('js-add')
+								))->setColSpan(5)
+							)
+					)
+			))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		)
+	]);
 
 // SAML authentication fields.
 $saml_tab = (new CFormList('list_saml'))
@@ -303,6 +310,7 @@ $saml_tab = (new CFormList('list_saml'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUTHENTICATION_EDIT))
 	->addItem((new CForm())
 		->addVar('action', $data['action_submit'])
+		->addVar('db_authentication_type', $data['db_authentication_type']) // TODO VM: make sure, it is needed
 		->setId('authentication-form')
 		->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 		->disablePasswordAutofill()

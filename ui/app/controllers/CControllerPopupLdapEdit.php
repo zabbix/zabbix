@@ -24,16 +24,17 @@ class CControllerPopupLdapEdit extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'row_index' => 'required|int32',
+			'userdirectoryid' => 'id',
 			'name' => 'string',
 			'host' => 'string',
 			'port' => 'int32',
 			'base_dn' => 'string',
 			'search_attribute' => 'string',
 			'userfilter' => 'string',
-			'start_tls' => 'in 0,1',
+			'start_tls' => 'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
 			'bind_dn' => 'string',
 			'bind_password' => 'string',
-			'case_sensitive' => 'in 0,1',
+			'case_sensitive' => 'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'description' => 'string',
 			'ldap_configured' => 'in 0,1',
 			'add_ldap_server' => 'in 0,1'
@@ -63,34 +64,34 @@ class CControllerPopupLdapEdit extends CController {
 	 * @throws Exception
 	 */
 	protected function doAction(): void {
-		$defaults = [
-			'row_index' => 0,
-			'name' => '',
-			'host' => '',
-			'port' => '',
-			'base_dn' => '',
-			'search_attribute' => '',
-			'start_tls' => ZBX_AUTH_START_TLS_OFF,
-			'bind_dn' => '',
-			'bind_password' => '',
-			'case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
-			'description' => '',
-			'userfilter' => '',
-			'ldap_configured' => 0,
-			'add_ldap_server' => 1
-		];
-
-		$this->getInputs($defaults, array_keys($defaults));
-
 		$data = [
-			'advanced_configuration' => ($defaults['start_tls'] == ZBX_AUTH_START_TLS_ON
-				|| $defaults['userfilter'] !== ''
-			),
-			'is_password_set' => ($defaults['bind_password'] !== ''),
+			'row_index' => $this->getInput('row_index', 0),
+			'name' => $this->getInput('name', ''),
+			'host' => $this->getInput('host', ''),
+			'port' => $this->getInput('port', ''),
+			'base_dn' => $this->getInput('base_dn', ''),
+			'search_attribute' => $this->getInput('search_attribute', ''),
+			'start_tls' => $this->getInput('start_tls', ZBX_AUTH_START_TLS_OFF),
+			'bind_dn' => $this->getInput('bind_dn', ''),
+			'case_sensitive' => $this->getInput('case_sensitive', ZBX_AUTH_CASE_INSENSITIVE),
+			'description' => $this->getInput('description', ''),
+			'userfilter' => $this->getInput('userfilter', ''),
+			'ldap_configured' => $this->getInput('ldap_configured', ''),
+			'add_ldap_server' => $this->getInput('add_ldap_server', 1),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
-		] + $defaults;
+		];
+
+		if ($this->hasInput('userdirectoryid')) {
+			$data['userdirectoryid'] = $this->getInput('userdirectoryid');
+		}
+
+		if ($this->hasInput('bind_password')) {
+			$data['bind_password'] = $this->getInput('bind_password');
+		}
+
+		$data['advanced_configuration'] = $data['start_tls'] != ZBX_AUTH_START_TLS_OFF || $data['userfilter'] !== '';
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

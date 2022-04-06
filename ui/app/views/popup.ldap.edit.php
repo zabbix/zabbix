@@ -32,6 +32,7 @@ $form = (new CForm('post', $form_action))
 	->addItem(getMessages())
 	->addItem((new CInput('submit'))->addStyle('display: none;'))
 	->addVar('row_index', $data['row_index'])
+	->addVar('userdirectoryid', $data['userdirectoryid'] ?? null)
 	->addItem((new CFormGrid())
 		->addItem([
 			(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
@@ -83,12 +84,18 @@ $form = (new CForm('post', $form_action))
 		])
 		->addItem([
 			new CLabel(_('Bind password'), 'bind_password'),
-			new CFormField($data['is_password_set']
+			new CFormField($data['add_ldap_server'] == 0
 				? [
+					array_key_exists('bind_password', $data)
+						? new CVar('bind_password', $data['bind_password'])
+						: null,
 					(new CSimpleButton(_('Change password')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->setId('bind-password-btn'),
-					new CVar('bind_password', $data['bind_password'])
+					(new CPassBox('bind_password', ''))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->addStyle('display: none;')
+						->setAttribute('disabled', 'disabled')
 				]
 				: (new CPassBox('bind_password', ''))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			)
@@ -147,14 +154,6 @@ if ($data['add_ldap_server']) {
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'ldap_edit_popup.submit();'
-		],
-		[
-			'title' => _('Test'),
-			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test']),
-			'keepOpen' => true,
-			'isSubmit' => false,
-			'enabled' => (bool) $data['ldap_configured'],
-			'action' => 'ldap_edit_popup.openTestPopup();'
 		]
 	];
 }
@@ -167,25 +166,25 @@ else {
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'ldap_edit_popup.submit();'
-		],
-		[
-			'title' => _('Test'),
-			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test']),
-			'keepOpen' => true,
-			'isSubmit' => false,
-			'enabled' => (bool) $data['ldap_configured'],
-			'action' => 'ldap_edit_popup.openTestPopup();'
 		]
 	];
 }
+
+$buttons[] = [
+	'title' => _('Test'),
+	'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test']),
+	'keepOpen' => true,
+	'isSubmit' => false,
+	'enabled' => (bool) $data['ldap_configured'],
+	'action' => 'ldap_edit_popup.openTestPopup();'
+];
 
 $output = [
 	'header' => $title,
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('popup.ldap.edit.js.php').
-		''
+		$this->readJsFile('popup.ldap.edit.js.php')
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

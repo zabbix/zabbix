@@ -19,16 +19,16 @@
 **/
 
 
-/**
- * @var CView $this
- */
 ?>
 
-window.ldap_edit_popup = {
-	overlay: null,
-	dialogue: null,
-	form: null,
-	advanced_chbox: null,
+window.ldap_edit_popup = new class {
+
+	constructor() {
+		this.overlay = null;
+		this.dialogue = null;
+		this.form = null;
+		this.advanced_chbox = null;
+	}
 
 	init() {
 		this.overlay = overlays_stack.getById('ldap_edit');
@@ -37,32 +37,35 @@ window.ldap_edit_popup = {
 		this.advanced_chbox = document.getElementById('advanced_configuration');
 
 		this.advanced_chbox.addEventListener('change', (e) => {
-			this.onChangeAdvancedConfiguration(e.target.checked);
+			this.toggleAdvancedConfiguration(e.target.checked);
 		});
 
-		this.onChangeAdvancedConfiguration(this.advanced_chbox.checked);
+		this.toggleAdvancedConfiguration(this.advanced_chbox.checked);
 
 		if (document.getElementById('bind-password-btn') !== null) {
-			document.getElementById('bind-password-btn').addEventListener('click', this.bindPasswordBtnOnClick);
+			document.getElementById('bind-password-btn').addEventListener('click', this.showPasswordField);
 		}
-	},
+	}
 
-	onChangeAdvancedConfiguration(checked) {
-		[...this.form.querySelectorAll('.advanced-configuration')].forEach(element => {
+	toggleAdvancedConfiguration(checked) {
+		for (const element of this.form.querySelectorAll('.advanced-configuration')) {
 			element.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !checked);
-		});
-	},
+		}
+	}
 
-	bindPasswordBtnOnClick(e) {
+	showPasswordField(e) {
 		const form_field = e.target.parentNode;
-		form_field.innerHTML = '';
+		const password_field = form_field.querySelector('[name="bind_password"][type="password"]');
+		const password_var = form_field.querySelector('[name="bind_password"][type="hidden"]');
 
-		const password_field = new Template(`<?= (new CPassBox('bind_password', ''))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->toString();
-		?>`);
-		form_field.insertAdjacentHTML('beforeend', password_field.evaluate({}));
-	},
+		password_field.style.display = '';
+		password_field.disabled = false;
+
+		if (password_var !== null) {
+			form_field.removeChild(password_var);
+		}
+		form_field.removeChild(e.target);
+	}
 
 	openTestPopup() {
 		const popup_params = {
@@ -85,19 +88,20 @@ window.ldap_edit_popup = {
 		test_overlay.$dialogue[0].addEventListener('overlay.close', () => {
 			this.overlay.unsetLoading();
 		}, {once: true});
-	},
+	}
 
 	submit() {
 		this.removePopupMessages();
 		this.overlay.setLoading();
 
-		const curl = new Curl(this.form.getAttribute('action'), false);
 		const fields = getFormFields(this.form);
 
 		if (fields.advanced_configuration != 1) {
 			delete fields.userfilter;
 			delete fields.start_tls;
 		}
+
+		const curl = new Curl(this.form.getAttribute('action'), false);
 
 		fetch(curl.getUrl(), {
 			method: 'POST',
@@ -112,14 +116,29 @@ window.ldap_edit_popup = {
 				else {
 					overlayDialogueDestroy(this.overlay.dialogueid);
 
-					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
 				}
 			})
-			.catch(this.ajaxExceptionHandler)
+			.catch((exception) => {
+				let title;
+				let messages = [];
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					title = <?= json_encode(_('Unexpected server error.')) ?>;
+				}
+
+				const message_box = makeMessageBox('bad', messages, title, true, true)[0];
+
+				this.form.parentNode.insertBefore(message_box, this.form);
+			})
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
-	},
+	}
 
 	removePopupMessages() {
 		for (const el of this.form.parentNode.children) {
@@ -127,22 +146,5 @@ window.ldap_edit_popup = {
 				el.parentNode.removeChild(el);
 			}
 		}
-	},
-
-	ajaxExceptionHandler: (exception) => {
-		let title;
-		let messages = [];
-
-		if (typeof exception === 'object' && 'error' in exception) {
-			title = exception.error.title;
-			messages = exception.error.messages;
-		}
-		else {
-			title = <?= json_encode(_('Unexpected server error.')) ?>;
-		}
-
-		const message_box = makeMessageBox('bad', messages, title, true, true)[0];
-
-		ldap_edit_popup.form.parentNode.insertBefore(message_box, ldap_edit_popup.form);
 	}
-};
+}();

@@ -76,8 +76,18 @@ if ($data['can_update_group']) {
 			GROUP_GUI_ACCESS_DISABLED => user_auth_type2str(GROUP_GUI_ACCESS_DISABLED)
 		]));
 
+	$ldap_server = (new CSelect('ldap_server'))
+		->setValue(0)
+		->setFocusableElementId('ldap-server')
+		->addOption(new CSelectOption(0, _('Default')))
+		->addOptions(CSelect::createOptionsFromArray([
+			1 => 'LDAP #1',
+			2 => 'LDAP #2'
+		]));
+
 	$form_list
 		->addRow((new CLabel(_('Frontend access'), $select_gui_access->getFocusableElementId())), $select_gui_access)
+		->addRow((new CLabel(_('LDAP Server'), $ldap_server->getFocusableElementId())), $ldap_server)
 		->addRow(_('Enabled'), (new CCheckBox('users_status', GROUP_STATUS_ENABLED))
 			->setUncheckedValue(GROUP_STATUS_DISABLED)
 			->setChecked($data['users_status'] == GROUP_STATUS_ENABLED)

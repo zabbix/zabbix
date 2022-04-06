@@ -163,7 +163,7 @@ class CControllerAuthenticationEdit extends CController {
 		$data['saml_enabled'] = ($openssl_status['result'] == CFrontendSetup::CHECK_OK
 				&& $data['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED);
 
-		// TODO: remove this.
+		// TODO VM: replace this by userdirecotry.get API call.
 		$data['ldap_servers'] = [
 			[
 				'userdirectoryid' => 1,
@@ -175,7 +175,6 @@ class CControllerAuthenticationEdit extends CController {
 				'userfilter' => '(%{attr}=%{user})',
 				'start_tls' => 1,
 				'bind_dn' => '',
-				'bind_password' => '',
 				'case_sensitive' => '',
 				'description' => '',
 				'user_groups' => 5
@@ -190,7 +189,6 @@ class CControllerAuthenticationEdit extends CController {
 				'userfilter' => '(%{attr}=%{user})',
 				'start_tls' => 1,
 				'bind_dn' => '',
-				'bind_password' => '123456',
 				'case_sensitive' => '',
 				'description' => '',
 				'user_groups' => 0
@@ -205,12 +203,13 @@ class CControllerAuthenticationEdit extends CController {
 				'userfilter' => '(%{attr}=%{user})',
 				'start_tls' => 1,
 				'bind_dn' => '',
-				'bind_password' => '',
 				'case_sensitive' => '',
 				'description' => '',
 				'user_groups' => 3
 			]
 		];
+
+		// TODO VM: request this from CAuthenticationHelper::get()
 		$data['ldap_defaultid'] = 2;
 
 		$response = new CControllerResponseData($data);
