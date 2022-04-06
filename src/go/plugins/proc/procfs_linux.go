@@ -197,14 +197,15 @@ func getProcessCalculatedMetrics(pid string, proc *procStatus) (err error) {
 }
 
 func getProcessCpuTimes(pid string, proc *procStatus) (err error) {
-	var stat cpuUtil
-	getProcCpuUtil(pid, &stat)
+	var stat procStat
+	getProcessStat(pid, &stat)
 	if stat.err != nil {
 		return stat.err
 	}
 
 	proc.CpuTimeUser = float64(stat.utime) / float64(C.sysconf(C._SC_CLK_TCK))
 	proc.CpuTimeSystem = float64(stat.stime) / float64(C.sysconf(C._SC_CLK_TCK))
+	proc.PageFaults = stat.pageFaults
 
 	return nil
 }
@@ -279,7 +280,7 @@ func getProcessCmdline(pid string, flags int) (arg0 string, cmdline string, err 
 	return arg0, string(data), nil
 }
 
-func getProcCpuUtil(pid string, stat *cpuUtil) {
+func getProcessStat(pid string, stat *procStat) {
 	var data []byte
 	if data, stat.err = read2k("/proc/" + pid + "/stat"); stat.err != nil {
 		return
@@ -301,6 +302,9 @@ func getProcCpuUtil(pid string, stat *cpuUtil) {
 		return
 	}
 	if stat.started, stat.err = strconv.ParseUint(string(stats[19]), 10, 64); stat.err != nil {
+		return
+	}
+	if stat.pageFaults, stat.err = strconv.ParseUint(string(stats[9]), 10, 64); stat.err != nil {
 		return
 	}
 }

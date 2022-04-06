@@ -54,7 +54,7 @@ type Plugin struct {
 	queries map[procQuery]*cpuUtilStats
 	mutex   sync.Mutex
 	scanid  uint64
-	stats   map[int64]*cpuUtil
+	stats   map[int64]*procStat
 }
 
 type PluginExport struct {
@@ -62,7 +62,7 @@ type PluginExport struct {
 }
 
 var impl Plugin = Plugin{
-	stats:   make(map[int64]*cpuUtil),
+	stats:   make(map[int64]*procStat),
 	queries: make(map[procQuery]*cpuUtilStats),
 }
 
@@ -215,11 +215,12 @@ type thread struct {
 	IoWritesB     uint64  `json:"io_write_b"`
 }
 
-type cpuUtil struct {
-	utime   uint64
-	stime   uint64
-	started uint64
-	err     error
+type procStat struct {
+	utime      uint64
+	stime      uint64
+	started    uint64
+	pageFaults uint64
+	err        error
 }
 
 func (q *cpuUtilQuery) match(p *procInfo) bool {
@@ -297,7 +298,7 @@ func (p *Plugin) Collect() (err error) {
 	}
 	p.Tracef("%s() queries:%d", log.Caller(), len(p.queries))
 
-	stats := make(map[int64]*cpuUtil)
+	stats := make(map[int64]*procStat)
 	// find processes matching prepared queries
 	for _, p := range processes {
 		var monitored bool
@@ -308,7 +309,7 @@ func (p *Plugin) Collect() (err error) {
 			}
 		}
 		if monitored {
-			stats[p.pid] = &cpuUtil{}
+			stats[p.pid] = &procStat{}
 		}
 	}
 
@@ -320,7 +321,7 @@ func (p *Plugin) Collect() (err error) {
 
 	now := time.Now()
 	for pid, stat := range stats {
-		getProcCpuUtil(fmt.Sprintf("%d", pid), stat)
+		getProcessStat(fmt.Sprintf("%d", pid), stat)
 		if stat.err != nil {
 			p.Debugf("cannot get process %d CPU utilization statistics: %s", pid, stat.err)
 		}
@@ -329,7 +330,7 @@ func (p *Plugin) Collect() (err error) {
 	// gather process utilization for queries
 	for _, q := range queries {
 		for _, pid := range q.pids {
-			var stat, last *cpuUtil
+			var stat, last *procStat
 			var ok bool
 			if stat, ok = stats[pid]; !ok || stat.err != nil {
 				continue
