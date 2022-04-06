@@ -25,6 +25,7 @@
 #include "zbxlld.h"
 #include "preprocessing.h"
 #include "preproc_history.h"
+#include "preproc_manager.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -53,14 +54,18 @@ typedef enum
 }
 zbx_preprocessing_kind_t;
 
-typedef struct zbx_preprocessing_request_base
+typedef struct zbx_preprocessing_request_base zbx_preprocessing_request_base_t;
+
+ZBX_PTR_VECTOR_DECL(preprocessing_request_base, zbx_preprocessing_request_base_t *)
+ZBX_PTR_VECTOR_IMPL(preprocessing_request_base, zbx_preprocessing_request_base_t *)
+
+struct zbx_preprocessing_request_base
 {
 	zbx_preprocessing_kind_t		kind;
 	zbx_preprocessing_states_t		state;
-	struct zbx_preprocessing_request_base	*pending;	/* the request waiting on this request to complete */
-	zbx_vector_ptr_t			flush_queue;	/* processed request waiting to be flushed */
-}
-zbx_preprocessing_request_base_t;
+	zbx_preprocessing_request_base_t	*pending;	/* the request waiting on this request to complete */
+	zbx_vector_preprocessing_request_base_t	flush_queue;	/* processed request waiting to be flushed */
+};
 
 /* preprocessing request */
 typedef struct preprocessing_request
@@ -338,7 +343,7 @@ static	void	preprocessor_set_request_state_done(zbx_preprocessing_manager_t *man
 	}
 
 	prev = (zbx_preprocessing_request_base_t *)iterator.current->data;
-	zbx_vector_ptr_append(&prev->flush_queue, base);
+	zbx_vector_preprocessing_request_base_append(&prev->flush_queue, base);
 
 	next_iterator = iterator;
 	if (SUCCEED == zbx_list_iterator_next(&next_iterator))
@@ -651,8 +656,8 @@ static void	preprocessor_free_request(zbx_preprocessing_request_base_t *base)
 	zbx_preprocessing_request_t	*request;
 	zbx_preprocessing_dep_request_t	*dep_request;
 
-	zbx_vector_ptr_clear_ext(&base->flush_queue, (zbx_ptr_free_func_t)preprocessor_free_request);
-	zbx_vector_ptr_destroy(&base->flush_queue);
+	zbx_vector_preprocessing_request_base_clear_ext(&base->flush_queue, preprocessor_free_request);
+	zbx_vector_preprocessing_request_base_destroy(&base->flush_queue);
 
 	switch (base->kind)
 	{
@@ -936,7 +941,7 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 	request = (zbx_preprocessing_request_t *)zbx_malloc(NULL, sizeof(zbx_preprocessing_request_t));
 	memset(request, 0, sizeof(zbx_preprocessing_request_t));
 	request->base.kind = ZBX_PREPROC_ITEM;
-	zbx_vector_ptr_create(&request->base.flush_queue);
+	zbx_vector_preprocessing_request_base_create(&request->base.flush_queue);
 	memcpy(&request->value, value, sizeof(zbx_preproc_item_value_t));
 	request->base.state = state;
 
@@ -1047,7 +1052,7 @@ static void	preprocessor_enqueue_dependent(zbx_preprocessing_manager_t *manager,
 			dep_request->base.kind = ZBX_PREPROC_DEPS;
 			dep_request->base.state = REQUEST_STATE_QUEUED;
 			dep_request->base.pending = NULL;
-			zbx_vector_ptr_create(&dep_request->base.flush_queue);
+			zbx_vector_preprocessing_request_base_create(&dep_request->base.flush_queue);
 			dep_request->hostid = hostid;
 
 			dep_request->ts = NULL != ts ? *ts : (zbx_timespec_t){0, 0};
