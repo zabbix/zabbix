@@ -35,8 +35,8 @@ class CUserDirectory extends CApiService {
 	/**
 	 * @var array
 	 */
-	private $output_fields = ['base_dn', 'bind_dn', 'bind_password', 'case_sensitive', 'description', 'host', 'name',
-		'port', 'search_attribute', 'search_filter', 'start_tls'
+	protected $output_fields = ['base_dn', 'bind_dn', 'case_sensitive', 'description', 'host', 'name', 'port',
+		'search_attribute', 'search_filter', 'start_tls', 'userdirectoryid'
 	];
 
 	/**
@@ -53,9 +53,9 @@ class CUserDirectory extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'userdirectoryids' => 			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'filter' =>						['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				// add userdirectoryid rule
-				'host' =>					['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'name' =>					['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+				'userdirectoryid' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'host' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'name' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 			]],
 			'search' =>						['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_fill_keys(
 				['base_dn', 'bind_dn', 'description', 'host', 'name', 'search_attribute', 'search_filter'],
