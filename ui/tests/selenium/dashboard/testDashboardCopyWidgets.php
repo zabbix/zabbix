@@ -26,9 +26,9 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testDashboardCopyWidgets extends CWebTest {
 
-	const DASHBOARD_ID = 1300;
+	const DASHBOARD_IDS = [13000, 14000];
 	const PASTE_DASHBOARD_ID = 1310;
-	const NEW_PAGE_ID = 14300;
+	const NEW_PAGE_IDS = [13001, 14001];
 	const NEW_PAGE_NAME = 'Test_page';
 	const UPDATE_TEMPLATEID = 50000;
 	const TEMPLATED_PAGE_NAME = 'Page for pasting widgets';
@@ -147,7 +147,7 @@ class testDashboardCopyWidgets extends CWebTest {
 									[
 										'type' => 0,
 										'name' => 'itemid',
-										'value' => 40041
+										'value' => 400410
 									]
 								]
 							]
@@ -174,48 +174,92 @@ class testDashboardCopyWidgets extends CWebTest {
 	}
 
 	/**
-	 * Data provider for copying widgets.
+	 * Data provider for copying widgets from the first dashboard.
 	 */
-	public static function getCopyWidgetsData() {
+	public static function getCopyWidgetsFirstData() {
 		return CDBHelper::getDataProvider('SELECT * FROM widget w'.
 			' WHERE EXISTS ('.
 				'SELECT NULL'.
 				' FROM dashboard_page dp'.
 				' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
-					' AND dp.dashboardid='.self::DASHBOARD_ID.
+					' AND dp.dashboardid='.self::DASHBOARD_IDS[0].
 			') ORDER BY w.widgetid DESC'
 		);
 	}
 
 	/**
-	 * @dataProvider getCopyWidgetsData
+	 * Data provider for copying widgets from the second dashboard.
 	 */
-	public function testDashboardCopyWidgets_SameDashboard($data) {
-		$this->copyWidgets($data);
+	public static function getCopyWidgetsSecondData() {
+		return CDBHelper::getDataProvider('SELECT * FROM widget w'.
+			' WHERE EXISTS ('.
+				'SELECT NULL'.
+				' FROM dashboard_page dp'.
+				' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
+					' AND dp.dashboardid='.self::DASHBOARD_IDS[1].
+			') ORDER BY w.widgetid DESC'
+		);
 	}
 
 	/**
-	 * @dataProvider getCopyWidgetsData
+	 * @dataProvider getCopyWidgetsFirstData
 	 */
-	public function testDashboardCopyWidgets_OtherDashboard($data) {
-		$this->copyWidgets($data, true);
+	public function testDashboardCopyWidgets_SameDashboard_1($data) {
+		$this->copyWidgets($data, self::DASHBOARD_IDS[0]);
 	}
 
 	/**
-	 * @dataProvider getCopyWidgetsData
+	 * @dataProvider getCopyWidgetsSecondData
 	 */
-	public function testDashboardCopyWidgets_ReplaceWidget($data) {
-		$this->copyWidgets($data, true, true);
+	public function testDashboardCopyWidgets_SameDashboard_2($data) {
+		$this->copyWidgets($data, self::DASHBOARD_IDS[1]);
+	}
+
+
+	/**
+	 * @dataProvider getCopyWidgetsFirstData
+	 */
+	public function testDashboardCopyWidgets_OtherDashboard_1($data) {
+		$this->copyWidgets($data, self::DASHBOARD_IDS[0], null, true);
 	}
 
 	/**
-	 * @dataProvider getCopyWidgetsData
+	 * @dataProvider getCopyWidgetsSecondData
 	 */
-	public function testDashboardCopyWidgets_NewPage($data) {
-		$this->copyWidgets($data, false, false, true);
+	public function testDashboardCopyWidgets_OtherDashboard_2($data) {
+		$this->copyWidgets($data, self::DASHBOARD_IDS[1], null, true);
 	}
 
-	private function copyWidgets($data, $new_dashboard = false, $replace = false, $new_page = false, $templated = false) {
+	/**
+	 * @dataProvider getCopyWidgetsFirstData
+	 */
+	public function testDashboardCopyWidgets_ReplaceWidget_1($data) {
+		$this->copyWidgets($data, self::DASHBOARD_IDS[0], null, true, true);
+	}
+
+	/**
+	 * @dataProvider getCopyWidgetsSecondData
+	 */
+	public function testDashboardCopyWidgets_ReplaceWidget_2($data) {
+		$this->copyWidgets($data, self::DASHBOARD_IDS[1], null, true, true);
+	}
+
+	/**
+	 * @dataProvider getCopyWidgetsFirstData
+	 */
+	public function testDashboardCopyWidgets_NewPage_1($data) {
+		$this->copyWidgets($data, self::DASHBOARD_IDS[0], self::NEW_PAGE_IDS[0], false, false, true);
+	}
+
+	/**
+	 * @dataProvider getCopyWidgetsSecondData
+	 */
+	public function testDashboardCopyWidgets_NewPage_2($data) {
+		$this->copyWidgets($data, self::DASHBOARD_IDS[1], self::NEW_PAGE_IDS[1], false, false, true);
+	}
+
+	private function copyWidgets($data, $start_dashboard, $paste_page_id = null, $new_dashboard = false, $replace = false,
+			$new_page = false, $templated = false) {
 		$name = $data['name'];
 
 		// Exclude Map navigation tree widget from replacing tests.
@@ -239,10 +283,10 @@ class testDashboardCopyWidgets extends CWebTest {
 			$url = 'zabbix.php?action=template.dashboard.edit&dashboardid=';
 		}
 		else {
-			$dashboard_id = self::DASHBOARD_ID;
+			$dashboard_id = $start_dashboard;
 			$new_dashboard_id = self::PASTE_DASHBOARD_ID;
 			$new_page_name = self::NEW_PAGE_NAME;
-			$new_page_id = self::NEW_PAGE_ID;
+			$new_page_id = $paste_page_id;
 			$url = 'zabbix.php?action=dashboard.view&dashboardid=';
 		}
 
@@ -486,15 +530,15 @@ class testDashboardCopyWidgets extends CWebTest {
 	public function testDashboardCopyWidgets_CopyTemplateWidgets($data) {
 		switch ($data['copy to']) {
 			case 'same page':
-				$this->copyWidgets($data, false, false, false, true);
+				$this->copyWidgets($data,  self::$dashboardid_with_widgets, null, false, false, false, true);
 				break;
 
 			case 'another page':
-				$this->copyWidgets($data, false, false, true, true);
+				$this->copyWidgets($data, self::$dashboardid_with_widgets, null, false, false, true, true);
 				break;
 
 			case 'another dashboard':
-				$this->copyWidgets($data, true, false, false, true);
+				$this->copyWidgets($data, self::$dashboardid_with_widgets, null, true, false, false, true);
 				break;
 
 			case 'another template':
