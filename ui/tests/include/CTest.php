@@ -243,8 +243,6 @@ class CTest extends TestCase {
 		if (!self::executeCallbacks($this, $callbacks)) {
 			self::markTestSuiteSkipped();
 			throw new Exception(implode("\n", static::$warnings));
-
-			return;
 		}
 
 		// Store callback to be executed later.
