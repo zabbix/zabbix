@@ -1531,9 +1531,10 @@ out:
 }
 
 static int	check_vcenter_hv_network_common(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result, const char *counter_name, const char *func_parent)
+		AGENT_RESULT *result, int direction_in, const char *func_parent)
 {
-	const char		*url, *mode, *uuid;
+	const char		*url, *mode, *uuid, *counter_name;
+	unsigned int		coeff = 0;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	int			ret = SYSINFO_RET_FAIL;
@@ -1550,7 +1551,28 @@ static int	check_vcenter_hv_network_common(AGENT_REQUEST *request, const char *u
 	uuid = get_rparam(request, 1);
 	mode = get_rparam(request, 2);
 
-	if (NULL != mode && '\0' != *mode && 0 != strcmp(mode, "bps"))
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bps"))
+	{
+		counter_name = 1 == direction_in ? "net/received[average]" : "net/transmitted[average]";
+		coeff = ZBX_KIBIBYTE;
+	}
+	else if (0 == strcmp(mode, "packets"))
+	{
+		counter_name = 1 == direction_in ? "net/packetsRx[summation]" : "net/packetsTx[summation]";
+	}
+	else if (0 == strcmp(mode, "dropped"))
+	{
+		counter_name = 1 == direction_in ? "net/droppedRx[summation]" : "net/droppedTx[summation]";
+	}
+	else if (0 == strcmp(mode, "errors"))
+	{
+		counter_name = 1 == direction_in ? "net/errorsRx[summation]" : "net/errorsTx[summation]";
+	}
+	else if (0 == strcmp(mode, "broadcast"))
+	{
+		counter_name = 1 == direction_in ? "net/broadcastRx[summation]" : "net/broadcastTx[summation]";
+	}
+	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		goto out;
@@ -1568,7 +1590,7 @@ static int	check_vcenter_hv_network_common(AGENT_REQUEST *request, const char *u
 	}
 
 	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id, counter_name, "",
-			ZBX_KIBIBYTE, result);
+			coeff, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -1581,15 +1603,13 @@ out:
 int	check_vcenter_hv_network_in(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return	check_vcenter_hv_network_common(request, username, password, result, "net/received[average]",
-			__func__);
+	return	check_vcenter_hv_network_common(request, username, password, result, 1, __func__);
 }
 
 int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return	check_vcenter_hv_network_common(request, username, password, result, "net/transmitted[average]",
-			__func__);
+	return	check_vcenter_hv_network_common(request, username, password, result, 0, __func__);
 }
 
 int	check_vcenter_hv_datacenter_name(AGENT_REQUEST *request, const char *username, const char *password,
