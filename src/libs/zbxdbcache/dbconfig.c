@@ -13039,9 +13039,12 @@ char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t 
 	size_t			params_len;
 	char			*buf;
 	size_t			buf_alloc, buf_offset = 0, sep_pos;
+	zbx_dc_um_handle_t	*um_handle;
 
 	buf_alloc = params_len = strlen(params);
 	buf = zbx_malloc(NULL, buf_alloc);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	for (ptr = params; ptr < params + params_len; ptr += sep_pos + 1)
 	{
@@ -13052,7 +13055,7 @@ char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t 
 		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
 
 		param = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
-		resolved_param = zbx_dc_expand_user_macros(param, &hostid, 1);
+		resolved_param = zbx_dc_expand_user_macros(um_handle, param, &hostid, 1);
 
 		if (SUCCEED == zbx_function_param_quote(&resolved_param, quoted))
 			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, resolved_param);
@@ -13065,6 +13068,8 @@ char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t 
 		zbx_free(resolved_param);
 		zbx_free(param);
 	}
+
+	zbx_dc_close_user_macros(um_handle);
 
 	return buf;
 }
@@ -13131,11 +13136,11 @@ int	zbx_dc_maintenance_has_tags(void)
 struct zbx_dc_um_handle_t
 {
 	zbx_dc_um_handle_t	*prev;
+	zbx_um_cache_t		**cache;
 	unsigned char		macro_env;
 };
 
-static zbx_dc_um_handle_t      *dc_um_handle = NULL;
-static zbx_um_cache_t		*dc_um_cache = NULL;
+static zbx_dc_um_handle_t	*dc_um_handle = NULL;
 
 /******************************************************************************
  *                                                                            *
@@ -13159,6 +13164,7 @@ static zbx_um_cache_t		*dc_um_cache = NULL;
 static zbx_dc_um_handle_t	*dc_open_user_macros(unsigned char macro_env)
 {
 	zbx_dc_um_handle_t	*handle;
+	static zbx_um_cache_t	*um_cache = NULL;
 
 	handle = (zbx_dc_um_handle_t *)zbx_malloc(NULL, sizeof(zbx_dc_um_handle_t));
 
@@ -13175,6 +13181,8 @@ static zbx_dc_um_handle_t	*dc_open_user_macros(unsigned char macro_env)
 
 	handle->macro_env = macro_env;
 	handle->prev = dc_um_handle;
+	handle->cache = &um_cache;
+
 	dc_um_handle = handle;
 
 	return handle;
@@ -13205,13 +13213,13 @@ zbx_dc_um_handle_t	*zbx_dc_open_user_macros_masked(void)
  ******************************************************************************/
 void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *handle)
 {
-	if (NULL == handle->prev && NULL != dc_um_cache)
+	if (NULL == handle->prev && NULL != *handle->cache)
 	{
 		WRLOCK_CACHE;
-		um_cache_release(dc_um_cache);
+		um_cache_release(*handle->cache);
 		UNLOCK_CACHE;
 
-		dc_um_cache = NULL;
+		*handle->cache = NULL;
 	}
 
 	dc_um_handle = handle->prev;
@@ -13223,25 +13231,26 @@ void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *handle)
  * Purpose: get user macro using the specified hosts                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *handle, const char *macro, const zbx_uint64_t *hostids,
+void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macro, const zbx_uint64_t *hostids,
 		int hostids_num, char **value)
 {
-	if (NULL == dc_um_cache)
+	if (NULL == *um_handle->cache)
 	{
 		WRLOCK_CACHE;
-		dc_um_cache = config->um_cache;
-		dc_um_cache->refcount++;
+		*um_handle->cache = config->um_cache;
+		config->um_cache->refcount++;
 		UNLOCK_CACHE;
 	}
 
-	um_cache_resolve(dc_um_cache, hostids, hostids_num, macro, handle->macro_env, value);
+	um_cache_resolve(*um_handle->cache, hostids, hostids_num, macro, um_handle->macro_env, value);
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: expand user macros in the specified text value                    *
  *                                                                            *
- * Parameters: text        - [IN] the text value to expand                    *
+ * Parameters: um_handle   - [IN] the user macro cache handle                 *
+ *             text        - [IN] the text value to expand                    *
  *             hostids     - [IN] an array of host identifiers                *
  *             hostids_num - [IN] the number of host identifiers              *
  *                                                                            *
@@ -13251,17 +13260,11 @@ void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *handle, const char *macro, 
  * Comments: The returned value must be freed by the caller.                  *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int hostids_num)
+char	*zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, const char *text, const zbx_uint64_t *hostids,
+		int hostids_num)
 {
-	if (NULL == dc_um_cache)
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		return zbx_strdup(NULL, text);
-	}
-
-	return dc_expand_user_macros_impl(dc_um_cache, text, hostids, hostids_num);
+	return dc_expand_user_macros_impl(*um_handle->cache, text, hostids, hostids_num);
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -13285,7 +13288,7 @@ void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 
 		if (0 == timer->exec_ts.sec)
 		{
-			if (0 != (timer->exec_ts.sec = dc_function_calculate_nextcheck(dc_um_cache, timer, now,
+			if (0 != (timer->exec_ts.sec = dc_function_calculate_nextcheck(*um_handle->cache, timer, now,
 					timer->triggerid)))
 			{
 				timer->eval_ts = timer->exec_ts;

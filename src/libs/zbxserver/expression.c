@@ -596,7 +596,14 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 
 				if (SUCCEED == errcode)
 				{
-					*replace_to = zbx_dc_expand_user_macros(row[5], &dc_item.host.hostid, 1);
+					zbx_dc_um_handle_t	*um_handle;
+
+					um_handle = zbx_dc_open_user_macros();
+
+					*replace_to = zbx_dc_expand_user_macros(um_handle, row[5], &dc_item.host.hostid,
+							1);
+
+					zbx_dc_close_user_macros(um_handle);
 					ret = SUCCEED;
 				}
 
