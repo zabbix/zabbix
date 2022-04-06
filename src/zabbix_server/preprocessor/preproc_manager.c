@@ -32,6 +32,7 @@
 #include "preprocessing.h"
 #include "preproc_manager.h"
 #include "zbxalgo.h"
+#include "../../libs/zbxalgo/vectorimpl.h"
 #include "preproc_history.h"
 
 extern unsigned char	process_type, program_type;
@@ -52,19 +53,23 @@ typedef enum
 }
 zbx_preprocessing_states_t;
 
+typedef struct preprocessing_request zbx_preprocessing_request_t;
+
+ZBX_PTR_VECTOR_DECL(preprocessing_request, zbx_preprocessing_request_t *)
+ZBX_PTR_VECTOR_IMPL(preprocessing_request, zbx_preprocessing_request_t *)
+
 /* preprocessing request */
-typedef struct preprocessing_request
+struct preprocessing_request
 {
-	zbx_preprocessing_states_t	state;		/* request state */
-	struct preprocessing_request	*pending;	/* the request waiting on this request to complete */
-	zbx_preproc_item_value_t	value;		/* unpacked item value */
-	zbx_preproc_op_t		*steps;		/* preprocessing steps */
-	int				steps_num;	/* number of preprocessing steps */
-	unsigned char			value_type;	/* value type from configuration */
-							/* at the beginning of preprocessing queue */
-	zbx_vector_ptr_t		flush_queue;	/* processed request waiting to be flushed */
-}
-zbx_preprocessing_request_t;
+	zbx_preprocessing_states_t		state;		/* request state */
+	zbx_preprocessing_request_t		*pending;	/* the request waiting on this request to complete */
+	zbx_preproc_item_value_t		value;		/* unpacked item value */
+	zbx_preproc_op_t			*steps;		/* preprocessing steps */
+	int					steps_num;	/* number of preprocessing steps */
+	unsigned char				value_type;	/* value type from configuration */
+								/* at the beginning of preprocessing queue */
+	zbx_vector_preprocessing_request_t	flush_queue;	/* processed request waiting to be flushed */
+};
 
 /* preprocessing worker data */
 typedef struct
@@ -291,7 +296,7 @@ static	void	preprocessor_set_request_state_done(zbx_preprocessing_manager_t *man
 	*queue_item = iterator.current;
 
 	prev = (zbx_preprocessing_request_t *)iterator.current->data;
-	zbx_vector_ptr_append(&prev->flush_queue, request);
+	zbx_vector_preprocessing_request_append(&prev->flush_queue, request);
 
 	next_iterator = iterator;
 	if (SUCCEED == zbx_list_iterator_next(&next_iterator))
@@ -506,8 +511,8 @@ static void	preproc_item_value_clear(zbx_preproc_item_value_t *value)
  ******************************************************************************/
 static void	preprocessor_free_request(zbx_preprocessing_request_t *request)
 {
-	zbx_vector_ptr_clear_ext(&request->flush_queue, (zbx_ptr_free_func_t)preprocessor_free_request);
-	zbx_vector_ptr_destroy(&request->flush_queue);
+	zbx_vector_preprocessing_request_clear_ext(&request->flush_queue, preprocessor_free_request);
+	zbx_vector_preprocessing_request_destroy(&request->flush_queue);
 
 	preproc_item_value_clear(&request->value);
 	request_free_steps(request);
@@ -553,8 +558,6 @@ static void	preprocessor_flush_value(const zbx_preproc_item_value_t *value)
 
 /******************************************************************************
  *                                                                            *
- * Function: preprocessing_flush_request                                      *
- *                                                                            *
  * Purpose: flush preprocessing request and all requests waiting on it        *
  *                                                                            *
  ******************************************************************************/
@@ -568,7 +571,7 @@ static void	preprocessing_flush_request(zbx_preprocessing_manager_t *manager, zb
 	manager->queued_num--;
 
 	for (i = 0; i < request->flush_queue.values_num; i++)
-		preprocessing_flush_request(manager, (zbx_preprocessing_request_t *)request->flush_queue.values[i]);
+		preprocessing_flush_request(manager, request->flush_queue.values[i]);
 }
 
 /******************************************************************************
@@ -736,7 +739,7 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 
 	request = (zbx_preprocessing_request_t *)zbx_malloc(NULL, sizeof(zbx_preprocessing_request_t));
 	memset(request, 0, sizeof(zbx_preprocessing_request_t));
-	zbx_vector_ptr_create(&request->flush_queue);
+	zbx_vector_preprocessing_request_create(&request->flush_queue);
 	memcpy(&request->value, value, sizeof(zbx_preproc_item_value_t));
 	request->state = state;
 
