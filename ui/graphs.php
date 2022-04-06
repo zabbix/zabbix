@@ -589,7 +589,6 @@ elseif (isset($_REQUEST['form'])) {
 		$data['visible'] = getRequest('visible');
 		$data['percent_left'] = 0;
 		$data['percent_right'] = 0;
-		$data['visible'] = getRequest('visible');
 		$data['items'] = $gitems;
 		$data['discover'] = getRequest('discover', DB::getDefault('graphs', 'discover'));
 		$data['templates'] = [];
