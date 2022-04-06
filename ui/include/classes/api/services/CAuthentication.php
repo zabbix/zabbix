@@ -145,6 +145,16 @@ class CAuthentication extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		$exists = (!array_key_exists('ldap_userdirectoryid', $auth)
+			|| API::UserDirectory()->get(['userdirectoryids' => $auth['ldap_userdirectoryid']])
+		);
+
+		if (!$exists) {
+			static::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Invalid parameter "%1$s": %2$s.', '/ldap_userdirectoryid', _('referred object do not exist'))
+			);
+		}
+
 		$output_fields = $this->output_fields;
 		$output_fields[] = 'configid';
 

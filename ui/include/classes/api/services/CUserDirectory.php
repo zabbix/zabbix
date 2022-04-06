@@ -205,7 +205,7 @@ class CUserDirectory extends CApiService {
 		if ($options['selectUsrgrps'] === API_OUTPUT_COUNT) {
 			static::addUserGroupsCounts($options, $userdirectories);
 		}
-		else {
+		else if ($options['selectUsrgrps'] !== null) {
 			static::addUserGroups($options, $userdirectories);
 		}
 
@@ -284,7 +284,7 @@ class CUserDirectory extends CApiService {
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'name')],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'description'), 'default' => ''],
 			'host' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'host')],
-			'port' =>				['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => '1:65535'],
+			'port' =>				['type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'base_dn' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'base_dn')],
 			'bind_dn' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'bind_dn'), 'default' => ''],
 			'bind_password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'bind_password'), 'default' => ''],
@@ -322,7 +322,7 @@ class CUserDirectory extends CApiService {
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'name')],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'description')],
 			'host' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'host')],
-			'port' =>				['type' => API_INT32, 'in' => '1:65535'],
+			'port' =>				['type' => API_PORT],
 			'base_dn' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'base_dn')],
 			'bind_dn' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'bind_dn')],
 			'bind_password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'bind_password')],

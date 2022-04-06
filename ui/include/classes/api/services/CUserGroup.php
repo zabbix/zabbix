@@ -208,22 +208,26 @@ class CUserGroup extends CApiService {
 	 */
 	private function validateCreate(array &$usrgrps) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
-			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('usrgrp', 'name')],
-			'debug_mode' =>		['type' => API_INT32, 'in' => implode(',', [GROUP_DEBUG_MODE_DISABLED, GROUP_DEBUG_MODE_ENABLED])],
-			'gui_access' =>		['type' => API_INT32, 'in' => implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED])],
-			'users_status' =>	['type' => API_INT32, 'in' => implode(',', [GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED])],
-			'rights' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['id']], 'fields' => [
-				'id' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-				'permission' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_DENY, PERM_READ, PERM_READ_WRITE])]
+			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('usrgrp', 'name')],
+			'debug_mode' =>			['type' => API_INT32, 'in' => implode(',', [GROUP_DEBUG_MODE_DISABLED, GROUP_DEBUG_MODE_ENABLED])],
+			'gui_access' =>			['type' => API_INT32, 'in' => implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED])],
+			'users_status' =>		['type' => API_INT32, 'in' => implode(',', [GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED])],
+			'userdirectoryid' =>	['type' => API_MULTIPLE, 'flags' => API_ALLOW_NULL, 'rules' => [
+				['if' => ['field' => 'gui_access', 'in' => implode(',', [GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_SYSTEM])], 'type' => API_ID],
+				['else' => true, 'type' => API_UNEXPECTED]
 			]],
-			'tag_filters' =>	['type' => API_OBJECTS, 'uniq' => [['groupid', 'tag', 'value']], 'fields' => [
-				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
-				'tag' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'tag'), 'default' => DB::getDefault('tag_filter', 'tag')],
-				'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'value'), 'default' => DB::getDefault('tag_filter', 'value')]
+			'rights' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['id']], 'fields' => [
+				'id' =>					['type' => API_ID, 'flags' => API_REQUIRED],
+				'permission' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_DENY, PERM_READ, PERM_READ_WRITE])]
 			]],
-			'userids' =>		['type' => API_IDS, 'flags' => API_NORMALIZE | API_DEPRECATED, 'uniq' => true],
-			'users' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
-				'userid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			'tag_filters' =>		['type' => API_OBJECTS, 'uniq' => [['groupid', 'tag', 'value']], 'fields' => [
+				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+				'tag' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'tag'), 'default' => DB::getDefault('tag_filter', 'tag')],
+				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'value'), 'default' => DB::getDefault('tag_filter', 'value')]
+			]],
+			'userids' =>			['type' => API_IDS, 'flags' => API_NORMALIZE | API_DEPRECATED, 'uniq' => true],
+			'users' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
+				'userid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $usrgrps, '/', $error)) {
@@ -247,6 +251,7 @@ class CUserGroup extends CApiService {
 		$this->checkHimself($usrgrps, __FUNCTION__);
 		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
+		static::validateUserDirectories($usrgrps);
 	}
 
 	/**
@@ -276,25 +281,31 @@ class CUserGroup extends CApiService {
 	 */
 	private function validateUpdate(array &$usrgrps, array &$db_usrgrps = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['usrgrpid'], ['name']], 'fields' => [
-			'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
-			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('usrgrp', 'name')],
-			'debug_mode' =>		['type' => API_INT32, 'in' => implode(',', [GROUP_DEBUG_MODE_DISABLED, GROUP_DEBUG_MODE_ENABLED])],
-			'gui_access' =>		['type' => API_INT32, 'in' => implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED])],
-			'users_status' =>	['type' => API_INT32, 'in' => implode(',', [GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED])],
-			'rights' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['id']], 'fields' => [
-				'id' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-				'permission' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_DENY, PERM_READ, PERM_READ_WRITE])]
+			'usrgrpid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('usrgrp', 'name')],
+			'debug_mode' =>			['type' => API_INT32, 'in' => implode(',', [GROUP_DEBUG_MODE_DISABLED, GROUP_DEBUG_MODE_ENABLED])],
+			'gui_access' =>			['type' => API_INT32, 'in' => implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED])],
+			'users_status' =>		['type' => API_INT32, 'in' => implode(',', [GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED])],
+			'userdirectoryid' =>	['type' => API_MULTIPLE, 'flags' => API_ALLOW_NULL, 'rules' => [
+				['if' => ['field' => 'gui_access', 'in' => implode(',', [GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_SYSTEM])], 'type' => API_ID],
+				['else' => true, 'type' => API_UNEXPECTED]
 			]],
-			'tag_filters' =>	['type' => API_OBJECTS, 'uniq' => [['groupid', 'tag', 'value']], 'fields' => [
-				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
-				'tag' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'tag'), 'default' => DB::getDefault('tag_filter', 'tag')],
-				'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'value'), 'default' => DB::getDefault('tag_filter', 'value')]
+			'rights' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['id']], 'fields' => [
+				'id' =>					['type' => API_ID, 'flags' => API_REQUIRED],
+				'permission' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_DENY, PERM_READ, PERM_READ_WRITE])]
 			]],
-			'userids' =>		['type' => API_IDS, 'flags' => API_NORMALIZE | API_DEPRECATED, 'uniq' => true],
-			'users' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
-				'userid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			'tag_filters' =>		['type' => API_OBJECTS, 'uniq' => [['groupid', 'tag', 'value']], 'fields' => [
+				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+				'tag' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'tag'), 'default' => DB::getDefault('tag_filter', 'tag')],
+				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'value'), 'default' => DB::getDefault('tag_filter', 'value')]
+			]],
+			'userids' =>			['type' => API_IDS, 'flags' => API_NORMALIZE | API_DEPRECATED, 'uniq' => true],
+			'users' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
+				'userid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
 		]];
+		$usrgrps = $this->extendObjectsByKey($usrgrps, $db_usrgrps, 'usrgrpid', ['gui_access']);
+
 		if (!CApiInputValidator::validate($api_input_rules, $usrgrps, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -343,6 +354,7 @@ class CUserGroup extends CApiService {
 		$this->checkUsersWithoutGroups($usrgrps);
 		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
+		static::validateUserDirectories($usrgrps);
 	}
 
 	/**
@@ -1154,6 +1166,32 @@ class CUserGroup extends CApiService {
 				$db_usrgrps[$db_user['usrgrpid']]['users'][$db_user['id']] =
 					array_diff_key($db_user, array_flip(['usrgrpid']));
 			}
+		}
+	}
+
+	/**
+	 * Validate user directories exists.
+	 *
+	 * @param array $usrgrps
+	 * @param int   $usrgrps['userdirectoryid]
+	 *
+	 * @throws APIException
+	 */
+	protected static function validateUserDirectories(array $usrgrps) {
+		$ids = array_filter(array_column($usrgrps, 'userdirectoryid'));
+
+		if (!$ids) {
+			return;
+		}
+
+		$db_userdirectories = API::UserDirectory()->get([
+			'userdirectoryids' => $ids
+		]);
+
+		if (count($ids) != count($db_userdirectories)) {
+			static::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Invalid parameter "%1$s": %2$s.', '/ldap_userdirectoryid', _('referred object do not exist'))
+			);
 		}
 	}
 }
