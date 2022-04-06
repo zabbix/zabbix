@@ -23,7 +23,7 @@
 #include "sysinfo.h" //included for convenience
 #include "db.h"
 #include "zbxcomms.h"
-#include "memalloc.h"
+#include "zbxshmem.h"
 #include "zbxeval.h"
 
 #define ZBX_SYNC_DONE		0
@@ -1013,7 +1013,7 @@ int	zbx_dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_
 
 /* diagnostic data */
 void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num);
-void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index);
+void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index);
 void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items);
 
 typedef struct

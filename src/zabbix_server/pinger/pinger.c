@@ -22,7 +22,7 @@
 #include "log.h"
 #include "zbxserver.h"
 #include "zbxicmpping.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
 #include "preproc.h"
 

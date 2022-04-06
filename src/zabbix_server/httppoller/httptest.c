@@ -21,7 +21,7 @@
 
 #include "log.h"
 #include "preproc.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
 #include "zbxhttp.h"

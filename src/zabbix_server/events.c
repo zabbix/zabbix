@@ -820,7 +820,7 @@ static zbx_correlation_match_result_t	correlation_match_new_event(zbx_correlatio
 		pos = token.loc.r;
 	}
 
-	if (SUCCEED == evaluate_unknown(expression, &result, error, sizeof(error)))
+	if (SUCCEED == zbx_evaluate_unknown(expression, &result, error, sizeof(error)))
 	{
 		if (result == ZBX_UNKNOWN)
 			ret = CORRELATION_MAY_MATCH;

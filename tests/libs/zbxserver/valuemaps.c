@@ -26,7 +26,6 @@
 
 #include "zbxserver.h"
 #include "log.h"
-#include "../zbxalgo/vectorimpl.h"
 
 #define ZBX_VALUEMAP_STRING_LEN	64
 

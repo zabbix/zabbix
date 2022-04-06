@@ -17,36 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_DAEMON_H
-#define ZABBIX_DAEMON_H
+#ifndef ZABBIX_PID_H
+#define ZABBIX_PID_H
 
 #include "sysinc.h"
 
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 #	error "This module allowed only for Unix OS"
 #endif
 
-extern char			*CONFIG_PID_FILE;
-extern volatile sig_atomic_t	sig_exiting;
+#include "threads.h"
 
-#define ZBX_EXIT_NONE		0
-#define ZBX_EXIT_SUCCESS	1
-#define ZBX_EXIT_FAILURE	2
-
-int	daemon_start(int allow_root, const char *user, unsigned int flags);
-void	daemon_stop(void);
-
-int	zbx_sigusr_send(int flags);
-void	zbx_set_sigusr_handler(void (*handler)(int flags));
-
-#define ZBX_IS_RUNNING()	(ZBX_EXIT_NONE == sig_exiting)
-#define ZBX_EXIT_STATUS()	(ZBX_EXIT_SUCCESS == sig_exiting ? SUCCEED : FAIL)
-
-#define ZBX_DO_EXIT()
-
-#define START_MAIN_ZABBIX_ENTRY(allow_root, user, flags)	daemon_start(allow_root, user, flags)
-
-void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **out);
-void	zbx_signal_process_by_pid(int pid, int flags, char **out);
-
-#endif	/* ZABBIX_DAEMON_H */
+int	create_pid_file(const char *pidfile);
+int	read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_error_len);
+void	drop_pid_file(const char *pidfile);
+#endif /* ZABBIX_PID_H */

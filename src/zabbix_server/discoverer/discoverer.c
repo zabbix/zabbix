@@ -26,7 +26,7 @@
 #include "zbxself.h"
 #include "zbxrtc.h"
 
-#include "daemon.h"
+#include "zbxnix.h"
 #include "../poller/checks_agent.h"
 #include "../poller/checks_snmp.h"
 #include "zbxcrypto.h"

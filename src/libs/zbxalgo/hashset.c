@@ -17,10 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxalgo.h"
+#include "algodefs.h"
+
 #include "common.h"
 #include "log.h"
-
-#include "zbxalgo.h"
 
 static void	__hashset_free_entry(zbx_hashset_t *hs, ZBX_HASHSET_ENTRY_T *entry);
 
@@ -47,8 +48,11 @@ static int	zbx_hashset_init_slots(zbx_hashset_t *hs, size_t init_size)
 	{
 		hs->num_slots = next_prime(init_size);
 
-		if (NULL == (hs->slots = (ZBX_HASHSET_ENTRY_T **)hs->mem_malloc_func(NULL, hs->num_slots * sizeof(ZBX_HASHSET_ENTRY_T *))))
+		if (NULL == (hs->slots = (ZBX_HASHSET_ENTRY_T **)hs->mem_malloc_func(NULL, hs->num_slots *
+				sizeof(ZBX_HASHSET_ENTRY_T *))))
+		{
 			return FAIL;
+		}
 
 		memset(hs->slots, 0, hs->num_slots * sizeof(ZBX_HASHSET_ENTRY_T *));
 	}

@@ -2647,7 +2647,7 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 
 	if (CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
 	{
-		if (SUCCEED == evaluate(&eval_result, expression, error, sizeof(error), NULL))
+		if (SUCCEED == zbx_evaluate(&eval_result, expression, error, sizeof(error), NULL))
 			ret = (SUCCEED != zbx_double_compare(eval_result, 0) ? SUCCEED : FAIL);
 
 		zbx_free(expression);
