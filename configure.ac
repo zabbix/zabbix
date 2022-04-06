@@ -1978,7 +1978,8 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
 		\${abs_top_builddir}/src/libs/zbxnix/libzbxnix.a \
 		\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
-		\${abs_top_builddir}/src/libs/zbxsys/libzbxsys.a \
+		\${abs_top_builddir}/src/libs/zbxthreads/libzbxthreads.a \
+		\${abs_top_builddir}/src/libs/zbxmutexs/libzbxmutexs.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspechostnamesysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspecsysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
@@ -2092,7 +2093,8 @@ AC_OUTPUT([
 	src/libs/zbxsysinfo/netbsd/Makefile
 	src/libs/zbxsysinfo/unknown/Makefile
 	src/libs/zbxnix/Makefile
-	src/libs/zbxsys/Makefile
+	src/libs/zbxthreads/Makefile
+	src/libs/zbxmutexs/Makefile
 	src/libs/zbxcomms/Makefile
 	src/libs/zbxcommshigh/Makefile
 	src/libs/zbxdb/Makefile

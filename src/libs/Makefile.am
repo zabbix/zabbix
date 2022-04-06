@@ -17,7 +17,8 @@ DIST_SUBDIRS = \
 	zbxnix \
 	zbxconf \
 	zbxsysinfo \
-	zbxsys \
+	zbxthreads \
+	zbxmutexs \
 	zbxjson \
 	zbxserver \
 	zbxicmpping \
@@ -117,7 +118,8 @@ SUBDIRS = \
 	zbxconf \
 	zbxhttp \
 	zbxsysinfo \
-	zbxsys \
+	zbxthreads \
+	zbxmutexs \
 	zbxcommshigh \
 	zbxcomms \
 	zbxjson \
@@ -131,4 +133,6 @@ SUBDIRS = \
 	$(SERVER_SUBDIRS) \
 	$(AGENT_SUBDIRS)
 
-EXTRA_DIST = zbxwin32
+EXTRA_DIST = \
+	symbols \
+	zbxwin32
