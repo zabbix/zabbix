@@ -165,7 +165,8 @@ class CLocalApiClient extends CApiClient {
 		}
 
 		if (strlen($auth) == 64) {
-			return $this->tokenAuthentication($auth);
+			$this->tokenAuthentication($auth);
+			return;
 		}
 
 		$user = $this->serviceFactory->getObject('user')->checkAuthentication(['sessionid' => $auth]);
