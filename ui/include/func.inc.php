@@ -2152,7 +2152,7 @@ function imageOut(&$image, $format = null) {
  *
  * @return bool
  */
-function hasErrorMesssages() {
+function hasErrorMessages() {
 	return CMessageHelper::getType() === CMessageHelper::MESSAGE_TYPE_ERROR;
 }
 
@@ -2169,10 +2169,10 @@ function uncheckTableRows($parentid = null, $keepids = []) {
 		// If $keepids will not have same key as value, it will create mess, when new checkbox will be checked.
 		$keepids = array_combine($keepids, $keepids);
 
-		insert_js('sessionStorage.setItem("'.$key.'", JSON.stringify('.json_encode($keepids).'))');
+		insert_js('sessionStorage.setItem('.json_encode($key).', JSON.stringify('.json_encode($keepids).'));');
 	}
 	else {
-		insert_js('sessionStorage.removeItem("'.$key.'")');
+		insert_js('sessionStorage.removeItem('.json_encode($key).');');
 	}
 }
 

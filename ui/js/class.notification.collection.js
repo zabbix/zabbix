@@ -181,7 +181,7 @@ ZBX_NotificationCollection.prototype.makeToggleBtn = function(attrs_inactive, at
 
 /**
  * Iterator property will be updated and reference to DOM node kept to be gracefully removed at render. No reference
- * to notification object would exists after this call - notification is removed and will not cycle back into LS.
+ * to notification object would exist after this call - notification is removed and will not cycle back into LS.
  *
  * @param {string} id
  */
@@ -247,12 +247,12 @@ ZBX_NotificationCollection.prototype.removeDanglingNodes = function() {
 			.then(function(node) {
 				node.parentNode && node.remove();
 			});
-		first &= false;
+		first = false;
 	}
 };
 
 /**
- * Notification sequecnce is maintained in DOM, in server response notifications must be ordered.
+ * Notification sequence is maintained in DOM, in server response notifications must be ordered.
  * Shows or hides list node, updates and appends notification nodes, then deligates to remove dangling nodes.
  *
  * @param {object} severity_styles

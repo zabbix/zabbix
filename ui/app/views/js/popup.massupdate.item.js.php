@@ -28,34 +28,35 @@
 // Item type and interface.
 (() => {
 	const item_interface_types = <?= json_encode(itemTypeInterface()) ?>;
-	const interface_ids_by_types = <?= json_encode($data['interfaceids']) ?>;
+	const interface_ids_by_types = <?= json_encode(interfaceIdsByType($data['interfaces'])) ?>;
 
-	const item_type_elem = document.querySelector('#type');
+	let item_type_element = document.getElementById('type');
 
-	if (!item_type_elem) {
+	if (item_type_element === null) {
 		return false;
 	}
 
-	let obj = item_type_elem;
-	if (item_type_elem.tagName === 'SPAN') {
-		obj = item_type_elem.originalObject;
+	if (item_type_element.tagName === 'SPAN') {
+		item_type_element = item_type_element.originalObject;
 	}
 
-	const cb = (event) => {
-		if (!document.querySelector('#visible_type').checked) {
-			return organizeInterfaces(interface_ids_by_types, item_interface_types, <?= json_encode($data['initial_item_type']) ?>);
+	const interface_change_handler = (e) => {
+		let item_type = parseInt(item_type_element.value, 10);
+
+		if (!document.getElementById('visible_type').checked) {
+			item_type = <?= json_encode($data['initial_item_type']) ?>;
 		}
 
-		return organizeInterfaces(interface_ids_by_types, item_interface_types, parseInt(obj.value));
+		return organizeInterfaces(interface_ids_by_types, item_interface_types, item_type);
 	};
 
-	obj.addEventListener('change', cb);
-	obj.dispatchEvent(new CustomEvent('change', {}));
+	item_type_element.addEventListener('change', interface_change_handler);
+	item_type_element.dispatchEvent(new CustomEvent('change'));
 
-	document.querySelector('#visible_type').addEventListener('click', cb);
+	document.getElementById('visible_type').addEventListener('click', interface_change_handler);
 
-	if (!!document.querySelector('#visible_interfaceid')) {
-		document.querySelector('#visible_interfaceid').addEventListener('click', cb);
+	if (document.getElementById('visible_interfaceid') !== null) {
+		document.getElementById('visible_interfaceid').addEventListener('click', interface_change_handler);
 	}
 })();
 

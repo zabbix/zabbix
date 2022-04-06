@@ -27,16 +27,46 @@ class CControllerTokenCreate extends CController {
 			'description'   => 'db token.description',
 			'userid'        => 'db users.userid|required',
 			'expires_state' => 'in 0,1|required',
-			'expires_at'    => 'range_time',
+			'expires_at'    => 'abs_time',
 			'status'        => 'db token.status|required|in '.ZBX_AUTH_TOKEN_ENABLED.','.ZBX_AUTH_TOKEN_DISABLED,
 			'action_src'    => 'fatal|required|in token.edit,user.token.edit',
 			'action_dst'    => 'fatal|required|in token.view,user.token.view'
 		];
 
+		$validation_result = self::VALIDATION_OK;
+
 		$ret = $this->validateInput($fields);
 
+		if ($ret) {
+			$fields = [];
+
+			if ($this->getInput('expires_state') == 1) {
+				$fields['expires_at'] = 'required';
+			}
+
+			if ($fields) {
+				$validator = new CNewValidator($this->getInputAll(), $fields);
+
+				foreach ($validator->getAllErrors() as $error) {
+					info($error);
+				}
+
+				if ($validator->isErrorFatal()) {
+					$validation_result = self::VALIDATION_FATAL_ERROR;
+				}
+				elseif ($validator->isError()) {
+					$validation_result = self::VALIDATION_ERROR;
+				}
+
+				$ret = $validation_result == self::VALIDATION_OK;
+			}
+		}
+		else {
+			$validation_result = $this->getValidationError();
+		}
+
 		if (!$ret) {
-			switch ($this->getValidationError()) {
+			switch ($validation_result) {
 				case self::VALIDATION_ERROR:
 					$location = (new CUrl('zabbix.php'))->setArgument('action', $this->getInput('action_src'));
 					$response = new CControllerResponseRedirect($location);
@@ -61,12 +91,23 @@ class CControllerTokenCreate extends CController {
 		return $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	protected function doAction() {
 		$this->getInputs($token, ['name', 'description', 'userid', 'expires_at', 'status']);
 
-		$token['expires_at'] = $this->getInput('expires_state')
-			? (new DateTime($token['expires_at']))->getTimestamp()
-			: 0;
+		if ($this->getInput('expires_state')) {
+			$parser = new CAbsoluteTimeParser();
+			$parser->parse($token['expires_at']);
+
+			$token['expires_at'] = $parser
+				->getDateTime(true)
+				->getTimestamp();
+		}
+		else {
+			$token['expires_at'] = 0;
+		}
 
 		$result = API::Token()->create($token);
 

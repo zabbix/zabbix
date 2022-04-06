@@ -22,8 +22,8 @@
 ** were used in development of this file. Thanks to PostgreSQL developers!
 **/
 
-#include "common.h"
 #include "setproctitle.h"
+#include "common.h"
 
 #if defined(PS_DARWIN_ARGV)
 #include <crt_externs.h>

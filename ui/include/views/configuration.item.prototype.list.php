@@ -204,8 +204,9 @@ $itemForm->addItem([
 			'popup.massupdate.itemprototype' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
-						"return openMassupdatePopup('popup.massupdate.itemprototype', {}, {
-							dialogue_class: 'modal-popup-preprocessing'
+						"openMassupdatePopup('popup.massupdate.itemprototype', {}, {
+							dialogue_class: 'modal-popup-preprocessing',
+							trigger_element: this
 						});"
 					)
 					->addClass(ZBX_STYLE_BTN_ALT)

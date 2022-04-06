@@ -104,14 +104,16 @@ static void	zbx_register_history_write_cbs(zbx_module_t *module, ZBX_HISTORY_WRI
 
 		if (NULL == history_float_cbs)
 		{
-			history_float_cbs = (zbx_history_float_cb_t *)zbx_malloc(history_float_cbs, sizeof(zbx_history_float_cb_t));
+			history_float_cbs = (zbx_history_float_cb_t *)zbx_malloc(history_float_cbs,
+					sizeof(zbx_history_float_cb_t));
 			history_float_cbs[0].module = NULL;
 		}
 
 		while (NULL != history_float_cbs[j].module)
 			j++;
 
-		history_float_cbs = (zbx_history_float_cb_t *)zbx_realloc(history_float_cbs, (j + 2) * sizeof(zbx_history_float_cb_t));
+		history_float_cbs = (zbx_history_float_cb_t *)zbx_realloc(history_float_cbs, (j + 2) *
+				sizeof(zbx_history_float_cb_t));
 		history_float_cbs[j].module = module;
 		history_float_cbs[j].history_float_cb = history_write_cbs.history_float_cb;
 		history_float_cbs[j + 1].module = NULL;
@@ -123,14 +125,16 @@ static void	zbx_register_history_write_cbs(zbx_module_t *module, ZBX_HISTORY_WRI
 
 		if (NULL == history_integer_cbs)
 		{
-			history_integer_cbs = (zbx_history_integer_cb_t *)zbx_malloc(history_integer_cbs, sizeof(zbx_history_integer_cb_t));
+			history_integer_cbs = (zbx_history_integer_cb_t *)zbx_malloc(history_integer_cbs,
+					sizeof(zbx_history_integer_cb_t));
 			history_integer_cbs[0].module = NULL;
 		}
 
 		while (NULL != history_integer_cbs[j].module)
 			j++;
 
-		history_integer_cbs = (zbx_history_integer_cb_t *)zbx_realloc(history_integer_cbs, (j + 2) * sizeof(zbx_history_integer_cb_t));
+		history_integer_cbs = (zbx_history_integer_cb_t *)zbx_realloc(history_integer_cbs, (j + 2) *
+				sizeof(zbx_history_integer_cb_t));
 		history_integer_cbs[j].module = module;
 		history_integer_cbs[j].history_integer_cb = history_write_cbs.history_integer_cb;
 		history_integer_cbs[j + 1].module = NULL;
@@ -142,14 +146,16 @@ static void	zbx_register_history_write_cbs(zbx_module_t *module, ZBX_HISTORY_WRI
 
 		if (NULL == history_string_cbs)
 		{
-			history_string_cbs = (zbx_history_string_cb_t *)zbx_malloc(history_string_cbs, sizeof(zbx_history_string_cb_t));
+			history_string_cbs = (zbx_history_string_cb_t *)zbx_malloc(history_string_cbs,
+					sizeof(zbx_history_string_cb_t));
 			history_string_cbs[0].module = NULL;
 		}
 
 		while (NULL != history_string_cbs[j].module)
 			j++;
 
-		history_string_cbs = (zbx_history_string_cb_t *)zbx_realloc(history_string_cbs, (j + 2) * sizeof(zbx_history_string_cb_t));
+		history_string_cbs = (zbx_history_string_cb_t *)zbx_realloc(history_string_cbs, (j + 2) *
+				sizeof(zbx_history_string_cb_t));
 		history_string_cbs[j].module = module;
 		history_string_cbs[j].history_string_cb = history_write_cbs.history_string_cb;
 		history_string_cbs[j + 1].module = NULL;
@@ -161,14 +167,16 @@ static void	zbx_register_history_write_cbs(zbx_module_t *module, ZBX_HISTORY_WRI
 
 		if (NULL == history_text_cbs)
 		{
-			history_text_cbs = (zbx_history_text_cb_t *)zbx_malloc(history_text_cbs, sizeof(zbx_history_text_cb_t));
+			history_text_cbs = (zbx_history_text_cb_t *)zbx_malloc(history_text_cbs,
+					sizeof(zbx_history_text_cb_t));
 			history_text_cbs[0].module = NULL;
 		}
 
 		while (NULL != history_text_cbs[j].module)
 			j++;
 
-		history_text_cbs = (zbx_history_text_cb_t *)zbx_realloc(history_text_cbs, (j + 2) * sizeof(zbx_history_text_cb_t));
+		history_text_cbs = (zbx_history_text_cb_t *)zbx_realloc(history_text_cbs, (j + 2) *
+				sizeof(zbx_history_text_cb_t));
 		history_text_cbs[j].module = module;
 		history_text_cbs[j].history_text_cb = history_write_cbs.history_text_cb;
 		history_text_cbs[j + 1].module = NULL;
@@ -180,14 +188,16 @@ static void	zbx_register_history_write_cbs(zbx_module_t *module, ZBX_HISTORY_WRI
 
 		if (NULL == history_log_cbs)
 		{
-			history_log_cbs = (zbx_history_log_cb_t *)zbx_malloc(history_log_cbs, sizeof(zbx_history_log_cb_t));
+			history_log_cbs = (zbx_history_log_cb_t *)zbx_malloc(history_log_cbs,
+					sizeof(zbx_history_log_cb_t));
 			history_log_cbs[0].module = NULL;
 		}
 
 		while (NULL != history_log_cbs[j].module)
 			j++;
 
-		history_log_cbs = (zbx_history_log_cb_t *)zbx_realloc(history_log_cbs, (j + 2) * sizeof(zbx_history_log_cb_t));
+		history_log_cbs = (zbx_history_log_cb_t *)zbx_realloc(history_log_cbs, (j + 2) *
+				sizeof(zbx_history_log_cb_t));
 		history_log_cbs[j].module = module;
 		history_log_cbs[j].history_log_cb = history_write_cbs.history_log_cb;
 		history_log_cbs[j + 1].module = NULL;
@@ -247,7 +257,7 @@ static int	zbx_load_module(const char *path, char *name, int timeout)
 		return SUCCEED;
 	}
 
-	if (NULL == (func_version = (int (*)(void))dlsym(lib, ZBX_MODULE_FUNC_API_VERSION)))
+	if (NULL == (*(void **)(&func_version) = dlsym(lib, ZBX_MODULE_FUNC_API_VERSION)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot find \"" ZBX_MODULE_FUNC_API_VERSION "()\""
 				" function in module \"%s\": %s", name, dlerror());
@@ -260,7 +270,7 @@ static int	zbx_load_module(const char *path, char *name, int timeout)
 		goto fail;
 	}
 
-	if (NULL == (func_init = (int (*)(void))dlsym(lib, ZBX_MODULE_FUNC_INIT)))
+	if (NULL == (*(void **)(&func_init) = dlsym(lib, ZBX_MODULE_FUNC_INIT)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot find \"" ZBX_MODULE_FUNC_INIT "()\""
 				" function in module \"%s\": %s", name, dlerror());
@@ -271,7 +281,7 @@ static int	zbx_load_module(const char *path, char *name, int timeout)
 		goto fail;
 	}
 
-	if (NULL == (func_list = (ZBX_METRIC *(*)(void))dlsym(lib, ZBX_MODULE_FUNC_ITEM_LIST)))
+	if (NULL == (*(void **)(&func_list) = dlsym(lib, ZBX_MODULE_FUNC_ITEM_LIST)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot find \"" ZBX_MODULE_FUNC_ITEM_LIST "()\""
 				" function in module \"%s\": %s", name, dlerror());
@@ -284,7 +294,7 @@ static int	zbx_load_module(const char *path, char *name, int timeout)
 			goto fail;
 		}
 
-		if (NULL == (func_timeout = (void (*)(int))dlsym(lib, ZBX_MODULE_FUNC_ITEM_TIMEOUT)))
+		if (NULL == (*(void **)(&func_timeout) = dlsym(lib, ZBX_MODULE_FUNC_ITEM_TIMEOUT)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot find \"" ZBX_MODULE_FUNC_ITEM_TIMEOUT "()\""
 					" function in module \"%s\": %s", name, dlerror());
@@ -296,8 +306,7 @@ static int	zbx_load_module(const char *path, char *name, int timeout)
 	/* module passed validation and can now be registered */
 	module = zbx_register_module(lib, name);
 
-	if (NULL == (func_history_write_cbs = (ZBX_HISTORY_WRITE_CBS (*)(void))dlsym(lib,
-			ZBX_MODULE_FUNC_HISTORY_WRITE_CBS)))
+	if (NULL == (*(void **)(&func_history_write_cbs) = dlsym(lib, ZBX_MODULE_FUNC_HISTORY_WRITE_CBS)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot find \"" ZBX_MODULE_FUNC_HISTORY_WRITE_CBS "()\""
 				" function in module \"%s\": %s", name, dlerror());
@@ -376,7 +385,7 @@ static void	zbx_unload_module(void *data)
 	zbx_module_t	*module = (zbx_module_t *)data;
 	int		(*func_uninit)(void);
 
-	if (NULL == (func_uninit = (int (*)(void))dlsym(module->lib, ZBX_MODULE_FUNC_UNINIT)))
+	if (NULL == (*(void **)(&func_uninit) = dlsym(module->lib, ZBX_MODULE_FUNC_UNINIT)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot find \"" ZBX_MODULE_FUNC_UNINIT "()\""
 				" function in module \"%s\": %s", module->name, dlerror());

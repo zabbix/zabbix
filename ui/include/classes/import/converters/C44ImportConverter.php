@@ -24,6 +24,14 @@
  */
 class C44ImportConverter extends CConverter {
 
+
+	/**
+	 * Update types.
+	 */
+	const TYPE_ITEM = 1;
+	const TYPE_DISCOVERY_RULE = 2;
+	const TYPE_ITEM_PROTOTYPE = 3;
+
 	/**
 	 * Convert import data from 4.4 to 5.0 version.
 	 *
@@ -193,7 +201,7 @@ class C44ImportConverter extends CConverter {
 				if (array_key_exists('type', $item) && in_array($item['type'], $types)) {
 					$interfaceid = str_replace('if', '', $item['interface_ref']);
 
-					$interfaces[$interfaceid][] = $this->createHelperArray($item, 1);
+					$interfaces[$interfaceid][] = $this->createHelperArray($item, self::TYPE_ITEM);
 				}
 			}
 		}
@@ -204,7 +212,7 @@ class C44ImportConverter extends CConverter {
 				if (array_key_exists('type', $drule) && in_array($drule['type'], $types)) {
 					$interfaceid = str_replace('if', '', $drule['interface_ref']);
 
-					$interfaces[$interfaceid][] = $this->createHelperArray($drule, 2);
+					$interfaces[$interfaceid][] = $this->createHelperArray($drule, self::TYPE_DISCOVERY_RULE);
 				}
 
 				if (array_key_exists('item_prototypes', $drule)) {
@@ -213,7 +221,9 @@ class C44ImportConverter extends CConverter {
 						if (array_key_exists('type', $prototype) && in_array($prototype['type'], $types)) {
 							$interfaceid = str_replace('if', '', $prototype['interface_ref']);
 
-							$interfaces[$interfaceid][] = $this->createHelperArray($prototype, 3);
+							$interfaces[$interfaceid][] = $this->createHelperArray($prototype,
+								self::TYPE_ITEM_PROTOTYPE
+							);
 						}
 					}
 				}
@@ -257,8 +267,8 @@ class C44ImportConverter extends CConverter {
 		$interface = ['interface_ref' => 'if'.$maxid] + $parent_interface;
 
 		if ($item['type'] == CXmlConstantName::SNMP_TRAP) {
-			$interface['details']['version'] = CXmlConstantName::SNMPV2;
-			$interface['details']['community'] = '{$SNMP_COMMUNITY}';
+			$interface['details']['version'] = CXmlConstantName::SNMPV1;
+			$interface['details']['community'] = 'public';
 		}
 		else {
 			$interface['details']['version'] = $item['type'];
@@ -295,25 +305,28 @@ class C44ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function updateInterfaceRef(array $host, array $updates): array {
-		if (array_key_exists('items', $host) && array_key_exists('1', $updates)) {
+		if (array_key_exists('items', $host) && array_key_exists(self::TYPE_ITEM, $updates)) {
 			foreach ($host['items'] as &$item) {
-				if (array_key_exists($item['key'], $updates[1])) {
-					$item['interface_ref'] = $updates[1][$item['key']];
+				if (array_key_exists($item['key'], $updates[self::TYPE_ITEM])) {
+					$item['interface_ref'] = $updates[self::TYPE_ITEM][$item['key']];
 				}
 			}
 			unset($item);
 		}
 
-		if (array_key_exists('discovery_rules', $host) && array_key_exists('2', $updates)) {
+		if (array_key_exists('discovery_rules', $host)) {
 			foreach ($host['discovery_rules'] as &$drule) {
-				if (array_key_exists($drule['key'], $updates[2])) {
-					$drule['interface_ref'] = $updates[2][$drule['key']];
+				if (array_key_exists(self::TYPE_DISCOVERY_RULE, $updates)) {
+					if (array_key_exists($drule['key'], $updates[self::TYPE_DISCOVERY_RULE])) {
+						$drule['interface_ref'] = $updates[self::TYPE_DISCOVERY_RULE][$drule['key']];
+					}
 				}
 
-				if (array_key_exists('item_prototypes', $drule) && array_key_exists('3', $updates)) {
+				if (array_key_exists('item_prototypes', $drule)
+						&& array_key_exists(self::TYPE_ITEM_PROTOTYPE, $updates)) {
 					foreach ($drule['item_prototypes'] as &$prototype) {
-						if (array_key_exists($prototype['key'], $updates[3])) {
-							$prototype['interface_ref'] = $updates[3][$prototype['key']];
+						if (array_key_exists($prototype['key'], $updates[self::TYPE_ITEM_PROTOTYPE])) {
+							$prototype['interface_ref'] = $updates[self::TYPE_ITEM_PROTOTYPE][$prototype['key']];
 						}
 					}
 					unset($prototype);
@@ -375,23 +388,17 @@ class C44ImportConverter extends CConverter {
 								foreach ($new_interfaces[$interfaceid] as &$iface) {
 									if (array_key_exists('new', $iface)) {
 										if ($item['type'] === CXmlConstantName::SNMP_TRAP) {
-											// Use default SNMP V2 interface for SNMP traps.
-											$iface['details']['version'] = CXmlConstantName::SNMPV2;
-											$iface['details']['community'] = '{$SNMP_COMMUNITY}';
+											// Use default SNMP V1 interface for SNMP traps.
+											$iface['details']['version'] = CXmlConstantName::SNMPV1;
+											$iface['details']['community'] = 'public';
 										}
-										else {
-											$iface['details']['version'] = $item['type'];
-										}
-
-										// Item port not set here because we will find it in next steps.
-
-										// And set other SNMP fields.
-										if ($item['type'] === CXmlConstantName::SNMPV1
+										elseif ($item['type'] === CXmlConstantName::SNMPV1
 												|| $item['type'] === CXmlConstantName::SNMPV2) {
+											$iface['details']['version'] = $item['type'];
 											$iface['details']['community'] = $item['community'];
 										}
-
-										if ($item['type'] === CXmlConstantName::SNMPV3) {
+										elseif ($item['type'] === CXmlConstantName::SNMPV3) {
+											$iface['details']['version'] = CXmlConstantName::SNMPV3;
 											$iface['details']['contextname'] = $item['contextname'];
 											$iface['details']['securityname'] = $item['securityname'];
 											$iface['details']['securitylevel'] = $item['securitylevel'];
@@ -400,6 +407,8 @@ class C44ImportConverter extends CConverter {
 											$iface['details']['privprotocol'] = $item['privprotocol'];
 											$iface['details']['privpassphrase'] = $item['privpassphrase'];
 										}
+
+										// Item port not set here because we will find it in next steps.
 
 										unset($iface['new']);
 										break;
@@ -410,10 +419,10 @@ class C44ImportConverter extends CConverter {
 								// Find interfaces having same SNMP version.
 								$same_ver_interfaces = array_filter($new_interfaces[$interfaceid],
 									function (array $iface) use (&$item): bool {
-										// Use default SNMP V2 interface for SNMP traps.
+										// Use default SNMP V1 interface for SNMP traps.
 										if ($item['type'] === CXmlConstantName::SNMP_TRAP) {
-											$item['community'] = '{$SNMP_COMMUNITY}';
-											$item['type'] = CXmlConstantName::SNMPV2;
+											$item['type'] = CXmlConstantName::SNMPV1;
+											$item['community'] = 'public';
 										}
 
 										return ($iface['details']['version'] === $item['type']);

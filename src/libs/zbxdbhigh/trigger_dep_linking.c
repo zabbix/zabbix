@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "trigger_dep_linking.h"
+
 #include "db.h"
 #include "log.h"
 #include "../../libs/zbxaudit/audit_trigger.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
-
-#include "trigger_dep_linking.h"
 
 typedef struct
 {

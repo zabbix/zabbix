@@ -28,7 +28,7 @@ class testDashboardCopyWidgets extends CWebTest {
 
 	const DASHBOARD_ID = 1300;
 	const PASTE_DASHBOARD_ID = 1310;
-	const NEW_PAGE_ID = 1430;
+	const NEW_PAGE_ID = 14300;
 	const NEW_PAGE_NAME = 'Test_page';
 	const UPDATE_TEMPLATEID = 50000;
 	const TEMPLATED_PAGE_NAME = 'Page for pasting widgets';
@@ -133,6 +133,21 @@ class testDashboardCopyWidgets extends CWebTest {
 										'type' => 7,
 										'name' => 'graphid',
 										'value' => 700016
+									]
+								]
+							],
+							[
+								'type' => 'item',
+								'name' => 'Item value widget',
+								'x' => 13,
+								'y' => 4,
+								'width' => 4,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'itemid',
+										'value' => 40041
 									]
 								]
 							]
@@ -374,6 +389,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Item value widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
 					'name' => 'Clock widget',
 					'copy to' => 'another page'
 				]
@@ -404,6 +425,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Item value widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
 					'name' => 'Clock widget',
 					'copy to' => 'another dashboard'
 				]
@@ -429,6 +456,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'URL widget',
+					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
+					'name' => 'Item value widget',
 					'copy to' => 'another dashboard'
 				]
 			],

@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "proxydata.h"
 #include "db.h"
 #include "log.h"
 #include "proxy.h"
@@ -27,7 +27,6 @@
 #include "daemon.h"
 #include "zbxcompress.h"
 
-#include "proxydata.h"
 
 extern unsigned char	program_type;
 static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
@@ -161,7 +160,14 @@ out:
 	if (SUCCEED == status)	/* moved the unpredictable long operation to the end */
 				/* we are trying to save info about lastaccess to detect communication problem */
 	{
-		zbx_update_proxy_data(&proxy, version, ts->sec,
+		int	lastaccess;
+
+		if (ZBX_PROXY_UPLOAD_DISABLED == upload_status)
+			lastaccess = time(NULL);
+		else
+			lastaccess = ts->sec;
+
+		zbx_update_proxy_data(&proxy, version, lastaccess,
 				(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0), 0);
 	}
 

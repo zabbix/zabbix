@@ -529,6 +529,7 @@ class testUserRolesPermissions extends CWebTest {
 
 		foreach ([true, false] as $action_status) {
 			$page_number = $this->query('xpath://ul[@class="menu-main"]/li/a')->count();
+			$all_pages = [];
 
 			for ($i = 1; $i <= $page_number; ++$i) {
 				$all_pages[] = $this->query('xpath:(//ul[@class="menu-main"]/li/a)['.$i.']')->one()->getText();
@@ -537,7 +538,6 @@ class testUserRolesPermissions extends CWebTest {
 			if ($action_status) {
 				$this->assertEquals($pages_before, $all_pages);
 				$this->changeRoleRule(['5th Module' => false]);
-				$all_pages = [];
 			}
 			else {
 				$pages_after = array_values(array_diff($pages_before, ['Module 5 menu']));

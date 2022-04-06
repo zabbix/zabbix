@@ -559,7 +559,7 @@ class CScript extends CApiService {
 			if ($script['scope'] != $db_script['scope'] && $script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
 				$script['menu_path'] = '';
 				$script['usrgrpid'] = 0;
-				$script['host_access'] = DB::getDefault('scripts', 'host_access');;
+				$script['host_access'] = DB::getDefault('scripts', 'host_access');
 				$script['confirmation'] = '';
 			}
 
@@ -1188,7 +1188,9 @@ class CScript extends CApiService {
 
 		$group_search_names = [];
 		foreach ($result as $script) {
-			$has_write_access_level |= ($script['host_access'] == PERM_READ_WRITE);
+			if ($script['host_access'] == PERM_READ_WRITE) {
+				$has_write_access_level = true;
+			}
 
 			// If any script belongs to all host groups.
 			if ($script['groupid'] == 0) {

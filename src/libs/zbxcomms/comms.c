@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "comms.h"
+
+#include "common.h"
 #include "log.h"
 #include "../zbxcrypto/tls_tcp.h"
 #include "zbxcompress.h"
@@ -469,6 +470,9 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	struct addrinfo	*ai_bind = NULL;
 	char		service[8], *error = NULL;
 	void		(*func_socket_close)(zbx_socket_t *s);
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	const char	*server_name = NULL;
+#endif
 
 	zbx_socket_clean(s);
 
@@ -550,8 +554,13 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (NULL != ip && SUCCEED != is_ip(ip))
+	{
+		server_name = ip;
+	}
+
 	if ((ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect) &&
-			SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, &error))
+			SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, server_name, &error))
 	{
 		zbx_tcp_close(s);
 		zbx_set_socket_strerror("TCP successful, cannot establish TLS to [[%s]:%hu]: %s", ip, port, error);
@@ -582,6 +591,9 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	struct addrinfo	hints, *ai;
 	char		*error = NULL;
 	void		(*func_socket_close)(zbx_socket_t *s);
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	const char	*server_name = NULL;
+#endif
 
 	if (SOCK_DGRAM == type && (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect))
 	{
@@ -673,8 +685,14 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (NULL != ip && SUCCEED != is_ip(ip))
+	{
+		server_name = ip;
+	}
+
+
 	if ((ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect) &&
-			SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, &error))
+			SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, server_name, &error))
 	{
 		zbx_tcp_close(s);
 		zbx_set_socket_strerror("TCP successful, cannot establish TLS to [[%s]:%hu]: %s", ip, port, error);

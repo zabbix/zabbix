@@ -325,7 +325,7 @@ int	zbx_es_fatal_error(zbx_es_t *es)
  * Return value: SUCCEED                                                      *
  *               FAIL                                                         *
  *                                                                            *
- * Comments: The this function allocates the bytecode array, which must be    *
+ * Comments: this function allocates the bytecode array, which must be        *
  *           freed by the caller after being used.                            *
  *                                                                            *
  ******************************************************************************/

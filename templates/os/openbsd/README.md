@@ -69,8 +69,8 @@ There are no template links in this template.
 |Monitoring agent |Zabbix agent ping |<p>The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.</p> |ZABBIX_PASSIVE |agent.ping |
 |Network interfaces |Network interfaces: Incoming network traffic on {#IFNAME} |<p>-</p> |ZABBIX_PASSIVE |net.if.in[{#IFNAME}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND: ``</p><p>- MULTIPLIER: `8`</p> |
 |Network interfaces |Network interfaces: Outgoing network traffic on {#IFNAME} |<p>-</p> |ZABBIX_PASSIVE |net.if.out[{#IFNAME}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND: ``</p><p>- MULTIPLIER: `8`</p> |
-|OS |Maximum number of opened files |<p>It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.</p> |ZABBIX_PASSIVE |kernel.maxfiles |
-|OS |Maximum number of processes |<p>It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.</p> |ZABBIX_PASSIVE |kernel.maxproc |
+|OS |Maximum number of opened files |<p>It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.</p> |ZABBIX_PASSIVE |kernel.maxfiles |
+|OS |Maximum number of processes |<p>It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.</p> |ZABBIX_PASSIVE |kernel.maxproc |
 |OS |Number of logged in users |<p>Number of users who are currently logged in.</p> |ZABBIX_PASSIVE |system.users.num |
 |Processes |Number of running processes |<p>Number of processes in running state.</p> |ZABBIX_PASSIVE |proc.num[,,run] |
 |Processes |Number of processes |<p>Total number of processes in any state.</p> |ZABBIX_PASSIVE |proc.num[] |

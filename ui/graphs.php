@@ -43,7 +43,7 @@ $fields = [
 	'name' =>				[T_ZBX_STR, O_OPT, null,		NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
 	'width' =>				[T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({add}) || isset({update})', _('Width')],
 	'height' =>				[T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({add}) || isset({update})', _('Height')],
-	'graphtype' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1,2,3'),	'isset({add}) || isset({update})'],
+	'graphtype' =>			[T_ZBX_INT, O_OPT, P_SYS,		IN('0,1,2,3'),	'isset({add}) || isset({update})'],
 	'show_3d' =>			[T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null],
 	'show_legend' =>		[T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null],
 	'ymin_type' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1,2'),	null],
@@ -370,7 +370,9 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && h
 		DBstart();
 		foreach (getRequest('group_graphid') as $graphid) {
 			foreach ($dbHosts as $host) {
-				$result &= (bool) copyGraphToHost($graphid, $host['hostid']);
+				if (!copyGraphToHost($graphid, $host['hostid'])) {
+					$result = false;
+				}
 			}
 		}
 		$result = DBend($result);
@@ -553,7 +555,7 @@ elseif (isset($_REQUEST['form'])) {
 		// templates
 		$flag = ($data['parent_discoveryid'] === null) ? ZBX_FLAG_DISCOVERY_NORMAL : ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		$data['templates'] = makeGraphTemplatesHtml($graph['graphid'], getGraphParentTemplates([$graph], $flag),
-			$flag, CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES), $data['context']
+			$flag, CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 
 		// items
@@ -591,7 +593,6 @@ elseif (isset($_REQUEST['form'])) {
 		$data['visible'] = getRequest('visible');
 		$data['percent_left'] = 0;
 		$data['percent_right'] = 0;
-		$data['visible'] = getRequest('visible');
 		$data['items'] = $gitems;
 		$data['discover'] = getRequest('discover', DB::getDefault('graphs', 'discover'));
 		$data['templates'] = [];

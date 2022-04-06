@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "audit_trigger.h"
+
 #include "log.h"
 #include "db.h"
 #include "zbxdb.h"
 #include "audit.h"
-
-#include "audit_trigger.h"
 
 static int	trigger_flag_to_resource_type(int flag)
 {
@@ -208,6 +208,7 @@ PREPARE_AUDIT_TRIGGER_UPDATE(priority, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(comments, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(url, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(type, int, int)
+PREPARE_AUDIT_TRIGGER_UPDATE(status, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(templateid, zbx_uint64_t, uint64)
 PREPARE_AUDIT_TRIGGER_UPDATE(description, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(expression, const char*, string)

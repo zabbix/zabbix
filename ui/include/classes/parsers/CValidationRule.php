@@ -42,7 +42,6 @@ class CValidationRule {
 		$pos = 0;
 		$state = self::STATE_BEGIN;
 		$rules = [];
-		$is_empty = true;
 
 		while (isset($buffer[$pos])) {
 			switch ($state) {
@@ -53,29 +52,31 @@ class CValidationRule {
 							break;
 
 						default:
-							$is_empty = false;
 							$rule = [];
 
-							if (!$this->parseString($buffer, $pos, $rule)				// string
-									&& !$this->parseRangeTime($buffer, $pos, $rule)		// range time
-									&& !$this->parseTimePeriods($buffer, $pos, $rule)	// time periods
-									&& !$this->parseTimeUnit($buffer, $pos, $rule)		// time unit
-									&& !$this->parseRgb($buffer, $pos, $rule)			// rgb
-									&& !$this->parseRequired($buffer, $pos, $rule)		// required
-									&& !$this->parseNotEmpty($buffer, $pos, $rule)		// not_empty
-									&& !$this->parseLE($buffer, $pos, $rule)			// le
-									&& !$this->parseJson($buffer, $pos, $rule)			// json
-									&& !$this->parseInt32($buffer, $pos, $rule)			// int32
-									&& !$this->parseIn($buffer, $pos, $rule)			// in
-									&& !$this->parseId($buffer, $pos, $rule)			// id
-									&& !$this->parseGE($buffer, $pos, $rule)			// ge
-									&& !$this->parseFatal($buffer, $pos, $rule)			// fatal
-									&& !$this->parseDB($buffer, $pos, $rule)			// db
-									&& !$this->parseArrayId($buffer, $pos, $rule)		// array_id
-									&& !$this->parseArrayDB($buffer, $pos, $rule)		// array_db
-									&& !$this->parseArray($buffer, $pos, $rule)			// array
-									&& !$this->parseFlags($buffer, $pos, $rule) 		// flags
-									&& !$this->parseCuid($buffer, $pos, $rule)) {		// cuid
+							if (!$this->parseString($buffer, $pos, $rule)
+									&& !$this->parseRangeTime($buffer, $pos, $rule)
+									&& !$this->parseAbsDate($buffer, $pos, $rule)
+									&& !$this->parseAbsTime($buffer, $pos, $rule)
+									&& !$this->parseTimePeriods($buffer, $pos, $rule)
+									&& !$this->parseTimeUnit($buffer, $pos, $rule)
+									&& !$this->parseRgb($buffer, $pos, $rule)
+									&& !$this->parseRequired($buffer, $pos, $rule)
+									&& !$this->parseNotEmpty($buffer, $pos, $rule)
+									&& !$this->parseLE($buffer, $pos, $rule)
+									&& !$this->parseJson($buffer, $pos, $rule)
+									&& !$this->parseInt32($buffer, $pos, $rule)
+									&& !$this->parseUInt64($buffer, $pos, $rule)
+									&& !$this->parseIn($buffer, $pos, $rule)
+									&& !$this->parseId($buffer, $pos, $rule)
+									&& !$this->parseGE($buffer, $pos, $rule)
+									&& !$this->parseFatal($buffer, $pos, $rule)
+									&& !$this->parseDB($buffer, $pos, $rule)
+									&& !$this->parseArrayId($buffer, $pos, $rule)
+									&& !$this->parseArrayDB($buffer, $pos, $rule)
+									&& !$this->parseArray($buffer, $pos, $rule)
+									&& !$this->parseFlags($buffer, $pos, $rule)
+									&& !$this->parseCuid($buffer, $pos, $rule)) {
 								// incorrect validation rule
 								break 3;
 							}
@@ -171,6 +172,38 @@ class CValidationRule {
 
 		$pos += 10;
 		$rules['range_time'] = true;
+
+		return true;
+	}
+
+	/**
+	 * abs_date
+	 *
+	 * 'abs_date' => true
+	 */
+	private function parseAbsDate($buffer, &$pos, &$rules) {
+		if (strncmp(substr($buffer, $pos), 'abs_date', 8) != 0) {
+			return false;
+		}
+
+		$pos += 8;
+		$rules['abs_date'] = true;
+
+		return true;
+	}
+
+	/**
+	 * abs_time
+	 *
+	 * 'abs_time' => true
+	 */
+	private function parseAbsTime($buffer, &$pos, &$rules) {
+		if (strncmp(substr($buffer, $pos), 'abs_time', 8) != 0) {
+			return false;
+		}
+
+		$pos += 8;
+		$rules['abs_time'] = true;
 
 		return true;
 	}
@@ -352,6 +385,22 @@ class CValidationRule {
 
 		$pos += 5;
 		$rules['int32'] = true;
+
+		return true;
+	}
+
+	/**
+	 * uint64
+	 *
+	 * 'uint64' => true
+	 */
+	private function parseUInt64($buffer, &$pos, &$rules) {
+		if (strncmp(substr($buffer, $pos), 'uint64', 6) != 0) {
+			return false;
+		}
+
+		$pos += 6;
+		$rules['uint64'] = true;
 
 		return true;
 	}

@@ -102,9 +102,9 @@ static void	str_rev(char *str)
 		str[len - i - 1] = temp;
 	}
 }
-static void	from_decimal(char *res, size_t base, size_t input_num)
+static void	from_decimal(char *res, size_t base, zbx_uint64_t input_num)
 {
-	size_t	index = 0;
+	zbx_uint64_t	index = 0;
 
 	if (0 == input_num)
 	{
@@ -132,7 +132,7 @@ static void	from_decimal(char *res, size_t base, size_t input_num)
 static void	zbx_cuid_init(void)
 {
 	char		*hostname;
-	size_t		hostname_num, hostname_len, i;
+	zbx_uint64_t	hostname_num, hostname_len, i;
 	struct utsname	name;
 
 	srand((unsigned int)time(NULL) + (unsigned int)getpid());
@@ -146,7 +146,7 @@ static void	zbx_cuid_init(void)
 	hostname_num = hostname_len + CUID_BASE_36;
 
 	for (i = 0; i < hostname_len; i++)
-		hostname_num = hostname_num + (size_t)hostname[i];
+		hostname_num = hostname_num + (zbx_uint64_t)hostname[i];
 
 	from_decimal(host_block, CUID_BASE_36, hostname_num);
 	pad(host_block, sizeof(host_block), CUID_HOSTNAME_BLOCK_SIZE, PAD_FILL_CHAR);
@@ -186,19 +186,20 @@ void	zbx_new_cuid(char *cuid)
 			counter[CUID_BLOCK_SIZE+1], pid_block[PID_TMP_36_BASE_BUF_LEN];
 	struct timeval	current_time;
 
-	from_decimal(counter, CUID_BASE_36, next());
+	from_decimal(counter, CUID_BASE_36, (zbx_uint64_t)next());
 	pad(counter, sizeof(counter), CUID_BLOCK_SIZE, PAD_FILL_CHAR);
 
-	from_decimal(pid_block, CUID_BASE_36, (size_t)getpid());
+	from_decimal(pid_block, CUID_BASE_36, (zbx_uint64_t)getpid());
 	pad(pid_block, sizeof(pid_block), CUID_PID_BLOCK_SIZE, PAD_FILL_CHAR);
 
 	gettimeofday(&current_time, NULL);
-	from_decimal(timestamp, CUID_BASE_36, (size_t)(current_time.tv_sec * 1000 + current_time.tv_usec / 1000));
+	from_decimal(timestamp, CUID_BASE_36, ((zbx_uint64_t)current_time.tv_sec * 1000 + current_time.tv_usec / 1000));
+	pad(timestamp, sizeof(timestamp), CUID_TIMESTAMP_SIZE, PAD_FILL_CHAR);
 
-	from_decimal(rand_block_1, CUID_BASE_36, (size_t)rand());
+	from_decimal(rand_block_1, CUID_BASE_36, (zbx_uint64_t)rand());
 	pad(rand_block_1, sizeof(rand_block_1), CUID_BLOCK_SIZE, PAD_FILL_CHAR);
 
-	from_decimal(rand_block_2, CUID_BASE_36, (size_t)rand());
+	from_decimal(rand_block_2, CUID_BASE_36, (zbx_uint64_t)rand());
 	pad(rand_block_2, sizeof(rand_block_2), CUID_BLOCK_SIZE, PAD_FILL_CHAR);
 
 	zbx_snprintf(fingerprint, sizeof(fingerprint), "%s%s", pid_block, host_block);

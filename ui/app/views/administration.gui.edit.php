@@ -36,7 +36,7 @@ $lang_select = (new CSelect('default_lang'))
 	->setFocusableElementId('label-default-lang')
 	->setAttribute('autofocus', 'autofocus');
 
-$all_locales_available = 1;
+$all_locales_available = true;
 
 foreach (getLocales() as $localeid => $locale) {
 	if (!$locale['display']) {
@@ -51,7 +51,9 @@ foreach (getLocales() as $localeid => $locale) {
 
 	$lang_select->addOption((new CSelectOption($localeid, $locale['name']))->setDisabled(!$locale_available));
 
-	$all_locales_available &= (int) $locale_available;
+	if (!$locale_available) {
+		$all_locales_available = false;
+	}
 }
 
 // Restoring original locale.
@@ -62,7 +64,7 @@ if (!function_exists('bindtextdomain')) {
 	$language_error = 'Translations are unavailable because the PHP gettext module is missing.';
 	$lang_select->setReadonly();
 }
-elseif ($all_locales_available == 0) {
+elseif (!$all_locales_available) {
 	$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
 }
 

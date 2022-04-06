@@ -17,16 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "dbcache.h"
+#include "preproc_manager.h"
+
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
-#include "sysinfo.h"
-#include "zbxipcservice.h"
 #include "zbxlld.h"
 #include "preprocessing.h"
-#include "zbxalgo.h"
 #include "preproc_history.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 #include "preproc_manager.h"

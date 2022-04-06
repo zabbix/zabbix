@@ -20,7 +20,6 @@
 #ifndef ZABBIX_COMMS_H
 #define ZABBIX_COMMS_H
 
-#include "zbxtypes.h"
 #include "zbxalgo.h"
 
 #ifdef _WINDOWS
