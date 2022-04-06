@@ -2112,24 +2112,13 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$data = &$this->data[$this->items[$item]['itemid']];
 
-			if ($this->type == GRAPH_TYPE_STACKED) {
-				$drawtype = $this->items[$item]['drawtype'];
-				$max_color = $this->getColor('ValueMax', GRAPH_STACKED_ALFA);
-				$avg_color = $this->getColor($this->items[$item]['color'], GRAPH_STACKED_ALFA);
-				$min_color = $this->getColor('ValueMin', GRAPH_STACKED_ALFA);
-				$minmax_color = $this->getColor('ValueMinMax', GRAPH_STACKED_ALFA);
+			$drawtype = $this->items[$item]['drawtype'];
+			$max_color = $this->getColor('ValueMax', GRAPH_STACKED_ALFA);
+			$avg_color = $this->getColor($this->items[$item]['color'], GRAPH_STACKED_ALFA);
+			$min_color = $this->getColor('ValueMin', GRAPH_STACKED_ALFA);
+			$minmax_color = $this->getColor('ValueMinMax', GRAPH_STACKED_ALFA);
 
-				$calc_fnc = $this->items[$item]['calc_fnc'];
-			}
-			else {
-				$drawtype = $this->items[$item]['drawtype'];
-				$max_color = $this->getColor('ValueMax', GRAPH_STACKED_ALFA);
-				$avg_color = $this->getColor($this->items[$item]['color'], GRAPH_STACKED_ALFA);
-				$min_color = $this->getColor('ValueMin', GRAPH_STACKED_ALFA);
-				$minmax_color = $this->getColor('ValueMinMax', GRAPH_STACKED_ALFA);
-
-				$calc_fnc = $this->items[$item]['calc_fnc'];
-			}
+			$calc_fnc = $this->items[$item]['calc_fnc'];
 
 			// for each X
 			$prevDraw = true;
