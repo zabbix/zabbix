@@ -165,6 +165,8 @@ int	check_vcenter_vm_net_if_usage(AGENT_REQUEST *request, const char *username, 
 		AGENT_RESULT *result);
 int	check_vcenter_vm_powerstate(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_vm_snapshot_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_net_if_in(AGENT_REQUEST *request, const char *username, const char *password,

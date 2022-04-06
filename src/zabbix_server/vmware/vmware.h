@@ -22,6 +22,8 @@
 #include "config.h"
 #include "threads.h"
 #include "zbxalgo.h"
+#include "log.h"
+#include "zbxjson.h"
 
 /* the vmware service state */
 #define ZBX_VMWARE_STATE_NEW		0x001
@@ -187,6 +189,7 @@ typedef struct
 	char			**props;
 	zbx_vector_ptr_t	devs;
 	zbx_vector_ptr_t	file_systems;
+	unsigned int		snapshot_count;
 }
 zbx_vmware_vm_t;
 
@@ -386,8 +389,9 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_VMPROP_GUESTFAMILY			18
 #define ZBX_VMWARE_VMPROP_GUESTFULLNAME			19
 #define ZBX_VMWARE_VMPROP_FOLDER			20
+#define ZBX_VMWARE_VMPROP_SNAPSHOT			21
 
-#define ZBX_VMWARE_VMPROPS_NUM				21
+#define ZBX_VMWARE_VMPROPS_NUM				22
 
 /* vmware service types */
 #define ZBX_VMWARE_TYPE_UNKNOWN	0
