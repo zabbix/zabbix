@@ -227,8 +227,8 @@ class CUserDirectory extends CApiService {
 			: $options['selectUsrgrps'];
 		$keys = array_fill_keys($fields, '');
 
-		if (!in_array('ldap_serverid', $fields)) {
-			$fields[] = 'ldap_serverid';
+		if (!in_array('userdirectoryid', $fields)) {
+			$fields[] = 'userdirectoryid';
 		}
 
 		foreach (array_keys($userdirectories) as $i) {
@@ -237,11 +237,11 @@ class CUserDirectory extends CApiService {
 
 		$db_usergroups = API::UserGroup()->get([
 			'output' => $fields,
-			'filter' => ['ldap_serverid' => $serverids]
+			'filter' => ['userdirectoryid' => $serverids]
 		]);
 
 		foreach ($db_usergroups as $db_usergroup) {
-			$userdirectories[$db_usergroup['ldap_serverid']]['usrgrps'][] = array_intersect_key($db_usergroup, $keys);
+			$userdirectories[$db_usergroup['userdirectoryid']]['usrgrps'][] = array_intersect_key($db_usergroup, $keys);
 		}
 	}
 
@@ -254,11 +254,11 @@ class CUserDirectory extends CApiService {
 	 * @param array $userdirectories
 	 */
 	protected static function addUserGroupsCounts(array $options, array &$userdirectories): void {
-		$serverids = array_unique(array_column($userdirectories, 'userdirectoryid'));
+		$ids = array_unique(array_column($userdirectories, 'userdirectoryid'));
 
 		$db_usergroups = API::UserGroup()->get([
-			'output' => ['ldap_serverid'],
-			'filter' => ['ldap_serverid' => $serverids]
+			'output' => ['userdirectoryid'],
+			'filter' => ['userdirectoryid' => $ids]
 		]);
 
 		foreach (array_keys($userdirectories) as $i) {
@@ -266,7 +266,7 @@ class CUserDirectory extends CApiService {
 		}
 
 		foreach ($db_usergroups as $db_usergroup) {
-			++$userdirectories[$db_usergroup['ldap_serverid']]['usrgrps'];
+			++$userdirectories[$db_usergroup['userdirectoryid']]['usrgrps'];
 		}
 	}
 
