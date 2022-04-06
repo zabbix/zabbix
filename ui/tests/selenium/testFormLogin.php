@@ -1,24 +1,25 @@
 <?php
-/*
-** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
-**
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-**/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+/*
+ * * Zabbix
+ * * Copyright (C) 2001-2022 Zabbix SIA
+ * *
+ * * This program is free software; you can redistribute it and/or modify
+ * * it under the terms of the GNU General Public License as published by
+ * * the Free Software Foundation; either version 2 of the License, or
+ * * (at your option) any later version.
+ * *
+ * * This program is distributed in the hope that it will be useful,
+ * * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * * GNU General Public License for more details.
+ * *
+ * * You should have received a copy of the GNU General Public License
+ * * along with this program; if not, write to the Free Software
+ * * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * */
+
+require_once dirname(__FILE__) . '/../include/CLegacyWebTest.php';
 
 class testFormLogin extends CLegacyWebTest {
 
@@ -29,136 +30,129 @@ class testFormLogin extends CLegacyWebTest {
 				'password' => 'zabbix',
 				'success_expected' => false,
 				'dbCheck' => false
-			]],
+				]],
 			[[
 				'login' => 'no-access-to-the-frontend',
 				'password' => 'zabbix',
 				'success_expected' => false,
 				'dbCheck' => false
-			]],
+				]],
 			[[
 				'login' => 'admin',
 				'password' => 'zabbix',
 				'success_expected' => false,
 				'dbCheck' => false
-			]],
+				]],
 			[[
 				'login' => 'Admin',
 				'password' => 'Zabbix',
 				'success_expected' => false,
 				'dbCheck' => true
-			]],
+				]],
 			[[
 				'login' => 'Admin',
 				'password' => '',
 				'success_expected' => false,
 				'dbCheck' => true
-			]],
+				]],
 			[[
 				'login' => 'Admin',
 				'password' => '!@$#%$&^*(\"\'\\*;:',
 				'success_expected' => false,
 				'dbCheck' => true
-			]],
+				]],
 			[[
 				'login' => 'Admin',
 				'password' => 'zabbix',
 				'success_expected' => true,
 				'dbCheck' => false
-			]],
+				]],
 			[[
 				'login' => 'guest',
 				'password' => '',
 				'success_expected' => true,
 				'dbCheck' => false
-			]]
+				]]
 		];
 	}
 
 	/**
+	 * Function is using previously defined data in order to login into system by checking different type of
+	 * user permissions. When expected view is opened with the user, function is logging out of system.
+	 * Additonally function checks if database is gathering correct data.
+	 *
 	 * @onBefore removeGuestFromDisabledGroup
 	 * @onAfter addGuestToDisabledGroup
-	 *
 	 * @dataProvider data
 	 */
-	public function testFormLogin_LoginLogout($data) {
-		$this->zbxTestOpen('index.php');
-		$this->zbxTestInputTypeOverwrite('name', $data['login']);
-		$this->zbxTestInputTypeOverwrite('password', $data['password']);
-		$this->zbxTestClickWait('enter');
 
-		switch($data['login'])	{
+	public function testFormLogin_LoginLogout($data) {
+		$this->page->userLogin($data['login'], $data['password']);
+		switch ($data['login']) {
 			case 'disabled-user':
-				$this->zbxTestAssertElementText("//form//div[@class='red']", 'No permissions for system access.');
-				$this->zbxTestTextPresent(['Username', 'Password']);
+				$this->assertEquals('No permissions for system access.', $this->query('class:red')
+						->waitUntilVisible()->one()->getText());
 				break;
+
 			case 'no-access-to-the-frontend':
-				$this->zbxTestAssertElementText("//form//div[@class='red']", 'GUI access disabled.');
-				$this->zbxTestTextPresent(['Username', 'Password']);
+				$this->assertEquals('GUI access disabled.', $this->query('class:red')
+						->waitUntilVisible()->one()->getText());
 				break;
+
 			case 'admin':
-				$this->zbxTestAssertElementText("//form//div[@class='red']",
-					'Incorrect user name or password or account is temporarily blocked.'
-				);
-				$this->zbxTestTextPresent(['Username', 'Password']);
+				$this->assertEquals('Incorrect user name or password or account is temporarily blocked.', $this->query('class:red')
+						->waitUntilVisible()->one()->getText());
 				break;
 		}
 
 		if ($data['success_expected']) {
-			$this->zbxTestTextNotPresent('Incorrect user name or password or account is temporarily blocked.');
-			$this->zbxTestCheckHeader('Global view');
-			$this->zbxTestTextNotPresent('Password');
-			$this->zbxTestTextNotPresent('Username');
-
-			$this->zbxTestClickXpathWait('//a[@href="#signout"]');
-			$this->zbxTestTextPresent('Username');
-			$this->zbxTestTextPresent('Password');
-			$this->zbxTestTextNotPresent('Dashboard');
+			$this->page->assertHeader('Global view');
+			$this->query('class:icon-signout')->one()->click();
+			$this->assertEquals('Remember me for 30 days', $this->query('xpath://label[@for="autologin"]')->one()->getText());
 		}
 		elseif ($data['dbCheck']) {
-			$this->zbxTestAssertElementText("//form//div[@class='red']",
-				'Incorrect user name or password or account is temporarily blocked.'
-			);
-			$this->zbxTestTextPresent(['Username', 'Password']);
-			$this->assertEquals(1, CDBHelper::getCount("SELECT * FROM users WHERE attempt_failed>0 AND alias='".$data['login']."'"));
-			$this->assertEquals(1, CDBHelper::getCount("SELECT * FROM users WHERE attempt_clock>0 AND alias='".$data['login']."'"));
-			$this->assertEquals(1, CDBHelper::getCount("SELECT * FROM users WHERE attempt_ip<>'' AND alias='".$data['login']."'"));
+			$this->assertEquals('Incorrect user name or password or account is temporarily blocked.', $this->query('class:red')
+					->waitUntilVisible()->one()->getText());
+			$sql = "SELECT * FROM users WHERE attempt_failed>0 AND alias='".$data['login']."'";
+			$this->assertEquals(1, CDBHelper::getCount($sql));
+			$sql = "SELECT * FROM users WHERE attempt_clock>0 AND alias='".$data['login']."'";
+			$this->assertEquals(1, CDBHelper::getCount($sql));
+			$sql = "SELECT * FROM users WHERE attempt_ip<>'' AND alias='".$data['login']."'";
+			$this->assertEquals(1, CDBHelper::getCount($sql));
 		}
 	}
 
+
+	/**
+	 * Function is creating failed authentifications in order to block account, afterwards by halting it's work for
+	 * 30 seconds, function checks if correctly inserted authentification data for account gives access to view
+	 * and properly returns message stating how many times failed attempts have been made to login into account.
+	 */
+
 	public function testFormLogin_BlockAccountAndRecoverAfter30Seconds() {
-		$this->zbxTestOpen('index.php');
-
+		$this->page->open('index.php');
 		for ($i = 1; $i < 5; $i++) {
-			$this->zbxTestInputTypeWait('name', 'user-for-blocking');
-			$this->zbxTestInputTypeWait('password', '!@$#%$&^*(\"\'\\*;:');
-			$this->zbxTestClickWait('enter');
-			$this->zbxTestTextPresent('Incorrect user name or password or account is temporarily blocked.');
-			$this->zbxTestTextPresent('Username');
-			$this->zbxTestTextPresent('Password');
-
-			$sql = 'SELECT * FROM users WHERE alias=\'user-for-blocking\' AND attempt_failed='.$i.'';
-			$this->assertEquals(1, CDBHelper::getCount($sql));
+			$this->page->userLogin('user-for-blocking','!@$#%$&^*(\"\'\\*;:');
+			$this->assertEquals('Incorrect user name or password or account is temporarily blocked.', $this->query('class:red')
+					->waitUntilVisible()->one()->getText());
+			$sql = 'SELECT attempt_failed FROM users WHERE alias=\'user-for-blocking\'';
+			$this->assertEquals($i, CDBHelper::getValue($sql));
 			$sql = 'SELECT * FROM users WHERE alias=\'user-for-blocking\' AND attempt_clock>0';
 			$this->assertEquals(1, CDBHelper::getCount($sql));
 			$sql = "SELECT * FROM users WHERE alias='user-for-blocking' AND attempt_ip<>''";
 			$this->assertEquals(1, CDBHelper::getCount($sql));
 		}
 
-		$this->zbxTestInputType('name', 'user-for-blocking');
-		$this->zbxTestInputType('password', '!@$#%$&^*(\"\'\\*;:');
-		$this->zbxTestClickWait('enter');
-		$this->zbxTestTextPresent(['account is temporarily blocked', 'Username', 'Password']);
+		$this->page->userLogin('user-for-blocking','!@$#%$&^*(\"\'\\*;:');
+		$this->assertEquals('Incorrect user name or password or account is temporarily blocked.', $this->query('class:red')
+				->waitUntilVisible()->one()->getText());
+
 		// account is blocked, waiting 30 sec and trying to login
 		sleep(30);
-
-		$this->zbxTestInputTypeWait('name', 'user-for-blocking');
-		$this->zbxTestInputTypeWait('password', 'zabbix');
-		$this->zbxTestClickWait('enter');
-		$this->zbxTestCheckHeader('Global view');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', '5 failed login attempts logged.');
-		$this->zbxTestTextNotPresent('Password');
-		$this->zbxTestTextNotPresent('Username');
+		$this->page->userLogin('user-for-blocking','zabbix');
+		$this->page->assertHeader('Global view');
+		$this->assertStringContainsString('5 failed login attempts logged.', $this->query('class:msg-bad')
+				->waitUntilVisible()->one()->getText());
 	}
 
 	public static function login_with_request() {
@@ -183,16 +177,17 @@ class testFormLogin extends CLegacyWebTest {
 	}
 
 	/**
+	 * Function makes two authentifications with different data to different Zabbix views, seperatably clicking on
+	 * sign in button and checking by views header, if correct url is opened.
+	 *
 	 * @dataProvider login_with_request
 	 */
 	public function testFormLogin_LoginWithRequest($data) {
-		$this->zbxTestOpen($data['url']);
-		$this->zbxTestInputTypeOverwrite('name', $data['login']);
-		$this->zbxTestInputTypeOverwrite('password', $data['password']);
-		$this->zbxTestClickWait('enter');
-
-		// Test page title.
-		$this->zbxTestCheckHeader($data['header']);
+		$this->page->open($data['url']);
+		$this->query('id:name')->one()->clear()->type($data['login']);
+		$this->query('id:password')->one()->clear()->type($data['password']);
+		$this->query('id:enter')->one()->click();
+		$this->page->assertHeader($data['header']);
 	}
 
 	/**
