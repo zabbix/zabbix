@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LIBRARIES = libzbxmemory.a
+noinst_LIBRARIES = libzbxshmem.a
 
-libzbxmemory_a_SOURCES = \
+libzbxshmem_a_SOURCES = \
 	memalloc.c

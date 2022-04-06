@@ -17,7 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "../../libs/zbxalgo/vectorimpl.h"
 #include "zbxprometheus.h"
 
 #include "item_preproc.h"

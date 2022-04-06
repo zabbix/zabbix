@@ -30,7 +30,6 @@
 #include "zbxmodules.h"
 
 #include "zbxnix.h"
-#include "daemon.h"
 #include "zbxself.h"
 
 #include "../zabbix_server/dbsyncer/dbsyncer.h"
@@ -55,7 +54,6 @@
 #include "../zabbix_server/availability/avail_manager.h"
 #include "../libs/zbxvault/vault.h"
 #include "zbxdiag.h"
-#include "sighandler.h"
 #include "zbxrtc.h"
 
 #ifdef HAVE_OPENIPMI
@@ -1037,7 +1035,7 @@ int	main(int argc, char **argv)
 		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
-	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
+	return zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 }
 
 static void	zbx_check_db(void)
