@@ -1556,11 +1556,13 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'ldap_serverid' => [
-				'null' => false,
+			'userdirectoryid' => [
+				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0'
+				'default' => NULL,
+				'ref_table' => 'userdirectory',
+				'ref_field' => 'userdirectoryid'
 			]
 		]
 	],
@@ -2778,12 +2780,12 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'ldap_defaultid' => [
+			'ldap_userdirectoryid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'default' => NULL,
-				'ref_table' => 'users_directory',
+				'ref_table' => 'userdirectory',
 				'ref_field' => 'userdirectoryid'
 			]
 		]
@@ -8872,7 +8874,7 @@ return [
 			]
 		]
 	],
-	'users_directory' => [
+	'userdirectory' => [
 		'key' => 'userdirectoryid',
 		'fields' => [
 			'userdirectoryid' => [
@@ -8926,6 +8928,12 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 128,
 				'default' => ''
+			],
+			'start_tls' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			],
 			'search_filter' => [
 				'null' => false,
