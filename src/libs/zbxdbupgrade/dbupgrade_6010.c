@@ -99,24 +99,24 @@ static int	DBpatch_6010003(void)
 static int	DBpatch_6010004(void)
 {
 	const ZBX_TABLE	table =
-			{"userdirectory", "userdirectoryid", 0,
-				{
-					{"userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"description", "", NULL, NULL, 255, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
-					{"host", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"port", "389", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{"base_dn", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"bind_dn", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"bind_password", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"search_attribute", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"start_tls", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{"search_filter", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"case_sensitive", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{0}
-				},
-				NULL
-			};
+		{"userdirectory", "userdirectoryid", 0,
+			{
+				{"userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"description", "", NULL, NULL, 255, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{"host", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"port", "389", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"base_dn", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"bind_dn", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"bind_password", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"search_attribute", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"start_tls", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"search_filter", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"case_sensitive", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
 
 	return DBcreate_table(&table);
 }
@@ -144,11 +144,40 @@ static int	DBpatch_6010007(void)
 
 static int	DBpatch_6010008(void)
 {
-	// Create users_directory row from config.ldap_* fields data when config.ldap_configured == 1
-	if (ZBX_DB_OK > DBexecute("insert into userdirectory "
-			"(userdirectoryid, name, description, host, port, base_dn, bind_dn, bind_password, search_attribute, case_sensitive) "
-			"select 1, 'Default LDAP server', '', ldap_host, ldap_port, ldap_base_dn, ldap_bind_dn, ldap_bind_password, ldap_search_attribute, ldap_case_sensitive "
-			"  from config where ldap_configured=1 limit 1"))
+	int		rc = ZBX_DB_OK;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	if (NULL == (result = DBselect("select ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,"
+			"ldap_bind_password,ldap_search_attribute,ldap_case_sensitive"
+			" from config where ldap_configured=1")))
+	{
+		return FAIL;
+	}
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		char	*base_dn_esc, *bind_dn_esc, *password_esc, *search_esc;
+
+		base_dn_esc = DBdyn_escape_string(row[2]);
+		bind_dn_esc = DBdyn_escape_string(row[3]);
+		password_esc = DBdyn_escape_string(row[4]);
+		search_esc = DBdyn_escape_string(row[5]);
+
+		rc = DBexecute("insert into userdirectory (userdirectoryid,name,description,host,port,"
+				"base_dn,bind_dn,bind_password,search_attribute,case_sensitive,start_tls) values "
+				"(1,'Default LDAP server','','%s',%s,'%s','%s','%s','%s',%s,%d)",
+				row[0], row[1], base_dn_esc, bind_dn_esc, password_esc, search_esc, row[6], 0);
+
+		zbx_free(base_dn_esc);
+		zbx_free(bind_dn_esc);
+		zbx_free(password_esc);
+		zbx_free(search_esc);
+	}
+
+	DBfree_result(result);
+
+	if (ZBX_DB_OK > rc)
 		return FAIL;
 
 	return SUCCEED;
@@ -156,8 +185,7 @@ static int	DBpatch_6010008(void)
 
 static int	DBpatch_6010009(void)
 {
-	// Set config.ldap_userdirectoryid when config.ldap_configured == 1
-	if (ZBX_DB_OK > DBexecute("update config set ldap_userdirectoryid=1 where ldap_configured=1 limit 1"))
+	if (ZBX_DB_OK > DBexecute("update config set ldap_userdirectoryid=1 where ldap_configured=1"))
 		return FAIL;
 
 	return SUCCEED;
