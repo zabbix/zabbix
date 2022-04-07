@@ -681,7 +681,7 @@ class CHostGroup extends CApiService {
 		]);
 
 		if ($db_hosts) {
-			self::checkObjectsWithoutGroups($db_hosts, $groupids);
+			self::checkHostsWithoutGroups($db_hosts, $groupids);
 		}
 
 		$db_scripts = DB::select('scripts', [
@@ -1227,7 +1227,7 @@ class CHostGroup extends CApiService {
 		}
 
 		self::checkHostsNotDiscovered($db_hosts);
-		self::checkObjectsWithoutGroups($db_hosts, $data['groupids']);
+		self::checkHostsWithoutGroups($db_hosts, $data['groupids']);
 
 		self::addAffectedObjects($data['hostids'], $db_groups);
 	}
@@ -1258,27 +1258,27 @@ class CHostGroup extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param array  $db_objects
-	 * @param string $db_objects[<objectid>]['host']
+	 * @param array  $db_hosts
+	 * @param string $db_hosts[<objectid>]['host']
 	 * @param array  $groupids
 	 *
 	 * @throws APIException
 	 */
-	public static function checkObjectsWithoutGroups(array $db_objects, array $groupids): void {
-		$hostids = array_keys($db_objects);
+	public static function checkHostsWithoutGroups(array $db_hosts, array $groupids): void {
+		$hostids = array_keys($db_hosts);
 
-		$objectids_with_groups = DBfetchColumn(DBselect(
+		$hostids_with_groups = DBfetchColumn(DBselect(
 			'SELECT DISTINCT hg.hostid'.
 			' FROM hosts_groups hg'.
 			' WHERE '.dbConditionInt('hg.groupid', $groupids, true).
 				' AND '.dbConditionInt('hg.hostid', $hostids)
 		), 'hostid');
 
-		$objectids_without_groups = array_diff($hostids, $objectids_with_groups);
+		$hostids_without_groups = array_diff($hostids, $hostids_with_groups);
 
-		if ($objectids_without_groups) {
-			$objectid = reset($objectids_without_groups);
-			$error = _s('Host "%1$s" cannot be without host group.', $db_objects[$objectid]['host']);
+		if ($hostids_without_groups) {
+			$hostid = reset($hostids_without_groups);
+			$error = _s('Host "%1$s" cannot be without host group.', $db_hosts[$hostid]['host']);
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -1363,7 +1363,7 @@ class CHostGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		self::checkObjectsWithoutGroups($db_hosts, $groupids);
+		self::checkHostsWithoutGroups($db_hosts, $groupids);
 	}
 
 	/**

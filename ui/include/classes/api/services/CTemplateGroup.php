@@ -550,7 +550,7 @@ class CTemplateGroup extends CApiService {
 		]);
 
 		if ($db_templates) {
-			self::checkObjectsWithoutGroups($db_templates, $groupids);
+			self::checkTemplatesWithoutGroups($db_templates, $groupids);
 		}
 
 		$db_scripts = DB::select('scripts', [
@@ -984,7 +984,7 @@ class CTemplateGroup extends CApiService {
 			);
 		}
 
-		self::checkObjectsWithoutGroups($db_templates, $data['groupids']);
+		self::checkTemplatesWithoutGroups($db_templates, $data['groupids']);
 
 		self::addAffectedObjects($data['templateids'], $db_groups);
 	}
@@ -994,27 +994,27 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param array  $db_objects
-	 * @param string $db_objects[<objectid>]['host']
+	 * @param array  $db_templates
+	 * @param string $db_templates[<objectid>]['host']
 	 * @param array  $groupids
 	 *
 	 * @throws APIException
 	 */
-	public static function checkObjectsWithoutGroups(array $db_objects, array $groupids): void {
-		$templateids = array_keys($db_objects);
+	public static function checkTemplatesWithoutGroups(array $db_templates, array $groupids): void {
+		$templateids = array_keys($db_templates);
 
-		$objectids_with_groups = DBfetchColumn(DBselect(
+		$templateids_with_groups = DBfetchColumn(DBselect(
 			'SELECT DISTINCT tg.hostid'.
 			' FROM template_group tg'.
 			' WHERE '.dbConditionInt('tg.groupid', $groupids, true).
 			' AND '.dbConditionInt('tg.hostid', $templateids)
 		), 'hostid');
 
-		$objectids_without_groups = array_diff($templateids, $objectids_with_groups);
+		$templateids_without_groups = array_diff($templateids, $templateids_with_groups);
 
-		if ($objectids_without_groups) {
-			$objectid = reset($objectids_without_groups);
-			$error = _s('Template "%1$s" cannot be without template group.', $db_objects[$objectid]['host']);
+		if ($templateids_without_groups) {
+			$templateid = reset($templateids_without_groups);
+			$error = _s('Template "%1$s" cannot be without template group.', $db_templates[$templateid]['host']);
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -1099,7 +1099,7 @@ class CTemplateGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		self::checkObjectsWithoutGroups($db_templates, $groupids);
+		self::checkTemplatesWithoutGroups($db_templates, $groupids);
 	}
 
 	/**
