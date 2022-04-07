@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-04T10:28:20Z'
+  date: '2022-04-06T19:27:52Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -278,14 +278,14 @@ zabbix_export:
           timeout: 10s
           parameters:
             -
+              name: api_endpoint
+              value: '{$KUBE.API.ENDPOINT.URL}'
+            -
               name: token
               value: '{$KUBE.API.TOKEN}'
             -
               name: endpoint_name
               value: '{$KUBE.NODES.ENDPOINT.NAME}'
-            -
-              name: api_endpoint
-              value: '{$KUBE.API.ENDPOINT.URL}'
           tags:
             -
               tag: component
@@ -699,7 +699,7 @@ zabbix_export:
                   uuid: 4e283f3f104a4239a0b1c24f0313ab95
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.conditions.diskpressure[{#NAME}])=1'
                   name: 'Node [{#NAME}] Conditions: Pressure exists on the disk size'
-                  event_name: 'Pressure exists on the disk size (state: {ITEM.VALUE})'
+                  event_name: 'Node [{#NAME}] Conditions: Pressure exists on the disk size (state: {ITEM.VALUE})'
                   priority: WARNING
                   description: 'True - pressure exists on the disk size - that is, if the disk capacity is low; otherwise False.'
                   tags:
@@ -740,7 +740,7 @@ zabbix_export:
                   uuid: f580b6534bf54281912515874ca46cdf
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.conditions.memorypressure[{#NAME}])=1'
                   name: 'Node [{#NAME}] Conditions: Pressure exists on the node memory'
-                  event_name: 'Pressure exists on the node memory (state: {ITEM.VALUE})'
+                  event_name: 'Node [{#NAME}] Conditions: Pressure exists on the node memory (state: {ITEM.VALUE})'
                   priority: WARNING
                   description: 'True - pressure exists on the node memory - that is, if the node memory is low; otherwise False'
                   tags:
@@ -781,7 +781,7 @@ zabbix_export:
                   uuid: 0da0db08077a42668efcc886c155bf4e
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.conditions.networkunavailable[{#NAME}])=1'
                   name: 'Node [{#NAME}] Conditions: Network is not correctly configured'
-                  event_name: 'Network is not correctly configured (state: {ITEM.VALUE})'
+                  event_name: 'Node [{#NAME}] Conditions: Network is not correctly configured (state: {ITEM.VALUE})'
                   priority: WARNING
                   description: 'True - the network for the node is not correctly configured, otherwise False'
                   tags:
@@ -822,7 +822,7 @@ zabbix_export:
                   uuid: 5f6a7fce910e4cf79e9fc778519ad00f
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.conditions.pidpressure[{#NAME}])=1'
                   name: 'Node [{#NAME}] Conditions: Pressure exists on the processes'
-                  event_name: 'Pressure exists on the processes (state: {ITEM.VALUE})'
+                  event_name: 'Node [{#NAME}] Conditions: Pressure exists on the processes (state: {ITEM.VALUE})'
                   priority: WARNING
                   description: 'True - pressure exists on the processes - that is, if there are too many processes on the node; otherwise False'
                   tags:
@@ -863,7 +863,7 @@ zabbix_export:
                   uuid: 02f873ab69fb4df49578cf5e1cbad1b8
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.conditions.ready[{#NAME}])<>1'
                   name: 'Node [{#NAME}] Conditions: Is not in Ready state'
-                  event_name: 'Is not in Ready state (state: {ITEM.VALUE})'
+                  event_name: 'Node [{#NAME}] Conditions: Is not in Ready state (state: {ITEM.VALUE})'
                   priority: WARNING
                   description: |
                     False - if the node is not healthy and is not accepting pods.
@@ -1269,7 +1269,7 @@ zabbix_export:
               uuid: f64efc13be2c4c53a48de40504cf064d
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 0.9'
               name: 'Node [{#NAME}] Limits: Total CPU limits are too high'
-              event_name: 'Total CPU limits are too high (more than 90% of allocatable)'
+              event_name: 'Node [{#NAME}] Limits: Total CPU limits are too high (more than 90% of allocatable)'
               opdata: 'Limits: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
               priority: WARNING
               dependencies:
@@ -1284,7 +1284,7 @@ zabbix_export:
               uuid: 4c035b6c85574141832691e7ad264f40
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 1'
               name: 'Node [{#NAME}] Limits: Total CPU limits are too high'
-              event_name: 'Total CPU limits are too high (more than 100% of allocatable)'
+              event_name: 'Node [{#NAME}] Limits: Total CPU limits are too high (more than 100% of allocatable)'
               opdata: 'Limits: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
               priority: AVERAGE
               tags:
@@ -1295,7 +1295,7 @@ zabbix_export:
               uuid: 5d0d803cfbbe42edb7d32d731ae5f741
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.9'
               name: 'Node [{#NAME}] Limits: Total memory limits are too high'
-              event_name: 'Total memory limits are too high (more than 90% of allocatable)'
+              event_name: 'Node [{#NAME}] Limits: Total memory limits are too high (more than 90% of allocatable)'
               opdata: 'Limits: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
               priority: WARNING
               dependencies:
@@ -1310,7 +1310,7 @@ zabbix_export:
               uuid: 4fa15174194c476899a96fcf233a5aea
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 1'
               name: 'Node [{#NAME}] Limits: Total memory limits are too high'
-              event_name: 'Total memory limits are too high (more than 100% of allocatable)'
+              event_name: 'Node [{#NAME}] Limits: Total memory limits are too high (more than 100% of allocatable)'
               opdata: 'Limits: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
               priority: AVERAGE
               tags:
@@ -1321,7 +1321,7 @@ zabbix_export:
               uuid: 256cf876a4674dd09123bb388c1a9d32
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 0.5'
               name: 'Node [{#NAME}] Requests: Total CPU requests are too high'
-              event_name: 'Total CPU requests are too high (more than 50% of allocatable)'
+              event_name: 'Node [{#NAME}] Requests: Total CPU requests are too high (more than 50% of allocatable)'
               opdata: 'Requests: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
               priority: WARNING
               dependencies:
@@ -1336,7 +1336,7 @@ zabbix_export:
               uuid: 7fa6901f620c4b388d550c669089dde2
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 0.8'
               name: 'Node [{#NAME}] Requests: Total CPU requests are too high'
-              event_name: 'Total CPU requests are too high (more than 80% of allocatable)'
+              event_name: 'Node [{#NAME}] Requests: Total CPU requests are too high (more than 80% of allocatable)'
               opdata: 'Requests: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
               priority: AVERAGE
               tags:
@@ -1347,7 +1347,7 @@ zabbix_export:
               uuid: d73aa5aa2a9b424789181033630bb432
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.5'
               name: 'Node [{#NAME}] Requests: Total memory requests are too high'
-              event_name: 'Total memory requests are too high (more than 50% of allocatable)'
+              event_name: 'Node [{#NAME}] Requests: Total memory requests are too high (more than 50% of allocatable)'
               opdata: 'Requests: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
               priority: WARNING
               dependencies:
@@ -1362,7 +1362,7 @@ zabbix_export:
               uuid: ad9a65c4786e48b9a4b77c1214fa2e1f
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.8'
               name: 'Node [{#NAME}] Requests: Total memory requests are too high'
-              event_name: 'Total memory requests are too high (more than 80% of allocatable)'
+              event_name: 'Node [{#NAME}] Requests: Total memory requests are too high (more than 80% of allocatable)'
               opdata: 'Requests: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
               priority: AVERAGE
               tags:
@@ -1373,7 +1373,7 @@ zabbix_export:
               uuid: 0126dfbfa9d949499e0f7689b714c855
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.used.pods[{#NAME}])/ last(/Kubernetes nodes by HTTP/kube.node.capacity.pods[{#NAME}]) > 0.9'
               name: 'Node [{#NAME}] Used: Kubelet too many pods'
-              event_name: 'Kubelet too many pods (more than 95% of capacity)'
+              event_name: 'Node [{#NAME}] Used: Kubelet too many pods (more than 95% of capacity)'
               opdata: 'Used: {ITEM.LASTVALUE1}, Capacity: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Kubelet is running at capacity.'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-04T10:27:15Z'
+  date: '2022-04-06T19:27:40Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -880,7 +880,7 @@ zabbix_export:
                   uuid: 2b173fa3eec941e3b3d73c732740e210
                   expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#1)<>last(/HPE ProLiant DL380 SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#2) and length(last(/HPE ProLiant DL380 SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#DISK_LOCATION}: Disk has been replaced'
-                  event_name: 'Disk has been replaced (new serial number received)'
+                  event_name: '{#DISK_LOCATION}: Disk has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Disk serial number has changed. Ack to close'
                   manual_close: 'YES'

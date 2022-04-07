@@ -222,9 +222,9 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|{#DEVNAME}: Disk is overloaded |<p>The disk appears to be under heavy load</p> |`min(/Windows physical disks by Zabbix agent/perf_counter_en["\PhysicalDisk({#DEVNAME})\% Idle Time",60],15m)>{$VFS.DEV.UTIL.MAX.WARN}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- {#DEVNAME}: Disk read request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}s for 15m</p><p>- {#DEVNAME}: Disk write request responses are too high (write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}s for 15m)</p> |
-|{#DEVNAME}: Disk read request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}s for 15m |<p>This trigger might indicate disk {#DEVNAME} saturation.</p> |`min(/Windows physical disks by Zabbix agent/perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60],15m) > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}` |WARNING |<p>Manual close: YES</p> |
-|{#DEVNAME}: Disk write request responses are too high (write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}s for 15m) |<p>This trigger might indicate disk {#DEVNAME} saturation.</p> |`min(/Windows physical disks by Zabbix agent/perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60],15m) > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}` |WARNING |<p>Manual close: YES</p> |
+|{#DEVNAME}: Disk is overloaded |<p>The disk appears to be under heavy load</p> |`min(/Windows physical disks by Zabbix agent/perf_counter_en["\PhysicalDisk({#DEVNAME})\% Idle Time",60],15m)>{$VFS.DEV.UTIL.MAX.WARN}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- {#DEVNAME}: Disk read request responses are too high</p><p>- {#DEVNAME}: Disk write request responses are too high</p> |
+|{#DEVNAME}: Disk read request responses are too high |<p>This trigger might indicate disk {#DEVNAME} saturation.</p> |`min(/Windows physical disks by Zabbix agent/perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60],15m) > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}` |WARNING |<p>Manual close: YES</p> |
+|{#DEVNAME}: Disk write request responses are too high |<p>This trigger might indicate disk {#DEVNAME} saturation.</p> |`min(/Windows physical disks by Zabbix agent/perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60],15m) > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
 

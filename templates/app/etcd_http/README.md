@@ -134,7 +134,7 @@ There are no template links in this template.
 |Etcd: Cluster version has changed |<p>Etcd version has changed. Ack to close.</p> |`last(/Etcd by HTTP/etcd.cluster.version,#1)<>last(/Etcd by HTTP/etcd.cluster.version,#2) and length(last(/Etcd by HTTP/etcd.cluster.version))>0` |INFO |<p>Manual close: YES</p> |
 |Etcd: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Etcd by HTTP/etcd.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |Etcd: Current number of open files is too high |<p>Heavy file descriptor usage (i.e., near the process's file descriptor limit) indicates a potential file descriptor exhaustion issue.</p><p>If the file descriptors are exhausted, etcd may panic because it cannot create new WAL files.</p> |`min(/Etcd by HTTP/etcd.open.fds,5m)/last(/Etcd by HTTP/etcd.max.fds)*100>{$ETCD.OPEN.FDS.MAX.WARN}` |WARNING | |
-|Etcd: Too many failed gRPC requests with code: {#GRPC.CODE} (over {$ETCD.GRPC.ERRORS.MAX.WARN} in 5m) |<p>-</p> |`min(/Etcd by HTTP/etcd.grpc.handled.rate[{#GRPC.CODE}],5m)>{$ETCD.GRPC.ERRORS.MAX.WARN}` |WARNING | |
+|Etcd: Too many failed gRPC requests with code: {#GRPC.CODE} |<p>-</p> |`min(/Etcd by HTTP/etcd.grpc.handled.rate[{#GRPC.CODE}],5m)>{$ETCD.GRPC.ERRORS.MAX.WARN}` |WARNING | |
 
 ## Feedback
 

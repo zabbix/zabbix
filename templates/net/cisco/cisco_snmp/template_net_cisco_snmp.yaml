@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-04T10:44:19Z'
+  date: '2022-04-06T19:34:27Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -514,7 +514,7 @@ zabbix_export:
                   uuid: e8c328ad70a146219a8ae62f101cfc00
                   expression: 'last(/Cisco IOS prior to 12.0_3_T SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Cisco IOS prior to 12.0_3_T SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/Cisco IOS prior to 12.0_3_T SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced'
-                  event_name: 'Device has been replaced (new serial number received)'
+                  event_name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
@@ -642,7 +642,7 @@ zabbix_export:
                   uuid: 8793ba7767cc415a80a6a206aaf01f11
                   expression: 'min(/Cisco IOS prior to 12.0_3_T SNMP/vm.memory.util[vm.memory.util.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '{#SNMPVALUE}: High memory utilization'
-                  event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  event_name: '{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
                   tags:
@@ -775,7 +775,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/Cisco IOS prior to 12.0_3_T SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}+3'
                   name: '{#SNMPVALUE}: Temperature is too low'
-                  event_name: 'Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
+                  event_name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:
@@ -797,7 +797,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/Cisco IOS prior to 12.0_3_T SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
               name: '{#SNMPVALUE}: Temperature is above critical threshold'
-              event_name: 'Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}'
+              event_name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -817,7 +817,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/Cisco IOS prior to 12.0_3_T SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
               name: '{#SNMPVALUE}: Temperature is above warning threshold'
-              event_name: 'Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}"}'
+              event_name: '{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1439,7 +1439,7 @@ zabbix_export:
                   uuid: 89b292f6748f49fa8b0f23f5378944b2
                   expression: 'min(/Cisco IOS SNMP/system.cpu.util[cpmCPUTotal5minRev.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: '#{#SNMPINDEX}: High CPU utilization'
-                  event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  event_name: '#{#SNMPINDEX}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -1504,7 +1504,7 @@ zabbix_export:
                   uuid: e5477e6803974060ba3ce8a131d97d40
                   expression: 'last(/Cisco IOS SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Cisco IOS SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/Cisco IOS SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced'
-                  event_name: 'Device has been replaced (new serial number received)'
+                  event_name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
@@ -1632,7 +1632,7 @@ zabbix_export:
                   uuid: ee300a1f9f644bdbb545bd65d59d4837
                   expression: 'min(/Cisco IOS SNMP/vm.memory.util[vm.memory.util.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '{#SNMPVALUE}: High memory utilization'
-                  event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  event_name: '{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
                   tags:
@@ -2052,7 +2052,7 @@ zabbix_export:
                 avg(/Cisco IOS SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Cisco IOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
                 avg(/Cisco IOS SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Cisco IOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
-              event_name: 'High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -2076,7 +2076,7 @@ zabbix_export:
                 max(/Cisco IOS SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and max(/Cisco IOS SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
-              event_name: 'High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
@@ -2344,7 +2344,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/Cisco IOS SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}+3'
                   name: '{#SNMPVALUE}: Temperature is too low'
-                  event_name: 'Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
+                  event_name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:
@@ -2366,7 +2366,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/Cisco IOS SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
               name: '{#SNMPVALUE}: Temperature is above critical threshold'
-              event_name: 'Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}'
+              event_name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -2386,7 +2386,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/Cisco IOS SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
               name: '{#SNMPVALUE}: Temperature is above warning threshold'
-              event_name: 'Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}"}'
+              event_name: '{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -3978,7 +3978,7 @@ zabbix_export:
                   uuid: b964834d4f6549c7ae0f0c0c2646dfbc
                   expression: 'min(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/system.cpu.util[cpmCPUTotal5min.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: '{#SNMPVALUE}: High CPU utilization'
-                  event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  event_name: '{#SNMPVALUE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -4043,7 +4043,7 @@ zabbix_export:
                   uuid: 75ee6ab1f0c84946a4f4d6e87007ec25
                   expression: 'last(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced'
-                  event_name: 'Device has been replaced (new serial number received)'
+                  event_name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
@@ -4171,7 +4171,7 @@ zabbix_export:
                   uuid: 0f8d70ef5e704483a49d7b635e74dfc6
                   expression: 'min(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/vm.memory.util[vm.memory.util.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '{#SNMPVALUE}: High memory utilization'
-                  event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  event_name: '{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
                   tags:
@@ -4591,7 +4591,7 @@ zabbix_export:
                 avg(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
                 avg(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
-              event_name: 'High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -4615,7 +4615,7 @@ zabbix_export:
                 max(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and max(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
-              event_name: 'High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
@@ -4788,7 +4788,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}+3'
                   name: '{#SNMPVALUE}: Temperature is too low'
-                  event_name: 'Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
+                  event_name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:
@@ -4810,7 +4810,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
               name: '{#SNMPVALUE}: Temperature is above critical threshold'
-              event_name: 'Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}'
+              event_name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -4830,7 +4830,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
               name: '{#SNMPVALUE}: Temperature is above warning threshold'
-              event_name: 'Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}"}'
+              event_name: '{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'

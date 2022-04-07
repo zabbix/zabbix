@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-04T10:28:10Z'
+  date: '2022-04-06T19:27:50Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -205,7 +205,7 @@ zabbix_export:
               uuid: 0e1ef1630b5d4cb98270564f324f5382
               expression: 'min(/Kubernetes API server by HTTP/kubernetes.api.apiserver_request_total_500.rate,5m)>{$KUBE.API.HTTP.SERVER.ERROR}'
               name: 'Kubernetes API: Too many server errors'
-              event_name: 'Too many server errors (over {$KUBE.API.HTTP.SERVER.ERROR} for 5m)'
+              event_name: 'Kubernetes API: Too many server errors (over {$KUBE.API.HTTP.SERVER.ERROR} for 5m)'
               priority: WARNING
               description: '"Kubernetes API server is experiencing high error rate (with 5xx HTTP code).'
               tags:
@@ -659,7 +659,7 @@ zabbix_export:
               uuid: 4c79888da91448738092c86e5f427a6a
               expression: 'min(/Kubernetes API server by HTTP/kubernetes.api.rest_client_requests_total_500.rate,5m)>{$KUBE.API.HTTP.CLIENT.ERROR}'
               name: 'Kubernetes API: Too many client errors'
-              event_name: 'Too many client errors (over {$KUBE.API.HTTP.CLIENT.ERROR} for 5m)'
+              event_name: 'Kubernetes API: Too many client errors (over {$KUBE.API.HTTP.CLIENT.ERROR} for 5m)'
               priority: WARNING
               description: '"Kubernetes API client is experiencing high error rate (with 5xx HTTP code).'
               tags:
@@ -880,25 +880,26 @@ zabbix_export:
                   value: client-certificate
               trigger_prototypes:
                 -
+                  uuid: 1371958c0339430b8a333851766c01c0
+                  expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < 24*60*60'
+                  name: 'Kubernetes API: Kubernetes client certificate expires soon'
+                  priority: WARNING
+                  description: 'A client certificate used to authenticate to the apiserver is expiring in less than 24.0 hours.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                -
                   uuid: 132d58724bd141afa3f28101326fe922
                   expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < {$KUBE.API.CERT.EXPIRATION}*24*60*60'
-                  name: 'Kubernetes API: Kubernetes client certificate expires in {$KUBE.API.CERT.EXPIRATION} days'
+                  name: 'Kubernetes API: Kubernetes client certificate is expiring'
+                  event_name: 'Kubernetes API: Kubernetes client certificate expires in {$KUBE.API.CERT.EXPIRATION} days'
                   priority: WARNING
                   description: 'A client certificate used to authenticate to the apiserver is expiring in {$KUBE.API.CERT.EXPIRATION} days.'
                   dependencies:
                     -
                       name: 'Kubernetes API: Kubernetes client certificate expires soon'
                       expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < 24*60*60'
-                  tags:
-                    -
-                      tag: scope
-                      value: availability
-                -
-                  uuid: 1371958c0339430b8a333851766c01c0
-                  expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < 24*60*60'
-                  name: 'Kubernetes API: Kubernetes client certificate expires soon'
-                  priority: WARNING
-                  description: 'A client certificate used to authenticate to the apiserver is expiring in less than 24.0 hours.'
                   tags:
                     -
                       tag: scope

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-04T10:43:16Z'
+  date: '2022-04-06T19:34:02Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -734,7 +734,7 @@ zabbix_export:
                   uuid: 2d5cf100fe094c819d725ee598d37de8
                   expression: 'last(/SMART by Zabbix agent 2 active/smart.disk.sn[{#NAME}],#1)<>last(/SMART by Zabbix agent 2 active/smart.disk.sn[{#NAME}],#2) and length(last(/SMART by Zabbix agent 2 active/smart.disk.sn[{#NAME}]))>0'
                   name: 'SMART [{#NAME}]: Disk has been replaced'
-                  event_name: 'Disk has been replaced (new serial number received)'
+                  event_name: 'SMART [{#NAME}]: Disk has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close.'
                   manual_close: 'YES'
@@ -777,7 +777,7 @@ zabbix_export:
                   uuid: 7f46b24934854866849dd758cb5999d5
                   expression: 'avg(/SMART by Zabbix agent 2 active/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.CRIT}'
                   name: 'SMART [{#NAME}]: Average disk temperature is critical'
-                  event_name: 'Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)'
+                  event_name: 'SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)'
                   priority: AVERAGE
                   tags:
                     -
@@ -787,7 +787,7 @@ zabbix_export:
                   uuid: c903a37f4b004e1593ef85ac893c3f6c
                   expression: 'avg(/SMART by Zabbix agent 2 active/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.WARN}'
                   name: 'SMART [{#NAME}]: Average disk temperature is too high'
-                  event_name: 'Average disk temperature is too high (over {$SMART.TEMPERATURE.MAX.WARN}°C for 5m)'
+                  event_name: 'SMART [{#NAME}]: Average disk temperature is too high (over {$SMART.TEMPERATURE.MAX.WARN}°C for 5m)'
                   priority: WARNING
                   dependencies:
                     -

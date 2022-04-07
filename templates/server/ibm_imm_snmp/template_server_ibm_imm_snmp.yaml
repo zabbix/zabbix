@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-04T10:47:11Z'
+  date: '2022-04-06T19:35:28Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -682,7 +682,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/IBM IMM SNMP/sensor.temp.value[tempReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                   name: '{#SNMPVALUE}: Temperature is above critical threshold'
-                  event_name: 'Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                  event_name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -699,7 +699,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/IBM IMM SNMP/sensor.temp.value[tempReading.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
                   name: '{#SNMPVALUE}: Temperature is above warning threshold'
-                  event_name: 'Temperature is above warning threshold: >{$TEMP_WARN:""}'
+                  event_name: '{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -721,7 +721,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/IBM IMM SNMP/sensor.temp.value[tempReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
                   name: '{#SNMPVALUE}: Temperature is too low'
-                  event_name: 'Temperature is too low: <{$TEMP_CRIT_LOW:""}'
+                  event_name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:
@@ -769,7 +769,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/IBM IMM SNMP/sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Ambient"}-3'
                   name: 'Ambient: Temperature is above critical threshold'
-                  event_name: 'Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
+                  event_name: 'Ambient: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -786,7 +786,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/IBM IMM SNMP/sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Ambient"}-3'
                   name: 'Ambient: Temperature is above warning threshold'
-                  event_name: 'Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
+                  event_name: 'Ambient: Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -808,7 +808,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/IBM IMM SNMP/sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Ambient"}+3'
                   name: 'Ambient: Temperature is too low'
-                  event_name: 'Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
+                  event_name: 'Ambient: Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:
@@ -856,7 +856,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/IBM IMM SNMP/sensor.temp.value[tempReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
                   name: 'CPU: Temperature is above critical threshold'
-                  event_name: 'Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
+                  event_name: 'CPU: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -873,7 +873,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/IBM IMM SNMP/sensor.temp.value[tempReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_WARN:"CPU"}-3'
                   name: 'CPU: Temperature is above warning threshold'
-                  event_name: 'Temperature is above warning threshold: >{$TEMP_WARN:"CPU"}'
+                  event_name: 'CPU: Temperature is above warning threshold: >{$TEMP_WARN:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -895,7 +895,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/IBM IMM SNMP/sensor.temp.value[tempReading.CPU.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"CPU"}+3'
                   name: 'CPU: Temperature is too low'
-                  event_name: 'Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"}'
+                  event_name: 'CPU: Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-04T10:43:21Z'
+  date: '2022-04-06T19:34:03Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -296,7 +296,7 @@ zabbix_export:
                 last(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                 ((last(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<5G or timeleft(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
               name: '{#FSLABEL}({#FSNAME}): Disk space is critically low'
-              event_name: '__RESOURCE__: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+              event_name: '{#FSLABEL}({#FSNAME}): Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
               description: |
@@ -315,7 +315,7 @@ zabbix_export:
                 last(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
                 ((last(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<10G or timeleft(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
               name: '{#FSLABEL}({#FSNAME}): Disk space is low'
-              event_name: '__RESOURCE__: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
+              event_name: '{#FSLABEL}({#FSNAME}): Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
               description: |
@@ -1153,7 +1153,7 @@ zabbix_export:
                 avg(/Windows network by Zabbix agent/net.if.in["{#IFGUID}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Windows network by Zabbix agent/net.if.speed["{#IFGUID}"]) and
                 avg(/Windows network by Zabbix agent/net.if.out["{#IFGUID}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Windows network by Zabbix agent/net.if.speed["{#IFGUID}"])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
-              event_name: 'High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -1177,7 +1177,7 @@ zabbix_export:
                 max(/Windows network by Zabbix agent/net.if.in["{#IFGUID}",errors],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and max(/Windows network by Zabbix agent/net.if.out["{#IFGUID}",errors],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
-              event_name: 'High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
@@ -1463,16 +1463,16 @@ zabbix_export:
                   uuid: c194f813f0c5417aaac56875b955637a
                   expression: 'min(/Windows physical disks by Zabbix agent/perf_counter_en["\PhysicalDisk({#DEVNAME})\% Idle Time",60],15m)>{$VFS.DEV.UTIL.MAX.WARN}'
                   name: '{#DEVNAME}: Disk is overloaded'
-                  event_name: 'Disk is overloaded (util > {$VFS.DEV.UTIL.MAX.WARN}% for 15m)'
+                  event_name: '{#DEVNAME}: Disk is overloaded (util > {$VFS.DEV.UTIL.MAX.WARN}% for 15m)'
                   priority: WARNING
                   description: 'The disk appears to be under heavy load'
                   manual_close: 'YES'
                   dependencies:
                     -
-                      name: '{#DEVNAME}: Disk read request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}s for 15m'
+                      name: '{#DEVNAME}: Disk read request responses are too high'
                       expression: 'min(/Windows physical disks by Zabbix agent/perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60],15m) > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}'
                     -
-                      name: '{#DEVNAME}: Disk write request responses are too high (write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}s for 15m)'
+                      name: '{#DEVNAME}: Disk write request responses are too high'
                       expression: 'min(/Windows physical disks by Zabbix agent/perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60],15m) > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}'
                   tags:
                     -
@@ -1511,7 +1511,8 @@ zabbix_export:
                 -
                   uuid: d96338f9104a4eb4bc7725a5736c96d0
                   expression: 'min(/Windows physical disks by Zabbix agent/perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60],15m) > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}'
-                  name: '{#DEVNAME}: Disk read request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}s for 15m'
+                  name: '{#DEVNAME}: Disk read request responses are too high'
+                  event_name: '{#DEVNAME}: Disk read request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}s for 15m'
                   priority: WARNING
                   description: 'This trigger might indicate disk {#DEVNAME} saturation.'
                   manual_close: 'YES'
@@ -1538,7 +1539,8 @@ zabbix_export:
                 -
                   uuid: 205acd9a37424bd78618ebdc197f251f
                   expression: 'min(/Windows physical disks by Zabbix agent/perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60],15m) > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}'
-                  name: '{#DEVNAME}: Disk write request responses are too high (write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}s for 15m)'
+                  name: '{#DEVNAME}: Disk write request responses are too high'
+                  event_name: '{#DEVNAME}: Disk write request responses are too high (write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}s for 15m)'
                   priority: WARNING
                   description: 'This trigger might indicate disk {#DEVNAME} saturation.'
                   manual_close: 'YES'
@@ -1758,7 +1760,7 @@ zabbix_export:
                   uuid: 9fab20eab61d48c09682fe5c142cc917
                   expression: 'min(/Windows services by Zabbix agent/service.info["{#SERVICE.NAME}",state],#3)<>0'
                   name: '"{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME}) is not running'
-                  event_name: '__RESOURCE__ is not running (startup type {#SERVICE.STARTUPNAME})'
+                  event_name: '"{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME}) is not running (startup type {#SERVICE.STARTUPNAME})'
                   priority: AVERAGE
                   description: 'The service has a state other than "Running" for the last three times.'
                   tags:

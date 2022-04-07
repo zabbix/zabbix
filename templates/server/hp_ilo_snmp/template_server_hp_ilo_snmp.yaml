@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-04T10:47:01Z'
+  date: '2022-04-06T19:35:25Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -962,7 +962,7 @@ zabbix_export:
                   uuid: 87bcd812474b44729da19f49344ba976
                   expression: 'last(/HP iLO SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#1)<>last(/HP iLO SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#2) and length(last(/HP iLO SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#DISK_LOCATION}: Disk has been replaced'
-                  event_name: 'Disk has been replaced (new serial number received)'
+                  event_name: '{#DISK_LOCATION}: Disk has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Disk serial number has changed. Ack to close'
                   manual_close: 'YES'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-04T10:43:14Z'
+  date: '2022-04-06T19:34:01Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -732,7 +732,7 @@ zabbix_export:
                   uuid: 7257c02f398f4338ace1eb3a07cb7362
                   expression: 'last(/SMART by Zabbix agent 2/smart.disk.sn[{#NAME}],#1)<>last(/SMART by Zabbix agent 2/smart.disk.sn[{#NAME}],#2) and length(last(/SMART by Zabbix agent 2/smart.disk.sn[{#NAME}]))>0'
                   name: 'SMART [{#NAME}]: Disk has been replaced'
-                  event_name: 'Disk has been replaced (new serial number received)'
+                  event_name: 'SMART [{#NAME}]: Disk has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close.'
                   manual_close: 'YES'
@@ -775,7 +775,7 @@ zabbix_export:
                   uuid: cd09aebe3ca146119cdf5b977bf6b018
                   expression: 'avg(/SMART by Zabbix agent 2/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.CRIT}'
                   name: 'SMART [{#NAME}]: Average disk temperature is critical'
-                  event_name: 'Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)'
+                  event_name: 'SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)'
                   priority: AVERAGE
                   tags:
                     -
@@ -785,7 +785,7 @@ zabbix_export:
                   uuid: aaa5acb3196b481f894998c0ca5ea165
                   expression: 'avg(/SMART by Zabbix agent 2/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.WARN}'
                   name: 'SMART [{#NAME}]: Average disk temperature is too high'
-                  event_name: 'Average disk temperature is too high (over {$SMART.TEMPERATURE.MAX.WARN}°C for 5m)'
+                  event_name: 'SMART [{#NAME}]: Average disk temperature is too high (over {$SMART.TEMPERATURE.MAX.WARN}°C for 5m)'
                   priority: WARNING
                   dependencies:
                     -

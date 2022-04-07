@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-04T10:47:46Z'
+  date: '2022-04-06T19:35:34Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -1039,7 +1039,8 @@ zabbix_export:
               expression: |
                 min(/Cisco UCS Manager SNMP/cisco.ucs.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
                 or min(/Cisco UCS Manager SNMP/cisco.ucs.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate on {#IFNAME} ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate on {#IFNAME}'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate on {#IFNAME} ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when value below {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.'
@@ -1207,7 +1208,7 @@ zabbix_export:
                   uuid: 693cdcf58cb34def90ade23e2f2485cb
                   expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.serialnumber[cucsStorageLocalDiskSerial.{#SNMPINDEX}],#1)<>last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.serialnumber[cucsStorageLocalDiskSerial.{#SNMPINDEX}],#2) and length(last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.serialnumber[cucsStorageLocalDiskSerial.{#SNMPINDEX}]))>0'
                   name: '{#DISK_LOCATION}: Disk has been replaced'
-                  event_name: 'Disk has been replaced (new serial number received)'
+                  event_name: '{#DISK_LOCATION}: Disk has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Disk serial number has changed. Ack to close'
                   manual_close: 'YES'
@@ -1402,7 +1403,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"CPU"}-3'
                   name: '{#SENSOR_LOCATION}: Temperature is above critical threshold'
-                  event_name: 'Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"CPU"}'
+                  event_name: '{#SENSOR_LOCATION}: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1419,7 +1420,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"CPU"}-3'
                   name: '{#SENSOR_LOCATION}: Temperature is above warning threshold'
-                  event_name: 'Temperature is above warning threshold: >{$TEMP.MAX.WARN:"CPU"}'
+                  event_name: '{#SENSOR_LOCATION}: Temperature is above warning threshold: >{$TEMP.MAX.WARN:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1471,7 +1472,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold'
-                  event_name: 'Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                  event_name: '{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1488,7 +1489,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.IOH: Temperature is above warning threshold'
-                  event_name: 'Temperature is above warning threshold: >{$TEMP.MAX.WARN:"Ambient"}'
+                  event_name: '{#SENSOR_LOCATION}.IOH: Temperature is above warning threshold: >{$TEMP.MAX.WARN:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1532,7 +1533,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold'
-                  event_name: 'Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                  event_name: '{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1549,7 +1550,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.Ambient: Temperature is above warning threshold'
-                  event_name: 'Temperature is above warning threshold: >{$TEMP.MAX.WARN:"Ambient"}'
+                  event_name: '{#SENSOR_LOCATION}.Ambient: Temperature is above warning threshold: >{$TEMP.MAX.WARN:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1593,7 +1594,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.Front: Temperature is above critical threshold'
-                  event_name: 'Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                  event_name: '{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1610,7 +1611,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.Front: Temperature is above warning threshold'
-                  event_name: 'Temperature is above warning threshold: >{$TEMP.MAX.WARN:"Ambient"}'
+                  event_name: '{#SENSOR_LOCATION}.Front: Temperature is above warning threshold: >{$TEMP.MAX.WARN:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1654,7 +1655,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold'
-                  event_name: 'Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                  event_name: '{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1671,7 +1672,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.Rear: Temperature is above warning threshold'
-                  event_name: 'Temperature is above warning threshold: >{$TEMP.MAX.WARN:"Ambient"}'
+                  event_name: '{#SENSOR_LOCATION}.Rear: Temperature is above warning threshold: >{$TEMP.MAX.WARN:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1744,7 +1745,7 @@ zabbix_export:
                   uuid: 27253665837647bb9c3be58f7d0881ae
                   expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#1)<>last(/Cisco UCS Manager SNMP/cisco.ucs.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#2) and length(last(/Cisco UCS Manager SNMP/cisco.ucs.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}]))>0'
                   name: '{#UNIT_LOCATION}: Device has been replaced'
-                  event_name: 'Device has been replaced (new serial number received)'
+                  event_name: '{#UNIT_LOCATION}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'

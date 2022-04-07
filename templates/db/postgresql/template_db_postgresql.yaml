@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-04T10:41:00Z'
+  date: '2022-04-06T19:33:35Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -668,7 +668,8 @@ zabbix_export:
             -
               uuid: 11831c52e86445498eed42de6a629b65
               expression: 'min(/PostgreSQL by Zabbix agent/pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"],5m) > {$PG.REPL_LAG.MAX.WARN}'
-              name: 'PostgreSQL: Streaming lag with {#MASTER} is too high (over {$PG.REPL_LAG.MAX.WARN} in 5m)'
+              name: 'PostgreSQL: Streaming lag with {#MASTER} is too high'
+              event_name: 'PostgreSQL: Streaming lag with {#MASTER} is too high (over {$PG.REPL_LAG.MAX.WARN} in 5m)'
               priority: AVERAGE
               tags:
                 -
@@ -1028,7 +1029,7 @@ zabbix_export:
                   uuid: 3b51f02258bd4e02829f04ca016dd01d
                   expression: 'min(/PostgreSQL by Zabbix agent/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}'
                   name: 'DB {#DBNAME}: Too many recovery conflicts'
-                  event_name: 'Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m)'
+                  event_name: 'DB {#DBNAME}: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: AVERAGE
                   description: |
                     The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.
@@ -1069,7 +1070,7 @@ zabbix_export:
                   uuid: 3bee63fa04d94586937e22aafab9bdd8
                   expression: 'min(/PostgreSQL by Zabbix agent/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}'
                   name: 'DB {#DBNAME}: Deadlock occurred'
-                  event_name: 'Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
+                  event_name: 'DB {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: HIGH
                   tags:
                     -
@@ -1374,7 +1375,7 @@ zabbix_export:
                   uuid: 709df9c1e29a4ff68a3de9423ff7ae58
                   expression: 'last(/PostgreSQL by Zabbix agent/pgsql.frozenxid.prc_before_stop["{#DBNAME}"])<{$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"}'
                   name: 'DB {#DBNAME}: VACUUM FREEZE is required to prevent wraparound'
-                  event_name: 'VACUUM FREEZE is required to prevent wraparound (frozen XID less than {$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"} %)'
+                  event_name: 'DB {#DBNAME}: VACUUM FREEZE is required to prevent wraparound (frozen XID less than {$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"} %)'
                   priority: AVERAGE
                   description: |
                     Preventing Transaction ID Wraparound Failures
@@ -1424,7 +1425,7 @@ zabbix_export:
                   uuid: ef7d3c9866df44aa9b378e7f125a34de
                   expression: 'min(/PostgreSQL by Zabbix agent/pgsql.locks.total["{#DBNAME}"],5m)>{$PG.LOCKS.MAX.WARN:"{#DBNAME}"}'
                   name: 'DB {#DBNAME}: Number of locks is too high'
-                  event_name: 'Number of locks is too high (over {$PG.LOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
+                  event_name: 'DB {#DBNAME}: Number of locks is too high (over {$PG.LOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: WARNING
                   tags:
                     -
@@ -1525,7 +1526,7 @@ zabbix_export:
                   uuid: facc8f6976664da4ad5567d270f0f311
                   expression: 'min(/PostgreSQL by Zabbix agent/pgsql.queries.query.slow_count["{#DBNAME}"],5m)>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}'
                   name: 'DB {#DBNAME}: Too many slow queries'
-                  event_name: 'Too many slow queries (over {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"} in 5m)'
+                  event_name: 'DB {#DBNAME}: Too many slow queries (over {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: WARNING
                   tags:
                     -

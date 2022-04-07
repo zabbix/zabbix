@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-04T10:46:51Z'
+  date: '2022-04-06T19:35:22Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -785,7 +785,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco UCS SNMP/sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
                   name: '{#SENSOR_LOCATION}: Temperature is above critical threshold'
-                  event_name: 'Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
+                  event_name: '{#SENSOR_LOCATION}: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -802,7 +802,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco UCS SNMP/sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"CPU"}-3'
                   name: '{#SENSOR_LOCATION}: Temperature is above warning threshold'
-                  event_name: 'Temperature is above warning threshold: >{$TEMP_WARN:"CPU"}'
+                  event_name: '{#SENSOR_LOCATION}: Temperature is above warning threshold: >{$TEMP_WARN:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -824,7 +824,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/Cisco UCS SNMP/sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"CPU"}+3'
                   name: '{#SENSOR_LOCATION}: Temperature is too low'
-                  event_name: 'Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"}'
+                  event_name: '{#SENSOR_LOCATION}: Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:
@@ -865,7 +865,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco UCS SNMP/sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold'
-                  event_name: 'Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
+                  event_name: '{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -882,7 +882,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco UCS SNMP/sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.IOH: Temperature is above warning threshold'
-                  event_name: 'Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
+                  event_name: '{#SENSOR_LOCATION}.IOH: Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -904,7 +904,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/Cisco UCS SNMP/sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Ambient"}+3'
                   name: '{#SENSOR_LOCATION}.IOH: Temperature is too low'
-                  event_name: 'Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
+                  event_name: '{#SENSOR_LOCATION}.IOH: Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:
@@ -937,7 +937,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco UCS SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold'
-                  event_name: 'Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
+                  event_name: '{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -954,7 +954,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco UCS SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.Ambient: Temperature is above warning threshold'
-                  event_name: 'Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
+                  event_name: '{#SENSOR_LOCATION}.Ambient: Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -976,7 +976,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/Cisco UCS SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Ambient"}+3'
                   name: '{#SENSOR_LOCATION}.Ambient: Temperature is too low'
-                  event_name: 'Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
+                  event_name: '{#SENSOR_LOCATION}.Ambient: Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:
@@ -1009,7 +1009,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco UCS SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.Front: Temperature is above critical threshold'
-                  event_name: 'Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
+                  event_name: '{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1026,7 +1026,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco UCS SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.Front: Temperature is above warning threshold'
-                  event_name: 'Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
+                  event_name: '{#SENSOR_LOCATION}.Front: Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1048,7 +1048,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/Cisco UCS SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Ambient"}+3'
                   name: '{#SENSOR_LOCATION}.Front: Temperature is too low'
-                  event_name: 'Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
+                  event_name: '{#SENSOR_LOCATION}.Front: Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:
@@ -1081,7 +1081,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco UCS SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold'
-                  event_name: 'Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
+                  event_name: '{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1098,7 +1098,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Cisco UCS SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.Rear: Temperature is above warning threshold'
-                  event_name: 'Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
+                  event_name: '{#SENSOR_LOCATION}.Rear: Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1120,7 +1120,7 @@ zabbix_export:
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/Cisco UCS SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Ambient"}+3'
                   name: '{#SENSOR_LOCATION}.Rear: Temperature is too low'
-                  event_name: 'Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
+                  event_name: '{#SENSOR_LOCATION}.Rear: Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:
@@ -1187,7 +1187,7 @@ zabbix_export:
                   uuid: b9667c535fe542eeb21dea7aaf2bbf80
                   expression: 'last(/Cisco UCS SNMP/system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#1)<>last(/Cisco UCS SNMP/system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#2) and length(last(/Cisco UCS SNMP/system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}]))>0'
                   name: '{#UNIT_LOCATION}: Device has been replaced'
-                  event_name: 'Device has been replaced (new serial number received)'
+                  event_name: '{#UNIT_LOCATION}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'

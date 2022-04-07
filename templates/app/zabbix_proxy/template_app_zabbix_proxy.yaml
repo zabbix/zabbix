@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-04T10:49:37Z'
+  date: '2022-04-06T19:36:00Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -46,7 +46,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,availability manager,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"availability manager"}'
               name: 'Zabbix proxy: Utilization of availability manager processes is high'
-              event_name: 'Utilization of availability manager processes over {$ZABBIX.PROXY.UTIL.MAX:"availability manager"}%'
+              event_name: 'Zabbix proxy: Utilization of availability manager processes over {$ZABBIX.PROXY.UTIL.MAX:"availability manager"}%'
               priority: AVERAGE
               tags:
                 -
@@ -72,7 +72,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,configuration syncer,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"configuration syncer"}'
               name: 'Zabbix proxy: Utilization of configuration syncer processes is high'
-              event_name: 'Utilization of configuration syncer processes over {$ZABBIX.PROXY.UTIL.MAX:"configuration syncer"}%'
+              event_name: 'Zabbix proxy: Utilization of configuration syncer processes over {$ZABBIX.PROXY.UTIL.MAX:"configuration syncer"}%'
               priority: AVERAGE
               tags:
                 -
@@ -98,7 +98,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,data sender,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"data sender"}'
               name: 'Zabbix proxy: Utilization of data sender processes is high'
-              event_name: 'Utilization of data sender processes over {$ZABBIX.PROXY.UTIL.MAX:"data sender"}%'
+              event_name: 'Zabbix proxy: Utilization of data sender processes over {$ZABBIX.PROXY.UTIL.MAX:"data sender"}%'
               priority: AVERAGE
               tags:
                 -
@@ -124,7 +124,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,discoverer,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"discoverer"}'
               name: 'Zabbix proxy: Utilization of discoverer processes is high'
-              event_name: 'Utilization of discoverer processes over {$ZABBIX.PROXY.UTIL.MAX:"discoverer"}%'
+              event_name: 'Zabbix proxy: Utilization of discoverer processes over {$ZABBIX.PROXY.UTIL.MAX:"discoverer"}%'
               priority: AVERAGE
               tags:
                 -
@@ -150,7 +150,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,heartbeat sender,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"heartbeat sender"}'
               name: 'Zabbix proxy: Utilization of heartbeat sender processes is high'
-              event_name: 'Utilization of heartbeat sender processes over {$ZABBIX.PROXY.UTIL.MAX:"heartbeat sender"}%'
+              event_name: 'Zabbix proxy: Utilization of heartbeat sender processes over {$ZABBIX.PROXY.UTIL.MAX:"heartbeat sender"}%'
               priority: AVERAGE
               tags:
                 -
@@ -176,7 +176,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,history poller,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"history poller"}'
               name: 'Zabbix proxy: Utilization of history poller processes is high'
-              event_name: 'Utilization of history poller processes over {$ZABBIX.PROXY.UTIL.MAX:"history poller"}%'
+              event_name: 'Zabbix proxy: Utilization of history poller processes over {$ZABBIX.PROXY.UTIL.MAX:"history poller"}%'
               priority: AVERAGE
               tags:
                 -
@@ -202,7 +202,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,history syncer,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"history syncer"}'
               name: 'Zabbix proxy: Utilization of history syncer processes is high'
-              event_name: 'Utilization of history syncer processes over {$ZABBIX.PROXY.UTIL.MAX:"history syncer"}%'
+              event_name: 'Zabbix proxy: Utilization of history syncer processes over {$ZABBIX.PROXY.UTIL.MAX:"history syncer"}%'
               priority: AVERAGE
               tags:
                 -
@@ -228,7 +228,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,housekeeper,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"housekeeper"}'
               name: 'Zabbix proxy: Utilization of housekeeper processes is high'
-              event_name: 'Utilization of housekeeper processes over {$ZABBIX.PROXY.UTIL.MAX:"housekeeper"}%'
+              event_name: 'Zabbix proxy: Utilization of housekeeper processes over {$ZABBIX.PROXY.UTIL.MAX:"housekeeper"}%'
               priority: AVERAGE
               tags:
                 -
@@ -254,7 +254,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,http poller,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"http poller"}'
               name: 'Zabbix proxy: Utilization of http poller processes is high'
-              event_name: 'Utilization of http poller processes over {$ZABBIX.PROXY.UTIL.MAX:"http poller"}%'
+              event_name: 'Zabbix proxy: Utilization of http poller processes over {$ZABBIX.PROXY.UTIL.MAX:"http poller"}%'
               priority: AVERAGE
               tags:
                 -
@@ -280,7 +280,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,icmp pinger,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"icmp pinger"}'
               name: 'Zabbix proxy: Utilization of icmp pinger processes is high'
-              event_name: 'Utilization of icmp pinger processes over {$ZABBIX.PROXY.UTIL.MAX:"icmp pinger"}%'
+              event_name: 'Zabbix proxy: Utilization of icmp pinger processes over {$ZABBIX.PROXY.UTIL.MAX:"icmp pinger"}%'
               priority: AVERAGE
               tags:
                 -
@@ -306,7 +306,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,ipmi manager,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"ipmi manager"}'
               name: 'Zabbix proxy: Utilization of ipmi manager processes is high'
-              event_name: 'Utilization of ipmi manager processes over {$ZABBIX.PROXY.UTIL.MAX:"ipmi manager"}%'
+              event_name: 'Zabbix proxy: Utilization of ipmi manager processes over {$ZABBIX.PROXY.UTIL.MAX:"ipmi manager"}%'
               priority: AVERAGE
               tags:
                 -
@@ -332,7 +332,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,ipmi poller,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"ipmi poller"}'
               name: 'Zabbix proxy: Utilization of ipmi poller processes is high'
-              event_name: 'Utilization of ipmi poller processes over {$ZABBIX.PROXY.UTIL.MAX:"ipmi poller"}%'
+              event_name: 'Zabbix proxy: Utilization of ipmi poller processes over {$ZABBIX.PROXY.UTIL.MAX:"ipmi poller"}%'
               priority: AVERAGE
               tags:
                 -
@@ -358,7 +358,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,java poller,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"java poller"}'
               name: 'Zabbix proxy: Utilization of java poller processes is high'
-              event_name: 'Utilization of java poller processes over {$ZABBIX.PROXY.UTIL.MAX:"java poller"}%'
+              event_name: 'Zabbix proxy: Utilization of java poller processes over {$ZABBIX.PROXY.UTIL.MAX:"java poller"}%'
               priority: AVERAGE
               tags:
                 -
@@ -384,7 +384,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,odbc poller,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"ODBC poller"}'
               name: 'Zabbix proxy: Utilization of ODBC poller processes is high'
-              event_name: 'Utilization of ODBC poller processes over {$ZABBIX.PROXY.UTIL.MAX:"ODBC poller"}%'
+              event_name: 'Zabbix proxy: Utilization of ODBC poller processes over {$ZABBIX.PROXY.UTIL.MAX:"ODBC poller"}%'
               priority: AVERAGE
               tags:
                 -
@@ -410,7 +410,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,poller,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"poller"}'
               name: 'Zabbix proxy: Utilization of poller processes is high'
-              event_name: 'Utilization of poller processes over {$ZABBIX.PROXY.UTIL.MAX:"poller"}%'
+              event_name: 'Zabbix proxy: Utilization of poller processes over {$ZABBIX.PROXY.UTIL.MAX:"poller"}%'
               priority: AVERAGE
               tags:
                 -
@@ -436,7 +436,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,preprocessing manager,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"preprocessing manager"}'
               name: 'Zabbix proxy: Utilization of preprocessing manager processes is high'
-              event_name: 'Utilization of preprocessing manager processes over {$ZABBIX.PROXY.UTIL.MAX:"preprocessing manager"}%'
+              event_name: 'Zabbix proxy: Utilization of preprocessing manager processes over {$ZABBIX.PROXY.UTIL.MAX:"preprocessing manager"}%'
               priority: AVERAGE
               tags:
                 -
@@ -462,7 +462,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,preprocessing worker,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"preprocessing worker"}'
               name: 'Zabbix proxy: Utilization of preprocessing worker processes is high'
-              event_name: 'Utilization of preprocessing worker processes over {$ZABBIX.PROXY.UTIL.MAX:"preprocessing worker"}%'
+              event_name: 'Zabbix proxy: Utilization of preprocessing worker processes over {$ZABBIX.PROXY.UTIL.MAX:"preprocessing worker"}%'
               priority: AVERAGE
               tags:
                 -
@@ -488,7 +488,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,self-monitoring,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"self-monitoring"}'
               name: 'Zabbix proxy: Utilization of self-monitoring processes is high'
-              event_name: 'Utilization of self-monitoring processes over {$ZABBIX.PROXY.UTIL.MAX:"self-monitoring"}%'
+              event_name: 'Zabbix proxy: Utilization of self-monitoring processes over {$ZABBIX.PROXY.UTIL.MAX:"self-monitoring"}%'
               priority: AVERAGE
               tags:
                 -
@@ -514,7 +514,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,snmp trapper,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"snmp trapper"}'
               name: 'Zabbix proxy: Utilization of snmp trapper processes is high'
-              event_name: 'Utilization of snmp trapper processes over {$ZABBIX.PROXY.UTIL.MAX:"snmp trapper"}%'
+              event_name: 'Zabbix proxy: Utilization of snmp trapper processes over {$ZABBIX.PROXY.UTIL.MAX:"snmp trapper"}%'
               priority: AVERAGE
               tags:
                 -
@@ -540,7 +540,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,task manager,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"task manager"}'
               name: 'Zabbix proxy: Utilization of task manager processes is high'
-              event_name: 'Utilization of task manager processes over {$ZABBIX.PROXY.UTIL.MAX:"task manager"}%'
+              event_name: 'Zabbix proxy: Utilization of task manager processes over {$ZABBIX.PROXY.UTIL.MAX:"task manager"}%'
               priority: AVERAGE
               tags:
                 -
@@ -566,7 +566,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,trapper,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"trapper"}'
               name: 'Zabbix proxy: Utilization of trapper processes is high'
-              event_name: 'Utilization of trapper processes over {$ZABBIX.PROXY.UTIL.MAX:"trapper"}%'
+              event_name: 'Zabbix proxy: Utilization of trapper processes over {$ZABBIX.PROXY.UTIL.MAX:"trapper"}%'
               priority: AVERAGE
               tags:
                 -
@@ -592,7 +592,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,unreachable poller,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"unreachable poller"}'
               name: 'Zabbix proxy: Utilization of unreachable poller processes is high'
-              event_name: 'Utilization of unreachable poller processes over {$ZABBIX.PROXY.UTIL.MAX:"unreachable poller"}%'
+              event_name: 'Zabbix proxy: Utilization of unreachable poller processes over {$ZABBIX.PROXY.UTIL.MAX:"unreachable poller"}%'
               priority: AVERAGE
               tags:
                 -
@@ -618,7 +618,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,vmware collector,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"vmware collector"}'
               name: 'Zabbix proxy: Utilization of vmware collector processes is high'
-              event_name: 'Utilization of vmware collector processes over {$ZABBIX.PROXY.UTIL.MAX:"vmware collector"}%'
+              event_name: 'Zabbix proxy: Utilization of vmware collector processes over {$ZABBIX.PROXY.UTIL.MAX:"vmware collector"}%'
               priority: AVERAGE
               tags:
                 -
@@ -724,7 +724,7 @@ zabbix_export:
               uuid: b505a16c50f64adb8c5528907925f798
               expression: 'last(/Zabbix proxy health/zabbix[uptime])<10m'
               name: 'Zabbix proxy: has been restarted'
-              event_name: 'has been restarted (uptime < 10m)'
+              event_name: 'Zabbix proxy: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -755,7 +755,7 @@ zabbix_export:
               uuid: bf7eef07faf14fc4b2603ae952f001da
               expression: 'last(/Zabbix proxy health/zabbix[version],#1)<>last(/Zabbix proxy health/zabbix[version],#2) and length(last(/Zabbix proxy health/zabbix[version]))>0'
               name: 'Zabbix proxy: Version has changed'
-              event_name: 'Version has changed (new version: {ITEM.VALUE})'
+              event_name: 'Zabbix proxy: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Zabbix proxy version has changed. Ack to close.'
               manual_close: 'YES'
