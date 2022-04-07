@@ -163,11 +163,12 @@ class CUserDirectory extends CApiService {
 
 		if ($update) {
 			DB::update('userdirectory', $update);
+
+			static::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USERDIRECTORY, $userdirectories,
+				$db_userdirectories
+			);
 		}
 
-		static::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USERDIRECTORY, $userdirectories,
-			$db_userdirectories
-		);
 
 		return ['userdirectoryids' => array_column($userdirectories, 'userdirectoryid')];
 	}
@@ -182,7 +183,7 @@ class CUserDirectory extends CApiService {
 	 * @throws APIException
 	 */
 	public function delete(array $userdirectoryids) {
-		self::validateDelete($userdirectoryids);
+		static::validateDelete($userdirectoryids);
 
 		DB::delete('userdirectory', ['userdirectoryid' => $userdirectoryids]);
 
@@ -221,7 +222,7 @@ class CUserDirectory extends CApiService {
 	 * @param array $userdirectories
 	 */
 	protected static function addUserGroups(array $options, array &$userdirectories): void {
-		$serverids = array_unique(array_column($userdirectories, 'userdirectoryid'));
+		$ids = array_unique(array_column($userdirectories, 'userdirectoryid'));
 		$fields = ($options['selectUsrgrps'] === API_OUTPUT_EXTEND)
 			? array_keys(DB::getSchema('usrgrp')['fields'])
 			: $options['selectUsrgrps'];
@@ -237,7 +238,7 @@ class CUserDirectory extends CApiService {
 
 		$db_usergroups = API::UserGroup()->get([
 			'output' => $fields,
-			'filter' => ['userdirectoryid' => $serverids]
+			'filter' => ['userdirectoryid' => $ids]
 		]);
 
 		foreach ($db_usergroups as $db_usergroup) {
@@ -302,7 +303,11 @@ class CUserDirectory extends CApiService {
 		$duplicate = DBfetch(DBselect('SELECT name FROM userdirectory WHERE '.$names_sql, 1));
 
 		if ($duplicate) {
-			static::exception(ZBX_API_ERROR_PARAMETERS, _s('User directory "%1$s" already exists.', $duplicate['name']));
+			$subpath = '/'.(array_search($duplicate['name'], array_column($userdirectories, 'name')) + 1);
+			$error = _s('Invalid parameter "%1$s": %2$s.', $subpath,
+				_s('value %1$s already exists', '(name)=('.$duplicate['name'].')')
+			);
+			static::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
 
@@ -344,7 +349,12 @@ class CUserDirectory extends CApiService {
 		$duplicates = array_diff_key($duplicates, array_column($userdirectories, 'name', 'userdirectoryid'));
 
 		if ($duplicates) {
-			static::exception(ZBX_API_ERROR_PARAMETERS, _s('User directory "%1$s" already exists.', reset($duplicates)));
+			$name = reset($duplicates);
+			$subpath = '/'.(array_search($name, array_column($userdirectories, 'name')) + 1);
+			$error = _s('Invalid parameter "%1$s": %2$s.', $subpath,
+				_s('value %1$s already exists', '(name)=('.$name.')')
+			);
+			static::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$db_userdirectories = DB::select('userdirectory', [
