@@ -571,14 +571,18 @@ class testHost extends CAPITest {
 		$res = DB::update('hosts_templates', $upd_hosts_templates);
 		$this->assertSame(true, $res);
 
-		// Add few manual templates to discovered hosts to test the template removal. Do not use API at this point.
-		$nextid = CDBHelper::getValue(
+		/*
+		 * Add few manual templates to discovered hosts to test the template removal. Do not use API at this point.
+		 * Cannot use CDBHelper::getValue, because it will add "LIMIT 1" at the end of query and MySQL does not support
+		 * a syntaxt like that.
+		 */
+		$nextid = CDBHelper::getAll(
 			'SELECT i.nextid'.
 			' FROM ids i'.
 			' WHERE i.table_name='.zbx_dbstr('hosts_templates').
 				' AND i.field_name='.zbx_dbstr('hosttemplateid').
 			' FOR UPDATE'
-		) + 1;
+		)[0]['nextid'] + 1;
 		$hosts_templates_data = [
 			// Host contains only manual templates.
 			[
@@ -718,16 +722,16 @@ class testHost extends CAPITest {
 			],
 			'Test host.create common error - mssing "groups"' => [
 				'request' => [
-					'host' => 'API test create fail'
+					'host' => 'API test hosts create fail'
 				],
-				'expected_error' => 'Host "API test create fail" cannot be without host group.'
+				'expected_error' => 'Host "API test hosts create fail" cannot be without host group.'
 			],
 			'Test host.create common error - empty group' => [
 				'request' => [
-					'host' => 'API test create fail',
+					'host' => 'API test hosts create fail',
 					'groups' => []
 				],
-				'expected_error' => 'Host "API test create fail" cannot be without host group.'
+				'expected_error' => 'Host "API test hosts create fail" cannot be without host group.'
 			],
 			'Test host.create common error - empty host name' => [
 				'request' => [
@@ -753,7 +757,7 @@ class testHost extends CAPITest {
 			],
 			'Test host.create common error - missing "groupid"' => [
 				'request' => [
-					'host' => 'API test create fail',
+					'host' => 'API test hosts create fail',
 					'groups' => [
 						[]
 					]
@@ -762,7 +766,7 @@ class testHost extends CAPITest {
 			],
 			'Test host.create common error - invalid group' => [
 				'request' => [
-					'host' => 'API test create fail',
+					'host' => 'API test hosts create fail',
 					'groups' => [
 						[
 							'groupid' => '01'
@@ -795,7 +799,7 @@ class testHost extends CAPITest {
 			// Test create interfaces.
 			'Test host.create interfaces (empty)' => [
 				'request' => [
-					'host' => 'API test create fail',
+					'host' => 'API test hosts create fail',
 					'groups' => [
 						[
 							'groupid' => 'ID'
@@ -807,7 +811,7 @@ class testHost extends CAPITest {
 			],
 			'Test host.create interfaces (string)' => [
 				'request' => [
-					'host' => 'API test create fail',
+					'host' => 'API test hosts create fail',
 					'groups' => [
 						[
 							'groupid' => 'ID'
@@ -819,7 +823,7 @@ class testHost extends CAPITest {
 			],
 			'Test host.create interfaces (integer)' => [
 				'request' => [
-					'host' => 'API test create fail',
+					'host' => 'API test hosts create fail',
 					'groups' => [
 						[
 							'groupid' => 'ID'
@@ -841,7 +845,7 @@ class testHost extends CAPITest {
 		return [
 			'Test host.create minimal' => [
 				'request' => [
-					'host' => 'API test create success minimal',
+					'host' => 'API test hosts create success minimal',
 					'groups' => [
 						[
 							'groupid' => 'ID'
@@ -852,7 +856,7 @@ class testHost extends CAPITest {
 			],
 			'Test host.create empty interfaces' => [
 				'request' => [
-					'host' => 'API test create success empty interfaces',
+					'host' => 'API test hosts create success empty interfaces',
 					'groups' => [
 						[
 							'groupid' => 'ID'
