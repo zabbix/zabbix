@@ -1388,33 +1388,14 @@ class CUser extends CApiService {
 	 * - password   - user password
 	 *
 	 * @param array $user
+	 * @param array $config  CLdap object connection configuration.
+	 *
+	 * @throws APIException
 	 *
 	 * @return bool
 	 */
-	protected function ldapLogin(array $user) {
-		$cnf = [];
-		$auth_params = [
-			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
-			CAuthenticationHelper::LDAP_CONFIGURED,
-			CAuthenticationHelper::LDAP_HOST,
-			CAuthenticationHelper::LDAP_PORT,
-			CAuthenticationHelper::LDAP_BASE_DN,
-			CAuthenticationHelper::LDAP_BIND_DN,
-			CAuthenticationHelper::LDAP_SEARCH_ATTRIBUTE,
-			CAuthenticationHelper::LDAP_BIND_PASSWORD
-		];
-
-		foreach ($auth_params as $param) {
-			$cnf[str_replace('ldap_', '', $param)] = CAuthenticationHelper::get($param);
-		}
-
-		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
-
-		if ($ldap_status['result'] != CFrontendSetup::CHECK_OK) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $ldap_status['error']);
-		}
-
-		$ldapValidator = new CLdapAuthValidator(['conf' => $cnf]);
+	protected function ldapLogin(array $user, array $config) {
+		$ldapValidator = new CLdapAuthValidator(['conf' => $config]);
 
 		if ($ldapValidator->validate($user)) {
 			return true;
@@ -1501,8 +1482,7 @@ class CUser extends CApiService {
 			GROUP_GUI_ACCESS_DISABLED => CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)
 		];
 
-		$user_data = $this->findAccessibleUser($user['username'],
-			(CAuthenticationHelper::get(CAuthenticationHelper::LDAP_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
+		$user_data = $this->findAccessibleUser($user['username'], false,
 			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE), true
 		);
 
@@ -1535,7 +1515,29 @@ class CUser extends CApiService {
 		try {
 			switch ($group_to_auth_map[$db_user['gui_access']]) {
 				case ZBX_AUTH_LDAP:
-					$this->ldapLogin($user);
+					if (CAuthenticationHelper::get(CAuthenticationHelper::LDAP_CONFIGURED) == ZBX_AUTH_LDAP_DISABLED) {
+						self::exception(ZBX_API_ERROR_INTERNAL, _('LDAP authentication is disabled.'));
+					}
+
+					$id = ($db_user['gui_access'] == GROUP_GUI_ACCESS_LDAP)
+						? $db_user['userdirectoryid']
+						: CAuthenticationHelper::get(CAuthenticationHelper::LDAP_USERDIRECTORYID);
+					$userdirectory = $id ? CUserDirectory::getUserDirectoryById($id) : [];
+
+					if (!$userdirectory) {
+						self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot find user directory for LDAP.'));
+					}
+
+					if ($userdirectory['case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE
+							&& $user['username'] !== $db_user['username']) {
+
+					}
+
+					$ldap_fields = array_flip(['host', 'port', 'base_dn', 'bind_dn', 'bind_password', 'search_attribute',
+						'search_filter', 'start_tls'
+					]);
+
+					$this->ldapLogin($user, array_intersect_key($userdirectory, $ldap_fields));
 					break;
 
 				case ZBX_AUTH_INTERNAL:
@@ -1786,11 +1788,12 @@ class CUser extends CApiService {
 		$permissions = [
 			'debug_mode' => GROUP_DEBUG_MODE_DISABLED,
 			'users_status' => GROUP_STATUS_ENABLED,
-			'gui_access' => GROUP_GUI_ACCESS_SYSTEM
+			'gui_access' => GROUP_GUI_ACCESS_SYSTEM,
+			'userdirectoryid' => null
 		];
 
 		$db_usrgrps = DBselect(
-			'SELECT g.debug_mode,g.users_status,g.gui_access'.
+			'SELECT g.debug_mode,g.users_status,g.gui_access,g.userdirectoryid'.
 			' FROM usrgrp g,users_groups ug'.
 			' WHERE g.usrgrpid=ug.usrgrpid'.
 				' AND ug.userid='.$userid
@@ -1805,6 +1808,7 @@ class CUser extends CApiService {
 			}
 			if ($db_usrgrp['gui_access'] > $permissions['gui_access']) {
 				$permissions['gui_access'] = $db_usrgrp['gui_access'];
+				$permissions['userdirectoryid'] = $db_usrgrp['userdirectoryid'];
 			}
 		}
 

@@ -193,6 +193,21 @@ class CUserDirectory extends CApiService {
 	}
 
 	/**
+	 * Cannot be called via API. Return all fields of userdirectory data from database.
+	 * Return empty array when userdirectoryid does not exists.
+	 *
+	 * @param string $userdirectoryid
+	 */
+	public static function getUserDirectoryById($userdirectoryid): array {
+		$db_row = DB::select('userdirectory', [
+			'output' => DB::getSchema('userdirectory')['fields'],
+			'userdirectoryids' => $userdirectoryid
+		]);
+
+		return $db_row ? $db_row : [];
+	}
+
+	/**
 	 * Add user groups data if requested.
 	 *
 	 * @param array $options
