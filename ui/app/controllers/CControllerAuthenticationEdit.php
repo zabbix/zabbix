@@ -41,6 +41,8 @@ class CControllerAuthenticationEdit extends CController {
 			'http_strip_domains' =>			'db config.http_strip_domains',
 			'http_case_sensitive' =>		'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'ldap_configured' =>			'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
+			'ldap_servers' =>				'array',
+			'ldap_default_row_index' =>		'int32',
 			'saml_auth_enabled' =>			'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
 			'saml_idp_entityid' =>			'db config.saml_idp_entityid',
 			'saml_sso_url' =>				'db config.saml_sso_url',
@@ -98,6 +100,7 @@ class CControllerAuthenticationEdit extends CController {
 			CAuthenticationHelper::HTTP_STRIP_DOMAINS,
 			CAuthenticationHelper::HTTP_CASE_SENSITIVE,
 			CAuthenticationHelper::LDAP_CONFIGURED,
+			CAuthenticationHelper::LDAP_USERDIRECTORYID,
 			CAuthenticationHelper::SAML_AUTH_ENABLED,
 			CAuthenticationHelper::SAML_IDP_ENTITYID,
 			CAuthenticationHelper::SAML_SSO_URL,
@@ -132,6 +135,8 @@ class CControllerAuthenticationEdit extends CController {
 				'http_strip_domains',
 				'http_case_sensitive',
 				'ldap_configured',
+				'ldap_servers',
+				'ldap_default_row_index',
 				'saml_auth_enabled',
 				'saml_idp_entityid',
 				'saml_sso_url',
@@ -152,65 +157,32 @@ class CControllerAuthenticationEdit extends CController {
 			]);
 
 			$data += $auth;
+
+			// TODO VM: on form_refresh user group count for ldap servers is lost.
 		}
 		else {
 			$data += $auth;
 			$data['db_authentication_type'] = $data['authentication_type'];
+
+			$data['ldap_servers'] = API::UserDirectory()->get([
+				'output' => ['userdirectoryid', 'name', 'host', 'port', 'base_dn', 'search_attribute', 'search_filter',
+					'start_tls', 'bind_dn', 'case_sensitive'
+				],
+				'selectUsrgrps' => API_OUTPUT_COUNT,
+				'sortfield' => ['name'],
+				'sortorder' => ZBX_SORT_UP
+			]);
+
+			$data['ldap_default_row_index'] = array_search($data[CAuthenticationHelper::LDAP_USERDIRECTORYID],
+				array_column($data['ldap_servers'], 'userdirectoryid')
+			);
 		}
 
+		unset($data[CAuthenticationHelper::LDAP_USERDIRECTORYID]);
 		$data['ldap_enabled'] = ($ldap_status['result'] == CFrontendSetup::CHECK_OK
 				&& $data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED);
 		$data['saml_enabled'] = ($openssl_status['result'] == CFrontendSetup::CHECK_OK
 				&& $data['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED);
-
-		// TODO VM: replace this by userdirecotry.get API call.
-		$data['ldap_servers'] = [
-			[
-				'userdirectoryid' => 1,
-				'name' => 'ldap1',
-				'host' => '127.0.0.1',
-				'port' => '89',
-				'base_dn' => 1,
-				'search_attribute' => 1,
-				'userfilter' => '(%{attr}=%{user})',
-				'start_tls' => 1,
-				'bind_dn' => '',
-				'case_sensitive' => '',
-				'description' => '',
-				'user_groups' => 5
-			],
-			[
-				'userdirectoryid' => 2,
-				'name' => 'ldap2',
-				'host' => '127.0.0.1',
-				'port' => '89',
-				'base_dn' => 1,
-				'search_attribute' => 1,
-				'userfilter' => '(%{attr}=%{user})',
-				'start_tls' => 1,
-				'bind_dn' => '',
-				'case_sensitive' => '',
-				'description' => '',
-				'user_groups' => 0
-			],
-			[
-				'userdirectoryid' => 3,
-				'name' => 'ldap3',
-				'host' => '127.0.0.1',
-				'port' => '89',
-				'base_dn' => 1,
-				'search_attribute' => 1,
-				'userfilter' => '(%{attr}=%{user})',
-				'start_tls' => 1,
-				'bind_dn' => '',
-				'case_sensitive' => '',
-				'description' => '',
-				'user_groups' => 3
-			]
-		];
-
-		// TODO VM: request this from CAuthenticationHelper::get()
-		$data['ldap_defaultid'] = 2;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of authentication'));

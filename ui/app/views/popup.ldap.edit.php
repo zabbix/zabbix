@@ -131,9 +131,9 @@ $form = (new CForm('post', $form_action))
 			))->addClass('advanced-configuration')
 		])
 		->addItem([
-			(new CLabel(_('Search filter'), 'userfilter'))->addClass('advanced-configuration'),
+			(new CLabel(_('Search filter'), 'search_filter'))->addClass('advanced-configuration'),
 			(new CFormField(
-				(new CTextBox('userfilter', $data['userfilter'], false, DB::getFieldLength('usersdirectory', 'userfilter')))
+				(new CTextBox('search_filter', $data['search_filter'], false, DB::getFieldLength('usersdirectory', 'search_filter')))
 					->setAttribute('placeholder', '(%{attr}=%{user})')
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))->addClass('advanced-configuration')

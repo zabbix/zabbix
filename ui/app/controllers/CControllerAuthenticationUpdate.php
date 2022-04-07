@@ -43,14 +43,9 @@ class CControllerAuthenticationUpdate extends CController {
 			'change_bind_password' =>		'in 0,1',
 			'authentication_type' =>		'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
 			'http_case_sensitive' =>		'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'ldap_case_sensitive' =>		'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'ldap_configured' =>			'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
-			'ldap_host' =>					'db config.ldap_host',
-			'ldap_port' =>					'int32',
-			'ldap_base_dn' =>				'db config.ldap_base_dn',
-			'ldap_bind_dn' =>				'db config.ldap_bind_dn',
-			'ldap_search_attribute' =>		'db config.ldap_search_attribute',
-			'ldap_bind_password' =>			'db config.ldap_bind_password',
+			'ldap_servers' =>				'array',
+			'ldap_default_row_index' =>		'int32',
 			'http_auth_enabled' =>			'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
 			'http_login_form' =>			'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
 			'http_strip_domains' =>			'db config.http_strip_domains',
@@ -113,53 +108,34 @@ class CControllerAuthenticationUpdate extends CController {
 	 *
 	 * @return bool
 	 */
-	private function validateLdap() {
-		$is_valid = true;
-		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
-		$ldap_fields = ['ldap_host', 'ldap_port', 'ldap_base_dn', 'ldap_search_attribute', 'ldap_configured'];
-		$ldap_auth_original = [
-			'ldap_host' => CAuthenticationHelper::get(CAuthenticationHelper::LDAP_HOST),
-			'ldap_port' => CAuthenticationHelper::get(CAuthenticationHelper::LDAP_PORT),
-			'ldap_base_dn' => CAuthenticationHelper::get(CAuthenticationHelper::LDAP_BASE_DN),
-			'ldap_search_attribute' => CAuthenticationHelper::get(CAuthenticationHelper::LDAP_SEARCH_ATTRIBUTE),
-			'ldap_configured' => CAuthenticationHelper::get(CAuthenticationHelper::LDAP_CONFIGURED),
-			'ldap_bind_dn' => CAuthenticationHelper::get(CAuthenticationHelper::LDAP_BIND_DN),
-			'ldap_bind_password' => CAuthenticationHelper::get(CAuthenticationHelper::LDAP_BIND_PASSWORD)
-		];
-		$ldap_auth = $ldap_auth_original;
-		$this->getInputs($ldap_auth, array_merge($ldap_fields, ['ldap_bind_dn', 'ldap_bind_password']));
-		$ldap_auth_changed = array_diff_assoc($ldap_auth, $ldap_auth_original);
+	private function validateLdap(): bool {
+		$ldap_enabled = $this->getInput('ldap_configured', ZBX_AUTH_LDAP_DISABLED) == ZBX_AUTH_LDAP_ENABLED;
+		$ldap_servers = $this->getInput('ldap_servers', []);
 
-		if (!$ldap_auth_changed && !$this->hasInput('ldap_test')) {
-			return $is_valid;
-		}
+		if ($ldap_enabled) {
+			$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
 
-		if ($this->getInput('ldap_bind_password', '') !== '') {
-			$ldap_fields[] = 'ldap_bind_dn';
-		}
+			if ($ldap_status['result'] != CFrontendSetup::CHECK_OK) {
+				CMessageHelper::setErrorTitle($ldap_status['error']);
+				return false;
+			}
 
-		foreach ($ldap_fields as $field) {
-			if (trim($ldap_auth[$field]) === '') {
-				CMessageHelper::setErrorTitle(_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty')));
-				$is_valid = false;
-				break;
+			if ($ldap_servers) {
+				CMessageHelper::setErrorTitle(_('At least one LDAP server must exist.')); // TODO VM: new translation string
+				return false;
 			}
 		}
 
-		if ($is_valid
-				&& ($ldap_auth['ldap_port'] < ZBX_MIN_PORT_NUMBER
-					|| $ldap_auth['ldap_port'] > ZBX_MAX_PORT_NUMBER)) {
-			CMessageHelper::setErrorTitle(_s(
-				'Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.', $this->getInput('ldap_port'),
-				'ldap_port', ZBX_MIN_PORT_NUMBER, ZBX_MAX_PORT_NUMBER
-			));
-			$is_valid = false;
+		if ($ldap_servers
+				&& (!$this->hasInput('ldap_default_row_index')
+					|| !array_key_exists($this->getInput('ldap_default_row_index'), $ldap_servers)
+				)) {
+			CMessageHelper::setErrorTitle(_('Default LDAP server must be specified.')); // TODO VM: new translation string
+			return false;
 		}
 
-		if ($ldap_status['result'] != CFrontendSetup::CHECK_OK) {
-			CMessageHelper::setErrorTitle($ldap_status['error']);
-			$is_valid = false;
-		}
+		// TODO VM: move to LDAP test popup
+		/*
 		elseif ($is_valid) {
 			$ldap_validator = new CLdapAuthValidator([
 				'conf' => [
@@ -183,8 +159,9 @@ class CControllerAuthenticationUpdate extends CController {
 				$is_valid = false;
 			}
 		}
+		*/
 
-		return $is_valid;
+		return true;
 	}
 
 	/**
@@ -251,9 +228,11 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$auth_valid = ($this->getInput('ldap_configured', '') == ZBX_AUTH_LDAP_ENABLED)
-			? $this->validateLdap()
-			: $this->validateDefaultAuth();
+		$auth_valid = $this->validateDefaultAuth();
+
+		if ($auth_valid && !$this->validateLdap()) {
+			$auth_valid = false;
+		}
 
 		if ($auth_valid && $this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
 			if (!$this->validateSamlAuth()) {
@@ -268,9 +247,24 @@ class CControllerAuthenticationUpdate extends CController {
 			return;
 		}
 
+		/*
+		// TODO VM: move to test popup
 		// Only ZBX_AUTH_LDAP have 'Test' option.
 		if ($this->hasInput('ldap_test')) {
 			CMessageHelper::setSuccessTitle(_('LDAP login successful'));
+			$this->response->setFormData($this->getInputAll());
+			$this->setResponse($this->response);
+
+			return;
+		}
+		*/
+
+		[$ldap_servers_updated, $ldap_userdirectoryid] = $this->processLdapServers(
+			$this->getInput('ldap_servers', []),
+			$this->getInput('ldap_default_row_index', [])
+		);
+
+		if (!$ldap_servers_updated) {
 			$this->response->setFormData($this->getInputAll());
 			$this->setResponse($this->response);
 
@@ -283,14 +277,8 @@ class CControllerAuthenticationUpdate extends CController {
 			CAuthenticationHelper::HTTP_LOGIN_FORM,
 			CAuthenticationHelper::HTTP_STRIP_DOMAINS,
 			CAuthenticationHelper::HTTP_CASE_SENSITIVE,
-			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
 			CAuthenticationHelper::LDAP_CONFIGURED,
-			CAuthenticationHelper::LDAP_HOST,
-			CAuthenticationHelper::LDAP_PORT,
-			CAuthenticationHelper::LDAP_BASE_DN,
-			CAuthenticationHelper::LDAP_BIND_DN,
-			CAuthenticationHelper::LDAP_SEARCH_ATTRIBUTE,
-			CAuthenticationHelper::LDAP_BIND_PASSWORD,
+			CAuthenticationHelper::LDAP_USERDIRECTORYID,
 			CAuthenticationHelper::SAML_AUTH_ENABLED,
 			CAuthenticationHelper::SAML_IDP_ENTITYID,
 			CAuthenticationHelper::SAML_SSO_URL,
@@ -317,6 +305,7 @@ class CControllerAuthenticationUpdate extends CController {
 		$fields = [
 			'authentication_type' => ZBX_AUTH_INTERNAL,
 			'ldap_configured' => ZBX_AUTH_LDAP_DISABLED,
+			'ldap_userdirectoryid' => $ldap_userdirectoryid,
 			'http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED,
 			'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
 			'passwd_min_length' => DB::getDefault('config', 'passwd_min_length'),
@@ -329,24 +318,6 @@ class CControllerAuthenticationUpdate extends CController {
 				'http_login_form' => 0,
 				'http_strip_domains' => ''
 			];
-		}
-
-		if ($this->getInput('ldap_configured', ZBX_AUTH_LDAP_DISABLED) == ZBX_AUTH_LDAP_ENABLED) {
-			$fields += [
-				'ldap_host' => '',
-				'ldap_port' => '',
-				'ldap_base_dn' => '',
-				'ldap_bind_dn' => '',
-				'ldap_search_attribute' => '',
-				'ldap_case_sensitive' => 0
-			];
-
-			if ($this->hasInput('ldap_bind_password')) {
-				$fields['ldap_bind_password'] = '';
-			}
-			else {
-				unset($auth[CAuthenticationHelper::LDAP_BIND_PASSWORD]);
-			}
 		}
 
 		if ($this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
@@ -380,10 +351,6 @@ class CControllerAuthenticationUpdate extends CController {
 
 		$data = array_diff_assoc($data, $auth);
 
-		if (array_key_exists('ldap_bind_dn', $data) && trim($data['ldap_bind_dn']) === '') {
-			$data['ldap_bind_password'] = '';
-		}
-
 		if ($data) {
 			$result = API::Authentication()->update($data);
 
@@ -404,6 +371,72 @@ class CControllerAuthenticationUpdate extends CController {
 		}
 
 		$this->setResponse($this->response);
+	}
+
+	/**
+	 * Updates exising LDAP servers, creates new ones, removes deleted ones.
+	 *
+	 * @param $ldap_servers
+	 *
+	 * @return array
+	 */
+	private function processLdapServers($ldap_servers, $ldap_default_row_index): array {
+		$db_ldap_servers = API::UserDirectory()->get([
+			'output' => [],
+			'preservekeys' => true
+		]);
+
+		$ins_ldap_servers = [];
+		$upd_ldap_servers = [];
+
+		$ldap_userdirectoryid = 0;
+		$default_ldap_mapping_index = null;
+
+		foreach ($ldap_servers as $row_index => $ldap_server) {
+			if (array_key_exists('userdirectoryid', $ldap_server)) {
+				$upd_ldap_servers[] = $ldap_server;
+				unset($db_ldap_servers[$ldap_server['userdirectoryid']]);
+
+				if ($ldap_default_row_index == $row_index) {
+					$ldap_userdirectoryid = $ldap_server['userdirectoryid'];
+				}
+			}
+			else {
+				$ins_ldap_servers[] = $ldap_server;
+
+				if ($ldap_default_row_index == $row_index) {
+					$default_ldap_mapping_index = count($ins_ldap_servers) - 1;
+				}
+			}
+		}
+
+		$del_ldap_serverids = array_keys($db_ldap_servers);
+
+		if ($del_ldap_serverids && !API::UserDirectory()->delete(array_keys($del_ldap_serverids))) {
+			return [false, $ldap_userdirectoryid];
+		}
+
+		if ($upd_ldap_servers && !API::UserDirectory()->update($upd_ldap_servers)) {
+			return [false, $ldap_userdirectoryid];
+		}
+
+		if ($ins_ldap_servers) {
+			$inserted_ids = API::UserDirectory()->create($ins_ldap_servers);
+
+			if (!$inserted_ids) {
+				return [false, $ldap_userdirectoryid];
+			}
+
+			$ldap_userdirectoryid = $inserted_ids[$default_ldap_mapping_index];
+		}
+
+		if ($ldap_servers && $ldap_userdirectoryid === 0) {
+			CMessageHelper::setErrorTitle(_('Failed to select default LDAP server.')); // TODO VM: new translation string
+
+			return [false, $ldap_userdirectoryid];
+		}
+
+		return [true, $ldap_userdirectoryid];
 	}
 
 	/**

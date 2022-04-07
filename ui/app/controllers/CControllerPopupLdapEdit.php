@@ -24,19 +24,19 @@ class CControllerPopupLdapEdit extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'row_index' => 'required|int32',
-			'userdirectoryid' => 'id',
-			'name' => 'string',
-			'host' => 'string',
-			'port' => 'int32',
-			'base_dn' => 'string',
-			'search_attribute' => 'string',
-			'userfilter' => 'string',
+			'userdirectoryid' => 'db userdirectory.userdirectoryid',
+			'name' => 'db userdirectory.name',
+			'host' => 'db userdirectory.host',
+			'port' => 'db userdirectory.port|ge '.ZBX_MIN_PORT_NUMBER.'|le '.ZBX_MAX_PORT_NUMBER,
+			'base_dn' => 'db userdirectory.base_dn',
+			'bind_dn' => 'db userdirectory.bind_dn',
+			'bind_password' => 'db userdirectory.bind_password',
+			'search_attribute' => 'db userdirectory.search_attribute',
 			'start_tls' => 'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
-			'bind_dn' => 'string',
-			'bind_password' => 'string',
+			'search_filter' => 'db userdirectory.search_filter',
 			'case_sensitive' => 'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'description' => 'string',
-			'ldap_configured' => 'in 0,1',
+			'description' => 'db userdirectory.description',
+			'ldap_configured' => 'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
 			'add_ldap_server' => 'in 0,1'
 		];
 
@@ -75,7 +75,7 @@ class CControllerPopupLdapEdit extends CController {
 			'bind_dn' => $this->getInput('bind_dn', ''),
 			'case_sensitive' => $this->getInput('case_sensitive', ZBX_AUTH_CASE_INSENSITIVE),
 			'description' => $this->getInput('description', ''),
-			'userfilter' => $this->getInput('userfilter', ''),
+			'search_filter' => $this->getInput('search_filter', ''),
 			'ldap_configured' => $this->getInput('ldap_configured', ''),
 			'add_ldap_server' => $this->getInput('add_ldap_server', 1),
 			'user' => [
@@ -91,7 +91,7 @@ class CControllerPopupLdapEdit extends CController {
 			$data['bind_password'] = $this->getInput('bind_password');
 		}
 
-		$data['advanced_configuration'] = $data['start_tls'] != ZBX_AUTH_START_TLS_OFF || $data['userfilter'] !== '';
+		$data['advanced_configuration'] = $data['start_tls'] != ZBX_AUTH_START_TLS_OFF || $data['search_filter'] !== '';
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

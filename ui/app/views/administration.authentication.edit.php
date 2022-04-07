@@ -330,9 +330,9 @@ $saml_tab = (new CFormList('list_saml'))
 (new CScriptTag(
 	'view.init('. json_encode([
 		'ldap_servers' => $data['ldap_servers'],
-		'ldap_defaultid' => $data['ldap_defaultid'],
+		'ldap_default_row_index' => $data['ldap_default_row_index'],
 		'db_authentication_type' => $data['db_authentication_type']
-	]).');'
+	], JSON_FORCE_OBJECT).');'
 ))
 	->setOnDocumentReady()
 	->show();

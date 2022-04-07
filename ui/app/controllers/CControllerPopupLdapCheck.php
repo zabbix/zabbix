@@ -30,18 +30,18 @@ class CControllerPopupLdapCheck extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'row_index' => 'required|int32',
-			'userdirectoryid' => 'id',
-			'name' => 'required|string|not_empty',
-			'host' => 'required|string|not_empty',
-			'port' => 'required|int32',
-			'base_dn' => 'required|string|not_empty',
-			'search_attribute' => 'required|string|not_empty',
-			'userfilter' => 'string',
+			'userdirectoryid' => 'db userdirectory.userdirectoryid',
+			'name' => 'required|db userdirectory.name|not_empty',
+			'host' => 'required|db userdirectory.host|not_empty',
+			'port' => 'required|db userdirectory.port|ge '.ZBX_MIN_PORT_NUMBER.'|le '.ZBX_MAX_PORT_NUMBER,
+			'base_dn' => 'required|db userdirectory.base_dn|not_empty',
+			'bind_dn' => 'db userdirectory.bind_dn',
+			'bind_password' => 'db userdirectory.bind_password',
+			'search_attribute' => 'required|db userdirectory.search_attribute|not_empty',
 			'start_tls' => 'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
-			'bind_dn' => 'string',
-			'bind_password' => 'string',
+			'search_filter' => 'db userdirectory.search_filter',
 			'case_sensitive' => 'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'description' => 'string'
+			'description' => 'db userdirectory.description'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -77,7 +77,7 @@ class CControllerPopupLdapCheck extends CController {
 				'bind_dn' => $this->getInput('bind_dn', ''),
 				'case_sensitive' => $this->getInput('case_sensitive', ZBX_AUTH_CASE_INSENSITIVE),
 				'description' => $this->getInput('description', ''),
-				'userfilter' => $this->getInput('userfilter', '')
+				'search_filter' => $this->getInput('search_filter', '')
 			]
 		];
 

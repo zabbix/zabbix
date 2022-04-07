@@ -80,7 +80,7 @@ window.ldap_edit_popup = new class {
 
 		if (this.advanced_chbox.checked) {
 			popup_params['start_tls'] = this.form.start_tls.checked ? 1 : 0;
-			popup_params['userfilter'] = this.form.userfilter.value;
+			popup_params['search_filter'] = this.form.search_filter.value;
 		}
 
 		const test_overlay = PopUp('popup.ldap.test.edit', popup_params, {dialogueid: 'ldap_test_edit'});
@@ -97,8 +97,8 @@ window.ldap_edit_popup = new class {
 		const fields = getFormFields(this.form);
 
 		if (fields.advanced_configuration != 1) {
-			delete fields.userfilter;
 			delete fields.start_tls;
+			delete fields.search_filter;
 		}
 
 		const curl = new Curl(this.form.getAttribute('action'), false);
