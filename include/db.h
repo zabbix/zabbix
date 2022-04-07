@@ -924,7 +924,7 @@ typedef struct
 	unsigned char		operator;
 	unsigned char		status;
 	unsigned char		severity;
-	unsigned char		inventory_mode;
+	int			inventory_mode;
 	unsigned char		discover;
 }
 zbx_lld_override_operation_t;
