@@ -940,7 +940,7 @@ class CTemplateGroup extends CApiService {
 		$del_templateids = array_diff($db_templateids, $templateids);
 
 		if ($del_templateids) {
-			self::checkDeletedObjects($del_templateids, $groupids);
+			self::checkDeletedTemplates($del_templateids, $groupids);
 		}
 	}
 
@@ -1082,24 +1082,24 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param array  $del_objectids
+	 * @param array  $del_templateids
 	 * @param array  $groupids
 	 *
 	 * @throws APIException
 	 */
-	private static function checkDeletedObjects(array $del_objectids, array $groupids): void {
-		$db_objects = API::Template()->get([
+	private static function checkDeletedTemplates(array $del_templateids, array $groupids): void {
+		$db_templates = API::Template()->get([
 			'output' => ['host'],
-			'templateids' => $del_objectids,
+			'templateids' => $del_templateids,
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		if (count($db_objects) != count($del_objectids)) {
+		if (count($db_templates) != count($del_templateids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		self::checkObjectsWithoutGroups($db_objects, $groupids);
+		self::checkObjectsWithoutGroups($db_templates, $groupids);
 	}
 
 	/**

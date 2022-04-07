@@ -1182,7 +1182,7 @@ class CHostGroup extends CApiService {
 		$del_hostids = array_diff($db_hostids, $hostids);
 
 		if ($del_hostids) {
-			self::checkDeletedObjects($del_hostids, $groupids);
+			self::checkDeletedHosts($del_hostids, $groupids);
 		}
 	}
 
@@ -1346,24 +1346,24 @@ class CHostGroup extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param array  $del_objectids
+	 * @param array  $del_hostids
 	 * @param array  $groupids
 	 *
 	 * @throws APIException
 	 */
-	private static function checkDeletedObjects(array $del_objectids, array $groupids): void {
-		$db_objects = API::Host()->get([
+	private static function checkDeletedHosts(array $del_hostids, array $groupids): void {
+		$db_hosts = API::Host()->get([
 			'output' => ['host'],
-			'hostids' => $del_objectids,
+			'hostids' => $del_hostids,
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		if (count($db_objects) != count($del_objectids)) {
+		if (count($db_hosts) != count($del_hostids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		self::checkObjectsWithoutGroups($db_objects, $groupids);
+		self::checkObjectsWithoutGroups($db_hosts, $groupids);
 	}
 
 	/**
