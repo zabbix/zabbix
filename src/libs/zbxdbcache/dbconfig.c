@@ -7380,7 +7380,7 @@ static void	DCget_function(DC_FUNCTION *dst_function, const ZBX_DC_FUNCTION *src
 	memcpy(dst_function->parameter, src_function->parameter, sz_parameter);
 }
 
-static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_trigger)
+static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_trigger, unsigned int flags)
 {
 	int	i;
 
@@ -7432,6 +7432,19 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
 			zbx_vector_ptr_append(&dst_trigger->tags, tag);
 		}
 	}
+
+	zbx_vector_uint64_create(&dst_trigger->itemids);
+
+	if (0 != (flags & ZBX_TRIGGER_GET_ITEMIDS) && NULL != src_trigger->itemids)
+	{
+		zbx_uint64_t	*itemid;
+
+		for (itemid = src_trigger->itemids; 0 != *itemid; itemid++)
+			;
+
+		zbx_vector_uint64_append_array(&dst_trigger->itemids, src_trigger->itemids,
+				(int)(itemid - src_trigger->itemids));
+	}
 }
 
 void	zbx_free_item_tag(zbx_item_tag_t *item_tag)
@@ -7469,6 +7482,7 @@ static void	DCclean_trigger(DC_TRIGGER *trigger)
 		zbx_free(trigger->eval_ctx_r);
 	}
 
+	zbx_vector_uint64_destroy(&trigger->itemids);
 }
 
 /******************************************************************************
@@ -7884,7 +7898,7 @@ void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_
 			continue;
 		}
 
-		DCget_trigger(&triggers[i], dc_trigger);
+		DCget_trigger(&triggers[i], dc_trigger, ZBX_TRIGGER_GET_DEFAULT);
 		errcode[i] = SUCCEED;
 	}
 
@@ -7919,38 +7933,6 @@ void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t 
 
 		DCget_function(&functions[i], dc_function);
 		errcodes[i] = SUCCEED;
-	}
-
-	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get hostids for functions                                         *
- *                                                                            *
- ******************************************************************************/
-void	DCconfig_get_hostids_by_functions(DC_FUNCTION *functions, int *errcodes, size_t functions_num,
-		zbx_vector_uint64_t *hostids)
-{
-	size_t			i;
-
-	zbx_vector_uint64_reserve(hostids, functions_num);
-
-	RDLOCK_CACHE;
-
-	for (i = 0; i < functions_num; i++)
-	{
-		zbx_uint64_t	hostid = 0;
-
-		if (SUCCEED == errcodes[i])
-		{
-			const ZBX_DC_ITEM	*item;
-
-			if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &functions[i].itemid)))
-				hostid = item->hostid;
-		}
-
-		zbx_vector_uint64_append(hostids, hostid);
 	}
 
 	UNLOCK_CACHE;
@@ -8173,7 +8155,7 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 
 			if (0 == found)
 			{
-				DCget_trigger(trigger, dc_trigger);
+				DCget_trigger(trigger, dc_trigger, ZBX_TRIGGER_GET_ALL);
 				zbx_vector_ptr_append(trigger_order, trigger);
 			}
 
@@ -8299,7 +8281,7 @@ void	zbx_dc_get_triggers_by_timers(zbx_hashset_t *trigger_info, zbx_vector_ptr_t
 
 			trigger_local.triggerid = dc_trigger->triggerid;
 			trigger = (DC_TRIGGER *)zbx_hashset_insert(trigger_info, &trigger_local, sizeof(trigger_local));
-			DCget_trigger(trigger, dc_trigger);
+			DCget_trigger(trigger, dc_trigger, ZBX_TRIGGER_GET_ALL);
 
 			trigger->timespec = timer->eval_ts;
 			trigger->flags = flags;

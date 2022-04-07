@@ -251,6 +251,7 @@ typedef struct _DC_TRIGGER
 	unsigned char		flags;
 
 	zbx_vector_ptr_t	tags;
+	zbx_vector_uint64_t	itemids;
 
 	zbx_eval_context_t	*eval_ctx;
 	zbx_eval_context_t	*eval_ctx_r;
@@ -680,6 +681,11 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
 #define ZBX_ITEM_GET_PROCESS		(ZBX_ITEM_GET_MAINTENANCE|ZBX_ITEM_GET_MISC|ZBX_ITEM_GET_LOGTIMEFMT)
 
+#define ZBX_TRIGGER_GET_ITEMIDS		0x0001
+
+#define ZBX_TRIGGER_GET_DEFAULT		(~(unsigned int)ZBX_TRIGGER_GET_ITEMIDS)
+#define ZBX_TRIGGER_GET_ALL		(~(unsigned int)0)
+
 void	DCsync_configuration(unsigned char mode);
 void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths);
 int	init_configuration_cache(char **error);
@@ -698,8 +704,6 @@ void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *i
 void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp);
 void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
-void	DCconfig_get_hostids_by_functions(DC_FUNCTION *functions, int *errcodes, size_t functions_num,
-		zbx_vector_uint64_t *hostids);
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);
 void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num);
 int	DCconfig_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zbx_vector_uint64_t *triggerids);
