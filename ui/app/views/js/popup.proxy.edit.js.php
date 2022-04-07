@@ -161,9 +161,7 @@ window.proxy_edit_popup = new class {
 				}
 			}
 
-			const title = response.success.title ?? null;
-			const messages = response.success.messages ?? [];
-			const message_box = makeMessageBox('good', messages, title, true, true)[0];
+			const message_box = makeMessageBox('good', response.success.messages, response.success.title)[0];
 
 			this.form.parentNode.insertBefore(message_box, this.form);
 		});

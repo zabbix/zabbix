@@ -69,9 +69,7 @@ window.dashboard_share_edit_popup = {
 
 				overlayDialogueDestroy(overlay.dialogueid);
 
-				const title = response.success.title ?? null;
-				const messages = response.success.messages ?? [];
-				const message_box = makeMessageBox('good', messages, title, true, true)[0];
+				const message_box = makeMessageBox('good', response.success.messages, response.success.title);
 
 				addMessage(message_box);
 			})
