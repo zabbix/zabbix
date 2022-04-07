@@ -849,17 +849,13 @@ class CTemplateGroup extends CApiService {
 			'groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'templates' =>	['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
+			'templates' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
 				'templateid'=>	['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		if (!array_key_exists('templates', $data)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one template must be specified.'));
 		}
 
 		$db_groups = $this->get([

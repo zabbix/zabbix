@@ -491,7 +491,7 @@ class testTemplateGroup extends CAPITest {
 						['groupid' => '52003']
 					]
 				],
-				'expected_error' => 'At least one template must be specified.'
+				'expected_error' => 'Invalid parameter "/": the parameter "templates" is missing.'
 			],
 			[
 				'templategroup' => [

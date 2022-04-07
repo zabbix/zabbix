@@ -1087,17 +1087,13 @@ class CHostGroup extends CApiService {
 			'groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'hosts' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
+			'hosts' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED |API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
 				'hostid'=>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		if (!array_key_exists('hosts', $data)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host must be specified.'));
 		}
 
 		$db_groups = $this->get([
