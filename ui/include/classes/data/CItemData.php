@@ -755,7 +755,7 @@ final class CItemData {
 					'js-item-value-map-label',
 					'js-item-value-map-field',
 					'valuemap_name',
-					'valuemapid',
+					'valuemapid'
 				],
 				ITEM_VALUE_TYPE_LOG => [
 					'js-item-log-time-format-label',
