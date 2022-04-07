@@ -556,6 +556,7 @@ zbx_preproc_op_t;
 typedef struct
 {
 	zbx_uint64_t		itemid;
+	zbx_uint64_t		hostid;
 	unsigned char		type;
 	unsigned char		value_type;
 
@@ -1064,7 +1065,7 @@ void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *handle);
 void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *handle, const char *macro, const zbx_uint64_t *hostids,
 		int hostids_num, char **value);
 
-char	*zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *handle, const char *text, const zbx_uint64_t *hostids,
+void	zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, char **text, const zbx_uint64_t *hostids,
 		int hostids_num);
 
 char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);

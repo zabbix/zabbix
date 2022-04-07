@@ -199,25 +199,6 @@ static void	dbsync_prepare(zbx_dbsync_t *sync, int columns_num, zbx_dbsync_prepr
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if the specified column in the row contains user macros    *
- *                                                                            *
- * Parameter: row    - [IN] the row to check                                  *
- *            column - [IN] the column index                                  *
- *                                                                            *
- * Comments: While not definite, this check is used to filter out rows before *
- *           doing more precise (and resource intense) checks.                *
- *                                                                            *
- ******************************************************************************/
-static int	dbsync_check_row_macros(char **row, int column)
-{
-	if (NULL != strstr(row[column], "{$"))
-		return SUCCEED;
-
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: applies necessary pre-processing before row is compared/used      *
  *                                                                            *
  * Parameter: sync - [IN] the changeset                                       *
@@ -3578,49 +3559,6 @@ int	zbx_dbsync_compare_host_groups(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: applies necessary preprocessing before row is compared/used       *
- *                                                                            *
- * Parameter: row - [IN] the row to preprocess                                *
- *                                                                            *
- * Return value: the preprocessed row of item_preproc table                   *
- *                                                                            *
- * Comments: The row preprocessing can be used to expand user macros in       *
- *           some columns.                                                    *
- *                                                                            *
- ******************************************************************************/
-static char	**dbsync_item_pp_preproc_row(char **row)
-{
-#define ZBX_DBSYNC_ITEM_PP_COLUMN_PARAM		0x01
-#define ZBX_DBSYNC_ITEM_PP_COLUMN_ERR_PARAM	0x02
-
-	zbx_uint64_t	hostid;
-	unsigned int	flags = 0;
-
-	if (SUCCEED == dbsync_check_row_macros(row, 3))
-		flags |= ZBX_DBSYNC_ITEM_PP_COLUMN_PARAM;
-
-	if (SUCCEED == dbsync_check_row_macros(row, 7))
-		flags |= ZBX_DBSYNC_ITEM_PP_COLUMN_ERR_PARAM;
-
-	if (0 != flags)
-	{
-		ZBX_STR2UINT64(hostid, row[5]);
-
-		if (0 != (flags & ZBX_DBSYNC_ITEM_PP_COLUMN_PARAM))
-			row[3] = dc_expand_user_macros(row[3], &hostid, 1);
-
-		if (0 != (flags & ZBX_DBSYNC_ITEM_PP_COLUMN_ERR_PARAM))
-			row[7] = dc_expand_user_macros(row[7], &hostid, 1);
-	}
-
-	return row;
-
-#undef ZBX_DBSYNC_ITEM_PP_COLUMN_PARAM
-#undef ZBX_DBSYNC_ITEM_PP_COLUMN_ERR_PARAM
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: compares item preproc table row with cached configuration data    *
  *                                                                            *
  * Parameter: preproc - [IN] the cached item preprocessing operation          *
@@ -3690,7 +3628,7 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 8, dbsync_item_pp_preproc_row);
+	dbsync_prepare(sync, 8, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

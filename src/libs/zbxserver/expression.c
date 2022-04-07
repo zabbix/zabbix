@@ -600,8 +600,8 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 
 					um_handle = zbx_dc_open_user_macros();
 
-					*replace_to = zbx_dc_expand_user_macros(um_handle, row[5], &dc_item.host.hostid,
-							1);
+					*replace_to = zbx_strdup(NULL, row[5]);
+					zbx_dc_expand_user_macros(um_handle, replace_to, &dc_item.host.hostid, 1);
 
 					zbx_dc_close_user_macros(um_handle);
 					ret = SUCCEED;

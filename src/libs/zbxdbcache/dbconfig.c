@@ -7694,6 +7694,7 @@ static int	dc_preproc_item_init(zbx_preproc_item_t *item, zbx_uint64_t itemid)
 		return FAIL;
 
 	item->itemid = itemid;
+	item->hostid = dc_item->hostid;
 	item->type = dc_item->type;
 	item->value_type = dc_item->value_type;
 
@@ -7728,6 +7729,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 	zbx_hashset_iter_t		iter;
 	zbx_preproc_op_t		*op;
 	int				i;
+	zbx_dc_um_handle_t		*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -7806,6 +7808,23 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 	}
 
 	UNLOCK_CACHE;
+
+	um_handle = zbx_dc_open_user_macros();
+
+	zbx_hashset_iter_reset(items, &iter);
+	while (NULL != (item = (zbx_preproc_item_t *)zbx_hashset_iter_next(&iter)))
+	{
+
+		for (i = 0; i < item->preproc_ops_num; i++)
+		{
+			zbx_dc_expand_user_macros(um_handle, &item->preproc_ops[i].params, &item->hostid, 1);
+			zbx_dc_expand_user_macros(um_handle, &item->preproc_ops[i].error_handler_params, &item->hostid,
+					1);
+		}
+
+	}
+
+	zbx_dc_close_user_macros(um_handle);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() items:%d", __func__, items->num_data);
 }
@@ -13050,22 +13069,21 @@ char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t 
 	{
 		size_t	param_pos, param_len;
 		int	quoted;
-		char	*param, *resolved_param = NULL;
+		char	*param;
 
 		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
 
 		param = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
-		resolved_param = zbx_dc_expand_user_macros(um_handle, param, &hostid, 1);
+		zbx_dc_expand_user_macros(um_handle, &param, &hostid, 1);
 
-		if (SUCCEED == zbx_function_param_quote(&resolved_param, quoted))
-			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, resolved_param);
+		if (SUCCEED == zbx_function_param_quote(&param, quoted))
+			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, param);
 		else
 			zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, ptr + param_pos, param_len);
 
 		if (',' == ptr[sep_pos])
 			zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, ',');
 
-		zbx_free(resolved_param);
 		zbx_free(param);
 	}
 
@@ -13203,6 +13221,19 @@ zbx_dc_um_handle_t	*zbx_dc_open_user_macros_masked(void)
 	return dc_open_user_macros(ZBX_MACRO_ENV_NONSECURE);
 }
 
+static const zbx_um_cache_t	*dc_um_get_cache(const zbx_dc_um_handle_t *um_handle)
+{
+	if (NULL == *um_handle->cache)
+	{
+		WRLOCK_CACHE;
+		*um_handle->cache = config->um_cache;
+		config->um_cache->refcount++;
+		UNLOCK_CACHE;
+	}
+
+	return *um_handle->cache;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: closes user macro resolving handle                                *
@@ -13234,15 +13265,7 @@ void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *handle)
 void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macro, const zbx_uint64_t *hostids,
 		int hostids_num, char **value)
 {
-	if (NULL == *um_handle->cache)
-	{
-		WRLOCK_CACHE;
-		*um_handle->cache = config->um_cache;
-		config->um_cache->refcount++;
-		UNLOCK_CACHE;
-	}
-
-	um_cache_resolve(*um_handle->cache, hostids, hostids_num, macro, um_handle->macro_env, value);
+	um_cache_resolve(dc_um_get_cache(um_handle), hostids, hostids_num, macro, um_handle->macro_env, value);
 }
 
 /******************************************************************************
@@ -13250,20 +13273,35 @@ void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macr
  * Purpose: expand user macros in the specified text value                    *
  *                                                                            *
  * Parameters: um_handle   - [IN] the user macro cache handle                 *
- *             text        - [IN] the text value to expand                    *
+ *             text        - [IN/OUT] the text value with macros to expand    *
  *             hostids     - [IN] an array of host identifiers                *
  *             hostids_num - [IN] the number of host identifiers              *
  *                                                                            *
- * Return value: The text value with expanded user macros. Unknown or invalid *
- *               macros will be left unresolved.                              *
- *                                                                            *
- * Comments: The returned value must be freed by the caller.                  *
- *                                                                            *
  ******************************************************************************/
-char	*zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, const char *text, const zbx_uint64_t *hostids,
+void	zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, char **text, const zbx_uint64_t *hostids,
 		int hostids_num)
 {
-	return dc_expand_user_macros_impl(*um_handle->cache, text, hostids, hostids_num);
+	zbx_token_t	token;
+	int		pos = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'", __func__, *text);
+
+	for (; SUCCEED == zbx_token_find(*text, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
+	{
+		const char	*value = NULL;
+
+		if (ZBX_TOKEN_USER_MACRO != token.type)
+			continue;
+
+		um_cache_resolve_const(dc_um_get_cache(um_handle), hostids, hostids_num, *text + token.loc.l, &value);
+
+		if (NULL != value)
+			zbx_replace_string(text, token.loc.l, &token.loc.r, value);
+
+		pos = token.loc.r;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() '%s'", __func__, *text);
 }
 
 /******************************************************************************
