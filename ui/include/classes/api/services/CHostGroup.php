@@ -1123,7 +1123,7 @@ class CHostGroup extends CApiService {
 
 		self::checkHostsNotDiscovered($db_hosts);
 
-		self::addAffectedObjects('hosts', $hostids, $db_groups);
+		self::addAffectedObjects($hostids, $db_groups);
 	}
 
 	/**
@@ -1175,7 +1175,7 @@ class CHostGroup extends CApiService {
 
 		self::checkHostsNotDiscovered($db_hosts);
 
-		self::addAffectedObjects('hosts', [], $db_groups, $db_hostids);
+		self::addAffectedObjects([], $db_groups, $db_hostids);
 
 		$del_hostids = array_diff($db_hostids, $hostids);
 
@@ -1231,7 +1231,7 @@ class CHostGroup extends CApiService {
 		self::checkHostsNotDiscovered($db_hosts);
 		self::checkObjectsWithoutGroups($db_hosts, $data['groupids']);
 
-		self::addAffectedObjects('hosts', $data['hostids'], $db_groups);
+		self::addAffectedObjects($data['hostids'], $db_groups);
 	}
 
 	/**
@@ -1293,29 +1293,25 @@ class CHostGroup extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param string     $objects
-	 * @param array      $objectids
+	 * @param array      $hostids
 	 * @param array      $db_groups
-	 * @param array|null $db_objectids
+	 * @param array|null $db_hostids
 	 */
-	private static function addAffectedObjects(string $objects, array $objectids, array &$db_groups,
-			array &$db_objectids = null): void {
-		$id_field_name = 'hostid';
-
-		if (!$objectids) {
-			$db_objectids = [];
+	private static function addAffectedObjects(array $hostids, array &$db_groups, array &$db_hostids = null): void {
+		if (!$hostids) {
+			$db_hostids = [];
 		}
 
 		foreach ($db_groups as &$db_group) {
-			$db_group[$objects] = [];
+			$db_group['hosts'] = [];
 		}
 		unset($db_group);
 
-		if ($objectids) {
+		if ($hostids) {
 			$options = [
 				'output' => ['hostgroupid', 'hostid', 'groupid'],
 				'filter' => [
-					'hostid' => $objectids,
+					'hostid' => $hostids,
 					'groupid' => array_keys($db_groups)
 				]
 			];
@@ -1327,24 +1323,23 @@ class CHostGroup extends CApiService {
 				' FROM hosts_groups hg,hosts h'.
 				' WHERE hg.hostid=h.hostid'.
 					' AND '.dbConditionInt('hg.groupid', array_keys($db_groups)).
-					' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE], $objects === 'hosts').
 					' AND h.flags='.ZBX_FLAG_DISCOVERY_NORMAL
 			);
 		}
 
 		while ($link = DBfetch($db_hosts_groups)) {
-			$db_groups[$link['groupid']][$objects][$link['hostgroupid']] = [
+			$db_groups[$link['groupid']]['hosts'][$link['hostgroupid']] = [
 				'hostgroupid' => $link['hostgroupid'],
-				$id_field_name => $link['hostid']
+				'hostid' => $link['hostid']
 			];
 
-			if (!$objectids) {
-				$db_objectids[$link['hostid']] = true;
+			if (!$hostids) {
+				$db_hostids[$link['hostid']] = true;
 			}
 		}
 
-		if (!$objectids) {
-			$db_objectids = array_keys($db_objectids);
+		if (!$hostids) {
+			$db_hostids = array_keys($db_hostids);
 		}
 	}
 

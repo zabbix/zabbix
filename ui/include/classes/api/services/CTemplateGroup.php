@@ -883,7 +883,7 @@ class CTemplateGroup extends CApiService {
 			);
 		}
 
-		self::addAffectedObjects('templates', $templateids, $db_groups);
+		self::addAffectedObjects($templateids, $db_groups);
 	}
 
 	/**
@@ -933,7 +933,7 @@ class CTemplateGroup extends CApiService {
 			);
 		}
 
-		self::addAffectedObjects('templates', [], $db_groups, $db_templateids);
+		self::addAffectedObjects([], $db_groups, $db_templateids);
 
 		$del_templateids = array_diff($db_templateids, $templateids);
 
@@ -988,7 +988,7 @@ class CTemplateGroup extends CApiService {
 
 		self::checkObjectsWithoutGroups($db_templates, $data['groupids']);
 
-		self::addAffectedObjects('templates', $data['templateids'], $db_groups);
+		self::addAffectedObjects($data['templateids'], $db_groups);
 	}
 
 	/**
@@ -1029,29 +1029,25 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param string     $objects
-	 * @param array      $objectids
+	 * @param array      $templateids
 	 * @param array      $db_groups
-	 * @param array|null $db_objectids
+	 * @param array|null $db_templateids
 	 */
-	private static function addAffectedObjects(string $objects, array $objectids, array &$db_groups,
-												array &$db_objectids = null): void {
-		$id_field_name = 'templateid';
-
-		if (!$objectids) {
-			$db_objectids = [];
+	private static function addAffectedObjects(array $templateids, array &$db_groups, array &$db_templateids = null): void {
+		if (!$templateids) {
+			$db_templateids = [];
 		}
 
 		foreach ($db_groups as &$db_group) {
-			$db_group[$objects] = [];
+			$db_group['templates'] = [];
 		}
 		unset($db_group);
 
-		if ($objectids) {
+		if ($templateids) {
 			$options = [
 				'output' => ['templategroupid', 'hostid', 'groupid'],
 				'filter' => [
-					'hostid' => $objectids,
+					'hostid' => $templateids,
 					'groupid' => array_keys($db_groups)
 				]
 			];
@@ -1063,24 +1059,23 @@ class CTemplateGroup extends CApiService {
 				' FROM template_group tg,hosts h'.
 				' WHERE tg.hostid=h.hostid'.
 				' AND '.dbConditionInt('tg.groupid', array_keys($db_groups)).
-				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE], $objects === 'hosts').
 				' AND h.flags='.ZBX_FLAG_DISCOVERY_NORMAL
 			);
 		}
 
 		while ($link = DBfetch($db_template_groups)) {
-			$db_groups[$link['groupid']][$objects][$link['templategroupid']] = [
+			$db_groups[$link['groupid']]['templates'][$link['templategroupid']] = [
 				'templategroupid' => $link['templategroupid'],
-				$id_field_name => $link['hostid']
+				'templateid' => $link['hostid']
 			];
 
-			if (!$objectids) {
-				$db_objectids[$link['hostid']] = true;
+			if (!$templateids) {
+				$db_templateids[$link['hostid']] = true;
 			}
 		}
 
-		if (!$objectids) {
-			$db_objectids = array_keys($db_objectids);
+		if (!$templateids) {
+			$db_templateids = array_keys($db_templateids);
 		}
 	}
 
