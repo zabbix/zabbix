@@ -379,7 +379,7 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const DB_TRIGGER *trigger, zbx_
 			um_handle = zbx_dc_open_user_macros();
 
 			ret = zbx_eval_expand_user_macros(&cache->eval_ctx, cache->hostids.values,
-					cache->hostids.values_num, (zbx_macro_resolve_func_t)zbx_dc_get_user_macro,
+					cache->hostids.values_num, (zbx_macro_expand_func_t)zbx_dc_expand_user_macros,
 					um_handle, NULL);
 
 			zbx_dc_close_user_macros(um_handle);
@@ -398,7 +398,7 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const DB_TRIGGER *trigger, zbx_
 			um_handle = zbx_dc_open_user_macros();
 
 			ret = zbx_eval_expand_user_macros(&cache->eval_ctx_r, cache->hostids.values,
-					cache->hostids.values_num, (zbx_macro_resolve_func_t)zbx_dc_get_user_macro,
+					cache->hostids.values_num, (zbx_macro_expand_func_t)zbx_dc_expand_user_macros,
 					um_handle, NULL);
 
 			zbx_dc_close_user_macros(um_handle);

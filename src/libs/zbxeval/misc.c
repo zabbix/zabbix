@@ -439,12 +439,12 @@ static int	eval_has_usermacro(const char *str, size_t len)
  *                                 first failed macro expansion               *
  *                                                                            *
  ******************************************************************************/
-static void	eval_query_expand_user_macros(const char *itemquery, size_t len, const zbx_uint64_t *hostids,
-		int hostids_num, zbx_macro_resolve_func_t resolver_cb, void *data, char **out, char **error)
+static int	eval_query_expand_user_macros(const char *itemquery, size_t len, const zbx_uint64_t *hostids,
+		int hostids_num, zbx_macro_expand_func_t um_expand_cb, void *um_data, char **out, char **error)
 {
 	zbx_eval_context_t	ctx;
 	zbx_item_query_t	query;
-	int			i;
+	int			i, ret = FAIL;
 	char			*errmsg = NULL, *filter = NULL;
 
 	if (len != zbx_eval_parse_query(itemquery, len, &query))
@@ -452,18 +452,24 @@ static void	eval_query_expand_user_macros(const char *itemquery, size_t len, con
 		if (NULL != error)
 		{
 			*error = zbx_strdup(NULL, "cannot parse item query");
-			return;
+			return FAIL;
 		}
+		return SUCCEED;
 	}
 
 	if (NULL == query.filter)
+	{
+		ret = SUCCEED;
 		goto out;
+	}
 
 	if (SUCCEED != zbx_eval_parse_expression(&ctx, query.filter,
 			ZBX_EVAL_PARSE_QUERY_EXPRESSION | ZBX_EVAL_COMPOSE_QUOTE, &errmsg))
 	{
 		if (NULL != error)
 			*error = zbx_dsprintf(NULL, "cannot parse item query filter: %s", errmsg);
+		else
+			ret = SUCCEED;
 
 		zbx_free(errmsg);
 		goto out;
@@ -472,12 +478,13 @@ static void	eval_query_expand_user_macros(const char *itemquery, size_t len, con
 	for (i = 0; i < ctx.stack.values_num; i++)
 	{
 		zbx_eval_token_t	*token = &ctx.stack.values[i];
-		char			*value = NULL, *tmp;
+		char			*value = NULL;
 
 		switch (token->type)
 		{
 			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
-				resolver_cb(data, ctx.expression + token->loc.l, hostids, hostids_num, &value);
+				value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
+				ret = um_expand_cb(um_data, &value, hostids, hostids_num, error);
 				break;
 			case ZBX_EVAL_TOKEN_VAR_STR:
 				if (SUCCEED != eval_has_usermacro(ctx.expression + token->loc.l,
@@ -485,27 +492,20 @@ static void	eval_query_expand_user_macros(const char *itemquery, size_t len, con
 				{
 					continue;
 				}
-				tmp = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
-				resolver_cb(data, tmp, hostids, hostids_num, &value);
-				zbx_free(tmp);
+				value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
+				ret = um_expand_cb(um_data, &value, hostids, hostids_num, error);
 				break;
 			default:
 				continue;
 		}
 
-		if (NULL == value)
+		if (FAIL == ret)
 		{
-			/* stop resolving on failure if error is requested */
-			if (NULL != error)
-			{
-				*error = zbx_dsprintf(NULL, "unknown user macro \"%.*s\"",
-						(int)(token->loc.r - token->loc.l + 1), ctx.expression + token->loc.l);
-				zbx_eval_clear(&ctx);
-				goto out;
-			}
-			continue;
+			zbx_free(value);
+			goto out;
 		}
 
+		zbx_variant_clear(&token->value);
 		zbx_variant_set_str(&token->value, value);
 	}
 
@@ -513,10 +513,12 @@ static void	eval_query_expand_user_macros(const char *itemquery, size_t len, con
 	zbx_eval_clear(&ctx);
 
 	*out = zbx_dsprintf(NULL, "/%s/%s?[%s]", ZBX_NULL2EMPTY_STR(query.host), query.key, filter);
-
+	ret = SUCCEED;
 out:
 	zbx_free(filter);
 	zbx_eval_clear_query(&query);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -526,8 +528,8 @@ out:
  * Parameters: ctx         - [IN] the evaluation context                      *
  *             hostids     - [IN] the linked hostids                          *
  *             hostids_num - [IN] the number of linked hostids                *
- *             resolver_cb - [IN] the resolver callback                       *
- *             data        - [IN] the resolver callback data                  *
+ *             um_expand_cb- [IN] the resolver callback                       *
+ *             um_data     - [IN] the resolver callback data                  *
  *             error       - [OUT] the error message, optional. If specified  *
  *                                 the function will return failure at the    *
  *                                 first failed macro expansion               *
@@ -538,19 +540,21 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, const zbx_uint64_t *hostids, int hostids_num,
-		zbx_macro_resolve_func_t resolver_cb, void *data, char **error)
+		zbx_macro_expand_func_t um_expand_cb, void *um_data, char **error)
 {
 	int	i;
 
 	for (i = 0; i < ctx->stack.values_num; i++)
 	{
 		zbx_eval_token_t	*token = &ctx->stack.values[i];
-		char			*value = NULL, *tmp;
+		char			*value = NULL;
+		int			ret;
 
 		switch (token->type)
 		{
 			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
-				resolver_cb(data, ctx->expression + token->loc.l, hostids, hostids_num, &value);
+				value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
+				ret = um_expand_cb(um_data, &value, hostids, hostids_num, error);
 				break;
 			case ZBX_EVAL_TOKEN_VAR_STR:
 			case ZBX_EVAL_TOKEN_VAR_NUM:
@@ -560,9 +564,8 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, const zbx_uint64_
 				{
 					continue;
 				}
-				tmp = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
-				resolver_cb(data, tmp, hostids, hostids_num, &value);
-				zbx_free(tmp);
+				value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
+				ret = um_expand_cb(um_data, &value, hostids, hostids_num, error);
 				break;
 			case ZBX_EVAL_TOKEN_ARG_QUERY:
 				if (SUCCEED != eval_has_usermacro(ctx->expression + token->loc.l,
@@ -570,31 +573,25 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, const zbx_uint64_
 				{
 					continue;
 				}
-				eval_query_expand_user_macros(ctx->expression + token->loc.l,
+				ret = eval_query_expand_user_macros(ctx->expression + token->loc.l,
 						token->loc.r - token->loc.l + 1, hostids, hostids_num,
-						resolver_cb, data, &value, error);
+						um_expand_cb, um_data, &value, error);
 				break;
 			default:
 				continue;
 		}
 
-		if (NULL == value)
+		if (FAIL == ret)
 		{
-			/* stop resolving on failure if error is requested */
-			if (NULL != error)
-			{
-				if (NULL == *error)
-				{
-					*error = zbx_dsprintf(NULL, "unknown user macro \"%.*s\"",
-							(int)(token->loc.r - token->loc.l + 1),
-							ctx->expression + token->loc.l);
-				}
-				return FAIL;
-			}
-			continue;
+			zbx_free(value);
+			return FAIL;
 		}
-		zbx_variant_clear(&token->value);
-		zbx_variant_set_str(&token->value, value);
+
+		if (NULL != value)
+		{
+			zbx_variant_clear(&token->value);
+			zbx_variant_set_str(&token->value, value);
+		}
 	}
 
 	return SUCCEED;

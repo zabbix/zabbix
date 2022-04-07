@@ -93,7 +93,7 @@ ZBX_SHMEM_FUNC_IMPL(__config, config_mem)
 static void	dc_maintenance_precache_nested_groups(void);
 static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_exclude);
 
-static char	*dc_expand_user_macros_impl(zbx_um_cache_t *um_cache, const char *text, const zbx_uint64_t *hostids,
+static char	*dc_expand_user_macros_dyn(zbx_um_cache_t *um_cache, const char *text, const zbx_uint64_t *hostids,
 		int hostids_num);
 
 extern char		*CONFIG_VAULTTOKEN;
@@ -351,7 +351,7 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *in
 
 	seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, item->type, item->key);
 
-	delay_s = dc_expand_user_macros(item->delay, &item->hostid, 1);
+	delay_s = dc_expand_user_macros_dyn(config->um_cache, item->delay, &item->hostid, 1);
 	ret = zbx_interval_preproc(delay_s, &simple_interval, &custom_intervals, error);
 	zbx_free(delay_s);
 
@@ -3313,7 +3313,7 @@ static int	dc_function_calculate_nextcheck(zbx_um_cache_t *um_cache, const zbx_t
 			{
 				char	*period;
 
-				period = dc_expand_user_macros_impl(um_cache, param, &timer->hostid, 1);
+				period = dc_expand_user_macros_dyn(um_cache, param, &timer->hostid, 1);
 
 				if (NULL != (period_shift = strchr(param, ':')))
 				{
@@ -7817,9 +7817,10 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 
 		for (i = 0; i < item->preproc_ops_num; i++)
 		{
-			zbx_dc_expand_user_macros(um_handle, &item->preproc_ops[i].params, &item->hostid, 1);
-			zbx_dc_expand_user_macros(um_handle, &item->preproc_ops[i].error_handler_params, &item->hostid,
-					1);
+			(void)zbx_dc_expand_user_macros(um_handle, &item->preproc_ops[i].params, &item->hostid, 1,
+					NULL);
+			(void)zbx_dc_expand_user_macros(um_handle, &item->preproc_ops[i].error_handler_params,
+					&item->hostid, 1, NULL);
 		}
 
 	}
@@ -10202,115 +10203,11 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int pr
 
 /******************************************************************************
  *                                                                            *
- * Purpose: expand user macros in the specified text value                    *
- *                                                                            *
- * Parameters: text         - [IN] the text value to expand                   *
- *             len          - [IN] the text length                            *
- *             hostids      - [IN] an array of related hostids                *
- *             hostids_num  - [IN] the number of hostids                      *
- *             value        - [IN] the expanded macro with expanded user      *
- *                                 macros. Unknown or invalid macros will be  *
- *                                 left unresolved.                           *
- *             error        - [IN] the error message, optional. If specified  *
- *                                 the function will return failure on first  *
- *                                 unknown user macro                         *
- *                                                                            *
- * Return value: SUCCEED - the macros were expanded successfully              *
- *               FAIL    - error parameter was given and at least one of      *
- *                         macros was not expanded                            *
- *                                                                            *
- * Comments: The returned value must be freed by the caller.                  *
+ * Purpose: expand user macros in string returning new string with resolved   *
+ *          macros                                                            *
  *                                                                            *
  ******************************************************************************/
-int	dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *hostids, int hostids_num,
-		char **value, char **error)
-{
-	zbx_token_t	token;
-	char		*str = NULL;
-	size_t		str_alloc = 0, str_offset = 0, pos = 0, last_pos = 0;
-
-	if ('\0' == *text)
-	{
-		*value = zbx_strdup(NULL, text);
-		return SUCCEED;
-	}
-
-	for (; SUCCEED == zbx_token_find(text, pos, &token, ZBX_TOKEN_SEARCH_BASIC) && token.loc.r < text_len; pos++)
-	{
-		const char	*macro_value = NULL;
-
-		if (ZBX_TOKEN_USER_MACRO != token.type)
-			continue;
-
-		if (last_pos < token.loc.l)
-			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
-
-		um_cache_resolve_const(config->um_cache, hostids, hostids_num, text + token.loc.l, &macro_value);
-
-		if (NULL != macro_value)
-		{
-			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, macro_value);
-		}
-		else
-		{
-			if (NULL != error)
-			{
-				*error = zbx_dsprintf(NULL, "unknown user macro \"%.*s\"",
-						(int)(token.loc.r - token.loc.l + 1), text + token.loc.l);
-				zbx_free(str);
-				return FAIL;
-			}
-			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + token.loc.l,
-					token.loc.r - token.loc.l + 1);
-		}
-
-		pos = token.loc.r;
-		last_pos = pos + 1;
-	}
-
-	if (last_pos < text_len)
-		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, text_len - last_pos);
-
-	*value = str;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: expand user macros in the specified text                          *
- *                                                                            *
- * Parameters: text         - [IN] the text value to expand                   *
- *             len          - [IN] the text length                            *
- *             hostids      - [IN] an array of related hostids                *
- *             hostids_num  - [IN] the number of hostids                      *
- *             value        - [IN] the expanded macro with expanded user      *
- *                                 macros. Unknown or invalid macros will be  *
- *                                 left unresolved.                           *
- *             error        - [IN] the error message, optional. If specified  *
- *                                 the function will return failure on first  *
- *                                 unknown user macro                         *
- *                                                                            *
- * Return value: SUCCEED - the macros were expanded successfully              *
- *               FAIL    - error parameter was given and at least one of      *
- *                         macros was not expanded                            *
- *                                                                            *
- * Comments: The returned value must be freed by the caller.                  *
- *                                                                            *
- ******************************************************************************/
-int	zbx_dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *hostids, int hostids_num,
-		char **value, char **error)
-{
-	int	ret;
-
-	RDLOCK_CACHE;
-	ret = dc_expand_user_macros_len(text, text_len, hostids, hostids_num, value, error);
-	UNLOCK_CACHE;
-
-	return ret;
-}
-
-static char	*dc_expand_user_macros_impl(zbx_um_cache_t *um_cache, const char *text, const zbx_uint64_t *hostids,
+static char	*dc_expand_user_macros_dyn(zbx_um_cache_t *um_cache, const char *text, const zbx_uint64_t *hostids,
 		int hostids_num)
 {
 	zbx_token_t	token;
@@ -10351,26 +10248,6 @@ static char	*dc_expand_user_macros_impl(zbx_um_cache_t *um_cache, const char *te
 	zbx_strcpy_alloc(&str, &str_alloc, &str_offset, text + last_pos);
 
 	return str;
-}
-/******************************************************************************
- *                                                                            *
- * Purpose: expand user macros in the specified text value                    *
- * WARNING - DO NOT USE FOR TRIGGERS, for triggers use the dedicated function *
- *                                                                            *
- * Parameters: text           - [IN] the text value to expand                 *
- *             hostids        - [IN] an array of related hostids              *
- *             hostids_num    - [IN] the number of hostids                    *
- *                                                                            *
- * Return value: The text value with expanded user macros. Unknown or invalid *
- *               macros will be left unresolved.                              *
- *                                                                            *
- * Comments: The returned value must be freed by the caller.                  *
- *           This function must be used only by configuration syncer          *
- *                                                                            *
- ******************************************************************************/
-char	*dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int hostids_num)
-{
-	return dc_expand_user_macros_impl(config->um_cache, text, hostids, hostids_num);
 }
 
 /******************************************************************************
@@ -10455,7 +10332,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 				if (dc_host->data_expected_from > (data_expected_from = dc_item->data_expected_from))
 					data_expected_from = dc_host->data_expected_from;
 
-				delay_s = dc_expand_user_macros(dc_item->delay, &dc_item->hostid, 1);
+				delay_s = dc_expand_user_macros_dyn(config->um_cache, dc_item->delay, &dc_item->hostid, 1);
 				ret = zbx_interval_preproc(delay_s, &delay, NULL, NULL);
 				zbx_free(delay_s);
 
@@ -10664,7 +10541,8 @@ static void	dc_status_update(void)
 					int	delay;
 					char	*delay_s;
 
-					delay_s = dc_expand_user_macros(dc_item->delay, &dc_item->hostid, 1);
+					delay_s = dc_expand_user_macros_dyn(config->um_cache, dc_item->delay,
+							&dc_item->hostid, 1);
 
 					if (SUCCEED == zbx_interval_preproc(delay_s, &delay, NULL, NULL) &&
 							0 != delay)
@@ -13074,7 +12952,7 @@ char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t 
 		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
 
 		param = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
-		zbx_dc_expand_user_macros(um_handle, &param, &hostid, 1);
+		(void)zbx_dc_expand_user_macros(um_handle, &param, &hostid, 1, NULL);
 
 		if (SUCCEED == zbx_function_param_quote(&param, quoted))
 			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, param);
@@ -13278,11 +13156,11 @@ void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macr
  *             hostids_num - [IN] the number of host identifiers              *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, char **text, const zbx_uint64_t *hostids,
-		int hostids_num)
+int	zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, char **text, const zbx_uint64_t *hostids,
+		int hostids_num, char **error)
 {
 	zbx_token_t	token;
-	int		pos = 0;
+	int		pos = 0, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'", __func__, *text);
 
@@ -13295,13 +13173,26 @@ void	zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, char **text,
 
 		um_cache_resolve_const(dc_um_get_cache(um_handle), hostids, hostids_num, *text + token.loc.l, &value);
 
-		if (NULL != value)
+		if (NULL == value)
+		{
+			if (NULL != error)
+			{
+				*error = zbx_dsprintf(NULL, "unknown user macro \"%.*s\"",
+						(int)(token.loc.r - token.loc.l + 1), *text + token.loc.l);
+				goto out;
+			}
+		}
+		else
 			zbx_replace_string(text, token.loc.l, &token.loc.r, value);
 
 		pos = token.loc.r;
 	}
 
+	ret = SUCCEED;
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() '%s'", __func__, *text);
+
+	return ret;
 }
 
 /******************************************************************************

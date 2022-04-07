@@ -599,9 +599,10 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 					zbx_dc_um_handle_t	*um_handle;
 
 					um_handle = zbx_dc_open_user_macros();
-
 					*replace_to = zbx_strdup(NULL, row[5]);
-					zbx_dc_expand_user_macros(um_handle, replace_to, &dc_item.host.hostid, 1);
+
+					(void)zbx_dc_expand_user_macros(um_handle, replace_to, &dc_item.host.hostid, 1,
+							NULL);
 
 					zbx_dc_close_user_macros(um_handle);
 					ret = SUCCEED;
@@ -2439,7 +2440,7 @@ static int	get_expression_macro_result(const DB_EVENT *event, char *data, zbx_st
 	}
 
 	if (SUCCEED != zbx_eval_expand_user_macros(&ctx, hostids->values, hostids->values_num,
-			(zbx_macro_resolve_func_t)zbx_dc_get_user_macro, um_handle, NULL))
+			(zbx_macro_expand_func_t)zbx_dc_expand_user_macros, um_handle, NULL))
 	{
 		goto out;
 	}
@@ -5418,8 +5419,8 @@ static int	expand_expression_macros(zbx_eval_context_t *ctx, zbx_dc_um_handle_t 
 		return FAIL;
 	}
 
-	return zbx_eval_expand_user_macros(ctx, hostids, hostids_num, (zbx_macro_resolve_func_t)zbx_dc_get_user_macro,
-			um_handle, error);
+	return zbx_eval_expand_user_macros(ctx, hostids, hostids_num,
+			(zbx_macro_expand_func_t)zbx_dc_expand_user_macros, um_handle, error);
 }
 
 static int	expand_trigger_macros(DC_TRIGGER *tr, DB_EVENT *db_event, zbx_dc_um_handle_t *um_handle, char **error)
