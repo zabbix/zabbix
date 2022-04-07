@@ -213,7 +213,7 @@ class CUserGroup extends CApiService {
 			'gui_access' =>			['type' => API_INT32, 'in' => implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED])],
 			'users_status' =>		['type' => API_INT32, 'in' => implode(',', [GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED])],
 			'userdirectoryid' =>	['type' => API_MULTIPLE, 'flags' => API_ALLOW_NULL, 'rules' => [
-				['if' => ['field' => 'gui_access', 'in' => implode(',', [GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_SYSTEM])], 'type' => API_ID],
+				['if' => ['field' => 'gui_access', 'in' => (string) GROUP_GUI_ACCESS_LDAP], 'type' => API_ID],
 				['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'rights' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['id']], 'fields' => [
@@ -287,7 +287,7 @@ class CUserGroup extends CApiService {
 			'gui_access' =>			['type' => API_INT32, 'in' => implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED])],
 			'users_status' =>		['type' => API_INT32, 'in' => implode(',', [GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED])],
 			'userdirectoryid' =>	['type' => API_MULTIPLE, 'flags' => API_ALLOW_NULL, 'rules' => [
-				['if' => ['field' => 'gui_access', 'in' => implode(',', [GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_SYSTEM])], 'type' => API_ID],
+				['if' => ['field' => 'gui_access', 'in' => (string) GROUP_GUI_ACCESS_LDAP], 'type' => API_ID],
 				['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'rights' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['id']], 'fields' => [
@@ -304,18 +304,16 @@ class CUserGroup extends CApiService {
 				'userid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
 		]];
-		$usrgrps = $this->extendObjectsByKey($usrgrps, $db_usrgrps, 'usrgrpid', ['gui_access']);
-
-		if (!CApiInputValidator::validate($api_input_rules, $usrgrps, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		// Check user group names.
 		$db_usrgrps = DB::select('usrgrp', [
 			'output' => ['usrgrpid', 'name', 'debug_mode', 'gui_access', 'users_status'],
 			'usrgrpids' => array_column($usrgrps, 'usrgrpid'),
 			'preservekeys' => true
 		]);
+		$usrgrps = $this->extendObjectsByKey($usrgrps, $db_usrgrps, 'usrgrpid', ['gui_access']);
+
+		if (!CApiInputValidator::validate($api_input_rules, $usrgrps, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 
 		$names = [];
 
@@ -340,6 +338,11 @@ class CUserGroup extends CApiService {
 
 			if (array_key_exists('name', $usrgrp) && $usrgrp['name'] !== $db_usrgrp['name']) {
 				$names[] = $usrgrp['name'];
+			}
+
+			if (array_key_exists('gui_access', $usrgrp) && $usrgrp['gui_access'] != $db_usrgrp['gui_access']
+					&& $usrgrp['gui_access'] != GROUP_GUI_ACCESS_LDAP) {
+				$usrgrp['userdirectoryid'] = 0;
 			}
 		}
 		unset($usrgrp);
