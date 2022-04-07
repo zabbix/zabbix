@@ -269,7 +269,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 					$this->assertEquals(1, $entry['link_type']);
 		}
 
-		$response = $this->call('hostprototype.delete', [$hostprototypeid]);
+		$this->call('hostprototype.delete', [$hostprototypeid]);
 
 		// Reload configuration cache.
 		$this->reloadConfigurationCache();

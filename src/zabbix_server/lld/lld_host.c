@@ -2447,7 +2447,6 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
 	if (0 != hostids.values_num)
 	{
 		char	*sql = NULL;
-		int	link_type;
 		size_t	sql_alloc = 0, sql_offset = 0;
 
 		/* select already linked templates */
@@ -2464,6 +2463,8 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
 
 		while (NULL != (row = DBfetch(result)))
 		{
+			int	link_type;
+
 			ZBX_STR2UINT64(hostid, row[0]);
 			ZBX_STR2UINT64(templateid, row[1]);
 			link_type = atoi(row[2]);

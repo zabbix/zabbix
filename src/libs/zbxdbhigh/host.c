@@ -3842,8 +3842,8 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 			zbx_db_insert_add_values(db_insert_htemplates, hosttemplateid, host_prototype->hostid,
 					host_prototype->lnk_templateids.values[j]);
 
-			zbx_audit_host_prototype_update_json_add_parent_template(host_prototype->hostid,
-					hosttemplateid, host_prototype->lnk_templateids.values[j], 0);
+			zbx_audit_host_prototype_update_json_add_parent_template(host_prototype->hostid, hosttemplateid,
+					host_prototype->lnk_templateids.values[j], TEMPLATE_LINK_MANUAL);
 
 			hosttemplateid++;
 		}

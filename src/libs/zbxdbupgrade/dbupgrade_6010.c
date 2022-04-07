@@ -114,12 +114,13 @@ static int	DBpatch_6010005(void)
 	result = DBselect(
 		"select ht.hosttemplateid"
 		" from hosts_templates ht, hosts h"
-		" where ht.hostid=h.hostid and h.flags=4");
+		" where ht.hostid=h.hostid and h.flags=4"); /* ZBX_FLAG_DISCOVERY_CREATED */
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		/* set TEMPLATE_LINK_LLD as link_type */
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update hosts_templates set link_type=1 where hosttemplateid=%s;\n", row[0]);
 
