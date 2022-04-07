@@ -125,6 +125,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"vm.storage.writeoio", VMCHECK_FUNC(check_vcenter_vm_storage_writeoio)},
 	{"vm.storage.totalwritelatency", VMCHECK_FUNC(check_vcenter_vm_storage_totalwritelatency)},
 	{"vm.storage.totalreadlatency", VMCHECK_FUNC(check_vcenter_vm_storage_totalreadlatency)},
+	{"vm.tools", VMCHECK_FUNC(check_vcenter_vm_tools)},
 	{"vm.uptime", VMCHECK_FUNC(check_vcenter_vm_uptime)},
 	{"vm.vfs.dev.discovery", VMCHECK_FUNC(check_vcenter_vm_vfs_dev_discovery)},
 	{"vm.vfs.dev.read", VMCHECK_FUNC(check_vcenter_vm_vfs_dev_read)},

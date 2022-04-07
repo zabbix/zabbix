@@ -189,6 +189,8 @@ int	check_vcenter_vm_storage_totalwritelatency(AGENT_REQUEST *request, const cha
 		AGENT_RESULT *result);
 int	check_vcenter_vm_storage_totalreadlatency(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_vm_tools(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_vm_uptime(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_vfs_dev_discovery(AGENT_REQUEST *request, const char *username, const char *password,

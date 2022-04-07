@@ -3315,6 +3315,56 @@ int	check_vcenter_vm_storage_uncommitted(AGENT_REQUEST *request, const char *use
 	return ret;
 }
 
+#define ZBX_VMWARE_VM_TOOLS_VERSION             0
+#define ZBX_VMWARE_VM_TOOLS_RUNNING_STATUS      1
+int	check_vcenter_vm_tools(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	int		mode, ret;
+	const char	*param1;
+
+	if (1 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		ret = SYSINFO_RET_FAIL;
+		goto out;
+	}
+
+	param1  = get_rparam(request, 0);
+
+	if (NULL == param1 || '\0' == *param1)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+
+		ret = SYSINFO_RET_FAIL;
+		goto out;
+	}
+
+	if (0 == strcmp(param1, "version"))
+	{
+		mode = ZBX_VMWARE_VM_TOOLS_VERSION;
+	}
+	else if (0 == strcmp(param1, "status"))
+	{
+		mode = ZBX_VMWARE_VM_TOOLS_RUNNING_STATUS;
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+
+		ret = SYSINFO_RET_FAIL;
+		goto out;
+	}
+
+	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_TOOLS_VERSION, result);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+#undef ZBX_VMWARE_VM_TOOLS_VERSION
+#undef ZBX_VMWARE_VM_TOOLS_RUNNING_STATUS
+
 int	check_vcenter_vm_uptime(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
