@@ -48,7 +48,7 @@ void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, cons
 void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, unsigned char *severity,
 		zbx_vector_ptr_pair_t *override_tags, unsigned char *status, unsigned char *discover);
 void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, zbx_vector_uint64_t *lnk_templateids,
-		char *inventory_mode, unsigned char *status, unsigned char *discover);
+		int *inventory_mode, unsigned char *status, unsigned char *discover);
 void	lld_override_graph(const zbx_vector_ptr_t *overrides, const char *name, unsigned char *discover);
 
 int	lld_validate_item_override_no_discover(const zbx_vector_ptr_t *overrides, const char *name,
