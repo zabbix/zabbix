@@ -1201,6 +1201,7 @@ class CControllerPopupTriggerExpr extends CController {
 			$this->setResponse(
 				(new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
+						'title' => _('Cannot insert trigger expression'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 				])]))->disableView()
@@ -1572,12 +1573,14 @@ class CControllerPopupTriggerExpr extends CController {
 			}
 			catch (Exception $e) {
 				error($e->getMessage());
-				error(_('Cannot insert trigger expression'));
 			}
 
 			if ($messages = get_and_clear_messages()) {
 				$output = [
-					'error' => array_column($messages, 'message')
+					'error' => [
+						'title' => _('Cannot insert trigger expression'),
+						'messages' => array_column($messages, 'message')
+					]
 				];
 			}
 			else {
