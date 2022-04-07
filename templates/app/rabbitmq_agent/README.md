@@ -39,7 +39,7 @@ In the case of a single-node installation, you can assign the `cluster` template
 
 If you use another API endpoint, then don't forget to change `{$RABBITMQ.API.CLUSTER_HOST}` macro.
 
-Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.0/manual/installation/install_from_packages).
+Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.2/manual/installation/install_from_packages).
 
 
 ## Zabbix configuration
@@ -166,7 +166,7 @@ Login and password are also set in macros:
 - {$RABBITMQ.API.PASSWORD}
 
 If you use another API endpoint, then don't forget to change `{$RABBITMQ.API.HOST}` macro.
-Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.0/manual/installation/install_from_packages).
+Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.2/manual/installation/install_from_packages).
 
 
 ## Zabbix configuration

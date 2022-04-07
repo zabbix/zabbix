@@ -43,7 +43,7 @@ No specific Zabbix configuration is required.
 |{$IIS.PORT} |<p>Listening port.</p> |`80` |
 |{$IIS.QUEUE.MAX.TIME} |<p>The time during which the queue length may exceed the threshold.</p> |`5m` |
 |{$IIS.QUEUE.MAX.WARN} |<p>Maximum application pool's request queue length for trigger expression.</p> |`` |
-|{$IIS.SERVICE} |<p>The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/simple_checks</p> |`http` |
+|{$IIS.SERVICE} |<p>The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/6.2/manual/config/items/itemtypes/simple_checks</p> |`http` |
 
 ## Template links
 
