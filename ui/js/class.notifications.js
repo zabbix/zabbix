@@ -435,9 +435,10 @@ ZBX_Notifications.prototype.handleCloseClicked = function(e) {
 		})
 		.catch((exception) => {
 			if (typeof exception === 'object' && 'error' in exception) {
+				clearMessages();
+
 				const message_box = makeMessageBox('bad', exception.error.messages, exception.error.title);
 
-				clearMessages();
 				addMessage(message_box);
 			}
 			else {
@@ -483,15 +484,14 @@ ZBX_Notifications.prototype.handleMuteClicked = function(e) {
 		.catch((exception) => {
 			clearMessages();
 
-			let title;
-			let messages = [];
+			let title, messages;
 
 			if (typeof exception === 'object' && 'error' in exception) {
 				title = exception.error.title;
 				messages = exception.error.messages;
 			}
 			else {
-				title = t('Unexpected server error.');
+				messages = [t('Unexpected server error.')];
 			}
 
 			const message_box = makeMessageBox('bad', messages, title);
@@ -600,9 +600,10 @@ ZBX_Notifications.prototype.mainLoop = function() {
 		})
 		.catch((exception) => {
 			if (typeof exception === 'object' && 'error' in exception) {
+				clearMessages();
+
 				const message_box = makeMessageBox('bad', exception.error.messages, exception.error.title);
 
-				clearMessages();
 				addMessage(message_box);
 			}
 			else {

@@ -109,15 +109,14 @@ window.tophosts_column_edit_form = new class {
 					}
 				}
 
-				let title;
-				let messages = [];
+				let title, messages;
 
 				if (typeof exception === 'object' && 'error' in exception) {
 					title = exception.error.title;
 					messages = exception.error.messages;
 				}
 				else {
-					title = <?= json_encode(_('Unexpected server error.')) ?>;
+					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 				}
 
 				const message_box = makeMessageBox('bad', messages, title)[0];

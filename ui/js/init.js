@@ -316,9 +316,10 @@ jQuery(function($) {
 				overlayPreloaderDestroy($preloader.prop('id'));
 
 				if ('error' in resp) {
+					clearMessages();
+
 					const message_box = makeMessageBox('bad', resp.error.messages, resp.error.title);
 
-					clearMessages();
 					addMessage(message_box);
 
 					return;

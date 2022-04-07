@@ -184,10 +184,10 @@
 					location.href = location.href;
 				})
 				.catch(() => {
-					const title = <?= json_encode(_('Unexpected server error.')) ?>;
-					const message_box = makeMessageBox('bad', [], title);
-
 					clearMessages();
+
+					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
+
 					addMessage(message_box);
 				})
 				.finally(() => {

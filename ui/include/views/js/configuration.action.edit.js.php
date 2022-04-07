@@ -787,7 +787,7 @@
 		overlay.xhr
 			.fail(({statusText}) => {
 				overlay.$dialogue.$body.find('output.msg-bad').remove();
-				overlay.$dialogue.$body.prepend(makeMessageBox('bad', [], statusText));
+				overlay.$dialogue.$body.prepend(makeMessageBox('bad', [statusText]));
 				overlay.unsetLoading();
 			})
 			.then((res) => {
@@ -1047,7 +1047,7 @@
 		this.overlay.xhr
 			.fail(({statusText}) => {
 				this.overlay.$dialogue.$body.find('output.msg-bad').remove();
-				this.overlay.$dialogue.$body.prepend(makeMessageBox('bad', [], statusText));
+				this.overlay.$dialogue.$body.prepend(makeMessageBox('bad', [statusText]));
 				this.overlay.unsetLoading();
 			})
 			.done((res) => {
@@ -1127,7 +1127,7 @@
 
 				this.onload(res);
 			})
-			.fail(({statusText}) => this.overlay.setProperties({content: makeMessageBox('bad', [], statusText)}));
+			.fail(({statusText}) => this.overlay.setProperties({content: makeMessageBox('bad', [statusText])}));
 	};
 
 	/**
