@@ -36,11 +36,25 @@ abstract class CItemGeneral extends CApiService {
 	protected const ERROR_NO_INTERFACE = 'noInterface';
 
 	/**
-	 * A list of supported pre-processing types.
+	 * A list of supported preprocessing types.
 	 *
 	 * @var array
 	 */
 	public const SUPPORTED_PREPROCESSING_TYPES = [];
+
+	/**
+	 * A list of preprocessing types that supports the "params" field.
+	 *
+	 * @var array
+	 */
+	protected const PREPROC_TYPES_WITH_PARAMS = [];
+
+	/**
+	 * A list of preprocessing types that supports the error handling.
+	 *
+	 * @var array
+	 */
+	protected const PREPROC_TYPES_WITH_ERR_HANDLING = [];
 
 	/**
 	 * A list of supported item types.
@@ -140,281 +154,42 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * @param array $items
+	 * @param int $flags
 	 *
-	 * @throws APIException
+	 * @return array
 	 */
-	protected function validatePreprocessing(array &$items): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'fields' => [
-			'type' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_PREPROCESSING_TYPES)],
-			'params' =>					['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'type', 'in' => ZBX_PREPROC_MULTIPLIER], 'type' => API_MULTIPLIER, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'length' => DB::getFieldLength('item_preproc', 'params')],
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_PREPROC_RTRIM, ZBX_PREPROC_LTRIM, ZBX_PREPROC_TRIM, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH, ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_preproc', 'params')],
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_REGSUB, ZBX_PREPROC_ERROR_FIELD_REGEX])], 'type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_preproc', 'params')],
-											['if' => ['field' => 'type', 'in' => ZBX_PREPROC_THROTTLE_TIMED_VALUE], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | ($this instanceof CItemPrototype || $this instanceof CDiscoveryRule) ? API_ALLOW_LLD_MACRO : 0, 'in' => '1:'.ZBX_MAX_TIMESHIFT, 'length' => DB::getFieldLength('item_preproc', 'params')],
-											['if' => ['field' => 'type', 'in' => ZBX_PREPROC_PROMETHEUS_TO_JSON], 'type' => API_PROMETHEUS_PATTERN, 'flags' => API_REQUIRED | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'length' => DB::getFieldLength('item_preproc', 'params')],
-											['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'error_handler' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_REGSUB, ZBX_PREPROC_BOOL2DEC, ZBX_PREPROC_OCT2DEC, ZBX_PREPROC_HEX2DEC, ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH, ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX, ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_XML_TO_JSON])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_FAIL_DEFAULT, ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE, ZBX_PREPROC_FAIL_SET_ERROR])],
-											['if' => ['field' => 'type', 'in' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE, ZBX_PREPROC_FAIL_SET_ERROR])],
-											['else' => true, 'type' => API_INT32, 'in' => ZBX_PREPROC_FAIL_DEFAULT, 'default' => ZBX_PREPROC_FAIL_DEFAULT]
-			]],
-			'error_handler_params' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'error_handler', 'in' => ZBX_PREPROC_FAIL_DEFAULT.','.ZBX_PREPROC_FAIL_DISCARD_VALUE], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => ''],
-											['if' => ['field' => 'error_handler', 'in' => ZBX_PREPROC_FAIL_SET_VALUE], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('item_preproc', 'error_handler_params')],
-											['if' => ['field' => 'error_handler', 'in' => ZBX_PREPROC_FAIL_SET_ERROR], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_preproc', 'error_handler_params')]
-			]]
-		]];
+	public static function getPreprocessingValidationRules(int $flags): array {
+		$is_item_prototype = $flags == ZBX_FLAG_DISCOVERY_PROTOTYPE;
 
-		$prometheus_pattern_parser = new CPrometheusPatternParser([
-			'usermacros' => true,
-			'lldmacros' => ($this instanceof CItemPrototype)
-		]);
-		$prometheus_output_parser = new CPrometheusOutputParser([
-			'usermacros' => true,
-			'lldmacros' => ($this instanceof CItemPrototype)
-		]);
-		$with_header_row_validator = new CLimitedSetValidator([
-			'values' => [ZBX_PREPROC_CSV_NO_HEADER, ZBX_PREPROC_CSV_HEADER]
-		]);
-
-		foreach ($items as $i => &$item) {
-			if (!array_key_exists('preprocessing', $item) || !$item['preprocessing']) {
-				continue;
-			}
-
-			$item['preprocessing'] = self::normalizeItemPreprocessingSteps($item['preprocessing']);
-
-			if (!CApiInputValidator::validate($api_input_rules, $item['preprocessing'], '/'.($i + 1).'/preprocessing',
-					$error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-
-			$delta = false;
-			$throttling = false;
-			$prometheus = false;
-			$not_supported = false;
-
-			foreach ($item['preprocessing'] as $preprocessing) {
-				switch ($preprocessing['type']) {
-					case ZBX_PREPROC_REGSUB:
-					case ZBX_PREPROC_ERROR_FIELD_REGEX:
-					case ZBX_PREPROC_STR_REPLACE:
-						$params = explode("\n", $preprocessing['params']);
-
-						if ($params[0] === '') {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'params', _('first parameter is expected')
-							));
-						}
-
-						if (($preprocessing['type'] == ZBX_PREPROC_REGSUB
-								|| $preprocessing['type'] == ZBX_PREPROC_ERROR_FIELD_REGEX)
-									&& (!array_key_exists(1, $params) || $params[1] === '')) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'params', _('second parameter is expected')
-							));
-						}
-						break;
-
-					case ZBX_PREPROC_DELTA_VALUE:
-					case ZBX_PREPROC_DELTA_SPEED:
-						if ($delta) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one change step is allowed.'));
-						}
-
-						$delta = true;
-						break;
-
-					case ZBX_PREPROC_VALIDATE_RANGE:
-						$params = explode("\n", $preprocessing['params']);
-
-						if ($params[0] === '') {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'params', _('first parameter is expected')
-							));
-						}
-
-						if (!is_numeric($params[0])
-								&& (new CUserMacroParser())->parse($params[0]) != CParser::PARSE_SUCCESS
-								&& (!$this instanceof CItemPrototype
-									|| ((new CLLDMacroFunctionParser())->parse($params[0]) != CParser::PARSE_SUCCESS
-										&& (new CLLDMacroParser())->parse($params[0]) != CParser::PARSE_SUCCESS))) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'params', _('a numeric value is expected')
-							));
-						}
-
-						if (!array_key_exists(1, $params) || $params[1] === '') {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'params', _('second parameter is expected')
-							));
-						}
-
-						if (!is_numeric($params[1])
-								&& (new CUserMacroParser())->parse($params[1]) != CParser::PARSE_SUCCESS
-								&& (!$this instanceof CItemPrototype
-									|| ((new CLLDMacroFunctionParser())->parse($params[1]) != CParser::PARSE_SUCCESS
-										&& (new CLLDMacroParser())->parse($params[1]) != CParser::PARSE_SUCCESS))) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'params', _('a numeric value is expected')
-							));
-						}
-
-						if (is_numeric($params[0]) && is_numeric($params[1]) && $params[0] > $params[1]) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Incorrect value for field "%1$s": %2$s.',
-								'params',
-								_s('"%1$s" value must be less than or equal to "%2$s" value', _('min'), _('max'))
-							));
-						}
-						break;
-
-					case ZBX_PREPROC_THROTTLE_VALUE:
-					case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
-						if ($throttling) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one throttling step is allowed.'));
-						}
-
-						$throttling = true;
-						break;
-
-					case ZBX_PREPROC_PROMETHEUS_PATTERN:
-					case ZBX_PREPROC_PROMETHEUS_TO_JSON:
-						if ($prometheus) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one Prometheus step is allowed.'));
-						}
-
-						$prometheus = true;
-
-						if ($preprocessing['type'] == ZBX_PREPROC_PROMETHEUS_PATTERN) {
-							$params = explode("\n", $preprocessing['params']);
-
-							if ($params[0] === '') {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-									'params', _('first parameter is expected')
-								));
-							}
-							elseif (!array_key_exists(1, $params)) {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-									'params', _('second parameter is expected')
-								));
-							}
-							elseif ($params[2] === ''
-									&& ($params[1] === ZBX_PREPROC_PROMETHEUS_LABEL
-										|| $params[1] === ZBX_PREPROC_PROMETHEUS_FUNCTION)) {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-									'params', _('third parameter is expected')
-								));
-							}
-
-							if ($prometheus_pattern_parser->parse($params[0]) != CParser::PARSE_SUCCESS) {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-									'params', _('invalid Prometheus pattern')
-								));
-							}
-
-							if (!in_array($params[1], [ZBX_PREPROC_PROMETHEUS_VALUE, ZBX_PREPROC_PROMETHEUS_LABEL,
-									ZBX_PREPROC_PROMETHEUS_FUNCTION])) {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-									'params', _('invalid aggregation method')
-								));
-							}
-
-							switch ($params[1]) {
-								case ZBX_PREPROC_PROMETHEUS_VALUE:
-									if ($params[2] !== '') {
-										self::exception(ZBX_API_ERROR_PARAMETERS,
-											_s('Incorrect value for field "%1$s": %2$s.', 'params',
-												_('invalid Prometheus output')
-											)
-										);
-									}
-									break;
-
-								case ZBX_PREPROC_PROMETHEUS_LABEL:
-									if ($prometheus_output_parser->parse($params[2]) != CParser::PARSE_SUCCESS) {
-										self::exception(ZBX_API_ERROR_PARAMETERS,
-											_s('Incorrect value for field "%1$s": %2$s.', 'params',
-												_('invalid Prometheus output')
-											)
-										);
-									}
-									break;
-
-								case ZBX_PREPROC_PROMETHEUS_FUNCTION:
-									if (!in_array($params[2], [ZBX_PREPROC_PROMETHEUS_SUM, ZBX_PREPROC_PROMETHEUS_MIN,
-											ZBX_PREPROC_PROMETHEUS_MAX, ZBX_PREPROC_PROMETHEUS_AVG,
-											ZBX_PREPROC_PROMETHEUS_COUNT])) {
-										self::exception(ZBX_API_ERROR_PARAMETERS,
-											_s('Incorrect value for field "%1$s": %2$s.', 'params',
-												_('unsupported Prometheus function')
-											)
-										);
-									}
-									break;
-							}
-						}
-						break;
-
-					case ZBX_PREPROC_CSV_TO_JSON:
-						$params = explode("\n", $preprocessing['params']);
-						$params_cnt = count($params);
-
-						if ($params_cnt > 3) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-						elseif ($params_cnt == 1) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'params', _('second parameter is expected')
-							));
-						}
-						elseif ($params_cnt == 2) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'params', _('third parameter is expected')
-							));
-						}
-						else {
-							// Correct amount of parameters, but check if they are valid.
-
-							if (mb_strlen($params[0]) > 1) {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-									'params', _('value of first parameter is too long')
-								));
-							}
-
-							if (mb_strlen($params[1]) > 1) {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-									'params', _('value of second parameter is too long')
-								));
-							}
-
-							if (!$with_header_row_validator->validate($params[2])) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('Incorrect value for field "%1$s": %2$s.', 'params',
-										_s('value of third parameter must be one of %1$s',
-											implode(', ', [ZBX_PREPROC_CSV_NO_HEADER, ZBX_PREPROC_CSV_HEADER])
-										)
-									)
-								);
-							}
-						}
-						break;
-
-					case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
-						if ($not_supported) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_('Only one not supported value check is allowed.')
-							);
-						}
-
-						$not_supported = true;
-						break;
-				}
-			}
-		}
-		unset($item);
+		return [
+			'type' => API_OBJECTS,
+			'uniq_by_values' => [
+				['type' => [ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED]],
+				['type' => [ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
+				['type' => [ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON]]
+			],
+			'fields' => [
+				'type' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_PREPROCESSING_TYPES)],
+				'params' =>					['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'type', 'in' => implode(',', static::PREPROC_TYPES_WITH_PARAMS)], 'type' => API_PREPROC_PARAMS, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'preproc_type' => ['field' => 'type'], 'length' => DB::getFieldLength('item_preproc', 'params')],
+												['else' => true, 'type' => API_UNEXPECTED]
+											]],
+				'error_handler' =>			['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'type', 'in' => implode(',', array_diff(static::PREPROC_TYPES_WITH_ERR_HANDLING, [ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]))], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_FAIL_DEFAULT, ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE, ZBX_PREPROC_FAIL_SET_ERROR])],
+												['if' => ['field' => 'type', 'in' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE, ZBX_PREPROC_FAIL_SET_ERROR])],
+												['else' => true, 'type' => API_UNEXPECTED]
+				]],
+				'error_handler_params' =>	['type' => API_MULTIPLE, 'rules' => [
+												['if' => static function (array $data): bool {
+													return array_key_exists('error_handler', $data) && $data['error_handler'] == ZBX_PREPROC_FAIL_SET_VALUE;
+												},  'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('item_preproc', 'error_handler_params')],
+												['if' => static function (array $data): bool {
+													return array_key_exists('error_handler', $data) && $data['error_handler'] == ZBX_PREPROC_FAIL_SET_ERROR;
+												},  'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_preproc', 'error_handler_params')],
+												['else' => true, 'type' => API_UNEXPECTED]
+				]]
+			]
+		];
 	}
 
 	/**

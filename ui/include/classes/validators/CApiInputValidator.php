@@ -192,9 +192,6 @@ class CApiInputValidator {
 			case API_EVENT_NAME:
 				return self::validateEventName($rule, $data, $path, $error);
 
-			case API_JSON:
-				return self::validateJson($rule, $data, $path, $error);
-
 			case API_JSONRPC_PARAMS:
 				return self::validateJsonRpcParams($rule, $data, $path, $error);
 
@@ -231,20 +228,26 @@ class CApiInputValidator {
 			case API_TIMESTAMP:
 				return self::validateTimestamp($rule, $data, $path, $error);
 
-			case API_MULTIPLIER:
-				return self::validateMultiplier($rule, $data, $path, $error);
-
-			case API_XML:
-				return self::validateXml($rule, $data, $path, $error);
-
-			case API_PROMETHEUS_PATTERN:
-				return self::validatePrometheusPattern($rule, $data, $path, $error);
-
 			case API_ITEM_KEY:
 				return self::validateItemKey($rule, $data, $path, $error);
 
 			case API_ITEM_DELAY:
 				return self::validateItemDelay($rule, $data, $path, $error);
+
+			case API_JSON:
+				return self::validateJson($rule, $data, $path, $error);
+
+			case API_XML:
+				return self::validateXml($rule, $data, $path, $error);
+
+			case API_PREPROC_PARAMS:
+				return self::validatePreprocParams($rule, $data, $path, $error);
+
+			case API_PROMETHEUS_PATTERN:
+				return self::validatePrometheusPattern($rule, $data, $path, $error);
+
+			case API_PROMETHEUS_LABEL:
+				return self::validatePrometheusLabel($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -300,7 +303,6 @@ class CApiInputValidator {
 			case API_PORT:
 			case API_TRIGGER_EXPRESSION:
 			case API_EVENT_NAME:
-			case API_JSON:
 			case API_JSONRPC_PARAMS:
 			case API_JSONRPC_ID:
 			case API_DATE:
@@ -313,11 +315,13 @@ class CApiInputValidator {
 			case API_UNEXPECTED:
 			case API_LAT_LNG_ZOOM:
 			case API_TIMESTAMP:
-			case API_MULTIPLIER:
-			case API_XML:
-			case API_PROMETHEUS_PATTERN:
 			case API_ITEM_KEY:
 			case API_ITEM_DELAY:
+			case API_JSON:
+			case API_XML:
+			case API_PREPROC_PARAMS:
+			case API_PROMETHEUS_PATTERN:
+			case API_PROMETHEUS_LABEL:
 				return true;
 
 			case API_OBJECT:
@@ -810,7 +814,7 @@ class CApiInputValidator {
 	 * Floating point number validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL
+	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO
 	 * @param string $rule['in']      (optional) a comma-delimited character string, for example: '0,60:900'
 	 * @param mixed  $data
 	 * @param string $path
@@ -818,7 +822,7 @@ class CApiInputValidator {
 	 *
 	 * @return bool
 	 */
-	private static function validateFloat($rule, &$data, $path, &$error) {
+	private static function validateFloat(array $rule, &$data, string $path, ?string &$error): bool {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
 		if (($flags & API_ALLOW_NULL) && $data === null) {
@@ -835,6 +839,21 @@ class CApiInputValidator {
 				$value = (float) $number_parser->getMatch();
 			}
 			else {
+				if ($flags & API_ALLOW_USER_MACRO) {
+					$user_macro_parser = new CUserMacroParser();
+				}
+
+				if ($flags & API_ALLOW_LLD_MACRO) {
+					$lld_macro_parser = new CLLDMacroParser();
+					$lld_macro_function_parser = new CLLDMacroFunctionParser();
+				}
+
+				if (($flags & API_ALLOW_USER_MACRO && $user_macro_parser->parse($data) == CParser::PARSE_SUCCESS)
+						|| ($flags & API_ALLOW_LLD_MACRO && ($lld_macro_parser->parse($data) == CParser::PARSE_SUCCESS
+							|| $lld_macro_function_parser->parse($data) == CParser::PARSE_SUCCESS))) {
+					return true;
+				}
+
 				$value = NAN;
 			}
 		}
@@ -849,6 +868,10 @@ class CApiInputValidator {
 		}
 
 		if (!self::checkFloatIn($rule, $value, $path, $error)) {
+			return false;
+		}
+
+		if (!self::checkCompare($rule, $value, $path, $error)) {
 			return false;
 		}
 
@@ -959,7 +982,7 @@ class CApiInputValidator {
 	 *
 	 * @return bool
 	 */
-	private static function checkFloatIn($rule, $data, $path, &$error) {
+	private static function checkFloatIn(array $rule, $data, string $path, ?string &$error) {
 		if (!array_key_exists('in', $rule)) {
 			return true;
 		}
@@ -1278,6 +1301,10 @@ class CApiInputValidator {
 			if (array_key_exists('compare', $field_rule)) {
 				$field_rule['compare']['path'] = ($path === '/' ? $path : $path.'/').$field_rule['compare']['field'];
 				$field_rule['compare']['value'] = $data[$field_rule['compare']['field']];
+			}
+
+			if (array_key_exists('preproc_type', $field_rule)) {
+				$field_rule['preproc_type']['value'] = $data[$field_rule['preproc_type']['field']];
 			}
 
 			if (array_key_exists($field_name, $data)) {
@@ -2084,7 +2111,7 @@ class CApiInputValidator {
 
 				foreach ($data as $index => $object) {
 					$_uniq = &$uniq;
-					$values = [];
+					$object_values = [];
 					$level = 1;
 
 					foreach ($field_names as $field_name) {
@@ -2092,29 +2119,104 @@ class CApiInputValidator {
 							break;
 						}
 
-						$values[] = $object[$field_name];
+						$object_values[] = $object[$field_name];
 
-						$value = ($rule['fields'][$field_name]['type'] == API_USER_MACRO)
+						$object_value = ($rule['fields'][$field_name]['type'] == API_USER_MACRO)
 							? self::trimMacro($object[$field_name])
 							: $object[$field_name];
 
 						if ($level < count($field_names)) {
-							if (!array_key_exists($value, $_uniq)) {
-								$_uniq[$value] = [];
+							if (!array_key_exists($object_value, $_uniq)) {
+								$_uniq[$object_value] = [];
 							}
 
-							$_uniq = &$_uniq[$value];
+							$_uniq = &$_uniq[$object_value];
 						}
 						else {
-							if (array_key_exists($value, $_uniq)) {
+							if (array_key_exists($object_value, $_uniq)) {
 								$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
 								$error = _s('Invalid parameter "%1$s": %2$s.', $subpath, _s('value %1$s already exists',
-									'('.implode(', ', $field_names).')=('.implode(', ', $values).')'
+									'('.implode(', ', $field_names).')=('.implode(', ', $object_values).')'
 								));
 								return false;
 							}
 
-							$_uniq[$value] = true;
+							$_uniq[$object_value] = true;
+						}
+
+						$level++;
+					}
+				}
+			}
+		}
+
+		if (array_key_exists('uniq_by_values', $rule)) {
+			foreach ($rule['uniq_by_values'] as $field_values) {
+				$uniq = [];
+				$_uniqs = [&$uniq];
+
+				foreach ($data as $index => $object) {
+					$object_values = [];
+					$level = 1;
+
+					foreach ($field_values as $field_name => $values) {
+						if (!array_key_exists($field_name, $object)) {
+							$_uniqs = [&$uniq];
+							break;
+						}
+
+						$object_values[] = $object[$field_name];
+
+						$object_value = ($rule['fields'][$field_name]['type'] == API_USER_MACRO)
+							? self::trimMacro($object[$field_name])
+							: $object[$field_name];
+
+						if (!in_array($object_value, $values)) {
+							$_uniqs = [&$uniq];
+							break;
+						}
+
+						if ($level < count($field_values)) {
+							$__uniqs = [];
+
+							foreach ($_uniqs as &$_uniq) {
+								foreach ($values as $value) {
+									if (!array_key_exists($value, $_uniq)) {
+										$_uniq[$value] = [];
+									}
+
+									$__uniqs[] = &$_uniq[$value];
+								}
+							}
+							unset($_uniq);
+
+							$_uniqs = $__uniqs;
+						}
+						else {
+							foreach ($_uniqs as &$_uniq) {
+								foreach ($values as $value) {
+									if (array_key_exists($value, $_uniq)) {
+										$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
+
+										$combinations = array_map(static function (array $values): string {
+											return '('.implode(', ', $values).')';
+										}, $field_values);
+
+										$error = _s('Invalid parameter "%1$s": %2$s.', $subpath,
+											_s('only one object can exist within the combinations of %1$s',
+												'('.implode(', ', array_keys($field_values)).')=('.
+													implode(', ', $combinations).')'
+											)
+										);
+										return false;
+									}
+
+									$_uniq[$value] = true;
+								}
+							}
+							unset($_uniq);
+
+							$_uniqs = [&$uniq];
 						}
 
 						$level++;
@@ -2525,70 +2627,6 @@ class CApiInputValidator {
 
 		if (!$eventname_validator->validate($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $eventname_validator->getError());
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * JSON validator.
-	 *
-	 * @param array  $rule
-	 * @param int    $rule['flags']     (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
-	 * @param array  $rule['macros_n']  (optional) An array of supported macros. Example: ['{HOST.IP}', '{ITEM.KEY}'].
-	 * @param int    $rule['length']    (optional)
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param string $error
-	 *
-	 * @return bool
-	 */
-	private static function validateJson($rule, &$data, $path, &$error) {
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-
-		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
-			return false;
-		}
-
-		if ($data === '') {
-			return true;
-		}
-
-		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
-			return false;
-		}
-
-		$json = $data;
-		$types = [];
-
-		if ($flags & API_ALLOW_USER_MACRO) {
-			$types['usermacros'] = true;
-		}
-
-		if ($flags & API_ALLOW_LLD_MACRO) {
-			$types['lldmacros'] = true;
-		}
-
-		if (array_key_exists('macros_n', $rule)) {
-			$types['macros_n'] = $rule['macros_n'];
-		}
-
-		if ($types) {
-			$matches = (new CMacrosResolverGeneral)->getMacroPositions($json, $types);
-			$shift = 0;
-
-			foreach ($matches as $pos => $substr) {
-				$json = substr_replace($json, '1', $pos + $shift, strlen($substr));
-				$shift = $shift + 1 - strlen($substr);
-			}
-		}
-
-		json_decode($json);
-
-		if (json_last_error()) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('JSON is expected'));
 			return false;
 		}
 
@@ -3073,7 +3111,7 @@ class CApiInputValidator {
 	 *
 	 * @return bool
 	 */
-	private static function checkCompare(array $rule, $data, string $path, string &$error): bool {
+	private static function checkCompare(array $rule, $data, string $path, ?string &$error): bool {
 		if (!array_key_exists('compare', $rule)) {
 			return true;
 		}
@@ -3140,147 +3178,6 @@ class CApiInputValidator {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Custom multiplier validator.
-	 *
-	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
-	 * @param int    $rule['length']  (optional)
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param string $error
-	 *
-	 * @return bool
-	 */
-	private static function validateMultiplier(array $rule, &$data, string $path, string &$error): bool {
-		if (is_numeric($data)) {
-			$data = (string) $data;
-		}
-
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-
-		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
-			return false;
-		}
-
-		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
-			return false;
-		}
-
-		$types = [];
-
-		if ($flags & API_ALLOW_USER_MACRO) {
-			$types['usermacros'] = true;
-		}
-
-		if ($flags & API_ALLOW_LLD_MACRO) {
-			$types['lldmacros'] = true;
-		}
-
-		$multiplier = $data;
-		$matches = (new CMacrosResolverGeneral)->getMacroPositions($data, $types);
-		$shift = 0;
-
-		foreach ($matches as $pos => $substr) {
-			$multiplier = substr_replace($multiplier, '1', $pos + $shift, strlen($substr));
-			$shift = $shift + 1 - strlen($substr);
-		}
-
-		$number_parser = new CNumberParser();
-
-		if ($number_parser->parse($multiplier) != CParser::PARSE_SUCCESS) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a numeric value is expected'));
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * XML validator.
-	 *
-	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
-	 * @param int    $rule['length']  (optional)
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param string $error
-	 *
-	 * @return bool
-	 */
-	private static function validateXml(array $rule, &$data, string $path, string &$error): bool {
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-
-		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
-			return false;
-		}
-
-		if ($data === '') {
-			return true;
-		}
-
-		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
-			return false;
-		}
-
-		libxml_use_internal_errors(true);
-
-		if (simplexml_load_string($data, null, LIBXML_IMPORT_FLAGS) === false) {
-			$errors = libxml_get_errors();
-			libxml_clear_errors();
-
-			if ($errors) {
-				$error = reset($errors);
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('%1$s [Line: %2$s | Column: %3$s]',
-					'('.$error->code.') '.trim($error->message), $error->line, $error->column
-				));
-				return false;
-			}
-
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('XML is expected'));
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_ALLOW_LLD_MACRO
-	 * @param int    $rule['length']  (optional)
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param string $error
-	 *
-	 * @return bool
-	 */
-	private static function validatePrometheusPattern(array $rule, &$data, string $path, string &$error): bool {
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-
-		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
-			return false;
-		}
-
-		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
-			return false;
-		}
-
-		$prometheus_pattern_parser = new CPrometheusPatternParser([
-			'usermacros' => true,
-			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)
-		]);
-
-		if ($prometheus_pattern_parser->parse($data) != CParser::PARSE_SUCCESS) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid Prometheus pattern'));
-			return false;
-		}
-
-		return true;
 	}
 
 	/**
@@ -3386,6 +3283,327 @@ class CApiInputValidator {
 
 				return false;
 			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * JSON validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']     (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
+	 * @param array  $rule['macros_n']  (optional) An array of supported macros. Example: ['{HOST.IP}', '{ITEM.KEY}'].
+	 * @param int    $rule['length']    (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateJson($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if ($data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$json = $data;
+		$types = [];
+
+		if ($flags & API_ALLOW_USER_MACRO) {
+			$types['usermacros'] = true;
+		}
+
+		if ($flags & API_ALLOW_LLD_MACRO) {
+			$types['lldmacros'] = true;
+		}
+
+		if (array_key_exists('macros_n', $rule)) {
+			$types['macros_n'] = $rule['macros_n'];
+		}
+
+		if ($types) {
+			$matches = (new CMacrosResolverGeneral)->getMacroPositions($json, $types);
+			$shift = 0;
+
+			foreach ($matches as $pos => $substr) {
+				$json = substr_replace($json, '1', $pos + $shift, strlen($substr));
+				$shift = $shift + 1 - strlen($substr);
+			}
+		}
+
+		json_decode($json);
+
+		if (json_last_error()) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('JSON is expected'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * XML validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateXml(array $rule, &$data, string $path, string &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if ($data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		libxml_use_internal_errors(true);
+
+		if (simplexml_load_string($data, null, LIBXML_IMPORT_FLAGS) === false) {
+			$errors = libxml_get_errors();
+			libxml_clear_errors();
+
+			if ($errors) {
+				$error = reset($errors);
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('%1$s [Line: %2$s | Column: %3$s]',
+					'('.$error->code.') '.trim($error->message), $error->line, $error->column
+				));
+				return false;
+			}
+
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('XML is expected'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param array  $rule
+	 * @param int    $rule['flags']                  (optional) API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
+	 * @param array  $rule['preproc_type']
+	 * @param int    $rule['preproc_type']['value']
+	 * @param int    $rule['length']                 (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validatePreprocParams(array $rule, &$data, string $path, string &$error): bool {
+		$preproc_type = $rule['preproc_type']['value'];
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8(0x00, $data, $path, $error) === false) {
+			return false;
+		}
+
+		$data = str_replace("\r\n", "\n", $data);
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+
+			return false;
+		}
+
+		$params = [];
+
+		foreach (explode("\n", $data) as $i => $param) {
+			$params[(string) $i + 1] = $param;
+		}
+
+		switch ($preproc_type) {
+			case ZBX_PREPROC_MULTIPLIER:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_FLOAT, 'flags' => API_REQUIRED | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO)]
+				]];
+				break;
+
+			case ZBX_PREPROC_RTRIM:
+			case ZBX_PREPROC_LTRIM:
+			case ZBX_PREPROC_TRIM:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+				]];
+				break;
+
+			case ZBX_PREPROC_REGSUB:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+					'2' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+				]];
+				break;
+
+			case ZBX_PREPROC_XPATH:
+			case ZBX_PREPROC_JSONPATH:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+				]];
+				break;
+
+			case ZBX_PREPROC_VALIDATE_RANGE:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_FLOAT, 'flags' => API_REQUIRED | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO)],
+					'2' =>	['type' => API_FLOAT, 'flags' => API_REQUIRED | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO), 'compare' => ['operator' => '>', 'field' => '1']]
+				]];
+				break;
+
+			case ZBX_PREPROC_VALIDATE_REGEX:
+			case ZBX_PREPROC_VALIDATE_NOT_REGEX:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+				]];
+				break;
+
+			case ZBX_PREPROC_ERROR_FIELD_JSON:
+			case ZBX_PREPROC_ERROR_FIELD_XML:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+				]];
+				break;
+
+			case ZBX_PREPROC_ERROR_FIELD_REGEX:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+					'2' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+				]];
+				break;
+
+			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO), 'in' => implode(':', [1, 25 * SEC_PER_YEAR])],
+				]];
+				break;
+
+			case ZBX_PREPROC_SCRIPT:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+				]];
+				break;
+
+			case ZBX_PREPROC_PROMETHEUS_PATTERN:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_PROMETHEUS_PATTERN, 'flags' => API_REQUIRED | API_NOT_EMPTY | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO)],
+					'2' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_PROMETHEUS_VALUE, ZBX_PREPROC_PROMETHEUS_LABEL, ZBX_PREPROC_PROMETHEUS_FUNCTION])],
+					'3' =>	['type' => API_MULTIPLE, 'rules' =>[
+								['if' => ['field' => '2', 'in' => implode(',', [ZBX_PREPROC_PROMETHEUS_VALUE])], 'type' => API_STRING_UTF8, 'in' => '', 'default' => ''],
+								['if' => ['field' => '2', 'in' => implode(',', [ZBX_PREPROC_PROMETHEUS_LABEL])], 'type' => API_PROMETHEUS_LABEL, 'flags' => API_REQUIRED | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO)],
+								['if' => ['field' => '2', 'in' => implode(',', [ZBX_PREPROC_PROMETHEUS_FUNCTION])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_PROMETHEUS_SUM, ZBX_PREPROC_PROMETHEUS_MIN, ZBX_PREPROC_PROMETHEUS_MAX, ZBX_PREPROC_PROMETHEUS_AVG, ZBX_PREPROC_PROMETHEUS_COUNT])]
+					]]
+				]];
+				break;
+
+			case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_PROMETHEUS_PATTERN, 'flags' => API_REQUIRED | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO)]
+				]];
+				break;
+
+			case ZBX_PREPROC_CSV_TO_JSON:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 1],
+					'2' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 1],
+					'3' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_CSV_NO_HEADER, ZBX_PREPROC_CSV_HEADER])]
+				]];
+				break;
+
+			case ZBX_PREPROC_STR_REPLACE:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+					'2' =>	['type' => API_STRING_UTF8, 'default' => '']
+				]];
+				break;
+		}
+
+		if (self::validate($api_input_rules, $params, $path, $error)) {
+			$data = implode("\n", $params);
+
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validatePrometheusPattern(array $rule, &$data, string $path, string &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8(($flags & API_NOT_EMPTY), $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		$prometheus_pattern_parser = new CPrometheusPatternParser([
+			'usermacros' => (bool) ($flags & API_ALLOW_USER_MACRO),
+			'lldmacros' => (bool) ($flags & API_ALLOW_LLD_MACRO)
+		]);
+
+		if ($prometheus_pattern_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid Prometheus pattern'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validatePrometheusLabel(array $rule, &$data, string $path, string &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		$prometheus_output_parser = new CPrometheusOutputParser([
+			'usermacros' => (bool) ($flags & API_ALLOW_USER_MACRO),
+			'lldmacros' => (bool) ($flags & API_ALLOW_LLD_MACRO)
+		]);
+
+		if ($prometheus_output_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid Prometheus label'));
+			return false;
 		}
 
 		return true;

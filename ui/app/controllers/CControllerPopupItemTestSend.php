@@ -158,9 +158,13 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			}
 
 			// Check preprocessing steps.
-			if ($steps && ($error = $this->preproc_item->validateItemPreprocessingSteps($steps)) !== true) {
-				error($error);
-				$ret = false;
+			if ($steps) {
+				$api_input_rules = CItemGeneral::getPreprocessingValidationRules(ZBX_FLAG_DISCOVERY_NORMAL);
+
+				if (!CApiInputValidator::validate($api_input_rules, $steps, '/', $error)) {
+					error($error);
+					$ret = false;
+				}
 			}
 
 			// Check previous time.

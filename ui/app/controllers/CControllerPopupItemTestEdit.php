@@ -100,9 +100,10 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			$steps = $this->getInput('steps', []);
 			if ($ret && $steps) {
 				$steps = normalizeItemPreprocessingSteps($steps);
-				$steps_validation_response = $this->preproc_item->validateItemPreprocessingSteps($steps);
-				if ($steps_validation_response !== true) {
-					error($steps_validation_response);
+				$api_input_rules = CItem::getPreprocessingValidationRules(ZBX_FLAG_DISCOVERY_NORMAL);
+
+				if (!CApiInputValidator::validate($api_input_rules, $steps, '/', $error)) {
+					error($error);
 					$ret = false;
 				}
 			}
