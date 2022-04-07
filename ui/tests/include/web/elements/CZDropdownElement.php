@@ -75,6 +75,35 @@ class CZDropdownElement extends CElement {
 	}
 
 	/**
+	 * Select option which text is combined from multiple consequent stings.
+	 *
+	 * @param string $text    option text to be selected
+	 *
+	 * @return $this
+	 */
+	public function selectCompositeOption($text) {
+		$all_options = $this->getOptions();
+
+		foreach ($all_options as $option) {
+			if ($text === $option->getText()) {
+				for ($i = 0; $i < 5; $i++) {
+					try {
+						$this->waitUntilClickable()->click();
+						$option->click();
+
+						return $this;
+					}
+					catch (Exception $exception) {
+						// Code is not missing here.
+					}
+				}
+			}
+		}
+
+		throw new Exception('Failed to select dropdown option "'.$text.'".');
+	}
+
+	/**
 	 * Alias for select.
 	 * @see self::select
 	 *

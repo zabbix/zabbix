@@ -212,58 +212,185 @@ class testFormMonitoringServices extends CWebTest {
 		// Check tabs available in the form.
 		$this->assertEquals(json_encode(['Service', 'Tags', 'Child services']), json_encode($form->getTabs()));
 
-		$service_tabs_labels = [
-			'Name',
-			'Parent services',
-			'Problem tags',
-			'Sort order (0->999)',
-			'Status calculation rule',
-			'Description',
-			'Advanced configuration'
+		$service_labels = [
+			'Name' => true,
+			'Parent services' => true,
+			'Problem tags' => true,
+			'Sort order (0->999)' => true,
+			'Status calculation rule' => true,
+			'Description' => true,
+			'Advanced configuration' => true,
+			'Additional rules' => false,
+			'Status propagation rule' => false,
+			'Weight' => false
 		];
 
 		// Check layout at Service tab.
-		foreach ($service_tabs_labels as $label) {
-			$this->assertTrue($form->query("xpath://div[@id='service-tab']//label[text()=".
-					CXPathHelper::escapeQuotes($label)."]")->one(false)->isValid());
+		$hidden_fields = [];
+		foreach ($service_labels as $label => $visible) {
+			$this->assertEquals($visible, $form->query("xpath://div[@id='service-tab']//label[text()=".
+					CXPathHelper::escapeQuotes($label)."]")->one(false)->isDisplayed()
+			);
+			if (!$visible) {
+				$hidden_fields[] = $label;
+			}
 		}
 
-		// Check Problem tags table data.
-		// Checks Problem tags table headers.
-		$problem_tags_table = $form->query('id:problem_tags')->asMultifieldTable()->one();
-		$this->assertSame(['Name', 'Operation', 'Value', 'Action'], $problem_tags_table->getHeadersText());
+		// Check advanced configuration default value.
+		$this->assertFalse($form->query('id:advanced_configuration')->asCheckbox()->one()->isChecked());
 
-		// Check Problem tags table fields.
-		$problem_tags_table->checkValue([['tag' => '', 'operator' => 'Equals', 'value' => '']]);
+		// Set "Advanced configuration" to true and check that corresponding fields are now visible.
+		$form->query('id:advanced_configuration')->asCheckbox()->one()->set(true);
+
+		foreach ($hidden_fields as $label) {
+			$this->assertTrue($form->getLabel($label)->isDisplayed());
+		}
+
+		$service_tab_tables = [
+			'problem_tags' => ['Name', 'Operation', 'Value', 'Action'],
+			'status_rules' => ['Name', 'Action']
+		];
+
+		// Check layout of tables in Service tab.
+		foreach ($service_tab_tables as $table_id => $columns) {
+			$table = $form->query('id', $table_id)->asMultifieldTable()->one();
+			$this->assertSame($columns, $table->getHeadersText());
+
+			if ($table_id === 'problem_tags') {
+				// Check Problem tags table fields.
+				$table->checkValue([['tag' => '', 'operator' => 'Equals', 'value' => '']]);
+
+				// Check table tags placeholders.
+				foreach (['tag', 'value'] as $placeholder) {
+					$this->assertEquals($placeholder, $table->query('id:problem_tags_0_'.$placeholder)->one()->getAttribute('placeholder'));
+				}
+			}
+		}
 
 		// Check Service tab fields' maxlengths.
 		$service_tab_limits = [
 			'Name' => 128,
 			'Sort order (0->999)' => 3,
 			'id:problem_tags_0_tag' => 255,
-			'id:problem_tags_0_value' => 255
+			'id:problem_tags_0_value' => 255,
+			'Weight' => 7
 		];
 		foreach ($service_tab_limits as $field => $max_length) {
 			$this->assertEquals($max_length, $form->getField($field)->getAttribute('maxlength'));
 		}
 
-		// Check table tags placeholders.
-		foreach (['tag', 'value'] as $placeholder) {
-			$this->assertEquals($placeholder, $problem_tags_table->query('id:problem_tags_0_'.$placeholder)->one()
-					->getAttribute('placeholder')
-			);
+		// Check Sort order  and Weight default value.
+		foreach (['Sort order (0->999)', 'Weight'] as $field) {
+			$this->assertEquals(0, $form->getField($field)->getValue());
 		}
 
-		// Check Operator options.
-		$this->assertSame(['Equals', 'Contains'],
-			$form->getField('name:problem_tags[0][operator]')->asZDropdown()->getOptions()->asText()
-		);
+		$dropdowns = [
+			'name:problem_tags[0][operator]' => [
+				'values' => ['Equals', 'Contains'],
+				'default' => 'Equals'
+			],
+			'Status calculation rule' => [
+				'values' => [
+					'Most critical of child services',
+					'Most critical if all children have problems',
+					'Set status to OK'
+				],
+				'default' => 'Most critical of child services'
+			],
+			'Status propagation rule' => [
+				'values' => [
+					'As is',
+					'Increase by',
+					'Decrease by',
+					'Ignore this service',
+					'Fixed status'
+				],
+				'default' => 'As is'
+			]
+		];
 
-		// Check Sort order default value.
-		$this->assertEquals(0, $form->getField('Sort order (0->999)')->getValue());
+		$this->checkDropdowns($dropdowns, $form);
 
-		// Check status calculation rule default value.
-		$this->assertEquals('Most critical of child services', $form->getField('Status calculation rule')->getText());
+		// Check radio buttons that are displayed for certain status propagation rules.
+		$radio_buttons = [
+			[
+				'propagation_rule' => 'Increase by',
+				'locator' => 'id:propagation_value_number',
+				'values' => ['1', '2', '3', '4', '5'],
+				'default' => '1'
+			],
+			[
+				'propagation_rule' => 'Decrease by',
+				'locator' => 'id:propagation_value_number',
+				'values' => ['1', '2', '3', '4', '5'],
+				'default' => '1'
+			],
+			[
+				'propagation_rule' => 'Fixed status',
+				'locator' => 'id:propagation_value_status',
+				'values' => ['OK', 'Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+				'default' => 'OK'
+			]
+		];
+		$propagation_rule_field = $form->getField('Status propagation rule')->asZDropdown();
+
+		foreach ($radio_buttons as $radio_params) {
+			$propagation_rule_field->select($radio_params['propagation_rule']);
+			$radio_element = $form->query($radio_params['locator'])->waitUntilVisible()->one()->asSegmentedRadio();
+			$this->assertEquals($radio_params['default'], $radio_element->getText());
+			$this->assertEquals($radio_params['values'], $radio_element->getLabels()->asText());
+		}
+
+		// Check the "New advanced rule" dialog layout.
+		$form->getFieldContainer('Additional rules')->query('button:Add')->waitUntilClickable()->one()->click();
+		$rules_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$rules_form = $rules_dialog->asForm();
+
+		// Check dialog title.
+		$this->assertEquals('New additional rule', $rules_dialog->getTitle());
+
+		// Check the initially displayed fields in "New additional rule" dialog.
+		$this->assertEquals(['Set status to', 'Condition', 'N', 'Status'], $rules_form->getLabels()->asText());
+
+		// Check default and possible values of dropdown elements.
+		$rules_dropdowns = [
+			'Set status to' => [
+				'values' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+				'default' => 'Not classified'
+			],
+			'Condition' => [
+				'values' => [
+					'If at least N child services have Status status or above',
+					'If at least N% of child services have Status status or above',
+					'If less than N child services have Status status or below',
+					'If less than N% of child services have Status status or below',
+					'If weight of child services with Status status or above is at least W',
+					'If weight of child services with Status status or above is at least N%',
+					'If weight of child services with Status status or below is less than W',
+					'If weight of child services with Status status or below is less than N%'
+				],
+				'default' => 'If at least N child services have Status status or above'
+			],
+			'Status' => [
+				'values' => ['OK', 'Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+				'default' => 'OK'
+			]
+		];
+
+		$this->checkDropdowns($rules_dropdowns, $rules_form);
+
+		// Check field "N" value nad maxlength.
+		$n_field = $rules_form->query('name:limit_value')->one();
+		$this->assertEquals(7, $n_field->getAttribute('maxlength'));
+		$this->assertEquals(1, $n_field->getValue());
+
+		// Change the condition and check that N field was replaced with W field.
+		$rules_form->getField('Condition')->selectCompositeOption('If weight of child services with Status status or above is at least W');
+
+		$rules_form->invalidate();
+		$this->assertEquals(['Set status to', 'Condition', 'W', 'Status'], $rules_form->getLabels()->asText());
+
+		$rules_dialog->query('button:Cancel')->one()->click();
 
 		// Check hint-box.
 		$form->query('id:algorithm-not-applicable-warning')->one()->click();
@@ -274,9 +401,6 @@ class testFormMonitoringServices extends CWebTest {
 		// Close the hint-box.
 		$hint->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
 		$hint->waitUntilNotPresent();
-
-		// Check advanced configuration default value.
-		$this->assertFalse($form->query('id:advanced_configuration')->asCheckbox()->one()->isChecked());
 
 		// Check layout at Tags tab.
 		$form->selectTab('Tags');
@@ -350,6 +474,18 @@ class testFormMonitoringServices extends CWebTest {
 
 		foreach (['Add', 'Cancel'] as $button) {
 			$this->assertTrue($dialog->getFooter()->query('button', $button)->one()->isClickable());
+		}
+	}
+
+	private function checkDropdowns($dropdowns, $form) {
+		foreach ($dropdowns as $field => $options) {
+			$dropdown = $form->getField($field);
+
+			// Check default dropdown value.
+			$this->assertEquals($options['default'], $dropdown->getText());
+
+			// Check all possible dropdown values.
+			$this->assertSame($options['values'], $dropdown->asZDropdown()->getOptions()->asText());
 		}
 	}
 
