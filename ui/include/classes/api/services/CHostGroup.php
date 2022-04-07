@@ -41,12 +41,84 @@ class CHostGroup extends CApiService {
 	/**
 	 * Get host groups.
 	 *
-	 * @param array $params
+	 * @param array $options
 	 *
 	 * @return array
 	 */
-	public function get($params) {
+	public function get($options) {
 		$result = [];
+
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'groupids' =>								['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'hostids' =>								['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'graphids' =>								['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'triggerids' =>								['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'maintenanceids' =>							['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'monitored_hosts' =>						['type' => API_BOOLEAN, 'flags' => API_DEPRECATED],
+			'with_monitored_hosts' =>					['type' => API_BOOLEAN, 'default' => false],
+			'real_hosts' =>								['type' => API_BOOLEAN, 'flags' => API_DEPRECATED],
+			'with_hosts' =>								['type' => API_BOOLEAN, 'default' => false],
+			'with_items' =>								['type' => API_BOOLEAN, 'default' => false],
+			'with_item_prototypes' =>					['type' => API_BOOLEAN, 'default' => false],
+			'with_simple_graph_items' =>				['type' => API_BOOLEAN, 'default' => false],
+			'with_simple_graph_item_prototypes' =>		['type' => API_BOOLEAN, 'default' => false],
+			'with_monitored_items' =>					['type' => API_BOOLEAN, 'default' => false],
+			'with_triggers' =>							['type' => API_BOOLEAN, 'default' => false],
+			'with_monitored_triggers' =>				['type' => API_BOOLEAN, 'default' => false],
+			'with_httptests' =>							['type' => API_BOOLEAN, 'default' => false],
+			'with_monitored_httptests' =>				['type' => API_BOOLEAN, 'default' => false],
+			'with_graphs' =>							['type' => API_BOOLEAN, 'default' => false],
+			'with_graph_prototypes' =>					['type' => API_BOOLEAN, 'default' => false],
+			'editable' =>								['type' => API_BOOLEAN, 'default' => false],
+			'nopermissions' =>							['type' => API_BOOLEAN, 'default' => false],
+			// filter
+			'filter' =>									['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'name' =>									['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'flags' =>									['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'uuid' =>									['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+			]],
+			'search' =>									['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'name' =>									['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+			]],
+			'searchByAny' =>							['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>							['type' => API_BOOLEAN, 'default' => false],
+			'excludeSearch' =>							['type' => API_BOOLEAN, 'default' => false],
+			'searchWildcardsEnabled' =>					['type' => API_BOOLEAN, 'default' => false],
+			// output
+			'output' =>									['type' => API_OUTPUT, 'in' => implode(',', ['groupid', 'name', 'flags', 'uuid']), 'default' => API_OUTPUT_EXTEND],
+			'selectHosts' =>							['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'default' => null],
+			'selectGroupDiscovery' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'selectDiscoveryRule' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'countOutput' =>							['type' => API_BOOLEAN, 'default' => false],
+			'groupCount' =>								['type' => API_BOOLEAN, 'default' => false],
+			'preservekeys' =>							['type' => API_BOOLEAN, 'default' => false],
+			'sortfield' =>								['type' => API_STRINGS_UTF8, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
+			'sortorder' =>								['type' => API_SORTORDER, 'default' => []],
+			'limit' =>									['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			'limitSelects' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
+		]];
+
+		if (array_key_exists('real_hosts', $options)) {
+			if (array_key_exists('with_hosts', $options)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'real_hosts'));
+			}
+
+			$options['with_hosts'] = $options['real_hosts'];
+			unset($options['real_hosts']);
+		}
+
+		if (array_key_exists('monitored_hosts', $options)) {
+			if (array_key_exists('with_monitored_hosts', $options)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'monitored_hosts'));
+			}
+
+			$options['with_monitored_hosts'] = $options['monitored_hosts'];
+			unset($options['monitored_hosts']);
+		}
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 
 		$sqlParts = [
 			'select'	=> ['hstgrp' => 'g.groupid'],
@@ -56,81 +128,9 @@ class CHostGroup extends CApiService {
 			'limit'		=> null
 		];
 
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'groupids'								=> ['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'hostids'								=> ['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'graphids'								=> ['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'triggerids'							=> ['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'maintenanceids'						=> ['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'monitored_hosts'						=> ['type' => API_BOOLEAN, 'flags' => API_DEPRECATED],
-			'with_monitored_hosts'					=> ['type' => API_BOOLEAN, 'default' => false],
-			'real_hosts'							=> ['type' => API_BOOLEAN, 'flags' => API_DEPRECATED],
-			'with_hosts'							=> ['type' => API_BOOLEAN, 'default' => false],
-			'with_items'							=> ['type' => API_BOOLEAN, 'default' => false],
-			'with_item_prototypes'					=> ['type' => API_BOOLEAN, 'default' => false],
-			'with_simple_graph_items'				=> ['type' => API_BOOLEAN, 'default' => false],
-			'with_simple_graph_item_prototypes'		=> ['type' => API_BOOLEAN, 'default' => false],
-			'with_monitored_items'					=> ['type' => API_BOOLEAN, 'default' => false],
-			'with_triggers'							=> ['type' => API_BOOLEAN, 'default' => false],
-			'with_monitored_triggers'				=> ['type' => API_BOOLEAN, 'default' => false],
-			'with_httptests'						=> ['type' => API_BOOLEAN, 'default' => false],
-			'with_monitored_httptests'				=> ['type' => API_BOOLEAN, 'default' => false],
-			'with_graphs'							=> ['type' => API_BOOLEAN, 'default' => false],
-			'with_graph_prototypes'					=> ['type' => API_BOOLEAN, 'default' => false],
-			'editable'								=> ['type' => API_BOOLEAN, 'default' => false],
-			'nopermissions'							=> ['type' => API_BOOLEAN, 'default' => false],
-			// filter
-			'filter'								=> ['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'flags' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'uuid' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			]],
-			'search'								=> ['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			]],
-			'searchByAny'							=> ['type' => API_BOOLEAN, 'default' => false],
-			'startSearch'							=> ['type' => API_BOOLEAN, 'default' => false],
-			'excludeSearch'							=> ['type' => API_BOOLEAN, 'default' => false],
-			'searchWildcardsEnabled'				=> ['type' => API_BOOLEAN, 'default' => false],
-			// output
-			'output'								=> ['type' => API_OUTPUT, 'in' => implode(',', ['groupid', 'name', 'flags', 'uuid']), 'default' => API_OUTPUT_EXTEND],
-			'selectHosts'							=> ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'default' => null],
-			'selectGroupDiscovery'					=> ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'selectDiscoveryRule'					=> ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'countOutput'							=> ['type' => API_BOOLEAN, 'default' => false],
-			'groupCount'							=> ['type' => API_BOOLEAN, 'default' => false],
-			'preservekeys'							=> ['type' => API_BOOLEAN, 'default' => false],
-			'sortfield'								=> ['type' => API_STRINGS_UTF8, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
-			'sortorder'								=> ['type' => API_SORTORDER, 'default' => []],
-			'limit'									=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
-			'limitSelects'							=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
-		]];
-
-		if (array_key_exists('real_hosts', $params)) {
-			if (array_key_exists('with_hosts', $params)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'real_hosts'));
-			}
-
-			$params['with_hosts'] = $params['real_hosts'];
-			unset($params['real_hosts']);
-		}
-
-		if (array_key_exists('monitored_hosts', $params)) {
-			if (array_key_exists('with_monitored_hosts', $params)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'monitored_hosts'));
-			}
-
-			$params['with_monitored_hosts'] = $params['monitored_hosts'];
-			unset($params['monitored_hosts']);
-		}
-
-		if (!CApiInputValidator::validate($api_input_rules, $params, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
 		// editable + PERMISSION CHECK
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$params['nopermissions']) {
-			$permission = $params['editable'] ? PERM_READ_WRITE : PERM_READ;
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 			$sqlParts['where'][] = 'EXISTS ('.
@@ -145,64 +145,64 @@ class CHostGroup extends CApiService {
 		}
 
 		// groupids
-		if (!is_null($params['groupids'])) {
-			zbx_value2array($params['groupids']);
-			$sqlParts['where']['groupid'] = dbConditionInt('g.groupid', $params['groupids']);
+		if (!is_null($options['groupids'])) {
+			zbx_value2array($options['groupids']);
+			$sqlParts['where']['groupid'] = dbConditionInt('g.groupid', $options['groupids']);
 		}
 
 		// hostids
-		if (!is_null($params['hostids'])) {
-			zbx_value2array($params['hostids']);
+		if (!is_null($options['hostids'])) {
+			zbx_value2array($options['hostids']);
 
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = dbConditionInt('hg.hostid', $params['hostids']);
+			$sqlParts['where'][] = dbConditionInt('hg.hostid', $options['hostids']);
 			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
 		}
 
 		// triggerids
-		if (!is_null($params['triggerids'])) {
-			zbx_value2array($params['triggerids']);
+		if (!is_null($options['triggerids'])) {
+			zbx_value2array($options['triggerids']);
 
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where'][] = dbConditionInt('f.triggerid', $params['triggerids']);
+			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
 			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
 		}
 
 		// graphids
-		if (!is_null($params['graphids'])) {
-			zbx_value2array($params['graphids']);
+		if (!is_null($options['graphids'])) {
+			zbx_value2array($options['graphids']);
 
 			$sqlParts['from']['gi'] = 'graphs_items gi';
 			$sqlParts['from']['i'] = 'items i';
 			$sqlParts['from']['hg'] = 'hosts_groups hg';
-			$sqlParts['where'][] = dbConditionInt('gi.graphid', $params['graphids']);
+			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
 			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
 		}
 
 		// maintenanceids
-		if (!is_null($params['maintenanceids'])) {
-			zbx_value2array($params['maintenanceids']);
+		if (!is_null($options['maintenanceids'])) {
+			zbx_value2array($options['maintenanceids']);
 
 			$sqlParts['from']['maintenances_groups'] = 'maintenances_groups mg';
-			$sqlParts['where'][] = dbConditionInt('mg.maintenanceid', $params['maintenanceids']);
+			$sqlParts['where'][] = dbConditionInt('mg.maintenanceid', $options['maintenanceids']);
 			$sqlParts['where']['hmh'] = 'g.groupid=mg.groupid';
 		}
 
 		$sub_sql_common = [];
 
 		// with_monitored_hosts, with_hosts
-		if ($params['with_monitored_hosts']) {
+		if ($options['with_monitored_hosts']) {
 			$sub_sql_common['from']['h'] = 'hosts h';
 			$sub_sql_common['where']['hg-h'] = 'hg.hostid=h.hostid';
 			$sub_sql_common['where'][] = dbConditionInt('h.status', [HOST_STATUS_MONITORED]);
 		}
-		elseif ($params['with_hosts']) {
+		elseif ($options['with_hosts']) {
 			$sub_sql_common['from']['h'] = 'hosts h';
 			$sub_sql_common['where']['hg-h'] = 'hg.hostid=h.hostid';
 			$sub_sql_common['where'][] = dbConditionInt('h.status', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
@@ -211,14 +211,14 @@ class CHostGroup extends CApiService {
 		$sub_sql_parts = $sub_sql_common;
 
 		// with_items, with_monitored_items, with_simple_graph_items
-		if ($params['with_items']) {
+		if ($options['with_items']) {
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
 			$sub_sql_parts['where'][] = dbConditionInt('i.flags',
 				[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
 			);
 		}
-		elseif ($params['with_monitored_items']) {
+		elseif ($options['with_monitored_items']) {
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['from']['h'] = 'hosts h';
 			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
@@ -229,7 +229,7 @@ class CHostGroup extends CApiService {
 				[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
 			);
 		}
-		elseif ($params['with_simple_graph_items']) {
+		elseif ($options['with_simple_graph_items']) {
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
 			$sub_sql_parts['where'][] = dbConditionInt('i.value_type', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
@@ -240,7 +240,7 @@ class CHostGroup extends CApiService {
 		}
 
 		// with_triggers, with_monitored_triggers
-		if ($params['with_triggers']) {
+		if ($options['with_triggers']) {
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['from']['f'] = 'functions f';
 			$sub_sql_parts['from']['t'] = 'triggers t';
@@ -251,7 +251,7 @@ class CHostGroup extends CApiService {
 				[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
 			);
 		}
-		elseif ($params['with_monitored_triggers']) {
+		elseif ($options['with_monitored_triggers']) {
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['from']['h'] = 'hosts h';
 			$sub_sql_parts['from']['f'] = 'functions f';
@@ -269,18 +269,18 @@ class CHostGroup extends CApiService {
 		}
 
 		// with_httptests, with_monitored_httptests
-		if ($params['with_httptests']) {
+		if ($options['with_httptests']) {
 			$sub_sql_parts['from']['ht'] = 'httptest ht';
 			$sub_sql_parts['where']['hg-ht'] = 'hg.hostid=ht.hostid';
 		}
-		elseif ($params['with_monitored_httptests']) {
+		elseif ($options['with_monitored_httptests']) {
 			$sub_sql_parts['from']['ht'] = 'httptest ht';
 			$sub_sql_parts['where']['hg-ht'] = 'hg.hostid=ht.hostid';
 			$sub_sql_parts['where'][] = dbConditionInt('ht.status', [HTTPTEST_STATUS_ACTIVE]);
 		}
 
 		// with_graphs
-		if ($params['with_graphs']) {
+		if ($options['with_graphs']) {
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['from']['gi'] = 'graphs_items gi';
 			$sub_sql_parts['from']['gr'] = 'graphs gr';
@@ -306,12 +306,12 @@ class CHostGroup extends CApiService {
 		$sub_sql_parts = $sub_sql_common;
 
 		// with_item_prototypes, with_simple_graph_item_prototypes
-		if ($params['with_item_prototypes']) {
+		if ($options['with_item_prototypes']) {
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
 			$sub_sql_parts['where'][] = dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 		}
-		elseif ($params['with_simple_graph_item_prototypes']) {
+		elseif ($options['with_simple_graph_item_prototypes']) {
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
 			$sub_sql_parts['where'][] = dbConditionInt('i.value_type', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
@@ -320,7 +320,7 @@ class CHostGroup extends CApiService {
 		}
 
 		// with_graph_prototypes
-		if ($params['with_graph_prototypes']) {
+		if ($options['with_graph_prototypes']) {
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['from']['gi'] = 'graphs_items gi';
 			$sub_sql_parts['from']['gr'] = 'graphs gr';
@@ -342,26 +342,26 @@ class CHostGroup extends CApiService {
 		}
 
 		// filter
-		if (is_array($params['filter'])) {
-			$this->dbFilter('hstgrp g', $params, $sqlParts);
+		if (is_array($options['filter'])) {
+			$this->dbFilter('hstgrp g', $options, $sqlParts);
 		}
 
 		// search
-		if (is_array($params['search'])) {
-			zbx_db_search('hstgrp g', $params, $sqlParts);
+		if (is_array($options['search'])) {
+			zbx_db_search('hstgrp g', $options, $sqlParts);
 		}
 
 		// limit
-		if (zbx_ctype_digit($params['limit']) && $params['limit']) {
-			$sqlParts['limit'] = $params['limit'];
+		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
+			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $params, $sqlParts);
-		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $params, $sqlParts);
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($group = DBfetch($res)) {
-			if ($params['countOutput']) {
-				if ($params['groupCount']) {
+			if ($options['countOutput']) {
+				if ($options['groupCount']) {
 					$result[] = $group;
 				}
 				else {
@@ -373,16 +373,16 @@ class CHostGroup extends CApiService {
 			}
 		}
 
-		if ($params['countOutput']) {
+		if ($options['countOutput']) {
 			return $result;
 		}
 
 		if ($result) {
-			$result = $this->addRelatedObjects($params, $result);
+			$result = $this->addRelatedObjects($options, $result);
 		}
 
 		// removing keys (hash -> array)
-		if (!$params['preservekeys']) {
+		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 
