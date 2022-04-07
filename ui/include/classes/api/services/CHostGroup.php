@@ -45,57 +45,59 @@ class CHostGroup extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function get($options) {
+	public function get(array $options) {
 		$result = [];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'groupids' =>								['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'hostids' =>								['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'graphids' =>								['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'triggerids' =>								['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'maintenanceids' =>							['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'monitored_hosts' =>						['type' => API_BOOLEAN, 'flags' => API_DEPRECATED],
-			'with_monitored_hosts' =>					['type' => API_BOOLEAN, 'default' => false],
-			'real_hosts' =>								['type' => API_BOOLEAN, 'flags' => API_DEPRECATED],
-			'with_hosts' =>								['type' => API_BOOLEAN, 'default' => false],
-			'with_items' =>								['type' => API_BOOLEAN, 'default' => false],
-			'with_item_prototypes' =>					['type' => API_BOOLEAN, 'default' => false],
-			'with_simple_graph_items' =>				['type' => API_BOOLEAN, 'default' => false],
-			'with_simple_graph_item_prototypes' =>		['type' => API_BOOLEAN, 'default' => false],
-			'with_monitored_items' =>					['type' => API_BOOLEAN, 'default' => false],
-			'with_triggers' =>							['type' => API_BOOLEAN, 'default' => false],
-			'with_monitored_triggers' =>				['type' => API_BOOLEAN, 'default' => false],
-			'with_httptests' =>							['type' => API_BOOLEAN, 'default' => false],
-			'with_monitored_httptests' =>				['type' => API_BOOLEAN, 'default' => false],
-			'with_graphs' =>							['type' => API_BOOLEAN, 'default' => false],
-			'with_graph_prototypes' =>					['type' => API_BOOLEAN, 'default' => false],
-			'editable' =>								['type' => API_BOOLEAN, 'default' => false],
-			'nopermissions' =>							['type' => API_BOOLEAN, 'default' => false],
 			// filter
-			'filter' =>									['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'name' =>									['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'flags' =>									['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'uuid' =>									['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+			'groupids' =>							['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'hostids' =>							['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'graphids' =>							['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'triggerids' =>							['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'maintenanceids' =>						['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'monitored_hosts' =>					['type' => API_BOOLEAN, 'flags' => API_DEPRECATED],
+			'with_monitored_hosts' =>				['type' => API_BOOLEAN, 'default' => false],
+			'real_hosts' =>							['type' => API_BOOLEAN, 'flags' => API_DEPRECATED],
+			'with_hosts' =>							['type' => API_BOOLEAN, 'default' => false],
+			'with_items' =>							['type' => API_BOOLEAN, 'default' => false],
+			'with_item_prototypes' =>				['type' => API_BOOLEAN, 'default' => false],
+			'with_simple_graph_items' =>			['type' => API_BOOLEAN, 'default' => false],
+			'with_simple_graph_item_prototypes' =>	['type' => API_BOOLEAN, 'default' => false],
+			'with_monitored_items' =>				['type' => API_BOOLEAN, 'default' => false],
+			'with_triggers' =>						['type' => API_BOOLEAN, 'default' => false],
+			'with_monitored_triggers' =>			['type' => API_BOOLEAN, 'default' => false],
+			'with_httptests' =>						['type' => API_BOOLEAN, 'default' => false],
+			'with_monitored_httptests' =>			['type' => API_BOOLEAN, 'default' => false],
+			'with_graphs' =>						['type' => API_BOOLEAN, 'default' => false],
+			'with_graph_prototypes' =>				['type' => API_BOOLEAN, 'default' => false],
+			'filter' =>								['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'name' =>								['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'flags' =>								['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'uuid' =>								['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 			]],
-			'search' =>									['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'name' =>									['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+			'search' =>								['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'name' =>								['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 			]],
-			'searchByAny' =>							['type' => API_BOOLEAN, 'default' => false],
-			'startSearch' =>							['type' => API_BOOLEAN, 'default' => false],
-			'excludeSearch' =>							['type' => API_BOOLEAN, 'default' => false],
-			'searchWildcardsEnabled' =>					['type' => API_BOOLEAN, 'default' => false],
+			'searchByAny' =>						['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>						['type' => API_BOOLEAN, 'default' => false],
+			'excludeSearch' =>						['type' => API_BOOLEAN, 'default' => false],
+			'searchWildcardsEnabled' =>				['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>									['type' => API_OUTPUT, 'in' => implode(',', ['groupid', 'name', 'flags', 'uuid']), 'default' => API_OUTPUT_EXTEND],
-			'selectHosts' =>							['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'default' => null],
-			'selectGroupDiscovery' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'selectDiscoveryRule' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'countOutput' =>							['type' => API_BOOLEAN, 'default' => false],
-			'groupCount' =>								['type' => API_BOOLEAN, 'default' => false],
-			'preservekeys' =>							['type' => API_BOOLEAN, 'default' => false],
-			'sortfield' =>								['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
-			'sortorder' =>								['type' => API_SORTORDER, 'default' => []],
-			'limit' =>									['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
-			'limitSelects' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
+			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', ['groupid', 'name', 'flags', 'uuid']), 'default' => API_OUTPUT_EXTEND],
+			'selectHosts' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'default' => null],
+			'selectGroupDiscovery' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'selectDiscoveryRule' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'countOutput' =>						['type' => API_BOOLEAN, 'default' => false],
+			'groupCount' =>							['type' => API_BOOLEAN, 'default' => false],
+			// sort and limit
+			'sortfield' =>							['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
+			'sortorder' =>							['type' => API_SORTORDER, 'default' => []],
+			'limit' =>								['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			'limitSelects' =>						['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			// flags
+			'editable' =>							['type' => API_BOOLEAN, 'default' => false],
+			'preservekeys' =>						['type' => API_BOOLEAN, 'default' => false],
+			'nopermissions' =>						['type' => API_BOOLEAN, 'default' => false]
 		]];
 
 		if (array_key_exists('real_hosts', $options)) {

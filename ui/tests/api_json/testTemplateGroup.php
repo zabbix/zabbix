@@ -634,7 +634,7 @@ class testTemplateGroup extends CAPITest {
 			[
 				'templategroup' => [
 					'groups' => [
-						'groupid' => '',
+						'groupid' => ''
 					],
 					'templates' => [
 						'templateid' => '50010'
@@ -645,7 +645,7 @@ class testTemplateGroup extends CAPITest {
 			[
 				'templategroup' => [
 					'groups' => [
-						'groupid' => '12345',
+						'groupid' => '12345'
 					],
 					'templates' => [
 						'templateid' => '50010'
@@ -656,7 +656,7 @@ class testTemplateGroup extends CAPITest {
 			[
 				'templategroup' => [
 					'groups' => [
-						'groupid' => '52005',
+						'groupid' => '52005'
 					],
 					'templates' => [
 						'templateid' => '12345'
@@ -667,7 +667,7 @@ class testTemplateGroup extends CAPITest {
 			[
 				'templategroup' => [
 					'groups' => [
-						'groupid' => '52013',
+						'groupid' => '52013'
 					],
 					'templates' => [
 						'templateid' => '50020'
@@ -679,7 +679,7 @@ class testTemplateGroup extends CAPITest {
 			[
 				'templategroup' => [
 					'groups' => [
-						'groupid' => '52005',
+						'groupid' => '52005'
 					],
 					'templates' => [
 						'templateid' => '50010'
@@ -690,7 +690,7 @@ class testTemplateGroup extends CAPITest {
 			[
 				'templategroup' => [
 					'groups' => [
-						'groupid' => '52013',
+						'groupid' => '52013'
 					],
 					'templates' => []
 				],

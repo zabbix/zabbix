@@ -31,7 +31,7 @@ class CControllerHostGroupList extends CController {
 			'filter_rst' =>		'in 1',
 			'filter_name' =>	'string',
 			'sort' =>			'in name',
-			'sortorder' =>		'in '.ZBX_SORT_UP.','.ZBX_SORT_DOWN,
+			'sortorder' =>		'in '.ZBX_SORT_UP.','.ZBX_SORT_DOWN
 		];
 
 		$ret = $this->validateInput($fields);
