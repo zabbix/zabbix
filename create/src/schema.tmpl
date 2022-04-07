@@ -536,6 +536,7 @@ FIELD		|http_login_form	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|http_strip_domains	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|http_case_sensitive	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|ldap_configured		|t_integer		|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|ldap_case_sensitive	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|db_extension	|t_varchar(32)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|autoreg_tls_accept	|t_integer	|'1'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|compression_status	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
@@ -1942,10 +1943,9 @@ FIELD		|bind_password		|t_varchar(128)	|''		|NOT NULL	|0
 FIELD		|search_attribute	|t_varchar(128)	|''		|NOT NULL	|0
 FIELD		|start_tls			|t_integer		|'0'	|NOT NULL	|0
 FIELD		|search_filter		|t_varchar(255)	|''		|NOT NULL	|0
-FIELD		|case_sensitive		|t_integer		|'1'	|NOT NULL	|0
 
 TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6010016	|6010016
+ROW		|1		|6010015	|6010015

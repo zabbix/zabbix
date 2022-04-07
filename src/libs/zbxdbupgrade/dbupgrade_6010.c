@@ -112,7 +112,6 @@ static int	DBpatch_6010004(void)
 				{"search_attribute", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{"start_tls", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{"search_filter", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"case_sensitive", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{0}
 			},
 			NULL
@@ -149,7 +148,7 @@ static int	DBpatch_6010008(void)
 	DB_ROW		row;
 
 	if (NULL == (result = DBselect("select ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,"
-			"ldap_bind_password,ldap_search_attribute,ldap_case_sensitive"
+			"ldap_bind_password,ldap_search_attribute"
 			" from config where ldap_configured=1")))
 	{
 		return FAIL;
@@ -165,9 +164,9 @@ static int	DBpatch_6010008(void)
 		search_esc = DBdyn_escape_string(row[5]);
 
 		rc = DBexecute("insert into userdirectory (userdirectoryid,name,description,host,port,"
-				"base_dn,bind_dn,bind_password,search_attribute,case_sensitive,start_tls) values "
-				"(1,'Default LDAP server','','%s',%s,'%s','%s','%s','%s',%s,%d)",
-				row[0], row[1], base_dn_esc, bind_dn_esc, password_esc, search_esc, row[6], 0);
+				"base_dn,bind_dn,bind_password,search_attribute,start_tls) values "
+				"(1,'Default LDAP server','','%s',%s,'%s','%s','%s','%s',%d)",
+				row[0], row[1], base_dn_esc, bind_dn_esc, password_esc, search_esc, 0);
 
 		zbx_free(base_dn_esc);
 		zbx_free(bind_dn_esc);
@@ -221,11 +220,6 @@ static int	DBpatch_6010015(void)
 	return DBdrop_field("config", "ldap_search_attribute");
 }
 
-static int	DBpatch_6010016(void)
-{
-	return DBdrop_field("config", "ldap_case_sensitive");
-}
-
 #endif
 
 DBPATCH_START(6010)
@@ -248,6 +242,5 @@ DBPATCH_ADD(6010012, 0, 1)
 DBPATCH_ADD(6010013, 0, 1)
 DBPATCH_ADD(6010014, 0, 1)
 DBPATCH_ADD(6010015, 0, 1)
-DBPATCH_ADD(6010016, 0, 1)
 
 DBPATCH_END()

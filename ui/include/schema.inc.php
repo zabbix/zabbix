@@ -2463,6 +2463,12 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
+			'ldap_case_sensitive' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
+			],
 			'db_extension' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -8940,12 +8946,6 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => ''
-			],
-			'case_sensitive' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1'
 			]
 		]
 	],

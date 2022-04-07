@@ -35,8 +35,8 @@ class CUserDirectory extends CApiService {
 	/**
 	 * @var array
 	 */
-	protected $output_fields = ['base_dn', 'bind_dn', 'case_sensitive', 'description', 'host', 'name', 'port',
-		'search_attribute', 'search_filter', 'start_tls', 'userdirectoryid'
+	protected $output_fields = ['userdirectoryid', 'base_dn', 'bind_dn', 'description', 'host', 'name', 'port',
+		'search_attribute', 'search_filter', 'start_tls'
 	];
 
 	/**
@@ -306,8 +306,7 @@ class CUserDirectory extends CApiService {
 			'bind_password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'bind_password'), 'default' => ''],
 			'search_attribute' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'search_attribute')],
 			'start_tls' =>			['type' => API_INT32, 'in' => ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON, 'default' => ZBX_AUTH_START_TLS_OFF],
-			'search_filter' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'search_filter'), 'default' => ''],
-			'case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE, 'default' => ZBX_AUTH_CASE_SENSITIVE]
+			'search_filter' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'search_filter'), 'default' => '']
 		]];
 
 		if (!CApiInputValidator::validate($rules, $userdirectories, '/', $error)) {
@@ -348,8 +347,7 @@ class CUserDirectory extends CApiService {
 			'bind_password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'bind_password')],
 			'search_attribute' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'search_attribute')],
 			'start_tls' =>			['type' => API_INT32, 'in' => ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON],
-			'search_filter' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'search_filter')],
-			'case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE]
+			'search_filter' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'search_filter')]
 		]];
 
 		if (!CApiInputValidator::validate($rules, $userdirectories, '/', $error)) {
