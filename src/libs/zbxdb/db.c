@@ -2516,10 +2516,7 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 
 	zbx_json_addstring(json, "min_version", info->friendly_min_version, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(json, "max_version", info->friendly_max_version, ZBX_JSON_TYPE_STRING);
-	if (-1 != info->history_pk)
-		zbx_json_addint64(json, "history_pk", info->history_pk);
-	if (-1 != info->compression_availability)
-		zbx_json_addint64(json, "compression_availability", info->compression_availability);
+	zbx_json_addint64(json, "history_pk", info->history_pk);
 
 	if (NULL != info->friendly_min_supported_version)
 	{
@@ -2529,6 +2526,28 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 
 	zbx_json_addint64(json, "flag", info->flag);
 	zbx_json_close(json);
+
+	if (NULL != info->extension)
+	{
+		zbx_json_addobject(json, NULL);
+		zbx_json_addstring(json, "database", info->extension, ZBX_JSON_TYPE_STRING);
+
+		if (DB_VERSION_FAILED_TO_RETRIEVE != info->ext_flag)
+			zbx_json_addstring(json, "current_version", info->ext_friendly_current_version, ZBX_JSON_TYPE_STRING);
+
+		zbx_json_addstring(json, "min_version", info->ext_friendly_min_version, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(json, "max_version", info->ext_friendly_max_version, ZBX_JSON_TYPE_STRING);
+
+		if (NULL != info->ext_friendly_min_supported_version)
+		{
+			zbx_json_addstring(json, "min_supported_version", info->ext_friendly_min_supported_version,
+					ZBX_JSON_TYPE_STRING);
+		}
+
+		zbx_json_addint64(json, "flag", info->ext_flag);
+		zbx_json_addint64(json, "compression_availability", info->tsdb_compression_availability);
+		zbx_json_close(json);
+	}
 }
 
 /******************************************************************************
@@ -2797,30 +2816,58 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() version:%lu", __func__, (unsigned long)zbx_dbms_version_get());
 }
 
-#if defined(HAVE_POSTGRESQL)
-/******************************************************************************
- *                                                                            *
- * Purpose: converts TimescaleDB (TSDB) version to user friendly format       *
- *                                                                            *
- * Example: TSDB 10501 version will be returned as "1.5.1"                    *
- *                                                                            *
- * Return value: TSDB version in user friendly format                         *
- *                                                                            *
- * Comments: returns a pointer to allocated memory                            *
- *                                                                            *
- ******************************************************************************/
-char *zbx_tsdb_get_version_friendly(int ver)
+/***************************************************************************************************************
+ *                                                                                                             *
+ * Purpose: retrieves the DB extension info, including numeric version value                                   *
+ *                                                                                                             *
+ *          For TimescaleDB:                                                                                   *
+ *          numeric version is available from database                                                         *
+ *          string license information is available from database                                              *
+ *                                                                                                             *
+ **************************************************************************************************************/
+void	zbx_dbms_extension_info_extract(struct zbx_db_version_info_t *version_info)
 {
-	int major, minor, patch;
+#ifdef HAVE_POSTGRESQL
+	int			tsdb_ver;
 
-	patch = ver % 100;
-	ver = (ver - patch) / 100;
-	minor = ver % 100;
-	major = (ver - minor) / 100;
+	if (0 == (tsdb_ver = zbx_tsdb_get_version()))
+	{
+		version_info->ext_flag = DB_VERSION_FAILED_TO_RETRIEVE;
+		zabbix_log(LOG_LEVEL_CRIT, "Cannot determine TimescaleDB version");
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "TimescaleDB version: [%d]", tsdb_ver);
 
-	return zbx_dsprintf(NULL, "%d.%d.%d", major, minor, patch);
+		version_info->extension = "TimescaleDB";
+
+		version_info->ext_current_version = (zbx_uint32_t)tsdb_ver;
+		version_info->ext_min_version = ZBX_TIMESCALEDB_MIN_VERSION;
+		version_info->ext_max_version = ZBX_TIMESCALEDB_MAX_VERSION;
+		version_info->ext_min_supported_version = ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION;
+
+		version_info->ext_friendly_current_version = zbx_tsdb_get_version_friendly(tsdb_ver);
+		version_info->ext_friendly_min_version = ZBX_TIMESCALEDB_MIN_VERSION_FRIENDLY;
+		version_info->ext_friendly_max_version = ZBX_TIMESCALEDB_MAX_VERSION_FRIENDLY;
+		version_info->ext_friendly_min_supported_version = ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION_FRIENDLY;
+
+		version_info->ext_flag = zbx_db_version_check(
+				version_info->extension,
+				version_info->ext_current_version,
+				version_info->ext_min_version,
+				version_info->ext_max_version,
+				version_info->ext_min_supported_version);
+
+		version_info->tsdb_lic = zbx_tsdb_get_license();
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "TimescaleDB license: [%s]", version_info->tsdb_lic);
+	}
+#else
+	ZBX_UNUSED(version_info);
+#endif
 }
 
+#if defined(HAVE_POSTGRESQL)
 /******************************************************************************
  *                                                                            *
  * Purpose: returns TimescaleDB (TSDB) version as integer: MMmmuu             *
@@ -2883,6 +2930,56 @@ out:
 	return ver;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: converts TimescaleDB (TSDB) version to user friendly format       *
+ *                                                                            *
+ * Example: TSDB 10501 version will be returned as "1.5.1"                    *
+ *                                                                            *
+ * Return value: TSDB version in user friendly format as string               *
+ *                                                                            *
+ * Comments: returns a pointer to allocated memory                            *
+ *                                                                            *
+ ******************************************************************************/
+char *zbx_tsdb_get_version_friendly(int ver)
+{
+	int major, minor, patch;
+
+	patch = ver % 100;
+	ver = (ver - patch) / 100;
+	minor = ver % 100;
+	major = (ver - minor) / 100;
+
+	return zbx_dsprintf(NULL, "%d.%d.%d", major, minor, patch);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrievs TimescaleDB (TSDB) license information                   *
+ *                                                                            *
+ * Return value: license information from datase as string                    *
+ *               "apache"    for TimescaleDB Apache 2 Edition                 *
+ *               "timescale" for TimescaleDB Community Edition                *
+ *                                                                            *
+ * Comments: returns a pointer to allocated memory                            *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_tsdb_get_license(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char *tsdb_lic = NULL;
+
+	result = zbx_db_select("show timescaledb.license");
+
+	if ((DB_RESULT)ZBX_DB_DOWN != result && NULL != result)
+		if (NULL != (row = zbx_db_fetch(result)))
+			tsdb_lic = zbx_strdup(NULL, row[0]);
+
+	DBfree_result(result);
+
+	return tsdb_lic;
+}
 #endif
 
 #if defined(HAVE_MYSQL)

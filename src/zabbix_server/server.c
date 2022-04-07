@@ -1092,8 +1092,9 @@ static void	zbx_check_db(void)
 {
 	struct zbx_db_version_info_t	db_version_info;
 	struct zbx_json			db_version_json;
-	int 					should_build_db_version_json = 0;	/* no */
 	int				result = SUCCEED;
+
+	memset(&db_version_info, 0, sizeof(db_version_info));
 
 	DBextract_version_info(&db_version_info);
 
@@ -1133,26 +1134,30 @@ static void	zbx_check_db(void)
 		}
 	}
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-	if(SUCCEED == DBfield_exists("config", "dbversion_status"))
-	{
-		should_build_db_version_json = 1;	/* yes */
-		zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
-	}
-	DBclose();
+	if (SUCCEED == result)
+		DBextract_dbextension_info(&db_version_info);
 
-	if (SUCCEED == result &&
-			(SUCCEED != DBcheck_capabilities(
-					db_version_info.current_version,
-					should_build_db_version_json ? &db_version_json : NULL) ||
+	if (SUCCEED == result && (SUCCEED != DBcheck_capabilities(&db_version_info) ||
 			SUCCEED != DBcheck_version()))
 	{
 		result = FAIL;
 	}
 
-	if (should_build_db_version_json)
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+#if defined(HAVE_POSTGRESQL)
+	if (SUCCEED == DBfield_exists("config", "compression_status"))
 	{
-		DBconnect(ZBX_DB_CONNECT_NORMAL);
+		/* force disabling TimescaleDB compression if it is not supported */
+		if (OFF == db_version_info.tsdb_compression_availability)
+			DBexecute("update config set compression_status=0");
+	}
+#endif
+
+	if (SUCCEED == DBfield_exists("config", "dbversion_status"))
+	{
+		zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
+
 		if (SUCCEED == DBpk_exists("history"))
 		{
 			db_version_info.history_pk = 1;
@@ -1163,9 +1168,6 @@ static void	zbx_check_db(void)
 			zabbix_log(LOG_LEVEL_WARNING, "database could be upgraded to use primary keys in history tables");
 		}
 
-		/* this parameter is specific to TimescaleDB, do not add it to json for other DBMS */
-		db_version_info.compression_availability = -1;
-
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
 
 		if (SUCCEED == result)
@@ -1173,10 +1175,12 @@ static void	zbx_check_db(void)
 
 		DBflush_version_requirements(db_version_json.buffer);
 		zbx_json_free(&db_version_json);
-		DBclose();
 	}
 
+	DBclose();
 	zbx_free(db_version_info.friendly_current_version);
+	zbx_free(db_version_info.ext_friendly_current_version);
+	zbx_free(db_version_info.tsdb_lic);
 
 	if(SUCCEED != result)
 	{

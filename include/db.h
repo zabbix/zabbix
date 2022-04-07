@@ -544,9 +544,9 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 
 void	DBextract_version_info(struct zbx_db_version_info_t *version_info);
+void	DBextract_dbextension_info(struct zbx_db_version_info_t *version_info);
 void	DBflush_version_requirements(const char *version);
-int	DBcheck_capabilities(zbx_uint32_t db_version, struct zbx_json *json);
-int DBcheck_capabilities_timescaledb(zbx_uint32_t db_version, struct zbx_json *json);
+int	DBcheck_capabilities(struct zbx_db_version_info_t *db_version_info);
 
 #ifdef HAVE_POSTGRESQL
 char	*zbx_db_get_schema_esc(void);

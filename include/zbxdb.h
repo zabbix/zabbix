@@ -100,7 +100,8 @@ zbx_err_codes_t	zbx_db_last_errcode(void);
 
 #ifdef HAVE_POSTGRESQL
 int	zbx_tsdb_get_version(void);
-char *zbx_tsdb_get_version_friendly(int ver);
+char	*zbx_tsdb_get_version_friendly(int ver);
+char	*zbx_tsdb_get_license(void);
 #define ZBX_DB_TSDB_V1	(20000 > zbx_tsdb_get_version())
 #endif
 
@@ -227,10 +228,30 @@ struct zbx_db_version_info_t
 	zbx_db_version_status_t	flag;
 
 	int			history_pk;
-	int			compression_availability;	/* this parameter is specific to TimescaleDB */
+
+	/* information about database server extension */
+
+	const char		*extension;
+
+	zbx_uint32_t		ext_current_version;
+	zbx_uint32_t		ext_min_version;
+	zbx_uint32_t		ext_max_version;
+	zbx_uint32_t		ext_min_supported_version;
+
+	char			*ext_friendly_current_version;
+	const char		*ext_friendly_min_version;
+	const char		*ext_friendly_max_version;
+	const char		*ext_friendly_min_supported_version;
+
+	zbx_db_version_status_t	ext_flag;
+
+	/* TimescaleDB specific information */
+	char 		*tsdb_lic;
+	int			tsdb_compression_availability;
 };
 
 void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);
+void	zbx_dbms_extension_info_extract(struct zbx_db_version_info_t *version_info);
 
 #ifdef HAVE_MYSQL
 int	zbx_dbms_mariadb_used(void);
