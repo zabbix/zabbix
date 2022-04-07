@@ -3356,7 +3356,7 @@ int	check_vcenter_vm_tools(AGENT_REQUEST *request, const char *username, const c
 		goto out;
 	}
 
-	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_TOOLS_VERSION, result);
+	ret = get_vcenter_vmprop(request, username, password, mode, result);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
