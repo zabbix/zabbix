@@ -1161,19 +1161,21 @@ class CHostGroup extends CApiService {
 
 		$hostids = array_column($data['hosts'], 'hostid');
 
-		$db_hosts = API::Host()->get([
-			'output' => ['host', 'flags'],
-			'hostids' => $hostids,
-			'editable' => true
-		]);
+		if ($hostids) {
+			$db_hosts = API::Host()->get([
+				'output' => ['host', 'flags'],
+				'hostids' => $hostids,
+				'editable' => true
+			]);
 
-		if (count($db_hosts) != count($hostids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('No permissions to referred object or it does not exist!')
-			);
+			if (count($db_hosts) != count($hostids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
+			self::checkHostsNotDiscovered($db_hosts);
 		}
-
-		self::checkHostsNotDiscovered($db_hosts);
 
 		self::addAffectedObjects([], $db_groups, $db_hostids);
 
