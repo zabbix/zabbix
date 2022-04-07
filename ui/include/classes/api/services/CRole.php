@@ -817,7 +817,7 @@ class CRole extends CApiService {
 			'actions' => [
 				[
 					'name' => 'invoke_execute_now',
-					'status' => 0
+					'status' => ZBX_ROLE_RULE_DISABLED
 				]
 			],
 			'actions.default_access' => ZBX_ROLE_RULE_ENABLED
@@ -826,14 +826,44 @@ class CRole extends CApiService {
 		$rules = [];
 
 		foreach ($roles as $roleid => $role) {
-			if (!array_key_exists('rules', $role)) {
-				continue;
+			if ($db_roles === null) {
+				$type = $role['type'];
+				$old_rules = $default_rules;
+				$new_rules = array_key_exists('rules', $role) ? ($role['rules'] + $old_rules) : $old_rules;
 			}
+			else {
+				$type = array_key_exists('type', $role) ? $role['type'] : $db_roles[$role['roleid']]['type'];
+				$old_rules = $db_roles[$roleid]['rules'] + $default_rules;
+				$new_rules = array_key_exists('rules', $role) ? ($role['rules'] + $old_rules) : $old_rules;
 
-			$type = array_key_exists('type', $role) ? $role['type'] : $db_roles[$role['roleid']]['type'];
+				if ($type != $db_roles[$role['roleid']]['type']) {
+					if (array_key_exists('actions', $old_rules)) {
+						$old_rule_names = array_column($old_rules['actions'], 'name');
 
-			$old_rules = $db_roles !== null ? $db_roles[$roleid]['rules'] : $default_rules;
-			$new_rules = $role['rules'] + $old_rules;
+						foreach ($default_rules['actions'] as $action) {
+							if (!in_array($action['name'], $old_rule_names)) {
+								$old_rules['actions'][] = $action;
+							}
+						}
+					}
+					else {
+						$old_rules['actions'] = $default_rules['actions'];
+					}
+
+					if (array_key_exists('actions', $new_rules)) {
+						$new_rule_names = array_column($new_rules['actions'], 'name');
+
+						foreach ($default_rules['actions'] as $action) {
+							if (!in_array($action['name'], $new_rule_names)) {
+								$new_rules['actions'][] = $action;
+							}
+						}
+					}
+					else {
+						$new_rules['actions'] = $default_rules['actions'];
+					}
+				}
+			}
 
 			$rules[$roleid] = array_merge(
 				$this->compileUiRules((int) $type, $old_rules, $new_rules),
