@@ -2820,6 +2820,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 
 		for (i = 0; i < hv->vms.values_num; i++)
 		{
+			int			j;
 			zbx_vmware_datastore_t	*datastore = NULL;
 
 			vm = (zbx_vmware_vm_t *)hv->vms.values[i];
@@ -2830,22 +2831,22 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			if (NULL == (hv_name = hv->props[ZBX_VMWARE_HVPROP_NAME]))
 				continue;
 
-			for (i = 0; NULL != vm->props[ZBX_VMWARE_VMPROP_DATASTOREID] &&
-				i < service->data->datastores.values_num; i++)
+			for (j = 0; NULL != vm->props[ZBX_VMWARE_VMPROP_DATASTOREID] &&
+				j < service->data->datastores.values_num; j++)
 			{
 				if (0 != strcmp(vm->props[ZBX_VMWARE_VMPROP_DATASTOREID],
-						service->data->datastores.values[i]->id))
+						service->data->datastores.values[j]->id))
 				{
 					continue;
 				}
 
-				datastore = service->data->datastores.values[i];
+				datastore = service->data->datastores.values[j];
 				break;
 			}
 
 			if (NULL == datastore)
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() Unknown datastore id:%s", __func__,
+				zabbix_log(LOG_LEVEL_WARNING, "%s() Unknown datastore id:%s", __func__,
 						ZBX_NULL2EMPTY_STR(vm->props[ZBX_VMWARE_VMPROP_DATASTOREID]));
 				continue;
 			}
