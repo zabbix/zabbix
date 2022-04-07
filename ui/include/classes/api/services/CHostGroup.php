@@ -92,7 +92,7 @@ class CHostGroup extends CApiService {
 			'countOutput' =>							['type' => API_BOOLEAN, 'default' => false],
 			'groupCount' =>								['type' => API_BOOLEAN, 'default' => false],
 			'preservekeys' =>							['type' => API_BOOLEAN, 'default' => false],
-			'sortfield' =>								['type' => API_STRINGS_UTF8,'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
+			'sortfield' =>								['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>								['type' => API_SORTORDER, 'default' => []],
 			'limit' =>									['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			'limitSelects' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
