@@ -255,6 +255,7 @@ class CControllerHostEdit extends CController {
 		$data['groups_ms'] = $this->hostGroupsForMultiselect($data['host']['groups']);
 		unset($data['groups']);
 
+		CArrayHelper::sort($data['host']['parentTemplates'], ['name']);
 		$this->extendLinkedTemplates($data['editable_templates']);
 		$this->extendDiscoveryRule($data['editable_discovery_rules']);
 		$this->extendProxies($data['proxies']);
