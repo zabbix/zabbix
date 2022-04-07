@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '6.0'
-  date: '2022-03-04T11:40:42Z'
+  version: '6.2'
+  date: '2022-04-06T20:00:50Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -293,7 +293,8 @@ zabbix_export:
             -
               uuid: cfcabcb7d9ca4fd59ed79775bcf059bb
               expression: 'last(/Intel_Qlogic Infiniband SNMP/system.name,#1)<>last(/Intel_Qlogic Infiniband SNMP/system.name,#2) and length(last(/Intel_Qlogic Infiniband SNMP/system.name))>0'
-              name: 'System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -352,7 +353,8 @@ zabbix_export:
             -
               uuid: 20166f9c8d5448a494b6b578471df8cc
               expression: 'last(/Intel_Qlogic Infiniband SNMP/system.uptime[sysUpTime.0])<10m'
-              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -840,7 +842,8 @@ zabbix_export:
               recovery_expression: |
                 avg(/Intel_Qlogic Infiniband SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Intel_Qlogic Infiniband SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
                 avg(/Intel_Qlogic Infiniband SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Intel_Qlogic Infiniband SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
-              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -863,7 +866,8 @@ zabbix_export:
               recovery_expression: |
                 max(/Intel_Qlogic Infiniband SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and max(/Intel_Qlogic Infiniband SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
@@ -1050,7 +1054,8 @@ zabbix_export:
                   expression: 'avg(/Intel_Qlogic Infiniband SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/Intel_Qlogic Infiniband SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
-                  name: '{#SENSOR_INFO}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
+                  name: '{#SENSOR_INFO}: Temperature is too low'
+                  event_name: '{#SENSOR_INFO}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:
@@ -1069,7 +1074,8 @@ zabbix_export:
                 last(/Intel_Qlogic Infiniband SNMP/sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/Intel_Qlogic Infiniband SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
-              name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+              name: '{#SENSOR_INFO}: Temperature is above critical threshold'
+              event_name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1088,13 +1094,14 @@ zabbix_export:
                 last(/Intel_Qlogic Infiniband SNMP/sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}])={$TEMP_WARN_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/Intel_Qlogic Infiniband SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
-              name: '{#SENSOR_INFO}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
+              name: '{#SENSOR_INFO}: Temperature is above warning threshold'
+              event_name: '{#SENSOR_INFO}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
               dependencies:
                 -
-                  name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                  name: '{#SENSOR_INFO}: Temperature is above critical threshold'
                   expression: |
                     avg(/Intel_Qlogic Infiniband SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}
                     or
@@ -1147,7 +1154,8 @@ zabbix_export:
                 -
                   uuid: 90778aeb97244258a830e89eeb263e54
                   expression: 'last(/Intel_Qlogic Infiniband SNMP/system.hw.serialnumber[icsChassisSystemUnitFruSerialNumber.{#SNMPINDEX}],#1)<>last(/Intel_Qlogic Infiniband SNMP/system.hw.serialnumber[icsChassisSystemUnitFruSerialNumber.{#SNMPINDEX}],#2) and length(last(/Intel_Qlogic Infiniband SNMP/system.hw.serialnumber[icsChassisSystemUnitFruSerialNumber.{#SNMPINDEX}]))>0'
-                  name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
+                  name: '{#ENT_NAME}: Device has been replaced'
+                  event_name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'

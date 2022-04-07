@@ -43,7 +43,7 @@ No specific Zabbix configuration is required.
 |{$IIS.PORT} |<p>Listening port.</p> |`80` |
 |{$IIS.QUEUE.MAX.TIME} |<p>The time during which the queue length may exceed the threshold.</p> |`5m` |
 |{$IIS.QUEUE.MAX.WARN} |<p>Maximum application pool's request queue length for trigger expression.</p> |`` |
-|{$IIS.SERVICE} |<p>The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/6.2/manual/config/items/itemtypes/simple_checks</p> |`http` |
+|{$IIS.SERVICE} |<p>The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/simple_checks</p> |`http` |
 
 ## Template links
 
@@ -108,11 +108,11 @@ There are no template links in this template.
 |IIS: The World Wide Web Publishing Service (W3SVC) is not running |<p>The World Wide Web Publishing Service (W3SVC) is not in running state. IIS cannot start.</p> |`last(/IIS by Zabbix agent active/service_state[W3SVC])<>0` |HIGH |<p>**Depends on**:</p><p>- IIS: Windows process Activation Service (WAS) is not the running</p> |
 |IIS: Windows process Activation Service (WAS) is not the running |<p>Windows Process Activation Service (WAS) is not in the running state. IIS cannot start.</p> |`last(/IIS by Zabbix agent active/service_state[WAS])<>0` |HIGH | |
 |IIS: Port {$IIS.PORT} is down |<p>-</p> |`last(/IIS by Zabbix agent active/net.tcp.service[{$IIS.SERVICE},,{$IIS.PORT}])=0` |AVERAGE |<p>Manual close: YES</p><p>**Depends on**:</p><p>- IIS: The World Wide Web Publishing Service (W3SVC) is not running</p> |
-|IIS: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/IIS by Zabbix agent active/perf_counter_en["\Web Service(_Total)\Service Uptime"])<10m` |INFO |<p>Manual close: YES</p> |
-|IIS: {#APPPOOL} has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/IIS by Zabbix agent active/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool Uptime"])<10m` |INFO |<p>Manual close: YES</p> |
+|IIS: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/IIS by Zabbix agent active/perf_counter_en["\Web Service(_Total)\Service Uptime"])<10m` |INFO |<p>Manual close: YES</p> |
+|IIS: {#APPPOOL} has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/IIS by Zabbix agent active/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool Uptime"])<10m` |INFO |<p>Manual close: YES</p> |
 |IIS: Application pool {#APPPOOL} is not in Running state |<p>-</p> |`last(/IIS by Zabbix agent active/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"])<>3 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1` |HIGH |<p>**Depends on**:</p><p>- IIS: The World Wide Web Publishing Service (W3SVC) is not running</p> |
 |IIS: Application pool {#APPPOOL} has been recycled |<p>-</p> |`last(/IIS by Zabbix agent active/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"],#1)<>last(/IIS by Zabbix agent active/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"],#2) and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1` |INFO | |
-|IIS: Request queue of {#APPPOOL} is too large (over {$IIS.QUEUE.MAX.WARN}) |<p>-</p> |`min(/IIS by Zabbix agent active/perf_counter_en["\HTTP Service Request Queues({#APPPOOL})\CurrentQueueSize"],{$IIS.QUEUE.MAX.TIME})>{$IIS.QUEUE.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- IIS: Application pool {#APPPOOL} is not in Running state</p> |
+|IIS: Request queue of {#APPPOOL} is too large |<p>-</p> |`min(/IIS by Zabbix agent active/perf_counter_en["\HTTP Service Request Queues({#APPPOOL})\CurrentQueueSize"],{$IIS.QUEUE.MAX.TIME})>{$IIS.QUEUE.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- IIS: Application pool {#APPPOOL} is not in Running state</p> |
 
 ## Feedback
 

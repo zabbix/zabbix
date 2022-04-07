@@ -6,7 +6,7 @@
 For Zabbix version: 6.2 and higher  
 The template to monitor VMware vCenter and ESX hypervisor.
 The "VMware Hypervisor" and "VMware Guest" templates are used by discovery and normally should not be manually linked to a host.
-For additional information please check https://www.zabbix.com/documentation/6.2/manual/vm_monitoring
+For additional information please check https://www.zabbix.com/documentation/6.0/manual/vm_monitoring
 
 
 ## Setup
@@ -52,7 +52,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|VMware |VMware: Event log |<p>Collect VMware event log. See also: https://www.zabbix.com/documentation/6.2/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records</p> |SIMPLE |vmware.eventlog[{$VMWARE.URL},skip] |
+|VMware |VMware: Event log |<p>Collect VMware event log. See also: https://www.zabbix.com/documentation/6.0/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records</p> |SIMPLE |vmware.eventlog[{$VMWARE.URL},skip] |
 |VMware |VMware: Full name |<p>VMware service full name.</p> |SIMPLE |vmware.fullname[{$VMWARE.URL}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |VMware |VMware: Version |<p>VMware service version.</p> |SIMPLE |vmware.version[{$VMWARE.URL}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |VMware |VMware: Status of "{#CLUSTER.NAME}" cluster |<p>VMware cluster status.</p> |SIMPLE |vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}] |
@@ -159,7 +159,7 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|VMware: VM has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/VMware Guest/vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}])<10m` |WARNING |<p>Manual close: YES</p> |
+|VMware: VM has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/VMware Guest/vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}])<10m` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
 
@@ -242,7 +242,7 @@ There are no template links in this template.
 |VMware: Hypervisor is down |<p>The service is unavailable or does not accept ICMP ping.</p> |`last(/VMware Hypervisor/icmpping[])=0` |AVERAGE |<p>Manual close: YES</p> |
 |VMware: The {$VMWARE.HV.UUID} health is Red |<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p> |`last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3` |HIGH | |
 |VMware: The {$VMWARE.HV.UUID} health is Yellow |<p>One or more components in the appliance might become overloaded soon.</p> |`last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2` |AVERAGE |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p> |
-|VMware: Hypervisor has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/VMware Hypervisor/vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}])<10m` |WARNING |<p>Manual close: YES</p> |
+|VMware: Hypervisor has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/VMware Hypervisor/vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}])<10m` |WARNING |<p>Manual close: YES</p> |
 |VMware: The multipath count has been changed |<p>The number of available datastore paths less than registered ({#MULTIPATH.COUNT}).</p> |`last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#1)<>last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#2) and last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}])<{#MULTIPATH.COUNT}` |AVERAGE |<p>Manual close: YES</p> |
 |VMware: The {$VMWARE.HV.UUID} health is Red |<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p> |`last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])="Red"` |HIGH |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p> |
 |VMware: The {$VMWARE.HV.UUID} health is Yellow |<p>One or more components in the appliance might become overloaded soon.</p> |`last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])="Yellow"` |AVERAGE |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p><p>- VMware: The {$VMWARE.HV.UUID} health is Yellow</p> |
