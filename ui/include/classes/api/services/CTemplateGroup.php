@@ -921,16 +921,18 @@ class CTemplateGroup extends CApiService {
 
 		$templateids = array_column($data['templates'], 'templateid');
 
-		$count = API::Template()->get([
-			'countOutput' => true,
-			'templateids' => $templateids,
-			'editable' => true
-		]);
+		if ($templateids) {
+			$db_templates = API::Template()->get([
+				'countOutput' => true,
+				'templateids' => $templateids,
+				'editable' => true
+			]);
 
-		if ($count != count($templateids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('No permissions to referred object or it does not exist!')
-			);
+			if ($db_templates != count($templateids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 
 		self::addAffectedObjects([], $db_groups, $db_templateids);
