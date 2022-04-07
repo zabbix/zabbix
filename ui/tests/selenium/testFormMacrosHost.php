@@ -21,7 +21,7 @@
 require_once dirname(__FILE__).'/common/testFormMacros.php';
 
 /**
- * @backup hosts
+ * @backup hosts, config
  */
 class testFormMacrosHost extends testFormMacros {
 
@@ -52,7 +52,8 @@ class testFormMacrosHost extends testFormMacros {
 	public $macro_resolve_hostid = 99135;
 
 	public $vault_object = 'host';
-	public $vault_error_field = '/1/macros/6/value';
+	public $hashi_error_field = '/1/macros/3/value';
+	public $cyber_error_field = '/1/macros/4/value';
 	public $update_vault_macro = '{$VAULT_HOST_MACRO3_CHANGED}';
 	public $vault_macro_index = 2;
 
@@ -310,7 +311,8 @@ class testFormMacrosHost extends testFormMacros {
 	 *
 	 */
 	public function testFormMacrosHost_CreateVaultMacros($data) {
-		$this->createVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', 'Available host');
+		$host = ($data['vault'] === 'Hashicorp') ? 'Host 1 from first group' : 'Empty host';
+		$this->createVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', $host);
 	}
 
 	/**
@@ -318,5 +320,12 @@ class testFormMacrosHost extends testFormMacros {
 	 */
 	public function testFormMacrosHost_UpdateVaultMacros($data) {
 		$this->updateVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', 'Host for suppression');
+	}
+
+	/**
+	 * Check Vault macros validation.
+	 */
+	public function testFormMacrosHost_checkVaultValidation() {
+		$this->checkVaultValidation('zabbix.php?action=host.view', 'hosts', 'Host for different items types');
 	}
 }

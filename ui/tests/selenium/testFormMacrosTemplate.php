@@ -21,7 +21,7 @@
 require_once dirname(__FILE__) . '/common/testFormMacros.php';
 
 /**
- * @backup hosts
+ * @backup hosts, config
  */
 class testFormMacrosTemplate extends testFormMacros {
 
@@ -49,7 +49,8 @@ class testFormMacrosTemplate extends testFormMacros {
 	protected static $templateid_remove_inherited;
 
 	public $vault_object = 'template';
-	public $vault_error_field = '/1/macros/6/value';
+	public $hashi_error_field = '/1/macros/6/value';
+	public $cyber_error_field = '/1/macros/4/value';
 	public $update_vault_macro = '{$VAULT_HOST_MACRO_CHANGED}';
 	public $vault_macro_index = 0;
 
@@ -241,7 +242,8 @@ class testFormMacrosTemplate extends testFormMacros {
 	 * @dataProvider getCreateVaultMacrosData
 	 */
 	public function testFormMacrosTemplate_CreateVaultMacros($data) {
-		$this->createVaultMacros($data, 'templates.php?form=update&templateid=99022', 'templates');
+		$templateid = ($data['vault'] === 'Hashicorp') ? '99022' : '50000';
+		$this->createVaultMacros($data, 'templates.php?form=update&templateid='.$templateid, 'templates');
 	}
 
 	/**
@@ -249,5 +251,12 @@ class testFormMacrosTemplate extends testFormMacros {
 	 */
 	public function testFormMacrosTemplate_UpdateVaultMacros($data) {
 		$this->updateVaultMacros($data, 'templates.php?form=update&templateid=99014', 'templates');
+	}
+
+	/**
+	 * Check Vault macros validation.
+	 */
+	public function testFormMacrosTemplate_checkVaultValidation() {
+		$this->checkVaultValidation('templates.php?form=update&templateid=50002', 'templates');
 	}
 }
