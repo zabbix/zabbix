@@ -1089,7 +1089,7 @@ class CHostGroup extends CApiService {
 			'groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'hosts' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED |API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
+			'hosts' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
 				'hostid'=>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
 		]];
