@@ -127,7 +127,7 @@ typedef struct
 	int		jmx_errors_from;
 	unsigned char	jmx_available;
 	int		jmx_disable_until;
-	char		inventory_mode;
+	int		inventory_mode;
 	unsigned char	status;
 	unsigned char	tls_connect;
 	unsigned char	tls_accept;
