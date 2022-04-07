@@ -309,7 +309,6 @@ typedef enum
 	ZBX_TRIGGER_CACHE_EVAL_CTX,
 	ZBX_TRIGGER_CACHE_EVAL_CTX_R,
 	ZBX_TRIGGER_CACHE_EVAL_CTX_MACROS,
-	ZBX_TRIGGER_CACHE_EVAL_CTX_R_MACROS,
 	ZBX_TRIGGER_CACHE_HOSTIDS,
 }
 zbx_trigger_cache_state_t;
@@ -379,25 +378,6 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const DB_TRIGGER *trigger, zbx_
 			um_handle = zbx_dc_open_user_macros();
 
 			ret = zbx_eval_expand_user_macros(&cache->eval_ctx, cache->hostids.values,
-					cache->hostids.values_num, (zbx_macro_expand_func_t)zbx_dc_expand_user_macros,
-					um_handle, NULL);
-
-			zbx_dc_close_user_macros(um_handle);
-
-			if (SUCCEED != ret)
-				return NULL;
-
-			break;
-		case ZBX_TRIGGER_CACHE_EVAL_CTX_R_MACROS:
-			if (NULL == db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX_R))
-				return NULL;
-
-			if (NULL == db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_HOSTIDS))
-				return NULL;
-
-			um_handle = zbx_dc_open_user_macros();
-
-			ret = zbx_eval_expand_user_macros(&cache->eval_ctx_r, cache->hostids.values,
 					cache->hostids.values_num, (zbx_macro_expand_func_t)zbx_dc_expand_user_macros,
 					um_handle, NULL);
 
@@ -794,11 +774,8 @@ void	zbx_db_trigger_get_expression(const DB_TRIGGER *trigger, char **expression)
 {
 	zbx_trigger_cache_t	*cache;
 
-	if (NULL == db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX) ||
-			NULL == (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX_MACROS)))
-	{
+	if (NULL == (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX)))
 		*expression = zbx_strdup(NULL, trigger->expression);
-	}
 	else
 		db_trigger_get_expression(&cache->eval_ctx, expression);
 }
@@ -815,11 +792,8 @@ void	zbx_db_trigger_get_recovery_expression(const DB_TRIGGER *trigger, char **ex
 {
 	zbx_trigger_cache_t	*cache;
 
-	if (NULL == db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX_R) ||
-			NULL == (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX_R_MACROS)))
-	{
+	if (NULL == (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX_R)))
 		*expression = zbx_strdup(NULL, trigger->recovery_expression);
-	}
 	else
 		db_trigger_get_expression(&cache->eval_ctx_r, expression);
 }
