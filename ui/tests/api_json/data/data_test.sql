@@ -776,7 +776,7 @@ INSERT INTO hosts (hostid,host,name,status,description) VALUES (120003,'Template
 INSERT INTO items (itemid,type,hostid,name,description,key_,delay,interfaceid,params,formula,url,posts,query_fields,headers) VALUES (110004,0,120003,'templated-item','','agent.ping[]',30,NULL,'','','','','','');
 INSERT INTO items (itemid,type,hostid,name,description,key_,delay,interfaceid,params,formula,url,posts,query_fields,headers,flags) VALUES (110005,0,120003,'templated-lld-rule','','agent.ping[-]',30,NULL,'','','','','','',1);
 
--- testHost_Delete and testHostGroup_Delete maintenance constraint
+-- testHostGroup_Delete maintenance constraint
 INSERT INTO hstgrp (groupid, name) VALUES (62002, 'maintenance_has_only_group');
 INSERT INTO hstgrp (groupid, name) VALUES (62003, 'maintenance_has_group_and_host');
 INSERT INTO hstgrp (groupid, name) VALUES (62004, 'maintenance_group_1');
@@ -784,7 +784,6 @@ INSERT INTO hstgrp (groupid, name) VALUES (62005, 'maintenance_group_2');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (61003, 'maintenance_has_group_and_host', 'maintenance_has_group_and_host', 0, '');
 INSERT INTO maintenances (maintenanceid, name, description, active_since, active_till) VALUES (60002, 'maintenance_has_only_group', '', 1539723600, 1539810000);
 INSERT INTO maintenances (maintenanceid, name, description, active_since, active_till) VALUES (60003, 'maintenance_has_group_and_host', '', 1539723600, 1539810000);
-INSERT INTO maintenances (maintenanceid, name, description, active_since, active_till) VALUES (60004, 'maintenance_two_hosts', '', 1539723600, 1539810000);
 INSERT INTO maintenances (maintenanceid, name, description, active_since, active_till) VALUES (60005, 'maintenance_two_groups', '', 1539723600, 1539810000);
 INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (2, 60003, 61003);
 INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (1, 60002, 62002);
@@ -797,7 +796,6 @@ INSERT INTO timeperiods (timeperiodid) VALUES (4);
 INSERT INTO timeperiods (timeperiodid) VALUES (5);
 INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (2, 60002, 2);
 INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (3, 60003, 3);
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (4, 60004, 4);
 INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (5, 60005, 5);
 
 -- testItemDelete
