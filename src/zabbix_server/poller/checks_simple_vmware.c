@@ -2352,16 +2352,7 @@ int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	for (i = 0; i < service->data->datastores.values_num; i++)
-	{
-		if (0 != strcmp(ds_name, service->data->datastores.values[i]->name))
-			continue;
-
-		datastore = service->data->datastores.values[i];
-		break;
-	}
-
-	if (NULL == datastore)
+	if (NULL == (datastore = ds_get(&service->data->datastores, ds_name)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
 		goto unlock;
