@@ -117,6 +117,7 @@ void	mock_config_free(void)
 	if (0 != (mock_config.initialized & ZBX_MOCK_CONFIG_HOSTS))
 		mock_config_free_hosts();
 
+	zbx_free(mock_config.dc.um_cache);
 }
 
 

@@ -212,9 +212,9 @@ um_cache_sync_SOURCES = \
 um_cache_sync_LDADD = \
 	$(CACHE_LIBS) @SERVER_LIBS@
 um_cache_sync_LDFLAGS = @SERVER_LDFLAGS@ \
-	-Wl,--wrap=__zbx_mem_malloc \
-	-Wl,--wrap=__zbx_mem_realloc \
-	-Wl,--wrap=__zbx_mem_free
+	-Wl,--wrap=__zbx_shmem_malloc \
+	-Wl,--wrap=__zbx_shmem_realloc \
+	-Wl,--wrap=__zbx_shmem_free
 
 um_cache_resolve_CFLAGS = \
 	-I@top_srcdir@/tests \
@@ -226,9 +226,9 @@ um_cache_resolve_SOURCES = \
 um_cache_resolve_LDADD = \
 	$(CACHE_LIBS) @SERVER_LIBS@
 um_cache_resolve_LDFLAGS = @SERVER_LDFLAGS@ \
-	-Wl,--wrap=__zbx_mem_malloc \
-	-Wl,--wrap=__zbx_mem_realloc \
-	-Wl,--wrap=__zbx_mem_free
+	-Wl,--wrap=__zbx_shmem_malloc \
+	-Wl,--wrap=__zbx_shmem_realloc \
+	-Wl,--wrap=__zbx_shmem_free
 
 um_cache_resolve_cont_CFLAGS = \
 	-I@top_srcdir@/tests \
@@ -240,9 +240,9 @@ um_cache_resolve_cont_SOURCES = \
 um_cache_resolve_cont_LDADD = \
 	$(CACHE_LIBS) @SERVER_LIBS@
 um_cache_resolve_cont_LDFLAGS = @SERVER_LDFLAGS@ \
-	-Wl,--wrap=__zbx_mem_malloc \
-	-Wl,--wrap=__zbx_mem_realloc \
-	-Wl,--wrap=__zbx_mem_free
+	-Wl,--wrap=__zbx_shmem_malloc \
+	-Wl,--wrap=__zbx_shmem_realloc \
+	-Wl,--wrap=__zbx_shmem_free
 
 
 endif

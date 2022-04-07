@@ -25,7 +25,7 @@
 #include "common.h"
 #include "zbxjson.h"
 #include "zbxdbcache/user_macro.h"
-#include "zbxalgo/vectorimpl.h"
+#include "zbxalgo.h"
 #include "um_cache_mock.h"
 
 ZBX_VECTOR_DECL(kv, zbx_dc_kv_t)

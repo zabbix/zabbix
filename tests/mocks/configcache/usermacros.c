@@ -109,6 +109,10 @@ void	mock_config_load_user_macros(const char *path)
 	for (i = 0; i < mock_config.um_hosts.values_num; i++)
 		zbx_vector_um_macro_sort(&mock_config.um_hosts.values[i]->macros, mock_um_macro_compare);
 
+	mock_config.dc.um_cache = (zbx_um_cache_t *)zbx_malloc(NULL, sizeof(zbx_um_cache_t));
+	memset (mock_config.dc.um_cache, 0, sizeof(zbx_um_cache_t));
+	mock_config.dc.um_cache->refcount = 10000;
+
 	mock_config.initialized |= ZBX_MOCK_CONFIG_USERMACROS;
 }
 
@@ -122,6 +126,7 @@ static void	mock_um_macro_free(zbx_um_macro_t *macro)
 	mock_str_free((char *)macro->name);
 	mock_str_free((char *)macro->context);
 	mock_str_free((char *)macro->value);
+	zbx_free(macro);
 }
 
 static void	mock_um_host_free(zbx_um_host_t *host)

@@ -23,7 +23,7 @@
 #include "zbxmockutil.h"
 
 #include "common.h"
-#include "zbxalgo/vectorimpl.h"
+#include "zbxalgo.h"
 #include "zbxdbcache/user_macro.h"
 #include "um_cache_mock.h"
 
@@ -742,7 +742,7 @@ void	mock_dbsync_clear(zbx_dbsync_t *sync)
 
 /* mocked functions */
 
-void	*__wrap___zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const void *old, size_t size)
+void	*__wrap___zbx_shmem_malloc(const char *file, int line, zbx_shmem_info_t *info, const void *old, size_t size)
 {
 	ZBX_UNUSED(file);
 	ZBX_UNUSED(line);
@@ -752,7 +752,7 @@ void	*__wrap___zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, 
 	return zbx_malloc(NULL, size);
 }
 
-void	*__wrap___zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *old, size_t size)
+void	*__wrap___zbx_shmem_realloc(const char *file, int line, zbx_shmem_info_t *info, void *old, size_t size)
 {
 	ZBX_UNUSED(file);
 	ZBX_UNUSED(line);
@@ -761,7 +761,7 @@ void	*__wrap___zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info,
 	return zbx_realloc(old, size);
 }
 
-void	__wrap___zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr)
+void	__wrap___zbx_shmem_free(const char *file, int line, zbx_shmem_info_t *info, void *ptr)
 {
 	ZBX_UNUSED(file);
 	ZBX_UNUSED(line);

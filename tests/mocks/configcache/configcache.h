@@ -23,7 +23,7 @@
 #include "common.h"
 #include "zbxalgo.h"
 #include "dbconfig.h"
-#include "../zbxalgo/vectorimpl.h"
+#include "zbxalgo.h"
 
 typedef struct
 {

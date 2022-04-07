@@ -24,7 +24,7 @@
 
 #include "common.h"
 #include "zbxdbcache/user_macro.h"
-#include "zbxalgo/vectorimpl.h"
+#include "zbxalgo.h"
 #include "um_cache_mock.h"
 
 typedef struct
