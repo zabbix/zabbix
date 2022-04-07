@@ -412,7 +412,7 @@ class CControllerAuthenticationUpdate extends CController {
 
 		$del_ldap_serverids = array_keys($db_ldap_servers);
 
-		if ($del_ldap_serverids && !API::UserDirectory()->delete(array_keys($del_ldap_serverids))) {
+		if ($del_ldap_serverids && !API::UserDirectory()->delete($del_ldap_serverids)) {
 			return [false, $ldap_userdirectoryid];
 		}
 
@@ -427,7 +427,9 @@ class CControllerAuthenticationUpdate extends CController {
 				return [false, $ldap_userdirectoryid];
 			}
 
-			$ldap_userdirectoryid = $inserted_ids[$default_ldap_mapping_index];
+			if ($default_ldap_mapping_index !== null) {
+				$ldap_userdirectoryid = $inserted_ids['userdirectoryids'][$default_ldap_mapping_index];
+			}
 		}
 
 		if ($ldap_servers && $ldap_userdirectoryid === 0) {
