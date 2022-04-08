@@ -153,6 +153,193 @@ func TestURI_String(t *testing.T) {
 	}
 }
 
+func TestURI_NoQueryString(t *testing.T) {
+	type fields struct {
+		scheme   string
+		host     string
+		port     string
+		rawQuery string
+		socket   string
+		user     string
+		password string
+		rawUri   string
+		path     string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		{
+			"Should return URI with creds. Test 1",
+			fields{scheme: "https", host: "127.0.0.1", port: "8003", user: "zabbix",
+				password: "a35c2787-6ab4-4f6b-b538-0fcf91e678ed"},
+			"https://zabbix:a35c2787-6ab4-4f6b-b538-0fcf91e678ed@127.0.0.1:8003",
+		},
+		{
+			"Should return URI with creds. Test 2",
+			fields{scheme: "unix", socket: "/tmp/redis.sock", user: "zabbix", password: "secret"},
+			"unix://zabbix:secret@/tmp/redis.sock",
+		},
+		{
+			"Should return URI with user only",
+			fields{scheme: "unix", socket: "/tmp/redis.sock", user: "zabbix"},
+			"unix://zabbix@/tmp/redis.sock",
+		},
+		{
+			"Should return URI with creds containing special characters",
+			fields{scheme: "https", host: "127.0.0.1", port: "8003", user: "zabbix",
+				password: `!@#$%^&*()_+{}?|\/., -=_+`},
+			"https://zabbix:%21%40%23$%25%5E&%2A%28%29_+%7B%7D%3F%7C%5C%2F.,%20-=_+@127.0.0.1:8003",
+		},
+		{
+			"Should return URI with username",
+			fields{scheme: "https", host: "127.0.0.1", port: "8003", user: "zabbix"},
+			"https://zabbix@127.0.0.1:8003",
+		},
+		{
+			"Should return URI without creds",
+			fields{scheme: "https", host: "127.0.0.1", port: "8003"},
+			"https://127.0.0.1:8003",
+		},
+		{
+			"Should return URI with path and no query",
+			fields{scheme: "oracle", host: "127.0.0.1", port: "1521", rawQuery: "dbname=XE"},
+			"oracle://127.0.0.1:1521",
+		},
+		{
+			"Should return URI without port",
+			fields{scheme: "https", host: "127.0.0.1"},
+			"https://127.0.0.1",
+		},
+		{
+			"Should return URI with socket",
+			fields{scheme: "unix", socket: "/var/lib/mysql/mysql.sock"},
+			"unix:///var/lib/mysql/mysql.sock",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			u := &URI{
+				scheme:   tt.fields.scheme,
+				host:     tt.fields.host,
+				port:     tt.fields.port,
+				rawQuery: tt.fields.rawQuery,
+				socket:   tt.fields.socket,
+				user:     tt.fields.user,
+				password: tt.fields.password,
+				rawUri:   tt.fields.rawUri,
+				path:     tt.fields.path,
+			}
+			if got := u.NoQueryString(); got != tt.want {
+				t.Errorf("URI.NoQueryString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestURI_string(t *testing.T) {
+	type fields struct {
+		scheme   string
+		host     string
+		port     string
+		rawQuery string
+		socket   string
+		user     string
+		password string
+		rawUri   string
+	}
+	type args struct {
+		query string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   string
+	}{
+		{
+			"Should return URI with creds. Test 1",
+			fields{scheme: "https", host: "127.0.0.1", port: "8003", user: "zabbix",
+				password: "a35c2787-6ab4-4f6b-b538-0fcf91e678ed"},
+			args{""},
+			"https://zabbix:a35c2787-6ab4-4f6b-b538-0fcf91e678ed@127.0.0.1:8003",
+		},
+		{
+			"Should return URI with creds. Test 2",
+			fields{scheme: "unix", socket: "/tmp/redis.sock", user: "zabbix", password: "secret"},
+			args{""},
+			"unix://zabbix:secret@/tmp/redis.sock",
+		},
+		{
+			"Should return URI with user only",
+			fields{scheme: "unix", socket: "/tmp/redis.sock", user: "zabbix"},
+			args{""},
+			"unix://zabbix@/tmp/redis.sock",
+		},
+		{
+			"Should return URI with creds containing special characters",
+			fields{scheme: "https", host: "127.0.0.1", port: "8003", user: "zabbix",
+				password: `!@#$%^&*()_+{}?|\/., -=_+`},
+			args{""},
+			"https://zabbix:%21%40%23$%25%5E&%2A%28%29_+%7B%7D%3F%7C%5C%2F.,%20-=_+@127.0.0.1:8003",
+		},
+		{
+			"Should return URI with username",
+			fields{scheme: "https", host: "127.0.0.1", port: "8003", user: "zabbix"},
+			args{""},
+			"https://zabbix@127.0.0.1:8003",
+		},
+		{
+			"Should return URI without creds",
+			fields{scheme: "https", host: "127.0.0.1", port: "8003"},
+			args{""},
+			"https://127.0.0.1:8003",
+		},
+		{
+			"Should return URI with path and no query",
+			fields{scheme: "oracle", host: "127.0.0.1", port: "1521", rawQuery: "dbname=XE"},
+			args{""},
+			"oracle://127.0.0.1:1521",
+		},
+		{
+			"Should return URI with path and with query",
+			fields{scheme: "oracle", host: "127.0.0.1", port: "1521", rawQuery: "dbname=XE"},
+			args{"dbname=XE"},
+			"oracle://127.0.0.1:1521?dbname=XE",
+		},
+		{
+			"Should return URI without port",
+			fields{scheme: "https", host: "127.0.0.1"},
+			args{""},
+			"https://127.0.0.1",
+		},
+		{
+			"Should return URI with socket",
+			fields{scheme: "unix", socket: "/var/lib/mysql/mysql.sock"},
+			args{""},
+			"unix:///var/lib/mysql/mysql.sock",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			u := &URI{
+				scheme:   tt.fields.scheme,
+				host:     tt.fields.host,
+				port:     tt.fields.port,
+				rawQuery: tt.fields.rawQuery,
+				socket:   tt.fields.socket,
+				user:     tt.fields.user,
+				password: tt.fields.password,
+				rawUri:   tt.fields.rawUri,
+			}
+			if got := u.string(tt.args.query); got != tt.want {
+				t.Errorf("string() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 var (
 	defaults              = &Defaults{Scheme: "https", Port: "443"}
 	defaultsWithoutPort   = &Defaults{Scheme: "https"}

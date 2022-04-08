@@ -427,7 +427,7 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
 
 			endpoint->conn_info.serial.port = NULL;
 			zbx_strncpy_alloc(&endpoint->conn_info.serial.port, &alloc_len, &offset, ptr, tmp - ptr);
-			zbx_strsplit(++tmp, ':', &baudrate_str, &ptr);
+			zbx_strsplit_first(++tmp, ':', &baudrate_str, &ptr);
 			endpoint->conn_info.serial.baudrate = atoi(baudrate_str);
 			zbx_free(baudrate_str);
 

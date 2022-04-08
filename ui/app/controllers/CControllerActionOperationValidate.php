@@ -200,6 +200,6 @@ class CControllerActionOperationValidate extends CController {
 	}
 
 	protected function doAction() {
-		return $this->setResponse(new CControllerResponseData(['main_block' => json_encode([])]));
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode([])]));
 	}
 }

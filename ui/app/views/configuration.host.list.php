@@ -200,14 +200,13 @@ $table = (new CTableInfo())
 	]);
 
 $current_time = time();
-$interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI];
 
 foreach ($data['hosts'] as $host) {
 	// Select an interface from the list with highest priority.
 	$interface = null;
 
 	if ($host['interfaces']) {
-		foreach ($interface_types as $interface_type) {
+		foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $interface_type) {
 			$host_interfaces = array_filter($host['interfaces'], function(array $host_interface) use ($interface_type) {
 				return ($host_interface['type'] == $interface_type);
 			});

@@ -205,7 +205,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			return false;
 		}
 
-		if (!copyItems($src_hostid, $hostid)) {
+		if (!copyItems($src_hostid, $hostid, true)) {
 			return false;
 		}
 

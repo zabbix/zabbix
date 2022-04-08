@@ -23,7 +23,7 @@
  * @var CView $this
  */
 
-$pageHeader = (new CPageHeader(_('Fatal error, please report to the Zabbix team')))
+$pageHeader = (new CPageHeader(_('Fatal error, please report to the Zabbix team'), CWebUser::getLang()))
 	->addCssFile('assets/styles/'.CHtml::encode($data['theme']).'.css')
 	->display();
 
@@ -33,7 +33,7 @@ $buttons = [
 		->onClick('document.location = this.dataset.url')
 ];
 
-echo '<body lang="'.CWebUser::getLang().'">';
+echo '<body';
 
 (new CDiv((new CTag('main', true,
 	new CWarning(_('Fatal error, please report to the Zabbix team'), $data['messages'], $buttons)
