@@ -30,10 +30,17 @@ class CItemTypeZabbixActive extends CItemType {
 	 */
 	public static function getCreateValidationRules(array &$item): array {
 		return [
+			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
+				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]],
 			'delay' =>	['type' => API_MULTIPLE, 'rules' => [
 							['if' => static function (array $data): bool {
 								return strncmp($data['key_'], 'mqtt.get', 8) !== 0;
 							}, 'type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')],
+							['if' => static function (array $data): bool {
+								return strncmp($data['key_'], 'mqtt.get', 8) === 0;
+							}, 'type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')],
 							['else' => true, 'type' => API_UNEXPECTED]
 			]]
 		];

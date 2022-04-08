@@ -30,6 +30,10 @@ class CItemTypeDbMonitor extends CItemType {
 	 */
 	public static function getCreateValidationRules(array &$item): array {
 		return [
+			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
+				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]],
 			'username' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
 			'password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
 			'params' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')],

@@ -61,18 +61,32 @@ class testItemPrototype extends CAPITest {
 					];
 					break;
 
+				case ITEM_TYPE_SIMPLE:
+				case ITEM_TYPE_DB_MONITOR:
+					$params = [
+						'username' => 'username',
+					];
+					break;
+
 				case ITEM_TYPE_TELNET:
+					$params = [
+						'username' => 'username',
+						'params' => 'script',
+					];
+					break;
+
 				case ITEM_TYPE_SSH:
 					$params = [
 						'username' => 'username',
-						'authtype' => ITEM_AUTHTYPE_PASSWORD
+						'authtype' => ITEM_AUTHTYPE_PASSWORD,
+						'params' => 'script'
 					];
 					break;
 
 				case ITEM_TYPE_DEPENDENT:
 					$params = [
 						'master_itemid' => '150151',
-						'delay' => '0'
+						'delay' => '30s'
 					];
 					break;
 
@@ -85,7 +99,10 @@ class testItemPrototype extends CAPITest {
 
 				case ITEM_TYPE_HTTPAGENT:
 					$params = [
-						'url' => 'http://0.0.0.0'
+						'url' => 'http://0.0.0.0',
+						'authtype' => HTTPTEST_AUTH_BASIC,
+						'username' => 'username',
+						'password' => 'password'
 					];
 					break;
 
@@ -99,6 +116,12 @@ class testItemPrototype extends CAPITest {
 					$params = [
 						'params' => 'script',
 						'timeout' => '30s'
+					];
+					break;
+
+				case ITEM_TYPE_CALCULATED:
+					$params = [
+						'params' => '100*last(/'.'/vfs.fs.size[/,free])/last(/'.'/vfs.fs.size[/,total])'
 					];
 					break;
 
@@ -161,13 +184,14 @@ class testItemPrototype extends CAPITest {
 			[
 				'request_data' => [
 					'hostid' => '50009',
+					'ruleid' => '400660',
 					'name' => 'Test mqtt key without delay',
 					'key_' => 'mqtt.get[{#1}]',
 					'interfaceid' => '50022',
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'type' => ITEM_TYPE_ZABBIX
 				],
-				'expected_error' => 'Incorrect arguments passed to function.'
+				'expected_error' => 'Invalid parameter "/1": the parameter "delay" is missing.'
 			],
 			[
 				'request_data' => [
@@ -206,7 +230,7 @@ class testItemPrototype extends CAPITest {
 					'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 					'delay' => '0'
 				],
-				'expected_error' => null
+				'expected_error' => 'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
 			],
 			[
 				'request_data' => [
