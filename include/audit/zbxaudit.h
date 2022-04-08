@@ -17,17 +17,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PID_H
-#define ZABBIX_PID_H
+#ifndef ZABBIX_ZBXAUDIT_H
+#define ZABBIX_ZBXAUDIT_H
 
-#include "threads.h"
+#include "zbxtypes.h"
 
-#ifdef _WINDOWS
-#	error "This module allowed only for Unix OS"
-#endif
+#define ZBX_AUDIT_ACTION_ADD		0
+#define ZBX_AUDIT_ACTION_UPDATE		1
+#define ZBX_AUDIT_ACTION_DELETE		2
+#define ZBX_AUDIT_ACTION_EXECUTE	7
 
-int	create_pid_file(const char *pidfile);
-int	read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_error_len);
-void	drop_pid_file(const char *pidfile);
+int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
+		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
+		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *username, const char *clientip,
+		const char *output, const char *error);
 
-#endif
+void	zbx_audit_init(int audit_mode_set);
+void	zbx_audit_clean(void);
+void	zbx_audit_flush(void);
+int	zbx_audit_flush_once(void);
+
+#endif	/* ZABBIX_ZBXAUDIT_H */

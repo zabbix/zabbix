@@ -5,7 +5,7 @@ DIST_SUBDIRS = \
 	zbxdbhigh \
 	zbxdb \
 	zbxdbupgrade \
-	zbxmemory \
+	zbxshmem \
 	zbxalgo \
 	zbxmedia \
 	zbxcrypto \
@@ -53,7 +53,7 @@ SERVER_SUBDIRS = \
 	zbxdbcache \
 	zbxdbhigh \
 	zbxhttp \
-	zbxmemory \
+	zbxshmem \
 	zbxserver \
 	zbxicmpping \
 	zbxmedia \
@@ -84,7 +84,7 @@ PROXY_SUBDIRS = \
 	zbxdbcache \
 	zbxdbhigh \
 	zbxhttp \
-	zbxmemory \
+	zbxshmem \
 	zbxserver \
 	zbxicmpping \
 	zbxself \

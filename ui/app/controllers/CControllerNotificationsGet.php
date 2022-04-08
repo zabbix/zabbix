@@ -69,7 +69,8 @@ class CControllerNotificationsGet extends CController {
 
 	protected function doAction() {
 		if (!$this->settings['enabled']) {
-			return $this->setResponse(new CControllerResponseData(['main_block' => $this->makeResponseData()]));
+			$this->setResponse(new CControllerResponseData(['main_block' => $this->makeResponseData()]));
+			return;
 		}
 
 		// Server returns only basic details for events already known by client-side.

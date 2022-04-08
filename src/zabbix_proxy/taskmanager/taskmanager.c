@@ -19,7 +19,7 @@
 
 #include "taskmanager.h"
 
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxtasks.h"
 #include "log.h"

@@ -63,7 +63,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 	protected function doGraphPrototype(array $fields) {
 		$options = [
 			'output' => ['graphid', 'name'],
-			'selectHosts' => ['name'],
+			'selectHosts' => ['hostid', 'name'],
 			'selectDiscoveryRule' => ['hostid']
 		];
 
@@ -161,9 +161,12 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			$widget_name = $this->getInput('name');
 		}
 		else {
+			$host_names = array_column($graph_prototype['hosts'], 'name', 'hostid');
+			$host_name = $host_names[$graph_prototype['discoveryRule']['hostid']];
+
 			$widget_name = $is_template_dashboard
 				? $graph_prototype['name']
-				: $graph_prototype['hosts'][0]['name'].NAME_DELIMITER.$graph_prototype['name'];
+				: $host_name.NAME_DELIMITER.$graph_prototype['name'];
 		}
 
 		return [

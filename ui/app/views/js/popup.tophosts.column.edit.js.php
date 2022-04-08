@@ -26,8 +26,8 @@ window.tophosts_column_edit_form = new class {
 		this._$widget_form = $(`form[name="${form_name}"]`);
 		this._$thresholds_table = this._$widget_form.find('#thresholds_table');
 
-		$('[name="display"],[name="data"],[name="aggregate_function"]', this._$widget_form).on('change', () => {
-			this.updateAccessibility();
+		$('[name="data"], [name="aggregate_function"], [name="display"]', this._$widget_form).on('change', () => {
+			this._update();
 		});
 
 		colorPalette.setThemeColors(thresholds_colors);
@@ -46,21 +46,28 @@ window.tophosts_column_edit_form = new class {
 			$(colorpicker).colorpicker({appendTo: $(colorpicker).closest('.input-color-picker')});
 		});
 
-		this._$thresholds_table.on('afteradd.dynamicRows', e => {
-			const $colorpicker = $('tr.form_row:last input[name$="[color]"]', e.target);
+		this._$thresholds_table
+			.on('afteradd.dynamicRows', e => {
+				const $colorpicker = $('tr.form_row:last input[name$="[color]"]', e.target);
 
-			$colorpicker.colorpicker({appendTo: $colorpicker.closest('.input-color-picker')});
-		});
+				$colorpicker.colorpicker({appendTo: $colorpicker.closest('.input-color-picker')});
+
+				this._update();
+			})
+			.on('afterremove.dynamicRows', () => this._update());
 
 		this._$widget_form.on('process.form', (e, overlay) => {
 			this.handleFormSubmit(e, overlay);
 		});
 
 		// Initialize form elements accessibility.
-		this.updateAccessibility();
+		this._update();
+
+		this._$widget_form[0].style.display = '';
+		this._$widget_form[0].querySelector('[name="name"]').focus();
 	}
 
-	updateAccessibility() {
+	_update() {
 		const display_as_is = ($('[name="display"]:checked').val() == <?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>);
 		const data_item_value = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_ITEM_VALUE ?>);
 		const data_text = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_TEXT ?>);
@@ -74,6 +81,16 @@ window.tophosts_column_edit_form = new class {
 		$('[name="min"],[name="max"]', this._$widget_form).attr('disabled', display_as_is || !data_item_value);
 		this._$thresholds_table.toggleClass('disabled', !data_item_value);
 		$('[name$="[color]"],[name$="[threshold]"],button', this._$thresholds_table).attr('disabled', !data_item_value);
+
+		// Toggle warning icons for non-numeric items settings.
+		if (data_item_value) {
+			document.getElementById('tophosts-column-aggregate-function-warning').style.display = no_aggregate_function
+				? 'none'
+				: '';
+			document.getElementById('tophosts-column-display-warning').style.display = display_as_is ? 'none' : '';
+			document.getElementById('tophosts-column-thresholds-warning').style.display =
+				this._$thresholds_table[0].rows.length > 2 ? '' : 'none';
+		}
 
 		// Toggle visibility of disabled form elements.
 		$('.form-grid > label', this._$widget_form).each((i, elm) => {

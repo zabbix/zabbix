@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "audit_httptest.h"
+#include "audit/zbxaudit_httptest.h"
 
+#include "audit/zbxaudit.h"
 #include "log.h"
 #include "zbxalgo.h"
 #include "audit.h"
@@ -162,7 +163,7 @@ int	zbx_audit_DBselect_delete_for_httptest(const char *sql, zbx_vector_uint64_t 
 		ZBX_STR2UINT64(id, row[0]);
 		zbx_vector_uint64_append(ids, id);
 
-		zbx_audit_httptest_create_entry(AUDIT_ACTION_DELETE, id, row[1]);
+		zbx_audit_httptest_create_entry(ZBX_AUDIT_ACTION_DELETE, id, row[1]);
 	}
 
 	DBfree_result(result);
