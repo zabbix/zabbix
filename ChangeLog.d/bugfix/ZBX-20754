@@ -1,0 +1,1 @@
+...G...... [ZBX-20754] fixed Zabbix sender and Zabbix js not releasing semaphores upon exit (vso)
