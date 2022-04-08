@@ -726,8 +726,8 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 			else
 			{
 				/* recreate empty-macros vector to release memory */
-				zbx_vector_um_macro_destroy(&host->macros);
-				zbx_vector_um_macro_create_ext(&host->macros, __config_shmem_malloc_func,
+				zbx_vector_um_macro_destroy(&hosts.values[i]->macros);
+				zbx_vector_um_macro_create_ext(&hosts.values[i]->macros, __config_shmem_malloc_func,
 						__config_shmem_realloc_func, __config_shmem_free_func);
 			}
 		}
