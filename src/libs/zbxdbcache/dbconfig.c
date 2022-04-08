@@ -12920,6 +12920,9 @@ char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t 
 	size_t			buf_alloc, buf_offset = 0, sep_pos;
 	zbx_dc_um_handle_t	*um_handle;
 
+	if ('\0' == *params)
+		return zbx_strdup(NULL, "");
+
 	buf_alloc = params_len = strlen(params);
 	buf = zbx_malloc(NULL, buf_alloc);
 
