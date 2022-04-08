@@ -10,7 +10,7 @@ function run
 
 	local pofile=${workdir}/$1/LC_MESSAGES/frontend.po
 	[[ -f $pofile  ]] &&
-		die "$pofile already exist"
+		die "$pofile already exists"
 
 	if [[ -f $potfile ]]; then
 		mkdir -p $(dirname $pofile)
