@@ -34,7 +34,7 @@ if (isset($ZBX_SERVER_NAME) && $ZBX_SERVER_NAME !== '') {
 	$page_title = $ZBX_SERVER_NAME.NAME_DELIMITER.$page_title;
 }
 
-$pageHeader = new CPageHeader($page_title);
+$pageHeader = new CPageHeader($page_title, CWebUser::getLang());
 
 if (!empty($DB['DB'])) {
 	$theme = getUserTheme($data['user']);
@@ -83,4 +83,4 @@ if ($scripts) {
 
 $pageHeader->display();
 
-echo '<body lang="'.CWebUser::getLang().'">';
+echo '<body>';

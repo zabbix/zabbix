@@ -23,11 +23,6 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 
-#define AUDIT_ACTION_ADD		0
-#define AUDIT_ACTION_UPDATE		1
-#define AUDIT_ACTION_DELETE		2
-#define AUDIT_ACTION_EXECUTE		7
-
 #define AUDIT_DETAILS_ACTION_ADD	"add"
 #define AUDIT_DETAILS_ACTION_UPDATE	"update"
 #define AUDIT_DETAILS_ACTION_DELETE	"delete"
@@ -42,14 +37,11 @@
 #define AUDIT_RESOURCE_SCENARIO			22
 #define AUDIT_RESOURCE_DISCOVERY_RULE		23
 #define AUDIT_RESOURCE_SCRIPT			25
-
 #define AUDIT_RESOURCE_TRIGGER_PROTOTYPE	31
 #define AUDIT_RESOURCE_GRAPH_PROTOTYPE		35
 #define AUDIT_RESOURCE_ITEM_PROTOTYPE		36
 #define AUDIT_RESOURCE_HOST_PROTOTYPE		37
-
 #define AUDIT_RESOURCE_SETTINGS			40
-
 #define AUDIT_RESOURCE_HA_NODE			47
 
 #define AUDIT_HOST_ID		1
@@ -61,12 +53,12 @@
 #define AUDIT_HA_NODE_ID	7
 #define AUDIT_CONFIG_ID		8
 
+int		zbx_get_audit_mode(void);
+zbx_hashset_t	*zbx_get_audit_hashset(void);
+
 #define RETURN_IF_AUDIT_OFF()					\
 	if (ZBX_AUDITLOG_ENABLED != zbx_get_audit_mode())	\
 		return						\
-
-int		zbx_get_audit_mode(void);
-zbx_hashset_t	*zbx_get_audit_hashset(void);
 
 typedef struct zbx_audit_entry
 {
@@ -86,15 +78,6 @@ zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const int id_table, con
 zbx_audit_entry_t	*zbx_audit_entry_init_cuid(const char *cuid, const int id_table,const char *name,
 		int audit_action, int resource_type);
 
-int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
-		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
-		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *username, const char *clientip,
-		const char *output, const char *error);
-
-void	zbx_audit_init(int audit_mode_set);
-void	zbx_audit_clean(void);
-void	zbx_audit_flush(void);
-int	zbx_audit_flush_once(void);
 void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const int id_table, const char *audit_op,
 		const char *key, const char *value, const char *table, const char *field);
 void	zbx_audit_update_json_append_string_secret(const zbx_uint64_t id, const int id_table, const char *audit_op,

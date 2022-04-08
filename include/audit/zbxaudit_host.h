@@ -208,4 +208,5 @@ void	zbx_audit_host_group_update_json_update_##resource(zbx_uint64_t groupid, ty
 PREPARE_AUDIT_HOST_GROUP_UPDATE_H(name, const char*)
 #undef PREPARE_AUDIT_HOST_UPDATE_H
 
+void	zbx_audit_host_update_json_add_proxy_hostid(zbx_uint64_t hostid, zbx_uint64_t proxy_hostid);
 #endif	/* ZABBIX_AUDIT_HOST_H */

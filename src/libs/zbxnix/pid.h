@@ -17,19 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SIGHANDLER_H
-#define ZABBIX_SIGHANDLER_H
+#ifndef ZABBIX_PID_H
+#define ZABBIX_PID_H
 
-#include "sysinc.h"
+#include "zbxsysinc.h"
 
-void	zbx_set_common_signal_handlers(void);
-void	zbx_set_child_signal_handler(void);
-void	zbx_unset_child_signal_handler(void);
-void	zbx_set_metric_thread_signal_handler(void);
-void	zbx_block_signals(sigset_t *orig_mask);
-void	zbx_unblock_signals(const sigset_t *orig_mask);
-
-void	zbx_set_exit_on_terminate(void);
-void	zbx_unset_exit_on_terminate(void);
-
+#ifdef _WINDOWS
+#	error "This module allowed only for Unix OS"
 #endif
+
+#include "threads.h"
+
+int	create_pid_file(const char *pidfile);
+int	read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_error_len);
+void	drop_pid_file(const char *pidfile);
+#endif /* ZABBIX_PID_H */
