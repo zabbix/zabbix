@@ -50,9 +50,9 @@ zbx_sysinfo_proc_t;
 
 typedef struct
 {
-	zbx_uint64_t	pid;
-	zbx_uint64_t	ppid;
-	zbx_uint64_t	tid;
+	unsigned int	pid;
+	unsigned int	tid;
+	unsigned int	ppid;
 
 	char		*name;
 	char		*tname;
@@ -1590,7 +1590,10 @@ static proc_data_t	*proc_get_data(FILE *f_status, FILE *f_stat, FILE *f_io, int 
 	memset(proc_data, 0, sizeof(proc_data_t));
 
 	if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode)
-		read_value_from_proc_file(f_status, 0, "PPid", PROC_VAL_TYPE_NUM, &proc_data->ppid, NULL);
+	{
+		read_value_from_proc_file(f_status, 0, "PPid", PROC_VAL_TYPE_NUM, &val, NULL);
+		proc_data->ppid = (unsigned int)val;
+	}
 
 	if (ZBX_PROC_MODE_THREAD != zbx_proc_mode)
 	{
@@ -1878,7 +1881,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				struct dirent	*threads;
 				char		path[MAX_STRING_LEN];
-				zbx_uint64_t	tid;
+				unsigned int	tid;
 
 				while (NULL != (threads = readdir(taskdir)))
 				{

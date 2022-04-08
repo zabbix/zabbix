@@ -30,8 +30,8 @@ static kvm_t	*kd = NULL;
 
 typedef struct
 {
-	zbx_uint64_t	pid;
-	zbx_uint64_t	ppid;
+	int		pid;
+	int		ppid;
 
 	char		*name;
 	char		*cmdline;
@@ -573,8 +573,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (ZBX_PROC_MODE_PROCESS == zbx_proc_mode)
 		{
-			zbx_json_adduint64(&j, "pid", pdata->pid);
-			zbx_json_adduint64(&j, "ppid", pdata->ppid);
+			zbx_json_addint64(&j, "pid", pdata->pid);
+			zbx_json_addint64(&j, "ppid", pdata->ppid);
 			zbx_json_addstring(&j, "name", pdata->name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "cmdline", pdata->cmdline, ZBX_JSON_TYPE_STRING);
 		}

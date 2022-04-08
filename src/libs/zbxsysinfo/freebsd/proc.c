@@ -85,10 +85,10 @@
 
 typedef struct
 {
-	zbx_uint64_t	pid;
-	zbx_uint64_t	ppid;
-	zbx_uint64_t	tid;
-	zbx_uint64_t	jid;
+	int		pid;
+	int		ppid;
+	int		tid;
+	int		jid;
 
 	char		*name;
 	char		*tname;
@@ -897,9 +897,9 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (ZBX_PROC_MODE_PROCESS == zbx_proc_mode)
 		{
-			zbx_json_adduint64(&j, "pid", pdata->pid);
-			zbx_json_adduint64(&j, "ppid", pdata->ppid);
-			zbx_json_adduint64(&j, "jid", pdata->jid);
+			zbx_json_addint64(&j, "pid", pdata->pid);
+			zbx_json_addint64(&j, "ppid", pdata->ppid);
+			zbx_json_addint64(&j, "jid", pdata->jid);
 			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "cmdline", ZBX_NULL2EMPTY_STR(pdata->cmdline), ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&j, "vsize", pdata->vsize);
@@ -921,11 +921,11 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 		else if (ZBX_PROC_MODE_THREAD == zbx_proc_mode)
 		{
-			zbx_json_adduint64(&j, "pid", pdata->pid);
-			zbx_json_adduint64(&j, "ppid", pdata->ppid);
-			zbx_json_adduint64(&j, "jid", pdata->jid);
+			zbx_json_addint64(&j, "pid", pdata->pid);
+			zbx_json_addint64(&j, "ppid", pdata->ppid);
+			zbx_json_addint64(&j, "jid", pdata->jid);
 			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
-			zbx_json_adduint64(&j, "tid", pdata->tid);
+			zbx_json_addint64(&j, "tid", pdata->tid);
 			zbx_json_addstring(&j, "tname", ZBX_NULL2EMPTY_STR(pdata->tname), ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&j, "cputime_user", pdata->cputime_user);
 			zbx_json_adduint64(&j, "cputime_system", pdata->cputime_system);

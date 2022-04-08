@@ -33,9 +33,9 @@
 
 typedef struct
 {
-	zbx_uint64_t	pid;
-	zbx_uint64_t	ppid;
-	zbx_uint64_t	tid;
+	unsigned int	pid;
+	unsigned int	ppid;
+	unsigned int	tid;
 
 	char		*name;
 	zbx_uint64_t	processes;
