@@ -21,10 +21,25 @@ package smart
 
 import (
 	"encoding/json"
+	"fmt"
+	"strings"
 
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/zbxerr"
+)
+
+const (
+	twoParameters = 2
+	oneParameter  = 1
+	all           = 0
+
+	firstParameter  = 0
+	secondParameter = 1
+
+	diskGet            = "smart.disk.get"
+	diskDiscovery      = "smart.disk.discovery"
+	attributeDiscovery = "smart.attribute.discovery"
 )
 
 // Options -
@@ -61,7 +76,7 @@ func (p *Plugin) Validate(options interface{}) error {
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if len(params) > 0 {
+	if len(params) > 0 && key != diskGet {
 		return nil, zbxerr.ErrorTooManyParameters
 	}
 
@@ -72,77 +87,22 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	var jsonArray []byte
 
 	switch key {
-	case "smart.disk.discovery":
-		out := []device{}
-
-		r, err := p.execute(false)
+	case diskDiscovery:
+		jsonArray, err = p.diskDiscovery()
 		if err != nil {
-			return nil, err
+			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
 
-		for _, dev := range r.devices {
-			out = append(out, device{
-				Name:       cutPrefix(dev.Info.Name),
-				DeviceType: getType(dev.Info.DevType, dev.RotationRate, dev.SmartAttributes.Table),
-				Model:      dev.ModelName, SerialNumber: dev.SerialNumber,
-			})
-		}
-
-		jsonArray, err = json.Marshal(out)
+	case diskGet:
+		jsonArray, err = p.diskGet(params)
 		if err != nil {
-			return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
 
-	case "smart.disk.get":
-		r, err := p.execute(true)
+	case attributeDiscovery:
+		jsonArray, err = p.attributeDiscovery()
 		if err != nil {
-			return nil, err
-		}
-
-		fields, err := setDiskFields(r.jsonDevices)
-		if err != nil {
-			return nil, err
-		}
-
-		if fields == nil {
-			jsonArray, err = json.Marshal([]string{})
-			if err != nil {
-				return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
-			}
-
-			break
-		}
-
-		jsonArray, err = json.Marshal(fields)
-		if err != nil {
-			return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
-		}
-
-	case "smart.attribute.discovery":
-		out := []attribute{}
-
-		r, err := p.execute(false)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, dev := range r.devices {
-			t := getAttributeType(dev.Info.DevType, dev.RotationRate, dev.SmartAttributes.Table)
-			for _, attr := range dev.SmartAttributes.Table {
-				out = append(
-					out, attribute{
-						Name:       cutPrefix(dev.Info.Name),
-						DeviceType: t,
-						ID:         attr.ID,
-						Attrname:   attr.Attrname,
-						Thresh:     attr.Thresh,
-					})
-			}
-		}
-
-		jsonArray, err = json.Marshal(out)
-		if err != nil {
-			return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
 
 	default:
@@ -150,6 +110,194 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	return string(jsonArray), nil
+}
+
+func (p *Plugin) diskDiscovery() (jsonArray []byte, err error) {
+	out := []device{}
+
+	r, err := p.execute(false)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, dev := range r.devices {
+		out = append(out, device{
+			Name:         cutPrefix(dev.Info.Name),
+			DeviceType:   getType(dev.Info.DevType, dev.RotationRate, dev.SmartAttributes.Table),
+			Model:        dev.ModelName,
+			SerialNumber: dev.SerialNumber,
+			Path:         dev.Info.name,
+			RaidType:     dev.Info.raidType,
+			Attributes:   getAttributes(dev),
+		})
+	}
+
+	jsonArray, err = json.Marshal(out)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+	}
+
+	return
+}
+
+func (p *Plugin) diskGet(params []string) ([]byte, error) {
+	switch len(params) {
+	case twoParameters:
+		return p.diskGetSingle(params[firstParameter], params[secondParameter])
+	case oneParameter:
+		return p.diskGetSingle(params[firstParameter], "")
+	case all:
+		return p.diskGetAll()
+	default:
+		return nil, zbxerr.ErrorTooManyParameters
+	}
+}
+
+func (p *Plugin) diskGetSingle(path, raidType string) ([]byte, error) {
+	executable := path
+
+	if raidType != "" {
+		executable = fmt.Sprintf("%s -d %s", executable, raidType)
+	}
+
+	device, err := p.executeSingle(executable)
+	if err != nil {
+		return nil, err
+	}
+
+	out, err := setSingleDiskFields(device)
+	if err != nil {
+		return nil, err
+	}
+
+	jsonArray, err := json.Marshal(out)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+	}
+
+	return jsonArray, nil
+}
+
+func (p *Plugin) diskGetAll() (jsonArray []byte, err error) {
+	r, err := p.execute(true)
+	if err != nil {
+		return nil, err
+	}
+
+	fields, err := setDiskFields(r.jsonDevices)
+	if err != nil {
+		return nil, err
+	}
+
+	if fields == nil {
+		jsonArray, err = json.Marshal([]string{})
+		if err != nil {
+			return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		}
+
+		return
+	}
+
+	jsonArray, err = json.Marshal(fields)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+	}
+
+	return
+}
+
+func (p *Plugin) attributeDiscovery() (jsonArray []byte, err error) {
+	out := []attribute{}
+
+	r, err := p.execute(false)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, dev := range r.devices {
+		t := getAttributeType(dev.Info.DevType, dev.RotationRate, dev.SmartAttributes.Table)
+		for _, attr := range dev.SmartAttributes.Table {
+			out = append(
+				out, attribute{
+					Name:       cutPrefix(dev.Info.Name),
+					DeviceType: t,
+					ID:         attr.ID,
+					Attrname:   attr.Attrname,
+					Thresh:     attr.Thresh,
+				})
+		}
+	}
+
+	jsonArray, err = json.Marshal(out)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+	}
+
+	return
+}
+
+// setSingleDiskFields goes through provided device json data and sets required output fields.
+// It returns an error if there is an issue with unmarshal for the provided input JSON map.
+func setSingleDiskFields(dev []byte) (out map[string]interface{}, err error) {
+	attr := make(map[string]interface{})
+	if err = json.Unmarshal(dev, &attr); err != nil {
+		return out, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+	}
+
+	var sd singleDevice
+	if err = json.Unmarshal(dev, &sd); err != nil {
+		return out, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+	}
+
+	diskType := getType(getTypeFromJson(attr), getRateFromJson(attr), getTablesFromJson(attr))
+
+	out = map[string]interface{}{}
+	out["disk_type"] = diskType
+	out["firmware_version"] = sd.Firmware
+	out["model_name"] = sd.ModelName
+	out["serial_number"] = sd.SerialNumber
+	out["exit_status"] = sd.Smartctl.ExitStatus
+
+	var errors []string
+	for _, msg := range sd.Smartctl.Messages {
+		errors = append(errors, msg.Str)
+	}
+
+	out["error"] = strings.Join(errors, ", ")
+	out["self_test_passed"] = setSelfTest(sd)
+
+	if diskType == nvmeType {
+		out["temperature"] = sd.HealthLog.Temperature
+		out["power_on_time"] = sd.HealthLog.PowerOnTime
+		out["critical_warning"] = sd.HealthLog.CriticalWarning
+		out["media_errors"] = sd.HealthLog.MediaErrors
+		out["percentage_used"] = sd.HealthLog.Percentage_used
+	} else {
+		out["temperature"] = sd.Temperature.Current
+		out["power_on_time"] = sd.PowerOnTime.Hours
+		out["critical_warning"] = 0
+		out["media_errors"] = 0
+		out["percentage_used"] = 0
+	}
+
+	for _, a := range sd.SmartAttributes.Table {
+		if a.Name == unknownAttrName {
+			continue
+		}
+
+		out[strings.ToLower(a.Name)] = singleRequestAttribute{a.Raw.Value, a.Raw.Str}
+	}
+
+	return
+}
+
+// setSelfTest determines if device is self test capable and if the test is passed.
+func setSelfTest(sd singleDevice) *bool {
+	if sd.Data.Capabilities.SelfTestsSupported {
+		return &sd.Data.SelfTest.Status.Passed
+	}
+
+	return nil
 }
 
 // setDiskFields goes through provided device json map and sets disk_name
@@ -240,6 +388,18 @@ func getAttributeType(devType string, rate int, tables []table) string {
 	}
 
 	return getTypeByRateAndAttr(rate, tables)
+}
+
+func getAttributes(in deviceParser) (out string) {
+	for _, table := range in.SmartAttributes.Table {
+		if table.Attrname == unknownAttrName {
+			continue
+		}
+
+		out = out + " " + table.Attrname
+	}
+
+	return strings.TrimSpace(out)
 }
 
 func getType(devType string, rate int, tables []table) string {

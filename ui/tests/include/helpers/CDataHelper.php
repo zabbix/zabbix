@@ -23,6 +23,7 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../../include/hosts.inc.php';
+require_once dirname(__FILE__).'/../../../include/db.inc.php';
 
 class CDataHelper extends CAPIHelper {
 
@@ -188,7 +189,7 @@ class CDataHelper extends CAPIHelper {
 		$result['ids'] = [];
 		foreach ($hosts as $host) {
 			foreach ($host['interfaces'] as $interface) {
-				if ($interface['main'] == 1) {
+				if ($interface['main'] == INTERFACE_PRIMARY) {
 					$result['default_interfaces'][$host['host']][$interface['type']] = $interface['interfaceid'];
 				}
 
@@ -362,5 +363,45 @@ class CDataHelper extends CAPIHelper {
 		}
 
 		return true;
+	}
+
+	/**
+	 *  Add data to item.
+	 *
+	 * @param string $itemid		item id
+	 * @param array $values		value that should be sent to item
+	 * @param mixed $time			time when value was received
+	 */
+	public static function addItemData($itemid, $values, $time = null) {
+		if (!is_array($values)) {
+			$values = [$values];
+		}
+
+		if ($time === null) {
+			$time = time();
+		}
+		elseif (is_array($time)) {
+			if (count($time) !== count($values)) {
+				throw new Exception('Value count should match the time record count.');
+			}
+
+			$time = array_values($time);
+		}
+
+		// Check item value type to set correct history table where to insert data.
+		$value_type = CDBHelper::getValue('SELECT value_type FROM items where itemid='.zbx_dbstr($itemid));
+		$suffixes = ['', '_str', '_log', '_uint', '_text'];
+
+		if (!array_key_exists($value_type, $suffixes)) {
+			throw new Exception('Unsupported item value type: '.$value_type);
+		}
+
+		$history_table = 'history'.$suffixes[$value_type];
+
+		foreach (array_values($values) as $key => $value) {
+			$clock = is_array($time) ? $time[$key] : $time;
+			DBexecute('INSERT INTO '.$history_table.' (itemid, clock, value) VALUES ('.zbx_dbstr($itemid).', '
+					.zbx_dbstr($clock).', '.zbx_dbstr($value).')');
+		}
 	}
 }
