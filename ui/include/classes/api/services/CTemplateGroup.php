@@ -117,8 +117,7 @@ class CTemplateGroup extends CApiService {
 			'select'	=> ['tplgrp' => 'g.groupid'],
 			'from'		=> ['tplgrp' => 'tplgrp g'],
 			'where'		=> [],
-			'order'		=> [],
-			'limit'		=> null
+			'order'		=> []
 		];
 
 		// editable + PERMISSION CHECK
@@ -324,13 +323,9 @@ class CTemplateGroup extends CApiService {
 		}
 
 		// limit
-		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sqlParts['limit'] = $options['limit'];
-		}
-
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $options['limit']);
 		while ($group = DBfetch($res)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {
