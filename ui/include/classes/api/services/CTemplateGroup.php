@@ -138,19 +138,19 @@ class CTemplateGroup extends CApiService {
 		}
 
 		// groupids
-		if (!is_null($options['groupids'])) {
+		if ($options['groupids'] !== null) {
 			$sqlParts['where']['groupid'] = dbConditionInt('g.groupid', $options['groupids']);
 		}
 
 		// templateids
-		if (!is_null($options['templateids'])) {
+		if ($options['templateids'] !== null) {
 			$sqlParts['from']['template_group'] = 'template_group tg';
 			$sqlParts['where'][] = dbConditionInt('tg.hostid', $options['templateids']);
 			$sqlParts['where']['tgg'] = 'tg.groupid=g.groupid';
 		}
 
 		// triggerids
-		if (!is_null($options['triggerids'])) {
+		if ($options['triggerids'] !== null) {
 			$sqlParts['from']['template_group'] = 'template_group tg';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
@@ -161,7 +161,7 @@ class CTemplateGroup extends CApiService {
 		}
 
 		// graphids
-		if (!is_null($options['graphids'])) {
+		if ($options['graphids'] !== null) {
 			$sqlParts['from']['gi'] = 'graphs_items gi';
 			$sqlParts['from']['i'] = 'items i';
 			$sqlParts['from']['tg'] = 'template_group tg';
@@ -314,12 +314,12 @@ class CTemplateGroup extends CApiService {
 		}
 
 		// filter
-		if (is_array($options['filter'])) {
+		if ($options['filter'] !== null) {
 			$this->dbFilter('tplgrp g', $options, $sqlParts);
 		}
 
 		// search
-		if (is_array($options['search'])) {
+		if ($options['search'] !== null) {
 			zbx_db_search('tplgrp g', $options, $sqlParts);
 		}
 
@@ -1228,7 +1228,7 @@ class CTemplateGroup extends CApiService {
 						'templateids' => $related_ids,
 						'preservekeys' => true
 					]);
-					if (!is_null($options['limitSelects'])) {
+					if ($options['limitSelects'] !== null) {
 						order_result($templates, 'template');
 					}
 				}

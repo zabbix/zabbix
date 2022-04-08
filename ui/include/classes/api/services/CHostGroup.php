@@ -151,19 +151,19 @@ class CHostGroup extends CApiService {
 		}
 
 		// groupids
-		if (!is_null($options['groupids'])) {
+		if ($options['groupids'] !== null) {
 			$sqlParts['where']['groupid'] = dbConditionInt('g.groupid', $options['groupids']);
 		}
 
 		// hostids
-		if (!is_null($options['hostids'])) {
+		if (($options['hostids']) !== null) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where'][] = dbConditionInt('hg.hostid', $options['hostids']);
 			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
 		}
 
 		// triggerids
-		if (!is_null($options['triggerids'])) {
+		if ($options['triggerids'] !== null) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
@@ -174,7 +174,7 @@ class CHostGroup extends CApiService {
 		}
 
 		// graphids
-		if (!is_null($options['graphids'])) {
+		if ($options['graphids'] !== null) {
 			$sqlParts['from']['gi'] = 'graphs_items gi';
 			$sqlParts['from']['i'] = 'items i';
 			$sqlParts['from']['hg'] = 'hosts_groups hg';
@@ -185,7 +185,7 @@ class CHostGroup extends CApiService {
 		}
 
 		// maintenanceids
-		if (!is_null($options['maintenanceids'])) {
+		if ($options['maintenanceids'] !== null) {
 			$sqlParts['from']['maintenances_groups'] = 'maintenances_groups mg';
 			$sqlParts['where'][] = dbConditionInt('mg.maintenanceid', $options['maintenanceids']);
 			$sqlParts['where']['hmh'] = 'g.groupid=mg.groupid';
@@ -339,12 +339,12 @@ class CHostGroup extends CApiService {
 		}
 
 		// filter
-		if (is_array($options['filter'])) {
+		if ($options['filter'] !== null) {
 			$this->dbFilter('hstgrp g', $options, $sqlParts);
 		}
 
 		// search
-		if (is_array($options['search'])) {
+		if ($options['search'] !== null) {
 			zbx_db_search('hstgrp g', $options, $sqlParts);
 		}
 
@@ -1499,7 +1499,7 @@ class CHostGroup extends CApiService {
 						'hostids' => $related_ids,
 						'preservekeys' => true
 					]);
-					if (!is_null($options['limitSelects'])) {
+					if ($options['limitSelects'] !== null) {
 						order_result($hosts, 'host');
 					}
 				}
