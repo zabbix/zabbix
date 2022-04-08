@@ -118,6 +118,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"vm.perfcounter", VMCHECK_FUNC(check_vcenter_vm_perfcounter)},
 	{"vm.powerstate", VMCHECK_FUNC(check_vcenter_vm_powerstate)},
 	{"vm.snapshot.get", VMCHECK_FUNC(check_vcenter_vm_snapshot_get)},
+	{"vm.state", VMCHECK_FUNC(check_vcenter_vm_state)},
 	{"vm.storage.committed", VMCHECK_FUNC(check_vcenter_vm_storage_committed)},
 	{"vm.storage.unshared", VMCHECK_FUNC(check_vcenter_vm_storage_unshared)},
 	{"vm.storage.uncommitted", VMCHECK_FUNC(check_vcenter_vm_storage_uncommitted)},

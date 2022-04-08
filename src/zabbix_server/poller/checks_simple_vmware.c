@@ -3279,6 +3279,20 @@ int	check_vcenter_vm_net_if_out(AGENT_REQUEST *request, const char *username, co
 			"net/transmitted[average]",  __func__);
 }
 
+int	check_vcenter_vm_state(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	int ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_STATE, result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
 int	check_vcenter_vm_storage_committed(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
