@@ -4559,7 +4559,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .overlay-dialogue .dashboard-widget-head .icon-doc-link {
       width: 18px;
       height: 18px;
-      margin: -9px -6px 0 38px;
+      margin: -9px -6px 0 30px;
       line-height: 18px; }
       .overlay-dialogue .dashboard-widget-head .icon-doc-link::after {
         font-size: 14px; }
