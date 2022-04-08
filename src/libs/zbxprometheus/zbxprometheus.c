@@ -1521,6 +1521,7 @@ static int	prometheus_aggregate_values(const zbx_vector_ptr_t *rows, const char 
 		row = (const zbx_prometheus_row_t *)rows->values[i];
 
 		value_dbl = atof(row->value);
+
 		if (0 == isnan(value_dbl))
 			zbx_vector_dbl_append(&values, value_dbl);
 	}
