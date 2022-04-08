@@ -1617,8 +1617,8 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Add subgroups with tag filters inherited from main host group ($groupid) to all user groups in which tag filters for
-	 * particular group are created.
+	 * Add subgroups with tag filters inherited from main host group ($groupid) to all user groups in which tag filters
+	 * for particular group are created.
 	 *
 	 * @param string $groupid  Host group ID.
 	 * @param string $name     Host group name.

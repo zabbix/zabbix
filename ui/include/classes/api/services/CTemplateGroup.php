@@ -571,7 +571,9 @@ class CTemplateGroup extends CApiService {
 		]);
 
 		if ($duplicates) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template group "%1$s" already exists.', $duplicates[0]['name']));
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Template group "%1$s" already exists.', $duplicates[0]['name'])
+			);
 		}
 	}
 
@@ -1102,7 +1104,8 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @return array
 	 */
-	private static function getInsTemplatesGroups(array $groups, string $method, array &$db_templategroupids = null): array {
+	private static function getInsTemplatesGroups(array $groups, string $method,
+			array &$db_templategroupids = null): array {
 		$ins_templates_groups = [];
 
 		if ($method === 'massUpdate') {
