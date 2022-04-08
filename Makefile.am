@@ -13,6 +13,7 @@ EXTRA_DIST = \
 	bin \
 	build \
 	ui \
+	include \
 	conf \
 	sass
 
