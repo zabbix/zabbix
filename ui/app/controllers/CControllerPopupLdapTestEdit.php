@@ -23,15 +23,15 @@ class CControllerPopupLdapTestEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'host' => 'required|string',
-			'port' => 'required|int32',
-			'base_dn' => 'required|string',
-			'search_attribute' => 'required|string',
-			'bind_dn' => 'string',
-			'bind_password' => 'string',
-			'case_sensitive' => 'in 0,1',
-			'userfilter' => 'string',
-			'start_tls' => 'in 0,1'
+			'userdirectoryid' => 'db userdirectory.userdirectoryid',
+			'host' => 'required|db userdirectory.host|not_empty',
+			'port' => 'required|db userdirectory.port|ge '.ZBX_MIN_PORT_NUMBER.'|le '.ZBX_MAX_PORT_NUMBER,
+			'base_dn' => 'required|db userdirectory.base_dn|not_empty',
+			'bind_dn' => 'db userdirectory.bind_dn',
+			'bind_password' => 'db userdirectory.bind_password',
+			'search_attribute' => 'required|db userdirectory.search_attribute|not_empty',
+			'start_tls' => 'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
+			'search_filter' => 'db userdirectory.search_filter'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -52,27 +52,22 @@ class CControllerPopupLdapTestEdit extends CController {
 	}
 
 	protected function doAction(): void {
-		$ldap_config = [
-			'host' => '',
-			'port' => '',
-			'base_dn' => '',
-			'search_attribute' => '',
-			'bind_dn' => '',
-			'bind_password' => '',
-			'case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
-			'userfilter' => '',
-			'start_tls' => ZBX_AUTH_START_TLS_OFF
-		];
-
-		$this->getInputs($ldap_config, array_keys($ldap_config));
-
 		$data = [
+			'ldap_config' => [
+				'host' => $this->getInput('host'),
+				'port' => $this->getInput('port'),
+				'base_dn' => $this->getInput('base_dn'),
+				'bind_dn' => $this->getInput('bind_dn', ''),
+				'search_attribute' => $this->getInput('search_attribute'),
+				'start_tls' => $this->getInput('case_sensitive', ZBX_AUTH_START_TLS_OFF),
+			],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
-			'test_user' => CWebUser::$data['username'],
-			'ldap_config' => $ldap_config
+			'test_username' => CWebUser::$data['username']
 		];
+
+		$this->getInputs($data['ldap_config'], ['userdirectoryid', 'bind_password']);
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

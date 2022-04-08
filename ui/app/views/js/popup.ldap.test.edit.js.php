@@ -24,16 +24,19 @@
  */
 ?>
 
-window.ldap_test_edit_popup = {
-	overlay: null,
-	dialogue: null,
-	form: null,
+window.ldap_test_edit_popup = new class {
+
+	constructor() {
+		this.overlay = null;
+		this.dialogue = null;
+		this.form = null;
+	}
 
 	init() {
 		this.overlay = overlays_stack.getById('ldap_test_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-	},
+	}
 
 	submit() {
 		this.removePopupMessages();
@@ -57,11 +60,26 @@ window.ldap_test_edit_popup = {
 					this.form.parentNode.insertBefore(message_box, this.form);
 				}
 			})
-			.catch(this.ajaxExceptionHandler)
+			.catch((exception) => {
+				let title;
+				let messages = [];
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					title = <?= json_encode(_('Unexpected server error.')) ?>;
+				}
+
+				const message_box = makeMessageBox('bad', messages, title, true, true)[0];
+
+				this.form.parentNode.insertBefore(message_box, this.form);
+			})
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
-	},
+	}
 
 	removePopupMessages() {
 		for (const el of this.form.parentNode.children) {
@@ -69,22 +87,5 @@ window.ldap_test_edit_popup = {
 				el.parentNode.removeChild(el);
 			}
 		}
-	},
-
-	ajaxExceptionHandler: (exception) => {
-		let title;
-		let messages = [];
-
-		if (typeof exception === 'object' && 'error' in exception) {
-			title = exception.error.title;
-			messages = exception.error.messages;
-		}
-		else {
-			title = <?= json_encode(_('Unexpected server error.')) ?>;
-		}
-
-		const message_box = makeMessageBox('bad', messages, title, true, true)[0];
-
-		ldap_test_edit_popup.form.parentNode.insertBefore(message_box, ldap_test_edit_popup.form);
 	}
 };

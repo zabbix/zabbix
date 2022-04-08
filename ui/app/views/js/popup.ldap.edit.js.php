@@ -74,8 +74,7 @@ window.ldap_edit_popup = new class {
 			base_dn: this.form.base_dn.value,
 			search_attribute: this.form.search_attribute.value,
 			bind_dn: this.form.bind_dn.value,
-			bind_password: this.form.bind_password.value,
-			case_sensitive: this.form.case_sensitive.checked ? 1 : 0
+			bind_password: this.form.bind_password.value
 		};
 
 		if (this.advanced_chbox.checked) {

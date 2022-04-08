@@ -462,7 +462,7 @@ class CUserDirectory extends CApiService {
 	 */
 	protected static function validateTest(array &$userdirectory) {
 		$rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
-			'userdirectoryid' =>	['type' => API_ID, 'default' => null],
+			'userdirectoryid' =>	['type' => API_ID, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'host' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'host')],
 			'port' =>				['type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'base_dn' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'base_dn')],
@@ -475,7 +475,7 @@ class CUserDirectory extends CApiService {
 			'test_password' => 		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 		]];
 
-		if (!CApiInputValidator::validate($rules, $userdirectories, '/', $error)) {
+		if (!CApiInputValidator::validate($rules, $userdirectory, '/', $error)) {
 			static::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 

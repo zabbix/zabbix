@@ -155,8 +155,6 @@
 				};
 			}
 
-			popup_params['ldap_configured'] = document.getElementById('ldap_configured').checked ? 1 : 0;
-
 			const overlay = PopUp('popup.ldap.edit', popup_params, {dialogueid: 'ldap_edit'});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {

@@ -36,7 +36,6 @@ class CControllerPopupLdapEdit extends CController {
 			'search_filter' => 'db userdirectory.search_filter',
 			'case_sensitive' => 'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'description' => 'db userdirectory.description',
-			'ldap_configured' => 'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
 			'add_ldap_server' => 'in 0,1'
 		];
 
@@ -75,7 +74,6 @@ class CControllerPopupLdapEdit extends CController {
 			'bind_dn' => $this->getInput('bind_dn', ''),
 			'description' => $this->getInput('description', ''),
 			'search_filter' => $this->getInput('search_filter', ''),
-			'ldap_configured' => $this->getInput('ldap_configured', ''),
 			'add_ldap_server' => $this->getInput('add_ldap_server', 1),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

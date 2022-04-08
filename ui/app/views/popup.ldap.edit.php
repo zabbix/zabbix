@@ -167,7 +167,6 @@ $buttons[] = [
 	'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test']),
 	'keepOpen' => true,
 	'isSubmit' => false,
-	'enabled' => (bool) $data['ldap_configured'],
 	'action' => 'ldap_edit_popup.openTestPopup();'
 ];
 

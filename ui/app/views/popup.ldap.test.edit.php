@@ -32,9 +32,9 @@ $form = (new CForm('post', $form_action))
 	->addItem((new CInput('submit'))->addStyle('display: none;'))
 	->addItem((new CFormGrid())
 		->addItem([
-			(new CLabel(_('Login'), 'test_user'))->setAsteriskMark(),
+			(new CLabel(_('Login'), 'test_username'))->setAsteriskMark(),
 			new CFormField(
-				(new CTextBox('test_user', $data['test_user']))
+				(new CTextBox('test_username', $data['test_username']))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 					->setAriaRequired()
 			)

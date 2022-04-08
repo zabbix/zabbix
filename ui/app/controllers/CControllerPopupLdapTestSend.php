@@ -29,16 +29,16 @@ class CControllerPopupLdapTestSend extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'host' => 'required|string',
-			'port' => 'required|int32',
-			'base_dn' => 'required|string',
-			'search_attribute' => 'required|string',
-			'bind_dn' => 'string',
-			'bind_password' => 'string',
-			'case_sensitive' => 'in 0,1',
-			'userfilter' => 'string',
-			'start_tls' => 'in 0,1',
-			'test_user' => 'required|string',
+			'userdirectoryid' => 'db userdirectory.userdirectoryid',
+			'host' => 'required|db userdirectory.host|not_empty',
+			'port' => 'required|db userdirectory.port|ge '.ZBX_MIN_PORT_NUMBER.'|le '.ZBX_MAX_PORT_NUMBER,
+			'base_dn' => 'required|db userdirectory.base_dn|not_empty',
+			'bind_dn' => 'db userdirectory.bind_dn',
+			'bind_password' => 'db userdirectory.bind_password',
+			'search_attribute' => 'required|db userdirectory.search_attribute|not_empty',
+			'start_tls' => 'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
+			'search_filter' => 'db userdirectory.search_filter',
+			'test_username' => 'required|string',
 			'test_password' => 'required|string'
 		];
 
@@ -60,12 +60,29 @@ class CControllerPopupLdapTestSend extends CController {
 	}
 
 	protected function doAction(): void {
+		$ldap_test_object = [];
+		$this->getInputs($ldap_test_object, ['userdirectoryid', 'host', 'port', 'base_dn', 'bind_dn', 'bind_password',
+			'search_attribute', 'start_tls', 'search_filter','test_username', 'test_password']);
 
-		$output = [
-			'success' => [
-				'title' => _('Login successful')
-			]
-		];
+		$result = API::UserDirectory()->test($ldap_test_object);
+
+		$output = [];
+
+		if ($result) {
+			$success = ['title' => _('Login successful')]; // TODO VM: new translation string
+
+			if ($messages = get_and_clear_messages()) {
+				$success['messages'] = array_column($messages, 'message');
+			}
+
+			$output['success'] = $success;
+		}
+		else {
+			$output['error'] = [
+				'title' => _('Login failed'), // TODO VM: new translation string
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
+		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
