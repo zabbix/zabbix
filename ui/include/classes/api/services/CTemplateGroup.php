@@ -58,7 +58,6 @@ class CTemplateGroup extends CApiService {
 			'templateids' =>						['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'graphids' =>							['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'triggerids' =>							['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'templated_hosts' =>					['type' => API_BOOLEAN, 'flags' => API_DEPRECATED],
 			'with_templates' =>						['type' => API_BOOLEAN, 'default' => false],
 			'with_items' =>							['type' => API_BOOLEAN, 'default' => false],
 			'with_item_prototypes' =>				['type' => API_BOOLEAN, 'default' => false],
@@ -99,15 +98,6 @@ class CTemplateGroup extends CApiService {
 			'preservekeys' =>						['type' => API_BOOLEAN, 'default' => false],
 			'nopermissions' =>						['type' => API_BOOLEAN, 'default' => false]
 		]];
-
-		if (array_key_exists('templated_hosts', $options)) {
-			if (array_key_exists('with_templates', $options)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'templated_hosts'));
-			}
-
-			$options['with_templates'] = $options['templated_hosts'];
-			unset( $options['templated_hosts']);
-		}
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
