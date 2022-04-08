@@ -30,7 +30,11 @@ $widget = (new CWidget())
 		(new CTag('nav', true,
 			(new CList())
 				->addItem(
-					(new CSubmit('form', _('Create map')))->setEnabled($data['allowed_edit'])
+					(new CForm('get'))
+						->cleanItems()
+						->addItem(
+							(new CSubmit('form', _('Create map')))->setEnabled($data['allowed_edit'])
+						)
 				)
 				->addItem(
 					(new CButton('form', _('Import')))
