@@ -54,6 +54,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"datastore.hv.list", VMCHECK_FUNC(check_vcenter_datastore_hv_list)},
 
 	{"hv.cluster.name", VMCHECK_FUNC(check_vcenter_hv_cluster_name)},
+	{"hv.connectionstate", VMCHECK_FUNC(check_vcenter_hv_connectionstate)},
 	{"hv.cpu.usage", VMCHECK_FUNC(check_vcenter_hv_cpu_usage)},
 	{"hv.cpu.usage.perf", VMCHECK_FUNC(check_vcenter_hv_cpu_usage_perf)},
 	{"hv.cpu.utilization", VMCHECK_FUNC(check_vcenter_hv_cpu_utilization)},
