@@ -30,10 +30,7 @@ class CItemTypeZabbix extends CItemType {
 	 */
 	public static function getCreateValidationRules(array &$item): array {
 		return [
-			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
-				['else' => true, 'type' => API_UNEXPECTED]
-			]],
+			'interfaceid' =>	self::getCreateFieldRule('interfaceid'),
 			'delay' =>			['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')]
 		];
 	}

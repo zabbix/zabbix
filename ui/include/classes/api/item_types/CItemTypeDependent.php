@@ -30,12 +30,7 @@ class CItemTypeDependent extends CItemType {
 	 */
 	public static function getCreateValidationRules(array &$item): array {
 		return [
-			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
-				['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'master_itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'delay' =>			['type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')]
+			'master_itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 		];
 	}
 
