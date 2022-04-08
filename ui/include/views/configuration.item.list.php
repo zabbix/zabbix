@@ -33,20 +33,21 @@ $widget = (new CWidget())
 	))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())->addItem(
-				($data['hostid'] != 0)
-					? new CRedirectButton(_('Create item'), (new CUrl('items.php'))
-						->setArgument('form', 'create')
-						->setArgument('hostid', $data['hostid'])
-						->setArgument('context', $data['context'])
-						->getUrl()
-					)
-					: (new CButton('form',
-						($data['context'] === 'host')
-							? _('Create item (select host first)')
-							: _('Create item (select template first)')
-					))->setEnabled(false)
-			)
+			(new CList())
+				->addItem(
+					$data['hostid'] != 0
+						? new CRedirectButton(_('Create item'),
+							(new CUrl('items.php'))
+								->setArgument('form', 'create')
+								->setArgument('hostid', $data['hostid'])
+								->setArgument('context', $data['context'])
+						)
+						: (new CButton('form',
+							$data['context'] === 'host'
+								? _('Create item (select host first)')
+								: _('Create item (select template first)')
+						))->setEnabled(false)
+				)
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 
