@@ -947,9 +947,31 @@ function urlEncodeData(parameters, prefix = '') {
 }
 
 /**
- * Get all input fields from the given form and return them. The order of returned fields is not predictable.
+ * Get form field values as deep object.
  *
- * @param {object}  form    Form object from which fields are retrieved.
+ * Example:
+ *     <form>
+ *         <input name="a" value="1">
+ *         <input name="b[c]" value="2">
+ *         <input name="b[d]" value="3">
+ *         <input name="e[f][]" value="4">
+ *         <input name="e[f][]" value="5">
+ *     </form>
+ *
+ *    ... will result in:
+ *
+ *    {
+ *        a: "1",
+ *        b: {
+ *            c: "2",
+ *            d: "3"
+ *        },
+ *        e: {
+ *            f: ["4", "5"]
+ *        }
+ *    }
+ *
+ * @param {HTMLFormElement} form
  *
  * @return {object}
  */
@@ -957,6 +979,8 @@ function getFormFields(form) {
 	const fields = {};
 
 	for (let [key, value] of new FormData(form)) {
+		value = value.replace(/\r?\n/g, '\r\n');
+
 		const key_parts = [...key.matchAll(/[^\[\]]+|\[\]/g)];
 
 		let key_fields = fields;
