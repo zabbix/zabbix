@@ -25,6 +25,7 @@
 #include "zbxcomms.h"
 #include "zbxshmem.h"
 #include "zbxeval.h"
+#include "zbxavailability.h"
 
 #define ZBX_SYNC_DONE		0
 #define	ZBX_SYNC_MORE		1
@@ -54,6 +55,13 @@
 #define ZBX_IPC_SERVICE_CONFIG		"config"
 #define ZBX_IPC_CONFIG_RELOAD_REQUEST	1
 #define ZBX_IPC_CONFIG_RELOAD_RESPONSE	2
+
+#define ZBX_AGENT_ZABBIX	(INTERFACE_TYPE_AGENT - 1)
+#define ZBX_AGENT_SNMP		(INTERFACE_TYPE_SNMP - 1)
+#define ZBX_AGENT_IPMI		(INTERFACE_TYPE_IPMI - 1)
+#define ZBX_AGENT_JMX		(INTERFACE_TYPE_JMX - 1)
+#define ZBX_AGENT_UNKNOWN	255
+#define ZBX_AGENT_MAX		INTERFACE_TYPE_COUNT
 
 extern int	CONFIG_TIMEOUT;
 
@@ -830,11 +838,6 @@ void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags);
 
 int	DCget_interfaces_availability(zbx_vector_ptr_t *interfaces, int *ts);
 void	DCtouch_interfaces_availability(const zbx_vector_uint64_t *interfaceids);
-
-void	zbx_interface_availability_init(zbx_interface_availability_t *availability, zbx_uint64_t interfaceid);
-void	zbx_interface_availability_clean(zbx_interface_availability_t *ia);
-void	zbx_interface_availability_free(zbx_interface_availability_t *availability);
-int	zbx_interface_availability_is_set(const zbx_interface_availability_t *ia);
 
 void	zbx_set_availability_diff_ts(int ts);
 
