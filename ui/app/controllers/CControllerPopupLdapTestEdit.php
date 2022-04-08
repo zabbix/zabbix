@@ -53,21 +53,15 @@ class CControllerPopupLdapTestEdit extends CController {
 
 	protected function doAction(): void {
 		$data = [
-			'ldap_config' => [
-				'host' => $this->getInput('host'),
-				'port' => $this->getInput('port'),
-				'base_dn' => $this->getInput('base_dn'),
-				'bind_dn' => $this->getInput('bind_dn', ''),
-				'search_attribute' => $this->getInput('search_attribute'),
-				'start_tls' => $this->getInput('case_sensitive', ZBX_AUTH_START_TLS_OFF),
-			],
+			'ldap_config' => [],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
 			'test_username' => CWebUser::$data['username']
 		];
 
-		$this->getInputs($data['ldap_config'], ['userdirectoryid', 'bind_password']);
+		$this->getInputs($data['ldap_config'], ['userdirectoryid', 'host', 'port', 'base_dn', 'bind_dn',
+			'bind_password', 'search_attribute', 'start_tls', 'search_filter','test_username', 'test_password']);
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

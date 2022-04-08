@@ -72,14 +72,21 @@ window.ldap_edit_popup = new class {
 			host: this.form.host.value,
 			port: this.form.port.value,
 			base_dn: this.form.base_dn.value,
-			search_attribute: this.form.search_attribute.value,
 			bind_dn: this.form.bind_dn.value,
-			bind_password: this.form.bind_password.value
+			search_attribute: this.form.search_attribute.value
 		};
 
+		if (this.form.userdirectoryid !== undefined) {
+			popup_params.userdirectoryid = this.form.userdirectoryid.value;
+		}
+
+		if (this.form.bind_password.disabled === false) {
+			popup_params.bind_password = this.form.bind_password.value;
+		}
+
 		if (this.advanced_chbox.checked) {
-			popup_params['start_tls'] = this.form.start_tls.checked ? 1 : 0;
-			popup_params['search_filter'] = this.form.search_filter.value;
+			popup_params.start_tls = this.form.start_tls.checked ? 1 : 0;
+			popup_params.search_filter = this.form.search_filter.value;
 		}
 
 		const test_overlay = PopUp('popup.ldap.test.edit', popup_params, {dialogueid: 'ldap_test_edit'});
