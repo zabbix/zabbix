@@ -5172,8 +5172,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_u
 		}
 
 		params = zbx_dc_expand_user_macros_in_func_params(func->parameter, item->host.hostid);
-		ret = evaluate_function2(&func->value, (DC_ITEM *)item, func->function, func->parameter,
-				&func->timespec, &error);
+		ret = evaluate_function2(&func->value, (DC_ITEM *)item, func->function, params, &func->timespec, &error);
 		zbx_free(params);
 
 		if (SUCCEED != ret)
@@ -5496,7 +5495,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t 
 			{
 				DC_ITEM	*item;
 
-				item = (DC_ITEM *)bsearch(&tr->itemids.values[i], items, items_num, sizeof(DC_ITEM),
+				item = (DC_ITEM *)bsearch(&tr->itemids.values[j], items, items_num, sizeof(DC_ITEM),
 						dc_item_compare_by_itemid);
 
 				if (NULL == item || SUCCEED != items_err[item - items])

@@ -23,6 +23,7 @@
 #include "log.h"
 #include "dbcache.h"
 #include "events.h"
+#include "zbxserver.h"
 
 #define ZBX_FLAGS_TRIGGER_CREATE_NOTHING		0x00
 #define ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT		0x01
@@ -309,9 +310,12 @@ typedef enum
 	ZBX_TRIGGER_CACHE_EVAL_CTX,
 	ZBX_TRIGGER_CACHE_EVAL_CTX_R,
 	ZBX_TRIGGER_CACHE_EVAL_CTX_MACROS,
+	ZBX_TRIGGER_CACHE_EVAL_CTX_R_MACROS,
 	ZBX_TRIGGER_CACHE_HOSTIDS,
 }
 zbx_trigger_cache_state_t;
+
+static int	db_trigger_expand_macros(const DB_TRIGGER *trigger, zbx_eval_context_t *ctx);
 
 /******************************************************************************
  *                                                                            *
@@ -327,8 +331,6 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const DB_TRIGGER *trigger, zbx_
 	char			*error = NULL;
 	zbx_uint32_t		flag = 1 << state;
 	zbx_vector_uint64_t	functionids;
-	zbx_dc_um_handle_t	*um_handle;
-	int			ret;
 
 	if (NULL == trigger->cache)
 	{
@@ -369,21 +371,12 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const DB_TRIGGER *trigger, zbx_
 			}
 			break;
 		case ZBX_TRIGGER_CACHE_EVAL_CTX_MACROS:
-			if (NULL == db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX))
+			if (FAIL == db_trigger_expand_macros(trigger, &cache->eval_ctx))
 				return NULL;
 
-			if (NULL == db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_HOSTIDS))
-				return NULL;
-
-			um_handle = zbx_dc_open_user_macros();
-
-			ret = zbx_eval_expand_user_macros(&cache->eval_ctx, cache->hostids.values,
-					cache->hostids.values_num, (zbx_macro_expand_func_t)zbx_dc_expand_user_macros,
-					um_handle, NULL);
-
-			zbx_dc_close_user_macros(um_handle);
-
-			if (SUCCEED != ret)
+			break;
+		case ZBX_TRIGGER_CACHE_EVAL_CTX_R_MACROS:
+			if (FAIL == db_trigger_expand_macros(trigger, &cache->eval_ctx_r))
 				return NULL;
 
 			break;
@@ -401,6 +394,68 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const DB_TRIGGER *trigger, zbx_
 	cache->done |= flag;
 
 	return cache;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: expand macros in trigger expression/recovery expression           *
+ *                                                                            *
+ ******************************************************************************/
+static int	db_trigger_expand_macros(const DB_TRIGGER *trigger, zbx_eval_context_t *ctx)
+{
+	int 			i;
+	DB_EVENT		db_event;
+	zbx_dc_um_handle_t	*um_handle;
+	zbx_trigger_cache_t	*cache;
+
+	if (NULL == (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_HOSTIDS)))
+		return FAIL;
+
+	db_event.value = trigger->value;
+	db_event.object = EVENT_OBJECT_TRIGGER;
+
+	um_handle = zbx_dc_open_user_macros();
+
+	(void)zbx_eval_expand_user_macros(ctx, cache->hostids.values, cache->hostids.values_num,
+			(zbx_macro_expand_func_t)zbx_dc_expand_user_macros, um_handle, NULL);
+
+	zbx_dc_close_user_macros(um_handle);
+
+	for (i = 0; i < ctx->stack.values_num; i++)
+	{
+		char			*value;
+		zbx_eval_token_t	*token = &ctx->stack.values[i];
+
+		switch (token->type)
+		{
+			case ZBX_EVAL_TOKEN_VAR_STR:
+				if (ZBX_VARIANT_NONE != token->value.type)
+				{
+					zbx_variant_convert(&token->value, ZBX_VARIANT_STR);
+					value = token->value.data.str;
+					zbx_variant_set_none(&token->value);
+					break;
+				}
+				value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
+				break;
+			case ZBX_EVAL_TOKEN_VAR_MACRO:
+				value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
+				break;
+			default:
+				continue;
+		}
+
+		if (SUCCEED == substitute_simple_macros(NULL, &db_event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+				NULL, NULL, NULL, &value, MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0))
+		{
+			zbx_variant_clear(&token->value);
+			zbx_variant_set_str(&token->value, value);
+		}
+		else
+			zbx_free(value);
+	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -856,11 +911,7 @@ static void	db_trigger_explain_expression(const zbx_eval_context_t *ctx, char **
 		zbx_uint64_t		functionid;
 
 		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
-		{
-			/* reset cached token values to get the original expression */
-			zbx_variant_clear(&token->value);
 			continue;
-		}
 
 		switch (token->value.type)
 		{
@@ -939,7 +990,7 @@ void	zbx_db_trigger_explain_expression(const DB_TRIGGER *trigger, char **express
 	zbx_trigger_cache_state_t	state;
 	const zbx_eval_context_t	*ctx;
 
-	state = (1 == recovery) ? ZBX_TRIGGER_CACHE_EVAL_CTX_R : ZBX_TRIGGER_CACHE_EVAL_CTX;
+	state = (1 == recovery) ? ZBX_TRIGGER_CACHE_EVAL_CTX_R_MACROS : ZBX_TRIGGER_CACHE_EVAL_CTX_MACROS;
 
 	if (NULL == (cache = db_trigger_get_cache(trigger, state)))
 	{

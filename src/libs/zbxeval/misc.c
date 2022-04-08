@@ -557,6 +557,22 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, const zbx_uint64_
 				ret = um_expand_cb(um_data, &value, hostids, hostids_num, error);
 				break;
 			case ZBX_EVAL_TOKEN_VAR_STR:
+				if (SUCCEED != eval_has_usermacro(ctx->expression + token->loc.l,
+						token->loc.r - token->loc.l + 1))
+				{
+					continue;
+				}
+				if (ZBX_VARIANT_NONE != token->value.type)
+				{
+					zbx_variant_convert(&token->value, ZBX_VARIANT_STR);
+					value = token->value.data.str;
+					zbx_variant_set_none(&token->value);
+				}
+				else
+					value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
+
+				ret = um_expand_cb(um_data, &value, hostids, hostids_num, error);
+				break;
 			case ZBX_EVAL_TOKEN_VAR_NUM:
 			case ZBX_EVAL_TOKEN_ARG_PERIOD:
 				if (SUCCEED != eval_has_usermacro(ctx->expression + token->loc.l,
