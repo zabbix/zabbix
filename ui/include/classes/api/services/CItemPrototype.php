@@ -443,7 +443,7 @@ class CItemPrototype extends CItemGeneral {
 			'status' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
 			'discover' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])],
 			'tags' =>			self::getTagsValidationRules(),
-			'preprocessing' =>	self::getPreprocessingValidationRules(ZBX_FLAG_DISCOVERY_PROTOTYPE)
+			'preprocessing' =>	self::getPreprocessingValidationRules()
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
@@ -560,6 +560,13 @@ class CItemPrototype extends CItemGeneral {
 	}
 
 	/**
+	 * @inheritDoc
+	 */
+	public static function getPreprocessingValidationRules(int $flags = 0x00): array {
+		return parent::getPreprocessingValidationRules(API_ALLOW_LLD_MACRO);
+	}
+
+	/**
 	 * @return array
 	 */
 	private static function getValidationRules(): array {
@@ -590,7 +597,7 @@ class CItemPrototype extends CItemGeneral {
 			'status' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
 			'discover' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])],
 			'tags' =>			self::getTagsValidationRules(),
-			'preprocessing' =>	self::getPreprocessingValidationRules(ZBX_FLAG_DISCOVERY_PROTOTYPE)
+			'preprocessing' =>	self::getPreprocessingValidationRules()
 		]];
 	}
 

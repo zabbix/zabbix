@@ -571,7 +571,7 @@ class CItem extends CItemGeneral {
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
 			'status' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
 			'tags' =>			self::getTagsValidationRules(),
-			'preprocessing' =>	self::getPreprocessingValidationRules(ZBX_FLAG_DISCOVERY_NORMAL)
+			'preprocessing' =>	self::getPreprocessingValidationRules()
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
@@ -731,7 +731,7 @@ class CItem extends CItemGeneral {
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
 			'status' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
 			'tags' =>			self::getTagsValidationRules(),
-			'preprocessing' =>	self::getPreprocessingValidationRules(ZBX_FLAG_DISCOVERY_NORMAL)
+			'preprocessing' =>	self::getPreprocessingValidationRules()
 		]];
 	}
 

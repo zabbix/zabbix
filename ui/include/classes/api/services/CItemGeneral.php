@@ -158,9 +158,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @return array
 	 */
-	public static function getPreprocessingValidationRules(int $flags): array {
-		$is_item_prototype = $flags == ZBX_FLAG_DISCOVERY_PROTOTYPE;
-
+	public static function getPreprocessingValidationRules(int $flags = 0x00): array {
 		return [
 			'type' => API_OBJECTS,
 			'uniq_by_values' => [
@@ -171,7 +169,7 @@ abstract class CItemGeneral extends CApiService {
 			'fields' => [
 				'type' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_PREPROCESSING_TYPES)],
 				'params' =>					['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'type', 'in' => implode(',', static::PREPROC_TYPES_WITH_PARAMS)], 'type' => API_PREPROC_PARAMS, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'preproc_type' => ['field' => 'type'], 'length' => DB::getFieldLength('item_preproc', 'params')],
+												['if' => ['field' => 'type', 'in' => implode(',', static::PREPROC_TYPES_WITH_PARAMS)], 'type' => API_PREPROC_PARAMS, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | ($flags & API_ALLOW_LLD_MACRO), 'preproc_type' => ['field' => 'type'], 'length' => DB::getFieldLength('item_preproc', 'params')],
 												['else' => true, 'type' => API_UNEXPECTED]
 											]],
 				'error_handler' =>			['type' => API_MULTIPLE, 'rules' => [

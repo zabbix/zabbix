@@ -80,7 +80,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		if ($ret) {
 			$testable_item_types = self::getTestableItemTypes($this->getInput('hostid', '0'));
 			$this->item_type = $this->hasInput('item_type') ? $this->getInput('item_type') : -1;
-			$this->preproc_item = self::getPreprocessingItemClassInstance($this->getInput('test_type'));
+			$this->test_type = $this->getInput('test_type');
 			$this->is_item_testable = in_array($this->item_type, $testable_item_types);
 
 			// Check if key is valid for item types it's mandatory.
@@ -100,11 +100,31 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			$steps = $this->getInput('steps', []);
 			if ($ret && $steps) {
 				$steps = normalizeItemPreprocessingSteps($steps);
-				$api_input_rules = CItem::getPreprocessingValidationRules(ZBX_FLAG_DISCOVERY_NORMAL);
 
-				if (!CApiInputValidator::validate($api_input_rules, $steps, '/', $error)) {
-					error($error);
-					$ret = false;
+				if ($this->test_type == self::ZBX_TEST_TYPE_LLD) {
+					$lld_instance = new CDiscoveryRule();
+					$steps_validation_response = $lld_instance->validateItemPreprocessingSteps($steps);
+
+					if ($steps_validation_response !== true) {
+						error($steps_validation_response);
+						$ret = false;
+					}
+				}
+				else {
+					switch ($this->test_type) {
+						case self::ZBX_TEST_TYPE_ITEM:
+							$api_input_rules = CItem::getPreprocessingValidationRules();
+							break;
+
+						case self::ZBX_TEST_TYPE_ITEM_PROTOTYPE:
+							$api_input_rules = CItemPrototype::getPreprocessingValidationRules();
+							break;
+					}
+
+					if (!CApiInputValidator::validate($api_input_rules, $steps, '/', $error)) {
+						error($error);
+						$ret = false;
+					}
 				}
 			}
 			elseif ($ret && !$this->is_item_testable) {
@@ -151,7 +171,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 		$preprocessing_types = zbx_objectValues($preprocessing_steps, 'type');
 		$preprocessing_names = get_preprocessing_types(null, false, $preprocessing_types);
-		$support_lldmacros = ($this->preproc_item instanceof CItemPrototype);
+		$support_lldmacros = ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE);
 		$show_prev = (count(array_intersect($preprocessing_types, self::$preproc_steps_using_prev_value)) > 0);
 
 		// Collect item texts and macros to later check their usage.
@@ -362,7 +382,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'prev_time' => $prev_time,
 			'hostid' => $this->getInput('hostid'),
 			'interfaceid' => $this->getInput('interfaceid', 0),
-			'test_type' => $this->getInput('test_type'),
+			'test_type' => $this->test_type,
 			'step_obj' => $this->getInput('step_obj'),
 			'show_final_result' => $this->getInput('show_final_result'),
 			'valuemapid' => $this->getInput('valuemapid', 0),
@@ -379,7 +399,6 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'interface_port_enabled' => (array_key_exists($this->item_type, $this->items_require_interface)
 				&& $this->items_require_interface[$this->item_type]['port']
 			),
-			'preproc_item' => $this->preproc_item,
 			'show_snmp_form' => ($this->item_type == ITEM_TYPE_SNMP),
 			'show_warning' => $show_warning,
 			'user' => [
