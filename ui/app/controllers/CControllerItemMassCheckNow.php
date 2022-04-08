@@ -282,6 +282,7 @@ class CControllerItemMassCheckNow extends CController {
 				'selectHosts' => ['name', 'status'],
 				'itemids' => $itemids,
 				'editable' => !$this->checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW),
+				'webitems' => true,
 				'preservekeys' => true
 			]);
 
