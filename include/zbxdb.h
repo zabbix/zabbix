@@ -171,6 +171,7 @@ int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 #define ZBX_POSTGRESQL_MAX_VERSION			149999
 #define ZBX_POSTGRESQL_MAX_VERSION_FRIENDLY		"14.x"
 
+#define ZBX_TIMESCALEDB											"TimescaleDB"
 #define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB				100002
 #define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB_FRIENDLY	"10.2"
 #define ZBX_TIMESCALEDB_MIN_VERSION								10500
@@ -246,6 +247,7 @@ struct zbx_db_version_info_t
 	zbx_db_version_status_t	ext_flag;
 
 	/* TimescaleDB specific information */
+	int			tsdb_support_expected;
 	char 		*tsdb_lic;
 	int			tsdb_compression_availability;
 };

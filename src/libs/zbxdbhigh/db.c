@@ -815,8 +815,11 @@ void	DBextract_dbextension_info(struct zbx_db_version_info_t *version_info)
 	DB_RESULT	result;
 	DB_ROW		row;
 
+	version_info->tsdb_support_expected = OFF;
+
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
+	/* in case of major upgrade, db_extension may be missing */
 	if (FAIL == DBfield_exists("config", "db_extension"))
 		goto out;
 
@@ -829,6 +832,7 @@ void	DBextract_dbextension_info(struct zbx_db_version_info_t *version_info)
 	if (0 != zbx_strcmp_null(row[0], ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
 		goto clean;
 
+	version_info->tsdb_support_expected = ON;
 	zbx_dbms_extension_info_extract(version_info);
 clean:
 	DBfree_result(result);
@@ -868,8 +872,13 @@ int	DBcheck_capabilities(struct zbx_db_version_info_t *db_version_info)
 {
 	int	ret = SUCCEED;
 #ifdef HAVE_POSTGRESQL
-	ret = FAIL;	/* in case of major upgrade, db_extension may be missing */
 	db_version_info->tsdb_compression_availability = OFF;
+
+	/* in case of major upgrade, db_extension may be missing */
+	if (OFF == db_version_info->tsdb_support_expected)
+		goto out;
+
+	ret = FAIL;
 
 	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 and newer */
 	/* in TimescaleDB Community Edition, and it is not available in TimescaleDB Apache 2 Edition. */

@@ -2545,7 +2545,10 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 		}
 
 		zbx_json_addint64(json, "flag", info->ext_flag);
-		zbx_json_addint64(json, "compression_availability", info->tsdb_compression_availability);
+
+		if (0 == zbx_strcmp_null(info->extension, ZBX_TIMESCALEDB))
+			zbx_json_addint64(json, "compression_availability", info->tsdb_compression_availability);
+
 		zbx_json_close(json);
 	}
 }
@@ -2839,7 +2842,7 @@ void	zbx_dbms_extension_info_extract(struct zbx_db_version_info_t *version_info)
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "TimescaleDB version: [%d]", tsdb_ver);
 
-		version_info->extension = "TimescaleDB";
+		version_info->extension = ZBX_TIMESCALEDB;
 
 		version_info->ext_current_version = (zbx_uint32_t)tsdb_ver;
 		version_info->ext_min_version = ZBX_TIMESCALEDB_MIN_VERSION;
@@ -2851,12 +2854,8 @@ void	zbx_dbms_extension_info_extract(struct zbx_db_version_info_t *version_info)
 		version_info->ext_friendly_max_version = ZBX_TIMESCALEDB_MAX_VERSION_FRIENDLY;
 		version_info->ext_friendly_min_supported_version = ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION_FRIENDLY;
 
-		version_info->ext_flag = zbx_db_version_check(
-				version_info->extension,
-				version_info->ext_current_version,
-				version_info->ext_min_version,
-				version_info->ext_max_version,
-				version_info->ext_min_supported_version);
+		version_info->ext_flag = zbx_db_version_check(version_info->extension, version_info->ext_current_version,
+				version_info->ext_min_version, version_info->ext_max_version, version_info->ext_min_supported_version);
 
 		version_info->tsdb_lic = zbx_tsdb_get_license();
 
