@@ -25,7 +25,8 @@ class CUserDirectory extends CApiService {
 		'get' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
 		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
 		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'test' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
 	protected $tableName = 'userdirectory';
@@ -193,18 +194,30 @@ class CUserDirectory extends CApiService {
 	}
 
 	/**
-	 * Cannot be called via API. Return all fields of userdirectory data from database.
-	 * Return empty array when userdirectoryid does not exists.
+	 * Test user against specific userdirectory connection.
 	 *
-	 * @param string $userdirectoryid
+	 * @param array $userdirectory
+	 *
+	 * @throws APIException
 	 */
-	public static function getUserDirectoryById($userdirectoryid): array {
-		$db_row = DB::select('userdirectory', [
-			'output' => DB::getSchema('userdirectory')['fields'],
-			'userdirectoryids' => $userdirectoryid
-		]);
+	public function test(array $userdirectory) {
+		static::validateTest($userdirectory);
 
-		return $db_row ? $db_row : [];
+		$user = [
+			'username' => $userdirectory['test_username'],
+			'password' => $userdirectory['test_password']
+		];
+		$ldapValidator = new CLdapAuthValidator(['conf' => $userdirectory]);
+
+		if (!$ldapValidator->validate($user)) {
+			self::exception($ldapValidator->isConnectionError()
+					? ZBX_API_ERROR_PARAMETERS
+					: ZBX_API_ERROR_PERMISSIONS,
+				$ldapValidator->getError()
+			);
+		}
+
+		return true;
 	}
 
 	/**
@@ -438,5 +451,49 @@ class CUserDirectory extends CApiService {
 		}
 
 		static::exception(ZBX_API_ERROR_PARAMETERS, $error);
+	}
+
+	/**
+	 * Validate user directory and test user credentials to be used for testing.
+	 *
+	 * @param array $userdirectory
+	 *
+	 * @throws APIException
+	 */
+	protected static function validateTest(array &$userdirectory) {
+		$rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
+			'userdirectoryid' =>	['type' => API_ID, 'default' => null],
+			'host' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'host')],
+			'port' =>				['type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'base_dn' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'base_dn')],
+			'bind_dn' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'bind_dn'), 'default' => ''],
+			'bind_password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'bind_password')],
+			'search_attribute' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'search_attribute')],
+			'start_tls' =>			['type' => API_INT32, 'in' => ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON, 'default' => ZBX_AUTH_START_TLS_OFF],
+			'search_filter' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'search_filter'), 'default' => ''],
+			'test_username' => 		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'test_password' => 		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+		]];
+
+		if (!CApiInputValidator::validate($rules, $userdirectories, '/', $error)) {
+			static::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		if ($userdirectory['userdirectoryid'] !== null) {
+			$db_userdirectory = DB::select('userdirectory', [
+				'output' => [
+					'host', 'port', 'base_dn', 'bind_dn', 'bind_password', 'search_attribute', 'start_tls',
+					'search_filter'
+				],
+				'userdirectoryids' => $userdirectory['userdirectoryid']
+			]);
+			$db_userdirectory = reset($db_userdirectory);
+
+			if (!$db_userdirectory) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+			}
+
+			$userdirectory += $db_userdirectory;
+		}
 	}
 }

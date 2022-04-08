@@ -1380,35 +1380,6 @@ class CUser extends CApiService {
 		}
 	}
 
-	/**
-	 * Authenticate a user using LDAP.
-	 *
-	 * The $user array must have the following attributes:
-	 * - username   - user name
-	 * - password   - user password
-	 *
-	 * @param array $user
-	 * @param array $config  CLdap object connection configuration.
-	 *
-	 * @throws APIException
-	 *
-	 * @return bool
-	 */
-	protected function ldapLogin(array $user, array $config) {
-		$ldapValidator = new CLdapAuthValidator(['conf' => $config]);
-
-		if ($ldapValidator->validate($user)) {
-			return true;
-		}
-		else {
-			self::exception($ldapValidator->isConnectionError()
-					? ZBX_API_ERROR_PARAMETERS
-					: ZBX_API_ERROR_PERMISSIONS,
-				$ldapValidator->getError()
-			);
-		}
-	}
-
 	public function logout($user) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
 		if (!CApiInputValidator::validate($api_input_rules, $user, '/', $error)) {
@@ -1523,7 +1494,17 @@ class CUser extends CApiService {
 					$id = ($db_user['gui_access'] == GROUP_GUI_ACCESS_LDAP)
 						? $db_user['userdirectoryid']
 						: CAuthenticationHelper::get(CAuthenticationHelper::LDAP_USERDIRECTORYID);
-					$userdirectory = $id ? CUserDirectory::getUserDirectoryById($id) : [];
+					$userdirectory = [];
+
+					if ($id) {
+						$userdirectory = API::UserDirectory()->get([
+							'output' => ['userdirectoryid', 'host', 'port', 'base_dn', 'bind_dn', 'search_attribute',
+								'search_filter', 'start_tls'
+							],
+							'userdirecotryids' => $id
+						]);
+						$userdirectory = reset($userdirectory);
+					}
 
 					if (!$userdirectory) {
 						self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot find user directory for LDAP.'));
@@ -1531,14 +1512,17 @@ class CUser extends CApiService {
 
 					if ($userdirectory['case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE
 							&& $user['username'] !== $db_user['username']) {
-
+						self::exception(ZBX_API_ERROR_PERMISSIONS,
+							_('Incorrect user name or password or account is temporarily blocked.')
+						);
 					}
 
-					$ldap_fields = array_flip(['host', 'port', 'base_dn', 'bind_dn', 'bind_password', 'search_attribute',
-						'search_filter', 'start_tls'
-					]);
-
-					$this->ldapLogin($user, array_intersect_key($userdirectory, $ldap_fields));
+					$userdirectory += [
+						'test_username' => $user['username'],
+						'test_password' => $user['password']
+					];
+					unset($userdirectory['case_sensitive']);
+					API::UserDirectory()->test($userdirectory);
 					break;
 
 				case ZBX_AUTH_INTERNAL:
