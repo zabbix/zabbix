@@ -304,18 +304,18 @@ class CUserGroup extends CApiService {
 				'userid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
 		]];
+		$usrgrps = zbx_toArray($usrgrps);
 		$db_usrgrps = DB::select('usrgrp', [
 			'output' => ['usrgrpid', 'name', 'debug_mode', 'gui_access', 'users_status'],
 			'usrgrpids' => array_column($usrgrps, 'usrgrpid'),
 			'preservekeys' => true
 		]);
 		$usrgrps = $this->extendObjectsByKey($usrgrps, $db_usrgrps, 'usrgrpid', ['gui_access']);
+		$names = [];
 
 		if (!CApiInputValidator::validate($api_input_rules, $usrgrps, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-
-		$names = [];
 
 		foreach ($usrgrps as &$usrgrp) {
 			// Check if this user group exists.
