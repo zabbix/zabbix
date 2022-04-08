@@ -22,7 +22,7 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
 #include "httptest.h"
 

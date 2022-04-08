@@ -17,17 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "daemon.h"
+#include "zbxnix.h"
+
+#include "fatal.h"
+#include "sigcommon.h"
 
 #include "common.h"
-#include "pid.h"
 #include "cfg.h"
 #include "log.h"
 #include "control.h"
+#include "pid.h"
 
-#include "fatal.h"
-#include "sighandler.h"
-#include "sigcommon.h"
+#if defined(__linux__)
+#define ZBX_PID_FILE_TIMEOUT 20
+#define ZBX_PID_FILE_SLEEP_TIME 100000000
+#endif
 
 char		*CONFIG_PID_FILE = NULL;
 static int	parent_pid = -1;
@@ -317,7 +321,7 @@ static void	set_daemon_signal_handlers(void)
  * Comments: it doesn't allow running under 'root' if allow_root is zero      *
  *                                                                            *
  ******************************************************************************/
-int	daemon_start(int allow_root, const char *user, unsigned int flags)
+int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags)
 {
 	struct passwd	*pwd;
 
@@ -375,8 +379,29 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 
 	if (0 == (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
-		if (0 != zbx_fork())
+		pid_t	child_pid;
+
+		if(0 != (child_pid = zbx_fork()))
+		{
+#if defined(__linux__)
+			if (0 < child_pid)
+			{
+				int		pid_file_timeout = ZBX_PID_FILE_TIMEOUT;
+				zbx_stat_t	stat_buff;
+				struct timespec	ts = {0, ZBX_PID_FILE_SLEEP_TIME};
+
+				/* wait for the forked child to create pid file */
+				while (0 < pid_file_timeout && 0 != zbx_stat(CONFIG_PID_FILE, &stat_buff))
+				{
+					pid_file_timeout--;
+					nanosleep(&ts, NULL);
+				}
+			}
+#else
+			ZBX_UNUSED(child_pid);
+#endif
 			exit(EXIT_SUCCESS);
+		}
 
 		setsid();
 
@@ -395,7 +420,7 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 	if (FAIL == create_pid_file(CONFIG_PID_FILE))
 		exit(EXIT_FAILURE);
 
-	atexit(daemon_stop);
+	atexit(zbx_daemon_stop);
 
 	parent_pid = (int)getpid();
 
@@ -410,7 +435,7 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 	return MAIN_ZABBIX_ENTRY(flags);
 }
 
-void	daemon_stop(void)
+void	zbx_daemon_stop(void)
 {
 	/* this function is registered using atexit() to be called when we terminate */
 	/* there should be nothing like logging or calls to exit() beyond this point */

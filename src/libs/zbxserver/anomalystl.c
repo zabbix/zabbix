@@ -22,7 +22,6 @@
 #include "common.h"
 #include "log.h"
 #include "zbxeval.h"
-#include "../zbxalgo/vectorimpl.h"
 
 ZBX_PTR_VECTOR_DECL(VV, zbx_vector_history_record_t *)
 ZBX_PTR_VECTOR_IMPL(VV, zbx_vector_history_record_t *)

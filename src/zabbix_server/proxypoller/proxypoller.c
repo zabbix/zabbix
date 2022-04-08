@@ -20,7 +20,7 @@
 #include "proxypoller.h"
 
 #include "common.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxserver.h"
 #include "db.h"

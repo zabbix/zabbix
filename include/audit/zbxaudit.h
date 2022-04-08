@@ -17,24 +17,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_TELNET_H
-#define ZABBIX_TELNET_H
+#ifndef ZABBIX_ZBXAUDIT_H
+#define ZABBIX_ZBXAUDIT_H
 
-#include "module.h"
-#include "zbxcomms.h"
+#include "zbxtypes.h"
 
-#define WAIT_READ	0
-#define WAIT_WRITE	1
+#define ZBX_AUDIT_ACTION_ADD		0
+#define ZBX_AUDIT_ACTION_UPDATE		1
+#define ZBX_AUDIT_ACTION_DELETE		2
+#define ZBX_AUDIT_ACTION_EXECUTE	7
 
-#define CMD_IAC		255
-#define CMD_WILL	251
-#define CMD_WONT	252
-#define CMD_DO		253
-#define CMD_DONT	254
-#define OPT_SGA		3
+int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
+		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
+		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *username, const char *clientip,
+		const char *output, const char *error);
 
-int	telnet_test_login(ZBX_SOCKET socket_fd);
-int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *password, AGENT_RESULT *result);
-int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *result, const char *encoding);
+void	zbx_audit_init(int audit_mode_set);
+void	zbx_audit_clean(void);
+void	zbx_audit_flush(void);
+int	zbx_audit_flush_once(void);
 
-#endif
+#endif	/* ZABBIX_ZBXAUDIT_H */

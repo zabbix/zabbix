@@ -2009,7 +2009,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			if (array_key_exists('column_error', $data)) {
 				$this->assertMessage(TEST_BAD, null, $data['column_error']);
 				$selector = ($action === 'update') ? 'Update column' : 'New column';
-				$this->query('xpath://div/h4[text()="'.$selector.'"]/../preceding-sibling::button[@title="Close"]')
+				$this->query('xpath://div/h4[text()="'.$selector.'"]/../button[@title="Close"]')
 						->one()->click();
 			}
 

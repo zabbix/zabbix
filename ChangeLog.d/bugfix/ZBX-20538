@@ -1,0 +1,1 @@
+...G...... [ZBX-20538] changed postgres plugin to handle connection per user and not per database for Zabbix agent 2 (esneiders)

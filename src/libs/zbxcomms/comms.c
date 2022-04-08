@@ -18,6 +18,7 @@
 **/
 
 #include "zbxcomms.h"
+#include "comms.h"
 
 #include "common.h"
 #include "base64.h"
