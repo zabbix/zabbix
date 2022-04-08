@@ -644,6 +644,16 @@ class CHostGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
+		$discovery_groupid = CSettingsHelper::get(CSettingsHelper::DISCOVERY_GROUPID);
+
+		if (array_key_exists($discovery_groupid, $db_groups)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Host group "%1$s" is group for discovered hosts and cannot be deleted.',
+					$db_groups[$discovery_groupid]['name']
+				)
+			);
+		}
+
 		// Check if a group is used by a host prototype.
 		$group_prototypes = DB::select('group_prototype', [
 			'output' => ['groupid'],
