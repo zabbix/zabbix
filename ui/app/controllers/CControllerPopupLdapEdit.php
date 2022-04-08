@@ -73,7 +73,6 @@ class CControllerPopupLdapEdit extends CController {
 			'search_attribute' => $this->getInput('search_attribute', ''),
 			'start_tls' => $this->getInput('start_tls', ZBX_AUTH_START_TLS_OFF),
 			'bind_dn' => $this->getInput('bind_dn', ''),
-			'case_sensitive' => $this->getInput('case_sensitive', ZBX_AUTH_CASE_INSENSITIVE),
 			'description' => $this->getInput('description', ''),
 			'search_filter' => $this->getInput('search_filter', ''),
 			'ldap_configured' => $this->getInput('ldap_configured', ''),

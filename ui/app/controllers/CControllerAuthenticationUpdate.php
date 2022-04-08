@@ -46,6 +46,7 @@ class CControllerAuthenticationUpdate extends CController {
 			'ldap_configured' =>			'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
 			'ldap_servers' =>				'array',
 			'ldap_default_row_index' =>		'int32',
+			'ldap_case_sensitive' =>		'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'http_auth_enabled' =>			'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
 			'http_login_form' =>			'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
 			'http_strip_domains' =>			'db config.http_strip_domains',
@@ -279,6 +280,7 @@ class CControllerAuthenticationUpdate extends CController {
 			CAuthenticationHelper::HTTP_CASE_SENSITIVE,
 			CAuthenticationHelper::LDAP_CONFIGURED,
 			CAuthenticationHelper::LDAP_USERDIRECTORYID,
+			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
 			CAuthenticationHelper::SAML_AUTH_ENABLED,
 			CAuthenticationHelper::SAML_IDP_ENTITYID,
 			CAuthenticationHelper::SAML_SSO_URL,
@@ -306,6 +308,7 @@ class CControllerAuthenticationUpdate extends CController {
 			'authentication_type' => ZBX_AUTH_INTERNAL,
 			'ldap_configured' => ZBX_AUTH_LDAP_DISABLED,
 			'ldap_userdirectoryid' => $ldap_userdirectoryid,
+			'ldap_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
 			'http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED,
 			'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
 			'passwd_min_length' => DB::getDefault('config', 'passwd_min_length'),
@@ -410,6 +413,7 @@ class CControllerAuthenticationUpdate extends CController {
 			}
 		}
 
+		// TODO VM: save any deleted serverid. And delete only them.
 		$del_ldap_serverids = array_keys($db_ldap_servers);
 
 		if ($del_ldap_serverids && !API::UserDirectory()->delete($del_ldap_serverids)) {

@@ -43,6 +43,7 @@ class CControllerAuthenticationEdit extends CController {
 			'ldap_configured' =>			'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
 			'ldap_servers' =>				'array',
 			'ldap_default_row_index' =>		'int32',
+			'ldap_case_sensitive' =>		'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'saml_auth_enabled' =>			'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
 			'saml_idp_entityid' =>			'db config.saml_idp_entityid',
 			'saml_sso_url' =>				'db config.saml_sso_url',
@@ -101,6 +102,7 @@ class CControllerAuthenticationEdit extends CController {
 			CAuthenticationHelper::HTTP_CASE_SENSITIVE,
 			CAuthenticationHelper::LDAP_CONFIGURED,
 			CAuthenticationHelper::LDAP_USERDIRECTORYID,
+			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
 			CAuthenticationHelper::SAML_AUTH_ENABLED,
 			CAuthenticationHelper::SAML_IDP_ENTITYID,
 			CAuthenticationHelper::SAML_SSO_URL,
@@ -135,8 +137,7 @@ class CControllerAuthenticationEdit extends CController {
 				'http_strip_domains',
 				'http_case_sensitive',
 				'ldap_configured',
-				'ldap_servers',
-				'ldap_default_row_index',
+				'ldap_case_sensitive',
 				'saml_auth_enabled',
 				'saml_idp_entityid',
 				'saml_sso_url',
@@ -156,6 +157,9 @@ class CControllerAuthenticationEdit extends CController {
 				'passwd_check_rules'
 			]);
 
+			$data['ldap_servers'] = $this->getInput('ldap_servers', []);
+			$data['ldap_default_row_index'] = $this->getInput('ldap_default_row_index', 0);
+
 			$data += $auth;
 
 			// TODO VM: on form_refresh user group count for ldap servers is lost.
@@ -166,7 +170,7 @@ class CControllerAuthenticationEdit extends CController {
 
 			$data['ldap_servers'] = API::UserDirectory()->get([
 				'output' => ['userdirectoryid', 'name', 'host', 'port', 'base_dn', 'search_attribute', 'search_filter',
-					'start_tls', 'bind_dn', 'case_sensitive'
+					'start_tls', 'bind_dn'
 				],
 				'selectUsrgrps' => API_OUTPUT_COUNT,
 				'sortfield' => ['name'],

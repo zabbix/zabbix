@@ -194,6 +194,14 @@ $ldap_tab = (new CFormGrid())
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		)
+	])
+	->addItem([
+		new CLabel(_('Case-sensitive login'), 'ldap_case_sensitive'),
+		new CFormField(
+			(new CCheckBox('ldap_case_sensitive', ZBX_AUTH_CASE_SENSITIVE))
+				->setChecked($data['ldap_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
+				->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
+		)
 	]);
 
 // SAML authentication fields.

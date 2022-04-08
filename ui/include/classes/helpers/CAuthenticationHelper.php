@@ -29,9 +29,9 @@ class CAuthenticationHelper extends CConfigGeneralHelper {
 	public const HTTP_CASE_SENSITIVE = 'http_case_sensitive';
 	public const HTTP_LOGIN_FORM = 'http_login_form';
 	public const HTTP_STRIP_DOMAINS = 'http_strip_domains';
-	public const LDAP_CASE_SENSITIVE = 'ldap_case_sensitive';
 	public const LDAP_CONFIGURED = 'ldap_configured';
 	public const LDAP_USERDIRECTORYID = 'ldap_userdirectoryid';
+	public const LDAP_CASE_SENSITIVE = 'ldap_case_sensitive';
 	public const PASSWD_CHECK_RULES = 'passwd_check_rules';
 	public const PASSWD_MIN_LENGTH = 'passwd_min_length';
 	public const SAML_AUTH_ENABLED = 'saml_auth_enabled';

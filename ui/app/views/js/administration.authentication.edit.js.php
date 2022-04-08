@@ -42,7 +42,6 @@
 
 			// TODO VM: move to function
 			// Parse LDAP servers.
-			debugger;
 			for (const [row_index, ldap] of Object.entries(ldap_servers)) {
 				ldap.row_index = row_index;
 				ldap.is_default = (ldap.row_index == ldap_default_row_index) ? 'checked' : '';
@@ -129,9 +128,6 @@
 					search_filter: row.querySelector(`[name="ldap_servers[${row_index}][search_filter]"`).value,
 					start_tls: row.querySelector(`[name="ldap_servers[${row_index}][start_tls]"`).checked ? 1 : 0,
 					bind_dn: row.querySelector(`[name="ldap_servers[${row_index}][bind_dn]"`).value,
-					case_sensitive: row.querySelector(`[name="ldap_servers[${row_index}][case_sensitive]"`).checked
-						? 1
-						: 0,
 					description: row.querySelector(`[name="ldap_servers[${row_index}][description]"`).value
 				};
 
@@ -202,6 +198,10 @@
 				row.querySelector('input[name="ldap_servers[' + ldap.row_index + '][bind_password]"]').remove();
 			}
 
+			if (ldap.usrgrps > 0) {
+				row.querySelector('.js-remove').disabled = true;
+			}
+
 			return row;
 		}
 
@@ -220,7 +220,6 @@
 						<input type="hidden" name="ldap_servers[#{row_index}][start_tls]" value="#{start_tls}">
 						<input type="hidden" name="ldap_servers[#{row_index}][bind_dn]" value="#{bind_dn}">
 						<input type="hidden" name="ldap_servers[#{row_index}][bind_password]" value="#{bind_password}">
-						<input type="hidden" name="ldap_servers[#{row_index}][case_sensitive]" value="#{case_sensitive}">
 						<input type="hidden" name="ldap_servers[#{row_index}][description]" value="#{description}">
 					</td>
 					<td>#{host}</td>

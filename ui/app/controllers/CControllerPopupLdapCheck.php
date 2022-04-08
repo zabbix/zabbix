@@ -40,7 +40,6 @@ class CControllerPopupLdapCheck extends CController {
 			'search_attribute' => 'required|db userdirectory.search_attribute|not_empty',
 			'start_tls' => 'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
 			'search_filter' => 'db userdirectory.search_filter',
-			'case_sensitive' => 'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'description' => 'db userdirectory.description'
 		];
 
@@ -75,7 +74,6 @@ class CControllerPopupLdapCheck extends CController {
 				'search_attribute' => $this->getInput('search_attribute'),
 				'start_tls' => $this->getInput('start_tls', ZBX_AUTH_START_TLS_OFF), // TODO VM: unchecked value should solve this, or be removed.
 				'bind_dn' => $this->getInput('bind_dn', ''),
-				'case_sensitive' => $this->getInput('case_sensitive', ZBX_AUTH_CASE_INSENSITIVE),
 				'description' => $this->getInput('description', ''),
 				'search_filter' => $this->getInput('search_filter', '')
 			]

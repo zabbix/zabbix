@@ -101,14 +101,6 @@ $form = (new CForm('post', $form_action))
 			)
 		])
 		->addItem([
-			new CLabel(_('Case-sensitive login'), 'case_sensitive'),
-			new CFormField(
-				(new CCheckBox('case_sensitive', ZBX_AUTH_CASE_SENSITIVE))
-					->setChecked($data['case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
-					->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
-			)
-		])
-		->addItem([
 			new CLabel(_('Description'), 'description'),
 			new CFormField(
 				(new CTextArea('description', $data['description'], ['rows' => 3]))
