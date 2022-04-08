@@ -28,6 +28,7 @@ class CControllerUsergroupCreate extends CController {
 			'gui_access'      => 'db usrgrp.gui_access|in '.implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED]),
 			'users_status'    => 'db usrgrp.users_status|in '.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
 			'debug_mode'      => 'db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED,
+			'userdirectoryid' => 'db usrgrp.userdirectoryid',
 
 			'group_rights'    => 'array',
 			'tag_filters'     => 'array',
@@ -71,7 +72,9 @@ class CControllerUsergroupCreate extends CController {
 			'rights' => []
 		];
 
-		$this->getInputs($user_group, ['name', 'users_status', 'gui_access', 'debug_mode', 'tag_filters']);
+		$this->getInputs($user_group, ['name', 'users_status', 'gui_access', 'debug_mode', 'tag_filters',
+			'userdirectoryid'
+		]);
 
 		$group_rights = applyHostGroupRights($this->getInput('group_rights', []));
 

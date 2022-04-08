@@ -2558,6 +2558,11 @@ z-select,
   z-select:focus,
   .z-select:focus {
     outline: none; }
+  z-select.with-default[value="0"] button,
+  z-select.with-default ul > li[value="0"],
+  .z-select.with-default[value="0"] button,
+  .z-select.with-default ul > li[value="0"] {
+    font-style: italic; }
   z-select button.focusable,
   .z-select button.focusable {
     position: relative;
