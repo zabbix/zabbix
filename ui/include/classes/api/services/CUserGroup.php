@@ -213,7 +213,7 @@ class CUserGroup extends CApiService {
 			'gui_access' =>			['type' => API_INT32, 'in' => implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED])],
 			'users_status' =>		['type' => API_INT32, 'in' => implode(',', [GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED])],
 			'userdirectoryid' =>	['type' => API_MULTIPLE, 'flags' => API_ALLOW_NULL, 'rules' => [
-				['if' => ['field' => 'gui_access', 'in' => (string) GROUP_GUI_ACCESS_LDAP], 'type' => API_ID],
+				['if' => ['field' => 'gui_access', 'in' => implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_LDAP])], 'type' => API_ID],
 				['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'rights' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['id']], 'fields' => [
@@ -287,7 +287,7 @@ class CUserGroup extends CApiService {
 			'gui_access' =>			['type' => API_INT32, 'in' => implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED])],
 			'users_status' =>		['type' => API_INT32, 'in' => implode(',', [GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED])],
 			'userdirectoryid' =>	['type' => API_MULTIPLE, 'flags' => API_ALLOW_NULL, 'rules' => [
-				['if' => ['field' => 'gui_access', 'in' => (string) GROUP_GUI_ACCESS_LDAP], 'type' => API_ID],
+				['if' => ['field' => 'gui_access', 'in' => implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_LDAP])], 'type' => API_ID],
 				['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'rights' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['id']], 'fields' => [
