@@ -1201,7 +1201,7 @@ class testMassUpdateItems extends CWebTest{
 				case 'Host interface':
 				case 'Type of information':
 				case 'Authentication method':
-					$form->query('id', $value['id'])->asZDropdown()->one()->select($value['value']);
+					$form->query('id', $value['id'])->asDropdown()->one()->select($value['value']);
 					break;
 
 				case 'Units':

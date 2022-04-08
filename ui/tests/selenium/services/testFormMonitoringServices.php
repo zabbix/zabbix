@@ -332,7 +332,7 @@ class testFormMonitoringServices extends CWebTest {
 				'default' => 'OK'
 			]
 		];
-		$propagation_rule_field = $form->getField('Status propagation rule')->asZDropdown();
+		$propagation_rule_field = $form->getField('Status propagation rule')->asDropdown();
 
 		foreach ($radio_buttons as $radio_params) {
 			$propagation_rule_field->select($radio_params['propagation_rule']);
@@ -385,7 +385,7 @@ class testFormMonitoringServices extends CWebTest {
 		$this->assertEquals(1, $n_field->getValue());
 
 		// Change the condition and check that N field was replaced with W field.
-		$rules_form->getField('Condition')->selectCompositeOption('If weight of child services with Status status or above is at least W');
+		$rules_form->getField('Condition')->select('If weight of child services with Status status or above is at least W');
 
 		$rules_form->invalidate();
 		$this->assertEquals(['Set status to', 'Condition', 'W', 'Status'], $rules_form->getLabels()->asText());
@@ -474,18 +474,6 @@ class testFormMonitoringServices extends CWebTest {
 
 		foreach (['Add', 'Cancel'] as $button) {
 			$this->assertTrue($dialog->getFooter()->query('button', $button)->one()->isClickable());
-		}
-	}
-
-	private function checkDropdowns($dropdowns, $form) {
-		foreach ($dropdowns as $field => $options) {
-			$dropdown = $form->getField($field);
-
-			// Check default dropdown value.
-			$this->assertEquals($options['default'], $dropdown->getText());
-
-			// Check all possible dropdown values.
-			$this->assertSame($options['values'], $dropdown->asZDropdown()->getOptions()->asText());
 		}
 	}
 
@@ -1064,5 +1052,23 @@ class testFormMonitoringServices extends CWebTest {
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
 				self::$parentid_2.' AND servicedownid ='.self::$childid_2)
 		);
+	}
+
+	/**
+	 * Check all possible options and the default option for the provided dropdown element.
+	 *
+	 * @param array			$dropdowns	array with reference values of dropdown parameters
+	 * @param CFormElement	$form		form that contains the dropdown elements under attention
+	 */
+	private function checkDropdowns($dropdowns, $form) {
+		foreach ($dropdowns as $field => $options) {
+			$dropdown = $form->getField($field);
+
+			// Check default dropdown value.
+			$this->assertEquals($options['default'], $dropdown->getText());
+
+			// Check all possible dropdown values.
+			$this->assertSame($options['values'], $dropdown->asDropdown()->getOptions()->asText());
+		}
 	}
 }

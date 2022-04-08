@@ -68,6 +68,17 @@ trait CastableTrait {
 	}
 
 	/**
+	 * Cast object to List element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CListElement
+	 */
+	public function asList($options = []) {
+		return $this->cast(CListElement::class, $options);
+	}
+
+	/**
 	 * Cast object to Dropdown element.
 	 *
 	 * @param array $options    additional casting options
@@ -76,17 +87,6 @@ trait CastableTrait {
 	 */
 	public function asDropdown($options = []) {
 		return $this->cast(CDropdownElement::class, $options);
-	}
-
-	/**
-	 * Cast object to ZDropdown element.
-	 *
-	 * @param array $options    additional casting options
-	 *
-	 * @return CZDropdownElement
-	 */
-	public function asZDropdown($options = []) {
-		return $this->cast(CZDropdownElement::class, $options);
 	}
 
 	/**
