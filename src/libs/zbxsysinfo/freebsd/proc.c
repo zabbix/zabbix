@@ -22,6 +22,7 @@
 #include "zbxregexp.h"
 #include "log.h"
 #include "zbxjson.h"
+#include "../../zbxalgo/vectorimpl.h"
 
 #if (__FreeBSD_version) < 500000
 #	define ZBX_COMMLEN		MAXCOMLEN
