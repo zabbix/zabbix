@@ -347,20 +347,20 @@ static void	um_host_remove_macro(zbx_um_host_t *host, zbx_um_macro_t *macro)
 
 static int	dc_compare_kvs_path(const void *d1, const void *d2)
 {
-	const zbx_dc_kvs_path_t	*ptr1 = *((const zbx_dc_kvs_path_t **)d1);
-	const zbx_dc_kvs_path_t	*ptr2 = *((const zbx_dc_kvs_path_t **)d2);
+	const zbx_dc_kvs_path_t	*ptr1 = *((const zbx_dc_kvs_path_t * const *)d1);
+	const zbx_dc_kvs_path_t	*ptr2 = *((const zbx_dc_kvs_path_t * const *)d2);
 
 	return strcmp(ptr1->path, ptr2->path);
 }
 
 static zbx_hash_t	dc_kv_hash(const void *data)
 {
-	return ZBX_DEFAULT_STRING_HASH_FUNC(((zbx_dc_kv_t *)data)->key);
+	return ZBX_DEFAULT_STRING_HASH_FUNC(((const zbx_dc_kv_t *)data)->key);
 }
 
 static int	dc_kv_compare(const void *d1, const void *d2)
 {
-	return strcmp(((zbx_dc_kv_t *)d1)->key, ((zbx_dc_kv_t *)d2)->key);
+	return strcmp(((const zbx_dc_kv_t *)d1)->key, ((const zbx_dc_kv_t *)d2)->key);
 }
 
 /*********************************************************************************

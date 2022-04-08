@@ -229,8 +229,8 @@ void	zbx_trigger_diff_free(zbx_trigger_diff_t *diff)
  ******************************************************************************/
 static int	zbx_trigger_topoindex_compare(const void *d1, const void *d2)
 {
-	const DC_TRIGGER	*t1 = *(const DC_TRIGGER **)d1;
-	const DC_TRIGGER	*t2 = *(const DC_TRIGGER **)d2;
+	const DC_TRIGGER	*t1 = *(const DC_TRIGGER * const *)d1;
+	const DC_TRIGGER	*t2 = *(const DC_TRIGGER * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(t1->topoindex, t2->topoindex);
 
@@ -853,8 +853,7 @@ void	zbx_db_trigger_get_recovery_expression(const DB_TRIGGER *trigger, char **ex
 		db_trigger_get_expression(&cache->eval_ctx_r, expression);
 }
 
-static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value, int (*eval_func_cb)(
-		zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *, char **))
+static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value, zbx_trigger_func_t eval_func_cb)
 {
 	DC_ITEM		item;
 	DC_FUNCTION	function;
@@ -895,8 +894,8 @@ static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value, int (
 		*value = zbx_strdup(NULL, "*UNKNOWN*");
 }
 
-static void	db_trigger_explain_expression(const zbx_eval_context_t *ctx, char **expression, int (*eval_func_cb)(
-		zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *, char **))
+static void	db_trigger_explain_expression(const zbx_eval_context_t *ctx, char **expression,
+		zbx_trigger_func_t eval_func_cb)
 {
 	int			i;
 	zbx_eval_context_t	local_ctx;
@@ -940,8 +939,7 @@ static void	db_trigger_explain_expression(const zbx_eval_context_t *ctx, char **
 }
 
 static void	db_trigger_get_function_value(const zbx_eval_context_t *ctx, int index, char **value_ret,
-		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
-		char **))
+		zbx_trigger_func_t eval_func_cb)
 {
 	int			i;
 	zbx_eval_context_t	local_ctx;
@@ -982,9 +980,8 @@ static void	db_trigger_get_function_value(const zbx_eval_context_t *ctx, int ind
 		*value_ret = zbx_strdup(NULL, "*UNKNOWN*");
 }
 
-void	zbx_db_trigger_explain_expression(const DB_TRIGGER *trigger, char **expression,
-		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
-		char **), int recovery)
+void	zbx_db_trigger_explain_expression(const DB_TRIGGER *trigger, char **expression, zbx_trigger_func_t eval_func_cb,
+		int recovery)
 {
 	zbx_trigger_cache_t		*cache;
 	zbx_trigger_cache_state_t	state;
@@ -1004,8 +1001,7 @@ void	zbx_db_trigger_explain_expression(const DB_TRIGGER *trigger, char **express
 }
 
 void	zbx_db_trigger_get_function_value(const DB_TRIGGER *trigger, int index, char **value,
-		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
-		char **), int recovery)
+		zbx_trigger_func_t eval_func_cb, int recovery)
 {
 	zbx_trigger_cache_t		*cache;
 	zbx_trigger_cache_state_t	state;

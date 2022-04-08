@@ -468,8 +468,9 @@ void	zbx_hashset_copy(zbx_hashset_t *dst, const zbx_hashset_t *src, size_t size)
 
 	*dst = *src;
 
-	dst->slots = (ZBX_HASHSET_ENTRY_T **)dst->mem_malloc_func(NULL, dst->num_slots * sizeof(ZBX_HASHSET_ENTRY_T *));
-	memset(dst->slots, 0, dst->num_slots * sizeof(ZBX_HASHSET_ENTRY_T *));
+	dst->slots = (ZBX_HASHSET_ENTRY_T **)dst->mem_malloc_func(NULL, (size_t)dst->num_slots *
+			sizeof(ZBX_HASHSET_ENTRY_T *));
+	memset(dst->slots, 0, (size_t)dst->num_slots * sizeof(ZBX_HASHSET_ENTRY_T *));
 
 	for (i = 0; i < src->num_slots; i++)
 	{

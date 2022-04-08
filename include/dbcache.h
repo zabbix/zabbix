@@ -1046,12 +1046,13 @@ void	zbx_get_host_interfaces_availability(zbx_uint64_t	hostid, zbx_agent_availab
 
 int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
 
-void	zbx_db_trigger_explain_expression(const DB_TRIGGER *trigger, char **expression,
-		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
-		char **), int recovery);
+typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const DC_ITEM *, const char *, const char *,
+		const zbx_timespec_t *, char **);
+
+void	zbx_db_trigger_explain_expression(const DB_TRIGGER *trigger, char **expression, zbx_trigger_func_t eval_func_cb,
+		int recovery);
 void	zbx_db_trigger_get_function_value(const DB_TRIGGER *trigger, int index, char **value,
-		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
-		char **), int recovery);
+		zbx_trigger_func_t eval_func_cb, int recovery);
 
 /* external user macro cache API */
 

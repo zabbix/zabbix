@@ -38,8 +38,8 @@
  ******************************************************************************/
 static int	compare_events(const void *d1, const void *d2)
 {
-	const DB_EVENT	*p1 = *(const DB_EVENT **)d1;
-	const DB_EVENT	*p2 = *(const DB_EVENT **)d2;
+	const DB_EVENT	*p1 = *(const DB_EVENT * const *)d1;
+	const DB_EVENT	*p2 = *(const DB_EVENT * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(p1->objectid, p2->objectid);
 	ZBX_RETURN_IF_NOT_EQUAL(p1->object, p2->object);

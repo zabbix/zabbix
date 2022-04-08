@@ -1024,7 +1024,7 @@ void	zbx_eval_copy(zbx_eval_context_t *dst, const zbx_eval_context_t *src, const
 	dst->expression = expression;
 	dst->rules = src->rules;
 	zbx_vector_eval_token_create(&dst->stack);
-	zbx_vector_eval_token_reserve(&dst->stack, src->stack.values_num);
+	zbx_vector_eval_token_reserve(&dst->stack, (size_t)src->stack.values_num);
 
 	zbx_vector_eval_token_append_array(&dst->stack, src->stack.values, src->stack.values_num);
 	for (i = 0; i < dst->stack.values_num; i++)
