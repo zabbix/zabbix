@@ -35,38 +35,39 @@ class CControllerAuthenticationUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'form_refresh' =>				'string',
-			'ldap_test_user' =>				'string',
-			'ldap_test_password' =>			'string',
-			'ldap_test' =>					'in 1',
-			'db_authentication_type' =>		'int32',
-			'change_bind_password' =>		'in 0,1',
-			'authentication_type' =>		'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
-			'http_case_sensitive' =>		'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'ldap_configured' =>			'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
-			'ldap_servers' =>				'array',
-			'ldap_default_row_index' =>		'int32',
-			'ldap_case_sensitive' =>		'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'http_auth_enabled' =>			'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
-			'http_login_form' =>			'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
-			'http_strip_domains' =>			'db config.http_strip_domains',
-			'saml_auth_enabled' =>			'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
-			'saml_idp_entityid' =>			'db config.saml_idp_entityid',
-			'saml_sso_url' =>				'db config.saml_sso_url',
-			'saml_slo_url' =>				'db config.saml_slo_url',
-			'saml_username_attribute' =>	'db config.saml_username_attribute',
-			'saml_sp_entityid' =>			'db config.saml_sp_entityid',
-			'saml_nameid_format' =>			'db config.saml_nameid_format',
-			'saml_sign_messages' =>			'in 0,1',
-			'saml_sign_assertions' =>		'in 0,1',
-			'saml_sign_authn_requests' =>	'in 0,1',
-			'saml_sign_logout_requests' =>	'in 0,1',
-			'saml_sign_logout_responses' =>	'in 0,1',
-			'saml_encrypt_nameid' =>		'in 0,1',
-			'saml_encrypt_assertions' =>	'in 0,1',
-			'saml_case_sensitive' =>		'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'passwd_min_length' =>			'int32',
-			'passwd_check_rules' =>			'array'
+			'form_refresh' =>					'string',
+			'ldap_test_user' =>					'string',
+			'ldap_test_password' =>				'string',
+			'ldap_test' =>						'in 1',
+			'db_authentication_type' =>			'int32',
+			'change_bind_password' =>			'in 0,1',
+			'authentication_type' =>			'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
+			'http_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
+			'ldap_configured' =>				'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
+			'ldap_servers' =>					'array',
+			'ldap_default_row_index' =>			'int32',
+			'ldap_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
+			'ldap_removed_userdirectoryids'  =>	 'array',
+			'http_auth_enabled' =>				'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
+			'http_login_form' =>				'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
+			'http_strip_domains' =>				'db config.http_strip_domains',
+			'saml_auth_enabled' =>				'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
+			'saml_idp_entityid' =>				'db config.saml_idp_entityid',
+			'saml_sso_url' =>					'db config.saml_sso_url',
+			'saml_slo_url' =>					'db config.saml_slo_url',
+			'saml_username_attribute' =>		'db config.saml_username_attribute',
+			'saml_sp_entityid' =>				'db config.saml_sp_entityid',
+			'saml_nameid_format' =>				'db config.saml_nameid_format',
+			'saml_sign_messages' =>				'in 0,1',
+			'saml_sign_assertions' =>			'in 0,1',
+			'saml_sign_authn_requests' =>		'in 0,1',
+			'saml_sign_logout_requests' =>		'in 0,1',
+			'saml_sign_logout_responses' =>		'in 0,1',
+			'saml_encrypt_nameid' =>			'in 0,1',
+			'saml_encrypt_assertions' =>		'in 0,1',
+			'saml_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
+			'passwd_min_length' =>				'int32',
+			'passwd_check_rules' =>				'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -241,31 +242,15 @@ class CControllerAuthenticationUpdate extends CController {
 			}
 		}
 
+		if ($auth_valid) {
+			[$auth_valid, $ldap_userdirectoryid] = $this->processLdapServers(
+				$this->getInput('ldap_servers', []),
+				$this->getInput('ldap_default_row_index', 0),
+				$this->getInput('ldap_removed_userdirectoryids', [])
+			);
+		}
+
 		if (!$auth_valid) {
-			$this->response->setFormData($this->getInputAll());
-			$this->setResponse($this->response);
-
-			return;
-		}
-
-		/*
-		// TODO VM: move to test popup
-		// Only ZBX_AUTH_LDAP have 'Test' option.
-		if ($this->hasInput('ldap_test')) {
-			CMessageHelper::setSuccessTitle(_('LDAP login successful'));
-			$this->response->setFormData($this->getInputAll());
-			$this->setResponse($this->response);
-
-			return;
-		}
-		*/
-
-		[$ldap_servers_updated, $ldap_userdirectoryid] = $this->processLdapServers(
-			$this->getInput('ldap_servers', []),
-			$this->getInput('ldap_default_row_index', [])
-		);
-
-		if (!$ldap_servers_updated) {
 			$this->response->setFormData($this->getInputAll());
 			$this->setResponse($this->response);
 
@@ -383,7 +368,7 @@ class CControllerAuthenticationUpdate extends CController {
 	 *
 	 * @return array
 	 */
-	private function processLdapServers($ldap_servers, $ldap_default_row_index): array {
+	private function processLdapServers($ldap_servers, $default_row_index, $del_userdirectoryids): array {
 		$db_ldap_servers = API::UserDirectory()->get([
 			'output' => [],
 			'preservekeys' => true
@@ -400,21 +385,22 @@ class CControllerAuthenticationUpdate extends CController {
 				$upd_ldap_servers[] = $ldap_server;
 				unset($db_ldap_servers[$ldap_server['userdirectoryid']]);
 
-				if ($ldap_default_row_index == $row_index) {
+				if ($default_row_index == $row_index) {
 					$ldap_userdirectoryid = $ldap_server['userdirectoryid'];
 				}
 			}
 			else {
 				$ins_ldap_servers[] = $ldap_server;
 
-				if ($ldap_default_row_index == $row_index) {
+				if ($default_row_index == $row_index) {
 					$default_ldap_mapping_index = count($ins_ldap_servers) - 1;
 				}
 			}
 		}
 
-		// TODO VM: save any deleted serverid. And delete only them.
-		$del_ldap_serverids = array_keys($db_ldap_servers);
+		$del_ldap_serverids = array_keys(array_intersect_key(
+			$db_ldap_servers, array_flip($del_userdirectoryids)
+		));
 
 		if ($del_ldap_serverids && !API::UserDirectory()->delete($del_ldap_serverids)) {
 			return [false, $ldap_userdirectoryid];

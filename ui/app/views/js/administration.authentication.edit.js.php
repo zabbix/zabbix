@@ -64,6 +64,17 @@
 					}
 					else if (e.target.classList.contains('js-remove')) {
 						const table = e.target.closest('table');
+						const userdirectoryid_input = e.target.closest('tr')
+							.querySelector('input[name$="[userdirectoryid]"]');
+
+						if (userdirectoryid_input !== null) {
+							const input = document.createElement('input');
+							input.type = 'hidden';
+							input.name = 'ldap_removed_userdirectoryids[]';
+							input.value = userdirectoryid_input.value;
+							this.form.appendChild(input);
+						}
+
 						e.target.closest('tr').remove();
 
 						if (table.querySelector('input[name="ldap_userdirectoryid"]:checked') === null) {
