@@ -2060,6 +2060,7 @@ m4_ifdef([CONF_TESTS],[CONF_TESTS])
 
 AC_OUTPUT([
 	Makefile
+	include/Makefile
 	database/Makefile
 	database/mysql/Makefile
 	database/oracle/Makefile

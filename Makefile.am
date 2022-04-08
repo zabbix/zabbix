@@ -3,6 +3,7 @@
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = \
+	include \
 	src \
 	database \
 	man \
@@ -12,7 +13,6 @@ EXTRA_DIST = \
 	bin \
 	build \
 	ui \
-	include \
 	conf \
 	sass
 

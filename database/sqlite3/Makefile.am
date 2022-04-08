@@ -12,3 +12,7 @@ EXTRA_DIST = \
 	data.sql \
 	images.sql \
 	schema.sql
+
+clean:
+	rm -f schema.sql \
+	rm -f data.sql
