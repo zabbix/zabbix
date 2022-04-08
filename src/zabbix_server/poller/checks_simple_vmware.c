@@ -2877,6 +2877,9 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			zbx_json_addstring(&json_data, "{#VM.TOOLS.STATUS}",
 					ZBX_NULL2EMPTY_STR(vm->props[ZBX_VMWARE_VMPROP_TOOLS_RUNNING_STATUS]),
 					ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "{#VM.POWERSTATE}",
+					ZBX_NULL2EMPTY_STR(vm->props[ZBX_VMWARE_VMPROP_POWER_STATE]),
+					ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#DATASTORE.NAME}", datastore->name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#DATASTORE.UUID}", datastore->uuid, ZBX_JSON_TYPE_STRING);
 
