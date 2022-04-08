@@ -770,7 +770,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 			$msg_box.prepend($link_details);
 		}
 		jQuery('<span>')
-			.html(title)
+			.text(title)
 			.appendTo($msg_box);
 
 		$list.addClass('msg-details-border');
@@ -783,7 +783,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 	if (Array.isArray(messages) && messages.length > 0) {
 		jQuery.map(messages, function (message) {
 			jQuery('<li>')
-				.html(message)
+				.text(message)
 				.appendTo($list);
 			return null;
 		});
