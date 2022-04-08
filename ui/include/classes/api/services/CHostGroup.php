@@ -76,7 +76,7 @@ class CHostGroup extends CApiService {
 			'with_graph_prototypes' =>				['type' => API_BOOLEAN, 'default' => false],
 			'filter' =>								['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'name' =>								['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'flags' =>								['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'flags' =>								['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'uuid' =>								['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 			]],
 			'search' =>								['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
