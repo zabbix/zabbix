@@ -507,7 +507,7 @@ class CItem extends CItemGeneral {
 	public function create(array $items): array {
 		$this->validateCreate($items);
 
-		$this->createForce($items);
+		self::createForce($items);
 		[$tpl_items] = $this->getTemplatedObjects($items);
 
 		if ($tpl_items) {
@@ -551,7 +551,7 @@ class CItem extends CItemGeneral {
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
 									['else' => true, 'type' => API_UNEXPECTED]
 			]],
-			'history' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'history')],
+			'history' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'history'), 'default' => '90d'],
 			'trends' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends')],
 									['else' => true, 'type' => API_UNEXPECTED]
@@ -637,7 +637,7 @@ class CItem extends CItemGeneral {
 
 		$db_items = DBfetchArrayAssoc(DBselect(
 			'SELECT i.itemid,i.name,i.type,i.key_,i.value_type,i.units,i.history,i.trends,i.valuemapid,'.
-				'i.inventory_link,i.logtimefmt,i.description,i.status,i.hostid,i.templateid,i.flags,i.master_itemid,'.
+				'i.inventory_link,i.logtimefmt,i.description,i.status,i.hostid,i.templateid,i.flags,'.
 				'h.status AS host_status'.
 			' FROM items i,hosts h'.
 			' WHERE i.hostid=h.hostid'.
@@ -681,9 +681,7 @@ class CItem extends CItemGeneral {
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
 
-		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'key_', 'host_status', 'flags',
-			'master_itemid'
-		]);
+		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'key_', 'host_status', 'flags']);
 
 		self::validateUniqueness($items);
 
@@ -797,9 +795,7 @@ class CItem extends CItemGeneral {
 	public function delete(array $itemids): array {
 		$this->validateDelete($itemids, $db_items);
 
-		CItemManager::delete($itemids);
-
-		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_ITEM, $db_items);
+		self::deleteForce($db_items);
 
 		return ['itemids' => $itemids];
 	}
@@ -842,7 +838,7 @@ class CItem extends CItemGeneral {
 	public function syncTemplates(array $templateids, array $hostids): void {
 		$db_items = DBfetchArrayAssoc(DBselect(
 			'SELECT i.itemid,i.name,i.type,i.key_,i.value_type,i.units,i.history,i.trends,i.valuemapid,'.
-				'i.inventory_link,i.logtimefmt,i.description,i.status,i.hostid,i.templateid,i.flags,i.master_itemid,'.
+				'i.inventory_link,i.logtimefmt,i.description,i.status,i.hostid,i.templateid,i.flags,'.
 				'h.status AS host_status'.
 			' FROM items i,hosts h'.
 			' WHERE i.hostid=h.hostid'.
@@ -893,7 +889,7 @@ class CItem extends CItemGeneral {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkInventoryLinks(array $items, array $db_items = []): void {
+	protected static function checkInventoryLinks(array $items, array $db_items = []): void {
 		$item_indexes = [];
 		$del_links = [];
 

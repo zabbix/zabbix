@@ -378,7 +378,7 @@ abstract class CHostBase extends CApiService {
 						$circular_linkage = $template_name.' -> '.implode(' -> ', $links_path).' -> '.$template_name;
 
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Cannot link template "%1$s" to template "%2$s" because circular linkage (%3$s) will occurs.',
+							'Cannot link template "%1$s" to template "%2$s" because a circular linkage (%3$s) will occur.',
 							$templates[$templateid]['host'], $templates[$hostid]['host'], $circular_linkage
 						));
 					}

@@ -112,6 +112,7 @@ class CAudit {
 		self::RESOURCE_AUTOREGISTRATION => 'config',
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
+		self::RESOURCE_DISCOVERY_RULE => 'items',
 		self::RESOURCE_HOST => 'hosts',
 		self::RESOURCE_HOST_GROUP => 'hstgrp',
 		self::RESOURCE_HOST_PROTOTYPE => 'hosts',
@@ -161,6 +162,7 @@ class CAudit {
 		self::RESOURCE_AUTOREGISTRATION => null,
 		self::RESOURCE_CORRELATION => 'name',
 		self::RESOURCE_DASHBOARD => 'name',
+		self::RESOURCE_DISCOVERY_RULE => 'name',
 		self::RESOURCE_HOST => 'host',
 		self::RESOURCE_HOST_GROUP => 'name',
 		self::RESOURCE_HOST_PROTOTYPE => 'host',
@@ -520,10 +522,17 @@ class CAudit {
 						'recordsetid' => $recordsetid,
 						'details' => (count($diff) == 0) ? '' : json_encode($diff)
 					];
+
+					if (count($auditlog) == ZBX_DB_MAX_INSERTS) {
+						DB::insertBatch('auditlog', $auditlog);
+						$auditlog = [];
+					}
 				}
 		}
 
-		DB::insertBatch('auditlog', $auditlog);
+		if ($auditlog) {
+			DB::insertBatch('auditlog', $auditlog);
+		}
 	}
 
 	/**
