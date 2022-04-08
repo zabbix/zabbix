@@ -138,6 +138,67 @@
 				});
 		},
 
+		statusChange(button) {
+			// Create the redirect URL.
+			const item = JSON.parse(button.getAttribute('data-item'));
+
+			const curl = new Curl('items.php', true);
+			curl.setArgument('group_itemid[]', item.itemid);
+			curl.setArgument('hostid', item.hostid);
+			curl.setArgument('action', (item.status == <?= ITEM_STATUS_DISABLED ?>)
+				? 'item.massenable'
+				: 'item.massdisable'
+			);
+			curl.setArgument('context', new URLSearchParams(location.search).get('context'));
+
+			// Actions that are affected by status change, should be also changed in checkbox session storage.
+			const selected_ids = chkbxRange.getSelectedIds();
+			let ids = {};
+
+			for (const [id, attr] of Object.entries(selected_ids)) {
+				if (id == item.itemid) {
+					// Get allowed and affected actions.
+					let allowed_actions = button.getAttribute('data-actions');
+
+					if (allowed_actions === null) {
+						allowed_actions = '';
+					}
+
+					const allowed_actions_list = allowed_actions.split(' ');
+
+					// Compare affected actions and existing actions and then replace them if needed.
+					if (attr !== null) {
+						const existing_action_list = attr.split(' ');
+
+						// First save the actions that are not affected by status change.
+						let actions = existing_action_list.filter(action => !allowed_actions_list.includes(action));
+
+						// Then add only affected actions.
+						for (const action of allowed_actions_list) {
+							if (item.status == <?= ITEM_STATUS_DISABLED ?>) {
+								actions.push(action);
+							}
+						}
+
+						ids[id] = actions.join(' ').trim();
+					}
+					else {
+						// If there are no exising attributes for this checkbox, new ones should be added or removed.
+						ids[id] = (item.status == <?= ITEM_STATUS_DISABLED ?>) ? allowed_actions : '';
+					}
+				}
+				else {
+					ids[id] = attr;
+				}
+			}
+
+			// Store the new actions with same selected IDs in session storage.
+			chkbxRange.saveSessionStorage(chkbxRange.pageGoName, ids);
+
+			// Perform redirect to item form for the massenable or massdisable.
+			location.href = curl.getUrl();
+		},
+
 		events: {
 			hostSuccess(e) {
 				const data = e.detail;
