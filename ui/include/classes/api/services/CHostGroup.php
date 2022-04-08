@@ -48,6 +48,10 @@ class CHostGroup extends CApiService {
 	public function get(array $options) {
 		$result = [];
 
+		$hosts_fields = array_keys($this->getTableSchema('hosts')['fields']);
+		$group_discovery_fields = ['groupid', 'lastcheck', 'name', 'parent_group_prototypeid', 'ts_delete'];
+		$discovery_rule_fields = array_keys($this->getTableSchema('items')['fields']);
+
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'groupids' =>							['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -84,9 +88,9 @@ class CHostGroup extends CApiService {
 			'searchWildcardsEnabled' =>				['type' => API_BOOLEAN, 'default' => false],
 			// output
 			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', ['groupid', 'name', 'flags', 'uuid']), 'default' => API_OUTPUT_EXTEND],
-			'selectHosts' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'default' => null],
-			'selectGroupDiscovery' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'selectDiscoveryRule' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'selectHosts' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $hosts_fields), 'default' => null],
+			'selectGroupDiscovery' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $group_discovery_fields), 'default' => null],
+			'selectDiscoveryRule' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $discovery_rule_fields), 'default' => null],
 			'countOutput' =>						['type' => API_BOOLEAN, 'default' => false],
 			'groupCount' =>							['type' => API_BOOLEAN, 'default' => false],
 			// sort and limit
