@@ -156,7 +156,7 @@ class CHostGroup extends CApiService {
 		}
 
 		// hostids
-		if (($options['hostids']) !== null) {
+		if ($options['hostids'] !== null) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where'][] = dbConditionInt('hg.hostid', $options['hostids']);
 			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
