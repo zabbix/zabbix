@@ -127,13 +127,13 @@ class CTemplateGroup extends CApiService {
 			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 			$sqlParts['where'][] = 'EXISTS ('.
-				'SELECT NULL' .
-				' FROM right_tplgrp r' .
-				' WHERE g.groupid=r.id' .
-				' AND ' . dbConditionInt('r.groupid', $userGroups) .
-				' GROUP BY r.id' .
-				' HAVING MIN(r.permission)>' . PERM_DENY .
-				' AND MAX(r.permission)>=' . zbx_dbstr($permission) .
+				'SELECT NULL'.
+				' FROM right_tplgrp r'.
+				' WHERE g.groupid=r.id'.
+					' AND '.dbConditionInt('r.groupid', $userGroups).
+				' GROUP BY r.id'.
+				' HAVING MIN(r.permission)>'.PERM_DENY.
+					' AND MAX(r.permission)>='.zbx_dbstr($permission).
 				')';
 		}
 
@@ -272,7 +272,7 @@ class CTemplateGroup extends CApiService {
 				'SELECT NULL'.
 				' FROM '.implode(',', $sub_sql_parts['from']).
 				' WHERE '.implode(' AND ', array_unique($sub_sql_parts['where'])).
-				')';
+			')';
 		}
 
 		$sub_sql_parts = $sub_sql_common;
@@ -310,7 +310,7 @@ class CTemplateGroup extends CApiService {
 				'SELECT NULL'.
 				' FROM '.implode(',', $sub_sql_parts['from']).
 				' WHERE '.implode(' AND ', array_unique($sub_sql_parts['where'])).
-				')';
+			')';
 		}
 
 		// filter
@@ -740,7 +740,7 @@ class CTemplateGroup extends CApiService {
 			'SELECT r.groupid,r.permission,r.id,g.name'.
 			' FROM rights r,usrgrp g'.
 			' WHERE r.groupid=g.usrgrpid'.
-			' AND '.dbConditionInt('r.id', array_keys($group_links))
+				' AND '.dbConditionInt('r.id', array_keys($group_links))
 		);
 
 		while ($db_right = DBfetch($db_rights)) {
@@ -782,6 +782,7 @@ class CTemplateGroup extends CApiService {
 			$ids = DB::insertBatch('template_group', $ins_templates_groups);
 			self::addTemplategroupids($groups, $ids);
 		}
+
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE_GROUP, $groups, $db_groups);
 
 		return ['groupids' => array_column($data['groups'], 'groupid')];
@@ -1002,7 +1003,7 @@ class CTemplateGroup extends CApiService {
 			'SELECT DISTINCT tg.hostid'.
 			' FROM template_group tg'.
 			' WHERE '.dbConditionInt('tg.groupid', $groupids, true).
-			' AND '.dbConditionInt('tg.hostid', $templateids)
+				' AND '.dbConditionInt('tg.hostid', $templateids)
 		), 'hostid');
 
 		$templateids_without_groups = array_diff($templateids, $templateids_with_groups);
@@ -1052,8 +1053,8 @@ class CTemplateGroup extends CApiService {
 				'SELECT tg.templategroupid,tg.hostid,tg.groupid'.
 				' FROM template_group tg,hosts h'.
 				' WHERE tg.hostid=h.hostid'.
-				' AND '.dbConditionInt('tg.groupid', array_keys($db_groups)).
-				' AND h.flags='.ZBX_FLAG_DISCOVERY_NORMAL
+					' AND '.dbConditionInt('tg.groupid', array_keys($db_groups)).
+					' AND h.flags='.ZBX_FLAG_DISCOVERY_NORMAL
 			);
 		}
 
@@ -1255,10 +1256,10 @@ class CTemplateGroup extends CApiService {
 			// discovered items
 			$discoveryRules = DBFetchArray(DBselect(
 				'SELECT gd.groupid,hd.parent_itemid'.
-				' FROM group_discovery gd,group_prototype gp,host_discovery hd'.
-				' WHERE '.dbConditionInt('gd.groupid', $groupIds).
-				' AND gd.parent_group_prototypeid=gp.group_prototypeid'.
-				' AND gp.hostid=hd.hostid'
+					' FROM group_discovery gd,group_prototype gp,host_discovery hd'.
+					' WHERE '.dbConditionInt('gd.groupid', $groupIds).
+					' AND gd.parent_group_prototypeid=gp.group_prototypeid'.
+					' AND gp.hostid=hd.hostid'
 			));
 			$relationMap = $this->createRelationMap($discoveryRules, 'groupid', 'parent_itemid');
 
@@ -1334,11 +1335,11 @@ class CTemplateGroup extends CApiService {
 		}
 	}
 
-/**
-* Returns list of child groups for template group with given name.
-*
-* @param string $name     template group name.
-*/
+	/**
+	 * Returns list of child groups for template group with given name.
+	 *
+	 * @param string $name     template group name.
+	 */
 	private static function getChildGroupIds($name) {
 		$parent = $name.'/';
 		$len = strlen($parent);
