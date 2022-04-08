@@ -1420,8 +1420,9 @@ class CHost extends CHostGeneral {
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
+
 		if ($del_items) {
-			CItemManager::delete(array_keys($del_items));
+			CItemGeneral::deleteForce($del_items);
 		}
 
 		// delete web tests

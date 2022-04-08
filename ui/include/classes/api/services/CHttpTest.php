@@ -638,18 +638,15 @@ class CHttpTest extends CApiService {
 			$del_itemids[] = $db_httptestitem['itemid'];
 		}
 
-		$db_httpstepitems = DBselect(
+		$db_httpstepitems = DBfetchArray(DBselect(
 			'SELECT hsi.itemid'.
 			' FROM httpstepitem hsi,httpstep hs'.
 			' WHERE hsi.httpstepid=hs.httpstepid'.
 				' AND '.dbConditionInt('hs.httptestid', $del_httptestids)
-		);
-		while ($db_httpstepitem = DBfetch($db_httpstepitems)) {
-			$del_itemids[] = $db_httpstepitem['itemid'];
-		}
+		));
 
-		if ($del_itemids) {
-			CItemManager::delete($del_itemids);
+		if ($db_httpstepitems) {
+			CItemGeneral::deleteForce($db_httpstepitems);
 		}
 
 		DB::delete('httptest', ['httptestid' => $del_httptestids]);

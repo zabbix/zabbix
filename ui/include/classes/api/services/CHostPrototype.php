@@ -767,7 +767,7 @@ class CHostPrototype extends CHostBase {
 	 * @param array $host_prototypes
 	 * @param array $db_host_prototypes
 	 */
-	protected function updateForce(array &$host_prototypes, array $db_host_prototypes): void {
+	public function updateForce(array &$host_prototypes, array $db_host_prototypes): void {
 		$upd_host_prototypes = [];
 
 		// save the host prototypes

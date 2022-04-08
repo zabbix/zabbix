@@ -145,7 +145,7 @@ class CHttpTestManager {
 			'preservekeys' => true
 		]);
 
-		$deleteStepItemIds = [];
+		$del_step_items = [];
 		$steps_create = [];
 		$steps_update = [];
 		$itemids = [];
@@ -220,13 +220,9 @@ class CHttpTestManager {
 				$stepidsDelete = array_keys($dbSteps);
 
 				if (!empty($stepidsDelete)) {
-					$result = DBselect(
+					$del_step_items += DBfetchArray(DBselect(
 						'SELECT hi.itemid FROM httpstepitem hi WHERE '.dbConditionInt('hi.httpstepid', $stepidsDelete)
-					);
-
-					foreach (DBfetchColumn($result, 'itemid') as $itemId) {
-						$deleteStepItemIds[] = $itemId;
-					}
+					));
 
 					DB::delete('httpstep', ['httpstepid' => $stepidsDelete]);
 				}
@@ -234,8 +230,8 @@ class CHttpTestManager {
 		}
 
 		// Old items must be deleted prior to createStepsReal() since identical items cannot be created in DB.
-		if ($deleteStepItemIds) {
-			CItemManager::delete($deleteStepItemIds);
+		if ($del_step_items) {
+			CItemGeneral::deleteForce($del_step_items);
 		}
 
 		foreach ($httptests as $key => $httptest) {

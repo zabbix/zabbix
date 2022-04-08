@@ -45,18 +45,15 @@ class CDiscoveryRuleManager {
 		$ruleids = array_merge($ruleids, $child_ruleids);
 
 		// Delete item prototypes.
-		$iprototypeids = [];
-		$db_items = DBselect(
+		$db_item_prototypes = DBfetchArray(DBselect(
 			'SELECT i.itemid'.
 			' FROM item_discovery id,items i'.
 			' WHERE i.itemid=id.itemid'.
 				' AND '.dbConditionInt('parent_itemid', $ruleids)
-		);
-		while ($item = DBfetch($db_items)) {
-			$iprototypeids[$item['itemid']] = $item['itemid'];
-		}
-		if ($iprototypeids) {
-			CItemPrototypeManager::delete($iprototypeids);
+		));
+
+		if ($db_item_prototypes) {
+			CItemPrototype::deleteForce($db_item_prototypes);
 		}
 
 		// Delete host prototypes.
@@ -75,6 +72,7 @@ class CDiscoveryRuleManager {
 		DB::delete('items', ['itemid' => $ruleids]);
 
 		$insert = [];
+
 		foreach ($ruleids as $ruleid) {
 			$insert[] = [
 				'tablename' => 'events',
@@ -82,6 +80,7 @@ class CDiscoveryRuleManager {
 				'value' => $ruleid
 			];
 		}
+
 		DB::insertBatch('housekeeper', $insert);
 	}
 }
