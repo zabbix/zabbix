@@ -5377,7 +5377,7 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
       height: 10px;
       width: 10px;
       opacity: 0; }
-    .range-control input[type=range]::-webkit-slider-runnable-track, .range-control input[type=range]::-moz-range-track {
+    .range-control input[type=range]::-webkit-slider-runnable-track {
       height: 10px;
       opacity: 0; }
   .range-control input[type=text] {
