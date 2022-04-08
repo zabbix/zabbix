@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ZBXNIX_H
 #define ZABBIX_ZBXNIX_H
 
-#include "sysinc.h"
+#include "zbxsysinc.h"
 
 /* IPC start */
 #include "zbxtypes.h"
