@@ -1118,9 +1118,7 @@ class CHostGroup extends CApiService {
 		]);
 
 		if (count($db_hosts) != count($hostids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('No permissions to referred object or it does not exist!')
-			);
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		self::checkHostsNotDiscovered($db_hosts);
@@ -1223,9 +1221,7 @@ class CHostGroup extends CApiService {
 		]);
 
 		if (count($db_hosts) != count($data['hostids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('No permissions to referred object or it does not exist!')
-			);
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		self::checkHostsNotDiscovered($db_hosts);
@@ -1261,7 +1257,7 @@ class CHostGroup extends CApiService {
 	 * @static
 	 *
 	 * @param array  $db_hosts
-	 * @param string $db_hosts[<objectid>]['host']
+	 * @param string $db_hosts[<hostid>]['host']
 	 * @param array  $groupids
 	 *
 	 * @throws APIException
@@ -1288,8 +1284,8 @@ class CHostGroup extends CApiService {
 
 	/**
 	 * Add the existing hosts whether these are affected by the mass methods.
-	 * If object IDs passed as empty array, all object links of given groups will be collected from database and all
-	 * existing object IDs will be collected in $db_objectids.
+	 * If host IDs passed as empty array, all host links of given groups will be collected from database and all
+	 * existing host IDs will be collected in $db_hostids.
 	 *
 	 * @static
 	 *

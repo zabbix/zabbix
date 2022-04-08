@@ -880,9 +880,7 @@ class CTemplateGroup extends CApiService {
 		]);
 
 		if ($count != count($templateids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('No permissions to referred object or it does not exist!')
-			);
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		self::addAffectedObjects($templateids, $db_groups);
@@ -981,9 +979,7 @@ class CTemplateGroup extends CApiService {
 		]);
 
 		if (count($db_templates) != count($data['templateids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('No permissions to referred object or it does not exist!')
-			);
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		self::checkTemplatesWithoutGroups($db_templates, $data['groupids']);
@@ -997,7 +993,7 @@ class CTemplateGroup extends CApiService {
 	 * @static
 	 *
 	 * @param array  $db_templates
-	 * @param string $db_templates[<objectid>]['host']
+	 * @param string $db_templates[<templateid>]['host']
 	 * @param array  $groupids
 	 *
 	 * @throws APIException
@@ -1024,8 +1020,8 @@ class CTemplateGroup extends CApiService {
 
 	/**
 	 * Add the existing templates whether these are affected by the mass methods.
-	 * If object IDs passed as empty array, all object links of given groups will be collected from database and all
-	 * existing object IDs will be collected in $db_objectids.
+	 * If template IDs passed as empty array, all template links of given groups will be collected from database and all
+	 * existing template IDs will be collected in $db_templateids.
 	 *
 	 * @static
 	 *
@@ -1033,7 +1029,8 @@ class CTemplateGroup extends CApiService {
 	 * @param array      $db_groups
 	 * @param array|null $db_templateids
 	 */
-	private static function addAffectedObjects(array $templateids, array &$db_groups, array &$db_templateids = null): void {
+	private static function addAffectedObjects(array $templateids, array &$db_groups,
+			array &$db_templateids = null): void {
 		if (!$templateids) {
 			$db_templateids = [];
 		}
