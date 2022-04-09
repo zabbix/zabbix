@@ -122,7 +122,7 @@ class CControllerAuthenticationUpdate extends CController {
 				return false;
 			}
 
-			if ($ldap_servers) {
+			if (!$ldap_servers) {
 				CMessageHelper::setErrorTitle(_('At least one LDAP server must exist.')); // TODO VM: new translation string
 				return false;
 			}

@@ -1501,7 +1501,7 @@ class CUser extends CApiService {
 							'output' => ['userdirectoryid', 'host', 'port', 'base_dn', 'bind_dn', 'search_attribute',
 								'search_filter', 'start_tls'
 							],
-							'userdirecotryids' => $id
+							'userdirectoryids' => $id
 						]);
 						$userdirectory = reset($userdirectory);
 					}
@@ -1521,7 +1521,6 @@ class CUser extends CApiService {
 						'test_username' => $user['username'],
 						'test_password' => $user['password']
 					];
-					unset($userdirectory['case_sensitive']);
 					API::UserDirectory()->test($userdirectory);
 					break;
 
@@ -2035,6 +2034,7 @@ class CUser extends CApiService {
 
 		$db_user['debug_mode'] = $permissions['debug_mode'];
 		$db_user['gui_access'] = $permissions['gui_access'];
+		$db_user['userdirectoryid'] = $permissions['userdirectoryid'];
 
 		if ($db_user['lang'] === LANG_DEFAULT) {
 			$db_user['lang'] = CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG);
