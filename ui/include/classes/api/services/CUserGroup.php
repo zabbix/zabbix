@@ -341,7 +341,8 @@ class CUserGroup extends CApiService {
 			}
 
 			if (array_key_exists('gui_access', $usrgrp) && $usrgrp['gui_access'] != $db_usrgrp['gui_access']
-					&& $usrgrp['gui_access'] != GROUP_GUI_ACCESS_LDAP) {
+					&& $usrgrp['gui_access'] != GROUP_GUI_ACCESS_LDAP
+					&& $usrgrp['gui_access'] != GROUP_GUI_ACCESS_SYSTEM) {
 				$usrgrp['userdirectoryid'] = 0;
 			}
 		}
@@ -1187,9 +1188,7 @@ class CUserGroup extends CApiService {
 			return;
 		}
 
-		$db_userdirectories = API::UserDirectory()->get([
-			'userdirectoryids' => $ids
-		]);
+		$db_userdirectories = API::UserDirectory()->get(['userdirectoryids' => $ids]);
 
 		if (count($ids) != count($db_userdirectories)) {
 			static::exception(ZBX_API_ERROR_PARAMETERS,
