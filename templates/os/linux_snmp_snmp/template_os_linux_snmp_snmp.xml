@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-11-25T11:53:05Z</date>
+   <date>2022-04-10T22:48:48Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -291,7 +291,7 @@ return JSON.parse(value).length;
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <description>MIB: UCD-SNMP-MIB&#13;
-Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel)</description>
+Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel).</description>
                      <applications>
                         <application>
                            <name>CPU</name>
@@ -319,7 +319,7 @@ return value/{#CPU.COUNT}
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <description>MIB: UCD-SNMP-MIB&#13;
-Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system)</description>
+Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system).</description>
                      <applications>
                         <application>
                            <name>CPU</name>
@@ -570,7 +570,7 @@ return value/{#CPU.COUNT}
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
-                     <description>CPU utilization in %</description>
+                     <description>CPU utilization in %.</description>
                      <applications>
                         <application>
                            <name>CPU</name>
@@ -882,32 +882,32 @@ The amount of the storage represented by this entry that is allocated, in units 
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Module Linux filesystems SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
-(({Template Module Linux filesystems SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module Linux filesystems SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;5G or {Template Module Linux filesystems SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
+(({Template Module Linux filesystems SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module Linux filesystems SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or {Template Module Linux filesystems SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
                      <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>AVERAGE</priority>
                      <description>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.&#13;
  Second condition should be one of the following:&#13;
- - The disk free space is less than 5G.&#13;
+ - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}.&#13;
  - The disk will be full in less than 24 hours.</description>
                      <manual_close>YES</manual_close>
                   </trigger_prototype>
                   <trigger_prototype>
                      <expression>{Template Module Linux filesystems SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and&#13;
-(({Template Module Linux filesystems SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module Linux filesystems SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;10G or {Template Module Linux filesystems SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
+(({Template Module Linux filesystems SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module Linux filesystems SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or {Template Module Linux filesystems SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is low (used &gt; {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)</name>
                      <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>WARNING</priority>
                      <description>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.&#13;
  Second condition should be one of the following:&#13;
- - The disk free space is less than 10G.&#13;
+ - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}.&#13;
  - The disk will be full in less than 24 hours.</description>
                      <manual_close>YES</manual_close>
                      <dependencies>
                         <dependency>
                            <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
                            <expression>{Template Module Linux filesystems SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
-(({Template Module Linux filesystems SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module Linux filesystems SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;5G or {Template Module Linux filesystems SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
+(({Template Module Linux filesystems SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module Linux filesystems SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or {Template Module Linux filesystems SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -944,6 +944,16 @@ The amount of the storage represented by this entry that is allocated, in units 
             </discovery_rule>
          </discovery_rules>
          <macros>
+            <macro>
+               <macro>{$VFS.FS.FREE.MIN.CRIT}</macro>
+               <value>5G</value>
+               <description>The critical threshold of the filesystem utilization.</description>
+            </macro>
+            <macro>
+               <macro>{$VFS.FS.FREE.MIN.WARN}</macro>
+               <value>10G</value>
+               <description>The warning threshold of the filesystem utilization.</description>
+            </macro>
             <macro>
                <macro>{$VFS.FS.FSNAME.MATCHES}</macro>
                <value>.+</value>
@@ -1083,7 +1093,7 @@ The total amount of swap space configured for this host.</description>
                <history>7d</history>
                <units>B</units>
                <description>MIB: UCD-SNMP-MIB&#13;
-Memory used by kernel buffers (Buffers in /proc/meminfo)</description>
+Memory used by kernel buffers (Buffers in /proc/meminfo).</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -1104,7 +1114,7 @@ Memory used by kernel buffers (Buffers in /proc/meminfo)</description>
                <history>7d</history>
                <units>B</units>
                <description>MIB: UCD-SNMP-MIB&#13;
-Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo)</description>
+Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo).</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -1145,7 +1155,7 @@ Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo)</desc
                <history>7d</history>
                <units>B</units>
                <description>MIB: UCD-SNMP-MIB&#13;
-Total memory in Bytes</description>
+Total memory in Bytes.</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -1432,7 +1442,7 @@ Template tooling version used: 0.39</description>
          <name>High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)</name>
          <opdata>Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>WARNING</priority>
-         <description>This trigger is ignored, if there is no swap configured</description>
+         <description>This trigger is ignored, if there is no swap configured.</description>
          <dependencies>
             <dependency>
                <name>High memory utilization (&gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
