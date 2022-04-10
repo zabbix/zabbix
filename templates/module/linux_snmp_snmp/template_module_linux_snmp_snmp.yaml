@@ -1,10 +1,10 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-04T08:32:23Z'
+  date: '2022-04-10T20:21:27Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
-      name: Templates/Modules
+      name: Modules
   templates:
     -
       uuid: 8278f5e79ef2420cab500a147cc72009
@@ -17,7 +17,7 @@ zabbix_export:
         Template tooling version used: 0.41
       groups:
         -
-          name: Templates/Modules
+          name: Modules
       discovery_rules:
         -
           uuid: a85f20bbf86045438460bf439422aaec
@@ -145,7 +145,7 @@ zabbix_export:
         Template tooling version used: 0.41
       groups:
         -
-          name: Templates/Modules
+          name: Modules
       items:
         -
           uuid: cf935e4e2f224ce5a9d09662df90e5b2
@@ -261,7 +261,7 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: UCD-SNMP-MIB
-                Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system)
+                Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system).
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -288,7 +288,7 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: UCD-SNMP-MIB
-                Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel)
+                Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel).
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -529,7 +529,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'CPU utilization in %'
+              description: 'CPU utilization in %.'
               preprocessing:
                 -
                   type: JAVASCRIPT
@@ -657,7 +657,7 @@ zabbix_export:
         Template tooling version used: 0.41
       groups:
         -
-          name: Templates/Modules
+          name: Modules
       discovery_rules:
         -
           uuid: c55b2f96bd50421482dfcc230e6de01e
@@ -820,14 +820,14 @@ zabbix_export:
               uuid: ae3535ef3f674dccb6c809dc7d01172c
               expression: |
                 last(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Linux filesystems SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Linux filesystems SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<5G or timeleft(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+                ((last(/Linux filesystems SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Linux filesystems SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
               name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.
                  Second condition should be one of the following:
-                 - The disk free space is less than 5G.
+                 - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               tags:
@@ -841,14 +841,14 @@ zabbix_export:
               uuid: 3bef4897bcd549288203241c5ca9f017
               expression: |
                 last(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Linux filesystems SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Linux filesystems SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<10G or timeleft(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+                ((last(/Linux filesystems SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Linux filesystems SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
               name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.
                  Second condition should be one of the following:
-                 - The disk free space is less than 10G.
+                 - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               dependencies:
@@ -856,7 +856,7 @@ zabbix_export:
                   name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
                   expression: |
                     last(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Linux filesystems SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Linux filesystems SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<5G or timeleft(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+                    ((last(/Linux filesystems SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Linux filesystems SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -888,6 +888,14 @@ zabbix_export:
                     host: 'Linux filesystems SNMP'
                     key: 'vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]'
       macros:
+        -
+          macro: '{$VFS.FS.FREE.MIN.CRIT}'
+          value: 5G
+          description: 'The critical threshold of the filesystem utilization.'
+        -
+          macro: '{$VFS.FS.FREE.MIN.WARN}'
+          value: 10G
+          description: 'The warning threshold of the filesystem utilization.'
         -
           macro: '{$VFS.FS.FSNAME.MATCHES}'
           value: .+
@@ -931,7 +939,7 @@ zabbix_export:
         Template tooling version used: 0.41
       groups:
         -
-          name: Templates/Modules
+          name: Modules
       items:
         -
           uuid: 286b7a7da5bc46349d98d40e0fa87bb3
@@ -1019,7 +1027,7 @@ zabbix_export:
           units: B
           description: |
             MIB: UCD-SNMP-MIB
-            Memory used by kernel buffers (Buffers in /proc/meminfo)
+            Memory used by kernel buffers (Buffers in /proc/meminfo).
           preprocessing:
             -
               type: MULTIPLIER
@@ -1039,7 +1047,7 @@ zabbix_export:
           units: B
           description: |
             MIB: UCD-SNMP-MIB
-            Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo)
+            Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo).
           preprocessing:
             -
               type: MULTIPLIER
@@ -1077,7 +1085,7 @@ zabbix_export:
           units: B
           description: |
             MIB: UCD-SNMP-MIB
-            Total memory in Bytes
+            Total memory in Bytes.
           preprocessing:
             -
               type: MULTIPLIER
@@ -1136,7 +1144,7 @@ zabbix_export:
       name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: WARNING
-      description: 'This trigger is ignored, if there is no swap configured'
+      description: 'This trigger is ignored, if there is no swap configured.'
       dependencies:
         -
           name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'

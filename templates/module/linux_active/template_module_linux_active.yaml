@@ -1,10 +1,10 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-04T11:16:58Z'
+  date: '2022-04-10T20:19:55Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
-      name: Templates/Modules
+      name: Modules
   templates:
     -
       uuid: aa226119d3e94f53b9a2809f1d4ebaee
@@ -13,7 +13,7 @@ zabbix_export:
       description: 'Template tooling version used: 0.41'
       groups:
         -
-          name: Templates/Modules
+          name: Modules
       discovery_rules:
         -
           uuid: 37d15facfc5f42f4ad1145f55d4bdb1e
@@ -362,7 +362,7 @@ zabbix_export:
       description: 'Template tooling version used: 0.41'
       groups:
         -
-          name: Templates/Modules
+          name: Modules
       items:
         -
           uuid: 4ce91073d4a344a1bbbdb5f98a48ade4
@@ -453,7 +453,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'CPU utilization in %'
+          description: 'CPU utilization in %.'
           preprocessing:
             -
               type: JAVASCRIPT
@@ -494,7 +494,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system)'
+          description: 'Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system).'
           tags:
             -
               tag: component
@@ -507,7 +507,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel)'
+          description: 'Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel).'
           tags:
             -
               tag: component
@@ -631,7 +631,7 @@ zabbix_export:
       description: 'Template tooling version used: 0.41'
       groups:
         -
-          name: Templates/Modules
+          name: Modules
       discovery_rules:
         -
           uuid: 39b800d6136b4f8a8e57bbccc2f0352f
@@ -765,14 +765,14 @@ zabbix_export:
               uuid: 6f3a431ce1774d7e9cec073197f088ca
               expression: |
                 last(/Linux filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Linux filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Linux filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<5G or timeleft(/Linux filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+                ((last(/Linux filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Linux filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
               name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.
                  Second condition should be one of the following:
-                 - The disk free space is less than 5G.
+                 - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               tags:
@@ -786,14 +786,14 @@ zabbix_export:
               uuid: fd163fa0d1b0419797957d80222218bd
               expression: |
                 last(/Linux filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Linux filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Linux filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<10G or timeleft(/Linux filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+                ((last(/Linux filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Linux filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Linux filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
               name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.
                  Second condition should be one of the following:
-                 - The disk free space is less than 10G.
+                 - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               dependencies:
@@ -801,7 +801,7 @@ zabbix_export:
                   name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
                   expression: |
                     last(/Linux filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Linux filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Linux filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<5G or timeleft(/Linux filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+                    ((last(/Linux filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Linux filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -833,6 +833,14 @@ zabbix_export:
                     host: 'Linux filesystems by Zabbix agent active'
                     key: 'vfs.fs.size[{#FSNAME},used]'
       macros:
+        -
+          macro: '{$VFS.FS.FREE.MIN.CRIT}'
+          value: 5G
+          description: 'The critical threshold of the filesystem utilization.'
+        -
+          macro: '{$VFS.FS.FREE.MIN.WARN}'
+          value: 10G
+          description: 'The warning threshold of the filesystem utilization.'
         -
           macro: '{$VFS.FS.FSNAME.MATCHES}'
           value: .+
@@ -868,7 +876,7 @@ zabbix_export:
       description: 'Template tooling version used: 0.41'
       groups:
         -
-          name: Templates/Modules
+          name: Modules
       items:
         -
           uuid: 98a2a698cd784267a965d653fdbba456
@@ -1208,7 +1216,7 @@ zabbix_export:
       description: 'Template tooling version used: 0.41'
       groups:
         -
-          name: Templates/Modules
+          name: Modules
       items:
         -
           uuid: 824d5c6e62c04f2d8b6e73aeca87be1e
@@ -1288,7 +1296,7 @@ zabbix_export:
           key: 'vm.memory.size[total]'
           history: 7d
           units: B
-          description: 'Total memory in Bytes'
+          description: 'Total memory in Bytes.'
           tags:
             -
               tag: component
@@ -1351,7 +1359,7 @@ zabbix_export:
       description: 'Template tooling version used: 0.41'
       groups:
         -
-          name: Templates/Modules
+          name: Modules
       discovery_rules:
         -
           uuid: 37a61365e2f34811a389f37aafc04169
@@ -2032,7 +2040,7 @@ zabbix_export:
       name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: WARNING
-      description: 'This trigger is ignored, if there is no swap configured'
+      description: 'This trigger is ignored, if there is no swap configured.'
       dependencies:
         -
           name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
