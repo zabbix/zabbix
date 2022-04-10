@@ -1353,7 +1353,7 @@ static void	zbx_active_checks_sigusr_handler(int flags)
 }
 #endif
 
-static int	send_heartbeat_msg(zbx_vector_ptr_t *addrs)
+static void	send_heartbeat_msg(zbx_vector_ptr_t *addrs)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
 	int				ret, level;
@@ -1369,7 +1369,6 @@ static int	send_heartbeat_msg(zbx_vector_ptr_t *addrs)
 	zbx_json_addint64(&json, ZBX_PROTO_TAG_HEARTBEAT_FREQ, CONFIG_HEARTBEAT_FREQUENCY);
 
 	level = SUCCEED != last_ret ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
-
 
 	if (SUCCEED == (ret = zbx_connect_to_server(&s, CONFIG_SOURCE_IP, addrs, CONFIG_TIMEOUT, CONFIG_TIMEOUT,
 			configured_tls_connect_mode, 0, level)))
@@ -1389,6 +1388,8 @@ static int	send_heartbeat_msg(zbx_vector_ptr_t *addrs)
 					zbx_socket_strerror());
 		}
 	}
+
+	last_ret = ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Out %s()", __func__);
 }

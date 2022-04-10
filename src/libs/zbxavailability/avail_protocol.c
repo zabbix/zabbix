@@ -72,47 +72,6 @@ zbx_uint32_t	zbx_availability_serialize_active_heartbeat(unsigned char **data, z
 	return data_len;
 }
 
-zbx_uint32_t	zbx_availability_serialize_active_disabled_hosts(unsigned char **data, zbx_vector_uint64_t *hostids)
-{
-	zbx_uint32_t	data_len = 0;
-	int		i;
-	unsigned char	*ptr;
-
-	zbx_serialize_prepare_value(data_len, hostids->values_num);
-
-	for (i = 0; i < hostids->values_num; i++)
-		zbx_serialize_prepare_value(data_len, hostids->values[i]);
-
-	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_len);
-	ptr += zbx_serialize_value(ptr, hostids->values_num);
-
-	for (i = 0; i < hostids->values_num; i++)
-		ptr += zbx_serialize_value(ptr, hostids->values[i]);
-
-	return data_len;
-}
-
-void	zbx_availability_deserialize_active_disabled_hosts(const unsigned char *data, zbx_vector_uint64_t *hostids)
-{
-	int	values_num, i;
-
-	data += zbx_deserialize_value(data, &values_num);
-
-	if (0 == values_num)
-		return;
-
-	zbx_vector_uint64_reserve(hostids, (size_t)values_num);
-
-	for (i = 0; i < values_num; i++)
-	{
-		zbx_uint64_t	id;
-
-		data += zbx_deserialize_value(data, &id);
-
-		zbx_vector_uint64_append(hostids, id);
-	}
-}
-
 void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
 		zbx_vector_availability_ptr_t  *interface_availabilities)
 {
@@ -229,4 +188,154 @@ void	zbx_availability_deserialize_active_status_request(const unsigned char *dat
 void	zbx_availability_deserialize_active_status_response(const unsigned char *data, int *status)
 {
 	zbx_deserialize_int(data, status);
+}
+
+zbx_uint32_t	zbx_availability_serialize_confsync_diff(unsigned char **data, zbx_vector_ptr_t *diff)
+{
+	zbx_dbsync_active_avail_host_t	*host;
+	zbx_uint32_t		data_len = 0;
+	unsigned char		*ptr;
+	int			i;
+
+	zbx_serialize_prepare_value(data_len, diff->values_num);
+
+	data_len += (sizeof(zbx_uint64_t) + sizeof(int)) * diff->values_num;
+
+	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_len);
+	ptr += zbx_serialize_value(ptr, diff->values_num);
+
+	for (i = 0; i < diff->values_num; i++)
+	{
+		host = (zbx_dbsync_active_avail_host_t *)diff->values[i];
+		ptr += zbx_serialize_value(ptr, host->hostid);
+		ptr += zbx_serialize_value(ptr, host->flag);
+	}
+
+	return data_len;
+}
+
+void	zbx_availability_deserialize_confsync_diff(const unsigned char *data, zbx_vector_ptr_t *diff)
+{
+	int	values_num, i;
+
+	data += zbx_deserialize_value(data, &values_num);
+
+	if (0 == values_num)
+		return;
+
+	for (i = 0; i < values_num; i++)
+	{
+		zbx_dbsync_active_avail_host_t	*h = (zbx_dbsync_active_avail_host_t *)zbx_malloc(NULL, sizeof(zbx_dbsync_active_avail_host_t));
+
+		data += zbx_deserialize_uint64(data, &h->hostid);
+		data += zbx_deserialize_char(data, &h->flag);
+
+		zbx_vector_ptr_append(diff, h);
+	}
+}
+
+zbx_uint32_t	zbx_availability_serialize_hostdata2(unsigned char **data, zbx_vector_ptr_t *hosts)
+{
+	zbx_uint32_t		data_len = 0;
+	unsigned char		*ptr;
+	int			i;
+
+	zbx_serialize_prepare_value(data_len, hosts->values_num);
+
+	data_len += (sizeof(zbx_uint64_t) + sizeof(int)) * hosts->values_num;
+
+	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_len);
+	ptr += zbx_serialize_value(ptr, hosts->values_num);
+
+	for (i = 0; i < hosts->values_num; i++)
+	{
+		zbx_proxy_hostdata_t	*host;
+
+		host = (zbx_proxy_hostdata_t *)hosts->values[i];
+
+		ptr += zbx_serialize_value(ptr, host->hostid);
+		ptr += zbx_serialize_value(ptr, host->status);
+	}
+
+	return data_len;
+}
+
+void	zbx_availability_deserialize_hostdata2(const unsigned char *data, zbx_vector_ptr_t *hostdata)
+{
+	int	values_num, i;
+
+	data += zbx_deserialize_value(data, &values_num);
+
+	if (0 == values_num)
+		return;
+
+	for (i = 0; i < values_num; i++)
+	{
+		zbx_proxy_hostdata_t	*h = (zbx_proxy_hostdata_t *)zbx_malloc(NULL, sizeof(zbx_proxy_hostdata_t));
+
+		data += zbx_deserialize_uint64(data, &h->hostid);
+		data += zbx_deserialize_int(data, &h->status);
+
+		zbx_vector_ptr_append(hostdata, h);
+	}
+}
+
+zbx_uint32_t	zbx_availability_serialize_hostid(unsigned char **data, zbx_uint64_t hostid)
+{
+	zbx_uint32_t	data_len = 0;
+	unsigned char	*ptr;
+
+	zbx_serialize_prepare_value(data_len, hostid);
+
+	ptr = *data = (unsigned char *)zbx_calloc(NULL, data_len, 1);
+
+	ptr += zbx_serialize_value(ptr, hostid);
+
+	return data_len;
+}
+
+void	zbx_availability_deserialize_hostid(const unsigned char *data, zbx_uint64_t *hostid)
+{
+	zbx_deserialize_uint64(data, hostid);
+}
+
+zbx_uint32_t	zbx_availability_serialize_new_hosts(unsigned char **data, zbx_vector_uint64_t *hostids)
+{
+	zbx_uint32_t	data_len = 0;
+	int		i;
+	unsigned char	*ptr;
+
+	zbx_serialize_prepare_value(data_len, hostids->values_num);
+
+	for (i = 0; i < hostids->values_num; i++)
+		zbx_serialize_prepare_value(data_len, hostids->values[i]);
+
+	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_len);
+	ptr += zbx_serialize_value(ptr, hostids->values_num);
+
+	for (i = 0; i < hostids->values_num; i++)
+		ptr += zbx_serialize_value(ptr, hostids->values[i]);
+
+	return data_len;
+}
+
+void	zbx_availability_deserialize_new_hosts(const unsigned char *data, zbx_vector_uint64_t *hostids)
+{
+	int	values_num, i;
+
+	data += zbx_deserialize_value(data, &values_num);
+
+	if (0 == values_num)
+		return;
+
+	zbx_vector_uint64_reserve(hostids, (size_t)values_num);
+
+	for (i = 0; i < values_num; i++)
+	{
+		zbx_uint64_t	id;
+
+		data += zbx_deserialize_value(data, &id);
+
+		zbx_vector_uint64_append(hostids, id);
+	}
 }

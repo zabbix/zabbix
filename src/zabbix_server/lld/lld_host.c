@@ -23,6 +23,8 @@
 #include "zbxserver.h"
 #include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_host.h"
+#include "zbxavailability.h"
+#include "avail_protocol.h"
 
 typedef struct
 {
@@ -2626,6 +2628,29 @@ static void	lld_interface_snmp_prepare_sql(zbx_uint64_t hostid, const zbx_uint64
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where interfaceid=" ZBX_FS_UI64 ";\n", interfaceid);
 }
 
+static void	create_host_rtdata(zbx_vector_ptr_t *hosts)
+{
+	unsigned char		*data = NULL;
+	zbx_uint32_t		data_len;
+	zbx_vector_uint64_t	hostids;
+	int			i;
+	zbx_lld_host_t		*host;
+
+	if (0 == hosts->values_num)
+		return;
+
+	for (i = 0; i < hosts->values_num; i++)
+	{
+		host = (zbx_lld_host_t *)hosts->values[i];
+		zbx_vector_uint64_append(&hostids, host->hostid);
+	}
+
+	data_len = zbx_availability_serialize_new_hosts(&data, &hostids);
+	zbx_availability_send(ZBX_IPC_AVAILMAN_ADD_HOSTS, data, data_len, NULL);
+
+	zbx_vector_uint64_destroy(&hostids);
+}
+
 /******************************************************************************
  *                                                                            *
  * Parameters: parent_hostid    - [IN] parent host id                         *
@@ -3377,6 +3402,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 		zbx_db_insert_execute(&db_insert_hdiscovery);
 		zbx_db_insert_clean(&db_insert_hdiscovery);
+
+		create_host_rtdata(hosts);
 	}
 
 	if (0 != new_host_inventories)

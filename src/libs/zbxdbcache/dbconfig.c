@@ -614,7 +614,6 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
 		return;
 
 	proxy->nextcheck = proxy->proxy_tasks_nextcheck;
-	proxy->nextcheck = proxy->proxy_hostdata_nextcheck;
 	if (proxy->proxy_data_nextcheck < proxy->nextcheck)
 		proxy->nextcheck = proxy->proxy_data_nextcheck;
 	if (proxy->proxy_config_nextcheck < proxy->nextcheck)
@@ -1113,7 +1112,7 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 	zbx_hashset_remove_direct(&config->proxies, proxy);
 }
 
-static void	DCsync_hosts(zbx_dbsync_t *sync)
+static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_vector_ptr_t *active_avail_diff)
 {
 	char		**row;
 	zbx_uint64_t	rowid;
@@ -1444,14 +1443,32 @@ done:
 			if (status != host->status)
 			{
 				if (HOST_STATUS_NOT_MONITORED == status)
-					zbx_vector_uint64_append(&disabled_hostids, hostid);
+				{
+					zbx_dbsync_active_avail_host_t *diff_host = (zbx_dbsync_active_avail_host_t *)
+							zbx_malloc(NULL, sizeof(zbx_dbsync_active_avail_host_t));
+
+					diff_host->flag = ZBX_DBSYNC_ACTIVE_AVAIL_HOST_DISABLED;
+					diff_host->hostid = host->hostid;
+
+					zbx_vector_ptr_append(active_avail_diff, diff_host);
+				}
 
 				reset_availability = 1;
 			}
 
 			/* reset host status if host proxy assignment has been changed */
 			if (proxy_hostid != host->proxy_hostid)
+			{
+				zbx_dbsync_active_avail_host_t *diff_host = (zbx_dbsync_active_avail_host_t *)
+						zbx_malloc(NULL, sizeof(zbx_dbsync_active_avail_host_t));
+
+				diff_host->flag = ZBX_DBSYNC_ACTIVE_AVAIL_HOST_MOVED;
+				diff_host->hostid = host->hostid;
+
+				zbx_vector_ptr_append(active_avail_diff, diff_host);
+
 				reset_availability = 1;
+			}
 
 			if (0 != reset_availability)
 			{
@@ -1539,8 +1556,6 @@ done:
 						hostid, CONFIG_PROXYDATA_FREQUENCY, now);
 				proxy->proxy_tasks_nextcheck = (int)calculate_proxy_nextcheck(
 						hostid, ZBX_TASK_UPDATE_FREQUENCY, now);
-				proxy->proxy_hostdata_nextcheck = (int)calculate_proxy_nextcheck(
-						hostid, ZBX_AVAIL_HOSTDATA_FREQUENCY, now);
 
 				DCupdate_proxy_queue(proxy);
 			}
@@ -1633,18 +1648,6 @@ done:
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_destroy(&psk_owners);
 #endif
-
-	if (0 != disabled_hostids.values_num)
-	{
-		unsigned char	*data = NULL;
-		zbx_uint32_t	data_len = 0;
-
-		data_len = zbx_availability_serialize_active_disabled_hosts(&data, &disabled_hostids);
-		zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_DISABLED_HOSTS, data, data_len, NULL);
-		zbx_free(data);
-	}
-
-	zbx_vector_uint64_destroy(&disabled_hostids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -5990,6 +5993,25 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
 	DBfree_result(result);
 }
 
+static void	zbx_dbsync_process_active_avail_diff(zbx_vector_ptr_t *diff)
+{
+	zbx_ipc_message_t	message;
+	unsigned char		*data = NULL;
+	zbx_uint32_t		data_len = 0;
+
+	if (0 == diff->values_num)
+		return;
+
+	zbx_ipc_message_init(&message);
+	data_len = zbx_availability_serialize_confsync_diff(&data, diff);
+	zbx_availability_send(ZBX_IPC_AVAILMAN_CONFSYNC_DIFF, data, data_len, NULL);
+
+	zbx_ipc_message_clean(&message);
+
+	zbx_vector_ptr_clear_ext(diff, zbx_ptr_free);
+	zbx_vector_ptr_destroy(diff);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Synchronize configuration data from database                      *
@@ -6018,7 +6040,8 @@ void	DCsync_configuration(unsigned char mode)
 	zbx_dbsync_t	autoreg_config_sync;
 	zbx_uint64_t	update_flags = 0;
 
-	zbx_hashset_t		trend_queue;
+	zbx_hashset_t			trend_queue;
+	zbx_vector_ptr_t		active_avail_diff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -6177,7 +6200,8 @@ void	DCsync_configuration(unsigned char mode)
 
 	START_SYNC;
 	sec = zbx_time();
-	DCsync_hosts(&hosts_sync);
+	zbx_vector_ptr_create(&active_avail_diff);
+	DCsync_hosts(&hosts_sync, &active_avail_diff);
 	hsec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -6212,6 +6236,9 @@ void	DCsync_configuration(unsigned char mode)
 		dc_maintenance_precache_nested_groups();
 
 	FINISH_SYNC;
+
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		zbx_dbsync_process_active_avail_diff(&active_avail_diff);
 
 	/* sync item data to support item lookups when resolving macros during configuration sync */
 
@@ -10616,7 +10643,6 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, const ZBX_DC_PROXY *src_proxy)
 	dst_proxy->hostid = src_proxy->hostid;
 	dst_proxy->proxy_config_nextcheck = src_proxy->proxy_config_nextcheck;
 	dst_proxy->proxy_data_nextcheck = src_proxy->proxy_data_nextcheck;
-	dst_proxy->proxy_hostdata_nextcheck = src_proxy->proxy_hostdata_nextcheck;
 	dst_proxy->proxy_tasks_nextcheck = src_proxy->proxy_tasks_nextcheck;
 	dst_proxy->last_cfg_error_time = src_proxy->last_cfg_error_time;
 	dst_proxy->version = src_proxy->version;
@@ -10816,11 +10842,6 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int pr
 			{
 				dc_proxy->proxy_tasks_nextcheck = (int)calculate_proxy_nextcheck(
 						hostid, ZBX_TASK_UPDATE_FREQUENCY, now);
-			}
-			if (0 != (update_nextcheck & ZBX_PROXY_DATA_NEXTCHECK))
-			{
-				dc_proxy->proxy_hostdata_nextcheck = (int)calculate_proxy_nextcheck(
-						hostid, ZBX_AVAIL_HOSTDATA_FREQUENCY, now);
 			}
 
 			DCupdate_proxy_queue(dc_proxy);

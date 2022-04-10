@@ -22,7 +22,6 @@
 
 #include "db.h"
 
-
 void	zbx_availability_serialize_interface(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_interface_availability_t *interface_availability);
 
@@ -31,10 +30,8 @@ void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
 
 void	zbx_availability_deserialize_active_hb(const unsigned char *data, zbx_host_active_avail_t *avail);
 
-zbx_uint32_t	zbx_availability_serialize_active_heartbeat(unsigned char **data, zbx_uint64_t hostid, int heartbeat_freq);
-
-zbx_uint32_t	zbx_availability_serialize_active_disabled_hosts(unsigned char **data, zbx_vector_uint64_t *hostids);
-void	zbx_availability_deserialize_active_disabled_hosts(const unsigned char *data, zbx_vector_uint64_t *hostids);
+zbx_uint32_t	zbx_availability_serialize_active_heartbeat(unsigned char **data, zbx_uint64_t hostid,
+		int heartbeat_freq);
 
 zbx_uint32_t	zbx_availability_serialize_hostdata(unsigned char **data, zbx_hashset_t *queue);
 void	zbx_availability_deserialize_hostdata(const unsigned char *data, zbx_vector_ptr_t *hostdata);
@@ -45,10 +42,16 @@ void	zbx_availability_deserialize_active_status_request(const unsigned char *dat
 zbx_uint32_t	zbx_availability_serialize_active_status_response(unsigned char **data, int status);
 void	zbx_availability_deserialize_active_status_response(const unsigned char *data, int *status);
 
-#define ZBX_AVAIL_MSG_INTERFACE			1
-#define ZBX_AVAIL_MSG_ACTIVE_HEARTBEAT		2
-#define ZBX_AVAIL_MSG_ACTIVE_HOSTDATA		3
-#define ZBX_AVAIL_MSG_ACTIVE_HOSTS_DISABLED	4
-#define ZBX_AVAIL_MSG_ACTIVE_STATUS		5
+zbx_uint32_t	zbx_availability_serialize_confsync_diff(unsigned char **data, zbx_vector_ptr_t *diff);
+void	zbx_availability_deserialize_confsync_diff(const unsigned char *data, zbx_vector_ptr_t *diff);
+
+zbx_uint32_t	zbx_availability_serialize_hostdata2(unsigned char **data, zbx_vector_ptr_t *hosts);
+void	zbx_availability_deserialize_hostdata2(const unsigned char *data, zbx_vector_ptr_t *hostdata);
+
+zbx_uint32_t	zbx_availability_serialize_hostid(unsigned char **data, zbx_uint64_t hostid);
+void	zbx_availability_deserialize_hostid(const unsigned char *data, zbx_uint64_t *hostid);
+
+zbx_uint32_t	zbx_availability_serialize_new_hosts(unsigned char **data, zbx_vector_uint64_t *hostids);
+void	zbx_availability_deserialize_new_hosts(const unsigned char *data, zbx_vector_uint64_t *hostids);
 
 #endif

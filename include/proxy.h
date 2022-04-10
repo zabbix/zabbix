@@ -35,7 +35,8 @@
 #define ZBX_PROXY_UPLOAD_DISABLED	1
 #define ZBX_PROXY_UPLOAD_ENABLED	2
 
-#define ZBX_ACTIVE_PROXY_HOSTDATA_FREQUENCY	5
+#define ZBX_ACTIVE_PROXY_HOSTDATA_FREQUENCY		5
+#define ZBX_PROXY_ACTIVE_CHECK_AVAIL_TIMEOUT		30
 
 int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, char **error);
 int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock, char **error);

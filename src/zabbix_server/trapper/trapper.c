@@ -45,7 +45,6 @@
 
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
-#define ZBX_PROXY_IPC_HOSTDATA_TIMEOUT	5
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -953,7 +952,7 @@ static void	active_passive_misconfig(zbx_socket_t *sock)
 	zbx_free(msg);
 }
 
-static int	process_active_check_heartbeat(struct zbx_json_parse	*jp)
+static int	process_active_check_heartbeat(struct zbx_json_parse *jp)
 {
 	char		host[HOST_HOST_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
 			hbfreq[5];
@@ -962,7 +961,8 @@ static int	process_active_check_heartbeat(struct zbx_json_parse	*jp)
 	unsigned char	*data = NULL;
 	zbx_uint32_t	data_len;
 
-	zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host), NULL);
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host), NULL))
+		return FAIL;
 
 	if (FAIL == DCconfig_get_hostid_by_name(host, &hostid))
 		return FAIL;
@@ -973,7 +973,8 @@ static int	process_active_check_heartbeat(struct zbx_json_parse	*jp)
 	if (HOST_STATUS_NOT_MONITORED == dc_host.status)
 		return SUCCEED;
 
-	zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HEARTBEAT_FREQ, hbfreq, sizeof(hbfreq), NULL);
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HEARTBEAT_FREQ, hbfreq, sizeof(hbfreq), NULL))
+		return FAIL;
 
 	data_len = zbx_availability_serialize_active_heartbeat(&data, hostid, atoi(hbfreq));
 	zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_HB, data, data_len, NULL);
@@ -1107,31 +1108,6 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_ACTIVE_CHECK_HEARTBEAT))
 			{
 				ret = process_active_check_heartbeat(&jp);
-			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_HOST_DATA))
-			{
-				if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-				{
-					zbx_ipc_message_t	response;
-
-					zbx_ipc_message_init(&response);
-					zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_HOSTDATA, 0, 0, &response);
-
-					if (0 != response.size)
-					{
-						zbx_vector_ptr_t	hostdata;
-
-						zbx_vector_ptr_create(&hostdata);
-
-						zbx_availability_deserialize_hostdata(response.data, &hostdata);
-						zbx_send_host_data(sock, ts, &hostdata);
-
-						zbx_vector_ptr_clear_ext(&hostdata, (zbx_clean_func_t)zbx_ptr_free);
-						zbx_vector_ptr_destroy(&hostdata);
-					}
-
-					zbx_ipc_message_clean(&response);
-				}
 			}
 			else if (SUCCEED != trapper_process_request(value, sock, &jp))
 			{

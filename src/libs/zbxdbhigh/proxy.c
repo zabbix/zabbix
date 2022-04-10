@@ -35,6 +35,7 @@
 #include "events.h"
 #include "../zbxvault/vault.h"
 #include "zbxavailability.h"
+#include "avail_protocol.h"
 #include "zbxcommshigh.h"
 
 extern char	*CONFIG_SERVER;
@@ -4709,39 +4710,43 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		const char		*ptr;
 		zbx_vector_ptr_t	host_avails;
 		struct zbx_json_parse	jp_host;
-		char			buffer[1024];
+		char			buffer[ZBX_KIBIBYTE];
 
 		zbx_vector_ptr_create(&host_avails);
 
 		for (ptr = NULL; NULL != (ptr = zbx_json_next(&jp_data, ptr));)
 		{
-			zbx_host_active_avail_t	*avail;
+			zbx_proxy_hostdata_t	*host;
 
 			if (SUCCEED != zbx_json_brackets_open(ptr, &jp_host))
 				continue;
 
 			if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_HOSTID, buffer, sizeof(buffer), NULL))
 			{
-				avail = (zbx_host_active_avail_t *)zbx_malloc(NULL, sizeof(zbx_host_active_avail_t));
-				avail->hostid = atoi(buffer);
+				host = (zbx_proxy_hostdata_t *)zbx_malloc(NULL, sizeof(zbx_proxy_hostdata_t));
+				host->hostid = atoi(buffer);
 			}
 			else
 				continue;
 
 			if (FAIL == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_ACTIVE_STATUS, buffer, sizeof(buffer), NULL))
 			{
-				zbx_free(avail);
+				zbx_free(host);
 				continue;
 			}
 
-			avail->active_status = atoi(buffer);
+			host->status = atoi(buffer);
 
-			zbx_vector_ptr_append(&host_avails, avail);
+			zbx_vector_ptr_append(&host_avails, host);
 		}
 
 		if (0 != host_avails.values_num)
 		{
-			zbx_db_update_active_check_availabilities(&host_avails, ZBX_ACTIVE_CHECK_AVAILS_DATA_VECTOR);
+			unsigned char		*data = NULL;
+			zbx_uint32_t		data_len;
+
+			data_len = zbx_availability_serialize_hostdata2(&data, &host_avails);
+			zbx_availability_send(ZBX_IPC_AVAILMAN_PROCESS_PROXY_HOSTDATA, data, data_len, NULL);
 
 			zbx_vector_ptr_clear_ext(&host_avails, zbx_ptr_free);
 			zbx_vector_ptr_destroy(&host_avails);

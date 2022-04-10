@@ -377,7 +377,6 @@ typedef struct
 	double			required_performance;
 	int			proxy_config_nextcheck;
 	int			proxy_data_nextcheck;
-	int			proxy_hostdata_nextcheck;
 	int			proxy_tasks_nextcheck;
 	int			nextcheck;
 	int			lastaccess;

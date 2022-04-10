@@ -22,6 +22,8 @@
 #include "log.h"
 #include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_host.h"
+#include "avail_protocol.h"
+#include "zbxavailability.h"
 
 typedef enum
 {
@@ -455,6 +457,20 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, hostid, hostname);
 				interfaceid = DBadd_interface(hostid, interface_type, 1, row[2], row[3], port,
 						ZBX_CONN_DEFAULT);
+			}
+
+			if (0 != hostid)
+			{
+				zbx_uint32_t		data_len;
+				zbx_vector_uint64_t	hostids;
+				unsigned char		*data = NULL;
+
+				zbx_vector_uint64_create(&hostids);
+
+				data_len = zbx_availability_serialize_new_hosts(&data, &hostids);
+				zbx_availability_send(ZBX_IPC_AVAILMAN_ADD_HOSTS, data, data_len, NULL);
+
+				zbx_vector_uint64_destroy(&hostids);
 			}
 
 			if (INTERFACE_TYPE_SNMP == interface_type)

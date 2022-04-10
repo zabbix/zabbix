@@ -215,6 +215,28 @@ static int	send_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_
 	return SUCCEED;
 }
 
+static void	send_active_host_data(struct zbx_json *j)
+{
+	zbx_ipc_message_t	response;
+
+	zbx_ipc_message_init(&response);
+	zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_HOSTDATA, 0, 0, &response);
+
+	if (0 != response.size)
+	{
+		zbx_vector_ptr_t	hostdata;
+
+		zbx_vector_ptr_create(&hostdata);
+		zbx_availability_deserialize_hostdata(response.data, &hostdata);
+		zbx_availability_serialize_json_hostdata(&hostdata, j);
+
+		zbx_vector_ptr_clear_ext(&hostdata, (zbx_clean_func_t)zbx_ptr_free);
+		zbx_vector_ptr_destroy(&hostdata);
+	}
+
+	zbx_ipc_message_clean(&response);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: sends 'proxy data' request to server                              *
@@ -252,6 +274,8 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 
 	zbx_vector_ptr_create(&tasks);
 	zbx_tm_get_remote_tasks(&tasks, 0);
+
+	send_active_host_data(&j);
 
 	if (0 != tasks.values_num)
 		zbx_tm_json_serialize_tasks(&j, &tasks);
@@ -337,45 +361,6 @@ clean:
 
 	zbx_json_free(&j);
 	UNLOCK_PROXY_HISTORY;
-out:
-	zbx_free(buffer);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-void	zbx_send_host_data(zbx_socket_t *sock, zbx_timespec_t *ts, zbx_vector_ptr_t *hostdata)
-{
-	struct zbx_json	j;
-	int		i;
-	char		*error = NULL, *buffer = NULL;
-	size_t		buffer_size, reserved;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-
-	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
-
-	zbx_availability_serialize_json_hostdata(hostdata, &j);
-
-	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
-	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts->sec);
-	zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, ts->ns);
-
-	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
-	{
-		zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
-		goto out;
-	}
-
-	reserved = j.buffer_size;
-
-	if (FAIL == send_data_to_server(sock, &buffer, buffer_size, reserved, &error))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot send host data to server at \"%s\": %s", sock->peer, error);
-		zbx_free(error);
-	}
-
-	zbx_json_free(&j);
 out:
 	zbx_free(buffer);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
