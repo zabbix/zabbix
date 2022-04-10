@@ -21,7 +21,7 @@
 #define ZABBIX_PID_H
 
 #include "zbxthreads.h"
-#include "sysinc.h"
+#include "zbxsysinc.h"
 
 #ifdef _WINDOWS
 #	error "This module allowed only for Unix OS"

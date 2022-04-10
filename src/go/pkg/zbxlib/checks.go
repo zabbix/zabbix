@@ -23,6 +23,7 @@ package zbxlib
 
 /*
 #cgo CFLAGS: -I${SRCDIR}/../../../../include
+#cgo CFLAGS: -I${SRCDIR}/../../../../include/common
 
 #include "common.h"
 #include "sysinfo.h"
