@@ -107,6 +107,7 @@ class CDocHelper {
 	const MONITORING_DISCOVERY_VIEW =						'web_interface/frontend_sections/monitoring/discovery';
 	const MONITORING_HOST_DASHBOARD_VIEW =					'config/visualization/host_screens';
 	const MONITORING_HOST_VIEW =							'web_interface/frontend_sections/monitoring/hosts';
+	const MONITORING_HISTORY =								'web_interface/frontend_sections/monitoring/latest_data#graphs';
 	const MONITORING_LATEST_VIEW =							'web_interface/frontend_sections/monitoring/latest_data';
 	const MONITORING_PROBLEM_VIEW =							'web_interface/frontend_sections/monitoring/problems';
 	const MONITORING_SYSMAP_EDIT =							'config/visualization/maps/map#creating-a-map';
