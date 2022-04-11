@@ -135,25 +135,6 @@ $http_tab = (new CFormList('list_http'))
 			->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
 	);
 
-// LDAP configuration fields.
-// TODO VM: move this to popup
-if ($data['change_bind_password']) {
-	$password_box = [
-		new CVar('change_bind_password', 1),
-		(new CPassBox('ldap_bind_password', $data['ldap_bind_password']))
-			->setEnabled($data['ldap_enabled'])
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	];
-}
-else {
-	$password_box = [
-		new CVar('action_passw_change', $data['action_passw_change']),
-		(new CButton('change_bind_password', _('Change password')))
-			->setEnabled($data['ldap_enabled'])
-			->addClass(ZBX_STYLE_BTN_GREY)
-	];
-}
-
 $ldap_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Enable LDAP authentication'), 'ldap_configured'),

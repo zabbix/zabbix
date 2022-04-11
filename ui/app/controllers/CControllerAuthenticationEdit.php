@@ -157,7 +157,7 @@ class CControllerAuthenticationEdit extends CController {
 				'passwd_check_rules'
 			]);
 
-			$data['ldap_servers'] = $this->getInput('ldap_servers', []);
+			$data['ldap_servers'] = $this->getLdapServerUserGroupCount($this->getInput('ldap_servers', []));
 			$data['ldap_default_row_index'] = $this->getInput('ldap_default_row_index', 0);
 			$data['ldap_removed_userdirectoryids'] = $this->getInput('ldap_removed_userdirectoryids', []);
 
@@ -193,5 +193,35 @@ class CControllerAuthenticationEdit extends CController {
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of authentication'));
 		$this->setResponse($response);
+	}
+
+	private function getLdapServerUserGroupCount(array $ldap_servers): array {
+		$ldap_serverids = [];
+
+		foreach ($ldap_servers as $ldap_server) {
+			if (array_key_exists('userdirectoryid', $ldap_server)) {
+				$ldap_serverids[] = $ldap_server['userdirectoryid'];
+			}
+		}
+
+		$db_ldap_servers = API::UserDirectory()->get([
+			'output' => ['userdirectoryid'],
+			'selectUsrgrps' => API_OUTPUT_COUNT,
+			'userdirectoryids' => $ldap_serverids,
+			'preservekeys' => true
+		]);
+
+		foreach ($ldap_servers as &$ldap_server) {
+			if (array_key_exists('userdirectoryid', $ldap_server)
+					&& array_key_exists($ldap_server['userdirectoryid'], $db_ldap_servers)) {
+				$ldap_server['usrgrps'] = $db_ldap_servers[$ldap_server['userdirectoryid']]['usrgrps'];
+			}
+			else {
+				$ldap_server['usrgrps'] = 0;
+			}
+		}
+		unset($ldap_server);
+
+		return $ldap_servers;
 	}
 }

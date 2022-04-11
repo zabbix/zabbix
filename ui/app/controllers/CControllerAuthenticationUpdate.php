@@ -135,33 +135,6 @@ class CControllerAuthenticationUpdate extends CController {
 			return false;
 		}
 
-		// TODO VM: move to LDAP test popup
-		/*
-		elseif ($is_valid) {
-			$ldap_validator = new CLdapAuthValidator([
-				'conf' => [
-					'host' => $ldap_auth['ldap_host'],
-					'port' => $ldap_auth['ldap_port'],
-					'base_dn' => $ldap_auth['ldap_base_dn'],
-					'bind_dn' => $ldap_auth['ldap_bind_dn'],
-					'bind_password' => $ldap_auth['ldap_bind_password'],
-					'search_attribute' => $ldap_auth['ldap_search_attribute']
-				],
-				'detailed_errors' => true
-			]);
-
-			$login = $ldap_validator->validate([
-				'username' => $this->getInput('ldap_test_user', CWebUser::$data['username']),
-				'password' => $this->getInput('ldap_test_password', '')
-			]);
-
-			if (!$login) {
-				CMessageHelper::setErrorTitle($ldap_validator->getError());
-				$is_valid = false;
-			}
-		}
-		*/
-
 		return true;
 	}
 
