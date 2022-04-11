@@ -1106,7 +1106,7 @@ class CTemplate extends CHostGeneral {
 				);
 			}
 
-			CTemplateGroup::checkObjectsWithoutGroups($db_templates, $data['groupids']);
+			CTemplateGroup::checkTemplatesWithoutGroups($db_templates, $data['groupids']);
 
 			$this->massAddAffectedObjects('groups', $data['groupids'], $db_templates);
 		}
