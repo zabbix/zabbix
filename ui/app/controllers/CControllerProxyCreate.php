@@ -119,7 +119,7 @@ class CControllerProxyCreate extends CController {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
-						'title' => _('Cannot create proxy'),
+						'title' => _('Cannot add proxy'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 				])])
@@ -190,7 +190,7 @@ class CControllerProxyCreate extends CController {
 		$output = [];
 
 		if ($result) {
-			$output['success']['title'] = _('Proxy created');
+			$output['success']['title'] = _('Proxy added');
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -198,7 +198,7 @@ class CControllerProxyCreate extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _('Cannot create proxy'),
+				'title' => _('Cannot add proxy'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}
