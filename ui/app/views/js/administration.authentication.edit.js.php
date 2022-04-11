@@ -28,7 +28,6 @@
 	const view = new class {
 
 		constructor() {
-			this.template_ldap_server_row = null;
 			this.form = null;
 			this.db_authentication_type = null;
 		}
@@ -37,19 +36,8 @@
 			this.form = document.getElementById('authentication-form');
 			this.db_authentication_type = db_authentication_type;
 
-			this.template_ldap_server_row = new Template(this._templateLdapServerRow());
 			this._addEventListeners();
-
-			// TODO VM: move to function
-			// Parse LDAP servers.
-			for (const [row_index, ldap] of Object.entries(ldap_servers)) {
-				ldap.row_index = row_index;
-				ldap.is_default = (ldap.row_index == ldap_default_row_index) ? 'checked' : '';
-
-				document
-					.querySelector('#ldap-servers tbody')
-					.appendChild(this._prepareServerRow(ldap));
-			}
+			this._addLdapServers(ldap_servers, ldap_default_row_index);
 		}
 
 		_addEventListeners() {
@@ -120,6 +108,17 @@
 			) ?>;
 
 			return (auth_type == this.db_authentication_type || confirm(warning_msg));
+		}
+
+		_addLdapServers(ldap_servers, ldap_default_row_index) {
+			for (const [row_index, ldap] of Object.entries(ldap_servers)) {
+				ldap.row_index = row_index;
+				ldap.is_default = (ldap.row_index == ldap_default_row_index) ? 'checked' : '';
+
+				document
+						.querySelector('#ldap-servers tbody')
+						.appendChild(this._prepareServerRow(ldap));
+			}
 		}
 
 		editLdapServer(row = null) {
@@ -195,8 +194,9 @@
 		}
 
 		_prepareServerRow(ldap) {
+			const template_ldap_server_row = new Template(this._templateLdapServerRow());
 			const template = document.createElement('template');
-			template.innerHTML = this.template_ldap_server_row.evaluate(ldap).trim();
+			template.innerHTML = template_ldap_server_row.evaluate(ldap).trim();
 			const row = template.content.firstChild;
 
 			if (!('userdirectoryid' in ldap)) {
