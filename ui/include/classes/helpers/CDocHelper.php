@@ -119,6 +119,7 @@ class CDocHelper {
 	const POPUP_ACKNOWLEDGE_EDIT =							'acknowledges#updating-problems';
 	const POPUP_DASHBOARD_SHARE_EDIT =						'config/visualization/maps/map#sharing';
 	const POPUP_HOST_IMPORT =								'xml_export_import/hosts#importing';
+	const POPUP_HTTP_STEP_EDIT =							'web_monitoring#configuring-steps';
 	const POPUP_MAPS_IMPORT =								'xml_export_import/maps#importing';
 	const POPUP_MAP_ELEMENT =								'config/visualization/maps/map#adding-elements';
 	const POPUP_MAP_SHAPE =									'config/visualization/maps/map#adding-shapes';
