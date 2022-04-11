@@ -505,34 +505,6 @@ class CTemplateGroup extends CApiService {
 		if ($db_templates) {
 			self::checkTemplatesWithoutGroups($db_templates, $groupids);
 		}
-
-		$db_scripts = DB::select('scripts', [
-			'output' => ['groupid'],
-			'filter' => ['groupid' => $groupids],
-			'limit' => 1
-		]);
-
-		if ($db_scripts) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Template group "%1$s" cannot be deleted, because it is used in a global script.',
-					$db_groups[$db_scripts[0]['groupid']]['name']
-				)
-			);
-		}
-
-		$corr_condition_groups = DB::select('corr_condition_group', [
-			'output' => ['groupid'],
-			'filter' => ['groupid' => $groupids],
-			'limit' => 1
-		]);
-
-		if ($corr_condition_groups) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Group "%1$s" cannot be deleted, because it is used in a correlation condition.',
-					$db_groups[$corr_condition_groups[0]['groupid']]['name']
-				)
-			);
-		}
 	}
 
 	/**
