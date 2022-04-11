@@ -1138,16 +1138,13 @@ static void	zbx_check_db(void)
 		DBextract_dbextension_info(&db_version_info);
 
 	if (SUCCEED == result && (SUCCEED != DBcheck_capabilities(&db_version_info) || SUCCEED != DBcheck_version()))
-	{
 		result = FAIL;
-	}
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 #if defined(HAVE_POSTGRESQL)
 	/* force disabling TimescaleDB compression if it is expected but not supported */
-	if (SUCCEED == result && ON == db_version_info.tsdb_support_expected &&
-			OFF == db_version_info.tsdb_compression_availability)
+	if (SUCCEED == result && OFF == db_version_info.tsdb_compression_availability)
 		DBexecute("update config set compression_status=0");
 #endif
 
