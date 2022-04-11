@@ -217,8 +217,7 @@ class CControllerAuthenticationUpdate extends CController {
 		if ($auth_valid) {
 			[$auth_valid, $ldap_userdirectoryid] = $this->processLdapServers(
 				$this->getInput('ldap_servers', []),
-				$this->getInput('ldap_default_row_index', 0),
-				$this->getInput('ldap_removed_userdirectoryids', [])
+				$this->getInput('ldap_default_row_index', 0)
 			);
 		}
 
@@ -310,24 +309,30 @@ class CControllerAuthenticationUpdate extends CController {
 		}
 
 		$data = array_diff_assoc($data, $auth);
+		$result = true;
 
 		if ($data) {
 			$result = API::Authentication()->update($data);
 
-			if ($result) {
-				if (array_key_exists('authentication_type', $data)) {
-					$this->invalidateSessions();
-				}
-
-				CMessageHelper::setSuccessTitle(_('Authentication settings updated'));
-			}
-			else {
-				$this->response->setFormData($this->getInputAll());
-				CMessageHelper::setErrorTitle(_('Cannot update authentication'));
+			if ($result && array_key_exists('authentication_type', $data)) {
+				$this->invalidateSessions();
 			}
 		}
-		else {
+
+		if ($result) {
+			$del_userdirectoryids = $this->getInput('ldap_removed_userdirectoryids', []);
+
+			if ($del_userdirectoryids) {
+				$result = API::UserDirectory()->delete($del_userdirectoryids);
+			}
+		}
+
+		if ($result) {
 			CMessageHelper::setSuccessTitle(_('Authentication settings updated'));
+		}
+		else {
+			$this->response->setFormData($this->getInputAll());
+			CMessageHelper::setErrorTitle(_('Cannot update authentication'));
 		}
 
 		$this->setResponse($this->response);
@@ -336,16 +341,12 @@ class CControllerAuthenticationUpdate extends CController {
 	/**
 	 * Updates exising LDAP servers, creates new ones, removes deleted ones.
 	 *
-	 * @param $ldap_servers
+	 * @param array $ldap_servers
+	 * @param int $default_row_index
 	 *
 	 * @return array
 	 */
-	private function processLdapServers($ldap_servers, $default_row_index, $del_userdirectoryids): array {
-		$db_ldap_servers = API::UserDirectory()->get([
-			'output' => [],
-			'preservekeys' => true
-		]);
-
+	private function processLdapServers(array $ldap_servers, int $default_row_index): array {
 		$ins_ldap_servers = [];
 		$upd_ldap_servers = [];
 
@@ -355,7 +356,6 @@ class CControllerAuthenticationUpdate extends CController {
 		foreach ($ldap_servers as $row_index => $ldap_server) {
 			if (array_key_exists('userdirectoryid', $ldap_server)) {
 				$upd_ldap_servers[] = $ldap_server;
-				unset($db_ldap_servers[$ldap_server['userdirectoryid']]);
 
 				if ($default_row_index == $row_index) {
 					$ldap_userdirectoryid = $ldap_server['userdirectoryid'];
@@ -368,14 +368,6 @@ class CControllerAuthenticationUpdate extends CController {
 					$default_ldap_mapping_index = count($ins_ldap_servers) - 1;
 				}
 			}
-		}
-
-		$del_ldap_serverids = array_keys(array_intersect_key(
-			$db_ldap_servers, array_flip($del_userdirectoryids)
-		));
-
-		if ($del_ldap_serverids && !API::UserDirectory()->delete($del_ldap_serverids)) {
-			return [false, $ldap_userdirectoryid];
 		}
 
 		if ($upd_ldap_servers && !API::UserDirectory()->update($upd_ldap_servers)) {
