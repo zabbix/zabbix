@@ -53,15 +53,14 @@ function submitScheduledReport(overlay) {
 		.catch((exception) => {
 			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
-			let title;
-			let messages = [];
+			let title, messages;
 
 			if (typeof exception === 'object' && 'error' in exception) {
 				title = exception.error.title;
 				messages = exception.error.messages;
 			}
 			else {
-				title = <?= json_encode(_('Unexpected server error')) ?>;
+				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 			}
 
 			const message_box = makeMessageBox('bad', messages, title);
