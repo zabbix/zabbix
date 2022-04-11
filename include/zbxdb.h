@@ -171,20 +171,6 @@ int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 #define ZBX_POSTGRESQL_MAX_VERSION			149999
 #define ZBX_POSTGRESQL_MAX_VERSION_FRIENDLY		"14.x"
 
-#define ZBX_TIMESCALEDB											"TimescaleDB"
-#define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB				100002
-#define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB_FRIENDLY	"10.2"
-#define ZBX_TIMESCALEDB_MIN_VERSION								10500
-#define ZBX_TIMESCALEDB_MIN_VERSION_FRIENDLY					"1.5.0"
-#define ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION 					20001
-#define ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION_FRIENDLY 			"2.0.1"
-#define ZBX_TIMESCALEDB_MAX_VERSION								20399
-#define ZBX_TIMESCALEDB_MAX_VERSION_FRIENDLY					"2.3"
-#define ZBX_TIMESCALEDB_LICENSE_APACHE							"apache"
-#define ZBX_TIMESCALEDB_LICENSE_APACHE_FRIENDLY					"TimescaleDB Apache 2 Edition"
-#define ZBX_TIMESCALEDB_LICENSE_TIMESCALE						"timescale"
-#define ZBX_TIMESCALEDB_LICENSE_TIMESCALE_FRIENDLY				"TimescaleDB Community Edition"
-
 #define ZBX_ORACLE_MIN_VERSION				1201000200
 #define ZBX_ORACLE_MIN_VERSION_FRIENDLY			"Database 12c Release 12.01.00.02.x"
 #define ZBX_ORACLE_MIN_SUPPORTED_VERSION		1900000000
@@ -196,6 +182,23 @@ int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 #define ZBX_ELASTIC_MIN_VERSION_FRIENDLY		"7.x"
 
 #define ZBX_DBVERSION_UNDEFINED				0
+
+#define ZBX_DB_EXT_STATUS_FLAGS_TSDB_CONFIGURED			0x00000001
+#define ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE	0x00000002
+
+#define ZBX_TIMESCALEDB						"TimescaleDB"
+#define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB		100002
+#define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB_FRIENDLY	"10.2"
+#define ZBX_TIMESCALEDB_MIN_VERSION				10500
+#define ZBX_TIMESCALEDB_MIN_VERSION_FRIENDLY			"1.5.0"
+#define ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION 			20001
+#define ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION_FRIENDLY 		"2.0.1"
+#define ZBX_TIMESCALEDB_MAX_VERSION				20399
+#define ZBX_TIMESCALEDB_MAX_VERSION_FRIENDLY			"2.3"
+#define ZBX_TIMESCALEDB_LICENSE_APACHE				"apache"
+#define ZBX_TIMESCALEDB_LICENSE_APACHE_FRIENDLY			"TimescaleDB Apache 2 Edition"
+#define ZBX_TIMESCALEDB_LICENSE_TIMESCALE			"timescale"
+#define ZBX_TIMESCALEDB_LICENSE_TIMESCALE_FRIENDLY		"TimescaleDB Community Edition"
 
 typedef enum
 {	/* db version status flags shared with FRONTEND */
@@ -246,14 +249,12 @@ struct zbx_db_version_info_t
 
 	zbx_db_version_status_t	ext_flag;
 
-	/* TimescaleDB specific information */
-	int			tsdb_support_expected;
-	char 		*tsdb_lic;
-	int			tsdb_compression_availability;
+	char 			*ext_lic;
+	zbx_uint32_t		ext_status;
 };
 
 void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);
-void	zbx_dbms_extension_info_extract(struct zbx_db_version_info_t *version_info);
+void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info);
 
 #ifdef HAVE_MYSQL
 int	zbx_dbms_mariadb_used(void);

@@ -2500,7 +2500,8 @@ int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx
  *                                                                            *
  * Purpose: prepare json for front-end with the DB current, minimum and       *
  *          maximum versions and a flag that indicates if the version         *
- *          satisfies the requirements                                        *
+ *          satisfies the requirements, and other infomration as well as      *
+ *          information about DB extension in a similar way                   *
  *                                                                            *
  * Parameters:  json                     - [IN/OUT] json data                 *
  *              info                     - [IN] info to serialize             *
@@ -2527,7 +2528,7 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 	zbx_json_addint64(json, "flag", info->flag);
 	zbx_json_close(json);
 
-	if (NULL != info->extension)
+	if (info->ext_status & ZBX_DB_EXT_STATUS_FLAGS_TSDB_CONFIGURED)
 	{
 		zbx_json_addobject(json, NULL);
 		zbx_json_addstring(json, "database", info->extension, ZBX_JSON_TYPE_STRING);
@@ -2546,8 +2547,8 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 
 		zbx_json_addint64(json, "flag", info->ext_flag);
 
-		if (0 == zbx_strcmp_null(info->extension, ZBX_TIMESCALEDB))
-			zbx_json_addint64(json, "compression_availability", info->tsdb_compression_availability);
+		zbx_json_addint64(json, "compression_availability",
+				info->ext_status & ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE ? ON : OFF);
 
 		zbx_json_close(json);
 	}
@@ -2819,19 +2820,17 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() version:%lu", __func__, (unsigned long)zbx_dbms_version_get());
 }
 
+#if defined(HAVE_POSTGRESQL)
 /***************************************************************************************************************
  *                                                                                                             *
- * Purpose: retrieves the DB extension info, including numeric version value                                   *
- *                                                                                                             *
- *          For TimescaleDB:                                                                                   *
- *          numeric version is available from database                                                         *
- *          string license information is available from database                                              *
+ * Purpose: retrieves TimescaleDB extension info, including license string and numeric version value           *
  *                                                                                                             *
  **************************************************************************************************************/
-void	zbx_dbms_extension_info_extract(struct zbx_db_version_info_t *version_info)
+void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info)
 {
-#ifdef HAVE_POSTGRESQL
 	int			tsdb_ver;
+
+	version_info->extension = ZBX_TIMESCALEDB;
 
 	if (0 == (tsdb_ver = zbx_tsdb_get_version()))
 	{
@@ -2841,8 +2840,6 @@ void	zbx_dbms_extension_info_extract(struct zbx_db_version_info_t *version_info)
 	else
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "TimescaleDB version: [%d]", tsdb_ver);
-
-		version_info->extension = ZBX_TIMESCALEDB;
 
 		version_info->ext_current_version = (zbx_uint32_t)tsdb_ver;
 		version_info->ext_min_version = ZBX_TIMESCALEDB_MIN_VERSION;
@@ -2857,14 +2854,12 @@ void	zbx_dbms_extension_info_extract(struct zbx_db_version_info_t *version_info)
 		version_info->ext_flag = zbx_db_version_check(version_info->extension, version_info->ext_current_version,
 				version_info->ext_min_version, version_info->ext_max_version, version_info->ext_min_supported_version);
 
-		version_info->tsdb_lic = zbx_tsdb_get_license();
+		version_info->ext_lic = zbx_tsdb_get_license();
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "TimescaleDB license: [%s]", version_info->tsdb_lic);
+		zabbix_log(LOG_LEVEL_INFORMATION, "TimescaleDB license: [%s]", version_info->ext_lic);
 	}
-#else
-	ZBX_UNUSED(version_info);
-#endif
 }
+#endif
 
 #if defined(HAVE_POSTGRESQL)
 /******************************************************************************

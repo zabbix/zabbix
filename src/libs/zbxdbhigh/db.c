@@ -815,8 +815,6 @@ void	DBextract_dbextension_info(struct zbx_db_version_info_t *version_info)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	version_info->tsdb_support_expected = OFF;
-
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	/* in case of major upgrade, db_extension may be missing */
@@ -832,8 +830,8 @@ void	DBextract_dbextension_info(struct zbx_db_version_info_t *version_info)
 	if (0 != zbx_strcmp_null(row[0], ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
 		goto clean;
 
-	version_info->tsdb_support_expected = ON;
-	zbx_dbms_extension_info_extract(version_info);
+	version_info->ext_status |= ZBX_DB_EXT_STATUS_FLAGS_TSDB_CONFIGURED;
+	zbx_tsdb_info_extract(version_info);
 clean:
 	DBfree_result(result);
 out:
@@ -860,7 +858,7 @@ void	DBflush_version_requirements(const char *version)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks DBMS for optional features and exit if is not suitable     *
+ * Purpose: checks TSDB for compression support                               *
  *                                                                            *
  * Parameters: db_version - [IN/OUT] version of DB                            *
  *                                                                            *
@@ -868,21 +866,20 @@ void	DBflush_version_requirements(const char *version)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	DBcheck_capabilities(struct zbx_db_version_info_t *db_version_info)
+int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info)
 {
 	int	ret = SUCCEED;
 #ifdef HAVE_POSTGRESQL
-	db_version_info->tsdb_compression_availability = OFF;
-
 	/* in case of major upgrade, db_extension may be missing */
-	if (OFF == db_version_info->tsdb_support_expected)
+	if  (!(db_version_info->ext_status & ZBX_DB_EXT_STATUS_FLAGS_TSDB_CONFIGURED))
 		goto out;
 
 	ret = FAIL;
+	db_version_info->ext_status &= ~ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE;
 
 	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 and newer */
-	/* in TimescaleDB Community Edition, and it is not available in TimescaleDB Apache 2 Edition. */
-	/* timescaledb.license parameter is available in TimescaleDB API starting from TimescaleDB 2.0. */
+	/* in TimescaleDB Community Edition, and it is not available in TimescaleDB Apache 2 Edition.    */
+	/* timescaledb.license parameter is available in TimescaleDB API starting from TimescaleDB 2.0.  */
 	if (ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB > db_version_info->current_version)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "PostgreSQL version %lu is not supported with TimescaleDB, minimum required is %d",
@@ -897,40 +894,30 @@ int	DBcheck_capabilities(struct zbx_db_version_info_t *db_version_info)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "TimescaleDB version %d is too old.", db_version_info->ext_current_version);
 		zabbix_log(LOG_LEVEL_CRIT, "Version must be at least %d. Recommended version should be at least %s %s.",
-				ZBX_TIMESCALEDB_MIN_VERSION,
-				ZBX_TIMESCALEDB_LICENSE_TIMESCALE_FRIENDLY, ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION_FRIENDLY);
+				ZBX_TIMESCALEDB_MIN_VERSION, ZBX_TIMESCALEDB_LICENSE_TIMESCALE_FRIENDLY,
+				ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION_FRIENDLY);
 		goto out;
 	}
 	else if (ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION > db_version_info->ext_current_version)
 	{
-		/* It is not possible to check compression support for TimescaleDB 1.x, */
-		/* and we assume that compression is supported. */
-		/* This should be implemented this way to keep compression enabled at Zabbix setups with TimescaleDB 1.x, */
-		/* which actually support compression. */
-		db_version_info->tsdb_compression_availability = ON;
-		zabbix_log(LOG_LEVEL_WARNING, "TimescaleDB version %d is not officially supported.", db_version_info->ext_current_version);
+		db_version_info->ext_status |= ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE;
+		zabbix_log(LOG_LEVEL_WARNING, "TimescaleDB version %d is not officially supported.",
+				db_version_info->ext_current_version);
 		zabbix_log(LOG_LEVEL_WARNING, "Recommended version should be at least %s %s.",
 				ZBX_TIMESCALEDB_LICENSE_TIMESCALE_FRIENDLY, ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION_FRIENDLY);
 	}
 	else
 	{
-		if (0 == zbx_strcmp_null(db_version_info->tsdb_lic, ZBX_TIMESCALEDB_LICENSE_APACHE))
+		if (0 == zbx_strcmp_null(db_version_info->ext_lic, ZBX_TIMESCALEDB_LICENSE_TIMESCALE))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s does not support Timescale compression.",
-					ZBX_TIMESCALEDB_LICENSE_APACHE_FRIENDLY);
-			zabbix_log(LOG_LEVEL_WARNING, "%s is required to use Timescale compression.",
-					ZBX_TIMESCALEDB_LICENSE_TIMESCALE_FRIENDLY);
-		}
-		else if (0 == zbx_strcmp_null(db_version_info->tsdb_lic, ZBX_TIMESCALEDB_LICENSE_TIMESCALE))
-		{
-			db_version_info->tsdb_compression_availability = ON;
+			db_version_info->ext_status |= ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE;
 			zabbix_log(LOG_LEVEL_DEBUG, "%s was detected. Timescale compression is supported.",
 					ZBX_TIMESCALEDB_LICENSE_TIMESCALE_FRIENDLY);
 		}
 		else
 		{
-			/* this should not happen */
-			zabbix_log(LOG_LEVEL_WARNING, "This should not happen. Unknown TimescaleDB license was detected.");
+			zabbix_log(LOG_LEVEL_WARNING, "[%s] license does not support Timescale compression.",
+					db_version_info->ext_lic);
 			zabbix_log(LOG_LEVEL_WARNING, "%s is required to use Timescale compression.",
 					ZBX_TIMESCALEDB_LICENSE_TIMESCALE_FRIENDLY);
 		}

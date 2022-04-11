@@ -1137,15 +1137,24 @@ static void	zbx_check_db(void)
 	if (SUCCEED == result)
 		DBextract_dbextension_info(&db_version_info);
 
-	if (SUCCEED == result && (SUCCEED != DBcheck_capabilities(&db_version_info) || SUCCEED != DBcheck_version()))
+	if (SUCCEED == result && (SUCCEED != DBcheck_tsdb_capabilities(&db_version_info) ||
+			SUCCEED != DBcheck_version()))
+	{
 		result = FAIL;
+	}
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 #if defined(HAVE_POSTGRESQL)
-	/* force disabling TimescaleDB compression if it is expected but not supported */
-	if (SUCCEED == result && OFF == db_version_info.tsdb_compression_availability)
-		DBexecute("update config set compression_status=0");
+	if (SUCCEED == result)
+	{
+		if (db_version_info.ext_status & ZBX_DB_EXT_STATUS_FLAGS_TSDB_CONFIGURED &&
+				!(db_version_info.ext_status & ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE))
+		{
+			if (ZBX_DB_OK > DBexecute("update config set compression_status=0"))
+				zabbix_log(LOG_LEVEL_ERR, "failed to set database compression status");
+		}
+	}
 #endif
 
 	if (SUCCEED == DBfield_exists("config", "dbversion_status"))
@@ -1174,7 +1183,7 @@ static void	zbx_check_db(void)
 	DBclose();
 	zbx_free(db_version_info.friendly_current_version);
 	zbx_free(db_version_info.ext_friendly_current_version);
-	zbx_free(db_version_info.tsdb_lic);
+	zbx_free(db_version_info.ext_lic);
 
 	if(SUCCEED != result)
 	{
