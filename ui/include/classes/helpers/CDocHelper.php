@@ -36,6 +36,7 @@ class CDocHelper {
 	const ADMINISTRATION_MEDIATYPE_EDIT =					'config/notifications/media#common-parameters';
 	const ADMINISTRATION_MEDIATYPE_LIST =					'web_interface/frontend_sections/administration/mediatypes';
 	const ADMINISTRATION_MISCCONFIG_EDIT =					'web_interface/frontend_sections/administration/general#other-parameters';
+	const ADMINISTRATION_MODULE_EDIT =						'modules#manifest-preparation';
 	const ADMINISTRATION_MODULE_LIST =						'web_interface/frontend_sections/administration/general#modules';
 	const ADMINISTRATION_PROXY_EDIT =						'distributed_monitoring/proxies#configuration';
 	const ADMINISTRATION_PROXY_LIST =						'web_interface/frontend_sections/administration/proxies';
