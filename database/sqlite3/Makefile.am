@@ -14,5 +14,4 @@ EXTRA_DIST = \
 	schema.sql
 
 clean:
-	rm -f schema.sql \
-	rm -f data.sql
+	rm -f schema.sql data.sql
