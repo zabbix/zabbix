@@ -102,7 +102,7 @@ class CTemplate extends CHostGeneral {
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM template_group tgg'.
-						' JOIN rights r'.
+						' JOIN right_tplgrp r'.
 							' ON r.id=tgg.groupid'.
 								' AND '.dbConditionInt('r.groupid', $userGroups).
 					' WHERE h.hostid=tgg.hostid'.
