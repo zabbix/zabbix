@@ -79,7 +79,7 @@ if ($data['can_update_group']) {
 	$userdirectory = (new CSelect('userdirectoryid'))
 		->setValue($data['userdirectoryid'])
 		->setFocusableElementId('userdirectoryid')
-		->addOption((new CSelectOption(0, _('Default')))->addClass(ZBX_STYLE_OPTION_DEFAULT))
+		->addOption((new CSelectOption(0, _('Default')))->addClass(ZBX_STYLE_DEFAULT_OPTION))
 		->addOptions(CSelect::createOptionsFromArray($data['userdirectories']));
 
 	$form_list

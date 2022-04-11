@@ -2049,7 +2049,7 @@ define('ZBX_STYLE_ZABBIX_LOGO', 'zabbix-logo');
 define('ZBX_STYLE_ZABBIX_SIDEBAR_LOGO', 'zabbix-sidebar-logo');
 define('ZBX_STYLE_ZABBIX_SIDEBAR_LOGO_COMPACT', 'zabbix-sidebar-logo-compact');
 define('ZBX_STYLE_WIDGET_ITEM_LABEL', 'widget-item-label');
-define('ZBX_STYLE_OPTION_DEFAULT', 'default-option');
+define('ZBX_STYLE_DEFAULT_OPTION', 'default-option');
 
 // HTML column layout.
 define('ZBX_STYLE_COLUMNS', 'columns-wrapper');
