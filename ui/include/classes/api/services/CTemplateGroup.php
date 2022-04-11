@@ -49,7 +49,7 @@ class CTemplateGroup extends CApiService {
 		$result = [];
 
 		$template_fields = ['templateid', 'host', 'name', 'description', 'uuid'];
-		$group_discovery_fields = ['groupid', 'lastcheck', 'name', 'parent_group_prototypeid', 'ts_delete'];
+//		$group_discovery_fields = ['groupid', 'lastcheck', 'name', 'parent_group_prototypeid', 'ts_delete'];
 		$discovery_rule_fields = ['itemid', 'hostid', 'name', 'type', 'key_', 'url', 'query_fields', 'request_method',
 			'timeout', 'post_type', 'posts', 'headers', 'status_codes', 'follow_redirects', 'retrieve_mode',
 			'http_proxy', 'authtype', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
@@ -87,7 +87,6 @@ class CTemplateGroup extends CApiService {
 			// output
 			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', ['groupid', 'name', 'uuid']), 'default' => API_OUTPUT_EXTEND],
 			'selectTemplates' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $template_fields), 'default' => null],
-			'selectGroupDiscovery' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $group_discovery_fields), 'default' => null],
 			'selectDiscoveryRule' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $discovery_rule_fields), 'default' => null],
 			'countOutput' =>						['type' => API_BOOLEAN, 'default' => false],
 			'groupCount' =>							['type' => API_BOOLEAN, 'default' => false],
@@ -1228,21 +1227,6 @@ class CTemplateGroup extends CApiService {
 				'preservekeys' => true
 			]);
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
-		}
-
-		// adding group discovery
-		if ($options['selectGroupDiscovery'] !== null) {
-			$groupDiscoveries = API::getApiService()->select('group_discovery', [
-				'output' => $this->outputExtend($options['selectGroupDiscovery'], ['groupid']),
-				'filter' => ['groupid' => $groupIds],
-				'preservekeys' => true
-			]);
-			$relationMap = $this->createRelationMap($groupDiscoveries, 'groupid', 'groupid');
-
-			$groupDiscoveries = $this->unsetExtraFields($groupDiscoveries, ['groupid'],
-				$options['selectGroupDiscovery']
-			);
-			$result = $relationMap->mapOne($result, $groupDiscoveries, 'groupDiscovery');
 		}
 
 		return $result;
