@@ -424,6 +424,7 @@ $warning_box = $data['show_warning']
 
 $output = [
 	'header' => $data['title'],
+	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_ITEM_TEST_EDIT),
 	'script_inline' => $this->readJsFile('popup.itemtestedit.view.js.php'),
 	'body' => (new CDiv([$warning_box, $form, $templates]))->toString(),
 	'cancel_action' => 'return saveItemTestInputs();',
