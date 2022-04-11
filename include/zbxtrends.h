@@ -64,7 +64,4 @@ void	zbx_tfc_invalidate_trends(ZBX_DC_TREND *trends, int trends_num);
 int	zbx_baseline_get_data(zbx_uint64_t itemid, unsigned char value_type, time_t now, const char *period,
 		int season_num, zbx_time_unit_t season_unit, int skip, zbx_vector_dbl_t *values,
 		zbx_vector_uint64_t *index, char **error);
-
-zbx_trend_state_t	zbx_trends_get_avg(const char *table, zbx_uint64_t itemid, int start, int end, double *value);
-const char	*zbx_trends_error(zbx_trend_state_t state);
 #endif
