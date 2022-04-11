@@ -443,7 +443,9 @@ class CTemplate extends CHostGeneral {
 		$this->updateTagsNew($templates, $db_templates);
 		$this->updateMacros($templates, $db_templates);
 		$this->updateTemplates($templates, $db_templates);
+
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE, $templates, $db_templates);
+
 		return ['templateids' => array_column($templates, 'templateid')];
 	}
 
@@ -497,6 +499,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$this->addAffectedObjects($templates, $db_templates);
+
 		$this->checkDuplicates($templates, $db_templates);
 		$this->checkGroups($templates, $db_templates);
 		$this->checkTemplates($templates, $db_templates);
