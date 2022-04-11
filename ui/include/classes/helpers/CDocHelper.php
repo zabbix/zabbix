@@ -97,6 +97,7 @@ class CDocHelper {
 	const CONFIGURATION_TEMPLATES_PROTOTYPE_LIST =			'web_interface/frontend_sections/configuration/templates/discovery/host_prototypes';
 	const CONFIGURATION_TRIGGERS_EDIT =						'config/triggers/trigger#configuration';
 	const DASHBOARD_PROPERTIES_EDIT =						'web_interface/frontend_sections/monitoring/dashboard#creating-a-dashboard';
+	const HOST_EDIT =										'config/hosts/host#configuration';
 	const HOSTINVENTORIESOVERVIEW =							'web_interface/frontend_sections/inventory/overview';
 	const INVENTORY_HOST_LIST =								'web_interface/frontend_sections/inventory/hosts';
 	const MONITORING_CHARTS_VIEW =							'web_interface/frontend_sections/monitoring/hosts/graphs';
@@ -114,7 +115,6 @@ class CDocHelper {
 	const MONITORING_SYSMAP_CONSTRUCTOR =					'config/visualization/maps/map#overview';
 	const MONITORING_WEB_VIEW =								'web_interface/frontend_sections/monitoring/hosts/web';
 	const POPUP_ACKNOWLEDGE_EDIT =							'acknowledges#updating-problems';
-	const POPUP_HOST_EDIT =									'config/hosts/host#configuration';
 	const POPUP_HOST_IMPORT =								'xml_export_import/hosts#importing';
 	const POPUP_MAPS_IMPORT =								'xml_export_import/maps#importing';
 	const POPUP_MAP_ELEMENT =								'config/visualization/maps/map#adding-elements';
