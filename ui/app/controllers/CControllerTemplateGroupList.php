@@ -119,7 +119,6 @@ class CControllerTemplateGroupList extends CController {
 			'output' => ['groupid', 'name'],
 			'groupids' => $groupIds,
 			'selectTemplates' => ['templateid', 'name'],
-			'selectDiscoveryRule' => ['itemid', 'name'],
 			'limitSelects' => $limit
 		]);
 		order_result($data['groups'], $sort_field, $sort_order);
