@@ -49,7 +49,6 @@ class CTemplateGroup extends CApiService {
 		$result = [];
 
 		$template_fields = ['templateid', 'host', 'name', 'description', 'uuid'];
-//		$group_discovery_fields = ['groupid', 'lastcheck', 'name', 'parent_group_prototypeid', 'ts_delete'];
 		$discovery_rule_fields = ['itemid', 'hostid', 'name', 'type', 'key_', 'url', 'query_fields', 'request_method',
 			'timeout', 'post_type', 'posts', 'headers', 'status_codes', 'follow_redirects', 'retrieve_mode',
 			'http_proxy', 'authtype', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
