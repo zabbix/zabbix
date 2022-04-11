@@ -135,7 +135,7 @@ class CControllerTemplateDashboardUpdate extends CController {
 			$result = API::TemplateDashboard()->update($save_dashboard);
 
 			$success_title = _('Dashboard updated');
-			$error_title =  _('Failed to update dashboard');
+			$error_title = _('Failed to update dashboard');
 		}
 		else {
 			$result = API::TemplateDashboard()->create($save_dashboard);
