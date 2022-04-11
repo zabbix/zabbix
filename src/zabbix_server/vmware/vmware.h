@@ -22,7 +22,6 @@
 #include "config.h"
 #include "threads.h"
 #include "zbxalgo.h"
-#include "log.h"
 #include "zbxjson.h"
 
 /* the vmware service state */
