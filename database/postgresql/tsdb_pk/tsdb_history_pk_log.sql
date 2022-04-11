@@ -47,7 +47,7 @@ BEGIN
 		CALL run_job(jobid);
 	ELSE
 		PERFORM add_compress_chunks_policy('history_log', (
-				SELECT (p.older_than).integer_interval FROM _timescaledb_config.bgw_policy_compress_chunks p 
+				SELECT (p.older_than).integer_interval FROM _timescaledb_config.bgw_policy_compress_chunks p
 				INNER JOIN _timescaledb_catalog.hypertable h ON (h.id=p.hypertable_id) WHERE h.table_name='history_log_old'
 			)::integer
 		);
