@@ -39,7 +39,6 @@ class CControllerAuthenticationUpdate extends CController {
 			'ldap_test_user' =>					'string',
 			'ldap_test_password' =>				'string',
 			'ldap_test' =>						'in 1',
-			'db_authentication_type' =>			'int32',
 			'change_bind_password' =>			'in 0,1',
 			'authentication_type' =>			'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
 			'http_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,

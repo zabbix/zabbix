@@ -318,7 +318,7 @@ $saml_tab = (new CFormList('list_saml'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUTHENTICATION_EDIT))
 	->addItem((new CForm())
 		->addVar('action', $data['action_submit'])
-		->addVar('db_authentication_type', $data['db_authentication_type']) // TODO VM: make sure, it is needed
+		->addVar('ldap_removed_userdirectoryids', $data['ldap_removed_userdirectoryids'])
 		->setId('authentication-form')
 		->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 		->disablePasswordAutofill()

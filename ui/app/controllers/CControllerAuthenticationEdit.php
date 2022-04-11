@@ -32,35 +32,36 @@ class CControllerAuthenticationEdit extends CController {
 	 */
 	protected function checkInput() {
 		$fields = [
-			'form_refresh' =>				'string',
-			'change_bind_password' =>		'in 0,1',
-			'db_authentication_type' =>		'string',
-			'authentication_type' =>		'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
-			'http_auth_enabled' =>			'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
-			'http_login_form' =>			'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
-			'http_strip_domains' =>			'db config.http_strip_domains',
-			'http_case_sensitive' =>		'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'ldap_configured' =>			'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
-			'ldap_servers' =>				'array',
-			'ldap_default_row_index' =>		'int32',
-			'ldap_case_sensitive' =>		'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'saml_auth_enabled' =>			'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
-			'saml_idp_entityid' =>			'db config.saml_idp_entityid',
-			'saml_sso_url' =>				'db config.saml_sso_url',
-			'saml_slo_url' =>				'db config.saml_slo_url',
-			'saml_username_attribute' =>	'db config.saml_username_attribute',
-			'saml_sp_entityid' =>			'db config.saml_sp_entityid',
-			'saml_nameid_format' =>			'db config.saml_nameid_format',
-			'saml_sign_messages' =>			'in 0,1',
-			'saml_sign_assertions' =>		'in 0,1',
-			'saml_sign_authn_requests' =>	'in 0,1',
-			'saml_sign_logout_requests' =>	'in 0,1',
-			'saml_sign_logout_responses' =>	'in 0,1',
-			'saml_encrypt_nameid' =>		'in 0,1',
-			'saml_encrypt_assertions' =>	'in 0,1',
-			'saml_case_sensitive' =>		'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'passwd_min_length' =>			'int32',
-			'passwd_check_rules' =>			'int32|ge 0|le '.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE)
+			'form_refresh' =>					'string',
+			'change_bind_password' =>			'in 0,1',
+			'db_authentication_type' =>			'string',
+			'authentication_type' =>			'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
+			'http_auth_enabled' =>				'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
+			'http_login_form' =>				'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
+			'http_strip_domains' =>				'db config.http_strip_domains',
+			'http_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
+			'ldap_configured' =>				'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
+			'ldap_servers' =>					'array',
+			'ldap_default_row_index' =>			'int32',
+			'ldap_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
+			'ldap_removed_userdirectoryids' =>	'array',
+			'saml_auth_enabled' =>				'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
+			'saml_idp_entityid' =>				'db config.saml_idp_entityid',
+			'saml_sso_url' =>					'db config.saml_sso_url',
+			'saml_slo_url' =>					'db config.saml_slo_url',
+			'saml_username_attribute' =>		'db config.saml_username_attribute',
+			'saml_sp_entityid' =>				'db config.saml_sp_entityid',
+			'saml_nameid_format' =>				'db config.saml_nameid_format',
+			'saml_sign_messages' =>				'in 0,1',
+			'saml_sign_assertions' =>			'in 0,1',
+			'saml_sign_authn_requests' =>		'in 0,1',
+			'saml_sign_logout_requests' =>		'in 0,1',
+			'saml_sign_logout_responses' =>		'in 0,1',
+			'saml_encrypt_nameid' =>			'in 0,1',
+			'saml_encrypt_assertions' =>		'in 0,1',
+			'saml_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
+			'passwd_min_length' =>				'int32',
+			'passwd_check_rules' =>				'int32|ge 0|le '.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE)
 		];
 
 		$ret = $this->validateInput($fields);
@@ -130,7 +131,6 @@ class CControllerAuthenticationEdit extends CController {
 			$this->getInputs($data, [
 				'form_refresh',
 				'change_bind_password',
-				'db_authentication_type',
 				'authentication_type',
 				'http_auth_enabled',
 				'http_login_form',
@@ -159,6 +159,7 @@ class CControllerAuthenticationEdit extends CController {
 
 			$data['ldap_servers'] = $this->getInput('ldap_servers', []);
 			$data['ldap_default_row_index'] = $this->getInput('ldap_default_row_index', 0);
+			$data['ldap_removed_userdirectoryids'] = $this->getInput('ldap_removed_userdirectoryids', []);
 
 			$data += $auth;
 
@@ -166,7 +167,6 @@ class CControllerAuthenticationEdit extends CController {
 		}
 		else {
 			$data += $auth;
-			$data['db_authentication_type'] = $data['authentication_type'];
 
 			$data['ldap_servers'] = API::UserDirectory()->get([
 				'output' => ['userdirectoryid', 'name', 'host', 'port', 'base_dn', 'search_attribute', 'search_filter',
@@ -180,6 +180,7 @@ class CControllerAuthenticationEdit extends CController {
 			$data['ldap_default_row_index'] = array_search($data[CAuthenticationHelper::LDAP_USERDIRECTORYID],
 				array_column($data['ldap_servers'], 'userdirectoryid')
 			);
+			$data['ldap_removed_userdirectoryids'] = [];
 		}
 
 		unset($data[CAuthenticationHelper::LDAP_USERDIRECTORYID]);
@@ -187,6 +188,7 @@ class CControllerAuthenticationEdit extends CController {
 				&& $data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED);
 		$data['saml_enabled'] = ($openssl_status['result'] == CFrontendSetup::CHECK_OK
 				&& $data['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED);
+		$data['db_authentication_type'] = CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of authentication'));

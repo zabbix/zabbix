@@ -77,8 +77,8 @@
 
 						e.target.closest('tr').remove();
 
-						if (table.querySelector('input[name="ldap_userdirectoryid"]:checked') === null) {
-							const default_ldap = table.querySelector('input[name="ldap_userdirectoryid"]');
+						if (table.querySelector('input[name="ldap_default_row_index"]:checked') === null) {
+							const default_ldap = table.querySelector('input[name="ldap_default_row_index"]');
 
 							if (default_ldap !== null) {
 								default_ldap.checked = true;
