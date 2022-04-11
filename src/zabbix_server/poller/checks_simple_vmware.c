@@ -2814,7 +2814,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 		AGENT_RESULT *result)
 {
 	struct zbx_json		json_data;
-	const char		*url, *vm_name, *hv_name;
+	const char		*url, *vm_name, *hv_name, *hv_uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_vm_t		*vm;
@@ -2859,6 +2859,9 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			if (NULL == (hv_name = hv->props[ZBX_VMWARE_HVPROP_NAME]))
 				continue;
 
+			if (NULL == (hv_uuid = hv->props[ZBX_VMWARE_HVPROP_HW_UUID]))
+				continue;
+
 			for (j = 0; NULL != vm->props[ZBX_VMWARE_VMPROP_DATASTOREID] &&
 				j < service->data->datastores.values_num; j++)
 			{
@@ -2884,6 +2887,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			zbx_json_addstring(&json_data, "{#VM.ID}", vm->id, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#VM.NAME}", vm_name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#HV.NAME}", hv_name, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "{#HV.UUID}", hv_uuid, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#DATACENTER.NAME}", hv->datacenter_name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#CLUSTER.NAME}",
 					NULL != cluster ? cluster->name : "", ZBX_JSON_TYPE_STRING);
