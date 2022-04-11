@@ -1395,8 +1395,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 *
 	 * @throws APIException if error occurred
 	 */
-	private function implode_expressions(array &$triggers, array $db_triggers = null, array &$triggers_functions,
-			$inherited = false) {
+	private function implode_expressions(array &$triggers, ?array $db_triggers, array &$triggers_functions, $inherited) {
 		$class = get_class($this);
 
 		switch ($class) {
@@ -1661,6 +1660,7 @@ abstract class CTriggerGeneral extends CApiService {
 				}
 
 				$status_mask |= ($host_keys['status'] == HOST_STATUS_TEMPLATE ? 0x01 : 0x02);
+
 				$hostids[$host_keys['hostid']] = true;
 				$hosts[$host] = true;
 			}

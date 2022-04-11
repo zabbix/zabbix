@@ -17,15 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
+#include "actions.h"
+
 #include "log.h"
 #include "zbxserver.h"
 #include "operations.h"
 #include "zbxregexp.h"
-#include "../../libs/zbxaudit/audit.h"
-
-#include "actions.h"
+#include "audit/zbxaudit.h"
 
 /******************************************************************************
  *                                                                            *
@@ -2649,7 +2647,7 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 
 	if (CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
 	{
-		if (SUCCEED == evaluate(&eval_result, expression, error, sizeof(error), NULL))
+		if (SUCCEED == zbx_evaluate(&eval_result, expression, error, sizeof(error), NULL))
 			ret = (SUCCEED != zbx_double_compare(eval_result, 0) ? SUCCEED : FAIL);
 
 		zbx_free(expression);

@@ -79,7 +79,6 @@ abstract class CControllerLatest extends CController {
 			'output' => ['hostid', 'name', 'status', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
 			'groupids' => $groupids,
 			'hostids' => $filter['hostids'] ? $filter['hostids'] : null,
-			'monitored_hosts' => true,
 			'preservekeys' => true
 		]);
 
@@ -370,7 +369,10 @@ abstract class CControllerLatest extends CController {
 				if ($filter_name === 'hostids') {
 					continue;
 				}
-				$item_matches &= $match;
+				if (!$match) {
+					$item_matches = false;
+					break;
+				}
 			}
 
 			if ($item_matches) {
@@ -383,7 +385,10 @@ abstract class CControllerLatest extends CController {
 				if ($filter_name === 'tagnames') {
 					continue;
 				}
-				$item_matches &= $match;
+				if (!$match) {
+					$item_matches = false;
+					break;
+				}
 			}
 
 			if ($item_matches) {
@@ -403,7 +408,10 @@ abstract class CControllerLatest extends CController {
 				if ($filter_name === 'tags') {
 					continue;
 				}
-				$item_matches &= $match;
+				if (!$match) {
+					$item_matches = false;
+					break;
+				}
 			}
 
 			if ($item_matches) {

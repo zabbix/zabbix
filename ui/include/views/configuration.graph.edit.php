@@ -28,11 +28,13 @@ $widget = new CWidget();
 if ($data['parent_discoveryid'] === null) {
 	$widget
 		->setTitle(_('Graphs'))
+		->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_GRAPH_EDIT))
 		->setNavigation(getHostNavigation('graphs', $data['hostid']));
 }
 else {
 	$widget
 		->setTitle(_('Graph prototypes'))
+		->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_PROTOTYPE_GRAPH_EDIT))
 		->setNavigation(getHostNavigation('graphs', $data['hostid'], $data['parent_discoveryid']));
 }
 

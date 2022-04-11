@@ -17,17 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "poller.h"
 
-#include "db.h"
-#include "dbcache.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxserver.h"
 #include "zbxself.h"
 #include "preproc.h"
 #include "zbxrtc.h"
-
-#include "poller.h"
 
 #include "checks_agent.h"
 #include "checks_external.h"
@@ -44,7 +40,6 @@
 #include "zbxcrypto.h"
 #include "zbxjson.h"
 #include "zbxhttp.h"
-#include "avail_protocol.h"
 #include "log.h"
 #include "zbxavailability.h"
 

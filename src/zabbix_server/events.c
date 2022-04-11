@@ -17,15 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
-#include "log.h"
-
-#include "actions.h"
 #include "events.h"
+
+#include "log.h"
+#include "actions.h"
 #include "zbxserver.h"
 #include "export.h"
-#include "zbxservice.h"
 #include "service_protocol.h"
 
 /* event recovery data */
@@ -812,7 +809,7 @@ static zbx_correlation_match_result_t	correlation_match_new_event(zbx_correlatio
 		pos = token.loc.r;
 	}
 
-	if (SUCCEED == evaluate_unknown(expression, &result, error, sizeof(error)))
+	if (SUCCEED == zbx_evaluate_unknown(expression, &result, error, sizeof(error)))
 	{
 		if (result == ZBX_UNKNOWN)
 			ret = CORRELATION_MAY_MATCH;

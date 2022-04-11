@@ -20,10 +20,9 @@
 #ifndef ZABBIX_DIAG_H
 #define ZABBIX_DIAG_H
 
-#include "common.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
-#include "memalloc.h"
+#include "zbxshmem.h"
 
 #define ZBX_DIAG_SECTION_MAX	64
 #define ZBX_DIAG_FIELD_MAX	64
@@ -76,7 +75,7 @@ void	diag_map_free(zbx_diag_map_t *map);
 int	diag_parse_request(const struct zbx_json_parse *jp, const zbx_diag_map_t *field_map, zbx_uint64_t *field_mask,
 		zbx_vector_ptr_t *top_views, char **error);
 
-void	diag_add_mem_stats(struct zbx_json *json, const char *name, const zbx_mem_stats_t *stats);
+void	diag_add_mem_stats(struct zbx_json *json, const char *name, const zbx_shmem_stats_t *stats);
 
 int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, struct zbx_json *json, char **error);
 

@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
 #include "dbupgrade.h"
+
+#include "db.h"
 #include "log.h"
 #include "sysinfo.h"
 
@@ -44,7 +44,7 @@ static int	DBmodify_proxy_table_id_field(const char *table_name)
 /*********************************************************************************
  *                                                                               *
  * Purpose: parse database monitor item params string "user=<user> password=     *
- *          <passsword> DSN=<dsn> sql=<sql>" into parameter values.              *
+ *          <password> DSN=<dsn> sql=<sql>" into parameter values.               *
  *                                                                               *
  * Parameters:  params     - [IN] the params string                              *
  *              dsn        - [OUT] the ODBC DSN output buffer                    *

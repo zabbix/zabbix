@@ -148,6 +148,7 @@ $select_groupby = (new CSelect('filter_groupby'))
 
 (new CWidget())
 	->setTitle(_('Host inventory overview'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::HOSTINVENTORIESOVERVIEW))
 	->addItem(
 		(new CFilter())
 			->setResetUrl(new CUrl('hostinventoriesoverview.php'))

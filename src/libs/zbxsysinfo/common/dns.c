@@ -21,7 +21,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
-#include "comms.h"
+#include "zbxcomms.h"
 #include "log.h"
 #include "zbxalgo.h"
 

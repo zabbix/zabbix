@@ -26,7 +26,7 @@
 #include <net-snmp/net-snmp-includes.h>
 
 #include "log.h"
-#include "comms.h"
+#include "zbxcomms.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
 
@@ -294,7 +294,8 @@ static void	cache_put_snmp_index(const DC_ITEM *item, const char *snmp_oid, cons
 				__snmpidx_mapping_hash, __snmpidx_mapping_compare, __snmpidx_mapping_clean,
 				ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
-		main_key = (zbx_snmpidx_main_key_t *)zbx_hashset_insert(&snmpidx, &main_key_local, sizeof(main_key_local));
+		main_key = (zbx_snmpidx_main_key_t *)zbx_hashset_insert(&snmpidx, &main_key_local,
+				sizeof(main_key_local));
 	}
 
 	if (NULL == (mapping = (zbx_snmpidx_mapping_t *)zbx_hashset_search(main_key->mappings, &value)))

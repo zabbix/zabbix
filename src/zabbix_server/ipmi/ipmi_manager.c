@@ -21,8 +21,9 @@
 
 #ifdef HAVE_OPENIPMI
 
-#include "dbcache.h"
-#include "daemon.h"
+#include "ipmi_manager.h"
+
+#include "zbxnix.h"
 #include "zbxself.h"
 #include "log.h"
 #include "zbxipcservice.h"
@@ -32,8 +33,6 @@
 #include "ipmi.h"
 #include "../poller/poller.h"
 #include "zbxavailability.h"
-
-#include "ipmi_manager.h"
 
 #define ZBX_IPMI_MANAGER_DELAY	1
 
@@ -589,13 +588,14 @@ static zbx_ipmi_manager_host_t	*ipmi_manager_cache_host(zbx_ipmi_manager_t *mana
 		zbx_ipmi_manager_host_t	host_local;
 
 		host_local.hostid = hostid;
+		host_local.disable_until = 0;
+		host_local.poller = ipmi_manager_get_host_poller(manager);
+		host_local.lastcheck = now;
+
 		host = (zbx_ipmi_manager_host_t *)zbx_hashset_insert(&manager->hosts, &host_local, sizeof(host_local));
-
-		host->disable_until = 0;
-		host->poller = ipmi_manager_get_host_poller(manager);
 	}
-
-	host->lastcheck = now;
+	else
+		host->lastcheck = now;
 
 	return host;
 }

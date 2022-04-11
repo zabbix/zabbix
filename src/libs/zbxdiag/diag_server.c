@@ -17,15 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "diag.h"
+
 #include "common.h"
-#include "zbxalgo.h"
-#include "memalloc.h"
 #include "../../libs/zbxdbcache/valuecache.h"
 #include "zbxlld.h"
 #include "zbxalert.h"
 #include "zbxdiag.h"
-
-#include "diag.h"
 
 /******************************************************************************
  *                                                                            *
@@ -129,7 +127,7 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 
 		if (0 != (fields & ZBX_DIAG_VALUECACHE_MEMORY))
 		{
-			zbx_mem_stats_t	mem;
+			zbx_shmem_stats_t	mem;
 
 			time1 = zbx_time();
 			zbx_vc_get_mem_stats(&mem);

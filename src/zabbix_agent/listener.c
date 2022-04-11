@@ -17,14 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "comms.h"
-#include "cfg.h"
+#include "listener.h"
+
+#include "zbxcomms.h"
 #include "zbxconf.h"
 #include "sysinfo.h"
 #include "log.h"
-
-#include "listener.h"
 
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
@@ -33,7 +31,7 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
 #elif defined(ZABBIX_DAEMON)
-#	include "daemon.h"
+#	include "zbxnix.h"
 #endif
 
 #include "zbxcrypto.h"

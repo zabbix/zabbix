@@ -17,15 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
+#include "housekeeper.h"
+
 #include "log.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
 #include "dbcache.h"
 #include "zbxrtc.h"
 
-#include "housekeeper.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -47,9 +46,9 @@ static int	hk_period;
  ******************************************************************************/
 static int	delete_history(const char *table, const char *fieldname, int now)
 {
-	DB_RESULT       result;
-	DB_ROW          row;
-	int             minclock, records = 0;
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		minclock, records = 0;
 	zbx_uint64_t	lastid, maxid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' now:%d", __func__, table, now);

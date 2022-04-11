@@ -3,10 +3,10 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 The template to monitor VMware vCenter and ESX hypervisor.
 The "VMware Hypervisor" and "VMware Guest" templates are used by discovery and normally should not be manually linked to a host.
-For additional information please check https://www.zabbix.com/documentation/6.0/manual/vm_monitoring
+For additional information please check https://www.zabbix.com/documentation/6.2/manual/vm_monitoring
 
 
 ## Setup
@@ -52,7 +52,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|VMware |VMware: Event log |<p>Collect VMware event log. See also: https://www.zabbix.com/documentation/6.0/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records</p> |SIMPLE |vmware.eventlog[{$VMWARE.URL},skip] |
+|VMware |VMware: Event log |<p>Collect VMware event log. See also: https://www.zabbix.com/documentation/6.2/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records</p> |SIMPLE |vmware.eventlog[{$VMWARE.URL},skip] |
 |VMware |VMware: Full name |<p>VMware service full name.</p> |SIMPLE |vmware.fullname[{$VMWARE.URL}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |VMware |VMware: Version |<p>VMware service version.</p> |SIMPLE |vmware.version[{$VMWARE.URL}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |VMware |VMware: Status of "{#CLUSTER.NAME}" cluster |<p>VMware cluster status.</p> |SIMPLE |vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}] |
@@ -76,7 +76,7 @@ You can also provide feedback, discuss the template or ask for help with it at [
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 
 ## Setup
 
@@ -169,7 +169,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 
 ## Setup
 
@@ -233,7 +233,7 @@ There are no template links in this template.
 |VMware |VMware: Average write latency of the datastore {#DATASTORE} |<p>Average amount of time for a write operation to the datastore (milliseconds).</p> |SIMPLE |vmware.hv.datastore.write[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency] |
 |VMware |VMware: Multipath count for datastore {#DATASTORE} |<p>Number of available datastore paths.</p> |SIMPLE |vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}] |
 |VMware |VMware: Health state rollup |<p>The host health state rollup sensor value: gray - unknown, green - ok, red - it has a problem, yellow - it might have a problem.</p> |DEPENDENT |vmware.hv.sensor.health.state[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..HostNumericSensorInfo[?(@.name=="VMware Rollup Health State")].healthState.label.first()`</p> |
-|Zabbix raw items |VMware: Get sensors |<p>Master item for sensors data.</p> |SIMPLE |vmware.hv.sensors.get[{$VMWARE.URL},{HOST.HOST}] |
+|Zabbix raw items |VMware: Get sensors |<p>Master item for sensors data.</p> |SIMPLE |vmware.hv.sensors.get[{$VMWARE.URL},{$VMWARE.HV.UUID}] |
 
 ## Triggers
 

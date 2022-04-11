@@ -17,16 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "lld.h"
-#include "db.h"
-#include "log.h"
-#include "zbxalgo.h"
-#include "zbxserver.h"
-#include "zbxregexp.h"
 #include "proxy.h"
 
-#include "../../libs/zbxaudit/audit.h"
+#include "log.h"
+#include "zbxserver.h"
+#include "zbxregexp.h"
+
+#include "audit/zbxaudit.h"
 
 #define OVERRIDE_STOP_TRUE	1
 
@@ -396,7 +394,7 @@ static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_
  *                                                                            *
  * Comments: 1) replace {item_condition} references with action condition     *
  *              evaluation results (1 or 0)                                   *
- *           2) call evaluate() to calculate the final result                 *
+ *           2) call zbx_evaluate() to calculate the final result                 *
  *                                                                            *
  ******************************************************************************/
 static int	filter_evaluate_expression(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
@@ -429,7 +427,7 @@ static int	filter_evaluate_expression(const lld_filter_t *filter, const struct z
 		}
 	}
 
-	if (SUCCEED == evaluate(&result, expression, error, sizeof(error), NULL))
+	if (SUCCEED == zbx_evaluate(&result, expression, error, sizeof(error), NULL))
 		ret = (SUCCEED != zbx_double_compare(result, 0) ? SUCCEED : FAIL);
 
 	zbx_free(expression);

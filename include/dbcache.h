@@ -22,11 +22,10 @@
 
 #include "sysinfo.h" //included for convenience
 #include "db.h"
-#include "comms.h"
-#include "zbxalgo.h"
-#include "zbxjson.h"
-#include "memalloc.h"
+#include "zbxcomms.h"
+#include "zbxshmem.h"
 #include "zbxeval.h"
+#include "zbxavailability.h"
 
 #define ZBX_SYNC_DONE		0
 #define	ZBX_SYNC_MORE		1
@@ -56,6 +55,13 @@
 #define ZBX_IPC_SERVICE_CONFIG		"config"
 #define ZBX_IPC_CONFIG_RELOAD_REQUEST	1
 #define ZBX_IPC_CONFIG_RELOAD_RESPONSE	2
+
+#define ZBX_AGENT_ZABBIX	(INTERFACE_TYPE_AGENT - 1)
+#define ZBX_AGENT_SNMP		(INTERFACE_TYPE_SNMP - 1)
+#define ZBX_AGENT_IPMI		(INTERFACE_TYPE_IPMI - 1)
+#define ZBX_AGENT_JMX		(INTERFACE_TYPE_JMX - 1)
+#define ZBX_AGENT_UNKNOWN	255
+#define ZBX_AGENT_MAX		INTERFACE_TYPE_COUNT
 
 extern int	CONFIG_TIMEOUT;
 
@@ -620,6 +626,10 @@ void	zbx_log_sync_history_cache_progress(void);
 int	init_database_cache(char **error);
 void	free_database_cache(int);
 
+void	change_proxy_history_count(int change_count);
+void	reset_proxy_history_count(int reset);
+int	get_proxy_history_count(void);
+
 #define ZBX_STATS_HISTORY_COUNTER	0
 #define ZBX_STATS_HISTORY_FLOAT_COUNTER	1
 #define ZBX_STATS_HISTORY_UINT_COUNTER	2
@@ -808,8 +818,8 @@ void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_u
 void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hashset_t *hosts);
 
 int	DCget_proxy_nodata_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *nodata_win, int *lastaccess);
-int	DCget_proxy_delay(zbx_uint64_t hostid, int *delay);
 int	DCget_proxy_delay_by_name(const char *name, int *delay, char **error);
+int	DCget_proxy_lastaccess_by_name(const char *name, int *lastaccess, char **error);
 
 unsigned int	DCget_internal_action_count(void);
 
@@ -828,11 +838,6 @@ void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags);
 
 int	DCget_interfaces_availability(zbx_vector_ptr_t *interfaces, int *ts);
 void	DCtouch_interfaces_availability(const zbx_vector_uint64_t *interfaceids);
-
-void	zbx_interface_availability_init(zbx_interface_availability_t *availability, zbx_uint64_t interfaceid);
-void	zbx_interface_availability_clean(zbx_interface_availability_t *ia);
-void	zbx_interface_availability_free(zbx_interface_availability_t *availability);
-int	zbx_interface_availability_is_set(const zbx_interface_availability_t *ia);
 
 void	zbx_set_availability_diff_ts(int ts);
 
@@ -1010,7 +1015,7 @@ int	zbx_dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_
 
 /* diagnostic data */
 void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num);
-void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index);
+void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index);
 void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items);
 
 typedef struct

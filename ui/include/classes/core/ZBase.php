@@ -50,6 +50,11 @@ class ZBase {
 	protected $config = [];
 
 	/**
+	 * @var CVault
+	 */
+	protected $vault;
+
+	/**
 	 * @var CAutoloader
 	 */
 	protected $autoloader;
@@ -182,6 +187,7 @@ class ZBase {
 				}
 
 				$this->loadConfigFile();
+				$this->initVault();
 				$this->initDB();
 				$this->setServerAddress();
 				$this->authenticateUser();
@@ -212,6 +218,7 @@ class ZBase {
 
 			case self::EXEC_MODE_API:
 				$this->loadConfigFile();
+				$this->initVault();
 				$this->initDB();
 				$this->setServerAddress();
 				$this->initLocales('en_us');
@@ -221,6 +228,7 @@ class ZBase {
 				try {
 					// try to load config file, if it exists we need to init db and authenticate user to check permissions
 					$this->loadConfigFile();
+					$this->initVault();
 					$this->initDB();
 					$this->authenticateUser();
 					$this->initComponents();
@@ -344,6 +352,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/widgets/forms',
 			$this->rootDir.'/include/classes/widgets',
 			$this->rootDir.'/include/classes/xml',
+			$this->rootDir.'/include/classes/vaults',
 			$this->rootDir.'/local/app/controllers',
 			$this->rootDir.'/app/controllers'
 		];
@@ -381,9 +390,11 @@ class ZBase {
 	/**
 	 * Load zabbix config file.
 	 */
-	protected function loadConfigFile() {
+	protected function loadConfigFile(): void {
 		$configFile = $this->getRootDir().CConfigFile::CONFIG_FILE_PATH;
+
 		$config = new CConfigFile($configFile);
+
 		$this->config = $config->load();
 	}
 
@@ -401,13 +412,71 @@ class ZBase {
 	}
 
 	/**
+	 * Vault provider initialisation if it exists in configuration file.
+	 */
+	protected function initVault(): void {
+		if (!array_key_exists('VAULT', $this->config['DB'])) {
+			return;
+		}
+
+		switch ($this->config['DB']['VAULT']) {
+			case CVaultCyberArk::NAME:
+				$this->vault = new CVaultCyberArk($this->config['DB']['VAULT_URL'],
+					$this->config['DB']['VAULT_DB_PATH'], $this->config['DB']['VAULT_CERT_FILE'],
+					$this->config['DB']['VAULT_KEY_FILE']
+				);
+				break;
+
+			case CVaultHashiCorp::NAME:
+				$this->vault = new CVaultHashiCorp($this->config['DB']['VAULT_URL'],
+					$this->config['DB']['VAULT_DB_PATH'], $this->config['DB']['VAULT_TOKEN']
+				);
+				break;
+		}
+	}
+
+	/**
 	 * Check if frontend can connect to DB.
+	 *
 	 * @throws DBException
 	 */
-	protected function initDB() {
+	protected function initDB(): void {
+		global $DB;
+
 		$error = null;
+
+		if ($this->vault !== null) {
+			$db_user = $this->config['DB']['VAULT_CACHE'] ? CDataCacheHelper::getValue('db_user', '') : '';
+			$db_password = $this->config['DB']['VAULT_CACHE'] ? CDataCacheHelper::getValue('db_password', '') : '';
+
+			if ($db_user === '' || $db_password === '') {
+				$db_credentials = $this->vault->getCredentials();
+
+				if ($db_credentials === null) {
+					throw new DBException(_('Unable to load database credentials from Vault.'));
+				}
+
+				['user' => $db_user, 'password' => $db_password] = $db_credentials;
+			}
+
+			if ($this->config['DB']['VAULT_CACHE'] && $db_user !== '' && $db_password !== '') {
+				CDataCacheHelper::setValueArray([
+					'db_user' => $db_user,
+					'db_password' => $db_password
+				]);
+			}
+			else {
+				CDataCacheHelper::clearValues(['db_user', 'db_password']);
+			}
+
+			$this->config['DB']['USER'] = $db_user;
+			$this->config['DB']['PASSWORD'] = $db_password;
+
+			$DB = $this->config['DB'];
+		}
+
 		if (!DBconnect($error)) {
-			CDataCacheHelper::clearValues(['db_username', 'db_password']);
+			CDataCacheHelper::clearValues(['db_user', 'db_password']);
 
 			throw new DBException($error);
 		}
@@ -416,9 +485,9 @@ class ZBase {
 	/**
 	 * Initialize translations, set up translated date and time constants.
 	 *
-	 * @param string $lang  Locale variant prefix like en_US, ru_RU etc.
+	 * @param string|null $language  Locale variant prefix like en_US, ru_RU etc.
 	 */
-	public function initLocales(string $language): void {
+	public function initLocales(?string $language): void {
 		if (!setupLocale($language, $error) && $error !== '') {
 			error($error);
 		}

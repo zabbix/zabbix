@@ -31,9 +31,17 @@ abstract class CItemGeneral extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
+	public const INTERFACE_TYPES_BY_PRIORITY = [
+		INTERFACE_TYPE_AGENT,
+		INTERFACE_TYPE_SNMP,
+		INTERFACE_TYPE_JMX,
+		INTERFACE_TYPE_IPMI
+	];
+
 	protected const ERROR_EXISTS_TEMPLATE = 'existsTemplate';
 	protected const ERROR_EXISTS = 'exists';
 	protected const ERROR_NO_INTERFACE = 'noInterface';
+
 
 	/**
 	 * A list of supported preprocessing types.
@@ -381,6 +389,31 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
+	 * Return first main interface matched from list of preferred types, or NULL.
+	 *
+	 * @param array $interfaces  An array of interfaces to choose from.
+	 *
+	 * @return ?array
+	 */
+	public static function findInterfaceByPriority(array $interfaces): ?array {
+		$interface_by_type = [];
+
+		foreach ($interfaces as $interface) {
+			if ($interface['main'] == INTERFACE_PRIMARY) {
+				$interface_by_type[$interface['type']] = $interface;
+			}
+		}
+
+		foreach (self::INTERFACE_TYPES_BY_PRIORITY as $interface_type) {
+			if (array_key_exists($interface_type, $interface_by_type)) {
+				return $interface_by_type[$interface_type];
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Returns the interface that best matches the given item.
 	 *
 	 * @param array $item_type  An item type
@@ -391,27 +424,24 @@ abstract class CItemGeneral extends CApiService {
 	 *							false, if the item does not need an interface
 	 */
 	public static function findInterfaceForItem($item_type, array $interfaces) {
-		$interface_by_type = [];
-		foreach ($interfaces as $interface) {
-			if ($interface['main'] == 1) {
-				$interface_by_type[$interface['type']] = $interface;
-			}
-		}
-
-		// find item interface type
 		$type = itemTypeInterface($item_type);
 
-		// the item can use any interface
-		if ($type == INTERFACE_TYPE_ANY) {
-			$interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI];
-			foreach ($interface_types as $interface_type) {
-				if (array_key_exists($interface_type, $interface_by_type)) {
-					return $interface_by_type[$interface_type];
-				}
-			}
+		if ($type == INTERFACE_TYPE_OPT) {
+			return false;
+		}
+		elseif ($type == INTERFACE_TYPE_ANY) {
+			return self::findInterfaceByPriority($interfaces);
 		}
 		// the item uses a specific type of interface
 		elseif ($type !== false) {
+			$interface_by_type = [];
+
+			foreach ($interfaces as $interface) {
+				if ($interface['main'] == INTERFACE_PRIMARY) {
+					$interface_by_type[$interface['type']] = $interface;
+				}
+			}
+
 			return array_key_exists($type, $interface_by_type) ? $interface_by_type[$type] : [];
 		}
 		// the item does not need an interface

@@ -379,7 +379,7 @@ class CHistFunctionValidator extends CValidator {
 					return ($matches['num'] > 0 && $matches['num'] <= ZBX_MAX_INT32);
 				}
 
-				return false;
+				break;
 
 			case CHistFunctionData::PERIOD_MODE_SEC:
 			case CHistFunctionData::PERIOD_MODE_SEC_ONLY:
@@ -393,14 +393,14 @@ class CHistFunctionValidator extends CValidator {
 					return ($sec > 0 && $sec <= ZBX_MAX_INT32);
 				}
 
-				return false;
+				break;
 
 			case CHistFunctionData::PERIOD_MODE_NUM_ONLY:
 				if (preg_match('/^#(?<num>\d+)$/', $sec_num, $matches) == 1) {
 					return ($matches['num'] > 0 && $matches['num'] <= ZBX_MAX_INT32);
 				}
 
-				return false;
+				break;
 
 			case CHistFunctionData::PERIOD_MODE_TREND:
 				if ($time_shift === '') {
@@ -417,10 +417,7 @@ class CHistFunctionValidator extends CValidator {
 					return ($sec > 0 && $sec <= ZBX_MAX_INT32 && $sec % SEC_PER_HOUR == 0);
 				}
 
-				return false;
-
-			default:
-				return false;
+				break;
 		}
 
 		return false;

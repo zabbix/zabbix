@@ -133,12 +133,11 @@ ZBX_NotificationCollection.prototype.makeNodes = function() {
 	this.btn_close.setAttribute('type', 'button');
 	this.btn_close.className = 'overlay-close-btn';
 
-	this.node.appendChild(this.btn_close);
-
 	header.className = 'dashboard-widget-head cursor-move';
 	this.node.appendChild(header);
 
 	header.appendChild(controls);
+	header.appendChild(this.btn_close);
 
 	this.btn_mute = this.makeToggleBtn(
 		{class: 'btn-sound-on', title: locale['S_MUTE']},
@@ -148,8 +147,14 @@ ZBX_NotificationCollection.prototype.makeNodes = function() {
 	this.btn_snooze = this.makeToggleBtn({class: 'btn-alarm-on'}, {class: 'btn-alarm-off'});
 	this.btn_snooze.setAttribute('title', locale['S_SNOOZE']);
 
-	controls.appendChild(document.createElement('li').appendChild(this.btn_snooze));
-	controls.appendChild(document.createElement('li').appendChild(this.btn_mute));
+	const li_btn_snooze = document.createElement('li');
+	li_btn_snooze.appendChild(this.btn_snooze);
+
+	const li_btn_mute = document.createElement('li');
+	li_btn_mute.appendChild(this.btn_mute);
+
+	controls.appendChild(li_btn_snooze);
+	controls.appendChild(li_btn_mute);
 
 	this.list_node = document.createElement('ul');
 	this.list_node.className = 'notif-body';
@@ -247,7 +252,7 @@ ZBX_NotificationCollection.prototype.removeDanglingNodes = function() {
 			.then(function(node) {
 				node.parentNode && node.remove();
 			});
-		first &= false;
+		first = false;
 	}
 };
 

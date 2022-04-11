@@ -17,17 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
+#include "proxyconfig.h"
+
 #include "log.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "proxy.h"
 #include "zbxself.h"
 
-#include "proxyconfig.h"
 #include "zbxcrypto.h"
 #include "zbxcompress.h"
 #include "zbxrtc.h"
+#include "zbxcommshigh.h"
 
 #define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
 
@@ -69,7 +69,7 @@ static void	process_configuration_sync(size_t *data_size)
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
-	if (FAIL == connect_to_server(&sock,CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
+	if (FAIL == zbx_connect_to_server(&sock,CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
 			configured_tls_connect_mode, CONFIG_PROXYCONFIG_RETRY, LOG_LEVEL_WARNING))	/* retry till have a connection */
 	{
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
@@ -78,7 +78,7 @@ static void	process_configuration_sync(size_t *data_size)
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-	if (SUCCEED != get_data_from_server(&sock, &buffer, buffer_size, reserved, &error))
+	if (SUCCEED != zbx_get_data_from_server(&sock, &buffer, buffer_size, reserved, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
 				sock.peer, error);
@@ -131,7 +131,7 @@ static void	process_configuration_sync(size_t *data_size)
 		DCupdate_interfaces_availability();
 	}
 error:
-	disconnect_server(&sock);
+	zbx_disconnect_from_server(&sock);
 out:
 	zbx_free(error);
 	zbx_free(buffer);

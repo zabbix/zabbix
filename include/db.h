@@ -20,7 +20,6 @@
 #ifndef ZABBIX_DB_H
 #define ZABBIX_DB_H
 
-#include "common.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "dbschema.h"
@@ -75,7 +74,7 @@ zbx_graph_item_type;
 
 #define TRIGGER_OPDATA_LEN		255
 #define TRIGGER_URL_LEN			255
-#define TRIGGER_DESCRIPTION_LEN		2048
+#define TRIGGER_DESCRIPTION_LEN		255
 #define TRIGGER_EXPRESSION_LEN		2048
 #define TRIGGER_EXPRESSION_LEN_MAX	(TRIGGER_EXPRESSION_LEN + 1)
 #if defined(HAVE_ORACLE)
@@ -397,7 +396,7 @@ typedef struct DB_MEDIATYPE
 }
 DB_MEDIATYPE;
 
-void 	zbx_db_mediatype_clean(DB_MEDIATYPE *mt);
+void	zbx_db_mediatype_clean(DB_MEDIATYPE *mt);
 void	zbx_serialize_mediatype(unsigned char **data, zbx_uint32_t *data_alloc, zbx_uint32_t *data_offset,
 		const DB_MEDIATYPE *mt);
 zbx_uint32_t	zbx_deserialize_mediatype(const unsigned char *data, DB_MEDIATYPE *mt);
@@ -405,7 +404,7 @@ zbx_uint32_t	zbx_deserialize_mediatype(const unsigned char *data, DB_MEDIATYPE *
 typedef struct
 {
 	zbx_uint64_t	alertid;
-	zbx_uint64_t 	actionid;
+	zbx_uint64_t	actionid;
 	int		clock;
 	zbx_uint64_t	mediatypeid;
 	char		*sendto;
@@ -590,7 +589,7 @@ typedef struct
 #define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_STATE			0x0004
 #define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR			0x0008
 #define ZBX_FLAGS_TRIGGER_DIFF_UPDATE										\
-		(ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE | ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE | 		\
+		(ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE | ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE |		\
 		ZBX_FLAGS_TRIGGER_DIFF_UPDATE_STATE | ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR)
 #define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT		0x1000
 #define ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT	0x2000
@@ -603,9 +602,6 @@ void	zbx_db_save_trigger_changes(const zbx_vector_ptr_t *trigger_diff);
 void	zbx_trigger_diff_free(zbx_trigger_diff_t *diff);
 void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t triggerid, unsigned char priority,
 		zbx_uint64_t flags, unsigned char value, unsigned char state, int lastchange, const char *error);
-
-int	DBget_row_count(const char *table_name);
-int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error);
 
 char	*DBdyn_escape_field(const char *table_name, const char *field_name, const char *src);
 char	*DBdyn_escape_string(const char *src);
@@ -740,49 +736,6 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self);
 void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name);
 int	zbx_db_get_database_type(void);
 
-/* agent (ZABBIX, SNMP, IPMI, JMX) availability data */
-typedef struct
-{
-	/* flags specifying which fields are set, see ZBX_FLAGS_AGENT_STATUS_* defines */
-	unsigned char	flags;
-
-	/* agent availability fields */
-	unsigned char	available;
-	char		*error;
-	int		errors_from;
-	int		disable_until;
-}
-zbx_agent_availability_t;
-
-#define ZBX_FLAGS_AGENT_STATUS_NONE		0x00000000
-#define ZBX_FLAGS_AGENT_STATUS_AVAILABLE	0x00000001
-#define ZBX_FLAGS_AGENT_STATUS_ERROR		0x00000002
-#define ZBX_FLAGS_AGENT_STATUS_ERRORS_FROM	0x00000004
-#define ZBX_FLAGS_AGENT_STATUS_DISABLE_UNTIL	0x00000008
-
-#define ZBX_FLAGS_AGENT_STATUS		(ZBX_FLAGS_AGENT_STATUS_AVAILABLE |	\
-					ZBX_FLAGS_AGENT_STATUS_ERROR |		\
-					ZBX_FLAGS_AGENT_STATUS_ERRORS_FROM |	\
-					ZBX_FLAGS_AGENT_STATUS_DISABLE_UNTIL)
-
-#define ZBX_AGENT_ZABBIX	(INTERFACE_TYPE_AGENT - 1)
-#define ZBX_AGENT_SNMP		(INTERFACE_TYPE_SNMP - 1)
-#define ZBX_AGENT_IPMI		(INTERFACE_TYPE_IPMI - 1)
-#define ZBX_AGENT_JMX		(INTERFACE_TYPE_JMX - 1)
-#define ZBX_AGENT_UNKNOWN 	255
-#define ZBX_AGENT_MAX		INTERFACE_TYPE_COUNT
-
-typedef struct
-{
-	zbx_uint64_t			interfaceid;
-	zbx_agent_availability_t	agent;
-	/* ensure chronological order in case of flapping interface availability */
-	int				id;
-}
-zbx_interface_availability_t;
-
-ZBX_PTR_VECTOR_DECL(availability_ptr, zbx_interface_availability_t *)
-
 typedef struct
 {
 	zbx_uint64_t		eventid;
@@ -795,7 +748,6 @@ typedef struct
 }
 zbx_event_t;
 
-void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t *interface_availabilities);
 int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user);
 int	DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user);
 void	zbx_user_init(zbx_user_t *user);

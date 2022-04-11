@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+require_once dirname(__FILE__).'/testDocumentationLinks.php';
 require_once dirname(__FILE__).'/testGeneric.php';
 require_once dirname(__FILE__).'/testGraphAxis.php';
 require_once dirname(__FILE__).'/testPageDashboard.php';
@@ -34,8 +35,8 @@ require_once dirname(__FILE__).'/testPageAdministrationGeneralModules.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralRegexp.php';
 require_once dirname(__FILE__).'/testPageAdministrationMediaTypes.php';
 require_once dirname(__FILE__).'/testPageAdministrationScripts.php';
-require_once dirname(__FILE__).'/testPageApiTokensAdministrationGeneral.php';
-require_once dirname(__FILE__).'/testPageApiTokensUserSettings.php';
+require_once dirname(__FILE__).'/apiTokens/testPageApiTokensAdministrationGeneral.php';
+require_once dirname(__FILE__).'/apiTokens/testPageApiTokensUserSettings.php';
 require_once dirname(__FILE__).'/testPageAvailabilityReport.php';
 require_once dirname(__FILE__).'/testPageDashboardList.php';
 require_once dirname(__FILE__).'/testPageEventCorrelation.php';
@@ -89,11 +90,12 @@ require_once dirname(__FILE__).'/testFormAdministrationMediaTypeMessageTemplates
 require_once dirname(__FILE__).'/testFormAdministrationMediaTypeWebhook.php';
 require_once dirname(__FILE__).'/testFormAdministrationScripts.php';
 require_once dirname(__FILE__).'/testFormAdministrationUserGroups.php';
-require_once dirname(__FILE__).'/testFormApiTokensAdministrationGeneral.php';
-require_once dirname(__FILE__).'/testFormApiTokensUserSettings.php';
+require_once dirname(__FILE__).'/apiTokens/testFormApiTokensAdministrationGeneral.php';
+require_once dirname(__FILE__).'/apiTokens/testFormApiTokensUserSettings.php';
 require_once dirname(__FILE__).'/testFormEventCorrelation.php';
-require_once dirname(__FILE__).'/testFormFilterHosts.php';
-require_once dirname(__FILE__).'/testFormFilterProblems.php';
+require_once dirname(__FILE__).'/filterTabs/testFormFilterHosts.php';
+require_once dirname(__FILE__).'/filterTabs/testFormFilterLatestData.php';
+require_once dirname(__FILE__).'/filterTabs/testFormFilterProblems.php';
 require_once dirname(__FILE__).'/testFormGraph.php';
 require_once dirname(__FILE__).'/testFormGraphPrototype.php';
 require_once dirname(__FILE__).'/hosts/testFormHostConfiguration.php';
@@ -180,14 +182,19 @@ require_once dirname(__FILE__).'/roles/testPageUserRoles.php';
 require_once dirname(__FILE__).'/roles/testUserRolesPermissions.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardCopyWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphPrototypeWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardGeomapWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardItemValueWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardSystemInformationWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardTopHostsWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardPages.php';
 require_once dirname(__FILE__).'/dashboard/testFormTemplateDashboards.php';
 require_once dirname(__FILE__).'/dashboard/testPageTemplateDashboards.php';
+require_once dirname(__FILE__).'/geomaps/testFormAdministrationGeneralGeomaps.php';
+require_once dirname(__FILE__).'/geomaps/testGeomapWidgetScreenshots.php';
 require_once dirname(__FILE__).'/reports/testPageReportsActionLog.php';
 require_once dirname(__FILE__).'/reports/testPageReportsAudit.php';
 require_once dirname(__FILE__).'/reports/testPageReportsNotifications.php';
@@ -204,6 +211,7 @@ class SeleniumTests {
 	public static function suite() {
 		$suite = new TestSuite('selenium');
 
+		$suite->addTestSuite('testDocumentationLinks');
 		$suite->addTestSuite('testGeneric');
 		$suite->addTestSuite('testGraphAxis');
 		$suite->addTestSuite('testPageActions');
@@ -286,7 +294,10 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormApiTokensUserSettings');
 		$suite->addTestSuite('testFormEventCorrelation');
 		$suite->addTestSuite('testFormFilterHosts');
+		$suite->addTestSuite('testFormFilterLatestData');
 		$suite->addTestSuite('testFormFilterProblems');
+		$suite->addTestSuite('testFormAdministrationGeneralGeomaps');
+		$suite->addTestSuite('testGeomapWidgetScreenshots');
 		$suite->addTestSuite('testFormGraph');
 		$suite->addTestSuite('testFormGraphPrototype');
 		$suite->addTestSuite('testFormHostConfiguration');
@@ -371,11 +382,14 @@ class SeleniumTests {
 		$suite->addTestSuite('testUserRolesPermissions');
 		$suite->addTestSuite('testDashboardCopyWidgets');
 		$suite->addTestSuite('testDashboardGraphPrototypeWidget');
+		$suite->addTestSuite('testDashboardGeomapWidget');
 		$suite->addTestSuite('testDashboardDynamicItemWidgets');
 		$suite->addTestSuite('testDashboardGraphWidget');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
+		$suite->addTestSuite('testDashboardItemValueWidget');
 		$suite->addTestSuite('testDashboardSystemInformationWidget');
+		$suite->addTestSuite('testDashboardTopHostsWidget');
 		$suite->addTestSuite('testDashboardPages');
 		$suite->addTestSuite('testFormTemplateDashboards');
 		$suite->addTestSuite('testPageTemplateDashboards');

@@ -1539,7 +1539,7 @@ class CUser extends CApiService {
 					break;
 
 				case ZBX_AUTH_INTERNAL:
-					if (!self::verifyPassword($user['password'], $db_user)) {
+					if (!password_verify($user['password'], $db_user['passwd'])) {
 						self::exception(ZBX_API_ERROR_PERMISSIONS,
 							_('Incorrect user name or password or account is temporarily blocked.')
 						);
@@ -1594,31 +1594,6 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * @param string $password           User-specified password.
-	 * @param array  $db_user            Saved user profile.
-	 * @param string $db_user['passwd']  Saved password hash.
-	 * @param int    $db_user['userid']  User id.
-	 *
-	 * @return bool
-	 */
-	private static function verifyPassword($password, array $db_user) {
-		if (strlen($db_user['passwd']) > ZBX_MD5_SIZE) {
-			return password_verify($password, $db_user['passwd']);
-		}
-
-		if (hash_equals($db_user['passwd'], md5($password))) {
-			DB::update('users', [
-				'values' => ['passwd' => password_hash($password, PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST])],
-				'where' => ['userid' => $db_user['userid']]
-			]);
-
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Method is ONLY for internal use!
 	 * Login user by username. Return array with user data.
 	 *
@@ -1633,9 +1608,7 @@ class CUser extends CApiService {
 	public function loginByUsername($username, $case_sensitive = null, $default_auth = null) {
 		// Check whether the method is called via an API call or from a local php file.
 		if ($case_sensitive === null || $default_auth === null) {
-			return self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect method "%1$s.%2$s".', 'user', 'loginByUsername')
-			);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect method "%1$s.%2$s".', 'user', 'loginByUsername'));
 		}
 
 		$user_data = $this->findAccessibleUser($username, $case_sensitive, $default_auth, false);
@@ -2086,10 +2059,10 @@ class CUser extends CApiService {
 	/**
 	 * Sets the default user timezone used by all date/time functions.
 	 *
-	 * @param string $timezone
+	 * @param string|null $timezone
 	 */
-	private function setTimezone(string $timezone): void {
-		if ($timezone !== ZBX_DEFAULT_TIMEZONE) {
+	private function setTimezone(?string $timezone): void {
+		if ($timezone !== null && $timezone !== ZBX_DEFAULT_TIMEZONE) {
 			date_default_timezone_set($timezone);
 		}
 	}

@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 for IMM2 and IMM1 IBM serverX hardware
 
 This template was tested on:

@@ -17,25 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "log.h"
+#include "report_manager.h"
+
 #include "zbxself.h"
-#include "zbxipcservice.h"
-#include "daemon.h"
-#include "db.h"
-#include "zbxjson.h"
+#include "zbxnix.h"
 #include "base64.h"
-#include "zbxalgo.h"
-#include "dbcache.h"
 #include "zbxreport.h"
+#include "zbxhash.h"
 #include "../../libs/zbxcrypto/hmac_sha256.h"
 #include "sha256crypt.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
 #include "zbxalert.h"
 #include "zbxserver.h"
 #include "report_protocol.h"
-
-#include "report_manager.h"
 
 #define ZBX_REPORT_INCLUDE_USER		0
 #define ZBX_REPORT_EXCLUDE_USER		1
@@ -1062,20 +1055,29 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 		if (NULL == (report = (zbx_rm_report_t *)zbx_hashset_search(&manager->reports, &reportid)))
 		{
 			report_local.reportid = reportid;
+			ZBX_STR2UINT64(report_local.userid, row[1]);
+			ZBX_STR2UINT64(report_local.dashboardid, row[3]);
+			report_local.name = zbx_strdup(NULL, row[2]);
+			report_local.timezone = zbx_strdup(NULL, tz);
+			report_local.error = zbx_strdup(NULL, row[12]);
+			ZBX_STR2UCHAR(report_local.period, row[4]);
+			ZBX_STR2UCHAR(report_local.cycle, row[5]);
+			ZBX_STR2UCHAR(report_local.weekdays, row[6]);
+			ZBX_STR2UCHAR(report_local.status, row[14]);
+			report_local.start_time = atoi(row[7]);
+			ZBX_STR2UCHAR(report_local.state, row[11]);
+			report_local.flags = 0;
+			report_local.nextcheck = 0;
+			report_local.active_since = atoi(row[8]);
+			report_local.active_till = atoi(row[9]);
+			report_local.lastsent = atoi(row[13]);
+			zbx_vector_ptr_pair_create(&report_local.params);
+			zbx_vector_recipient_create(&report_local.usergroups);
+			zbx_vector_recipient_create(&report_local.users);
+			zbx_vector_uint64_create(&report_local.users_excl);
+
 			report = (zbx_rm_report_t *)zbx_hashset_insert(&manager->reports, &report_local,
 					sizeof(report_local));
-
-			zbx_vector_ptr_pair_create(&report->params);
-			zbx_vector_recipient_create(&report->usergroups);
-			zbx_vector_recipient_create(&report->users);
-			zbx_vector_uint64_create(&report->users_excl);
-			report->name = zbx_strdup(NULL, row[2]);
-			report->timezone = zbx_strdup(NULL, tz);
-			report->nextcheck = 0;
-			ZBX_STR2UCHAR(report->state, row[11]);
-			report->error = zbx_strdup(NULL, row[12]);
-			report->lastsent = atoi(row[13]);
-			report->flags = 0;
 
 			reschedule = 1;
 		}
@@ -1096,17 +1098,17 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 				report->timezone = zbx_strdup(report->timezone, tz);
 				reschedule = 1;
 			}
-		}
 
-		ZBX_STR2UINT64(report->userid, row[1]);
-		ZBX_STR2UINT64(report->dashboardid, row[3]);
-		ZBX_STR2UCHAR(report->period, row[4]);
-		ZBX_STR2UCHAR(report->cycle, row[5]);
-		ZBX_STR2UCHAR(report->weekdays, row[6]);
-		report->start_time = atoi(row[7]);
-		report->active_since = atoi(row[8]);
-		report->active_till = atoi(row[9]);
-		ZBX_STR2UCHAR(report->status, row[14]);
+			ZBX_STR2UINT64(report->userid, row[1]);
+			ZBX_STR2UINT64(report->dashboardid, row[3]);
+			ZBX_STR2UCHAR(report->period, row[4]);
+			ZBX_STR2UCHAR(report->cycle, row[5]);
+			ZBX_STR2UCHAR(report->weekdays, row[6]);
+			report->start_time = atoi(row[7]);
+			report->active_since = atoi(row[8]);
+			report->active_till = atoi(row[9]);
+			ZBX_STR2UCHAR(report->status, row[14]);
+		}
 
 		if (ZBX_REPORT_STATUS_DISABLED == report->status)
 		{

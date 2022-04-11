@@ -17,24 +17,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "trapper.h"
 
 #include "log.h"
-#include "zbxjson.h"
-#include "dbcache.h"
 #include "proxy.h"
 #include "zbxself.h"
-
 #include "active.h"
 #include "nodecommand.h"
 #include "proxyconfig.h"
 #include "proxydata.h"
-
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxcrypto.h"
+#include "zbxcommshigh.h"
 #include "../../libs/zbxserver/zabbix_stats.h"
 #include "../poller/checks_snmp.h"
-
 #include "trapper_auth.h"
 #include "trapper_preproc.h"
 #include "trapper_expressions_evaluate.h"
@@ -44,8 +40,6 @@
 #ifdef HAVE_NETSNMP
 #	include "zbxrtc.h"
 #endif
-
-#include "trapper.h"
 
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
@@ -1110,7 +1104,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 
 		if ('<' == *s)	/* XML protocol */
 		{
-			comms_parse_response(s, host, sizeof(host), key, sizeof(key), value_dec,
+			zbx_comms_parse_response(s, host, sizeof(host), key, sizeof(key), value_dec,
 					sizeof(value_dec), lastlogsize, sizeof(lastlogsize), timestamp,
 					sizeof(timestamp), source, sizeof(source), severity, sizeof(severity));
 

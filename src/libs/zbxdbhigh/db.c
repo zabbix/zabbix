@@ -24,6 +24,7 @@
 #include "threads.h"
 #include "dbcache.h"
 #include "cfg.h"
+#include "zbxhash.h"
 
 #if defined(HAVE_POSTGRESQL)
 #	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
@@ -498,53 +499,6 @@ DB_RESULT	DBselectN(const char *query, int n)
 	}
 
 	return rc;
-}
-
-int	DBget_row_count(const char *table_name)
-{
-	int		count = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table_name:'%s'", __func__, table_name);
-
-	result = DBselect("select count(*) from %s", table_name);
-
-	if (NULL != (row = DBfetch(result)))
-		count = atoi(row[0]);
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, count);
-
-	return count;
-}
-
-int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*host_esc;
-	int		ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	host_esc = DBdyn_escape_string(hostname);
-	result = DBselect("select lastaccess from hosts where host='%s' and status in (%d,%d)",
-			host_esc, HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE);
-	zbx_free(host_esc);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		*lastaccess = atoi(row[0]);
-		ret = SUCCEED;
-	}
-	else
-		*error = zbx_dsprintf(*error, "Proxy \"%s\" does not exist.", hostname);
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
 }
 
 #ifdef HAVE_MYSQL
@@ -3329,108 +3283,6 @@ int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64
 		zbx_vector_uint64_remove_noorder(ids, i);
 
 	return (0 != ids->values_num ? SUCCEED : FAIL);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: adds interface availability update to sql statement               *
- *                                                                            *
- * Parameters: ia           [IN] the interface availability data              *
- *             sql        - [IN/OUT] the sql statement                        *
- *             sql_alloc  - [IN/OUT] the number of bytes allocated for sql    *
- *                                   statement                                *
- *             sql_offset - [IN/OUT] the number of bytes used in sql          *
- *                                   statement                                *
- *                                                                            *
- * Return value: SUCCEED - sql statement is created                           *
- *               FAIL    - no interface availability is set                   *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_sql_add_interface_availability(const zbx_interface_availability_t *ia, char **sql,
-		size_t *sql_alloc, size_t *sql_offset)
-{
-	char		delim = ' ';
-
-	if (FAIL == zbx_interface_availability_is_set(ia))
-		return FAIL;
-
-	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update interface set");
-
-	if (0 != (ia->agent.flags & ZBX_FLAGS_AGENT_STATUS_AVAILABLE))
-	{
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cavailable=%d", delim, (int)ia->agent.available);
-		delim = ',';
-	}
-
-	if (0 != (ia->agent.flags & ZBX_FLAGS_AGENT_STATUS_ERROR))
-	{
-		char	*error_esc;
-
-		error_esc = DBdyn_escape_field("interface", "error", ia->agent.error);
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cerror='%s'", delim, error_esc);
-		zbx_free(error_esc);
-		delim = ',';
-	}
-
-	if (0 != (ia->agent.flags & ZBX_FLAGS_AGENT_STATUS_ERRORS_FROM))
-	{
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cerrors_from=%d", delim, ia->agent.errors_from);
-		delim = ',';
-	}
-
-	if (0 != (ia->agent.flags & ZBX_FLAGS_AGENT_STATUS_DISABLE_UNTIL))
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cdisable_until=%d", delim, ia->agent.disable_until);
-
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where interfaceid=" ZBX_FS_UI64, ia->interfaceid);
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: sync interface availabilities updates into database               *
- *                                                                            *
- * Parameters: interface_availabilities [IN] the interface availability data  *
- *                                                                            *
- ******************************************************************************/
-void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t *interface_availabilities)
-{
-	int	txn_error;
-	char	*sql = NULL;
-	size_t	sql_alloc = 4 * ZBX_KIBIBYTE;
-	int	i;
-
-	sql = (char *)zbx_malloc(sql, sql_alloc);
-
-	do
-	{
-		size_t	sql_offset = 0;
-
-		DBbegin();
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		for (i = 0; i < interface_availabilities->values_num; i++)
-		{
-			if (SUCCEED != zbx_sql_add_interface_availability(interface_availabilities->values[i], &sql,
-					&sql_alloc, &sql_offset))
-			{
-				continue;
-			}
-
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-		}
-
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)
-			DBexecute("%s", sql);
-
-		txn_error = DBcommit();
-	}
-	while (ZBX_DB_DOWN == txn_error);
-
-	zbx_free(sql);
 }
 
 /******************************************************************************

@@ -17,24 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
-#include "log.h"
-#include "daemon.h"
+#include "escalator.h"
+
+#include "zbxnix.h"
 #include "zbxserver.h"
 #include "zbxself.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
 #include "../actions.h"
 #include "../scripts/scripts.h"
 #include "zbxcrypto.h"
-#include "comms.h"
 #include "../../libs/zbxserver/get_host_from_event.h"
 #include "../../libs/zbxserver/zabbix_users.h"
-#include "zbxservice.h"
 #include "service_protocol.h"
-#include "dbcache.h"
-
-#include "escalator.h"
 
 extern int	CONFIG_ESCALATOR_FORKS;
 

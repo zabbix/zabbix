@@ -244,6 +244,12 @@ $fields = [
 									],
 	'sortorder' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
+
+if (getRequest('type') == ITEM_TYPE_HTTPAGENT && getRequest('interfaceid') == INTERFACE_TYPE_OPT) {
+	unset($fields['interfaceid']);
+	unset($_REQUEST['interfaceid']);
+}
+
 $valid_input = check_fields($fields);
 
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
@@ -470,7 +476,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					$http_item['password'] = getRequest('http_password', '');
 				}
 
-				$item = prepareItemHttpAgentFormData($http_item) + $item;
 				break;
 
 			case ITEM_TYPE_SNMP:
@@ -558,25 +563,18 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['master_itemid'] = getRequest('master_itemid');
 			}
 
-			if (getRequest('type') == ITEM_TYPE_SCRIPT) {
-				if ($db_item['type'] == getRequest('type')) {
-					$compare = function($arr, $arr2) {
-						return (array_combine(array_column($arr, 'name'), array_column($arr, 'value')) ==
-							array_combine(array_column($arr2, 'name'), array_column($arr2, 'value'))
-						);
-					};
-
-					if ($compare($db_item['parameters'], $item['parameters'])) {
-						unset($item['parameters']);
-					}
-				}
-				else {
-					$item['params'] = getRequest('params', '');
-				}
+			if ($item['type'] == ITEM_TYPE_HTTPAGENT && $db_item['templateid'] == 0) {
+				$item = prepareItemHttpAgentFormData($http_item) + $item;
 			}
-			elseif (in_array($type, [ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED])
-					&& $db_item['params'] !== getRequest('params', '')) {
-				$item['params'] = getRequest('params', '');
+
+			function parameters_equal(array $stored_parameters, array $input_parameters): bool {
+				return (array_column($stored_parameters, 'value') == array_column($input_parameters, 'value')
+						&& array_column($stored_parameters, 'name') == array_column($input_parameters, 'name'));
+			}
+
+			if (getRequest('type') == ITEM_TYPE_SCRIPT && $db_item['type'] == getRequest('type')
+					&& parameters_equal($db_item['parameters'], $item['parameters'])) {
+				unset($item['parameters']);
 			}
 
 			if ($db_item['preprocessing'] !== $preprocessing) {
@@ -585,13 +583,31 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			CArrayHelper::sort($db_item['tags'], ['tag', 'value']);
 			CArrayHelper::sort($tags, ['tag', 'value']);
+
 			if (array_values($db_item['tags']) !== array_values($tags)) {
 				$item['tags'] = $tags;
+			}
+
+			if ($db_item['templateid'] != 0) {
+				$allowed_fields = array_fill_keys([
+					'itemid', 'delay', 'delay_flex', 'history', 'trends', 'history_mode', 'trends_mode', 'allow_traps',
+					'description', 'status', 'discover', 'tags'
+				], true);
+
+				foreach ($item as $field => $value) {
+					if (!array_key_exists($field, $allowed_fields)) {
+						unset($item[$field]);
+					}
+				}
 			}
 
 			$result = API::ItemPrototype()->update($item);
 		}
 		else {
+			if (getRequest('type') == ITEM_TYPE_HTTPAGENT) {
+				$item = prepareItemHttpAgentFormData($http_item) + $item;
+			}
+
 			if ($preprocessing) {
 				$item['preprocessing'] = $preprocessing;
 			}

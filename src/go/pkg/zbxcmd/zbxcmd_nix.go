@@ -1,4 +1,4 @@
-// +build !windows
+//go:build !windows
 
 /*
 ** Zabbix
@@ -64,7 +64,9 @@ func execute(s string, timeout time.Duration, path string, strict bool) (string,
 
 	// we need to check error after t.Stop so we can inform the user if timeout was reached and Zabbix agent2 terminated the command
 	if strict && werr != nil && !errors.Is(werr, syscall.ECHILD) {
-		return "", fmt.Errorf("Command execution failed: %s", werr)
+		log.Debugf("Command [%s] execution failed: %s\n%s", s, werr, b.String())
+
+		return "", fmt.Errorf("Command execution failed: %w", werr)
 	}
 
 	if MaxExecuteOutputLenB <= len(b.String()) {

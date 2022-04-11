@@ -29,12 +29,9 @@ define('UNRESOLVED_MACRO_STRING', '*'._('UNKNOWN').'*');
  * Date formats must be compatible with the CDate class (class.cdate.js).
  */
 define('DATE_TIME_FORMAT_SECONDS', _('Y-m-d H:i:s'));
-define('DATE_TIME_FORMAT_SECONDS_PLACEHOLDER', _('YYYY-MM-DD hh:mm:ss'));
 define('DATE_TIME_FORMAT', _('Y-m-d H:i'));
-define('DATE_TIME_FORMAT_PLACEHOLDER', _('YYYY-MM-DD hh:mm'));
 define('DATE_TIME_FORMAT_SHORT', _('m-d H:i'));
 define('DATE_FORMAT', _('Y-m-d'));
-define('DATE_FORMAT_PLACEHOLDER', _('YYYY-MM-DD'));
 define('DATE_FORMAT_SHORT', _('m-d'));
 define('TIME_FORMAT_SECONDS', _('H:i:s'));
 define('TIME_FORMAT', _('H:i'));
