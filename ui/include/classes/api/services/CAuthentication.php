@@ -159,6 +159,30 @@ class CAuthentication extends CApiService {
 		$output_fields = $this->output_fields;
 		$output_fields[] = 'configid';
 
-		return DB::select('config', ['output' => $output_fields])[0];
+		$db_auth = DB::select('config', ['output' => $output_fields]);
+		$db_auth = reset($db_auth);
+
+		if (array_key_exists('authentication_type', $auth)) {
+			$auth += $db_auth;
+
+			if ($auth['authentication_type'] == ZBX_AUTH_LDAP
+					&& $auth['ldap_configured'] == ZBX_AUTH_LDAP_DISABLED) {
+				static::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', '/authentication_type', _('LDAP should be enabled'))
+				);
+			}
+
+			$have_userdirectories = ($auth['ldap_userdirectoryid'] > 0
+				|| API::UserDirectory()->get(['output' => ['userdirectoryid', 'limit' => 1]]));
+
+			if (!$have_userdirectories) {
+				static::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', '/authentication_type', _('no LDAP servers'))
+				);
+			}
+		}
+
+
+		return $db_auth;
 	}
 }

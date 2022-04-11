@@ -123,6 +123,7 @@ class CUserDirectory extends CApiService {
 	public function create(array $userdirectories) {
 		static::validateCreate($userdirectories);
 
+		$db_count = DB::select($this->tableName(), ['countOutput' => true]);
 		$ids = DB::insert($this->tableName(), $userdirectories);
 
 		foreach (array_keys($userdirectories) as $i) {
@@ -130,6 +131,10 @@ class CUserDirectory extends CApiService {
 		}
 
 		static::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USERDIRECTORY, $userdirectories);
+
+		if (!$db_count) {
+			API::Authentication()->update(['ldap_userdirectoryid' => reset($ids)]);
+		}
 
 		return ['userdirectoryids' => $ids];
 	}
@@ -184,11 +189,12 @@ class CUserDirectory extends CApiService {
 	 * @throws APIException
 	 */
 	public function delete(array $userdirectoryids) {
-		static::validateDelete($userdirectoryids, $db_suerdirectories);
+		$db_userdirectories = [];
+		static::validateDelete($userdirectoryids, $db_userdirectories);
 
 		DB::delete('userdirectory', ['userdirectoryid' => $userdirectoryids]);
 
-		static::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USERDIRECTORY, $db_suerdirectories);
+		static::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USERDIRECTORY, $db_userdirectories);
 
 		return ['userdirectoryids' => $userdirectoryids];
 	}
@@ -416,14 +422,18 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
+		$userdirectories_count = API::UserDirectory()->get(['countOutput' => true]);
 		$auth = API::Authentication()->get([
 			'output' => ['ldap_userdirectoryid', 'authentication_type', 'ldap_configured']
 		]);
 
-		if ($auth['authentication_type'] != ZBX_AUTH_INTERNAL
-				&& in_array($auth['ldap_userdirectoryid'], $userdirectoryids)) {
-			// Check there are no user groups with default user directory.
-			$userdirectoryids[] = 0;
+		if (in_array($auth['ldap_userdirectoryid'], $userdirectoryids)
+				&& ($auth['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED || $userdirectories_count > 1)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default user directory.'));
+		}
+
+		if ($auth['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED && count($userdirectoryids) == $userdirectories_count) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete all user directories when LDAP is enabled.'));
 		}
 
 		$db_groups = API::UserGroup()->get([
