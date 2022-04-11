@@ -41,7 +41,6 @@ class CControllerHostMacrosList extends CController {
 			$this->setResponse(
 				(new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
-						'title' => _('Cannot add host'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 				])]))->disableView()
