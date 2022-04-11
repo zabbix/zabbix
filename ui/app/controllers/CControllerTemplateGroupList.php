@@ -119,7 +119,6 @@ class CControllerTemplateGroupList extends CController {
 			'output' => ['groupid', 'name'],
 			'groupids' => $groupIds,
 			'selectTemplates' => ['templateid', 'name'],
-			'selectGroupDiscovery' => ['ts_delete'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
 			'limitSelects' => $limit
 		]);
