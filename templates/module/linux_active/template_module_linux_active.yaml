@@ -4,7 +4,7 @@ zabbix_export:
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
-      name: Modules
+      name: Templates/Modules
   templates:
     -
       uuid: aa226119d3e94f53b9a2809f1d4ebaee
@@ -13,7 +13,7 @@ zabbix_export:
       description: 'Template tooling version used: 0.41'
       groups:
         -
-          name: Modules
+          name: Templates/Modules
       discovery_rules:
         -
           uuid: 37d15facfc5f42f4ad1145f55d4bdb1e
@@ -362,7 +362,7 @@ zabbix_export:
       description: 'Template tooling version used: 0.41'
       groups:
         -
-          name: Modules
+          name: Templates/Modules
       items:
         -
           uuid: 4ce91073d4a344a1bbbdb5f98a48ade4
@@ -631,7 +631,7 @@ zabbix_export:
       description: 'Template tooling version used: 0.41'
       groups:
         -
-          name: Modules
+          name: Templates/Modules
       discovery_rules:
         -
           uuid: 39b800d6136b4f8a8e57bbccc2f0352f
@@ -876,7 +876,7 @@ zabbix_export:
       description: 'Template tooling version used: 0.41'
       groups:
         -
-          name: Modules
+          name: Templates/Modules
       items:
         -
           uuid: 98a2a698cd784267a965d653fdbba456
@@ -1216,7 +1216,7 @@ zabbix_export:
       description: 'Template tooling version used: 0.41'
       groups:
         -
-          name: Modules
+          name: Templates/Modules
       items:
         -
           uuid: 824d5c6e62c04f2d8b6e73aeca87be1e
@@ -1359,7 +1359,7 @@ zabbix_export:
       description: 'Template tooling version used: 0.41'
       groups:
         -
-          name: Modules
+          name: Templates/Modules
       discovery_rules:
         -
           uuid: 37a61365e2f34811a389f37aafc04169

@@ -4,7 +4,7 @@ zabbix_export:
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
-      name: 'Network devices'
+      name: 'Templates/Network devices'
   templates:
     -
       uuid: a60798c651604d93a062bec0f8a89751
@@ -24,7 +24,7 @@ zabbix_export:
         Template tooling version used: 0.41
       groups:
         -
-          name: 'Network devices'
+          name: 'Templates/Network devices'
       items:
         -
           uuid: 87480ce035a94f299c4cf4103eaaf066

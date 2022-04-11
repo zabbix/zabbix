@@ -4,7 +4,7 @@ zabbix_export:
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
-      name: 'Operating systems'
+      name: 'Templates/Operating systems'
   templates:
     -
       uuid: f8f7908280354f2abeed07dc788c3747
@@ -22,7 +22,7 @@ zabbix_export:
         Template tooling version used: 0.41
       groups:
         -
-          name: 'Operating systems'
+          name: 'Templates/Operating systems'
       items:
         -
           uuid: df561a0cece94760a78704edf7da7326

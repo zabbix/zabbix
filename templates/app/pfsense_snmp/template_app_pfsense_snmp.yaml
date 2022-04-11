@@ -4,7 +4,7 @@ zabbix_export:
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
-      name: Applications
+      name: Templates/Applications
   templates:
     -
       uuid: 16f281aeb8904d3db8b66dda94611fcc
@@ -29,7 +29,7 @@ zabbix_export:
         Template tooling version used: 0.41
       groups:
         -
-          name: Applications
+          name: Templates/Applications
       items:
         -
           uuid: 2257828f22fd4b5ea7ffffc1c4296674
