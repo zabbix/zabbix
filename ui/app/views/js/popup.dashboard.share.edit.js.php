@@ -17,44 +17,35 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-
-/**
- * @var CView $this
- */
 ?>
 
-window.dashboard_share_edit_popup = {
-	user_group_row_template: null,
-	user_row_template: null,
+
+window.dashboard_share_edit_popup = new class {
 
 	init({dashboard, user_group_row_template, user_row_template}) {
 		this.user_group_row_template = new Template(user_group_row_template);
 		this.user_row_template = new Template(user_row_template);
 
-		this.addPopupValues({'object': 'private', 'values': [dashboard.private]});
-		this.addPopupValues({'object': 'userid', 'values': dashboard.users});
-		this.addPopupValues({'object': 'usrgrpid', 'values': dashboard.userGroups});
+		this._addPopupValues({'object': 'private', 'values': [dashboard.private]});
+		this._addPopupValues({'object': 'userid', 'values': dashboard.users});
+		this._addPopupValues({'object': 'usrgrpid', 'values': dashboard.userGroups});
 
 		/**
 		* @see init.js add.popup event
 		*/
 		window.addPopupValues = (list) => {
-			this.addPopupValues(list);
+			this._addPopupValues(list);
 		};
-	},
+	}
 
 	submit() {
-		clearMessages();
-
 		const overlay = overlays_stack.getById('dashboard_share_edit');
 		const form = overlay.$dialogue.$body[0].querySelector('form');
 
-		const curl = new Curl('zabbix.php', false);
-
-		curl.setArgument('action', 'dashboard.share.update');
-
 		overlay.setLoading();
+
+		const curl = new Curl('zabbix.php', false);
+		curl.setArgument('action', 'dashboard.share.update');
 
 		fetch(curl.getUrl(), {
 			method: 'POST',
@@ -63,6 +54,8 @@ window.dashboard_share_edit_popup = {
 		})
 			.then((response) => response.json())
 			.then((response) => {
+				clearMessages();
+
 				if ('error' in response) {
 					throw {error: response.error};
 				}
@@ -97,8 +90,7 @@ window.dashboard_share_edit_popup = {
 			.finally(() => {
 				overlay.unsetLoading();
 			});
-		;
-	},
+	}
 
 	removeUserGroupShares(usrgrpid) {
 		const element = document.getElementById(`user-group-shares-${usrgrpid}`);
@@ -106,7 +98,7 @@ window.dashboard_share_edit_popup = {
 		if (element !== null) {
 			element.remove();
 		}
-	},
+	}
 
 	removeUserShares(userid) {
 		const element = document.getElementById(`user-shares-${userid}`);
@@ -114,9 +106,9 @@ window.dashboard_share_edit_popup = {
 		if (element !== null) {
 			element.remove();
 		}
-	},
+	}
 
-	addPopupValues(list) {
+	_addPopupValues(list) {
 		for (let i = 0; i < list.values.length; i++) {
 			const value = list.values[i];
 
