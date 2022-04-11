@@ -20,7 +20,7 @@
 #ifndef ZABBIX_PROXYCONFIG_H
 #define ZABBIX_PROXYCONFIG_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 extern int	CONFIG_PROXYCONFIG_FREQUENCY;
 

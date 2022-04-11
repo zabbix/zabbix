@@ -19,8 +19,8 @@
 
 #include "log.h"
 
-#include "mutexs.h"
-#include "threads.h"
+#include "zbxmutexs.h"
+#include "zbxthreads.h"
 #include "cfg.h"
 #ifdef _WINDOWS
 #	include "messages.h"

@@ -20,7 +20,7 @@
 #ifndef ZABBIX_HOUSEKEEPER_H
 #define ZABBIX_HOUSEKEEPER_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 extern int	CONFIG_HOUSEKEEPING_FREQUENCY;
 extern int	CONFIG_MAX_HOUSEKEEPER_DELETE;

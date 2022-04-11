@@ -30,7 +30,7 @@
 #include "zbxdbupgrade.h"
 #include "log.h"
 #include "zbxgetopt.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "zbxmodules.h"
 #include "zbxnix.h"
 
