@@ -80,15 +80,14 @@ window.dashboard_share_edit_popup = {
 					}
 				}
 
-				let title;
-				let messages = [];
+				let title, messages;
 
 				if (typeof exception === 'object' && 'error' in exception) {
 					title = exception.error.title;
 					messages = exception.error.messages;
 				}
 				else {
-					title = t('Failed to update dashboard sharing.');
+					messages = [<?= json_encode(_('Failed to update dashboard sharing.')) ?>];
 				}
 
 				const message_box = makeMessageBox('bad', messages, title)[0];

@@ -668,8 +668,7 @@ class CDashboard extends CBaseComponent {
 
 				clearMessages();
 
-				let title;
-				let messages = [];
+				let title, messages;
 
 				if (typeof exception === 'object' && 'error' in exception) {
 					title = exception.error.title;
@@ -984,15 +983,14 @@ class CDashboard extends CBaseComponent {
 					}
 				}
 
-				let title;
-				let messages = [];
+				let title, messages;
 
 				if (typeof exception === 'object' && 'error' in exception) {
 					title = exception.error.title;
 					messages = exception.error.messages;
 				}
 				else {
-					title = t('Failed to update dashboard properties.');
+					messages = [t('Failed to update dashboard properties.')];
 				}
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
@@ -1061,15 +1059,14 @@ class CDashboard extends CBaseComponent {
 					}
 				}
 
-				let title;
-				let messages = [];
+				let title, messages;
 
 				if (typeof exception === 'object' && 'error' in exception) {
 					title = exception.error.title;
 					messages = exception.error.messages;
 				}
 				else {
-					title = t('Failed to update dashboard page properties.');
+					messages = [t('Failed to update dashboard page properties.')];
 				}
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
@@ -1315,15 +1312,14 @@ class CDashboard extends CBaseComponent {
 					}
 				}
 
-				let title;
-				let messages = [];
+				let title, messages;
 
 				if (typeof exception === 'object' && 'error' in exception) {
 					title = exception.error.title;
 					messages = exception.error.messages;
 				}
 				else {
-					title = t('Failed to update widget properties.');
+					messages = [t('Failed to update widget properties.')];
 				}
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
