@@ -22,11 +22,19 @@ ALTER TABLE history_str SET (timescaledb.compress,timescaledb.compress_segmentby
 -- In TSDBv1 chunks will be compressed automatically when policy is added and it is time for these chunks to be compressed
 DO $$
 DECLARE
-	jobid					INTEGER;
-	current_timescaledb_version_major	INTEGER;
+	jobid			INTEGER;
+	tsdb_version_major	INTEGER;
 BEGIN
-	IF (current_timescaledb_version_major < 2)
+	SELECT substring(extversion, '^\d+') INTO tsdb_version_major FROM pg_extension WHERE extname='timescaledb';
+
+	IF (tsdb_version_major < 2)
 	THEN
+		PERFORM add_compress_chunks_policy('history_str', (
+				SELECT (p.older_than).integer_interval FROM _timescaledb_config.bgw_policy_compress_chunks p
+				INNER JOIN _timescaledb_catalog.hypertable h ON (h.id=p.hypertable_id) WHERE h.table_name='history_str_old'
+			)::integer
+		);
+	ELSE
 		SELECT add_compression_policy('history_str', (
 			SELECT extract(epoch FROM (config::json->>'compress_after')::interval)
 			FROM timescaledb_information.jobs
@@ -41,11 +49,5 @@ BEGIN
 
 		PERFORM alter_job(jobid, scheduled => true);
 		CALL run_job(jobid);
-	ELSE
-		PERFORM add_compress_chunks_policy('history_str', (
-				SELECT (p.older_than).integer_interval FROM _timescaledb_config.bgw_policy_compress_chunks p
-				INNER JOIN _timescaledb_catalog.hypertable h ON (h.id=p.hypertable_id) WHERE h.table_name='history_str_old'
-			)::integer
-		);
 	END IF;
 END $$;
