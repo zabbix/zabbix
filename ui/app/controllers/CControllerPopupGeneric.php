@@ -1183,11 +1183,13 @@ class CControllerPopupGeneric extends CController {
 			case 'graph_prototypes':
 				$options += [
 					'output' => API_OUTPUT_EXTEND,
-					'selectHosts' => ['name'],
+					'selectHosts' => ['hostid', 'name'],
 					'hostids' => $this->hostids ? $this->hostids : null
 				];
 
 				if ($this->source_table === 'graph_prototypes') {
+					$options['selectDiscoveryRule'] = ['hostid'];
+
 					$records = (!$this->host_preselect_required || $this->hostids)
 						? API::GraphPrototype()->get($options)
 						: [];
