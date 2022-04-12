@@ -70,6 +70,7 @@ class CDocHelper {
 	const CONFIGURATION_HOST_HTTPCONF_LIST =				'web_interface/frontend_sections/configuration/hosts/web';
 	const CONFIGURATION_HOST_ITEM_LIST =					'web_interface/frontend_sections/configuration/hosts/items';
 	const CONFIGURATION_HOST_ITEM_PROTOTYPE_LIST =			'web_interface/frontend_sections/configuration/hosts/discovery/item_prototypes';
+	const CONFIGURATION_HOST_EDIT =							'config/hosts/host#configuration';
 	const CONFIGURATION_HOST_LIST =							'web_interface/frontend_sections/configuration/hosts';
 	const CONFIGURATION_HOST_PROTOTYPE_EDIT =				'vm_monitoring#host-prototypes';
 	const CONFIGURATION_HOST_PROTOTYPE_LIST =				'web_interface/frontend_sections/configuration/hosts/discovery/host_prototypes';
@@ -99,9 +100,8 @@ class CDocHelper {
 	const CONFIGURATION_TRIGGERS_EDIT =						'config/triggers/trigger#configuration';
 	const DASHBOARD_PAGE_PROPERTIES_EDIT =					'web_interface/frontend_sections/monitoring/dashboard#adding-pages';
 	const DASHBOARD_PROPERTIES_EDIT =						'web_interface/frontend_sections/monitoring/dashboard#creating-a-dashboard';
-	const CONFIGURATION_HOST_EDIT = 'config/hosts/host#configuration';
-	const HOSTINVENTORIESOVERVIEW =							'web_interface/frontend_sections/inventory/overview';
 	const INVENTORY_HOST_LIST =								'web_interface/frontend_sections/inventory/hosts';
+	const INVENTORY_HOST_OVERVIEW =							'web_interface/frontend_sections/inventory/overview';
 	const MONITORING_CHARTS_VIEW =							'web_interface/frontend_sections/monitoring/hosts/graphs';
 	const MONITORING_DASHBOARD_LIST =						'web_interface/frontend_sections/monitoring/dashboard';
 	const MONITORING_DASHBOARD_VIEW =						'web_interface/frontend_sections/monitoring/dashboard';
