@@ -373,7 +373,7 @@ class CItemPrototype extends CItemGeneral {
 		self::validateCreate($items);
 
 		self::createForce($items);
-		[$tpl_items] = $this->getTemplatedObjects($items);
+		[$tpl_items] = self::getTemplatedObjects($items);
 
 		if ($tpl_items) {
 			$this->inherit($tpl_items);
@@ -463,7 +463,7 @@ class CItemPrototype extends CItemGeneral {
 
 		self::updateForce($items, $db_items);
 
-		[$tpl_items, $tpl_db_items] = $this->getTemplatedObjects($items, $db_items);
+		[$tpl_items, $tpl_db_items] = self::getTemplatedObjects($items, $db_items);
 
 		if ($tpl_items) {
 			$this->inherit($tpl_items, $tpl_db_items);

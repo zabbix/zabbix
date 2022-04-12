@@ -445,7 +445,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @return array     Consisting of [0] parent items and (on update) [1] their current DB records.
 	 */
-	protected function getTemplatedObjects(array $items, array $db_items = []): array {
+	protected static function getTemplatedObjects(array $items, array $db_items = []): array {
 		foreach ($items as $i => $item) {
 			if ($item['host_status'] != HOST_STATUS_TEMPLATE) {
 				unset($items[$i]);
@@ -898,7 +898,7 @@ abstract class CItemGeneral extends CApiService {
 			self::checkDependentItems($edit_items, $upd_db_items, true);
 		}
 
-		[$tpl_items, $tpl_db_items] = $this->getTemplatedObjects(array_merge($upd_items, $ins_items), $upd_db_items);
+		[$tpl_items, $tpl_db_items] = self::getTemplatedObjects(array_merge($upd_items, $ins_items), $upd_db_items);
 
 		if ($tpl_items) {
 			$this->inherit($tpl_items, $tpl_db_items);

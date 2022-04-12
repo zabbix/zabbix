@@ -439,7 +439,7 @@ class CHostPrototype extends CHostBase {
 		$this->validateCreate($host_prototypes);
 
 		$this->createForce($host_prototypes);
-		[$tpl_host_prototypes] = $this->getTemplatedObjects($host_prototypes);
+		[$tpl_host_prototypes] = self::getTemplatedObjects($host_prototypes);
 
 		if ($tpl_host_prototypes) {
 			$this->inherit($tpl_host_prototypes);
@@ -545,7 +545,7 @@ class CHostPrototype extends CHostBase {
 		$this->updateForce($host_prototypes, $db_host_prototypes);
 
 		[$tpl_host_prototypes, $tpl_db_host_prototypes] =
-			$this->getTemplatedObjects($host_prototypes, $db_host_prototypes);
+			self::getTemplatedObjects($host_prototypes, $db_host_prototypes);
 
 		if ($tpl_host_prototypes) {
 			$this->inherit($tpl_host_prototypes, $tpl_db_host_prototypes);
@@ -1695,7 +1695,7 @@ class CHostPrototype extends CHostBase {
 			$this->createForce($ins_host_prototypes, true);
 		}
 
-		[$tpl_host_prototypes, $tpl_db_host_prototypes] = $this->getTemplatedObjects(
+		[$tpl_host_prototypes, $tpl_db_host_prototypes] = self::getTemplatedObjects(
 			array_merge($upd_host_prototypes, $ins_host_prototypes), $upd_db_host_prototypes
 		);
 
