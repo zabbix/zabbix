@@ -97,6 +97,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	AGENT_ERROR	-5
 #define	GATEWAY_ERROR	-6
 #define	CONFIG_ERROR	-7
+#define	SIG_ERROR	-8
 
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_sysinfo_ret_string(int ret);
@@ -1158,6 +1159,7 @@ typedef struct zbx_custom_interval	zbx_custom_interval_t;
 int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_custom_interval_t **custom_intervals,
 		char **error);
 int	zbx_validate_interval(const char *str, char **error);
+int	zbx_custom_interval_is_scheduling(const zbx_custom_interval_t *custom_intervals);
 void	zbx_custom_interval_free(zbx_custom_interval_t *custom_intervals);
 int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interval,
 		const zbx_custom_interval_t *custom_intervals, time_t now);
