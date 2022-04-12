@@ -451,16 +451,7 @@ class CUserDirectory extends CApiService {
 
 		$db_group = reset($db_groups);
 
-		if ($db_group['userdirectoryid'] === $auth['ldap_userdirectoryid']) {
-			$error = _s('Cannot delete default user directory "%1$s".',
-				$db_userdirectories[$auth['ldap_userdirectoryid']]['name']
-			);
-		}
-		else {
-			$error = _s('Cannot delete user directory "%1$s".', $db_group['name']);
-		}
-
-		static::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		static::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete user directory "%1$s".', $db_group['name']));
 	}
 
 	/**
