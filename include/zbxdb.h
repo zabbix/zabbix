@@ -247,7 +247,7 @@ struct zbx_db_version_info_t
 
 	zbx_db_version_status_t	ext_flag;
 
-	char 			*ext_lic;
+	char			*ext_lic;
 	zbx_uint32_t		ext_status;
 };
 
