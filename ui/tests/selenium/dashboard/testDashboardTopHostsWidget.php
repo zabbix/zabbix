@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../traits/TagTrait.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
- * @backup widget, profiles, dashboard
+ * @backup widget, profiles, dashboard, items
  *
  * @onBefore prepareDashboardPageData
  */
@@ -37,6 +37,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 * @var integer
 	 */
 	protected static $dashboardids;
+
+	/**
+	 * Id of items by name.
+	 *
+	 * @var integer
+	 */
+	protected static $itemids;
 
 	/**
 	 * Widget name for update.
@@ -500,14 +507,53 @@ class testDashboardTopHostsWidget extends CWebTest {
 						]
 					]
 				]
+			],
+			[
+				'name' => 'top_host_text_items',
+				'display_period' => 30,
+				'auto_start' => 1,
+				'pages' => [
+					[]
+				]
 			]
 		]);
 
 		$this->assertArrayHasKey('dashboardids', $response);
 		self::$dashboardids = CDataHelper::getIds('name');
 
+		// Create 3 items with different Value type.
+		$response_2 = CDataHelper::call('item.create', [
+			[
+				'name' => 'trap_text',
+				'key_' => 'trap_text',
+				'hostid' => 10084,
+				'type' => 2,
+				'value_type' => 4
+			],
+			[
+				'name' => 'trap_log',
+				'key_' => 'trap_log',
+				'hostid' => 10084,
+				'type' => 2,
+				'value_type' => 2
+			],
+			[
+				'name' => 'trap_char',
+				'key_' => 'trap_char',
+				'hostid' => 10084,
+				'type' => 2,
+				'value_type' => 1
+			]
+		]);
+
+		$this->assertArrayHasKey('itemids', $response_2);
+		self::$itemids = CDataHelper::getIds('name');
+
 		// Add value to item displayed in Top Hosts widget.
 		CDataHelper::addItemData(99086, 1000);
+		CDataHelper::addItemData(self::$itemids['trap_text'], 'Text for text item');
+		CDataHelper::addItemData(self::$itemids['trap_log'], 'Logs for text item');
+		CDataHelper::addItemData(self::$itemids['trap_char'], 'characters_here');
 	}
 
 	public static function getCreateData() {
@@ -2138,5 +2184,166 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		$element = $dashboard->getWidget('Top hosts screenshots')->query('class:list-table')->one();
 		$this->assertScreenshot($element, $data['screen_name']);
+	}
+
+	/**
+	 * Check warning and info messages.
+	 */
+	public function testDashboardTopHostsWidget_CheckInfoMessages() {
+		$warnings = ['.//span[@id="tophosts-column-aggregate-function-warning"]', './/span[@id="tophosts-column-display-warning"]',
+				'.//span[@id="tophosts-column-thresholds-warning"]'];
+		$info = '//label[@for="history"]';
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_create']);
+		$dashboard = CDashboardElement::find()->one();
+		$form = $dashboard->edit()->addWidget()->asForm();
+		$form->fill(['Type' => 'Top hosts']);
+		COverlayDialogElement::find()->waitUntilReady()->one();
+
+		// Add column.
+		$form->query('id:add')->waitUntilClickable()->one()->click();
+		$column_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->all()->last();
+
+		// Check that no warning icon displayed before adding fields.
+		foreach ($warnings as $warning) {
+			$this->assertFalse($column_form->query('xpath:'.$warning)->one()->isVisible());
+		}
+
+		// Check that History data hint ID is visible.
+		$this->assertTrue($column_form->query('xpath:'.$info.'/a')->one()->isVisible());
+
+		// Adding those fields new info icons appear.
+		$column_form->fill(['Aggregation function' => 'min', 'Display' => 'Bar']);
+		$column_form->query('button:Add')->one()->click();
+		$warnings = array_merge($warnings, [$info]);
+
+		// Check warning and info icon message.
+		foreach ($warnings as $warning) {
+			$column_form->query('xpath:'.$warning.'/a')->one()->click();
+
+			// Check hint-box.
+			$hint = $column_form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
+			$hintbox = ($warning === $info)
+					? 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
+					: 'With this setting only numeric items will be displayed in this column.';
+			$this->assertEquals($hintbox, $hint->one()->getText());
+
+			// Close the hint-box.
+			$hint->query('xpath://button[@class="overlay-close-btn"]')->one()->click();
+			$hint->waitUntilNotPresent();
+		}
+	}
+
+	public static function getCheckTextItemsData() {
+		return [
+			// #0 text item - value displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'text value item'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_text'
+						]
+					],
+					'text' => 'Text for text item'
+				]
+			],
+			// #1 text item, display Bar - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'text display bar'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_text',
+							'Display' => 'Bar'
+						]
+					]
+				]
+			],
+			// #2 text item, display Indicators - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'text display indicators'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_text',
+							'Display' => 'Indicators'
+						]
+					]
+				]
+			],
+			// #3 text item, Aggregation function max - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'text aggregation function'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_text',
+							'Aggregation function' => 'max'
+						]
+					]
+				]
+			],
+			// #4 text item, Threshold - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'text threshold'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_text',
+							'Aggregation function' => 'max',
+							'Thresholds' => [
+								[
+									'value' => '1',
+									'color' => 'FFEB3B'
+								]
+							]
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 *
+	 * @dataProvider getCheckTextItemsData
+	 */
+	public function testDashboardTopHostsWidget_CheckTextItems($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_text_items']);
+		$dashboard = CDashboardElement::find()->one();
+		$form = $dashboard->edit()->addWidget()->asForm();
+		$form->fill(['Type' => 'Top hosts']);
+		COverlayDialogElement::find()->waitUntilReady()->one();
+
+		// Add new column.
+		$this->fillColumnForm($data, 'create');
+
+		$form->fill($data['main_fields']);
+		$form->submit();
+		$this->page->waitUntilReady();
+
+		$dashboard->save();
+
+		if (array_key_exists('text', $data)) {
+			$this->assertEquals($data['text'], $dashboard->getWidget($data['main_fields']['Name'])->getContent()->getText());
+		}
+		else {
+			$this->assertEquals('No data found.', $dashboard->getWidget($data['main_fields']['Name'])->getContent()->getText());
+		}
 	}
 }
