@@ -333,7 +333,7 @@ class CTemplate extends CHostGeneral {
 
 		$this->checkTemplatesLinks($templates);
 
-		$this->updateTemplateGroups($templates);
+		$this->updateGroups($templates);
 		$this->updateTagsNew($templates);
 		$this->updateMacros($templates);
 		$this->updateTemplates($templates);
@@ -439,7 +439,7 @@ class CTemplate extends CHostGeneral {
 			DB::update('hosts', $upd_templates);
 		}
 
-		$this->updateTemplateGroups($templates, $db_templates);
+		$this->updateGroups($templates, $db_templates);
 		$this->updateTagsNew($templates, $db_templates);
 		$this->updateMacros($templates, $db_templates);
 		$this->updateTemplates($templates, $db_templates);
@@ -744,7 +744,7 @@ class CTemplate extends CHostGeneral {
 
 		$templates = $this->getObjectsByData($data, $db_templates);
 
-		$this->updateTemplateGroups($templates, $db_templates);
+		$this->updateGroups($templates, $db_templates);
 		$this->updateMacros($templates, $db_templates);
 		$this->updateTemplates($templates, $db_templates);
 
@@ -765,7 +765,7 @@ class CTemplate extends CHostGeneral {
 
 		$templates = $this->getObjectsByData($data, $db_templates);
 
-		$this->updateTemplateGroups($templates, $db_templates);
+		$this->updateGroups($templates, $db_templates);
 		$this->updateMacros($templates, $db_templates);
 		$this->updateTemplates($templates, $db_templates);
 
@@ -786,7 +786,7 @@ class CTemplate extends CHostGeneral {
 
 		$templates = $this->getObjectsByData($data, $db_templates);
 
-		$this->updateTemplateGroups($templates, $db_templates);
+		$this->updateGroups($templates, $db_templates);
 		$this->updateMacros($templates, $db_templates);
 		$this->updateTemplates($templates, $db_templates);
 

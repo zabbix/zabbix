@@ -35,7 +35,7 @@ abstract class CHostGeneral extends CHostBase {
 	];
 
 	/**
-	 * Check for valid template groups.
+	 * Check for valid host groups and template groups.
 	 *
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
@@ -43,6 +43,8 @@ abstract class CHostGeneral extends CHostBase {
 	 * @throws APIException if groups are not valid.
 	 */
 	protected function checkGroups(array $hosts, array $db_hosts = null): void {
+		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+
 		$edit_groupids = [];
 
 		foreach ($hosts as $host) {
@@ -56,7 +58,7 @@ abstract class CHostGeneral extends CHostBase {
 				$edit_groupids += array_flip($groupids);
 			}
 			else {
-				$db_groupids = array_column($db_hosts[$host['templateid']]['groups'], 'groupid');
+				$db_groupids = array_column($db_hosts[$host[$id_field_name]]['groups'], 'groupid');
 
 				$ins_groupids = array_flip(array_diff($groupids, $db_groupids));
 				$del_groupids = array_flip(array_diff($db_groupids, $groupids));
@@ -69,11 +71,20 @@ abstract class CHostGeneral extends CHostBase {
 			return;
 		}
 
-		$count = API::TemplateGroup()->get([
-			'countOutput' => true,
-			'groupids' => array_keys($edit_groupids),
-			'editable' => true
-		]);
+		if ($id_field_name === 'templateid') {
+			$count = API::TemplateGroup()->get([
+				'countOutput' => true,
+				'groupids' => array_keys($edit_groupids),
+				'editable' => true
+			]);
+		}
+		else {
+			$count = API::HostGroup()->get([
+				'countOutput' => true,
+				'groupids' => array_keys($edit_groupids),
+				'editable' => true
+			]);
+		}
 
 		if ($count != count($edit_groupids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
@@ -232,78 +243,19 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	/**
-	 * Update table "hosts_groups" and populate hosts.groups by "hostgroupid" property.
+	 * Update table "hosts_groups" and populate hosts.groups by "hostgroupid" property or update table "template_group
+	 * and populate template.groups by "templategroupid".
 	 *
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
 	 */
 	protected function updateGroups(array &$hosts, array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+		$groupid_field_name = $this instanceof CTemplate ? 'templategroupid' : 'hostgroupid';
+		$table_name = $this instanceof CTemplate ? 'template_group' : 'hosts_groups';
 
-		$ins_hosts_groups = [];
-		$del_hostgroupids = [];
-
-		foreach ($hosts as &$host) {
-			if (!array_key_exists('groups', $host)) {
-				continue;
-			}
-
-			$db_groups = ($db_hosts !== null)
-				? array_column($db_hosts[$host[$id_field_name]]['groups'], null, 'groupid')
-				: [];
-
-			foreach ($host['groups'] as &$group) {
-				if (array_key_exists($group['groupid'], $db_groups)) {
-					$group['hostgroupid'] = $db_groups[$group['groupid']]['hostgroupid'];
-					unset($db_groups[$group['groupid']]);
-				}
-				else {
-					$ins_hosts_groups[] = [
-						'hostid' => $host[$id_field_name],
-						'groupid' => $group['groupid']
-					];
-				}
-			}
-			unset($group);
-
-			$del_hostgroupids = array_merge($del_hostgroupids, array_column($db_groups, 'hostgroupid'));
-		}
-		unset($host);
-
-		if ($del_hostgroupids) {
-			DB::delete('hosts_groups', ['hostgroupid' => $del_hostgroupids]);
-		}
-
-		if ($ins_hosts_groups) {
-			$hostgroupids = DB::insertBatch('hosts_groups', $ins_hosts_groups);
-		}
-
-		foreach ($hosts as &$host) {
-			if (!array_key_exists('groups', $host)) {
-				continue;
-			}
-
-			foreach ($host['groups'] as &$group) {
-				if (!array_key_exists('hostgroupid', $group)) {
-					$group['hostgroupid'] = array_shift($hostgroupids);
-				}
-			}
-			unset($group);
-		}
-		unset($host);
-	}
-
-	/**
-	 * Update table "template_group" and populate template.group by "templategroupid" property.
-	 *
-	 * @param array      $hosts
-	 * @param array|null $db_hosts
-	 */
-	protected function updateTemplateGroups(array &$hosts, array $db_hosts = null): void {
-		$id_field_name = 'templateid';
-
-		$ins_template_group = [];
-		$del_templategroupids = [];
+		$ins_groups = [];
+		$del_groupids = [];
 
 		foreach ($hosts as &$host) {
 			if (!array_key_exists('groups', $host)) {
@@ -316,11 +268,11 @@ abstract class CHostGeneral extends CHostBase {
 
 			foreach ($host['groups'] as &$group) {
 				if (array_key_exists($group['groupid'], $db_groups)) {
-					$group['templategroupid'] = $db_groups[$group['groupid']]['templategroupid'];
+					$group[$groupid_field_name] = $db_groups[$group['groupid']][$groupid_field_name];
 					unset($db_groups[$group['groupid']]);
 				}
 				else {
-					$ins_template_group[] = [
+					$ins_groups[] = [
 						'hostid' => $host[$id_field_name],
 						'groupid' => $group['groupid']
 					];
@@ -328,16 +280,16 @@ abstract class CHostGeneral extends CHostBase {
 			}
 			unset($group);
 
-			$del_templategroupids = array_merge($del_templategroupids, array_column($db_groups, 'templategroupid'));
+			$del_groupids = array_merge($del_groupids, array_column($db_groups, $groupid_field_name));
 		}
 		unset($host);
 
-		if ($del_templategroupids) {
-			DB::delete('template_group', ['templategroupid' => $del_templategroupids]);
+		if ($del_groupids) {
+			DB::delete($table_name, [$groupid_field_name => $del_groupids]);
 		}
 
-		if ($ins_template_group) {
-			$templategroupids = DB::insertBatch('template_group', $ins_template_group);
+		if ($ins_groups) {
+			$groupids = DB::insertBatch($table_name, $ins_groups);
 		}
 
 		foreach ($hosts as &$host) {
@@ -346,8 +298,8 @@ abstract class CHostGeneral extends CHostBase {
 			}
 
 			foreach ($host['groups'] as &$group) {
-				if (!array_key_exists('templategroupid', $group)) {
-					$group['templategroupid'] = array_shift($templategroupids);
+				if (!array_key_exists($groupid_field_name, $group)) {
+					$group[$groupid_field_name] = array_shift($groupids);
 				}
 			}
 			unset($group);
@@ -1797,12 +1749,16 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array $db_hosts
 	 */
 	protected function addAffectedGroups(array $hosts, array &$db_hosts): void {
+		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+		$groupid_field_name = $this instanceof CTemplate ? 'templategroupid' : 'hostgroupid';
+		$table_name = $this instanceof CTemplate ? 'template_group' : 'hosts_groups';
+
 		$hostids = [];
 
 		foreach ($hosts as $host) {
 			if (array_key_exists('groups', $host)) {
-				$hostids[] = $host['templateid'];
-				$db_hosts[$host['templateid']]['groups'] = [];
+				$hostids[] = $host[$id_field_name];
+				$db_hosts[$host[$id_field_name]]['groups'] = [];
 			}
 		}
 
@@ -1813,23 +1769,32 @@ abstract class CHostGeneral extends CHostBase {
 		$filter = ['hostid' => $hostids];
 
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
-			$db_groups = API::TemplateGroup()->get([
-				'output' => [],
-				'templateids' => $hostids,
-				'preservekeys' => true
-			]);
+			if ($id_field_name === 'templateid') {
+				$db_groups = API::TemplateGroup()->get([
+					'output' => [],
+					$id_field_name.'s' => $hostids,
+					'preservekeys' => true
+				]);
+			}
+			else {
+				$db_groups = API::HostGroup()->get([
+					'output' => [],
+					$id_field_name.'s' => $hostids,
+					'preservekeys' => true
+				]);
+			}
 
 			$filter += ['groupid' => array_keys($db_groups)];
 		}
 
 		$options = [
-			'output' => ['templategroupid', 'hostid', 'groupid'],
+			'output' => [$groupid_field_name, 'hostid', 'groupid'],
 			'filter' => $filter
 		];
-		$db_groups = DBselect(DB::makeSql('template_group', $options));
+		$db_groups = DBselect(DB::makeSql($table_name, $options));
 
 		while ($db_group = DBfetch($db_groups)) {
-			$db_hosts[$db_group['hostid']]['groups'][$db_group['templategroupid']] =
+			$db_hosts[$db_group['hostid']]['groups'][$db_group[$groupid_field_name]] =
 				array_diff_key($db_group, array_flip(['hostid']));
 		}
 	}
@@ -1842,6 +1807,10 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array      $db_hosts
 	 */
 	protected function massAddAffectedObjects(string $objects, array $objectids, array &$db_hosts): void {
+		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+		$groupid_field_name = $this instanceof CTemplate ? 'templategroupid' : 'hostgroupid';
+		$table_name = $this instanceof CTemplate ? 'template_group' : 'hosts_groups';
+
 		foreach ($db_hosts as &$db_host) {
 			$db_host[$objects] = [];
 		}
@@ -1854,23 +1823,32 @@ abstract class CHostGeneral extends CHostBase {
 				$filter += ['groupid' => $objectids];
 			}
 			elseif (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
-				$db_groups = API::TemplateGroup()->get([
-					'output' => [],
-					'templateids' => array_keys($db_hosts),
-					'preservekeys' => true
-				]);
+				if ($id_field_name === 'templateid') {
+					$db_groups = API::TemplateGroup()->get([
+						'output' => [],
+						$id_field_name.'s' => array_keys($db_hosts),
+						'preservekeys' => true
+					]);
+				}
+				else {
+					$db_groups = API::HostGroup()->get([
+						'output' => [],
+						$id_field_name.'s' => array_keys($db_hosts),
+						'preservekeys' => true
+					]);
+				}
 
 				$filter += ['groupid' => array_keys($db_groups)];
 			}
 
 			$options = [
-				'output' => ['templategroupid', 'hostid', 'groupid'],
+				'output' => [$groupid_field_name, 'hostid', 'groupid'],
 				'filter' => $filter
 			];
-			$db_hosts_groups = DBselect(DB::makeSql('template_group', $options));
+			$db_groups = DBselect(DB::makeSql($table_name, $options));
 
-			while ($link = DBfetch($db_hosts_groups)) {
-				$db_hosts[$link['hostid']]['groups'][$link['templategroupid']] =
+			while ($link = DBfetch($db_groups)) {
+				$db_hosts[$link['hostid']]['groups'][$link[$groupid_field_name]] =
 					array_diff_key($link, array_flip(['hostid']));
 			}
 		}
