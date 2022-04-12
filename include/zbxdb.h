@@ -100,7 +100,6 @@ zbx_err_codes_t	zbx_db_last_errcode(void);
 
 #ifdef HAVE_POSTGRESQL
 int	zbx_tsdb_get_version(void);
-char	*zbx_tsdb_get_version_friendly(int ver);
 char	*zbx_tsdb_get_license(void);
 #define ZBX_DB_TSDB_V1	(20000 > zbx_tsdb_get_version())
 #endif
@@ -183,10 +182,9 @@ int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 
 #define ZBX_DBVERSION_UNDEFINED				0
 
-#define ZBX_DB_EXT_STATUS_FLAGS_TSDB_CONFIGURED			0x00000001
+#define ZBX_DB_EXT_STATUS_FLAGS_TSDB_EXPECTED			0x00000001
 #define ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE	0x00000002
 
-#define ZBX_TIMESCALEDB						"TimescaleDB"
 #define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB		100002
 #define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB_FRIENDLY	"10.2"
 #define ZBX_TIMESCALEDB_MIN_VERSION				10500

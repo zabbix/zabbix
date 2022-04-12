@@ -2500,7 +2500,7 @@ int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx
  *                                                                            *
  * Purpose: prepare json for front-end with the DB current, minimum and       *
  *          maximum versions and a flag that indicates if the version         *
- *          satisfies the requirements, and other infomration as well as      *
+ *          satisfies the requirements, and other information as well as      *
  *          information about DB extension in a similar way                   *
  *                                                                            *
  * Parameters:  json                     - [IN/OUT] json data                 *
@@ -2528,13 +2528,16 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 	zbx_json_addint64(json, "flag", info->flag);
 	zbx_json_close(json);
 
-	if (info->ext_status & ZBX_DB_EXT_STATUS_FLAGS_TSDB_CONFIGURED)
+	if (0 != (ZBX_DB_EXT_STATUS_FLAGS_TSDB_EXPECTED & info->ext_status))
 	{
 		zbx_json_addobject(json, NULL);
 		zbx_json_addstring(json, "database", info->extension, ZBX_JSON_TYPE_STRING);
 
 		if (DB_VERSION_FAILED_TO_RETRIEVE != info->ext_flag)
-			zbx_json_addstring(json, "current_version", info->ext_friendly_current_version, ZBX_JSON_TYPE_STRING);
+		{
+			zbx_json_addstring(json, "current_version",
+					info->ext_friendly_current_version, ZBX_JSON_TYPE_STRING);
+		}
 
 		zbx_json_addstring(json, "min_version", info->ext_friendly_min_version, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(json, "max_version", info->ext_friendly_max_version, ZBX_JSON_TYPE_STRING);
@@ -2547,8 +2550,14 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 
 		zbx_json_addint64(json, "flag", info->ext_flag);
 
-		zbx_json_addint64(json, "compression_availability",
-				info->ext_status & ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE ? ON : OFF);
+		if (0 != (ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE & info->ext_status))
+		{
+			zbx_json_addint64(json, "compression_availability", ON);
+		}
+		else
+		{
+			zbx_json_addint64(json, "compression_availability", OFF);
+		}
 
 		zbx_json_close(json);
 	}
@@ -2828,36 +2837,34 @@ out:
  **************************************************************************************************************/
 void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info)
 {
-	int			tsdb_ver;
+	int	tsdb_ver;
 
-	version_info->extension = ZBX_TIMESCALEDB;
+	if (0 == (ZBX_DB_EXT_STATUS_FLAGS_TSDB_EXPECTED & version_info->ext_status))
+		return;
 
-	if (0 == (tsdb_ver = zbx_tsdb_get_version()))
-	{
-		version_info->ext_flag = DB_VERSION_FAILED_TO_RETRIEVE;
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot determine TimescaleDB version");
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "TimescaleDB version: [%d]", tsdb_ver);
+	tsdb_ver = zbx_tsdb_get_version();
 
-		version_info->ext_current_version = (zbx_uint32_t)tsdb_ver;
-		version_info->ext_min_version = ZBX_TIMESCALEDB_MIN_VERSION;
-		version_info->ext_max_version = ZBX_TIMESCALEDB_MAX_VERSION;
-		version_info->ext_min_supported_version = ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION;
+	version_info->extension = "TimescaleDB";
 
-		version_info->ext_friendly_current_version = zbx_tsdb_get_version_friendly(tsdb_ver);
-		version_info->ext_friendly_min_version = ZBX_TIMESCALEDB_MIN_VERSION_FRIENDLY;
-		version_info->ext_friendly_max_version = ZBX_TIMESCALEDB_MAX_VERSION_FRIENDLY;
-		version_info->ext_friendly_min_supported_version = ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION_FRIENDLY;
+	version_info->ext_current_version = (zbx_uint32_t)tsdb_ver;
+	version_info->ext_min_version = ZBX_TIMESCALEDB_MIN_VERSION;
+	version_info->ext_max_version = ZBX_TIMESCALEDB_MAX_VERSION;
+	version_info->ext_min_supported_version = ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION;
 
-		version_info->ext_flag = zbx_db_version_check(version_info->extension, version_info->ext_current_version,
-				version_info->ext_min_version, version_info->ext_max_version, version_info->ext_min_supported_version);
+	version_info->ext_friendly_current_version = zbx_dsprintf(NULL, "%d.%d.%d",
+			RIGHT2(tsdb_ver/10000), RIGHT2(tsdb_ver/100), RIGHT2(tsdb_ver));
 
-		version_info->ext_lic = zbx_tsdb_get_license();
+	version_info->ext_friendly_min_version = ZBX_TIMESCALEDB_MIN_VERSION_FRIENDLY;
+	version_info->ext_friendly_max_version = ZBX_TIMESCALEDB_MAX_VERSION_FRIENDLY;
+	version_info->ext_friendly_min_supported_version = ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION_FRIENDLY;
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "TimescaleDB license: [%s]", version_info->ext_lic);
-	}
+	version_info->ext_flag = zbx_db_version_check(version_info->extension, version_info->ext_current_version,
+			version_info->ext_min_version, version_info->ext_max_version,
+			version_info->ext_min_supported_version);
+
+	version_info->ext_lic = zbx_tsdb_get_license();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: [%d], license: [%s]", tsdb_ver, version_info->ext_lic);
 }
 #endif
 
@@ -2926,29 +2933,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: converts TimescaleDB (TSDB) version to user friendly format       *
- *                                                                            *
- * Example: TSDB 10501 version will be returned as "1.5.1"                    *
- *                                                                            *
- * Return value: TSDB version in user friendly format as string               *
- *                                                                            *
- * Comments: returns a pointer to allocated memory                            *
- *                                                                            *
- ******************************************************************************/
-char *zbx_tsdb_get_version_friendly(int ver)
-{
-	int major, minor, patch;
-
-	patch = ver % 100;
-	ver = (ver - patch) / 100;
-	minor = ver % 100;
-	major = (ver - minor) / 100;
-
-	return zbx_dsprintf(NULL, "%d.%d.%d", major, minor, patch);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: retrievs TimescaleDB (TSDB) license information                   *
  *                                                                            *
  * Return value: license information from datase as string                    *
@@ -2966,9 +2950,10 @@ char	*zbx_tsdb_get_license(void)
 
 	result = zbx_db_select("show timescaledb.license");
 
-	if ((DB_RESULT)ZBX_DB_DOWN != result && NULL != result)
-		if (NULL != (row = zbx_db_fetch(result)))
-			tsdb_lic = zbx_strdup(NULL, row[0]);
+	if ((DB_RESULT)ZBX_DB_DOWN != result && NULL != result && NULL != (row = zbx_db_fetch(result)))
+	{
+		tsdb_lic = zbx_strdup(NULL, row[0]);
+	}
 
 	DBfree_result(result);
 
