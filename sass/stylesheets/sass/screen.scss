@@ -3066,9 +3066,8 @@ $form-icon-btn: (
 
 			.overlay-close-btn {
 				position: static;
-				margin: -8px -6px 0 30px;
-				font-size: 24px;
-				font-weight: normal;
+				margin: -9px -6px 0 30px;
+				font-size: 25px;
 			}
 		}
 
@@ -3603,6 +3602,7 @@ $form-icon-btn: (
 
 	.dashboard-widget-head {
 		margin: -13px -10px 7px;
+		padding: 0;
 
 		ul {
 			margin: 4px 0 0 1px;
