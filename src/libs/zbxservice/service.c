@@ -21,7 +21,6 @@
 #include "log.h"
 #include "zbxipcservice.h"
 
-#include "../../libs/zbxalgo/vectorimpl.h"
 ZBX_PTR_VECTOR_IMPL(service, DB_SERVICE *)
 
 void	zbx_service_flush(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size)

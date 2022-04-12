@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "sysinc.h"
+#include "zbxsysinc.h"
 
 extern "C"
 {
@@ -25,7 +25,6 @@ extern "C"
 #	include "sysinfo.h"
 #	include "log.h"
 #	include "zbxalgo.h"
-#	include "../../zbxalgo/vectorimpl.h"
 #	include "zbxjson.h"
 #	include "cfg.h"
 }

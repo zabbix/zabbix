@@ -153,6 +153,7 @@ class CWebUser {
 			'username' => ZBX_GUEST_USER,
 			'userid' => 0,
 			'lang' => CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG),
+			'theme' => CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_THEME),
 			'type' => 0,
 			'gui_access' => GROUP_GUI_ACCESS_SYSTEM,
 			'debug_mode' => false,

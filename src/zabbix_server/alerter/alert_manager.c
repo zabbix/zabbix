@@ -19,7 +19,7 @@
 
 #include "alert_manager.h"
 
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
 #include "log.h"
 #include "zbxserver.h"
@@ -34,8 +34,8 @@
 
 #define ZBX_UPDATE_STR(dst, src)			\
 	if (NULL == src)				\
-		zbx_free(dst); 				\
-	else if (NULL == dst || 0 != strcmp(dst, src)) 	\
+		zbx_free(dst);				\
+	else if (NULL == dst || 0 != strcmp(dst, src))	\
 		dst = zbx_strdup(dst, src);
 
 #define ZBX_AM_DB_POLL_DELAY	1
@@ -2199,8 +2199,8 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 
 			if (NULL == (source = zbx_hashset_search(&sources, &source_local)))
 			{
+				source_local.alerts_num = 0;
 				source = zbx_hashset_insert(&sources, &source_local, sizeof(source_local));
-				source->alerts_num = 0;
 				zbx_vector_ptr_append(&view, source);
 			}
 			source->alerts_num++;

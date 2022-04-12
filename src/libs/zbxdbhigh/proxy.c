@@ -28,10 +28,12 @@
 #include "discovery.h"
 #include "zbxalgo.h"
 #include "preproc.h"
+#include "zbxhash.h"
 #include "../zbxcrypto/tls_tcp_active.h"
+#include "../zbxkvs/kvs.h"
 #include "zbxlld.h"
 #include "events.h"
-#include "zbxvault.h"
+#include "../zbxvault/vault.h"
 #include "zbxavailability.h"
 #include "zbxcommshigh.h"
 
@@ -894,7 +896,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 			if (ZBX_MACRO_VALUE_VAULT != type)
 				continue;
 
-			zbx_strsplit(row[2 + offset], ':', &path, &key);
+			zbx_strsplit_last(row[2 + offset], ':', &path, &key);
 
 			if (NULL == key)
 			{
@@ -1038,10 +1040,9 @@ static void	get_proxy_monitored_httptests(zbx_uint64_t proxy_hostid, zbx_vector_
 static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_json *j)
 {
 	int		i;
-	zbx_hashset_t	kvs;
+	zbx_kvs_t	kvs;
 
-	zbx_hashset_create_ext(&kvs, 100, zbx_vault_kv_hash, zbx_vault_kv_compare, zbx_vault_kv_clean,
-			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+	zbx_kvs_create(&kvs, 100);
 
 	zbx_json_addobject(j, "macro.secrets");
 
@@ -1068,16 +1069,16 @@ static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_jso
 
 			kv_local.key = *ptr;
 
-			if (NULL != (kv = zbx_hashset_search(&kvs, &kv_local)))
+			if (NULL != (kv = zbx_kvs_search(&kvs, &kv_local)))
 				zbx_json_addstring(j, kv->key, kv->value, ZBX_JSON_TYPE_STRING);
 		}
 		zbx_json_close(j);
 
-		zbx_hashset_clear(&kvs);
+		zbx_kvs_clear(&kvs);
 	}
 
 	zbx_json_close(j);
-	zbx_hashset_destroy(&kvs);
+	zbx_kvs_destroy(&kvs);
 }
 
 /******************************************************************************
@@ -3800,7 +3801,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 	{
 		size_t	token_len;
 
-		if (ZBX_DATA_SESSION_TOKEN_SIZE != (token_len = strlen(token)))
+		if (zbx_get_token_len() != (token_len = strlen(token)))
 		{
 			*info = zbx_dsprintf(*info, "invalid session token length %d", (int)token_len);
 			ret = FAIL;
@@ -4655,7 +4656,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		{
 			size_t	token_len;
 
-			if (ZBX_DATA_SESSION_TOKEN_SIZE != (token_len = strlen(value)))
+			if (zbx_get_token_len() != (token_len = strlen(value)))
 			{
 				*error = zbx_dsprintf(*error, "invalid session token length %d", (int)token_len);
 				ret = FAIL;

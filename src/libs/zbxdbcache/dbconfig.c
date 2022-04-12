@@ -24,15 +24,17 @@
 #include "zbxserver.h"
 #include "zbxregexp.h"
 #include "cfg.h"
+#include "zbxhash.h"
 #include "../zbxcrypto/tls_tcp_active.h"
-#include "../zbxalgo/vectorimpl.h"
+#include "../zbxkvs/kvs.h"
+#include "../zbxvault/vault.h"
 #include "base64.h"
 #include "db.h"
 #include "dbsync.h"
 #include "actions.h"
 #include "zbxtrends.h"
-#include "zbxvault.h"
 #include "zbxserialize.h"
+#include "zbxavailability.h"
 
 int	sync_in_progress = 0;
 
@@ -79,14 +81,14 @@ int	sync_in_progress = 0;
  ******************************************************************************/
 typedef int (*zbx_value_validator_func_t)(const char *macro, const char *value, char **error);
 
-ZBX_DC_CONFIG	*config = NULL;
-zbx_rwlock_t	config_lock = ZBX_RWLOCK_NULL;
-static zbx_mem_info_t	*config_mem;
+ZBX_DC_CONFIG		*config = NULL;
+zbx_rwlock_t		config_lock = ZBX_RWLOCK_NULL;
+static zbx_shmem_info_t	*config_mem;
 
 extern unsigned char	program_type;
 extern int		CONFIG_TIMER_FORKS;
 
-ZBX_MEM_FUNC_IMPL(__config, config_mem)
+ZBX_SHMEM_FUNC_IMPL(__config, config_mem)
 
 static void	dc_maintenance_precache_nested_groups(void);
 static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_exclude);
@@ -95,6 +97,7 @@ static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_ex
 static unsigned char	macro_env = ZBX_MACRO_ENV_NONSECURE;
 extern char		*CONFIG_VAULTDBPATH;
 extern char		*CONFIG_VAULTTOKEN;
+extern char		*CONFIG_VAULT;
 /******************************************************************************
  *                                                                            *
  * Purpose: copies string into configuration cache shared memory              *
@@ -106,7 +109,7 @@ static char	*dc_strdup(const char *source)
 	size_t	len;
 
 	len = strlen(source) + 1;
-	dst = (char *)__config_mem_malloc_func(NULL, len);
+	dst = (char *)__config_shmem_malloc_func(NULL, len);
 	memcpy(dst, source, len);
 	return dst;
 }
@@ -658,10 +661,11 @@ static ZBX_DC_GMACRO_M	*config_gmacro_add_index(zbx_hashset_t *gmacro_index, ZBX
 	if (NULL == (gmacro_m = (ZBX_DC_GMACRO_M *)zbx_hashset_search(gmacro_index, &gmacro_m_local)))
 	{
 		gmacro_m_local.macro = zbx_strpool_acquire(gmacro->macro);
-		zbx_vector_ptr_create_ext(&gmacro_m_local.gmacros, __config_mem_malloc_func, __config_mem_realloc_func,
-				__config_mem_free_func);
+		zbx_vector_ptr_create_ext(&gmacro_m_local.gmacros, __config_shmem_malloc_func,
+				__config_shmem_realloc_func, __config_shmem_free_func);
 
-		gmacro_m = (ZBX_DC_GMACRO_M *)zbx_hashset_insert(gmacro_index, &gmacro_m_local, sizeof(ZBX_DC_GMACRO_M));
+		gmacro_m = (ZBX_DC_GMACRO_M *)zbx_hashset_insert(gmacro_index, &gmacro_m_local,
+				sizeof(ZBX_DC_GMACRO_M));
 	}
 
 	zbx_vector_ptr_append(&gmacro_m->gmacros, gmacro);
@@ -733,10 +737,11 @@ static ZBX_DC_HMACRO_HM	*config_hmacro_add_index(zbx_hashset_t *hmacro_index, ZB
 	if (NULL == (hmacro_hm = (ZBX_DC_HMACRO_HM *)zbx_hashset_search(hmacro_index, &hmacro_hm_local)))
 	{
 		hmacro_hm_local.macro = zbx_strpool_acquire(hmacro->macro);
-		zbx_vector_ptr_create_ext(&hmacro_hm_local.hmacros, __config_mem_malloc_func, __config_mem_realloc_func,
-				__config_mem_free_func);
+		zbx_vector_ptr_create_ext(&hmacro_hm_local.hmacros, __config_shmem_malloc_func,
+				__config_shmem_realloc_func, __config_shmem_free_func);
 
-		hmacro_hm = (ZBX_DC_HMACRO_HM *)zbx_hashset_insert(hmacro_index, &hmacro_hm_local, sizeof(ZBX_DC_HMACRO_HM));
+		hmacro_hm = (ZBX_DC_HMACRO_HM *)zbx_hashset_insert(hmacro_index, &hmacro_hm_local,
+				sizeof(ZBX_DC_HMACRO_HM));
 	}
 
 	zbx_vector_ptr_append(&hmacro_hm->hmacros, hmacro);
@@ -819,12 +824,12 @@ static zbx_dc_kv_t	*config_kvs_path_add(const char *path, const char *key)
 
 	if (FAIL == (i = zbx_vector_ptr_search(&config->kvs_paths, &kvs_path_local, dc_compare_kvs_path)))
 	{
-		kvs_path = (zbx_dc_kvs_path_t *)__config_mem_malloc_func(NULL, sizeof(zbx_dc_kvs_path_t));
+		kvs_path = (zbx_dc_kvs_path_t *)__config_shmem_malloc_func(NULL, sizeof(zbx_dc_kvs_path_t));
 		DCstrpool_replace(0, &kvs_path->path, path);
 		zbx_vector_ptr_append(&config->kvs_paths, kvs_path);
 
 		zbx_hashset_create_ext(&kvs_path->kvs, 0, dc_kv_hash, dc_kv_compare, NULL,
-				__config_mem_malloc_func, __config_mem_realloc_func, __config_mem_free_func);
+				__config_shmem_malloc_func, __config_shmem_realloc_func, __config_shmem_free_func);
 		kv = NULL;
 	}
 	else
@@ -857,7 +862,7 @@ static void	config_kvs_path_remove(const char *value, zbx_dc_kv_t *kv)
 	if (0 != --kv->refcount)
 		return;
 
-	zbx_strsplit(value, ':', &path, &key);
+	zbx_strsplit_last(value, ':', &path, &key);
 	zbx_free(key);
 
 	zbx_strpool_release(kv->key);
@@ -878,7 +883,7 @@ static void	config_kvs_path_remove(const char *value, zbx_dc_kv_t *kv)
 	if (0 == kvs_path->kvs.num_data)
 	{
 		zbx_strpool_release(kvs_path->path);
-		__config_mem_free_func(kvs_path);
+		__config_shmem_free_func(kvs_path);
 		zbx_vector_ptr_remove_noorder(&config->kvs_paths, i);
 	}
 clean:
@@ -939,7 +944,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	if (NULL == config->config)
 	{
 		found = 0;
-		config->config = (ZBX_DC_CONFIG_TABLE *)__config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG_TABLE));
+		config->config = (ZBX_DC_CONFIG_TABLE *)__config_shmem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG_TABLE));
 	}
 
 	if (SUCCEED != (ret = zbx_dbsync_next(sync, &rowid, &db_row, &tag)))
@@ -1417,7 +1422,7 @@ done:
 		if ((HOST_STATUS_PROXY_PASSIVE == status && 0 != (ZBX_TCP_SEC_UNENCRYPTED & host->tls_connect)) ||
 				(HOST_STATUS_PROXY_ACTIVE == status && 0 != (ZBX_TCP_SEC_UNENCRYPTED & host->tls_accept)))
 		{
-			if (NULL != CONFIG_VAULTTOKEN)
+			if (NULL != CONFIG_VAULTTOKEN || NULL != CONFIG_VAULT)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "connection with Zabbix proxy \"%s\" should not be"
 						" unencrypted when using Vault", host->host);
@@ -1433,8 +1438,8 @@ done:
 			host->data_expected_from = now;
 			host->update_items = 0;
 
-			zbx_vector_ptr_create_ext(&host->interfaces_v, __config_mem_malloc_func,
-					__config_mem_realloc_func, __config_mem_free_func);
+			zbx_vector_ptr_create_ext(&host->interfaces_v, __config_shmem_malloc_func,
+					__config_shmem_realloc_func, __config_shmem_free_func);
 		}
 		else
 		{
@@ -1745,9 +1750,9 @@ static void	DCsync_htmpls(zbx_dbsync_t *sync)
 			if (0 == found)
 			{
 				zbx_vector_uint64_create_ext(&htmpl->templateids,
-						__config_mem_malloc_func,
-						__config_mem_realloc_func,
-						__config_mem_free_func);
+						__config_shmem_malloc_func,
+						__config_shmem_realloc_func,
+						__config_shmem_free_func);
 				zbx_vector_uint64_reserve(&htmpl->templateids, 1);
 			}
 
@@ -1836,7 +1841,7 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 		{
 			zbx_free(path);
 			zbx_free(key);
-			zbx_strsplit(row[2], ':', &path, &key);
+			zbx_strsplit_last(row[2], ':', &path, &key);
 			if (NULL == key)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot parse user macro \"%s\" Vault location \"%s\":"
@@ -1993,7 +1998,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 		{
 			zbx_free(path);
 			zbx_free(key);
-			zbx_strsplit(row[3], ':', &path, &key);
+			zbx_strsplit_last(row[3], ':', &path, &key);
 			if (NULL == key)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\" Vault location"
@@ -2119,7 +2124,7 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 {
 	zbx_dc_kvs_path_t	*dc_kvs_path;
 	zbx_dc_kv_t		*dc_kv;
-	zbx_hashset_t		kvs;
+	zbx_kvs_t		kvs;
 	zbx_hashset_iter_t	iter;
 	int			i, j;
 	zbx_vector_ptr_pair_t	diff;
@@ -2127,8 +2132,7 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_pair_create(&diff);
-	zbx_hashset_create_ext(&kvs, 100, zbx_vault_kv_hash, zbx_vault_kv_compare, zbx_vault_kv_clean,
-			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+	zbx_kvs_create(&kvs, 100);
 
 	for (i = 0; i < config->kvs_paths.values_num; i++)
 	{
@@ -2138,7 +2142,7 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 
 		if (NULL != jp_kvs_paths)
 		{
-			if (FAIL == zbx_vault_json_kvs_get(dc_kvs_path->path, jp_kvs_paths, &kvs, &error))
+			if (FAIL == zbx_kvs_from_json_by_path_get(dc_kvs_path->path, jp_kvs_paths, &kvs, &error))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s",
 						dc_kvs_path->path, error);
@@ -2149,7 +2153,8 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 		}
 		else if (FAIL == zbx_vault_kvs_get(dc_kvs_path->path, &kvs, &error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", dc_kvs_path->path, error);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", dc_kvs_path->path,
+					error);
 			zbx_free(error);
 			continue;
 		}
@@ -2161,7 +2166,7 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 			zbx_ptr_pair_t	pair;
 
 			kv_local.key = (char *)dc_kv->key;
-			if (NULL != (kv = zbx_hashset_search(&kvs, &kv_local)))
+			if (NULL != (kv = zbx_kvs_search(&kvs, &kv_local)))
 			{
 				if (0 == zbx_strcmp_null(dc_kv->value, kv->value))
 					continue;
@@ -2199,11 +2204,11 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 		}
 
 		zbx_vector_ptr_pair_clear(&diff);
-		zbx_hashset_clear(&kvs);
+		zbx_kvs_clear(&kvs);
 	}
 
 	zbx_vector_ptr_pair_destroy(&diff);
-	zbx_hashset_destroy(&kvs);
+	zbx_kvs_destroy(&kvs);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -2482,9 +2487,9 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 					interface_snmpaddr = (ZBX_DC_INTERFACE_ADDR *)zbx_hashset_insert(&config->interface_snmpaddrs,
 							&interface_snmpaddr_local, sizeof(ZBX_DC_INTERFACE_ADDR));
 					zbx_vector_uint64_create_ext(&interface_snmpaddr->interfaceids,
-							__config_mem_malloc_func,
-							__config_mem_realloc_func,
-							__config_mem_free_func);
+							__config_shmem_malloc_func,
+							__config_shmem_realloc_func,
+							__config_shmem_free_func);
 				}
 
 				zbx_vector_uint64_append(&interface_snmpaddr->interfaceids, interfaceid);
@@ -2706,7 +2711,7 @@ static unsigned char	*config_decode_serialized_expression(const char *src)
 		return NULL;
 
 	src_len = strlen(src) * 3 / 4;
-	dst = __config_mem_malloc_func(NULL, src_len);
+	dst = __config_shmem_malloc_func(NULL, src_len);
 	str_base64_decode(src, (char *)dst, src_len, &data_len);
 
 	return dst;
@@ -2850,11 +2855,11 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 			item->queue_priority = ZBX_QUEUE_PRIORITY_NORMAL;
 			item->schedulable = 1;
 
-			zbx_vector_ptr_create_ext(&item->tags, __config_mem_malloc_func, __config_mem_realloc_func,
-					__config_mem_free_func);
-
 			if (ZBX_SYNCED_NEW_CONFIG_YES == synced && 0 == host->proxy_hostid)
 				flags |= ZBX_ITEM_NEW;
+
+			zbx_vector_ptr_create_ext(&item->tags, __config_shmem_malloc_func, __config_shmem_realloc_func,
+					__config_shmem_free_func);
 		}
 		else
 		{
@@ -3137,9 +3142,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 			if (0 == found)
 			{
 				zbx_vector_uint64_create_ext(&interface_snmpitem->itemids,
-						__config_mem_malloc_func,
-						__config_mem_realloc_func,
-						__config_mem_free_func);
+						__config_shmem_malloc_func,
+						__config_shmem_realloc_func,
+						__config_shmem_free_func);
 			}
 
 			zbx_vector_uint64_append(&interface_snmpitem->itemids, itemid);
@@ -3155,7 +3160,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 			DCstrpool_replace(found, &calcitem->params, row[11]);
 
 			if (1 == found && NULL != calcitem->formula_bin)
-				__config_mem_free_func((void *)calcitem->formula_bin);
+				__config_shmem_free_func((void *)calcitem->formula_bin);
 
 			calcitem->formula_bin = config_decode_serialized_expression(row[49]);
 		}
@@ -3164,7 +3169,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 			/* remove calculated item parameters */
 
 			if (NULL != calcitem->formula_bin)
-				__config_mem_free_func((void *)calcitem->formula_bin);
+				__config_shmem_free_func((void *)calcitem->formula_bin);
 			zbx_strpool_release(calcitem->params);
 			zbx_hashset_remove_direct(&config->calcitems, calcitem);
 		}
@@ -3231,8 +3236,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 
 			if (0 == found)
 			{
-				zbx_vector_ptr_create_ext(&scriptitem->params, __config_mem_malloc_func,
-						__config_mem_realloc_func, __config_mem_free_func);
+				zbx_vector_ptr_create_ext(&scriptitem->params, __config_shmem_malloc_func,
+						__config_shmem_realloc_func, __config_shmem_free_func);
 			}
 		}
 		else if (NULL != (scriptitem = (ZBX_DC_SCRIPTITEM *)zbx_hashset_search(&config->scriptitems, &itemid)))
@@ -3306,8 +3311,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 			master_local.itemid = depitem->master_itemid;
 			master = (ZBX_DC_MASTERITEM *)zbx_hashset_insert(&config->masteritems, &master_local, sizeof(master_local));
 
-			zbx_vector_uint64_pair_create_ext(&master->dep_itemids, __config_mem_malloc_func,
-					__config_mem_realloc_func, __config_mem_free_func);
+			zbx_vector_uint64_pair_create_ext(&master->dep_itemids, __config_shmem_malloc_func,
+					__config_shmem_realloc_func, __config_shmem_free_func);
 		}
 
 		zbx_vector_uint64_pair_append(&master->dep_itemids, pair);
@@ -3460,7 +3465,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 			zbx_strpool_release(calcitem->params);
 
 			if (NULL != calcitem->formula_bin)
-				__config_mem_free_func((void *)calcitem->formula_bin);
+				__config_shmem_free_func((void *)calcitem->formula_bin);
 
 			zbx_hashset_remove_direct(&config->calcitems, calcitem);
 		}
@@ -3703,17 +3708,17 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 			trigger->locked = 0;
 			trigger->timer_revision = 0;
 
-			zbx_vector_ptr_create_ext(&trigger->tags, __config_mem_malloc_func, __config_mem_realloc_func,
-					__config_mem_free_func);
+			zbx_vector_ptr_create_ext(&trigger->tags, __config_shmem_malloc_func,
+					__config_shmem_realloc_func, __config_shmem_free_func);
 			trigger->topoindex = 1;
 			trigger->itemids = NULL;
 		}
 		else
 		{
 			if (NULL != trigger->expression_bin)
-				__config_mem_free_func((void *)trigger->expression_bin);
+				__config_shmem_free_func((void *)trigger->expression_bin);
 			if (NULL != trigger->recovery_expression_bin)
-				__config_mem_free_func((void *)trigger->recovery_expression_bin);
+				__config_shmem_free_func((void *)trigger->recovery_expression_bin);
 		}
 
 		trigger->expression_bin = config_decode_serialized_expression(row[16]);
@@ -3759,12 +3764,12 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 				zbx_vector_ptr_destroy(&trigger->tags);
 
 				if (NULL != trigger->expression_bin)
-					__config_mem_free_func((void *)trigger->expression_bin);
+					__config_shmem_free_func((void *)trigger->expression_bin);
 				if (NULL != trigger->recovery_expression_bin)
-					__config_mem_free_func((void *)trigger->recovery_expression_bin);
+					__config_shmem_free_func((void *)trigger->recovery_expression_bin);
 
 				if (NULL != trigger->itemids)
-					__config_mem_free_func((void *)trigger->itemids);
+					__config_shmem_free_func((void *)trigger->itemids);
 			}
 
 			zbx_hashset_remove_direct(&config->triggers, trigger);
@@ -3802,8 +3807,8 @@ static void	dc_trigger_deplist_init(ZBX_DC_TRIGGER_DEPLIST *trigdep, ZBX_DC_TRIG
 {
 	trigdep->refcount = 1;
 	trigdep->trigger = trigger;
-	zbx_vector_ptr_create_ext(&trigdep->dependencies, __config_mem_malloc_func, __config_mem_realloc_func,
-			__config_mem_free_func);
+	zbx_vector_ptr_create_ext(&trigdep->dependencies, __config_shmem_malloc_func, __config_shmem_realloc_func,
+			__config_shmem_free_func);
 }
 
 /******************************************************************************
@@ -3815,8 +3820,8 @@ static void	dc_trigger_deplist_init(ZBX_DC_TRIGGER_DEPLIST *trigdep, ZBX_DC_TRIG
 static void	dc_trigger_deplist_reset(ZBX_DC_TRIGGER_DEPLIST *trigdep)
 {
 	zbx_vector_ptr_destroy(&trigdep->dependencies);
-	zbx_vector_ptr_create_ext(&trigdep->dependencies, __config_mem_malloc_func, __config_mem_realloc_func,
-			__config_mem_free_func);
+	zbx_vector_ptr_create_ext(&trigdep->dependencies, __config_shmem_malloc_func, __config_shmem_realloc_func,
+			__config_shmem_free_func);
 }
 
 static void	DCsync_trigdeps(zbx_dbsync_t *sync)
@@ -4032,7 +4037,7 @@ static zbx_trigger_timer_t	*dc_trigger_function_timer_create(ZBX_DC_FUNCTION *fu
 		type = ZBX_TRIGGER_TIMER_FUNCTION_TIME;
 	}
 
-	timer = (zbx_trigger_timer_t *)__config_mem_malloc_func(NULL, sizeof(zbx_trigger_timer_t));
+	timer = (zbx_trigger_timer_t *)__config_shmem_malloc_func(NULL, sizeof(zbx_trigger_timer_t));
 
 	timer->objectid = function->functionid;
 	timer->triggerid = function->triggerid;
@@ -4062,7 +4067,7 @@ static zbx_trigger_timer_t	*dc_trigger_timer_create(ZBX_DC_TRIGGER *trigger)
 {
 	zbx_trigger_timer_t	*timer;
 
-	timer = (zbx_trigger_timer_t *)__config_mem_malloc_func(NULL, sizeof(zbx_trigger_timer_t));
+	timer = (zbx_trigger_timer_t *)__config_shmem_malloc_func(NULL, sizeof(zbx_trigger_timer_t));
 	timer->type = ZBX_TRIGGER_TIMER_TRIGGER;
 	timer->objectid = trigger->triggerid;
 	timer->triggerid = trigger->triggerid;
@@ -4086,7 +4091,7 @@ static void	dc_trigger_timer_free(zbx_trigger_timer_t *timer)
 	if (NULL != timer->parameter)
 		zbx_strpool_release(timer->parameter);
 
-	__config_mem_free_func(timer);
+	__config_shmem_free_func(timer);
 }
 
 /******************************************************************************
@@ -4356,9 +4361,9 @@ static void	DCsync_expressions(zbx_dbsync_t *sync)
 		{
 			DCstrpool_replace(0, &regexp_local.name, row[0]);
 			zbx_vector_uint64_create_ext(&regexp_local.expressionids,
-					__config_mem_malloc_func,
-					__config_mem_realloc_func,
-					__config_mem_free_func);
+					__config_shmem_malloc_func,
+					__config_shmem_realloc_func,
+					__config_shmem_free_func);
 
 			regexp = (ZBX_DC_REGEXP *)zbx_hashset_insert(&config->regexps, &regexp_local, sizeof(ZBX_DC_REGEXP));
 		}
@@ -4446,8 +4451,8 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
 			if (EVENT_SOURCE_INTERNAL == action->eventsource)
 				config->internal_actions++;
 
-			zbx_vector_ptr_create_ext(&action->conditions, __config_mem_malloc_func,
-					__config_mem_realloc_func, __config_mem_free_func);
+			zbx_vector_ptr_create_ext(&action->conditions, __config_shmem_malloc_func,
+					__config_shmem_realloc_func, __config_shmem_free_func);
 
 			zbx_vector_ptr_reserve(&action->conditions, 1);
 
@@ -4663,11 +4668,11 @@ static void	DCsync_correlations(zbx_dbsync_t *sync)
 
 		if (0 == found)
 		{
-			zbx_vector_ptr_create_ext(&correlation->conditions, __config_mem_malloc_func,
-					__config_mem_realloc_func, __config_mem_free_func);
+			zbx_vector_ptr_create_ext(&correlation->conditions, __config_shmem_malloc_func,
+					__config_shmem_realloc_func, __config_shmem_free_func);
 
-			zbx_vector_ptr_create_ext(&correlation->operations, __config_mem_malloc_func,
-					__config_mem_realloc_func, __config_mem_free_func);
+			zbx_vector_ptr_create_ext(&correlation->operations, __config_shmem_malloc_func,
+					__config_shmem_realloc_func, __config_shmem_free_func);
 		}
 
 		DCstrpool_replace(found, &correlation->name, row[1]);
@@ -5045,8 +5050,8 @@ static void	DCsync_hostgroups(zbx_dbsync_t *sync)
 			zbx_vector_ptr_append(&config->hostgroups_name, group);
 
 			zbx_hashset_create_ext(&group->hostids, 0, ZBX_DEFAULT_UINT64_HASH_FUNC,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL, __config_mem_malloc_func,
-					__config_mem_realloc_func, __config_mem_free_func);
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL, __config_shmem_malloc_func,
+					__config_shmem_realloc_func, __config_shmem_free_func);
 		}
 
 		DCstrpool_replace(found, &group->name, row[1]);
@@ -5144,8 +5149,8 @@ static void	DCsync_trigger_tags(zbx_dbsync_t *sync)
 					if (0 == trigger->tags.values_num)
 					{
 						zbx_vector_ptr_destroy(&trigger->tags);
-						zbx_vector_ptr_create_ext(&trigger->tags, __config_mem_malloc_func,
-								__config_mem_realloc_func, __config_mem_free_func);
+						zbx_vector_ptr_create_ext(&trigger->tags, __config_shmem_malloc_func,
+								__config_shmem_realloc_func, __config_shmem_free_func);
 					}
 				}
 			}
@@ -5228,8 +5233,8 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 				if (0 == item->tags.values_num)
 				{
 					zbx_vector_ptr_destroy(&item->tags);
-					zbx_vector_ptr_create_ext(&item->tags, __config_mem_malloc_func,
-							__config_mem_realloc_func, __config_mem_free_func);
+					zbx_vector_ptr_create_ext(&item->tags, __config_shmem_malloc_func,
+							__config_shmem_realloc_func, __config_shmem_free_func);
 				}
 			}
 		}
@@ -5295,8 +5300,8 @@ static void	DCsync_host_tags(zbx_dbsync_t *sync)
 
 			if (0 == found)
 			{
-				zbx_vector_ptr_create_ext(&host_tag_index_entry->tags, __config_mem_malloc_func,
-						__config_mem_realloc_func, __config_mem_free_func);
+				zbx_vector_ptr_create_ext(&host_tag_index_entry->tags, __config_shmem_malloc_func,
+						__config_shmem_realloc_func, __config_shmem_free_func);
 			}
 
 			zbx_vector_ptr_append(&host_tag_index_entry->tags, host_tag);
@@ -5416,25 +5421,28 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 
 		if (NULL == preprocitem || itemid != preprocitem->itemid)
 		{
-			if (NULL == (preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_search(&config->preprocitems, &itemid)))
+			if (NULL == (preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_search(&config->preprocitems,
+					&itemid)))
 			{
 				ZBX_DC_PREPROCITEM	preprocitem_local;
 
 				preprocitem_local.itemid = itemid;
+				preprocitem_local.update_time = timestamp;
 
-				preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_insert(&config->preprocitems, &preprocitem_local,
-						sizeof(preprocitem_local));
+				zbx_vector_ptr_create_ext(&preprocitem_local.preproc_ops, __config_shmem_malloc_func,
+						__config_shmem_realloc_func, __config_shmem_free_func);
 
-				zbx_vector_ptr_create_ext(&preprocitem->preproc_ops, __config_mem_malloc_func,
-						__config_mem_realloc_func, __config_mem_free_func);
+				preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_insert(&config->preprocitems,
+						&preprocitem_local, sizeof(preprocitem_local));
 			}
-
-			preprocitem->update_time = timestamp;
+			else
+				preprocitem->update_time = timestamp;
 		}
 
 		ZBX_STR2UINT64(item_preprocid, row[0]);
 
-		op = (zbx_dc_preproc_op_t *)DCfind_id(&config->preprocops, item_preprocid, sizeof(zbx_dc_preproc_op_t), &found);
+		op = (zbx_dc_preproc_op_t *)DCfind_id(&config->preprocops, item_preprocid, sizeof(zbx_dc_preproc_op_t),
+				&found);
 
 		ZBX_STR2UCHAR(op->type, row[2]);
 		DCstrpool_replace(found, &op->params, row[3]);
@@ -5458,7 +5466,8 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 		if (NULL == (op = (zbx_dc_preproc_op_t *)zbx_hashset_search(&config->preprocops, &rowid)))
 			continue;
 
-		if (NULL != (preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_search(&config->preprocitems, &op->itemid)))
+		if (NULL != (preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_search(&config->preprocitems,
+				&op->itemid)))
 		{
 			if (FAIL != (index = zbx_vector_ptr_search(&preprocitem->preproc_ops, op,
 					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
@@ -5733,12 +5742,12 @@ static void	dc_trigger_add_itemids(ZBX_DC_TRIGGER *trigger, const zbx_vector_uin
 		for (itemid = trigger->itemids; 0 != *itemid; itemid++)
 			itemids_num++;
 
-		trigger->itemids = (zbx_uint64_t *)__config_mem_realloc_func(trigger->itemids,
+		trigger->itemids = (zbx_uint64_t *)__config_shmem_realloc_func(trigger->itemids,
 				sizeof(zbx_uint64_t) * (size_t)(itemids->values_num + itemids_num + 1));
 	}
 	else
 	{
-		trigger->itemids = (zbx_uint64_t *)__config_mem_malloc_func(trigger->itemids,
+		trigger->itemids = (zbx_uint64_t *)__config_shmem_malloc_func(trigger->itemids,
 				sizeof(zbx_uint64_t) * (size_t)(itemids->values_num + 1));
 		trigger->itemids[0] = 0;
 	}
@@ -6694,7 +6703,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() strings    : %d (%d slots)", __func__,
 				config->strpool.num_data, config->strpool.num_slots);
 
-		zbx_mem_dump_stats(LOG_LEVEL_DEBUG, config_mem);
+		zbx_shmem_dump_stats(LOG_LEVEL_DEBUG, config_mem);
 	}
 out:
 	if (0 == sync_in_progress)
@@ -7081,13 +7090,13 @@ int	init_configuration_cache(char **error)
 	if (SUCCEED != (ret = zbx_rwlock_create(&config_lock, ZBX_RWLOCK_CONFIG, error)))
 		goto out;
 
-	if (SUCCEED != (ret = zbx_mem_create(&config_mem, CONFIG_CONF_CACHE_SIZE, "configuration cache",
+	if (SUCCEED != (ret = zbx_shmem_create(&config_mem, CONFIG_CONF_CACHE_SIZE, "configuration cache",
 			"CacheSize", 0, error)))
 	{
 		goto out;
 	}
 
-	config = (ZBX_DC_CONFIG *)__config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG) +
+	config = (ZBX_DC_CONFIG *)__config_shmem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG) +
 			CONFIG_TIMER_FORKS * sizeof(zbx_vector_ptr_t));
 
 #define CREATE_HASHSET(hashset, hashset_size)									\
@@ -7097,7 +7106,7 @@ int	init_configuration_cache(char **error)
 #define CREATE_HASHSET_EXT(hashset, hashset_size, hash_func, compare_func)					\
 														\
 	zbx_hashset_create_ext(&hashset, hashset_size, hash_func, compare_func, NULL,				\
-			__config_mem_malloc_func, __config_mem_realloc_func, __config_mem_free_func)
+			__config_shmem_malloc_func, __config_shmem_realloc_func, __config_shmem_free_func)
 
 	CREATE_HASHSET(config->items, 100);
 	CREATE_HASHSET(config->numitems, 0);
@@ -7145,10 +7154,10 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->corr_conditions, 0);
 	CREATE_HASHSET(config->corr_operations, 0);
 	CREATE_HASHSET(config->hostgroups, 0);
-	zbx_vector_ptr_create_ext(&config->hostgroups_name, __config_mem_malloc_func, __config_mem_realloc_func,
-			__config_mem_free_func);
-	zbx_vector_ptr_create_ext(&config->kvs_paths, __config_mem_malloc_func, __config_mem_realloc_func,
-			__config_mem_free_func);
+	zbx_vector_ptr_create_ext(&config->hostgroups_name, __config_shmem_malloc_func, __config_shmem_realloc_func,
+			__config_shmem_free_func);
+	zbx_vector_ptr_create_ext(&config->kvs_paths, __config_shmem_malloc_func, __config_shmem_realloc_func,
+			__config_shmem_free_func);
 
 	CREATE_HASHSET(config->preprocops, 0);
 
@@ -7179,25 +7188,25 @@ int	init_configuration_cache(char **error)
 				zbx_binary_heap_create_ext(&config->queues[i],
 						__config_java_elem_compare,
 						ZBX_BINARY_HEAP_OPTION_DIRECT,
-						__config_mem_malloc_func,
-						__config_mem_realloc_func,
-						__config_mem_free_func);
+						__config_shmem_malloc_func,
+						__config_shmem_realloc_func,
+						__config_shmem_free_func);
 				break;
 			case ZBX_POLLER_TYPE_PINGER:
 				zbx_binary_heap_create_ext(&config->queues[i],
 						__config_pinger_elem_compare,
 						ZBX_BINARY_HEAP_OPTION_DIRECT,
-						__config_mem_malloc_func,
-						__config_mem_realloc_func,
-						__config_mem_free_func);
+						__config_shmem_malloc_func,
+						__config_shmem_realloc_func,
+						__config_shmem_free_func);
 				break;
 			default:
 				zbx_binary_heap_create_ext(&config->queues[i],
 						__config_heap_elem_compare,
 						ZBX_BINARY_HEAP_OPTION_DIRECT,
-						__config_mem_malloc_func,
-						__config_mem_realloc_func,
-						__config_mem_free_func);
+						__config_shmem_malloc_func,
+						__config_shmem_realloc_func,
+						__config_shmem_free_func);
 				break;
 		}
 	}
@@ -7205,22 +7214,22 @@ int	init_configuration_cache(char **error)
 	zbx_binary_heap_create_ext(&config->pqueue,
 					__config_proxy_compare,
 					ZBX_BINARY_HEAP_OPTION_DIRECT,
-					__config_mem_malloc_func,
-					__config_mem_realloc_func,
-					__config_mem_free_func);
+					__config_shmem_malloc_func,
+					__config_shmem_realloc_func,
+					__config_shmem_free_func);
 
 	zbx_binary_heap_create_ext(&config->trigger_queue,
 					__config_timer_compare,
 					ZBX_BINARY_HEAP_OPTION_EMPTY,
-					__config_mem_malloc_func,
-					__config_mem_realloc_func,
-					__config_mem_free_func);
+					__config_shmem_malloc_func,
+					__config_shmem_realloc_func,
+					__config_shmem_free_func);
 
 	CREATE_HASHSET_EXT(config->data_sessions, 0, __config_data_session_hash, __config_data_session_compare);
 
 	config->config = NULL;
 
-	config->status = (ZBX_DC_STATUS *)__config_mem_malloc_func(NULL, sizeof(ZBX_DC_STATUS));
+	config->status = (ZBX_DC_STATUS *)__config_shmem_malloc_func(NULL, sizeof(ZBX_DC_STATUS));
 	config->status->last_update = 0;
 
 	config->availability_diff_ts = 0;
@@ -7234,8 +7243,8 @@ int	init_configuration_cache(char **error)
 	if (0 != CONFIG_TIMER_FORKS)
 	{
 		config->maintenance_update = ZBX_MAINTENANCE_UPDATE_FALSE;
-		config->maintenance_update_flags = (zbx_uint64_t *)__config_mem_malloc_func(NULL, sizeof(zbx_uint64_t) *
-				ZBX_MAINTENANCE_UPDATE_FLAGS_NUM());
+		config->maintenance_update_flags = (zbx_uint64_t *)__config_shmem_malloc_func(NULL,
+				sizeof(zbx_uint64_t) * ZBX_MAINTENANCE_UPDATE_FLAGS_NUM());
 		memset(config->maintenance_update_flags, 0, sizeof(zbx_uint64_t) * ZBX_MAINTENANCE_UPDATE_FLAGS_NUM());
 	}
 
@@ -7276,7 +7285,7 @@ void	free_configuration_cache(void)
 
 	UNLOCK_CACHE;
 
-	zbx_mem_destroy(config_mem);
+	zbx_shmem_destroy(config_mem);
 	config_mem = NULL;
 	zbx_rwlock_destroy(&config_lock);
 
@@ -10030,85 +10039,6 @@ static int	DCinterface_set_availability(ZBX_DC_INTERFACE *dc_interface, int now,
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: initializes interface availability data                           *
- *                                                                            *
- * Parameters: availability - [IN/OUT] interface availability data            *
- *             interfaceid  - [IN]                                            *
- *                                                                            *
- ******************************************************************************/
-void	zbx_interface_availability_init(zbx_interface_availability_t *availability, zbx_uint64_t interfaceid)
-{
-	memset(availability, 0, sizeof(zbx_interface_availability_t));
-	availability->interfaceid = interfaceid;
-}
-
-/********************************************************************************
- *                                                                              *
- * Purpose: releases resources allocated to store interface availability data   *
- *                                                                              *
- * Parameters: ia - [IN] interface availability data                            *
- *                                                                              *
- ********************************************************************************/
-void	zbx_interface_availability_clean(zbx_interface_availability_t *ia)
-{
-	zbx_free(ia->agent.error);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: frees interface availability data                                 *
- *                                                                            *
- * Parameters: availability - [IN] interface availability data                *
- *                                                                            *
- ******************************************************************************/
-void	zbx_interface_availability_free(zbx_interface_availability_t *availability)
-{
-	zbx_interface_availability_clean(availability);
-	zbx_free(availability);
-}
-
-ZBX_PTR_VECTOR_IMPL(availability_ptr, zbx_interface_availability_t *)
-/******************************************************************************
- *                                                                            *
- * Purpose: initializes agent availability with the specified data            *
- *                                                                            *
- * Parameters: agent         - [IN/OUT] agent availability data               *
- *             available     - [IN] the availability data                     *
- *             error         - [IN] the availability error                    *
- *             errors_from   - [IN] error starting timestamp                  *
- *             disable_until - [IN] disable until timestamp                   *
- *                                                                            *
- ******************************************************************************/
-static void	zbx_agent_availability_init(zbx_agent_availability_t *agent, unsigned char available, const char *error,
-		int errors_from, int disable_until)
-{
-	agent->flags = ZBX_FLAGS_AGENT_STATUS;
-	agent->available = available;
-	agent->error = zbx_strdup(NULL, error);
-	agent->errors_from = errors_from;
-	agent->disable_until = disable_until;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: checks interface availability if agent availability field is set  *
- *                                                                            *
- * Parameters: ia - [IN] interface availability data                          *
- *                                                                            *
- * Return value: SUCCEED - an agent availability field is set                 *
- *               FAIL - no agent availability field is set                    *
- *                                                                            *
- ******************************************************************************/
-int	zbx_interface_availability_is_set(const zbx_interface_availability_t *ia)
-{
-	if (ZBX_FLAGS_AGENT_STATUS_NONE != ia->agent.flags)
-		return SUCCEED;
-
-	return FAIL;
-}
-
 /**************************************************************************************
  *                                                                                    *
  * Host availability update example                                                   *
@@ -12722,8 +12652,8 @@ void	dc_hostgroup_cache_nested_groupids(zbx_dc_hostgroup_t *parent_group)
 	{
 		int	index, len;
 
-		zbx_vector_uint64_create_ext(&parent_group->nested_groupids, __config_mem_malloc_func,
-				__config_mem_realloc_func, __config_mem_free_func);
+		zbx_vector_uint64_create_ext(&parent_group->nested_groupids, __config_shmem_malloc_func,
+				__config_shmem_realloc_func, __config_shmem_free_func);
 
 		index = zbx_vector_ptr_bsearch(&config->hostgroups_name, parent_group, dc_compare_hgroups);
 		len = strlen(parent_group->name);
@@ -13560,16 +13490,18 @@ zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const
 
 	if (NULL == session)
 	{
+		session_local.last_valueid = 0;
+		session_local.lastaccess = now;
+		session_local.token = dc_strdup(token);
+
 		WRLOCK_CACHE;
+
 		session = (zbx_data_session_t *)zbx_hashset_insert(&config->data_sessions, &session_local,
 				sizeof(session_local));
-		session->token = dc_strdup(token);
 		UNLOCK_CACHE;
-
-		session->last_valueid = 0;
 	}
-
-	session->lastaccess = now;
+	else
+		session->lastaccess = now;
 
 	return session;
 }
@@ -13594,7 +13526,7 @@ void	zbx_dc_cleanup_data_sessions(void)
 	{
 		if (session->lastaccess + SEC_PER_DAY <= now)
 		{
-			__config_mem_free_func((char *)session->token);
+			__config_shmem_free_func((char *)session->token);
 			zbx_hashset_iter_remove(&iter);
 		}
 	}

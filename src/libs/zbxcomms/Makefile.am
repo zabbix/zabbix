@@ -3,6 +3,7 @@
 noinst_LIBRARIES = libzbxcomms.a
 
 libzbxcomms_a_SOURCES = \
+	comms.h \
 	comms.c \
 	telnet.c
 

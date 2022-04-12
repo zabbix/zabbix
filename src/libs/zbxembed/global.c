@@ -24,6 +24,7 @@
 #include "duktape.h"
 #include "base64.h"
 #include "sha256crypt.h"
+#include "zbxhash.h"
 
 /******************************************************************************
  *                                                                            *

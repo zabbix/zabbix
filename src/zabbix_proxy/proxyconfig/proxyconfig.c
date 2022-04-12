@@ -20,7 +20,7 @@
 #include "proxyconfig.h"
 
 #include "log.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "proxy.h"
 #include "zbxself.h"
 

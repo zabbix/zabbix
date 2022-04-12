@@ -77,7 +77,8 @@
 		// test button
 		var testable_item_types = item_form.testable_item_types,
 			type = parseInt(jQuery('#type').val(), 10),
-			key = jQuery('#key').val();
+			key = jQuery('#key').val(),
+			is_http_agent_type = (type == <?= ITEM_TYPE_HTTPAGENT ?>);
 
 		if (type == <?= ITEM_TYPE_SIMPLE ?> && (key.substr(0, 7) === 'vmware.' || key.substr(0, 8) === 'icmpping')) {
 			jQuery('#test_item').prop('disabled', true);
@@ -102,6 +103,9 @@
 				object_switcher[set_hidden ? 'hideObj' : 'showObj']({id: element_id})
 			);
 		}
+
+		$('label[for=interfaceid]').toggleClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', !is_http_agent_type);
+		$('input[name=interfaceid]').prop('aria-required', !is_http_agent_type);
 	}
 
 	jQuery(document).ready(function($) {
@@ -152,7 +156,7 @@
 		$('#type')
 			.change(function() {
 				updateItemFormElements();
-				organizeInterfaces(interface_ids_by_types, item_interface_types, parseInt($(this).val(), 10));
+				organizeInterfaces(interface_ids_by_types, item_interface_types, parseInt(this.value, 10));
 
 				setAuthTypeLabel();
 			})

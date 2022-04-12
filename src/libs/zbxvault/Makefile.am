@@ -3,4 +3,5 @@
 noinst_LIBRARIES = libzbxvault.a
 
 libzbxvault_a_SOURCES = \
-	vault.c
+	vault.c \
+	vault.h
