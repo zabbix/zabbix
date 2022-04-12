@@ -23,7 +23,7 @@
 #include "zbxmockutil.h"
 
 #include "common.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
 #include "dbconfig.h"

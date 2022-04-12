@@ -21,7 +21,7 @@
 
 #include "log.h"
 #include "events.h"
-#include "threads.h"
+#include "zbxthreads.h"
 #include "dbcache.h"
 #include "cfg.h"
 #include "zbxhash.h"

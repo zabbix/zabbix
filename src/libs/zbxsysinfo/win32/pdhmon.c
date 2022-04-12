@@ -19,7 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
-#include "threads.h"
+#include "zbxthreads.h"
 #include "perfstat.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"

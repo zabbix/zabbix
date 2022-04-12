@@ -20,7 +20,7 @@
 #ifndef ZABBIX_LISTENER_H
 #define ZABBIX_LISTENER_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 ZBX_THREAD_ENTRY(listener_thread, args);
 
