@@ -22,6 +22,8 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
+ * @onBefore  prepareTestData
+ *
  * @backup config
  */
 class testAuthentication extends CAPITest {
@@ -179,9 +181,16 @@ class testAuthentication extends CAPITest {
 			],
 			'Test invalid userdirectoryid' => [
 				'authentication' => [
-					'ldap_userdirectoryid' => 999,
+					'ldap_userdirectoryid' => 'userdirectory_invalidid_1'
 				],
 				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": referred object do not exist.'
+			],
+			'Cannot set default authentication ldap when ldap is disabled' => [
+				'authentication' => [
+					'authentication_type' => ZBX_AUTH_LDAP,
+					'ldap_configured' => ZBX_AUTH_LDAP_DISABLED
+				],
+				'expected_error' => 'Incorrect value for field "/authentication_type": LDAP should be enabled.'
 			],
 
 			// Invalid SAML auth tests.
@@ -326,8 +335,13 @@ class testAuthentication extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			// TODO: test valid ldap_userdirectoryid
-
+			'Test userdirectory can be set as default server' => [
+				'authentication' => [
+					'ldap_configured' => ZBX_AUTH_LDAP_ENABLED,
+					'ldap_userdirectoryid' => 'userdirectory_1'
+				],
+				'expected_error' => null
+			],
 			// Valid SAML auth tests.
 			'Test valid SAML auth' => [
 				'authentication' => [
@@ -427,6 +441,10 @@ class testAuthentication extends CAPITest {
 	 * @dataProvider authentication_update_data_valid
 	 */
 	public function testAuthentication_Update($authentication, $expected_error) {
+		if (array_key_exists('ldap_userdirectoryid', $authentication)) {
+			$authentication['ldap_userdirectoryid'] = static::$data[$authentication['ldap_userdirectoryid']];
+		}
+
 		if ($expected_error === null) {
 			// Before updating, collect old authentication data.
 			$fields = '';
@@ -467,5 +485,24 @@ class testAuthentication extends CAPITest {
 			// Call method and make sure it really returns the error.
 			$this->call('authentication.update', $authentication, $expected_error);
 		}
+	}
+
+	/**
+	 * Test data used by test.
+	 */
+	protected static $data = [
+		'userdirectory_1' => null,
+		'userdirectory_invalidid_1' => 999
+	];
+
+	/**
+	 * Prepare data for tests. Create user, group, userdirectory.
+	 */
+	public function prepareTestData() {
+		$response = CDataHelper::call('userdirectory.create', [
+			['name' => 'LDAP #1', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid'],
+		]);
+		$this->assertArrayHasKey('userdirectoryids', $response);
+		self::$data['userdirectory_1'] = reset($response['userdirectoryids']);
 	}
 }
