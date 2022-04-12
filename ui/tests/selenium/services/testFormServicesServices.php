@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  *
  * @onBefore prepareServicesData
  */
-class testFormMonitoringServices extends CWebTest {
+class testFormServicesServices extends CWebTest {
 
 	use TableTrait;
 
@@ -201,7 +201,7 @@ class testFormMonitoringServices extends CWebTest {
 	/**
 	 * Check Service create form layout.
 	 */
-	public function testFormMonitoringServices_Layout() {
+	public function testFormServicesServices_Layout() {
 		$this->page->login()->open('zabbix.php?action=service.list');
 		$this->query('id:list_mode')->one()->asSegmentedRadio()->waitUntilVisible()->select('Edit');
 		$this->query('button:Create service')->waitUntilClickable()->one()->click();
@@ -385,10 +385,15 @@ class testFormMonitoringServices extends CWebTest {
 		$this->assertEquals(1, $n_field->getValue());
 
 		// Change the condition and check that N field was replaced with W field.
-		$rules_form->getField('Condition')->select('If weight of child services with Status status or above is at least W');
+		$condition_field = $rules_form->getField('Condition');
+		$condition_field->select('If weight of child services with Status status or above is at least W');
 
 		$rules_form->invalidate();
 		$this->assertEquals(['Set status to', 'Condition', 'W', 'Status'], $rules_form->getLabels()->asText());
+
+		// Change the condition and check that "%" symbol is displayed when N is being counted in percentage.
+		$condition_field->select('If weight of child services with Status status or above is at least N%');
+		$this->assertTrue($rules_form->query('xpath:.//span[text()="%"]')->one()->isDisplayed());
 
 		$rules_dialog->query('button:Cancel')->one()->click();
 
@@ -602,14 +607,14 @@ class testFormMonitoringServices extends CWebTest {
 	 *
 	 * @backupOnce services
 	 */
-	public function testFormMonitoringServices_Create($data) {
+	public function testFormServicesServices_Create($data) {
 		$this->checkForm($data);
 	}
 
 	/**
 	 * @dataProvider getServicesData
 	 */
-	public function testFormMonitoringServices_Update($data) {
+	public function testFormServicesServices_Update($data) {
 		$this->checkForm($data, self::UPDATE);
 	}
 
@@ -745,7 +750,7 @@ class testFormMonitoringServices extends CWebTest {
 	/**
 	 * @dataProvider getCloneData
 	 */
-	public function testFormMonitoringServices_Clone($data) {
+	public function testFormServicesServices_Clone($data) {
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
 
 		$table = $this->query('class:list-table')->asTable()->waitUntilVisible()->one();
@@ -816,7 +821,7 @@ class testFormMonitoringServices extends CWebTest {
 	 *
 	 * @dataProvider getCancelData
 	 */
-	public function testFormMonitoringServices_Cancel($data) {
+	public function testFormServicesServices_Cancel($data) {
 		$old_hash = CDBHelper::getHash(self::$service_sql);
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
@@ -863,7 +868,7 @@ class testFormMonitoringServices extends CWebTest {
 	 *
 	 * @dataProvider getSimpleUpdateData
 	 */
-	public function testFormMonitoringServices_SimpleUpdate($data) {
+	public function testFormServicesServices_SimpleUpdate($data) {
 		$old_hash = CDBHelper::getHash(self::$service_sql);
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
@@ -912,7 +917,7 @@ class testFormMonitoringServices extends CWebTest {
 	/**
 	 * @dataProvider getCreateChildData
 	 */
-	public function testFormMonitoringServices_CreateChild($data) {
+	public function testFormServicesServices_CreateChild($data) {
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 
 		if ($expected === TEST_BAD) {
@@ -988,7 +993,7 @@ class testFormMonitoringServices extends CWebTest {
 		}
 	}
 
-	public function testFormMonitoringServices_DeleteChild() {
+	public function testFormServicesServices_DeleteChild() {
 		$parent = 'Parent2';
 		$child = 'Child3';
 
@@ -1026,7 +1031,7 @@ class testFormMonitoringServices extends CWebTest {
 		);
 	}
 
-	public function testFormMonitoringServices_DeleteParent() {
+	public function testFormServicesServices_DeleteParent() {
 		$parent = 'Parent4';
 		$child = 'Child4';
 
