@@ -26,16 +26,22 @@
 
 <script>
 	const view = {
-		editHost({hostid}) {
-			const original_url = location.href;
+		editHost(e, hostid) {
+			e.preventDefault();
+			const host_data = {hostid};
 
+			this.openHostPopup(host_data);
+		},
+
+		openHostPopup(host_data) {
+			const original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {
 				dialogueid: 'host_edit',
 				dialogue_class: 'modal-popup-large'
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostCreate, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostUpdate, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
@@ -43,25 +49,7 @@
 		},
 
 		events: {
-			hostCreate: (e) => {
-				const data = e.detail;
-
-				if ('success' in data) {
-					const title = data.success.title;
-					let messages = [];
-
-					if ('messages' in data.success) {
-						messages = data.success.messages;
-					}
-
-					const message_box = makeMessageBox('good', messages, title)[0];
-
-					clearMessages();
-					addMessage(message_box);
-				}
-			},
-
-			hostUpdate: (e) => {
+			hostSuccess(e) {
 				const data = e.detail;
 
 				if ('success' in data) {
@@ -75,7 +63,7 @@
 				location.href = location.href;
 			},
 
-			hostDelete: (e) => {
+			hostDelete(e) {
 				const data = e.detail;
 
 				if ('success' in data) {
