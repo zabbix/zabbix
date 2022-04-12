@@ -150,7 +150,7 @@ if ($data['add_ldap_server']) {
 	];
 }
 else {
-	$title = _('LDAP server');
+	$title = _('LDAP Server');
 	$buttons = [
 		[
 			'title' => _('Update'),
