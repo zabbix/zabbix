@@ -44,7 +44,7 @@ class CControllerProxyUpdate extends CController {
 			'tls_psk' =>				'string',
 			'tls_issuer' =>				'string',
 			'tls_subject' =>			'string',
-			'update_psk' =>				'required|bool',
+			'update_psk' =>				'required|bool'
 		];
 
 		$ret = $this->validateInput($fields);

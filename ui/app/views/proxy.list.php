@@ -197,7 +197,7 @@ $form->addItem(
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdelete-proxy')
 				->addClass('no-chkbxrange')
-		],
+		]
 	], 'proxy')
 );
 
