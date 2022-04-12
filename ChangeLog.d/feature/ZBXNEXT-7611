@@ -1,0 +1,1 @@
+..F....... [ZBXNEXT-7611] fixed silenced errors not silenced in zbx_err_handler running PHP 8 (rdetlavs)

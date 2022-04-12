@@ -2289,9 +2289,10 @@ function getUserGraphTheme() {
  */
 function zbx_err_handler($errno, $errstr, $errfile, $errline) {
 	// Necessary to suppress errors when calling with error control operator like @function_name().
-	if (error_reporting() === 0) {
+	if ((error_reporting() & ~(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR))
+		=== 0) {
 		return true;
-	}
+    }
 
 	// Don't show the call to this handler function.
 	error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']', 'php');
