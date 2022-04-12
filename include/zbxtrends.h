@@ -24,16 +24,6 @@
 #include "common.h"
 #include "dbcache.h"
 
-typedef enum
-{
-	ZBX_TREND_STATE_UNKNOWN,
-	ZBX_TREND_STATE_NORMAL,
-	ZBX_TREND_STATE_NODATA,
-	ZBX_TREND_STATE_OVERFLOW,
-	ZBX_TREND_STATE_COUNT
-}
-zbx_trend_state_t;
-
 int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **error);
 int	zbx_parse_timeshift(time_t from, const char *timeshift, struct tm *tm, char **error);
 

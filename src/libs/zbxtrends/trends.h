@@ -35,6 +35,16 @@ typedef enum
 }
 zbx_trend_function_t;
 
+typedef enum
+{
+	ZBX_TREND_STATE_UNKNOWN,
+	ZBX_TREND_STATE_NORMAL,
+	ZBX_TREND_STATE_NODATA,
+	ZBX_TREND_STATE_OVERFLOW,
+	ZBX_TREND_STATE_COUNT
+}
+zbx_trend_state_t;
+
 int	zbx_tfc_get_value(zbx_uint64_t itemid, int start, int end, zbx_trend_function_t function, double *value,
 		zbx_trend_state_t *state);
 void	zbx_tfc_put_value(zbx_uint64_t itemid, int start, int end, zbx_trend_function_t function, double value,
