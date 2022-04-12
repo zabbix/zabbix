@@ -1146,8 +1146,7 @@ class testPageServicesServices extends CWebTest {
 
 		// Services disappeared from frontend.
 		foreach ($names as $name) {
-			$this->assertFalse($table->query("xpath:.//td/a[text()=".CXPathHelper::escapeQuotes($name)."]")->exists()
-			);
+			$this->assertFalse($table->query("xpath:.//td/a[text()=".CXPathHelper::escapeQuotes($name)."]")->exists());
 		}
 
 		// Check database.
@@ -1203,7 +1202,7 @@ class testPageServicesServices extends CWebTest {
 		$children = ['1' => 2, '2' => 3, '3' => 1];
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
-		$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
+		$table = $this->query('class:list-table')->waitUntilVisible()->asTable()->one();
 		$table->findRow('Name', $parent, true)->query('link', $parent)->waitUntilClickable()->one()->click();
 		$this->assertTableDataColumn(['1', '2', '3']);
 
