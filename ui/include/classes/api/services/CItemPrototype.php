@@ -379,7 +379,7 @@ class CItemPrototype extends CItemGeneral {
 	 * @return array
 	 */
 	public function create(array $items): array {
-		$this->validateCreate($items);
+		self::validateCreate($items);
 
 		self::createForce($items);
 		[$tpl_items] = $this->getTemplatedObjects($items);
@@ -396,7 +396,7 @@ class CItemPrototype extends CItemGeneral {
 	 *
 	 * @throws APIException
 	 */
-	protected function validateCreate(array &$items): void {
+	protected static function validateCreate(array &$items): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
 			'hostid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
@@ -450,14 +450,13 @@ class CItemPrototype extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->validateByType(array_keys($api_input_rules['fields']), $items);
+		self::validateByType(array_keys($api_input_rules['fields']), $items);
 
 		self::checkAndAddUuid($items);
 		self::checkDuplicates($items);
 		self::checkDiscoveryRules($items);
 		self::checkValueMaps($items);
 		self::checkHostInterfaces($items);
-		$this->checkSpecificFields($items);
 		self::checkDependentItems($items);
 	}
 
@@ -560,7 +559,6 @@ class CItemPrototype extends CItemGeneral {
 		self::checkDuplicates($items, $db_items);
 		self::checkValueMaps($items, $db_items);
 		self::checkHostInterfaces($items, $db_items);
-		$this->checkSpecificFields($items);
 		self::checkDependentItems($items, $db_items);
 	}
 

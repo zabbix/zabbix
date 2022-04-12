@@ -133,6 +133,64 @@ abstract class CItemGeneral extends CApiService {
 			if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($i + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
+
+			if ($item['type'] == ITEM_TYPE_JMX) {
+				if (array_key_exists('username', $item) || array_key_exists('password', $item)
+						|| ($db_item !== null && $db_item['type'] != ITEM_TYPE_JMX)) {
+					$_item = array_intersect_key($item, array_flip(['username', 'password']));
+
+					if ($db_item === null) {
+						$_item += array_fill_keys(['username', 'password'], '');
+					}
+					else {
+						$_item += array_intersect_key($db_item, array_flip(['username', 'password']));
+					}
+
+					if (($_item['username'] === '') !== ($_item['password'] === '')) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
+							_('both username and password should be either present or empty')
+						));
+					}
+				}
+			}
+
+			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+				if (array_key_exists('query_fields', $item)) {
+					foreach ($item['query_fields'] as $query_field) {
+						if (count($query_field) != 1 || key($query_field) === '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+								'/'.($i + 1).'/query_fields', _('nonempty key and value pair expected'))
+							);
+						}
+					}
+
+					$item['query_fields'] = $item['query_fields'] ? json_encode($item['query_fields']) : '';
+
+					if (strlen($item['query_fields']) > DB::getFieldLength('items', 'query_fields')) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							'/'.($i + 1).'/query_fields', _('value is too long')
+						));
+					}
+				}
+
+				if (array_key_exists('headers', $item)) {
+					foreach ($item['headers'] as $name => $value) {
+						if (trim($name) === '' || !is_string($value) || $value === '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							'/'.($i + 1).'/headers', _('nonempty key and value pair expected'))
+							);
+						}
+					}
+
+					$item['headers'] = self::headersArrayToString($item['headers']);
+
+					if (strlen($item['headers']) > DB::getFieldLength('items', 'headers')) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							'/'.($i + 1).'/headers', _('value is too long')
+						));
+					}
+				}
+			}
 		}
 		unset($item);
 	}
@@ -196,66 +254,6 @@ abstract class CItemGeneral extends CApiService {
 				]]
 			]
 		];
-	}
-
-	/**
-	 * @param array $items
-	 *
-	 * @throws APIException
-	 */
-	protected function checkSpecificFields(array &$items): void {
-		foreach ($items as $i => &$item) {
-			switch ($item['type']) {
-				case ITEM_TYPE_JMX:
-					if ((array_key_exists('username', $item) && !array_key_exists('password', $item))
-							|| (!array_key_exists('username', $item) && array_key_exists('password', $item))
-							|| (array_key_exists('username', $item) && array_key_exists('password', $item)
-								&& ($item['username'] === '') !== ($item['password'] === ''))) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'username', _('both username and password should be either present or empty')
-						));
-					}
-					break;
-
-				case ITEM_TYPE_HTTPAGENT:
-					if (array_key_exists('query_fields', $item)) {
-						if ($item['query_fields']) {
-							foreach ($item['query_fields'] as $v) {
-								if (!is_array($v) || count($v) > 1 || key($v) === '') {
-									self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-										'/'.($i + 1).'/query_fields', _('nonempty key and value pair expected'))
-									);
-								}
-							}
-
-							$item['query_fields'] = json_encode($item['query_fields']);
-
-							if (strlen($item['query_fields']) > DB::getFieldLength('items', 'query_fields')) {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-									'query_fields', _('cannot convert to JSON, result value too long')
-								));
-							}
-						}
-						else {
-							$item['query_fields'] = '';
-						}
-					}
-
-					if (array_key_exists('headers', $item)) {
-						foreach ($item['headers'] as $k => $v) {
-							if (trim($k) === '' || !is_string($v) || $v === '') {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-									'headers', _('nonempty key and value pair expected'))
-								);
-							}
-						}
-
-						$item['headers'] = self::headersArrayToString($item['headers']);
-					}
-					break;
-			}
-		}
-		unset($item);
 	}
 
 	/**
