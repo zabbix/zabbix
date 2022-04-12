@@ -31,13 +31,13 @@ import (
 	"sync"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/uri"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/jackc/pgx/v4/stdlib"
 	"github.com/omeid/go-yarn"
-	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/tlsconfig"
-	"zabbix.com/pkg/uri"
-	"zabbix.com/pkg/zbxerr"
 )
 
 const MinSupportedPGVersion = 100000
