@@ -1015,27 +1015,6 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Method validates preprocessing steps independently of other item properties.
-	 *
-	 * @param array  $preprocessing_steps  An array of item preprocessing step details.
-	 *                                     See self::validatePreprocessing for details.
-	 *
-	 * @return bool|string
-	 */
-	public function validateItemPreprocessingSteps(array $preprocessing_steps) {
-		$items = [['preprocessing' => $preprocessing_steps]];
-
-		try {
-			$this->validatePreprocessing($items);
-
-			return true;
-		}
-		catch (APIException $error) {
-			return $error->getMessage();
-		}
-	}
-
-	/**
 	 * Common create handler for Items and derivatives.
 	 *
 	 * @param array $items Item or derived entity (prototype, discovery rule).
