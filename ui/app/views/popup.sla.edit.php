@@ -264,7 +264,8 @@ if ($data['slaid'] !== null) {
 					[
 						'title' => _('Cancel'),
 						'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-cancel']),
-						'cancel' => true
+						'cancel' => true,
+						'action' => ''
 					]
 				]
 			]).');'

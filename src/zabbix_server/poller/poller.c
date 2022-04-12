@@ -19,7 +19,7 @@
 
 #include "poller.h"
 
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxserver.h"
 #include "zbxself.h"
 #include "preproc.h"
@@ -40,7 +40,6 @@
 #include "zbxcrypto.h"
 #include "zbxjson.h"
 #include "zbxhttp.h"
-#include "avail_protocol.h"
 #include "log.h"
 #include "zbxavailability.h"
 

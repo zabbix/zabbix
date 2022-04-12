@@ -21,8 +21,8 @@
 
 #include "log.h"
 #include "zbxserver.h"
-#include "../../libs/zbxaudit/audit.h"
-#include "../../libs/zbxaudit/audit_host.h"
+#include "audit/zbxaudit.h"
+#include "audit/zbxaudit_host.h"
 
 typedef struct
 {
@@ -1117,7 +1117,7 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 				ZBX_STR2UINT64(hostgroupid, row[2]);
 				zbx_vector_uint64_append(del_hostgroupids, hostgroupid);
 
-				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, hostid,
+				zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_UPDATE, hostid,
 						(NULL == host->host_orig) ? host->host : host->host_orig);
 
 				zbx_audit_hostgroup_update_json_delete_group(hostid, hostgroupid, groupid);
@@ -1798,7 +1798,7 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *gr
 
 			zbx_db_insert_add_values(&db_insert, group->groupid, group->name,
 					(int)ZBX_FLAG_DISCOVERY_CREATED);
-			zbx_audit_host_group_create_entry(AUDIT_ACTION_ADD, group->groupid, group->name);
+			zbx_audit_host_group_create_entry(ZBX_AUDIT_ACTION_ADD, group->groupid, group->name);
 
 			zbx_audit_host_group_update_json_add_details(group->groupid, group->name,
 					(int)ZBX_FLAG_DISCOVERY_CREATED);
@@ -1829,7 +1829,7 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *gr
 			if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE))
 			{
 				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hstgrp set ");
-				zbx_audit_host_group_create_entry(AUDIT_ACTION_UPDATE, group->groupid, group->name);
+				zbx_audit_host_group_create_entry(ZBX_AUDIT_ACTION_UPDATE, group->groupid, group->name);
 
 				if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE_NAME))
 				{
@@ -2696,7 +2696,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		}
 		else
 		{
-			zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, host->hostid,
+			zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_UPDATE, host->hostid,
 					(NULL == host->host_orig) ? host->host : host->host_orig);
 
 			if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE))
@@ -2746,7 +2746,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			{
 				zbx_vector_uint64_append(&del_interfaceids, interface->interfaceid);
 
-				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE,
+				zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_UPDATE,
 						host->hostid, (NULL == host->host_orig) ? host->host : host->host_orig);
 
 				zbx_audit_host_update_json_delete_interface(
@@ -2757,7 +2757,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			{
 				zbx_vector_uint64_append(&del_snmp_ids, interface->interfaceid);
 
-				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE,
+				zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_UPDATE,
 						host->hostid, (NULL == host->host_orig) ? host->host : host->host_orig);
 
 				zbx_audit_host_update_json_delete_interface(
@@ -2792,7 +2792,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			{
 				zbx_vector_uint64_append(&del_hostmacroids, hostmacro->hostmacroid);
 
-				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE,
+				zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_UPDATE,
 						host->hostid, (NULL == host->host_orig) ? host->host : host->host_orig);
 
 				zbx_audit_host_update_json_delete_hostmacro(
@@ -2814,7 +2814,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			{
 				zbx_vector_uint64_append(&del_tagids, host->tags.values[j]->tagid);
 
-				zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE, host->hostid,
+				zbx_audit_host_prototype_create_entry(ZBX_AUDIT_ACTION_UPDATE, host->hostid,
 						host->host);
 				zbx_audit_host_update_json_delete_tag(host->hostid, host->tags.values[j]->tagid);
 			}
@@ -2921,7 +2921,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					(int)tls_accept, tls_issuer, tls_subject, tls_psk_identity, tls_psk,
 					(int)host->custom_interfaces);
 
-			zbx_audit_host_create_entry(AUDIT_ACTION_ADD, host->hostid, host->host);
+			zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_ADD, host->hostid, host->host);
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host->hostid, parent_hostid, host_proto);
 
@@ -4306,7 +4306,7 @@ static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
 		{
 			type = get_interface_type_by_item_type((unsigned char)atoi(row[1]));
 
-			if (type != INTERFACE_TYPE_ANY && type != INTERFACE_TYPE_UNKNOWN)
+			if (type != INTERFACE_TYPE_ANY && type != INTERFACE_TYPE_UNKNOWN && type != INTERFACE_TYPE_OPT)
 			{
 				ZBX_STR2UINT64(interfaceid, row[0]);
 

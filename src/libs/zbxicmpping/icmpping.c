@@ -19,8 +19,8 @@
 
 #include "zbxicmpping.h"
 
-#include "threads.h"
-#include "comms.h"
+#include "zbxthreads.h"
+#include "zbxcomms.h"
 #include "zbxexec.h"
 #include "log.h"
 #include <signal.h>

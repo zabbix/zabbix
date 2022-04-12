@@ -17,17 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "dbupgrade.h"
+#include "dbupgrade_macros.h"
+
 #include "zbxeval.h"
 #include "log.h"
 #include "db.h"
-#include "dbupgrade.h"
-#include "dbupgrade_macros.h"
 #include "zbxregexp.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
-#include "../zbxalgo/vectorimpl.h"
 #include "sysinfo.h"
+#include "zbxhash.h"
 
 /*
  * 5.4 development database patches

@@ -19,12 +19,11 @@
 
 #include "alert_syncer.h"
 
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
 #include "log.h"
 #include "alerter_protocol.h"
 #include "service_protocol.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
 #include "dbcache.h"
 
 #define ZBX_POLL_INTERVAL	1

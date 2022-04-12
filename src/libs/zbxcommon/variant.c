@@ -17,11 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "log.h"
 #include "zbxvariant.h"
 
-#include "../zbxalgo/vectorimpl.h"
+#include "common.h"
+#include "log.h"
 
 ZBX_VECTOR_IMPL(var, zbx_variant_t)
 
