@@ -17,13 +17,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_AVAIL_PROTOCOL_H
-#define ZABBIX_AVAIL_PROTOCOL_H
+#ifndef ZABBIX_ZBXAUDIT_H
+#define ZABBIX_ZBXAUDIT_H
 
-#include "db.h"
+#include "zbxtypes.h"
 
-void	zbx_availability_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset,
-		const zbx_interface_availability_t *interface_availability);
-void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
-		zbx_vector_availability_ptr_t  *interface_availabilities);
-#endif
+#define ZBX_AUDIT_ACTION_ADD		0
+#define ZBX_AUDIT_ACTION_UPDATE		1
+#define ZBX_AUDIT_ACTION_DELETE		2
+#define ZBX_AUDIT_ACTION_EXECUTE	7
+
+int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
+		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
+		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *username, const char *clientip,
+		const char *output, const char *error);
+
+void	zbx_audit_init(int audit_mode_set);
+void	zbx_audit_clean(void);
+void	zbx_audit_flush(void);
+int	zbx_audit_flush_once(void);
+
+#endif	/* ZABBIX_ZBXAUDIT_H */

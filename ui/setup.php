@@ -160,7 +160,7 @@ DBclose();
 $setup_wizard = new CSetupWizard();
 
 // page title
-(new CPageHeader(_('Installation')))
+(new CPageHeader(_('Installation'), substr($default_lang, 0, strpos($default_lang, '_'))))
 	->addCssFile('assets/styles/'.CHtml::encode($default_theme).'.css')
 	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
 	->addJsFile((new CUrl('jsLoader.php'))
@@ -190,9 +190,7 @@ $sub_footer = (new CDiv([_('Licensed under'), ' ', $link]))->addClass(ZBX_STYLE_
 		(new CTag('main', true, [$setup_wizard, $sub_footer])),
 		makePageFooter()
 	]))->addClass(ZBX_STYLE_LAYOUT_WRAPPER)
-))
-	->setAttribute('lang', substr($default_lang, 0, strpos($default_lang, '_')))
-	->show();
+))->show();
 
 (new CScriptTag('
 	view.init('.json_encode([

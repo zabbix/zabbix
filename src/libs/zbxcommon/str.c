@@ -18,7 +18,7 @@
 **/
 
 #include "common.h"
-#include "threads.h"
+#include "zbxthreads.h"
 #include "module.h"
 
 #include "zbxcrypto.h"

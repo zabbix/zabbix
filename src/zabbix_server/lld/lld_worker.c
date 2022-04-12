@@ -19,7 +19,7 @@
 
 #include "lld_worker.h"
 
-#include "daemon.h"
+#include "zbxnix.h"
 #include "log.h"
 #include "zbxipcservice.h"
 #include "zbxself.h"

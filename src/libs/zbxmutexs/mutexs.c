@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "mutexs.h"
+#include "zbxmutexs.h"
 
 #include "log.h"
 
@@ -49,7 +49,7 @@ static int			shm_id, locks_disabled;
 #	endif	/* HAVE_SEMUN */
 
 #	include "cfg.h"
-#	include "threads.h"
+#	include "zbxthreads.h"
 
 	static int		ZBX_SEM_LIST_ID = -1;
 	static unsigned char	mutexes;

@@ -21,7 +21,7 @@
 
 #if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
 
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "log.h"
 #include "stats.h"
 

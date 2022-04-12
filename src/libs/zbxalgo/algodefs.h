@@ -17,17 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PID_H
-#define ZABBIX_PID_H
+#ifndef ZABBIX_ALGO_H
+#define ZABBIX_ALGO_H
 
-#include "threads.h"
-
-#ifdef _WINDOWS
-#	error "This module allowed only for Unix OS"
-#endif
-
-int	create_pid_file(const char *pidfile);
-int	read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_error_len);
-void	drop_pid_file(const char *pidfile);
-
-#endif
+int	next_prime(int n);
+#endif /* ZABBIX_ALGO_H */

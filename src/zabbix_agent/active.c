@@ -24,7 +24,7 @@
 #include "sysinfo.h"
 #include "logfiles/logfiles.h"
 #include "zbxcommshigh.h"
-#include "threads.h"
+#include "zbxthreads.h"
 #include "zbxjson.h"
 #include "alias.h"
 #include "zbxregexp.h"
@@ -37,7 +37,7 @@ extern ZBX_THREAD_LOCAL char		*CONFIG_HOSTNAME;
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
 #elif defined(ZABBIX_DAEMON)
-#	include "daemon.h"
+#	include "zbxnix.h"
 #endif
 
 #include "zbxcrypto.h"

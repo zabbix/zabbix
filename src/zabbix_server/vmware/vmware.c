@@ -24,12 +24,11 @@
 #	include <libxml/xpath.h>
 #endif
 
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "zbxshmem.h"
 #include "log.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
 
 /*
  * The VMware data (zbx_vmware_service_t structure) are stored in shared memory.
