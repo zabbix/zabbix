@@ -423,9 +423,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_DB_MONITOR => [
 					'js-item-delay-label',
@@ -441,19 +440,17 @@ final class CItemData {
 					'password',
 					'js-item-sql-query-label',
 					'js-item-sql-query-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
 					['id' => 'key', 'defaultValue' => $data['is_discovery_rule']
 						? ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY
 						: ZBX_DEFAULT_KEY_DB_MONITOR
-					]
+					],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_DEPENDENT => [
 					'js-item-master-item-label',
 					'js-item-master-item-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_EXTERNAL => [
 					'js-item-interface-label',
@@ -464,9 +461,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_HTTPAGENT => [
 					'js-item-url-label',
@@ -515,13 +511,12 @@ final class CItemData {
 					'js-item-interface-label',
 					'js-item-interface-field',
 					'interfaceid',
-					'js-item-trends-label',
-					'js-item-trends-field',
 					'js-item-allow-traps-label',
 					'js-item-allow-traps-field',
 					'allow_traps',
 					'trapper_hosts',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_INTERNAL => [
 					'js-item-delay-label',
@@ -529,9 +524,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_IPMI => [
 					'js-item-interface-label',
@@ -545,9 +539,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_JMX => [
 					'js-item-interface-label',
@@ -567,9 +560,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_SCRIPT => [
 					'js-item-parameters-label',
@@ -583,9 +575,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_SIMPLE => [
 					'js-item-delay-label',
@@ -602,9 +593,8 @@ final class CItemData {
 					'js-item-password-label',
 					'js-item-password-field',
 					'password',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_SNMP => [
 					'js-item-interface-label',
@@ -618,17 +608,15 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_SNMPTRAP => [
 					'js-item-interface-label',
 					'js-item-interface-field',
 					'interfaceid',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_SSH => [
 					'js-item-interface-label',
@@ -650,10 +638,9 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
 					'params_script',
-					['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_SSH]
+					['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_SSH],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_TELNET => [
 					'js-item-interface-label',
@@ -672,18 +659,16 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
 					'params_script',
-					['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_TELNET]
+					['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_TELNET],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_TRAPPER => [
 					'js-item-trapper-hosts-label',
 					'js-item-trapper-hosts-field',
 					'trapper_hosts',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_ZABBIX => [
 					'js-item-interface-label',
@@ -694,9 +679,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_ZABBIX_ACTIVE => [
 					'js-item-delay-label',
@@ -704,9 +688,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-field',
-					'js-item-trends-label',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				]
 			],
 			// Ids to toggle when the field 'authtype' is changed.
