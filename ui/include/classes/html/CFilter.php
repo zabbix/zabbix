@@ -122,8 +122,8 @@ class CFilter extends CDiv {
 	 *
 	 * @return CFilter
 	 */
-	public function addVar($name, $value) {
-		$this->form->addVar($name, $value);
+	public function addVar($name, $value, $id = null) {
+		$this->form->addVar($name, $value, $id);
 
 		return $this;
 	}
