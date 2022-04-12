@@ -220,9 +220,12 @@ class CHttpTestManager {
 				$stepidsDelete = array_keys($dbSteps);
 
 				if (!empty($stepidsDelete)) {
-					$del_step_items += DBfetchArray(DBselect(
-						'SELECT hi.itemid FROM httpstepitem hi WHERE '.dbConditionInt('hi.httpstepid', $stepidsDelete)
-					));
+					$del_step_items += DBfetchArrayAssoc(DBselect(
+						'SELECT i.itemid,i.name,i.flags'.
+						' FROM httpstepitem hi'.
+						' WHERE i.itemid=hi.itemid'.
+							' AND '.dbConditionInt('hi.httpstepid', $stepidsDelete)
+					), 'itemid');
 
 					DB::delete('httpstep', ['httpstepid' => $stepidsDelete]);
 				}

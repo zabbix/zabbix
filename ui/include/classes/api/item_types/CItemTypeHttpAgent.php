@@ -69,7 +69,10 @@ class CItemTypeHttpAgent extends CItemType {
 			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_cert_file')],
 			'ssl_key_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_file')],
 			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_password')],
-			'interfaceid' =>		self::getCreateFieldRule('interfaceid'),
+			'interfaceid' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
 			'delay' =>				['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')],
 			'allow_traps' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON]), 'default' => DB::getDefault('items', 'allow_traps')],
 			'trapper_hosts' =>		['type' => API_MULTIPLE, 'rules' => [
@@ -126,7 +129,10 @@ class CItemTypeHttpAgent extends CItemType {
 			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_cert_file')],
 			'ssl_key_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_file')],
 			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_password')],
-			'interfaceid' =>		self::getUpdateFieldRule('interfaceid', $db_item),
+			'interfaceid' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
 			'delay' =>				self::getUpdateFieldRule('delay', $db_item),
 			'allow_traps' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON])],
 			'trapper_hosts' =>		['type' => API_MULTIPLE, 'rules' => [

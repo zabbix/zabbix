@@ -38,11 +38,6 @@ abstract class CItemGeneral extends CApiService {
 		INTERFACE_TYPE_IPMI
 	];
 
-	protected const ERROR_EXISTS_TEMPLATE = 'existsTemplate';
-	protected const ERROR_EXISTS = 'exists';
-	protected const ERROR_NO_INTERFACE = 'noInterface';
-
-
 	/**
 	 * A list of supported preprocessing types.
 	 *
@@ -93,14 +88,6 @@ abstract class CItemGeneral extends CApiService {
 	 * @return array
 	 */
 	abstract public function get($options = []);
-
-	public function __construct() {
-		parent::__construct();
-
-		$this->errorMessages = array_merge($this->errorMessages, [
-			self::ERROR_NO_INTERFACE => _('Cannot find host interface on "%1$s" for item key "%2$s".')
-		]);
-	}
 
 	/**
 	 * @param array      $field_names
@@ -1809,8 +1796,7 @@ abstract class CItemGeneral extends CApiService {
 				' FROM items i'.
 				' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
 				' WHERE '.dbConditionId('i.itemid', $master_itemids).
-					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE
-					])
+					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE])
 			), 'itemid');
 		}
 		else {
@@ -2515,9 +2501,12 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Deletes items and related entities without permission check.
 	 *
-	 * @param array $itemids
+	 * @param array  $db_items
+	 * @param string $db_items[<num>]['itemid']
+	 * @param string $db_items[<num>]['name']
+	 * @param int    $db_items[<num>]['flags']
 	 */
-	public static function deleteForce(array $items) {
+	public static function deleteForce(array $db_items) {
 		$del_itemids = [];
 		$del_items = [
 			ZBX_FLAG_DISCOVERY_NORMAL => [],
@@ -2526,23 +2515,27 @@ abstract class CItemGeneral extends CApiService {
 			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
 		];
 
-		// Select parent and their inherited items.
-		$parent_itemids = array_column($items, 'itemid');
+		$parent_itemids = array_column($db_items, 'itemid');
 
+		foreach ($db_items as $i => $db_item) {
+			$del_items[$db_item['flags']][$db_item['itemid']] = $db_item;
+			unset($db_items[$i]);
+		}
+
+		// Select inherited items.
 		do {
-			$db_items = DBselect(
+			$child_items = DBselect(
 				'SELECT i.itemid,i.name,i.flags'.
 				' FROM items i'.
-				' WHERE '.dbConditionId('i.templateid', $parent_itemids).
-					' OR '.dbConditionId('i.itemid', $parent_itemids)
+				' WHERE '.dbConditionId('i.templateid', $parent_itemids)
 			);
 
 			$del_itemids += array_flip($parent_itemids);
 			$parent_itemids = [];
 
-			while ($db_item = DBfetch($db_items)) {
-				$itemid = $db_item['itemid'];
-				$del_items[$db_item['flags']][$itemid] = array_diff_key($db_item, ['flags' => true]);
+			while ($child_item = DBfetch($child_items)) {
+				$itemid = $child_item['itemid'];
+				$del_items[$child_item['flags']][$itemid] = $child_item;
 
 				if (!array_key_exists($itemid, $del_itemids)) {
 					$parent_itemids[] = $itemid;
@@ -2556,7 +2549,7 @@ abstract class CItemGeneral extends CApiService {
 		$del_itemids = [];
 
 		do {
-			$db_items = DBselect(
+			$dep_items = DBselect(
 				'SELECT i.itemid,i.name,i.flags'.
 				' FROM items i'.
 				' WHERE i.type='.ITEM_TYPE_DEPENDENT.
@@ -2566,9 +2559,9 @@ abstract class CItemGeneral extends CApiService {
 			$del_itemids += array_flip($dep_itemids);
 			$dep_itemids = [];
 
-			while ($db_item = DBfetch($db_items)) {
-				$itemid = $db_item['itemid'];
-				$del_items[$db_item['flags']][$itemid] = array_diff_key($db_item, ['flags' => true]);
+			while ($dep_item = DBfetch($dep_items)) {
+				$itemid = $dep_item['itemid'];
+				$del_items[$dep_item['flags']][$itemid] = $dep_item;
 
 				if (!array_key_exists($itemid, $del_itemids)) {
 					$dep_itemids[] = $itemid;
@@ -2709,9 +2702,9 @@ abstract class CItemGeneral extends CApiService {
 			ZBX_FLAG_DISCOVERY_PROTOTYPE => CAudit::RESOURCE_ITEM_PROTOTYPE
 		];
 
-		foreach ($del_items as $flags => $items) {
-			if ($items) {
-				self::addAuditLog(CAudit::ACTION_DELETE, $resource_types[$flags], $items);
+		foreach ($del_items as $flags => $db_items) {
+			if ($db_items) {
+				self::addAuditLog(CAudit::ACTION_DELETE, $resource_types[$flags], $db_items);
 			}
 		}
 	}

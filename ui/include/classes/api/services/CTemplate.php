@@ -527,16 +527,16 @@ class CTemplate extends CHostGeneral {
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
+
 		if ($del_rules) {
 			CDiscoveryRuleManager::delete(array_keys($del_rules));
 		}
 
 		// delete the items
 		$del_items = API::Item()->get([
-			'output' => [],
+			'output' => ['itemid', 'name', 'flags'],
 			'templateids' => $templateids,
-			'nopermissions' => true,
-			'preservekeys' => true
+			'nopermissions' => true
 		]);
 
 		if ($del_items) {

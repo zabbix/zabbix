@@ -90,15 +90,6 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	protected const AUDIT_RESOURCE = CAudit::RESOURCE_ITEM_PROTOTYPE;
 
-	public function __construct() {
-		parent::__construct();
-
-		$this->errorMessages = array_merge($this->errorMessages, [
-			self::ERROR_EXISTS_TEMPLATE => _('Item prototype "%1$s" already exists on "%2$s", inherited from another template.'),
-			self::ERROR_EXISTS => _('Item prototype "%1$s" already exists on "%2$s".')
-		]);
-	}
-
 	/**
 	 * Get ItemPrototype data.
 	 */
@@ -905,37 +896,36 @@ class CItemPrototype extends CItemGeneral {
 	/**
 	 * Deletes item prototypes and related entities without permission check.
 	 *
-	 * @param array $itemids
+	 * @param array $db_items
 	 */
-	public static function deleteForce(array $items) {
+	public static function deleteForce(array $db_items) {
 		$del_itemids = [];
 		$del_items = [
 			ZBX_FLAG_DISCOVERY_NORMAL => [],
 			ZBX_FLAG_DISCOVERY_RULE => [],
 			ZBX_FLAG_DISCOVERY_CREATED => [],
-			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => $db_items
 		];
 
 		// Select parent and their inherited items.
-		$parent_itemids = array_column($items, 'itemid');
+		$parent_itemids = array_column($db_items, 'itemid');
 
 		do {
-			$db_items = DBselect(
+			$child_items = DBselect(
 				'SELECT i.itemid,i.name,i.flags'.
 				' FROM items i'.
-				' WHERE '.dbConditionId('i.templateid', $parent_itemids).
-					' OR '.dbConditionId('i.itemid', $parent_itemids)
+				' WHERE '.dbConditionId('i.templateid', $parent_itemids)
 			);
 
 			$del_itemids += array_flip($parent_itemids);
 			$parent_itemids = [];
 
-			while ($db_item = DBfetch($db_items)) {
-				$itemid = $db_item['itemid'];
-				$del_items[$db_item['flags']][$itemid] = array_diff_key($db_item, ['flags' => true]);
+			while ($child_item = DBfetch($child_items)) {
+				$itemid = $child_item['itemid'];
+				$del_items[$child_item['flags']][$itemid] = $child_item;
 
 				if (!array_key_exists($itemid, $del_itemids)) {
-					$parent_itemids[] = $db_item['itemid'];
+					$parent_itemids[] = $child_item['itemid'];
 				}
 			}
 		} while ($parent_itemids);
@@ -946,7 +936,7 @@ class CItemPrototype extends CItemGeneral {
 		$del_itemids = [];
 
 		do {
-			$db_items = DBselect(
+			$dep_items = DBselect(
 				'SELECT i.itemid,i.name,i.flags'.
 				' FROM items i'.
 				' WHERE i.type='.ITEM_TYPE_DEPENDENT.
@@ -956,9 +946,9 @@ class CItemPrototype extends CItemGeneral {
 			$del_itemids += array_flip($dep_itemids);
 			$dep_itemids = [];
 
-			while ($db_item = DBfetch($db_items)) {
-				$itemid = $db_item['itemid'];
-				$del_items[$db_item['flags']][$itemid] = array_diff_key($db_item, ['flags' => true]);
+			while ($dep_item = DBfetch($dep_items)) {
+				$itemid = $dep_item['itemid'];
+				$del_items[$dep_item['flags']][$itemid] = $dep_item;
 
 				if (!array_key_exists($itemid, $del_itemids)) {
 					$dep_itemids[] = $itemid;
@@ -1020,7 +1010,10 @@ class CItemPrototype extends CItemGeneral {
 
 		// Delete discovered items.
 		$del_discovered_items = DBfetchColumn(DBselect(
-			'SELECT id.itemid FROM item_discovery id WHERE '.dbConditionInt('id.parent_itemid', $del_itemids)
+			'SELECT i.itemid,i.name,i.flags'.
+			' FROM items i,item_discovery id'.
+			' WHERE id.itemid=i.itemid'.
+				' AND '.dbConditionInt('id.parent_itemid', $del_itemids)
 		), 'itemid');
 
 		if ($del_discovered_items) {
@@ -1047,9 +1040,9 @@ class CItemPrototype extends CItemGeneral {
 			ZBX_FLAG_DISCOVERY_PROTOTYPE => CAudit::RESOURCE_ITEM_PROTOTYPE
 		];
 
-		foreach ($del_items as $flags => $items) {
-			if ($items) {
-				self::addAuditLog(CAudit::ACTION_DELETE, $resource_types[$flags], $items);
+		foreach ($del_items as $flags => $db_items) {
+			if ($db_items) {
+				self::addAuditLog(CAudit::ACTION_DELETE, $resource_types[$flags], $db_items);
 			}
 		}
 	}

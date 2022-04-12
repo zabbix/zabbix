@@ -608,24 +608,24 @@ abstract class CHostGeneral extends CHostBase {
 			$db_upd_items = [];
 		}
 
-		while ($item = DBfetch($db_items)) {
+		while ($db_item = DBfetch($db_items)) {
 			if ($clear) {
-				$upd_items[$item['flags']][$item['itemid']] = array_diff_key($item, ['flags' => true]);
+				$upd_items[$db_item['flags']][$db_item['itemid']] = $db_item;
 			}
 			else {
-				$upd_item = $item;
+				$upd_item = $db_item;
 				$upd_item['templateid'] = 0;
 
-				if ($item['host_status'] == HOST_STATUS_TEMPLATE) {
+				if ($db_item['host_status'] == HOST_STATUS_TEMPLATE) {
 					$upd_item['uuid'] = generateUuidV4();
 				}
 
-				if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				if (in_array($db_item['flags'], [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
 					$upd_item['valuemapid'] = 0;
 				}
 
-				$upd_items[$item['flags']][$item['itemid']] = $upd_item;
-				$db_upd_items[$item['itemid']] = $item;
+				$upd_items[$db_item['flags']][$db_item['itemid']] = $upd_item;
+				$db_upd_items[$db_item['itemid']] = $db_item;
 			}
 		}
 
@@ -1268,23 +1268,24 @@ abstract class CHostGeneral extends CHostBase {
 			$db_upd_items = [];
 		}
 
-		while ($item = DBfetch($db_items)) {
+		while ($db_item = DBfetch($db_items)) {
 			if ($clear) {
-				$upd_items[$item['flags']][$item['itemid']] = array_diff_key($item, ['flags' => true]);
+				$upd_items[$db_item['flags']][$db_item['itemid']] = $db_item;
 			}
 			else {
-				$upd_item = $item;
+				$upd_item = $db_item;
 				$upd_item['templateid'] = 0;
 
-				if ($item['host_status'] == HOST_STATUS_TEMPLATE) {
+				if ($db_item['host_status'] == HOST_STATUS_TEMPLATE) {
 					$upd_item['uuid'] = generateUuidV4();
 				}
-				if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+
+				if (in_array($db_item['flags'], [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
 					$upd_item['valuemapid'] = 0;
 				}
 
-				$upd_items[$item['flags']][$item['itemid']] = $upd_item;
-				$db_upd_items[$item['itemid']] = $item;
+				$upd_items[$db_item['flags']][$db_item['itemid']] = $upd_item;
+				$db_upd_items[$db_item['itemid']] = $db_item;
 			}
 		}
 

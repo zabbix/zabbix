@@ -1415,10 +1415,9 @@ class CHost extends CHostGeneral {
 
 		// delete the items
 		$del_items = API::Item()->get([
-			'output' => [],
+			'output' => ['itemid', 'name', 'flags'],
 			'templateids' => $hostids,
-			'nopermissions' => true,
-			'preservekeys' => true
+			'nopermissions' => true
 		]);
 
 		if ($del_items) {

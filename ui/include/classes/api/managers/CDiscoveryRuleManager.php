@@ -46,7 +46,7 @@ class CDiscoveryRuleManager {
 
 		// Delete item prototypes.
 		$db_item_prototypes = DBfetchArray(DBselect(
-			'SELECT i.itemid'.
+			'SELECT i.itemid,i.name,i.flags'.
 			' FROM item_discovery id,items i'.
 			' WHERE i.itemid=id.itemid'.
 				' AND '.dbConditionInt('parent_itemid', $ruleids)

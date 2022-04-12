@@ -639,9 +639,10 @@ class CHttpTest extends CApiService {
 		}
 
 		$db_httpstepitems = DBfetchArray(DBselect(
-			'SELECT hsi.itemid'.
-			' FROM httpstepitem hsi,httpstep hs'.
-			' WHERE hsi.httpstepid=hs.httpstepid'.
+			'SELECT i.itemid,i.name,i.flags'.
+			' FROM items i,httpstepitem hsi,httpstep hs'.
+			' WHERE i.itemid=hsu.itemid'.
+				' AND hsi.httpstepid=hs.httpstepid'.
 				' AND '.dbConditionInt('hs.httptestid', $del_httptestids)
 		));
 
