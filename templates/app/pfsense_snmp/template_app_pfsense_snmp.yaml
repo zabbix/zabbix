@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-30T11:30:23Z'
+  date: '2022-04-10T20:58:35Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -2649,14 +2649,14 @@ zabbix_export:
               uuid: 711e2c5b136e4a51a2fb745d847a9fc5
               expression: |
                 last(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/PFSense SNMP/vfs.fs.total[{#SNMPINDEX}])-last(/PFSense SNMP/vfs.fs.used[{#SNMPINDEX}]))<5G or timeleft(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}],1h,100)<1d)
+                ((last(/PFSense SNMP/vfs.fs.total[{#SNMPINDEX}])-last(/PFSense SNMP/vfs.fs.used[{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}],1h,100)<1d)
               name: 'PFSense: [{#FSNAME}]: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.
                 Second condition should be one of the following:
-                  - The disk free space is less than 5G.
+                  - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}.
                   - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               tags:
@@ -2670,14 +2670,14 @@ zabbix_export:
               uuid: ef0273e1092a40ff888e0ea87c859abb
               expression: |
                 last(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/PFSense SNMP/vfs.fs.total[{#SNMPINDEX}])-last(/PFSense SNMP/vfs.fs.used[{#SNMPINDEX}]))<10G or timeleft(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}],1h,100)<1d)
+                ((last(/PFSense SNMP/vfs.fs.total[{#SNMPINDEX}])-last(/PFSense SNMP/vfs.fs.used[{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}],1h,100)<1d)
               name: 'PFSense: [{#FSNAME}]: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.
                 Second condition should be one of the following:
-                  - The disk free space is less than 5G.
+                  - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}.
                   - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               dependencies:
@@ -2685,7 +2685,7 @@ zabbix_export:
                   name: 'PFSense: [{#FSNAME}]: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
                   expression: |
                     last(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/PFSense SNMP/vfs.fs.total[{#SNMPINDEX}])-last(/PFSense SNMP/vfs.fs.used[{#SNMPINDEX}]))<5G or timeleft(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}],1h,100)<1d)
+                    ((last(/PFSense SNMP/vfs.fs.total[{#SNMPINDEX}])-last(/PFSense SNMP/vfs.fs.used[{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -2832,6 +2832,14 @@ zabbix_export:
           macro: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
           value: '^(loop[0-9]*|sd[a-z][0-9]+|nbd[0-9]+|sr[0-9]+|fd[0-9]+|dm-[0-9]+|ram[0-9]+|ploop[a-z0-9]+|md[0-9]*|hcp[0-9]*|cd[0-9]*|pass[0-9]*|zram[0-9]*)'
           description: 'This macro is used in block devices discovery. Can be overridden on the host or linked template level'
+        -
+          macro: '{$VFS.FS.FREE.MIN.CRIT}'
+          value: 5G
+          description: 'The critical threshold of the filesystem utilization.'
+        -
+          macro: '{$VFS.FS.FREE.MIN.WARN}'
+          value: 10G
+          description: 'The warning threshold of the filesystem utilization.'
         -
           macro: '{$VFS.FS.FSNAME.MATCHES}'
           value: .+

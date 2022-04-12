@@ -22,7 +22,6 @@
 /**
  * @var CView $this
  */
-insert_javascript_for_visibilitybox();
 ?>
 <script type="text/x-jquery-tmpl" id="lldoverride-row-templated">
 	<?= (new CRow([
