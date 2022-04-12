@@ -2340,39 +2340,6 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Normalize preprocessing step parameters.
-	 *
-	 * @param array  $preprocessing                   Preprocessing steps.
-	 * @param string $preprocessing[<num>]['params']  Preprocessing step parameters.
-	 * @param int    $preprocessing[<num>]['type']    Preprocessing step type.
-	 *
-	 * @return array
-	 */
-	protected static function normalizeItemPreprocessingSteps(array $preprocessing): array {
-		foreach ($preprocessing as &$step) {
-			if (!array_key_exists('params', $step)) {
-				continue;
-			}
-
-			$step['params'] = str_replace("\r\n", "\n", $step['params']);
-			$params = explode("\n", $step['params']);
-
-			switch ($step['type']) {
-				case ZBX_PREPROC_PROMETHEUS_PATTERN:
-					if (!array_key_exists(2, $params)) {
-						$params[2] = '';
-					}
-					break;
-			}
-
-			$step['params'] = implode("\n", $params);
-		}
-		unset($step);
-
-		return $preprocessing;
-	}
-
-	/**
 	 * Add the specific fields of item types with its values into $db_items.
 	 * In case when item type is changed, fields of existing type and new type are added.
 	 *
