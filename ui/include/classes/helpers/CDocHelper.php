@@ -136,7 +136,7 @@ class CDocHelper {
 	const POPUP_SLA_EDIT =									'web_interface/frontend_sections/services/sla#configuration';
 	const POPUP_TEMPLATE_IMPORT =							'xml_export_import/templates#importing';
 	const POPUP_TOKEN_EDIT =								'web_interface/frontend_sections/administration/general#api-tokens';
-	const POPUP_ITEM_TEST_EDIT =							'config/items/item#testing';
+	const POPUP_TEST_EDIT =									'config/items/item#testing';
 	const QUEUE_DETAILS =									'web_interface/frontend_sections/administration/queue#list-of-waiting-items';
 	const QUEUE_OVERVIEW =									'web_interface/frontend_sections/administration/queue#overview-by-item-type';
 	const QUEUE_OVERVIEW_PROXY =							'web_interface/frontend_sections/administration/queue#overview-by-proxy';
