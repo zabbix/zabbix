@@ -280,15 +280,31 @@ class CUserGroup extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateUpdate(array &$usrgrps, array &$db_usrgrps = null) {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['usrgrpid'], ['name']], 'fields' => [
-			'usrgrpid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['usrgrpid']], 'fields' => [
+			'usrgrpid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $usrgrps, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['usrgrpid'], ['name']], 'fields' => [
+		$usrgrpids = array_column($usrgrps, 'usrgrpid');
+		$db_usrgrps = API::UserGroup()->get([
+			'output' => ['usrgrpid', 'name', 'debug_mode', 'gui_access', 'users_status'],
+			'usrgrpids' => $usrgrpids,
+			'preservekeys' => true
+		]);
+
+		if (count($usrgrps) != count($usrgrpids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('No permissions to referred object or it does not exist!')
+			);
+		}
+
+		$names = [];
+		$usrgrps = $this->extendObjectsByKey($usrgrps, $db_usrgrps, 'usrgrpid', ['gui_access']);
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+			'usrgrpid' =>			['type' => API_ID],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('usrgrp', 'name')],
 			'debug_mode' =>			['type' => API_INT32, 'in' => implode(',', [GROUP_DEBUG_MODE_DISABLED, GROUP_DEBUG_MODE_ENABLED])],
 			'gui_access' =>			['type' => API_INT32, 'in' => implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED])],
@@ -312,26 +328,11 @@ class CUserGroup extends CApiService {
 			]]
 		]];
 
-		$db_usrgrps = DB::select('usrgrp', [
-			'output' => ['usrgrpid', 'name', 'debug_mode', 'gui_access', 'users_status'],
-			'usrgrpids' => array_column($usrgrps, 'usrgrpid'),
-			'preservekeys' => true
-		]);
-		$usrgrps = $this->extendObjectsByKey($usrgrps, $db_usrgrps, 'usrgrpid', ['gui_access']);
-		$names = [];
-
 		if (!CApiInputValidator::validate($api_input_rules, $usrgrps, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		foreach ($usrgrps as &$usrgrp) {
-			// Check if this user group exists.
-			if (!array_key_exists($usrgrp['usrgrpid'], $db_usrgrps)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
 			if (array_key_exists('userids', $usrgrp)) {
 				if (array_key_exists('users', $usrgrp)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'userids'));

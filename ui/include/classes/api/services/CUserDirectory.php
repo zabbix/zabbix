@@ -45,9 +45,9 @@ class CUserDirectory extends CApiService {
 	 *
 	 * @param array $options
 	 *
-	 * @return array|string
-	 *
 	 * @throws APIException
+	 *
+	 * @return array|string
 	 */
 	public function get(array $options) {
 		$usergroups_fields = array_keys($this->getTableSchema('usrgrp')['fields']);
@@ -116,11 +116,11 @@ class CUserDirectory extends CApiService {
 	 *
 	 * @param array $userdirectories
 	 *
-	 * @return array
-	 *
 	 * @throws APIException
+	 *
+	 * @return array
 	 */
-	public function create(array $userdirectories) {
+	public function create(array $userdirectories): array {
 		static::validateCreate($userdirectories);
 
 		$db_count = DB::select($this->tableName(), ['countOutput' => true]);
@@ -144,11 +144,11 @@ class CUserDirectory extends CApiService {
 	 *
 	 * @param array $userdirectories
 	 *
-	 * @return array
-	 *
 	 * @throws APIException
+	 *
+	 * @return array
 	 */
-	public function update(array $userdirectories) {
+	public function update(array $userdirectories): array {
 		$update = [];
 		$db_userdirectories = [];
 
@@ -169,12 +169,10 @@ class CUserDirectory extends CApiService {
 
 		if ($update) {
 			DB::update('userdirectory', $update);
-
 			static::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USERDIRECTORY, $userdirectories,
 				$db_userdirectories
 			);
 		}
-
 
 		return ['userdirectoryids' => array_column($userdirectories, 'userdirectoryid')];
 	}
@@ -184,11 +182,11 @@ class CUserDirectory extends CApiService {
 	 *
 	 * @param array $userdirectoryids
 	 *
-	 * @return array
-	 *
 	 * @throws APIException
+	 *
+	 * @return array
 	 */
-	public function delete(array $userdirectoryids) {
+	public function delete(array $userdirectoryids): array {
 		$db_userdirectories = [];
 		static::validateDelete($userdirectoryids, $db_userdirectories);
 
@@ -205,8 +203,10 @@ class CUserDirectory extends CApiService {
 	 * @param array $userdirectory
 	 *
 	 * @throws APIException
+	 *
+	 * @return bool
 	 */
-	public function test(array $userdirectory) {
+	public function test(array $userdirectory): bool {
 		static::validateTest($userdirectory);
 
 		$user = [
@@ -240,7 +240,7 @@ class CUserDirectory extends CApiService {
 		if ($options['selectUsrgrps'] === API_OUTPUT_COUNT) {
 			static::addUserGroupsCounts($options, $userdirectories);
 		}
-		else if ($options['selectUsrgrps'] !== null) {
+		elseif ($options['selectUsrgrps'] !== null) {
 			static::addUserGroups($options, $userdirectories);
 		}
 
@@ -249,8 +249,6 @@ class CUserDirectory extends CApiService {
 
 	/**
 	 * Add user groups details to $userdirectories array, passed by reference.
-	 *
-	 * @static
 	 *
 	 * @param array $options
 	 * @param array $userdirectories
@@ -283,8 +281,6 @@ class CUserDirectory extends CApiService {
 	/**
 	 * Add user groups count details to $userdirectories array, passed by reference.
 	 *
-	 * @static
-	 *
 	 * @param array $options
 	 * @param array $userdirectories
 	 */
@@ -307,8 +303,6 @@ class CUserDirectory extends CApiService {
 
 	/**
 	 * Validate input data before create. Modify input data in $userdirectories.
-	 *
-	 * @static
 	 *
 	 * @param array $userdirectories
 	 *
@@ -347,7 +341,6 @@ class CUserDirectory extends CApiService {
 	/**
 	 * Validate input data before update. Modify input data in $db_userdirectories.
 	 *
-	 * @static
 	 *
 	 * @param array $userdirectories
 	 * @param array $db_userdirectories
@@ -374,8 +367,8 @@ class CUserDirectory extends CApiService {
 		}
 
 		$duplicates = DB::select('userdirectory', [
-			'output' =>			['userdirectoryid', 'name'],
-			'filter' =>			['name' => array_column($userdirectories, 'name')]
+			'output' => ['userdirectoryid', 'name'],
+			'filter' => ['name' => array_column($userdirectories, 'name')]
 		]);
 		$duplicates = array_column($duplicates, 'name', 'userdirectoryid');
 		$duplicates = array_diff_key($duplicates, array_column($userdirectories, 'name', 'userdirectoryid'));
@@ -399,13 +392,11 @@ class CUserDirectory extends CApiService {
 	/**
 	 * Validate user directory to be deleted.
 	 *
-	 * @static
-	 *
 	 * @param array $userdirectoryids
 	 *
 	 * @throws APIException
 	 */
-	protected static function validateDelete(array $userdirectoryids, &$db_userdirectories) {
+	protected static function validateDelete(array $userdirectoryids, &$db_userdirectories): void {
 		$rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($rules, $userdirectoryids, '/', $error)) {
@@ -461,7 +452,7 @@ class CUserDirectory extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected static function validateTest(array &$userdirectory) {
+	protected static function validateTest(array &$userdirectory): void {
 		$rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
 			'userdirectoryid' =>	['type' => API_ID, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'host' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'host')],

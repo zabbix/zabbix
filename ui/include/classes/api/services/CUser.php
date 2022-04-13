@@ -1510,13 +1510,6 @@ class CUser extends CApiService {
 						self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot find user directory for LDAP.'));
 					}
 
-					if ($userdirectory['case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE
-							&& $user['username'] !== $db_user['username']) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS,
-							_('Incorrect user name or password or account is temporarily blocked.')
-						);
-					}
-
 					$userdirectory += [
 						'test_username' => $user['username'],
 						'test_password' => $user['password']
