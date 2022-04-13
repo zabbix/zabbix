@@ -886,11 +886,12 @@ abstract class CControllerPopupItemTest extends CController {
 	/**
 	 * Resolve macros used in the calculates item formula.
 	 *
-	 * @param string $formula  Calculated item formula.
+	 * @param string $formula        Calculated item formula.
+	 * @param array  $macros_posted  Macros.
 	 *
-	 * @return array
+	 * @return string
 	 */
-	private function resolveCalcFormulaMacros(string $formula, $macros_posted) {
+	private function resolveCalcFormulaMacros(string $formula, array $macros_posted): string {
 		if (!$macros_posted) {
 			return $formula;
 		}
