@@ -182,8 +182,9 @@ int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 
 #define ZBX_DBVERSION_UNDEFINED				0
 
-#define ZBX_DB_EXT_STATUS_FLAGS_TSDB_EXPECTED			0x00000001
-#define ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE	0x00000002
+#define ZBX_DB_EXTENSION_TIMESCALE				"timescaledb"
+
+#define ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE	0x00000001
 
 #define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB		100002
 #define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB_FRIENDLY	"10.2"
@@ -233,7 +234,7 @@ struct zbx_db_version_info_t
 
 	/* information about database server extension */
 
-	const char		*extension;
+	char			*extension;
 
 	zbx_uint32_t		ext_current_version;
 	zbx_uint32_t		ext_min_version;

@@ -2528,7 +2528,7 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 	zbx_json_addint64(json, "flag", info->flag);
 	zbx_json_close(json);
 
-	if (0 != (ZBX_DB_EXT_STATUS_FLAGS_TSDB_EXPECTED & info->ext_status))
+	if (0 == zbx_strcmp_null(info->extension, ZBX_DB_EXTENSION_TIMESCALE))
 	{
 		zbx_json_addobject(json, NULL);
 		zbx_json_addstring(json, "database", info->extension, ZBX_JSON_TYPE_STRING);
@@ -2839,12 +2839,10 @@ void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info)
 {
 	int	tsdb_ver;
 
-	if (0 == (ZBX_DB_EXT_STATUS_FLAGS_TSDB_EXPECTED & version_info->ext_status))
+	if (0 != zbx_strcmp_null(version_info->extension, ZBX_DB_EXTENSION_TIMESCALE))
 		return;
 
 	tsdb_ver = zbx_tsdb_get_version();
-
-	version_info->extension = "TimescaleDB";
 
 	version_info->ext_current_version = (zbx_uint32_t)tsdb_ver;
 	version_info->ext_min_version = ZBX_TIMESCALEDB_MIN_VERSION;

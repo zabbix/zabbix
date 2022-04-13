@@ -826,8 +826,7 @@ void	DBextract_dbextension_info(struct zbx_db_version_info_t *version_info)
 	if (NULL == (row = DBfetch(result)))
 		goto clean;
 
-	if (0 == zbx_strcmp_null(row[0], ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
-		version_info->ext_status |= ZBX_DB_EXT_STATUS_FLAGS_TSDB_EXPECTED;
+	version_info->extension = zbx_strdup(NULL, row[0]);
 
 	zbx_tsdb_info_extract(version_info);
 clean:
@@ -870,7 +869,7 @@ int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info)
 {
 	int	ret = SUCCEED;
 #ifdef HAVE_POSTGRESQL
-	if (0 == (ZBX_DB_EXT_STATUS_FLAGS_TSDB_EXPECTED & db_version_info->ext_status))
+	if (0 != zbx_strcmp_null(db_version_info->extension, ZBX_DB_EXTENSION_TIMESCALE))
 	{
 		goto out;
 	}

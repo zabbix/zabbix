@@ -1148,7 +1148,7 @@ static void	zbx_check_db(void)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 #if defined(HAVE_POSTGRESQL)
-	if (SUCCEED == result && 0 != (ZBX_DB_EXT_STATUS_FLAGS_TSDB_EXPECTED & db_version_info.ext_status) &&
+	if (SUCCEED == result && 0 == zbx_strcmp_null(db_version_info.extension, ZBX_DB_EXTENSION_TIMESCALE) &&
 			0 == (ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE & db_version_info.ext_status) &&
 			ZBX_DB_OK > DBexecute("update config set compression_status=0"))
 	{
@@ -1181,6 +1181,7 @@ static void	zbx_check_db(void)
 
 	DBclose();
 	zbx_free(db_version_info.friendly_current_version);
+	zbx_free(db_version_info.extension);
 	zbx_free(db_version_info.ext_friendly_current_version);
 	zbx_free(db_version_info.ext_lic);
 
