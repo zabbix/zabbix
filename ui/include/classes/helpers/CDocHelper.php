@@ -118,7 +118,6 @@ class CDocHelper {
 	const MONITORING_SYSMAP_CONSTRUCTOR =					'config/visualization/maps/map#overview';
 	const MONITORING_WEB_VIEW =								'web_interface/frontend_sections/monitoring/hosts/web';
 	const POPUP_ACKNOWLEDGE_EDIT =							'acknowledges#updating-problems';
-	const POPUP_DASHBOARD_SHARE_EDIT =						'config/visualization/maps/map#sharing';
 	const POPUP_HOST_IMPORT =								'xml_export_import/hosts#importing';
 	const POPUP_HTTP_STEP_EDIT =							'web_monitoring#configuring-steps';
 	const POPUP_MAPS_IMPORT =								'xml_export_import/maps#importing';
