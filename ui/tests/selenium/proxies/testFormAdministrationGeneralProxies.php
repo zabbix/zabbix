@@ -1097,7 +1097,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		}
 		else {
 			$dialog->ensureNotPresent();
-			$this->assertMessage(TEST_GOOD, $update ? 'Proxy updated' : 'Proxy created');
+			$this->assertMessage(TEST_GOOD, $update ? 'Proxy updated' : 'Proxy added');
 
 			// Remove leading and trailing spaces from data for assertion.
 			if (CTestArrayHelper::get($data, 'trim', false)) {
@@ -1212,7 +1212,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		$form->invalidate();
 		$form->fill(['Proxy name' => $new_name]);
 		$form->submit();
-		$this->assertMessage(TEST_GOOD, 'Proxy created');
+		$this->assertMessage(TEST_GOOD, 'Proxy added');
 
 		// Check cloned proxy form fields.
 		$this->query('link', $new_name)->one()->waitUntilClickable()->click();
