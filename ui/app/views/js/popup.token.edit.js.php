@@ -46,8 +46,6 @@ window.token_edit_popup = {
 		this.expiresAtHandler();
 
 		this.expires_state.addEventListener('change', () => this.expiresAtHandler());
-		this.overlay.$dialogue[0].addEventListener('overlay.close', this.events.overlayClose, {once: true});
-		this.enableNavigationWarning();
 	},
 
 	submit() {
@@ -151,14 +149,6 @@ window.token_edit_popup = {
 		overlayDialogueDestroy(this.overlay.dialogueid);
 	},
 
-	enableNavigationWarning() {
-		window.addEventListener('beforeunload', this.events.beforeUnload, {passive: false});
-	},
-
-	disableNavigationWarning() {
-		window.removeEventListener('beforeunload', this.events.beforeUnload);
-	},
-
 	removePopupMessages() {
 		for (const el of this.form.parentNode.children) {
 			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
@@ -169,18 +159,18 @@ window.token_edit_popup = {
 
 	ajaxExceptionHandler: (exception) => {
 		const form = token_edit_popup.form;
-		let title;
-		let messages = [];
+
+		let title, messages;
 
 		if (typeof exception === 'object' && 'error' in exception) {
 			title = exception.error.title;
 			messages = exception.error.messages;
 		}
 		else {
-			title = <?= json_encode(_('Unexpected server error.')) ?>;
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 		}
 
-		const message_box = makeMessageBox('bad', messages, title, true, true)[0];
+		const message_box = makeMessageBox('bad', messages, title)[0];
 
 		form.parentNode.insertBefore(message_box, form);
 	},
@@ -240,7 +230,6 @@ window.token_edit_popup = {
 					throw {error: response.error};
 				}
 
-				this.overlay.$dialogue[0].removeEventListener('overlay.close', this.events.overlayClose);
 				this.overlay.$dialogue[0].addEventListener('overlay.close', this.events.overlayCloseAfterUpdate,
 					{once: true}
 				);
@@ -254,18 +243,7 @@ window.token_edit_popup = {
 	},
 
 	events: {
-		beforeUnload(e) {
-			// Display confirmation message.
-			e.preventDefault();
-			e.returnValue = '';
-		},
-
-		overlayClose() {
-			token_edit_popup.disableNavigationWarning();
-		},
-
 		overlayCloseAfterUpdate() {
-			token_edit_popup.disableNavigationWarning();
 			token_edit_popup.dialogue.dispatchEvent(new CustomEvent('dialogue.update', {detail: {}}));
 		}
 	}

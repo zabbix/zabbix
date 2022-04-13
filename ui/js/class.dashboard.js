@@ -561,13 +561,23 @@ class CDashboard extends CBaseComponent {
 
 				this._selectDashboardPage(dashboard_page, {is_async: true});
 			})
-			.catch((error) => {
+			.catch((exception) => {
 				clearMessages();
 
-				addMessage((typeof error === 'object' && 'html_string' in error)
-					? error.html_string
-					: makeMessageBox('bad', [], t('Failed to paste dashboard page.'), true, false)
-				);
+				let title;
+				let messages = [];
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					title = t('Failed to paste dashboard page.');
+				}
+
+				const message_box = makeMessageBox('bad', messages, title);
+
+				addMessage(message_box);
 			})
 			.finally(() => this._deleteBusyCondition(busy_condition))
 	}
@@ -653,13 +663,24 @@ class CDashboard extends CBaseComponent {
 					unique_id: this._createUniqueId()
 				});
 			})
-			.catch((error) => {
+			.catch((exception) => {
+				dashboard_page.deleteWidget(paste_placeholder_widget);
+
 				clearMessages();
 
-				addMessage((typeof error === 'object' && 'html_string' in error)
-					? error.html_string
-					: makeMessageBox('bad', [], t('Failed to paste widget.'), true, false)
-				);
+				let title, messages;
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					title = t('Failed to paste widget.');
+				}
+
+				const message_box = makeMessageBox('bad', messages, title);
+
+				addMessage(message_box);
 			})
 			.finally(() => this._deleteBusyCondition(busy_condition));
 	}
@@ -685,8 +706,8 @@ class CDashboard extends CBaseComponent {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				if ('errors' in response) {
-					throw {html_string: response.errors};
+				if ('error' in response) {
+					throw {error: response.error};
 				}
 
 				return response;
@@ -955,16 +976,24 @@ class CDashboard extends CBaseComponent {
 
 				this.fire(DASHBOARD_EVENT_APPLY_PROPERTIES);
 			})
-			.catch((error) => {
-				for (const el of form.parentNode.children) {
-					if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
-						el.parentNode.removeChild(el);
+			.catch((exception) => {
+				for (const element of form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
 					}
 				}
 
-				const message_box = (typeof error === 'object' && 'html_string' in error)
-					? new DOMParser().parseFromString(error.html_string, 'text/html').body.firstElementChild
-					: makeMessageBox('bad', [], t('Failed to update dashboard properties.'), true, false)[0];
+				let title, messages;
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					messages = [t('Failed to update dashboard properties.')];
+				}
+
+				const message_box = makeMessageBox('bad', messages, title)[0];
 
 				form.parentNode.insertBefore(message_box, form);
 			})
@@ -989,8 +1018,8 @@ class CDashboard extends CBaseComponent {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				if ('errors' in response) {
-					throw {html_string: response.errors};
+				if ('error' in response) {
+					throw {error: response.error};
 				}
 
 				this._data.name = properties.name;
@@ -1023,16 +1052,24 @@ class CDashboard extends CBaseComponent {
 			.then(() => {
 				overlayDialogueDestroy(overlay.dialogueid);
 			})
-			.catch((error) => {
-				for (const el of form.parentNode.children) {
-					if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
-						el.parentNode.removeChild(el);
+			.catch((exception) => {
+				for (const element of form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
 					}
 				}
 
-				const message_box = (typeof error === 'object' && 'html_string' in error)
-					? new DOMParser().parseFromString(error.html_string, 'text/html').body.firstElementChild
-					: makeMessageBox('bad', [], t('Failed to update dashboard page properties.'), true, false)[0];
+				let title, messages;
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					messages = [t('Failed to update dashboard page properties.')];
+				}
+
+				const message_box = makeMessageBox('bad', messages, title)[0];
 
 				form.parentNode.insertBefore(message_box, form);
 			})
@@ -1056,8 +1093,8 @@ class CDashboard extends CBaseComponent {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				if ('errors' in response) {
-					throw {html_string: response.errors};
+				if ('error' in response) {
+					throw {error: response.error};
 				}
 
 				if (data.unique_id !== null) {
@@ -1137,8 +1174,8 @@ class CDashboard extends CBaseComponent {
 						}
 					}
 
-					const message_box = makeMessageBox('warning',
-						t('Cannot add widget: not enough free space on the dashboard.'), null, false
+					const message_box = makeMessageBox('warning', [],
+						t('Cannot add widget: not enough free space on the dashboard.')
 					)[0];
 
 					form.parentNode.insertBefore(message_box, form);
@@ -1268,16 +1305,24 @@ class CDashboard extends CBaseComponent {
 						});
 				}
 			})
-			.catch((error) => {
-				for (const el of form.parentNode.children) {
-					if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
-						el.parentNode.removeChild(el);
+			.catch((exception) => {
+				for (const element of form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
 					}
 				}
 
-				const message_box = (typeof error === 'object' && 'html_string' in error)
-					? new DOMParser().parseFromString(error.html_string, 'text/html').body.firstElementChild
-					: makeMessageBox('bad', [], t('Failed to update widget properties.'), true, false)[0];
+				let title, messages;
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					messages = [t('Failed to update widget properties.')];
+				}
+
+				const message_box = makeMessageBox('bad', messages, title)[0];
 
 				form.parentNode.insertBefore(message_box, form);
 			})
@@ -1301,8 +1346,8 @@ class CDashboard extends CBaseComponent {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				if ('errors' in response) {
-					throw {html_string: response.errors};
+				if ('error' in response) {
+					throw {error: response.error};
 				}
 			});
 	}
@@ -1321,7 +1366,11 @@ class CDashboard extends CBaseComponent {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				return typeof response.configuration === 'object' ? response.configuration : {};
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				return response.configuration;
 			});
 	}
 
@@ -1387,7 +1436,7 @@ class CDashboard extends CBaseComponent {
 		this._warning_message_box = makeMessageBox('warning', [], sprintf(
 			t('Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.'),
 			this._max_dashboard_pages
-		), true, false);
+		));
 
 		addMessage(this._warning_message_box);
 	}
@@ -1395,8 +1444,8 @@ class CDashboard extends CBaseComponent {
 	_warnDashboardPageExhausted() {
 		this._clearWarnings();
 
-		this._warning_message_box = makeMessageBox(
-			'warning', [], t('Cannot add widget: not enough free space on the dashboard.'), true, false
+		this._warning_message_box = makeMessageBox('warning', [],
+			t('Cannot add widget: not enough free space on the dashboard.')
 		);
 
 		addMessage(this._warning_message_box);

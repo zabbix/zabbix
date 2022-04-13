@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "sysinc.h"
+#include "zbxsysinc.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
 #include "tls.h"
 #include "zbxcomms.h"
-#include "threads.h"
+#include "zbxthreads.h"
 #include "log.h"
 #include "zbxcrypto.h"
 #include "tls_tcp.h"
@@ -35,7 +35,7 @@
 /* mutexes for multi-threaded OpenSSL (see "man 3ssl threads" and example in crypto/threads/mttest.c) */
 
 #ifdef _WINDOWS
-#include "mutexs.h"
+#include "zbxmutexs.h"
 
 static zbx_mutex_t	*crypto_mutexes = NULL;
 

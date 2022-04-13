@@ -292,6 +292,28 @@ void	zbx_audit_init(int audit_mode_set)
 #undef AUDIT_HASHSET_DEF_SIZE
 }
 
+void	zbx_audit_prepare(void)
+{
+	zbx_config_t	cfg;
+
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED);
+	zbx_audit_init(cfg.auditlog_enabled);
+}
+
+static int	zbx_audit_validate_entry(const zbx_audit_entry_t *entry)
+{
+	switch (entry->audit_action)
+	{
+		case AUDIT_ACTION_ADD:
+		case AUDIT_ACTION_UPDATE:
+			if (0 == strcmp(entry->details_json.buffer, "{}"))
+				return FAIL;
+			return SUCCEED;
+		default:
+			return SUCCEED;
+	}
+}
+
 void	zbx_audit_flush(void)
 {
 	char			recsetid_cuid[CUID_LEN];
@@ -309,8 +331,7 @@ void	zbx_audit_flush(void)
 
 	while (NULL != (audit_entry = (zbx_audit_entry_t **)zbx_hashset_iter_next(&iter)))
 	{
-		if (ZBX_AUDIT_ACTION_DELETE == (*audit_entry)->audit_action ||
-				0 != strcmp((*audit_entry)->details_json.buffer, "{}"))
+		if (SUCCEED == zbx_audit_validate_entry(*audit_entry))
 		{
 			char	*details_esc;
 
@@ -348,11 +369,8 @@ int	zbx_audit_flush_once(void)
 		char	id[ZBX_MAX_UINT64_LEN + 1], *pvalue, *name_esc, *details_esc;
 		const char	*pfield;
 
-		if (ZBX_AUDIT_ACTION_DELETE != (*audit_entry)->audit_action &&
-				0 == strcmp((*audit_entry)->details_json.buffer, "{}"))
-		{
+		if (SUCCEED != zbx_audit_validate_entry(*audit_entry))
 			continue;
-		}
 
 		if (0 != (*audit_entry)->id)
 		{

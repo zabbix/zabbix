@@ -1,3 +1,4 @@
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -17,13 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_AVAIL_PROTOCOL_H
-#define ZABBIX_AVAIL_PROTOCOL_H
 
-#include "db.h"
+class CAccessDeniedException extends Exception {
 
-void	zbx_availability_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset,
-		const zbx_interface_availability_t *interface_availability);
-void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
-		zbx_vector_availability_ptr_t  *interface_availabilities);
-#endif
+}

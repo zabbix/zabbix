@@ -24,7 +24,7 @@
 
 #ifdef HAVE_OPENIPMI
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 ZBX_THREAD_ENTRY(ipmi_poller_thread, args);
 

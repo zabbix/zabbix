@@ -20,7 +20,7 @@
 #ifndef ZABBIX_PROXYPOLLER_H
 #define ZABBIX_PROXYPOLLER_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 extern char	*CONFIG_SOURCE_IP;
 extern int	CONFIG_TRAPPER_TIMEOUT;

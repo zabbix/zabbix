@@ -36,6 +36,8 @@ No specific Zabbix configuration is required.
 |{$VFS.DEV.DEVNAME.NOT_MATCHES} |<p>This macro is used in block devices discovery. Can be overridden on the host or linked template level</p> |`^(loop[0-9]*|sd[a-z][0-9]+|nbd[0-9]+|sr[0-9]+|fd[0-9]+|dm-[0-9]+|ram[0-9]+|ploop[a-z0-9]+|md[0-9]*|hcp[0-9]*|zram[0-9]*)` |
 |{$VFS.DEV.READ.AWAIT.WARN} |<p>Disk read average response time (in ms) before the trigger would fire</p> |`20` |
 |{$VFS.DEV.WRITE.AWAIT.WARN} |<p>Disk write average response time (in ms) before the trigger would fire</p> |`20` |
+|{$VFS.FS.FREE.MIN.CRIT} |<p>The critical threshold of the filesystem utilization.</p> |`5G` |
+|{$VFS.FS.FREE.MIN.WARN} |<p>The warning threshold of the filesystem utilization.</p> |`10G` |
 |{$VFS.FS.FSNAME.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level</p> |`.+` |
 |{$VFS.FS.FSNAME.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level</p> |`^(/dev|/sys|/run|/proc|.+/shm$)` |
 |{$VFS.FS.FSTYPE.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level</p> |`^(btrfs|ext2|ext3|ext4|reiser|xfs|ffs|ufs|jfs|jfs2|vxfs|hfs|apfs|refs|ntfs|fat32|zfs)$` |
@@ -65,7 +67,7 @@ There are no template links in this template.
 |CPU |Load average (1m avg) |<p>-</p> |ZABBIX_ACTIVE |system.cpu.load[all,avg1] |
 |CPU |Load average (5m avg) |<p>-</p> |ZABBIX_ACTIVE |system.cpu.load[all,avg5] |
 |CPU |Load average (15m avg) |<p>-</p> |ZABBIX_ACTIVE |system.cpu.load[all,avg15] |
-|CPU |CPU utilization |<p>CPU utilization in %</p> |DEPENDENT |system.cpu.util<p>**Preprocessing**:</p><p>- JAVASCRIPT: `//Calculate utilization return (100 - value)`</p> |
+|CPU |CPU utilization |<p>CPU utilization in %.</p> |DEPENDENT |system.cpu.util<p>**Preprocessing**:</p><p>- JAVASCRIPT: `//Calculate utilization return (100 - value)`</p> |
 |CPU |CPU idle time |<p>The time the CPU has spent doing nothing.</p> |ZABBIX_ACTIVE |system.cpu.util[,idle] |
 |CPU |CPU system time |<p>The time the CPU has spent running the kernel and its processes.</p> |ZABBIX_ACTIVE |system.cpu.util[,system] |
 |CPU |CPU user time |<p>The time the CPU has spent running users' processes that are not niced.</p> |ZABBIX_ACTIVE |system.cpu.util[,user] |
@@ -74,8 +76,8 @@ There are no template links in this template.
 |CPU |CPU steal time |<p>The amount of CPU 'stolen' from this virtual machine by the hypervisor for other tasks (such as running another virtual machine).</p> |ZABBIX_ACTIVE |system.cpu.util[,steal] |
 |CPU |CPU interrupt time |<p>The amount of time the CPU has been servicing hardware interrupts.</p> |ZABBIX_ACTIVE |system.cpu.util[,interrupt] |
 |CPU |CPU softirq time |<p>The amount of time the CPU has been servicing software interrupts.</p> |ZABBIX_ACTIVE |system.cpu.util[,softirq] |
-|CPU |CPU guest time |<p>Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system)</p> |ZABBIX_ACTIVE |system.cpu.util[,guest] |
-|CPU |CPU guest nice time |<p>Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel)</p> |ZABBIX_ACTIVE |system.cpu.util[,guest_nice] |
+|CPU |CPU guest time |<p>Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system).</p> |ZABBIX_ACTIVE |system.cpu.util[,guest] |
+|CPU |CPU guest nice time |<p>Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel).</p> |ZABBIX_ACTIVE |system.cpu.util[,guest_nice] |
 |CPU |Context switches per second |<p>-</p> |ZABBIX_ACTIVE |system.cpu.switches<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |CPU |Interrupts per second |<p>-</p> |ZABBIX_ACTIVE |system.cpu.intr<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |Filesystems |{#FSNAME}: Used space |<p>Used storage in Bytes</p> |ZABBIX_ACTIVE |vfs.fs.size[{#FSNAME},used] |
@@ -96,7 +98,7 @@ There are no template links in this template.
 |Inventory |Software installed |<p>-</p> |ZABBIX_ACTIVE |system.sw.packages<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Memory |Memory utilization |<p>Memory used percentage is calculated as (100-pavailable)</p> |DEPENDENT |vm.memory.utilization<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return (100-value);`</p> |
 |Memory |Available memory in % |<p>Available memory as percentage of total. See also Appendixes in Zabbix Documentation about parameters of the vm.memory.size item.</p> |ZABBIX_ACTIVE |vm.memory.size[pavailable] |
-|Memory |Total memory |<p>Total memory in Bytes</p> |ZABBIX_ACTIVE |vm.memory.size[total] |
+|Memory |Total memory |<p>Total memory in Bytes.</p> |ZABBIX_ACTIVE |vm.memory.size[total] |
 |Memory |Available memory |<p>Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also Appendixes in Zabbix Documentation about parameters of the vm.memory.size item.</p> |ZABBIX_ACTIVE |vm.memory.size[available] |
 |Memory |Total swap space |<p>The total space of swap volume/file in bytes.</p> |ZABBIX_ACTIVE |system.swap.size[,total] |
 |Memory |Free swap space |<p>The free space of swap volume/file in bytes.</p> |ZABBIX_ACTIVE |system.swap.size[,free] |
