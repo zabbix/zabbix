@@ -366,20 +366,24 @@ class CUserDirectory extends CApiService {
 			static::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$duplicates = DB::select('userdirectory', [
-			'output' => ['userdirectoryid', 'name'],
-			'filter' => ['name' => array_column($userdirectories, 'name')]
-		]);
-		$duplicates = array_column($duplicates, 'name', 'userdirectoryid');
-		$duplicates = array_diff_key($duplicates, array_column($userdirectories, 'name', 'userdirectoryid'));
+		$names = array_column($userdirectories, 'name');
 
-		if ($duplicates) {
-			$name = reset($duplicates);
-			$subpath = '/'.(array_search($name, array_column($userdirectories, 'name')) + 1);
-			$error = _s('Invalid parameter "%1$s": %2$s.', $subpath,
-				_s('value %1$s already exists', '(name)=('.$name.')')
-			);
-			static::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		if ($names) {
+			$duplicates = DB::select('userdirectory', [
+				'output' => ['userdirectoryid', 'name'],
+				'filter' => ['name' => array_column($userdirectories, 'name')]
+			]);
+			$duplicates = array_column($duplicates, 'name', 'userdirectoryid');
+			$duplicates = array_diff_key($duplicates, array_column($userdirectories, 'name', 'userdirectoryid'));
+
+			if ($duplicates) {
+				$name = reset($duplicates);
+				$subpath = '/'.(array_search($name, array_column($userdirectories, 'name')) + 1);
+				$error = _s('Invalid parameter "%1$s": %2$s.', $subpath,
+					_s('value %1$s already exists', '(name)=('.$name.')')
+				);
+				static::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
 		}
 
 		$db_userdirectories = DB::select('userdirectory', [
@@ -387,6 +391,10 @@ class CUserDirectory extends CApiService {
 			'userdirectoryids' => array_column($userdirectories, 'userdirectoryid'),
 			'preservekeys' => true
 		]);
+
+		if (count($db_userdirectories) != count($userdirectories)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
 	}
 
 	/**
@@ -413,18 +421,14 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$userdirectories_count = API::UserDirectory()->get(['countOutput' => true]);
+		$userdirectories_left = API::UserDirectory()->get(['countOutput' => true]) - count($userdirectoryids);
 		$auth = API::Authentication()->get([
 			'output' => ['ldap_userdirectoryid', 'authentication_type', 'ldap_configured']
 		]);
 
 		if (in_array($auth['ldap_userdirectoryid'], $userdirectoryids)
-				&& ($auth['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED || $userdirectories_count > 1)) {
+				&& ($auth['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED || $userdirectories_left > 0)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default user directory.'));
-		}
-
-		if ($auth['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED && count($userdirectoryids) == $userdirectories_count) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete all user directories when LDAP is enabled.'));
 		}
 
 		$db_groups = API::UserGroup()->get([
