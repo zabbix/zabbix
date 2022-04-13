@@ -12,5 +12,4 @@ libzbxaudit_a_SOURCES = \
 	audit_graph.c \
 	audit_ha.c \
 	audit_proxy.c \
-	audit_proxy.h \
 	audit_settings.c
