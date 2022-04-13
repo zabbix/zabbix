@@ -222,16 +222,7 @@ $form
 			sla_edit_popup.init('.json_encode([
 				'slaid' => $data['slaid'],
 				'service_tags' => $data['form']['service_tags'],
-				'excluded_downtimes' => $data['form']['excluded_downtimes'],
-				'create_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'sla.create')
-					->getUrl(),
-				'update_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'sla.update')
-					->getUrl(),
-				'delete_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'sla.delete')
-					->getUrl()
+				'excluded_downtimes' => $data['form']['excluded_downtimes']
 			]).');
 		'))->setOnDocumentReady()
 	);

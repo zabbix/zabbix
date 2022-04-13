@@ -22,6 +22,13 @@
 
 #include "zbxalgo.h"
 #include "zbxjson.h"
+#include "zbxtypes.h"
+
+#define AUDIT_ACTION_ADD		0
+#define AUDIT_ACTION_UPDATE		1
+#define AUDIT_ACTION_DELETE		2
+#define AUDIT_ACTION_EXECUTE		7
+#define AUDIT_ACTION_CONFIG_REFRESH	11
 
 #define AUDIT_DETAILS_ACTION_ADD	"add"
 #define AUDIT_DETAILS_ACTION_UPDATE	"update"
@@ -37,6 +44,8 @@
 #define AUDIT_RESOURCE_SCENARIO			22
 #define AUDIT_RESOURCE_DISCOVERY_RULE		23
 #define AUDIT_RESOURCE_SCRIPT			25
+#define AUDIT_RESOURCE_PROXY			26
+
 #define AUDIT_RESOURCE_TRIGGER_PROTOTYPE	31
 #define AUDIT_RESOURCE_GRAPH_PROTOTYPE		35
 #define AUDIT_RESOURCE_ITEM_PROTOTYPE		36
@@ -78,6 +87,17 @@ zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const int id_table, con
 zbx_audit_entry_t	*zbx_audit_entry_init_cuid(const char *cuid, const int id_table,const char *name,
 		int audit_action, int resource_type);
 
+int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
+		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
+		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *username, const char *clientip,
+		const char *output, const char *error);
+
+void	zbx_audit_init(int audit_mode_set);
+void	zbx_audit_prepare(void);
+void	zbx_audit_clean(void);
+void	zbx_audit_flush(void);
+int	zbx_audit_flush_once(void);
+
 void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const int id_table, const char *audit_op,
 		const char *key, const char *value, const char *table, const char *field);
 void	zbx_audit_update_json_append_string_secret(const zbx_uint64_t id, const int id_table, const char *audit_op,
@@ -103,5 +123,7 @@ void	zbx_audit_update_json_delete(const zbx_uint64_t id, const int id_table, con
 zbx_audit_entry_t	*zbx_audit_get_entry(zbx_uint64_t id, const char *cuid, int id_table);
 void	zbx_audit_entry_append_int(zbx_audit_entry_t *entry, int audit_op, const char *key, ...);
 void	zbx_audit_entry_append_string(zbx_audit_entry_t *entry, int audit_op, const char *key, ...);
+
+void	zbx_audit_proxy_config_reload(zbx_uint64_t proxy_hostid, const char *name);
 
 #endif	/* ZABBIX_AUDIT_H */

@@ -148,19 +148,20 @@
 		},
 
 		ajaxExceptionHandler: (exception) => {
-			let title;
-			let messages = [];
+			clearMessages();
+
+			let title, messages;
 
 			if (typeof exception === 'object' && 'error' in exception) {
 				title = exception.error.title;
 				messages = exception.error.messages;
-			} else {
-				title = <?= json_encode(_('Unexpected server error.')) ?>;
+			}
+			else {
+				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 			}
 
-			const message_box = makeMessageBox('bad', messages, title, true, true)[0];
+			const message_box = makeMessageBox('bad', messages, title);
 
-			clearMessages();
 			addMessage(message_box);
 		},
 

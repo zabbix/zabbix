@@ -452,6 +452,7 @@ zbx_graph_yaxis_types_t;
 #define ZBX_HA_REMOVE_NODE		"ha_remove_node"
 #define ZBX_HA_SET_FAILOVER_DELAY	"ha_set_failover_delay"
 #define ZBX_USER_PARAMETERS_RELOAD	"userparameter_reload"
+#define ZBX_PROXY_CONFIG_CACHE_RELOAD	"proxy_config_cache_reload"
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
@@ -998,6 +999,8 @@ zbx_task_t;
 #define ZBX_RTC_HA_REMOVE_NODE			15
 #define ZBX_RTC_HA_SET_FAILOVER_DELAY		16
 #define ZBX_RTC_USER_PARAMETERS_RELOAD		17
+#define ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD	18
+#define ZBX_RTC_PROXYPOLLER_PROCESS		19
 
 /* internal rtc messages */
 #define ZBX_RTC_SUBSCRIBE			100

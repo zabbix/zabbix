@@ -42,11 +42,21 @@ class CControllerDashboardWidgetConfigure extends CController {
 				? CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
 				: CWidgetConfig::CONTEXT_DASHBOARD;
 
-			$ret = CWidgetConfig::isWidgetTypeSupportedInContext($this->getInput('type'), $this->context);
+			if (!CWidgetConfig::isWidgetTypeSupportedInContext($this->getInput('type'), $this->context)) {
+				error(_('Widget type is not supported in this context.'));
+
+				$ret = false;
+			}
 		}
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
 		}
 
 		return $ret;
@@ -58,16 +68,20 @@ class CControllerDashboardWidgetConfigure extends CController {
 
 	protected function doAction() {
 		$type = $this->getInput('type');
+
 		$form = CWidgetConfig::getForm($type, $this->getInput('fields', '{}'),
 			($this->context === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD) ? $this->getInput('templateid') : null
 		);
-		// Transforms corrupted data to default values.
+
+		// Fix possibly corrupted data to the defaults.
 		$form->validate();
 
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode([
-			'configuration' => CWidgetConfig::getConfiguration(
-				$type, $form->getFieldsData(), $this->getInput('view_mode')
+		$output = [
+			'configuration' => CWidgetConfig::getConfiguration($type, $form->getFieldsData(),
+				$this->getInput('view_mode')
 			)
-		])]));
+		];
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }
