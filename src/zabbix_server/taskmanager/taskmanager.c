@@ -32,7 +32,6 @@
 #include "zbxjson.h"
 #include "zbxrtc.h"
 #include "../../libs/zbxaudit/audit.h"
-#include "audit/zbxaudit_proxy.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
