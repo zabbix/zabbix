@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:34:05Z'
+  date: '2022-04-08T09:22:28Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -162,7 +162,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'CPU utilization in %'
+          description: 'CPU utilization in %.'
           tags:
             -
               tag: component
@@ -306,7 +306,7 @@ zabbix_export:
               uuid: d09b152f2b53451b9daec16eadeaa0ee
               expression: |
                 last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<5G or timeleft(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+                ((last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
               name: '{#FSLABEL}({#FSNAME}): Disk space is critically low'
               event_name: '{#FSLABEL}({#FSNAME}): Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -314,7 +314,7 @@ zabbix_export:
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.
                 Second condition should be one of the following:
-                - The disk free space is less than 5G.
+                - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}.
                 - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               tags:
@@ -325,7 +325,7 @@ zabbix_export:
               uuid: c3e9ee6d771d4047b4351e5870b8ca01
               expression: |
                 last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<10G or timeleft(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+                ((last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
               name: '{#FSLABEL}({#FSNAME}): Disk space is low'
               event_name: '{#FSLABEL}({#FSNAME}): Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -333,7 +333,7 @@ zabbix_export:
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.
                 Second condition should be one of the following:
-                - The disk free space is less than 10G.
+                - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}.
                 - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               dependencies:
@@ -341,7 +341,7 @@ zabbix_export:
                   name: '{#FSLABEL}({#FSNAME}): Disk space is critically low'
                   expression: |
                     last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<5G or timeleft(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+                    ((last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -370,6 +370,14 @@ zabbix_export:
                     host: 'Windows filesystems by Zabbix agent active'
                     key: 'vfs.fs.size[{#FSNAME},used]'
       macros:
+        -
+          macro: '{$VFS.FS.FREE.MIN.CRIT}'
+          value: 5G
+          description: 'The critical threshold of the filesystem utilization.'
+        -
+          macro: '{$VFS.FS.FREE.MIN.WARN}'
+          value: 10G
+          description: 'The warning threshold of the filesystem utilization.'
         -
           macro: '{$VFS.FS.FSDRIVETYPE.MATCHES}'
           value: fixed
@@ -756,7 +764,7 @@ zabbix_export:
           key: 'vm.memory.size[total]'
           history: 7d
           units: B
-          description: 'Total memory in Bytes'
+          description: 'Total memory in Bytes.'
           tags:
             -
               tag: component
@@ -768,7 +776,7 @@ zabbix_export:
           key: 'vm.memory.size[used]'
           history: 7d
           units: B
-          description: 'Used memory in Bytes'
+          description: 'Used memory in Bytes.'
           tags:
             -
               tag: component
@@ -782,7 +790,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: 'last(//vm.memory.size[used]) / last(//vm.memory.size[total]) * 100'
-          description: 'Memory utilization in %'
+          description: 'Memory utilization in %.'
           tags:
             -
               tag: component

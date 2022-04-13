@@ -34,9 +34,9 @@ There are no template links in this template.
 |-----|----|-----------|----|---------------------|
 |Memory |Memory utilization |<p>Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.</p> |CALCULATED |vm.memory.util[snmp]<p>**Expression**:</p>`(last(//vm.memory.total[memTotalReal.0])-(last(//vm.memory.free[memAvailReal.0])+last(//vm.memory.buffers[memBuffer.0])+last(//vm.memory.cached[memCached.0])))/last(//vm.memory.total[memTotalReal.0])*100` |
 |Memory |Free memory |<p>MIB: UCD-SNMP-MIB</p> |SNMP |vm.memory.free[memAvailReal.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
-|Memory |Memory (buffers) |<p>MIB: UCD-SNMP-MIB</p><p>Memory used by kernel buffers (Buffers in /proc/meminfo)</p> |SNMP |vm.memory.buffers[memBuffer.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
-|Memory |Memory (cached) |<p>MIB: UCD-SNMP-MIB</p><p>Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo)</p> |SNMP |vm.memory.cached[memCached.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
-|Memory |Total memory |<p>MIB: UCD-SNMP-MIB</p><p>Total memory in Bytes</p> |SNMP |vm.memory.total[memTotalReal.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
+|Memory |Memory (buffers) |<p>MIB: UCD-SNMP-MIB</p><p>Memory used by kernel buffers (Buffers in /proc/meminfo).</p> |SNMP |vm.memory.buffers[memBuffer.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
+|Memory |Memory (cached) |<p>MIB: UCD-SNMP-MIB</p><p>Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo).</p> |SNMP |vm.memory.cached[memCached.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
+|Memory |Total memory |<p>MIB: UCD-SNMP-MIB</p><p>Total memory in Bytes.</p> |SNMP |vm.memory.total[memTotalReal.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
 |Memory |Available memory |<p>Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.</p> |CALCULATED |vm.memory.available[snmp]<p>**Expression**:</p>`last(//vm.memory.free[memAvailReal.0])+last(//vm.memory.buffers[memBuffer.0])+last(//vm.memory.cached[memCached.0])` |
 |Memory |Total swap space |<p>MIB: UCD-SNMP-MIB</p><p>The total amount of swap space configured for this host.</p> |SNMP |system.swap.total[memTotalSwap.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
 |Memory |Free swap space |<p>MIB: UCD-SNMP-MIB</p><p>The amount of swap space currently unused or available.</p> |SNMP |system.swap.free[memAvailSwap.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
@@ -155,9 +155,9 @@ There are no template links in this template.
 |CPU |CPU nice time |<p>MIB: UCD-SNMP-MIB</p><p>The time the CPU has spent running users' processes that have been niced.</p> |SNMP |system.cpu.nice[ssCpuRawNice.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p><p>- JAVASCRIPT: `//to get utilization in %, divide by N, where N is number of cores. return value/{#CPU.COUNT} `</p> |
 |CPU |CPU iowait time |<p>MIB: UCD-SNMP-MIB</p><p>Amount of time the CPU has been waiting for I/O to complete.</p> |SNMP |system.cpu.iowait[ssCpuRawWait.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p><p>- JAVASCRIPT: `//to get utilization in %, divide by N, where N is number of cores. return value/{#CPU.COUNT} `</p> |
 |CPU |CPU interrupt time |<p>MIB: UCD-SNMP-MIB</p><p>The amount of time the CPU has been servicing hardware interrupts.</p> |SNMP |system.cpu.interrupt[ssCpuRawInterrupt.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p><p>- JAVASCRIPT: `//to get utilization in %, divide by N, where N is number of cores. return value/{#CPU.COUNT} `</p> |
-|CPU |CPU guest time |<p>MIB: UCD-SNMP-MIB</p><p>Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system)</p> |SNMP |system.cpu.guest[ssCpuRawGuest.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p><p>- JAVASCRIPT: `//to get utilization in %, divide by N, where N is number of cores. return value/{#CPU.COUNT} `</p> |
-|CPU |CPU guest nice time |<p>MIB: UCD-SNMP-MIB</p><p>Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel)</p> |SNMP |system.cpu.guest_nice[ssCpuRawGuestNice.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p><p>- JAVASCRIPT: `//to get utilization in %, divide by N, where N is number of cores. return value/{#CPU.COUNT} `</p> |
-|CPU |CPU utilization |<p>CPU utilization in %</p> |DEPENDENT |system.cpu.util[snmp,{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `//Calculate utilization return (100 - value) `</p> |
+|CPU |CPU guest time |<p>MIB: UCD-SNMP-MIB</p><p>Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system).</p> |SNMP |system.cpu.guest[ssCpuRawGuest.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p><p>- JAVASCRIPT: `//to get utilization in %, divide by N, where N is number of cores. return value/{#CPU.COUNT} `</p> |
+|CPU |CPU guest nice time |<p>MIB: UCD-SNMP-MIB</p><p>Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel).</p> |SNMP |system.cpu.guest_nice[ssCpuRawGuestNice.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p><p>- JAVASCRIPT: `//to get utilization in %, divide by N, where N is number of cores. return value/{#CPU.COUNT} `</p> |
+|CPU |CPU utilization |<p>CPU utilization in %.</p> |DEPENDENT |system.cpu.util[snmp,{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `//Calculate utilization return (100 - value) `</p> |
 
 ## Triggers
 
@@ -188,6 +188,8 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$VFS.FS.FREE.MIN.CRIT} |<p>The critical threshold of the filesystem utilization.</p> |`5G` |
+|{$VFS.FS.FREE.MIN.WARN} |<p>The warning threshold of the filesystem utilization.</p> |`10G` |
 |{$VFS.FS.FSNAME.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level</p> |`.+` |
 |{$VFS.FS.FSNAME.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level</p> |`^(/dev|/sys|/run|/proc|.+/shm$)` |
 |{$VFS.FS.FSTYPE.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level</p> |`.*(\.4|\.9|hrStorageFixedDisk|hrStorageFlashMemory)$` |

@@ -17,6 +17,8 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$VFS.FS.FREE.MIN.CRIT} |<p>The critical threshold of the filesystem utilization.</p> |`5G` |
+|{$VFS.FS.FREE.MIN.WARN} |<p>The warning threshold of the filesystem utilization.</p> |`10G` |
 |{$VFS.FS.FSNAME.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`.+` |
 |{$VFS.FS.FSNAME.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`^(/dev|/sys|/run|/proc|.+/shm$)` |
 |{$VFS.FS.FSTYPE.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`.*(\.4|\.9|hrStorageFixedDisk|hrStorageFlashMemory)$` |
@@ -93,7 +95,7 @@ There are no template links in this template.
 |-----|----|-----------|----|---------------------|
 |Memory |{#MEMNAME}: Used memory |<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.</p> |SNMP |vm.memory.used[hrStorageUsed.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `{#ALLOC_UNITS}`</p> |
 |Memory |{#MEMNAME}: Total memory |<p>MIB: HOST-RESOURCES-MIB</p><p>The size of the storage represented by this entry, in units of hrStorageAllocationUnits.</p><p>This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system.</p><p>For example, the amount of main memory allocated to a buffer pool might be modified or the amount of disk space allocated to virtual memory might be modified.</p> |SNMP |vm.memory.total[hrStorageSize.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `{#ALLOC_UNITS}`</p> |
-|Memory |{#MEMNAME}: Memory utilization |<p>Memory utilization in %</p> |CALCULATED |vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}]<p>**Expression**:</p>`last(//vm.memory.used[hrStorageUsed.{#SNMPINDEX}])/last(//vm.memory.total[hrStorageSize.{#SNMPINDEX}])*100` |
+|Memory |{#MEMNAME}: Memory utilization |<p>Memory utilization in %.</p> |CALCULATED |vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}]<p>**Expression**:</p>`last(//vm.memory.used[hrStorageUsed.{#SNMPINDEX}])/last(//vm.memory.total[hrStorageSize.{#SNMPINDEX}])*100` |
 
 ## Triggers
 
@@ -172,6 +174,8 @@ No specific Zabbix configuration is required.
 |{$MEMORY.TYPE.MATCHES} |<p>This macro is used in memory discovery. Can be overridden on the host or linked template level.</p> |`.*(\.2|hrStorageRam)$` |
 |{$MEMORY.TYPE.NOT_MATCHES} |<p>This macro is used in memory discovery. Can be overridden on the host or linked template level if you need to filter out results.</p> |`CHANGE_IF_NEEDED` |
 |{$MEMORY.UTIL.MAX} |<p>The warning threshold of the "Physical memory: Memory utilization" item.</p> |`90` |
+|{$VFS.FS.FREE.MIN.CRIT} |<p>The critical threshold of the filesystem utilization.</p> |`5G` |
+|{$VFS.FS.FREE.MIN.WARN} |<p>The warning threshold of the filesystem utilization.</p> |`10G` |
 |{$VFS.FS.FSNAME.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`.+` |
 |{$VFS.FS.FSNAME.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`^(/dev|/sys|/run|/proc|.+/shm$)` |
 |{$VFS.FS.FSTYPE.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`.*(\.4|\.9|hrStorageFixedDisk|hrStorageFlashMemory)$` |
@@ -197,7 +201,7 @@ There are no template links in this template.
 |CPU |CPU utilization |<p>MIB: HOST-RESOURCES-MIB</p><p>The average, over the last minute, of the percentage of time that processors was not idle.</p><p>Implementations may approximate this one minute smoothing period if necessary.</p> |SNMP |system.cpu.util<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#CPU.UTIL}'].avg()`</p> |
 |Memory |{#MEMNAME}: Used memory |<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.</p> |SNMP |vm.memory.used[hrStorageUsed.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `{#ALLOC_UNITS}`</p> |
 |Memory |{#MEMNAME}: Total memory |<p>MIB: HOST-RESOURCES-MIB</p><p>The size of the storage represented by this entry, in units of hrStorageAllocationUnits.</p><p>This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system.</p><p>For example, the amount of main memory allocated to a buffer pool might be modified or the amount of disk space allocated to virtual memory might be modified.</p> |SNMP |vm.memory.total[hrStorageSize.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `{#ALLOC_UNITS}`</p> |
-|Memory |{#MEMNAME}: Memory utilization |<p>Memory utilization in %</p> |CALCULATED |vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}]<p>**Expression**:</p>`last(//vm.memory.used[hrStorageUsed.{#SNMPINDEX}])/last(//vm.memory.total[hrStorageSize.{#SNMPINDEX}])*100` |
+|Memory |{#MEMNAME}: Memory utilization |<p>Memory utilization in %.</p> |CALCULATED |vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}]<p>**Expression**:</p>`last(//vm.memory.used[hrStorageUsed.{#SNMPINDEX}])/last(//vm.memory.total[hrStorageSize.{#SNMPINDEX}])*100` |
 |Storage |{#FSNAME}: Used space |<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.</p> |SNMP |vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `{#ALLOC_UNITS}`</p> |
 |Storage |{#FSNAME}: Total space |<p>MIB: HOST-RESOURCES-MIB</p><p>The size of the storage represented by this entry, in units of hrStorageAllocationUnits.</p><p>This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system.</p><p>For example, the amount of main storage allocated to a buffer pool might be modified or the amount of disk space allocated to virtual storage might be modified.</p> |SNMP |vfs.fs.total[hrStorageSize.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `{#ALLOC_UNITS}`</p> |
 |Storage |{#FSNAME}: Space utilization |<p>Space utilization in % for {#FSNAME}</p> |CALCULATED |vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}]<p>**Expression**:</p>`(last(//vfs.fs.used[hrStorageUsed.{#SNMPINDEX}])/last(//vfs.fs.total[hrStorageSize.{#SNMPINDEX}]))*100` |

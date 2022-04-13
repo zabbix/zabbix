@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:33:28Z'
+  date: '2022-03-30T13:31:18Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -705,8 +705,8 @@ zabbix_export:
             2. by location name (for example: Riga)
             3. by location ID. Link to the list of city ID: http://bulk.openweathermap.org/sample/city.list.json.gz
             4. by zip/post code with a country code (for example: 94040,us)
-            A few locations can be added to the macro at the same time by "|" delimiter. 
-            For example: 43.81821,7.76115|Riga|2643743|94040,us.
+            A few locations can be added to the macro at the same time by `|` delimiter. 
+            For example: `43.81821,7.76115|Riga|2643743|94040,us`.
             Please note that API requests by city name, zip-codes and city id will be deprecated soon.
         -
           macro: '{$OPENWEATHERMAP.API.ENDPOINT}'

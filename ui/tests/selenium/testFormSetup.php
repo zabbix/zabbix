@@ -460,7 +460,7 @@ class testFormSetup extends CWebTest {
 						'value' => '/etc/apache2/magic'
 					],
 					'tls_encryption' => true,
-					'mysql_error' => 'Database error code 2002'
+					'mysql_error' => 'Error connecting to database. Empty cipher.'
 				]
 			],
 			// Wrong "Database TLS key file" field format.
@@ -486,7 +486,7 @@ class testFormSetup extends CWebTest {
 					],
 					'tls_encryption' => true,
 					'fill_ca_file' => true,
-					'mysql_error' => 'Database error code 2002'
+					'mysql_error' => 'Error connecting to database. Empty cipher.'
 				]
 			],
 			// Wrong "Database TLS certificate file" field format.
@@ -512,7 +512,7 @@ class testFormSetup extends CWebTest {
 					],
 					'tls_encryption' => true,
 					'fill_ca_file' => true,
-					'mysql_error' => 'Database error code 2002'
+					'mysql_error' => 'Error connecting to database. Empty cipher.'
 				]
 			],
 			// With "Database TLS encryption" set.

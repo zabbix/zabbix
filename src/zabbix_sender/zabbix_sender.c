@@ -1859,6 +1859,9 @@ exit:
 	}
 #endif
 	zabbix_close_log();
+#ifndef _WINDOWS
+	zbx_locks_destroy();
+#endif
 #if defined(_WINDOWS)
 	while (0 == WSACleanup())
 		;

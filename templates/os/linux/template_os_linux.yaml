@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:27:56Z'
+  date: '2022-04-10T20:20:48Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -245,7 +245,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'CPU utilization in %'
+          description: 'CPU utilization in %.'
           preprocessing:
             -
               type: JAVASCRIPT
@@ -286,7 +286,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system)'
+          description: 'Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system).'
           tags:
             -
               tag: component
@@ -298,7 +298,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel)'
+          description: 'Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel).'
           tags:
             -
               tag: component
@@ -691,7 +691,7 @@ zabbix_export:
           key: 'vm.memory.size[total]'
           history: 7d
           units: B
-          description: 'Total memory in Bytes'
+          description: 'Total memory in Bytes.'
           tags:
             -
               tag: component
@@ -1597,7 +1597,7 @@ zabbix_export:
               uuid: 9abccdfff8be4e14967ac917ca09afe1
               expression: |
                 last(/Linux by Zabbix agent/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Linux by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Linux by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<5G or timeleft(/Linux by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+                ((last(/Linux by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Linux by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
               name: '{#FSNAME}: Disk space is critically low'
               event_name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1605,7 +1605,7 @@ zabbix_export:
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.
                  Second condition should be one of the following:
-                 - The disk free space is less than 5G.
+                 - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               tags:
@@ -1619,7 +1619,7 @@ zabbix_export:
               uuid: d6d348ea500c428da6ba718816c4b048
               expression: |
                 last(/Linux by Zabbix agent/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Linux by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Linux by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<10G or timeleft(/Linux by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+                ((last(/Linux by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Linux by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Linux by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
               name: '{#FSNAME}: Disk space is low'
               event_name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1627,7 +1627,7 @@ zabbix_export:
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.
                  Second condition should be one of the following:
-                 - The disk free space is less than 10G.
+                 - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               dependencies:
@@ -1635,7 +1635,7 @@ zabbix_export:
                   name: '{#FSNAME}: Disk space is critically low'
                   expression: |
                     last(/Linux by Zabbix agent/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Linux by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Linux by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<5G or timeleft(/Linux by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+                    ((last(/Linux by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Linux by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -1738,6 +1738,14 @@ zabbix_export:
           macro: '{$VFS.DEV.WRITE.AWAIT.WARN}'
           value: '20'
           description: 'Disk write average response time (in ms) before the trigger would fire'
+        -
+          macro: '{$VFS.FS.FREE.MIN.CRIT}'
+          value: 5G
+          description: 'The critical threshold of the filesystem utilization.'
+        -
+          macro: '{$VFS.FS.FREE.MIN.WARN}'
+          value: 10G
+          description: 'The warning threshold of the filesystem utilization.'
         -
           macro: '{$VFS.FS.FSNAME.MATCHES}'
           value: .+
@@ -2247,7 +2255,7 @@ zabbix_export:
       event_name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: WARNING
-      description: 'This trigger is ignored, if there is no swap configured'
+      description: 'This trigger is ignored, if there is no swap configured.'
       dependencies:
         -
           name: 'High memory utilization'
