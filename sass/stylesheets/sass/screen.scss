@@ -5619,7 +5619,8 @@ $range-input-width: 31px;
 		}
 
 		/* Special styling for WebKit/Blink */
-		&::-webkit-slider-thumb {
+		&::-webkit-slider-thumb,
+		&::-moz-range-thumb {
 			margin-top: 1px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
 			height: $range-thumb-size;
 			width: $range-thumb-size;
