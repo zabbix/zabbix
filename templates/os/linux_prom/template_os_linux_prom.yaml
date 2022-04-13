@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-10T20:20:22Z'
+  date: '2022-04-13T22:41:29Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -1636,14 +1636,14 @@ zabbix_export:
             key: node_exporter.get
           lld_macro_paths:
             -
-              lld_macro: '{#IFNAME}'
-              path: $.labels.device
-            -
               lld_macro: '{#HELP}'
               path: $.help
             -
               lld_macro: '{#IFALIAS}'
               path: $.labels.ifalias
+            -
+              lld_macro: '{#IFNAME}'
+              path: $.labels.device
             -
               lld_macro: '{#IFOPERSTATUS}'
               path: $.labels.operstate
@@ -2241,14 +2241,14 @@ zabbix_export:
             key: node_exporter.get
           lld_macro_paths:
             -
-              lld_macro: '{#FSTYPE}'
-              path: $.labels.fstype
+              lld_macro: '{#FSDEVICE}'
+              path: $.labels.device
             -
               lld_macro: '{#FSNAME}'
               path: $.labels.mountpoint
             -
-              lld_macro: '{#FSDEVICE}'
-              path: $.labels.device
+              lld_macro: '{#FSTYPE}'
+              path: $.labels.fstype
             -
               lld_macro: '{#HELP}'
               path: $.help

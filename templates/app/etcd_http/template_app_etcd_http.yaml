@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:27:23Z'
+  date: '2022-04-13T21:49:37Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -444,7 +444,7 @@ zabbix_export:
               uuid: 0302957e0f6b43389546e1cfb958ed9c
               expression: 'min(/Etcd by HTTP/etcd.http.requests.5xx.rate,5m)>{$ETCD.HTTP.FAIL.MAX.WARN}'
               name: 'Etcd: Too many HTTP requests failures'
-              event_name: 'Etcd: Too many HTTP requests failures (over {$ETCD.HTTP.FAIL.MAX.WARN} for 5m)'''
+              event_name: 'Etcd: Too many HTTP requests failures (over {$ETCD.HTTP.FAIL.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'Too many requests failed on etcd instance with 5xx HTTP code.'
               tags:
@@ -1071,7 +1071,7 @@ zabbix_export:
               name: 'Etcd: has been restarted'
               event_name: 'Etcd: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
