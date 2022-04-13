@@ -130,13 +130,12 @@ class CControllerPopupTestTriggerExpr extends CController {
 		$ret = $this->validateInput(['test_expression' => 'string'] + $this->fields);
 
 		if (!$ret) {
-			$output = [];
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
 			);
 		}
 
@@ -216,7 +215,7 @@ class CControllerPopupTestTriggerExpr extends CController {
 			'eHTMLTree' => $expression_html_tree,
 			'results' => $results,
 			'outline' => $outline,
-			'message' => getMessages(false, $message_title),
+			'messages' => getMessages(false, $message_title),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

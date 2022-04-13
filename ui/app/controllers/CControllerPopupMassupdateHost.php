@@ -71,13 +71,12 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$output = [];
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
 			);
 		}
 
@@ -462,7 +461,12 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					}
 				}
 				else {
-					$output = ['errors' => getMessages(false, _('Cannot update hosts'))->toString()];
+					$output = [
+						'error' => [
+							'title' => _('Cannot update hosts'),
+							'messages' => array_column(get_and_clear_messages(), 'message')
+						]
+					];
 				}
 
 				$this->setResponse(

@@ -42,11 +42,21 @@ class CControllerDashboardWidgetCheck extends CController {
 				? CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
 				: CWidgetConfig::CONTEXT_DASHBOARD;
 
-			$ret = CWidgetConfig::isWidgetTypeSupportedInContext($this->getInput('type'), $this->context);
+			if (!CWidgetConfig::isWidgetTypeSupportedInContext($this->getInput('type'), $this->context)) {
+				error(_('Widget type is not supported in this context.'));
+
+				$ret = false;
+			}
 		}
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
 		}
 
 		return $ret;
@@ -61,16 +71,16 @@ class CControllerDashboardWidgetCheck extends CController {
 			($this->context === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD) ? $this->getInput('templateid') : null
 		);
 
-		$data = [];
+		$output = [];
 
 		if ($errors = $form->validate(true)) {
-			foreach ($errors as $msg) {
-				error($msg);
+			foreach ($errors as $error) {
+				error($error);
 			}
 
-			$data['errors'] = getMessages()->toString();
+			$output['error']['messages'] = array_column(get_and_clear_messages(), 'message');
 		}
 
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

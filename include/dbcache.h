@@ -1061,4 +1061,22 @@ void	zbx_db_trigger_explain_expression(const DB_TRIGGER *trigger, char **express
 void	zbx_db_trigger_get_function_value(const DB_TRIGGER *trigger, int index, char **value,
 		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
 		char **), int recovery);
+
+int	zbx_dc_get_proxyid_by_name(const char *name, zbx_uint64_t *proxyid, unsigned char *type);
+int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid);
+
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	unsigned char	status;
+	char		*name;
+}
+zbx_cached_proxy_t;
+
+ZBX_PTR_VECTOR_DECL(cached_proxy, zbx_cached_proxy_t *)
+
+void	zbx_dc_get_all_proxies(zbx_vector_cached_proxy_t *proxies);
+
+int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **name);
+
 #endif

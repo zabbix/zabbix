@@ -176,8 +176,6 @@
 		},
 
 		save() {
-			clearMessages();
-
 			this.is_busy_saving = true;
 			this.updateBusy();
 
@@ -196,31 +194,44 @@
 			})
 				.then((response) => response.json())
 				.then((response) => {
-					if ('errors' in response) {
-						throw {html_string: response.errors};
+					if ('error' in response) {
+						throw {error: response.error};
 					}
 
-					if ('redirect' in response) {
-						if ('system-message-ok' in response) {
-							postMessageOk(response['system-message-ok']);
-						}
+					postMessageOk(response.success.title);
 
-						this.disableNavigationWarning();
-
-						location.replace(response.redirect);
+					if ('messages' in response.success) {
+						postMessageDetails('success', response.success.messages);
 					}
+
+					this.disableNavigationWarning();
+
+					const curl = new Curl('zabbix.php', false);
+
+					curl.setArgument('action', 'dashboard.view');
+					curl.setArgument('dashboardid', response.dashboardid);
+
+					location.replace(curl.getUrl());
 				})
-				.catch((error) => {
-					if (typeof error === 'object' && 'html_string' in error) {
-						addMessage(error.html_string);
+				.catch((exception) => {
+					clearMessages();
+
+					let title;
+					let messages = [];
+
+					if (typeof exception === 'object' && 'error' in exception) {
+						title = exception.error.title;
+						messages = exception.error.messages;
 					}
 					else {
-						const message = this.dashboard.dashboardid === null
+						title = this.dashboard.dashboardid === null
 							? <?= json_encode(_('Failed to create dashboard')) ?>
 							: <?= json_encode(_('Failed to update dashboard')) ?>;
-
-						addMessage(makeMessageBox('bad', [], message, true, false));
 					}
+
+					const message_box = makeMessageBox('bad', messages, title);
+
+					addMessage(message_box);
 				})
 				.finally(() => {
 					this.is_busy_saving = false;
@@ -266,7 +277,8 @@
 
 			const overlay = PopUp('popup.host.edit', host_data, {
 				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large'
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});

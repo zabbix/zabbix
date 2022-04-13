@@ -54,11 +54,11 @@ class CControllerSlaDelete extends CController {
 	 * @throws APIException
 	 */
 	protected function doAction(): void {
-		$output = [];
-
 		$slaids = $this->getInput('slaids');
 
 		$result = API::Sla()->delete($slaids);
+
+		$output = [];
 
 		if ($result) {
 			$output['success']['title'] = _n('SLA deleted', 'SLAs deleted', count($slaids));
@@ -68,18 +68,19 @@ class CControllerSlaDelete extends CController {
 			}
 		}
 		else {
-			$services = API::Sla()->get([
+			$output['error'] = [
+				'title' => _n('Cannot delete SLA', 'Cannot delete SLAs', count($slaids)),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
+
+			$slas = API::Sla()->get([
 				'output' => [],
 				'slaids' => $slaids,
 				'editable' => true,
 				'preservekeys' => true
 			]);
 
-			$output['error'] = [
-				'title' => _n('Cannot delete SLA', 'Cannot delete SLAs', count($slaids)),
-				'messages' => array_column(get_and_clear_messages(), 'message'),
-				'keepids' => array_keys($services)
-			];
+			$output['keepids'] = array_keys($slas);
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
