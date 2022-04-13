@@ -4,6 +4,7 @@ SUBDIRS = \
 	alerter \
 	dbsyncer \
 	dbconfig \
+	diag \
 	discoverer \
 	housekeeper \
 	httppoller \
@@ -51,6 +52,7 @@ zabbix_server_LDADD = \
 	alerter/libzbxalerter.a \
 	dbsyncer/libzbxdbsyncer.a \
 	dbconfig/libzbxdbconfig.a \
+	diag/libzbxdiag_server.a \
 	discoverer/libzbxdiscoverer.a \
 	pinger/libzbxpinger.a \
 	poller/libzbxpoller.a \
@@ -114,7 +116,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_builddir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_builddir)/src/libs/zbxtasks/libzbxtasks.a \
-	$(top_builddir)/src/libs/zbxdiag/libzbxdiag_server.a \
+	$(top_builddir)/src/libs/zbxdiag/libzbxdiag.a \
 	$(top_builddir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_builddir)/src/libs/zbxtrends/libzbxtrends_baseline.a \
 	$(top_builddir)/src/libs/zbxtrends/libzbxtrends.a \

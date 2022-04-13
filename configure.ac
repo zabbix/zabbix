@@ -2138,6 +2138,7 @@ AC_OUTPUT([
 	src/zabbix_server/alerter/Makefile
 	src/zabbix_server/dbsyncer/Makefile
 	src/zabbix_server/dbconfig/Makefile
+	src/zabbix_server/diag/Makefile
 	src/zabbix_server/discoverer/Makefile
 	src/zabbix_server/ha/Makefile
 	src/zabbix_server/housekeeper/Makefile
@@ -2161,6 +2162,7 @@ AC_OUTPUT([
 	src/zabbix_server/lld/Makefile
 	src/zabbix_server/reporter/Makefile
 	src/zabbix_proxy/Makefile
+	src/zabbix_proxy/diag/Makefile
 	src/zabbix_proxy/heart/Makefile
 	src/zabbix_proxy/housekeeper/Makefile
 	src/zabbix_proxy/proxyconfig/Makefile

@@ -54,6 +54,7 @@
 #include "../zabbix_server/availability/avail_manager.h"
 #include "../libs/zbxvault/vault.h"
 #include "zbxdiag.h"
+#include "diag/diag_proxy.h"
 #include "zbxrtc.h"
 
 #ifdef HAVE_OPENIPMI
@@ -1301,7 +1302,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_parent();
 #endif
-	zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
+	zbx_diag_init(diag_add_section_info);
 
 	for (i = 0; i < threads_num; i++)
 	{
