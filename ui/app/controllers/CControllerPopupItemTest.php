@@ -1055,13 +1055,12 @@ abstract class CControllerPopupItemTest extends CController {
 	/**
 	 * Resolve macros used in the calculates item formula.
 	 *
-	 * @param string $formula  Calculated item formula.
+	 * @param string $formula        Calculated item formula.
+	 * @param array  $macros_posted  Macros.
 	 *
-	 * @return array
+	 * @return string
 	 */
-	private function resolveCalcFormulaMacros(string $formula) {
-		$macros_posted = $this->getInput('macros', []);
-
+	private function resolveCalcFormulaMacros(string $formula, array $macros_posted): string {
 		if (!$macros_posted) {
 			return $formula;
 		}
@@ -1135,8 +1134,9 @@ abstract class CControllerPopupItemTest extends CController {
 											break;
 
 										case CFilterParser::TOKEN_TYPE_STRING:
-
-											$string = strtr(CFilterParser::unquoteString($filter_token['match']), $macros_posted);
+											$string = strtr(CFilterParser::unquoteString($filter_token['match']),
+												$macros_posted
+											);
 											$expression[] = CFilterParser::quoteString($string);
 											break;
 									}
@@ -1159,7 +1159,7 @@ abstract class CControllerPopupItemTest extends CController {
 								break;
 						}
 					}
-				break;
+					break;
 			}
 		}
 
