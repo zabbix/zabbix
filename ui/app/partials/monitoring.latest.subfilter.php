@@ -73,7 +73,7 @@ foreach (['hostids', 'tagnames', 'data'] as $key) {
 					(new CLinkAction($element['name']))
 						->setAttribute('data-key', $key)
 						->setAttribute('data-value', $value)
-						->onClick('view.setSubfilter(`[subfilter_${this.dataset.key}[]`, this.dataset.value]);'),
+						->onClick('view.setSubfilter([`subfilter_${this.dataset.key}[]`, this.dataset.value]);'),
 					' ',
 					new CSup(($subfilter_used ? '+' : '').$element['count'])
 				]))->addClass(ZBX_STYLE_SUBFILTER);
