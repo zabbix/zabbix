@@ -22,7 +22,6 @@
 
 #include "zbxalgo.h"
 #include "zbxjson.h"
-#include "zbxtypes.h"
 
 #define AUDIT_ACTION_ADD		0
 #define AUDIT_ACTION_UPDATE		1
@@ -123,7 +122,5 @@ void	zbx_audit_update_json_delete(const zbx_uint64_t id, const int id_table, con
 zbx_audit_entry_t	*zbx_audit_get_entry(zbx_uint64_t id, const char *cuid, int id_table);
 void	zbx_audit_entry_append_int(zbx_audit_entry_t *entry, int audit_op, const char *key, ...);
 void	zbx_audit_entry_append_string(zbx_audit_entry_t *entry, int audit_op, const char *key, ...);
-
-void	zbx_audit_proxy_config_reload(zbx_uint64_t proxy_hostid, const char *name);
 
 #endif	/* ZABBIX_AUDIT_H */
