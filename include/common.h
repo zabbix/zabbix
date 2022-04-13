@@ -20,7 +20,7 @@
 #ifndef ZABBIX_COMMON_H
 #define ZABBIX_COMMON_H
 
-#include "sysinc.h"
+#include "zbxsysinc.h"
 #include "module.h"
 #include "version.h"
 
@@ -97,6 +97,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	AGENT_ERROR	-5
 #define	GATEWAY_ERROR	-6
 #define	CONFIG_ERROR	-7
+#define	SIG_ERROR	-8
 
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_sysinfo_ret_string(int ret);
@@ -451,6 +452,7 @@ zbx_graph_yaxis_types_t;
 #define ZBX_HA_REMOVE_NODE		"ha_remove_node"
 #define ZBX_HA_SET_FAILOVER_DELAY	"ha_set_failover_delay"
 #define ZBX_USER_PARAMETERS_RELOAD	"userparameter_reload"
+#define ZBX_PROXY_CONFIG_CACHE_RELOAD	"proxy_config_cache_reload"
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
@@ -997,6 +999,8 @@ zbx_task_t;
 #define ZBX_RTC_HA_REMOVE_NODE			15
 #define ZBX_RTC_HA_SET_FAILOVER_DELAY		16
 #define ZBX_RTC_USER_PARAMETERS_RELOAD		17
+#define ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD	18
+#define ZBX_RTC_PROXYPOLLER_PROCESS		19
 
 /* internal rtc messages */
 #define ZBX_RTC_SUBSCRIBE			100
@@ -1158,6 +1162,7 @@ typedef struct zbx_custom_interval	zbx_custom_interval_t;
 int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_custom_interval_t **custom_intervals,
 		char **error);
 int	zbx_validate_interval(const char *str, char **error);
+int	zbx_custom_interval_is_scheduling(const zbx_custom_interval_t *custom_intervals);
 void	zbx_custom_interval_free(zbx_custom_interval_t *custom_intervals);
 int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interval,
 		const zbx_custom_interval_t *custom_intervals, time_t now);

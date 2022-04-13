@@ -19,10 +19,9 @@
 
 #include "escalator.h"
 
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxserver.h"
 #include "zbxself.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
 #include "../actions.h"
 #include "../scripts/scripts.h"
 #include "zbxcrypto.h"
@@ -1502,7 +1501,7 @@ fail:
 			}
 		}
 
-		if (FAIL == rc)
+		if (SUCCEED != rc)
 			status = ALERT_STATUS_FAILED;
 
 		add_command_alert(&db_insert, alerts_num++, alertid, host.host, event, r_event, actionid,

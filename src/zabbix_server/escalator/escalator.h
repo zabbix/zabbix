@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ESCALATOR_H
 #define ZABBIX_ESCALATOR_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 ZBX_THREAD_ENTRY(escalator_thread, args);
 

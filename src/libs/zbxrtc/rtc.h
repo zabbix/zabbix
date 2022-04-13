@@ -32,6 +32,6 @@ int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char 
 int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result);
 
 void	rtc_notify(zbx_rtc_t *rtc, unsigned char process_type, int process_num, zbx_uint32_t code,
-		unsigned char *data, zbx_uint32_t size);
+		const unsigned char *data, zbx_uint32_t size);
 
 #endif

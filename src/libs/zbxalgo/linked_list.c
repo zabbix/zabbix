@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "zbxalgo.h"
+
+#include "common.h"
 
 /******************************************************************************
  *                                                                            *
@@ -332,4 +333,35 @@ void	zbx_list_iterator_update(zbx_list_iterator_t *iterator)
 {
 	if (NULL != iterator->current)
 		iterator->next = iterator->current->next;
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: removes next iterator value from list                             *
+ *                                                                            *
+ * Parameters: iterator - [IN] list iterator                                  *
+ *                                                                            *
+ * Return value: The data held by the removed item.                           *
+ *                                                                            *
+ ******************************************************************************/
+void	*zbx_list_iterator_remove_next(zbx_list_iterator_t *iterator)
+{
+	zbx_list_item_t	*next;
+	void		*data;
+
+	if (NULL == iterator->current || NULL == iterator->next)
+		return NULL;
+
+	next = iterator->next;
+	data = next->data;
+
+	if (iterator->list->tail == next)
+		iterator->list->tail = iterator->current;
+
+	iterator->current->next = next->next;
+	iterator->next = next->next;
+	iterator->list->mem_free_func(next);
+
+	return data;
 }

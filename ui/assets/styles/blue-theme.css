@@ -1097,6 +1097,10 @@ footer {
   .dashboard-grid-widget-content .msg-good,
   .dashboard-grid-widget-content .msg-warning {
     margin: 0 10px; }
+  .dashboard-grid-widget-content.no-padding .msg-bad,
+  .dashboard-grid-widget-content.no-padding .msg-good,
+  .dashboard-grid-widget-content.no-padding .msg-warning {
+    margin: 8px 10px; }
 
 .dashboard-grid-widget-mask {
   position: absolute;
@@ -2158,8 +2162,10 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
       margin: 8px 0 0;
       border-top-width: 1px;
       border-top-style: dashed; }
-  .msg-details .list-dashed li:only-child {
-    margin-left: 0; }
+  .msg-details .list-dashed li {
+    white-space: pre-line; }
+    .msg-details .list-dashed li:only-child {
+      margin-left: 0; }
 
 .msg-buttons {
   margin: 10px 0 0;
@@ -6412,7 +6418,7 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
     /* Special styling for WebKit/Blink */ }
     .range-control input[type=range]:focus {
       outline: none; }
-    .range-control input[type=range]::-webkit-slider-thumb {
+    .range-control input[type=range]::-webkit-slider-thumb, .range-control input[type=range]::-moz-range-thumb {
       margin-top: 1px;
       /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
       height: 10px;

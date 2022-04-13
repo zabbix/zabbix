@@ -24,9 +24,8 @@
 #include "cfg.h"
 #include "zbxregexp.h"
 
-
 #if defined(_WINDOWS) || defined(__MINGW32__)
-#	include "symbols.h"
+#	include "zbxsymbols.h"
 #	include "zbxtypes.h"	/* ssize_t */
 #endif /* _WINDOWS */
 

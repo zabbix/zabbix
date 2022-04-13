@@ -250,8 +250,8 @@ class CFrontendSetup {
 	public static function getSupportedDatabases() {
 		$allowed_db = [];
 
-		if (zbx_is_callable(['mysqli_close', 'mysqli_connect', 'mysqli_connect_error', 'mysqli_error',
-				'mysqli_fetch_assoc', 'mysqli_free_result', 'mysqli_query', 'mysqli_real_escape_string'])) {
+		if (zbx_is_callable(['mysqli_close', 'mysqli_fetch_assoc', 'mysqli_free_result', 'mysqli_init', 'mysqli_query',
+				'mysqli_real_escape_string', 'mysqli_report'])) {
 			$allowed_db[ZBX_DB_MYSQL] = 'MySQL';
 		}
 

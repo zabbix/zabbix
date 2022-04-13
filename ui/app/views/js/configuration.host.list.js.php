@@ -82,7 +82,8 @@
 			const original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {
 				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large'
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
@@ -111,28 +112,32 @@
 			})
 				.then((response) => response.json())
 				.then((response) => {
-					const keepids = ('keepids' in response) ? response.keepids : [];
-
 					if ('error' in response) {
-						postMessageError(response.error.title);
+						if ('title' in response.error) {
+							postMessageError(response.error.title);
+						}
+
 						postMessageDetails('error', response.error.messages);
+
+						uncheckTableRows('hosts', response.keepids ?? []);
 					}
-					else if('success' in response) {
+					else if ('success' in response) {
 						postMessageOk(response.success.title);
 
 						if ('messages' in response.success) {
 							postMessageDetails('success', response.success.messages);
 						}
+
+						uncheckTableRows('hosts');
 					}
 
-					uncheckTableRows('hosts', keepids);
 					location.href = location.href;
 				})
 				.catch(() => {
-					const title = <?= json_encode(_('Unexpected server error.')) ?>;
-					const message_box = makeMessageBox('bad', [], title)[0];
-
 					clearMessages();
+
+					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
+
 					addMessage(message_box);
 				})
 				.finally(() => {
