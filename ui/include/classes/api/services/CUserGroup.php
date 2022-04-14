@@ -210,7 +210,7 @@ class CUserGroup extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('usrgrp', 'name')],
 			'debug_mode' =>			['type' => API_INT32, 'in' => implode(',', [GROUP_DEBUG_MODE_DISABLED, GROUP_DEBUG_MODE_ENABLED])],
-			'gui_access' =>			['type' => API_INT32, 'in' => implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED])],
+			'gui_access' =>			['type' => API_INT32, 'in' => implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED]), 'default' => DB::getDefault('usrgrp', 'gui_access')],
 			'users_status' =>		['type' => API_INT32, 'in' => implode(',', [GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED])],
 			'userdirectoryid' =>	['type' => API_MULTIPLE, 'flags' => API_ALLOW_NULL, 'rules' => [
 				['if' => ['field' => 'gui_access', 'in' => implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_LDAP])], 'type' => API_ID],
@@ -295,10 +295,8 @@ class CUserGroup extends CApiService {
 			'preservekeys' => true
 		]);
 
-		if (count($usrgrps) != count($usrgrpids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('No permissions to referred object or it does not exist!')
-			);
+		if (count($usrgrpids) != count($db_usrgrps)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$names = [];
