@@ -24,7 +24,7 @@
 
 /* IPC start */
 #include "zbxtypes.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 /* IPC end */
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)

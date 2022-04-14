@@ -1501,7 +1501,7 @@ fail:
 			}
 		}
 
-		if (FAIL == rc)
+		if (SUCCEED != rc)
 			status = ALERT_STATUS_FAILED;
 
 		add_command_alert(&db_insert, alerts_num++, alertid, host.host, event, r_event, actionid,

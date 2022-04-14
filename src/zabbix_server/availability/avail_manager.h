@@ -20,7 +20,7 @@
 #ifndef ZABBIX_AVAIL_MANAGER_H
 #define ZABBIX_AVAIL_MANAGER_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 ZBX_THREAD_ENTRY(availability_manager_thread, args);
 

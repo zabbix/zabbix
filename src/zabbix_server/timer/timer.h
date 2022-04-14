@@ -20,7 +20,7 @@
 #ifndef ZABBIX_TIMER_H
 #define ZABBIX_TIMER_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 ZBX_THREAD_ENTRY(timer_thread, args);
 

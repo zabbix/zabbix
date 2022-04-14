@@ -25,7 +25,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 
 	protected function checkInput(): bool {
 		$fields = [
-			'ids' => 'required|array',
+			'hostids' => 'required|array',
 			'update' => 'in 1',
 			'visible' => 'array',
 			'tags' => 'array',
@@ -71,13 +71,12 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$output = [];
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
 			);
 		}
 
@@ -87,7 +86,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 	protected function checkPermissions(): bool {
 		$hosts = API::Host()->get([
 			'output' => [],
-			'hostids' => $this->getInput('ids'),
+			'hostids' => $this->getInput('hostids'),
 			'editable' => true
 		]);
 
@@ -97,7 +96,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 	protected function doAction(): void {
 		if ($this->hasInput('update')) {
 			$output = [];
-			$hostids = $this->getInput('ids');
+			$hostids = $this->getInput('hostids');
 			$visible = $this->getInput('visible', []);
 			$macros = array_filter(cleanInheritedMacros($this->getInput('macros', [])),
 				function (array $macro): bool {
@@ -462,7 +461,12 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					}
 				}
 				else {
-					$output = ['errors' => getMessages(false, _('Cannot update hosts'))->toString()];
+					$output = [
+						'error' => [
+							'title' => _('Cannot update hosts'),
+							'messages' => array_column(get_and_clear_messages(), 'message')
+						]
+					];
 				}
 
 				$this->setResponse(
@@ -476,7 +480,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				],
-				'ids' => $this->getInput('ids'),
+				'hostids' => $this->getInput('hostids'),
 				'inventories' => zbx_toHash(getHostInventories(), 'db_field'),
 				'location_url' => (new CUrl('zabbix.php'))
 					->setArgument('action', 'host.list')
@@ -494,7 +498,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 
 			$data['discovered_host'] = !(bool) API::Host()->get([
 				'output' => [],
-				'hostids' => $data['ids'],
+				'hostids' => $data['hostids'],
 				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 				'limit' => 1
 			]);

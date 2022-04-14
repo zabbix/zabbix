@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ACTIVE_H
 #define ZABBIX_ACTIVE_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 #include "zbxalgo.h"
 
 extern char	*CONFIG_SOURCE_IP;
