@@ -1153,6 +1153,18 @@ class CTemplate extends CHostGeneral {
 
 		$templateids = array_keys($result);
 
+		// adding groups
+		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'hostid', 'groupid', 'hosts_groups');
+			$groups = API::TemplateGroup()->get([
+				'output' => $options['selectGroups'],
+				'groupids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			]);
+
+			$result = $relationMap->mapMany($result, $groups, 'groups');
+		}
+
 		// Adding Templates
 		if ($options['selectTemplates'] !== null) {
 			if ($options['selectTemplates'] != API_OUTPUT_COUNT) {

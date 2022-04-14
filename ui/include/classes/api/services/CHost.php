@@ -1530,6 +1530,18 @@ class CHost extends CHostGeneral {
 
 		$hostids = array_keys($result);
 
+		// adding groups
+		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'hostid', 'groupid', 'hosts_groups');
+			$groups = API::HostGroup()->get([
+				'output' => $options['selectGroups'],
+				'groupids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			]);
+
+			$result = $relationMap->mapMany($result, $groups, 'groups');
+		}
+
 		// adding inventory
 		if ($options['selectInventory'] !== null) {
 			$inventory = API::getApiService()->select('host_inventory', [

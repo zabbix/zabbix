@@ -1378,26 +1378,6 @@ abstract class CHostGeneral extends CHostBase {
 
 		$hostids = array_keys($result);
 
-		// adding groups
-		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'hostid', 'groupid', 'hosts_groups');
-			if ($this instanceof CTemplate) {
-				$groups = API::TemplateGroup()->get([
-					'output' => $options['selectGroups'],
-					'groupids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
-			} else {
-				$groups = API::HostGroup()->get([
-					'output' => $options['selectGroups'],
-					'groupids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
-			}
-
-			$result = $relationMap->mapMany($result, $groups, 'groups');
-		}
-
 		// adding templates
 		if ($options['selectParentTemplates'] !== null) {
 			if ($options['selectParentTemplates'] != API_OUTPUT_COUNT) {
