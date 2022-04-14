@@ -162,8 +162,6 @@ class CControllerAuthenticationEdit extends CController {
 			$data['ldap_removed_userdirectoryids'] = $this->getInput('ldap_removed_userdirectoryids', []);
 
 			$data += $auth;
-
-			// TODO VM: on form_refresh user group count for ldap servers is lost.
 		}
 		else {
 			$data += $auth;
@@ -196,28 +194,23 @@ class CControllerAuthenticationEdit extends CController {
 	}
 
 	private function getLdapServerUserGroupCount(array $ldap_servers): array {
-		$ldap_serverids = [];
+		$ldap_serverids = array_column($ldap_servers, 'userdirectoryid');
 
-		foreach ($ldap_servers as $ldap_server) {
-			if (array_key_exists('userdirectoryid', $ldap_server)) {
-				$ldap_serverids[] = $ldap_server['userdirectoryid'];
-			}
-		}
-
-		$db_ldap_servers = API::UserDirectory()->get([
-			'output' => ['userdirectoryid'],
-			'selectUsrgrps' => API_OUTPUT_COUNT,
-			'userdirectoryids' => $ldap_serverids,
-			'preservekeys' => true
-		]);
+		$db_ldap_servers = $ldap_serverids
+			? API::UserDirectory()->get([
+				'output' => ['userdirectoryid'],
+				'selectUsrgrps' => API_OUTPUT_COUNT,
+				'userdirectoryids' => $ldap_serverids,
+				'preservekeys' => true
+			])
+			: [];
 
 		foreach ($ldap_servers as &$ldap_server) {
+			$ldap_server['usrgrps'] = 0;
+
 			if (array_key_exists('userdirectoryid', $ldap_server)
 					&& array_key_exists($ldap_server['userdirectoryid'], $db_ldap_servers)) {
 				$ldap_server['usrgrps'] = $db_ldap_servers[$ldap_server['userdirectoryid']]['usrgrps'];
-			}
-			else {
-				$ldap_server['usrgrps'] = 0;
 			}
 		}
 		unset($ldap_server);

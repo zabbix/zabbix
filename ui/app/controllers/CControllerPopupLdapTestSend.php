@@ -67,7 +67,7 @@ class CControllerPopupLdapTestSend extends CController {
 		$output = [];
 
 		if ($result) {
-			$success = ['title' => _('Login successful')]; // TODO VM: new translation string
+			$success = ['title' => _('Login successful')];
 
 			if ($messages = get_and_clear_messages()) {
 				$success['messages'] = array_column($messages, 'message');
@@ -77,7 +77,7 @@ class CControllerPopupLdapTestSend extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _('Login failed'), // TODO VM: new translation string
+				'title' => _('Login failed'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}

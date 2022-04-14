@@ -72,7 +72,7 @@ class CControllerPopupLdapCheck extends CController {
 				'port' => $this->getInput('port'),
 				'base_dn' => $this->getInput('base_dn'),
 				'search_attribute' => $this->getInput('search_attribute'),
-				'start_tls' => $this->getInput('start_tls', ZBX_AUTH_START_TLS_OFF), // TODO VM: unchecked value should solve this, or be removed.
+				'start_tls' => $this->getInput('start_tls', ZBX_AUTH_START_TLS_OFF),
 				'bind_dn' => $this->getInput('bind_dn', ''),
 				'description' => $this->getInput('description', ''),
 				'search_filter' => $this->getInput('search_filter', '')

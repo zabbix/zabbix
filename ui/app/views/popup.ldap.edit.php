@@ -119,7 +119,6 @@ $form = (new CForm('post', $form_action))
 			(new CFormField(
 				(new CCheckBox('start_tls', ZBX_AUTH_START_TLS_ON))
 					->setChecked($data['start_tls'] == ZBX_AUTH_START_TLS_ON)
-					->setUncheckedValue(ZBX_AUTH_START_TLS_OFF)
 			))->addClass('advanced-configuration')
 		])
 		->addItem([

@@ -122,7 +122,7 @@ class CControllerAuthenticationUpdate extends CController {
 			}
 
 			if (!$ldap_servers) {
-				CMessageHelper::setErrorTitle(_('At least one LDAP server must exist.')); // TODO VM: new translation string
+				CMessageHelper::setErrorTitle(_('At least one LDAP server must exist.'));
 				return false;
 			}
 		}
@@ -131,7 +131,7 @@ class CControllerAuthenticationUpdate extends CController {
 				&& (!$this->hasInput('ldap_default_row_index')
 					|| !array_key_exists($this->getInput('ldap_default_row_index'), $ldap_servers)
 				)) {
-			CMessageHelper::setErrorTitle(_('Default LDAP server must be specified.')); // TODO VM: new translation string
+			CMessageHelper::setErrorTitle(_('Default LDAP server must be specified.'));
 			return false;
 		}
 
@@ -387,7 +387,7 @@ class CControllerAuthenticationUpdate extends CController {
 		}
 
 		if ($ldap_servers && $ldap_userdirectoryid === 0) {
-			CMessageHelper::setErrorTitle(_('Failed to select default LDAP server.')); // TODO VM: new translation string
+			CMessageHelper::setErrorTitle(_('Failed to select default LDAP server.'));
 
 			return [false, $ldap_userdirectoryid];
 		}
