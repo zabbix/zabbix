@@ -1017,7 +1017,14 @@ function openMassupdatePopup(action, parameters = {}, {
 }) {
 	const form = trigger_element.closest('form');
 
-	parameters.ids = chkbxRange.getSelectedIds();
+	switch (action) {
+		case 'popup.massupdate.host':
+			parameters.hostids = chkbxRange.getSelectedIds();
+			break;
+
+		default:
+			parameters.ids = chkbxRange.getSelectedIds();
+	}
 
 	switch (action) {
 		case 'popup.massupdate.item':
