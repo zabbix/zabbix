@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '6.0'
+  version: '6.2'
   date: '2022-04-10T20:41:37Z'
   groups:
     -
@@ -1663,15 +1663,15 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
-                      name: rows
-                      value: '1'
-                    -
-                      type: INTEGER
                       name: source_type
                       value: '2'
                     -
                       type: INTEGER
                       name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
                       value: '1'
                     -
                       type: GRAPH_PROTOTYPE

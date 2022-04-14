@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:59:09Z'
+  date: '2022-04-13T22:55:23Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -1787,7 +1787,7 @@ zabbix_export:
               name: 'MSSQL: Service has been restarted'
               event_name: 'MSSQL: Service has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -2314,7 +2314,7 @@ zabbix_export:
                 -
                   uuid: 036892c6b9de41c698a4e9acd5457e6a
                   expression: 'last(/MSSQL by ODBC/mssql.backup.diff["{#DBNAME}"])>{$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
-                  name: 'MSSQL DB ''{#DBNAME}'': Diff backup old'
+                  name: 'MSSQL DB ''{#DBNAME}'': Diff backup is old'
                   event_name: 'MSSQL DB ''{#DBNAME}'': Diff backup older than {$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -2330,7 +2330,7 @@ zabbix_export:
                 -
                   uuid: 9a294163ee034fc6a58f5534a7d79aac
                   expression: 'last(/MSSQL by ODBC/mssql.backup.diff["{#DBNAME}"])>{$MSSQL.BACKUP_DIFF.WARN:"{#DBNAME}"}'
-                  name: 'MSSQL DB ''{#DBNAME}'': Diff backup old'
+                  name: 'MSSQL DB ''{#DBNAME}'': Diff backup is old'
                   event_name: 'MSSQL DB ''{#DBNAME}'': Diff backup older than {$MSSQL.BACKUP_DIFF.WARN:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -2338,7 +2338,7 @@ zabbix_export:
                   manual_close: 'YES'
                   dependencies:
                     -
-                      name: 'MSSQL DB ''{#DBNAME}'': Diff backup old'
+                      name: 'MSSQL DB ''{#DBNAME}'': Diff backup is old'
                       expression: 'last(/MSSQL by ODBC/mssql.backup.diff["{#DBNAME}"])>{$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
                   tags:
                     -
@@ -2401,7 +2401,7 @@ zabbix_export:
                 -
                   uuid: 09c8e059ffa44d0eb1be626b5d820dc9
                   expression: 'last(/MSSQL by ODBC/mssql.backup.full["{#DBNAME}"])>{$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
-                  name: 'MSSQL DB ''{#DBNAME}'': Full backup old'
+                  name: 'MSSQL DB ''{#DBNAME}'': Full backup is old'
                   event_name: 'MSSQL DB ''{#DBNAME}'': Full backup older than {$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -2417,7 +2417,7 @@ zabbix_export:
                 -
                   uuid: b380d76b1055482ca8cd69c90611f1a5
                   expression: 'last(/MSSQL by ODBC/mssql.backup.full["{#DBNAME}"])>{$MSSQL.BACKUP_FULL.WARN:"{#DBNAME}"}'
-                  name: 'MSSQL DB ''{#DBNAME}'': Full backup old'
+                  name: 'MSSQL DB ''{#DBNAME}'': Full backup is old'
                   event_name: 'MSSQL DB ''{#DBNAME}'': Full backup older than {$MSSQL.BACKUP_FULL.WARN:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -2425,7 +2425,7 @@ zabbix_export:
                   manual_close: 'YES'
                   dependencies:
                     -
-                      name: 'MSSQL DB ''{#DBNAME}'': Full backup old'
+                      name: 'MSSQL DB ''{#DBNAME}'': Full backup is old'
                       expression: 'last(/MSSQL by ODBC/mssql.backup.full["{#DBNAME}"])>{$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
                   tags:
                     -
@@ -2485,7 +2485,7 @@ zabbix_export:
                 -
                   uuid: 4a6e76dc9a5148649d07e35e962b5893
                   expression: 'last(/MSSQL by ODBC/mssql.backup.log["{#DBNAME}"])>{$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
-                  name: 'MSSQL DB ''{#DBNAME}'': Log backup old'
+                  name: 'MSSQL DB ''{#DBNAME}'': Log backup is old'
                   event_name: 'MSSQL DB ''{#DBNAME}'': Log backup older than {$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -2501,7 +2501,7 @@ zabbix_export:
                 -
                   uuid: 6000420450cf453bae3652c7f7d05e2b
                   expression: 'last(/MSSQL by ODBC/mssql.backup.log["{#DBNAME}"])>{$MSSQL.BACKUP_LOG.WARN:"{#DBNAME}"}'
-                  name: 'MSSQL DB ''{#DBNAME}'': Log backup old'
+                  name: 'MSSQL DB ''{#DBNAME}'': Log backup is old'
                   event_name: 'MSSQL DB ''{#DBNAME}'': Log backup older than {$MSSQL.BACKUP_LOG.WARN:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -2509,7 +2509,7 @@ zabbix_export:
                   manual_close: 'YES'
                   dependencies:
                     -
-                      name: 'MSSQL DB ''{#DBNAME}'': Log backup old'
+                      name: 'MSSQL DB ''{#DBNAME}'': Log backup is old'
                       expression: 'last(/MSSQL by ODBC/mssql.backup.log["{#DBNAME}"])>{$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
                   tags:
                     -
