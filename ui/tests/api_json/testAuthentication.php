@@ -190,7 +190,7 @@ class testAuthentication extends CAPITest {
 					'authentication_type' => ZBX_AUTH_LDAP,
 					'ldap_configured' => ZBX_AUTH_LDAP_DISABLED
 				],
-				'expected_error' => 'Incorrect value for field "/authentication_type": LDAP should be enabled.'
+				'expected_error' => 'Incorrect value for field "/authentication_type": LDAP must be enabled.'
 			],
 
 			// Invalid SAML auth tests.
