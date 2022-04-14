@@ -44,10 +44,10 @@ class testUserDirectory extends CAPITest {
 		return [
 			'Test dublicate names in one request' => [
 				'userdirectory' => [
-					['name' => 'LDAP #3', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid'],
-					['name' => 'LDAP #3', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid']
+					['name' => 'LDAP #1', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid'],
+					['name' => 'LDAP #1', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid']
 				],
-				'expected_error' => 'Invalid parameter "/2": value (name)=(LDAP #3) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (name)=(LDAP #1) already exists.'
 			],
 			'Test dublicate name' => [
 				'userdirectory' => [
@@ -66,7 +66,7 @@ class testUserDirectory extends CAPITest {
 		$response = $this->call('userdirectory.create', $userdirectory, $expected_error);
 
 		if ($expected_error === null) {
-			self::$data['userdirectoryids'] += array_combine(array_column($userdirectory, 'name'),
+			self::$data['userdirectoryid'] += array_combine(array_column($userdirectory, 'name'),
 				$response['result']['userdirectoryids']
 			);
 		}
@@ -112,19 +112,13 @@ class testUserDirectory extends CAPITest {
 	 * @dataProvider updateInvalidDataProvider
 	 */
 	public function testUpdate(array $userdirectories, $expected_error) {
-		foreach ($userdirectories as &$userdirectory) {
-			if (array_key_exists($userdirectory['userdirectoryid'], self::$data['userdirectoryids'])) {
-				$userdirectory['userdirectoryid'] = self::$data['userdirectoryids'][$userdirectory['userdirectoryid']];
-			}
-		}
-		unset($userdirectory);
-
-		$this->call('userdirectory.update', array_values($userdirectories), $expected_error);
+		$userdirectories = self::resolveIds($userdirectories);
+		$this->call('userdirectory.update', $userdirectories, $expected_error);
 
 		if ($expected_error === null) {
 			foreach ($userdirectories as $userdirectory) {
 				if (array_key_exists('name', $userdirectory)) {
-					self::$data['userdirectoryids'][$userdirectory['name']] = $userdirectory['userdirectoryid'];
+					self::$data['userdirectoryid'][$userdirectory['name']] = $userdirectory['userdirectoryid'];
 				}
 			}
 		}
@@ -163,8 +157,8 @@ class testUserDirectory extends CAPITest {
 	public function testDelete(array $userdirectoryids, $expected_error) {
 		$ids = [];
 		foreach ($userdirectoryids as $userdirectoryid) {
-			if (array_key_exists($userdirectoryid, self::$data['userdirectoryids'])) {
-				$ids[] = self::$data['userdirectoryids'][$userdirectoryid];
+			if (array_key_exists($userdirectoryid, self::$data['userdirectoryid'])) {
+				$ids[] = self::$data['userdirectoryid'][$userdirectoryid];
 			}
 			elseif (is_numeric($userdirectoryid)) {
 				$ids[] = (string) $userdirectoryid;
@@ -175,7 +169,7 @@ class testUserDirectory extends CAPITest {
 		$this->call('userdirectory.delete', $ids, $expected_error);
 
 		if ($expected_error === null) {
-			self::$data['userdirectoryids'] = array_diff(self::$data['userdirectoryids'], $ids);
+			self::$data['userdirectoryid'] = array_diff(self::$data['userdirectoryid'], $ids);
 		}
 	}
 
@@ -184,58 +178,82 @@ class testUserDirectory extends CAPITest {
 	 */
 	public function testDeleteDefault() {
 		// Delete user group to allow to delete userdirectory linked to user group.
-		$this->call('usergroup.delete', [self::$data['usergroupids']['Auth test #1']]);
-		self::$data['usergroupids'] = array_diff(
-			self::$data['usergroupids'],
-			[self::$data['usergroupids']['Auth test #1']]
-		);
+		$this->call('usergroup.delete', [self::$data['usrgrpid']['Auth test #1']]);
+		self::$data['usrgrpid'] = array_diff(self::$data['usrgrpid'], [self::$data['usrgrpid']['Auth test #1']]);
 
-		$ids = self::$data['userdirectoryids'];
+		$ids = self::$data['userdirectoryid'];
 		unset($ids['API LDAP #2']);
 
 		// Delete all usergroups except default usergroup.
 		$this->call('userdirectory.delete', array_values($ids));
-		self::$data['userdirectoryids'] = array_diff(self::$data['userdirectoryids'], $ids);
+		self::$data['userdirectoryid'] = array_diff(self::$data['userdirectoryid'], $ids);
 
 		$error = 'Cannot delete default user directory.';
-		$this->call('userdirectory.delete', self::$data['userdirectoryids'], $error);
+		$this->call('userdirectory.delete', self::$data['userdirectoryid'], $error);
 
 		// Disable ldap to be able to delete default userdirectory.
 		$this->call('authentication.update', ['ldap_configured' => ZBX_AUTH_LDAP_DISABLED]);
-		$this->call('userdirectory.delete', array_values(self::$data['userdirectoryids']));
+		$this->call('userdirectory.delete', array_values(self::$data['userdirectoryid']));
 	}
 
 	public static $data = [
-		'usergroupids' => [],
-		'userdirectoryids' => []
+		'usrgrpid' => [],
+		'userdirectoryid' => []
 	];
 
+	/**
+	 * Replace name by value for property names in self::$data.
+	 *
+	 * @param array $rows
+	 */
+	public static function resolveIds(array $rows): array {
+		$result = [];
+
+		foreach ($rows as $row) {
+			foreach (array_intersect_key(self::$data, $row) as $key => $ids) {
+				if (array_key_exists($row[$key], $ids)) {
+					$row[$key] = $ids[$row[$key]];
+				}
+			}
+
+			$result[] = $row;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Create data to be used in tests.
+	 */
 	public function prepareTestData() {
 		$response = CDataHelper::call('userdirectory.create', [
 			['name' => 'API LDAP #1', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid'],
 			['name' => 'API LDAP #2', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid'],
 		]);
 		$this->assertArrayHasKey('userdirectoryids', $response);
-		self::$data['userdirectoryids'] = array_combine(['API LDAP #1', 'API LDAP #2'], $response['userdirectoryids']);
-		$userdirectoryid = self::$data['userdirectoryids']['API LDAP #1'];
+		self::$data['userdirectoryid'] = array_combine(['API LDAP #1', 'API LDAP #2'], $response['userdirectoryids']);
+		$userdirectoryid = self::$data['userdirectoryid']['API LDAP #1'];
 
 		$response = CDataHelper::call('usergroup.create', [
 			['name' => 'Auth test #1', 'gui_access' => GROUP_GUI_ACCESS_LDAP, 'userdirectoryid' => $userdirectoryid],
 			['name' => 'Auth test #2', 'gui_access' => GROUP_GUI_ACCESS_LDAP]
 		]);
 		$this->assertArrayHasKey('usrgrpids', $response);
-		self::$data['usergroupids'] = array_combine(['Auth test #1', 'Auth test #2'], $response['usrgrpids']);
+		self::$data['usrgrpid'] = array_combine(['Auth test #1', 'Auth test #2'], $response['usrgrpids']);
 
 		CDataHelper::call('authentication.update', [
-			'ldap_userdirectoryid' => self::$data['userdirectoryids']['API LDAP #2'],
+			'ldap_userdirectoryid' => self::$data['userdirectoryid']['API LDAP #2'],
 			'ldap_configured' => ZBX_AUTH_LDAP_ENABLED
 		]);
 	}
 
+	/**
+	 * Remove data created for tests.
+	 */
 	public static function cleanTestData() {
 		$api_ids = array_filter([
-			'usergroup.delete' => array_values(self::$data['usergroupids']),
-			'userdirectory.delete' => array_values(self::$data['userdirectoryids'])
+			'usergroup.delete' => array_values(self::$data['usrgrpid']),
+			'userdirectory.delete' => array_values(self::$data['userdirectoryid'])
 		]);
 		CDataHelper::call('authentication.update', ['ldap_userdirectoryid' => 0]);
 
