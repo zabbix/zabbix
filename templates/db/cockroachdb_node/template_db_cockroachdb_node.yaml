@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-13T06:20:45Z'
+  date: '2022-04-14T08:05:33Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -11,7 +11,13 @@ zabbix_export:
       template: 'CockroachDB node by HTTP'
       name: 'CockroachDB node by HTTP'
       description: |
-        Get CockroachDB node metrics from Prometheus endpoint by HTTP agent.
+        Get CockroachDB node metrics from Prometheus and health endpoints by HTTP agent.
+        
+        Internal node metrics are collected from Prometheus /_status/vars endpoint.
+        Node health metrics are collected from /health and /health?ready=1 endpoints.
+        Template doesn't require usage of session token.
+        
+        Don't forget change macros {$COCKROACHDB.API.SCHEME} according to your situation (secure/insecure node).
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
@@ -20,6 +26,88 @@ zabbix_export:
         -
           name: Templates/Databases
       items:
+        -
+          uuid: 0328c188d5954ae48dcc0649c9c01f52
+          name: 'CockroachDB: CA certificate expiration date'
+          type: DEPENDENT
+          key: cockroachdb.node.cert.expire_date.ca
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: FLOAT
+          units: unixtime
+          description: 'CA certificate expires at that date.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - security_certificate_expiration_ca
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          master_item:
+            key: cockroachdb.node.get_metrics
+          tags:
+            -
+              tag: component
+              value: cert
+          triggers:
+            -
+              uuid: 76a2093eb0214185ab8e03986f3f1474
+              expression: '(last(/CockroachDB node by HTTP/cockroachdb.node.cert.expire_date.ca) - now()) / 86400 < {$COCKROACHDB.CERT.CA.EXPIRY.WARN}'
+              name: 'CockroachDB: CA certificate expires soon'
+              event_name: 'CockroachDB: CA certificate expires soon (less than {$COCKROACHDB.CERT.CA.EXPIRY.WARN} days)'
+              priority: WARNING
+              description: 'CA certificate expires soon.'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 0328c188d5954ae48dcc0649c9c01f52
+          name: 'CockroachDB: Node certificate expiration date'
+          type: DEPENDENT
+          key: cockroachdb.node.cert.expire_date.node
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: FLOAT
+          units: unixtime
+          description: 'Node certificate expires at that date.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - security_certificate_expiration_node
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          master_item:
+            key: cockroachdb.node.get_metrics
+          tags:
+            -
+              tag: component
+              value: cert
+          triggers:
+            -
+              uuid: 592152fe1dde4e81abd4bee76c3dae9d
+              expression: '(last(/CockroachDB node by HTTP/cockroachdb.node.cert.expire_date.node) - now()) / 86400 < {$COCKROACHDB.CERT.NODE.EXPIRY.WARN}'
+              name: 'CockroachDB: Node certificate expires soon'
+              event_name: 'CockroachDB: Node certificate expires soon (less than {$COCKROACHDB.CERT.NODE.EXPIRY.WARN} days)'
+              priority: WARNING
+              description: 'Node certificate expires soon.'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 156d0c66c25a4938b87bd4527580cfd4
           name: 'CockroachDB: Clock offset'
@@ -50,10 +138,11 @@ zabbix_export:
           triggers:
             -
               uuid: bddc5c6ac7294bb4be9ed8a4f4d4f4a9
-              expression: 'min(/CockroachDB node by HTTP/cockroachdb.node.clock.offset,5m)>0.3'
-              name: 'CockroachDB: Clock offset is near the limit'
+              expression: 'min(/CockroachDB node by HTTP/cockroachdb.node.clock.offset,5m) > {$COCKROACHDB.CLOCK.OFFSET.MAX.WARN} * 0.001'
+              name: 'CockroachDB: Clock offset is too high'
+              event_name: 'CockroachDB: Clock offset is too high (over {$COCKROACHDB.CLOCK.OFFSET.MAX.WARN}ms for 5m)'
               priority: WARNING
-              description: 'Cockroach-measured clock offset nearing limit (by default, servers kill themselves at 400ms from the mean, so alert at 300ms).'
+              description: 'Cockroach-measured clock offset is nearing limit (by default, servers kill themselves at 400ms from the mean).'
               tags:
                 -
                   tag: scope
@@ -129,7 +218,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'CPU utilization in %'
+          description: 'CPU utilization in %.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -155,7 +244,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The file descriptor limit.'
+          description: 'Open file descriptors soft limit of the process.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -203,7 +292,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of disk IOPS in progress.'
+          description: 'Number of disk IO operations currently in progress on this host.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -229,7 +318,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of disk read operations per second.'
+          description: 'Number of disk read operations per second across all disks since this process started.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -255,7 +344,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of disk write operations per second.'
+          description: 'Disk write operations per second across all disks since this process started.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -282,7 +371,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Disk reads rate.'
+          description: 'Bytes read from all disks per second since this process started'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -309,7 +398,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Disk writes rate.'
+          description: 'Bytes written to all disks per second since this process started.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -415,20 +504,17 @@ zabbix_export:
             -
               tag: component
               value: health
-            -
-              tag: component
-              value: raw
           triggers:
             -
               uuid: 6ccd74acda004a738c3003af4526cd91
-              expression: 'last(/CockroachDB node by HTTP/cockroachdb.node.get_health)=500'
+              expression: 'last(/CockroachDB node by HTTP/cockroachdb.node.get_health) = 500'
               name: 'CockroachDB: Node is unhealthy'
               priority: AVERAGE
               description: 'Node''s /health endpoint has returned HTTP 500 Internal Server Error which indicates unhealthy mode.'
               dependencies:
                 -
                   name: 'CockroachDB: Service is down'
-                  expression: 'last(/CockroachDB node by HTTP/net.tcp.service["{$COCKROACHDB.API.SCHEME}","{HOST.CONN}","{$COCKROACHDB.API.PORT}"])=0'
+                  expression: 'last(/CockroachDB node by HTTP/net.tcp.service["{$COCKROACHDB.API.SCHEME}","{HOST.CONN}","{$COCKROACHDB.API.PORT}"]) = 0'
               tags:
                 -
                   tag: scope
@@ -484,9 +570,6 @@ zabbix_export:
             -
               tag: component
               value: health
-            -
-              tag: component
-              value: raw
         -
           uuid: a36bcb9217054c1db2e67c8533842d01
           name: 'CockroachDB: Go: Goroutines count'
@@ -495,7 +578,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of Goroutines. This count should rise and fall based on load.'
+          description: 'Current number of Goroutines. This count should rise and fall based on load.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -536,7 +619,7 @@ zabbix_export:
               value: liveness
         -
           uuid: 1a01d2c75d934f489e171a3a147a2078
-          name: 'CockroachDB: KV: Transactions: Aborted, rate'
+          name: 'CockroachDB: KV transactions: Aborted, rate'
           type: DEPENDENT
           key: cockroachdb.node.kv.transactions.aborted.rate
           delay: '0'
@@ -562,7 +645,7 @@ zabbix_export:
               value: kv
         -
           uuid: be9c377ac5a64579a3b849bbd28e4dc7
-          name: 'CockroachDB: KV: Transactions: Commited, rate'
+          name: 'CockroachDB: KV transactions: Commited, rate'
           type: DEPENDENT
           key: cockroachdb.node.kv.transactions.commited.rate
           delay: '0'
@@ -613,14 +696,14 @@ zabbix_export:
               value: liveness
         -
           uuid: 5a8bf48e85b845bf83346491ccf5cfac
-          name: 'CockroachDB: Memory: CGo: Allocated'
+          name: 'CockroachDB: Memory: Allocated by Cgo'
           type: DEPENDENT
           key: cockroachdb.node.memory.cgo.allocated
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Memory allocated by the C layer.'
+          description: 'Current bytes of memory allocated by the C layer.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -639,14 +722,14 @@ zabbix_export:
               value: memory
         -
           uuid: 07dc780b07ee4a34abd9bc658416f507
-          name: 'CockroachDB: Memory: CGo: Managed'
+          name: 'CockroachDB: Memory: Managed by Cgo'
           type: DEPENDENT
           key: cockroachdb.node.memory.cgo.managed
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Total memory managed by the C layer.'
+          description: 'Total bytes of memory managed by the C layer.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -665,14 +748,14 @@ zabbix_export:
               value: memory
         -
           uuid: af45fdeea2ff4b7ba2d488b704966f16
-          name: 'CockroachDB: Memory: Go: Allocated'
+          name: 'CockroachDB: Memory: Allocated by Go'
           type: DEPENDENT
           key: cockroachdb.node.memory.go.allocated
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Memory allocated by the Go layer.'
+          description: 'Current bytes of memory allocated by the Go layer.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -691,14 +774,14 @@ zabbix_export:
               value: memory
         -
           uuid: 74669e09ce86441d877de519c86b3f83
-          name: 'CockroachDB: Memory: Go: Managed'
+          name: 'CockroachDB: Memory: Managed by Go'
           type: DEPENDENT
           key: cockroachdb.node.memory.go.managed
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Total memory managed by the Go layer.'
+          description: 'Total bytes of memory managed by the Go layer.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -717,14 +800,14 @@ zabbix_export:
               value: memory
         -
           uuid: 14524b3f8c5f4d509d15063af19c9569
-          name: 'CockroachDB: Memory: SQL: Allocated'
+          name: 'CockroachDB: Memory: Allocated by SQL'
           type: DEPENDENT
           key: cockroachdb.node.memory.sql
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The current amount of allocated SQL memory. This amount is what is compared against the node''s --max-sql-memory flag.'
+          description: 'Current SQL statement memory usage for root.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -773,7 +856,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Amount of incoming network traffic per second.'
+          description: 'Bytes received per second on all network interfaces since this process started.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -800,7 +883,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Amount of outgoing network traffic per second.'
+          description: 'Bytes sent per second on all network interfaces since this process started.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -849,7 +932,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'The total amount of incoming SQL client network traffic in bytes per second.'
+          description: 'Total amount of incoming SQL client network traffic in bytes per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -876,7 +959,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'The total amount of outgoing SQL client network traffic in bytes per second.'
+          description: 'Total amount of outgoing SQL client network traffic in bytes per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -902,7 +985,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The total number of DDL statements per second.'
+          description: 'Total number of SQL DDL statements successfully executed per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -922,13 +1005,13 @@ zabbix_export:
               value: sql
         -
           uuid: 79ed7dc3660a44cc8f30822e992154b6
-          name: 'CockroachDB: SQL: Sessions: Open'
+          name: 'CockroachDB: SQL sessions: Open'
           type: DEPENDENT
           key: cockroachdb.node.sql.sessions
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The total number of open SQL sessions.'
+          description: 'Total number of open SQL sessions.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -944,13 +1027,13 @@ zabbix_export:
               value: sql
         -
           uuid: d4164a9763b34976ba8f89a49e9aaf25
-          name: 'CockroachDB: SQL: Statements: Active'
+          name: 'CockroachDB: SQL statements: Active'
           type: DEPENDENT
           key: cockroachdb.node.sql.statements.active
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The total number of SQL statements currently running.'
+          description: 'Total number of SQL statements currently active.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -966,13 +1049,13 @@ zabbix_export:
               value: sql
         -
           uuid: bcae7af870ed48dc919be3dbd63df1ba
-          name: 'CockroachDB: SQL: Statements: Contention, rate'
+          name: 'CockroachDB: SQL statements: Contention, rate'
           type: DEPENDENT
           key: cockroachdb.node.sql.statements.contention.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The total number of SQL statements that experienced contention per second.'
+          description: 'Total number of SQL statements that experienced contention per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -992,7 +1075,7 @@ zabbix_export:
               value: sql
         -
           uuid: 80b08a576e334963a17e37a5c2305214
-          name: 'CockroachDB: SQL: Statements: DELETE, rate'
+          name: 'CockroachDB: SQL statements: DELETE, rate'
           type: DEPENDENT
           key: cockroachdb.node.sql.statements.delete.rate
           delay: '0'
@@ -1018,13 +1101,13 @@ zabbix_export:
               value: sql
         -
           uuid: 68532afbcda644f1928203c013335f2a
-          name: 'CockroachDB: SQL: Statements: Denials, rate'
+          name: 'CockroachDB: SQL statements: Denials, rate'
           type: DEPENDENT
           key: cockroachdb.node.sql.statements.denials.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The total number of statements denied per second due to a cluster setting (https://www.cockroachlabs.com/docs/v21.1/cluster-settings.html) in the format feature.statement_type.enabled = FALSE.'
+          description: 'The number of statements denied per second by a feature flag.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -1044,13 +1127,13 @@ zabbix_export:
               value: sql
         -
           uuid: dc93958dabdc439f8a7ad9c5a12fddcd
-          name: 'CockroachDB: SQL: Statements: Errors, rate'
+          name: 'CockroachDB: SQL statements: Errors, rate'
           type: DEPENDENT
           key: cockroachdb.node.sql.statements.errors.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of statements which returned a planning or runtime error per second.'
+          description: 'Total number of statements which returned a planning or runtime error per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -1068,9 +1151,20 @@ zabbix_export:
             -
               tag: component
               value: sql
+          triggers:
+            -
+              uuid: 7307fc4f2c29438e99eea0256a8755ce
+              expression: 'min(/CockroachDB node by HTTP/cockroachdb.node.sql.statements.errors.rate,5m) > {$COCKROACHDB.STATEMENTS.ERRORS.MAX.WARN}'
+              name: 'CockroachDB: SQL statements errors rate is too high'
+              event_name: 'CockroachDB: SQL statements errors rate is too high (over {$COCKROACHDB.STATEMENTS.ERRORS.MAX.WARN} per second for 5m)'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: health
         -
           uuid: 3c9fb90492e44789ba9a899d03546b6d
-          name: 'CockroachDB: SQL: Statements: Executed, rate'
+          name: 'CockroachDB: SQL statements: Executed, rate'
           type: DEPENDENT
           key: cockroachdb.node.sql.statements.executed.rate
           delay: '0'
@@ -1096,13 +1190,13 @@ zabbix_export:
               value: sql
         -
           uuid: ae83868ea1194089a65b9c3bfb81ef27
-          name: 'CockroachDB: SQL: Statements: Active flows distributed, rate'
+          name: 'CockroachDB: SQL statements: Active flows distributed, rate'
           type: DEPENDENT
           key: cockroachdb.node.sql.statements.flows.active.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of flows on the node contributing to currently running distributed SQL statements per second.'
+          description: 'The number of distributed SQL flows currently active per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -1122,7 +1216,7 @@ zabbix_export:
               value: sql
         -
           uuid: b9c72429c3264119af27e3b4d1c7486a
-          name: 'CockroachDB: SQL: Statements: INSERT, rate'
+          name: 'CockroachDB: SQL statements: INSERT, rate'
           type: DEPENDENT
           key: cockroachdb.node.sql.statements.insert.rate
           delay: '0'
@@ -1148,7 +1242,7 @@ zabbix_export:
               value: sql
         -
           uuid: d6fc464f4e784569911880f52020d08d
-          name: 'CockroachDB: SQL: Statements: SELECT, rate'
+          name: 'CockroachDB: SQL statements: SELECT, rate'
           type: DEPENDENT
           key: cockroachdb.node.sql.statements.select.rate
           delay: '0'
@@ -1174,7 +1268,7 @@ zabbix_export:
               value: sql
         -
           uuid: 8832cd69551a4ad084c283fb076a17b6
-          name: 'CockroachDB: SQL: Statements: UPDATE, rate'
+          name: 'CockroachDB: SQL statements: UPDATE, rate'
           type: DEPENDENT
           key: cockroachdb.node.sql.statements.update.rate
           delay: '0'
@@ -1200,13 +1294,13 @@ zabbix_export:
               value: sql
         -
           uuid: 6e2f06b2b71f447aae06940b205e22bf
-          name: 'CockroachDB: SQL: Transactions: Aborted, rate'
+          name: 'CockroachDB: SQL transactions: Aborted, rate'
           type: DEPENDENT
           key: cockroachdb.node.sql.transactions.aborted.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The total number of aborted SQL transactions per second.'
+          description: 'Total number of SQL transaction abort errors per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -1226,13 +1320,13 @@ zabbix_export:
               value: sql
         -
           uuid: d32b3f22158f4091926ebf9746439da3
-          name: 'CockroachDB: SQL: Transactions: Commited, rate'
+          name: 'CockroachDB: SQL transactions: Commited, rate'
           type: DEPENDENT
           key: cockroachdb.node.sql.transactions.committed.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The total number of committed SQL transactions per second.'
+          description: 'Total number of SQL transaction COMMIT statements successfully executed per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -1252,13 +1346,13 @@ zabbix_export:
               value: sql
         -
           uuid: ca529d30b36e4bf591c8b5e313f9bbc0
-          name: 'CockroachDB: SQL: Transactions: Initiated, rate'
+          name: 'CockroachDB: SQL transactions: Initiated, rate'
           type: DEPENDENT
           key: cockroachdb.node.sql.transactions.initiated.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The total number of initiated SQL transactions per second.'
+          description: 'Total number of SQL transaction BEGIN statements successfully executed per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -1278,13 +1372,13 @@ zabbix_export:
               value: sql
         -
           uuid: 6490aac99d654eebae14cedb935c8d9f
-          name: 'CockroachDB: SQL: Transactions: Open'
+          name: 'CockroachDB: SQL transactions: Open'
           type: DEPENDENT
           key: cockroachdb.node.sql.transactions.open
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The total number of SQL transactions currently open.'
+          description: 'Total number of currently open SQL transactions.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -1300,13 +1394,13 @@ zabbix_export:
               value: sql
         -
           uuid: 07274667c22d4e52b50ead17c864ae36
-          name: 'CockroachDB: SQL: Transactions: Rolled back, rate'
+          name: 'CockroachDB: SQL transactions: Rolled back, rate'
           type: DEPENDENT
           key: cockroachdb.node.sql.transactions.rollbacks.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The total number of rolled back SQL transactions per second.'
+          description: 'Total number of SQL transaction ROLLBACK statements successfully executed per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -1332,7 +1426,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of errors attempting to write time series, per second.'
+          description: 'The number of errors encountered while attempting to write metrics to disk, per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -1358,7 +1452,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of successfully written time series samples per second.'
+          description: 'The number of successfully written metric samples per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -1402,7 +1496,7 @@ zabbix_export:
           triggers:
             -
               uuid: 90f6cccaf3d94a3d853641482ccb5254
-              expression: 'nodata(/CockroachDB node by HTTP/cockroachdb.node.uptime,5m)=1'
+              expression: 'nodata(/CockroachDB node by HTTP/cockroachdb.node.uptime,5m) = 1'
               name: 'CockroachDB: Failed to fetch node data'
               event_name: 'CockroachDB: Failed to fetch node data (or no data for 5m)'
               priority: WARNING
@@ -1410,14 +1504,14 @@ zabbix_export:
               dependencies:
                 -
                   name: 'CockroachDB: Service is down'
-                  expression: 'last(/CockroachDB node by HTTP/net.tcp.service["{$COCKROACHDB.API.SCHEME}","{HOST.CONN}","{$COCKROACHDB.API.PORT}"])=0'
+                  expression: 'last(/CockroachDB node by HTTP/net.tcp.service["{$COCKROACHDB.API.SCHEME}","{HOST.CONN}","{$COCKROACHDB.API.PORT}"]) = 0'
               tags:
                 -
                   tag: scope
                   value: availability
             -
               uuid: 83802e38f1414ca9b40e2d2df2d94941
-              expression: 'last(/CockroachDB node by HTTP/cockroachdb.node.uptime)<10m'
+              expression: 'last(/CockroachDB node by HTTP/cockroachdb.node.uptime) < 10m'
               name: 'CockroachDB: Node has been restarted'
               event_name: 'CockroachDB: Node has been restarted (uptime < 10m)'
               priority: INFO
@@ -1456,7 +1550,7 @@ zabbix_export:
           triggers:
             -
               uuid: 620aee1613e841acb44a438b4b9b68c9
-              expression: 'last(/CockroachDB node by HTTP/cockroachdb.node.version)<>last(/CockroachDB node by HTTP/cockroachdb.node.version,#2) and length(last(/CockroachDB node by HTTP/cockroachdb.node.version))>0'
+              expression: 'last(/CockroachDB node by HTTP/cockroachdb.node.version) <> last(/CockroachDB node by HTTP/cockroachdb.node.version,#2) and length(last(/CockroachDB node by HTTP/cockroachdb.node.version)) > 0'
               name: 'CockroachDB: Version has changed'
               event_name: 'CockroachDB: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
@@ -1487,7 +1581,7 @@ zabbix_export:
           triggers:
             -
               uuid: d3c0d0a9e1f44c95a2246ab7081f581b
-              expression: 'last(/CockroachDB node by HTTP/net.tcp.service["{$COCKROACHDB.API.SCHEME}","{HOST.CONN}","{$COCKROACHDB.API.PORT}"])=0'
+              expression: 'last(/CockroachDB node by HTTP/net.tcp.service["{$COCKROACHDB.API.SCHEME}","{HOST.CONN}","{$COCKROACHDB.API.PORT}"]) = 0'
               name: 'CockroachDB: Service is down'
               priority: AVERAGE
               tags:
@@ -1495,281 +1589,6 @@ zabbix_export:
                   tag: scope
                   value: availability
       discovery_rules:
-        -
-          uuid: eb3f6cfcef0d401b83e2043876f3c574
-          name: 'Certificates expiration discovery'
-          type: DEPENDENT
-          key: cockroachdb.node.cert.discovery
-          delay: '0'
-          description: 'Discovery CA and node certificates expiration dates.'
-          item_prototypes:
-            -
-              uuid: 0328c188d5954ae48dcc0649c9c01f52
-              name: 'CockroachDB: {#DESC} certificate expiration date'
-              type: DEPENDENT
-              key: 'cockroachdb.node.cert.expire_date[{#TYPE}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
-              discover: NO_DISCOVER
-              value_type: FLOAT
-              units: unixtime
-              description: '{#DESC} certificate expires at that date.'
-              preprocessing:
-                -
-                  type: PROMETHEUS_PATTERN
-                  parameters:
-                    - '{#NAME}'
-                    - value
-                    - ''
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1d
-              master_item:
-                key: cockroachdb.node.get_metrics
-              tags:
-                -
-                  tag: component
-                  value: cert
-              trigger_prototypes:
-                -
-                  uuid: 76a2093eb0214185ab8e03986f3f1474
-                  expression: '(last(/CockroachDB node by HTTP/cockroachdb.node.cert.expire_date[{#TYPE}]) - now()) / 86400 < {#EXPIRY}'
-                  name: 'CockroachDB: {#DESC} certificate expires soon'
-                  event_name: 'CockroachDB: {#DESC} certificate expires soon (less than {#EXPIRY} days)'
-                  priority: WARNING
-                  description: '{#DESC} certificate expires soon.'
-                  tags:
-                    -
-                      tag: scope
-                      value: notice
-          master_item:
-            key: cockroachdb.node.get_metrics
-          preprocessing:
-            -
-              type: PROMETHEUS_TO_JSON
-              parameters:
-                - '{__name__=~ "^security_certificate_expiration_*"}'
-            -
-              type: JAVASCRIPT
-              parameters:
-                - |
-                  var lookup = {},
-                      result = [];
-                  JSON.parse(value).forEach(function (item) {
-                      if (item.name === "security_certificate_expiration_ca"){
-                          result.push({
-                              '{#TYPE}': 'ca',
-                              '{#NAME}': item.name,
-                              '{#DESC}': 'CA',
-                              '{#EXPIRY}': '{$COCKROACHDB.CERT.CA.EXPIRY.WARN}'
-                          });
-                  
-                      }
-                      else if  (item.name === "security_certificate_expiration_node"){
-                          result.push({
-                              '{#TYPE}': 'node',
-                              '{#NAME}': item.name,
-                              '{#DESC}': 'Node',
-                              '{#EXPIRY}': '{$COCKROACHDB.CERT.NODE.EXPIRY.WARN}'
-                          });
-                      }
-                  });
-                  return JSON.stringify(result);
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 3h
-          overrides:
-            -
-              name: cert
-              step: '1'
-              filter:
-                conditions:
-                  -
-                    macro: '{#TYPE}'
-                    value: ca
-                    formulaid: A
-                  -
-                    macro: '{#TYPE}'
-                    value: node
-                    formulaid: B
-              operations:
-                -
-                  operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
-                  value: certificate
-                  status: ENABLED
-                  discover: DISCOVER
-        -
-          uuid: 09a863b4d86948be9ead7161bed9969f
-          name: 'SQL: Service latency buckets discovery'
-          type: DEPENDENT
-          key: cockroachdb.node.sql.buckets.discovery
-          delay: '0'
-          lifetime: '0'
-          description: 'Discovery buckets of SQL request execution latency histogram.'
-          item_prototypes:
-            -
-              uuid: 4eade3c411aa478d85e841214fc2220d
-              name: 'CockroachDB: SQL: Service latency bucket: {#LE}'
-              type: DEPENDENT
-              key: 'cockroachdb.node.sql.latency.bucket[{#LE}]'
-              delay: '0'
-              history: 1h
-              trends: '0'
-              value_type: FLOAT
-              description: 'Latency of SQL request execution.'
-              preprocessing:
-                -
-                  type: PROMETHEUS_PATTERN
-                  parameters:
-                    - 'sql_service_latency_bucket{le="{#LE}"}'
-                    - value
-                    - ''
-              master_item:
-                key: cockroachdb.node.get_metrics
-              tags:
-                -
-                  tag: component
-                  value: buckets
-                -
-                  tag: component
-                  value: latency
-          master_item:
-            key: cockroachdb.node.get_metrics
-          lld_macro_paths:
-            -
-              lld_macro: '{#LE}'
-              path: $.labels.le
-          preprocessing:
-            -
-              type: PROMETHEUS_TO_JSON
-              parameters:
-                - 'sql_service_latency_bucket{le=~".*"}'
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 3h
-        -
-          uuid: f562e028643f4cc392358d10b1dcea93
-          name: 'SQL: Service latency percentile discovery'
-          type: DEPENDENT
-          key: cockroachdb.node.sql.percentile.discovery
-          delay: '0'
-          description: 'Discovery percentile items of SQL request execution latency histogram.'
-          item_prototypes:
-            -
-              uuid: fb4294efdde640b4afee37b61b14c737
-              name: 'CockroachDB: SQL: Service latency, p90'
-              type: CALCULATED
-              key: 'cockroachdb.node.sql.latency.p90[{#SINGLETON}]'
-              history: 7d
-              discover: NO_DISCOVER
-              value_type: FLOAT
-              units: s
-              params: 'bucket_percentile(//cockroachdb.node.sql.latency.bucket[*],5m,90)'
-              description: 'Over the last 5 minutes, this node executed 90% of queries within this time. This time does not include network latency between the node and client.'
-              preprocessing:
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '0.000000001'
-                -
-                  type: STR_REPLACE
-                  parameters:
-                    - '-1E-09'
-                    - '0'
-              tags:
-                -
-                  tag: component
-                  value: latency
-            -
-              uuid: 0e76366bff714c43bc6f45f35a9f5717
-              name: 'CockroachDB: SQL: Service latency, p99'
-              type: CALCULATED
-              key: 'cockroachdb.node.sql.latency.p99[{#SINGLETON}]'
-              history: 7d
-              discover: NO_DISCOVER
-              value_type: FLOAT
-              units: s
-              params: 'bucket_percentile(//cockroachdb.node.sql.latency.bucket[*],5m,99)'
-              description: 'Over the last 5 minutes, this node executed 99% of queries within this time. This time does not include network latency between the node and client.'
-              preprocessing:
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '0.000000001'
-                -
-                  type: STR_REPLACE
-                  parameters:
-                    - '-1E-09'
-                    - '0'
-              tags:
-                -
-                  tag: component
-                  value: latency
-          graph_prototypes:
-            -
-              uuid: 9ce86aa502134096b5a21bf5ce3ff9e6
-              name: 'CockroachDB: SQL: Service latency percentile {#SINGLETON}'
-              graph_items:
-                -
-                  color: 1A7C11
-                  item:
-                    host: 'CockroachDB node by HTTP'
-                    key: 'cockroachdb.node.sql.latency.p90[{#SINGLETON}]'
-                -
-                  sortorder: '1'
-                  color: 2774A4
-                  item:
-                    host: 'CockroachDB node by HTTP'
-                    key: 'cockroachdb.node.sql.latency.p99[{#SINGLETON}]'
-          master_item:
-            key: cockroachdb.node.get_metrics
-          preprocessing:
-            -
-              type: PROMETHEUS_TO_JSON
-              parameters:
-                - sql_service_latency_count
-            -
-              type: JAVASCRIPT
-              parameters:
-                - |
-                  var lookup = {},
-                      result = [];
-                  JSON.parse(value).forEach(function (item) {
-                      if (item.value !== "0"){
-                          result.push({
-                              '{#TYPE}': 'totals',
-                              '{#SINGLETON}': ''
-                          });
-                  
-                      }
-                  });
-                  return JSON.stringify(result);
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 3h
-          overrides:
-            -
-              name: 'total item'
-              step: '1'
-              filter:
-                conditions:
-                  -
-                    macro: '{#TYPE}'
-                    value: totals
-                    formulaid: A
-              operations:
-                -
-                  operationobject: ITEM_PROTOTYPE
-                  operator: NOT_LIKE
-                  value: bucket
-                  status: ENABLED
-                  discover: DISCOVER
         -
           uuid: c201ddd6c35c4d67a05b9a99952f54f2
           name: 'Storage metrics discovery'
@@ -1780,7 +1599,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: a12e4937d2c44eacada535774e74653a
-              name: 'CockroachDB: Storage {#STORE}: Queue processing failures: Consistency, rate'
+              name: 'CockroachDB: Storage [{#STORE}]: Queue processing failures: Consistency, rate'
               type: DEPENDENT
               key: 'cockroachdb.node.queue.processing_failures.consistency.[{#STORE},rate]'
               delay: '0'
@@ -1806,7 +1625,7 @@ zabbix_export:
                   value: queues
             -
               uuid: 5d328a66855d4cbba099713befd4d240
-              name: 'CockroachDB: Storage {#STORE}: Queue processing failures: GC, rate'
+              name: 'CockroachDB: Storage [{#STORE}]: Queue processing failures: GC, rate'
               type: DEPENDENT
               key: 'cockroachdb.node.queue.processing_failures.gc.[{#STORE},rate]'
               delay: '0'
@@ -1832,7 +1651,7 @@ zabbix_export:
                   value: queues
             -
               uuid: b71cc221443b42888d64dea02e75d3f9
-              name: 'CockroachDB: Storage {#STORE}: Queue processing failures: Replica GC, rate'
+              name: 'CockroachDB: Storage [{#STORE}]: Queue processing failures: Replica GC, rate'
               type: DEPENDENT
               key: 'cockroachdb.node.queue.processing_failures.gc_replica.[{#STORE},rate]'
               delay: '0'
@@ -1858,7 +1677,7 @@ zabbix_export:
                   value: queues
             -
               uuid: eabbf198e158428aaf9b15f491dd0895
-              name: 'CockroachDB: Storage {#STORE}: Queue processing failures: Raft log, rate'
+              name: 'CockroachDB: Storage [{#STORE}]: Queue processing failures: Raft log, rate'
               type: DEPENDENT
               key: 'cockroachdb.node.queue.processing_failures.raftlog.[{#STORE},rate]'
               delay: '0'
@@ -1884,7 +1703,7 @@ zabbix_export:
                   value: queues
             -
               uuid: 2369ad2e98c84d2a83b64f3b1fce826e
-              name: 'CockroachDB: Storage {#STORE}: Queue processing failures: Raft snapshot, rate'
+              name: 'CockroachDB: Storage [{#STORE}]: Queue processing failures: Raft snapshot, rate'
               type: DEPENDENT
               key: 'cockroachdb.node.queue.processing_failures.raftsnapshot.[{#STORE},rate]'
               delay: '0'
@@ -1910,7 +1729,7 @@ zabbix_export:
                   value: queues
             -
               uuid: 604df422fb084fba8480758e30fc81f3
-              name: 'CockroachDB: Storage {#STORE}: Queue processing failures: Replicate, rate'
+              name: 'CockroachDB: Storage [{#STORE}]: Queue processing failures: Replicate, rate'
               type: DEPENDENT
               key: 'cockroachdb.node.queue.processing_failures.replicate.[{#STORE},rate]'
               delay: '0'
@@ -1936,7 +1755,7 @@ zabbix_export:
                   value: queues
             -
               uuid: 40e94d8e2cc54c7b9c0a6c4d7c8dc308
-              name: 'CockroachDB: Storage {#STORE}: Queue processing failures: Split, rate'
+              name: 'CockroachDB: Storage [{#STORE}]: Queue processing failures: Split, rate'
               type: DEPENDENT
               key: 'cockroachdb.node.queue.processing_failures.split.[{#STORE},rate]'
               delay: '0'
@@ -1962,7 +1781,7 @@ zabbix_export:
                   value: queues
             -
               uuid: ceb47605bc364044993e59430f37a07c
-              name: 'CockroachDB: Storage {#STORE}: Queue processing failures: Time series maintenance, rate'
+              name: 'CockroachDB: Storage [{#STORE}]: Queue processing failures: Time series maintenance, rate'
               type: DEPENDENT
               key: 'cockroachdb.node.queue.processing_failures.tsmaintenance.[{#STORE},rate]'
               delay: '0'
@@ -1988,7 +1807,7 @@ zabbix_export:
                   value: queues
             -
               uuid: 4ed616f13c9d4669879aa8bdad35a06a
-              name: 'CockroachDB: Storage {#STORE}: Ranges: Count'
+              name: 'CockroachDB: Storage [{#STORE}]: Ranges count'
               type: DEPENDENT
               key: 'cockroachdb.node.ranges.[{#STORE},count]'
               delay: '0'
@@ -2010,7 +1829,7 @@ zabbix_export:
                   value: ranges
             -
               uuid: 63e70400900a4b5caa8e89a18c83ebd7
-              name: 'CockroachDB: Storage {#STORE}: Ranges: Unavaliable'
+              name: 'CockroachDB: Storage [{#STORE}]: Ranges unavaliable'
               type: DEPENDENT
               key: 'cockroachdb.node.ranges.[{#STORE},unavaliable]'
               delay: '0'
@@ -2032,7 +1851,7 @@ zabbix_export:
                   value: ranges
             -
               uuid: beea6adf48df454fa6628d44455ca52f
-              name: 'CockroachDB: Storage {#STORE}: Ranges: Underreplicated'
+              name: 'CockroachDB: Storage [{#STORE}]: Ranges underreplicated'
               type: DEPENDENT
               key: 'cockroachdb.node.ranges.[{#STORE},underreplicated]'
               delay: '0'
@@ -2054,7 +1873,7 @@ zabbix_export:
                   value: ranges
             -
               uuid: d0b45b5a00d64c39bce2117fdb35d373
-              name: 'CockroachDB: Storage {#STORE}: Rebalancing: Average queries, rate'
+              name: 'CockroachDB: Storage [{#STORE}]: Rebalancing: Average queries, rate'
               type: DEPENDENT
               key: 'cockroachdb.node.rebalancing.queries.average.[{#STORE},rate]'
               delay: '0'
@@ -2076,7 +1895,7 @@ zabbix_export:
                   value: rebalancing
             -
               uuid: b5c10de1a784458f9df54813cc10c32b
-              name: 'CockroachDB: Storage {#STORE}: Rebalancing: Average writes, rate'
+              name: 'CockroachDB: Storage [{#STORE}]: Rebalancing: Average writes, rate'
               type: DEPENDENT
               key: 'cockroachdb.node.rebalancing.writes.average.[{#STORE},rate]'
               delay: '0'
@@ -2098,7 +1917,7 @@ zabbix_export:
                   value: rebalancing
             -
               uuid: 191985a08c554160bc371f5fca638336
-              name: 'CockroachDB: Storage {#STORE}: Replication: Replicas'
+              name: 'CockroachDB: Storage [{#STORE}]: Replication: Replicas'
               type: DEPENDENT
               key: 'cockroachdb.node.replication.replicas.[{#STORE},count]'
               delay: '0'
@@ -2120,7 +1939,7 @@ zabbix_export:
                   value: replication
             -
               uuid: 089c354ee1c547808bbf8655d16d1a06
-              name: 'CockroachDB: Storage {#STORE}: Replication: Replicas quiesced'
+              name: 'CockroachDB: Storage [{#STORE}]: Replication: Replicas quiesced'
               type: DEPENDENT
               key: 'cockroachdb.node.replication.replicas.[{#STORE},quiesced]'
               delay: '0'
@@ -2142,7 +1961,7 @@ zabbix_export:
                   value: replication
             -
               uuid: 87f949f768b54ba1b648a04d86f4c4da
-              name: 'CockroachDB: Storage {#STORE}: Replication: Lease holders'
+              name: 'CockroachDB: Storage [{#STORE}]: Replication: Lease holders'
               type: DEPENDENT
               key: 'cockroachdb.node.replication.[{#STORE},lease_holders]'
               delay: '0'
@@ -2164,7 +1983,7 @@ zabbix_export:
                   value: replication
             -
               uuid: eb6202583eb24ac28b60a8d5f24c1ccf
-              name: 'CockroachDB: Storage {#STORE}: RocksDB: Cache hits, rate'
+              name: 'CockroachDB: Storage [{#STORE}]: RocksDB cache hits, rate'
               type: DEPENDENT
               key: 'cockroachdb.node.rocksdb.cache.hits.[{#STORE},rate]'
               delay: '0'
@@ -2190,7 +2009,7 @@ zabbix_export:
                   value: rocksdb
             -
               uuid: 278d4cbcaa844f1281dd029da54300e4
-              name: 'CockroachDB: Storage {#STORE}: RocksDB: Cache misses, rate'
+              name: 'CockroachDB: Storage [{#STORE}]: RocksDB cache misses, rate'
               type: DEPENDENT
               key: 'cockroachdb.node.rocksdb.cache.misses.[{#STORE},rate]'
               delay: '0'
@@ -2216,7 +2035,7 @@ zabbix_export:
                   value: rocksdb
             -
               uuid: cafdf6248d114787b2a3f9647a4afea9
-              name: 'CockroachDB: Storage {#STORE}: RocksDB: Cache hit ratio'
+              name: 'CockroachDB: Storage [{#STORE}]: RocksDB cache hit ratio'
               type: CALCULATED
               key: 'cockroachdb.node.rocksdb.cache.[{#STORE},hit_ratio]'
               history: 7d
@@ -2230,7 +2049,7 @@ zabbix_export:
                   value: rocksdb
             -
               uuid: f4175e8984d14ad89c0bd1fce5b37372
-              name: 'CockroachDB: Storage {#STORE}: RocksDB: Read amplification'
+              name: 'CockroachDB: Storage [{#STORE}]: RocksDB read amplification'
               type: DEPENDENT
               key: 'cockroachdb.node.rocksdb.[{#STORE},read_amp]'
               delay: '0'
@@ -2252,7 +2071,7 @@ zabbix_export:
                   value: rocksdb
             -
               uuid: edc1e5548d9e4d629b44b067ffc666b9
-              name: 'CockroachDB: Storage {#STORE}: RocksDB: SSTables'
+              name: 'CockroachDB: Storage [{#STORE}]: RocksDB SSTables'
               type: DEPENDENT
               key: 'cockroachdb.node.rocksdb.[{#STORE},sstables]'
               delay: '0'
@@ -2274,7 +2093,7 @@ zabbix_export:
                   value: rocksdb
             -
               uuid: 6e826e48da5844468ba8d14ae0f1acc4
-              name: 'CockroachDB: Storage {#STORE}: Slow requests: Latch acquisitions'
+              name: 'CockroachDB: Storage [{#STORE}]: Slow requests: Latch acquisitions'
               type: DEPENDENT
               key: 'cockroachdb.node.slow_requests.[{#STORE},latch_acquisitions]'
               delay: '0'
@@ -2296,7 +2115,7 @@ zabbix_export:
                   value: 'slow requests'
             -
               uuid: 0cc9c428567a47c6adb41d137965a362
-              name: 'CockroachDB: Storage {#STORE}: Slow requests: Lease acquisitions'
+              name: 'CockroachDB: Storage [{#STORE}]: Slow requests: Lease acquisitions'
               type: DEPENDENT
               key: 'cockroachdb.node.slow_requests.[{#STORE},lease_acquisitions]'
               delay: '0'
@@ -2318,7 +2137,7 @@ zabbix_export:
                   value: 'slow requests'
             -
               uuid: 11c9e0dea4ec48a69ff3961aa6d1f910
-              name: 'CockroachDB: Storage {#STORE}: Slow requests: Raft proposals'
+              name: 'CockroachDB: Storage [{#STORE}]: Slow requests: Raft proposals'
               type: DEPENDENT
               key: 'cockroachdb.node.slow_requests.[{#STORE},raft_proposals]'
               delay: '0'
@@ -2340,14 +2159,14 @@ zabbix_export:
                   value: 'slow requests'
             -
               uuid: bbf0f281f3aa4964829ed2213db5dfc7
-              name: 'CockroachDB: Storage {#STORE}: Bytes: Live'
+              name: 'CockroachDB: Storage [{#STORE}]: Bytes: Live'
               type: DEPENDENT
               key: 'cockroachdb.node.storage.bytes.[{#STORE},live]'
               delay: '0'
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'Number of logical bytes stored in live key-value pairs (https://www.cockroachlabs.com/docs/v21.1/architecture/distribution-layer.html#table-data) on this node. Live data excludes historical and deleted data.'
+              description: 'Number of logical bytes stored in live key-value pairs on this node. Live data excludes historical and deleted data.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -2363,14 +2182,14 @@ zabbix_export:
                   value: storage
             -
               uuid: 232970f8bf12412e8a6bd96978a7ad5f
-              name: 'CockroachDB: Storage {#STORE}: Bytes: Logical'
+              name: 'CockroachDB: Storage [{#STORE}]: Bytes: Logical'
               type: DEPENDENT
               key: 'cockroachdb.node.storage.bytes.[{#STORE},logical]'
               delay: '0'
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'Number of logical bytes stored in key-value pairs (https://www.cockroachlabs.com/docs/v21.1/architecture/distribution-layer.html#table-data) on this node. This includes historical and deleted data.'
+              description: 'Number of logical bytes stored in key-value pairs on this node. This includes historical and deleted data.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -2386,14 +2205,14 @@ zabbix_export:
                   value: storage
             -
               uuid: 58d6f4d3c9ff41cab05697e7c59cf8e2
-              name: 'CockroachDB: Storage {#STORE}: Bytes: System'
+              name: 'CockroachDB: Storage [{#STORE}]: Bytes: System'
               type: DEPENDENT
               key: 'cockroachdb.node.storage.bytes.[{#STORE},system]'
               delay: '0'
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'Number of physical bytes stored in system key-value pairs (https://www.cockroachlabs.com/docs/v21.1/architecture/distribution-layer.html#table-data).'
+              description: 'Number of physical bytes stored in system key-value pairs.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -2409,7 +2228,7 @@ zabbix_export:
                   value: storage
             -
               uuid: 01c02c5a9c174cd2b958634da07824e5
-              name: 'CockroachDB: Storage {#STORE}: Capacity: Available'
+              name: 'CockroachDB: Storage [{#STORE}]: Capacity available'
               type: DEPENDENT
               key: 'cockroachdb.node.storage.capacity.[{#STORE},available]'
               delay: '0'
@@ -2432,7 +2251,7 @@ zabbix_export:
                   value: storage
             -
               uuid: bb07359b779d4e4080593a02c18dc8c1
-              name: 'CockroachDB: Storage {#STORE}: Capacity: Available in %'
+              name: 'CockroachDB: Storage [{#STORE}]: Capacity available in %'
               type: CALCULATED
               key: 'cockroachdb.node.storage.capacity.[{#STORE},available_percent]'
               history: 7d
@@ -2446,28 +2265,46 @@ zabbix_export:
                   value: storage
               trigger_prototypes:
                 -
-                  uuid: a58b694f4cf642228ec0633f0efb04a7
-                  expression: 'max(/CockroachDB node by HTTP/cockroachdb.node.storage.capacity.[{#STORE},available_percent],5m)<{$COCKROACHDB.STORE.USED.MIN.WARN}'
+                  uuid: db07663014aa47a892faa2f9dbd97ec9
+                  expression: 'max(/CockroachDB node by HTTP/cockroachdb.node.storage.capacity.[{#STORE},available_percent],5m) < {$COCKROACHDB.STORE.USED.MIN.CRIT}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/CockroachDB node by HTTP/cockroachdb.node.storage.capacity.[{#STORE},available_percent],5m)>{$COCKROACHDB.STORE.USED.MIN.WARN}'
-                  name: 'CockroachDB: Storage {#STORE}: Available storage capacity is low'
-                  event_name: 'CockroachDB: Storage {#STORE}: Available storage capacity is low (less than {$COCKROACHDB.STORE.USED.MIN.WARN}%)'
+                  recovery_expression: 'min(/CockroachDB node by HTTP/cockroachdb.node.storage.capacity.[{#STORE},available_percent],5m) > {$COCKROACHDB.STORE.USED.MIN.CRIT}'
+                  name: 'CockroachDB: Storage [{#STORE}]: Available storage capacity is critically low'
+                  event_name: 'CockroachDB: Storage [{#STORE}]: Available storage capacity is critically low (less than {$COCKROACHDB.STORE.USED.MIN.CRIT}%)'
+                  priority: AVERAGE
+                  description: 'Storage is running critically low on free space (less than {$COCKROACHDB.STORE.USED.MIN.CRIT}% available).'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                -
+                  uuid: a58b694f4cf642228ec0633f0efb04a7
+                  expression: 'max(/CockroachDB node by HTTP/cockroachdb.node.storage.capacity.[{#STORE},available_percent],5m) < {$COCKROACHDB.STORE.USED.MIN.WARN}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'min(/CockroachDB node by HTTP/cockroachdb.node.storage.capacity.[{#STORE},available_percent],5m) > {$COCKROACHDB.STORE.USED.MIN.WARN}'
+                  name: 'CockroachDB: Storage [{#STORE}]: Available storage capacity is low'
+                  event_name: 'CockroachDB: Storage [{#STORE}]: Available storage capacity is low (less than {$COCKROACHDB.STORE.USED.MIN.WARN}%)'
                   priority: WARNING
-                  description: 'Storage is running low on free space (less than {$COCKROACHDB.STORE.USED.MIN.WARN}% available)'
+                  description: 'Storage is running low on free space (less than {$COCKROACHDB.STORE.USED.MIN.WARN}% available).'
+                  dependencies:
+                    -
+                      name: 'CockroachDB: Storage [{#STORE}]: Available storage capacity is critically low'
+                      expression: 'max(/CockroachDB node by HTTP/cockroachdb.node.storage.capacity.[{#STORE},available_percent],5m) < {$COCKROACHDB.STORE.USED.MIN.CRIT}'
+                      recovery_expression: 'min(/CockroachDB node by HTTP/cockroachdb.node.storage.capacity.[{#STORE},available_percent],5m) > {$COCKROACHDB.STORE.USED.MIN.CRIT}'
                   tags:
                     -
                       tag: scope
                       value: capacity
             -
               uuid: 35ce626304fb4d39bd382161cb052346
-              name: 'CockroachDB: Storage {#STORE}: Capacity: Total'
+              name: 'CockroachDB: Storage [{#STORE}]: Capacity total'
               type: DEPENDENT
               key: 'cockroachdb.node.storage.capacity.[{#STORE},total]'
               delay: '0'
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'Total storage capacity. This value may be explicitly set using --store (https://www.cockroachlabs.com/docs/v21.1/cockroach-start.html#store). If a store size has not been set, this metric displays the actual disk capacity.'
+              description: 'Total storage capacity. This value may be explicitly set using --store. If a store size has not been set, this metric displays the actual disk capacity.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -2487,7 +2324,7 @@ zabbix_export:
                   value: storage
             -
               uuid: b6db680d16bc41408d13f7275c603fca
-              name: 'CockroachDB: Storage {#STORE}: Capacity: Used'
+              name: 'CockroachDB: Storage [{#STORE}]: Capacity used'
               type: DEPENDENT
               key: 'cockroachdb.node.storage.capacity.[{#STORE},used]'
               delay: '0'
@@ -2511,7 +2348,7 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: 4cd837e243f14174a6d259b359e4f90d
-              name: 'CockroachDB: Storage {#STORE}: Bytes'
+              name: 'CockroachDB: Storage [{#STORE}]: Bytes'
               graph_items:
                 -
                   color: 1A7C11
@@ -2526,7 +2363,7 @@ zabbix_export:
                     key: 'cockroachdb.node.storage.bytes.[{#STORE},system]'
             -
               uuid: f5054466f5834071ad9e3bd50764ba29
-              name: 'CockroachDB: Storage {#STORE}: Capacity'
+              name: 'CockroachDB: Storage [{#STORE}]: Capacity'
               graph_items:
                 -
                   color: 1A7C11
@@ -2547,7 +2384,7 @@ zabbix_export:
                     key: 'cockroachdb.node.storage.capacity.[{#STORE},used]'
             -
               uuid: e6763dafd3c54e0787eae612921e35f8
-              name: 'CockroachDB: Storage {#STORE}: Queue processing failures'
+              name: 'CockroachDB: Storage [{#STORE}]: Queue processing failures'
               graph_items:
                 -
                   color: 1A7C11
@@ -2598,7 +2435,7 @@ zabbix_export:
                     key: 'cockroachdb.node.queue.processing_failures.tsmaintenance.[{#STORE},rate]'
             -
               uuid: 0c4977666e5e4af1b5e1f840284fe7d0
-              name: 'CockroachDB: Storage {#STORE}: Ranges'
+              name: 'CockroachDB: Storage [{#STORE}]: Ranges'
               graph_items:
                 -
                   color: 1A7C11
@@ -2625,7 +2462,7 @@ zabbix_export:
                     key: 'cockroachdb.node.ranges.[{#STORE},underreplicated]'
             -
               uuid: 811d38ab09494628ae6ac36aa54c1795
-              name: 'CockroachDB: Storage {#STORE}: Replica quiescence'
+              name: 'CockroachDB: Storage [{#STORE}]: Replica quiescence'
               graph_items:
                 -
                   color: 1A7C11
@@ -2664,27 +2501,39 @@ zabbix_export:
         -
           macro: '{$COCKROACHDB.API.PORT}'
           value: '8080'
-          description: 'The port of CockroachDB API and Prometheus endpoint'
+          description: 'The port of CockroachDB API and Prometheus endpoint.'
         -
           macro: '{$COCKROACHDB.API.SCHEME}'
           value: http
-          description: 'Request scheme which may be http or https'
+          description: 'Request scheme which may be http or https.'
         -
           macro: '{$COCKROACHDB.CERT.CA.EXPIRY.WARN}'
           value: '90'
-          description: 'Number of days until the CA certificate expires'
+          description: 'Number of days until the CA certificate expires.'
         -
           macro: '{$COCKROACHDB.CERT.NODE.EXPIRY.WARN}'
           value: '30'
-          description: 'Number of days until the node certificate expires'
+          description: 'Number of days until the node certificate expires.'
+        -
+          macro: '{$COCKROACHDB.CLOCK.OFFSET.MAX.WARN}'
+          value: '300'
+          description: 'Maximum clock offset of the node against the rest of the cluster in milliseconds.'
         -
           macro: '{$COCKROACHDB.OPEN.FDS.MAX.WARN}'
           value: '80'
-          description: 'Maximum percentage of used file descriptors'
+          description: 'Maximum percentage of used file descriptors.'
+        -
+          macro: '{$COCKROACHDB.STATEMENTS.ERRORS.MAX.WARN}'
+          value: '2'
+          description: 'Maximum number of SQL statements errors for trigger expression.'
+        -
+          macro: '{$COCKROACHDB.STORE.USED.MIN.CRIT}'
+          value: '10'
+          description: 'The critical threshold of the available disk space in percent.'
         -
           macro: '{$COCKROACHDB.STORE.USED.MIN.WARN}'
-          value: '15'
-          description: 'The threshold of the minimal available disk space in percent'
+          value: '20'
+          description: 'The warning threshold of the available disk space in percent.'
       dashboards:
         -
           uuid: fda49a1847d34b84be2fe5d9d12b8444
@@ -2745,7 +2594,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'CockroachDB: Storage {#STORE}: Capacity'
+                        name: 'CockroachDB: Storage [{#STORE}]: Capacity'
                         host: 'CockroachDB node by HTTP'
                 -
                   type: GRAPH_CLASSIC
@@ -2838,7 +2687,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'CockroachDB: Storage {#STORE}: Ranges'
+                        name: 'CockroachDB: Storage [{#STORE}]: Ranges'
                         host: 'CockroachDB node by HTTP'
                 -
                   type: GRAPH_PROTOTYPE
@@ -2910,7 +2759,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'CockroachDB: Storage {#STORE}: Replica quiescence'
+                        name: 'CockroachDB: Storage [{#STORE}]: Replica quiescence'
                         host: 'CockroachDB node by HTTP'
         -
           uuid: 0d9a3feb76ad403dac7379dbe04298f0
@@ -3206,7 +3055,7 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CockroachDB: SQL: Statements'
+                        name: 'CockroachDB: SQL statements'
                         host: 'CockroachDB node by HTTP'
                 -
                   type: GRAPH_CLASSIC
@@ -3259,32 +3108,8 @@ zabbix_export:
                         key: cockroachdb.node.sql.statements.flows.active.rate
                         host: 'CockroachDB node by HTTP'
                 -
-                  type: GRAPH_PROTOTYPE
-                  'y': '20'
-                  width: '24'
-                  height: '5'
-                  fields:
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
-                    -
-                      type: INTEGER
-                      name: columns
-                      value: '1'
-                    -
-                      type: INTEGER
-                      name: rows
-                      value: '1'
-                    -
-                      type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        name: 'CockroachDB: SQL: Service latency percentile {#SINGLETON}'
-                        host: 'CockroachDB node by HTTP'
-                -
                   type: GRAPH_CLASSIC
-                  'y': '25'
+                  'y': '20'
                   width: '24'
                   height: '5'
                   fields:
@@ -3296,11 +3121,11 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CockroachDB: SQL: Transactions'
+                        name: 'CockroachDB: SQL transactions'
                         host: 'CockroachDB node by HTTP'
                 -
                   type: GRAPH_CLASSIC
-                  'y': '30'
+                  'y': '25'
                   width: '12'
                   height: '5'
                   fields:
@@ -3317,7 +3142,7 @@ zabbix_export:
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
-                  'y': '30'
+                  'y': '25'
                   width: '12'
                   height: '5'
                   fields:
@@ -3333,7 +3158,7 @@ zabbix_export:
                         host: 'CockroachDB node by HTTP'
                 -
                   type: GRAPH_CLASSIC
-                  'y': '35'
+                  'y': '30'
                   width: '24'
                   height: '5'
                   fields:
@@ -3374,7 +3199,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'CockroachDB: Storage {#STORE}: Capacity'
+                        name: 'CockroachDB: Storage [{#STORE}]: Capacity'
                         host: 'CockroachDB node by HTTP'
                 -
                   type: GRAPH_PROTOTYPE
@@ -3398,7 +3223,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'CockroachDB: Storage {#STORE}: Bytes'
+                        name: 'CockroachDB: Storage [{#STORE}]: Bytes'
                         host: 'CockroachDB node by HTTP'
                 -
                   type: GRAPH_PROTOTYPE
@@ -3516,14 +3341,14 @@ zabbix_export:
   triggers:
     -
       uuid: 8c2035ad44ea44b2b690b086d11e8cfc
-      expression: 'min(/CockroachDB node by HTTP/cockroachdb.node.descriptors.open,10m)/last(/CockroachDB node by HTTP/cockroachdb.node.descriptors.limit)*100>{$COCKROACHDB.OPEN.FDS.MAX.WARN}'
+      expression: 'min(/CockroachDB node by HTTP/cockroachdb.node.descriptors.open,10m) / last(/CockroachDB node by HTTP/cockroachdb.node.descriptors.limit) * 100 > {$COCKROACHDB.OPEN.FDS.MAX.WARN}'
       name: 'CockroachDB: Current number of open files is too high'
-      event_name: 'CockroachDB: Current number of open files is too high (over {$COCKROACHDB.OPEN.FDS.MAX.WARN} for 10m)'
+      event_name: 'CockroachDB: Current number of open files is too high (over {$COCKROACHDB.OPEN.FDS.MAX.WARN}% for 10m)'
       priority: WARNING
-      description: 'Getting close to open file descriptor limit'
+      description: 'Getting close to open file descriptor limit.'
     -
       uuid: b099e323ec974823bfd84317b152a1fb
-      expression: 'last(/CockroachDB node by HTTP/cockroachdb.node.sql.sessions)>0 and last(/CockroachDB node by HTTP/cockroachdb.node.sql.statements.executed.rate)=0'
+      expression: 'last(/CockroachDB node by HTTP/cockroachdb.node.sql.sessions) > 0 and last(/CockroachDB node by HTTP/cockroachdb.node.sql.statements.executed.rate) = 0'
       name: 'CockroachDB: Node is not executing SQL'
       priority: WARNING
       description: 'Node is not executing SQL despite having connections.'
@@ -3533,7 +3358,7 @@ zabbix_export:
           value: notice
     -
       uuid: 0d2fa3b6ea434a07867b9f4d6156ea81
-      expression: 'last(/CockroachDB node by HTTP/cockroachdb.node.get_readiness)=503 and last(/CockroachDB node by HTTP/cockroachdb.node.uptime)>5m'
+      expression: 'last(/CockroachDB node by HTTP/cockroachdb.node.get_readiness) = 503 and last(/CockroachDB node by HTTP/cockroachdb.node.uptime) > 5m'
       name: 'CockroachDB: Node is not ready'
       priority: AVERAGE
       description: |
@@ -3543,7 +3368,7 @@ zabbix_export:
       dependencies:
         -
           name: 'CockroachDB: Service is down'
-          expression: 'last(/CockroachDB node by HTTP/net.tcp.service["{$COCKROACHDB.API.SCHEME}","{HOST.CONN}","{$COCKROACHDB.API.PORT}"])=0'
+          expression: 'last(/CockroachDB node by HTTP/net.tcp.service["{$COCKROACHDB.API.SCHEME}","{HOST.CONN}","{$COCKROACHDB.API.PORT}"]) = 0'
       tags:
         -
           tag: scope
@@ -3611,7 +3436,7 @@ zabbix_export:
             key: cockroachdb.node.descriptors.open
     -
       uuid: 919586b301534623b16d5aadef0de5a6
-      name: 'CockroachDB: KV: Transactions'
+      name: 'CockroachDB: KV transactions'
       graph_items:
         -
           color: 1A7C11
@@ -3673,8 +3498,23 @@ zabbix_export:
             host: 'CockroachDB node by HTTP'
             key: cockroachdb.node.network.bytes.sent.rate
     -
+      uuid: b6f9d3cda4a5451da3d90107960e91b7
+      name: 'CockroachDB: SQL: Traffic'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'CockroachDB node by HTTP'
+            key: cockroachdb.node.sql.bytes.received.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'CockroachDB node by HTTP'
+            key: cockroachdb.node.sql.bytes.sent.rate
+    -
       uuid: 76bfd0743c63481db9793e3c55181bc9
-      name: 'CockroachDB: SQL: Statements'
+      name: 'CockroachDB: SQL statements'
       graph_items:
         -
           color: 1A7C11
@@ -3700,23 +3540,8 @@ zabbix_export:
             host: 'CockroachDB node by HTTP'
             key: cockroachdb.node.sql.statements.delete.rate
     -
-      uuid: b6f9d3cda4a5451da3d90107960e91b7
-      name: 'CockroachDB: SQL: Traffic'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'CockroachDB node by HTTP'
-            key: cockroachdb.node.sql.bytes.received.rate
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'CockroachDB node by HTTP'
-            key: cockroachdb.node.sql.bytes.sent.rate
-    -
       uuid: 53151cd0e61d487485f8d201c6881d59
-      name: 'CockroachDB: SQL: Transactions'
+      name: 'CockroachDB: SQL transactions'
       graph_items:
         -
           color: 1A7C11
