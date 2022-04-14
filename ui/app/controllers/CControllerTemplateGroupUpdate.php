@@ -27,8 +27,8 @@ class CControllerTemplateGroupUpdate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'groupid' => 			'fatal|required|db tplgrp.groupid',
-			'name' => 				'db tplgrp.name',
+			'groupid' => 			'fatal|required|db hstgrp.groupid',
+			'name' => 				'db hstgrp.name',
 			'subgroups' => 			'in 0,1'
 		];
 

@@ -22,11 +22,9 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
- * @backup tplgrp
  * @backup hstgrp
  * @backup hosts
  * @backup hosts_groups
- * @backup template_group
  * @backup valuemap
  *
  */
@@ -935,21 +933,21 @@ class testConfiguration extends CAPITest {
 							</template>
 							</templates>
 						</zabbix_export>',
-			'sql' => 'select * from tplgrp where name=\'API template group xml import as non Super Admin\'',
+			'sql' => 'select * from hstgrp where name=\'API template group xml import as non Super Admin\'',
 			'expected_error' => 'No permissions to call "templategroup.create".'
 			],
 			[
 				'format' => 'json',
 				'parameter' => 'template_groups',
 				'source' => '{"zabbix_export": {"version": "5.4","date": "2022-04-05T13:57:36Z","groups": [{"uuid": "1b086ec667184dff8015c7f7bb5c5978","name": "API template group xml import as non Super Admin"}],"templates": [{"uuid": "17e68f86419d40a18bb3b1d1a876d231","template": "API xml import template as non Super Admin","name": "API xml import template as non Super Admin","groups": [{"name": "API template group xml import as non Super Admin"}]}]}}',
-				'sql' => 'select * from tplgrp where name=\'API template group json import as non Super Admin\'',
+				'sql' => 'select * from hstgrp where name=\'API template group json import as non Super Admin\'',
 				'expected_error' => 'No permissions to call "templategroup.create".'
 			],
 			[
 				'format' => 'yaml',
 				'parameter' => 'template_groups',
 				'source' => "{zabbix_export: {version: '5.4', date: '2022-04-05T13:59:57Z', groups: [{uuid: 1b086ec667184dff8015c7f7bb5c5978, name: API template group xml import as non Super Admin}], templates: [{uuid: 17e68f86419d40a18bb3b1d1a876d231, template: API xml import template as non Super Admin, name: API xml import template as non Super Admin, groups: [{name: API template group xml import as non Super Admin}]}]}}",
-				'sql' => 'select * from tplgrp where name=\'API template group yaml import as non Super Admin\'',
+				'sql' => 'select * from hstgrp where name=\'API template group yaml import as non Super Admin\'',
 				'expected_error' => 'No permissions to call "templategroup.create".'
 			]
 		];

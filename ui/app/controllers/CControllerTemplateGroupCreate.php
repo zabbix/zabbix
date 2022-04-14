@@ -27,7 +27,7 @@ class CControllerTemplateGroupCreate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'name' => 			'db tplgrp.name',
+			'name' => 			'db hstgrp.name',
 			'subgroups' => 		'in 0,1'
 		];
 

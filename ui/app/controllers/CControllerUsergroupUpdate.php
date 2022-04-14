@@ -73,8 +73,7 @@ class CControllerUsergroupUpdate extends CController {
 		$user_group = [
 			'users' => zbx_toObject($this->getInput('userids', []), 'userid'),
 			'tag_filters' => $this->getInput('tag_filters', []),
-			'rights' => [],
-			'right_tplgrp' => []
+			'rights' => []
 		];
 
 		$this->getInputs($user_group, ['usrgrpid', 'name', 'users_status', 'gui_access', 'debug_mode']);
@@ -94,7 +93,7 @@ class CControllerUsergroupUpdate extends CController {
 
 		foreach ($templategroup_rights as $groupid => $group_right) {
 			if ($groupid != 0 && $group_right['permission'] != PERM_NONE) {
-				$user_group['right_tplgrp'][] = [
+				$user_group['rights'][] = [
 					'id' => (string) $groupid,
 					'permission' => $group_right['permission']
 				];

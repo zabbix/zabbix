@@ -27,7 +27,7 @@ class CControllerTemplateGroupDelete extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'groupids' => 'required|array_db tplgrp.groupid'
+			'groupids' => 'required|array_db hstgrp.groupid'
 		];
 
 		$ret = $this->validateInput($fields);

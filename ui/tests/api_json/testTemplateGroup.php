@@ -22,8 +22,8 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
- * @backup tplgrp
- * @backup template_group
+ * @backup hstgrp
+ * @backup hosts_groups
  */
 class testTemplateGroup extends CAPITest {
 	public static function templategroup_create() {
@@ -127,7 +127,7 @@ class testTemplateGroup extends CAPITest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['groupids'] as $key => $id) {
-				$dbResult = DBSelect('select * from tplgrp where groupid='.zbx_dbstr($id));
+				$dbResult = DBSelect('select * from hstgrp where groupid='.zbx_dbstr($id));
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['name'], $templategroup[$key]['name']);
 			}
@@ -214,10 +214,10 @@ class testTemplateGroup extends CAPITest {
 				'templategroup' => [
 					[
 						'groupid' => '52001',
-						'name' => 'API template group 2'
+						'name' => 'Templates'
 					]
 				],
-				'expected_error' => 'Template group "API template group 2" already exists.'
+				'expected_error' => 'Template group "Templates" already exists.'
 			],
 			[
 				'templategroup' => [
@@ -279,7 +279,7 @@ class testTemplateGroup extends CAPITest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['groupids'] as $key => $id) {
-				$dbResult = DBSelect('select * from tplgrp where groupid='.zbx_dbstr($id));
+				$dbResult = DBSelect('select * from hstgrp where groupid='.zbx_dbstr($id));
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['name'], $templategroups[$key]['name']);
 			}
@@ -378,7 +378,7 @@ class testTemplateGroup extends CAPITest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['groupids'] as $id) {
-				$this->assertEquals(0, CDBHelper::getCount('select * from tplgrp where groupid='.zbx_dbstr($id)));
+				$this->assertEquals(0, CDBHelper::getCount('select * from hstgrp where groupid='.zbx_dbstr($id)));
 			}
 		}
 	}
@@ -580,7 +580,7 @@ class testTemplateGroup extends CAPITest {
 			foreach ($result['result']['groupids'] as $key => $id) {
 				foreach($templategroup['templates'] as $templateid) {
 					$dbResult = DBSelect(
-						'select * from template_group where groupid=' . zbx_dbstr($id)
+						'select * from hosts_groups where groupid=' . zbx_dbstr($id)
 						.'and hostid=' .zbx_dbstr($templateid['templateid'])
 					);
 					$dbRow = DBFetch($dbResult);
@@ -709,14 +709,14 @@ class testTemplateGroup extends CAPITest {
 			foreach ($result['result']['groupids'] as $id) {
 				if (array_key_exists('templateid', $templategroup['templates'])) {
 					$dbResult = DBSelect(
-						'select * from template_group where groupid=' . zbx_dbstr($id)
+						'select * from hosts_groups where groupid=' . zbx_dbstr($id)
 						.'and hostid=' .zbx_dbstr($templategroup['templates']['templateid'])
 					);
 					$dbRow = DBFetch($dbResult);
 					$this->assertEquals($dbRow['groupid'], $templategroup['groups']['groupid']);
 				}
 				else {
-					$dbResult = DBSelect('select * from template_group where groupid=' . zbx_dbstr($id));
+					$dbResult = DBSelect('select * from hosts_groups where groupid=' . zbx_dbstr($id));
 					$dbRow = DBFetch($dbResult);
 					$this->assertEquals($dbRow['groupid'], false);
 				}
@@ -809,7 +809,7 @@ class testTemplateGroup extends CAPITest {
 			foreach ($result['result']['groupids'] as $key => $id) {
 				foreach($templategroup['templateids'] as $templateid) {
 					$dbResult = DBSelect(
-						'select * from template_group where groupid=' . zbx_dbstr($id)
+						'select * from hosts_groups where groupid=' . zbx_dbstr($id)
 						.'and hostid=' .zbx_dbstr($templateid)
 					);
 					$dbRow = DBFetch($dbResult);

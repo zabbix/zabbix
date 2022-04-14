@@ -34,7 +34,7 @@ class CTemplateGroup extends CApiService {
 		'massremove' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
-	protected $tableName = 'tplgrp';
+	protected $tableName = 'hstgrp';
 	protected $tableAlias = 'g';
 	protected $sortColumns = ['groupid', 'name'];
 
@@ -77,7 +77,7 @@ class CTemplateGroup extends CApiService {
 			'excludeSearch' =>						['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled' =>				['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', ['groupid', 'name', 'uuid']), 'default' => API_OUTPUT_EXTEND],
+			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', ['groupid', 'name', 'uuid', 'type']), 'default' => API_OUTPUT_EXTEND],
 			'selectTemplates' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $template_fields), 'default' => null],
 			'countOutput' =>						['type' => API_BOOLEAN, 'default' => false],
 			'groupCount' =>							['type' => API_BOOLEAN, 'default' => false],
@@ -97,9 +97,9 @@ class CTemplateGroup extends CApiService {
 		}
 
 		$sqlParts = [
-			'select'	=> ['tplgrp' => 'g.groupid'],
-			'from'		=> ['tplgrp' => 'tplgrp g'],
-			'where'		=> [],
+			'select'	=> ['hstgrp' => 'g.groupid'],
+			'from'		=> ['hstgrp' => 'hstgrp g'],
+			'where'		=> ['g.type='.HOST_GROUP_TYPE_TEMPLATE_GROUP],
 			'order'		=> []
 		];
 
@@ -110,7 +110,7 @@ class CTemplateGroup extends CApiService {
 
 			$sqlParts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
-				' FROM right_tplgrp r'.
+				' FROM rights r'.
 				' WHERE g.groupid=r.id'.
 					' AND '.dbConditionInt('r.groupid', $userGroups).
 				' GROUP BY r.id'.
@@ -126,27 +126,27 @@ class CTemplateGroup extends CApiService {
 
 		// templateids
 		if ($options['templateids'] !== null) {
-			$sqlParts['from']['template_group'] = 'template_group tg';
-			$sqlParts['where'][] = dbConditionInt('tg.hostid', $options['templateids']);
-			$sqlParts['where']['tgg'] = 'tg.groupid=g.groupid';
+			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['where'][] = dbConditionInt('hg.hostid', $options['templateids']);
+			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
 		}
 
 		// triggerids
 		if ($options['triggerids'] !== null) {
-			$sqlParts['from']['template_group'] = 'template_group tg';
+			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-			$sqlParts['where']['tgi'] = 'tg.hostid=i.hostid';
-			$sqlParts['where']['tgg'] = 'tg.groupid=g.groupid';
+			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
+			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
 		}
 
 		// graphids
 		if ($options['graphids'] !== null) {
 			$sqlParts['from']['gi'] = 'graphs_items gi';
 			$sqlParts['from']['i'] = 'items i';
-			$sqlParts['from']['tg'] = 'template_group tg';
+			$sqlParts['from']['hg'] = 'hosts_groups tg';
 			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
 			$sqlParts['where']['tgg'] = 'tg.groupid=g.groupid';
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
@@ -158,7 +158,7 @@ class CTemplateGroup extends CApiService {
 		// with_templates
 		if ($options['with_templates']) {
 			$sub_sql_common['from']['h'] = 'hosts h';
-			$sub_sql_common['where']['tg-h'] = 'tg.hostid=h.hostid';
+			$sub_sql_common['where']['hg-h'] = 'hg.hostid=h.hostid';
 			$sub_sql_common['where'][] = dbConditionInt('h.status', [HOST_STATUS_TEMPLATE]);
 		}
 
@@ -167,14 +167,14 @@ class CTemplateGroup extends CApiService {
 		// with_items, with_simple_graph_items
 		if ($options['with_items']) {
 			$sub_sql_parts['from']['i'] = 'items i';
-			$sub_sql_parts['where']['tg-i'] = 'tg.hostid=i.hostid';
+			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
 			$sub_sql_parts['where'][] = dbConditionInt('i.flags',
 				[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
 			);
 		}
 		elseif ($options['with_simple_graph_items']) {
 			$sub_sql_parts['from']['i'] = 'items i';
-			$sub_sql_parts['where']['tg-i'] = 'tg.hostid=i.hostid';
+			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
 			$sub_sql_parts['where'][] = dbConditionInt('i.value_type', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
 			$sub_sql_parts['where'][] = dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]);
 			$sub_sql_parts['where'][] = dbConditionInt('i.flags',
@@ -187,7 +187,7 @@ class CTemplateGroup extends CApiService {
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['from']['f'] = 'functions f';
 			$sub_sql_parts['from']['t'] = 'triggers t';
-			$sub_sql_parts['where']['tg-i'] = 'tg.hostid=i.hostid';
+			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
 			$sub_sql_parts['where']['i-f'] = 'i.itemid=f.itemid';
 			$sub_sql_parts['where']['f-t'] = 'f.triggerid=t.triggerid';
 			$sub_sql_parts['where'][] = dbConditionInt('t.flags',
@@ -198,7 +198,7 @@ class CTemplateGroup extends CApiService {
 		// with_httptests,
 		if ($options['with_httptests']) {
 			$sub_sql_parts['from']['ht'] = 'httptest ht';
-			$sub_sql_parts['where']['tg-ht'] = 'tg.hostid=ht.hostid';
+			$sub_sql_parts['where']['hg-ht'] = 'hg.hostid=ht.hostid';
 		}
 
 		// with_graphs
@@ -206,7 +206,7 @@ class CTemplateGroup extends CApiService {
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['from']['gi'] = 'graphs_items gi';
 			$sub_sql_parts['from']['gr'] = 'graphs gr';
-			$sub_sql_parts['where']['tg-i'] = 'tg.hostid=i.hostid';
+			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
 			$sub_sql_parts['where']['i-gi'] = 'i.itemid=gi.itemid';
 			$sub_sql_parts['where']['gi-gr'] = 'gi.graphid=gr.graphid';
 			$sub_sql_parts['where'][] = dbConditionInt('gr.flags',
@@ -215,8 +215,8 @@ class CTemplateGroup extends CApiService {
 		}
 
 		if ($sub_sql_parts) {
-			$sub_sql_parts['from']['tg'] = 'template_group tg';
-			$sub_sql_parts['where']['g-tg'] = 'g.groupid=tg.groupid';
+			$sub_sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sub_sql_parts['where']['g-hg'] = 'g.groupid=hg.groupid';
 
 			$sqlParts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
@@ -230,12 +230,12 @@ class CTemplateGroup extends CApiService {
 		// with_item_prototypes, with_simple_graph_item_prototypes
 		if ($options['with_item_prototypes']) {
 			$sub_sql_parts['from']['i'] = 'items i';
-			$sub_sql_parts['where']['tg-i'] = 'tg.hostid=i.hostid';
+			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
 			$sub_sql_parts['where'][] = dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 		}
 		elseif ($options['with_simple_graph_item_prototypes']) {
 			$sub_sql_parts['from']['i'] = 'items i';
-			$sub_sql_parts['where']['tg-i'] = 'tg.hostid=i.hostid';
+			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
 			$sub_sql_parts['where'][] = dbConditionInt('i.value_type', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
 			$sub_sql_parts['where'][] = dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]);
 			$sub_sql_parts['where'][] = dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]);
@@ -246,15 +246,15 @@ class CTemplateGroup extends CApiService {
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['from']['gi'] = 'graphs_items gi';
 			$sub_sql_parts['from']['gr'] = 'graphs gr';
-			$sub_sql_parts['where']['tg-i'] = 'tg.hostid=i.hostid';
+			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
 			$sub_sql_parts['where']['i-gi'] = 'i.itemid=gi.itemid';
 			$sub_sql_parts['where']['gi-gr'] = 'gi.graphid=gr.graphid';
 			$sub_sql_parts['where'][] = dbConditionInt('gr.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 		}
 
 		if ($sub_sql_parts) {
-			$sub_sql_parts['from']['tg'] = 'template_group tg';
-			$sub_sql_parts['where']['g-tg'] = 'g.groupid=tg.groupid';
+			$sub_sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sub_sql_parts['where']['g-hg'] = 'g.groupid=hg.groupid';
 
 			$sqlParts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
@@ -265,12 +265,12 @@ class CTemplateGroup extends CApiService {
 
 		// filter
 		if ($options['filter'] !== null) {
-			$this->dbFilter('tplgrp g', $options, $sqlParts);
+			$this->dbFilter('hstgrp g', $options, $sqlParts);
 		}
 
 		// search
 		if ($options['search'] !== null) {
-			zbx_db_search('tplgrp g', $options, $sqlParts);
+			zbx_db_search('hstgrp g', $options, $sqlParts);
 		}
 
 		// limit
@@ -321,7 +321,13 @@ class CTemplateGroup extends CApiService {
 
 		self::validateCreate($groups);
 
-		$groupids = DB::insert('tplgrp', $groups);
+		$ins_groups = [];
+
+		foreach ($groups as $group) {
+			$ins_groups[] = $group + ['type' => HOST_GROUP_TYPE_TEMPLATE_GROUP];
+		}
+
+		$groupids = DB::insert('hstgrp', $ins_groups);
 
 		foreach ($groups as $index => &$group) {
 			$group['groupid'] = $groupids[$index];
@@ -346,7 +352,7 @@ class CTemplateGroup extends CApiService {
 		$upd_groups = [];
 
 		foreach ($groups as $group) {
-			$upd_group = DB::getUpdatedValues('tplgrp', $group, $db_groups[$group['groupid']]);
+			$upd_group = DB::getUpdatedValues('hstgrp', $group, $db_groups[$group['groupid']]);
 
 			if ($upd_group) {
 				$upd_groups[] = [
@@ -366,7 +372,7 @@ class CTemplateGroup extends CApiService {
 		}
 
 		if ($upd_groups) {
-			DB::update('tplgrp', $upd_groups);
+			DB::update('hstgrp', $upd_groups);
 		}
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE_GROUP, $groups, $db_groups);
@@ -393,7 +399,7 @@ class CTemplateGroup extends CApiService {
 	public static function deleteForce(array $db_groups): void {
 		$groupids = array_keys($db_groups);
 
-		DB::delete('tplgrp', ['groupid' => $groupids]);
+		DB::delete('hstgrp', ['groupid' => $groupids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_TEMPLATE_GROUP, $db_groups);
 	}
@@ -408,7 +414,7 @@ class CTemplateGroup extends CApiService {
 	private static function validateCreate(array &$groups): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['name']], 'fields' => [
 			'uuid' =>	['type' => API_UUID],
-			'name' =>	['type' => API_TG_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('tplgrp', 'name')]
+			'name' =>	['type' => API_TG_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hstgrp', 'name')]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $groups, '/', $error)) {
@@ -428,7 +434,7 @@ class CTemplateGroup extends CApiService {
 	protected function validateUpdate(array &$groups, array &$db_groups = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid'], ['name']], 'fields' => [
 			'groupid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-			'name' =>					['type' => API_TG_NAME, 'length' => DB::getFieldLength('tplgrp', 'name')],
+			'name' =>					['type' => API_TG_NAME, 'length' => DB::getFieldLength('hstgrp', 'name')],
 			'propagate_permissions' =>	['type' => API_BOOLEAN]
 		]];
 
@@ -526,9 +532,9 @@ class CTemplateGroup extends CApiService {
 			return;
 		}
 
-		$duplicates = DB::select('tplgrp', [
+		$duplicates = DB::select('hstgrp', [
 			'output' => ['name'],
-			'filter' => ['name' => $names],
+			'filter' => ['name' => $names, 'type' => HOST_GROUP_TYPE_TEMPLATE_GROUP],
 			'limit' => 1
 		]);
 
@@ -556,7 +562,7 @@ class CTemplateGroup extends CApiService {
 		}
 		unset($group);
 
-		$db_uuid = DB::select('tplgrp', [
+		$db_uuid = DB::select('hstgrp', [
 			'output' => ['uuid'],
 			'filter' => ['uuid' => array_column($groups_to_create, 'uuid')],
 			'limit' => 1
@@ -616,7 +622,7 @@ class CTemplateGroup extends CApiService {
 			'output' => ['groupid', 'name'],
 			'filter' => ['name' => array_keys($parent_names)]
 		];
-		$result = DBselect(DB::makeSql('tplgrp', $options));
+		$result = DBselect(DB::makeSql('hstgrp', $options));
 
 		$parents_groupids = [];
 
@@ -676,10 +682,10 @@ class CTemplateGroup extends CApiService {
 				$db_usrgrps[$db_right['groupid']]['rights'] = [];
 			}
 
-			foreach ($group_links[$db_right['id']] as $tplgrpid) {
+			foreach ($group_links[$db_right['id']] as $hstgrpid) {
 				$usrgrps[$db_right['groupid']]['rights'][] = [
 					'permission' => $db_right['permission'],
-					'id' => $tplgrpid
+					'id' => $hstgrpid
 				];
 			}
 		}
@@ -699,7 +705,7 @@ class CTemplateGroup extends CApiService {
 		$ins_templates_groups = self::getInsTemplatesGroups($groups, __FUNCTION__);
 
 		if ($ins_templates_groups) {
-			$ids = DB::insertBatch('template_group', $ins_templates_groups);
+			$ids = DB::insertBatch('hosts_groups', $ins_templates_groups);
 			self::addTemplategroupids($groups, $ids);
 		}
 
@@ -723,12 +729,12 @@ class CTemplateGroup extends CApiService {
 		$del_templategroupids = self::getDelTemplategroupids($db_groups, $db_templategroupids);
 
 		if ($ins_template_groups) {
-			$ids = DB::insertBatch('template_group', $ins_template_groups);
+			$ids = DB::insertBatch('hosts_groups', $ins_template_groups);
 			self::addTemplategroupids($groups, $ids);
 		}
 
 		if ($del_templategroupids) {
-			DB::delete('template_group', ['templategroupid' => $del_templategroupids]);
+			DB::delete('hosts_groups', ['hostgroupid' => $del_templategroupids]);
 		}
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE_GROUP, $groups, $db_groups);
@@ -750,7 +756,7 @@ class CTemplateGroup extends CApiService {
 		$del_templategroupids = self::getDelTemplategroupids($db_groups);
 
 		if ($del_templategroupids) {
-			DB::delete('template_group', ['templategroupid' => $del_templategroupids]);
+			DB::delete('hosts_groups', ['hostgroupid' => $del_templategroupids]);
 		}
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE_GROUP, $groups, $db_groups);
@@ -921,7 +927,7 @@ class CTemplateGroup extends CApiService {
 
 		$templateids_with_groups = DBfetchColumn(DBselect(
 			'SELECT DISTINCT tg.hostid'.
-			' FROM template_group tg'.
+			' FROM hosts_groups tg'.
 			' WHERE '.dbConditionInt('tg.groupid', $groupids, true).
 				' AND '.dbConditionInt('tg.hostid', $templateids)
 		), 'hostid');
@@ -960,18 +966,18 @@ class CTemplateGroup extends CApiService {
 
 		if ($templateids) {
 			$options = [
-				'output' => ['templategroupid', 'hostid', 'groupid'],
+				'output' => ['hostgroupid', 'hostid', 'groupid'],
 				'filter' => [
 					'hostid' => $templateids,
 					'groupid' => array_keys($db_groups)
 				]
 			];
-			$db_template_groups = DBselect(DB::makeSql('template_group', $options));
+			$db_template_groups = DBselect(DB::makeSql('hosts_groups', $options));
 		}
 		else {
 			$db_template_groups = DBselect(
-				'SELECT tg.templategroupid,tg.hostid,tg.groupid'.
-				' FROM template_group tg,hosts h'.
+				'SELECT tg.hostgroupid,tg.hostid,tg.groupid'.
+				' FROM hosts_groups tg,hosts h'.
 				' WHERE tg.hostid=h.hostid'.
 					' AND '.dbConditionInt('tg.groupid', array_keys($db_groups)).
 					' AND h.flags='.ZBX_FLAG_DISCOVERY_NORMAL
@@ -979,8 +985,8 @@ class CTemplateGroup extends CApiService {
 		}
 
 		while ($link = DBfetch($db_template_groups)) {
-			$db_groups[$link['groupid']]['templates'][$link['templategroupid']] = [
-				'templategroupid' => $link['templategroupid'],
+			$db_groups[$link['groupid']]['templates'][$link['hostgroupid']] = [
+				'hostgroupid' => $link['hostgroupid'],
 				'templateid' => $link['hostid']
 			];
 
@@ -1076,14 +1082,14 @@ class CTemplateGroup extends CApiService {
 
 		foreach ($groups as $group) {
 			foreach ($group['templates'] as $template) {
-				if (!array_key_exists('templategroupid', $template)) {
+				if (!array_key_exists('hostgroupid', $template)) {
 					$ins_templates_groups[] = [
 						'hostid' => $template['templateid'],
 						'groupid' => $group['groupid']
 					];
 				}
 				elseif ($method === 'massUpdate') {
-					$db_templategroupids[$template['templategroupid']] = true;
+					$db_templategroupids[$template['hostgroupid']] = true;
 				}
 			}
 		}
@@ -1100,8 +1106,8 @@ class CTemplateGroup extends CApiService {
 	private static function addTemplategroupids(array &$groups, array $ids): void {
 		foreach ($groups as &$group) {
 			foreach ($group['templates'] as &$template) {
-				if (!array_key_exists('templategroupid', $template)) {
-					$template['templategroupid'] = array_shift($ids);
+				if (!array_key_exists('hostgroupid', $template)) {
+					$template['hostgroupid'] = array_shift($ids);
 				}
 			}
 			unset($template);
@@ -1141,7 +1147,7 @@ class CTemplateGroup extends CApiService {
 		if ($options['selectTemplates'] !== null) {
 			if ($options['selectTemplates'] !== API_OUTPUT_COUNT) {
 				$templates = [];
-				$relationMap = $this->createRelationMap($result, 'groupid', 'hostid', 'template_group');
+				$relationMap = $this->createRelationMap($result, 'groupid', 'hostid', 'hosts_groups');
 				$related_ids = $relationMap->getRelatedIds();
 
 				if ($related_ids) {
@@ -1184,13 +1190,13 @@ class CTemplateGroup extends CApiService {
 
 		$usrgrps = API::UserGroup()->get([
 			'output' => ['usrgrpid'],
-			'selectRightsTplgrp' => ['id', 'permission']
+			'selectRights' => ['id', 'permission']
 		]);
 
 		$upd_usrgrps = [];
 
 		foreach ($usrgrps as $usrgrp) {
-			$rights = zbx_toHash($usrgrp['right_tplgrp'], 'id');
+			$rights = zbx_toHash($usrgrp['rights'], 'id');
 
 			if (array_key_exists($groupid, $rights)) {
 				foreach ($child_groupids as $child_groupid) {
@@ -1208,10 +1214,10 @@ class CTemplateGroup extends CApiService {
 
 			$rights = array_values($rights);
 
-			if ($usrgrp['right_tplgrp'] !== $rights) {
+			if ($usrgrp['rights'] !== $rights) {
 				$upd_usrgrps[] = [
 					'usrgrpid' => $usrgrp['usrgrpid'],
-					'right_tplgrp' => $rights
+					'rights' => $rights
 				];
 			}
 		}

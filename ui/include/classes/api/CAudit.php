@@ -133,7 +133,7 @@ class CAudit {
 		self::RESOURCE_SLA => 'sla',
 		self::RESOURCE_TEMPLATE => 'hosts',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'dashboard',
-		self::RESOURCE_TEMPLATE_GROUP => 'tplgrp',
+		self::RESOURCE_TEMPLATE_GROUP => 'hstgrp',
 		self::RESOURCE_USER => 'users',
 		self::RESOURCE_USER_GROUP => 'usrgrp'
 	];
@@ -297,6 +297,7 @@ class CAudit {
 		'dashboard.pages.widgets' => 'widget',
 		'dashboard.pages.widgets.fields' => 'widget_field',
 		'hostgroup.hosts' => 'hosts_groups',
+		'hostgroup.templates' => 'hosts_groups',
 		'hostprototype.groupLinks' => 'group_prototype',
 		'hostprototype.groupPrototypes' => 'group_prototype',
 		'hostprototype.interfaces' => 'interface',
@@ -325,7 +326,7 @@ class CAudit {
 		'sla.schedule' => 'sla_schedule',
 		'sla.excluded_downtimes' => 'sla_excluded_downtime',
 		'script.parameters' => 'script_param',
-		'template.groups' => 'template_group',
+		'template.groups' => 'hosts_groups',
 		'template.macros' => 'hostmacro',
 		'template.tags' => 'host_tag',
 		'template.templates' => 'hosts_templates',
@@ -333,11 +334,10 @@ class CAudit {
 		'templatedashboard.pages' => 'dashboard_page',
 		'templatedashboard.pages.widgets' => 'widget',
 		'templatedashboard.pages.widgets.fields' => 'widget_field',
-		'templategroup.templates' => 'template_group',
+		'templategroup.templates' => 'hosts_groups',
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups',
 		'usergroup.rights' => 'rights',
-		'usergroup.right_tplgrp' => 'right_tplgrp',
 		'usergroup.tag_filters' => 'tag_filter',
 		'usergroup.users' => 'users_groups'
 	];
@@ -402,7 +402,7 @@ class CAudit {
 		'sla.service_tags' => 'sla_service_tagid',
 		'sla.schedule' => 'sla_scheduleid',
 		'sla.excluded_downtimes' => 'sla_excluded_downtimeid',
-		'template.groups' => 'templategroupid',
+		'template.groups' => 'hostgroupid',
 		'template.macros' => 'hostmacroid',
 		'template.tags' => 'hosttagid',
 		'template.templates' => 'hosttemplateid',
@@ -410,11 +410,10 @@ class CAudit {
 		'templatedashboard.pages' => 'dashboard_pageid',
 		'templatedashboard.pages.widgets' => 'widgetid',
 		'templatedashboard.pages.widgets.fields' => 'widget_fieldid',
-		'templategroup.templates' => 'templategroupid',
+		'templategroup.templates' => 'hostgroupid',
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
 		'usergroup.rights' => 'rightid',
-		'usergroup.right_tplgrp' => 'rightid',
 		'usergroup.tag_filters' => 'tag_filterid',
 		'usergroup.users' => 'id'
 	];

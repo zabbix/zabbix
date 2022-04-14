@@ -243,16 +243,13 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	/**
-	 * Update table "hosts_groups" and populate hosts.groups by "hostgroupid" property or update table "template_group
-	 * and populate template.groups by "templategroupid".
+	 * Update table "hosts_groups" and populate hosts.groups by "hostgroupid" property.
 	 *
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
 	 */
 	protected function updateGroups(array &$hosts, array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-		$groupid_field_name = $this instanceof CTemplate ? 'templategroupid' : 'hostgroupid';
-		$table_name = $this instanceof CTemplate ? 'template_group' : 'hosts_groups';
 
 		$ins_groups = [];
 		$del_groupids = [];
@@ -268,7 +265,7 @@ abstract class CHostGeneral extends CHostBase {
 
 			foreach ($host['groups'] as &$group) {
 				if (array_key_exists($group['groupid'], $db_groups)) {
-					$group[$groupid_field_name] = $db_groups[$group['groupid']][$groupid_field_name];
+					$group['hostgroupid'] = $db_groups[$group['groupid']]['hostgroupid'];
 					unset($db_groups[$group['groupid']]);
 				}
 				else {
@@ -280,16 +277,16 @@ abstract class CHostGeneral extends CHostBase {
 			}
 			unset($group);
 
-			$del_groupids = array_merge($del_groupids, array_column($db_groups, $groupid_field_name));
+			$del_groupids = array_merge($del_groupids, array_column($db_groups, 'hostgroupid'));
 		}
 		unset($host);
 
 		if ($del_groupids) {
-			DB::delete($table_name, [$groupid_field_name => $del_groupids]);
+			DB::delete('hosts_groups', ['hostgroupid' => $del_groupids]);
 		}
 
 		if ($ins_groups) {
-			$groupids = DB::insertBatch($table_name, $ins_groups);
+			$groupids = DB::insertBatch('hosts_groups', $ins_groups);
 		}
 
 		foreach ($hosts as &$host) {
@@ -298,8 +295,8 @@ abstract class CHostGeneral extends CHostBase {
 			}
 
 			foreach ($host['groups'] as &$group) {
-				if (!array_key_exists($groupid_field_name, $group)) {
-					$group[$groupid_field_name] = array_shift($groupids);
+				if (!array_key_exists('hostgroupid', $group)) {
+					$group['hostgroupid'] = array_shift($groupids);
 				}
 			}
 			unset($group);
@@ -1383,15 +1380,14 @@ abstract class CHostGeneral extends CHostBase {
 
 		// adding groups
 		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'hostid', 'groupid', 'hosts_groups');
 			if ($this instanceof CTemplate) {
-				$relationMap = $this->createRelationMap($result, 'hostid', 'groupid', 'template_group');
 				$groups = API::TemplateGroup()->get([
 					'output' => $options['selectGroups'],
 					'groupids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				]);
 			} else {
-				$relationMap = $this->createRelationMap($result, 'hostid', 'groupid', 'hosts_groups');
 				$groups = API::HostGroup()->get([
 					'output' => $options['selectGroups'],
 					'groupids' => $relationMap->getRelatedIds(),
@@ -1750,8 +1746,6 @@ abstract class CHostGeneral extends CHostBase {
 	 */
 	protected function addAffectedGroups(array $hosts, array &$db_hosts): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-		$groupid_field_name = $this instanceof CTemplate ? 'templategroupid' : 'hostgroupid';
-		$table_name = $this instanceof CTemplate ? 'template_group' : 'hosts_groups';
 
 		$hostids = [];
 
@@ -1788,13 +1782,13 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		$options = [
-			'output' => [$groupid_field_name, 'hostid', 'groupid'],
+			'output' => ['hostgroupid', 'hostid', 'groupid'],
 			'filter' => $filter
 		];
-		$db_groups = DBselect(DB::makeSql($table_name, $options));
+		$db_groups = DBselect(DB::makeSql('hosts_groups', $options));
 
 		while ($db_group = DBfetch($db_groups)) {
-			$db_hosts[$db_group['hostid']]['groups'][$db_group[$groupid_field_name]] =
+			$db_hosts[$db_group['hostid']]['groups'][$db_group['hostgroupid']] =
 				array_diff_key($db_group, array_flip(['hostid']));
 		}
 	}
@@ -1808,8 +1802,6 @@ abstract class CHostGeneral extends CHostBase {
 	 */
 	protected function massAddAffectedObjects(string $objects, array $objectids, array &$db_hosts): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-		$groupid_field_name = $this instanceof CTemplate ? 'templategroupid' : 'hostgroupid';
-		$table_name = $this instanceof CTemplate ? 'template_group' : 'hosts_groups';
 
 		foreach ($db_hosts as &$db_host) {
 			$db_host[$objects] = [];
@@ -1842,13 +1834,13 @@ abstract class CHostGeneral extends CHostBase {
 			}
 
 			$options = [
-				'output' => [$groupid_field_name, 'hostid', 'groupid'],
+				'output' => ['hostgroupid', 'hostid', 'groupid'],
 				'filter' => $filter
 			];
-			$db_groups = DBselect(DB::makeSql($table_name, $options));
+			$db_groups = DBselect(DB::makeSql('hosts_groups', $options));
 
 			while ($link = DBfetch($db_groups)) {
-				$db_hosts[$link['hostid']]['groups'][$link[$groupid_field_name]] =
+				$db_hosts[$link['hostid']]['groups'][$link['hostgroupid']] =
 					array_diff_key($link, array_flip(['hostid']));
 			}
 		}

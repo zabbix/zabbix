@@ -27,7 +27,7 @@ class CControllerPopupHostGroupEdit extends CController{
 
 	protected function checkInput(): bool {
 		$fields = [
-			'groupid' =>			'db tplgrp.groupid',
+			'groupid' =>			'db hstgrp.groupid',
 			'subgroups' =>			'in 0,1'
 		];
 

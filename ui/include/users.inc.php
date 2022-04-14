@@ -189,7 +189,9 @@ function getHostGroupsRights(array $usrgrpids = []) {
 		);
 
 		while ($db_right = DBfetch($db_rights)) {
-			$groups_rights[$db_right['groupid']]['permission'] = $db_right['permission'];
+			if (array_key_exists($db_right['groupid'], $groups_rights)) {
+				$groups_rights[$db_right['groupid']]['permission'] = $db_right['permission'];
+			}
 		}
 	}
 
@@ -225,13 +227,15 @@ function getTemplateGroupsRights(array $usrgrpids = []) {
 		$db_rights = DBselect(
 			'SELECT r.id AS groupid,'.
 			'CASE WHEN MIN(r.permission)='.PERM_DENY.' THEN '.PERM_DENY.' ELSE MAX(r.permission) END AS permission'.
-			' FROM right_tplgrp r'.
+			' FROM rights r'.
 			' WHERE '.dbConditionInt('r.groupid', $usrgrpids).
 			' GROUP BY r.id'
 		);
 
 		while ($db_right = DBfetch($db_rights)) {
-			$groups_rights[$db_right['groupid']]['permission'] = $db_right['permission'];
+			if (array_key_exists($db_right['groupid'], $groups_rights)) {
+				$groups_rights[$db_right['groupid']]['permission'] = $db_right['permission'];
+			}
 		}
 	}
 
