@@ -122,7 +122,7 @@ static duk_ret_t	es_md5(duk_context *ctx)
 
 	str = duk_require_lstring(ctx, 0, &len);
 
-	 md5sum = (char *)zbx_malloc(NULL, MD5_DIGEST_SIZE * 2 + 1);
+	md5sum = (char *)zbx_malloc(NULL, MD5_DIGEST_SIZE * 2 + 1);
 
 	zbx_md5_init(&state);
 	zbx_md5_append(&state, (const md5_byte_t *)str, (int)len);
