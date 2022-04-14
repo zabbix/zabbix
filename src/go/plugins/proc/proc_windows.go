@@ -165,16 +165,14 @@ type procStatus struct {
 	CpuTimeUser   float64  `json:"cputime_user"`
 	CpuTimeSystem float64  `json:"cputime_system"`
 	Threads       uint32   `json:"threads"`
-	PageFaults    uint32   `json:"page_faults"`
-	Handles       int32    `json:"handles"`
-	IoReadsB      uint64   `json:"io_read_b"`
-	IoWritesB     uint64   `json:"io_write_b"`
-	IoReadsOp     uint64   `json:"io_read_op"`
-	IoWritesOp    uint64   `json:"io_write_op"`
-	IoOtherB      uint64   `json:"io_other_b"`
-	IoOtherOp     uint64   `json:"io_other_op"`
-	GdiObj	      uint32   `json:"gdiobj"`
-	UserObj       uint32   `json:"userobj"`
+	PageFaults    int64   `json:"page_faults"`
+	Handles       int64    `json:"handles"`
+	IoReadsB      int64   `json:"io_read_b"`
+	IoWritesB     int64   `json:"io_write_b"`
+	IoReadsOp     int64   `json:"io_read_op"`
+	IoWritesOp    int64   `json:"io_write_op"`
+	IoOtherB      int64   `json:"io_other_b"`
+	IoOtherOp     int64   `json:"io_other_op"`
 }
 
 type procSummary struct {
@@ -185,16 +183,14 @@ type procSummary struct {
 	CpuTimeUser   float64 `json:"cputime_user"`
 	CpuTimeSystem float64 `json:"cputime_system"`
 	Threads       uint32  `json:"threads"`
-	PageFaults    uint32  `json:"page_faults"`
-	Handles       int32   `json:"handles"`
-	IoReadsB      uint64  `json:"io_read_b"`
-	IoWritesB     uint64  `json:"io_write_b"`
-	IoReadsOp     uint64  `json:"io_read_op"`
-	IoWritesOp    uint64  `json:"io_write_op"`
-	IoOtherB      uint64  `json:"io_other_b"`
-	IoOtherOp     uint64  `json:"io_other_op"`
-	GdiObj        uint32  `json:"gdiobj"`
-	UserObj       uint32  `json:"userobj"`
+	PageFaults    int64  `json:"page_faults"`
+	Handles       int64   `json:"handles"`
+	IoReadsB      int64  `json:"io_read_b"`
+	IoWritesB     int64  `json:"io_write_b"`
+	IoReadsOp     int64  `json:"io_read_op"`
+	IoWritesOp    int64  `json:"io_write_op"`
+	IoOtherB      int64  `json:"io_other_b"`
+	IoOtherOp     int64  `json:"io_other_op"`
 }
 
 type thread struct {
@@ -425,8 +421,8 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 
 		if userName != "" {
 			var uname string
-			if uname, err = getProcessUsername(pe.ProcessID); err == nil &&
-				strings.ToUpper(uname) != userName {
+			uname, err = getProcessUsername(pe.ProcessID)
+			if strings.ToUpper(uname) != userName {
 				continue
 			}
 		}
@@ -441,22 +437,33 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 		defer syscall.CloseHandle(h)
 
 		if count, err := win32.GetProcessHandleCount(h); err == nil {
-			proc.Handles = count
+			proc.Handles = int64(count)
+		} else {
+			proc.Handles = -1
 		}
 
 		if m, err := win32.GetProcessMemoryInfo(h); err == nil {
 			proc.Vmsize = float64(m.PagefileUsage) / 1024
 			proc.Wkset = float64(m.WorkingSetSize) / 1024
-			proc.PageFaults = m.PageFaultCount
+			proc.PageFaults = int64(m.PageFaultCount)
+		} else {
+			proc.PageFaults = -1
 		}
 
 		if ioc, err := win32.GetProcessIoCounters(h); err == nil {
-			proc.IoReadsB = ioc.ReadTransferCount
-			proc.IoWritesB = ioc.WriteTransferCount
-			proc.IoOtherB = ioc.OtherTransferCount
-			proc.IoReadsOp = ioc.ReadOperationCount
-			proc.IoWritesOp = ioc.WriteOperationCount
-			proc.IoOtherOp = ioc.OtherOperationCount
+			proc.IoReadsB = int64(ioc.ReadTransferCount)
+			proc.IoWritesB = int64(ioc.WriteTransferCount)
+			proc.IoOtherB = int64(ioc.OtherTransferCount)
+			proc.IoReadsOp = int64(ioc.ReadOperationCount)
+			proc.IoWritesOp = int64(ioc.WriteOperationCount)
+			proc.IoOtherOp = int64(ioc.OtherOperationCount)
+		} else {
+			proc.IoReadsB = -1
+			proc.IoWritesB = -1
+			proc.IoOtherB = -1
+			proc.IoReadsOp = -1
+			proc.IoWritesOp = -1
+			proc.IoOtherOp = -1
 		}
 
 		var creationTime, exitTime, kernelTime, userTime syscall.Filetime
@@ -464,9 +471,6 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 			proc.CpuTimeUser = float64(uint64(userTime.HighDateTime)<<32 | uint64(userTime.LowDateTime)) / 1e7
 			proc.CpuTimeSystem = float64(uint64(kernelTime.HighDateTime)<<32 | uint64(kernelTime.LowDateTime)) / 1e7
 		}
-
-		proc.GdiObj = win32.GetGuiResources(h, win32.GR_GDIOBJECTS)
-		proc.UserObj = win32.GetGuiResources(h, win32.GR_USEROBJECTS)
 
 		array = append(array, proc)
 		pids = append(pids, pe.ProcessID)
@@ -507,28 +511,27 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 				proc.CpuTimeUser, proc.CpuTimeSystem, proc.Threads,
 				proc.PageFaults, proc.Handles, proc.IoReadsB,
 				proc.IoWritesB, proc.IoReadsOp, proc.IoWritesOp,
-				proc.IoOtherB, proc.IoOtherOp, proc.GdiObj, proc.UserObj}
+				proc.IoOtherB, proc.IoOtherOp}
 
 			if len(array) > i + 1 {
 				for _, procCmp := range array[i + 1:] {
-					if procCmp.Name == proc.Name {
-						procSum.Processes++
-						procSum.Vmsize += procCmp.Vmsize
-						procSum.Wkset += procCmp.Wkset
-						procSum.CpuTimeUser += procCmp.CpuTimeUser
-						procSum.CpuTimeSystem += procCmp.CpuTimeSystem
-						procSum.Threads += procCmp.Threads
-						procSum.PageFaults += procCmp.PageFaults
-						procSum.Handles += procCmp.Handles
-						procSum.IoReadsB += procCmp.IoReadsB
-						procSum.IoWritesB += procCmp.IoWritesB
-						procSum.IoReadsOp += procCmp.IoReadsOp
-						procSum.IoWritesOp += procCmp.IoWritesOp
-						procSum.IoOtherB += procCmp.IoOtherB
-						procSum.IoOtherOp += procCmp.IoOtherOp
-						procSum.GdiObj += procCmp.GdiObj
-						procSum.UserObj += procCmp.UserObj
+					if procCmp.Name != proc.Name {
+						continue
 					}
+					procSum.Processes++
+					procSum.Vmsize += procCmp.Vmsize
+					procSum.Wkset += procCmp.Wkset
+					procSum.CpuTimeUser += procCmp.CpuTimeUser
+					procSum.CpuTimeSystem += procCmp.CpuTimeSystem
+					procSum.Threads += procCmp.Threads
+					addNonNegative(&procSum.PageFaults, procCmp.PageFaults)
+					addNonNegative(&procSum.Handles, procCmp.Handles)
+					addNonNegative(&procSum.IoReadsB, procCmp.IoReadsB)
+					addNonNegative(&procSum.IoWritesB, procCmp.IoWritesB)
+					addNonNegative(&procSum.IoOtherB, procCmp.IoOtherB)
+					addNonNegative(&procSum.IoReadsOp, procCmp.IoReadsOp)
+					addNonNegative(&procSum.IoWritesOp, procCmp.IoWritesOp)
+					addNonNegative(&procSum.IoOtherOp, procCmp.IoOtherOp)
 				}
 			}
 			processed = append(processed, proc.Name)
@@ -546,6 +549,13 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 	}
 
 	return string(jsonArray), nil
+}
+
+func addNonNegative(dst *int64, val int64) () {
+	if val != -1 {
+		*dst += val
+	}
+	return
 }
 
 // Export -
