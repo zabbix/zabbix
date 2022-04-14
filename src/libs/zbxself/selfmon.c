@@ -23,8 +23,8 @@
 #include "common.h"
 
 #ifndef _WINDOWS
-#	include "mutexs.h"
-#	include "ipc.h"
+#	include "zbxmutexs.h"
+#	include "zbxnix.h"
 #	include "log.h"
 
 #	define MAX_HISTORY	60

@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxalgo.h"
+
 #include "common.h"
 #include "log.h"
-
-#include "zbxalgo.h"
 
 #define DB_INFINITY	(1e12 - 1e-4)
 

@@ -20,7 +20,7 @@
 #ifndef ZABBIX_DATASENDER_H
 #define ZABBIX_DATASENDER_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 extern int	CONFIG_PROXYDATA_FREQUENCY;
 

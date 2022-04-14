@@ -20,10 +20,10 @@
 #include "log.h"
 #include "db.h"
 
-#include "../../libs/zbxaudit/audit.h"
-#include "../../libs/zbxaudit/audit_item.h"
-#include "../../libs/zbxaudit/audit_graph.h"
-#include "../../libs/zbxaudit/audit_trigger.h"
+#include "audit/zbxaudit.h"
+#include "audit/zbxaudit_item.h"
+#include "audit/zbxaudit_graph.h"
+#include "audit/zbxaudit_trigger.h"
 
 void	lld_field_str_rollback(char **field, char **field_orig, zbx_uint64_t *flags, zbx_uint64_t flag)
 {
@@ -96,12 +96,12 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 				}
 				else if (0 == strcmp(table, "graph_discovery"))
 				{
-					zbx_audit_graph_create_entry(AUDIT_ACTION_DELETE, id, name,
+					zbx_audit_graph_create_entry(ZBX_AUDIT_ACTION_DELETE, id, name,
 							(int)ZBX_FLAG_DISCOVERY_CREATED);
 				}
 				else if (0 == strcmp(table, "trigger_discovery"))
 				{
-					zbx_audit_trigger_create_entry(AUDIT_ACTION_DELETE, id, name,
+					zbx_audit_trigger_create_entry(ZBX_AUDIT_ACTION_DELETE, id, name,
 							ZBX_FLAG_DISCOVERY_CREATED);
 				}
 			}

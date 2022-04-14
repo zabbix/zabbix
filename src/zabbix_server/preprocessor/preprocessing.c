@@ -24,7 +24,6 @@
 #include "zbxserialize.h"
 #include "preproc_history.h"
 #include "item_preproc.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
 
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1

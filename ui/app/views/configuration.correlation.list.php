@@ -30,16 +30,13 @@ if ($data['uncheck']) {
 $widget = (new CWidget())
 	->setTitle(_('Event correlation'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_CORRELATION_LIST))
-	->setControls((new CTag('nav', true,
-		(new CForm('get'))
-			->cleanItems()
-			->addItem((new CList())
-				->addItem(new CRedirectButton(_('Create correlation'), (new CUrl('zabbix.php'))
-					->setArgument('action', 'correlation.edit'))
-				)
-			)
-		))
-			->setAttribute('aria-label', _('Content controls'))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(new CRedirectButton(_('Create correlation'),
+					(new CUrl('zabbix.php'))->setArgument('action', 'correlation.edit')
+				))
+		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter())
 		->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'correlation.list'))

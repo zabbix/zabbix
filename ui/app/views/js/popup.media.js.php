@@ -67,8 +67,11 @@ function validateMedia(overlay) {
 		success: function(ret) {
 			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 
-			if (typeof ret.errors !== 'undefined') {
-				jQuery(ret.errors).insertBefore($form);
+			if ('error' in ret) {
+				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);
+
+				message_box.insertBefore($form);
+
 				overlay.unsetLoading();
 			}
 			else {

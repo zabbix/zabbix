@@ -42,9 +42,13 @@ class CControllerDashboardShareUpdate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData([
-				'main_block' => json_encode(['errors' => getMessages()->toString()])
-			]));
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
 		}
 
 		return $ret;
@@ -52,7 +56,7 @@ class CControllerDashboardShareUpdate extends CController {
 
 	protected function checkPermissions() {
 		return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)
-				&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+			&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 	}
 
 	protected function doAction() {
@@ -62,7 +66,6 @@ class CControllerDashboardShareUpdate extends CController {
 			'editable' => true
 		]);
 
-		$msg_box_title = null;
 		if ($editable_dashboard) {
 			$dashboard = ['dashboardid' => $this->getInput('dashboardid')];
 
@@ -89,22 +92,26 @@ class CControllerDashboardShareUpdate extends CController {
 			}
 
 			$result = (bool) API::Dashboard()->update($dashboard);
-
-			if ($result) {
-				$msg_box_title = _('Dashboard updated');
-			}
 		}
 		else {
 			error(_('No permissions to referred object or it does not exist!'));
 			$result = false;
 		}
 
-		$response = [];
+		if ($result) {
+			$output['success']['title'] = _('Dashboard updated');
 
-		if (($messages = getMessages($result, $msg_box_title)) !== null) {
-			$response[$result ? 'messages' : 'errors'] = $messages->toString();
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
+		}
+		else {
+			$output['error'] = [
+				'title' => _('Failed to update dashboard sharing.'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

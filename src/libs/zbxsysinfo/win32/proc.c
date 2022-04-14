@@ -22,7 +22,7 @@
 
 #include <tlhelp32.h>
 
-#include "symbols.h"
+#include "zbxsymbols.h"
 #include "log.h"
 
 #define MAX_PROCESSES	4096

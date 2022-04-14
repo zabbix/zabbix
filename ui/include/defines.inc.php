@@ -1030,8 +1030,9 @@ define('ZBX_TM_TASK_DATA',			7);
 define('ZBX_TM_STATUS_NEW',			1);
 define('ZBX_TM_STATUS_INPROGRESS',	2);
 
-define('ZBX_TM_DATA_TYPE_DIAGINFO',		1);
-define('ZBX_TM_DATA_TYPE_CHECK_NOW',	6);
+define('ZBX_TM_DATA_TYPE_DIAGINFO',			1);
+define('ZBX_TM_DATA_TYPE_PROXY_HOSTIDS',	2);
+define('ZBX_TM_DATA_TYPE_CHECK_NOW',		6);
 
 define('EVENT_SOURCE_TRIGGERS',			0);
 define('EVENT_SOURCE_DISCOVERY',		1);
@@ -1716,6 +1717,7 @@ define('TAB_INDICATOR_OPERATIONS', 'operations');
 define('TAB_INDICATOR_OVERRIDES', 'overrides');
 define('TAB_INDICATOR_PERMISSIONS', 'permissions');
 define('TAB_INDICATOR_PREPROCESSING', 'preprocessing');
+define('TAB_INDICATOR_PROXY_ENCRYPTION', 'proxy-encryption');
 define('TAB_INDICATOR_SHARING', 'sharing');
 define('TAB_INDICATOR_STEPS', 'steps');
 define('TAB_INDICATOR_TAG_FILTER', 'tag-filter');

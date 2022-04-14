@@ -24,7 +24,7 @@
 #	error "This module is only available for Windows OS"
 #endif
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 extern ZBX_THREAD_HANDLE	*threads;
 
@@ -45,6 +45,6 @@ int	application_status;	/* required for closing application from service */
 #define ZBX_IS_RUNNING()	(ZBX_APP_RUNNING == application_status)
 #define ZBX_DO_EXIT()		application_status = ZBX_APP_STOPPED
 
-#define START_MAIN_ZABBIX_ENTRY(allow_root, user, flags)	service_start(flags)
+#define ZBX_START_MAIN_ZABBIX_ENTRY(allow_root, user, flags)	service_start(flags)
 
 #endif /* ZABBIX_SERVICE_H */

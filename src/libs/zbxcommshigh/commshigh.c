@@ -24,7 +24,7 @@
 #include "log.h"
 
 #if !defined(_WINDOWS) && !defined(__MINGW32)
-#include "daemon.h"
+#include "zbxnix.h"
 #endif
 
 #include "zbxalgo.h"

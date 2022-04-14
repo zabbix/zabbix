@@ -5,10 +5,11 @@ DIST_SUBDIRS = \
 	zbxdbhigh \
 	zbxdb \
 	zbxdbupgrade \
-	zbxmemory \
+	zbxshmem \
 	zbxalgo \
 	zbxmedia \
 	zbxcrypto \
+	zbxhash \
 	zbxcommon \
 	zbxcomms \
 	zbxcommshigh \
@@ -16,7 +17,8 @@ DIST_SUBDIRS = \
 	zbxnix \
 	zbxconf \
 	zbxsysinfo \
-	zbxsys \
+	zbxthreads \
+	zbxmutexs \
 	zbxjson \
 	zbxserver \
 	zbxicmpping \
@@ -52,7 +54,7 @@ SERVER_SUBDIRS = \
 	zbxdbcache \
 	zbxdbhigh \
 	zbxhttp \
-	zbxmemory \
+	zbxshmem \
 	zbxserver \
 	zbxicmpping \
 	zbxmedia \
@@ -83,7 +85,7 @@ PROXY_SUBDIRS = \
 	zbxdbcache \
 	zbxdbhigh \
 	zbxhttp \
-	zbxmemory \
+	zbxshmem \
 	zbxserver \
 	zbxicmpping \
 	zbxself \
@@ -107,6 +109,7 @@ endif
 endif
 
 SUBDIRS = \
+	zbxhash \
 	zbxcrypto \
 	zbxcommon \
 	zbxlog \
@@ -115,7 +118,8 @@ SUBDIRS = \
 	zbxconf \
 	zbxhttp \
 	zbxsysinfo \
-	zbxsys \
+	zbxthreads \
+	zbxmutexs \
 	zbxcommshigh \
 	zbxcomms \
 	zbxjson \
@@ -129,4 +133,6 @@ SUBDIRS = \
 	$(SERVER_SUBDIRS) \
 	$(AGENT_SUBDIRS)
 
-EXTRA_DIST = zbxwin32
+EXTRA_DIST = \
+	zbxsymbols \
+	zbxwin32
