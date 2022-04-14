@@ -145,81 +145,81 @@ type procInfo struct {
 
 type procStatus struct {
 	Pid           uint64  `json:"pid"`
-	Ppid          uint64  `json:"ppid"`
-	Tgid          uint64  `json:"-"`
+	Ppid          int64  `json:"ppid"`
+	Tgid          int64  `json:"-"`
 	Name          string  `json:"name"`
 	ThreadName    string  `json:"-"`
 	Cmdline       string  `json:"cmdline"`
-	Vsize         uint64  `json:"vsize"`
+	Vsize         int64  `json:"vsize"`
 	Pmem          float64 `json:"pmem"`
-	Rss           uint64  `json:"rss"`
-	Data          uint64  `json:"data"`
-	Exe           uint64  `json:"exe"`
-	Hwm           uint64  `json:"hwm"`
-	Lck           uint64  `json:"lck"`
-	Lib           uint64  `json:"lib"`
-	Peak          uint64  `json:"peak"`
-	Pin           uint64  `json:"pin"`
-	Pte           uint64  `json:"pte"`
-	Size          uint64  `json:"size"`
-	Stk           uint64  `json:"stk"`
-	Swap          uint64  `json:"swap"`
+	Rss           int64  `json:"rss"`
+	Data          int64  `json:"data"`
+	Exe           int64  `json:"exe"`
+	Hwm           int64  `json:"hwm"`
+	Lck           int64  `json:"lck"`
+	Lib           int64  `json:"lib"`
+	Peak          int64  `json:"peak"`
+	Pin           int64  `json:"pin"`
+	Pte           int64  `json:"pte"`
+	Size          int64  `json:"size"`
+	Stk           int64  `json:"stk"`
+	Swap          int64  `json:"swap"`
 	CpuTimeUser   float64 `json:"cputime_user"`
 	CpuTimeSystem float64 `json:"cputime_system"`
 	State         string  `json:"state"`
-	CtxSwitches   uint64  `json:"ctx_switches"`
-	Threads       uint64  `json:"threads"`
-	PageFaults    uint64  `json:"page_faults"`
-	Fds           uint64  `json:"fds"`
-	IoReadsB      uint64  `json:"io_read_b"`
-	IoWritesB     uint64  `json:"io_write_b"`
+	CtxSwitches   int64  `json:"ctx_switches"`
+	Threads       int64  `json:"threads"`
+	PageFaults    int64  `json:"page_faults"`
+	Fds           int64  `json:"fds"`
+	IoReadsB      int64  `json:"io_read_b"`
+	IoWritesB     int64  `json:"io_write_b"`
 }
 
 type procSummary struct {
 	Name          string  `json:"name"`
 	Processes     int     `json:"processes"`
-	Vsize         uint64  `json:"vsize"`
+	Vsize         int64   `json:"vsize"`
 	Pmem          float64 `json:"pmem"`
-	Rss           uint64  `json:"rss"`
-	Data          uint64  `json:"data"`
-	Exe           uint64  `json:"exe"`
-	Lck           uint64  `json:"lck"`
-	Lib           uint64  `json:"lib"`
-	Pin           uint64  `json:"pin"`
-	Pte           uint64  `json:"pte"`
-	Size          uint64  `json:"size"`
-	Stk           uint64  `json:"stk"`
-	Swap          uint64  `json:"swap"`
+	Rss           int64   `json:"rss"`
+	Data          int64   `json:"data"`
+	Exe           int64   `json:"exe"`
+	Lck           int64   `json:"lck"`
+	Lib           int64   `json:"lib"`
+	Pin           int64   `json:"pin"`
+	Pte           int64   `json:"pte"`
+	Size          int64   `json:"size"`
+	Stk           int64   `json:"stk"`
+	Swap          int64   `json:"swap"`
 	CpuTimeUser   float64 `json:"cputime_user"`
 	CpuTimeSystem float64 `json:"cputime_system"`
-	CtxSwitches   uint64  `json:"ctx_switches"`
-	Threads       uint64  `json:"threads"`
-	PageFaults    uint64  `json:"page_faults"`
-	Fds           uint64  `json:"fds"`
-	IoReadsB      uint64  `json:"io_read_b"`
-	IoWritesB     uint64  `json:"io_write_b"`
+	CtxSwitches   int64   `json:"ctx_switches"`
+	Threads       int64   `json:"threads"`
+	PageFaults    int64   `json:"page_faults"`
+	Fds           int64   `json:"fds"`
+	IoReadsB      int64   `json:"io_read_b"`
+	IoWritesB     int64   `json:"io_write_b"`
 }
 
 type thread struct {
-	Pid           uint64  `json:"pid"`
-	Ppid          uint64  `json:"ppid"`
+	Pid           int64   `json:"pid"`
+	Ppid          int64   `json:"ppid"`
 	Name          string  `json:"name"`
 	Tid           uint64  `json:"tid"`
 	ThreadName    string  `json:"tname"`
 	CpuTimeUser   float64 `json:"cputime_user"`
 	CpuTimeSystem float64 `json:"cputime_system"`
 	State         string  `json:"state"`
-	CtxSwitches   uint64  `json:"ctx_switches"`
-	PageFaults    uint64  `json:"page_faults"`
-	IoReadsB      uint64  `json:"io_read_b"`
-	IoWritesB     uint64  `json:"io_write_b"`
+	CtxSwitches   int64   `json:"ctx_switches"`
+	PageFaults    int64   `json:"page_faults"`
+	IoReadsB      int64   `json:"io_read_b"`
+	IoWritesB     int64   `json:"io_write_b"`
 }
 
 type procStat struct {
 	utime      uint64
 	stime      uint64
 	started    uint64
-	pageFaults uint64
+	pageFaults int64
 	err        error
 }
 
@@ -824,7 +824,6 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 	if mode != "thread" {
 		for _, pid := range pids {
 			data := procStatus{}
-			// a process might not exist anymore, continue silently or ignore errors
 			if err := parseProcessStatus(pid, &data); err != nil {
 				continue
 			}
@@ -895,29 +894,30 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 
 			if len(array) > i + 1 {
 				for _, procCmp := range array[i + 1:] {
-					if procCmp.Name == proc.Name {
-						procSum.Processes++
-						procSum.Vsize += procCmp.Vsize
-						procSum.Pmem += procCmp.Pmem
-						procSum.Rss += procCmp.Rss
-						procSum.Data += procCmp.Data
-						procSum.Exe += procCmp.Exe
-						procSum.Lck += procCmp.Lck
-						procSum.Lib += procCmp.Lib
-						procSum.Pin += procCmp.Pin
-						procSum.Pte += procCmp.Pte
-						procSum.Size += procCmp.Size
-						procSum.Stk += procCmp.Stk
-						procSum.Swap += procCmp.Swap
-						procSum.CpuTimeUser += procCmp.CpuTimeUser
-						procSum.CpuTimeSystem += procCmp.CpuTimeSystem
-						procSum.CtxSwitches += procCmp.CtxSwitches
-						procSum.Threads += procCmp.Threads
-						procSum.PageFaults += procCmp.PageFaults
-						procSum.Fds += procCmp.Fds
-						procSum.IoReadsB += procCmp.IoReadsB
-						procSum.IoWritesB += procCmp.IoWritesB
+					if procCmp.Name != proc.Name {
+						continue
 					}
+					procSum.Processes++
+					procSum.Vsize += procCmp.Vsize
+					procSum.Pmem += procCmp.Pmem
+					procSum.Rss += procCmp.Rss
+					procSum.Data += procCmp.Data
+					procSum.Exe += procCmp.Exe
+					procSum.Lck += procCmp.Lck
+					procSum.Lib += procCmp.Lib
+					procSum.Pin += procCmp.Pin
+					procSum.Pte += procCmp.Pte
+					procSum.Size += procCmp.Size
+					procSum.Stk += procCmp.Stk
+					procSum.Swap += procCmp.Swap
+					procSum.CpuTimeUser += procCmp.CpuTimeUser
+					procSum.CpuTimeSystem += procCmp.CpuTimeSystem
+					procSum.CtxSwitches += procCmp.CtxSwitches
+					procSum.Threads += procCmp.Threads
+					addNonNegative(&procSum.PageFaults, procCmp.PageFaults)
+					addNonNegative(&procSum.Fds, procCmp.Fds)
+					addNonNegative(&procSum.IoReadsB, procCmp.IoReadsB)
+					addNonNegative(&procSum.IoWritesB, procCmp.IoWritesB)
 				}
 			}
 			processed = append(processed, proc.Name)

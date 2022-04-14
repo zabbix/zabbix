@@ -94,7 +94,7 @@ func parseProcessStatus(pid string, proc *procStatus) (err error) {
 		case "State":
 			parseStateString(v, &proc.State)
 		case "PPid":
-			setUint64(v, &proc.Ppid)
+			setInt64(v, &proc.Ppid)
 		case "VmSize":
 			trimUnit(v, &proc.Vsize)
 		case "VmRSS":
@@ -120,11 +120,11 @@ func parseProcessStatus(pid string, proc *procStatus) (err error) {
 		case "VmSwap":
 			trimUnit(v, &proc.Swap)
 		case "Threads":
-			setUint64(v, &proc.Threads)
+			setInt64(v, &proc.Threads)
 		case "Tgid":
-			setUint64(v, &proc.Tgid)
+			setInt64(v, &proc.Tgid)
 		case "voluntary_ctxt_switches", "nonvoluntary_ctxt_switches":
-			if value, tmperr := strconv.ParseUint(v, 10, 64); tmperr == nil {
+			if value, tmperr := strconv.ParseInt(v, 10, 64); tmperr == nil {
 				proc.CtxSwitches += value
 			}
 		}
@@ -159,12 +159,14 @@ func getProcessIo(pid string, proc *procStatus) (err error) {
 
 			switch k {
 			case "read_bytes":
-				setUint64(v, &proc.IoReadsB)
+				setInt64(v, &proc.IoReadsB)
 			case "write_bytes":
-				setUint64(v, &proc.IoWritesB)
+				setInt64(v, &proc.IoWritesB)
 			}
 		}
 	} else {
+		proc.IoReadsB = -1
+		proc.IoWritesB = -1
 		return err
 	}
 	return nil
@@ -172,9 +174,10 @@ func getProcessIo(pid string, proc *procStatus) (err error) {
 
 func getProcessFds(pid string, proc *procStatus) (err error) {
 	if fds, err := ioutil.ReadDir("/proc/" + pid + "/fd"); err == nil {
-		proc.Fds = uint64(len(fds))
+		proc.Fds = int64(len(fds))
 		return nil
 	} else {
+		proc.Fds = -1
 		return err
 	}
 }
@@ -185,6 +188,7 @@ func getProcessCalculatedMetrics(pid string, proc *procStatus) (err error) {
 	var mem uint64
 	mem, err = procfs.GetMemory("MemTotal")
 	if err != nil {
+		proc.Pmem = -1
 		return err
 	}
 
@@ -197,6 +201,7 @@ func getProcessCpuTimes(pid string, proc *procStatus) (err error) {
 	var stat procStat
 	getProcessStat(pid, &stat)
 	if stat.err != nil {
+		proc.PageFaults = -1
 		return stat.err
 	}
 
@@ -301,7 +306,7 @@ func getProcessStat(pid string, stat *procStat) {
 	if stat.started, stat.err = strconv.ParseUint(string(stats[19]), 10, 64); stat.err != nil {
 		return
 	}
-	if stat.pageFaults, stat.err = strconv.ParseUint(string(stats[9]), 10, 64); stat.err != nil {
+	if stat.pageFaults, stat.err = strconv.ParseInt(string(stats[9]), 10, 64); stat.err != nil {
 		return
 	}
 }
@@ -390,15 +395,17 @@ func getThreadIds(pid string) (pids []string, err error) {
 	return getProcfsIds("/proc/" + pid + "/task")
 }
 
-func trimUnit(v string, p *uint64) () {
+func trimUnit(v string, p *int64) () {
 	var tmperr error
-	var value uint64
+	var value int64
 	var pos int
+
+	*p = -1
 	if pos = strings.IndexRune(v, ' '); pos == -1 {
 		return
 	}
 
-	if value, tmperr = strconv.ParseUint(v[:pos], 10, 64); tmperr != nil {
+	if value, tmperr = strconv.ParseInt(v[:pos], 10, 64); tmperr != nil {
 		return
 	}
 
@@ -419,11 +426,12 @@ func trimUnit(v string, p *uint64) () {
 	*p = value
 }
 
-func setUint64(v string, p *uint64) () {
+func setInt64(v string, p *int64) () {
 	var tmperr error
-	var value uint64
+	var value int64
 
-	if value, tmperr = strconv.ParseUint(v, 10, 64); tmperr != nil {
+	if value, tmperr = strconv.ParseInt(v, 10, 64); tmperr != nil {
+		*p = -1
 		return
 	}
 

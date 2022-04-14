@@ -551,13 +551,6 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 	return string(jsonArray), nil
 }
 
-func addNonNegative(dst *int64, val int64) () {
-	if val != -1 {
-		*dst += val
-	}
-	return
-}
-
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	switch key {
