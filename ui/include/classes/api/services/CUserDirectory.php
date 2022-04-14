@@ -256,13 +256,12 @@ class CUserDirectory extends CApiService {
 	 */
 	protected static function addUserGroups(array $options, array &$userdirectories): void {
 		$ids = array_unique(array_column($userdirectories, 'userdirectoryid'));
-		$fields = ($options['selectUsrgrps'] === API_OUTPUT_EXTEND)
-			? array_keys(DB::getSchema('usrgrp')['fields'])
-			: $options['selectUsrgrps'];
-		$keys = array_fill_keys($fields, '');
+		$fields = $options['selectUsrgrps'];
+		$unset_keys = [];
 
-		if (!in_array('userdirectoryid', $fields)) {
+		if (is_array($fields) && !in_array('userdirectoryid', $fields)) {
 			$fields[] = 'userdirectoryid';
+			$unset_keys = ['userdirectoryid' => ''];
 		}
 
 		foreach (array_keys($userdirectories) as $i) {
@@ -275,7 +274,9 @@ class CUserDirectory extends CApiService {
 		]);
 
 		foreach ($db_usergroups as $db_usergroup) {
-			$userdirectories[$db_usergroup['userdirectoryid']]['usrgrps'][] = array_intersect_key($db_usergroup, $keys);
+			$userdirectories[$db_usergroup['userdirectoryid']]['usrgrps'][] = array_diff_key($db_usergroup,
+				$unset_keys
+			);
 		}
 	}
 
@@ -299,6 +300,10 @@ class CUserDirectory extends CApiService {
 
 		foreach ($db_usergroups as $db_usergroup) {
 			++$userdirectories[$db_usergroup['userdirectoryid']]['usrgrps'];
+		}
+
+		foreach (array_keys($userdirectories) as $i) {
+			$userdirectories[$i]['usrgrps'] = (string) $userdirectories[$i]['usrgrps'];
 		}
 	}
 
