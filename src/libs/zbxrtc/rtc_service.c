@@ -183,7 +183,7 @@ static void	rtc_process_diaginfo(const char *data, char **result)
 }
 
 void	rtc_notify(zbx_rtc_t *rtc, unsigned char process_type, int process_num, zbx_uint32_t code,
-		unsigned char *data, zbx_uint32_t size)
+		const unsigned char *data, zbx_uint32_t size)
 {
 	int	i;
 

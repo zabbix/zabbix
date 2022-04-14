@@ -253,7 +253,7 @@ $expression_form->addItem($expression_form_list);
 
 $output = [
 	'header' => $data['title'],
-	'body' => (new CDiv([$data['errors'], $expression_form]))->toString(),
+	'body' => (new CDiv([$data['messages'], $expression_form]))->toString(),
 	'buttons' => [
 		[
 			'title' => _('Insert'),

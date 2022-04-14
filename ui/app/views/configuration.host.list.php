@@ -55,7 +55,7 @@ $filter = (new CFilter())
 	->setResetUrl($action_url)
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
-	->addVar('action', $data['action'])
+	->addVar('action', $data['action'], 'filter_action')
 	->addFilterTab(_('Filter'), [
 		(new CFormGrid())
 			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
@@ -170,7 +170,7 @@ $widget->addItem($filter);
 
 // table hosts
 $form = (new CForm())->setName('hosts');
-$header_checkbox = (new CCheckBox('all_hosts'))->onClick("checkAll('".$form->getName()."', 'all_hosts', 'ids');");
+$header_checkbox = (new CCheckBox('all_hosts'))->onClick("checkAll('".$form->getName()."', 'all_hosts', 'hostids');");
 $show_monitored_by = ($data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY
 		|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY);
 $header_sortable_name = make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'],
@@ -422,7 +422,7 @@ foreach ($data['hosts'] as $host) {
 	}
 
 	$table->addRow([
-		new CCheckBox('ids['.$host['hostid'].']', $host['hostid']),
+		new CCheckBox('hostids['.$host['hostid'].']', $host['hostid']),
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
 		[
 			new CLink(_('Items'),
@@ -494,7 +494,7 @@ $status_toggle_url =  (new CUrl('zabbix.php'))
 $form->addItem([
 	$table,
 	$data['paging'],
-	new CActionButtonList('action', 'ids', [
+	new CActionButtonList('action', 'hostids', [
 		'enable-hosts' => [
 			'name' => _('Enable'),
 			'confirm' => _('Enable selected hosts?'),

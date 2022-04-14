@@ -30,10 +30,8 @@ $widget = (new CWidget())
 		(new CTag('nav', true,
 			(new CList())
 				->addItem(
-					(new CRedirectButton(_('Create maintenance period'), (new CUrl('maintenance.php'))
-						->removeArgument('maintenanceid')
-						->setArgument('form', 'create')
-						->getUrl()
+					(new CRedirectButton(_('Create maintenance period'),
+						(new CUrl('maintenance.php'))->setArgument('form', 'create')
 					))->setEnabled($data['allowed_edit'])
 				)
 		))->setAttribute('aria-label', _('Content controls'))

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,32 +21,42 @@
 
 class CControllerProxyHostEnable extends CController {
 
-	protected function checkInput() {
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
+	protected function checkInput(): bool {
 		$fields = [
-			'proxyids' => 'required|array_db hosts.hostid'
+			'proxyids' => 'required|array_id'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
 		}
 
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)) {
 			return false;
 		}
 
-		$proxies = API::Proxy()->get([
+		$num_proxies = API::Proxy()->get([
 			'proxyids' => $this->getInput('proxyids'),
 			'countOutput' => true,
 			'editable' => true
 		]);
 
-		return ($proxies == count($this->getInput('proxyids')));
+		return $num_proxies == count($this->getInput('proxyids'));
 	}
 
 	protected function doAction() {
@@ -58,27 +68,33 @@ class CControllerProxyHostEnable extends CController {
 			]
 		]);
 
-		foreach ($hosts as &$host) {
-			$host['status'] = HOST_STATUS_MONITORED;
+		$update = [];
+
+		foreach ($hosts as $host) {
+			$update[] = [
+				'hostid' => $host['hostid'],
+				'status' => HOST_STATUS_MONITORED
+			];
 		}
-		unset($host);
 
-		$result = $hosts ? (bool) API::Host()->update($hosts) : true;
+		$result = !$update || API::Host()->update($update);
 
-		$updated = count($hosts);
-
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'proxy.list')
-			->setArgument('page', CPagerHelper::loadPage('proxy.list', null))
-		);
+		$output = [];
 
 		if ($result) {
-			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_n('Host enabled', 'Hosts enabled', $updated));
+			$output['success']['title'] = _n('Host enabled', 'Hosts enabled', count($update));
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
 		}
 		else {
-			CMessageHelper::setErrorTitle(_n('Cannot enable host', 'Cannot enable hosts', $updated));
+			$output['error'] = [
+				'title' => _n('Cannot enable host', 'Cannot enable hosts', count($update)),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
-		$this->setResponse($response);
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

@@ -20,11 +20,11 @@
 #ifndef ZABBIX_ZBXNIX_H
 #define ZABBIX_ZBXNIX_H
 
-#include "sysinc.h"
+#include "zbxsysinc.h"
 
 /* IPC start */
 #include "zbxtypes.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 /* IPC end */
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
