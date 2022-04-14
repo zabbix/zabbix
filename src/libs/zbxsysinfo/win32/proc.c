@@ -54,8 +54,6 @@ typedef struct
 
 	double		vmsize;
 	double		wkset;
-	double		gdiobj;
-	double		userobj;
 }
 proc_data_t;
 
@@ -618,12 +616,6 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 				proc_data->cputime_user = ConvertProcessTime(&ftUser) / 1000.0;
 			}
 
-			if (NULL != zbx_GetGuiResources)
-			{
-				proc_data->gdiobj = (double)zbx_GetGuiResources(hProcess, 0);
-				proc_data->userobj = (double)zbx_GetGuiResources(hProcess, 1);
-			}
-
 			if (NULL != zbx_GetProcessIoCounters &&
 					FALSE != zbx_GetProcessIoCounters(hProcess, &ioCounters))
 			{
@@ -665,8 +657,6 @@ next:
 					proc_data->processes++;
 					proc_data->vmsize += pdata_cmp->vmsize;
 					proc_data->wkset += pdata_cmp->wkset;
-					proc_data->gdiobj += pdata_cmp->gdiobj;
-					proc_data->userobj += pdata_cmp->userobj;
 					proc_data->cputime_user += pdata_cmp->cputime_user;
 					proc_data->cputime_system += pdata_cmp->cputime_system;
 					proc_data->threads += pdata_cmp->threads;
@@ -720,8 +710,6 @@ next:
 			zbx_json_adduint64(&j, "io_write_op", (zbx_uint64_t)proc_data->io_write_op);
 			zbx_json_adduint64(&j, "io_other_b", (zbx_uint64_t)proc_data->io_other_b);
 			zbx_json_adduint64(&j, "io_other_op", (zbx_uint64_t)proc_data->io_other_op);
-			zbx_json_adduint64(&j, "gdiobj", (zbx_uint64_t)proc_data->gdiobj);
-			zbx_json_adduint64(&j, "userobj", (zbx_uint64_t)proc_data->userobj);
 		}
 		else
 			zbx_json_adduint64(&j, "tid", proc_data->tid);
