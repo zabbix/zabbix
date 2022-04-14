@@ -295,7 +295,7 @@ $tabs = (new CTabView())
 if (!$data['discovered_host']) {
 	$tabs->addTab('valuemaps_tab', _('Value mapping'), new CPartial('massupdate.valuemaps.tab', [
 		'visible' => [],
-		'ids' => $data['hostids'],
+		'hostids' => $data['hostids'],
 		'context' => 'host'
 	]));
 }
