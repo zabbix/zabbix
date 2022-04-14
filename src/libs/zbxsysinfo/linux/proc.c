@@ -65,9 +65,6 @@ typedef struct
 	zbx_uint64_t	ctx_switches;
 	zbx_uint64_t	threads;
 	zbx_uint64_t	page_faults;
-	zbx_uint64_t	fds;
-	zbx_uint64_t	io_read_b;
-	zbx_uint64_t	io_write_b;
 
 	zbx_uint64_t	vsize;
 	double		pmem;
@@ -1578,7 +1575,7 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static proc_data_t	*proc_get_data(FILE *f_status, FILE *f_stat, FILE *f_io, int zbx_proc_mode)
+static proc_data_t	*proc_get_data(FILE *f_status, FILE *f_stat, int zbx_proc_mode)
 {
 	zbx_uint64_t	val;
 	char		buf[MAX_STRING_LEN], *ptr, *state;
@@ -1625,12 +1622,6 @@ static proc_data_t	*proc_get_data(FILE *f_status, FILE *f_stat, FILE *f_io, int 
 			NULL))
 	{
 		proc_data->ctx_switches += val;
-	}
-
-	if (NULL != f_io)
-	{
-		read_value_from_proc_file(f_io, 0, "read_bytes", PROC_VAL_TYPE_NUM, &proc_data->io_read_b, NULL);
-		read_value_from_proc_file(f_io, 0, "write_bytes", PROC_VAL_TYPE_NUM, &proc_data->io_write_b, NULL);
 	}
 
 	if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode && SUCCEED ==
@@ -1689,7 +1680,7 @@ out:
 static proc_data_t	*proc_read_data(char *path, int zbx_proc_mode)
 {
 	char		tmp[MAX_STRING_LEN];
-	FILE		*f_status, *f_stat, *f_io;
+	FILE		*f_status, *f_stat;
 	proc_data_t	*proc_data;
 
 	zbx_snprintf(tmp, sizeof(tmp), "%s/status", path);
@@ -1705,14 +1696,10 @@ static proc_data_t	*proc_read_data(char *path, int zbx_proc_mode)
 		return NULL;
 	}
 
-	zbx_snprintf(tmp, sizeof(tmp), "%s/io", path);
-	f_io = fopen(tmp, "r");
-
-	proc_data = proc_get_data(f_status, f_stat, f_io, zbx_proc_mode);
+	proc_data = proc_get_data(f_status, f_stat, zbx_proc_mode);
 
 	zbx_fclose(f_status);
 	zbx_fclose(f_stat);
-	zbx_fclose(f_io);
 
 	return proc_data;
 }
@@ -1722,7 +1709,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char				*procname, *proccomm, *param, *prname = NULL, *cmdline = NULL;
 	int				invalid_user = 0, zbx_proc_mode, i;
 	DIR				*dir;
-	FILE				*f_cmd = NULL, *f_status = NULL, *f_stat = NULL, *f_io = NULL;
+	FILE				*f_cmd = NULL, *f_status = NULL, *f_stat = NULL;
 	struct dirent			*entries;
 	struct passwd			*usrinfo;
 	struct zbx_json			j;
@@ -1892,36 +1879,17 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else
 		{
 			zbx_fclose(f_stat);
-			zbx_fclose(f_io);
 
 			zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/stat", entries->d_name);
 
 			if (NULL == (f_stat = fopen(tmp, "r")))
 				continue;
 
-			zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/io", entries->d_name);
-			f_io = fopen(tmp, "r");
-
-			if (NULL != (proc_data = proc_get_data(f_status, f_stat, f_io, zbx_proc_mode)))
+			if (NULL != (proc_data = proc_get_data(f_status, f_stat, zbx_proc_mode)))
 			{
-				DIR	*fddir;
-
 				proc_data->pid = pid;
 				proc_data->cmdline = cmdline;
 				proc_data->name = prname;
-
-				zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/fd", entries->d_name);
-
-				if (NULL != (fddir = opendir(tmp)))
-				{
-					while (NULL != readdir(fddir))
-						proc_data->fds++;
-
-					if (2 <= proc_data->fds)
-						proc_data->fds -= 2;
-
-					closedir(fddir);
-				}
 
 				zbx_vector_proc_data_ptr_append(&proc_data_ctx, proc_data);
 				cmdline = prname = NULL;
@@ -1931,7 +1899,6 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_fclose(f_cmd);
 	zbx_fclose(f_status);
 	zbx_fclose(f_stat);
-	zbx_fclose(f_io);
 	closedir(dir);
 
 	zbx_free(cmdline);
@@ -1971,9 +1938,6 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 					pdata->ctx_switches += pdata_cmp->ctx_switches;
 					pdata->threads += pdata_cmp->threads;
 					pdata->page_faults += pdata_cmp->page_faults;
-					pdata->fds += pdata_cmp->fds;
-					pdata->io_read_b += pdata_cmp->io_read_b;
-					pdata->io_write_b += pdata_cmp->io_write_b;
 
 					proc_data_free(pdata_cmp);
 					zbx_vector_proc_data_ptr_remove(&proc_data_ctx, k--);
@@ -2018,9 +1982,6 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_adduint64(&j, "ctx_switches", pdata->ctx_switches);
 			zbx_json_adduint64(&j, "threads", pdata->threads);
 			zbx_json_adduint64(&j, "page_faults", pdata->page_faults);
-			zbx_json_adduint64(&j, "fds", pdata->fds);
-			zbx_json_adduint64(&j, "io_read_b", pdata->io_read_b);
-			zbx_json_adduint64(&j, "io_write_b", pdata->io_write_b);
 		}
 		else if (ZBX_PROC_MODE_THREAD == zbx_proc_mode)
 		{
@@ -2034,8 +1995,6 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addstring(&j, "state", ZBX_NULL2EMPTY_STR(pdata->state), ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&j, "ctx_switches", pdata->ctx_switches);
 			zbx_json_adduint64(&j, "page_faults", pdata->page_faults);
-			zbx_json_adduint64(&j, "io_read_b", pdata->io_read_b);
-			zbx_json_adduint64(&j, "io_write_b", pdata->io_write_b);
 		}
 		else
 		{
@@ -2058,9 +2017,6 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_adduint64(&j, "ctx_switches", pdata->ctx_switches);
 			zbx_json_adduint64(&j, "threads", pdata->threads);
 			zbx_json_adduint64(&j, "page_faults", pdata->page_faults);
-			zbx_json_adduint64(&j, "fds", pdata->fds);
-			zbx_json_adduint64(&j, "io_read_b", pdata->io_read_b);
-			zbx_json_adduint64(&j, "io_write_b", pdata->io_write_b);
 		}
 
 		zbx_json_close(&j);
