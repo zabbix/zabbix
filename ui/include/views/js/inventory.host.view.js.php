@@ -26,11 +26,8 @@
 
 <script>
 	const view = {
-		editHost(e, hostid) {
-			e.preventDefault();
-			const host_data = {hostid};
-
-			this.openHostPopup(host_data);
+		editHost({hostid}) {
+			this.openHostPopup({hostid});
 		},
 
 		openHostPopup(host_data) {
@@ -40,7 +37,6 @@
 				dialogue_class: 'modal-popup-large'
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
