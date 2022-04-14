@@ -17,26 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxalgo.h"
-#include "audit.h"
-#include "audit/zbxaudit_proxy.h"
+#ifndef ZABBIX_AUDIT_PROXY_H
+#define ZABBIX_AUDIT_PROXY_H
 
-void	zbx_audit_proxy_config_reload(zbx_uint64_t proxy_hostid, const char *name)
-{
-	zbx_audit_entry_t	local_audit_entry, *plocal_audit_entry = &local_audit_entry;
+#include "zbxtypes.h"
 
-	RETURN_IF_AUDIT_OFF();
+void	zbx_audit_proxy_config_reload(zbx_uint64_t proxy_hostid, const char *name);
 
-	local_audit_entry.id = proxy_hostid;
-	local_audit_entry.cuid = NULL;
-	local_audit_entry.id_table = AUDIT_HOST_ID; /* proxies are stored in host table */
-
-	if (NULL == zbx_hashset_search(zbx_get_audit_hashset(), &plocal_audit_entry))
-	{
-		zbx_audit_entry_t	*new_entry;
-
-		new_entry = zbx_audit_entry_init(proxy_hostid, AUDIT_HOST_ID, name, AUDIT_ACTION_CONFIG_REFRESH,
-				AUDIT_RESOURCE_PROXY);
-		zbx_hashset_insert(zbx_get_audit_hashset(), &new_entry, sizeof(new_entry));
-	}
-}
+#endif
