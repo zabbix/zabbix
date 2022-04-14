@@ -431,6 +431,14 @@ function submitPopup(overlay) {
 		form.querySelector('#tls_accept').value = tls_accept;
 	}
 
+	// Convert input name from ids to hostids to avoid console error for duplicated ids. (ZBX-20782)
+	if (action == 'popup.massupdate.host') {
+		const ids = document.querySelectorAll('[name^=ids]');
+		for (const id_elem of ids.values()) {
+			id_elem.name = id_elem.name.replace('ids', 'hostids');
+		}
+	}
+
 	// Remove error message.
 	overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 

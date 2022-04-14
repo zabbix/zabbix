@@ -28,7 +28,7 @@ $form = (new CForm())
 	->setId('massupdate-form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', 'popup.massupdate.host')
-	->addVar('hostids', $data['hostids'])
+	->addVar('ids', $data['hostids'])
 	->addVar('tls_accept', HOST_ENCRYPTION_NONE)
 	->addVar('update', '1')
 	->addVar('location_url', $data['location_url'])
@@ -295,7 +295,7 @@ $tabs = (new CTabView())
 if (!$data['discovered_host']) {
 	$tabs->addTab('valuemaps_tab', _('Value mapping'), new CPartial('massupdate.valuemaps.tab', [
 		'visible' => [],
-		'hostids' => $data['hostids'],
+		'ids' => $data['hostids'],
 		'context' => 'host'
 	]));
 }
