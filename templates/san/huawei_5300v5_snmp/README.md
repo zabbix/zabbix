@@ -150,7 +150,7 @@ There are no template links in this template.
 |Pool {#NAME}: Health status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolHealthStatus, "{#NAME}"])<>1` |HIGH | |
 |Pool {#NAME}: Running status is not Online |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolRunningStatus, "{#NAME}"])<>27` |AVERAGE | |
 |Pool {#NAME}: Used capacity is too high |<p>-</p> |`min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolFreeCapacityPct, "{#NAME}"],{$HUAWEI.5300.POOL.CAPACITY.THRESH.TIME})>{#THRESHOLD}` |AVERAGE | |
-|has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Huawei OceanStor 5300 V5 SNMP/system.uptime[sysUpTime.0])<10m` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- No SNMP data collection</p> |
+|has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Huawei OceanStor 5300 V5 SNMP/system.uptime[sysUpTime.0])<10m` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- No SNMP data collection</p> |
 |No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/Huawei OceanStor 5300 V5 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING |<p>**Depends on**:</p><p>- Unavailable by ICMP ping</p> |
 |Unavailable by ICMP ping |<p>Last three attempts returned timeout.  Please check device connectivity.</p> |`max(/Huawei OceanStor 5300 V5 SNMP/icmpping,#3)=0` |HIGH | |
 |High ICMP ping loss |<p>-</p> |`min(/Huawei OceanStor 5300 V5 SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Huawei OceanStor 5300 V5 SNMP/icmppingloss,5m)<100` |WARNING |<p>**Depends on**:</p><p>- Unavailable by ICMP ping</p> |

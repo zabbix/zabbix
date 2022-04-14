@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T20:00:11Z'
+  date: '2022-04-14T09:55:12Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -390,7 +390,7 @@ zabbix_export:
               name: 'has been restarted'
               event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -1186,11 +1186,11 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: bace15be86774bb4a46ca491b3b53516
-                  expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
+                  expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_DESCR}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+                  recovery_expression: 'max(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_DESCR}"}-3'
                   name: '{#SENSOR_DESCR}: Temperature is above critical threshold'
-                  event_name: '{#SENSOR_DESCR}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                  event_name: '{#SENSOR_DESCR}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SENSOR_DESCR}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1203,19 +1203,19 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 3687c8a7e88949fb9953049fb0f5e54d
-                  expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
+                  expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SENSOR_DESCR}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
+                  recovery_expression: 'max(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SENSOR_DESCR}"}-3'
                   name: '{#SENSOR_DESCR}: Temperature is above warning threshold'
-                  event_name: '{#SENSOR_DESCR}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
+                  event_name: '{#SENSOR_DESCR}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SENSOR_DESCR}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                   dependencies:
                     -
                       name: '{#SENSOR_DESCR}: Temperature is above critical threshold'
-                      expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
-                      recovery_expression: 'max(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+                      expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_DESCR}"}'
+                      recovery_expression: 'max(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_DESCR}"}-3'
                   tags:
                     -
                       tag: scope
@@ -1225,11 +1225,11 @@ zabbix_export:
                       value: performance
                 -
                   uuid: fbe5f29b241248b4b4bff5d55fcc2180
-                  expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
+                  expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SENSOR_DESCR}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
+                  recovery_expression: 'min(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SENSOR_DESCR}"}+3'
                   name: '{#SENSOR_DESCR}: Temperature is too low'
-                  event_name: '{#SENSOR_DESCR}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
+                  event_name: '{#SENSOR_DESCR}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SENSOR_DESCR}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:
@@ -2656,7 +2656,7 @@ zabbix_export:
               name: 'has been restarted'
               event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -3439,11 +3439,11 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: e1a63b2ebef549ebbd95b307feee8b8d
-                  expression: 'avg(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
+                  expression: 'avg(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_DESCR}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+                  recovery_expression: 'max(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_DESCR}"}-3'
                   name: '{#SENSOR_DESCR}: Temperature is above critical threshold'
-                  event_name: '{#SENSOR_DESCR}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                  event_name: '{#SENSOR_DESCR}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SENSOR_DESCR}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -3456,19 +3456,19 @@ zabbix_export:
                       value: performance
                 -
                   uuid: c1e348e8a5f24100a5b29a840a43dca9
-                  expression: 'avg(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
+                  expression: 'avg(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SENSOR_DESCR}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
+                  recovery_expression: 'max(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SENSOR_DESCR}"}-3'
                   name: '{#SENSOR_DESCR}: Temperature is above warning threshold'
-                  event_name: '{#SENSOR_DESCR}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
+                  event_name: '{#SENSOR_DESCR}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SENSOR_DESCR}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                   dependencies:
                     -
                       name: '{#SENSOR_DESCR}: Temperature is above critical threshold'
-                      expression: 'avg(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
-                      recovery_expression: 'max(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+                      expression: 'avg(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_DESCR}"}'
+                      recovery_expression: 'max(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_DESCR}"}-3'
                   tags:
                     -
                       tag: scope
@@ -3478,11 +3478,11 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 722ee93a637643e9b3cff31e5ea5151d
-                  expression: 'avg(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
+                  expression: 'avg(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SENSOR_DESCR}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
+                  recovery_expression: 'min(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SENSOR_DESCR}"}+3'
                   name: '{#SENSOR_DESCR}: Temperature is too low'
-                  event_name: '{#SENSOR_DESCR}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
+                  event_name: '{#SENSOR_DESCR}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SENSOR_DESCR}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:

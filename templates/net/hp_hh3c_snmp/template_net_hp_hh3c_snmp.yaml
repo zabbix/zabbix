@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T20:00:38Z'
+  date: '2022-04-14T10:46:14Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -300,7 +300,7 @@ zabbix_export:
               name: 'has been restarted'
               event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -1333,11 +1333,11 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: bbad03018e8e408c952cca2615b4eab3
-                  expression: 'avg(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
+                  expression: 'avg(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+                  recovery_expression: 'max(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
                   name: '{#SNMPVALUE}: Temperature is above critical threshold'
-                  event_name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                  event_name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1350,19 +1350,19 @@ zabbix_export:
                       value: performance
                 -
                   uuid: cda6a4e305fe41239462d2f85acc5590
-                  expression: 'avg(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
+                  expression: 'avg(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
+                  recovery_expression: 'max(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
                   name: '{#SNMPVALUE}: Temperature is above warning threshold'
-                  event_name: '{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
+                  event_name: '{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                   dependencies:
                     -
                       name: '{#SNMPVALUE}: Temperature is above critical threshold'
-                      expression: 'avg(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
-                      recovery_expression: 'max(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+                      expression: 'avg(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
+                      recovery_expression: 'max(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
                   tags:
                     -
                       tag: scope
@@ -1372,11 +1372,11 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 340a9c397bff4ac5a37a2ada9d0c1e69
-                  expression: 'avg(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
+                  expression: 'avg(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
+                  recovery_expression: 'min(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}+3'
                   name: '{#SNMPVALUE}: Temperature is too low'
-                  event_name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
+                  event_name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:

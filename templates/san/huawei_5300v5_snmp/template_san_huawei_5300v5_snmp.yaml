@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:54:39Z'
+  date: '2022-04-14T11:00:18Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -384,7 +384,7 @@ zabbix_export:
               name: 'has been restarted'
               event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               dependencies:
                 -

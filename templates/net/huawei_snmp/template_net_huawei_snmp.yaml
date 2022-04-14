@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T20:00:46Z'
+  date: '2022-04-14T11:00:43Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -294,7 +294,7 @@ zabbix_export:
               name: 'has been restarted'
               event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -449,11 +449,11 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: d28db9267b9d488f8f359dd7d14d2ac1
-                  expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
+                  expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#ENT_NAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+                  recovery_expression: 'max(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#ENT_NAME}"}-3'
                   name: '{#ENT_NAME}: Temperature is above critical threshold'
-                  event_name: '{#ENT_NAME}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                  event_name: '{#ENT_NAME}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#ENT_NAME}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -466,19 +466,19 @@ zabbix_export:
                       value: performance
                 -
                   uuid: c54c36491adf4a488d11f2538b337129
-                  expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
+                  expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#ENT_NAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
+                  recovery_expression: 'max(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#ENT_NAME}"}-3'
                   name: '{#ENT_NAME}: Temperature is above warning threshold'
-                  event_name: '{#ENT_NAME}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
+                  event_name: '{#ENT_NAME}: Temperature is above warning threshold: >{$TEMP_WARN:"{#ENT_NAME}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                   dependencies:
                     -
                       name: '{#ENT_NAME}: Temperature is above critical threshold'
-                      expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
-                      recovery_expression: 'max(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+                      expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#ENT_NAME}"}'
+                      recovery_expression: 'max(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#ENT_NAME}"}-3'
                   tags:
                     -
                       tag: scope
@@ -488,11 +488,11 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 7b2cffb3ad47440d8b79b39958794ed9
-                  expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
+                  expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#ENT_NAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
+                  recovery_expression: 'min(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#ENT_NAME}"}+3'
                   name: '{#ENT_NAME}: Temperature is too low'
-                  event_name: '{#ENT_NAME}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
+                  event_name: '{#ENT_NAME}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#ENT_NAME}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:
