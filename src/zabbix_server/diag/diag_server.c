@@ -25,6 +25,16 @@
 #include "zbxlld.h"
 #include "zbxalert.h"
 
+#define ZBX_DIAG_LLD_RULES		0x00000001
+#define ZBX_DIAG_LLD_VALUES		0x00000002
+
+#define ZBX_DIAG_LLD_SIMPLE		(ZBX_DIAG_LLD_RULES | \
+					ZBX_DIAG_LLD_VALUES)
+
+#define ZBX_DIAG_ALERTING_ALERTS	0x00000001
+
+#define ZBX_DIAG_ALERTING_SIMPLE	(ZBX_DIAG_ALERTING_ALERTS)
+
 /******************************************************************************
  *                                                                            *
  * Purpose: sort itemid,values_num pair by values_num in descending order     *

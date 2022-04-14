@@ -20,18 +20,7 @@
 #ifndef ZABBIX_DIAG_SERVER_H
 #define ZABBIX_DIAG_SERVER_H
 
-#define ZBX_DIAG_LLD_RULES		0x00000001
-#define ZBX_DIAG_LLD_VALUES		0x00000002
-
-#define ZBX_DIAG_LLD_SIMPLE		(ZBX_DIAG_LLD_RULES | \
-					ZBX_DIAG_LLD_VALUES)
-
-#define ZBX_DIAG_ALERTING_ALERTS	0x00000001
-
-#define ZBX_DIAG_ALERTING_SIMPLE	(ZBX_DIAG_ALERTING_ALERTS)
-
 int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, struct zbx_json *json,
 		char **error);
 
 #endif
-
