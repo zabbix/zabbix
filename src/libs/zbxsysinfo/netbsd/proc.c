@@ -425,15 +425,15 @@ static char	*get_state(struct kinfo_proc2 *proc)
 	char	*state;
 
 	if (LSRUN == proc->p_stat || LSONPROC == proc->p_stat)
-		state = zbx_strdup(NULL, "run");
+		state = zbx_strdup(NULL, "running");
 	else if (LSSLEEP == proc->p_stat && 0 != (proc->p_flag & L_SINTR))
-		state = zbx_strdup(NULL, "sleep");
+		state = zbx_strdup(NULL, "sleeping");
 	else if (0 != P_ZOMBIE(proc))
-		state = zbx_strdup(NULL, "zomb");
+		state = zbx_strdup(NULL, "zombie");
 	else if (LSSLEEP == proc->p_stat && 0 == (proc->p_flag & L_SINTR))
-		state = zbx_strdup(NULL, "disk");
+		state = zbx_strdup(NULL, "disk sleep");
 	else if (LSSTOP == proc->p_stat)
-		state = zbx_strdup(NULL, "trace");
+		state = zbx_strdup(NULL, "tracing stop");
 	else
 		state = zbx_strdup(NULL, "other");
 

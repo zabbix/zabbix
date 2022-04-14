@@ -640,15 +640,15 @@ static char	*get_state(struct kinfo_proc *proc)
 	char	*state;
 
 	if (SRUN == proc->ZBX_PROC_STAT)
-		state = zbx_strdup(NULL, "run");
+		state = zbx_strdup(NULL, "running");
 	else if (SSLEEP == proc->ZBX_PROC_STAT && 0 != (proc->ZBX_PROC_TDFLAG & TDF_SINTR))
-		state = zbx_strdup(NULL, "sleep");
+		state = zbx_strdup(NULL, "sleeping");
 	else if (SZOMB == proc->ZBX_PROC_STAT)
-		state = zbx_strdup(NULL, "zomb");
+		state = zbx_strdup(NULL, "zombie");
 	else if (SSLEEP == proc->ZBX_PROC_STAT && 0 == (proc->ZBX_PROC_TDFLAG & TDF_SINTR))
-		state = zbx_strdup(NULL, "disk");
+		state = zbx_strdup(NULL, "disk sleep");
 	else if (SSTOP == proc->ZBX_PROC_STAT)
-		state = zbx_strdup(NULL, "trace");
+		state = zbx_strdup(NULL, "tracing stop");
 	else
 		state = zbx_strdup(NULL, "other");
 

@@ -1633,32 +1633,20 @@ static proc_data_t	*proc_get_data(FILE *f_status, FILE *f_stat, FILE *f_io, int 
 		read_value_from_proc_file(f_io, 0, "write_bytes", PROC_VAL_TYPE_NUM, &proc_data->io_write_b, NULL);
 	}
 
-	if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode &&
-			SUCCEED == read_value_from_proc_file(f_status, 0, "State", PROC_VAL_TYPE_TEXT, NULL, &state))
+	if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode && SUCCEED ==
+			read_value_from_proc_file(f_status, 0, "State", PROC_VAL_TYPE_TEXT, NULL, &state))
 	{
-		switch (*state)
+		if (NULL != (ptr = strchr(state, '(')))
 		{
-			case 'R':
-				proc_data->state = zbx_strdup(NULL, "run");
-				break;
-			case 'S':
-				proc_data->state = zbx_strdup(NULL, "sleep");
-				break;
-			case 'Z':
-				proc_data->state = zbx_strdup(NULL, "zomb");
-				break;
-			case 'D':
-				proc_data->state = zbx_strdup(NULL, "disk");
-				break;
-			case 'T':
-				proc_data->state = zbx_strdup(NULL, "trace");
-				break;
-			default:
-				proc_data->state = zbx_strdup(NULL, "other");
-				break;
-		}
+			zbx_rtrim(++ptr, ")");
 
-		zbx_free(state);
+			if ('\0' != *ptr)
+				proc_data->state = zbx_strdup(NULL, ptr);
+
+			zbx_free(state);
+		}
+		else
+			proc_data->state = state;
 	}
 
 	if (NULL == fgets(buf, (int)sizeof(buf), f_stat) || NULL == (ptr = strrchr(buf, ')')))
