@@ -445,7 +445,6 @@ class CControllerPopupGeneric extends CController {
 			'numeric' =>							'in 1',
 			'reference' =>							'string',
 			'writeonly' =>							'in 1',
-			'noempty' =>							'in 1',
 			'submit_parent' =>						'in 1',
 			'enrich_parent_groups' =>				'in 1',
 			'filter_groupid_rst' =>					'in 1',
@@ -722,7 +721,7 @@ class CControllerPopupGeneric extends CController {
 	 * @return array
 	 */
 	protected function getPageOptions(): array {
-		$option_fields_binary = ['noempty', 'real_hosts', 'submit_parent', 'with_items', 'writeonly'];
+		$option_fields_binary = ['real_hosts', 'submit_parent', 'with_items', 'writeonly'];
 		$option_fields_value = ['host_templates'];
 
 		$page_options = [

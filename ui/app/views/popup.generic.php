@@ -41,32 +41,6 @@ $script_inline = '';
 $header_form = ($data['popup_type'] === 'help_items') ? (new CForm())->cleanItems() : new CDiv();
 $header_form->setId('generic-popup-form');
 
-// Make 'empty' button.
-if ($data['popup_type'] === 'triggers' && !array_key_exists('noempty', $options)) {
-	$value1 = (strpos($options['dstfld1'], 'id') !== false) ? 0 : '';
-	$value2 = (strpos($options['dstfld2'], 'id') !== false) ? 0 : '';
-	$value3 = (strpos($options['dstfld3'], 'id') !== false) ? 0 : '';
-
-	$empty_btn = (new CButton('empty', _('Empty')))
-		->addStyle('float: right; margin-left: 5px;')
-		->setAttribute('data-dstfld1', $options['dstfld1'])
-		->setAttribute('data-dstfld2', $options['dstfld2'])
-		->setAttribute('data-dstfld3', $options['dstfld3'])
-		->setAttribute('data-value1', $value1)
-		->setAttribute('data-value2', $value2)
-		->setAttribute('data-value3', $value3)
-		->onClick('
-			popup_generic.setEmpty(event, {
-				[this.dataset.dstfld1]: this.dataset.value1,
-				[this.dataset.dstfld2]: this.dataset.value2,
-				[this.dataset.dstfld3]: this.dataset.value3,
-			})
-		');
-}
-else {
-	$empty_btn = null;
-}
-
 // Add host group multiselect control.
 if (array_key_exists('groups', $data['filter'])) {
 	$multiselect_options = $data['filter']['groups'];
@@ -87,12 +61,9 @@ if (array_key_exists('hosts', $data['filter'])) {
 	if ($multiselect_options['disabled']) {
 		$host_ms->setTitle(_('You cannot switch hosts for current selection.'));
 	}
-	$controls[] = (new CFormList())->addRow(new CLabel(_('Host'), 'popup_host_ms'), [$empty_btn, $host_ms]);
+	$controls[] = (new CFormList())->addRow(new CLabel(_('Host'), 'popup_host_ms'), $host_ms);
 
 	$script_inline .= $host_ms->getPostJS(). 'popup_generic.initHostsFilter();';
-}
-elseif ($empty_btn) {
-	$controls[] = (new CFormList())->addRow($empty_btn);
 }
 
 // Show Type dropdown in header for help items.

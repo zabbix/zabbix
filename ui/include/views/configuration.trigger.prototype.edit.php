@@ -632,7 +632,6 @@ $dependenciesFormList->addRow(_('Dependencies'),
 						multiselect: 1,
 						with_triggers: 1,
 						normal_only: 1,
-						noempty: 1,
 						hostid: this.dataset.hostid
 					}, {dialogue_class: "modal-popup-generic"});
 				')

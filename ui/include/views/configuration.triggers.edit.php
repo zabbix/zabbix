@@ -638,8 +638,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 						reference: "deptrigger",
 						hostid: this.dataset.hostid,
 						multiselect: 1,
-						with_triggers: 1,
-						noempty: 1
+						with_triggers: 1
 					}, {dialogue_class: "modal-popup-generic"});
 				')
 				->addClass(ZBX_STYLE_BTN_LINK)
