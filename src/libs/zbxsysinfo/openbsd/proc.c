@@ -794,12 +794,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			proc_data = (proc_data_t *)zbx_malloc(NULL, sizeof(proc_data_t));
 			memset(proc_data, 0, sizeof(proc_data_t));
 
-			proc_data->pid = proc[i].ZBX_P_PID;
-			proc_data->ppid = proc[i].ZBX_P_PPID;
 			proc_data->name = zbx_strdup(NULL, proc[i].ZBX_P_COMM);
-			proc_data->cmdline = zbx_strdup(NULL, args);
-
-			proc_data->state = get_state(&proc[i]);
 			proc_data->size = (proc[i].ZBX_P_VM_TSIZE + proc[i].ZBX_P_VM_DSIZE + proc[i].ZBX_P_VM_SSIZE)
 					* pagesize;
 			proc_data->rss = proc[i].ZBX_P_VM_RSSIZE * pagesize;
@@ -815,6 +810,14 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			proc_data->io_read_op = proc[i].ZBX_P_OUBLOCK;
 			proc_data->io_write_op = proc[i].ZBX_P_INBLOCK;
 			proc_data->swap = proc[i].ZBX_P_SWAP;
+
+			if (ZBX_PROC_MODE_PROCESS == zbx_proc_mode)
+			{
+				proc_data->pid = proc[i].ZBX_P_PID;
+				proc_data->ppid = proc[i].ZBX_P_PPID;
+				proc_data->cmdline = zbx_strdup(NULL, args);
+				proc_data->state = get_state(&proc[i]);
+			}
 
 			if (SUCCEED == get_kinfo_proc(&proc_thread, NULL, proc[i].ZBX_P_PID, &count_thread, NULL) &&
 					1 < count_thread)

@@ -822,7 +822,6 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 				proc_data->tid = proc_thread[k].ZBX_PROC_TID;
 				proc_data->tname = zbx_strdup(NULL, proc_thread[k].ZBX_PROC_TNAME);
-
 				proc_data->pid = proc_thread[k].ZBX_PROC_PID;
 				proc_data->ppid = proc_thread[k].ZBX_PROC_PPID;
 				proc_data->jid = proc_thread[k].ZBX_PROC_JID;
@@ -845,14 +844,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			proc_data = (proc_data_t *)zbx_malloc(NULL, sizeof(proc_data_t));
 			memset(proc_data, 0, sizeof(proc_data_t));
 
-			proc_data->pid = proc[i].ZBX_PROC_PID;
-			proc_data->ppid = proc[i].ZBX_PROC_PPID;
-			proc_data->jid = proc[i].ZBX_PROC_JID;
 			proc_data->name = zbx_strdup(NULL, proc[i].ZBX_PROC_COMM);
-			proc_data->cmdline = zbx_strdup(NULL, args);
 			proc_data->threads = proc[i].ZBX_PROC_NUMTHREADS;
-			proc_data->state = get_state(&proc[i]);
-
 			proc_data->size = (proc[i].ZBX_PROC_TSIZE + proc[i].ZBX_PROC_DSIZE + proc[i].ZBX_PROC_SSIZE)
 					* pagesize;
 			proc_data->rss = proc[i].ZBX_PROC_RSSIZE * pagesize;
@@ -860,6 +853,14 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			proc_data->tsize = proc[i].ZBX_PROC_TSIZE * pagesize;
 			proc_data->dsize = proc[i].ZBX_PROC_DSIZE * pagesize;
 			proc_data->ssize = proc[i].ZBX_PROC_SSIZE * pagesize;
+			proc_data->fds = get_fds(proc[i].ZBX_PROC_PID);
+			proc_data->page_faults = proc[i].ZBX_PROC_MAJFLT;
+			proc_data->swap = proc[i].ZBX_PROC_SWAP;
+			proc_data->ctx_switches = proc[i].ZBX_PROC_NVCSW + proc[i].ZBX_PROC_NIVCSW;
+			proc_data->io_write_op = proc[i].ZBX_PROC_INBLOCK;
+			proc_data->io_read_op = proc[i].ZBX_PROC_OUBLOCK;
+			proc_data->cputime_user = proc[i].ZBX_PROC_UTIME;
+			proc_data->cputime_system = proc[i].ZBX_PROC_STIME;
 
 			if (0 != (proc[i].ZBX_PROC_FLAG & ZBX_PROC_MASK))
 			{
@@ -872,14 +873,14 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			else
 				proc_data->pmem = 0.0;
 
-			proc_data->fds = get_fds(proc[i].ZBX_PROC_PID);
-			proc_data->page_faults = proc[i].ZBX_PROC_MAJFLT;
-			proc_data->swap = proc[i].ZBX_PROC_SWAP;
-			proc_data->ctx_switches = proc[i].ZBX_PROC_NVCSW + proc[i].ZBX_PROC_NIVCSW;
-			proc_data->io_write_op = proc[i].ZBX_PROC_INBLOCK;
-			proc_data->io_read_op = proc[i].ZBX_PROC_OUBLOCK;
-			proc_data->cputime_user = proc[i].ZBX_PROC_UTIME;
-			proc_data->cputime_system = proc[i].ZBX_PROC_STIME;
+			if (ZBX_PROC_MODE_PROCESS == zbx_proc_mode)
+			{
+				proc_data->pid = proc[i].ZBX_PROC_PID;
+				proc_data->ppid = proc[i].ZBX_PROC_PPID;
+				proc_data->jid = proc[i].ZBX_PROC_JID;
+				proc_data->cmdline = zbx_strdup(NULL, args);
+				proc_data->state = get_state(&proc[i]);
+			}
 
 			zbx_vector_proc_data_ptr_append(&proc_data_ctx, proc_data);
 		}
@@ -946,7 +947,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "cmdline", ZBX_NULL2EMPTY_STR(pdata->cmdline), ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&j, "vsize", pdata->vsize);
-			zbx_json_adduint64(&j, "pmem", pdata->pmem);
+			zbx_json_addfloat(&j, "pmem", pdata->pmem);
 			zbx_json_adduint64(&j, "rss", pdata->rss);
 			zbx_json_adduint64(&j, "size", pdata->size);
 			zbx_json_adduint64(&j, "tsize", pdata->tsize);
@@ -983,7 +984,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&j, "processes", pdata->processes);
 			zbx_json_adduint64(&j, "vsize", pdata->vsize);
-			zbx_json_adduint64(&j, "pmem", pdata->pmem);
+			zbx_json_addfloat(&j, "pmem", pdata->pmem);
 			zbx_json_adduint64(&j, "rss", pdata->rss);
 			zbx_json_adduint64(&j, "size", pdata->size);
 			zbx_json_adduint64(&j, "tsize", pdata->tsize);
@@ -991,7 +992,6 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_adduint64(&j, "ssize", pdata->ssize);
 			zbx_json_adduint64(&j, "cputime_user", pdata->cputime_user);
 			zbx_json_adduint64(&j, "cputime_system", pdata->cputime_system);
-			zbx_json_addstring(&j, "state", ZBX_NULL2EMPTY_STR(pdata->state), ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&j, "ctx_switches", pdata->ctx_switches);
 			zbx_json_adduint64(&j, "threads", pdata->threads);
 			zbx_json_adduint64(&j, "page_faults", pdata->page_faults);
