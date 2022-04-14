@@ -31,7 +31,7 @@
 #include "service_protocol.h"
 #include "zbxjson.h"
 #include "zbxrtc.h"
-#include "../../libs/zbxaudit/audit.h"
+#include "audit/zbxaudit.h"
 #include "audit/zbxaudit_proxy.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
