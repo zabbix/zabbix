@@ -476,7 +476,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				],
-				'ids' => $this->getInput('hostids'),
+				'hostids' => $this->getInput('hostids'),
 				'inventories' => zbx_toHash(getHostInventories(), 'db_field'),
 				'location_url' => (new CUrl('zabbix.php'))
 					->setArgument('action', 'host.list')
@@ -494,7 +494,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 
 			$data['discovered_host'] = !(bool) API::Host()->get([
 				'output' => [],
-				'hostids' => $data['ids'],
+				'hostids' => $data['hostids'],
 				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 				'limit' => 1
 			]);
