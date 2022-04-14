@@ -102,6 +102,7 @@ typedef struct
 	zbx_uint64_t	ctx_switches;
 	zbx_uint64_t	threads;
 	zbx_uint64_t	page_faults;
+	zbx_uint64_t	fds;
 	zbx_uint64_t	io_read_op;
 	zbx_uint64_t	io_write_op;
 
@@ -595,6 +596,45 @@ out:
 	return SYSINFO_RET_OK;
 }
 
+static zbx_uint64_t	get_fds(int pid)
+{
+	int			mib[4];
+	char			*p, *pend, *buf = NULL;
+	zbx_uint64_t		num = 0;
+	size_t			sz;
+	struct kinfo_file	*kf;
+
+	mib[0] = CTL_KERN;
+	mib[1] = KERN_PROC;
+	mib[2] = KERN_PROC_FILEDESC;
+	mib[3] = pid;
+
+	if (0 != sysctl(mib, 4, NULL, &sz, NULL, 0))
+		return 0;
+
+	buf = (char*)zbx_malloc(buf, sz);
+
+	if (0 != sysctl(mib, 4, buf, &sz, NULL, 0))
+	{
+		zbx_free(buf);
+		return 0;
+	}
+
+	for (p = buf, pend = buf + sz; p < pend; num++)
+	{
+		kf = (struct kinfo_file *)(uintptr_t)p;
+
+		if (kf->kf_structsize == 0)
+			break;
+
+		p += kf->kf_structsize;
+	}
+
+	zbx_free(buf);
+
+	return num;
+}
+
 static char	*get_state(struct kinfo_proc *proc)
 {
 	char	*state;
@@ -832,6 +872,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			else
 				proc_data->pmem = 0.0;
 
+			proc_data->fds = get_fds(proc[i].ZBX_PROC_PID);
 			proc_data->page_faults = proc[i].ZBX_PROC_MAJFLT;
 			proc_data->swap = proc[i].ZBX_PROC_SWAP;
 			proc_data->ctx_switches = proc[i].ZBX_PROC_NVCSW + proc[i].ZBX_PROC_NIVCSW;
@@ -876,6 +917,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 					pdata->cputime_system += pdata_cmp->cputime_system;
 					pdata->ctx_switches += pdata_cmp->ctx_switches;
 					pdata->page_faults += pdata_cmp->page_faults;
+					pdata->fds += pdata_cmp->fds;
 					pdata->io_read_op += pdata_cmp->io_read_op;
 					pdata->io_write_op += pdata_cmp->io_write_op;
 
@@ -916,6 +958,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_adduint64(&j, "ctx_switches", pdata->ctx_switches);
 			zbx_json_adduint64(&j, "threads", pdata->threads);
 			zbx_json_adduint64(&j, "page_faults", pdata->page_faults);
+			zbx_json_adduint64(&j, "fds", pdata->fds);
 			zbx_json_adduint64(&j, "swap", pdata->swap);
 			zbx_json_adduint64(&j, "io_read_op", pdata->io_read_op);
 			zbx_json_adduint64(&j, "io_write_op", pdata->io_write_op);
@@ -952,6 +995,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_adduint64(&j, "ctx_switches", pdata->ctx_switches);
 			zbx_json_adduint64(&j, "threads", pdata->threads);
 			zbx_json_adduint64(&j, "page_faults", pdata->page_faults);
+			zbx_json_adduint64(&j, "fds", pdata->fds);
 			zbx_json_adduint64(&j, "swap", pdata->swap);
 			zbx_json_adduint64(&j, "io_read_op", pdata->io_read_op);
 			zbx_json_adduint64(&j, "io_write_op", pdata->io_write_op);
