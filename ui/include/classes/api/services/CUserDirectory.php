@@ -86,7 +86,6 @@ class CUserDirectory extends CApiService {
 			$options['output'] = $this->output_fields;
 		}
 
-		$user_directories = [];
 		$result = DBselect($this->createSelectQuery($this->tableName(), $options));
 
 		if ($options['countOutput']) {
@@ -95,20 +94,22 @@ class CUserDirectory extends CApiService {
 			return (string) $row['rowscount'];
 		}
 
+		$userdirectories = [];
+
 		while ($row = DBfetch($result)) {
-			$user_directories[$row['userdirectoryid']] = $row;
+			$userdirectories[$row['userdirectoryid']] = $row;
 		}
 
-		if ($user_directories) {
-			$user_directories = $this->addRelatedObjects($options, $user_directories);
-			$user_directories = $this->unsetExtraFields($user_directories, ['userdirectoryids'], $options['output']);
+		if ($userdirectories) {
+			$userdirectories = $this->addRelatedObjects($options, $userdirectories);
+			$userdirectories = $this->unsetExtraFields($userdirectories, ['userdirectoryid'], $options['output']);
 
 			if (!$options['preservekeys']) {
-				$user_directories = array_values($user_directories);
+				$userdirectories = array_values($userdirectories);
 			}
 		}
 
-		return $user_directories;
+		return $userdirectories;
 	}
 
 	/**
@@ -347,7 +348,7 @@ class CUserDirectory extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected static function validateUpdate(array &$userdirectories, ?array &$db_userdirectories) {
+	protected static function validateUpdate(array &$userdirectories, ?array &$db_userdirectories): void {
 		$rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['userdirectoryid'], ['name']], 'fields' => [
 			'userdirectoryid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'name')],
