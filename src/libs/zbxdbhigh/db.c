@@ -805,7 +805,7 @@ void	DBextract_version_info(struct zbx_db_version_info_t *version_info)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: connects to DB and tries to detect DB extension info              *
+ * Purpose: connects to DB and tries to detect DB extension version info      *
  *                                                                            *
  ******************************************************************************/
 void	DBextract_dbextension_info(struct zbx_db_version_info_t *version_info)
@@ -857,15 +857,20 @@ void	DBflush_version_requirements(const char *version)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks TSDB for compression support                               *
+ * Purpose: checks if TimescaleDB version is allowed and if it supports       *
+ *          compression                                                       *
  *                                                                            *
- * Parameters: db_version - [IN/OUT] version of DB                            *
+ * Parameters: allow_unsupported_ver - [IN] flag that indicates whether to    *
+ *                                          allow unsupported versions of     *
+ *                                          TimescaleDB or not                *
+ *             db_version_info       - [IN/OUT] information about version of  *
+ *                                              DB and its extensions         *
  *                                                                            *
  * Return value: SUCCEED - if there are no critical errors                    *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info)
+int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int allow_unsupported_ver)
 {
 	int	ret = SUCCEED;
 #ifdef HAVE_POSTGRESQL
@@ -879,8 +884,8 @@ int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info)
 	/* timescaledb.license parameter is available in TimescaleDB API starting from TimescaleDB 2.0.  */
 	if (ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB > db_version_info->current_version)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "PostgreSQL version %lu is not supported with TimescaleDB, minimum required"
-				" is %d", (unsigned long)db_version_info->current_version,
+		zabbix_log(LOG_LEVEL_WARNING, "PostgreSQL version %lu is not supported with TimescaleDB, minimum"
+				" required is %d", (unsigned long)db_version_info->current_version,
 				ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB);
 		ret = FAIL;
 		goto out;
@@ -888,45 +893,50 @@ int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info)
 
 	if (DB_VERSION_FAILED_TO_RETRIEVE == db_version_info->ext_flag)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot determine TimescaleDB version");
 		ret = FAIL;
 		goto out;
 	}
 
-	if (ZBX_TIMESCALEDB_MIN_VERSION > db_version_info->ext_current_version)
+	if (DB_VERSION_LOWER_THAN_MINIMUM == db_version_info->ext_flag)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "TimescaleDB version %d is too old.", db_version_info->ext_current_version);
-		zabbix_log(LOG_LEVEL_ERR, "Version must be at least %d. Recommended version should be at least %s %s.",
-				ZBX_TIMESCALEDB_MIN_VERSION, ZBX_TIMESCALEDB_LICENSE_TIMESCALE_FRIENDLY,
-				ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION_FRIENDLY);
+		zabbix_log(LOG_LEVEL_WARNING, "Version must be at least %d. Recommended version should be at least"
+				" %s %s.", ZBX_TIMESCALE_MIN_VERSION, ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY,
+				ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY);
 		ret = FAIL;
 		goto out;
 	}
 
-	if (ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION > db_version_info->ext_current_version)
+	if (DB_VERSION_NOT_SUPPORTED_ERROR == db_version_info->ext_flag)
 	{
-		db_version_info->ext_status |= ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE;
 		zabbix_log(LOG_LEVEL_WARNING, "TimescaleDB version %d is not officially supported.",
-				db_version_info->ext_current_version);
+					db_version_info->ext_current_version);
 		zabbix_log(LOG_LEVEL_WARNING, "Recommended version should be at least %s %s.",
-				ZBX_TIMESCALEDB_LICENSE_TIMESCALE_FRIENDLY,
-				ZBX_TIMESCALEDB_MIN_SUPPORTED_VERSION_FRIENDLY);
-	}
-	else
-	{
-		if (0 == zbx_strcmp_null(db_version_info->ext_lic, ZBX_TIMESCALEDB_LICENSE_TIMESCALE))
+				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY, ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY);
+		if (0 == allow_unsupported_ver)
 		{
-			db_version_info->ext_status |= ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE;
-			zabbix_log(LOG_LEVEL_DEBUG, "%s was detected. Timescale compression is supported.",
-					ZBX_TIMESCALEDB_LICENSE_TIMESCALE_FRIENDLY);
+			ret = FAIL;
+			goto out;
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "[%s] license does not support Timescale compression.",
-					db_version_info->ext_lic);
-			zabbix_log(LOG_LEVEL_WARNING, "%s is required to use Timescale compression.",
-					ZBX_TIMESCALEDB_LICENSE_TIMESCALE_FRIENDLY);
+			db_version_info->ext_flag = DB_VERSION_NOT_SUPPORTED_WARNING;
+			db_version_info->ext_status |= ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE;
+			goto out;
 		}
+	}
+
+	if (0 == zbx_strcmp_null(db_version_info->ext_lic, ZBX_TIMESCALE_LICENSE_COMMUNITY))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s was detected. TimescaleDB compression is supported.",
+				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY);
+		db_version_info->ext_status |= ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "[%s] license does not support TimescaleDB compression.",
+				ZBX_NULL2EMPTY_STR(db_version_info->ext_lic));
+		zabbix_log(LOG_LEVEL_WARNING, "%s is required to use TimescaleDB compression.",
+				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY);
 	}
 out:
 #else
