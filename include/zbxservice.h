@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SERVICE_H
-#define ZABBIX_SERVICE_H
+#ifndef ZABBIX_ZBXSERVICE_H
+#define ZABBIX_ZBXSERVICE_H
 
 #include "zbxtypes.h"
 #include "db.h"
@@ -65,4 +65,4 @@ void	zbx_service_deserialize_parentids(const unsigned char *data, zbx_vector_uin
 zbx_uint32_t	zbx_service_serialize_event_severities(unsigned char **data, const zbx_vector_ptr_t *event_severities);
 void	zbx_service_deserialize_event_severities(const unsigned char *data, zbx_vector_ptr_t *event_severities);
 
-#endif /* ZABBIX_AVAILABILITY_H */
+#endif /* ZABBIX_ZBXSERVICE_H */
