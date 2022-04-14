@@ -24,8 +24,7 @@
 #include "base64.h"
 #include "zbxreport.h"
 #include "zbxhash.h"
-#include "../../libs/zbxcrypto/hmac_sha256.h"
-#include "sha256crypt.h"
+#include "zbxcrypto.h"
 #include "zbxalert.h"
 #include "zbxserver.h"
 #include "report_protocol.h"
@@ -392,21 +391,20 @@ static char	*rm_time_to_urlfield(const struct tm *tm)
 static char	*report_create_cookie(zbx_rm_t *manager, const char *sessionid)
 {
 	struct zbx_json	j;
-	char		*cookie = NULL, *out_str_raw = NULL;
-	size_t		i;
-	char		*out;
+	char		*cookie = NULL, *out_str = NULL, *out;
 
 	zbx_json_init(&j, 512);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSIONID, sessionid, ZBX_JSON_TYPE_STRING);
 
 	zbx_hmac(ZBX_HASH_SHA256, manager->session_key, strlen(manager->session_key), j.buffer, j.buffer_size, &out);
 
-	out_str_raw = zbx_dsprintf(NULL, "\"%s\"", out);
-	zbx_json_addraw(&j, ZBX_PROTO_TAG_SIGN, out_str_raw);
+	out_str = zbx_dsprintf(NULL, "\"%s\"", out);
+	zbx_json_addraw(&j, ZBX_PROTO_TAG_SIGN, out_str);
 	str_base64_encode_dyn(j.buffer, &cookie, j.buffer_size);
 
 	zbx_json_clean(&j);
-	zbx_free(out_str_raw);
+	zbx_free(out_str);
+	zbx_free(out);
 
 	return cookie;
 }

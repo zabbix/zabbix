@@ -151,5 +151,5 @@ int	zbx_hmac(zbx_crypto_hash_t hash_type, const char *key, size_t key_len, const
 	zbx_free(key_ipad);
 	zbx_free(key_block);
 
-	return (n == 2 * digest_size ? SUCCEED : FAIL);
+	return ((size_t)n == 2 * digest_size ? SUCCEED : FAIL);
 }
