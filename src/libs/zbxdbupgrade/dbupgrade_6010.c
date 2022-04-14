@@ -95,6 +95,49 @@ static int	DBpatch_6010003(void)
 
 	return DBmodify_field_type("triggers", &field, &old_field);
 }
+
+static int	DBpatch_6010004(void)
+{
+	const ZBX_FIELD	field = {"link_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts_templates", &field);
+}
+
+static int	DBpatch_6010005(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = SUCCEED;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	result = DBselect(
+		"select ht.hosttemplateid"
+		" from hosts_templates ht, hosts h"
+		" where ht.hostid=h.hostid and h.flags=4"); /* ZBX_FLAG_DISCOVERY_CREATED */
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		/* set TEMPLATE_LINK_LLD as link_type */
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update hosts_templates set link_type=1 where hosttemplateid=%s;\n", row[0]);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
 #endif
 
 DBPATCH_START(6010)
@@ -105,5 +148,7 @@ DBPATCH_ADD(6010000, 0, 1)
 DBPATCH_ADD(6010001, 0, 1)
 DBPATCH_ADD(6010002, 0, 1)
 DBPATCH_ADD(6010003, 0, 1)
+DBPATCH_ADD(6010004, 0, 1)
+DBPATCH_ADD(6010005, 0, 1)
 
 DBPATCH_END()
