@@ -223,7 +223,7 @@ else {
 		// Sanitize $data['filter']['groups'] and prepare "Template group" select options.
 		$groups = API::TemplateGroup()->get([
 			'output' => ['name'],
-			'templated_hosts' => true,
+			'with_templates' => true,
 			'with_triggers' => true,
 			'preservekeys' => true
 		]);
