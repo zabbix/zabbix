@@ -743,13 +743,14 @@ footer {
     opacity: 1; }
 
 .btn-remove, .overlay-close-btn, .subfilter-disable-btn {
-  font-size: 1.5em;
-  font-weight: bold;
+  font-size: 20px;
   color: #737373;
   text-align: center;
   cursor: pointer; }
   .btn-remove::before, .overlay-close-btn::before, .subfilter-disable-btn::before {
-    content: '\00d7'; }
+    display: block;
+    content: '+';
+    transform: rotate(45deg); }
   .btn-remove:hover, .overlay-close-btn:hover, .subfilter-disable-btn:hover, .btn-remove:focus, .overlay-close-btn:focus, .subfilter-disable-btn:focus, .btn-remove:active, .overlay-close-btn:active, .subfilter-disable-btn:active {
     color: #737373;
     outline: none; }
@@ -2061,8 +2062,7 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   .msg-bad .overlay-close-btn,
   .msg-good .overlay-close-btn,
   .msg-warning .overlay-close-btn {
-    color: #737373;
-    font-size: 1.167em; }
+    color: #737373; }
   .msg-bad .link-action,
   .msg-good .link-action,
   .msg-warning .link-action {
@@ -4577,10 +4577,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .overlay-dialogue .dashboard-widget-head .icon-doc-link {
       width: 18px;
       height: 18px;
-      margin: -9px -6px 0 38px;
+      margin: -9px -6px 0 30px;
       line-height: 18px; }
       .overlay-dialogue .dashboard-widget-head .icon-doc-link::after {
-        font-size: 15px; }
+        font-size: 14px; }
   .overlay-dialogue.modal {
     position: fixed;
     overflow: hidden;
@@ -4591,8 +4591,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
         margin-right: -26px; }
       .overlay-dialogue.modal .dashboard-widget-head .overlay-close-btn {
         position: static;
-        margin: -9px -6px 0 38px;
-        font-size: 24px; }
+        margin: -9px -6px 0 30px;
+        font-size: 25px; }
     .overlay-dialogue.modal .overlay-dialogue-body {
       overflow: auto;
       overflow-x: hidden;
@@ -4916,7 +4916,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .notif {
   width: 250px; }
   .notif .dashboard-widget-head {
-    margin: -13px -10px 7px; }
+    margin: -13px -10px 7px;
+    padding: 0; }
     .notif .dashboard-widget-head ul {
       margin: 4px 0 0 1px; }
       .notif .dashboard-widget-head ul li {
