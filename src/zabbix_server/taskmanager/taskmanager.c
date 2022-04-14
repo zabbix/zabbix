@@ -28,7 +28,7 @@
 #include "../actions.h"
 #include "export.h"
 #include "zbxdiag.h"
-#include "service_protocol.h"
+#include "zbxservice.h"
 #include "zbxjson.h"
 #include "zbxrtc.h"
 #include "audit/zbxaudit.h"
