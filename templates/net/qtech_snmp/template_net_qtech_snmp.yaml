@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:35:16Z'
+  date: '2022-04-14T11:11:36Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -139,11 +139,11 @@ zabbix_export:
           triggers:
             -
               uuid: 8ca8b9dfed0e4af898d9182150bb1ad0
-              expression: 'avg(/QTech QSW SNMP/sensor.temp.value[switchTemperature.0],5m)>{$TEMP_CRIT:""}'
+              expression: 'avg(/QTech QSW SNMP/sensor.temp.value[switchTemperature.0],5m)>{$TEMP_CRIT}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/QTech QSW SNMP/sensor.temp.value[switchTemperature.0],5m)<{$TEMP_CRIT:""}-3'
+              recovery_expression: 'max(/QTech QSW SNMP/sensor.temp.value[switchTemperature.0],5m)<{$TEMP_CRIT}-3'
               name: 'Temperature is above critical threshold'
-              event_name: 'Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+              event_name: 'Temperature is above critical threshold: >{$TEMP_CRIT}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -156,19 +156,19 @@ zabbix_export:
                   value: performance
             -
               uuid: b9122f253bf440ccb413d577790e46a0
-              expression: 'avg(/QTech QSW SNMP/sensor.temp.value[switchTemperature.0],5m)>{$TEMP_WARN:""}'
+              expression: 'avg(/QTech QSW SNMP/sensor.temp.value[switchTemperature.0],5m)>{$TEMP_WARN}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/QTech QSW SNMP/sensor.temp.value[switchTemperature.0],5m)<{$TEMP_WARN:""}-3'
+              recovery_expression: 'max(/QTech QSW SNMP/sensor.temp.value[switchTemperature.0],5m)<{$TEMP_WARN}-3'
               name: 'Temperature is above warning threshold'
-              event_name: 'Temperature is above warning threshold: >{$TEMP_WARN:""}'
+              event_name: 'Temperature is above warning threshold: >{$TEMP_WARN}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
               dependencies:
                 -
                   name: 'Temperature is above critical threshold'
-                  expression: 'avg(/QTech QSW SNMP/sensor.temp.value[switchTemperature.0],5m)>{$TEMP_CRIT:""}'
-                  recovery_expression: 'max(/QTech QSW SNMP/sensor.temp.value[switchTemperature.0],5m)<{$TEMP_CRIT:""}-3'
+                  expression: 'avg(/QTech QSW SNMP/sensor.temp.value[switchTemperature.0],5m)>{$TEMP_CRIT}'
+                  recovery_expression: 'max(/QTech QSW SNMP/sensor.temp.value[switchTemperature.0],5m)<{$TEMP_CRIT}-3'
               tags:
                 -
                   tag: scope
@@ -178,11 +178,11 @@ zabbix_export:
                   value: performance
             -
               uuid: d7607e97e2f549caaefa184c9fee8220
-              expression: 'avg(/QTech QSW SNMP/sensor.temp.value[switchTemperature.0],5m)<{$TEMP_CRIT_LOW:""}'
+              expression: 'avg(/QTech QSW SNMP/sensor.temp.value[switchTemperature.0],5m)<{$TEMP_CRIT_LOW}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'min(/QTech QSW SNMP/sensor.temp.value[switchTemperature.0],5m)>{$TEMP_CRIT_LOW:""}+3'
+              recovery_expression: 'min(/QTech QSW SNMP/sensor.temp.value[switchTemperature.0],5m)>{$TEMP_CRIT_LOW}+3'
               name: 'Temperature is too low'
-              event_name: 'Temperature is too low: <{$TEMP_CRIT_LOW:""}'
+              event_name: 'Temperature is too low: <{$TEMP_CRIT_LOW}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               tags:
@@ -240,7 +240,7 @@ zabbix_export:
           units: '%'
           description: |
             MIB: QTECH-MIB
-            CPU utilization in %
+            CPU utilization in %.
           tags:
             -
               tag: component
@@ -540,7 +540,7 @@ zabbix_export:
               name: 'has been restarted'
               event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -560,7 +560,7 @@ zabbix_export:
           units: B
           description: |
             MIB: QTECH-MIB
-            Total memory in Bytes
+            Total memory in Bytes.
           tags:
             -
               tag: component
@@ -575,7 +575,7 @@ zabbix_export:
           units: B
           description: |
             MIB: QTECH-MIB
-            Used memory in Bytes
+            Used memory in Bytes.
           tags:
             -
               tag: component
@@ -589,7 +589,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: 'last(//vm.memory.used[switchMemoryBusy.0])/last(//vm.memory.total[switchMemorySize.0])*100'
-          description: 'Memory utilization in %'
+          description: 'Memory utilization in %.'
           tags:
             -
               tag: component
