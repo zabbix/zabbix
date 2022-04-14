@@ -53,7 +53,7 @@ class testUserDirectory extends CAPITest {
 				'userdirectory' => [
 					['name' => 'LDAP #1', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid'],
 				],
-				'expected_error' => 'Invalid parameter "/1": value (name)=(LDAP #1) already exists.'
+				'expected_error' => 'User directory "LDAP #1" already exists.'
 			]
 		];
 	}
@@ -74,13 +74,6 @@ class testUserDirectory extends CAPITest {
 
 	public static function updateValidDataProvider() {
 		return [
-			'Test dublicate names update' => [
-				'userdirectory' => [
-					['userdirectoryid' => 'LDAP #1', 'name' => 'LDAP #2'],
-					['userdirectoryid' => 'LDAP #2', 'name' => 'LDAP #1'],
-				],
-				'expected_error' => null
-			],
 			'Test host update' => [
 				'userdirectory' => [
 					['userdirectoryid' => 'LDAP #1', 'host' => 'localhost'],
@@ -96,7 +89,14 @@ class testUserDirectory extends CAPITest {
 				'userdirectory' => [
 					['userdirectoryid' => 'LDAP #1', 'name' => 'LDAP #2'],
 				],
-				'expected_error' => 'Invalid parameter "/1": value (name)=(LDAP #2) already exists.'
+				'expected_error' => 'User directory "LDAP #2" already exists.'
+			],
+			'Test dublicate names cross name update' => [
+				'userdirectory' => [
+					['userdirectoryid' => 'LDAP #1', 'name' => 'LDAP #2'],
+					['userdirectoryid' => 'LDAP #2', 'name' => 'LDAP #1'],
+				],
+				'expected_error' => 'User directory "LDAP #1" already exists.'
 			],
 			'Test update not existing' => [
 				'userdirectory' => [
@@ -200,11 +200,8 @@ class testUserDirectory extends CAPITest {
 		$error = 'Cannot delete default user directory.';
 		$this->call('userdirectory.delete', self::$data['userdirectoryids'], $error);
 
-		// Update ldap_configured=0 to delete default userdirectory.
+		// Disable ldap to be able to delete default userdirectory.
 		$this->call('authentication.update', ['ldap_configured' => ZBX_AUTH_LDAP_DISABLED]);
-		// TODO: foreign key is restrict - reset config.ldap_userdirectory before delete in api or make key SETNULL?
-		$this->call('authentication.update', ['ldap_userdirectoryid' => 0]);
-
 		$this->call('userdirectory.delete', array_values(self::$data['userdirectoryids']));
 	}
 

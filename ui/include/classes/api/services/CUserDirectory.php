@@ -327,16 +327,7 @@ class CUserDirectory extends CApiService {
 			static::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$names_sql = dbConditionString('name', array_column($userdirectories, 'name'));
-		$duplicate = DBfetch(DBselect('SELECT name FROM userdirectory WHERE '.$names_sql, 1));
-
-		if ($duplicate) {
-			$subpath = '/'.(array_search($duplicate['name'], array_column($userdirectories, 'name')) + 1);
-			$error = _s('Invalid parameter "%1$s": %2$s.', $subpath,
-				_s('value %1$s already exists', '(name)=('.$duplicate['name'].')')
-			);
-			static::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
+		static::checkDuplicates($userdirectories);
 	}
 
 	/**
@@ -367,26 +358,6 @@ class CUserDirectory extends CApiService {
 			static::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$names = array_column($userdirectories, 'name');
-
-		if ($names) {
-			$duplicates = DB::select('userdirectory', [
-				'output' => ['userdirectoryid', 'name'],
-				'filter' => ['name' => array_column($userdirectories, 'name')]
-			]);
-			$duplicates = array_column($duplicates, 'name', 'userdirectoryid');
-			$duplicates = array_diff_key($duplicates, array_column($userdirectories, 'name', 'userdirectoryid'));
-
-			if ($duplicates) {
-				$name = reset($duplicates);
-				$subpath = '/'.(array_search($name, array_column($userdirectories, 'name')) + 1);
-				$error = _s('Invalid parameter "%1$s": %2$s.', $subpath,
-					_s('value %1$s already exists', '(name)=('.$name.')')
-				);
-				static::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-		}
-
 		$db_userdirectories = DB::select('userdirectory', [
 			'output' => array_keys($rules['fields']),
 			'userdirectoryids' => array_column($userdirectories, 'userdirectoryid'),
@@ -396,6 +367,8 @@ class CUserDirectory extends CApiService {
 		if (count($db_userdirectories) != count($userdirectories)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
+
+		static::checkDuplicates($userdirectories, $db_userdirectories);
 	}
 
 	/**
@@ -430,6 +403,11 @@ class CUserDirectory extends CApiService {
 		if (in_array($auth['ldap_userdirectoryid'], $userdirectoryids)
 				&& ($auth['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED || $userdirectories_left > 0)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default user directory.'));
+		}
+
+		if (in_array($auth['ldap_userdirectoryid'], $userdirectoryids)) {
+			// When last(default) is removed reset default userdirectoryid to prevent from foreign key constarin.
+			API::Authentication()->update(['ldap_userdirectoryid' => 0]);
 		}
 
 		$db_groups = API::UserGroup()->get([
@@ -491,6 +469,43 @@ class CUserDirectory extends CApiService {
 			}
 
 			$userdirectory += $db_userdirectory;
+		}
+	}
+
+	/**
+	 * Check for unique names.
+	 *
+	 * @param array      $userdirectories
+	 * @param array|null $db_userdirectories
+	 *
+	 * @throws APIException if userdirectory name is not unique.
+	 */
+	protected static function checkDuplicates(array $userdirectories, array $db_userdirectories = null): void {
+		$names = [];
+
+		foreach ($userdirectories as $userdirectory) {
+			if (!array_key_exists('name', $userdirectory)) {
+				continue;
+			}
+
+			if ($db_userdirectories === null
+					|| $userdirectory['name'] !== $db_userdirectories[$userdirectory['userdirectoryid']]['name']) {
+				$names[] = $userdirectory['name'];
+			}
+		}
+
+		if (!$names) {
+			return;
+		}
+
+		$duplicates = DB::select('userdirectory', [
+			'output' => ['name'],
+			'filter' => ['name' => $names],
+			'limit' => 1
+		]);
+
+		if ($duplicates) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('User directory "%1$s" already exists.', $duplicates[0]['name']));
 		}
 	}
 }
