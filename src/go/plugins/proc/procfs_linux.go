@@ -70,7 +70,7 @@ func getProcessName(pid string) (name string, err error) {
 	return string(data[left+1 : right]), nil
 }
 
-func getProcessStatus(pid string, proc *procStatus) (err error) {
+func parseProcessStatus(pid string, proc *procStatus) (err error) {
 	proc.Pid, _ = strconv.ParseUint(pid, 10, 64)
 
 	var data []byte
@@ -92,23 +92,7 @@ func getProcessStatus(pid string, proc *procStatus) (err error) {
 		case "Name":
 			proc.ThreadName = v
 		case "State":
-			if len(v) < 1 {
-				continue
-			}
-			switch string(v[0]) {
-			case "R":
-				proc.State = "run"
-			case "S":
-				proc.State = "sleep"
-			case "Z":
-				proc.State = "zomb"
-			case "D":
-				proc.State = "disk"
-			case "T":
-				proc.State = "trace"
-			default:
-				proc.State = "other"
-			}
+			parseStateString(v, &proc.State)
 		case "PPid":
 			setUint64(v, &proc.Ppid)
 		case "VmSize":
@@ -145,6 +129,19 @@ func getProcessStatus(pid string, proc *procStatus) (err error) {
 			}
 		}
 	}
+	return nil
+}
+
+func parseStateString(val string, state *string) (err error) {
+	posLeft := strings.IndexRune(val, '(')
+	posRight := strings.IndexRune(val, ')')
+
+	if posLeft == -1 || posRight == -1 {
+		*state = "other"
+		return fmt.Errorf("cannot parse process state string")
+	}
+
+	*state = val[posLeft+1:posRight]
 	return nil
 }
 

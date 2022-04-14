@@ -825,7 +825,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 		for _, pid := range pids {
 			data := procStatus{}
 			// a process might not exist anymore, continue silently or ignore errors
-			if err := getProcessStatus(pid, &data); err != nil {
+			if err := parseProcessStatus(pid, &data); err != nil {
 				continue
 			}
 			getProcessNames(pid, &data)
@@ -857,7 +857,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 		}
 		for _, tid := range threadIds {
 			data := procStatus{}
-			if err := getProcessStatus(tid, &data); err != nil {
+			if err := parseProcessStatus(tid, &data); err != nil {
 				continue
 			}
 			procPath := fmt.Sprintf("%d", data.Tgid) + "/task/" + tid
