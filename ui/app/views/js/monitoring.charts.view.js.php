@@ -246,27 +246,6 @@
 	};
 
 	/**
-	 * Start or pause timeout based Chart refresh.
-	 *
-	 * @param {number} seconds  Seconds to wait before reschedule. Zero seconds will pause schedule.
-	 * @param {number} delay_loading  (optional) Add "loading indicator" only when request exceeds delay.
-	 */
-	Chart.prototype.scheduleRefresh = function(seconds, delay_loading) {
-		if (this._timeoutid) {
-			clearTimeout(this._timeoutid);
-		}
-
-		if (!seconds) {
-			return;
-		}
-
-		this.refresh(delay_loading)
-			.finally(_ => {
-				this._timeoutid = setTimeout(() => this.scheduleRefresh(seconds, 0), seconds * 1000);
-			});
-	};
-
-	/**
 	 * @param {jQuery} $el       A container where charts are maintained.
 	 * @param {object} timeline  Time control object.
 	 * @param {object} config
@@ -372,10 +351,6 @@
 			clearTimeout(this._timeoutid);
 		}
 
-		for (const chart of this.charts) {
-			chart.scheduleRefresh(0);
-		}
-
 		this.updateListAndCharts(delay_loading)
 			.finally(_ => {
 				if (refresh_interval) {
@@ -430,7 +405,6 @@
 
 		if (this._prev_width === undefined) {
 			this._prev_width = width;
-			this.updateCharts();
 
 			return;
 		}

@@ -174,15 +174,14 @@ if (array_key_exists('problems', $data)) {
 
 		// Create acknowledge link.
 		$problem_update_link = ($data['allowed_add_comments'] || $data['allowed_change_severity']
-			|| $data['allowed_acknowledge'] || $can_be_closed)
+				|| $data['allowed_acknowledge'] || $can_be_closed)
 			? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->setAttribute('data-eventid', $problem['eventid'])
 				->onClick('acknowledgePopUp({eventids: [this.dataset.eventid]}, this);')
-			: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
-				$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
-			);
+			: (new CSpan($is_acknowledged ? _('Yes') : _('No')))
+				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
 
 		$table->addRow(array_merge($row, [
 			$cell_r_clock,

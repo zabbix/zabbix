@@ -313,6 +313,15 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				->addClass(ZBX_STYLE_RED);
 		}
 
+		$parameters = [
+			'dstfrm' => $user_form->getName(),
+			'media' => $index,
+			'mediatypeid' => $media['mediatypeid'],
+			($media['mediatype'] == MEDIA_TYPE_EMAIL) ? 'sendto_emails' : 'sendto' => $media['sendto'],
+			'period' => $media['period'],
+			'severity' => $media['severity'],
+			'active' => $media['active']
+		];
 		$media_severity = [];
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
@@ -328,11 +337,8 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				);
 		}
 
-		$media_send_to_key = "sendto";
-
 		if ($media['mediatype'] == MEDIA_TYPE_EMAIL) {
 			$media['sendto'] = implode(', ', $media['sendto']);
-			$media_send_to_key = "sendto_emails";
 		}
 
 		if (mb_strlen($media['sendto']) > 50) {
@@ -352,22 +358,8 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 					new CHorList([
 						(new CButton(null, _('Edit')))
 							->addClass(ZBX_STYLE_BTN_LINK)
-							->setAttribute('data-mediatypeid', $media['mediatypeid'])
-							->setAttribute('data-period', $media['period'])
-							->setAttribute('data-severity', $media['severity'])
-							->setAttribute('data-active', $media['active'])
-							->setAttribute('data-sendto',  $media['sendto'])
-							->onClick('
-								PopUp("popup.media",{
-									dstfrm:"'.$user_form->getName().'",
-									media:'.$index.',
-									mediatypeid:this.dataset.mediatypeid,
-									period:this.dataset.period,
-									severity:this.dataset.severity,
-									active:this.dataset.active,
-									'.$media_send_to_key.':this.dataset.sendto
-								});
-							'),
+							->setAttribute('data-parameters', json_encode($parameters))
+							->onClick('PopUp("popup.media", JSON.parse(this.dataset.parameters));'),
 						(new CButton(null, _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->onClick('removeMedia('.$index.');')
