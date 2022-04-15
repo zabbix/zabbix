@@ -99,12 +99,7 @@ TABLE|hstgrp|groupid|ZBX_DATA
 FIELD		|groupid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
-UNIQUE		|1		|name
-
-TABLE|tplgrp|groupid|ZBX_DATA
-FIELD		|groupid	|t_id		|	|NOT NULL	|0
-FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
 UNIQUE		|1		|name
 
@@ -726,13 +721,6 @@ FIELD		|groupid	|t_id		|	|NOT NULL	|0			|2|hstgrp
 UNIQUE		|1		|hostid,groupid
 INDEX		|2		|groupid
 
-TABLE|template_group|templategroupid|ZBX_TEMPLATE
-FIELD		|templategroupid|t_id		|	|NOT NULL	|0
-FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
-FIELD		|groupid	|t_id		|	|NOT NULL	|0			|2|tplgrp
-UNIQUE		|1		|hostid,groupid
-INDEX		|2		|groupid
-
 TABLE|hosts_templates|hosttemplateid|ZBX_TEMPLATE
 FIELD		|hosttemplateid	|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|hosts
@@ -765,14 +753,6 @@ FIELD		|rightid	|t_id		|	|NOT NULL	|0
 FIELD		|groupid	|t_id		|	|NOT NULL	|0			|1|usrgrp	|usrgrpid
 FIELD		|permission	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|id		|t_id		|	|NOT NULL	|0			|2|hstgrp	|groupid
-INDEX		|1		|groupid
-INDEX		|2		|id
-
-TABLE|right_tplgrp|rightid|ZBX_DATA
-FIELD		|rightid	|t_id		|	|NOT NULL	|0
-FIELD		|groupid	|t_id		|	|NOT NULL	|0			|1|usrgrp	|usrgrpid
-FIELD		|permission	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|id		|t_id		|	|NOT NULL	|0			|2|tplgrp	|groupid
 INDEX		|1		|groupid
 INDEX		|2		|id
 
@@ -1957,4 +1937,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6010022	|6010022
+ROW		|1		|6010006	|6010006
