@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:54:07Z'
+  date: '2022-04-15T08:18:35Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -231,7 +231,8 @@ zabbix_export:
             -
               uuid: 052fb88fae1349d5b9a5fa5bcf24d0fa
               expression: 'last(/Cisco Catalyst 3750V2-24PS SNMP/system.hw.serialnumber,#1)<>last(/Cisco Catalyst 3750V2-24PS SNMP/system.hw.serialnumber,#2) and length(last(/Cisco Catalyst 3750V2-24PS SNMP/system.hw.serialnumber))>0'
-              name: 'Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:54:50Z'
+  date: '2022-04-15T08:11:32Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -278,14 +278,14 @@ zabbix_export:
           timeout: 10s
           parameters:
             -
+              name: api_endpoint
+              value: '{$KUBE.API.ENDPOINT.URL}'
+            -
               name: token
               value: '{$KUBE.API.TOKEN}'
             -
               name: endpoint_name
               value: '{$KUBE.NODES.ENDPOINT.NAME}'
-            -
-              name: api_endpoint
-              value: '{$KUBE.API.ENDPOINT.URL}'
           tags:
             -
               tag: component
@@ -1235,7 +1235,8 @@ zabbix_export:
                 -
                   uuid: b322a8c9a4404da49c434e78822d6ac5
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.uptime[{#NAME}])<10'
-                  name: 'Node [{#NAME}]: Has been restarted (uptime < 10m)'
+                  name: 'Node [{#NAME}]: Has been restarted'
+                  event_name: 'Node [{#NAME}]: Has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   tags:

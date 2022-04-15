@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:54:22Z'
+  date: '2022-04-15T08:03:37Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -599,7 +599,7 @@ zabbix_export:
               name: 'ES: Cluster has been restarted'
               event_name: 'ES: Cluster has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -1648,10 +1648,10 @@ zabbix_export:
                 -
                   uuid: 580ae8aadf994fbcb34c9c8ad7cd5fad
                   expression: 'last(/Elasticsearch Cluster by HTTP/es.node.jvm.uptime[{#ES.NODE}])<10m'
-                  name: 'ES {#ES.NODE}: Node {#ES.NODE} has been restarted (uptime < 10m)'
+                  name: 'ES {#ES.NODE}: has been restarted'
                   event_name: 'ES {#ES.NODE}: has been restarted (uptime < 10m)'
                   priority: INFO
-                  description: 'Uptime is less than 10 minutes'
+                  description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
                   tags:
                     -
