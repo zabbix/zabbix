@@ -1,4 +1,4 @@
-# Translated by Wesli. 
+# Translated by Wesli.
 # In case of wrong translation, please contact tom3000@126.com
 # my blog www.dajianren.com
 # 20160923
@@ -7,17 +7,17 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-04 19:52+0200\n"
-"PO-Revision-Date: 2021-02-15 09:13+0300\n"
-"Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2022-04-10 07:26+0000\n"
+"Last-Translator: Yanan <wangyanan@grandage.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1613373219.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -130,7 +130,7 @@ msgstr[0] "%1$s 动作"
 #: jsLoader.php:239
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s 个字符"
 
 #: jsLoader.php:240
 #, c-format
@@ -1253,7 +1253,7 @@ msgstr "八月"
 
 #: app/views/administration.authentication.edit.php:212
 msgid "AuthN requests"
-msgstr ""
+msgstr "AuthN 请求"
 
 #: app/views/administration.authentication.edit.php:254
 #: app/views/administration.authentication.edit.php:263
@@ -1305,7 +1305,7 @@ msgstr "验证设置已更新"
 #: app/views/administration.module.edit.php:40
 #: app/views/administration.module.list.php:75
 msgid "Author"
-msgstr ""
+msgstr "作者"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:48
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:150
@@ -1351,20 +1351,20 @@ msgstr "自动的图标选择"
 #: app/views/popup.mediatype.message.php:61
 #: include/classes/helpers/CMediatypeHelper.php:119 include/html.inc.php:897
 msgid "Autoregistration"
-msgstr ""
+msgstr "自动注册"
 
 #: include/views/configuration.action.list.php:29
 msgid "Autoregistration actions"
-msgstr ""
+msgstr "自动注册动作"
 
 #: app/views/administration.housekeeping.edit.php:71
 msgid "Autoregistration data storage period"
-msgstr ""
+msgstr "自动注册数据存储周期"
 
 #: include/profiles.inc.php:232
 #, c-format
 msgid "Autoregistration event and alert data storage period \"%1$s\"."
-msgstr ""
+msgstr "自动注册事件和报警数据存储期 \"%1$s\" 。"
 
 #: app/partials/monitoring.host.view.html.php:35
 #: include/views/configuration.host.list.php:195
@@ -1489,7 +1489,7 @@ msgstr "边框宽度"
 
 #: app/controllers/CControllerUserUpdateGeneral.php:93
 msgid "Both passwords must be equal."
-msgstr ""
+msgstr "两次密码必须相同。"
 
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:146
@@ -1874,7 +1874,7 @@ msgstr "不能连接到数据库。"
 
 #: include/views/js/configuration.httpconf.edit.js.php:106
 msgid "Cannot convert POST data:"
-msgstr ""
+msgstr "无法转换 POST 数据："
 
 #: graphs.php:400
 msgid "Cannot copy graph"
@@ -2067,7 +2067,7 @@ msgstr[0] "无法删除示警媒介类型"
 #, c-format
 msgid "Cannot delete module: %1$s."
 msgid_plural "Cannot delete modules: %1$s."
-msgstr[0] ""
+msgstr[0] "无法删除模块：%1$s。"
 
 #: sysmaps.php:259
 msgid "Cannot delete network map"
@@ -2184,7 +2184,7 @@ msgstr[0] "无法删除用户"
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
-msgstr[0] ""
+msgstr[0] "无法删除用户组"
 
 #: app/controllers/CControllerValuemapDelete.php:66
 msgid "Cannot delete value map"
@@ -2230,7 +2230,7 @@ msgstr[0] "无法禁用消息介质类型"
 #, c-format
 msgid "Cannot disable module: %1$s."
 msgid_plural "Cannot disable modules: %1$s."
-msgstr[0] ""
+msgstr[0] "无法禁用模块: %1$s。"
 
 #: triggers.php:555
 msgid "Cannot disable trigger"
@@ -2285,7 +2285,7 @@ msgstr[0] "无法启用消息介质类型"
 #, c-format
 msgid "Cannot enable module: %1$s."
 msgid_plural "Cannot enable modules: %1$s."
-msgstr[0] ""
+msgstr[0] "无法启用模块: %1$s。"
 
 #: triggers.php:554
 msgid "Cannot enable trigger"
@@ -2299,7 +2299,7 @@ msgstr[0] "无法启用Web场景"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:213
 msgid "Cannot evaluate expression"
-msgstr ""
+msgstr "无法计算表达式"
 
 #: app/controllers/CControllerPopupScriptExec.php:89
 msgid "Cannot execute script"
@@ -2638,7 +2638,7 @@ msgstr ""
 #: app/controllers/CControllerUserUnblock.php:78
 msgid "Cannot unblock user"
 msgid_plural "Cannot unblock users"
-msgstr[0] ""
+msgstr[0] "无法解锁用户"
 
 #: include/classes/api/services/CHostGeneral.php:550
 msgid "Cannot unlink and clear Web scenarios."
@@ -2847,7 +2847,7 @@ msgstr[0] "无法更新监控项目模板"
 
 #: disc_prototypes.php:1119
 msgid "Cannot update item prototypes"
-msgstr ""
+msgstr "无法更新监控项原型"
 
 #: items.php:1212
 msgid "Cannot update items"
@@ -2869,7 +2869,7 @@ msgstr "无法更新媒介型态"
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
 msgid "Cannot update module: %1$s."
-msgstr ""
+msgstr "无法更新模块: %1$s。"
 
 #: sysmaps.php:180
 msgid "Cannot update network map"
@@ -2924,7 +2924,7 @@ msgstr "无法更新被模板化的应用程序."
 
 #: templates.php:495
 msgid "Cannot update templates"
-msgstr ""
+msgstr "无法更新模板"
 
 #: include/classes/api/services/CTemplate.php:857
 #: include/classes/api/services/CTemplate.php:1192
@@ -2968,7 +2968,7 @@ msgstr "无法更新用户"
 #: app/controllers/CControllerUsergroupUpdate.php:105
 msgid "Cannot update user group"
 msgid_plural "Cannot update user groups"
-msgstr[0] ""
+msgstr[0] "无法更新用户组"
 
 #: app/controllers/CControllerValuemapUpdate.php:44
 #: app/controllers/CControllerValuemapUpdate.php:102
@@ -3036,7 +3036,7 @@ msgstr "更改"
 
 #: app/views/administration.autoreg.edit.php:80
 msgid "Change PSK"
-msgstr ""
+msgstr "修改 PSK"
 
 #: app/views/administration.authentication.edit.php:80
 #: app/views/administration.mediatype.edit.php:137
@@ -3054,7 +3054,7 @@ msgstr "更改严重性"
 
 #: include/classes/html/CMacroValue.php:143
 msgid "Change type"
-msgstr ""
+msgstr "修改类型"
 
 #: include/forms.inc.php:192 include/items.inc.php:127
 #: include/views/configuration.item.edit.php:568
@@ -3092,11 +3092,11 @@ msgstr "检查开始于\"%1$s\"的表达式部份."
 
 #: include/items.inc.php:1840
 msgid "Check for error in JSON"
-msgstr ""
+msgstr "JSON数据错误检查"
 
 #: include/items.inc.php:1844
 msgid "Check for error in XML"
-msgstr ""
+msgstr "XML数据错误检查"
 
 #: include/items.inc.php:1848
 msgid "Check for error using regular expression"
@@ -3351,7 +3351,7 @@ msgstr "命令"
 #: include/items.inc.php:1255
 msgctxt "SNMP Community"
 msgid "Community"
-msgstr ""
+msgstr "团队"
 
 #: app/views/monitoring.problem.view.php:324
 msgid "Compact view"
