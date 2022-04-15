@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-01T13:18:30Z'
+  date: '2022-04-06T19:27:49Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -647,7 +647,8 @@ zabbix_export:
             -
               uuid: 39bfa825d88145d5a687ba07f6b5596e
               expression: 'nodata(/Apache Kafka by JMX/jmx["kafka.network:type=SocketServer,name=NetworkProcessorAvgIdlePercent","Value"],15m)=1'
-              name: 'Kafka: Failed to fetch info data (or no data for 15m)'
+              name: 'Kafka: Failed to fetch info data'
+              event_name: 'Kafka: Failed to fetch info data (or no data for 15m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 15 minutes'
               tags:
@@ -657,7 +658,8 @@ zabbix_export:
             -
               uuid: 91c95d4543ae436d986881e76f090aec
               expression: 'max(/Apache Kafka by JMX/jmx["kafka.network:type=SocketServer,name=NetworkProcessorAvgIdlePercent","Value"],15m)<{$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN}'
-              name: 'Kafka: Network processor average idle percent is too low (under {$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN} for 15m)'
+              name: 'Kafka: Network processor average idle percent is too low'
+              event_name: 'Kafka: Network processor average idle percent is too low (under {$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN} for 15m)'
               priority: AVERAGE
               description: 'The network processor idle ratio metric indicates the percentage of time the network processor are not in use. The lower this number, the more loaded the broker is.'
               tags:
@@ -688,7 +690,8 @@ zabbix_export:
             -
               uuid: b2fa6148a2b24fa6890b4078c235dcd8
               expression: 'last(/Apache Kafka by JMX/jmx["kafka.server:type=app-info","start-time-ms"])<10m'
-              name: 'Kafka: has been restarted (uptime < 10m)'
+              name: 'Kafka: has been restarted'
+              event_name: 'Kafka: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -721,7 +724,8 @@ zabbix_export:
             -
               uuid: 92ecd7eb1eae49d9886ecac7b8f2084a
               expression: 'last(/Apache Kafka by JMX/jmx["kafka.server:type=app-info","version"],#1)<>last(/Apache Kafka by JMX/jmx["kafka.server:type=app-info","version"],#2) and length(last(/Apache Kafka by JMX/jmx["kafka.server:type=app-info","version"]))>0'
-              name: 'Kafka: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Kafka: Version has changed'
+              event_name: 'Kafka: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Kafka version has changed. Ack to close.'
               manual_close: 'YES'
@@ -904,7 +908,8 @@ zabbix_export:
             -
               uuid: 8f070e06520b4b299fcfffa952d318fc
               expression: 'max(/Apache Kafka by JMX/jmx["kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent","OneMinuteRate"],15m)<{$KAFKA.REQUEST_HANDLER_AVG_IDLE.MIN.WARN}'
-              name: 'Kafka: Request handler average idle percent is too low (under {$KAFKA.REQUEST_HANDLER_AVG_IDLE.MIN.WARN} for 15m)'
+              name: 'Kafka: Request handler average idle percent is too low'
+              event_name: 'Kafka: Request handler average idle percent is too low (under {$KAFKA.REQUEST_HANDLER_AVG_IDLE.MIN.WARN} for 15m)'
               priority: AVERAGE
               description: 'The request handler idle ratio metric indicates the percentage of time the request handlers are not in use. The lower this number, the more loaded the broker is.'
               tags:

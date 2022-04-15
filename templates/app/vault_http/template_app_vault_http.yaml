@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-01T13:12:13Z'
+  date: '2022-04-06T19:35:48Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -319,7 +319,8 @@ zabbix_export:
             -
               uuid: a43a4139d225461289d16b7a78002cb0
               expression: 'length(last(/HashiCorp Vault by HTTP/vault.get_metrics.error))>0'
-              name: 'Vault: Failed to get metrics (error: {ITEM.VALUE})'
+              name: 'Vault: Failed to get metrics'
+              event_name: 'Vault: Failed to get metrics (error: {ITEM.VALUE})'
               priority: WARNING
               dependencies:
                 -
@@ -674,7 +675,8 @@ zabbix_export:
             -
               uuid: ee9a561165b847c2a0719a767e5c4fe9
               expression: 'last(/HashiCorp Vault by HTTP/vault.health.version,#1)<>last(/HashiCorp Vault by HTTP/vault.health.version,#2) and length(last(/HashiCorp Vault by HTTP/vault.health.version))>0'
-              name: 'Vault: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Vault: Version has changed'
+              event_name: 'Vault: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Vault version has changed. Ack to close.'
               manual_close: 'YES'
@@ -1122,7 +1124,8 @@ zabbix_export:
             -
               uuid: c68ab0c784314291bde1cc8693fd5959
               expression: '(max(/HashiCorp Vault by HTTP/vault.metrics.core.leadership.setup_failed,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.leadership.setup_failed,1h))>{$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN}'
-              name: 'Vault: High frequency of leadership setup failures (over {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} for 1h)'
+              name: 'Vault: High frequency of leadership setup failures'
+              event_name: 'Vault: High frequency of leadership setup failures (over {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} for 1h)'
               priority: AVERAGE
               description: 'There have been more than {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} Vault leadership setup failures in the past 1h.'
               tags:
@@ -1158,7 +1161,8 @@ zabbix_export:
             -
               uuid: 8d7f4f51272a4ce5a3a7ab9642e51d63
               expression: '(max(/HashiCorp Vault by HTTP/vault.metrics.core.leadership_lost,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.leadership_lost,1h))>{$VAULT.LEADERSHIP.LOSSES.MAX.WARN}'
-              name: 'Vault: High frequency of leadership losses (over {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} for 1h)'
+              name: 'Vault: High frequency of leadership losses'
+              event_name: 'Vault: High frequency of leadership losses (over {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} for 1h)'
               priority: AVERAGE
               description: 'There have been more than {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} Vault leadership losses in the past 1h.'
               tags:
@@ -1305,7 +1309,8 @@ zabbix_export:
             -
               uuid: 5f2895eb5a94441f858c573584ec8b19
               expression: '(max(/HashiCorp Vault by HTTP/vault.metrics.core.step_down,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.step_down,1h))>{$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN}'
-              name: 'Vault: High frequency of leadership step downs (over {$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN} for 1h)'
+              name: 'Vault: High frequency of leadership step downs'
+              event_name: 'Vault: High frequency of leadership step downs (over {$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN} for 1h)'
               priority: AVERAGE
               description: 'There have been more than {$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN} Vault leadership step downs in the past 1h.'
               tags:
@@ -1821,7 +1826,8 @@ zabbix_export:
             -
               uuid: a60eed70ecbc44fa935ec87d83fe4793
               expression: 'last(/HashiCorp Vault by HTTP/vault.metrics.process.uptime)<10m'
-              name: 'Vault: has been restarted (uptime < 10m)'
+              name: 'Vault: has been restarted'
+              event_name: 'Vault: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -2827,7 +2833,8 @@ zabbix_export:
             -
               uuid: f4f0db7e26d9470a86d11e86d1ae26e2
               expression: 'last(/HashiCorp Vault by HTTP/vault.token_via_accessor.has_ttl["{#ACCESSOR}"])=1 and last(/HashiCorp Vault by HTTP/vault.token_via_accessor.ttl["{#ACCESSOR}"])<{$VAULT.TOKEN.TTL.MIN.CRIT}'
-              name: 'Vault: Token [{#TOKEN_NAME}] will expire soon (less than {$VAULT.TOKEN.TTL.MIN.CRIT})'
+              name: 'Vault: Token [{#TOKEN_NAME}] will expire soon'
+              event_name: 'Vault: Token [{#TOKEN_NAME}] will expire soon (less than {$VAULT.TOKEN.TTL.MIN.CRIT})'
               priority: AVERAGE
               tags:
                 -
@@ -2836,11 +2843,12 @@ zabbix_export:
             -
               uuid: 0e2143a2a46d44778db34ac9af69bbfc
               expression: 'last(/HashiCorp Vault by HTTP/vault.token_via_accessor.has_ttl["{#ACCESSOR}"])=1 and last(/HashiCorp Vault by HTTP/vault.token_via_accessor.ttl["{#ACCESSOR}"])<{$VAULT.TOKEN.TTL.MIN.WARN}'
-              name: 'Vault: Token [{#TOKEN_NAME}] will expire soon (less than {$VAULT.TOKEN.TTL.MIN.WARN})'
+              name: 'Vault: Token [{#TOKEN_NAME}] will expire soon'
+              event_name: 'Vault: Token [{#TOKEN_NAME}] will expire soon (less than {$VAULT.TOKEN.TTL.MIN.WARN})'
               priority: WARNING
               dependencies:
                 -
-                  name: 'Vault: Token [{#TOKEN_NAME}] will expire soon (less than {$VAULT.TOKEN.TTL.MIN.CRIT})'
+                  name: 'Vault: Token [{#TOKEN_NAME}] will expire soon'
                   expression: 'last(/HashiCorp Vault by HTTP/vault.token_via_accessor.has_ttl["{#ACCESSOR}"])=1 and last(/HashiCorp Vault by HTTP/vault.token_via_accessor.ttl["{#ACCESSOR}"])<{$VAULT.TOKEN.TTL.MIN.CRIT}'
               tags:
                 -
@@ -3083,7 +3091,8 @@ zabbix_export:
     -
       uuid: ebe6f65e82ed4f00bd7c5be30841a25c
       expression: 'min(/HashiCorp Vault by HTTP/vault.metrics.process.open.fds,5m)/last(/HashiCorp Vault by HTTP/vault.metrics.process.max.fds)*100>{$VAULT.OPEN.FDS.MAX.WARN}'
-      name: 'Vault: Current number of open files is too high (over {$VAULT.OPEN.FDS.MAX.WARN}% for 5m)'
+      name: 'Vault: Current number of open files is too high'
+      event_name: 'Vault: Current number of open files is too high (over {$VAULT.OPEN.FDS.MAX.WARN}% for 5m)'
       priority: WARNING
       tags:
         -

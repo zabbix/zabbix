@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-01T08:23:53Z'
+  date: '2022-04-06T19:33:33Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -144,7 +144,8 @@ zabbix_export:
             -
               uuid: 1ad5018fb19d4a9cb9e627f964bfd627
               expression: 'min(/PHP-FPM by HTTP/php-fpm.listen_queue_usage,15m) > {$PHP_FPM.QUEUE.WARN.MAX}'
-              name: 'PHP-FPM: Queue utilization is high (over {$PHP_FPM.QUEUE.WARN.MAX}% for 15m)'
+              name: 'PHP-FPM: Queue utilization is high'
+              event_name: 'PHP-FPM: Queue utilization is high (over {$PHP_FPM.QUEUE.WARN.MAX}% for 15m)'
               priority: WARNING
               description: 'The queue for this pool reached {$PHP_FPM.QUEUE.WARN.MAX}% of its maximum capacity. Items in queue represent the current number of connections that have been initiated on this pool, but not yet accepted.'
               tags:
@@ -338,7 +339,8 @@ zabbix_export:
             -
               uuid: 8cfa50bcea744075954d0a9c8a132330
               expression: 'last(/PHP-FPM by HTTP/php-fpm.process_manager,#1)<>last(/PHP-FPM by HTTP/php-fpm.process_manager,#2)'
-              name: 'PHP-FPM: Manager  changed (new value received: {ITEM.VALUE})'
+              name: 'PHP-FPM: Manager  changed'
+              event_name: 'PHP-FPM: Manager  changed (new value received: {ITEM.VALUE})'
               priority: INFO
               description: 'PHP-FPM manager changed. Ack to close.'
               manual_close: 'YES'
@@ -424,7 +426,8 @@ zabbix_export:
             -
               uuid: b44815446b3b464f883f4d0e799b020e
               expression: 'nodata(/PHP-FPM by HTTP/php-fpm.uptime,30m)=1'
-              name: 'PHP-FPM: Failed to fetch info data (or no data for 30m)'
+              name: 'PHP-FPM: Failed to fetch info data'
+              event_name: 'PHP-FPM: Failed to fetch info data (or no data for 30m)'
               priority: INFO
               description: 'Zabbix has not received data for items for the last 30 minutes'
               manual_close: 'YES'
@@ -439,7 +442,8 @@ zabbix_export:
             -
               uuid: 9ed4047bdcd74e649814c5d004ba78c7
               expression: 'last(/PHP-FPM by HTTP/php-fpm.uptime)<10m'
-              name: 'PHP-FPM: has been restarted (uptime < 10m)'
+              name: 'PHP-FPM: has been restarted'
+              event_name: 'PHP-FPM: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -478,7 +482,8 @@ zabbix_export:
             -
               uuid: d6c891de92c34bdba80a2ba88f975271
               expression: 'last(/PHP-FPM by HTTP/php-fpm.version,#1)<>last(/PHP-FPM by HTTP/php-fpm.version,#2) and length(last(/PHP-FPM by HTTP/php-fpm.version))>0'
-              name: 'PHP-FPM: Version has changed (new version: {ITEM.VALUE})'
+              name: 'PHP-FPM: Version has changed'
+              event_name: 'PHP-FPM: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'PHP-FPM version has changed. Ack to close.'
               manual_close: 'YES'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-01T13:07:23Z'
+  date: '2022-04-06T19:35:32Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -48,6 +48,7 @@ zabbix_export:
               uuid: 152d235652914aa2af78334385334214
               expression: 'last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#1)<>last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#2) and length(last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo]))>0'
               name: 'Tomcat: Version has been changed'
+              event_name: 'Tomcat: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Tomcat version has changed. Ack to close.'
               manual_close: 'YES'
@@ -543,7 +544,8 @@ zabbix_export:
             -
               uuid: 7a15296553a447f6aebf4958631b6704
               expression: 'min(/Apache Tomcat by JMX/jmx[{#JMXOBJ},currentThreadsBusy],{$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})>last(/Apache Tomcat by JMX/jmx[{#JMXOBJ},maxThreads])*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100'
-              name: '{#JMXNAME}: Busy worker threads count are more than {$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}% of the limit for {$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"}'
+              name: '{#JMXNAME}: Busy worker threads count is high'
+              event_name: '{#JMXNAME}: Busy worker threads count are more than {$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}% of the limit for {$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"}'
               priority: HIGH
               description: 'When current threads busy counter reaches the limit, no more requests could be handled, and the application chokes.'
               tags:

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-28T12:02:19Z'
+  date: '2022-04-06T19:27:35Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -120,7 +120,8 @@ zabbix_export:
             -
               uuid: 1bc442ba67dc42d298d98feb845d8730
               expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#1)<>last(/HPE ProLiant BL460 SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#2) and length(last(/HPE ProLiant BL460 SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum]))>0'
-              name: 'Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
@@ -178,7 +179,8 @@ zabbix_export:
             -
               uuid: 87570f607b174ebe887920034a1be1ef
               expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.name[sysName],#1)<>last(/HPE ProLiant BL460 SNMP/hp.server.name[sysName],#2) and length(last(/HPE ProLiant BL460 SNMP/hp.server.name[sysName]))>0'
-              name: 'System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -312,7 +314,8 @@ zabbix_export:
             -
               uuid: 9159ee66dbe4498cba29daca24ddcb5f
               expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.uptime[sysUpTime])<10m'
-              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -876,7 +879,8 @@ zabbix_export:
                 -
                   uuid: d3dbef930bca4808ae3bf32ba84a987a
                   expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#1)<>last(/HPE ProLiant BL460 SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#2) and length(last(/HPE ProLiant BL460 SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]))>0'
-                  name: '{#DISK_LOCATION}: Disk has been replaced (new serial number received)'
+                  name: '{#DISK_LOCATION}: Disk has been replaced'
+                  event_name: '{#DISK_LOCATION}: Disk has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Disk serial number has changed. Ack to close'
                   manual_close: 'YES'

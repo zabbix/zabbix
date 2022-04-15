@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-05T06:43:31Z'
+  date: '2022-04-06T19:33:38Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -58,7 +58,8 @@ zabbix_export:
             -
               uuid: ae7f1953f9b94c9c907d7bd7627d389d
               expression: 'nodata(/RabbitMQ cluster by HTTP/rabbitmq.get_overview,30m)=1'
-              name: 'RabbitMQ: Failed to fetch overview data (or no data for 30m)'
+              name: 'RabbitMQ: Failed to fetch overview data'
+              event_name: 'RabbitMQ: Failed to fetch overview data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes'
               manual_close: 'YES'
@@ -1319,7 +1320,8 @@ zabbix_export:
             -
               uuid: 220eedd4f69b43fabe233b5127e09c50
               expression: 'min(/RabbitMQ node by HTTP/net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}'
-              name: 'RabbitMQ: Service response time is too high (over {$RABBITMQ.RESPONSE_TIME.MAX.WARN}s for 5m)'
+              name: 'RabbitMQ: Service response time is too high'
+              event_name: 'RabbitMQ: Service response time is too high (over {$RABBITMQ.RESPONSE_TIME.MAX.WARN}s for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
@@ -1382,7 +1384,8 @@ zabbix_export:
             -
               uuid: d4452f05d08343c7a374da412c0f1de6
               expression: 'nodata(/RabbitMQ node by HTTP/rabbitmq.get_nodes,30m)=1'
-              name: 'RabbitMQ: Failed to fetch nodes data (or no data for 30m)'
+              name: 'RabbitMQ: Failed to fetch nodes data'
+              event_name: 'RabbitMQ: Failed to fetch nodes data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes.'
               manual_close: 'YES'
@@ -1477,7 +1480,8 @@ zabbix_export:
             -
               uuid: 093eec2fd9264f158087509d8364dc09
               expression: 'last(/RabbitMQ node by HTTP/rabbitmq.node.disk_free_alarm)=1'
-              name: 'RabbitMQ: Free disk space alarm (Free space threshold has been reached)'
+              name: 'RabbitMQ: Free disk space alarm'
+              event_name: 'RabbitMQ: Free disk space alarm (Free space threshold has been reached)'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'https://www.rabbitmq.com/disk-alarms.html'
@@ -1553,7 +1557,8 @@ zabbix_export:
             -
               uuid: 843be64cfdcd4df5b3fea4726da69c7e
               expression: 'last(/RabbitMQ node by HTTP/rabbitmq.node.mem_alarm)=1'
-              name: 'RabbitMQ: Memory alarm (Memory usage threshold has been reached)'
+              name: 'RabbitMQ: Memory alarm'
+              event_name: 'RabbitMQ: Memory alarm (Memory usage threshold has been reached)'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'https://www.rabbitmq.com/memory.html'
@@ -1655,7 +1660,8 @@ zabbix_export:
             -
               uuid: 19989038dfe84fcdb12262ee3782ab41
               expression: 'last(/RabbitMQ node by HTTP/rabbitmq.node.overview.rabbitmq_version,#1)<>last(/RabbitMQ node by HTTP/rabbitmq.node.overview.rabbitmq_version,#2) and length(last(/RabbitMQ node by HTTP/rabbitmq.node.overview.rabbitmq_version))>0'
-              name: 'RabbitMQ: Version has changed (new version: {ITEM.VALUE})'
+              name: 'RabbitMQ: Version has changed'
+              event_name: 'RabbitMQ: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'RabbitMQ version has changed. Ack to close.'
               manual_close: 'YES'
@@ -1690,7 +1696,8 @@ zabbix_export:
             -
               uuid: 943d239a9fa5443dac3205c65a4da033
               expression: 'min(/RabbitMQ node by HTTP/rabbitmq.node.partitions,5m)>0'
-              name: 'RabbitMQ: Number of network partitions is too high (more than 0 for 5m)'
+              name: 'RabbitMQ: Number of network partitions is too high'
+              event_name: 'RabbitMQ: Number of network partitions is too high (more than 0 for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'https://www.rabbitmq.com/partitions.html#detecting'
@@ -1825,7 +1832,8 @@ zabbix_export:
             -
               uuid: 6edfa365704f480da4b35b51b6ed84f4
               expression: 'last(/RabbitMQ node by HTTP/rabbitmq.node.uptime)<10m'
-              name: 'RabbitMQ: has been restarted (uptime < 10m)'
+              name: 'RabbitMQ: has been restarted'
+              event_name: 'RabbitMQ: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -2588,7 +2596,8 @@ zabbix_export:
                 -
                   uuid: b6f52153a22144338e6d002287446ac1
                   expression: 'min(/RabbitMQ node by HTTP/rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"],5m)>{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}'
-                  name: 'RabbitMQ: Too many messages in queue [{#VHOST}][{#QUEUE}] (over {$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"} for 5m)'
+                  name: 'RabbitMQ: Too many messages in queue [{#VHOST}][{#QUEUE}]'
+                  event_name: 'RabbitMQ: Too many messages in queue [{#VHOST}][{#QUEUE}] (over {$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"} for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   tags:
@@ -2804,14 +2813,14 @@ zabbix_export:
             key: rabbitmq.get_queues
           lld_macro_paths:
             -
-              lld_macro: '{#NODE}'
-              path: $.node
-            -
               lld_macro: '{#QUEUE}'
               path: $.name
             -
               lld_macro: '{#VHOST}'
               path: $.vhost
+            -
+              lld_macro: '{#NODE}'
+              path: $.node
       tags:
         -
           tag: class

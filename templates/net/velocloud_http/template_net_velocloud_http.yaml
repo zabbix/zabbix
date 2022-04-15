@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T09:58:15Z'
+  date: '2022-04-06T19:35:49Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -244,7 +244,8 @@ zabbix_export:
             -
               uuid: 5a95d9c614e74c2c8b6181fc8dff2226
               expression: 'nodata(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.api_version,30m)=1'
-              name: 'Velocloud: Failed to fetch aggregate data (or no data for 30m)'
+              name: 'Velocloud: Failed to fetch aggregate data'
+              event_name: 'Velocloud: Failed to fetch aggregate data (or no data for 30m)'
               priority: AVERAGE
               description: 'Zabbix has not received data for items for the last 30 minutes.'
               manual_close: 'YES'
@@ -730,7 +731,8 @@ zabbix_export:
                 -
                   uuid: 156d96052fd54606828cc53484794bb2
                   expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.system_uptime[{#ID}])>0 and last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.system_uptime[{#ID}])<600'
-                  name: 'Edge [{#NAME}]: Edge has been restarted (uptime < 10m)'
+                  name: 'Edge [{#NAME}]: Edge has been restarted'
+                  event_name: 'Edge [{#NAME}]: Edge has been restarted (uptime < 10m)'
                   priority: WARNING
                   description: 'Edge was restarted.'
                   tags:
@@ -997,7 +999,8 @@ zabbix_export:
                 -
                   uuid: e51ea2da27284067bd3ec8fa4faffdde
                   expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.system_uptime[{#ID}])>0 and last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.system_uptime[{#ID}])<600'
-                  name: 'Gateway [{#NAME}]: Gateway has been restarted (uptime < 10m)'
+                  name: 'Gateway [{#NAME}]: Gateway has been restarted'
+                  event_name: 'Gateway [{#NAME}]: Gateway has been restarted (uptime < 10m)'
                   priority: WARNING
                   description: 'Gateway was restarted.'
                   tags:
