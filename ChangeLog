@@ -113,6 +113,11 @@ A.F....... [ZBX-19118] made Host Interface field non-required for HTTP agent ite
 Changes for 6.0.4rc1
 
 New features:
+.........T [ZBXNEXT-7582] moved threshold information from trigger name to the event name (abakaldin, vkhaliev)
+..F....... [ZBXNEXT-7525] fixed inconsistent trigger links in Configuration -> Items (rdetlavs)
+..F....... [ZBXNEXT-7564] fixed media type importing in PHP 8 (rdetlavs)
+.........T [ZBXNEXT-5580] added macros and fixed filesystem utilization triggers for windows, linux and some other templates (vkhaliev)
+..F....... [ZBXNEXT-7477] updated MySQL database error handling for PHP 8 (averza, jfreibergs)
 .........T [ZBXNEXT-7506] added Proxmox Virtual Environment template (abakaldin)
 ..F....... [ZBXNEXT-7472] added support of text data for top hosts widget (agriscenko)
 .........T [ZBXNEXT-7505] added new GLPi media type (abiba)
@@ -120,6 +125,13 @@ New features:
 .........T [ZBXNEXT-7507] added TrueNAS template (vkhaliev)
 
 Bug fixes:
+..F....... [ZBX-20678] fixed focusing and keyboard functionality for host in Geomap widget (rdetlavs)
+..F....... [ZBX-20782] fixed non unique ids browser console errors when executing Mass update action (rdetlavs)
+..F....... [ZBX-20458] fixed incorrect view of disabled range slider in firefox (rdetlavs)
+..F....... [ZBX-20545] fixed trend storage period field wrong appearance when item type of information is character/text/log (rdetlavs)
+.......PS. [ZBX-20844] fixed external check becoming unsupported when Zabbix server or Zabbix proxy is stopped (vso)
+..F....... [ZBX-20658] fixed missing CR (carriage return) characters in line endings, in popup forms (averza)
+..F....... [ZBX-20821] fixed required php version in setup (acikuns)
 ...G...... [ZBX-20754] fixed Zabbix sender and Zabbix js not releasing semaphores upon exit (vso)
 ...G...... [ZBX-20538] changed postgres plugin to handle connection per user and not per database for Zabbix agent 2 (esneiders)
 .......PS. [ZBX-20567] improved preprocessor queue performance with items taking long time to preprocess (wiper)
