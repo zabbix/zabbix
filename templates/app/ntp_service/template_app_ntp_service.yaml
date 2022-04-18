@@ -1,13 +1,13 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:33:43Z'
+  date: '2022-04-18T10:47:45Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
   templates:
     -
-      uuid: b28c13fdd0194ddcb5f6b18723a575ae
+      uuid: c190bf667c7e401c9a371f78335d0ab2
       template: 'NTP Service'
       name: 'NTP Service'
       description: |
@@ -19,10 +19,10 @@ zabbix_export:
           name: Templates/Modules
       items:
         -
-          uuid: e6101cf9015e436e82d9203f638f1840
+          uuid: a48a5f880e634e87ada6d872b65ca0c9
           name: 'NTP service is running'
           type: SIMPLE
-          key: 'net.tcp.service[ntp]'
+          key: 'net.udp.service[ntp]'
           history: 1w
           valuemap:
             name: 'Service state'
@@ -32,8 +32,8 @@ zabbix_export:
               value: network
           triggers:
             -
-              uuid: 6c7f4d7e2719401d8fd8f99ae8fc2d34
-              expression: 'max(/NTP Service/net.tcp.service[ntp],#3)=0'
+              uuid: 16d8a3771c0c4410b7a047aca72e4fb0
+              expression: 'max(/NTP Service/net.udp.service[ntp],#3)=0'
               name: 'NTP service is down on {HOST.NAME}'
               priority: AVERAGE
               tags:
@@ -42,7 +42,7 @@ zabbix_export:
                   value: availability
       valuemaps:
         -
-          uuid: 1fb344806bc84930a4c45b84fd375cc8
+          uuid: ad9997672a204e9da96787a1410989dd
           name: 'Service state'
           mappings:
             -
