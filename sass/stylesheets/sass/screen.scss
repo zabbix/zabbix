@@ -3043,11 +3043,11 @@ $form-icon-btn: (
 		.icon-doc-link {
 			width: 18px;
 			height: 18px;
-			margin: -9px -6px 0 38px;
+			margin: -9px -6px 0 30px;
 			line-height: 18px;
 
 			&::after {
-				font-size: 15px;
+				font-size: 14px;
 			}
 		}
 	}
@@ -3066,8 +3066,8 @@ $form-icon-btn: (
 
 			.overlay-close-btn {
 				position: static;
-				margin: -9px -6px 0 38px;
-				font-size: 24px;
+				margin: -9px -6px 0 30px;
+				font-size: 25px;
 			}
 		}
 
@@ -3602,6 +3602,7 @@ $form-icon-btn: (
 
 	.dashboard-widget-head {
 		margin: -13px -10px 7px;
+		padding: 0;
 
 		ul {
 			margin: 4px 0 0 1px;
@@ -6620,6 +6621,11 @@ z-select,
 	margin-top: 5px;
 	height: 30px;
 	width: 30px;
+}
+.leaflet-marker-icon:focus {
+	box-shadow: 0 0 0 2px $btn-border-focus-color;
+	border-radius: 2px;
+	outline: none;
 }
 .marker-cluster span {
 	line-height: 30px;

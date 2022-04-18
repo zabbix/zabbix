@@ -17,10 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "audit/zbxaudit_settings.h"
-
 #include "zbxalgo.h"
 #include "audit.h"
+#include "audit/zbxaudit_proxy.h"
 
 void	zbx_audit_proxy_config_reload(zbx_uint64_t proxy_hostid, const char *name)
 {
