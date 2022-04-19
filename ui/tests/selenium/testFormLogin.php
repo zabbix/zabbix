@@ -1,5 +1,4 @@
 <?php
-
 /*
  * * Zabbix
  * * Copyright (C) 2001-2022 Zabbix SIA
@@ -19,76 +18,92 @@
  * * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * */
 
-require_once dirname(__FILE__) . '/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__) . '/../include/CWebTest.php';
 
-class testFormLogin extends CLegacyWebTest {
+class testFormLogin extends CWebTest {
 
-	public static function data() {
+	public static function getLoginLogoutData() {
 		return [
-			[[
-				'login' => 'disabled-user',
-				'password' => 'zabbix',
-				'success_expected' => false,
-				'dbCheck' => false
-				]],
-			[[
-				'login' => 'no-access-to-the-frontend',
-				'password' => 'zabbix',
-				'success_expected' => false,
-				'dbCheck' => false
-				]],
-			[[
-				'login' => 'admin',
-				'password' => 'zabbix',
-				'success_expected' => false,
-				'dbCheck' => false
-				]],
-			[[
-				'login' => 'Admin',
-				'password' => 'Zabbix',
-				'success_expected' => false,
-				'dbCheck' => true
-				]],
-			[[
-				'login' => 'Admin',
-				'password' => '',
-				'success_expected' => false,
-				'dbCheck' => true
-				]],
-			[[
-				'login' => 'Admin',
-				'password' => '!@$#%$&^*(\"\'\\*;:',
-				'success_expected' => false,
-				'dbCheck' => true
-				]],
-			[[
-				'login' => 'Admin',
-				'password' => 'zabbix',
-				'success_expected' => true,
-				'dbCheck' => false
-				]],
-			[[
-				'login' => 'guest',
-				'password' => '',
-				'success_expected' => true,
-				'dbCheck' => false
-				]]
+			[
+				[
+					'login' => 'disabled-user',
+					'password' => 'zabbix',
+					'success_expected' => false,
+					'dbCheck' => false
+				]
+			],
+			[
+				[
+					'login' => 'no-access-to-the-frontend',
+					'password' => 'zabbix',
+					'success_expected' => false,
+					'dbCheck' => false
+				]
+			],
+			[
+				[
+					'login' => 'admin',
+					'password' => 'zabbix',
+					'success_expected' => false,
+					'dbCheck' => false
+				]
+			],
+			[
+				[
+					'login' => 'Admin',
+					'password' => 'Zabbix',
+					'success_expected' => false,
+					'dbCheck' => true
+				]
+			],
+			[
+				[
+					'login' => 'Admin',
+					'password' => '',
+					'success_expected' => false,
+					'dbCheck' => true
+				]
+			],
+			[
+				[
+					'login' => 'Admin',
+					'password' => '!@$#%$&^*(\"\'\\*;:',
+					'success_expected' => false,
+					'dbCheck' => true
+				]
+			],
+			[
+				[
+					'login' => 'Admin',
+					'password' => 'zabbix',
+					'success_expected' => true,
+					'dbCheck' => false
+				]
+			],
+			[
+				[
+					'login' => 'guest',
+					'password' => '',
+					'success_expected' => true,
+					'dbCheck' => false
+				]
+			]
 		];
 	}
 
 	/**
 	 * Function is using previously defined data in order to login into system by checking different type of
 	 * user permissions. When expected view is opened with the user, function is logging out of system.
-	 * Additonally function checks if database is gathering correct data.
+	 * Additionally function checks if database is gathering correct data.
 	 *
 	 * @onBefore removeGuestFromDisabledGroup
 	 * @onAfter addGuestToDisabledGroup
-	 * @dataProvider data
+	 *
+	 * @dataProvider getLoginLogoutData
 	 */
-
-	public function testFormLogin_LoginLogout($data) {
-		$this->page->userLogin($data['login'], $data['password']);
-		switch ($data['login']) {
+	public function testFormLogin_LoginLogout($getLoginLogoutData) {
+		$this->page->userLogin($getLoginLogoutData['login'], $getLoginLogoutData['password']);
+		switch ($getLoginLogoutData['login']) {
 			case 'disabled-user':
 				$this->assertEquals('No permissions for system access.', $this->query('class:red')
 						->waitUntilVisible()->one()->getText());
@@ -105,34 +120,32 @@ class testFormLogin extends CLegacyWebTest {
 				break;
 		}
 
-		if ($data['success_expected']) {
+		if ($getLoginLogoutData['success_expected']) {
 			$this->page->assertHeader('Global view');
 			$this->query('class:icon-signout')->one()->click();
 			$this->assertEquals('Remember me for 30 days', $this->query('xpath://label[@for="autologin"]')->one()->getText());
 		}
-		elseif ($data['dbCheck']) {
+		elseif ($getLoginLogoutData['dbCheck']) {
 			$this->assertEquals('Incorrect user name or password or account is temporarily blocked.', $this->query('class:red')
 					->waitUntilVisible()->one()->getText());
-			$sql = "SELECT * FROM users WHERE attempt_failed>0 AND alias='".$data['login']."'";
+			$sql = "SELECT * FROM users WHERE attempt_failed>0 AND alias='".$getLoginLogoutData['login']."'";
 			$this->assertEquals(1, CDBHelper::getCount($sql));
-			$sql = "SELECT * FROM users WHERE attempt_clock>0 AND alias='".$data['login']."'";
+			$sql = "SELECT * FROM users WHERE attempt_clock>0 AND alias='".$getLoginLogoutData['login']."'";
 			$this->assertEquals(1, CDBHelper::getCount($sql));
-			$sql = "SELECT * FROM users WHERE attempt_ip<>'' AND alias='".$data['login']."'";
+			$sql = "SELECT * FROM users WHERE attempt_ip<>'' AND alias='".$getLoginLogoutData['login']."'";
 			$this->assertEquals(1, CDBHelper::getCount($sql));
 		}
 	}
 
-
 	/**
-	 * Function is creating failed authentifications in order to block account, afterwards by halting it's work for
-	 * 30 seconds, function checks if correctly inserted authentification data for account gives access to view
+	 * Function is creating failed authentication in order to block account, afterwards by halting it's work for
+	 * 30 seconds, function checks if correctly inserted authentication data for account gives access to view
 	 * and properly returns message stating how many times failed attempts have been made to login into account.
 	 */
-
 	public function testFormLogin_BlockAccountAndRecoverAfter30Seconds() {
 		$this->page->open('index.php');
 		for ($i = 1; $i < 5; $i++) {
-			$this->page->userLogin('user-for-blocking','!@$#%$&^*(\"\'\\*;:');
+			$this->page->userLogin('user-for-blocking', '!@$#%$&^*(\"\'\\*;:');
 			$this->assertEquals('Incorrect user name or password or account is temporarily blocked.', $this->query('class:red')
 					->waitUntilVisible()->one()->getText());
 			$sql = 'SELECT attempt_failed FROM users WHERE alias=\'user-for-blocking\'';
@@ -143,19 +156,19 @@ class testFormLogin extends CLegacyWebTest {
 			$this->assertEquals(1, CDBHelper::getCount($sql));
 		}
 
-		$this->page->userLogin('user-for-blocking','!@$#%$&^*(\"\'\\*;:');
+		$this->page->userLogin('user-for-blocking', '!@$#%$&^*(\"\'\\*;:');
 		$this->assertEquals('Incorrect user name or password or account is temporarily blocked.', $this->query('class:red')
 				->waitUntilVisible()->one()->getText());
 
-		// account is blocked, waiting 30 sec and trying to login
+		// Account is blocked, waiting 30 sec and trying to login.
 		sleep(30);
-		$this->page->userLogin('user-for-blocking','zabbix');
+		$this->page->userLogin('user-for-blocking', 'zabbix');
 		$this->page->assertHeader('Global view');
 		$this->assertStringContainsString('5 failed login attempts logged.', $this->query('class:msg-bad')
 				->waitUntilVisible()->one()->getText());
 	}
 
-	public static function login_with_request() {
+	public static function getLoginWithRequestData() {
 		return [
 			[
 				[
@@ -177,17 +190,17 @@ class testFormLogin extends CLegacyWebTest {
 	}
 
 	/**
-	 * Function makes two authentifications with different data to different Zabbix views, seperatably clicking on
+	 * Function makes two authentifications with different data to different Zabbix views, separately clicking on
 	 * sign in button and checking by views header, if correct url is opened.
 	 *
-	 * @dataProvider login_with_request
+	 * @dataProvider getLoginWithRequestData
 	 */
-	public function testFormLogin_LoginWithRequest($data) {
-		$this->page->open($data['url']);
-		$this->query('id:name')->one()->clear()->type($data['login']);
-		$this->query('id:password')->one()->clear()->type($data['password']);
+	public function testFormLogin_LoginWithRequest($getLoginWithRequestData) {
+		$this->page->open($getLoginWithRequestData['url']);
+		$this->query('id:name')->one()->type($getLoginWithRequestData['login']);
+		$this->query('id:password')->one()->type($getLoginWithRequestData['password']);
 		$this->query('id:enter')->one()->click();
-		$this->page->assertHeader($data['header']);
+		$this->page->assertHeader($getLoginWithRequestData['header']);
 	}
 
 	/**
@@ -200,5 +213,4 @@ class testFormLogin extends CLegacyWebTest {
 	public function addGuestToDisabledGroup() {
 		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
 	}
-
 }
