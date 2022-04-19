@@ -50,19 +50,6 @@ class ExecuteNowAction {
 					'groupid' => $hostgroupids['HG-for-executenow']
 				],
 				'status' => HOST_STATUS_MONITORED,
-//				'discoveryrules' => [
-//					[
-//						'name' => 'DR1-agent',
-//						'key_' => 'DR1-agent',
-//						'type' => ITEM_TYPE_ZABBIX,
-//						'delay' => '1h'
-//					],
-//					[
-//						'name' => 'DR2-trap',
-//						'key_' => 'DR2-trap',
-//						'type' => ITEM_TYPE_TRAPPER
-//					]
-//				],
 				'items' => [
 					[
 						'name' => 'I1-lvl1-agent-num',
@@ -161,7 +148,7 @@ class ExecuteNowAction {
 		];
 		CDataHelper::createItems('item', $items, $hosts['hostids']);
 
-		// Create dependent discovery rules.
+		// Create discovery rules.
 		$discoveryrule = [
 			'Host for execute now permissions' => [
 				[

@@ -73,7 +73,7 @@ class testUserRolesPermissions extends CWebTest {
 				'rules' => [
 					'services.write.mode' => 1
 				]
-						]
+			]
 		]);
 		$this->assertArrayHasKey('roleids', $role);
 		self::$super_roleid = $role['roleids'][0];
