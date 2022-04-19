@@ -1102,7 +1102,7 @@ out:
 		if (0 == CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS)
 		{
 			zabbix_log(LOG_LEVEL_ERR, " ");
-			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix proxy due to unsupported %s database server"
+			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix server due to unsupported %s database server"
 					" version (%s).", db_version_info.database,
 					db_version_info.friendly_current_version);
 
