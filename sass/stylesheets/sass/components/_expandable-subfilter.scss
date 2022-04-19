@@ -5,6 +5,7 @@
 	word-break: break-word;
 	max-height: $line-height;
 	line-height: $line-height;
+	overflow: hidden;
 
 	&.ten-lines {
 		max-height: calc(#{$line-height} * 10);
