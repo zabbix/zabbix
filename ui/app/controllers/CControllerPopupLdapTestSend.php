@@ -27,31 +27,31 @@ class CControllerPopupLdapTestSend extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'userdirectoryid' => 	'db userdirectory.userdirectoryid',
-			'host' => 				'required|db userdirectory.host|not_empty',
-			'port' => 				'required|db userdirectory.port|ge '.ZBX_MIN_PORT_NUMBER.'|le '.ZBX_MAX_PORT_NUMBER,
-			'base_dn' => 			'required|db userdirectory.base_dn|not_empty',
-			'bind_dn' => 			'db userdirectory.bind_dn',
-			'bind_password' => 		'db userdirectory.bind_password',
-			'search_attribute' => 	'required|db userdirectory.search_attribute|not_empty',
-			'start_tls' => 			'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
-			'search_filter' => 		'db userdirectory.search_filter',
-			'test_username' => 		'required|string',
-			'test_password' => 		'required|string'
+			'userdirectoryid' =>	'db userdirectory.userdirectoryid',
+			'host' =>				'required|db userdirectory.host|not_empty',
+			'port' =>				'required|db userdirectory.port|ge '.ZBX_MIN_PORT_NUMBER.'|le '.ZBX_MAX_PORT_NUMBER,
+			'base_dn' =>			'required|db userdirectory.base_dn|not_empty',
+			'bind_dn' =>			'db userdirectory.bind_dn',
+			'bind_password' =>		'db userdirectory.bind_password',
+			'search_attribute' =>	'required|db userdirectory.search_attribute|not_empty',
+			'start_tls' =>			'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
+			'search_filter' =>		'db userdirectory.search_filter',
+			'test_username' =>		'required|string',
+			'test_password' =>		'required|string'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
 			$this->setResponse(
-				(new CControllerResponseData([
+				new CControllerResponseData([
 					'main_block' => json_encode([
 						'error' => [
 							'title' => _('Invalid LDAP configuration'),
 							'messages' => array_column(get_and_clear_messages(), 'message')
 						]
 					])
-				]))->disableView()
+				])
 			);
 		}
 
@@ -65,7 +65,8 @@ class CControllerPopupLdapTestSend extends CController {
 	protected function doAction(): void {
 		$ldap_test_object = [];
 		$this->getInputs($ldap_test_object, ['userdirectoryid', 'host', 'port', 'base_dn', 'bind_dn', 'bind_password',
-			'search_attribute', 'start_tls', 'search_filter','test_username', 'test_password']);
+			'search_attribute', 'start_tls', 'search_filter','test_username', 'test_password'
+		]);
 
 		$result = API::UserDirectory()->test($ldap_test_object);
 
