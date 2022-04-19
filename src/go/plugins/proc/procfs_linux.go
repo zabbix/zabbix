@@ -31,7 +31,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -145,43 +144,6 @@ func parseStateString(val string, state *string) (err error) {
 	return nil
 }
 
-func getProcessIo(pid string, proc *procStatus) (err error) {
-	var pos int
-	if data, err := read2k("/proc/" + pid + "/io"); err == nil {
-		s := strings.Split(string(data), "\n")
-		for _, tmp := range s {
-			if pos = strings.IndexRune(tmp, ':'); pos == -1 {
-				continue
-			}
-
-			k := tmp[:pos]
-			v := strings.TrimSpace(tmp[pos+1:])
-
-			switch k {
-			case "read_bytes":
-				setInt64(v, &proc.IoReadsB)
-			case "write_bytes":
-				setInt64(v, &proc.IoWritesB)
-			}
-		}
-	} else {
-		proc.IoReadsB = -1
-		proc.IoWritesB = -1
-		return err
-	}
-	return nil
-}
-
-func getProcessFds(pid string, proc *procStatus) (err error) {
-	if fds, err := ioutil.ReadDir("/proc/" + pid + "/fd"); err == nil {
-		proc.Fds = int64(len(fds))
-		return nil
-	} else {
-		proc.Fds = -1
-		return err
-	}
-}
-
 func getProcessCalculatedMetrics(pid string, proc *procStatus) (err error) {
 	proc.Size = proc.Exe + proc.Data + proc.Stk
 
@@ -201,6 +163,8 @@ func getProcessCpuTimes(pid string, proc *procStatus) (err error) {
 	var stat procStat
 	getProcessStat(pid, &stat)
 	if stat.err != nil {
+		proc.CpuTimeUser = -1
+		proc.CpuTimeSystem = -1
 		proc.PageFaults = -1
 		return stat.err
 	}

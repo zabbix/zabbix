@@ -519,11 +519,12 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 						continue
 					}
 					procSum.Processes++
-					procSum.Vmsize += procCmp.Vmsize
-					procSum.Wkset += procCmp.Wkset
-					procSum.CpuTimeUser += procCmp.CpuTimeUser
-					procSum.CpuTimeSystem += procCmp.CpuTimeSystem
 					procSum.Threads += procCmp.Threads
+					addNonNegativeFloat(&procSum.Vmsize, procCmp.Vmsize)
+					addNonNegativeFloat(&procSum.Wkset, procCmp.Wkset)
+					addNonNegativeFloat(&procSum.CpuTimeUser, procCmp.CpuTimeUser)
+					addNonNegativeFloat(&procSum.CpuTimeSystem, procCmp.CpuTimeSystem)
+					addNonNegative(&procSum.Threads, procCmp.Threads)
 					addNonNegative(&procSum.PageFaults, procCmp.PageFaults)
 					addNonNegative(&procSum.Handles, procCmp.Handles)
 					addNonNegative(&procSum.IoReadsB, procCmp.IoReadsB)

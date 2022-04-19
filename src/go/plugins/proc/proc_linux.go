@@ -170,9 +170,6 @@ type procStatus struct {
 	CtxSwitches   int64  `json:"ctx_switches"`
 	Threads       int64  `json:"threads"`
 	PageFaults    int64  `json:"page_faults"`
-	Fds           int64  `json:"fds"`
-	IoReadsB      int64  `json:"io_read_b"`
-	IoWritesB     int64  `json:"io_write_b"`
 }
 
 type procSummary struct {
@@ -195,9 +192,6 @@ type procSummary struct {
 	CtxSwitches   int64   `json:"ctx_switches"`
 	Threads       int64   `json:"threads"`
 	PageFaults    int64   `json:"page_faults"`
-	Fds           int64   `json:"fds"`
-	IoReadsB      int64   `json:"io_read_b"`
-	IoWritesB     int64   `json:"io_write_b"`
 }
 
 type thread struct {
@@ -211,8 +205,6 @@ type thread struct {
 	State         string  `json:"state"`
 	CtxSwitches   int64   `json:"ctx_switches"`
 	PageFaults    int64   `json:"page_faults"`
-	IoReadsB      int64   `json:"io_read_b"`
-	IoWritesB     int64   `json:"io_write_b"`
 }
 
 type procStat struct {
@@ -828,8 +820,6 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 				continue
 			}
 			getProcessNames(pid, &data)
-			getProcessIo(pid, &data)
-			getProcessFds(pid, &data)
 			getProcessCalculatedMetrics(pid, &data)
 			getProcessCpuTimes(pid, &data)
 
@@ -861,8 +851,6 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 			}
 			procPath := fmt.Sprintf("%d", data.Tgid) + "/task/" + tid
 			getProcessNames(tid, &data)
-			getProcessIo(procPath, &data)
-			getProcessFds(tid, &data)
 			getProcessCalculatedMetrics(tid, &data)
 			getProcessCpuTimes(procPath, &data)
 
@@ -870,7 +858,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 			if query.match(&pi) {
 				threadArray = append(threadArray, thread{data.Tgid, data.Ppid, data.Name, data.Pid,
 					data.ThreadName, data.CpuTimeUser, data.CpuTimeSystem, data.State, data.CtxSwitches,
-					data.PageFaults, data.IoReadsB, data.IoWritesB})
+					data.PageFaults})
 				}
 			}
 		}
@@ -890,7 +878,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 			procSum := procSummary{proc.Name, 1, proc.Vsize, proc.Pmem, proc.Rss, proc.Data,
 				proc.Exe, proc.Lck, proc.Lib, proc.Pin, proc.Pte, proc.Size, proc.Stk,
 				proc.Swap, proc.CpuTimeUser, proc.CpuTimeSystem, proc.CtxSwitches, proc.Threads,
-				proc.PageFaults, proc.Fds, proc.IoReadsB, proc.IoWritesB}
+				proc.PageFaults}
 
 			if len(array) > i + 1 {
 				for _, procCmp := range array[i + 1:] {
@@ -898,26 +886,23 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 						continue
 					}
 					procSum.Processes++
-					procSum.Vsize += procCmp.Vsize
-					procSum.Pmem += procCmp.Pmem
-					procSum.Rss += procCmp.Rss
-					procSum.Data += procCmp.Data
-					procSum.Exe += procCmp.Exe
-					procSum.Lck += procCmp.Lck
-					procSum.Lib += procCmp.Lib
-					procSum.Pin += procCmp.Pin
-					procSum.Pte += procCmp.Pte
-					procSum.Size += procCmp.Size
-					procSum.Stk += procCmp.Stk
-					procSum.Swap += procCmp.Swap
-					procSum.CpuTimeUser += procCmp.CpuTimeUser
-					procSum.CpuTimeSystem += procCmp.CpuTimeSystem
-					procSum.CtxSwitches += procCmp.CtxSwitches
 					procSum.Threads += procCmp.Threads
+					addNonNegative(&procSum.Vsize, procCmp.Vsize)
+					addNonNegativeFloat(&procSum.Pmem, procCmp.Pmem)
+					addNonNegative(&procSum.Rss, procCmp.Rss)
+					addNonNegative(&procSum.Data, procCmp.Data)
+					addNonNegative(&procSum.Exe, procCmp.Exe)
+					addNonNegative(&procSum.Lck, procCmp.Lck)
+					addNonNegative(&procSum.Lib, procCmp.Lib)
+					addNonNegative(&procSum.Pin, procCmp.Pin)
+					addNonNegative(&procSum.Pte, procCmp.Pte)
+					addNonNegative(&procSum.Size, procCmp.Size)
+					addNonNegative(&procSum.Stk, procCmp.Stk)
+					addNonNegative(&procSum.Swap, procCmp.Swap)
+					addNonNegativeFloat(&procSum.CpuTimeUser, procCmp.CpuTimeUser)
+					addNonNegativeFloat(&procSum.CpuTimeSystem, procCmp.CpuTimeSystem)
+					addNonNegative(&procSum.CtxSwitches, procCmp.CtxSwitches)
 					addNonNegative(&procSum.PageFaults, procCmp.PageFaults)
-					addNonNegative(&procSum.Fds, procCmp.Fds)
-					addNonNegative(&procSum.IoReadsB, procCmp.IoReadsB)
-					addNonNegative(&procSum.IoWritesB, procCmp.IoWritesB)
 				}
 			}
 			processed = append(processed, proc.Name)

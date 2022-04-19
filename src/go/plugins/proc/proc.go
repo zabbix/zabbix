@@ -19,10 +19,34 @@
 
 package proc
 
+import "fmt"
+
 func addNonNegative(dst *int64, val int64) () {
-	if val != -1 {
-		*dst += val
+	if *dst == -1 {
+		return
 	}
+
+	if val == -1 {
+		fmt.Printf("GOT -1\n")
+		*dst = -1
+		return
+	}
+
+	*dst += val
+	return
+}
+
+func addNonNegativeFloat(dst *float64, val float64) () {
+	if *dst == -1.0 {
+		return
+	}
+
+	if val == -1.0 {
+		*dst = -1.0
+		return
+	}
+
+	*dst += val
 	return
 }
 
