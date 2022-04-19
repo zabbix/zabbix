@@ -208,7 +208,6 @@
 #define ZBX_PROTO_VALUE_PROXY_DATA		"proxy data"
 #define ZBX_PROTO_VALUE_PROXY_TASKS		"proxy tasks"
 #define ZBX_PROTO_VALUE_ACTIVE_CHECK_HEARTBEAT	"active check heartbeat"
-#define ZBX_PROTO_VALUE_HOST_DATA		"host data"
 
 #define ZBX_PROTO_VALUE_GET_QUEUE_OVERVIEW	"overview"
 #define ZBX_PROTO_VALUE_GET_QUEUE_PROXY		"overview by proxy"
