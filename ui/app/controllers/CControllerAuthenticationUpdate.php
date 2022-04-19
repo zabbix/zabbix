@@ -339,7 +339,7 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	/**
-	 * Updates exising LDAP servers, creates new ones, removes deleted ones.
+	 * Updates existing LDAP servers, creates new ones, removes deleted ones.
 	 *
 	 * @param array $ldap_servers
 	 * @param int $default_row_index
