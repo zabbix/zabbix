@@ -130,7 +130,7 @@ class testItemTest extends CWebTest {
 					if ($check_now) {
 						if ($type === 'Dependent item') {
 							$enabled= true;
-					}
+						}
 						$execute_button = $this->query('button:Execute now')->waitUntilVisible()->one();
 						$this->assertTrue($execute_button->isEnabled($enabled));
 					}

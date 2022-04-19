@@ -623,6 +623,29 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
+			// Add access to "Execute now" action.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'user_execute_now_action',
+						'User type' => 'User',
+						'Invoke "Execute now" on read-only hosts' => true
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'admin_execute_now_action',
+						'User type' => 'Admin',
+						'Invoke "Execute now" on read-only hosts' => true
+					],
+					'message_header' => 'User role created'
+				]
+			],
 			// API methods deny list.
 			[
 				[
@@ -1107,23 +1130,25 @@ class testFormUserRoles extends CWebTest {
 							.' for user role "role_for_update".'
 				]
 			],
-			// Change name.
+			// Change name and add access to "Execute now" action.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'user_changed_name',
-						'User type' => 'User'
+						'User type' => 'User',
+						'Invoke "Execute now" on read-only hosts' => true
 					],
 					'message_header' => 'User role updated'
 				]
 			],
-			// Change type to admin.
+			// Change type to admin and remove access to "Execute now" action.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'User type' => 'Admin'
+						'User type' => 'Admin',
+						'Invoke "Execute now" on read-only hosts' => false
 					],
 					'message_header' => 'User role updated'
 				]
@@ -1193,7 +1218,8 @@ class testFormUserRoles extends CWebTest {
 						'Close problems' => false,
 						'Execute scripts' => false,
 						'Manage API tokens' => false,
-						'Default access to new actions' => false
+						'Default access to new actions' => false,
+						'Invoke "Execute now" on read-only hosts' => false
 					],
 					'message_header' => 'User role updated'
 				]

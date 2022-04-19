@@ -101,7 +101,7 @@ trait TableTrait {
 	 * @param string $column		column name
 	 * @param string $selector		table selector
 	 */
-	public function selectTableRows( $data = [], $column = 'Name', $selector = 'class:list-table') {
+	public function selectTableRows($data = [], $column = 'Name', $selector = 'class:list-table') {
 		$table = $this->query($selector)->asTable()->one();
 
 		if (!$data) {
