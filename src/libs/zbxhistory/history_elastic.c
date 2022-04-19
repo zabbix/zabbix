@@ -1103,10 +1103,10 @@ out:
 		{
 			zabbix_log(LOG_LEVEL_ERR, " ");
 			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix proxy due to unsupported %s database server"
-					" version (%s)", db_version_info.database,
+					" version (%s).", db_version_info.database,
 					db_version_info.friendly_current_version);
 
-			zabbix_log(LOG_LEVEL_ERR, "Must be up to (%s)",
+			zabbix_log(LOG_LEVEL_ERR, "Must be up to (%s).",
 						db_version_info.friendly_max_version);
 
 			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
@@ -1121,7 +1121,7 @@ out:
 		else
 		{
 			zabbix_log(LOG_LEVEL_ERR, " ");
-			zabbix_log(LOG_LEVEL_ERR, "Warning! Unsupported %s database server version (%s)",
+			zabbix_log(LOG_LEVEL_ERR, "Warning! Unsupported %s database server version (%s).",
 					db_version_info.database, db_version_info.friendly_current_version);
 			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
 			zabbix_log(LOG_LEVEL_ERR, " ");
