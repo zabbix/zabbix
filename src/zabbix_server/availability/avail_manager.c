@@ -339,8 +339,6 @@ static void	flush_proxy_hostdata(zbx_ipc_message_t *message)
 
 static void flush_all_hosts(zbx_avail_active_hb_cache_t *cache)
 {
-	zabbix_log(3, "DBG server is unavailable, flushing all hosts");
-
 	zbx_hashset_iter_t	iter;
 	zbx_host_active_avail_t	*host, *cached_host;
 
