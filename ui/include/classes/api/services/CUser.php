@@ -1491,7 +1491,7 @@ class CUser extends CApiService {
 						self::exception(ZBX_API_ERROR_INTERNAL, _('LDAP authentication is disabled.'));
 					}
 
-					$id = ($db_user['gui_access'] == GROUP_GUI_ACCESS_LDAP)
+					$id = ($db_user['gui_access'] == GROUP_GUI_ACCESS_LDAP && $db_user['userdirectoryid'])
 						? $db_user['userdirectoryid']
 						: CAuthenticationHelper::get(CAuthenticationHelper::LDAP_USERDIRECTORYID);
 					$userdirectory = [];
