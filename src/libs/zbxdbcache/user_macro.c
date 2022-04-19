@@ -237,11 +237,18 @@ static zbx_um_host_t *um_host_dup(zbx_um_host_t *host)
 
 	zbx_vector_uint64_create_ext(&dup->templateids, __config_shmem_malloc_func, __config_shmem_realloc_func,
 			__config_shmem_free_func);
-	zbx_vector_uint64_append_array(&dup->templateids, host->templateids.values, host->templateids.values_num);
+
+	if (0 != host->templateids.values_num)
+	{
+		zbx_vector_uint64_append_array(&dup->templateids, host->templateids.values,
+				host->templateids.values_num);
+	}
 
 	zbx_vector_um_macro_create_ext(&dup->macros, __config_shmem_malloc_func, __config_shmem_realloc_func,
 			__config_shmem_free_func);
-	zbx_vector_um_macro_append_array(&dup->macros, host->macros.values, host->macros.values_num);
+
+	if (0 != host->macros.values_num)
+		zbx_vector_um_macro_append_array(&dup->macros, host->macros.values, host->macros.values_num);
 
 	for (i = 0; i < host->macros.values_num; i++)
 		host->macros.values[i]->refcount++;
