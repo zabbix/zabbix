@@ -983,7 +983,6 @@ int	DBcheck_version(void)
 				zabbix_log(LOG_LEVEL_WARNING, "completed %d%% of database upgrade", completed);
 				last_completed = completed;
 			}
-
 		}
 
 		if (SUCCEED != ret)
