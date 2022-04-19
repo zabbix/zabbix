@@ -1187,7 +1187,7 @@ static void	zbx_check_db(void)
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
 
 		if (SUCCEED == result)
-			zbx_history_check_version(&db_version_json);
+			zbx_history_check_version(&db_version_json, &result);
 
 		DBflush_version_requirements(db_version_json.buffer);
 		zbx_json_free(&db_version_json);

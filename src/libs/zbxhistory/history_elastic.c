@@ -998,7 +998,7 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
  *          the response string                                                     *
  *                                                                                  *
  ************************************************************************************/
-void	zbx_elastic_version_extract(struct zbx_json *json)
+void	zbx_elastic_version_extract(struct zbx_json *json, int *result)
 {
 #define RIGHT2(x)	((int)((zbx_uint32_t)(x) - ((zbx_uint32_t)((x)/100))*100))
 	zbx_httppage_t			page;
@@ -1115,8 +1115,7 @@ out:
 			zabbix_log(LOG_LEVEL_ERR, " ");
 
 			db_version_info.flag = DB_VERSION_HIGHER_THAN_MAXIMUM_ERROR;
-
-			exit(EXIT_FAILURE);
+			*result = FAIL;
 		}
 		else
 		{
