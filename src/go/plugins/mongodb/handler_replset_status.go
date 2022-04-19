@@ -24,8 +24,8 @@ import (
 	"errors"
 	"strings"
 
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"gopkg.in/mgo.v2/bson"
-	"zabbix.com/pkg/zbxerr"
 )
 
 const (

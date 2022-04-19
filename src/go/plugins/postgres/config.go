@@ -20,8 +20,8 @@
 package postgres
 
 import (
-	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 // Session struct holds individual options for PostgreSQL connection for each session.

@@ -26,10 +26,10 @@ import (
 	"net"
 	"time"
 
-	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/plugin/comms"
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin/comms"
 )
 
 const queSize = 100
