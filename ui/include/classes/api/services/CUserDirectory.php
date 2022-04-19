@@ -36,13 +36,11 @@ class CUserDirectory extends CApiService {
 	/**
 	 * @var array
 	 */
-	protected $output_fields = ['userdirectoryid', 'base_dn', 'bind_dn', 'description', 'host', 'name', 'port',
-		'search_attribute', 'search_filter', 'start_tls'
+	protected $output_fields = ['userdirectoryid', 'name', 'description', 'host', 'port', 'base_dn', 'bind_dn',
+		'search_attribute', 'start_tls', 'search_filter'
 	];
 
 	/**
-	 * Get list of user directories.
-	 *
 	 * @param array $options
 	 *
 	 * @throws APIException
@@ -50,9 +48,9 @@ class CUserDirectory extends CApiService {
 	 * @return array|string
 	 */
 	public function get(array $options) {
-		$usergroups_fields = array_keys($this->getTableSchema('usrgrp')['fields']);
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'userdirectoryids' => 			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			// filter
+			'userdirectoryids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'filter' =>						['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'userdirectoryid' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'host' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
@@ -69,10 +67,10 @@ class CUserDirectory extends CApiService {
 			// output
 			'output' =>						['type' => API_OUTPUT, 'in' => implode(',', $this->output_fields), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>				['type' => API_FLAG, 'default' => false],
-			'selectUsrgrps' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $usergroups_fields), 'default' => null],
+			'selectUsrgrps' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode']), 'default' => null],
 			// sort and limit
+			'sortfield' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>					['type' => API_SORTORDER, 'default' => []],
-			'sortfield' => 					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'limit' =>						['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			// flags
 			'preservekeys' =>				['type' => API_BOOLEAN, 'default' => false],
@@ -86,35 +84,88 @@ class CUserDirectory extends CApiService {
 			$options['output'] = $this->output_fields;
 		}
 
-		$result = DBselect($this->createSelectQuery($this->tableName(), $options));
+		$db_userdirectories = [];
 
-		if ($options['countOutput']) {
-			$row = DBfetch($result);
+		$sql = $this->createSelectQuery($this->tableName, $options);
+		$resource = DBselect($sql, $options['limit']);
 
-			return (string) $row['rowscount'];
+		while ($row = DBfetch($resource)) {
+			if ($options['countOutput']) {
+				return $row['rowscount'];
+			}
+
+			$db_userdirectories[$row['userdirectoryid']] = $row;
 		}
 
-		$userdirectories = [];
-
-		while ($row = DBfetch($result)) {
-			$userdirectories[$row['userdirectoryid']] = $row;
-		}
-
-		if ($userdirectories) {
-			$userdirectories = $this->addRelatedObjects($options, $userdirectories);
-			$userdirectories = $this->unsetExtraFields($userdirectories, ['userdirectoryid'], $options['output']);
+		if ($db_userdirectories) {
+			$db_userdirectories = $this->addRelatedObjects($options, $db_userdirectories);
+			$db_userdirectories = $this->unsetExtraFields($db_userdirectories, ['userdirectoryid'], $options['output']);
 
 			if (!$options['preservekeys']) {
-				$userdirectories = array_values($userdirectories);
+				$db_userdirectories = array_values($db_userdirectories);
 			}
 		}
 
-		return $userdirectories;
+		return $db_userdirectories;
 	}
 
 	/**
-	 * Create user directories.
+	 * @param array $options
+	 * @param array $result
 	 *
+	 * @return array
+	 */
+	protected function addRelatedObjects(array $options, array $result): array {
+		$result = parent::addRelatedObjects($options, $result);
+
+		self::addRelatedUserGroups($options, $result);
+
+		return $result;
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 */
+	private static function addRelatedUserGroups(array $options, array &$result): void {
+		if ($options['selectUsrgrps'] === null) {
+			return;
+		}
+
+		foreach ($result as &$row) {
+			$row['usrgrps'] = [];
+		}
+		unset($row);
+
+		if ($options['selectUsrgrps'] === API_OUTPUT_COUNT) {
+			$output = ['userdirectoryid'];
+		}
+		elseif ($options['selectUsrgrps'] === API_OUTPUT_EXTEND) {
+			$output = ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode', 'userdirectoryid'];
+		}
+		else {
+			$output = array_unique(array_merge(['userdirectoryid'], $options['selectUsrgrps']));
+		}
+
+		$db_usergroups = API::UserGroup()->get([
+			'output' => $output,
+			'filter' => ['userdirectoryid' => array_keys($result)]
+		]);
+
+		foreach ($db_usergroups as $db_usergroup) {
+			$result[$db_usergroup['userdirectoryid']]['usrgrps'][] =
+				array_diff_key($db_usergroup, array_flip(['userdirectoryid']));
+		}
+
+		if ($options['selectUsrgrps'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$row) {
+				$row['usrgrps'] = (string) count($row['usrgrps']);
+			}
+			unset($row);
+		}
+	}
+
+	/**
 	 * @param array $userdirectories
 	 *
 	 * @throws APIException
@@ -122,200 +173,32 @@ class CUserDirectory extends CApiService {
 	 * @return array
 	 */
 	public function create(array $userdirectories): array {
-		static::validateCreate($userdirectories);
+		self::validateCreate($userdirectories);
 
-		$db_count = DB::select($this->tableName(), ['countOutput' => true]);
-		$ids = DB::insert($this->tableName(), $userdirectories);
+		$db_count = DB::select('userdirectory', ['countOutput' => true]);
+		$userdirectoryids = DB::insert('userdirectory', $userdirectories);
 
-		foreach (array_keys($userdirectories) as $i) {
-			$userdirectories[$i]['userdirectoryid'] = $ids[$i];
+		foreach ($userdirectories as $index => &$userdirectory) {
+			$userdirectory['userdirectoryid'] = $userdirectoryids[$index];
 		}
+		unset($userdirectory);
 
-		static::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USERDIRECTORY, $userdirectories);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USERDIRECTORY, $userdirectories);
 
 		if (!$db_count) {
-			API::Authentication()->update(['ldap_userdirectoryid' => reset($ids)]);
+			API::Authentication()->update(['ldap_userdirectoryid' => reset($userdirectoryids)]);
 		}
-
-		return ['userdirectoryids' => $ids];
-	}
-
-	/**
-	 * Update user directories.
-	 *
-	 * @param array $userdirectories
-	 *
-	 * @throws APIException
-	 *
-	 * @return array
-	 */
-	public function update(array $userdirectories): array {
-		$update = [];
-		$db_userdirectories = [];
-
-		static::validateUpdate($userdirectories, $db_userdirectories);
-
-		foreach ($userdirectories as $userdirectory) {
-			$columns = DB::getUpdatedValues('userdirectory', $userdirectory,
-				$db_userdirectories[$userdirectory['userdirectoryid']]
-			);
-
-			if ($columns) {
-				$update[] = [
-					'values' => $columns,
-					'where' => ['userdirectoryid' => $userdirectory['userdirectoryid']]
-				];
-			}
-		}
-
-		if ($update) {
-			DB::update('userdirectory', $update);
-			static::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USERDIRECTORY, $userdirectories,
-				$db_userdirectories
-			);
-		}
-
-		return ['userdirectoryids' => array_column($userdirectories, 'userdirectoryid')];
-	}
-
-	/**
-	 * Delete user directories by userdirectoryid.
-	 *
-	 * @param array $userdirectoryids
-	 *
-	 * @throws APIException
-	 *
-	 * @return array
-	 */
-	public function delete(array $userdirectoryids): array {
-		$db_userdirectories = [];
-		static::validateDelete($userdirectoryids, $db_userdirectories);
-
-		DB::delete('userdirectory', ['userdirectoryid' => $userdirectoryids]);
-
-		static::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USERDIRECTORY, $db_userdirectories);
 
 		return ['userdirectoryids' => $userdirectoryids];
 	}
 
 	/**
-	 * Test user against specific userdirectory connection.
-	 *
-	 * @param array $userdirectory
-	 *
-	 * @throws APIException
-	 *
-	 * @return bool
-	 */
-	public function test(array $userdirectory): bool {
-		static::validateTest($userdirectory);
-
-		$user = [
-			'username' => $userdirectory['test_username'],
-			'password' => $userdirectory['test_password']
-		];
-		$ldapValidator = new CLdapAuthValidator(['conf' => $userdirectory]);
-
-		if (!$ldapValidator->validate($user)) {
-			self::exception($ldapValidator->isConnectionError()
-					? ZBX_API_ERROR_PARAMETERS
-					: ZBX_API_ERROR_PERMISSIONS,
-				$ldapValidator->getError()
-			);
-		}
-
-		return true;
-	}
-
-	/**
-	 * Add user groups data if requested.
-	 *
-	 * @param array $options
-	 * @param array $result
-	 *
-	 * @return array
-	 */
-	protected function addRelatedObjects(array $options, array $userdirectories): array {
-		$userdirectories = parent::addRelatedObjects($options, $userdirectories);
-
-		if ($options['selectUsrgrps'] === API_OUTPUT_COUNT) {
-			static::addUserGroupsCounts($options, $userdirectories);
-		}
-		elseif ($options['selectUsrgrps'] !== null) {
-			static::addUserGroups($options, $userdirectories);
-		}
-
-		return $userdirectories;
-	}
-
-	/**
-	 * Add user groups details to $userdirectories array, passed by reference.
-	 *
-	 * @param array $options
-	 * @param array $userdirectories
-	 */
-	protected static function addUserGroups(array $options, array &$userdirectories): void {
-		$ids = array_unique(array_column($userdirectories, 'userdirectoryid'));
-		$fields = $options['selectUsrgrps'];
-		$unset_keys = [];
-
-		if (is_array($fields) && !in_array('userdirectoryid', $fields)) {
-			$fields[] = 'userdirectoryid';
-			$unset_keys = ['userdirectoryid' => ''];
-		}
-
-		foreach (array_keys($userdirectories) as $i) {
-			$userdirectories[$i]['usrgrps'] = [];
-		}
-
-		$db_usergroups = API::UserGroup()->get([
-			'output' => $fields,
-			'filter' => ['userdirectoryid' => $ids]
-		]);
-
-		foreach ($db_usergroups as $db_usergroup) {
-			$userdirectories[$db_usergroup['userdirectoryid']]['usrgrps'][] = array_diff_key($db_usergroup,
-				$unset_keys
-			);
-		}
-	}
-
-	/**
-	 * Add user groups count details to $userdirectories array, passed by reference.
-	 *
-	 * @param array $options
-	 * @param array $userdirectories
-	 */
-	protected static function addUserGroupsCounts(array $options, array &$userdirectories): void {
-		$ids = array_unique(array_column($userdirectories, 'userdirectoryid'));
-
-		$db_usergroups = API::UserGroup()->get([
-			'output' => ['userdirectoryid'],
-			'filter' => ['userdirectoryid' => $ids]
-		]);
-
-		foreach (array_keys($userdirectories) as $i) {
-			$userdirectories[$i]['usrgrps'] = 0;
-		}
-
-		foreach ($db_usergroups as $db_usergroup) {
-			++$userdirectories[$db_usergroup['userdirectoryid']]['usrgrps'];
-		}
-
-		foreach (array_keys($userdirectories) as $i) {
-			$userdirectories[$i]['usrgrps'] = (string) $userdirectories[$i]['usrgrps'];
-		}
-	}
-
-	/**
-	 * Validate input data before create. Modify input data in $userdirectories.
-	 *
 	 * @param array $userdirectories
 	 *
 	 * @throws APIException
 	 */
-	protected static function validateCreate(array &$userdirectories): void {
-		$rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+	private static function validateCreate(array &$userdirectories): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'name')],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'description')],
 			'host' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'host')],
@@ -328,24 +211,57 @@ class CUserDirectory extends CApiService {
 			'search_filter' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'search_filter')]
 		]];
 
-		if (!CApiInputValidator::validate($rules, $userdirectories, '/', $error)) {
-			static::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		if (!CApiInputValidator::validate($api_input_rules, $userdirectories, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		static::checkDuplicates($userdirectories);
+		self::checkDuplicates($userdirectories);
 	}
 
 	/**
-	 * Validate input data before update. Modify input data in $db_userdirectories.
-	 *
-	 *
 	 * @param array $userdirectories
-	 * @param array $db_userdirectories
+	 *
+	 * @throws APIException
+	 *
+	 * @return array
+	 */
+	public function update(array $userdirectories): array {
+		self::validateUpdate($userdirectories, $db_userdirectories);
+
+		$upd_userdirectories = [];
+
+		foreach ($userdirectories as $userdirectory) {
+			$upd_userdirectory = DB::getUpdatedValues('userdirectory', $userdirectory,
+				$db_userdirectories[$userdirectory['userdirectoryid']]
+			);
+
+			if ($upd_userdirectory) {
+				$upd_userdirectories[] = [
+					'values' => $upd_userdirectory,
+					'where' => ['userdirectoryid' => $userdirectory['userdirectoryid']]
+				];
+			}
+		}
+
+		if ($upd_userdirectories) {
+			DB::update('userdirectory', $upd_userdirectories);
+
+			self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USERDIRECTORY, $userdirectories,
+				$db_userdirectories
+			);
+		}
+
+		return ['userdirectoryids' => array_column($userdirectories, 'userdirectoryid')];
+	}
+
+	/**
+	 * @param array      $userdirectories
+	 * @param array|null $db_userdirectories
 	 *
 	 * @throws APIException
 	 */
-	protected static function validateUpdate(array &$userdirectories, ?array &$db_userdirectories): void {
-		$rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['userdirectoryid'], ['name']], 'fields' => [
+	private static function validateUpdate(array &$userdirectories, ?array &$db_userdirectories): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['userdirectoryid'], ['name']], 'fields' => [
 			'userdirectoryid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'name')],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'description')],
@@ -359,12 +275,14 @@ class CUserDirectory extends CApiService {
 			'search_filter' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'search_filter')]
 		]];
 
-		if (!CApiInputValidator::validate($rules, $userdirectories, '/', $error)) {
-			static::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		if (!CApiInputValidator::validate($api_input_rules, $userdirectories, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$db_userdirectories = DB::select('userdirectory', [
-			'output' => array_keys($rules['fields']),
+			'output' => ['userdirectoryid', 'name', 'description', 'host', 'port', 'base_dn', 'bind_dn',
+				'bind_password', 'search_attribute', 'start_tls', 'search_filter'
+			],
 			'userdirectoryids' => array_column($userdirectories, 'userdirectoryid'),
 			'preservekeys' => true
 		]);
@@ -373,108 +291,7 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		static::checkDuplicates($userdirectories, $db_userdirectories);
-	}
-
-	/**
-	 * Validate user directory to be deleted.
-	 *
-	 * @param array $userdirectoryids
-	 *
-	 * @throws APIException
-	 */
-	protected static function validateDelete(array $userdirectoryids, &$db_userdirectories): void {
-		$rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
-
-		if (!CApiInputValidator::validate($rules, $userdirectoryids, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		$db_userdirectories = API::UserDirectory()->get([
-			'output' => ['userdirectoryid', 'name'],
-			'userdirectoryids' => $userdirectoryids,
-			'preservekeys' => true
-		]);
-
-		if (count($db_userdirectories) != count($userdirectoryids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		$userdirectories_left = API::UserDirectory()->get(['countOutput' => true]) - count($userdirectoryids);
-		$auth = API::Authentication()->get([
-			'output' => ['ldap_userdirectoryid', 'authentication_type', 'ldap_configured']
-		]);
-
-		if (in_array($auth['ldap_userdirectoryid'], $userdirectoryids)
-				&& ($auth['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED || $userdirectories_left > 0)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default user directory.'));
-		}
-
-		if (in_array($auth['ldap_userdirectoryid'], $userdirectoryids)) {
-			// When last(default) is removed reset default userdirectoryid to prevent from foreign key constarin.
-			API::Authentication()->update(['ldap_userdirectoryid' => 0]);
-		}
-
-		$db_groups = API::UserGroup()->get([
-			'output' => ['userdirectoryid', 'name'],
-			'filter' => [
-				'gui_access' => GROUP_GUI_ACCESS_LDAP,
-				'userdirectoryid' => $userdirectoryids
-			],
-			'limit' => 1
-		]);
-
-		if (!$db_groups) {
-			return;
-		}
-
-		$db_group = reset($db_groups);
-
-		static::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete user directory "%1$s".', $db_group['name']));
-	}
-
-	/**
-	 * Validate user directory and test user credentials to be used for testing.
-	 *
-	 * @param array $userdirectory
-	 *
-	 * @throws APIException
-	 */
-	protected static function validateTest(array &$userdirectory): void {
-		$rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
-			'userdirectoryid' =>	['type' => API_ID, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'host' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'host')],
-			'port' =>				['type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'base_dn' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'base_dn')],
-			'bind_dn' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'bind_dn'), 'default' => ''],
-			'bind_password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'bind_password')],
-			'search_attribute' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'search_attribute')],
-			'start_tls' =>			['type' => API_INT32, 'in' => ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON, 'default' => ZBX_AUTH_START_TLS_OFF],
-			'search_filter' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'search_filter'), 'default' => ''],
-			'test_username' => 		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'test_password' => 		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
-		]];
-
-		if (!CApiInputValidator::validate($rules, $userdirectory, '/', $error)) {
-			static::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		if ($userdirectory['userdirectoryid'] !== null) {
-			$db_userdirectory = DB::select('userdirectory', [
-				'output' => [
-					'host', 'port', 'base_dn', 'bind_dn', 'bind_password', 'search_attribute', 'start_tls',
-					'search_filter'
-				],
-				'userdirectoryids' => $userdirectory['userdirectoryid']
-			]);
-			$db_userdirectory = reset($db_userdirectory);
-
-			if (!$db_userdirectory) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-			}
-
-			$userdirectory += $db_userdirectory;
-		}
+		self::checkDuplicates($userdirectories, $db_userdirectories);
 	}
 
 	/**
@@ -485,7 +302,7 @@ class CUserDirectory extends CApiService {
 	 *
 	 * @throws APIException if userdirectory name is not unique.
 	 */
-	protected static function checkDuplicates(array $userdirectories, array $db_userdirectories = null): void {
+	private static function checkDuplicates(array $userdirectories, array $db_userdirectories = null): void {
 		$names = [];
 
 		foreach ($userdirectories as $userdirectory) {
@@ -510,7 +327,155 @@ class CUserDirectory extends CApiService {
 		]);
 
 		if ($duplicates) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('User directory "%1$s" already exists.', $duplicates[0]['name']));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('User directory "%1$s" already exists.',
+				$duplicates[0]['name'])
+			);
+		}
+	}
+
+	/**
+	 * @param array $userdirectoryids
+	 *
+	 * @throws APIException
+	 *
+	 * @return array
+	 */
+	public function delete(array $userdirectoryids): array {
+		self::validateDelete($userdirectoryids, $db_userdirectories);
+
+		DB::delete('userdirectory', ['userdirectoryid' => $userdirectoryids]);
+
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USERDIRECTORY, $db_userdirectories);
+
+		return ['userdirectoryids' => $userdirectoryids];
+	}
+
+	/**
+	 * @param array      $userdirectoryids
+	 * @param array|null $db_userdirectories
+	 *
+	 * @throws APIException
+	 */
+	private static function validateDelete(array $userdirectoryids, ?array &$db_userdirectories): void {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
+		if (!CApiInputValidator::validate($api_input_rules, $userdirectoryids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_userdirectories = API::UserDirectory()->get([
+			'output' => ['userdirectoryid', 'name'],
+			'userdirectoryids' => $userdirectoryids,
+			'preservekeys' => true
+		]);
+
+		if (count($db_userdirectories) != count($userdirectoryids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$userdirectories_left = API::UserDirectory()->get(['countOutput' => true]) - count($userdirectoryids);
+		$auth = API::Authentication()->get([
+			'output' => ['ldap_userdirectoryid', 'authentication_type', 'ldap_configured']
+		]);
+
+		if (in_array($auth['ldap_userdirectoryid'], $userdirectoryids)
+				&& ($auth['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED || $userdirectories_left > 0)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default user directory.'));
+		}
+
+		if (in_array($auth['ldap_userdirectoryid'], $userdirectoryids)) {
+			// If last (default) is removed, reset default userdirectoryid to prevent from foreign key constraint.
+			API::Authentication()->update(['ldap_userdirectoryid' => 0]);
+		}
+
+		$db_groups = API::UserGroup()->get([
+			'output' => ['userdirectoryid', 'name'],
+			'filter' => [
+				'gui_access' => GROUP_GUI_ACCESS_LDAP,
+				'userdirectoryid' => $userdirectoryids
+			],
+			'limit' => 1
+		]);
+
+		if (!$db_groups) {
+			return;
+		}
+
+		$db_group = reset($db_groups);
+
+		self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete user directory "%1$s".', $db_group['name']));
+	}
+
+	/**
+	 * Test user against specific userdirectory connection.
+	 *
+	 * @param array $userdirectory
+	 *
+	 * @throws APIException
+	 *
+	 * @return bool
+	 */
+	public function test(array $userdirectory): bool {
+		self::validateTest($userdirectory);
+
+		$user = [
+			'username' => $userdirectory['test_username'],
+			'password' => $userdirectory['test_password']
+		];
+		$ldap_validator = new CLdapAuthValidator(['conf' => $userdirectory]);
+
+		if (!$ldap_validator->validate($user)) {
+			self::exception(
+				$ldap_validator->isConnectionError() ? ZBX_API_ERROR_PARAMETERS : ZBX_API_ERROR_PERMISSIONS,
+				$ldap_validator->getError()
+			);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validate user directory and test user credentials to be used for testing.
+	 *
+	 * @param array $userdirectory
+	 *
+	 * @throws APIException
+	 */
+	protected static function validateTest(array &$userdirectory): void {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
+			'userdirectoryid' =>	['type' => API_ID, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'host' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'host')],
+			'port' =>				['type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'base_dn' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'base_dn')],
+			'bind_dn' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'bind_dn'), 'default' => ''],
+			'bind_password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'bind_password')],
+			'search_attribute' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'search_attribute')],
+			'start_tls' =>			['type' => API_INT32, 'in' => ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON, 'default' => ZBX_AUTH_START_TLS_OFF],
+			'search_filter' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'search_filter'), 'default' => ''],
+			'test_username' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'test_password' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $userdirectory, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		if ($userdirectory['userdirectoryid'] !== null) {
+			$db_userdirectory = DB::select('userdirectory', [
+				'output' => ['host', 'port', 'base_dn', 'bind_dn', 'bind_password', 'search_attribute', 'start_tls',
+					'search_filter'
+				],
+				'userdirectoryids' => $userdirectory['userdirectoryid']
+			]);
+			$db_userdirectory = reset($db_userdirectory);
+
+			if (!$db_userdirectory) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
+			$userdirectory += $db_userdirectory;
 		}
 	}
 }
