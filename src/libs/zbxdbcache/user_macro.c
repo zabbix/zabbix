@@ -625,6 +625,10 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 
 			if (SUCCEED == um_macro_is_locked(*pmacro) || (*pmacro)->hostid != hostid)
 			{
+				int	is_macro_locked;
+
+				is_macro_locked = um_macro_is_locked(*pmacro);
+
 				if (NULL != host)
 				{
 					um_host_remove_macro(host, *pmacro);
@@ -633,8 +637,11 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 				else
 					THIS_SHOULD_NEVER_HAPPEN;
 
-				um_macro_release(*pmacro);
-				*pmacro = um_macro_dup(*pmacro);
+				if (SUCCEED == is_macro_locked)
+				{
+					um_macro_release(*pmacro);
+					*pmacro = um_macro_dup(*pmacro);
+				}
 			}
 
 			dc_strpool_release((*pmacro)->name);
