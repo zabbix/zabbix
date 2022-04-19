@@ -20,7 +20,6 @@
 #include "zbxconf.h"
 
 #include "log.h"
-//#include "alias.h"
 #include "sysinfo.h"
 
 #ifdef _WINDOWS

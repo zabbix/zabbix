@@ -96,8 +96,6 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 #	include "zbxmodules.h"
 #endif
 
-//#include "alias.h"
-
 #include "stats.h"
 #ifdef _WINDOWS
 #	include "perfstat.h"

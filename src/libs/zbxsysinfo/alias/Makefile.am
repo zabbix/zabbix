@@ -5,5 +5,3 @@ noinst_LIBRARIES = libalias.a
 libalias_a_SOURCES = \
 	alias.h \
 	alias.c
-
-
