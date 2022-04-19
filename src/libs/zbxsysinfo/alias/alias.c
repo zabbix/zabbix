@@ -17,9 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "alias.h"
-#include "common.h"
 #include "sysinfo.h"
+#include "alias.h"
+
+#include "common.h"
 #include "log.h"
 
 static ALIAS	*aliasList = NULL;
@@ -32,7 +33,7 @@ void	test_aliases(void)
 		test_parameter(alias->name);
 }
 
-void	add_alias(const char *name, const char *value)
+void	zbx_add_alias(const char *name, const char *value)
 {
 	ALIAS	*alias = NULL;
 
@@ -61,7 +62,7 @@ void	add_alias(const char *name, const char *value)
 	}
 }
 
-void	alias_list_free(void)
+void	zbx_alias_list_free(void)
 {
 	ALIAS	*curr, *next;
 

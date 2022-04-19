@@ -20,7 +20,7 @@
 #include "zbxconf.h"
 
 #include "log.h"
-#include "alias.h"
+//#include "alias.h"
 #include "sysinfo.h"
 
 #ifdef _WINDOWS
@@ -33,7 +33,7 @@
  *                                                                            *
  * Parameters: lines - aliases from configuration file                        *
  *                                                                            *
- * Comments: calls add_alias() for each entry                                 *
+ * Comments: calls zbx_add_alias() for each entry                             *
  *                                                                            *
  ******************************************************************************/
 void	load_aliases(char **lines)
@@ -63,7 +63,7 @@ void	load_aliases(char **lines)
 
 		*c++ = '\0';
 
-		add_alias(*pline, c);
+		zbx_add_alias(*pline, c);
 
 		*--c = ':';
 	}

@@ -96,7 +96,7 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 #	include "zbxmodules.h"
 #endif
 
-#include "alias.h"
+//#include "alias.h"
 
 #include "stats.h"
 #ifdef _WINDOWS
@@ -1269,7 +1269,7 @@ void	zbx_free_service_resources(int ret)
 	zbx_locks_disable();
 #endif
 	free_metrics();
-	alias_list_free();
+	zbx_alias_list_free();
 	free_collector_data();
 	zbx_deinit_modbus();
 #ifdef _WINDOWS
@@ -1440,7 +1440,7 @@ int	main(int argc, char **argv)
 			zbx_unload_modules();
 #endif
 			free_metrics();
-			alias_list_free();
+			zbx_alias_list_free();
 			exit(EXIT_SUCCESS);
 			break;
 		case ZBX_TASK_SHOW_VERSION:

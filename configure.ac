@@ -1987,6 +1987,7 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagent2sysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+		\${abs_top_builddir}/src/libs/zbxsysinfo/alias/libalias.a \
 		\${abs_top_builddir}/src/libs/zbxxml/libzbxxml.a \
 		$LIBS $AGENT2_LIBS $LD_END_GROUP"
 
@@ -2083,6 +2084,7 @@ AC_OUTPUT([
 	src/libs/zbxsysinfo/Makefile
 	src/libs/zbxcommon/Makefile
 	src/libs/zbxsysinfo/agent/Makefile
+	src/libs/zbxsysinfo/alias/Makefile
 	src/libs/zbxsysinfo/common/Makefile
 	src/libs/zbxsysinfo/simple/Makefile
 	src/libs/zbxsysinfo/linux/Makefile
