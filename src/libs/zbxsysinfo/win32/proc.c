@@ -40,7 +40,7 @@ typedef struct
 	char		*name;
 	zbx_uint64_t	processes;
 	zbx_uint64_t	threads;
-	zbx_uint64_t	handles;
+	zbx_int64_t	handles;
 
 	double		cputime_user;
 	double		cputime_system;
@@ -464,6 +464,15 @@ static void	proc_data_free(proc_data_t *proc_data)
 
 int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+#define SUM_PROC_VALUE_DBL(param)					\
+	do								\
+	{								\
+		if (0.0 <= proc_data->param && 0.0 <= pdata_cmp->param)	\
+			proc_data->param += pdata_cmp->param;		\
+		else if (0.0 <= proc_data->param)			\
+			proc_data->param = -1.0;			\
+	} while(0)
+
 	int				zbx_proc_mode, i;
 	struct zbx_json			j;
 	HANDLE				hProcessSnap, hThreadSnap;
@@ -573,7 +582,6 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 				if (te32.th32OwnerProcessID == pe32.th32ProcessID)
 				{
 					proc_data = (proc_data_t *)zbx_malloc(NULL, sizeof(proc_data_t));
-					memset(proc_data, 0, sizeof(proc_data_t));
 
 					proc_data->pid = pe32.th32ProcessID;
 					proc_data->ppid = pe32.th32ParentProcessID;
@@ -593,7 +601,6 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			FILETIME		ftCreate, ftExit, ftKernel, ftUser;
 
 			proc_data = (proc_data_t *)zbx_malloc(NULL, sizeof(proc_data_t));
-			memset(proc_data, 0, sizeof(proc_data_t));
 
 			proc_data->pid = pe32.th32ProcessID;
 			proc_data->ppid = pe32.th32ParentProcessID;
@@ -602,6 +609,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			if (FALSE != GetProcessHandleCount(hProcess, &handleCount))
 				proc_data->handles = (zbx_uint64_t)handleCount;
+			else
+				proc_data->handles = -1;
 
 			if (FALSE != GetProcessMemoryInfo(hProcess, &mc, sizeof(PROCESS_MEMORY_COUNTERS)))
 			{
@@ -609,12 +618,16 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 				proc_data->wkset = (double)mc.WorkingSetSize / 1024;
 				proc_data->page_faults = (double)mc.PageFaultCount;
 			}
+			else
+				proc_data->vmsize = proc_data->wkset = proc_data->page_faults = -1.0;
 
 			if (FALSE != GetProcessTimes(hProcess, &ftCreate, &ftExit, &ftKernel, &ftUser))
 			{
 				proc_data->cputime_system = ConvertProcessTime(&ftKernel) / 1000.0;
 				proc_data->cputime_user = ConvertProcessTime(&ftUser) / 1000.0;
 			}
+			else
+				proc_data->cputime_system = proc_data->cputime_user = -1.0;
 
 			if (NULL != zbx_GetProcessIoCounters &&
 					FALSE != zbx_GetProcessIoCounters(hProcess, &ioCounters))
@@ -625,6 +638,12 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 				proc_data->io_write_op = (double)((__int64)ioCounters.WriteOperationCount);
 				proc_data->io_other_b = (double)((__int64)ioCounters.OtherTransferCount);
 				proc_data->io_other_op = (double)((__int64)ioCounters.OtherOperationCount);
+			}
+			else
+			{
+				proc_data->io_read_b = proc_data->io_read_op = proc_data->io_write_b =
+						proc_data->io_write_op = proc_data->io_other_b =
+						proc_data->io_other_op = -1.0;
 			}
 
 			zbx_vector_proc_data_ptr_append(&proc_data_ctx, proc_data);
@@ -655,19 +674,24 @@ next:
 				if (0 == strcmp(proc_data->name, pdata_cmp->name))
 				{
 					proc_data->processes++;
-					proc_data->vmsize += pdata_cmp->vmsize;
-					proc_data->wkset += pdata_cmp->wkset;
-					proc_data->cputime_user += pdata_cmp->cputime_user;
-					proc_data->cputime_system += pdata_cmp->cputime_system;
 					proc_data->threads += pdata_cmp->threads;
-					proc_data->handles += pdata_cmp->handles;
-					proc_data->page_faults += pdata_cmp->page_faults;
-					proc_data->io_read_b += pdata_cmp->io_read_b;
-					proc_data->io_write_b += pdata_cmp->io_write_b;
-					proc_data->io_other_b += pdata_cmp->io_other_b;
-					proc_data->io_read_op += pdata_cmp->io_read_op;
-					proc_data->io_write_op += pdata_cmp->io_write_op;
-					proc_data->io_other_op += pdata_cmp->io_other_op;
+
+					SUM_PROC_VALUE_DBL(vmsize);
+					SUM_PROC_VALUE_DBL(wkset);
+					SUM_PROC_VALUE_DBL(cputime_user);
+					SUM_PROC_VALUE_DBL(cputime_system);
+					SUM_PROC_VALUE_DBL(page_faults);
+					SUM_PROC_VALUE_DBL(io_read_b);
+					SUM_PROC_VALUE_DBL(io_write_b);
+					SUM_PROC_VALUE_DBL(io_other_b);
+					SUM_PROC_VALUE_DBL(io_read_op);
+					SUM_PROC_VALUE_DBL(io_write_op);
+					SUM_PROC_VALUE_DBL(io_other_op);
+
+					if (0 <= proc_data->handles && 0 <= pdata_cmp->handles)
+						proc_data->handles += pdata_cmp->handles;
+					else if (0 <= proc_data->handles)
+						proc_data->handles = -1;
 
 					proc_data_free(pdata_cmp);
 					zbx_vector_proc_data_ptr_remove(&proc_data_ctx, k--);
@@ -697,19 +721,19 @@ next:
 
 		if (ZBX_PROC_MODE_THREAD != zbx_proc_mode)
 		{
-			zbx_json_adduint64(&j, "vmsize", (zbx_uint64_t)proc_data->vmsize);
-			zbx_json_adduint64(&j, "wkset", (zbx_uint64_t)proc_data->wkset);
+			zbx_json_addint64(&j, "vmsize", (zbx_uint64_t)proc_data->vmsize);
+			zbx_json_addint64(&j, "wkset", (zbx_uint64_t)proc_data->wkset);
 			zbx_json_addfloat(&j, "cputime_user", proc_data->cputime_user);
 			zbx_json_addfloat(&j, "cputime_system", proc_data->cputime_system);
 			zbx_json_adduint64(&j, "threads", proc_data->threads);
-			zbx_json_adduint64(&j, "page_faults", (zbx_uint64_t)proc_data->page_faults);
-			zbx_json_adduint64(&j, "handles", (zbx_uint64_t)proc_data->handles);
-			zbx_json_adduint64(&j, "io_read_b", (zbx_uint64_t)proc_data->io_read_b);
-			zbx_json_adduint64(&j, "io_write_b", (zbx_uint64_t)proc_data->io_write_b);
-			zbx_json_adduint64(&j, "io_read_op", (zbx_uint64_t)proc_data->io_read_op);
-			zbx_json_adduint64(&j, "io_write_op", (zbx_uint64_t)proc_data->io_write_op);
-			zbx_json_adduint64(&j, "io_other_b", (zbx_uint64_t)proc_data->io_other_b);
-			zbx_json_adduint64(&j, "io_other_op", (zbx_uint64_t)proc_data->io_other_op);
+			zbx_json_addint64(&j, "page_faults", (zbx_uint64_t)proc_data->page_faults);
+			zbx_json_addint64(&j, "handles", (zbx_uint64_t)proc_data->handles);
+			zbx_json_addint64(&j, "io_read_b", (zbx_uint64_t)proc_data->io_read_b);
+			zbx_json_addint64(&j, "io_write_b", (zbx_uint64_t)proc_data->io_write_b);
+			zbx_json_addint64(&j, "io_read_op", (zbx_uint64_t)proc_data->io_read_op);
+			zbx_json_addint64(&j, "io_write_op", (zbx_uint64_t)proc_data->io_write_op);
+			zbx_json_addint64(&j, "io_other_b", (zbx_uint64_t)proc_data->io_other_b);
+			zbx_json_addint64(&j, "io_other_op", (zbx_uint64_t)proc_data->io_other_op);
 		}
 		else
 			zbx_json_adduint64(&j, "tid", proc_data->tid);
@@ -725,4 +749,5 @@ next:
 	zbx_json_free(&j);
 
 	return SYSINFO_RET_OK;
+#undef SUM_PROC_VALUE_DBL
 }

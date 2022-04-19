@@ -1763,9 +1763,9 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 #define SUM_PROC_VALUE_DBL(param)								\
 	do											\
 	{											\
-		if (0 <= pdata->param && 0 <= pdata_cmp->param)					\
+		if (0.0 <= pdata->param && 0.0 <= pdata_cmp->param)				\
 			pdata->param += pdata_cmp->param;					\
-		else if (0 <= pdata->param)							\
+		else if (0.0 <= pdata->param)							\
 			pdata->param = -1.0;							\
 	} while(0)
 #define JSON_ADD_PROC_VALUE(name, value)							\
