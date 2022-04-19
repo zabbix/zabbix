@@ -963,7 +963,9 @@ int	DBcheck_version(void)
 			/* skipping the duplicated patches */
 			if ((0 != patches[i].duplicates && patches[i].duplicates <= db_optional) ||
 					SUCCEED == (ret = patches[i].function()))
-				//ret = DBset_version(patches[i].version, patches[i].mandatory);
+			{
+				ret = DBset_version(patches[i].version, patches[i].mandatory);
+			}
 
 			ret = DBend(ret);
 
