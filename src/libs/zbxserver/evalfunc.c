@@ -18,6 +18,7 @@
 **/
 
 #include "evalfunc.h"
+#include "evalfunc_common.h"
 
 #include "log.h"
 #include "zbxserver.h"
@@ -25,8 +26,6 @@
 #include "valuecache.h"
 #include "zbxtrends.h"
 #include "anomalystl.h"
-
-#include "evalfunc_common.h"
 
 #define ZBX_VALUEMAP_STRING_LEN	64
 
@@ -3716,7 +3715,7 @@ out:
  *               FAIL - evaluation failed                                     *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function, const char *parameter,
+int	zbx_evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function, const char *parameter,
 		const zbx_timespec_t *ts, char **error)
 {
 	int	ret;

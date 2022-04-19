@@ -979,7 +979,7 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 
 	if (0 == args_num)
 	{
-		ret = evaluate_function2(value, item, func_name, "", ts, error);
+		ret = zbx_evaluate_function2(value, item, func_name, "", ts, error);
 		goto out;
 	}
 
@@ -1010,7 +1010,7 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 		}
 	}
 
-	ret = evaluate_function2(value, item, func_name, ZBX_NULL2EMPTY_STR(params), ts, error);
+	ret = zbx_evaluate_function2(value, item, func_name, ZBX_NULL2EMPTY_STR(params), ts, error);
 out:
 	zbx_free(params);
 
@@ -1916,7 +1916,7 @@ void	zbx_expression_eval_resolve_filter_macros(zbx_expression_eval_t *eval, cons
 	{
 		zbx_expression_query_t	*query = (zbx_expression_query_t *)eval->queries.values[i];
 
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL, NULL, NULL, NULL,
+		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL, NULL, NULL, NULL,
 				&query->ref.filter, MACRO_TYPE_QUERY_FILTER, NULL, 0);
 	}
 }

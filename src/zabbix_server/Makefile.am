@@ -20,6 +20,7 @@ SUBDIRS = \
 	ipmi \
 	odbc \
 	scripts \
+	stats \
 	preprocessor \
 	availability \
 	lld \
@@ -118,7 +119,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_builddir)/src/libs/zbxtrends/libzbxtrends_baseline.a \
 	$(top_builddir)/src/libs/zbxtrends/libzbxtrends.a \
-	$(top_builddir)/src/libs/zbxserver/libzbxserver_server.a \
+	stats/libzbxserver_server.a \
 	$(top_builddir)/src/libs/zbxha/libzbxha.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_service.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_server.a \
