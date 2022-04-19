@@ -27,7 +27,6 @@ func addNonNegative(dst *int64, val int64) () {
 	}
 
 	if val == -1 {
-		fmt.Printf("GOT -1\n")
 		*dst = -1
 		return
 	}
