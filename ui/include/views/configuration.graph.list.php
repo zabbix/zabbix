@@ -34,13 +34,15 @@ if (!empty($this->data['parent_discoveryid'])) {
 		))
 		->setControls(
 			(new CTag('nav', true,
-				(new CList())->addItem(new CRedirectButton(_('Create graph prototype'),
-					(new CUrl('graphs.php'))
-						->setArgument('form', 'create')
-						->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-						->setArgument('context', $data['context'])
-						->getUrl()
-				))
+				(new CList())
+					->addItem(
+						new CRedirectButton(_('Create graph prototype'),
+							(new CUrl('graphs.php'))
+								->setArgument('form', 'create')
+								->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+								->setArgument('context', $data['context'])
+						)
+					)
 			))->setAttribute('aria-label', _('Content controls'))
 		)
 		->setNavigation(getHostNavigation('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
@@ -53,20 +55,23 @@ else {
 			: CDocHelper::CONFIGURATION_TEMPLATE_GRAPH_LIST
 		))
 		->setControls(
-			(new CTag('nav', true, ($data['hostid'] == 0)
-				? (new CButton('form',
-					($data['context'] === 'host')
-						? _('Create graph (select host first)')
-						: _('Create graph (select template first)')
-				))->setEnabled(false)
-				: new CRedirectButton(_('Create graph'), (new CUrl('graphs.php'))
-					->setArgument('hostid', $data['hostid'])
-					->setArgument('form', 'create')
-					->setArgument('context', $data['context'])
-					->getUrl()
-				)
-			))
-				->setAttribute('aria-label', _('Content controls'))
+			(new CTag('nav', true,
+				(new CList())
+					->addItem(
+						$data['hostid'] != 0
+							? new CRedirectButton(_('Create graph'),
+								(new CUrl('graphs.php'))
+									->setArgument('hostid', $data['hostid'])
+									->setArgument('form', 'create')
+									->setArgument('context', $data['context'])
+							)
+							: (new CButton('form',
+								$data['context'] === 'host'
+									? _('Create graph (select host first)')
+									: _('Create graph (select template first)')
+							))->setEnabled(false)
+					)
+			))->setAttribute('aria-label', _('Content controls'))
 		);
 
 	if (!empty($this->data['hostid'])) {

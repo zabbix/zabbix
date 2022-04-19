@@ -29,14 +29,16 @@ $this->includeJsFile('configuration.hostgroup.list.js.php');
 $widget = (new CWidget())
 	->setTitle(_('Host groups'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOSTGROUPS_LIST))
-	->setControls((new CTag('nav', true, (new CList())
-		->addItem(CWebUser::getType() == USER_TYPE_SUPER_ADMIN
-			? (new CSimpleButton(_('Create host group')))
-				->addClass('js-create-hostgroup')
-			: (new CSubmit('form', _('Create host group').' '._('(Only super admins can create groups)')))
-				->setEnabled(false)
-		)
-	))->setAttribute('aria-label', _('Content controls'))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(
+					CWebUser::getType() == USER_TYPE_SUPER_ADMIN
+						? (new CSimpleButton(_('Create host group')))->addClass('js-create-hostgroup')
+						: (new CSubmit('form', _('Create host group').' '._('(Only super admins can create groups)')))
+							->setEnabled(false)
+				)
+		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter())
 		->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'hostgroup.list'))

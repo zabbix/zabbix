@@ -787,13 +787,16 @@
 		overlay.xhr
 			.fail(({statusText}) => {
 				overlay.$dialogue.$body.find('output.msg-bad').remove();
-				overlay.$dialogue.$body.prepend(makeMessageBox('bad', statusText));
+				overlay.$dialogue.$body.prepend(makeMessageBox('bad', [statusText]));
 				overlay.unsetLoading();
 			})
 			.then((res) => {
-				if (res.errors) {
+				if ('error' in res) {
 					overlay.$dialogue.$body.find('output.msg-bad').remove();
-					overlay.$dialogue.$body.prepend(res.errors);
+
+					const message_box = makeMessageBox('bad', res.error.messages, res.error.title);
+
+					overlay.$dialogue.$body.prepend(message_box);
 
 					return overlay.unsetLoading();
 				}
@@ -1044,16 +1047,20 @@
 		this.overlay.xhr
 			.fail(({statusText}) => {
 				this.overlay.$dialogue.$body.find('output.msg-bad').remove();
-				this.overlay.$dialogue.$body.prepend(makeMessageBox('bad', statusText));
+				this.overlay.$dialogue.$body.prepend(makeMessageBox('bad', [statusText]));
 				this.overlay.unsetLoading();
 			})
 			.done((res) => {
-				if (res.errors) {
+				if ('error' in res) {
 					this.overlay.$dialogue.$body.find('output.msg-bad').remove();
-					this.overlay.$dialogue.$body.prepend(res.errors);
+
+					const message_box = makeMessageBox('bad', res.error.messages, res.error.title);
+
+					this.overlay.$dialogue.$body.prepend(message_box);
 
 					return this.overlay.unsetLoading();
 				}
+
 				// We keep overlay opened and in loading state during the full page reload.
 				this.submit(form_data);
 			});
@@ -1109,8 +1116,18 @@
 
 		this.overlay.xhr = $.post(url.getUrl(), {operation});
 		this.overlay.xhr
-			.done(res => this.onload(res))
-			.fail(({statusText}) => this.overlay.setProperties({content: makeMessageBox('bad', statusText)}));
+			.done((res) => {
+				if ('error' in res) {
+					const message_box = makeMessageBox('bad', res.error.messages, res.error.title, false);
+
+					this.overlay.setProperties({content: message_box});
+
+					return;
+				}
+
+				this.onload(res);
+			})
+			.fail(({statusText}) => this.overlay.setProperties({content: makeMessageBox('bad', [statusText])}));
 	};
 
 	/**

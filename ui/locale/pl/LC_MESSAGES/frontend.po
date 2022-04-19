@@ -1,19 +1,20 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-03-02 20:16+0300\n"
-"Last-Translator: Robert <r.szulist+zabbix@gmail.com>\n"
+"PO-Revision-Date: 2022-04-18 20:11+0000\n"
+"Last-Translator: Robert Szulist <r.szulist+zabbix@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1646244996.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
@@ -315,6 +316,10 @@ msgstr "(0 - użyj domyślnej opcji)"
 msgid "(Only super admins can create groups)"
 msgstr "(Tylko super administrator może tworzyć grupy)"
 
+#: app/partials/configuration.host.edit.html.php:131
+msgid "(linked by host discovery)"
+msgstr ""
+
 #: app/partials/configuration.host.edit.html.php:275
 #: app/views/popup.itemtestedit.view.php:241
 #: app/views/popup.massupdate.host.php:121
@@ -324,7 +329,7 @@ msgstr "(brak proxy)"
 
 #: include/classes/setup/CSetupWizard.php:494
 msgid "0 - use default port"
-msgstr "0 - użyj port domyślny"
+msgstr "0 - użyj domyślnego portu"
 
 #: include/triggers.inc.php:1594
 msgid "0 or 1"
@@ -1060,7 +1065,7 @@ msgstr "Funkcje agregujące"
 #: app/views/popup.tophosts.column.edit.php:120
 #: include/classes/widgets/CWidgetHelper.php:1289
 msgid "Aggregation function"
-msgstr "Agregacja funkcji"
+msgstr "Funkcja agregująca"
 
 #: app/views/popup.tophosts.column.edit.php:139
 #: include/classes/widgets/CWidgetHelper.php:1308
@@ -1104,7 +1109,7 @@ msgstr "Wszystkie"
 
 #: app/views/monitoring.dashboard.view.php:186
 msgid "All dashboards"
-msgstr "Wszystkie widoki"
+msgstr "Wszystkie pulpity"
 
 #: app/views/monitoring.charts.view.php:83
 msgid "All graphs"
@@ -1158,7 +1163,7 @@ msgstr "Zezwól na listę"
 #: include/views/configuration.trigger.prototype.edit.php:527
 #: include/views/configuration.triggers.edit.php:556
 msgid "Allow manual close"
-msgstr "Zezwól na manualne zamknięcie"
+msgstr "Zezwól na zamknięcie ręczne"
 
 #: app/views/popup.massupdate.item.php:382
 #: include/views/configuration.host.discovery.edit.php:723
@@ -1553,7 +1558,7 @@ msgstr "Automatyczne wylogowanie"
 #: include/hosts.inc.php:1128
 #: include/views/configuration.host.prototype.edit.php:365
 msgid "Automatic"
-msgstr "Automatycznie"
+msgstr "Automatyczny"
 
 #: include/views/monitoring.sysmap.edit.php:140
 msgid "Automatic icon mapping"
@@ -1581,7 +1586,7 @@ msgstr "Akcje autorejestracji"
 
 #: app/views/administration.housekeeping.edit.php:87
 msgid "Autoregistration data storage period"
-msgstr "Okres autorejestracji przechowywania danych"
+msgstr "Okres przechowywania danych autorejestracji"
 
 #: app/partials/monitoring.host.view.html.php:36
 #: app/views/configuration.host.list.php:196
@@ -1598,7 +1603,7 @@ msgstr "Raport dostępności"
 #: app/views/monitoring.widget.hostavail.view.php:102
 #: include/classes/html/CHostAvailability.php:80
 msgid "Available"
-msgstr "Dostępne"
+msgstr "Dostępny"
 
 #: app/views/administration.trigdisplay.edit.php:128 jsLoader.php:179
 msgid "Average"
@@ -1838,7 +1843,7 @@ msgstr "Spodziewano się CUID"
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:179
 #: include/views/configuration.graph.edit.php:254
 msgid "Calculated"
-msgstr "Obliczone"
+msgstr "Obliczona"
 
 #: jsLoader.php:232
 msgid "Calendar"
@@ -2137,6 +2142,11 @@ msgstr[2] "Nie można skopiować wyzwalaczy"
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
 msgstr "Nie można skopiować wyzwalacza \"%1$s:%2$s\", ponieważ jego wyrażanie zawiera wiele hostów."
 
+#: app/controllers/CControllerSlaCreate.php:69
+#: app/controllers/CControllerSlaCreate.php:127
+msgid "Cannot create SLA"
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:1110
 #, c-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
@@ -2168,9 +2178,18 @@ msgstr "Nie można utworzyć zasady wykrywania"
 msgid "Cannot create icon map"
 msgstr "Nie można utworzyć mapy ikon"
 
+#: app/controllers/CControllerProxyConfigRefresh.php:79
+msgid "Cannot create request"
+msgstr ""
+
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
 msgstr "Nie można utworzyć raportu okresowego"
+
+#: app/controllers/CControllerServiceCreate.php:96
+#: app/controllers/CControllerServiceCreate.php:184
+msgid "Cannot create service"
+msgstr ""
 
 #: include/classes/api/services/CService.php:2373
 #: include/classes/api/services/CService.php:2397
@@ -2348,6 +2367,10 @@ msgstr[2] "Nie można usunąć modułów: %1$s."
 #: sysmaps.php:261
 msgid "Cannot delete network map"
 msgstr "Nie można usunąć mapy sieci"
+
+#: app/controllers/CControllerProxyDelete.php:39
+msgid "Cannot delete proxies"
+msgstr ""
 
 #: app/controllers/CControllerProxyDelete.php:69
 msgid "Cannot delete proxy"
@@ -3149,6 +3172,11 @@ msgstr "Nie można zaktualizować \"%2$s\" dla wykrytego wyzwalacza \"%1$s\"."
 msgid "Cannot update API token"
 msgstr "Nie można zaktualizować tokena API"
 
+#: app/controllers/CControllerSlaUpdate.php:70
+#: app/controllers/CControllerSlaUpdate.php:138
+msgid "Cannot update SLA"
+msgstr ""
+
 #: include/classes/api/services/CGraphGeneral.php:67
 msgid "Cannot update a discovered graph."
 msgstr "Nie można zaktualizować wykrytego wykresu."
@@ -3342,6 +3370,11 @@ msgstr "Nie można zaktualizować skryptu"
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
 msgstr "Nie można zmienić zakresu skryptu. Skrypt %1$s\" jest użyty w akcji %2$s\"."
 
+#: app/controllers/CControllerServiceUpdate.php:97
+#: app/controllers/CControllerServiceUpdate.php:200
+msgid "Cannot update service"
+msgstr ""
+
 #: include/classes/api/services/CService.php:2310
 #: include/classes/api/services/CService.php:2372
 #: include/classes/api/services/CService.php:2396
@@ -3496,7 +3529,7 @@ msgstr "Zmień hasło"
 
 #: include/items.inc.php:1844
 msgid "Change per second"
-msgstr "Zmień na sekundy"
+msgstr "Zmiana na sekundę"
 
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:462
@@ -4022,6 +4055,10 @@ msgstr "Konfiguracja użytkowników"
 msgid "Configuration of web monitoring"
 msgstr "Konfiguracja monitorowania www"
 
+#: app/controllers/CControllerAuditLogList.php:199
+msgid "Configuration refresh"
+msgstr ""
+
 #: app/controllers/CControllerAuditSettingsUpdate.php:78
 #: app/controllers/CControllerAutoregUpdate.php:69
 #: app/controllers/CControllerGeomapsUpdate.php:81
@@ -4377,7 +4414,7 @@ msgstr "Tworzenie niezależnej reguły wykrywania"
 
 #: jsLoader.php:358
 msgid "Create dependent item"
-msgstr "Utwórz regułę wyszukiwania zależnego"
+msgstr "Utwórz pozycję zależną"
 
 #: include/views/configuration.host.prototype.list.php:196
 #: include/views/configuration.item.prototype.list.php:205
@@ -4392,7 +4429,7 @@ msgstr "Utwórz regułę wykrywania"
 
 #: include/views/configuration.host.discovery.list.php:47
 msgid "Create discovery rule (select host first)"
-msgstr "Utwórz regułę wyszukiwania (wybierz najpierw hosta)"
+msgstr "Utwórz regułę wykrywania niskopoziomowego (wybierz najpierw hosta)"
 
 #: include/views/configuration.host.discovery.list.php:48
 msgid "Create discovery rule (select template first)"
@@ -4430,7 +4467,7 @@ msgstr "Utwórz prototyp wykresu"
 #: app/views/configuration.host.list.php:39
 #: app/views/monitoring.host.view.php:41
 msgid "Create host"
-msgstr "Utwórz host"
+msgstr "Utwórz hosta"
 
 #: include/views/configuration.hostgroups.list.php:33
 #: include/views/configuration.hostgroups.list.php:37
@@ -5329,6 +5366,10 @@ msgstr "Usunąć wybrane typy mediów?"
 msgid "Delete selected proxies?"
 msgstr "Usunąć wybrane proxy?"
 
+#: app/views/js/proxy.list.js.php:152 app/views/popup.proxy.edit.php:249
+msgid "Delete selected proxy?"
+msgstr ""
+
 #: app/views/administration.regex.list.php:82
 msgid "Delete selected regular expressions?"
 msgstr "Usunąć wybrane wyrażenia regularne?"
@@ -5451,7 +5492,7 @@ msgstr "Zależny"
 
 #: include/items.inc.php:102
 msgid "Dependent item"
-msgstr "Element zależny"
+msgstr "Pozycja zależna"
 
 #: app/views/popup.generic.php:279 include/triggers.inc.php:2398
 #: include/views/configuration.trigger.prototype.list.php:98
@@ -5593,6 +5634,10 @@ msgstr "Wyłączyć hosty w wybranych grupach hostów?"
 #: app/views/administration.proxy.list.php:188
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "Wyłączyć hosty monitorowane przez wybrane proxy?"
+
+#: app/views/js/proxy.list.js.php:137
+msgid "Disable hosts monitored by selected proxy?"
+msgstr ""
 
 #: app/views/administration.token.list.php:199
 #: app/views/administration.user.token.list.php:151
@@ -6328,6 +6373,10 @@ msgstr "Włącz hosty"
 msgid "Enable hosts monitored by selected proxies?"
 msgstr "Włączyć hosty monitorowane przez wybrane proxy?"
 
+#: app/views/js/proxy.list.js.php:122
+msgid "Enable hosts monitored by selected proxy?"
+msgstr ""
+
 #: app/views/administration.audit.settings.edit.php:48
 #: app/views/administration.housekeeping.edit.php:44
 #: app/views/administration.housekeeping.edit.php:98
@@ -6916,6 +6965,11 @@ msgstr "Nie udało się zaktualizować właściwości strony pulpitu."
 msgid "Failed to update dashboard properties."
 msgstr "Nie udało się zaktualizować właściwości pulpitu."
 
+#: app/controllers/CControllerDashboardShareUpdate.php:110
+#: app/views/js/popup.dashboard.share.edit.js.php:83
+msgid "Failed to update dashboard sharing."
+msgstr ""
+
 #: jsLoader.php:141
 msgid "Failed to update widget properties."
 msgstr "Nie udało się zaktualizować właściwości widżetu."
@@ -7134,7 +7188,7 @@ msgstr "Dopasuj do mapy"
 #: include/views/configuration.graph.edit.php:180
 #: include/views/configuration.graph.edit.php:255
 msgid "Fixed"
-msgstr "Stały"
+msgstr "Stała"
 
 #: include/classes/helpers/CServiceHelper.php:152
 msgid "Fixed status"
@@ -7302,16 +7356,16 @@ msgstr "Pobiera zawartość strony www. Zwraca źródło strony www jako tekst"
 
 #: app/views/popup.itemtestedit.view.php:251
 msgid "Get value"
-msgstr "Pobiera wartość"
+msgstr "Pobierz wartość"
 
 #: app/views/js/popup.itemtestedit.view.js.php:503
 #: app/views/popup.itemtestedit.view.php:432
 msgid "Get value and test"
-msgstr "Pobiera wartość i testuje"
+msgstr "Pobierz wartość i testuj"
 
 #: app/views/popup.itemtestedit.view.php:94
 msgid "Get value from host"
-msgstr "Pobiera wartość z hosta"
+msgstr "Pobierz wartość z hosta"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:48
 #: include/triggers.inc.php:1143
@@ -8654,7 +8708,7 @@ msgstr "W trakcie"
 
 #: include/items.inc.php:1864
 msgid "In range"
-msgstr "W zasięgu"
+msgstr "W przedziale"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:363
 msgid "Inaccessible SLA"
@@ -10162,7 +10216,7 @@ msgstr "Inwentarz dla hosta \"%1$s\" jest wyłączony."
 
 #: app/views/administration.iconmap.edit.php:59
 msgid "Inventory field"
-msgstr "Pole inwentarzowe"
+msgstr "Pole inwentarza"
 
 #: app/partials/popup.operations.php:225
 #: app/views/popup.massupdate.host.php:179
@@ -10817,7 +10871,7 @@ msgstr "Y z lewej"
 
 #: include/items.inc.php:1816
 msgid "Left trim"
-msgstr "Przycięcie z lewej"
+msgstr "Przytnij z lewej"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:308
 msgid "Legend"
@@ -11226,7 +11280,7 @@ msgstr "Zarządzanie raportami okresowymi"
 #: include/hosts.inc.php:1127
 #: include/views/configuration.host.prototype.edit.php:364
 msgid "Manual"
-msgstr "Ręcznie"
+msgstr "Ręczny"
 
 #: app/views/administration.script.edit.php:104
 #: app/views/administration.script.list.php:54
@@ -12270,6 +12324,10 @@ msgstr "Nowy host"
 msgid "New operation"
 msgstr "Nowa operacja"
 
+#: app/views/popup.proxy.edit.php:229 app/views/popup.proxy.edit.php:258
+msgid "New proxy"
+msgstr ""
+
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
 msgstr "Nowe wyrażenie regularne"
@@ -12898,11 +12956,11 @@ msgstr "Nie autoryzowano."
 #: app/views/monitoring.widget.hostavail.view.php:103
 #: include/classes/html/CHostAvailability.php:81
 msgid "Not available"
-msgstr "Niedostępne"
+msgstr "Niedostępny"
 
 #: app/views/administration.trigdisplay.edit.php:101 jsLoader.php:176
 msgid "Not classified"
-msgstr "Niesklasyfikowane"
+msgstr "Niesklasyfikowany"
 
 #: include/forms.inc.php:315
 msgid "Not inherited items"
@@ -13081,18 +13139,18 @@ msgstr "Systemy liczbowe"
 #: include/triggers.inc.php:1590 include/views/configuration.item.edit.php:120
 #: include/views/configuration.item.prototype.edit.php:106
 msgid "Numeric (float)"
-msgstr "Numerycznie (zmiennoprzecinkowo)"
+msgstr "Liczba (zmiennoprzecinkowa)"
 
 #: include/triggers.inc.php:1591
 msgid "Numeric (integer)"
-msgstr "Numeryczny (liczba całkowita)"
+msgstr "Liczba (całkowita)"
 
 #: app/partials/configuration.filter.items.php:137
 #: app/views/popup.massupdate.item.php:155 include/items.inc.php:123
 #: include/views/configuration.item.edit.php:119
 #: include/views/configuration.item.prototype.edit.php:105
 msgid "Numeric (unsigned)"
-msgstr "Numerycznie (liczba całkowita bez znaku)"
+msgstr "Liczba (całkowita bez znaku)"
 
 #: include/hosts.inc.php:36 include/hosts.inc.php:64
 msgid "OEM"
@@ -13527,7 +13585,7 @@ msgstr "Nadpisanie o nazwie \"%1$s\" już istnieje."
 #: include/views/configuration.host.discovery.edit.php:957
 #: include/views/configuration.host.discovery.edit.php:980
 msgid "Overrides"
-msgstr "Przełączenia"
+msgstr "Nadpisania"
 
 #: include/classes/helpers/CMenuHelper.php:112
 #: include/classes/helpers/CRoleHelper.php:365
@@ -13852,7 +13910,7 @@ msgstr "Konflikt w relacji między usługami \"%1$s\" oraz \"%2$s\"."
 #: include/views/configuration.item.edit.php:158
 #: include/views/configuration.item.prototype.edit.php:144
 msgid "Parse"
-msgstr "Składnia"
+msgstr "Parsuj"
 
 #: include/classes/core/CJsonRpc.php:171
 msgid "Parse error"
@@ -14393,7 +14451,7 @@ msgstr "Wzorzec Prometheus"
 
 #: include/items.inc.php:1904
 msgid "Prometheus to JSON"
-msgstr "Prometeusz do JSON"
+msgstr "Prometeusz na JSON"
 
 #: include/views/monitoring.sysmap.list.php:82
 #: include/views/monitoring.sysmap.list.php:83 jsLoader.php:144
@@ -14697,7 +14755,7 @@ msgstr "Odzyskiwanie"
 #: include/views/configuration.triggers.edit.php:416 trigger_prototypes.php:41
 #: trigger_prototypes.php:54 triggers.php:49 triggers.php:61
 msgid "Recovery expression"
-msgstr "Wyrażenie dla przywracania"
+msgstr "Wyrażenie przywracania"
 
 #: include/forms.inc.php:1984 include/forms.inc.php:1991
 #: include/forms.inc.php:2001
@@ -14724,6 +14782,18 @@ msgstr "Prostokąt"
 #: app/views/administration.user.edit.php:276
 msgid "Refresh"
 msgstr "Odśwież"
+
+#: app/views/popup.proxy.edit.php:216 app/views/proxy.list.php:178
+msgid "Refresh configuration"
+msgstr ""
+
+#: app/views/js/proxy.list.js.php:106
+msgid "Refresh configuration of the selected proxies?"
+msgstr ""
+
+#: app/views/js/proxy.list.js.php:107 app/views/popup.proxy.edit.php:217
+msgid "Refresh configuration of the selected proxy?"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetForm.php:58 jsLoader.php:169
 msgid "Refresh interval"
@@ -15070,9 +15140,13 @@ msgstr "Żądanie treści"
 msgid "Request body type"
 msgstr "Żądanie typu treści"
 
+#: app/controllers/CControllerProxyConfigRefresh.php:71
+msgid "Request created successfully"
+msgstr ""
+
 #: host_discovery.php:428 host_discovery.php:800 items.php:895 items.php:1011
 msgid "Request sent successfully"
-msgstr "Żądanie wysłane z powodzenie"
+msgstr "Żądanie wysłane z powodzeniem"
 
 #: include/views/configuration.host.discovery.edit.php:271
 #: include/views/configuration.item.edit.php:328
@@ -16235,7 +16309,7 @@ msgstr "Ustaw własny okres czasu"
 #: app/views/js/popup.itemtestedit.view.js.php:371 include/forms.inc.php:1483
 #: include/views/js/item.preprocessing.js.php:68
 msgid "Set error to"
-msgstr "Ustaw błąd do"
+msgstr "Ustaw błąd na"
 
 #: app/views/popup.token.edit.php:94
 msgid "Set expiration date and time"
@@ -16264,7 +16338,7 @@ msgstr "Ustaw ten widok jako domyślny"
 #: app/views/js/popup.itemtestedit.view.js.php:365 include/forms.inc.php:1482
 #: include/views/js/item.preprocessing.js.php:67
 msgid "Set value to"
-msgstr "Ustaw wartość do"
+msgstr "Ustaw wartość na"
 
 #: include/classes/validators/CLdapAuthValidator.php:83
 msgid "Setting LDAP dereferencing mode failed."
@@ -17435,6 +17509,10 @@ msgstr "Szablony"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Szablony \"%1$s\" odłączone od hostów \"%2$s\"."
 
+#: app/partials/configuration.host.edit.html.php:187
+msgid "Templates linked by host discovery cannot be unlinked."
+msgstr ""
+
 #: app/controllers/CControllerPopupMassupdateTemplate.php:358
 msgid "Templates updated"
 msgstr "Zaktualizowane szablony"
@@ -17677,6 +17755,10 @@ msgstr "Bieżący miesiąc"
 #: include/func.inc.php:2477
 msgid "This month so far"
 msgstr "Ten miesiąc jak dotąd"
+
+#: app/views/popup.tophosts.column.edit.php:172
+msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
+msgstr ""
 
 #: include/views/configuration.item.edit.php:125
 #: include/views/configuration.item.prototype.edit.php:111
@@ -17954,7 +18036,7 @@ msgstr "Statystyki pamięci podręcznej funkcji trendów. Prawidłowe parametry 
 #: disc_prototypes.php:139 include/views/configuration.item.edit.php:885
 #: include/views/configuration.item.prototype.edit.php:797 items.php:84
 msgid "Trend storage period"
-msgstr "Okres przechowywania trendu"
+msgstr "Okres przechowywania trendów"
 
 #: app/partials/configuration.filter.items.php:156
 #: app/partials/monitoring.latest.view.html.php:75
@@ -18779,6 +18861,10 @@ msgstr "Użyj własnych kolorów dla stanów zdarzeń"
 #: jsLoader.php:402
 msgid "Use default"
 msgstr "Użyj domyślnej"
+
+#: app/partials/configuration.host.edit.html.php:188
+msgid "Use host prototype configuration form to remove automatically linked templates on upcoming discovery."
+msgstr ""
 
 #: app/views/administration.user.edit.php:300 app/views/popup.media.php:88
 msgid "Use if severity"
@@ -19838,6 +19924,13 @@ msgstr "Widżet jest przestarzały."
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "Widżet jest za mały dla okreśłonej liczby kolumn i wierszy."
 
+#: app/controllers/CControllerDashboardWidgetCheck.php:46
+#: app/controllers/CControllerDashboardWidgetConfigure.php:46
+#: app/controllers/CControllerDashboardWidgetEdit.php:47
+#: app/controllers/CControllerDashboardWidgetsSanitize.php:66
+msgid "Widget type is not supported in this context."
+msgstr ""
+
 #: graphs.php:44 include/classes/widgets/CWidgetHelper.php:923
 #: include/classes/widgets/CWidgetHelper.php:956
 #: include/classes/widgets/CWidgetHelper.php:957
@@ -19887,6 +19980,10 @@ msgstr "Z nazwą problemu"
 #: app/views/monitoring.widget.problemhosts.view.php:33
 msgid "With problems"
 msgstr "Z problemami"
+
+#: app/views/popup.tophosts.column.edit.php:119
+msgid "With this setting only numeric items will be displayed in this column."
+msgstr ""
 
 #: include/forms.inc.php:346 include/forms.inc.php:566
 msgid "With triggers"
@@ -21298,11 +21395,11 @@ msgstr "trzeci parametr funkcji \"%1$s\" jest nieprawidłowy"
 #: include/classes/graphdraw/CPieGraphDraw.php:176
 #: include/classes/helpers/CSvgGraphHelper.php:381
 msgid "invalid trend storage period"
-msgstr "niepoprawny okres przechowywania trendu"
+msgstr "niepoprawny okres przechowywania trendów"
 
 #: app/views/popup.valuemap.edit.php:79 include/actions.inc.php:29
 msgid "is greater than or equals"
-msgstr "jest większe niż lub równe"
+msgstr "jest większe lub równe"
 
 #: app/views/popup.valuemap.edit.php:80 include/actions.inc.php:30
 msgid "is less than or equals"
@@ -21397,7 +21494,7 @@ msgstr "niskopoziomowa reguła wykrywania"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:757
 msgid "ltrim() - Remove specified characters from the beginning of a string"
-msgstr "ltrim() - Usuń podane znaki z początku stringa"
+msgstr "ltrim() - Usuń podane znaki z początku ciągu znaków"
 
 #: include/func.inc.php:595 jsLoader.php:126 jsLoader.php:225 jsLoader.php:406
 msgctxt "minute short"
@@ -21434,7 +21531,7 @@ msgstr "mad - Średnie odchylenie bezwzględne"
 
 #: include/classes/parsers/CVaultSecretParser.php:180
 msgid "mandatory key is missing"
-msgstr ""
+msgstr "brakuje wymaganego klucza"
 
 #: include/classes/parsers/CVaultSecretParser.php:177
 #, c-format
@@ -21657,7 +21754,7 @@ msgstr "nodata() - Nie odebrano danych podczas okresu czasu T (1 - prawda, 0- fa
 #: app/views/popup.tophosts.column.edit.php:125
 #: include/classes/widgets/CWidgetHelper.php:1285 include/graphs.inc.php:74
 msgid "none"
-msgstr "żaden"
+msgstr "brak"
 
 #: include/classes/api/services/CItemGeneral.php:2595
 #: include/classes/api/services/CItemGeneral.php:2617
@@ -21870,7 +21967,7 @@ msgstr "round() - Zaokrągla wartość do wskazanego miejsca po przecinku"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:950
 msgid "rtrim() - Removes specified characters from the end of a string"
-msgstr "Usuń podane znaki z końca ciągu znaków"
+msgstr "rtrim() - Usuń podane znaki z końca ciągu znaków"
 
 #: include/func.inc.php:596
 msgctxt "second short"

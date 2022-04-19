@@ -38,8 +38,10 @@ $web_layout_mode = $this->getLayoutMode();
 	->setWebLayoutMode($web_layout_mode)
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_WEB_VIEW))
 	->setControls(
-		(new CTag('nav', true, get_icon('kioskmode', ['mode' => $web_layout_mode])))
-			->setAttribute('aria-label', _('Content controls'))
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
+		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter())
 		->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'web.view'))

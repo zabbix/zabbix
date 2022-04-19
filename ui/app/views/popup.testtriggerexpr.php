@@ -108,7 +108,7 @@ $form_list->addRow(_('Result'),
 $output = [
 	'header' => $data['title'],
 	'body' => (new CDiv([
-		$data['message'],
+		$data['messages'],
 		(new CForm())
 			->cleanItems()
 			->setId('expression_testing_from')

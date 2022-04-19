@@ -401,11 +401,19 @@ var hintBox = {
 
 			var $hint_box = $target.next('.hint-box').empty();
 
-			if (resp.messages) {
-				$hint_box.append(resp.messages);
+			if ('error' in resp) {
+				const message_box = makeMessageBox('bad', resp.error.messages, resp.error.title, false, true);
+
+				$hint_box.append(message_box);
 			}
-			if (resp.data) {
-				$hint_box.append(resp.data);
+			else {
+				if (resp.messages) {
+					$hint_box.append(resp.messages);
+				}
+
+				if (resp.data) {
+					$hint_box.append(resp.data);
+				}
 			}
 
 			hintBox.displayHint(e, $target);

@@ -725,6 +725,7 @@ TABLE|hosts_templates|hosttemplateid|ZBX_TEMPLATE
 FIELD		|hosttemplateid	|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|hosts
 FIELD		|templateid	|t_id		|	|NOT NULL	|ZBX_PROXY		|2|hosts	|hostid
+FIELD		|link_type	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 UNIQUE		|1		|hostid,templateid
 INDEX		|2		|templateid
 

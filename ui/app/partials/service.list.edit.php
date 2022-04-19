@@ -43,6 +43,7 @@ if ($data['is_filtered']) {
 }
 else {
 	$path = $data['path'];
+
 	if ($data['service'] !== null) {
 		$path[] = $data['service']['serviceid'];
 	}

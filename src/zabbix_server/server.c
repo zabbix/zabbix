@@ -30,7 +30,7 @@
 #include "zbxdbupgrade.h"
 #include "log.h"
 #include "zbxgetopt.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "zbxmodules.h"
 #include "zbxnix.h"
 
@@ -100,23 +100,26 @@ const char	*help_message[] = {
 	"  -R --runtime-control runtime-option   Perform administrative functions",
 	"",
 	"    Runtime control options:",
-	"      " ZBX_CONFIG_CACHE_RELOAD "         Reload configuration cache",
-	"      " ZBX_HOUSEKEEPER_EXECUTE "         Execute the housekeeper",
-	"      " ZBX_TRIGGER_HOUSEKEEPER_EXECUTE " Execute the trigger housekeeper",
-	"      " ZBX_LOG_LEVEL_INCREASE "=target   Increase log level, affects all processes if",
-	"                                  target is not specified",
-	"      " ZBX_LOG_LEVEL_DECREASE "=target   Decrease log level, affects all processes if",
-	"                                  target is not specified",
-	"      " ZBX_SNMP_CACHE_RELOAD "           Reload SNMP cache",
-	"      " ZBX_SECRETS_RELOAD "              Reload secrets from Vault",
-	"      " ZBX_DIAGINFO "=section            Log internal diagnostic information of the",
-	"                                  section (historycache, preprocessing, alerting,",
-	"                                  lld, valuecache, locks) or everything if section is",
-	"                                  not specified",
-	"      " ZBX_SERVICE_CACHE_RELOAD "        Reload service manager cache",
-	"      " ZBX_HA_STATUS "                   Display HA cluster status",
-	"      " ZBX_HA_REMOVE_NODE "=target       Remove the HA node specified by its name or ID",
-	"      " ZBX_HA_SET_FAILOVER_DELAY "=delay Set HA failover delay",
+	"      " ZBX_CONFIG_CACHE_RELOAD "             Reload configuration cache",
+	"      " ZBX_HOUSEKEEPER_EXECUTE "             Execute the housekeeper",
+	"      " ZBX_TRIGGER_HOUSEKEEPER_EXECUTE "     Execute the trigger housekeeper",
+	"      " ZBX_LOG_LEVEL_INCREASE "=target       Increase log level, affects all processes if",
+	"                                        target is not specified",
+	"      " ZBX_LOG_LEVEL_DECREASE "=target       Decrease log level, affects all processes if",
+	"                                        target is not specified",
+	"      " ZBX_SNMP_CACHE_RELOAD "               Reload SNMP cache",
+	"      " ZBX_SECRETS_RELOAD "                  Reload secrets from Vault",
+	"      " ZBX_DIAGINFO "=section                Log internal diagnostic information of the",
+	"                                        section (historycache, preprocessing, alerting,",
+	"                                        lld, valuecache, locks) or everything if section is",
+	"                                        not specified",
+	"      " ZBX_SERVICE_CACHE_RELOAD "             Reload service manager cache",
+	"      " ZBX_HA_STATUS "                        Display HA cluster status",
+	"      " ZBX_HA_REMOVE_NODE "=target            Remove the HA node specified by its name or ID",
+	"      " ZBX_HA_SET_FAILOVER_DELAY "=delay      Set HA failover delay",
+	"      " ZBX_PROXY_CONFIG_CACHE_RELOAD "[=name] Reload configuration cache on proxy by its name,",
+	"                                        comma-separated list can be used to pass multiple names.",
+	"                                        All proxies will be reloaded if no names were specified.",
 	"",
 	"      Log level control targets:",
 	"        process-type              All processes of specified type",
@@ -290,8 +293,8 @@ int	CONFIG_SERVER_STARTUP_TIME	= 0;	/* zabbix server startup time */
 
 int	CONFIG_PROXYPOLLER_FORKS	= 1;	/* parameters for passive proxies */
 
-/* how often Zabbix server sends configuration data to proxy, in seconds */
-int	CONFIG_PROXYCONFIG_FREQUENCY	= SEC_PER_HOUR;
+/* how often Zabbix server sends configuration data to passive proxy, in seconds */
+int	CONFIG_PROXYCONFIG_FREQUENCY	= SEC_PER_MIN * 5;
 int	CONFIG_PROXYDATA_FREQUENCY	= 1;	/* 1s */
 
 char	*CONFIG_LOAD_MODULE_PATH	= NULL;

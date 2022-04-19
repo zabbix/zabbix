@@ -267,7 +267,12 @@
 			return function(resp) {
 				clearMessages();
 
-				if (resp.messages) {
+				if ('error' in resp) {
+					const message_box = makeMessageBox('bad', resp.error.messages, resp.error.title);
+
+					addMessage(message_box);
+				}
+				else if ('messages' in resp) {
 					addMessage(resp.messages);
 				}
 

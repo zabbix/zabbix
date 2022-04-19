@@ -92,7 +92,6 @@ $widget = (new CWidget())
 				(new CUrl('templates.php'))
 					->setArgument('groupids', array_keys($data['filter']['groups']))
 					->setArgument('form', 'create')
-					->getUrl()
 				)
 			)
 			->addItem(

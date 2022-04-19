@@ -20,7 +20,7 @@
 #ifndef ZABBIX_LLD_H
 #define ZABBIX_LLD_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 ZBX_THREAD_ENTRY(lld_worker_thread, args);
 

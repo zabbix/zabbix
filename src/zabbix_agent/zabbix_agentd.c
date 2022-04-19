@@ -107,7 +107,7 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 #include "active.h"
 #include "listener.h"
 
-#include "symbols.h"
+#include "zbxsymbols.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
@@ -1330,9 +1330,9 @@ int	main(int argc, char **argv)
 
 	if (SUCCEED != parse_commandline(argc, argv, &t))
 		exit(EXIT_FAILURE);
-
-	import_symbols();
-
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	zbx_import_symbols();
+#endif
 #ifdef _WINDOWS
 	if (ZBX_TASK_SHOW_USAGE != t.task && ZBX_TASK_SHOW_VERSION != t.task && ZBX_TASK_SHOW_HELP != t.task &&
 			SUCCEED != zbx_socket_start(&error))
