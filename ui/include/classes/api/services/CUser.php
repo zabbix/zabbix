@@ -1491,7 +1491,7 @@ class CUser extends CApiService {
 						self::exception(ZBX_API_ERROR_INTERNAL, _('LDAP authentication is disabled.'));
 					}
 
-					$id = ($db_user['gui_access'] == GROUP_GUI_ACCESS_LDAP && $db_user['userdirectoryid'])
+					$id = $db_user['userdirectoryid']
 						? $db_user['userdirectoryid']
 						: CAuthenticationHelper::get(CAuthenticationHelper::LDAP_USERDIRECTORYID);
 					$userdirectory = [];
@@ -1760,13 +1760,7 @@ class CUser extends CApiService {
 	 * @return array
 	 */
 	private function getUserGroupsPermissions(string $userid): array {
-		$permissions = [
-			'debug_mode' => GROUP_DEBUG_MODE_DISABLED,
-			'users_status' => GROUP_STATUS_ENABLED,
-			'gui_access' => GROUP_GUI_ACCESS_SYSTEM,
-			'userdirectoryid' => null
-		];
-
+		$permissions = [];
 		$db_usrgrps = DBselect(
 			'SELECT g.debug_mode,g.users_status,g.gui_access,g.userdirectoryid'.
 			' FROM usrgrp g,users_groups ug'.
@@ -1781,11 +1775,19 @@ class CUser extends CApiService {
 			if ($db_usrgrp['users_status'] == GROUP_STATUS_DISABLED) {
 				$permissions['users_status'] = GROUP_STATUS_DISABLED;
 			}
-			if ($db_usrgrp['gui_access'] > $permissions['gui_access']) {
+			if (!array_key_exists('gui_access', $permissions)
+					|| $db_usrgrp['gui_access'] > $permissions['gui_access']) {
 				$permissions['gui_access'] = $db_usrgrp['gui_access'];
 				$permissions['userdirectoryid'] = $db_usrgrp['userdirectoryid'];
 			}
 		}
+
+		$permissions += [
+			'debug_mode' => GROUP_DEBUG_MODE_DISABLED,
+			'users_status' => GROUP_STATUS_ENABLED,
+			'gui_access' => GROUP_GUI_ACCESS_SYSTEM,
+			'userdirectoryid' => 0
+		];
 
 		return $permissions;
 	}
