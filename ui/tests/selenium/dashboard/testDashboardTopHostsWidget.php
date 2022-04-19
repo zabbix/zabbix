@@ -2308,8 +2308,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Aggregation function' => 'max',
 							'Thresholds' => [
 								[
-									'value' => '1',
-									'color' => 'FFEB3B'
+									'value' => '10'
 								]
 							]
 						]
@@ -2338,6 +2337,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$this->page->waitUntilReady();
 
 		$dashboard->save();
+		$this->page->waitUntilReady();
 
 		if (array_key_exists('text', $data)) {
 			$this->assertEquals($data['text'], $dashboard->getWidget($data['main_fields']['Name'])->getContent()->getText());
