@@ -162,13 +162,19 @@ zbx_vmware_datacenter_t;
 int	vmware_dc_name_compare(const void *d1, const void *d2);
 ZBX_PTR_VECTOR_DECL(vmware_datacenter, zbx_vmware_datacenter_t *)
 
-#define ZBX_VMWARE_DEV_TYPE_NIC		1
-#define ZBX_VMWARE_DEV_TYPE_DISK	2
+#define ZBX_VMWARE_DEV_TYPE_NIC			1
+#define ZBX_VMWARE_DEV_TYPE_DISK		2
+#define ZBX_VMWARE_DEV_PROPS_IFMAC		0
+#define ZBX_VMWARE_DEV_PROPS_IFCONNECTED	1
+#define ZBX_VMWARE_DEV_PROPS_IFTYPE		2
+#define ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE	3
+#define ZBX_VMWARE_DEV_PROPS_NUM		4
 typedef struct
 {
 	int	type;
 	char	*instance;
 	char	*label;
+	char	**props;
 }
 zbx_vmware_dev_t;
 

@@ -1618,6 +1618,12 @@ int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, c
 			__func__);
 }
 
+int	check_vcenter_hv_network_linkspeed(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	return SUCCEED;
+}
+
 int	check_vcenter_hv_datacenter_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
@@ -3153,9 +3159,21 @@ int	check_vcenter_vm_snapshot_get(AGENT_REQUEST *request, const char *username, 
 	return ret;
 }
 
+static void	check_vcenter_vm_discovery_nic_props_cb(struct zbx_json *j, char **props)
+{
+	zbx_json_addstring(j, "{#VM.IFMAC}", ZBX_NULL2EMPTY_STR(props[ZBX_VMWARE_DEV_PROPS_IFMAC]),
+			ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "{#VM.IFCONNECTED}", ZBX_NULL2EMPTY_STR(props[ZBX_VMWARE_DEV_PROPS_IFCONNECTED]),
+			ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "{#VM.IFTYPE}", ZBX_NULL2EMPTY_STR(props[ZBX_VMWARE_DEV_PROPS_IFTYPE]),
+			ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "{#VM.IFBACKINGDEVICE}", ZBX_NULL2EMPTY_STR(props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE]),
+			ZBX_JSON_TYPE_STRING);
+}
+
 static int	check_vcenter_vm_discovery_common(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result, int dev_type, const char *json_name, const char *json_desc,
-		const char *func_parent)
+		const char *func_parent, void (*props_cb)(struct zbx_json *j, char **props))
 {
 	struct zbx_json		json_data;
 	zbx_vmware_service_t	*service;
@@ -3206,6 +3224,9 @@ static int	check_vcenter_vm_discovery_common(AGENT_REQUEST *request, const char 
 		if (NULL != dev->label)
 			zbx_json_addstring(&json_data, json_desc, dev->label, ZBX_JSON_TYPE_STRING);
 
+		if (NULL != props_cb)
+			props_cb(&json_data, dev->props);
+
 		zbx_json_close(&json_data);
 	}
 
@@ -3229,7 +3250,7 @@ int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *userna
 		AGENT_RESULT *result)
 {
 	return check_vcenter_vm_discovery_common(request, username, password, result, ZBX_VMWARE_DEV_TYPE_NIC,
-			"{#IFNAME}", "{#IFDESC}", __func__);
+			"{#IFNAME}", "{#IFDESC}", __func__, check_vcenter_vm_discovery_nic_props_cb);
 }
 
 static int	check_vcenter_vm_common(AGENT_REQUEST *request, const char *username, const char *password,
@@ -3435,7 +3456,7 @@ int	check_vcenter_vm_vfs_dev_discovery(AGENT_REQUEST *request, const char *usern
 		AGENT_RESULT *result)
 {
 	return check_vcenter_vm_discovery_common(request, username, password, result, ZBX_VMWARE_DEV_TYPE_DISK,
-			"{#DISKNAME}", "{#DISKDESC}", __func__);
+			"{#DISKNAME}", "{#DISKDESC}", __func__, NULL);
 }
 
 int	check_vcenter_vm_vfs_dev_read(AGENT_REQUEST *request, const char *username, const char *password,

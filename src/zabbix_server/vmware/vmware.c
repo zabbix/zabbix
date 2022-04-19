@@ -1722,8 +1722,18 @@ static void	vmware_props_free(char **props, int props_num)
  ******************************************************************************/
 static void	vmware_dev_free(zbx_vmware_dev_t *dev)
 {
+	int	i;
+
 	zbx_free(dev->instance);
 	zbx_free(dev->label);
+
+	if (NULL == dev->props)
+		return;
+
+	for (i = 0; i < ZBX_VMWARE_DEV_PROPS_NUM; i++)
+			zbx_free(dev->props[i]);
+
+	zbx_free(dev->props);
 	zbx_free(dev);
 }
 
@@ -2385,6 +2395,43 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: gets virtual machine network interface devices' additional        *
+ * properties (props member of zbx_vmware_dev_t)                              *
+ *                                                                            *
+ * Parameters: details - [IN] a xml document containing virtual machine data  *
+ *             xmlNode - [IN] a xml document node that corresponds to given   *
+ *                            network interface device                        *
+ *                                                                            *
+ ******************************************************************************/
+static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node)
+{
+	char	*value;
+	char	**props;
+	xmlChar	*attr_value;
+
+	props = (char **)zbx_malloc(NULL, sizeof(char *) * ZBX_VMWARE_DEV_PROPS_NUM);
+
+	props[ZBX_VMWARE_DEV_PROPS_IFMAC] = zbx_xml_node_read_value(details, node,
+				"*[local-name()='macAddress']");
+
+	if (NULL != (value = zbx_xml_node_read_value(details, node,
+					"*[local-name()='connectable']/*[local-name()='connected']")))
+	{
+		props[ZBX_VMWARE_DEV_PROPS_IFCONNECTED] = (0 == strcmp(value, "true") ? "1" : "0");
+		zbx_free(value);
+	}
+
+	if (NULL != (attr_value = xmlGetProp(node->parent, "type")))
+		props[ZBX_VMWARE_DEV_PROPS_IFTYPE] = (char *)attr_value;
+
+	props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE] = zbx_xml_node_read_value(details, node,
+			"*[local-name()='backing']/*[local-name()='deviceName']");
+
+	return props;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: gets virtual machine network interface devices                    *
  *                                                                            *
  * Parameters: vm      - [OUT] the virtual machine                            *
@@ -2426,10 +2473,12 @@ static void	vmware_vm_get_nic_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 			continue;
 
 		dev = (zbx_vmware_dev_t *)zbx_malloc(NULL, sizeof(zbx_vmware_dev_t));
-		dev->type =  ZBX_VMWARE_DEV_TYPE_NIC;
+		dev->type = ZBX_VMWARE_DEV_TYPE_NIC;
 		dev->instance = key;
 		dev->label = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
 				"*[local-name()='deviceInfo']/*[local-name()='label']");
+
+		dev->props = vmware_vm_get_nic_device_props(details, nodeset->nodeTab[i]);
 
 		zbx_vector_ptr_append(&vm->devs, dev);
 		nics++;
