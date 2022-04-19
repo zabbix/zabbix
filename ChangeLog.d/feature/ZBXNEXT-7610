@@ -1,1 +1,1 @@
-..F....... [ZBXNEXT-7610] fixed excluding deprecated function strtime() in PHP 8 from zabbix frontend (rdetlavs)
+..F....... [ZBXNEXT-7610] refactored in PHP 8 deprecated function strtime() (rdetlavs)
