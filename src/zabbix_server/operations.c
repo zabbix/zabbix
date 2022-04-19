@@ -299,9 +299,10 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 							" and h.status in (%d,%d)"
 							" and h.proxy_hostid%s"
 							" and ds.dhostid=" ZBX_FS_UI64
+							" and h.flags <> %d"
 						" order by h.hostid",
 						HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-						DBsql_id_cmp(proxy_hostid), dhostid);
+						DBsql_id_cmp(proxy_hostid), dhostid, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 				if (NULL != (row2 = DBfetch(result2)))
 				{
@@ -969,7 +970,7 @@ void	op_template_add(const DB_EVENT *event, zbx_config_t *cfg, zbx_vector_uint64
 	if (0 == (hostid = add_discovered_host(event, &status, cfg)))
 		goto out;
 
-	if (SUCCEED != DBcopy_template_elements(hostid, lnk_templateids, &error))
+	if (SUCCEED != DBcopy_template_elements(hostid, lnk_templateids, TEMPLATE_LINK_MANUAL, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot link template(s) %s", error);
 		zbx_free(error);

@@ -63,6 +63,13 @@ typedef enum
 }
 zbx_graph_item_type;
 
+typedef enum
+{
+	TEMPLATE_LINK_MANUAL = 0,
+	TEMPLATE_LINK_LLD = 1
+}
+zbx_host_template_link_type;
+
 #define ZBX_DB_CONNECT_NORMAL	0
 #define ZBX_DB_CONNECT_EXIT	1
 #define ZBX_DB_CONNECT_ONCE	2
@@ -617,7 +624,8 @@ void	DBdelete_sysmaps_hosts_by_hostid(zbx_uint64_t hostid);
 
 int	DBadd_graph_item_to_linked_hosts(int gitemid, int hostid);
 
-int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids, char **error);
+int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids,
+		zbx_host_template_link_type link_type, char **error);
 int	DBdelete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_vector_uint64_t *del_templateids,
 		char **error);
 

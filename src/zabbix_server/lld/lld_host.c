@@ -2452,7 +2452,7 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
 		/* select already linked templates */
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select hostid,templateid"
+				"select hostid,templateid,link_type"
 				" from hosts_templates"
 				" where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
@@ -2463,8 +2463,11 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
 
 		while (NULL != (row = DBfetch(result)))
 		{
+			int	link_type;
+
 			ZBX_STR2UINT64(hostid, row[0]);
 			ZBX_STR2UINT64(templateid, row[1]);
+			link_type = atoi(row[2]);
 
 			if (FAIL == (i = zbx_vector_ptr_bsearch(hosts, &hostid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
@@ -2478,12 +2481,16 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
 				/* templates which should be unlinked */
-				zbx_vector_uint64_append(&host->del_templateids, templateid);
+				if (TEMPLATE_LINK_LLD == link_type)
+					zbx_vector_uint64_append(&host->del_templateids, templateid);
 			}
 			else
 			{
 				/* templates which are already linked */
-				zbx_vector_uint64_remove(&host->lnk_templateids, i);
+				if (TEMPLATE_LINK_MANUAL == link_type)
+					zbx_vector_uint64_append(&host->del_templateids, templateid);
+				else
+					zbx_vector_uint64_remove(&host->lnk_templateids, i);
 			}
 		}
 		DBfree_result(result);
@@ -3551,7 +3558,8 @@ static void	lld_templates_link(const zbx_vector_ptr_t *hosts, char **error)
 
 		if (0 != host->lnk_templateids.values_num)
 		{
-			if (SUCCEED != DBcopy_template_elements(host->hostid, &host->lnk_templateids, &err))
+			if (SUCCEED != DBcopy_template_elements(host->hostid, &host->lnk_templateids, TEMPLATE_LINK_LLD,
+					&err))
 			{
 				*error = zbx_strdcatf(*error, "Cannot link template(s) %s.\n", err);
 				zbx_free(err);
