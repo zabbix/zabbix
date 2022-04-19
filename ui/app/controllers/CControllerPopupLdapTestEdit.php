@@ -23,15 +23,15 @@ class CControllerPopupLdapTestEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'userdirectoryid' => 'db userdirectory.userdirectoryid',
-			'host' => 'required|db userdirectory.host|not_empty',
-			'port' => 'required|db userdirectory.port|ge '.ZBX_MIN_PORT_NUMBER.'|le '.ZBX_MAX_PORT_NUMBER,
-			'base_dn' => 'required|db userdirectory.base_dn|not_empty',
-			'bind_dn' => 'db userdirectory.bind_dn',
-			'bind_password' => 'db userdirectory.bind_password',
-			'search_attribute' => 'required|db userdirectory.search_attribute|not_empty',
-			'start_tls' => 'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
-			'search_filter' => 'db userdirectory.search_filter'
+			'userdirectoryid' => 	'db userdirectory.userdirectoryid',
+			'host' => 				'required|db userdirectory.host|not_empty',
+			'port' => 				'required|db userdirectory.port|ge '.ZBX_MIN_PORT_NUMBER.'|le '.ZBX_MAX_PORT_NUMBER,
+			'base_dn' => 			'required|db userdirectory.base_dn|not_empty',
+			'bind_dn' => 			'db userdirectory.bind_dn',
+			'bind_password' => 		'db userdirectory.bind_password',
+			'search_attribute' => 	'required|db userdirectory.search_attribute|not_empty',
+			'start_tls' => 			'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
+			'search_filter' => 		'db userdirectory.search_filter'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -39,7 +39,12 @@ class CControllerPopupLdapTestEdit extends CController {
 		if (!$ret) {
 			$this->setResponse(
 				(new CControllerResponseData([
-					'main_block' => json_encode(['errors' => getMessages()->toString()])
+					'main_block' => json_encode([
+						'error' => [
+							'title' => _('Invalid LDAP configuration'),
+							'messages' => array_column(get_and_clear_messages(), 'message')
+						]
+					])
 				]))->disableView()
 			);
 		}

@@ -23,20 +23,20 @@ class CControllerPopupLdapEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'row_index' => 'required|int32',
-			'userdirectoryid' => 'db userdirectory.userdirectoryid',
-			'name' => 'db userdirectory.name',
-			'host' => 'db userdirectory.host',
-			'port' => 'db userdirectory.port|ge '.ZBX_MIN_PORT_NUMBER.'|le '.ZBX_MAX_PORT_NUMBER,
-			'base_dn' => 'db userdirectory.base_dn',
-			'bind_dn' => 'db userdirectory.bind_dn',
-			'bind_password' => 'db userdirectory.bind_password',
-			'search_attribute' => 'db userdirectory.search_attribute',
-			'start_tls' => 'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
-			'search_filter' => 'db userdirectory.search_filter',
-			'case_sensitive' => 'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'description' => 'db userdirectory.description',
-			'add_ldap_server' => 'in 0,1'
+			'row_index' => 			'required|int32',
+			'userdirectoryid' => 	'db userdirectory.userdirectoryid',
+			'name' => 				'db userdirectory.name',
+			'host' => 				'db userdirectory.host',
+			'port' => 				'db userdirectory.port|ge '.ZBX_MIN_PORT_NUMBER.'|le '.ZBX_MAX_PORT_NUMBER,
+			'base_dn' => 			'db userdirectory.base_dn',
+			'bind_dn' => 			'db userdirectory.bind_dn',
+			'bind_password' => 		'db userdirectory.bind_password',
+			'search_attribute' => 	'db userdirectory.search_attribute',
+			'start_tls' => 			'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
+			'search_filter' => 		'db userdirectory.search_filter',
+			'case_sensitive' => 	'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
+			'description' => 		'db userdirectory.description',
+			'add_ldap_server' => 	'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -44,7 +44,12 @@ class CControllerPopupLdapEdit extends CController {
 		if (!$ret) {
 			$this->setResponse(
 				(new CControllerResponseData([
-					'main_block' => json_encode(['errors' => getMessages()->toString()])
+					'main_block' => json_encode([
+						'error' => [
+							'title' => _('Invalid LDAP configuration'),
+							'messages' => array_column(get_and_clear_messages(), 'message')
+						]
+					])
 				]))->disableView()
 			);
 		}

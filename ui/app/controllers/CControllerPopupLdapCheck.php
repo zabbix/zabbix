@@ -29,18 +29,18 @@ class CControllerPopupLdapCheck extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'row_index' => 'required|int32',
-			'userdirectoryid' => 'db userdirectory.userdirectoryid',
-			'name' => 'required|db userdirectory.name|not_empty',
-			'host' => 'required|db userdirectory.host|not_empty',
-			'port' => 'required|db userdirectory.port|ge '.ZBX_MIN_PORT_NUMBER.'|le '.ZBX_MAX_PORT_NUMBER,
-			'base_dn' => 'required|db userdirectory.base_dn|not_empty',
-			'bind_dn' => 'db userdirectory.bind_dn',
-			'bind_password' => 'db userdirectory.bind_password',
-			'search_attribute' => 'required|db userdirectory.search_attribute|not_empty',
-			'start_tls' => 'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
-			'search_filter' => 'db userdirectory.search_filter',
-			'description' => 'db userdirectory.description'
+			'row_index' => 			'required|int32',
+			'userdirectoryid' => 	'db userdirectory.userdirectoryid',
+			'name' => 				'required|db userdirectory.name|not_empty',
+			'host' => 				'required|db userdirectory.host|not_empty',
+			'port' => 				'required|db userdirectory.port|ge '.ZBX_MIN_PORT_NUMBER.'|le '.ZBX_MAX_PORT_NUMBER,
+			'base_dn' => 			'required|db userdirectory.base_dn|not_empty',
+			'bind_dn' => 			'db userdirectory.bind_dn',
+			'bind_password' => 		'db userdirectory.bind_password',
+			'search_attribute' => 	'required|db userdirectory.search_attribute|not_empty',
+			'start_tls' => 			'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
+			'search_filter' => 		'db userdirectory.search_filter',
+			'description' => 		'db userdirectory.description'
 		];
 
 		$ret = $this->validateInput($fields);
