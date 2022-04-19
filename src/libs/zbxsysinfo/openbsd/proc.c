@@ -93,6 +93,7 @@ typedef struct
 	char		*name;
 	char		*cmdline;
 	char		*state;
+	char		*tname;
 	zbx_uint64_t	processes;
 
 	zbx_uint64_t	cputime_user;
@@ -127,6 +128,7 @@ static void	proc_data_free(proc_data_t *proc_data)
 	zbx_free(proc_data->name);
 	zbx_free(proc_data->cmdline);
 	zbx_free(proc_data->state);
+	zbx_free(proc_data->tname);
 
 	zbx_free(proc_data);
 }
@@ -784,7 +786,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 				proc_data->tid = proc_thread[k].ZBX_P_TID;
 				proc_data->pid = proc_thread[k].ZBX_P_PID;
 				proc_data->ppid = proc_thread[k].ZBX_P_PPID;
-				proc_data->name = zbx_strdup(NULL, proc_thread[k].ZBX_P_COMM);
+				proc_data->name = zbx_strdup(NULL, proc[i].ZBX_P_COMM);
+				proc_data->tname = zbx_strdup(NULL, proc_thread[k].ZBX_P_COMM);
 				proc_data->state = get_state(&proc_thread[k]);
 				proc_data->cputime_user = proc_thread[k].ZBX_P_UTIME;
 				proc_data->cputime_system = proc_thread[k].ZBX_P_STIME;
@@ -832,6 +835,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 				proc_data->cmdline = NULL;
 				proc_data->state = NULL;
 			}
+
+			proc_data->tname = NULL;
 
 			if (SUCCEED == get_kinfo_proc(&proc_thread, NULL, proc[i].ZBX_P_PID, &count_thread, NULL) &&
 					1 < count_thread)
@@ -925,6 +930,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addint64(&j, "pid", pdata->pid);
 			zbx_json_addint64(&j, "ppid", pdata->ppid);
 			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "tname", ZBX_NULL2EMPTY_STR(pdata->tname), ZBX_JSON_TYPE_STRING);
 			zbx_json_addint64(&j, "tid", pdata->tid);
 			zbx_json_adduint64(&j, "cputime_user", pdata->cputime_user);
 			zbx_json_adduint64(&j, "cputime_system", pdata->cputime_system);
