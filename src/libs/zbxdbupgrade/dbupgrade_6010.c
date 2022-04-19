@@ -139,6 +139,175 @@ out:
 
 	return ret;
 }
+
+#define DBPATCH_TPLGRP_TYPE		1
+#define DBPATCH_HOST_STATUS_TEMPLATE	"3"
+#define DBPATCH_GROUPIDS(cmp)									\
+		"select distinct g.groupid"							\
+		" from hosts h,hosts_groups hg,hstgrp g"					\
+		" where g.groupid=hg.groupid and"						\
+			" hg.hostid=h.hostid and"						\
+			" h.status" cmp DBPATCH_HOST_STATUS_TEMPLATE " and length(g.name)>0"
+#define DBPATCH_TPLGRP_GROUPIDS	DBPATCH_GROUPIDS("=")
+#define DBPATCH_HSTGRP_GROUPIDS	DBPATCH_GROUPIDS("<>")
+
+typedef struct
+{
+	zbx_uint64_t	groupid;
+	zbx_uint64_t	newgroupid;
+	char		*name;
+	char		*uuid;
+}
+hstgrp_t;
+
+ZBX_PTR_VECTOR_DECL(hstgrp, hstgrp_t *)
+ZBX_PTR_VECTOR_IMPL(hstgrp, hstgrp_t *)
+
+static int	DBpatch_6010006(void)
+{
+	if (SUCCEED == DBfield_exists("hstgrp", "internal"))
+		return DBdrop_field("hstgrp", "internal");
+	else
+		return SUCCEED;
+}
+
+static int	DBpatch_6010007(void)
+{
+	const ZBX_FIELD	field = {"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	if (SUCCEED != DBfield_exists("hstgrp", "type"))
+		return DBadd_field("hstgrp", &field);
+	else
+		return SUCCEED;
+}
+
+static int	DBpatch_6010008(void)
+{
+	return DBdrop_index("hstgrp", "hstgrp_1");
+}
+
+static int	DBpatch_6010009(void)
+{
+	return DBcreate_index("hstgrp", "hstgrp_1", "name,type", 1);
+}
+
+static void	DBpatch_6010010_hstgrp_free(hstgrp_t *hstgrp)
+{
+	zbx_free(hstgrp->name);
+	zbx_free(hstgrp->uuid);
+}
+
+static int	DBpatch_6010010_split_groups(void)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			i, permission, ret = SUCCEED;
+	zbx_uint64_t		nextid, groupid, id;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_vector_hstgrp_t	hstgrps;
+	zbx_db_insert_t		db_insert;
+
+	zbx_vector_hstgrp_create(&hstgrps);
+
+	result = DBselect(
+			"select o.groupid,o.name,o.uuid from hstgrp o"
+			" where o.groupid in (" DBPATCH_TPLGRP_GROUPIDS
+			") and o.groupid in (" DBPATCH_HSTGRP_GROUPIDS
+			") order by o.groupid asc");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		hstgrp_t	*hstgrp;
+
+		hstgrp = (hstgrp_t *)zbx_malloc(NULL, sizeof(hstgrp_t));
+		ZBX_STR2UINT64(hstgrp->groupid, row[0]);
+		hstgrp->name = zbx_strdup(NULL, row[1]);
+		hstgrp->uuid = zbx_strdup(NULL, row[2]);
+
+		zbx_vector_hstgrp_append(&hstgrps, hstgrp);
+	}
+
+	if (0 == hstgrps.values_num)
+		goto out;
+
+	zbx_vector_hstgrp_sort(&hstgrps, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_db_insert_prepare(&db_insert, "hstgrp", "groupid", "name", "type", "uuid", NULL);
+	nextid = DBget_maxid_num("hstgrp", hstgrps.values_num);
+
+	for (i = 0; i < hstgrps.values_num; i++)
+	{
+		hstgrps.values[i]->newgroupid = ++nextid;
+		zbx_db_insert_add_values(&db_insert, hstgrps.values[i]->newgroupid, hstgrps.values[i]->name,
+				DBPATCH_TPLGRP_TYPE, hstgrps.values[i]->uuid);
+	}
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	zbx_db_insert_prepare(&db_insert, "rights", "rightid", "groupid", "permission", "id", NULL);
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	for (i = 0; i < hstgrps.values_num; i++)
+	{
+		result = DBselect(
+				"select r.groupid,r.permission,r.id"
+				" from rights r"
+				" where r.id =" ZBX_FS_UI64,
+				hstgrps.values[i]->groupid);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(groupid, row[0]);
+			permission = atoi(row[1]);
+			ZBX_STR2UINT64(id, row[2]);
+
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), groupid,
+					permission, hstgrps.values[i]->newgroupid);
+		}
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update hosts_groups hg"
+				" set hg.groupid ="  ZBX_FS_UI64
+				" where groupid=" ZBX_FS_UI64
+				" and hostid in ("
+				"  select h.hostid"
+				"   from hosts h"
+				"    where status=" DBPATCH_HOST_STATUS_TEMPLATE
+				");\n",
+				hstgrps.values[i]->newgroupid,
+				hstgrps.values[i]->groupid);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+	zbx_db_insert_autoincrement(&db_insert, "rightid");
+
+	ret = zbx_db_insert_execute(&db_insert);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	if (0 == hstgrps.values_num)
+		goto out;
+
+	if (ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	zbx_db_insert_clean(&db_insert);
+	DBfree_result(result);
+	zbx_free(sql);
+
+	zbx_vector_hstgrp_clear_ext(&hstgrps, DBpatch_6010010_hstgrp_free);
+	zbx_vector_hstgrp_destroy(&hstgrps);
+
+	return ret;
+}
+
+static int	DBpatch_6010010(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBpatch_6010010_split_groups();
+}
 #endif
 
 DBPATCH_START(6010)
@@ -151,5 +320,11 @@ DBPATCH_ADD(6010002, 0, 1)
 DBPATCH_ADD(6010003, 0, 1)
 DBPATCH_ADD(6010004, 0, 1)
 DBPATCH_ADD(6010005, 0, 1)
+DBPATCH_ADD(6010006, 0, 1)
+DBPATCH_ADD(6010007, 0, 1)
+DBPATCH_ADD(6010008, 0, 1)
+DBPATCH_ADD(6010009, 0, 1)
+DBPATCH_ADD(6010010, 0, 1)
+
 
 DBPATCH_END()
