@@ -953,6 +953,4 @@ zbx_host_active_avail_t;
 #define ZBX_ACTIVE_CHECK_AVAILS_DATA_VECTOR	0
 #define ZBX_ACTIVE_CHECK_AVAILS_DATA_HASHSET	1
 
-void	zbx_db_update_active_check_availabilities(void *data, int data_type);
-
 #endif
