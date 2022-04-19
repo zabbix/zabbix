@@ -67,7 +67,7 @@ zbx_uint32_t	zbx_availability_serialize_active_heartbeat(unsigned char **data, z
 	ptr = *data = (unsigned char *)zbx_calloc(NULL, data_len, 1);
 
 	ptr += zbx_serialize_value(ptr, hostid);
-	ptr += zbx_serialize_value(ptr, heartbeat_freq);
+	(void)zbx_serialize_value(ptr, heartbeat_freq);
 
 	return data_len;
 }
@@ -101,7 +101,7 @@ void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
 void	zbx_availability_deserialize_active_hb(const unsigned char *data, zbx_host_active_avail_t *avail)
 {
 	data += zbx_deserialize_uint64(data, &avail->hostid);
-	zbx_deserialize_int(data, &avail->heartbeat_freq);
+	(void)zbx_deserialize_int(data, &avail->heartbeat_freq);
 }
 
 zbx_uint32_t	zbx_availability_serialize_hostdata(unsigned char **data, zbx_hashset_t *queue)
@@ -116,7 +116,7 @@ zbx_uint32_t	zbx_availability_serialize_hostdata(unsigned char **data, zbx_hashs
 
 	zbx_serialize_prepare_value(data_len, queue->num_data);
 
-	data_len += (sizeof(zbx_uint64_t) + sizeof(int)) * queue->num_data;
+	data_len += (zbx_uint32_t)(sizeof(zbx_uint64_t) + sizeof(int)) * (zbx_uint32_t)queue->num_data;
 
 	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_len);
 	ptr += zbx_serialize_value(ptr, queue->num_data);
@@ -182,12 +182,12 @@ zbx_uint32_t	zbx_availability_serialize_active_status_response(unsigned char **d
 
 void	zbx_availability_deserialize_active_status_request(const unsigned char *data, zbx_uint64_t *hostid)
 {
-	zbx_deserialize_uint64(data, hostid);
+	(void)zbx_deserialize_uint64(data, hostid);
 }
 
 void	zbx_availability_deserialize_active_status_response(const unsigned char *data, int *status)
 {
-	zbx_deserialize_int(data, status);
+	(void)zbx_deserialize_int(data, status);
 }
 
 zbx_uint32_t	zbx_availability_serialize_confsync_diff(unsigned char **data, zbx_vector_ptr_t *diff)
@@ -199,7 +199,7 @@ zbx_uint32_t	zbx_availability_serialize_confsync_diff(unsigned char **data, zbx_
 
 	zbx_serialize_prepare_value(data_len, diff->values_num);
 
-	data_len += (sizeof(zbx_uint64_t) + sizeof(int)) * diff->values_num;
+	data_len += (zbx_uint32_t)(sizeof(zbx_uint64_t) + sizeof(int)) * (zbx_uint32_t)diff->values_num;
 
 	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_len);
 	ptr += zbx_serialize_value(ptr, diff->values_num);
@@ -242,7 +242,7 @@ zbx_uint32_t	zbx_availability_serialize_hostdata2(unsigned char **data, zbx_vect
 
 	zbx_serialize_prepare_value(data_len, hosts->values_num);
 
-	data_len += (sizeof(zbx_uint64_t) + sizeof(int)) * hosts->values_num;
+	data_len += (zbx_uint32_t)(sizeof(zbx_uint64_t) + sizeof(int)) * (zbx_uint32_t)hosts->values_num;
 
 	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_len);
 	ptr += zbx_serialize_value(ptr, hosts->values_num);
@@ -296,7 +296,7 @@ zbx_uint32_t	zbx_availability_serialize_hostid(unsigned char **data, zbx_uint64_
 
 void	zbx_availability_deserialize_hostid(const unsigned char *data, zbx_uint64_t *hostid)
 {
-	zbx_deserialize_uint64(data, hostid);
+	(void)zbx_deserialize_uint64(data, hostid);
 }
 
 zbx_uint32_t	zbx_availability_serialize_new_hosts(unsigned char **data, zbx_vector_uint64_t *hostids)

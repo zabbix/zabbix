@@ -902,7 +902,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 	if (NULL != data)
 	{
-		zbx_availability_send(ZBX_IPC_AVAILABILITY_REQUEST, data, data_offset, NULL);
+		zbx_availability_send(ZBX_IPC_AVAILABILITY_REQUEST, data, (zbx_uint32_t)data_offset, NULL);
 		zbx_free(data);
 	}
 

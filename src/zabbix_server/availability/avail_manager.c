@@ -39,8 +39,8 @@ static sigset_t				orig_mask;
 
 static int	interface_availability_compare(const void *d1, const void *d2)
 {
-	const zbx_interface_availability_t	*ia1 = *(const zbx_interface_availability_t **)d1;
-	const zbx_interface_availability_t	*ia2 = *(const zbx_interface_availability_t **)d2;
+	const zbx_interface_availability_t	*ia1 = *(const zbx_interface_availability_t * const *)d1;
+	const zbx_interface_availability_t	*ia2 = *(const zbx_interface_availability_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(ia1->interfaceid, ia2->interfaceid);
 
@@ -173,7 +173,7 @@ static void	process_active_hb(zbx_avail_active_hb_cache_t *cache, zbx_ipc_messag
 
 	zbx_availability_deserialize_active_hb(message->data, &avail);
 
-	avail.lastaccess_active = time(NULL);
+	avail.lastaccess_active = (int)time(NULL);
 	process_new_active_check_heartbeat(cache, &avail);
 }
 
