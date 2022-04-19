@@ -855,6 +855,7 @@ void	DBflush_version_requirements(const char *version)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+#ifdef HAVE_POSTGRESQL
 /******************************************************************************
  *                                                                            *
  * Purpose: checks if TimescaleDB version is allowed and if it supports       *
@@ -873,7 +874,7 @@ void	DBflush_version_requirements(const char *version)
 int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int allow_unsupported_ver)
 {
 	int	ret = SUCCEED;
-#ifdef HAVE_POSTGRESQL
+
 	if (0 != zbx_strcmp_null(db_version_info->extension, ZBX_DB_EXTENSION_TIMESCALE))
 	{
 		goto out;
@@ -912,38 +913,35 @@ int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int
 					db_version_info->ext_current_version);
 		zabbix_log(LOG_LEVEL_WARNING, "Recommended version should be at least %s %s.",
 				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY, ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY);
+
 		if (0 == allow_unsupported_ver)
 		{
 			ret = FAIL;
 			goto out;
 		}
-		else
-		{
-			db_version_info->ext_flag = DB_VERSION_NOT_SUPPORTED_WARNING;
-			db_version_info->ext_status |= ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE;
-			goto out;
-		}
+
+		db_version_info->ext_flag = DB_VERSION_NOT_SUPPORTED_WARNING;
+		db_version_info->ext_status |= ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE;
+		goto out;
 	}
 
-	if (0 == zbx_strcmp_null(db_version_info->ext_lic, ZBX_TIMESCALE_LICENSE_COMMUNITY))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s was detected. TimescaleDB compression is supported.",
-				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY);
-		db_version_info->ext_status |= ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE;
-	}
-	else
+	if (0 != zbx_strcmp_null(db_version_info->ext_lic, ZBX_TIMESCALE_LICENSE_COMMUNITY))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "[%s] license does not support TimescaleDB compression.",
 				ZBX_NULL2EMPTY_STR(db_version_info->ext_lic));
 		zabbix_log(LOG_LEVEL_WARNING, "%s is required to use TimescaleDB compression.",
 				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY);
+		db_version_info->ext_status |= ZBX_DB_EXT_STATUS_FLAGS_TSDB_DISABLE_COMPRESSION;
+		goto out;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s was detected. TimescaleDB compression is supported.",
+			ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY);
+	db_version_info->ext_status |= ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE;
 out:
-#else
-	ZBX_UNUSED(db_version_info);
-#endif
 	return ret;
 }
+#endif
 
 #define MAX_EXPRESSIONS	950
 

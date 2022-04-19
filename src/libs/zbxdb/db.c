@@ -2528,7 +2528,7 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 	zbx_json_addint64(json, "flag", info->flag);
 	zbx_json_close(json);
 
-	if (0 == zbx_strcmp_null(info->extension, ZBX_DB_EXTENSION_TIMESCALE))
+	if (NULL != info->extension)
 	{
 		zbx_json_addobject(json, NULL);
 		zbx_json_addstring(json, "database", info->extension, ZBX_JSON_TYPE_STRING);
@@ -2546,13 +2546,16 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 
 		zbx_json_addint64(json, "flag", info->ext_flag);
 
-		if (0 != (ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE & info->ext_status))
+		if (0 == zbx_strcmp_null(info->extension, ZBX_DB_EXTENSION_TIMESCALE))
 		{
-			zbx_json_addint64(json, "compression_availability", ON);
-		}
-		else
-		{
-			zbx_json_addint64(json, "compression_availability", OFF);
+			if (0 != (ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE & info->ext_status))
+			{
+				zbx_json_addstring(json, "compression_availability", "true", ZBX_JSON_TYPE_INT);
+			}
+			else
+			{
+				zbx_json_addstring(json, "compression_availability", "false", ZBX_JSON_TYPE_INT);
+			}
 		}
 
 		zbx_json_close(json);
@@ -2825,7 +2828,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() version:%lu", __func__, (unsigned long)zbx_dbms_version_get());
 }
 
-#if defined(HAVE_POSTGRESQL)
+#ifdef HAVE_POSTGRESQL
 /***************************************************************************************************************
  *                                                                                                             *
  * Purpose: retrieves TimescaleDB extension info, including license string and numeric version value           *
@@ -2863,7 +2866,7 @@ void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info)
 }
 #endif
 
-#if defined(HAVE_POSTGRESQL)
+#ifdef HAVE_POSTGRESQL
 /******************************************************************************
  *                                                                            *
  * Purpose: returns TimescaleDB (TSDB) version as integer: MMmmuu             *

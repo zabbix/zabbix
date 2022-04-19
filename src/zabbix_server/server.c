@@ -1139,17 +1139,19 @@ static void	zbx_check_db(void)
 		DBextract_dbextension_info(&db_version_info);
 	}
 
-	if (SUCCEED == result &&
-			(SUCCEED != DBcheck_tsdb_capabilities(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS) ||
+	if (SUCCEED == result && (
+#ifdef HAVE_POSTGRESQL
+			SUCCEED != DBcheck_tsdb_capabilities(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS) ||
+#endif
 			SUCCEED != DBcheck_version()))
 	{
 		result = FAIL;
 	}
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-#if defined(HAVE_POSTGRESQL)
-	if (SUCCEED == result && 0 == zbx_strcmp_null(db_version_info.extension, ZBX_DB_EXTENSION_TIMESCALE) &&
-			0 == (ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE & db_version_info.ext_status) &&
+#ifdef HAVE_POSTGRESQL
+	if (SUCCEED == result &&
+			0 != (ZBX_DB_EXT_STATUS_FLAGS_TSDB_DISABLE_COMPRESSION & db_version_info.ext_status) &&
 			ZBX_DB_OK > DBexecute("update config set compression_status=0"))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "failed to set database compression status");

@@ -546,9 +546,8 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 void	DBextract_version_info(struct zbx_db_version_info_t *version_info);
 void	DBextract_dbextension_info(struct zbx_db_version_info_t *version_info);
 void	DBflush_version_requirements(const char *version);
-int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int allow_unsupported_ver);
-
 #ifdef HAVE_POSTGRESQL
+int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int allow_unsupported_ver);
 char	*zbx_db_get_schema_esc(void);
 #endif
 
