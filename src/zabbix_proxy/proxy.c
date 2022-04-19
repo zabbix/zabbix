@@ -55,6 +55,8 @@
 #include "../libs/zbxvault/vault.h"
 #include "zbxdiag.h"
 #include "zbxrtc.h"
+#include "zbxserver.h"
+#include "stats/zabbix_stats.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
@@ -1303,6 +1305,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_tls_init_parent();
 #endif
 	zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
+
+	zbx_zabbix_stats_init(zbx_get_zabbix_stats_ext);
 
 	for (i = 0; i < threads_num; i++)
 	{

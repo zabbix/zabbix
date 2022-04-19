@@ -73,6 +73,8 @@
 #include "ha/ha.h"
 #include "zbxrtc.h"
 #include "zbxha.h"
+#include "zbxserver.h"
+#include "stats/zabbix_stats.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -1750,6 +1752,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		sig_exiting = ZBX_EXIT_FAILURE;
 	}
+
+	zbx_zabbix_stats_init(zbx_get_zabbix_stats_ext);
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
