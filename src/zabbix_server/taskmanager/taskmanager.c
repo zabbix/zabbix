@@ -681,6 +681,11 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 					zbx_vector_str_append(&proxynames_log, name);
 				}
 			}
+			else
+			{
+				zbx_free(name);
+				THIS_SHOULD_NEVER_HAPPEN;
+			}
 		}
 	}
 
