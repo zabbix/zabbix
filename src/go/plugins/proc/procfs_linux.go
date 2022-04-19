@@ -136,7 +136,6 @@ func parseStateString(val string, state *string) (err error) {
 	posRight := strings.IndexRune(val, ')')
 
 	if posLeft == -1 || posRight == -1 {
-		*state = "other"
 		return fmt.Errorf("cannot parse process state string")
 	}
 
