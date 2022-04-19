@@ -215,7 +215,6 @@ static zbx_um_macro_t	*um_macro_dup(zbx_um_macro_t *macro)
 	dup->type = macro->type;
 	dup->context_op = macro->context_op;
 	dup->refcount = 1;
-	dup->kv = macro->kv;
 
 	return dup;
 }
@@ -660,7 +659,6 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 			macro->macroid = macroid;
 			macro->refcount = 1;
 			macro->value = NULL;
-			macro->kv = NULL;
 			pmacro = zbx_hashset_insert(user_macros, &macro, sizeof(macro));
 		}
 

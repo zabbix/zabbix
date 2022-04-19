@@ -32,7 +32,6 @@ typedef struct
 	const char	*name;
 	const char	*context;
 	const char	*value;
-	void		*kv;
 	zbx_uint32_t	refcount;
 	unsigned char	type;
 	unsigned char	context_op;
