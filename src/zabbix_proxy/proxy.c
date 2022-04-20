@@ -1042,16 +1042,27 @@ static void	zbx_check_db(void)
 
 	DBextract_version_info(&db_version_info);
 
-	if (DB_VERSION_NOT_SUPPORTED_ERROR == db_version_info.flag)
+	if (DB_VERSION_NOT_SUPPORTED_ERROR == db_version_info.flag ||
+			DB_VERSION_HIGHER_THAN_MAXIMUM == db_version_info.flag)
 	{
 		if (0 == CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS)
 		{
 			zabbix_log(LOG_LEVEL_ERR, " ");
 			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix proxy due to unsupported %s database server"
-					" version (%s)", db_version_info.database,
+					" version (%s).", db_version_info.database,
 					db_version_info.friendly_current_version);
-			zabbix_log(LOG_LEVEL_ERR, "Must be at least (%s)",
-					db_version_info.friendly_min_supported_version);
+
+			if (DB_VERSION_HIGHER_THAN_MAXIMUM == db_version_info.flag)
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Must not be higher than (%s).",
+						db_version_info.friendly_max_version);
+				db_version_info.flag = DB_VERSION_HIGHER_THAN_MAXIMUM_ERROR;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Must be at least (%s).",
+						db_version_info.friendly_min_supported_version);
+			}
 			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
 			zabbix_log(LOG_LEVEL_ERR, "Override by setting AllowUnsupportedDBVersions=1"
 					" in Zabbix proxy configuration file at your own risk.");
@@ -1061,10 +1072,21 @@ static void	zbx_check_db(void)
 		else
 		{
 			zabbix_log(LOG_LEVEL_ERR, " ");
-			zabbix_log(LOG_LEVEL_ERR, "Warning! Unsupported %s database server version (%s)",
+			zabbix_log(LOG_LEVEL_ERR, "Warning! Unsupported %s database server version (%s).",
 					db_version_info.database, db_version_info.friendly_current_version);
-			zabbix_log(LOG_LEVEL_ERR, "Should be at least (%s)",
-					db_version_info.friendly_min_supported_version);
+
+			if (DB_VERSION_HIGHER_THAN_MAXIMUM == db_version_info.flag)
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Should not be higher than (%s).",
+						db_version_info.friendly_max_version);
+				db_version_info.flag = DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Should be at least (%s).",
+						db_version_info.friendly_min_supported_version);
+			}
+
 			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
 			zabbix_log(LOG_LEVEL_ERR, " ");
 		}
