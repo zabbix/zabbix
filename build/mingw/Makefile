@@ -28,7 +28,6 @@ OBJS = \
 	$(OUTPUTDIR)\persistent_state.o \
 	$(OUTPUTDIR)\logfiles.o \
 	$(OUTPUTDIR)\file.o \
-	$(OUTPUTDIR)\alias.o \
 	$(OUTPUTDIR)\algodefs.o \
 	$(OUTPUTDIR)\json.o \
 	$(OUTPUTDIR)\json_parser.o \
