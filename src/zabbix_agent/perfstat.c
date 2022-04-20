@@ -20,7 +20,6 @@
 #include "perfstat.h"
 
 #include "stats.h"
-#include "alias.h"
 #include "log.h"
 #include "zbxmutexs.h"
 #include "sysinfo.h"
