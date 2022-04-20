@@ -18,12 +18,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/common/testFormMacros.php';
+require_once dirname(__FILE__).'/../common/testFormMacros.php';
 
 /**
  * @backup hosts, config
+ *
+ * @onBefore prepareHostPrototypeMacrosData
  */
 class testFormMacrosHostPrototype extends testFormMacros {
+
+	/**
+	 * Create new macros for host prototype.
+	 */
+	public function prepareHostPrototypeMacrosData() {
+		CDataHelper::call('hostprototype.update', [
+			[
+				'hostid' => 90010,
+				'macros' => [
+					'macro' => '{$NEWMACROS}',
+					'value' => 'something/value:key',
+					'type' => 2
+				]
+			]
+		]);
+	}
 
 	// Parent LLD for Host prototypes 'Discovery rule 1' host: 'Host for host prototype tests'.
 	const LLD_ID		= 90001;
@@ -249,6 +267,14 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	}
 
 	/**
+	 * Check Vault macros validation.
+	 */
+	public function testFormMacrosHostPrototype_checkVaultValidation() {
+		$this->checkVaultValidation('host_prototypes.php?form=update&context=host&parent_discoveryid=90003&hostid=90010',
+				'host-prototype');
+	}
+
+	/**
 	 * @dataProvider getCreateVaultMacrosData
 	 */
 	public function testFormMacrosHostPrototype_CreateVaultMacros($data) {
@@ -262,14 +288,6 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 */
 	public function testFormMacrosHostPrototype_UpdateVaultMacros($data) {
 		$this->updateVaultMacros($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid=90003&hostid=90008',
-				'host-prototype');
-	}
-
-	/**
-	 * Check Vault macros validation.
-	 */
-	public function testFormMacrosHostPrototype_checkVaultValidation() {
-		$this->checkVaultValidation('host_prototypes.php?form=update&context=host&parent_discoveryid=90003&hostid=90010',
 				'host-prototype');
 	}
 }

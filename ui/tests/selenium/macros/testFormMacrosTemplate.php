@@ -18,12 +18,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/common/testFormMacros.php';
+require_once dirname(__FILE__) . '/../common/testFormMacros.php';
 
 /**
  * @backup hosts, config
+ *
+ * @onBefore prepareTemplateMacrosData
  */
 class testFormMacrosTemplate extends testFormMacros {
+
+	/**
+	 * Create new dashboards for autotest.
+	 */
+	public function prepareTemplateMacrosData() {
+		CDataHelper::call('template.update', [
+			[
+				'templateid' => 50002,
+				'macros' => [
+					'macro' => '{$NEWMACROS}',
+					'value' => 'something/value:key',
+					'type' => 2
+				]
+			]
+		]);
+	}
 
 	use MacrosTrait;
 
@@ -239,6 +257,13 @@ class testFormMacrosTemplate extends testFormMacros {
 	}
 
 	/**
+	 * Check Vault macros validation.
+	 */
+	public function testFormMacrosTemplate_checkVaultValidation() {
+		$this->checkVaultValidation('templates.php?form=update&templateid=50002', 'templates');
+	}
+
+	/**
 	 * @dataProvider getCreateVaultMacrosData
 	 */
 	public function testFormMacrosTemplate_CreateVaultMacros($data) {
@@ -251,12 +276,5 @@ class testFormMacrosTemplate extends testFormMacros {
 	 */
 	public function testFormMacrosTemplate_UpdateVaultMacros($data) {
 		$this->updateVaultMacros($data, 'templates.php?form=update&templateid=99014', 'templates');
-	}
-
-	/**
-	 * Check Vault macros validation.
-	 */
-	public function testFormMacrosTemplate_checkVaultValidation() {
-		$this->checkVaultValidation('templates.php?form=update&templateid=50002', 'templates');
 	}
 }

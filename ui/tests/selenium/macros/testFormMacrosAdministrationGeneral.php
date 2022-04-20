@@ -18,17 +18,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/traits/MacrosTrait.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/common/testFormMacros.php';
+require_once dirname(__FILE__).'/../traits/MacrosTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/../common/testFormMacros.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup globalmacro, config
  */
-class testFormAdministrationGeneralMacros extends testFormMacros {
+class testFormMacrosAdministrationGeneral extends testFormMacros {
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -163,7 +163,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 		];
 	}
 
-	public function testFormAdministrationGeneralMacros_CheckLayout() {
+	public function testFormMacrosAdministrationGeneral_CheckLayout() {
 		$countGlobalMacros = CDBHelper::getCount('select globalmacroid from globalmacro');
 
 		$this->openGlobalMacros();
@@ -207,7 +207,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 		}
 	}
 
-	public function testFormAdministrationGeneralMacros_SimpleUpdate() {
+	public function testFormMacrosAdministrationGeneral_SimpleUpdate() {
 		$this->calculateHash();
 
 		$this->openGlobalMacros();
@@ -220,7 +220,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 		$this->verifyHash();
 	}
 
-	public function testFormAdministrationGeneralMacros_SimpleUpdateWithEmptyRow() {
+	public function testFormMacrosAdministrationGeneral_SimpleUpdateWithEmptyRow() {
 		$this->calculateHash();
 
 		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
@@ -246,7 +246,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 	/**
 	 * @dataProvider wrongMacros
 	 */
-	public function testFormAdministrationGeneralMacros_CreateWrong(string $macro, string $error) {
+	public function testFormMacrosAdministrationGeneral_CreateWrong(string $macro, string $error) {
 		$this->calculateHash();
 
 		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
@@ -273,7 +273,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 		$this->verifyHash();
 	}
 
-	public function testFormAdministrationGeneralMacros_CreateWrongEmptyMacro() {
+	public function testFormMacrosAdministrationGeneral_CreateWrongEmptyMacro() {
 		$this->calculateHash();
 
 		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
@@ -300,7 +300,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 		$this->verifyHash();
 	}
 
-	public function testFormAdministrationGeneralMacros_Create() {
+	public function testFormMacrosAdministrationGeneral_Create() {
 		$row = DBfetch(DBselect('SELECT MAX(globalmacroid) AS globalmacroid FROM globalmacro'));
 
 		$this->calculateHash('globalmacroid<='.$row['globalmacroid']);
@@ -332,7 +332,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 		$this->assertEquals(1, $count, 'Chuck Norris: Macro has not been created in the DB.');
 	}
 
-	public function testFormAdministrationGeneralMacros_CreateEmptyValue() {
+	public function testFormMacrosAdministrationGeneral_CreateEmptyValue() {
 		$row = DBfetch(DBselect('SELECT MAX(globalmacroid) AS globalmacroid FROM globalmacro'));
 
 		$this->calculateHash('globalmacroid<='.$row['globalmacroid']);
@@ -364,7 +364,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 		$this->assertEquals(1, $count, 'Chuck Norris: Macro has not been created in the DB.');
 	}
 
-	public function testFormAdministrationGeneralMacros_CreateDuplicate() {
+	public function testFormMacrosAdministrationGeneral_CreateDuplicate() {
 		$this->calculateHash();
 
 		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
@@ -394,7 +394,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 	/**
 	 * @dataProvider wrongMacros
 	 */
-	public function testFormAdministrationGeneralMacros_UpdateWrong(string $macro, string $error) {
+	public function testFormMacrosAdministrationGeneral_UpdateWrong(string $macro, string $error) {
 		$this->calculateHash();
 
 		$this->openGlobalMacros();
@@ -416,7 +416,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 		$this->verifyHash();
 	}
 
-	public function testFormAdministrationGeneralMacros_UpdateWrongEmptyMacro() {
+	public function testFormMacrosAdministrationGeneral_UpdateWrongEmptyMacro() {
 		$this->calculateHash();
 
 		$this->openGlobalMacros();
@@ -437,7 +437,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 		$this->verifyHash();
 	}
 
-	public function testFormAdministrationGeneralMacros_UpdateWrongEmptyMacroValue() {
+	public function testFormMacrosAdministrationGeneral_UpdateWrongEmptyMacroValue() {
 		$this->calculateHash();
 
 		$this->openGlobalMacros();
@@ -459,7 +459,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 		$this->verifyHash();
 	}
 
-	public function testFormAdministrationGeneralMacros_Update() {
+	public function testFormMacrosAdministrationGeneral_Update() {
 		$this->calculateHash('globalmacroid<>'.$this->oldGlobalMacroId);
 
 		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
@@ -496,7 +496,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 		$this->verifyHash();
 	}
 
-	public function testFormAdministrationGeneralMacros_UpdateEmptyValueAndDescription() {
+	public function testFormMacrosAdministrationGeneral_UpdateEmptyValueAndDescription() {
 		$this->calculateHash('globalmacroid<>'.$this->oldGlobalMacroId);
 
 		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
@@ -533,7 +533,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 		$this->verifyHash();
 	}
 
-	public function testFormAdministrationGeneralMacros_UpdateDuplicate() {
+	public function testFormMacrosAdministrationGeneral_UpdateDuplicate() {
 		$this->calculateHash();
 
 		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
@@ -564,7 +564,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 		$this->verifyHash();
 	}
 
-	public function testFormAdministrationGeneralMacros_DeleteCancel() {
+	public function testFormMacrosAdministrationGeneral_DeleteCancel() {
 		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
 
 		$this->openGlobalMacros();
@@ -594,7 +594,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 		$this->assertEquals(1, $count, 'Chuck Norris: Global macro has been deleted from the DB.');
 	}
 
-	public function testFormAdministrationGeneralMacros_Delete() {
+	public function testFormMacrosAdministrationGeneral_Delete() {
 		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
 
 		$this->openGlobalMacros();
@@ -617,7 +617,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 		$this->assertEquals(0, $count, 'Chuck Norris: Global macro has not been deleted from the DB.');
 	}
 
-	public function testFormAdministrationGeneralMacros_DeleteNew() {
+	public function testFormMacrosAdministrationGeneral_DeleteNew() {
 		$this->calculateHash();
 
 		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
@@ -670,7 +670,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 	/**
 	 * @dataProvider getCreateSecretMacrosData
 	 */
-	public function testFormAdministrationGeneralMacros_CreateSecretMacros($data) {
+	public function testFormMacrosAdministrationGeneral_CreateSecretMacros($data) {
 		$this->page->login()->open('zabbix.php?action=macros.edit')->waitUntilReady();
 		$this->fillMacros([$data['macro_fields']]);
 
@@ -766,7 +766,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 	/**
 	 * @dataProvider getUpdateSecretMacrosData
 	 */
-	public function testFormAdministrationGeneralMacros_UpdateSecretMacros($data) {
+	public function testFormMacrosAdministrationGeneral_UpdateSecretMacros($data) {
 		$this->page->login()->open('zabbix.php?action=macros.edit')->waitUntilReady();
 		$this->fillMacros([$data]);
 		$this->query('button:Update')->one()->click();
@@ -809,7 +809,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 	/**
 	 * @dataProvider getRevertSecretMacrosData
 	 */
-	public function testFormAdministrationGeneralMacros_RevertSecretMacroChanges($data) {
+	public function testFormMacrosAdministrationGeneral_RevertSecretMacroChanges($data) {
 		$this->page->login()->open('zabbix.php?action=macros.edit')->waitUntilReady();
 
 		$sql = 'SELECT * FROM globalmacro WHERE macro in ('.CDBHelper::escape($data['macro_fields']['macro']).')';
@@ -843,14 +843,14 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 	 *
 	 * @dataProvider getResolveSecretMacroData
 	 */
-	public function testFormAdministrationGeneralMacros_ResolveSecretMacro($data) {
+	public function testFormMacrosAdministrationGeneral_ResolveSecretMacro($data) {
 		$this->resolveSecretMacro($data);
 	}
 
 	/**
 	 * @dataProvider getCreateVaultMacrosData
 	 */
-	public function testFormAdministrationGeneralMacros_CreateVaultMacros($data) {
+	public function testFormMacrosAdministrationGeneral_CreateVaultMacros($data) {
 		$this->selectVault($data['vault']);
 		$this->page->login()->open('zabbix.php?action=macros.edit')->waitUntilReady();
 		$this->fillMacros([$data['macro_fields']]);
@@ -887,7 +887,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 	 *
 	 * @dataProvider getUpdateVaultMacrosData
 	 */
-	public function testFormAdministrationGeneralMacros_UpdateVaultMacros($data) {
+	public function testFormMacrosAdministrationGeneral_UpdateVaultMacros($data) {
 		$this->selectVault($data['vault']);
 		$this->page->login()->open('zabbix.php?action=macros.edit')->waitUntilReady();
 		$this->fillMacros([$data['fields']]);
@@ -907,7 +907,7 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 	/**
 	 * Check vault macros validation after changing vault type.
 	 */
-	public function testFormAdministrationGeneralMacros_checkVaultValidation() {
+	public function testFormMacrosAdministrationGeneral_checkVaultValidation() {
 		$cyberark = [
 			'fields' =>
 				[

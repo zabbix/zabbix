@@ -18,12 +18,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/common/testFormMacros.php';
+require_once dirname(__FILE__).'/../common/testFormMacros.php';
 
 /**
  * @backup hosts, config
+ *
+ * @onBefore prepareHostMacrosData
  */
 class testFormMacrosHost extends testFormMacros {
+
+	/**
+	 * Create new macros for host.
+	 */
+	public function prepareHostMacrosData() {
+		CDataHelper::call('host.update', [
+			[
+				'hostid' => 50010,
+				'macros' => [
+					'macro' => '{$NEWMACROS}',
+					'value' => 'something/value:key',
+					'type' => 2
+				]
+			]
+		]);
+	}
 
 	use MacrosTrait;
 
@@ -307,6 +325,13 @@ class testFormMacrosHost extends testFormMacros {
 	}
 
 	/**
+	 * Check Vault macros validation.
+	 */
+	public function testFormMacrosHost_checkVaultValidation() {
+		$this->checkVaultValidation('zabbix.php?action=host.view', 'hosts', 'Host for different items types');
+	}
+
+	/**
 	 * @dataProvider getCreateVaultMacrosData
 	 *
 	 */
@@ -320,12 +345,5 @@ class testFormMacrosHost extends testFormMacros {
 	 */
 	public function testFormMacrosHost_UpdateVaultMacros($data) {
 		$this->updateVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', 'Host for suppression');
-	}
-
-	/**
-	 * Check Vault macros validation.
-	 */
-	public function testFormMacrosHost_checkVaultValidation() {
-		$this->checkVaultValidation('zabbix.php?action=host.view', 'hosts', 'Host for different items types');
 	}
 }

@@ -2132,6 +2132,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$cyberark = [
 			'fields' =>
 				[
+				'action' => USER_ACTION_UPDATE,
+				'index' => 0,
 				'macro' => '{$VAULT}',
 				'value' => [
 					'text' => 'AppID=zabbix:key',
@@ -2144,6 +2146,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$hashicorp = [
 			'fields' =>
 				[
+				'action' => USER_ACTION_UPDATE,
+				'index' => 0,
 				'macro' => '{$VAULT}',
 				'value' => [
 					'text' => 'secret/path:key',
@@ -2169,23 +2173,24 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$form->submit();
 			$this->assertMessage(TEST_BAD, 'Cannot update '.$this->vault_object, $vault_values['error']);
 
-			// Hosts in edit view opens in overlay and need to be closed manualy.
+			// Hosts in edit view opens in overlay and need to be closed manually.
 			if ($source === 'hosts') {
 				COverlayDialogElement::find()->one()->close();
+				COverlayDialogElement::ensureNotPresent();
 			}
 
-			// Change Vault in settings to correct one and create macros with this Vault.
+			// Change Vault in settings to correct one.
 			$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
 			$vault_settings = ($vault === 'CyberArk Vault') ? 'HashiCorp Vault' : 'CyberArk Vault';
 			$setting_form->fill(['Vault provider' => $vault_settings])->submit();
-			$this->openMacrosTab($url, $source, false, $name);
-			$this->fillMacros([$vault_values['fields']]);
-			$form->submit();
-			$this->assertMessage(TEST_GOOD, ucfirst($this->vault_object).' updated');
 
-			// Remove created macros.
+			// Check simple update.
 			$this->openMacrosTab($url, $source, false, $name);
-			$this->removeMacro([$vault_values['fields']]);
+			$form->submit();
+			$this->assertMessage(TEST_BAD, 'Cannot update '.$this->vault_object);
+
+			// Create macros with correct value.
+			$this->fillMacros([$vault_values['fields']]);
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, ucfirst($this->vault_object).' updated');
 		}
