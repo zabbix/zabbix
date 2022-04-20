@@ -316,6 +316,10 @@ msgstr "(0 - использовать умолчание действия)"
 msgid "(Only super admins can create groups)"
 msgstr "(Только супер администраторы могут создавать группы)"
 
+#: app/partials/configuration.host.edit.html.php:131
+msgid "(linked by host discovery)"
+msgstr ""
+
 #: app/partials/configuration.host.edit.html.php:275
 #: app/views/popup.itemtestedit.view.php:241
 #: app/views/popup.massupdate.host.php:121
@@ -2138,6 +2142,11 @@ msgstr[2] "Не удалось скопировать триггеры"
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
 msgstr "Не удалось скопировать триггер \"%1$s:%2$s\", потому что он содержит несколько узлов сети в выражении."
 
+#: app/controllers/CControllerSlaCreate.php:69
+#: app/controllers/CControllerSlaCreate.php:127
+msgid "Cannot create SLA"
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:1110
 #, c-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
@@ -2169,9 +2178,18 @@ msgstr "Не удалось создать правило обнаружения
 msgid "Cannot create icon map"
 msgstr "Не удалось создать соответствие иконок"
 
+#: app/controllers/CControllerProxyConfigRefresh.php:79
+msgid "Cannot create request"
+msgstr ""
+
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
 msgstr "Не удалось создать регулярный отчет"
+
+#: app/controllers/CControllerServiceCreate.php:96
+#: app/controllers/CControllerServiceCreate.php:184
+msgid "Cannot create service"
+msgstr ""
 
 #: include/classes/api/services/CService.php:2373
 #: include/classes/api/services/CService.php:2397
@@ -2349,6 +2367,10 @@ msgstr[2] "Не удалось удалить модули: %1$s."
 #: sysmaps.php:261
 msgid "Cannot delete network map"
 msgstr "Не удалось удалить карту сети"
+
+#: app/controllers/CControllerProxyDelete.php:39
+msgid "Cannot delete proxies"
+msgstr ""
 
 #: app/controllers/CControllerProxyDelete.php:69
 msgid "Cannot delete proxy"
@@ -3150,6 +3172,11 @@ msgstr "Не удалось обновить \"%2$s\" у обнаруженно�
 msgid "Cannot update API token"
 msgstr "Не удалось обновить API токен"
 
+#: app/controllers/CControllerSlaUpdate.php:70
+#: app/controllers/CControllerSlaUpdate.php:138
+msgid "Cannot update SLA"
+msgstr ""
+
 #: include/classes/api/services/CGraphGeneral.php:67
 msgid "Cannot update a discovered graph."
 msgstr "Невозможно обновить обнаруженный график."
@@ -3342,6 +3369,11 @@ msgstr "Не удалось обновить скрипт"
 #, c-format
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
 msgstr "Не удалось обновить область использования скрипта. Скрипт \"%1$s\" используется в действии \"%2$s\"."
+
+#: app/controllers/CControllerServiceUpdate.php:97
+#: app/controllers/CControllerServiceUpdate.php:200
+msgid "Cannot update service"
+msgstr ""
 
 #: include/classes/api/services/CService.php:2310
 #: include/classes/api/services/CService.php:2372
@@ -4022,6 +4054,10 @@ msgstr "Настройка пользователей"
 #: httpconf.php:27
 msgid "Configuration of web monitoring"
 msgstr "Настройка веб-мониторинга"
+
+#: app/controllers/CControllerAuditLogList.php:199
+msgid "Configuration refresh"
+msgstr ""
 
 #: app/controllers/CControllerAuditSettingsUpdate.php:78
 #: app/controllers/CControllerAutoregUpdate.php:69
@@ -5330,6 +5366,10 @@ msgstr "Удалить выбранные способы оповещений?"
 msgid "Delete selected proxies?"
 msgstr "Удалить выбранные прокси?"
 
+#: app/views/js/proxy.list.js.php:152 app/views/popup.proxy.edit.php:249
+msgid "Delete selected proxy?"
+msgstr ""
+
 #: app/views/administration.regex.list.php:82
 msgid "Delete selected regular expressions?"
 msgstr "Удалить выбранные регулярные выражения?"
@@ -5594,6 +5634,10 @@ msgstr "Деактивировать узлы сети в выбранных г�
 #: app/views/administration.proxy.list.php:188
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "Деактивировать узлы сети наблюдаемые выбранными прокси?"
+
+#: app/views/js/proxy.list.js.php:137
+msgid "Disable hosts monitored by selected proxy?"
+msgstr ""
 
 #: app/views/administration.token.list.php:199
 #: app/views/administration.user.token.list.php:151
@@ -6329,6 +6373,10 @@ msgstr "Активировать узлы сети"
 msgid "Enable hosts monitored by selected proxies?"
 msgstr "Активировать узлы сети наблюдаемые выбранными прокси?"
 
+#: app/views/js/proxy.list.js.php:122
+msgid "Enable hosts monitored by selected proxy?"
+msgstr ""
+
 #: app/views/administration.audit.settings.edit.php:48
 #: app/views/administration.housekeeping.edit.php:44
 #: app/views/administration.housekeeping.edit.php:98
@@ -6916,6 +6964,11 @@ msgstr "Ошибка при обновлении свойств страницы
 #: jsLoader.php:140
 msgid "Failed to update dashboard properties."
 msgstr "Ошибка при обновлении свойств панели."
+
+#: app/controllers/CControllerDashboardShareUpdate.php:110
+#: app/views/js/popup.dashboard.share.edit.js.php:83
+msgid "Failed to update dashboard sharing."
+msgstr ""
 
 #: jsLoader.php:141
 msgid "Failed to update widget properties."
@@ -12271,6 +12324,10 @@ msgstr "Новый узел сети"
 msgid "New operation"
 msgstr "Новая операция"
 
+#: app/views/popup.proxy.edit.php:229 app/views/popup.proxy.edit.php:258
+msgid "New proxy"
+msgstr ""
+
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
 msgstr "Новое регулярное выражение"
@@ -14726,6 +14783,18 @@ msgstr "Прямоугольник"
 msgid "Refresh"
 msgstr "Обновить"
 
+#: app/views/popup.proxy.edit.php:216 app/views/proxy.list.php:178
+msgid "Refresh configuration"
+msgstr ""
+
+#: app/views/js/proxy.list.js.php:106
+msgid "Refresh configuration of the selected proxies?"
+msgstr ""
+
+#: app/views/js/proxy.list.js.php:107 app/views/popup.proxy.edit.php:217
+msgid "Refresh configuration of the selected proxy?"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetForm.php:58 jsLoader.php:169
 msgid "Refresh interval"
 msgstr "Интервал обновления"
@@ -15070,6 +15139,10 @@ msgstr "Запрос тела"
 #: include/views/configuration.item.prototype.edit.php:340
 msgid "Request body type"
 msgstr "Типа запроса тела"
+
+#: app/controllers/CControllerProxyConfigRefresh.php:71
+msgid "Request created successfully"
+msgstr ""
 
 #: host_discovery.php:428 host_discovery.php:800 items.php:895 items.php:1011
 msgid "Request sent successfully"
@@ -17436,6 +17509,10 @@ msgstr "Шаблоны"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Шаблоны \"%1$s\" отсоединены от узлов сети \"%2$s\"."
 
+#: app/partials/configuration.host.edit.html.php:187
+msgid "Templates linked by host discovery cannot be unlinked."
+msgstr ""
+
 #: app/controllers/CControllerPopupMassupdateTemplate.php:358
 msgid "Templates updated"
 msgstr "Шаблоны обновлены"
@@ -17678,6 +17755,10 @@ msgstr "Этот месяц"
 #: include/func.inc.php:2477
 msgid "This month so far"
 msgstr "В этом месяце"
+
+#: app/views/popup.tophosts.column.edit.php:172
+msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
+msgstr ""
 
 #: include/views/configuration.item.edit.php:125
 #: include/views/configuration.item.prototype.edit.php:111
@@ -18781,6 +18862,10 @@ msgstr "Использовать пользовательские цвета с�
 msgid "Use default"
 msgstr "Использовать умолчание"
 
+#: app/partials/configuration.host.edit.html.php:188
+msgid "Use host prototype configuration form to remove automatically linked templates on upcoming discovery."
+msgstr ""
+
 #: app/views/administration.user.edit.php:300 app/views/popup.media.php:88
 msgid "Use if severity"
 msgstr "Использовать, если важность"
@@ -19839,6 +19924,13 @@ msgstr ""
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "Виджет слишком маленький для указанного количества колонок и строк."
 
+#: app/controllers/CControllerDashboardWidgetCheck.php:46
+#: app/controllers/CControllerDashboardWidgetConfigure.php:46
+#: app/controllers/CControllerDashboardWidgetEdit.php:47
+#: app/controllers/CControllerDashboardWidgetsSanitize.php:66
+msgid "Widget type is not supported in this context."
+msgstr ""
+
 #: graphs.php:44 include/classes/widgets/CWidgetHelper.php:923
 #: include/classes/widgets/CWidgetHelper.php:956
 #: include/classes/widgets/CWidgetHelper.php:957
@@ -19888,6 +19980,10 @@ msgstr "С именем проблемы"
 #: app/views/monitoring.widget.problemhosts.view.php:33
 msgid "With problems"
 msgstr "С проблемами"
+
+#: app/views/popup.tophosts.column.edit.php:119
+msgid "With this setting only numeric items will be displayed in this column."
+msgstr ""
 
 #: include/forms.inc.php:346 include/forms.inc.php:566
 msgid "With triggers"

@@ -234,7 +234,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 		// Retrieve data from API.
 		$response = $this->call('host.get', [
 			'filter' => ['host' => 'host_'.$key],
-			'selectParentTemplates' => ['link_type'],
+			'selectParentTemplates' => ['link_type']
 		]);
 		$this->assertArrayHasKey(0, $response['result'], json_encode($response, JSON_PRETTY_PRINT));
 		$this->assertArrayHasKey('host', $response['result'][0]);
@@ -260,7 +260,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 		// Retrieve data from API.
 		$response = $this->call('host.get', [
 			'filter' => ['host' => 'host_'.$key],
-			'selectParentTemplates' => ['link_type'],
+			'selectParentTemplates' => ['link_type']
 		]);
 		$this->assertArrayHasKey(0, $response['result'], json_encode($response, JSON_PRETTY_PRINT));
 		$this->assertArrayHasKey('host', $response['result'][0]);

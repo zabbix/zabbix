@@ -293,7 +293,7 @@ class testHost extends CAPITest {
 					]
 				],
 				'timeperiods' => $timeperiods
-			],
+			]
 		];
 		$maintenances = CDataHelper::call('maintenance.create', $maintenances_data);
 		$this->assertArrayHasKey('maintenanceids', $maintenances);
