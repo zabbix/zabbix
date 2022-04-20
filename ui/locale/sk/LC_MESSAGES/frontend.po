@@ -6524,6 +6524,10 @@ msgid "End of line sequence"
 msgstr ""
 
 #: include/locales.inc.php:33
+msgid "English (en_GB)"
+msgstr ""
+
+#: include/locales.inc.php:33
 msgid "English (en_US)"
 msgstr "Anglicky (en_US)"
 
