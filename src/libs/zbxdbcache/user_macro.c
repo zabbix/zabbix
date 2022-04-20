@@ -264,6 +264,12 @@ static int	um_macro_is_locked(const zbx_um_macro_t *macro)
 	return 2 != macro->refcount ? SUCCEED : FAIL;
 }
 
+static int	um_macro_has_host(const zbx_um_macro_t *macro)
+{
+	/* if macro is referred only by cache it does not belong to any host */
+	return 1 != macro->refcount ? SUCCEED : FAIL;
+}
+
 static int	um_host_is_locked(const zbx_um_host_t *host)
 {
 	return 1 != host->refcount ? SUCCEED : FAIL;
@@ -621,34 +627,39 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 
 		ZBX_STR2UCHAR(type, row[offset + 2]);
 
+		/* acquire new value before releasing old value to avoid value being */
+		/*  removed and added back to string pool if it was not changed      */
 		if (ZBX_MACRO_VALUE_VAULT != type)
 			dc_value = dc_strpool_intern(row[offset + 1]);
-
-		host = NULL;
 
 		if (NULL != (pmacro = (zbx_um_macro_t **)zbx_hashset_search(user_macros, &pmacroid)))
 		{
 			host = um_cache_acquire_host(cache, (*pmacro)->hostid);
 
-			if (SUCCEED == um_macro_is_locked(*pmacro) || (*pmacro)->hostid != hostid)
+			if (SUCCEED == um_macro_is_locked(*pmacro))
 			{
-				int	is_macro_locked;
-
-				is_macro_locked = um_macro_is_locked(*pmacro);
-
 				if (NULL != host)
 				{
+					/* remove old macro from host so a new (duped) one can be added later */
 					um_host_remove_macro(host, *pmacro);
 					zbx_vector_um_host_append(&hosts, host);
 				}
-				else
-					THIS_SHOULD_NEVER_HAPPEN;
 
-				if (SUCCEED == is_macro_locked)
+				um_macro_release(*pmacro);
+				*pmacro = um_macro_dup(*pmacro);
+			}
+
+			if ((*pmacro)->hostid != hostid)
+			{
+				if (SUCCEED == um_macro_has_host(*pmacro) && NULL != host)
 				{
-					um_macro_release(*pmacro);
-					*pmacro = um_macro_dup(*pmacro);
+					/* remove macro from old host */
+					um_host_remove_macro(host, *pmacro);
+					zbx_vector_um_host_append(&hosts, host);
 				}
+
+				/* acquire new host */
+				host = um_cache_acquire_host(cache, hostid);
 			}
 
 			dc_strpool_release((*pmacro)->name);
@@ -674,6 +685,8 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 			macro->refcount = 1;
 			macro->value = NULL;
 			pmacro = zbx_hashset_insert(user_macros, &macro, sizeof(macro));
+
+			host = um_cache_acquire_host(cache, hostid);
 		}
 
 		(*pmacro)->hostid = hostid;
@@ -687,11 +700,8 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 		else
 			(*pmacro)->value = dc_value;
 
-		if (NULL == host || host->hostid != hostid)
-		{
-			if (NULL == (host = um_cache_acquire_host(cache, hostid)))
-				host = um_cache_create_host(cache, hostid);
-		}
+		if (NULL == host)
+			host = um_cache_create_host(cache, hostid);
 
 		/* append created macros to host */
 		if (1 == (*pmacro)->refcount)
