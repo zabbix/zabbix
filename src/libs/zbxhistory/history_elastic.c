@@ -1111,7 +1111,7 @@ out:
 
 			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
 			zabbix_log(LOG_LEVEL_ERR, "Override by setting AllowUnsupportedDBVersions=1"
-					" in Zabbix proxy configuration file at your own risk.");
+					" in Zabbix server configuration file at your own risk.");
 			zabbix_log(LOG_LEVEL_ERR, " ");
 
 			db_version_info.flag = DB_VERSION_HIGHER_THAN_MAXIMUM_ERROR;
