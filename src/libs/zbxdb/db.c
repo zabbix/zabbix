@@ -2864,9 +2864,7 @@ void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info)
 	zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: [%d], license: [%s]", tsdb_ver,
 		ZBX_NULL2EMPTY_STR(version_info->ext_lic));
 }
-#endif
 
-#ifdef HAVE_POSTGRESQL
 /******************************************************************************
  *                                                                            *
  * Purpose: returns TimescaleDB (TSDB) version as integer: MMmmuu             *
