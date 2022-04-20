@@ -1600,7 +1600,6 @@ static proc_data_t	*proc_get_data(FILE *f_status, FILE *f_stat, int zbx_proc_mod
 		READ_STATUS_VALUE_NUM("VmSize", PROC_VAL_TYPE_BYTE, &proc_data->vsize);
 		READ_STATUS_VALUE_NUM("VmLck", PROC_VAL_TYPE_BYTE, &proc_data->lck);
 		READ_STATUS_VALUE_NUM("VmPin", PROC_VAL_TYPE_BYTE, &proc_data->pin);
-		READ_STATUS_VALUE_NUM("VmRSS", PROC_VAL_TYPE_BYTE, &proc_data->rss);
 		READ_STATUS_VALUE_NUM("VmData", PROC_VAL_TYPE_BYTE, &proc_data->data);
 		READ_STATUS_VALUE_NUM("VmStk", PROC_VAL_TYPE_BYTE, &proc_data->stk);
 		READ_STATUS_VALUE_NUM("VmExe", PROC_VAL_TYPE_BYTE, &proc_data->exe);
@@ -1609,24 +1608,13 @@ static proc_data_t	*proc_get_data(FILE *f_status, FILE *f_stat, int zbx_proc_mod
 		READ_STATUS_VALUE_NUM("VmSwap", PROC_VAL_TYPE_BYTE, &proc_data->swap);
 		READ_STATUS_VALUE_NUM("Threads", PROC_VAL_TYPE_NUM, &proc_data->threads);
 
-		if (ZBX_MAX_UINT64 == proc_data->exe && ZBX_MAX_UINT64 == proc_data->data &&
+		if (ZBX_MAX_UINT64 == proc_data->exe || ZBX_MAX_UINT64 == proc_data->data ||
 				ZBX_MAX_UINT64 == proc_data->stk)
 		{
 			proc_data->size = ZBX_MAX_UINT64;
 		}
 		else
-		{
-			proc_data->size = 0;
-
-			if (ZBX_MAX_UINT64 != proc_data->exe)
-				proc_data->size += proc_data->exe;
-
-			if (ZBX_MAX_UINT64 != proc_data->data)
-				proc_data->size += proc_data->data;
-
-			if (ZBX_MAX_UINT64 != proc_data->stk)
-				proc_data->size += proc_data->stk;
-		}
+			proc_data->size = proc_data->exe + proc_data->data + proc_data->stk;
 
 		if (SUCCEED == read_value_from_proc_file(f_status, 0, "VmRSS", PROC_VAL_TYPE_BYTE, &proc_data->rss,
 				NULL))
@@ -1658,8 +1646,8 @@ static proc_data_t	*proc_get_data(FILE *f_status, FILE *f_stat, int zbx_proc_mod
 
 	if (ZBX_MAX_UINT64 != proc_data->ctx_switches && ZBX_MAX_UINT64 != val)
 		proc_data->ctx_switches += val;
-	else if (ZBX_MAX_UINT64 != val)
-		proc_data->ctx_switches = val;
+	else if (ZBX_MAX_UINT64 != proc_data->ctx_switches)
+		proc_data->ctx_switches = ZBX_MAX_UINT64;
 
 	if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode && SUCCEED ==
 			read_value_from_proc_file(f_status, 0, "State", PROC_VAL_TYPE_TEXT, NULL, &state))
