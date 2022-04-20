@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:34:37Z'
+  date: '2022-04-06T19:35:24Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -263,7 +263,8 @@ zabbix_export:
             -
               uuid: 6f5b00a889804fbeb41c4246b29bd5f1
               expression: 'last(/Dell iDRAC SNMP/system.hw.serialnumber,#1)<>last(/Dell iDRAC SNMP/system.hw.serialnumber,#2) and length(last(/Dell iDRAC SNMP/system.hw.serialnumber))>0'
-              name: 'Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
@@ -321,7 +322,8 @@ zabbix_export:
             -
               uuid: ce1b064b2a07450d9b51b6b12bd752a9
               expression: 'last(/Dell iDRAC SNMP/system.name,#1)<>last(/Dell iDRAC SNMP/system.name,#2) and length(last(/Dell iDRAC SNMP/system.name))>0'
-              name: 'System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -459,7 +461,7 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 -
-                  name: 'System name has changed (new name: {ITEM.VALUE})'
+                  name: 'System name has changed'
                   expression: 'last(/Dell iDRAC SNMP/system.name,#1)<>last(/Dell iDRAC SNMP/system.name,#2) and length(last(/Dell iDRAC SNMP/system.name))>0'
               tags:
                 -
@@ -491,7 +493,8 @@ zabbix_export:
             -
               uuid: c0efbe61effc494a970e0e02b9ce8f55
               expression: 'last(/Dell iDRAC SNMP/system.uptime[sysUpTime.0])<10m'
-              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -931,7 +934,8 @@ zabbix_export:
                 -
                   uuid: eb26b6915b9f4ce6983566df9ee4db96
                   expression: 'last(/Dell iDRAC SNMP/system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#1)<>last(/Dell iDRAC SNMP/system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#2) and length(last(/Dell iDRAC SNMP/system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]))>0'
-                  name: '{#DISK_NAME}: Disk has been replaced (new serial number received)'
+                  name: '{#DISK_NAME}: Disk has been replaced'
+                  event_name: '{#DISK_NAME}: Disk has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Disk serial number has changed. Ack to close'
                   manual_close: 'YES'
@@ -1185,7 +1189,8 @@ zabbix_export:
                   expression: 'avg(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Ambient"}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Ambient"}+3'
-                  name: '{#SENSOR_LOCALE}: Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
+                  name: '{#SENSOR_LOCALE}: Temperature is too low'
+                  event_name: '{#SENSOR_LOCALE}: Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:
@@ -1206,7 +1211,8 @@ zabbix_export:
                 last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Ambient"}-3'
-              name: '{#SENSOR_LOCALE}: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
+              name: '{#SENSOR_LOCALE}: Temperature is above critical threshold'
+              event_name: '{#SENSOR_LOCALE}: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1225,13 +1231,14 @@ zabbix_export:
                 last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}])={$TEMP_WARN_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Ambient"}-3'
-              name: '{#SENSOR_LOCALE}: Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
+              name: '{#SENSOR_LOCALE}: Temperature is above warning threshold'
+              event_name: '{#SENSOR_LOCALE}: Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
               dependencies:
                 -
-                  name: '{#SENSOR_LOCALE}: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
+                  name: '{#SENSOR_LOCALE}: Temperature is above critical threshold'
                   expression: |
                     avg(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Ambient"}
                     or
@@ -1308,7 +1315,8 @@ zabbix_export:
                   expression: 'avg(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"CPU"}+3'
-                  name: '{#SENSOR_LOCALE}: Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"}'
+                  name: '{#SENSOR_LOCALE}: Temperature is too low'
+                  event_name: '{#SENSOR_LOCALE}: Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:
@@ -1329,7 +1337,8 @@ zabbix_export:
                 last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
-              name: '{#SENSOR_LOCALE}: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
+              name: '{#SENSOR_LOCALE}: Temperature is above critical threshold'
+              event_name: '{#SENSOR_LOCALE}: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1348,13 +1357,14 @@ zabbix_export:
                 last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}])={$TEMP_WARN_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_WARN:"CPU"}-3'
-              name: '{#SENSOR_LOCALE}: Temperature is above warning threshold: >{$TEMP_WARN:"CPU"}'
+              name: '{#SENSOR_LOCALE}: Temperature is above warning threshold'
+              event_name: '{#SENSOR_LOCALE}: Temperature is above warning threshold: >{$TEMP_WARN:"CPU"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
               dependencies:
                 -
-                  name: '{#SENSOR_LOCALE}: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
+                  name: '{#SENSOR_LOCALE}: Temperature is above critical threshold'
                   expression: |
                     avg(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}
                     or

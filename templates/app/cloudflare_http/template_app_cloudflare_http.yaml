@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-01T08:29:43Z'
+  date: '2022-04-06T19:27:14Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -83,7 +83,8 @@ zabbix_export:
             -
               uuid: acf573785c394924aae8ef74b2683fd1
               expression: 'max(/Cloudflare by HTTP/cloudflare.bandwidth.cache_hit_ratio,#3) < {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}'
-              name: 'Cloudflare: Cached bandwidth is too low (less than {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}% for 3 last measurements)'
+              name: 'Cloudflare: Cached bandwidth is too low'
+              event_name: 'Cloudflare: Cached bandwidth is too low (less than {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}% for 3 last measurements)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               tags:
@@ -554,7 +555,8 @@ zabbix_export:
             -
               uuid: e76f4a61dd094419b6e0af706758e545
               expression: 'min(/Cloudflare by HTTP/cloudflare.requests.others_ratio,#3) > {$CLOUDFLARE.ERRORS.MAX.WARN}'
-              name: 'Cloudflare: Ratio of non-2xx responses is too high (more than {$CLOUDFLARE.ERRORS.MAX.WARN}% for 3 last measurements)'
+              name: 'Cloudflare: Ratio of non-2xx responses is too high'
+              event_name: 'Cloudflare: Ratio of non-2xx responses is too high (more than {$CLOUDFLARE.ERRORS.MAX.WARN}% for 3 last measurements)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'A large number of errors can indicate a malfunction of the site.'

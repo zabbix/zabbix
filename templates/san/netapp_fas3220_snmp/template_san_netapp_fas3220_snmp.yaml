@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-27T08:33:00Z'
+  date: '2022-04-06T19:33:24Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -307,7 +307,8 @@ zabbix_export:
             -
               uuid: 5266fcf7c9db457885c219385cfd5025
               expression: 'last(/NetApp FAS3220 SNMP/system.name,#1)<>last(/NetApp FAS3220 SNMP/system.name,#2) and length(last(/NetApp FAS3220 SNMP/system.name))>0'
-              name: 'System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -366,7 +367,8 @@ zabbix_export:
             -
               uuid: d33ca3f0d2f14feca01dce7bdf476776
               expression: 'last(/NetApp FAS3220 SNMP/system.uptime[sysUpTime.0])<10m'
-              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -715,7 +717,8 @@ zabbix_export:
                 -
                   uuid: 6040422dc0b34863a90af558d72956ee
                   expression: 'last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeUptime, "{#NODE.NAME}"])<10m'
-                  name: 'Node {#NODE.NAME}: has been restarted (uptime < 10m)'
+                  name: 'Node {#NODE.NAME}: has been restarted'
+                  event_name: 'Node {#NODE.NAME}: has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
@@ -777,7 +780,8 @@ zabbix_export:
                 -
                   uuid: adb98d2d2f13435bbe1897208bb86989
                   expression: 'min(/NetApp FAS3220 SNMP/fas3220.cpu[cDOTCpuBusyTimePerCent, "{#NODE.NAME}"],5m)>{$CPU.UTIL.CRIT}'
-                  name: 'Node {#NODE.NAME}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  name: 'Node {#NODE.NAME}: High CPU utilization'
+                  event_name: 'Node {#NODE.NAME}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -859,7 +863,8 @@ zabbix_export:
                 -
                   uuid: 6ab014a44ad84966a97125c478b10789
                   expression: 'min(/NetApp FAS3220 SNMP/fas3220.fs[df64AvailKBytes, "{#VSERVER}{#FSNAME}"],{$FAS3220.FS.TIME:"{#FSNAME}"})<{$FAS3220.FS.AVAIL.MIN.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=0'
-                  name: '{#VSERVER}{#FSNAME}: Disk space is too low (below {$FAS3220.FS.AVAIL.MIN.CRIT:"{#FSNAME}"} for {$FAS3220.FS.TIME:"{#FSNAME}"})'
+                  name: '{#VSERVER}{#FSNAME}: Disk space is too low'
+                  event_name: '{#VSERVER}{#FSNAME}: Disk space is too low (below {$FAS3220.FS.AVAIL.MIN.CRIT:"{#FSNAME}"} for {$FAS3220.FS.TIME:"{#FSNAME}"})'
                   priority: HIGH
                   tags:
                     -
@@ -979,7 +984,8 @@ zabbix_export:
                 -
                   uuid: 712d9096c8064ef19005c4989794db45
                   expression: 'max(/NetApp FAS3220 SNMP/fas3220.fs[dfPerCentKBytesCapacity, "{#VSERVER}{#FSNAME}"],{$FAS3220.FS.TIME:"{#FSNAME}"})>{$FAS3220.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=1'
-                  name: '{#VSERVER}{#FSNAME}: Disk space is too low (used over {$FAS3220.FS.PUSED.MAX.CRIT:"{#FSNAME}"}% for {$FAS3220.FS.TIME:"{#FSNAME}"})'
+                  name: '{#VSERVER}{#FSNAME}: Disk space is too low'
+                  event_name: '{#VSERVER}{#FSNAME}: Disk space is too low (used over {$FAS3220.FS.PUSED.MAX.CRIT:"{#FSNAME}"}% for {$FAS3220.FS.TIME:"{#FSNAME}"})'
                   priority: HIGH
                   tags:
                     -
@@ -1518,7 +1524,8 @@ zabbix_export:
               recovery_expression: |
                 max(/NetApp FAS3220 SNMP/fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and max(/NetApp FAS3220 SNMP/fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): High error rate'
+              event_name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'

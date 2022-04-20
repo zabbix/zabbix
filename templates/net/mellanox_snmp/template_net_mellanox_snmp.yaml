@@ -184,7 +184,8 @@ zabbix_export:
             -
               uuid: 26913093ab414fe69ff157102ae54796
               expression: 'min(/Mellanox SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
-              name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -266,7 +267,8 @@ zabbix_export:
             -
               uuid: ff7ad0676a774cf49a4568e752dd916b
               expression: 'last(/Mellanox SNMP/system.name,#1)<>last(/Mellanox SNMP/system.name,#2) and length(last(/Mellanox SNMP/system.name))>0'
-              name: 'System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -325,7 +327,8 @@ zabbix_export:
             -
               uuid: 667856dcaad04a108cb0a5150e825a50
               expression: 'last(/Mellanox SNMP/system.uptime[sysUpTime.0])<10m'
-              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -433,7 +436,8 @@ zabbix_export:
                 -
                   uuid: 585db2b2a42b4eb09770ca2241a557d0
                   expression: 'last(/Mellanox SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Mellanox SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/Mellanox SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
-                  name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
+                  name: '{#ENT_NAME}: Device has been replaced'
+                  event_name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
@@ -921,7 +925,8 @@ zabbix_export:
               recovery_expression: |
                 avg(/Mellanox SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Mellanox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
                 avg(/Mellanox SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Mellanox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
-              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -944,7 +949,8 @@ zabbix_export:
               recovery_expression: |
                 max(/Mellanox SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and max(/Mellanox SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
@@ -1132,7 +1138,8 @@ zabbix_export:
                   expression: 'avg(/Mellanox SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Mellanox SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}-3'
-                  name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}'
+                  name: '{#SENSOR_INFO}: Temperature is above critical threshold'
+                  event_name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1148,7 +1155,8 @@ zabbix_export:
                   expression: 'avg(/Mellanox SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP.MIN.CRIT:"{#SENSOR_INFO}"}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/Mellanox SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP.MIN.CRIT:"{#SENSOR_INFO}"}+3'
-                  name: '{#SENSOR_INFO}: Temperature is too low: <{$TEMP.MIN.CRIT:"{#SENSOR_INFO}"}'
+                  name: '{#SENSOR_INFO}: Temperature is too low'
+                  event_name: '{#SENSOR_INFO}: Temperature is too low: <{$TEMP.MIN.CRIT:"{#SENSOR_INFO}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:
@@ -1167,13 +1175,14 @@ zabbix_export:
                 last(/Mellanox SNMP/sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}])={$TEMP.STATUS.WARN}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/Mellanox SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"{#SENSOR_INFO}"}-3'
-              name: '{#SENSOR_INFO}: Temperature is above warning threshold: >{$TEMP.MAX.WARN:"{#SENSOR_INFO}"}'
+              name: '{#SENSOR_INFO}: Temperature is above warning threshold'
+              event_name: '{#SENSOR_INFO}: Temperature is above warning threshold: >{$TEMP.MAX.WARN:"{#SENSOR_INFO}"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
               dependencies:
                 -
-                  name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}'
+                  name: '{#SENSOR_INFO}: Temperature is above critical threshold'
                   expression: 'avg(/Mellanox SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}'
                   recovery_expression: 'max(/Mellanox SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}-3'
               tags:
@@ -1298,7 +1307,8 @@ zabbix_export:
               expression: |
                 last(/Mellanox SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                 ((last(/Mellanox SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Mellanox SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Mellanox SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+              name: '{#FSNAME}: Disk space is critically low'
+              event_name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
               description: |
@@ -1319,7 +1329,8 @@ zabbix_export:
               expression: |
                 last(/Mellanox SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
                 ((last(/Mellanox SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Mellanox SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Mellanox SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
+              name: '{#FSNAME}: Disk space is low'
+              event_name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
               description: |
@@ -1330,7 +1341,7 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 -
-                  name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+                  name: '{#FSNAME}: Disk space is critically low'
                   expression: |
                     last(/Mellanox SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                     ((last(/Mellanox SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Mellanox SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Mellanox SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
@@ -1459,7 +1470,8 @@ zabbix_export:
                 -
                   uuid: 912430a103414c6eb9c8e55c45246f48
                   expression: 'min(/Mellanox SNMP/vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
-                  name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: '{#MEMNAME}: High memory utilization'
+                  event_name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
                   tags:

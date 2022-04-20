@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T19:42:09Z'
+  date: '2022-04-06T19:36:06Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -106,7 +106,8 @@ zabbix_export:
             -
               uuid: 2052d9e6becd48e5a3aed8037eaf9e87
               expression: 'min(/ZYXEL GS-4012F SNMP/zyxel.4012f.cpuusage,5m)>{$CPU.UTIL.CRIT}'
-              name: 'ZYXEL GS-4012F: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'ZYXEL GS-4012F: High CPU utilization'
+              event_name: 'ZYXEL GS-4012F: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -303,7 +304,8 @@ zabbix_export:
             -
               uuid: ae941404115d4b10809bce603528ceaa
               expression: 'last(/ZYXEL GS-4012F SNMP/zyxel.4012f.serialnumber,#1)<>last(/ZYXEL GS-4012F SNMP/zyxel.4012f.serialnumber,#2) and length(last(/ZYXEL GS-4012F SNMP/zyxel.4012f.serialnumber))>0'
-              name: 'ZYXEL GS-4012F: Device has been replaced (new serial number received)'
+              name: 'ZYXEL GS-4012F: Device has been replaced'
+              event_name: 'ZYXEL GS-4012F: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
@@ -339,7 +341,8 @@ zabbix_export:
             -
               uuid: 93c70a5dd2504d0d9b13a17af942d45e
               expression: 'last(/ZYXEL GS-4012F SNMP/zyxel.4012f.uptime)<10m'
-              name: 'ZYXEL GS-4012F: has been restarted (uptime < 10m)'
+              name: 'ZYXEL GS-4012F: has been restarted'
+              event_name: 'ZYXEL GS-4012F: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
