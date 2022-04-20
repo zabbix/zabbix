@@ -151,7 +151,7 @@ class CAuthentication extends CApiService {
 
 			if (!$exists) {
 				static::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', '/ldap_userdirectoryid', _('referred object do not exist'))
+					_s('Invalid parameter "%1$s": %2$s.', '/ldap_userdirectoryid', _('referred object does not exist'))
 				);
 			}
 		}

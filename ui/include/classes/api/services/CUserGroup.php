@@ -251,7 +251,7 @@ class CUserGroup extends CApiService {
 		$this->checkHimself($usrgrps, __FUNCTION__);
 		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
-		static::validateUserDirectories($usrgrps);
+		self::checkUserDirectories($usrgrps);
 	}
 
 	/**
@@ -364,7 +364,7 @@ class CUserGroup extends CApiService {
 		$this->checkUsersWithoutGroups($usrgrps);
 		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
-		static::validateUserDirectories($usrgrps);
+		self::checkUserDirectories($usrgrps);
 	}
 
 	/**
@@ -1180,26 +1180,35 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Validate user directories exists.
+	 * Check if user directories exist.
 	 *
-	 * @param array $usrgrps
-	 * @param int   $usrgrps['userdirectoryid]
+	 * @param array  $usrgrps
+	 * @param string $usrgrps['userdirectoryid]
 	 *
 	 * @throws APIException
 	 */
-	protected static function validateUserDirectories(array $usrgrps) {
-		$ids = array_filter(array_column($usrgrps, 'userdirectoryid'));
+	private static function checkUserDirectories(array $usrgrps): void {
+		$userdirectoryids = array_filter(array_column($usrgrps, 'userdirectoryid'));
 
-		if (!$ids) {
+		if (!$userdirectoryids) {
 			return;
 		}
 
-		$db_userdirectories = API::UserDirectory()->get(['userdirectoryids' => $ids]);
+		$db_userdirectories = API::UserDirectory()->get([
+			'output' => [],
+			'userdirectoryids' => $userdirectoryids,
+			'preservekeys' => true
+		]);
 
-		if (count($ids) != count($db_userdirectories)) {
-			static::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Invalid parameter "%1$s": %2$s.', '/ldap_userdirectoryid', _('referred object do not exist'))
-			);
+		foreach ($usrgrps as $i => $usrgrp) {
+			if (array_key_exists('userdirectoryid', $usrgrp) && $usrgrp['userdirectoryid'] != 0
+					&& !array_key_exists($usrgrp['userdirectoryid'], $db_userdirectories)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/userdirectoryid',
+						_('referred object does not exist')
+					)
+				);
+			}
 		}
 	}
 }
