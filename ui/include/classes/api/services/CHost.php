@@ -581,15 +581,17 @@ class CHost extends CHostGeneral {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if (!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output'])) {
-			$sqlParts['select']['inventory_mode'] =
-				dbConditionCoalesce('hinv.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode');
+		if ((!$options['countOutput'] && ($this->outputIsRequested('available', $options['output'])))
+			|| (is_array($options['filter']) && array_key_exists('available', $options['filter']))) {
+			$sqlParts['select']['available'] = 'hr.available';
+			$sqlParts['left_join'][] = ['alias' => 'hr', 'table' => 'host_rtdata', 'using' => 'hostid'];
+			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 		}
 
-		if ((!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output']))
-				|| ($options['filter'] && array_key_exists('inventory_mode', $options['filter']))) {
-			$sqlParts['left_join'][] = ['alias' => 'hinv', 'table' => 'host_inventory', 'using' => 'hostid'];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+		if (!$options['countOutput']) {
+			if ($this->outputIsRequested('available', $options['output'])) {
+				$sqlParts = $this->addQuerySelect('hr.available', $sqlParts);
+			}
 		}
 
 		return $sqlParts;
