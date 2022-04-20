@@ -43,7 +43,7 @@ window.services_popup = {
 		filter_form.addEventListener('submit', (e) => {
 			e.preventDefault();
 
-			PopUp('popup.services', {...getFormFields(filter_form), ...{multiple: this.is_multiple ? 1 : 0}}, {
+			PopUp('popup.services', getFormFields(filter_form), {
 				dialogueid: 'services',
 				trigger_element: e.target
 			});
@@ -54,7 +54,7 @@ window.services_popup = {
 
 			filter_form.elements.filter_name.value = '';
 
-			PopUp('popup.services', {...getFormFields(filter_form), ...{multiple: this.is_multiple ? 1 : 0}}, {
+			PopUp('popup.services', getFormFields(filter_form), {
 				dialogueid: 'services',
 				trigger_element: e.target
 			});
