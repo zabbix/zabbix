@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:40:36Z'
+  date: '2022-04-08T09:22:54Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -197,7 +197,8 @@ zabbix_export:
             -
               uuid: ad2261f1ab77449cb1279725e8cf02f9
               expression: 'min(/Windows SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
-              name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -279,7 +280,8 @@ zabbix_export:
             -
               uuid: e257b5cf5d9949028c690722e4153612
               expression: 'last(/Windows SNMP/system.name,#1)<>last(/Windows SNMP/system.name,#2) and length(last(/Windows SNMP/system.name))>0'
-              name: 'System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -338,9 +340,10 @@ zabbix_export:
             -
               uuid: b7a0b390f8844d2aa05ee849d12495f7
               expression: 'last(/Windows SNMP/system.uptime[sysUpTime.0])<10m'
-              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -722,7 +725,7 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 The type of interface.
-                Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),
+                Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),
                 through updating the syntax of the IANAifType textual convention.
               valuemap:
                 name: 'IF-MIB::ifType'
@@ -784,7 +787,8 @@ zabbix_export:
               recovery_expression: |
                 avg(/Windows SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Windows SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
                 avg(/Windows SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Windows SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
-              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -807,7 +811,8 @@ zabbix_export:
               recovery_expression: |
                 max(/Windows SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and max(/Windows SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
@@ -967,14 +972,15 @@ zabbix_export:
               uuid: 597ea2f6059746c0b2e5b7312f764224
               expression: |
                 last(/Windows SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Windows SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Windows SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<5G or timeleft(/Windows SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+                ((last(/Windows SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Windows SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+              name: '{#FSNAME}: Disk space is critically low'
+              event_name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.
                  Second condition should be one of the following:
-                 - The disk free space is less than 5G.
+                 - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               tags:
@@ -988,22 +994,23 @@ zabbix_export:
               uuid: 028b24edaf9c4640a2316845f50a4a7e
               expression: |
                 last(/Windows SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Windows SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Windows SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<10G or timeleft(/Windows SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
+                ((last(/Windows SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Windows SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Windows SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+              name: '{#FSNAME}: Disk space is low'
+              event_name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.
                  Second condition should be one of the following:
-                 - The disk free space is less than 10G.
+                 - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               dependencies:
                 -
-                  name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+                  name: '{#FSNAME}: Disk space is critically low'
                   expression: |
                     last(/Windows SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Windows SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Windows SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<5G or timeleft(/Windows SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+                    ((last(/Windows SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Windows SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -1115,7 +1122,7 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               params: 'last(//vm.memory.used[hrStorageUsed.{#SNMPINDEX}])/last(//vm.memory.total[hrStorageSize.{#SNMPINDEX}])*100'
-              description: 'Memory utilization in %'
+              description: 'Memory utilization in %.'
               tags:
                 -
                   tag: component
@@ -1124,7 +1131,8 @@ zabbix_export:
                 -
                   uuid: ab4b4ad08664454096f5e2cf3b7da1e9
                   expression: 'min(/Windows SNMP/vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
-                  name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: '{#MEMNAME}: High memory utilization'
+                  event_name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
                   tags:
@@ -1235,6 +1243,14 @@ zabbix_export:
         -
           macro: '{$SNMP.TIMEOUT}'
           value: 5m
+        -
+          macro: '{$VFS.FS.FREE.MIN.CRIT}'
+          value: 5G
+          description: 'The critical threshold of the filesystem utilization.'
+        -
+          macro: '{$VFS.FS.FREE.MIN.WARN}'
+          value: 10G
+          description: 'The warning threshold of the filesystem utilization.'
         -
           macro: '{$VFS.FS.FSNAME.MATCHES}'
           value: .+

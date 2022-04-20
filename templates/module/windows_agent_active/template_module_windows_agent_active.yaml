@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-04T09:16:51Z'
+  date: '2022-04-08T09:22:28Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -55,7 +55,8 @@ zabbix_export:
             -
               uuid: cbcd8d6c2eab4f18be5a40c2128e1b76
               expression: 'min(/Windows CPU by Zabbix agent active/perf_counter_en["\Processor Information(_total)\% Interrupt Time"],5m)>{$CPU.INTERRUPT.CRIT.MAX}'
-              name: 'CPU interrupt time is too high (over {$CPU.INTERRUPT.CRIT.MAX}% for 5m)'
+              name: 'CPU interrupt time is too high'
+              event_name: 'CPU interrupt time is too high (over {$CPU.INTERRUPT.CRIT.MAX}% for 5m)'
               priority: WARNING
               description: |
                 "The CPU Interrupt Time in the last 5 minutes exceeds {$CPU.INTERRUPT.CRIT.MAX}%."
@@ -66,7 +67,7 @@ zabbix_export:
                 hardware failure. This should never be higher than 20%.
               dependencies:
                 -
-                  name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  name: 'High CPU utilization'
                   expression: 'min(/Windows CPU by Zabbix agent active/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
               tags:
                 -
@@ -93,15 +94,16 @@ zabbix_export:
             -
               uuid: 150f35f3b43c48eb995a1e8f1211e9b3
               expression: 'min(/Windows CPU by Zabbix agent active/perf_counter_en["\Processor Information(_total)\% Privileged Time"],5m)>{$CPU.PRIV.CRIT.MAX}'
-              name: 'CPU privileged time is too high (over {$CPU.PRIV.CRIT.MAX}% for 5m)'
+              name: 'CPU privileged time is too high'
+              event_name: 'CPU privileged time is too high (over {$CPU.PRIV.CRIT.MAX}% for 5m)'
               priority: WARNING
               description: 'The CPU privileged time in the last 5 minutes exceeds {$CPU.PRIV.CRIT.MAX}%.'
               dependencies:
                 -
-                  name: 'CPU interrupt time is too high (over {$CPU.INTERRUPT.CRIT.MAX}% for 5m)'
+                  name: 'CPU interrupt time is too high'
                   expression: 'min(/Windows CPU by Zabbix agent active/perf_counter_en["\Processor Information(_total)\% Interrupt Time"],5m)>{$CPU.INTERRUPT.CRIT.MAX}'
                 -
-                  name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  name: 'High CPU utilization'
                   expression: 'min(/Windows CPU by Zabbix agent active/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
               tags:
                 -
@@ -160,7 +162,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'CPU utilization in %'
+          description: 'CPU utilization in %.'
           tags:
             -
               tag: component
@@ -169,7 +171,8 @@ zabbix_export:
             -
               uuid: 5f1bdb9eb4c44e8a8f33afee709b0667
               expression: 'min(/Windows CPU by Zabbix agent active/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
-              name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -303,14 +306,15 @@ zabbix_export:
               uuid: d09b152f2b53451b9daec16eadeaa0ee
               expression: |
                 last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<5G or timeleft(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
-              name: '{#FSLABEL}({#FSNAME}): Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+                ((last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+              name: '{#FSLABEL}({#FSNAME}): Disk space is critically low'
+              event_name: '{#FSLABEL}({#FSNAME}): Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.
                 Second condition should be one of the following:
-                - The disk free space is less than 5G.
+                - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}.
                 - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               tags:
@@ -321,22 +325,23 @@ zabbix_export:
               uuid: c3e9ee6d771d4047b4351e5870b8ca01
               expression: |
                 last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<10G or timeleft(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
-              name: '{#FSLABEL}({#FSNAME}): Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
+                ((last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+              name: '{#FSLABEL}({#FSNAME}): Disk space is low'
+              event_name: '{#FSLABEL}({#FSNAME}): Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.
                 Second condition should be one of the following:
-                - The disk free space is less than 10G.
+                - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}.
                 - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               dependencies:
                 -
-                  name: '{#FSLABEL}({#FSNAME}): Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+                  name: '{#FSLABEL}({#FSNAME}): Disk space is critically low'
                   expression: |
                     last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<5G or timeleft(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+                    ((last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -365,6 +370,14 @@ zabbix_export:
                     host: 'Windows filesystems by Zabbix agent active'
                     key: 'vfs.fs.size[{#FSNAME},used]'
       macros:
+        -
+          macro: '{$VFS.FS.FREE.MIN.CRIT}'
+          value: 5G
+          description: 'The critical threshold of the filesystem utilization.'
+        -
+          macro: '{$VFS.FS.FREE.MIN.WARN}'
+          value: 10G
+          description: 'The warning threshold of the filesystem utilization.'
         -
           macro: '{$VFS.FS.FSDRIVETYPE.MATCHES}'
           value: fixed
@@ -452,7 +465,8 @@ zabbix_export:
             -
               uuid: 2f5aa644755c4d18a3eafc74bde2d3ad
               expression: 'last(/Windows generic by Zabbix agent active/system.hostname,#1)<>last(/Windows generic by Zabbix agent active/system.hostname,#2) and length(last(/Windows generic by Zabbix agent active/system.hostname))>0'
-              name: 'System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -476,7 +490,8 @@ zabbix_export:
             -
               uuid: ed8075fd5332427ca0f9b56d55f4912b
               expression: 'fuzzytime(/Windows generic by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0'
-              name: 'System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
+              name: 'System time is out of syn'
+              event_name: 'System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
               priority: WARNING
               description: 'The host system time is different from the Zabbix server time.'
               manual_close: 'YES'
@@ -540,7 +555,8 @@ zabbix_export:
             -
               uuid: 13f9c722d9664d988a97a1c8123ad17a
               expression: 'last(/Windows generic by Zabbix agent active/system.uptime)<10m'
-              name: 'Host has been restarted (uptime < 10m)'
+              name: 'Host has been restarted'
+              event_name: 'Host has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'The device uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -594,12 +610,13 @@ zabbix_export:
             -
               uuid: 24fd9695799846b3ba812f8ec6148972
               expression: 'max(/Windows memory by Zabbix agent active/perf_counter_en["\Memory\Free System Page Table Entries"],5m)<{$MEM.PAGE_TABLE_CRIT.MIN}'
-              name: 'Number of free system page table entries is too low (less {$MEM.PAGE_TABLE_CRIT.MIN} for 5m)'
+              name: 'Number of free system page table entries is too low'
+              event_name: 'Number of free system page table entries is too low (less {$MEM.PAGE_TABLE_CRIT.MIN} for 5m)'
               priority: WARNING
               description: 'The Memory Free System Page Table Entries is less than {$MEM.PAGE_TABLE_CRIT.MIN} for 5 minutes. If the number is less than 5,000, there may well be a memory leak.'
               dependencies:
                 -
-                  name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: 'High memory utilization'
                   expression: 'min(/Windows memory by Zabbix agent active/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
               tags:
                 -
@@ -641,12 +658,13 @@ zabbix_export:
             -
               uuid: 655191afccad4673a641808be5500b46
               expression: 'min(/Windows memory by Zabbix agent active/perf_counter_en["\Memory\Pages/sec"],5m)>{$MEM.PAGE_SEC.CRIT.MAX}'
-              name: 'The Memory Pages/sec is too high (over {$MEM.PAGE_SEC.CRIT.MAX} for 5m)'
+              name: 'The Memory Pages/sec is too high'
+              event_name: 'The Memory Pages/sec is too high (over {$MEM.PAGE_SEC.CRIT.MAX} for 5m)'
               priority: WARNING
               description: 'The Memory Pages/sec in the last 5 minutes exceeds {$MEM.PAGE_SEC.CRIT.MAX}. If the value is greater than 1,000, as a result of excessive paging, there may be a memory leak.'
               dependencies:
                 -
-                  name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: 'High memory utilization'
                   expression: 'min(/Windows memory by Zabbix agent active/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
               tags:
                 -
@@ -746,7 +764,7 @@ zabbix_export:
           key: 'vm.memory.size[total]'
           history: 7d
           units: B
-          description: 'Total memory in Bytes'
+          description: 'Total memory in Bytes.'
           tags:
             -
               tag: component
@@ -758,7 +776,7 @@ zabbix_export:
           key: 'vm.memory.size[used]'
           history: 7d
           units: B
-          description: 'Used memory in Bytes'
+          description: 'Used memory in Bytes.'
           tags:
             -
               tag: component
@@ -772,7 +790,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: 'last(//vm.memory.size[used]) / last(//vm.memory.size[total]) * 100'
-          description: 'Memory utilization in %'
+          description: 'Memory utilization in %.'
           tags:
             -
               tag: component
@@ -781,7 +799,8 @@ zabbix_export:
             -
               uuid: df816288349743ad9b2015dda9066abb
               expression: 'min(/Windows memory by Zabbix agent active/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
-              name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               tags:
@@ -1176,7 +1195,8 @@ zabbix_export:
               recovery_expression: |
                 avg(/Windows network by Zabbix agent active/net.if.in["{#IFGUID}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Windows network by Zabbix agent active/net.if.speed["{#IFGUID}"]) and
                 avg(/Windows network by Zabbix agent active/net.if.out["{#IFGUID}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Windows network by Zabbix agent active/net.if.speed["{#IFGUID}"])
-              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -1199,7 +1219,8 @@ zabbix_export:
               recovery_expression: |
                 max(/Windows network by Zabbix agent active/net.if.in["{#IFGUID}",errors],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and max(/Windows network by Zabbix agent active/net.if.out["{#IFGUID}",errors],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
@@ -1486,16 +1507,17 @@ zabbix_export:
                 -
                   uuid: 6baacd2fab15466ab3b12dcfb7e2980a
                   expression: 'min(/Windows physical disks by Zabbix agent active/perf_counter_en["\PhysicalDisk({#DEVNAME})\% Idle Time",60],15m)>{$VFS.DEV.UTIL.MAX.WARN}'
-                  name: '{#DEVNAME}: Disk is overloaded (util > {$VFS.DEV.UTIL.MAX.WARN}% for 15m)'
+                  name: '{#DEVNAME}: Disk is overloaded'
+                  event_name: '{#DEVNAME}: Disk is overloaded (util > {$VFS.DEV.UTIL.MAX.WARN}% for 15m)'
                   priority: WARNING
                   description: 'The disk appears to be under heavy load'
                   manual_close: 'YES'
                   dependencies:
                     -
-                      name: '{#DEVNAME}: Disk read request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}s for 15m'
+                      name: '{#DEVNAME}: Disk read request responses are too high'
                       expression: 'min(/Windows physical disks by Zabbix agent active/perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60],15m) > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}'
                     -
-                      name: '{#DEVNAME}: Disk write request responses are too high (write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}s for 15m)'
+                      name: '{#DEVNAME}: Disk write request responses are too high'
                       expression: 'min(/Windows physical disks by Zabbix agent active/perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60],15m) > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}'
                   tags:
                     -
@@ -1536,7 +1558,8 @@ zabbix_export:
                 -
                   uuid: 32f7d131336348178069bbafbdabcfee
                   expression: 'min(/Windows physical disks by Zabbix agent active/perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60],15m) > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}'
-                  name: '{#DEVNAME}: Disk read request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}s for 15m'
+                  name: '{#DEVNAME}: Disk read request responses are too high'
+                  event_name: '{#DEVNAME}: Disk read request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}s for 15m'
                   priority: WARNING
                   description: 'This trigger might indicate disk {#DEVNAME} saturation.'
                   manual_close: 'YES'
@@ -1564,7 +1587,8 @@ zabbix_export:
                 -
                   uuid: d7116046921d441dba5830140f8bf433
                   expression: 'min(/Windows physical disks by Zabbix agent active/perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60],15m) > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}'
-                  name: '{#DEVNAME}: Disk write request responses are too high (write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}s for 15m)'
+                  name: '{#DEVNAME}: Disk write request responses are too high'
+                  event_name: '{#DEVNAME}: Disk write request responses are too high (write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}s for 15m)'
                   priority: WARNING
                   description: 'This trigger might indicate disk {#DEVNAME} saturation.'
                   manual_close: 'YES'
@@ -1789,7 +1813,8 @@ zabbix_export:
                 -
                   uuid: df3247515e2e4b48b2decd8401c11736
                   expression: 'min(/Windows services by Zabbix agent active/service.info["{#SERVICE.NAME}",state],#3)<>0'
-                  name: '"{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME}) is not running (startup type {#SERVICE.STARTUPNAME})'
+                  name: '"{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME}) is not running'
+                  event_name: '"{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME}) is not running (startup type {#SERVICE.STARTUPNAME})'
                   priority: AVERAGE
                   description: 'The service has a state other than "Running" for the last three times.'
                   tags:
@@ -1803,7 +1828,7 @@ zabbix_export:
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$SERVICE.NAME.NOT_MATCHES}'
-          value: '^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc)$'
+          value: '^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc|CDPUserSvc_.+|WpnUserService_.+|OneSyncSvc_.+|WbioSrvc|BITS|tiledatamodelsvc|GISvc|ShellHWDetection|TrustedInstaller|TabletInputService|CDPSvc)$'
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$SERVICE.STARTUPNAME.MATCHES}'
@@ -1849,12 +1874,13 @@ zabbix_export:
     -
       uuid: dfba6b17ab94449181584c8a4410f50f
       expression: 'min(/Windows CPU by Zabbix agent active/perf_counter_en["\System\Processor Queue Length"],5m) - last(/Windows CPU by Zabbix agent active/wmi.get[root/cimv2,"Select NumberOfLogicalProcessors from Win32_ComputerSystem"]) * 2 > {$CPU.QUEUE.CRIT.MAX}'
-      name: 'CPU queue length is too high (over {$CPU.QUEUE.CRIT.MAX} for 5m)'
+      name: 'CPU queue length is too high'
+      event_name: 'CPU queue length is too high (over {$CPU.QUEUE.CRIT.MAX} for 5m)'
       priority: WARNING
       description: 'The CPU Queue Length in the last 5 minutes exceeds {$CPU.QUEUE.CRIT.MAX}. According to actual observations, PQL should not exceed the number of cores * 2. To fine-tune the conditions, use the macro {$CPU.QUEUE.CRIT.MAX }.'
       dependencies:
         -
-          name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+          name: 'High CPU utilization'
           expression: 'min(/Windows CPU by Zabbix agent active/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
       tags:
         -
@@ -1863,13 +1889,14 @@ zabbix_export:
     -
       uuid: 237760596cd647bca82044e843992d87
       expression: 'min(/Windows memory by Zabbix agent active/system.swap.pfree,5m)<{$SWAP.PFREE.MIN.WARN} and last(/Windows memory by Zabbix agent active/system.swap.size[,total])>0'
-      name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
+      name: 'High swap space usage'
+      event_name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: WARNING
       description: 'This trigger is ignored, if there is no swap configured'
       dependencies:
         -
-          name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+          name: 'High memory utilization'
           expression: 'min(/Windows memory by Zabbix agent active/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
       tags:
         -

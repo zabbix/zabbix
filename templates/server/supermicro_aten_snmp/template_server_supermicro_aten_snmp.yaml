@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:51:29Z'
+  date: '2022-04-14T11:16:32Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -228,7 +228,8 @@ zabbix_export:
             -
               uuid: 07b7a49bffea4c03a022eed632754f47
               expression: 'last(/Supermicro Aten SNMP/system.name,#1)<>last(/Supermicro Aten SNMP/system.name,#2) and length(last(/Supermicro Aten SNMP/system.name))>0'
-              name: 'System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -287,9 +288,10 @@ zabbix_export:
             -
               uuid: 37aab043ea474548ab1e54e504720bed
               expression: 'last(/Supermicro Aten SNMP/system.uptime[sysUpTime.0])<10m'
-              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -412,10 +414,11 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 1a48aee477d54d34bdea47fc6027968c
-                  expression: 'avg(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
+                  expression: 'avg(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_DESCR}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
-                  name: '{#SENSOR_DESCR}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                  recovery_expression: 'max(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_DESCR}"}-3'
+                  name: '{#SENSOR_DESCR}: Temperature is above critical threshold'
+                  event_name: '{#SENSOR_DESCR}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SENSOR_DESCR}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -428,18 +431,19 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 2c2914d1c8c846d180ee308fa861540e
-                  expression: 'avg(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
+                  expression: 'avg(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SENSOR_DESCR}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
-                  name: '{#SENSOR_DESCR}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
+                  recovery_expression: 'max(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SENSOR_DESCR}"}-3'
+                  name: '{#SENSOR_DESCR}: Temperature is above warning threshold'
+                  event_name: '{#SENSOR_DESCR}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SENSOR_DESCR}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                   dependencies:
                     -
-                      name: '{#SENSOR_DESCR}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
-                      expression: 'avg(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
-                      recovery_expression: 'max(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+                      name: '{#SENSOR_DESCR}: Temperature is above critical threshold'
+                      expression: 'avg(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_DESCR}"}'
+                      recovery_expression: 'max(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_DESCR}"}-3'
                   tags:
                     -
                       tag: scope
@@ -449,10 +453,11 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 1439e7a34bbf4046836890f208f99a48
-                  expression: 'avg(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
+                  expression: 'avg(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SENSOR_DESCR}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
-                  name: '{#SENSOR_DESCR}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
+                  recovery_expression: 'min(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SENSOR_DESCR}"}+3'
+                  name: '{#SENSOR_DESCR}: Temperature is too low'
+                  event_name: '{#SENSOR_DESCR}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SENSOR_DESCR}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:

@@ -64,7 +64,7 @@ $url = (new CUrl('items.php'))
 $itemForm = (new CForm('post', $url))
 	->setName('items')
 	->addVar('checkbox_hash', $data['checkbox_hash'])
-	->addVar('context', $data['context']);
+	->addVar('context', $data['context'], 'form_context');
 
 if (!empty($data['hostid'])) {
 	$itemForm->addVar('hostid', $data['hostid']);
@@ -184,20 +184,15 @@ foreach ($data['items'] as $item) {
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 
-		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-			$trigger_description[] = new CSpan(CHtml::encode($trigger['description']));
-		}
-		else {
-			$trigger_description[] = new CLink(
-				CHtml::encode($trigger['description']),
-				(new CUrl('triggers.php'))
-					->setArgument('form', 'update')
-					->setArgument('hostid', key($trigger['hosts']))
-					->setArgument('triggerid', $trigger['triggerid'])
-					->setArgument('context', $data['context'])
-					->setArgument('backurl', $backurl)
-			);
-		}
+		$trigger_description[] = new CLink(
+			CHtml::encode($trigger['description']),
+			(new CUrl('triggers.php'))
+				->setArgument('form', 'update')
+				->setArgument('hostid', key($trigger['hosts']))
+				->setArgument('triggerid', $trigger['triggerid'])
+				->setArgument('context', $data['context'])
+				->setArgument('backurl', $backurl)
+		);
 
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$trigger['error'] = '';
@@ -274,7 +269,7 @@ foreach ($data['items'] as $item) {
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$wizard,
 		($data['hostid'] == 0) ? $item['host'] : null,
-		$description,
+		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
 		$triggerInfo,
 		(new CDiv(CHtml::encode($item['key_'])))->addClass(ZBX_STYLE_WORDWRAP),
 		$item['delay'],
@@ -314,8 +309,9 @@ $button_list += [
 	'popup.massupdate.item' => [
 		'content' => (new CButton('', _('Mass update')))
 			->onClick(
-				"return openMassupdatePopup('popup.massupdate.item', {}, {
-					dialogue_class: 'modal-popup-preprocessing'
+				"openMassupdatePopup('popup.massupdate.item', {}, {
+					dialogue_class: 'modal-popup-preprocessing',
+					trigger_element: this
 				});"
 			)
 			->addClass(ZBX_STYLE_BTN_ALT)

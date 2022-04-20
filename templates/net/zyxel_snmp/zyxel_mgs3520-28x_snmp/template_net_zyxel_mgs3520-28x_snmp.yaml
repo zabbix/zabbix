@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T19:42:18Z'
+  date: '2022-04-06T19:36:14Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -109,7 +109,8 @@ zabbix_export:
             -
               uuid: 96ed7ee3906541ea9cb2c95cf4da1a62
               expression: 'min(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.cpuusage,5m)>{$CPU.UTIL.CRIT}'
-              name: 'ZYXEL MGS3520-28x: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'ZYXEL MGS3520-28x: High CPU utilization'
+              event_name: 'ZYXEL MGS3520-28x: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -220,7 +221,8 @@ zabbix_export:
             -
               uuid: 1a999dff1dd9481083681741e71aba76
               expression: 'min(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.memusage,5m)>{$MEMORY.UTIL.MAX}'
-              name: 'ZYXEL MGS3520-28x: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'ZYXEL MGS3520-28x: High memory utilization'
+              event_name: 'ZYXEL MGS3520-28x: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               tags:
@@ -321,7 +323,8 @@ zabbix_export:
             -
               uuid: e953886c5a464fc18bb1e221d801901c
               expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.serialnumber,#1)<>last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.serialnumber,#2) and length(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.serialnumber))>0'
-              name: 'ZYXEL MGS3520-28x: Device has been replaced (new serial number received)'
+              name: 'ZYXEL MGS3520-28x: Device has been replaced'
+              event_name: 'ZYXEL MGS3520-28x: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
@@ -357,7 +360,8 @@ zabbix_export:
             -
               uuid: 308761b6dffb44c7b827f6ca76312233
               expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.uptime)<10m'
-              name: 'ZYXEL MGS3520-28x: has been restarted (uptime < 10m)'
+              name: 'ZYXEL MGS3520-28x: has been restarted'
+              event_name: 'ZYXEL MGS3520-28x: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -1117,7 +1121,8 @@ zabbix_export:
                 -
                   uuid: 27cd25ea30fa4f1c9b7b431218241d0c
                   expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}'
-                  name: 'ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
+                  name: 'ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION}'
+                  event_name: 'ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The upper threshold value of the parameter is exceeded'
                   tags:
@@ -1127,7 +1132,8 @@ zabbix_export:
                 -
                   uuid: 1188909e81c14c23aa9eefbb25a4c367
                   expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
-                  name: 'ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
+                  name: 'ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION}'
+                  event_name: 'ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The parameter values are less than the lower threshold'
                   tags:
@@ -1303,7 +1309,8 @@ zabbix_export:
                 -
                   uuid: b9c3894fed8140c684be7c1fe2bbca8d
                   expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}]))>0'
-                  name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX} has been replaced (new serial number received)'
+                  name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX} has been replaced'
+                  event_name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX} has been replaced (new serial number received)'
                   priority: INFO
                   description: 'SFP {#SNMPINDEX} serial number has changed. Ack to close'
                   manual_close: 'YES'

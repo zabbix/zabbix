@@ -20,7 +20,6 @@
 #ifndef ZABBIX_DB_H
 #define ZABBIX_DB_H
 
-#include "common.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "dbschema.h"
@@ -75,7 +74,7 @@ zbx_graph_item_type;
 
 #define TRIGGER_OPDATA_LEN		255
 #define TRIGGER_URL_LEN			255
-#define TRIGGER_DESCRIPTION_LEN		2048
+#define TRIGGER_DESCRIPTION_LEN		255
 #define TRIGGER_EXPRESSION_LEN		2048
 #define TRIGGER_EXPRESSION_LEN_MAX	(TRIGGER_EXPRESSION_LEN + 1)
 #if defined(HAVE_ORACLE)

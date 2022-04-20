@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-13T07:13:21Z'
+  date: '2022-04-06T19:34:02Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -11,7 +11,7 @@ zabbix_export:
       template: 'SMART by Zabbix agent 2 active'
       name: 'SMART by Zabbix agent 2 active'
       description: |
-        The template for monitoring S.M.A.R.T. attributes of physical disk that works without any external scripts. It collects metrics by Zabbix agent 2 version 5.0 and later with Smartmontools version 7.1 and later. Disk discovery LLD rule finds all HDD, SSD, NVMe disks with S.M.A.R.T. enabled. Attribute discovery LLD rule finds all Vendor Specific Attributes for each disk. If you want to skip some attributes, please set regular expressions with disk names in {$SMART.DISK.NAME.MATCHES} and with attribute IDs in {$SMART.ATTRIBUTE.ID.MATCHES} macros on the host level.
+        The template for monitoring S.M.A.R.T. attributes of physical disk that works without any external scripts. It collects metrics by Zabbix agent 2 version 5.0 and later with Smartmontools version 7.1 and later. Disk discovery LLD rule finds all HDD, SSD, NVMe disks with S.M.A.R.T. enabled. Attribute discovery LLD rule have pre-defined Vendor Specific Attributes for each disk, and will be discovered if attribute is present.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/415662-discussion-thread-for-official-zabbix-smart-disk-monitoring
         
@@ -19,154 +19,7 @@ zabbix_export:
       groups:
         -
           name: Templates/Modules
-      items:
-        -
-          uuid: feba508d76b845039b434f62d9e62d54
-          name: 'SMART: Get attributes'
-          type: ZABBIX_ACTIVE
-          key: smart.disk.get
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          tags:
-            -
-              tag: component
-              value: raw
-            -
-              tag: component
-              value: storage
       discovery_rules:
-        -
-          uuid: 3b19696e4d8f4f98acb40481adfa7513
-          name: 'Attribute discovery'
-          type: ZABBIX_ACTIVE
-          key: smart.attribute.discovery
-          delay: 1h
-          filter:
-            evaltype: AND
-            conditions:
-              -
-                macro: '{#NAME}'
-                value: '{$SMART.DISK.NAME.MATCHES}'
-                formulaid: C
-              -
-                macro: '{#NAME}'
-                value: '{$SMART.DISK.NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
-              -
-                macro: '{#ID}'
-                value: '{$SMART.ATTRIBUTE.ID.MATCHES}'
-                formulaid: A
-              -
-                macro: '{#ID}'
-                value: '{$SMART.ATTRIBUTE.ID.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: B
-          description: 'Discovery SMART Vendor Specific Attributes of disks.'
-          item_prototypes:
-            -
-              uuid: 5c09ba32ad72321bce5042d5f4dc59d2
-              name: 'SMART [{#NAME}]: ID {#ID} {#ATTRNAME} raw value'
-              type: DEPENDENT
-              key: 'smart.disk.attr.raw[{#NAME},{#ID}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
-              value_type: CHAR
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.disk_name==''{#NAME}'')].ata_smart_attributes.table[?(@.id=={#ID})].raw.string.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 6h
-              master_item:
-                key: smart.disk.get
-              tags:
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: diskname
-                  value: '{#NAME}'
-                -
-                  tag: disktype
-                  value: '{#DISKTYPE}'
-              trigger_prototypes:
-                -
-                  uuid: 91d59e7054f440298a6515cd32b83410
-                  expression: |
-                    ( count(/SMART by Zabbix agent 2 active/smart.disk.attr.raw[{#NAME},{#ID}],#2) = 1 and last(/SMART by Zabbix agent 2 active/smart.disk.attr.raw[{#NAME},{#ID}]) > {$SMART.RAW.ATTRIBUTE.MAX.CRIT:"{#ID}"} )
-                    or ( last(/SMART by Zabbix agent 2 active/smart.disk.attr.raw[{#NAME},{#ID}]) > {$SMART.RAW.ATTRIBUTE.MAX.CRIT:"{#ID}"} and last(/SMART by Zabbix agent 2 active/smart.disk.attr.raw[{#NAME},{#ID}]) > last(/SMART by Zabbix agent 2 active/smart.disk.attr.raw[{#NAME},{#ID}],#2) )
-                  recovery_mode: NONE
-                  name: 'SMART [{#NAME}]: Attribute raw value {#ID} {#ATTRNAME} is greater than {$SMART.RAW.ATTRIBUTE.MAX.CRIT:"{#ID}"}'
-                  priority: AVERAGE
-                  description: 'The value should not be more {$SMART.RAW.ATTRIBUTE.MAX.CRIT:"{#ID}"}'
-                  manual_close: 'YES'
-                  tags:
-                    -
-                      tag: scope
-                      value: notice
-            -
-              uuid: 498a4f1b4b7442b5a38c52400646cc47
-              name: 'SMART [{#NAME}]: ID {#ID} {#ATTRNAME}'
-              type: DEPENDENT
-              key: 'smart.disk.error[{#NAME},{#ID}]'
-              delay: '0'
-              history: 7d
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.disk_name==''{#NAME}'')].ata_smart_attributes.table[?(@.id=={#ID})].value.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 6h
-              master_item:
-                key: smart.disk.get
-              tags:
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: diskname
-                  value: '{#NAME}'
-                -
-                  tag: disktype
-                  value: '{#DISKTYPE}'
-              trigger_prototypes:
-                -
-                  uuid: 26a3e4a0b79340b1bb753ec23c07c79b
-                  expression: 'last(/SMART by Zabbix agent 2 active/smart.disk.error[{#NAME},{#ID}]) <= {#THRESH}'
-                  name: 'SMART [{#NAME}]: Attribute {#ID} {#ATTRNAME} is failed'
-                  priority: WARNING
-                  description: 'The value should be greater than THRESH.'
-                  tags:
-                    -
-                      tag: scope
-                      value: notice
-          overrides:
-            -
-              name: 'ID filter for Raw trigger'
-              step: '1'
-              filter:
-                conditions:
-                  -
-                    macro: '{#ID}'
-                    value: '{$SMART.RAW.ATTRIBUTE.ID.MATCHES}'
-                    operator: NOT_MATCHES_REGEX
-                    formulaid: A
-              operations:
-                -
-                  operationobject: TRIGGER_PROTOTYPE
-                  operator: LIKE
-                  value: 'Attribute raw value'
-                  status: ENABLED
-                  discover: NO_DISCOVER
         -
           uuid: 0a56a348d4a446938beae1eae5ec8993
           name: 'Disk discovery'
@@ -188,6 +41,303 @@ zabbix_export:
           description: 'Discovery SMART disks.'
           item_prototypes:
             -
+              uuid: b3891b80915c4e2488f2f87cb173474a
+              name: 'SMART [{#NAME}]: Bad_Block_Rate'
+              type: DEPENDENT
+              key: 'smart.disk.attribute.bad_block_rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              description: 'Percentage of used reserve blocks divided by total reserve blocks.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bad_block_rate.value
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'smart.disk.get[{#PATH},"{#RAIDTYPE}"]'
+              tags:
+                -
+                  tag: component
+                  value: attribute
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: diskname
+                  value: '{#NAME}'
+                -
+                  tag: disktype
+                  value: '{#DISKTYPE}'
+            -
+              uuid: 512c44706bff48fda2ef444713d93b29
+              name: 'SMART [{#NAME}]: Power_Cycle_Count'
+              type: DEPENDENT
+              key: 'smart.disk.attribute.power_cycle_count[{#NAME}]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              description: 'This attribute indicates the count of full hard disk power on/off cycles.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.power_cycle_count.value
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'smart.disk.get[{#PATH},"{#RAIDTYPE}"]'
+              tags:
+                -
+                  tag: component
+                  value: attribute
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: diskname
+                  value: '{#NAME}'
+                -
+                  tag: disktype
+                  value: '{#DISKTYPE}'
+            -
+              uuid: 0ab9412116924ca2a9561b44e4c9d6da
+              name: 'SMART [{#NAME}]: Program_Fail_Count_Chip'
+              type: DEPENDENT
+              key: 'smart.disk.attribute.program_fail_count_chip[{#NAME}]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              description: 'The total number of flash program operation failures since the drive was deployed.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.program_fail_count_chip.value
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'smart.disk.get[{#PATH},"{#RAIDTYPE}"]'
+              tags:
+                -
+                  tag: component
+                  value: attribute
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: diskname
+                  value: '{#NAME}'
+                -
+                  tag: disktype
+                  value: '{#DISKTYPE}'
+            -
+              uuid: f794dc07c88a4690be8512e029f0b50c
+              name: 'SMART [{#NAME}]: Raw_Read_Error_Rate'
+              type: DEPENDENT
+              key: 'smart.disk.attribute.raw_read_error_rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              description: 'Stores data related to the rate of hardware read errors that occurred when reading data from a disk surface. The raw value has different structure for different vendors and is often not meaningful as a decimal number. For some drives, this number may increase during normal operation without necessarily signifying errors.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.raw_read_error_rate.value
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'smart.disk.get[{#PATH},"{#RAIDTYPE}"]'
+              tags:
+                -
+                  tag: component
+                  value: attribute
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: diskname
+                  value: '{#NAME}'
+                -
+                  tag: disktype
+                  value: '{#DISKTYPE}'
+            -
+              uuid: 643276ac0dab47b8974e849a1574ac2a
+              name: 'SMART [{#NAME}]: Reallocated_Sector_Ct'
+              type: DEPENDENT
+              key: 'smart.disk.attribute.reallocated_sector_ct[{#NAME}]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              description: 'Disk discovered attribute.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.reallocated_sector_ct.value
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'smart.disk.get[{#PATH},"{#RAIDTYPE}"]'
+              tags:
+                -
+                  tag: component
+                  value: attribute
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: diskname
+                  value: '{#NAME}'
+                -
+                  tag: disktype
+                  value: '{#DISKTYPE}'
+            -
+              uuid: fa253069f1c74a0b9ee3dca5eafef17a
+              name: 'SMART [{#NAME}]: Reported_Uncorrect'
+              type: DEPENDENT
+              key: 'smart.disk.attribute.reported_uncorrect[{#NAME}]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              description: 'The count of errors that could not be recovered using hardware ECC.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.reported_uncorrect.value
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'smart.disk.get[{#PATH},"{#RAIDTYPE}"]'
+              tags:
+                -
+                  tag: component
+                  value: attribute
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: diskname
+                  value: '{#NAME}'
+                -
+                  tag: disktype
+                  value: '{#DISKTYPE}'
+            -
+              uuid: 99df8858bc6d4fb4a9fb4abd29b6c852
+              name: 'SMART [{#NAME}]: Seek_Error_Rate'
+              type: DEPENDENT
+              key: 'smart.disk.attribute.seek_error_rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              description: 'Rate of seek errors of the magnetic heads. If there is a partial failure in the mechanical positioning system, then seek errors will arise. Such a failure may be due to numerous factors, such as damage to a servo, or thermal widening of the hard disk. The raw value has different structure for different vendors and is often not meaningful as a decimal number. For some drives, this number may increase during normal operation without necessarily signifying errors.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.seek_error_rate.value
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'smart.disk.get[{#PATH},"{#RAIDTYPE}"]'
+              tags:
+                -
+                  tag: component
+                  value: attribute
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: diskname
+                  value: '{#NAME}'
+                -
+                  tag: disktype
+                  value: '{#DISKTYPE}'
+            -
+              uuid: 422ba65b87444329b5a23d03ce89dda7
+              name: 'SMART [{#NAME}]: Spin_Up_Time'
+              type: DEPENDENT
+              key: 'smart.disk.attribute.spin_up_time[{#NAME}]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              description: 'Average time of spindle spin up (from zero RPM to fully operational [milliseconds]).'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.spin_up_time.value
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'smart.disk.get[{#PATH},"{#RAIDTYPE}"]'
+              tags:
+                -
+                  tag: component
+                  value: attribute
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: diskname
+                  value: '{#NAME}'
+                -
+                  tag: disktype
+                  value: '{#DISKTYPE}'
+            -
+              uuid: eee36c13fc6248f6894188102d215638
+              name: 'SMART [{#NAME}]: Start_Stop_Count'
+              type: DEPENDENT
+              key: 'smart.disk.attribute.start_stop_count[{#NAME}]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              description: 'A tally of spindle start/stop cycles. The spindle turns on, and hence the count is increased, both when the hard disk is turned on after having before been turned entirely off (disconnected from power source) and when the hard disk returns from having previously been put to sleep mode.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.start_stop_count.value
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'smart.disk.get[{#PATH},"{#RAIDTYPE}"]'
+              tags:
+                -
+                  tag: component
+                  value: attribute
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: diskname
+                  value: '{#NAME}'
+                -
+                  tag: disktype
+                  value: '{#DISKTYPE}'
+            -
               uuid: ad6a9f6f7293495c916bb0aac0bc9729
               name: 'SMART [{#NAME}]: Critical warning'
               type: DEPENDENT
@@ -199,13 +349,44 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.disk_name==''{#NAME}'')].nvme_smart_health_information_log.critical_warning.first()'
+                    - $.critical_warning
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
-                key: smart.disk.get
+                key: 'smart.disk.get[{#PATH},"{#RAIDTYPE}"]'
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: diskname
+                  value: '{#NAME}'
+                -
+                  tag: disktype
+                  value: '{#DISKTYPE}'
+            -
+              uuid: b96b496a854f4165a44662bd93400b27
+              name: 'SMART [{#NAME}]: Smartctl error'
+              type: DEPENDENT
+              key: 'smart.disk.error[{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'This metric will contain smartctl errors.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.error
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'smart.disk.get[{#PATH},"{#RAIDTYPE}"]'
               tags:
                 -
                   tag: component
@@ -237,13 +418,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.disk_name==''{#NAME}'')].smartctl.exit_status.first()'
+                    - $.exit_status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
-                key: smart.disk.get
+                key: 'smart.disk.get[{#PATH},"{#RAIDTYPE}"]'
               tags:
                 -
                   tag: component
@@ -376,6 +557,21 @@ zabbix_export:
                       tag: scope
                       value: notice
             -
+              uuid: b26489a8ba12495dbb9687ef52ab1396
+              name: 'SMART [{#NAME}]: Get disk attributes'
+              type: ZABBIX_ACTIVE
+              key: 'smart.disk.get[{#PATH},"{#RAIDTYPE}"]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              tags:
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: storage
+            -
               uuid: e5bbd606e330469389bf081588b88d17
               name: 'SMART [{#NAME}]: Power on hours'
               type: DEPENDENT
@@ -387,13 +583,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.disk_name==''{#NAME}'')].power_on_time.hours.first()'
+                    - $.power_on_time
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
-                key: smart.disk.get
+                key: 'smart.disk.get[{#PATH},"{#RAIDTYPE}"]'
               tags:
                 -
                   tag: component
@@ -416,13 +612,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.disk_name==''{#NAME}'')].nvme_smart_health_information_log.media_errors.first()'
+                    - $.media_errors
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
-                key: smart.disk.get
+                key: 'smart.disk.get[{#PATH},"{#RAIDTYPE}"]'
               tags:
                 -
                   tag: component
@@ -446,13 +642,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.disk_name==''{#NAME}'')].model_name.first()'
+                    - $.model_name
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
-                key: smart.disk.get
+                key: 'smart.disk.get[{#PATH},"{#RAIDTYPE}"]'
               tags:
                 -
                   tag: component
@@ -476,13 +672,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.disk_name==''{#NAME}'')].nvme_smart_health_information_log.percentage_used.first()'
+                    - $.percentage_used
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
-                key: smart.disk.get
+                key: 'smart.disk.get[{#PATH},"{#RAIDTYPE}"]'
               tags:
                 -
                   tag: component
@@ -516,13 +712,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.disk_name==''{#NAME}'')].serial_number.first()'
+                    - $.serial_number
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
-                key: smart.disk.get
+                key: 'smart.disk.get[{#PATH},"{#RAIDTYPE}"]'
               tags:
                 -
                   tag: component
@@ -537,7 +733,8 @@ zabbix_export:
                 -
                   uuid: 2d5cf100fe094c819d725ee598d37de8
                   expression: 'last(/SMART by Zabbix agent 2 active/smart.disk.sn[{#NAME}],#1)<>last(/SMART by Zabbix agent 2 active/smart.disk.sn[{#NAME}],#2) and length(last(/SMART by Zabbix agent 2 active/smart.disk.sn[{#NAME}]))>0'
-                  name: 'SMART [{#NAME}]: Disk has been replaced (new serial number received)'
+                  name: 'SMART [{#NAME}]: Disk has been replaced'
+                  event_name: 'SMART [{#NAME}]: Disk has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close.'
                   manual_close: 'YES'
@@ -558,13 +755,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.disk_name==''{#NAME}'')].temperature.current.first()'
+                    - $.temperature
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
-                key: smart.disk.get
+                key: 'smart.disk.get[{#PATH},"{#RAIDTYPE}"]'
               tags:
                 -
                   tag: component
@@ -579,7 +776,8 @@ zabbix_export:
                 -
                   uuid: 7f46b24934854866849dd758cb5999d5
                   expression: 'avg(/SMART by Zabbix agent 2 active/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.CRIT}'
-                  name: 'SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)'
+                  name: 'SMART [{#NAME}]: Average disk temperature is critical'
+                  event_name: 'SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)'
                   priority: AVERAGE
                   tags:
                     -
@@ -588,11 +786,12 @@ zabbix_export:
                 -
                   uuid: c903a37f4b004e1593ef85ac893c3f6c
                   expression: 'avg(/SMART by Zabbix agent 2 active/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.WARN}'
-                  name: 'SMART [{#NAME}]: Average disk temperature is too high (over {$SMART.TEMPERATURE.MAX.WARN}°C for 5m)'
+                  name: 'SMART [{#NAME}]: Average disk temperature is too high'
+                  event_name: 'SMART [{#NAME}]: Average disk temperature is too high (over {$SMART.TEMPERATURE.MAX.WARN}°C for 5m)'
                   priority: WARNING
                   dependencies:
                     -
-                      name: 'SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)'
+                      name: 'SMART [{#NAME}]: Average disk temperature is critical'
                       expression: 'avg(/SMART by Zabbix agent 2 active/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.CRIT}'
                   tags:
                     -
@@ -612,13 +811,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.disk_name==''{#NAME}'')].ata_smart_data.self_test.status.passed.first()'
+                    - $.self_test_passed
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
-                key: smart.disk.get
+                key: 'smart.disk.get[{#PATH},"{#RAIDTYPE}"]'
               tags:
                 -
                   tag: component
@@ -641,6 +840,22 @@ zabbix_export:
                       value: notice
           overrides:
             -
+              name: Bad_Block_Rate
+              step: '9'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ATTRIBUTES}'
+                    value: Bad_Block_Rate
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: REGEXP
+                  value: Bad_Block_Rate
+                  status: ENABLED
+                  discover: DISCOVER
+            -
               name: 'Not NVMe'
               step: '2'
               filter:
@@ -658,6 +873,102 @@ zabbix_export:
                   status: ENABLED
                   discover: NO_DISCOVER
             -
+              name: Power_Cycle_Count
+              step: '6'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ATTRIBUTES}'
+                    value: Power_Cycle_Count
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: REGEXP
+                  value: Power_Cycle_Count
+                  status: ENABLED
+                  discover: DISCOVER
+            -
+              name: Program_Fail_Count_Chip
+              step: '10'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ATTRIBUTES}'
+                    value: Program_Fail_Count_Chip
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: REGEXP
+                  value: Program_Fail_Count_Chip
+                  status: ENABLED
+                  discover: DISCOVER
+            -
+              name: Raw_Read_Error_Rate
+              step: '3'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ATTRIBUTES}'
+                    value: Raw_Read_Error_Rate
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: REGEXP
+                  value: Raw_Read_Error_Rate
+                  status: ENABLED
+                  discover: DISCOVER
+            -
+              name: Reallocated_Sector_Ct
+              step: '11'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ATTRIBUTES}'
+                    value: Reallocated_Sector_Ct
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: REGEXP
+                  value: Reallocated_Sector_Ct
+                  status: ENABLED
+                  discover: DISCOVER
+            -
+              name: Reported_Uncorrect
+              step: '7'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ATTRIBUTES}'
+                    value: Reported_Uncorrect
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: REGEXP
+                  value: Reported_Uncorrect
+                  status: ENABLED
+                  discover: DISCOVER
+            -
+              name: Seek_Error_Rate
+              step: '8'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ATTRIBUTES}'
+                    value: Seek_Error_Rate
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: REGEXP
+                  value: Seek_Error_Rate
+                  status: ENABLED
+                  discover: DISCOVER
+            -
               name: Self-test
               step: '1'
               filter:
@@ -673,15 +984,39 @@ zabbix_export:
                   value: Self-test
                   status: ENABLED
                   discover: NO_DISCOVER
+            -
+              name: Spin_Up_Time
+              step: '4'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ATTRIBUTES}'
+                    value: Spin_Up_Time
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: REGEXP
+                  value: Spin_Up_Time
+                  status: ENABLED
+                  discover: DISCOVER
+            -
+              name: Start_Stop_Count
+              step: '5'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ATTRIBUTES}'
+                    value: Start_Stop_Count
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: REGEXP
+                  value: Start_Stop_Count
+                  status: ENABLED
+                  discover: DISCOVER
       macros:
-        -
-          macro: '{$SMART.ATTRIBUTE.ID.MATCHES}'
-          value: '^.*$'
-          description: 'This macro is used in the filter of attribute discovery for filtering IDs. It can be overridden on the host or linked on the template level.'
-        -
-          macro: '{$SMART.ATTRIBUTE.ID.NOT_MATCHES}'
-          value: CHANGE_IF_NEEDED
-          description: 'This macro is used in the filter of attribute discovery for filtering IDs. It can be overridden on the host or linked on the template level.'
         -
           macro: '{$SMART.DISK.NAME.MATCHES}'
           value: '^.*$'
@@ -690,14 +1025,6 @@ zabbix_export:
           macro: '{$SMART.DISK.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in the filter of attribute and disk discoveries. It can be overridden on the host or linked on the template level.'
-        -
-          macro: '{$SMART.RAW.ATTRIBUTE.ID.MATCHES}'
-          value: '^(?:5|187|188|196|197|198|199)$'
-          description: 'This macro is used for the creation of the integer items instead of the text ones and also triggers for some raw values.'
-        -
-          macro: '{$SMART.RAW.ATTRIBUTE.MAX.CRIT}'
-          value: '0'
-          description: 'The threshold for raw values.'
         -
           macro: '{$SMART.TEMPERATURE.MAX.CRIT}'
           value: '65'

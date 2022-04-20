@@ -40,7 +40,7 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	zbx_eval_deserialize(&ctx, dc_item->params, ZBX_EVAL_PARSE_CALC_EXPRESSSION, dc_item->formula_bin);
+	zbx_eval_deserialize(&ctx, dc_item->params, ZBX_EVAL_PARSE_CALC_EXPRESSION, dc_item->formula_bin);
 	zbx_timespec(&ts);
 
 	zbx_expression_eval_init(&eval, ZBX_EXPRESSION_AGGREGATE, &ctx);

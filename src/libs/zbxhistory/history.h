@@ -35,12 +35,17 @@ typedef int (*zbx_history_get_values_func_t)(struct zbx_history_iface *hist, zbx
 		int count, int end, zbx_vector_history_record_t *values);
 typedef int (*zbx_history_flush_func_t)(struct zbx_history_iface *hist);
 
+typedef void (*zbx_history_func_t)(const zbx_vector_ptr_t *);
+
 struct zbx_history_iface
 {
 	unsigned char			value_type;
 	unsigned char			requires_trends;
-	void				*data;
-
+	union
+	{
+		void				*elastic_data;
+		zbx_history_func_t		sql_history_func;
+	} data;
 	zbx_history_destroy_func_t	destroy;
 	zbx_history_add_values_func_t	add_values;
 	zbx_history_get_values_func_t	get_values;

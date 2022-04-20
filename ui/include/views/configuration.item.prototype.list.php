@@ -48,8 +48,8 @@ $url = (new CUrl('disc_prototypes.php'))
 // create form
 $itemForm = (new CForm('post', $url))
 	->setName('items')
-	->addVar('parent_discoveryid', $data['parent_discoveryid'])
-	->addVar('context', $data['context']);
+	->addVar('parent_discoveryid', $data['parent_discoveryid'], 'form_parent_discoveryid')
+	->addVar('context', $data['context'], 'form_context');
 
 // create table
 $itemTable = (new CTableInfo())
@@ -204,8 +204,9 @@ $itemForm->addItem([
 			'popup.massupdate.itemprototype' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
-						"return openMassupdatePopup('popup.massupdate.itemprototype', {}, {
-							dialogue_class: 'modal-popup-preprocessing'
+						"openMassupdatePopup('popup.massupdate.itemprototype', {}, {
+							dialogue_class: 'modal-popup-preprocessing',
+							trigger_element: this
 						});"
 					)
 					->addClass(ZBX_STYLE_BTN_ALT)

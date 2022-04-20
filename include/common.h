@@ -21,7 +21,6 @@
 #define ZABBIX_COMMON_H
 
 #include "sysinc.h"
-#include "zbxtypes.h"
 #include "module.h"
 #include "version.h"
 #include "md5.h"
@@ -99,6 +98,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	AGENT_ERROR	-5
 #define	GATEWAY_ERROR	-6
 #define	CONFIG_ERROR	-7
+#define	SIG_ERROR	-8
 
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_sysinfo_ret_string(int ret);
@@ -188,6 +188,7 @@ typedef enum
 	INTERFACE_TYPE_SNMP,
 	INTERFACE_TYPE_IPMI,
 	INTERFACE_TYPE_JMX,
+	INTERFACE_TYPE_OPT = 254,
 	INTERFACE_TYPE_ANY = 255
 }
 zbx_interface_type_t;
@@ -1693,7 +1694,7 @@ int	zbx_validate_value_dbl(double value, int dbl_precision);
 
 void	zbx_update_env(double time_now);
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
-		int *nextcheck, char **error);
+		int *nextcheck, int *scheduling, char **error);
 #define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
 char	*zbx_create_token(zbx_uint64_t seed);
 

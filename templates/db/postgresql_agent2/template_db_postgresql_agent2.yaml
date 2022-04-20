@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:38:38Z'
+  date: '2022-04-06T19:33:34Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -577,7 +577,8 @@ zabbix_export:
             -
               uuid: 1d0903401af64d93ac16761808d672ca
               expression: 'min(/PostgreSQL by Zabbix agent 2/pgsql.connections.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}'
-              name: 'Connections sum: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m)'
+              name: 'Connections sum: Total number of connections is too high'
+              event_name: 'Connections sum: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m)'
               priority: AVERAGE
               tags:
                 -
@@ -1134,6 +1135,18 @@ zabbix_export:
                   tag: scope
                   value: availability
         -
+          uuid: 01123126fcd54adc84c3bbfa227d9c0c
+          name: 'PostgreSQL: Get queries'
+          key: 'pgsql.queries["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Collect all metrics by query execution time'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
           uuid: a171db459d6144e4ad294579fb8dc56d
           name: 'Replication: Standby count'
           key: 'pgsql.replication.count["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
@@ -1216,7 +1229,8 @@ zabbix_export:
             -
               uuid: 5fbabc5f60b74a369a13a260d25cce3c
               expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.uptime["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]) < 600'
-              name: 'PostgreSQL: Service has been restarted (uptime={ITEM.LASTVALUE})'
+              name: 'PostgreSQL: Service has been restarted'
+              event_name: 'PostgreSQL: Service has been restarted (uptime={ITEM.LASTVALUE})'
               priority: AVERAGE
               tags:
                 -
@@ -1414,7 +1428,7 @@ zabbix_export:
                   value: '{#DBNAME}'
             -
               uuid: 0313d02ce8274bc9bcaee54d062300c8
-              name: 'DB {#DBNAME}: Disk blocks read per second'
+              name: 'DB {#DBNAME}: Disk blocks read time'
               type: DEPENDENT
               key: 'pgsql.dbstat.blk_read_time.rate["{#DBNAME}"]'
               delay: '0'
@@ -1446,7 +1460,7 @@ zabbix_export:
                   value: '{#DBNAME}'
             -
               uuid: e746a7760d554a0e9d41ba01c3be9db5
-              name: 'DB {#DBNAME}: Disk blocks read per second'
+              name: 'DB {#DBNAME}: Disk blocks write time'
               type: DEPENDENT
               key: 'pgsql.dbstat.blk_write_time.rate["{#DBNAME}"]'
               delay: '0'
@@ -1540,7 +1554,8 @@ zabbix_export:
                 -
                   uuid: 05ac4216e1a941df8880224ffd38b806
                   expression: 'min(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}'
-                  name: 'DB {#DBNAME}: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m)'
+                  name: 'DB {#DBNAME}: Too many recovery conflicts'
+                  event_name: 'DB {#DBNAME}: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: AVERAGE
                   description: |
                     The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.
@@ -1580,7 +1595,8 @@ zabbix_export:
                 -
                   uuid: dd948e3ec19c419e8c9a62ace8d1695f
                   expression: 'min(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}'
-                  name: 'DB {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
+                  name: 'DB {#DBNAME}: Deadlock occurred'
+                  event_name: 'DB {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: HIGH
                   tags:
                     -
@@ -2048,6 +2064,221 @@ zabbix_export:
                 -
                   tag: database
                   value: '{#DBNAME}'
+            -
+              uuid: 4c8934820b7f46a195115c7214d4379c
+              name: 'DB {#DBNAME}: Queries slow maintenance count'
+              type: DEPENDENT
+              key: 'pgsql.queries.mro.slow_count["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Slow maintenance query count'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].mro_slow_count'
+              master_item:
+                key: 'pgsql.queries["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+              tags:
+                -
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
+            -
+              uuid: 612c8f83e228406f86e70e8486a51f9b
+              name: 'DB {#DBNAME}: Queries max maintenance time'
+              type: DEPENDENT
+              key: 'pgsql.queries.mro.time_max["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'Max maintenance query time'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].mro_time_max'
+              master_item:
+                key: 'pgsql.queries["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+              tags:
+                -
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
+            -
+              uuid: 9cde2701b5814142b064696dc974f45d
+              name: 'DB {#DBNAME}: Queries sum maintenance time'
+              type: DEPENDENT
+              key: 'pgsql.queries.mro.time_sum["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'Sum maintenance query time'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].mro_time_sum'
+              master_item:
+                key: 'pgsql.queries["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+              tags:
+                -
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
+            -
+              uuid: 9e1191f80c3a4e9aa0d3aba2b2740fef
+              name: 'DB {#DBNAME}: Queries slow query count'
+              type: DEPENDENT
+              key: 'pgsql.queries.query.slow_count["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Slow query count'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].query_slow_count'
+              master_item:
+                key: 'pgsql.queries["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+              tags:
+                -
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
+              trigger_prototypes:
+                -
+                  uuid: 2bb34a2a7dee451cb5419a146d883601
+                  expression: 'min(/PostgreSQL by Zabbix agent 2/pgsql.queries.query.slow_count["{#DBNAME}"],5m)>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}'
+                  name: 'DB {#DBNAME}: Too many slow queries'
+                  event_name: 'DB {#DBNAME}: Too many slow queries (over {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"} in 5m)'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
+            -
+              uuid: 73712df30d66494998bf11566eba409f
+              name: 'DB {#DBNAME}: Queries max query time'
+              type: DEPENDENT
+              key: 'pgsql.queries.query.time_max["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'Max query time'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].query_time_max'
+              master_item:
+                key: 'pgsql.queries["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+              tags:
+                -
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
+            -
+              uuid: ba95d84bc11b4df4aece8ddb51042339
+              name: 'DB {#DBNAME}: Queries sum query time'
+              type: DEPENDENT
+              key: 'pgsql.queries.query.time_sum["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'Sum query time'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].query_time_sum'
+              master_item:
+                key: 'pgsql.queries["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+              tags:
+                -
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
+            -
+              uuid: d31701d52f5941d5a24241c95db52373
+              name: 'DB {#DBNAME}: Queries slow transaction count'
+              type: DEPENDENT
+              key: 'pgsql.queries.tx.slow_count["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Slow transaction query count'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].tx_slow_count'
+              master_item:
+                key: 'pgsql.queries["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+              tags:
+                -
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
+            -
+              uuid: ecc24b3143254dd4b2fc01c12cefb345
+              name: 'DB {#DBNAME}: Queries max transaction time'
+              type: DEPENDENT
+              key: 'pgsql.queries.tx.time_max["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'Max transaction query time'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].tx_time_max'
+              master_item:
+                key: 'pgsql.queries["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+              tags:
+                -
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
+            -
+              uuid: 178926a753614bb58206d82f68280097
+              name: 'DB {#DBNAME}: Queries sum transaction time'
+              type: DEPENDENT
+              key: 'pgsql.queries.tx.time_sum["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'Sum transaction query time'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].tx_time_sum'
+              master_item:
+                key: 'pgsql.queries["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+              tags:
+                -
+                  tag: component
+                  value: queries
+                -
+                  tag: database
+                  value: '{#DBNAME}'
           graph_prototypes:
             -
               uuid: af6eac83efc94d2a9f4a3501207fb5ce
@@ -2205,6 +2436,52 @@ zabbix_export:
                     host: 'PostgreSQL by Zabbix agent 2'
                     key: 'pgsql.dbstat.xact_rollback.rate["{#DBNAME}"]'
             -
+              uuid: 98f4c88e15b742fb80e1ecd8aeab970d
+              name: 'DB {#DBNAME}: Queries'
+              ymin_type_1: FIXED
+              graph_items:
+                -
+                  color: 1A7C11
+                  yaxisside: RIGHT
+                  item:
+                    host: 'PostgreSQL by Zabbix agent 2'
+                    key: 'pgsql.queries.mro.time_max["{#DBNAME}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  yaxisside: RIGHT
+                  item:
+                    host: 'PostgreSQL by Zabbix agent 2'
+                    key: 'pgsql.queries.query.time_max["{#DBNAME}"]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  yaxisside: RIGHT
+                  item:
+                    host: 'PostgreSQL by Zabbix agent 2'
+                    key: 'pgsql.queries.tx.time_max["{#DBNAME}"]'
+                -
+                  sortorder: '3'
+                  drawtype: GRADIENT_LINE
+                  color: A54F10
+                  item:
+                    host: 'PostgreSQL by Zabbix agent 2'
+                    key: 'pgsql.queries.mro.time_sum["{#DBNAME}"]'
+                -
+                  sortorder: '4'
+                  drawtype: GRADIENT_LINE
+                  color: FC6EA3
+                  item:
+                    host: 'PostgreSQL by Zabbix agent 2'
+                    key: 'pgsql.queries.query.time_sum["{#DBNAME}"]'
+                -
+                  sortorder: '5'
+                  drawtype: GRADIENT_LINE
+                  color: 6C59DC
+                  item:
+                    host: 'PostgreSQL by Zabbix agent 2'
+                    key: 'pgsql.queries.tx.time_sum["{#DBNAME}"]'
+            -
               uuid: 86853d8590344bad84aab1deb3d1cffc
               name: 'DB {#DBNAME}: Size'
               graph_items:
@@ -2214,6 +2491,28 @@ zabbix_export:
                   item:
                     host: 'PostgreSQL by Zabbix agent 2'
                     key: 'pgsql.db.size["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
+            -
+              uuid: 918a6fd8bd0e49c98f759778f44ab606
+              name: 'DB {#DBNAME}: Slow queries'
+              ymin_type_1: FIXED
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'PostgreSQL by Zabbix agent 2'
+                    key: 'pgsql.queries.mro.slow_count["{#DBNAME}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'PostgreSQL by Zabbix agent 2'
+                    key: 'pgsql.queries.query.slow_count["{#DBNAME}"]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'PostgreSQL by Zabbix agent 2'
+                    key: 'pgsql.queries.tx.slow_count["{#DBNAME}"]'
         -
           uuid: e94f9017c06644a2bbcb48697381556d
           name: 'Replication Discovery'
@@ -2348,6 +2647,14 @@ zabbix_export:
           macro: '{$PG.PASSWORD}'
           value: postgres
         -
+          macro: '{$PG.QUERY_ETIME.MAX.WARN}'
+          value: '30'
+          description: 'Execution time limit for count of slow queries.'
+        -
+          macro: '{$PG.SLOW_QUERIES.MAX.WARN}'
+          value: '5'
+          description: 'Slow queries count threshold for a trigger.'
+        -
           macro: '{$PG.URI}'
           value: 'tcp://localhost:5432'
         -
@@ -2455,6 +2762,55 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'DB {#DBNAME}: Number of bloating tables'
+                        host: 'PostgreSQL by Zabbix agent 2'
+                -
+                  type: GRAPH_PROTOTYPE
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: Queries'
+                        host: 'PostgreSQL by Zabbix agent 2'
+                -
+                  type: GRAPH_PROTOTYPE
+                  x: '12'
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: Slow queries'
                         host: 'PostgreSQL by Zabbix agent 2'
       valuemaps:
         -

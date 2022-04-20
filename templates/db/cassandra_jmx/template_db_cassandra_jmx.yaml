@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:38:15Z'
+  date: '2022-04-06T19:27:01Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -68,7 +68,8 @@ zabbix_export:
             -
               uuid: 855abdc321c74b6baf672c67f6483c1c
               expression: 'last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"],#1)<>last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"],#2) and length(last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"]))>0'
-              name: 'Version has changed (new version: {ITEM.VALUE})'
+              name: 'Version has changed'
+              event_name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Cassandra version has changed. Ack to close.'
               manual_close: 'YES'
@@ -598,11 +599,12 @@ zabbix_export:
             -
               uuid: 885035b2fc804615a54bf2eaca19beee
               expression: 'min(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"],15m)>{$CASSANDRA.PENDING_TASKS.MAX.WARN}'
-              name: 'Many pending tasks (over {$CASSANDRA.PENDING_TASKS.MAX.WARN} for 15m)'
+              name: 'Many pending tasks'
+              event_name: 'Many pending tasks (over {$CASSANDRA.PENDING_TASKS.MAX.WARN} for 15m)'
               priority: WARNING
               dependencies:
                 -
-                  name: 'Too many pending tasks (over {$CASSANDRA.PENDING_TASKS.MAX.HIGH} for 15m)'
+                  name: 'Too many pending tasks'
                   expression: 'min(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"],15m)>{$CASSANDRA.PENDING_TASKS.MAX.HIGH}'
               tags:
                 -
@@ -611,7 +613,8 @@ zabbix_export:
             -
               uuid: f6696c41e9d24144a1a95f74c94728ae
               expression: 'min(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"],15m)>{$CASSANDRA.PENDING_TASKS.MAX.HIGH}'
-              name: 'Too many pending tasks (over {$CASSANDRA.PENDING_TASKS.MAX.HIGH} for 15m)'
+              name: 'Too many pending tasks'
+              event_name: 'Too many pending tasks (over {$CASSANDRA.PENDING_TASKS.MAX.HIGH} for 15m)'
               priority: AVERAGE
               tags:
                 -
@@ -688,7 +691,8 @@ zabbix_export:
             -
               uuid: bda8e216175044ed829670b6bd272785
               expression: 'nodata(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Storage,name=Load","Count"],15m)=1'
-              name: 'Failed to fetch info data (or no data for 15m)'
+              name: 'Failed to fetch info data'
+              event_name: 'Failed to fetch info data (or no data for 15m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 15 minutes'
               tags:

@@ -89,7 +89,7 @@ extern int		CONFIG_TIMER_FORKS;
 ZBX_MEM_FUNC_IMPL(__config, config_mem)
 
 static void	dc_maintenance_precache_nested_groups(void);
-static void	dc_item_reset_triggers(ZBX_DC_ITEM *item);
+static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_exclude);
 
 /* by default the macro environment is non-secure and all secret macros are masked with ****** */
 static unsigned char	macro_env = ZBX_MACRO_ENV_NONSECURE;
@@ -3727,7 +3727,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 						if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
 								itemid)))
 						{
-							dc_item_reset_triggers(item);
+							dc_item_reset_triggers(item, trigger);
 						}
 					}
 				}
@@ -4128,6 +4128,9 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 		if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &function->triggerid)))
 			continue;
 
+		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+			continue;
+
 		if (TRIGGER_STATUS_ENABLED != trigger->status || TRIGGER_FUNCTIONAL_TRUE != trigger->functional)
 			continue;
 
@@ -4233,7 +4236,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 				ZBX_DC_ITEM	*item_last;
 
 				if (NULL != (item_last = zbx_hashset_search(&config->items, &function->itemid)))
-					dc_item_reset_triggers(item_last);
+					dc_item_reset_triggers(item_last, NULL);
 			}
 		}
 		else
@@ -4247,7 +4250,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 		function->type = zbx_get_function_type(function->function);
 		function->revision = config->sync_start_ts;
 
-		dc_item_reset_triggers(item);
+		dc_item_reset_triggers(item, NULL);
 	}
 
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
@@ -4256,7 +4259,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 			continue;
 
 		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &function->itemid)))
-			dc_item_reset_triggers(item);
+			dc_item_reset_triggers(item, NULL);
 
 		zbx_strpool_release(function->function);
 		zbx_strpool_release(function->parameter);
@@ -5659,7 +5662,12 @@ static void	dc_trigger_update_topology(void)
 
 	zbx_hashset_iter_reset(&config->triggers, &iter);
 	while (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
+	{
+		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+			continue;
+
 		trigger->topoindex = 1;
+	}
 
 	DCconfig_sort_triggers_topologically();
 }
@@ -5733,8 +5741,11 @@ static void	dc_trigger_add_itemids(ZBX_DC_TRIGGER *trigger, const zbx_vector_uin
  * Purpose: reset item trigger links and remove corresponding itemids from    *
  *          affected triggers                                                 *
  *                                                                            *
+ * Parameters: item    - the item to reset                                    *
+ *             trigger - the trigger to exclude                               *
+ *                                                                            *
  ******************************************************************************/
-static void	dc_item_reset_triggers(ZBX_DC_ITEM *item)
+static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_exclude)
 {
 	ZBX_DC_TRIGGER	**trigger;
 
@@ -5747,18 +5758,17 @@ static void	dc_item_reset_triggers(ZBX_DC_ITEM *item)
 	{
 		zbx_uint64_t	*itemid;
 
+		if (*trigger == trigger_exclude)
+			continue;
+
 		if (NULL != (*trigger)->itemids)
 		{
 			for (itemid = (*trigger)->itemids; 0 != *itemid; itemid++)
 			{
 				if (item->itemid == *itemid)
 				{
-					do
-					{
-						*itemid = itemid[1];
+					while (0 != (*itemid = itemid[1]))
 						itemid++;
-					}
-					while (0 != *itemid);
 
 					break;
 				}
@@ -5801,6 +5811,12 @@ static void	dc_trigger_update_cache(void)
 		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &function->itemid)) ||
 				NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &function->triggerid)))
 		{
+			continue;
+		}
+
+		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+		{
+			trigger->functional = TRIGGER_FUNCTIONAL_FALSE;
 			continue;
 		}
 
@@ -9794,6 +9810,7 @@ static void	dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
 			case CONFIG_ERROR:
+			case SIG_ERROR:
 				dc_item->queue_priority = ZBX_QUEUE_PRIORITY_NORMAL;
 				dc_requeue_item(dc_item, dc_host, dc_interface, ZBX_ITEM_COLLECTED, lastclocks[i]);
 				break;
@@ -11238,11 +11255,6 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
-		if (NULL == (dc_interface = (const ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces,
-				&dc_item->interfaceid)))
-		{
-			continue;
-		}
 
 		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 			continue;
@@ -11253,6 +11265,12 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 			case ITEM_TYPE_SNMP:
 			case ITEM_TYPE_IPMI:
 			case ITEM_TYPE_JMX:
+				if (NULL == (dc_interface = (const ZBX_DC_INTERFACE *)zbx_hashset_search(
+						&config->interfaces, &dc_item->interfaceid)))
+				{
+					continue;
+				}
+
 				if (INTERFACE_AVAILABLE_TRUE != dc_interface->available)
 					continue;
 				break;

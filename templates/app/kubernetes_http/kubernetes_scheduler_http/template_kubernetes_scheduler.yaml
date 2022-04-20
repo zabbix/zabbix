@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-27T09:52:19Z'
+  date: '2022-04-06T19:27:53Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -23,62 +23,6 @@ zabbix_export:
         -
           name: Templates/Applications
       items:
-        -
-          uuid: 5f40c030c1964ff7ab7786cee97bee81
-          name: 'Kubernetes Scheduler: Binding duration, p50'
-          type: CALCULATED
-          key: kubernetes.scheduler.binding_duration_p50
-          history: 7d
-          value_type: FLOAT
-          units: s
-          params: 'bucket_percentile(//kubernetes.scheduler.binding_duration[*],5m,50)'
-          description: '50 percentile of binding latency in seconds.'
-          tags:
-            -
-              tag: component
-              value: binding
-        -
-          uuid: 19ba0e215a9f4e13b3079fcdaf124cc5
-          name: 'Kubernetes Scheduler: Binding duration, p90'
-          type: CALCULATED
-          key: kubernetes.scheduler.binding_duration_p90
-          history: 7d
-          value_type: FLOAT
-          units: s
-          params: 'bucket_percentile(//kubernetes.scheduler.binding_duration[*],5m,90)'
-          description: '90 percentile of binding latency in seconds.'
-          tags:
-            -
-              tag: component
-              value: binding
-        -
-          uuid: b24d657a1568437fac77535a80d63bc3
-          name: 'Kubernetes Scheduler: Binding duration, p95'
-          type: CALCULATED
-          key: kubernetes.scheduler.binding_duration_p95
-          history: 7d
-          value_type: FLOAT
-          units: s
-          params: 'bucket_percentile(//kubernetes.scheduler.binding_duration[*],5m,95)'
-          description: '99 percentile of binding latency in seconds.'
-          tags:
-            -
-              tag: component
-              value: binding
-        -
-          uuid: 258d5d4b6534488a92ba29185e3ca56f
-          name: 'Kubernetes Scheduler: Binding duration, p99'
-          type: CALCULATED
-          key: kubernetes.scheduler.binding_duration_p99
-          history: 7d
-          value_type: FLOAT
-          units: s
-          params: 'bucket_percentile(//kubernetes.scheduler.binding_duration[*],5m,99)'
-          description: '95 percentile of binding latency in seconds.'
-          tags:
-            -
-              tag: component
-              value: binding
         -
           uuid: 87e91f23320043549457a5b2ab8ddf74
           name: 'Kubernetes Scheduler: REST Client requests: 2xx, rate'
@@ -203,7 +147,8 @@ zabbix_export:
             -
               uuid: ea92474a61214053b2cd20775817010e
               expression: 'min(/Kubernetes Scheduler by HTTP/kubernetes.scheduler.client_http_requests_500.rate,5m)>{$KUBE.SCHEDULER.HTTP.CLIENT.ERROR}'
-              name: 'Kubernetes Scheduler: Too many REST Client errors (over {$KUBE.SCHEDULER.HTTP.CLIENT.ERROR} for 5m)'
+              name: 'Kubernetes Scheduler: Too many REST Client errors'
+              event_name: 'Kubernetes Scheduler: Too many REST Client errors (over {$KUBE.SCHEDULER.HTTP.CLIENT.ERROR} for 5m)'
               priority: WARNING
               description: '"Kubernetes Scheduler REST Client requests is experiencing high error rate (with 5xx HTTP code).'
               tags:
@@ -249,7 +194,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Get raw metrics from Scheduler instance /metrics endpoint'
+          description: 'Get raw metrics from Scheduler instance /metrics endpoint.'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -260,7 +205,7 @@ zabbix_export:
           headers:
             -
               name: Authorization
-              value: 'Bearer {$KUBE.SCHEDULER.TOKEN}'
+              value: 'Bearer {$KUBE.API.TOKEN}'
           tags:
             -
               tag: component
@@ -436,7 +381,8 @@ zabbix_export:
             -
               uuid: 9116327bc14f4f189ca867b43187f6bd
               expression: 'min(/Kubernetes Scheduler by HTTP/kubernetes.scheduler.scheduler_schedule_attempts.error.rate,5m)>{$KUBE.SCHEDULER.ERROR}'
-              name: 'Kubernetes Scheduler: Too many schedule attempts with errors (over {$KUBE.SCHEDULER.ERROR} for 5m)'
+              name: 'Kubernetes Scheduler: Too many schedule attempts with errors'
+              event_name: 'Kubernetes Scheduler: Too many schedule attempts with errors (over {$KUBE.SCHEDULER.ERROR} for 5m)'
               priority: WARNING
               description: '"Number of attempts to schedule pods with ''error'' result is too high. ''error'' means an internal scheduler problem."'
               tags:
@@ -501,69 +447,14 @@ zabbix_export:
             -
               uuid: 16efba4ba322416fa2b8986273b83904
               expression: 'min(/Kubernetes Scheduler by HTTP/kubernetes.scheduler.scheduler_schedule_attempts.unschedulable.rate,5m)>{$KUBE.SCHEDULER.UNSCHEDULABLE}'
-              name: 'Kubernetes Scheduler: Too many unschedulable pods (over {$KUBE.SCHEDULER.UNSCHEDULABLE} for 5m)'
+              name: 'Kubernetes Scheduler: Too many unschedulable pods'
+              event_name: 'Kubernetes Scheduler: Too many unschedulable pods (over {$KUBE.SCHEDULER.UNSCHEDULABLE} for 5m)'
               priority: WARNING
               description: '"Number of attempts to schedule pods with ''unschedulable'' result is too high. ''unschedulable'' means a pod could not be scheduled."'
               tags:
                 -
                   tag: scope
                   value: performance
-        -
-          uuid: 3df35ee6e86a424f89f51bb74cb40b9d
-          name: 'Kubernetes Scheduler: Scheduling algorithm duration, p50'
-          type: CALCULATED
-          key: kubernetes.scheduler.scheduling_algorithm_duration_p50
-          history: 7d
-          value_type: FLOAT
-          units: s
-          params: 'bucket_percentile(//kubernetes.scheduler.scheduling_algorithm_duration[*],5m,50)'
-          description: '50 percentile of scheduling algorithm latency in seconds.'
-          tags:
-            -
-              tag: component
-              value: scheduling-algorithm
-        -
-          uuid: 2368f2c98f3641bdbd030d94ca53a4dd
-          name: 'Kubernetes Scheduler: Scheduling algorithm duration, p90'
-          type: CALCULATED
-          key: kubernetes.scheduler.scheduling_algorithm_duration_p90
-          history: 7d
-          value_type: FLOAT
-          units: s
-          params: 'bucket_percentile(//kubernetes.scheduler.scheduling_algorithm_duration[*],5m,90)'
-          description: '90 percentile of scheduling algorithm latency in seconds.'
-          tags:
-            -
-              tag: component
-              value: scheduling-algorithm
-        -
-          uuid: 6ca6a2480c4343a8b9a4e6598ec86501
-          name: 'Kubernetes Scheduler: Scheduling algorithm duration, p95'
-          type: CALCULATED
-          key: kubernetes.scheduler.scheduling_algorithm_duration_p95
-          history: 7d
-          value_type: FLOAT
-          units: s
-          params: 'bucket_percentile(//kubernetes.scheduler.scheduling_algorithm_duration[*],5m,95)'
-          description: '95 percentile of scheduling algorithm latency in seconds.'
-          tags:
-            -
-              tag: component
-              value: scheduling-algorithm
-        -
-          uuid: 955f0989372c4f9d82ad364b09f5efea
-          name: 'Kubernetes Scheduler: Scheduling algorithm duration, p99'
-          type: CALCULATED
-          key: kubernetes.scheduler.scheduling_algorithm_duration_p99
-          history: 7d
-          value_type: FLOAT
-          units: s
-          params: 'bucket_percentile(//kubernetes.scheduler.scheduling_algorithm_duration[*],5m,99)'
-          description: '99 percentile of scheduling algorithm latency in seconds.'
-          tags:
-            -
-              tag: component
-              value: scheduling-algorithm
       discovery_rules:
         -
           uuid: 0dacff4b5ab841569642350388f4e534
@@ -579,7 +470,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kubernetes.scheduler.e2e_scheduling_bucket[{#LE},"{#RESULT}"]'
               delay: '0'
-              history: 7d
+              history: 1h
+              trends: '0'
               discover: NO_DISCOVER
               value_type: FLOAT
               description: 'E2e scheduling latency in seconds (scheduling algorithm + binding)'
@@ -638,7 +530,7 @@ zabbix_export:
                   value: '{#RESULT}'
             -
               uuid: 706fc27da4d34a4e9189c566c7aa96ff
-              name: 'Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p90'
+              name: 'Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p95'
               type: CALCULATED
               key: 'kubernetes.scheduler.e2e_scheduling_p95["{#RESULT}"]'
               history: 7d
@@ -741,7 +633,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
           overrides:
             -
               name: 'bucket item'
@@ -789,7 +681,9 @@ zabbix_export:
               type: DEPENDENT
               key: 'kubernetes.scheduler.binding_duration[{#LE}]'
               delay: '0'
-              history: 7d
+              history: 1h
+              trends: '0'
+              discover: NO_DISCOVER
               value_type: FLOAT
               description: 'Binding latency in seconds.'
               preprocessing:
@@ -806,26 +700,161 @@ zabbix_export:
                 -
                   tag: component
                   value: binding
+            -
+              uuid: 5f40c030c1964ff7ab7786cee97bee81
+              name: 'Kubernetes Scheduler: Binding duration, p50'
+              type: CALCULATED
+              key: 'kubernetes.scheduler.binding_duration_p50[{#SINGLETON}]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.scheduler.binding_duration[*],5m,50)'
+              description: '50 percentile of binding latency in seconds.'
+              tags:
+                -
+                  tag: component
+                  value: binding
+            -
+              uuid: 19ba0e215a9f4e13b3079fcdaf124cc5
+              name: 'Kubernetes Scheduler: Binding duration, p90'
+              type: CALCULATED
+              key: 'kubernetes.scheduler.binding_duration_p90[{#SINGLETON}]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.scheduler.binding_duration[*],5m,90)'
+              description: '90 percentile of binding latency in seconds.'
+              tags:
+                -
+                  tag: component
+                  value: binding
+            -
+              uuid: b24d657a1568437fac77535a80d63bc3
+              name: 'Kubernetes Scheduler: Binding duration, p95'
+              type: CALCULATED
+              key: 'kubernetes.scheduler.binding_duration_p95[{#SINGLETON}]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.scheduler.binding_duration[*],5m,95)'
+              description: '99 percentile of binding latency in seconds.'
+              tags:
+                -
+                  tag: component
+                  value: binding
+            -
+              uuid: 258d5d4b6534488a92ba29185e3ca56f
+              name: 'Kubernetes Scheduler: Binding duration, p99'
+              type: CALCULATED
+              key: 'kubernetes.scheduler.binding_duration_p99[{#SINGLETON}]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.scheduler.binding_duration[*],5m,99)'
+              description: '95 percentile of binding latency in seconds.'
+              tags:
+                -
+                  tag: component
+                  value: binding
+          graph_prototypes:
+            -
+              uuid: 1c8da2cb32ae4dfaa0d16cff0cecfc43
+              name: 'Kubernetes Scheduler: [{#SINGLETON}]Binding latency'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Kubernetes Scheduler by HTTP'
+                    key: 'kubernetes.scheduler.binding_duration_p50[{#SINGLETON}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Kubernetes Scheduler by HTTP'
+                    key: 'kubernetes.scheduler.binding_duration_p90[{#SINGLETON}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Kubernetes Scheduler by HTTP'
+                    key: 'kubernetes.scheduler.binding_duration_p95[{#SINGLETON}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'Kubernetes Scheduler by HTTP'
+                    key: 'kubernetes.scheduler.binding_duration_p99[{#SINGLETON}]'
           master_item:
             key: kubernetes.scheduler.get_metrics
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
               parameters:
-                - scheduler_binding_duration_seconds_bucket
+                - '{__name__=~ "scheduler_binding_duration_seconds_*"}'
             -
               type: JAVASCRIPT
               parameters:
                 - |
-                  var output = JSON.parse(value).map(function(item) {
-                      return {'{#LE}': item.labels.le};
+                  var lookup = {},
+                      result = [];
+                  JSON.parse(value).forEach(function (item) {
+                      if (item.name === "scheduler_binding_duration_seconds_count"){
+                          result.push({
+                              '{#TYPE}': 'totals',
+                              '{#SINGLETON}': ''
+                          });
+                  
+                        }
+                      else if  (item.name === "scheduler_binding_duration_seconds_bucket"){
+                          result.push({
+                              '{#TYPE}': 'buckets',
+                              '{#LE}': item.labels.le
+                          });
+                      }
                   });
                   
-                  return JSON.stringify({'data': output});
+                  return JSON.stringify(result);
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
+          overrides:
+            -
+              name: 'bucket item'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: buckets
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: bucket
+                  status: ENABLED
+                  discover: DISCOVER
+            -
+              name: 'total item'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: totals
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: NOT_LIKE
+                  value: bucket
+                  status: ENABLED
+                  discover: DISCOVER
         -
           uuid: 5d4a17f09a7e4ad3b4ac72c30bac5e7d
           name: 'Scheduling algorithm histogram'
@@ -840,7 +869,9 @@ zabbix_export:
               type: DEPENDENT
               key: 'kubernetes.scheduler.scheduling_algorithm_duration[{#LE}]'
               delay: '0'
-              history: 7d
+              history: 1h
+              trends: '0'
+              discover: NO_DISCOVER
               value_type: FLOAT
               description: 'Scheduling algorithm latency in seconds.'
               preprocessing:
@@ -857,26 +888,161 @@ zabbix_export:
                 -
                   tag: component
                   value: scheduling-algorithm
+            -
+              uuid: 3df35ee6e86a424f89f51bb74cb40b9d
+              name: 'Kubernetes Scheduler: Scheduling algorithm duration, p50'
+              type: CALCULATED
+              key: 'kubernetes.scheduler.scheduling_algorithm_duration_p50[{#SINGLETON}]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.scheduler.scheduling_algorithm_duration[*],5m,50)'
+              description: '50 percentile of scheduling algorithm latency in seconds.'
+              tags:
+                -
+                  tag: component
+                  value: scheduling-algorithm
+            -
+              uuid: 2368f2c98f3641bdbd030d94ca53a4dd
+              name: 'Kubernetes Scheduler: Scheduling algorithm duration, p90'
+              type: CALCULATED
+              key: 'kubernetes.scheduler.scheduling_algorithm_duration_p90[{#SINGLETON}]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.scheduler.scheduling_algorithm_duration[*],5m,90)'
+              description: '90 percentile of scheduling algorithm latency in seconds.'
+              tags:
+                -
+                  tag: component
+                  value: scheduling-algorithm
+            -
+              uuid: 6ca6a2480c4343a8b9a4e6598ec86501
+              name: 'Kubernetes Scheduler: Scheduling algorithm duration, p95'
+              type: CALCULATED
+              key: 'kubernetes.scheduler.scheduling_algorithm_duration_p95[{#SINGLETON}]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.scheduler.scheduling_algorithm_duration[*],5m,95)'
+              description: '95 percentile of scheduling algorithm latency in seconds.'
+              tags:
+                -
+                  tag: component
+                  value: scheduling-algorithm
+            -
+              uuid: 955f0989372c4f9d82ad364b09f5efea
+              name: 'Kubernetes Scheduler: Scheduling algorithm duration, p99'
+              type: CALCULATED
+              key: 'kubernetes.scheduler.scheduling_algorithm_duration_p99[{#SINGLETON}]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.scheduler.scheduling_algorithm_duration[*],5m,99)'
+              description: '99 percentile of scheduling algorithm latency in seconds.'
+              tags:
+                -
+                  tag: component
+                  value: scheduling-algorithm
+          graph_prototypes:
+            -
+              uuid: 94607df22a1c49e5aa290fd50e9c2238
+              name: 'Kubernetes Scheduler: [{#SINGLETON}]Scheduling algorithm duration'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Kubernetes Scheduler by HTTP'
+                    key: 'kubernetes.scheduler.scheduling_algorithm_duration_p50[{#SINGLETON}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Kubernetes Scheduler by HTTP'
+                    key: 'kubernetes.scheduler.scheduling_algorithm_duration_p90[{#SINGLETON}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Kubernetes Scheduler by HTTP'
+                    key: 'kubernetes.scheduler.scheduling_algorithm_duration_p95[{#SINGLETON}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'Kubernetes Scheduler by HTTP'
+                    key: 'kubernetes.scheduler.scheduling_algorithm_duration_p99[{#SINGLETON}]'
           master_item:
             key: kubernetes.scheduler.get_metrics
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
               parameters:
-                - scheduler_scheduling_algorithm_duration_seconds_bucket
+                - '{__name__=~ "scheduler_scheduling_algorithm_duration_seconds_*"}'
             -
               type: JAVASCRIPT
               parameters:
                 - |
-                  var output = JSON.parse(value).map(function(item) {
-                      return {'{#LE}': item.labels.le};
+                  var lookup = {},
+                      result = [];
+                  JSON.parse(value).forEach(function (item) {
+                      if (item.name === "scheduler_scheduling_algorithm_duration_seconds_count"){
+                          result.push({
+                              '{#TYPE}': 'totals',
+                              '{#SINGLETON}': ''
+                          });
+                  
+                        }
+                      else if  (item.name === "scheduler_scheduling_algorithm_duration_seconds_bucket"){
+                          result.push({
+                              '{#TYPE}': 'buckets',
+                              '{#LE}': item.labels.le
+                          });
+                      }
                   });
                   
-                  return JSON.stringify({'data': output});
+                  return JSON.stringify(result);
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
+          overrides:
+            -
+              name: 'bucket item'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: buckets
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: bucket
+                  status: ENABLED
+                  discover: DISCOVER
+            -
+              name: 'total item'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: totals
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: NOT_LIKE
+                  value: bucket
+                  status: ENABLED
+                  discover: DISCOVER
       tags:
         -
           tag: class
@@ -885,6 +1051,9 @@ zabbix_export:
           tag: target
           value: 'kubernetes scheduler'
       macros:
+        -
+          macro: '{$KUBE.API.TOKEN}'
+          description: 'API Authorization Token'
         -
           macro: '{$KUBE.SCHEDULER.ERROR}'
           value: '2'
@@ -898,40 +1067,10 @@ zabbix_export:
           value: 'http://localhost:10251/metrics'
           description: 'Instance URL'
         -
-          macro: '{$KUBE.SCHEDULER.TOKEN}'
-          description: 'Scheduler Authorization Token'
-        -
           macro: '{$KUBE.SCHEDULER.UNSCHEDULABLE}'
           value: '2'
           description: 'Maximum number of scheduling failures with ''unschedulable'' used for trigger'
   graphs:
-    -
-      uuid: da572b0ad9a74a2392ad20f9bb2d475b
-      name: 'Kubernetes Scheduler: Binding latency'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Kubernetes Scheduler by HTTP'
-            key: kubernetes.scheduler.scheduling_algorithm_duration_p50
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Kubernetes Scheduler by HTTP'
-            key: kubernetes.scheduler.scheduling_algorithm_duration_p90
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Kubernetes Scheduler by HTTP'
-            key: kubernetes.scheduler.scheduling_algorithm_duration_p95
-        -
-          sortorder: '3'
-          color: A54F10
-          item:
-            host: 'Kubernetes Scheduler by HTTP'
-            key: kubernetes.scheduler.scheduling_algorithm_duration_p99
     -
       uuid: dd98f209541449f4a476718c46a0e721
       name: 'Kubernetes Scheduler: Memory usage'
@@ -975,35 +1114,8 @@ zabbix_export:
             host: 'Kubernetes Scheduler by HTTP'
             key: kubernetes.scheduler.client_http_requests_200.rate
     -
-      uuid: aa3e4f0494404b78b6e44841f9f8d7d2
-      name: 'Kubernetes Scheduler: Scheduling algorithm duration'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Kubernetes Scheduler by HTTP'
-            key: kubernetes.scheduler.scheduling_algorithm_duration_p50
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Kubernetes Scheduler by HTTP'
-            key: kubernetes.scheduler.scheduling_algorithm_duration_p90
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Kubernetes Scheduler by HTTP'
-            key: kubernetes.scheduler.scheduling_algorithm_duration_p95
-        -
-          sortorder: '3'
-          color: A54F10
-          item:
-            host: 'Kubernetes Scheduler by HTTP'
-            key: kubernetes.scheduler.scheduling_algorithm_duration_p99
-    -
       uuid: 4ee3ca9852a2440ea100e21291ac9103
-      name: 'Kubernetes Scheduler: Schedulling attempts rate'
+      name: 'Kubernetes Scheduler: Scheduling attempts rate'
       graph_items:
         -
           color: 1A7C11

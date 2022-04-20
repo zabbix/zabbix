@@ -44,6 +44,30 @@ class CControllerSlaReportList extends CController {
 
 		$ret = $this->validateInput($fields);
 
+		if ($ret) {
+			$fields = [];
+
+			if ($this->getInput('filter_date_from', '') !== '') {
+				$fields['filter_date_from'] = 'abs_date';
+			}
+
+			if ($this->getInput('filter_date_to', '') !== '') {
+				$fields['filter_date_to'] = 'abs_date';
+			}
+
+			if ($fields) {
+				$validator = new CNewValidator($this->getInputAll(), $fields);
+
+				foreach ($validator->getAllErrors() as $error) {
+					info($error);
+				}
+
+				if ($validator->isErrorFatal() || $validator->isError()) {
+					$ret = false;
+				}
+			}
+		}
+
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
@@ -56,7 +80,7 @@ class CControllerSlaReportList extends CController {
 	}
 
 	/**
-	 * @throws APIException
+	 * @throws Exception
 	 */
 	protected function doAction(): void {
 		if ($this->hasInput('filter_set')) {
@@ -133,45 +157,21 @@ class CControllerSlaReportList extends CController {
 		$period_from = null;
 
 		if ($filter['date_from'] !== '') {
-			$date_from = DateTime::createFromFormat('!'.DATE_FORMAT, $filter['date_from'], new DateTimeZone('UTC'));
-			$last_errors = DateTime::getLastErrors();
-
-			if ($date_from === false || $last_errors['warning_count'] > 0 || $last_errors['error_count'] > 0) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('From'), _('a date is expected')));
-			}
-			else {
-				$period_from = $date_from->getTimestamp();
-
-				if ($period_from < 0 || $period_from > ZBX_MAX_DATE) {
-					$period_from = null;
-
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('From'),
-						_s('a date not later than %1$s is expected', zbx_date2str(DATE_FORMAT, ZBX_MAX_DATE))
-					));
-				}
-			}
+			$parser = new CAbsoluteTimeParser();
+			$parser->parse($filter['date_from']);
+			$period_from = $parser
+				->getDateTime(true, new DateTimeZone('UTC'))
+				->getTimestamp();
 		}
 
 		$period_to = null;
 
 		if ($filter['date_to'] !== '') {
-			$date_to = DateTime::createFromFormat('!'.DATE_FORMAT, $filter['date_to'], new DateTimeZone('UTC'));
-			$last_errors = DateTime::getLastErrors();
-
-			if ($date_to === false || $last_errors['warning_count'] > 0 || $last_errors['error_count'] > 0) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('To'), _('a date is expected')));
-			}
-			else {
-				$period_to = $date_to->getTimestamp();
-
-				if ($period_to < 0 || $period_to > ZBX_MAX_DATE) {
-					$period_to = null;
-
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('To'),
-						_s('a date not later than %1$s is expected', zbx_date2str(DATE_FORMAT, ZBX_MAX_DATE))
-					));
-				}
-			}
+			$parser = new CAbsoluteTimeParser();
+			$parser->parse($filter['date_to']);
+			$period_to = $parser
+				->getDateTime(false, new DateTimeZone('UTC'))
+				->getTimestamp();
 		}
 
 		if ($period_from !== null && $period_to !== null && $period_to <= $period_from) {

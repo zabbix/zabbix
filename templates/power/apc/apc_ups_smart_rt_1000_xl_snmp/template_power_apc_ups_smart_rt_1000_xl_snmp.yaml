@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:21:18Z'
+  date: '2022-04-06T19:35:41Z'
   groups:
     -
       uuid: 3dcd5bbe90534f9e8eb5c2d53756af63
@@ -54,7 +54,8 @@ zabbix_export:
             -
               uuid: b5d618c6090447429191fe4d07e85afa
               expression: 'last(/APC Smart-UPS RT 1000 XL SNMP/battery.capacity[upsHighPrecBatteryCapacity]) < {$BATTERY.CAPACITY.MIN.WARN}'
-              name: 'Battery has low capacity (below {$BATTERY.CAPACITY.MIN.WARN}%)'
+              name: 'Battery has low capacity'
+              event_name: 'Battery has low capacity (below {$BATTERY.CAPACITY.MIN.WARN}%)'
               opdata: 'Current capacity: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
@@ -248,7 +249,8 @@ zabbix_export:
             -
               uuid: 33695c02cf6141f78e21ca899af10c03
               expression: 'min(/APC Smart-UPS RT 1000 XL SNMP/battery.temperature[upsHighPrecBatteryTemperature],{$TIME.PERIOD}) > {$BATTERY.TEMP.MAX.WARN}'
-              name: 'Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
+              name: 'Battery has high temperature'
+              event_name: 'Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
               opdata: 'Current temperature: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
@@ -353,7 +355,8 @@ zabbix_export:
             -
               uuid: 167de2d832984944878767571b0b5fe4
               expression: 'min(/APC Smart-UPS RT 1000 XL SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > 0 and (min(/APC Smart-UPS RT 1000 XL SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > {$UPS.INPUT_FREQ.MAX.WARN} or max(/APC Smart-UPS RT 1000 XL SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) < {$UPS.INPUT_FREQ.MIN.WARN})'
-              name: 'Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})'
+              name: 'Unacceptable input frequency'
+              event_name: 'Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})'
               opdata: 'Current frequency: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
@@ -389,7 +392,8 @@ zabbix_export:
             -
               uuid: b8741bc0081a4a9db2824c9f93ecb399
               expression: 'min(/APC Smart-UPS RT 1000 XL SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > 0 and (min(/APC Smart-UPS RT 1000 XL SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC Smart-UPS RT 1000 XL SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN})'
-              name: 'Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
+              name: 'Unacceptable input voltage'
+              event_name: 'Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
               opdata: 'Current voltage: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
@@ -451,7 +455,8 @@ zabbix_export:
             -
               uuid: a4faec3975134cd59e83f1ca7fa3ef7d
               expression: 'min(/APC Smart-UPS RT 1000 XL SNMP/output.load[upsHighPrecOutputLoad],{$TIME.PERIOD}) > {$UPS.OUTPUT.MAX.WARN}'
-              name: 'Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})'
+              name: 'Output load is high'
+              event_name: 'Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})'
               opdata: 'Current load: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'A battery installed has an internal error condition.'
@@ -752,7 +757,8 @@ zabbix_export:
             -
               uuid: 31bb0ff1ea334cd59d9f8b8f489611ef
               expression: 'last(/APC Smart-UPS RT 1000 XL SNMP/system.name[sysName.0],#1)<>last(/APC Smart-UPS RT 1000 XL SNMP/system.name[sysName.0],#2) and length(last(/APC Smart-UPS RT 1000 XL SNMP/system.name[sysName.0]))>0'
-              name: 'System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -842,7 +848,8 @@ zabbix_export:
             -
               uuid: 860d3beb50c0400283a71c2c4b4ea5e2
               expression: 'last(/APC Smart-UPS RT 1000 XL SNMP/system.uptime[sysUpTime.0])<10m'
-              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -1106,7 +1113,8 @@ zabbix_export:
                 -
                   uuid: 7f8613d752524d588e60aa1cab2c60bd
                   expression: 'min(/APC Smart-UPS RT 1000 XL SNMP/battery.temperature[upsHighPrecBatteryPackTemperature.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],{$TIME.PERIOD}) > {$BATTERY.TEMP.MAX.WARN}'
-                  name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
+                  name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery has high temperature'
+                  event_name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
                   opdata: 'Current temperature: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   tags:
@@ -1468,7 +1476,8 @@ zabbix_export:
                 -
                   uuid: 8c9226411afb4b32ba3e9d6232ff4710
                   expression: 'min(/APC Smart-UPS RT 1000 XL SNMP/phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC Smart-UPS RT 1000 XL SNMP/phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN}'
-                  name: '{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
+                  name: '{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} input voltage'
+                  event_name: '{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
                   opdata: 'Current phase {#PHASEINDEX} voltage: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   tags:
@@ -1560,7 +1569,8 @@ zabbix_export:
                 -
                   uuid: 58e0697a9a9147a4b1dfda251f2b593e
                   expression: 'min(/APC Smart-UPS RT 1000 XL SNMP/phase.output.voltage[upsPhaseOutputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC Smart-UPS RT 1000 XL SNMP/phase.output.voltage[upsPhaseOutputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN}'
-                  name: '{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} output voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
+                  name: '{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} output voltage'
+                  event_name: '{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} output voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
                   opdata: 'Current phase {#PHASEINDEX} voltage: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   tags:
@@ -1614,6 +1624,178 @@ zabbix_export:
           macro: '{$UPS.OUTPUT.MAX.WARN}'
           value: '80'
           description: 'Maximum output load in % for trigger expression.'
+      dashboards:
+        -
+          uuid: 8e5f02a3eab44a5f85011b7331696284
+          name: 'UPS Summary'
+          pages:
+            -
+              widgets:
+                -
+                  type: PLAIN_TEXT
+                  width: '8'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: show_as_html
+                      value: '0'
+                    -
+                      type: INTEGER
+                      name: show_lines
+                      value: '1'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'system.uptime[sysUpTime.0]'
+                        host: 'APC Smart-UPS RT 1000 XL SNMP'
+                -
+                  type: PLAIN_TEXT
+                  x: '8'
+                  width: '8'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: show_as_html
+                      value: '0'
+                    -
+                      type: INTEGER
+                      name: show_lines
+                      value: '1'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'input.fail[upsAdvInputLineFailCause]'
+                        host: 'APC Smart-UPS RT 1000 XL SNMP'
+                -
+                  type: PLAIN_TEXT
+                  x: '16'
+                  width: '8'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: show_as_html
+                      value: '0'
+                    -
+                      type: INTEGER
+                      name: show_lines
+                      value: '1'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'output.status[upsBasicOutputStatus]'
+                        host: 'APC Smart-UPS RT 1000 XL SNMP'
+                -
+                  type: PLAIN_TEXT
+                  'y': '2'
+                  width: '8'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: show_as_html
+                      value: '0'
+                    -
+                      type: INTEGER
+                      name: show_lines
+                      value: '1'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'battery.status[upsBasicBatteryStatus]'
+                        host: 'APC Smart-UPS RT 1000 XL SNMP'
+                -
+                  type: PLAIN_TEXT
+                  x: '8'
+                  'y': '2'
+                  width: '8'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: show_as_html
+                      value: '0'
+                    -
+                      type: INTEGER
+                      name: show_lines
+                      value: '1'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'battery.runtime_remaining[upsAdvBatteryRunTimeRemaining]'
+                        host: 'APC Smart-UPS RT 1000 XL SNMP'
+                -
+                  type: PLAIN_TEXT
+                  x: '16'
+                  'y': '2'
+                  width: '8'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: show_as_html
+                      value: '0'
+                    -
+                      type: INTEGER
+                      name: show_lines
+                      value: '1'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'battery.last_replace_date[upsBasicBatteryLastReplaceDate]'
+                        host: 'APC Smart-UPS RT 1000 XL SNMP'
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '4'
+                  width: '8'
+                  height: '7'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Capacity of the UPS batteries'
+                        host: 'APC Smart-UPS RT 1000 XL SNMP'
+                -
+                  type: GRAPH_CLASSIC
+                  x: '8'
+                  'y': '4'
+                  width: '8'
+                  height: '7'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: Voltage
+                        host: 'APC Smart-UPS RT 1000 XL SNMP'
+                -
+                  type: GRAPH_CLASSIC
+                  x: '16'
+                  'y': '4'
+                  width: '8'
+                  height: '7'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: Output
+                        host: 'APC Smart-UPS RT 1000 XL SNMP'
       valuemaps:
         -
           uuid: b2af1e2dcb874d43949c383f9b347f36

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-04T08:32:18Z'
+  date: '2022-04-10T20:20:08Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -273,7 +273,8 @@ zabbix_export:
             -
               uuid: 3ac02c78c65f49bdae63669652236b7b
               expression: 'min(/Linux block devices by Zabbix agent/vfs.dev.read.await[{#DEVNAME}],15m) > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} or min(/Linux block devices by Zabbix agent/vfs.dev.write.await[{#DEVNAME}],15m) > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}'
-              name: '{#DEVNAME}: Disk read/write request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} ms for 15m or write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"} ms for 15m)'
+              name: '{#DEVNAME}: Disk read/write request responses are too high'
+              event_name: '{#DEVNAME}: Disk read/write request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} ms for 15m or write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"} ms for 15m)'
               priority: WARNING
               description: 'This trigger might indicate disk {#DEVNAME} saturation.'
               manual_close: 'YES'
@@ -445,7 +446,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'CPU utilization in %'
+          description: 'CPU utilization in %.'
           preprocessing:
             -
               type: JAVASCRIPT
@@ -463,13 +464,14 @@ zabbix_export:
             -
               uuid: d6099dae0c3a4252ab2af61104768170
               expression: 'min(/Linux CPU by Zabbix agent/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
-              name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
               dependencies:
                 -
-                  name: 'Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
+                  name: 'Load average is too high'
                   expression: |
                     min(/Linux CPU by Zabbix agent/system.cpu.load[all,avg1],5m)/last(/Linux CPU by Zabbix agent/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN}
                     and last(/Linux CPU by Zabbix agent/system.cpu.load[all,avg5])>0
@@ -485,7 +487,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system)'
+          description: 'Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system).'
           tags:
             -
               tag: component
@@ -497,7 +499,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel)'
+          description: 'Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel).'
           tags:
             -
               tag: component
@@ -661,7 +663,8 @@ zabbix_export:
                 -
                   uuid: 26adf86d6dd741b48007577091d5902c
                   expression: 'min(/Linux filesystems by Zabbix agent/vfs.fs.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
-                  name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
+                  name: '{#FSNAME}: Running out of free inodes'
+                  event_name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -677,7 +680,8 @@ zabbix_export:
                 -
                   uuid: 756b0126cc004f8d97f10384a4dc8587
                   expression: 'min(/Linux filesystems by Zabbix agent/vfs.fs.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}'
-                  name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)'
+                  name: '{#FSNAME}: Running out of free inodes'
+                  event_name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)'
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: |
@@ -685,7 +689,7 @@ zabbix_export:
                     As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.
                   dependencies:
                     -
-                      name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
+                      name: '{#FSNAME}: Running out of free inodes'
                       expression: 'min(/Linux filesystems by Zabbix agent/vfs.fs.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
                   tags:
                     -
@@ -742,14 +746,15 @@ zabbix_export:
               uuid: fb410c10bd59476dbe58e1ee179cd25f
               expression: |
                 last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<5G or timeleft(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+                ((last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+              name: '{#FSNAME}: Disk space is critically low'
+              event_name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.
                  Second condition should be one of the following:
-                 - The disk free space is less than 5G.
+                 - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               tags:
@@ -763,22 +768,23 @@ zabbix_export:
               uuid: d66583735eb04973ac30d923533c4b0f
               expression: |
                 last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<10G or timeleft(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
+                ((last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+              name: '{#FSNAME}: Disk space is low'
+              event_name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.
                  Second condition should be one of the following:
-                 - The disk free space is less than 10G.
+                 - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               dependencies:
                 -
-                  name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+                  name: '{#FSNAME}: Disk space is critically low'
                   expression: |
                     last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<5G or timeleft(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+                    ((last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -810,6 +816,14 @@ zabbix_export:
                     host: 'Linux filesystems by Zabbix agent'
                     key: 'vfs.fs.size[{#FSNAME},used]'
       macros:
+        -
+          macro: '{$VFS.FS.FREE.MIN.CRIT}'
+          value: 5G
+          description: 'The critical threshold of the filesystem utilization.'
+        -
+          macro: '{$VFS.FS.FREE.MIN.WARN}'
+          value: 10G
+          description: 'The warning threshold of the filesystem utilization.'
         -
           macro: '{$VFS.FS.FSNAME.MATCHES}'
           value: .+
@@ -853,7 +867,7 @@ zabbix_export:
           key: kernel.maxfiles
           delay: 1h
           history: 7d
-          description: 'It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.'
+          description: 'It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -867,7 +881,8 @@ zabbix_export:
             -
               uuid: abf2e035f1e54971a0795152f922271b
               expression: 'last(/Linux generic by Zabbix agent/kernel.maxfiles)<{$KERNEL.MAXFILES.MIN}'
-              name: 'Configured max number of open filedescriptors is too low (< {$KERNEL.MAXFILES.MIN})'
+              name: 'Configured max number of open filedescriptors is too low'
+              event_name: 'Configured max number of open filedescriptors is too low (< {$KERNEL.MAXFILES.MIN})'
               priority: INFO
               tags:
                 -
@@ -879,7 +894,7 @@ zabbix_export:
           key: kernel.maxproc
           delay: 1h
           history: 7d
-          description: 'It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.'
+          description: 'It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -893,11 +908,12 @@ zabbix_export:
             -
               uuid: 079c2be2b0a44965a8e83cedba222b8d
               expression: 'last(/Linux generic by Zabbix agent/kernel.maxproc)<{$KERNEL.MAXPROC.MIN}'
-              name: 'Configured max number of processes is too low (< {$KERNEL.MAXPROC.MIN})'
+              name: 'Configured max number of processes is too low'
+              event_name: 'Configured max number of processes is too low (< {$KERNEL.MAXPROC.MIN})'
               priority: INFO
               dependencies:
                 -
-                  name: 'Getting closer to process limit (over 80% used)'
+                  name: 'Getting closer to process limit'
                   expression: 'last(/Linux generic by Zabbix agent/proc.num)/last(/Linux generic by Zabbix agent/kernel.maxproc)*100>80'
               tags:
                 -
@@ -960,7 +976,8 @@ zabbix_export:
             -
               uuid: eda29f0c8c55495ab93820caa26338bf
               expression: 'last(/Linux generic by Zabbix agent/system.hostname,#1)<>last(/Linux generic by Zabbix agent/system.hostname,#2) and length(last(/Linux generic by Zabbix agent/system.hostname))>0'
-              name: 'System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -986,7 +1003,8 @@ zabbix_export:
             -
               uuid: cffb7209ce2a45bd868ac41c0680be56
               expression: 'fuzzytime(/Linux generic by Zabbix agent/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0'
-              name: 'System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
+              name: 'System time is out of sync'
+              event_name: 'System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
               priority: WARNING
               description: 'The host system time is different from the Zabbix server time.'
               manual_close: 'YES'
@@ -1043,7 +1061,7 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 -
-                  name: 'System name has changed (new name: {ITEM.VALUE})'
+                  name: 'System name has changed'
                   expression: 'last(/Linux generic by Zabbix agent/system.hostname,#1)<>last(/Linux generic by Zabbix agent/system.hostname,#2) and length(last(/Linux generic by Zabbix agent/system.hostname))>0'
               tags:
                 -
@@ -1101,7 +1119,8 @@ zabbix_export:
             -
               uuid: 2b612f4d65f4444c8a0609362c48463b
               expression: 'last(/Linux generic by Zabbix agent/system.uptime)<10m'
-              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'The host uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -1148,7 +1167,7 @@ zabbix_export:
                   name: 'Operating system description has changed'
                   expression: 'last(/Linux generic by Zabbix agent/system.sw.os,#1)<>last(/Linux generic by Zabbix agent/system.sw.os,#2) and length(last(/Linux generic by Zabbix agent/system.sw.os))>0'
                 -
-                  name: 'System name has changed (new name: {ITEM.VALUE})'
+                  name: 'System name has changed'
                   expression: 'last(/Linux generic by Zabbix agent/system.hostname,#1)<>last(/Linux generic by Zabbix agent/system.hostname,#2) and length(last(/Linux generic by Zabbix agent/system.hostname))>0'
               tags:
                 -
@@ -1245,7 +1264,7 @@ zabbix_export:
           key: 'vm.memory.size[total]'
           history: 7d
           units: B
-          description: 'Total memory in Bytes'
+          description: 'Total memory in Bytes.'
           tags:
             -
               tag: component
@@ -1275,12 +1294,13 @@ zabbix_export:
             -
               uuid: 804010cd02244ec5b47ba77bfa734228
               expression: 'min(/Linux memory by Zabbix agent/vm.memory.utilization,5m)>{$MEMORY.UTIL.MAX}'
-              name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               dependencies:
                 -
-                  name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+                  name: 'Lack of available memory'
                   expression: 'max(/Linux memory by Zabbix agent/vm.memory.size[available],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux memory by Zabbix agent/vm.memory.size[total])>0'
               tags:
                 -
@@ -1605,7 +1625,8 @@ zabbix_export:
               recovery_expression: |
                 avg(/Linux network interfaces by Zabbix agent/net.if.in["{#IFNAME}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"]) and
                 avg(/Linux network interfaces by Zabbix agent/net.if.out["{#IFNAME}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])
-              name: 'Interface {#IFNAME}: High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              name: 'Interface {#IFNAME}: High bandwidth usage'
+              event_name: 'Interface {#IFNAME}: High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -1628,7 +1649,8 @@ zabbix_export:
               recovery_expression: |
                 max(/Linux network interfaces by Zabbix agent/net.if.in["{#IFNAME}",errors],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and max(/Linux network interfaces by Zabbix agent/net.if.out["{#IFNAME}",errors],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFNAME}: High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFNAME}: High error rate'
+              event_name: 'Interface {#IFNAME}: High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
@@ -1965,7 +1987,8 @@ zabbix_export:
     -
       uuid: 613c30a98cf044b1b46a3d1d50f90eb8
       expression: 'last(/Linux generic by Zabbix agent/proc.num)/last(/Linux generic by Zabbix agent/kernel.maxproc)*100>80'
-      name: 'Getting closer to process limit (over 80% used)'
+      name: 'Getting closer to process limit'
+      event_name: 'Getting closer to process limit (over 80% used)'
       opdata: '{ITEM.LASTVALUE1} active, {ITEM.LASTVALUE2} limit.'
       priority: WARNING
       tags:
@@ -1975,16 +1998,17 @@ zabbix_export:
     -
       uuid: 6bf4726efad344529d3c8908053c6e6c
       expression: 'max(/Linux memory by Zabbix agent/system.swap.size[,pfree],5m)<{$SWAP.PFREE.MIN.WARN} and last(/Linux memory by Zabbix agent/system.swap.size[,total])>0'
-      name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
+      name: 'High swap space usage'
+      event_name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: WARNING
-      description: 'This trigger is ignored, if there is no swap configured'
+      description: 'This trigger is ignored, if there is no swap configured.'
       dependencies:
         -
-          name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+          name: 'High memory utilization'
           expression: 'min(/Linux memory by Zabbix agent/vm.memory.utilization,5m)>{$MEMORY.UTIL.MAX}'
         -
-          name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+          name: 'Lack of available memory'
           expression: 'max(/Linux memory by Zabbix agent/vm.memory.size[available],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux memory by Zabbix agent/vm.memory.size[total])>0'
       tags:
         -
@@ -1993,7 +2017,8 @@ zabbix_export:
     -
       uuid: 3800877e8b474aa2aa83c1ecc0523db6
       expression: 'max(/Linux memory by Zabbix agent/vm.memory.size[available],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux memory by Zabbix agent/vm.memory.size[total])>0'
-      name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+      name: 'Lack of available memory'
+      event_name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
       opdata: 'Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: AVERAGE
       tags:
@@ -2009,7 +2034,8 @@ zabbix_export:
         min(/Linux CPU by Zabbix agent/system.cpu.load[all,avg1],5m)/last(/Linux CPU by Zabbix agent/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN}
         and last(/Linux CPU by Zabbix agent/system.cpu.load[all,avg5])>0
         and last(/Linux CPU by Zabbix agent/system.cpu.load[all,avg15])>0
-      name: 'Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
+      name: 'Load average is too high'
+      event_name: 'Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
       opdata: 'Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}'
       priority: AVERAGE
       description: 'Per CPU load average is too high. Your system may be slow to respond.'

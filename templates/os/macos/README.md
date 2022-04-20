@@ -38,8 +38,8 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|macOS |Maximum number of opened files |<p>It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.</p> |ZABBIX_PASSIVE |kernel.maxfiles |
-|macOS |Maximum number of processes |<p>It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.</p> |ZABBIX_PASSIVE |kernel.maxproc |
+|macOS |Maximum number of opened files |<p>It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.</p> |ZABBIX_PASSIVE |kernel.maxfiles |
+|macOS |Maximum number of processes |<p>It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.</p> |ZABBIX_PASSIVE |kernel.maxproc |
 |macOS |Incoming network traffic on en0 |<p>-</p> |ZABBIX_PASSIVE |net.if.in[en0]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `8`</p> |
 |macOS |Outgoing network traffic on en0 |<p>-</p> |ZABBIX_PASSIVE |net.if.out[en0]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `8`</p> |
 |macOS |Host boot time |<p>-</p> |ZABBIX_PASSIVE |system.boottime |
@@ -78,7 +78,7 @@ There are no template links in this template.
 |Lack of available memory on server |<p>-</p> |`last(/macOS/vm.memory.size[available])<20M` |AVERAGE | |
 |{#FSNAME}: Free inodes is less than 20% |<p>-</p> |`last(/macOS/vfs.fs.inode[{#FSNAME},pfree])<20` |WARNING | |
 |{#FSNAME}: Free disk space is less than 20% |<p>-</p> |`last(/macOS/vfs.fs.size[{#FSNAME},pfree])<20` |WARNING | |
-|Zabbix agent is not available (for {$AGENT.TIMEOUT}) |<p>For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.</p> |`max(/macOS/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0` |AVERAGE |<p>Manual close: YES</p> |
+|Zabbix agent is not available |<p>For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.</p> |`max(/macOS/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0` |AVERAGE |<p>Manual close: YES</p> |
 
 ## Feedback
 

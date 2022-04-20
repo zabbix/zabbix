@@ -103,12 +103,12 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Cisco ASAv: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m) |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/Cisco ASAv SNMP/cisco.asav.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}` |WARNING | |
-|Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} has been replaced (new serial number received) |<p>{#CISCO.ASAV.PHYS.NAME} serial number has changed. Ack to close</p> |`last(/Cisco ASAv SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#1)<>last(/Cisco ASAv SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#2) and length(last(/Cisco ASAv SNMP/cisco.asav.phys.sn[{#SNMPINDEX}]))>0` |INFO |<p>Manual close: YES</p> |
-|Cisco ASAv: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m) |<p>The system is running out of free memory.</p> |`min(/Cisco ASAv SNMP/cisco.asav.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}` |AVERAGE | |
+|Cisco ASAv: High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/Cisco ASAv SNMP/cisco.asav.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}` |WARNING | |
+|Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} has been replaced |<p>{#CISCO.ASAV.PHYS.NAME} serial number has changed. Ack to close</p> |`last(/Cisco ASAv SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#1)<>last(/Cisco ASAv SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#2) and length(last(/Cisco ASAv SNMP/cisco.asav.phys.sn[{#SNMPINDEX}]))>0` |INFO |<p>Manual close: YES</p> |
+|Cisco ASAv: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Cisco ASAv SNMP/cisco.asav.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}` |AVERAGE | |
 |Cisco ASAv: {#CISCO.IF.NAME} Link down |<p>This trigger expression works as follows:</p><p>1. Can be triggered if operations status is down.</p><p>2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)</p><p>WARNING: if closed manually - won't fire again on next poll, because of .diff.</p> |`last(/Cisco ASAv SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}])=2 and last(/Cisco ASAv SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/Cisco ASAv SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#2)`<p>Recovery expression:</p>`last(/Cisco ASAv SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}])<>2` |AVERAGE |<p>Manual close: YES</p> |
 |Cisco ASAv: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/Cisco ASAv SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
-|Cisco ASAv: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/Cisco ASAv SNMP/cisco.asav.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|Cisco ASAv: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Cisco ASAv SNMP/cisco.asav.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 
 ## Feedback
 

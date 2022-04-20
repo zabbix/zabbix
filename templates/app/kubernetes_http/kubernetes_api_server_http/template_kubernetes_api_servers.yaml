@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-27T09:51:32Z'
+  date: '2022-04-06T19:27:50Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -204,7 +204,8 @@ zabbix_export:
             -
               uuid: 0e1ef1630b5d4cb98270564f324f5382
               expression: 'min(/Kubernetes API server by HTTP/kubernetes.api.apiserver_request_total_500.rate,5m)>{$KUBE.API.HTTP.SERVER.ERROR}'
-              name: 'Kubernetes API: Too many server errors (over {$KUBE.API.HTTP.SERVER.ERROR} for 5m)'
+              name: 'Kubernetes API: Too many server errors'
+              event_name: 'Kubernetes API: Too many server errors (over {$KUBE.API.HTTP.SERVER.ERROR} for 5m)'
               priority: WARNING
               description: '"Kubernetes API server is experiencing high error rate (with 5xx HTTP code).'
               tags:
@@ -258,45 +259,6 @@ zabbix_export:
               tag: component
               value: audit
         -
-          uuid: 5b4c8a01ab03480bb7d95ab6e1630d98
-          name: 'Kubernetes API: Client certificate expiration, p1'
-          type: CALCULATED
-          key: kubernetes.api.client_certificate_expiration_p1
-          history: 7d
-          value_type: FLOAT
-          units: s
-          params: 'bucket_percentile(//kubernetes.api.client_certificate_expiration_seconds_bucket[*],5m,1)'
-          description: '1 percentile of of the remaining lifetime on the certificate used to authenticate a request.'
-          tags:
-            -
-              tag: component
-              value: client-certificate
-          triggers:
-            -
-              uuid: 132d58724bd141afa3f28101326fe922
-              expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1) < {$KUBE.API.CERT.EXPIRATION}*24*60*60'
-              name: 'Kubernetes API: Kubernetes client certificate expires in {$KUBE.API.CERT.EXPIRATION} days'
-              priority: WARNING
-              description: 'A client certificate used to authenticate to the apiserver is expiring in {$KUBE.API.CERT.EXPIRATION} days.'
-              dependencies:
-                -
-                  name: 'Kubernetes API: Kubernetes client certificate expires soon'
-                  expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1) < 24*60*60'
-              tags:
-                -
-                  tag: scope
-                  value: availability
-            -
-              uuid: 1371958c0339430b8a333851766c01c0
-              expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1) < 24*60*60'
-              name: 'Kubernetes API: Kubernetes client certificate expires soon'
-              priority: WARNING
-              description: 'A client certificate used to authenticate to the apiserver is expiring in less than 24.0 hours.'
-              tags:
-                -
-                  tag: scope
-                  value: availability
-        -
           uuid: de87284b8bd644398e4a88a064e206bb
           name: 'Kubernetes API: CPU'
           type: DEPENDENT
@@ -335,7 +297,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Get raw metrics from API instance /metrics endpoint'
+          description: 'Get raw metrics from API instance /metrics endpoint.'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -696,7 +658,8 @@ zabbix_export:
             -
               uuid: 4c79888da91448738092c86e5f427a6a
               expression: 'min(/Kubernetes API server by HTTP/kubernetes.api.rest_client_requests_total_500.rate,5m)>{$KUBE.API.HTTP.CLIENT.ERROR}'
-              name: 'Kubernetes API: Too many client errors (over {$KUBE.API.HTTP.CLIENT.ERROR} for 5m)'
+              name: 'Kubernetes API: Too many client errors'
+              event_name: 'Kubernetes API: Too many client errors (over {$KUBE.API.HTTP.CLIENT.ERROR} for 5m)'
               priority: WARNING
               description: '"Kubernetes API client is experiencing high error rate (with 5xx HTTP code).'
               tags:
@@ -763,7 +726,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
         -
           uuid: 45ad0dd7331d4b9391d26b78838b0433
           name: 'Authentication requests discovery'
@@ -827,7 +790,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
         -
           uuid: ca23c310c71f4e88891ceae883527389
           name: 'Authentication attempts discovery'
@@ -891,7 +854,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
         -
           uuid: 0821009ea3be43e089247e843723577f
           name: 'Client certificate expiration histogram'
@@ -901,12 +864,55 @@ zabbix_export:
           description: 'Discovery raw data of client certificate expiration'
           item_prototypes:
             -
+              uuid: b69600f22c7b42b48f8601ada06a5a9f
+              name: 'Kubernetes API: Client certificate expiration, p1'
+              type: CALCULATED
+              key: 'kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.api.client_certificate_expiration_seconds_bucket[*],5m,1)'
+              description: '1 percentile of of the remaining lifetime on the certificate used to authenticate a request.'
+              tags:
+                -
+                  tag: component
+                  value: client-certificate
+              trigger_prototypes:
+                -
+                  uuid: 1371958c0339430b8a333851766c01c0
+                  expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < 24*60*60'
+                  name: 'Kubernetes API: Kubernetes client certificate expires soon'
+                  priority: WARNING
+                  description: 'A client certificate used to authenticate to the apiserver is expiring in less than 24.0 hours.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                -
+                  uuid: 132d58724bd141afa3f28101326fe922
+                  expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < {$KUBE.API.CERT.EXPIRATION}*24*60*60'
+                  name: 'Kubernetes API: Kubernetes client certificate is expiring'
+                  event_name: 'Kubernetes API: Kubernetes client certificate expires in {$KUBE.API.CERT.EXPIRATION} days'
+                  priority: WARNING
+                  description: 'A client certificate used to authenticate to the apiserver is expiring in {$KUBE.API.CERT.EXPIRATION} days.'
+                  dependencies:
+                    -
+                      name: 'Kubernetes API: Kubernetes client certificate expires soon'
+                      expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < 24*60*60'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
               uuid: 860cc40806254564bddb3617b8b75e74
               name: 'Kubernetes API: Certificate expiration seconds bucket, {#LE}'
               type: DEPENDENT
               key: 'kubernetes.api.client_certificate_expiration_seconds_bucket[{#LE}]'
               delay: '0'
-              history: 7d
+              history: 1h
+              trends: '0'
+              discover: NO_DISCOVER
               value_type: FLOAT
               description: 'Distribution of the remaining lifetime on the certificate used to authenticate a request.'
               preprocessing:
@@ -929,20 +935,68 @@ zabbix_export:
             -
               type: PROMETHEUS_TO_JSON
               parameters:
-                - apiserver_client_certificate_expiration_seconds_bucket
+                - '{__name__=~ "apiserver_client_certificate_expiration_seconds_*"}'
             -
               type: JAVASCRIPT
               parameters:
                 - |
-                  var output = JSON.parse(value).map(function(item) {
-                      return {'{#LE}': item.labels.le};
+                  var lookup = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                      if (item.name === "apiserver_client_certificate_expiration_seconds_count"){
+                          result.push({
+                              '{#TYPE}': 'totals',
+                              '{#SINGLETON}': ''
+                          });
+                  
+                        }
+                      else if  (item.name === "apiserver_client_certificate_expiration_seconds_bucket"){
+                          result.push({
+                              '{#TYPE}': 'buckets',
+                              '{#LE}': item.labels.le
+                          });
+                      }
                   });
                   
-                  return JSON.stringify({'data': output});
+                  return JSON.stringify(result);
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
+          overrides:
+            -
+              name: 'bucket item'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: buckets
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: bucket
+                  status: ENABLED
+                  discover: DISCOVER
+            -
+              name: 'total item'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: totals
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: NOT_LIKE
+                  value: bucket
+                  status: ENABLED
+                  discover: DISCOVER
         -
           uuid: 8dcd7c95a9364efdb2fe64c651360ad4
           name: 'Etcd objects metrics discovery'
@@ -1002,7 +1056,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
         -
           uuid: 099e6ff46075457cba6b669a5880ceef
           name: 'gRPC completed requests discovery'
@@ -1066,7 +1120,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
         -
           uuid: 948e1d84d44642a78f59c92271a21a68
           name: 'Requests inflight discovery'
@@ -1126,7 +1180,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
         -
           uuid: 7cd3ef5e2c874db18088b3531c944b25
           name: 'Long-running requests'
@@ -1197,7 +1251,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
         -
           uuid: 7c5ffdbafc5e4e349cc62ed0d0c0f20f
           name: 'Request duration histogram'
@@ -1212,7 +1266,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kubernetes.api.request_duration_seconds_bucket[{#LE},"{#VERB}"]'
               delay: '0'
-              history: 7d
+              history: 1h
+              trends: '0'
               discover: NO_DISCOVER
               value_type: FLOAT
               description: 'Response latency distribution in seconds for each verb.'
@@ -1241,7 +1296,7 @@ zabbix_export:
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kubernetes.api.request_duration_seconds_bucket[*,"{#VERB}"],5m,90)'
+              params: 'bucket_percentile(//kubernetes.api.request_duration_seconds_bucket[*,"{#VERB}"],5m,50)'
               description: '50 percentile of response latency distribution in seconds for each verb.'
               tags:
                 -
@@ -1277,7 +1332,7 @@ zabbix_export:
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kubernetes.api.request_duration_seconds_bucket[*,"{#VERB}"],5m,90)'
+              params: 'bucket_percentile(//kubernetes.api.request_duration_seconds_bucket[*,"{#VERB}"],5m,95)'
               description: '95 percentile of response latency distribution in seconds for each verb.'
               tags:
                 -
@@ -1295,7 +1350,7 @@ zabbix_export:
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kubernetes.api.request_duration_seconds_bucket[*,"{#VERB}"],5m,90)'
+              params: 'bucket_percentile(//kubernetes.api.request_duration_seconds_bucket[*,"{#VERB}"],5m,99)'
               description: '99 percentile of response latency distribution in seconds for each verb.'
               tags:
                 -
@@ -1348,7 +1403,7 @@ zabbix_export:
                       result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                      if (item.name === "apiserver_request_duration_seconds_count"){
+                      if (item.name === 'apiserver_request_duration_seconds_count') {
                           var label_verb = item.labels.verb;
                           if (lookup[label_verb]) {
                               return;
@@ -1360,12 +1415,13 @@ zabbix_export:
                           });
                   
                         }
-                      else if  (item.name === "apiserver_request_duration_seconds_bucket"){
-                       var labels = item.labels.verb + item.labels.le;
+                      else if  (item.name === 'apiserver_request_duration_seconds_bucket') {
+                          var labels = item.labels.verb + item.labels.le;
                   
                           if (lookup_histogram[labels]) {
                               return;
                           }
+                  
                           lookup_histogram[labels] = 1;
                           result.push({
                               '{#TYPE}': 'buckets',
@@ -1379,7 +1435,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
           overrides:
             -
               name: 'bucket item'
@@ -1502,7 +1558,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
       tags:
         -
           tag: class

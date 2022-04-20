@@ -17,18 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "dbcache.h"
+#include "preproc_manager.h"
+
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
-#include "sysinfo.h"
-#include "zbxipcservice.h"
 #include "zbxlld.h"
 #include "preprocessing.h"
-#include "zbxalgo.h"
 #include "preproc_history.h"
-
+#include "../../libs/zbxalgo/vectorimpl.h"
 #include "preproc_manager.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
@@ -58,13 +55,18 @@ typedef enum
 }
 zbx_preprocessing_kind_t;
 
-typedef struct zbx_preprocessing_request_base
+typedef struct zbx_preprocessing_request_base zbx_preprocessing_request_base_t;
+
+ZBX_PTR_VECTOR_DECL(preprocessing_request_base, zbx_preprocessing_request_base_t *)
+ZBX_PTR_VECTOR_IMPL(preprocessing_request_base, zbx_preprocessing_request_base_t *)
+
+struct zbx_preprocessing_request_base
 {
 	zbx_preprocessing_kind_t		kind;
 	zbx_preprocessing_states_t		state;
-	struct zbx_preprocessing_request_base	*pending;	/* the request waiting on this request to complete */
-}
-zbx_preprocessing_request_base_t;
+	zbx_preprocessing_request_base_t	*pending;	/* the request waiting on this request to complete */
+	zbx_vector_preprocessing_request_base_t	flush_queue;	/* processed request waiting to be flushed */
+};
 
 /* preprocessing request */
 typedef struct preprocessing_request
@@ -296,9 +298,11 @@ static zbx_uint32_t	preprocessor_create_task(zbx_preprocessing_manager_t *manage
 static	void	preprocessor_set_request_state_done(zbx_preprocessing_manager_t *manager,
 		zbx_preprocessing_request_base_t *base, const zbx_list_item_t *queue_item)
 {
-	zbx_item_link_t			*index, index_local;
-	zbx_preprocessing_request_t	*request;
-	zbx_preprocessing_dep_request_t	*dep_request;
+	zbx_item_link_t				*index, index_local;
+	zbx_list_iterator_t			iterator, next_iterator;
+	zbx_preprocessing_request_t		*request;
+	zbx_preprocessing_dep_request_t		*dep_request;
+	zbx_preprocessing_request_base_t	*prev;
 
 	base->state = REQUEST_STATE_DONE;
 
@@ -325,6 +329,31 @@ static	void	preprocessor_set_request_state_done(zbx_preprocessing_manager_t *man
 	{
 		zbx_hashset_remove_direct(&manager->linked_items, index);
 	}
+
+	if (NULL == manager->queue.head)
+		return;
+
+	zbx_list_iterator_init(&manager->queue, &iterator);
+	if (iterator.next == queue_item)
+		return;
+
+	while (SUCCEED == zbx_list_iterator_next(&iterator))
+	{
+		if (iterator.next == queue_item)
+			break;
+	}
+
+	prev = (zbx_preprocessing_request_base_t *)iterator.current->data;
+	zbx_vector_preprocessing_request_base_append(&prev->flush_queue, base);
+
+	next_iterator = iterator;
+	if (SUCCEED == zbx_list_iterator_next(&next_iterator))
+	{
+		if (SUCCEED == zbx_list_iterator_equal(&next_iterator, &manager->priority_tail))
+			manager->priority_tail = iterator;
+	}
+
+	(void)zbx_list_iterator_remove_next(&iterator);
 }
 
 /******************************************************************************
@@ -628,6 +657,9 @@ static void	preprocessor_free_request(zbx_preprocessing_request_base_t *base)
 	zbx_preprocessing_request_t	*request;
 	zbx_preprocessing_dep_request_t	*dep_request;
 
+	zbx_vector_preprocessing_request_base_clear_ext(&base->flush_queue, preprocessor_free_request);
+	zbx_vector_preprocessing_request_base_destroy(&base->flush_queue);
+
 	switch (base->kind)
 	{
 		case ZBX_PREPROC_ITEM:
@@ -713,6 +745,40 @@ static void	preprocessor_flush_dep_results(zbx_preprocessing_manager_t *manager,
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: recursively flush processed request and the other processed       *
+ *          requests that were waiting on this request to be finished         *
+ *                                                                            *
+ * Parameters: manager - [IN] preprocessing manager                           *
+ *             base    - [IN] the preprocessing request                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	preprocessing_flush_request(zbx_preprocessing_manager_t *manager,
+		zbx_preprocessing_request_base_t *base)
+{
+	zbx_preprocessing_request_t	*request;
+	zbx_preprocessing_dep_request_t	*dep_request;
+	int				i;
+
+	switch (base->kind)
+	{
+		case ZBX_PREPROC_ITEM:
+			request = (zbx_preprocessing_request_t *)base;
+			preprocessor_flush_value(&request->value);
+			manager->processed_num++;
+			manager->queued_num--;
+			break;
+		case ZBX_PREPROC_DEPS:
+			dep_request = (zbx_preprocessing_dep_request_t *)base;
+			preprocessor_flush_dep_results(manager, dep_request);
+			break;
+	}
+
+	for (i = 0; i < base->flush_queue.values_num; i++)
+		preprocessing_flush_request(manager, base->flush_queue.values[i]);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: add all sequential processed values from beginning of the queue   *
  *          to the local history cache                                        *
  *                                                                            *
@@ -721,8 +787,6 @@ static void	preprocessor_flush_dep_results(zbx_preprocessing_manager_t *manager,
  ******************************************************************************/
 static void	preprocessing_flush_queue(zbx_preprocessing_manager_t *manager)
 {
-	zbx_preprocessing_request_t		*request;
-	zbx_preprocessing_dep_request_t		*dep_request;
 	zbx_preprocessing_request_base_t	*base;
 	zbx_list_iterator_t			iterator;
 
@@ -734,19 +798,7 @@ static void	preprocessing_flush_queue(zbx_preprocessing_manager_t *manager)
 		if (REQUEST_STATE_DONE != base->state)
 			break;
 
-		switch (base->kind)
-		{
-			case ZBX_PREPROC_ITEM:
-				request = (zbx_preprocessing_request_t *)base;
-				preprocessor_flush_value(&request->value);
-				manager->processed_num++;
-				manager->queued_num--;
-				break;
-			case ZBX_PREPROC_DEPS:
-				dep_request = (zbx_preprocessing_dep_request_t *)base;
-				preprocessor_flush_dep_results(manager, dep_request);
-				break;
-		}
+		preprocessing_flush_request(manager, base);
 
 		if (SUCCEED == zbx_list_iterator_equal(&iterator, &manager->priority_tail))
 			zbx_list_iterator_clear(&manager->priority_tail);
@@ -888,8 +940,9 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 		state = REQUEST_STATE_QUEUED;
 
 	request = (zbx_preprocessing_request_t *)zbx_malloc(NULL, sizeof(zbx_preprocessing_request_t));
-	request->base.kind = ZBX_PREPROC_ITEM;
 	memset(request, 0, sizeof(zbx_preprocessing_request_t));
+	request->base.kind = ZBX_PREPROC_ITEM;
+	zbx_vector_preprocessing_request_base_create(&request->base.flush_queue);
 	memcpy(&request->value, value, sizeof(zbx_preproc_item_value_t));
 	request->base.state = state;
 
@@ -1000,6 +1053,7 @@ static void	preprocessor_enqueue_dependent(zbx_preprocessing_manager_t *manager,
 			dep_request->base.kind = ZBX_PREPROC_DEPS;
 			dep_request->base.state = REQUEST_STATE_QUEUED;
 			dep_request->base.pending = NULL;
+			zbx_vector_preprocessing_request_base_create(&dep_request->base.flush_queue);
 			dep_request->hostid = hostid;
 
 			dep_request->ts = NULL != ts ? *ts : (zbx_timespec_t){0, 0};

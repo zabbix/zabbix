@@ -14,16 +14,31 @@
 		<mkdir dir="runtime"/>
 	</target>
 
-	<target name="create-configs" depends="init-common">
-		<property name="url" value="${URL}"/>
-		<property name="screenshot_dir" value="${SCREENSHOT_DIR}"/>
-		<property name="screenshot_url" value="${SCREENSHOT_URL}"/>
+	<target name="create-frontend-configs">
 		<property name="dbtype" value="${DBTYPE}"/>
 		<property name="dbhost" value="${DBHOST}"/>
 		<property name="dbname" value="${DBNAME}"/>
 		<property name="dbuser" value="${DBUSER}"/>
 		<property name="dbpassword" value="${DBPASSWORD}"/>
 		<property name="phpunit_error_log" value="${PHPUNIT_ERROR_LOG}"/>
+		<property name="phpunit_port_prefix" value="${PHPUNIT_PORT_PREFIX}"/>
+
+		<!-- Create PHP config file -->
+		<copy overwrite="true" file="ui/tests/templates/zabbix.conf.php" tofile="ui/conf/zabbix.conf.php"/>
+		<replace file="ui/conf/zabbix.conf.php" token="{DBTYPE}" value="${dbtype}"/>
+		<replace file="ui/conf/zabbix.conf.php" token="{DBHOST}" value="${dbhost}"/>
+		<replace file="ui/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
+		<replace file="ui/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
+		<replace file="ui/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
+		<replace file="ui/conf/zabbix.conf.php" token="{PHPUNIT_ERROR_LOG}" value="${phpunit_error_log}"/>
+		<replace file="ui/conf/zabbix.conf.php" token="{SERVER_PORT}" value="${phpunit_port_prefix}51"/>	<!-- 51 - CIntegrationTest::SERVER_PORT_SUFFIX -->
+		<chmod file="ui/conf/zabbix.conf.php" perm="go+rw"/>
+	</target>
+
+	<target name="create-configs" depends="init-common,create-frontend-configs">
+		<property name="url" value="${URL}"/>
+		<property name="screenshot_dir" value="${SCREENSHOT_DIR}"/>
+		<property name="screenshot_url" value="${SCREENSHOT_URL}"/>
 		<property name="phpunit_port_prefix" value="${PHPUNIT_PORT_PREFIX}"/>
 		<property name="screenshot_references_dir" value="${SCREENSHOT_REFERENCES_DIR}"/>
 		<condition property="phpunit_driver_address" value="${PHPUNIT_DRIVER_ADDRESS}" else="localhost">
@@ -48,17 +63,6 @@
 		<replace file="ui/tests/bootstrap.php" token="{SCREENSHOT_REFERENCES_DIR}" value="${screenshot_references_dir}"/>
 		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_DRIVER_ADDRESS}" value="${phpunit_driver_address}"/>
 		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_DATA_SOURCES_DIR}" value="${basedir}/ui/tests/selenium/data/sources/"/>
-
-		<!-- Create PHP config file -->
-		<copy overwrite="true" file="ui/tests/templates/zabbix.conf.php" tofile="ui/conf/zabbix.conf.php"/>
-		<replace file="ui/conf/zabbix.conf.php" token="{DBTYPE}" value="${dbtype}"/>
-		<replace file="ui/conf/zabbix.conf.php" token="{DBHOST}" value="${dbhost}"/>
-		<replace file="ui/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
-		<replace file="ui/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
-		<replace file="ui/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
-		<replace file="ui/conf/zabbix.conf.php" token="{PHPUNIT_ERROR_LOG}" value="${phpunit_error_log}"/>
-		<replace file="ui/conf/zabbix.conf.php" token="{SERVER_PORT}" value="${phpunit_port_prefix}51"/>	<!-- 51 - CIntegrationTest::SERVER_PORT_SUFFIX -->
-		<chmod file="ui/conf/zabbix.conf.php" perm="go+rw"/>
 	</target>
 
 	<target name="create-saml-configs">
@@ -255,6 +259,8 @@
 		</exec>
 	</target>
 
+	<target name="init-dast-postgresql" depends="create-frontend-configs,make-dbschema,create-db-postgresql"/>
+
 	<target name="make-binaries-mysql">
 		<!-- Binaries for integration tests -->
 		<exec executable="./bootstrap.sh" failonerror="on"/>
@@ -282,27 +288,27 @@
 	<target name="create-db-mysql" depends="drop-db-mysql">
 		<!-- Create MySQL database -->
 		<exec executable="mysql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="--execute='create database ${dbname} character set utf8mb4 collate utf8mb4_bin'"/>
 		</exec>
 		<exec executable="mysql" input="database/mysql/schema.sql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="${dbname}"/>
 		</exec>
 		<exec executable="mysql" input="database/mysql/images.sql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="${dbname}"/>
 		</exec>
 		<exec executable="mysql" input="database/mysql/data.sql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="${dbname}"/>
 		</exec>
 	</target>
@@ -310,9 +316,9 @@
 	<target name="drop-db-mysql">
 		<!-- Drop MySQL database -->
 		<exec executable="mysql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="--execute='drop database if exists ${dbname}'"/>
 		</exec>
 	</target>
@@ -320,51 +326,53 @@
 	<target name="init-proxy-mysql" depends="">
 		<!-- Create MySQL database -->
 		<exec executable="mysql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="--execute='drop database if exists ${dbname}_proxy'"/>
 		</exec>
 		<exec executable="mysql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="--execute='create database ${dbname}_proxy character set utf8mb4 collate utf8mb4_bin'"/>
 		</exec>
 		<exec executable="mysql" input="database/mysql/schema.sql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="${dbname}_proxy"/>
 		</exec>
 	</target>
 
 	<target name="init-frontend-mysql" depends="create-configs,create-saml-configs,make-dbschema,make-gettext,create-db-mysql,init-frontend-modules">
 		<exec executable="mysql" input="ui/tests/selenium/data/data_test.sql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="${dbname}"/>
 		</exec>
 	</target>
 
 	<target name="init-api-mysql" depends="create-configs,make-dbschema,create-db-mysql">
 		<exec executable="mysql" input="ui/tests/api_json/data/data_test.sql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="${dbname}"/>
 		</exec>
 	</target>
 
 	<target name="init-integration-mysql" depends="create-configs,init-integration,make-binaries-mysql,create-db-mysql,init-proxy-mysql">
 		<exec executable="mysql" input="ui/tests/integration/data/data_test.sql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="${dbname}"/>
 		</exec>
 	</target>
+
+	<target name="init-dast-mysql" depends="create-frontend-configs,make-dbschema,create-db-mysql"/>
 
 	<target name="test-phpunit" depends="init-common">
 		<exec executable="phpunit" dir="ui/tests/unit" failonerror="off">
@@ -413,6 +421,8 @@
 	<target name="build-api-postgresql" depends="init-api-postgresql,test-api"/>
 	<target name="build-integration-mysql" depends="init-integration-mysql,test-integration"/>
 	<target name="build-integration-postgresql" depends="init-integration-postgresql,test-integration"/>
+	<target name="build-dast-mysql" depends="init-dast-mysql"/>
+	<target name="build-dast-postgresql" depends="init-dast-postgresql"/>
 
 	<!-- Default target -->
 	<target name="build" depends="build-phpunit,build-mysql,build-postgresql,build-integration-mysql,build-integration-postgresql"/>
