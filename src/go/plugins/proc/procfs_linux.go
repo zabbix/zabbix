@@ -78,6 +78,10 @@ func parseProcessStatus(pid string, proc *procStatus) (err error) {
 	}
 
 	var pos int
+	var nonvoluntary int64
+	nonvoluntary, proc.Vsize, proc.Rss, proc.Data, proc.Exe, proc.Hwm, proc.Lck, proc.Lib, proc.Peak, proc.Pin,
+			proc.Pte, proc.Stk, proc.Swap, proc.Threads, proc.CtxSwitches =
+			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 	s := strings.Split(string(data), "\n")
 	for _, tmp := range s {
 		if pos = strings.IndexRune(tmp, ':'); pos == -1 {
@@ -86,6 +90,7 @@ func parseProcessStatus(pid string, proc *procStatus) (err error) {
 
 		k := tmp[:pos]
 		v := strings.TrimSpace(tmp[pos+1:])
+
 
 		switch k {
 		case "Name":
@@ -122,57 +127,60 @@ func parseProcessStatus(pid string, proc *procStatus) (err error) {
 			setInt64(v, &proc.Threads)
 		case "Tgid":
 			setInt64(v, &proc.Tgid)
-		case "voluntary_ctxt_switches", "nonvoluntary_ctxt_switches":
+		case "voluntary_ctxt_switches":
 			if value, tmperr := strconv.ParseInt(v, 10, 64); tmperr == nil {
-				proc.CtxSwitches += value
+				proc.CtxSwitches = value
+			}
+		case "nonvoluntary_ctxt_switches":
+			if value, tmperr := strconv.ParseInt(v, 10, 64); tmperr == nil {
+				nonvoluntary = value
 			}
 		}
 	}
+
+	addNonNegative(&proc.CtxSwitches, nonvoluntary)
+
 	return nil
 }
 
-func parseStateString(val string, state *string) (err error) {
+func parseStateString(val string, state *string) () {
 	posLeft := strings.IndexRune(val, '(')
 	posRight := strings.IndexRune(val, ')')
 
 	if posLeft == -1 || posRight == -1 {
-		return fmt.Errorf("cannot parse process state string")
+		*state = val
+	} else {
+		*state = val[posLeft+1:posRight]
 	}
-
-	*state = val[posLeft+1:posRight]
-	return nil
 }
 
-func getProcessCalculatedMetrics(pid string, proc *procStatus) (err error) {
-	proc.Size = proc.Exe + proc.Data + proc.Stk
+func getProcessCalculatedMetrics(pid string, proc *procStatus) () {
+	addNonNegative(&proc.Size, proc.Exe)
+	addNonNegative(&proc.Size, proc.Data)
+	addNonNegative(&proc.Size, proc.Stk)
 
-	var mem uint64
-	mem, err = procfs.GetMemory("MemTotal")
-	if err != nil {
+	mem, err := procfs.GetMemory("MemTotal")
+	if err != nil || 0 > proc.Rss {
 		proc.Pmem = -1
-		return err
+		return
 	}
 
 	proc.Pmem = float64(proc.Rss) / float64(mem) * 100.00
-
-	return nil
 }
 
-func getProcessCpuTimes(pid string, proc *procStatus) (err error) {
+func getProcessCpuTimes(pid string, proc *procStatus) () {
 	var stat procStat
-	getProcessStat(pid, &stat)
+	getProcessStats(pid, &stat)
 	if stat.err != nil {
 		proc.CpuTimeUser = -1
 		proc.CpuTimeSystem = -1
 		proc.PageFaults = -1
-		return stat.err
+		return
 	}
 
 	proc.CpuTimeUser = float64(stat.utime) / float64(C.sysconf(C._SC_CLK_TCK))
 	proc.CpuTimeSystem = float64(stat.stime) / float64(C.sysconf(C._SC_CLK_TCK))
 	proc.PageFaults = stat.pageFaults
-
-	return nil
 }
 
 func getProcessNames(pid string, proc *procStatus) (err error) {
@@ -245,7 +253,7 @@ func getProcessCmdline(pid string, flags int) (arg0 string, cmdline string, err 
 	return arg0, string(data), nil
 }
 
-func getProcessStat(pid string, stat *procStat) {
+func getProcessStats(pid string, stat *procStat) {
 	var data []byte
 	if data, stat.err = read2k("/proc/" + pid + "/stat"); stat.err != nil {
 		return

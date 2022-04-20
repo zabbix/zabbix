@@ -447,6 +447,8 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 			proc.Wkset = float64(m.WorkingSetSize) / 1024
 			proc.PageFaults = int64(m.PageFaultCount)
 		} else {
+			proc.Vmsize = -1
+			proc.Wkset = -1
 			proc.PageFaults = -1
 		}
 
@@ -470,6 +472,9 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 		if err = syscall.GetProcessTimes(h, &creationTime, &exitTime, &kernelTime, &userTime); err == nil {
 			proc.CpuTimeUser = float64(uint64(userTime.HighDateTime)<<32 | uint64(userTime.LowDateTime)) / 1e7
 			proc.CpuTimeSystem = float64(uint64(kernelTime.HighDateTime)<<32 | uint64(kernelTime.LowDateTime)) / 1e7
+		} else {
+			proc.CpuTimeUser = -1
+			proc.CpuTimeSystem = -1
 		}
 
 		array = append(array, proc)
@@ -524,7 +529,6 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 					addNonNegativeFloat(&procSum.Wkset, procCmp.Wkset)
 					addNonNegativeFloat(&procSum.CpuTimeUser, procCmp.CpuTimeUser)
 					addNonNegativeFloat(&procSum.CpuTimeSystem, procCmp.CpuTimeSystem)
-					addNonNegative(&procSum.Threads, procCmp.Threads)
 					addNonNegative(&procSum.PageFaults, procCmp.PageFaults)
 					addNonNegative(&procSum.Handles, procCmp.Handles)
 					addNonNegative(&procSum.IoReadsB, procCmp.IoReadsB)

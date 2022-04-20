@@ -19,8 +19,6 @@
 
 package proc
 
-import "fmt"
-
 func addNonNegative(dst *int64, val int64) () {
 	if *dst == -1 {
 		return

@@ -313,7 +313,7 @@ func (p *Plugin) Collect() (err error) {
 
 	now := time.Now()
 	for pid, stat := range stats {
-		getProcessStat(fmt.Sprintf("%d", pid), stat)
+		getProcessStats(fmt.Sprintf("%d", pid), stat)
 		if stat.err != nil {
 			p.Debugf("cannot get process %d CPU utilization statistics: %s", pid, stat.err)
 		}
