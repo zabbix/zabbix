@@ -265,11 +265,6 @@ class DB {
 	public static function getFieldLength($table_name, $field_name) {
 		global $DB;
 
-		// TODO: remove this.
-		if ($table_name === 'usersdirectory') {
-			return 255;
-		}
-
 		$schema = self::getSchema($table_name);
 
 		if ($schema['fields'][$field_name]['type'] == self::FIELD_TYPE_TEXT) {

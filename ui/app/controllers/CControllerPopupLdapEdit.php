@@ -72,7 +72,7 @@ class CControllerPopupLdapEdit extends CController {
 			'row_index' => $this->getInput('row_index', 0),
 			'name' => $this->getInput('name', ''),
 			'host' => $this->getInput('host', ''),
-			'port' => $this->getInput('port', ''),
+			'port' => $this->getInput('port', '389'),
 			'base_dn' => $this->getInput('base_dn', ''),
 			'search_attribute' => $this->getInput('search_attribute', ''),
 			'start_tls' => $this->getInput('start_tls', ZBX_AUTH_START_TLS_OFF),

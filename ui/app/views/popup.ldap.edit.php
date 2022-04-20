@@ -37,7 +37,7 @@ $form = (new CForm('post', $form_action))
 		->addItem([
 			(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 			new CFormField(
-				(new CTextBox('name', $data['name'], false, DB::getFieldLength('usersdirectory', 'name')))
+				(new CTextBox('name', $data['name'], false, DB::getFieldLength('userdirectory', 'name')))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setAriaRequired()
 					->setAttribute('autofocus', 'autofocus')
@@ -46,7 +46,7 @@ $form = (new CForm('post', $form_action))
 		->addItem([
 			(new CLabel(_('Host'), 'host'))->setAsteriskMark(),
 			new CFormField(
-				(new CTextBox('host', $data['host'], false, DB::getFieldLength('usersdirectory', 'host')))
+				(new CTextBox('host', $data['host'], false, DB::getFieldLength('userdirectory', 'host')))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setAriaRequired()
 			)
@@ -54,15 +54,15 @@ $form = (new CForm('post', $form_action))
 		->addItem([
 			(new CLabel(_('Port'), 'port'))->setAsteriskMark(),
 			new CFormField(
-				(new CTextBox('port', $data['port'], false, DB::getFieldLength('usersdirectory', 'port')))
-					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				(new CNumericBox('port', $data['port'], 5))
+					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 					->setAriaRequired()
 			)
 		])
 		->addItem([
 			(new CLabel(_('Base DN'), 'base_dn'))->setAsteriskMark(),
 			new CFormField(
-				(new CTextBox('base_dn', $data['base_dn'], false, DB::getFieldLength('usersdirectory', 'base_dn')))
+				(new CTextBox('base_dn', $data['base_dn'], false, DB::getFieldLength('userdirectory', 'base_dn')))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setAriaRequired()
 			)
@@ -70,7 +70,7 @@ $form = (new CForm('post', $form_action))
 		->addItem([
 			(new CLabel(_('Search attribute'), 'search_attribute'))->setAsteriskMark(),
 			new CFormField(
-				(new CTextBox('search_attribute', $data['search_attribute'], false, DB::getFieldLength('usersdirectory', 'search_attribute')))
+				(new CTextBox('search_attribute', $data['search_attribute'], false, DB::getFieldLength('userdirectory', 'search_attribute')))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setAriaRequired()
 			)
@@ -78,7 +78,7 @@ $form = (new CForm('post', $form_action))
 		->addItem([
 			new CLabel(_('Bind DN'), 'bind_dn'),
 			new CFormField(
-				(new CTextBox('bind_dn', $data['bind_dn'], false, DB::getFieldLength('usersdirectory', 'bind_dn')))
+				(new CTextBox('bind_dn', $data['bind_dn'], false, DB::getFieldLength('userdirectory', 'bind_dn')))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
 		])
@@ -105,7 +105,7 @@ $form = (new CForm('post', $form_action))
 			new CFormField(
 				(new CTextArea('description', $data['description'], ['rows' => 3]))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setMaxlength(DB::getFieldLength('usersdirectory', 'description'))
+					->setMaxlength(DB::getFieldLength('userdirectory', 'description'))
 			)
 		])
 		->addItem([
@@ -124,7 +124,7 @@ $form = (new CForm('post', $form_action))
 		->addItem([
 			(new CLabel(_('Search filter'), 'search_filter'))->addClass('advanced-configuration'),
 			(new CFormField(
-				(new CTextBox('search_filter', $data['search_filter'], false, DB::getFieldLength('usersdirectory', 'search_filter')))
+				(new CTextBox('search_filter', $data['search_filter'], false, DB::getFieldLength('userdirectory', 'search_filter')))
 					->setAttribute('placeholder', '(%{attr}=%{user})')
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))->addClass('advanced-configuration')
