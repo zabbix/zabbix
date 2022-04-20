@@ -1,9 +1,10 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-03-09 07:55+0300\n"
+"PO-Revision-Date: 2022-03-26 23:13+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -11,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.5.1.3\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1646805318.000000\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
@@ -296,6 +297,10 @@ msgstr "(0 - שימוש בבררת המחדל של המשימה)"
 #: include/views/configuration.hostgroups.list.php:37
 msgid "(Only super admins can create groups)"
 msgstr "(רק מנהלי על יכולים ליצור קבוצות)"
+
+#: app/partials/configuration.host.edit.html.php:131
+msgid "(linked by host discovery)"
+msgstr ""
 
 #: app/partials/configuration.host.edit.html.php:275
 #: app/views/popup.itemtestedit.view.php:241
@@ -2108,6 +2113,11 @@ msgstr[1] "לא ניתן להעתיק הקפצות"
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
 msgstr "לא ניתן להעתיק את ההקפצה „%1$s:%2$s”, כיוון שמופיעים מספר מארחים בביטוי."
 
+#: app/controllers/CControllerSlaCreate.php:69
+#: app/controllers/CControllerSlaCreate.php:127
+msgid "Cannot create SLA"
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:1110
 #, c-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
@@ -2139,9 +2149,18 @@ msgstr "לא ניתן ליצור כלל גילוי"
 msgid "Cannot create icon map"
 msgstr "לא ניתן ליצור מפת סמלים"
 
+#: app/controllers/CControllerProxyConfigRefresh.php:79
+msgid "Cannot create request"
+msgstr ""
+
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
 msgstr "לא ניתן ליצור דוח מתוזמן"
+
+#: app/controllers/CControllerServiceCreate.php:96
+#: app/controllers/CControllerServiceCreate.php:184
+msgid "Cannot create service"
+msgstr ""
 
 #: include/classes/api/services/CService.php:2373
 #: include/classes/api/services/CService.php:2397
@@ -2242,15 +2261,15 @@ msgstr "לא ניתן למחוק מארח"
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete hosts %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לא ניתן למחוק את המארח %1$s מכיוון שהתחזוקה \"%2$s\" חייבת להכיל לפחות מארח או קבוצת מארחים אחת."
+msgstr[1] "לא ניתן למחוק את המארחים %1$s מכיוון שהתחזוקה „%2$s” חייבת להכיל לפחות מארח או קבוצת מארחים אחת."
 
 #: include/classes/api/services/CHostGroup.php:849
 #, c-format
 msgid "Cannot delete host group %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete host groups %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לא ניתן למחוק את קבוצת המארחים %1$s מכיוון שהתחזוקה „%2$s” חייבת להכיל לפחות מארח או קבוצת מארחים אחת."
+msgstr[1] "לא ניתן למחוק את קבוצות המארחים %1$s מכיוון שהתחזוקה „%2$s” חייבת להכיל לפחות מארח או קבוצת מארחים אחת."
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -2309,6 +2328,10 @@ msgstr[1] "לא ניתן למחוק מודולים: %1$s."
 #: sysmaps.php:261
 msgid "Cannot delete network map"
 msgstr "לא ניתן למחוק מפת רשת"
+
+#: app/controllers/CControllerProxyDelete.php:39
+msgid "Cannot delete proxies"
+msgstr ""
 
 #: app/controllers/CControllerProxyDelete.php:69
 msgid "Cannot delete proxy"
@@ -2769,85 +2792,85 @@ msgstr "לא ניתן לקשר תבנית"
 #: include/classes/api/services/CHostBase.php:520
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” למארח „%2$s” מכיוון שתבנית האב שלה „%3$s” תקושר פעמיים."
 
 #: include/classes/api/services/CHostBase.php:678
 #: include/classes/api/services/CHostBase.php:755
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” למארח „%2$s” עקב תלות בהקפצה „%3$s”."
 
 #: include/classes/api/services/CHostBase.php:805
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” למארח „%2$s” עקב הביטוי של ההקפצה „%3$s”."
 
 #: include/classes/api/services/CHostBase.php:517
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” לאבטיפוס המארח „%2$s” מכיוון שתבנית האב שלה „%3$s” תקושר פעמיים."
 
 #: include/classes/api/services/CHostBase.php:675
 #: include/classes/api/services/CHostBase.php:752
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” לאבטיפוס המארח „%2$s” עקב תלות בהקפצה „%3$s”."
 
 #: include/classes/api/services/CHostBase.php:802
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” לאבטיפוס המארח „%2$s” עקב הביטוי של ההקפצה „%3$s”."
 
 #: include/classes/api/services/CHostBase.php:381
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" because circular linkage (%3$s) will occurs."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” לתבנית „%2$s” מכיוון שזה יוביל לקישור מעגלי (%3$s)."
 
 #: include/classes/api/services/CHostBase.php:514
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” לתבנית „%2$s” מכיוון שתבנית האב שלה „%3$s” תקושר פעמיים."
 
 #: include/classes/api/services/CHostBase.php:672
 #: include/classes/api/services/CHostBase.php:749
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” לתבנית „%2$s” עקב תלות בהקפצה „%3$s”."
 
 #: include/classes/api/services/CHostBase.php:799
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" due to expression of trigger \"%3$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” לתבנית „%2$s” עקב הביטוי של ההקפצה „%3$s”."
 
 #: include/classes/api/services/CHostBase.php:705
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to host \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” ללא התבנית „%2$s” למארח „%3$s” עקב תלות בהקפצה „%4$s”."
 
 #: include/classes/api/services/CHostBase.php:832
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to host \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” ללא התבנית „%2$s” למארח „%3$s” עקב הביטוי של ההקפצה „%4$s”."
 
 #: include/classes/api/services/CHostBase.php:702
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to host prototype \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” ללא התבנית „%2$s” לאבטיפוס המארח „%3$s” עקב תלות בהקפצה „%4$s”."
 
 #: include/classes/api/services/CHostBase.php:829
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to host prototype \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” ללא התבנית „%2$s” לאבטיפוס המארח „%3$s” עקב הביטוי של ההקפצה „%4$s”."
 
 #: include/classes/api/services/CHostBase.php:699
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to template \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” ללא התבנית „%2$s” לתבנית „%3$s” עקב תלות בהקפצה „%4$s”."
 
 #: include/classes/api/services/CHostBase.php:826
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to template \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” ללא התבנית „%2$s” לתבנית „%3$s” עקב הביטוי של ההקפצה „%4$s”."
 
 #: app/controllers/CControllerModuleEdit.php:106
 #: include/classes/core/ZBase.php:674
@@ -3001,17 +3024,17 @@ msgstr "לא ניתן לנתק ולפנות תבנית"
 #: include/classes/api/services/CHostBase.php:256
 #, c-format
 msgid "Cannot unlink template \"%1$s\" without template \"%2$s\" from host \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "אי אפשר לנתק את התבנית „%1$s” ללא התבנית „%2$s” מהמארח „%3$s” עקב תלות בהקפצה „%4$s”."
 
 #: include/classes/api/services/CHostBase.php:300
 #, c-format
 msgid "Cannot unlink template \"%1$s\" without template \"%2$s\" from host \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "אי אפשר לנתק את התבנית „%1$s” ללא התבנית „%2$s” מהמארח „%3$s” עקב ביטוי של ההקפצה „%4$s”."
 
 #: include/classes/api/services/CHostBase.php:255
 #, c-format
 msgid "Cannot unlink template \"%1$s\" without template \"%2$s\" from template \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "אי אפשר לנתק את התבנית „%1$s” ללא התבנית „%2$s” מהתבנית „%3$s” עקב תלות בהקפצה „%4$s”."
 
 #: include/classes/api/services/CHostBase.php:299
 #, c-format
@@ -3075,6 +3098,11 @@ msgstr "לא ניתן לעדכן את „%2$s” עבור הקפצה שהתגל�
 msgid "Cannot update API token"
 msgstr "לא ניתן לעדכן אסימון API"
 
+#: app/controllers/CControllerSlaUpdate.php:70
+#: app/controllers/CControllerSlaUpdate.php:138
+msgid "Cannot update SLA"
+msgstr ""
+
 #: include/classes/api/services/CGraphGeneral.php:67
 msgid "Cannot update a discovered graph."
 msgstr "לא ניתן לעדכן את התרשים שהתגלה."
@@ -3124,7 +3152,7 @@ msgstr "לא ניתן לעדכן יחס"
 #: include/classes/api/services/CTrigger.php:836
 #, c-format
 msgid "Cannot update dependencies of inherited trigger \"%1$s\"."
-msgstr ""
+msgstr "לא ניתן לעדכן את התלויות של ההקפצה „%1$s” שהתקבלה בירושה."
 
 #: app/controllers/CControllerDiscoveryUpdate.php:48
 #: app/controllers/CControllerDiscoveryUpdate.php:102 host_discovery.php:734
@@ -3264,6 +3292,11 @@ msgstr "לא ניתן לעדכן את הסקריפט"
 #, c-format
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
 msgstr "לא ניתן לעדכן את היקף הסקריפט. הסקריפט „%1$s” משמש את הפעולה „%2$s”."
+
+#: app/controllers/CControllerServiceUpdate.php:97
+#: app/controllers/CControllerServiceUpdate.php:200
+msgid "Cannot update service"
+msgstr ""
 
 #: include/classes/api/services/CService.php:2310
 #: include/classes/api/services/CService.php:2372
@@ -3707,7 +3740,7 @@ msgstr "תוצאה משולבת"
 
 #: include/classes/widgets/views/widget.geomap.form.view.php:68
 msgid "Comma separated center coordinates and zoom level to display when the widget is initially loaded."
-msgstr ""
+msgstr "רשימה מופרדת בפסיקים של נקודות ציון ורמות תקריב להצגה עם טעינת הווידג׳ט לראשונה."
 
 #: app/views/administration.script.edit.php:175 include/actions.inc.php:1943
 #: include/views/administration.auditacts.list.php:105
@@ -3942,6 +3975,10 @@ msgstr "הגדרת משתמשים"
 #: httpconf.php:27
 msgid "Configuration of web monitoring"
 msgstr "הגדרת ניטור רשת"
+
+#: app/controllers/CControllerAuditLogList.php:199
+msgid "Configuration refresh"
+msgstr ""
 
 #: app/controllers/CControllerAuditSettingsUpdate.php:78
 #: app/controllers/CControllerAutoregUpdate.php:69
@@ -4585,6 +4622,11 @@ msgstr "שמות דרגות חומרה מותאמים אישית משפיעים 
 msgid "Custom size"
 msgstr "גודל מותאם אישית"
 
+#: app/views/administration.miscconfig.edit.php:104
+#: include/classes/setup/CSetupWizard.php:563
+msgid "CyberArk Vault"
+msgstr "כספת של CyberArk"
+
 #: app/partials/scheduledreport.formgrid.html.php:95
 msgid "Cycle"
 msgstr "מחזור"
@@ -4596,7 +4638,7 @@ msgstr "צ׳כית (cs_CZ)"
 #: jsLoader.php:400
 msgctxt "Default color option"
 msgid "D"
-msgstr ""
+msgstr "ב"
 
 #: jsLoader.php:183
 msgctxt "abbreviation of severity level"
@@ -5241,6 +5283,10 @@ msgstr "למחוק את סוגי המדיה הנבחרים?"
 msgid "Delete selected proxies?"
 msgstr "למחוק את המתווכים הנבחרים?"
 
+#: app/views/js/proxy.list.js.php:152 app/views/popup.proxy.edit.php:249
+msgid "Delete selected proxy?"
+msgstr ""
+
 #: app/views/administration.regex.list.php:82
 msgid "Delete selected regular expressions?"
 msgstr "למחוק את הביטויים הרגולריים שנבחרו?"
@@ -5505,6 +5551,10 @@ msgstr "להשבית את המארחים בקבוצות המארחים הנבח�
 #: app/views/administration.proxy.list.php:188
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "להשבית את המארחים שמנוטרים על ידי המתווכים הנבחרים?"
+
+#: app/views/js/proxy.list.js.php:137
+msgid "Disable hosts monitored by selected proxy?"
+msgstr ""
 
 #: app/views/administration.token.list.php:199
 #: app/views/administration.user.token.list.php:151
@@ -6237,6 +6287,10 @@ msgstr "הפעלת מארחים"
 msgid "Enable hosts monitored by selected proxies?"
 msgstr "להפעיל מארחים שמנוטרים על ידי המתווכים הנבחרים?"
 
+#: app/views/js/proxy.list.js.php:122
+msgid "Enable hosts monitored by selected proxy?"
+msgstr ""
+
 #: app/views/administration.audit.settings.edit.php:48
 #: app/views/administration.housekeeping.edit.php:44
 #: app/views/administration.housekeeping.edit.php:98
@@ -6573,13 +6627,13 @@ msgstr "הדרת קבוצות מארחים"
 
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:94
 msgid "Excluded downtime"
-msgstr ""
+msgstr "זמן השבתה מוחרג"
 
 #: app/views/monitoring.widget.slareport.view.php:102
 #: app/views/popup.sla.edit.php:201 app/views/popup.sla.edit.php:212
 #: app/views/slareport.list.php:168
 msgid "Excluded downtimes"
-msgstr ""
+msgstr "זמני השבתה מוחרגים"
 
 #: app/controllers/CControllerAuditLogList.php:197 jsLoader.php:219
 msgid "Execute"
@@ -6823,6 +6877,11 @@ msgstr "עדכון מאפייני עמוד לוח המחוונים נכשל."
 #: jsLoader.php:140
 msgid "Failed to update dashboard properties."
 msgstr "עדכון מאפייני לוח המחוונים נכשל."
+
+#: app/controllers/CControllerDashboardShareUpdate.php:110
+#: app/views/js/popup.dashboard.share.edit.js.php:83
+msgid "Failed to update dashboard sharing."
+msgstr ""
 
 #: jsLoader.php:141
 msgid "Failed to update widget properties."
@@ -8063,12 +8122,12 @@ msgstr[1] "עודכנו אבות טיפוס של מארח"
 #: include/classes/api/services/CHostPrototype.php:999
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\" of host \"%3$s\"."
-msgstr ""
+msgstr "אבטיפוס מארח עם שם המארח „%1$s” כבר קיים בכלל הגילוי „%2$s” של המארח „%3$s”."
 
 #: include/classes/api/services/CHostPrototype.php:996
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\" of template \"%3$s\"."
-msgstr ""
+msgstr "אבטיפוס מארח עם שם המארח „%1$s” כבר קיים בכלל הגילוי „%2$s” של התבנית „%3$s”."
 
 #: include/classes/api/services/CHostPrototype.php:978
 #, c-format
@@ -8124,7 +8183,7 @@ msgstr "מארח עם המזהה „%1$s” אינו זמין."
 #: include/classes/api/services/CHostGeneral.php:127
 #, c-format
 msgid "Host with host name \"%1$s\" already exists."
-msgstr ""
+msgstr "מארח עם שם המארח „%1$s” כבר קיים."
 
 #: include/classes/api/services/CHost.php:2046
 #: include/classes/api/services/CHost.php:2328
@@ -8141,7 +8200,7 @@ msgstr "מארח עם אותו שם התצוגה „%1$s” כבר קיים."
 #: include/classes/api/services/CHostGeneral.php:147
 #, c-format
 msgid "Host with visible name \"%1$s\" already exists."
-msgstr ""
+msgstr "מארח עם השם הגלוי „%1$s” כבר קיים."
 
 #: app/controllers/CControllerHostView.php:125
 #: app/controllers/CControllerPopupGeneric.php:109
@@ -12151,6 +12210,10 @@ msgstr "מארח חדש"
 msgid "New operation"
 msgstr "פעילות חדשה"
 
+#: app/views/popup.proxy.edit.php:229 app/views/popup.proxy.edit.php:258
+msgid "New proxy"
+msgstr ""
+
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
 msgstr "ביטוי רגולרי חדש"
@@ -14280,6 +14343,12 @@ msgstr "Prometheus ל־JSON"
 msgid "Properties"
 msgstr "תכונות"
 
+#: include/classes/vaults/CVaultCyberArk.php:64
+#: include/classes/vaults/CVaultHashiCorp.php:55
+#, c-format
+msgid "Provided API endpoint \"%1$s\" is invalid."
+msgstr "נקודת הקצה של ה־API שסופקה „%1$s” שגויה."
+
 #: app/controllers/CControllerMenuPopup.php:405
 #: app/controllers/CControllerMenuPopup.php:693
 #: app/controllers/CControllerWidgetUrlView.php:64
@@ -14288,6 +14357,21 @@ msgstr "תכונות"
 #, c-format
 msgid "Provided URL \"%1$s\" is invalid."
 msgstr "הכתובת שסופקה „%1$s” שגויה."
+
+#: include/classes/vaults/CVaultHashiCorp.php:64
+#, c-format
+msgid "Provided authentication token \"%1$s\" is empty."
+msgstr "אסימון ההצפנה שסופק „%1$s” ריק."
+
+#: include/classes/vaults/CVaultHashiCorp.php:60
+#, c-format
+msgid "Provided secret path \"%1$s\" is invalid."
+msgstr "נתיב הסוד שסופק „%1$s” שגוי."
+
+#: include/classes/vaults/CVaultCyberArk.php:70
+#, c-format
+msgid "Provided secret query string \"%1$s\" is invalid."
+msgstr "מחרוזת שאילתת הסוד שסופקה „%1$s” שגויה."
 
 #: app/controllers/CControllerPopupGeneric.php:157
 #: app/views/administration.proxy.edit.php:29
@@ -14582,6 +14666,18 @@ msgstr "מרובע"
 #: app/views/administration.user.edit.php:276
 msgid "Refresh"
 msgstr "רענון"
+
+#: app/views/popup.proxy.edit.php:216 app/views/proxy.list.php:178
+msgid "Refresh configuration"
+msgstr ""
+
+#: app/views/js/proxy.list.js.php:106
+msgid "Refresh configuration of the selected proxies?"
+msgstr ""
+
+#: app/views/js/proxy.list.js.php:107 app/views/popup.proxy.edit.php:217
+msgid "Refresh configuration of the selected proxy?"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetForm.php:58 jsLoader.php:169
 msgid "Refresh interval"
@@ -14926,6 +15022,10 @@ msgstr "גוף בקשה"
 #: include/views/configuration.item.prototype.edit.php:340
 msgid "Request body type"
 msgstr "סוג גוף הבקשה"
+
+#: app/controllers/CControllerProxyConfigRefresh.php:71
+msgid "Request created successfully"
+msgstr ""
 
 #: host_discovery.php:428 host_discovery.php:800 items.php:895 items.php:1011
 msgid "Request sent successfully"
@@ -15284,7 +15384,7 @@ msgstr "SLA"
 #: include/classes/api/services/CSla.php:555
 #, c-format
 msgid "SLA \"%1$s\" SLO must have no more than 4 fractional digits."
-msgstr ""
+msgstr "ל־SLO של ה־SLA‏ „%1$s” לא יכולות להיות למעלה מ־4 ספרות אחרי הנקודה."
 
 #: include/classes/api/services/CSla.php:539
 #, c-format
@@ -16602,7 +16702,7 @@ msgstr "זמן ההתחלה חייב להיות פחות מזמן הסיום ע�
 #: include/classes/api/services/CSla.php:605
 #, c-format
 msgid "Start time must be less than end time for excluded downtime \"%2$s\" of SLA \"%1$s\"."
-msgstr ""
+msgstr "זמן ההתחלה חייב להקדים את זמן הסיום לזמן ההשבתה „%2$s” ב־SLA‏ „%1$s”."
 
 #: include/classes/validators/CLdapAuthValidator.php:81
 msgid "Starting TLS failed."
@@ -16794,6 +16894,10 @@ msgstr "לעצור מצגת"
 msgid "Stopped"
 msgstr "נעצר"
 
+#: app/views/administration.miscconfig.edit.php:100
+msgid "Storage of secrets"
+msgstr "אחסון סודות"
+
 #: app/views/popup.lldoperation.php:191 app/views/popup.lldoperation.php:212
 #: app/views/popup.massupdate.item.php:294
 #: app/views/popup.massupdate.item.php:310
@@ -16812,6 +16916,11 @@ msgstr "אחסון פרטי הגישה תחת"
 #: include/classes/setup/CSetupWizard.php:657
 msgid "Stored in HashiCorp Vault secret"
 msgstr "מאוחסן בסוד בכספת (Vault) מבית HashiCorp"
+
+#: include/classes/setup/CSetupWizard.php:757
+#: include/classes/setup/CSetupWizard.php:758
+msgid "Stored in Vault secret"
+msgstr "מאוחסן כסוד בכספת"
 
 #: include/hosts.inc.php:35
 msgid "Straight"
@@ -17275,6 +17384,10 @@ msgstr "תבניות"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "התבניות „%1$s” נותקו מהמארחים „%2$s”."
 
+#: app/partials/configuration.host.edit.html.php:187
+msgid "Templates linked by host discovery cannot be unlinked."
+msgstr ""
+
 #: app/controllers/CControllerPopupMassupdateTemplate.php:358
 msgid "Templates updated"
 msgstr "תבניות עודכנו"
@@ -17515,6 +17628,10 @@ msgstr "החודש"
 #: include/func.inc.php:2477
 msgid "This month so far"
 msgstr "החודש הזה עד כה"
+
+#: app/views/popup.tophosts.column.edit.php:172
+msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
+msgstr ""
 
 #: include/views/configuration.item.edit.php:125
 #: include/views/configuration.item.prototype.edit.php:111
@@ -18613,6 +18730,10 @@ msgstr "להשתמש בצבעי אירועים מותאמים אישית"
 msgid "Use default"
 msgstr "להשתמש בברירת מחדל"
 
+#: app/partials/configuration.host.edit.html.php:188
+msgid "Use host prototype configuration form to remove automatically linked templates on upcoming discovery."
+msgstr ""
+
 #: app/views/administration.user.edit.php:300 app/views/popup.media.php:88
 msgid "Use if severity"
 msgstr "להשתמש אם דרגת החומרה"
@@ -18931,6 +19052,10 @@ msgstr "שם משתמש"
 #: app/views/administration.mediatype.edit.php:93
 msgid "Username and password"
 msgstr "שם משתמש וססמה"
+
+#: include/classes/vaults/CVaultCyberArk.php:112
+msgid "Username and password must be stored in Vault secret keys \"UserName\" and \"Content\"."
+msgstr "את שם המשתמש והסיסמה יש לאחסן במפתחות הסוד „UserName” (שם משתמש) ו־„Content“ (תוכן) בכספת."
 
 #: include/classes/setup/CSetupWizard.php:206
 #: include/classes/setup/CSetupWizard.php:802
@@ -19395,10 +19520,19 @@ msgstr "נקודת הגישה ל־API של הכספת"
 msgid "Vault authentication token"
 msgstr "אסימון אימות כספת"
 
+#: include/classes/setup/CSetupWizard.php:618
+#: include/classes/setup/CSetupWizard.php:817
+msgid "Vault certificates"
+msgstr "אישורי כספת"
+
 #: include/classes/core/ZBase.php:231
 #: include/classes/setup/CSetupWizard.php:203 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr "החיבור לכספת נכשל."
+
+#: app/views/administration.miscconfig.edit.php:101
+msgid "Vault provider"
+msgstr "ספק כספת"
 
 #: include/classes/html/CMacroValue.php:158
 msgid "Vault secret"
@@ -19408,6 +19542,11 @@ msgstr "סוד לכספת"
 #: include/classes/setup/CSetupWizard.php:700
 msgid "Vault secret path"
 msgstr "נתיב סודי לכספת"
+
+#: include/classes/setup/CSetupWizard.php:609
+#: include/classes/setup/CSetupWizard.php:813
+msgid "Vault secret query string"
+msgstr "מחרוזת שאילתת סוג כספת"
 
 #: include/hosts.inc.php:249
 msgid "Vendor"
@@ -19646,6 +19785,13 @@ msgstr "השימוש בווידג׳ט הופסק."
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "הווידג׳ט קטן לעומת גודל העמודות והשורות שצוין."
 
+#: app/controllers/CControllerDashboardWidgetCheck.php:46
+#: app/controllers/CControllerDashboardWidgetConfigure.php:46
+#: app/controllers/CControllerDashboardWidgetEdit.php:47
+#: app/controllers/CControllerDashboardWidgetsSanitize.php:66
+msgid "Widget type is not supported in this context."
+msgstr ""
+
 #: graphs.php:44 include/classes/widgets/CWidgetHelper.php:923
 #: include/classes/widgets/CWidgetHelper.php:956
 #: include/classes/widgets/CWidgetHelper.php:957
@@ -19695,6 +19841,10 @@ msgstr "עם שם התקלה"
 #: app/views/monitoring.widget.problemhosts.view.php:33
 msgid "With problems"
 msgstr "עם תקלות"
+
+#: app/views/popup.tophosts.column.edit.php:119
+msgid "With this setting only numeric items will be displayed in this column."
+msgstr ""
 
 #: include/forms.inc.php:346 include/forms.inc.php:566
 msgid "With triggers"
@@ -20404,7 +20554,7 @@ msgstr "baselinedev()‎ - מחזירה את מספר הסטיות בין תקו
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1060
 msgid "baselinewma() - Calculates baseline by averaging data periods in seasons"
-msgstr ""
+msgstr "baselinewma()‎ - מחשבת את קו הבסיס על ידי מיצוע פרקי הזמן בעונות"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
@@ -20575,7 +20725,7 @@ msgstr "לא יכול להיות קטן או שווה לערך המשתנה „%
 #: include/classes/api/services/CTemplate.php:1019
 #, c-format
 msgid "cannot be specified the value of parameter \"%1$s\""
-msgstr ""
+msgstr "אי אפשר לציין את ערך המשתנה „%1$s”"
 
 #: include/classes/api/services/CHostBase.php:111
 msgid "cannot be unlinked"
@@ -20587,11 +20737,11 @@ msgstr "לא ניתן להמיר ל־JSON, ערך התוצאה ארוך מדי"
 
 #: include/classes/api/services/CHostPrototype.php:2167
 msgid "cannot delete templated host prototype"
-msgstr ""
+msgstr "לא ניתן למחוק אבטיפוס מארח מתבנית"
 
 #: include/classes/api/services/CHostPrototype.php:1197
 msgid "cannot have more than one default interface of the same type"
-msgstr ""
+msgstr "לא יכול להיות יותר ממנשק בררת מחדל יחיד מאותו הסוג"
 
 #: include/classes/helpers/CElasticsearchHelper.php:87
 msgid "cannot perform Scroll API request, data could be truncated"
@@ -20604,12 +20754,12 @@ msgstr "לא ניתן לעדכן מאפיין של כלל גילוי מתבני�
 #: include/classes/validators/CApiInputValidator.php:3031
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of discovered object"
-msgstr ""
+msgstr "אי אפשר לעדכן את המשתנה readonly (לקריאה בלבד) „%1$s” של הפריט שהתגלה"
 
 #: include/classes/validators/CApiInputValidator.php:3025
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of inherited object"
-msgstr ""
+msgstr "אי אפשר לעדכן את המשתנה readonly (לקריאה בלבד) „%1$s” של הפריט שהתקבל בירושה"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
@@ -20651,7 +20801,7 @@ msgstr "צבע"
 
 #: app/controllers/CControllerSlaCreateUpdate.php:35
 msgid "comma separated list of time periods is expected for scheduled week days"
-msgstr ""
+msgstr "אמורה להיות רשימה של פרקי זמן, מופרדים בפסיקים, לימי השבוע המתוזמנים"
 
 #: app/partials/monitoring.latest.filter.php:176
 #: app/partials/monitoring.problem.filter.php:236
@@ -21239,6 +21389,15 @@ msgstr "מאקרו/ים"
 #: app/controllers/CControllerPopupTriggerExpr.php:770
 msgid "mad() - Median absolute deviation"
 msgstr "mad()‎ - ממוצע ערך מוחלט של סטיות"
+
+#: include/classes/parsers/CVaultSecretParser.php:180
+msgid "mandatory key is missing"
+msgstr "מפתח חובה חסר"
+
+#: include/classes/parsers/CVaultSecretParser.php:177
+#, c-format
+msgid "mandatory parameter \"%1$s\" is missing"
+msgstr "משתנה החובה „%1$s” חסר"
 
 #: include/classes/validators/CHistFunctionValidator.php:93
 #, c-format

@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-#include "../zbxalgo/vectorimpl.h"
 
 #include "db.h"
 

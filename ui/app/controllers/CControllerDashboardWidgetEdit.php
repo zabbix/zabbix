@@ -44,13 +44,21 @@ class CControllerDashboardWidgetEdit extends CController {
 
 			if ($this->hasInput('type')) {
 				if (!CWidgetConfig::isWidgetTypeSupportedInContext($this->getInput('type'), $this->context)) {
+					error(_('Widget type is not supported in this context.'));
+
 					$ret = false;
 				}
 			}
 		}
 
 		if (!$ret) {
-			$this->setResponse((new CControllerResponseData([]))->disableView());
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
 		}
 
 		return $ret;
@@ -305,16 +313,19 @@ class CControllerDashboardWidgetEdit extends CController {
 		if ($ids['prototype_graph']) {
 			$db_graph_prototypes = API::GraphPrototype()->get([
 				'output' => ['graphid', 'name'],
-				'selectHosts' => ['name'],
+				'selectHosts' => ['hostid', 'name'],
+				'selectDiscoveryRule' => ['hostid'],
 				'graphids' => array_keys($ids['prototype_graph']),
 				'preservekeys' => true
 			]);
 
 			foreach ($db_graph_prototypes as $graphid => $graph) {
+				$host_names = array_column($graph['hosts'], 'name', 'hostid');
+
 				foreach ($ids['prototype_graph'][$graphid] as $field_name) {
 					$captions['ms']['graph_prototypes'][$field_name][$graphid] += [
 						'name' => $graph['name'],
-						'prefix' => $graph['hosts'][0]['name'].NAME_DELIMITER
+						'prefix' => $host_names[$graph['discoveryRule']['hostid']].NAME_DELIMITER
 					];
 				}
 			}

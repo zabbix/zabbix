@@ -37,6 +37,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\libs\zbxcrypto}.c{..\..\..\src\libs\zbxcrypto}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
+{..\..\..\src\libs\zbxhash}.c{..\..\..\src\libs\zbxhash}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
 {..\..\..\src\libs\zbxjson}.c{..\..\..\src\libs\zbxjson}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
@@ -49,7 +52,13 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\libs\zbxregexp}.c{..\..\..\src\libs\zbxregexp}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
-{..\..\..\src\libs\zbxsys}.c{..\..\..\src\libs\zbxsys}.o:
+{..\..\..\src\libs\zbxthreads}.c{..\..\..\src\libs\zbxthreads}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
+{..\..\..\src\libs\zbxmutexs}.c{..\..\..\src\libs\zbxmutexs}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
+{..\..\..\src\libs\zbxsymbols}.c{..\..\..\src\libs\zbxsymbols}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
 {..\..\..\src\libs\zbxexec}.c{..\..\..\src\libs\zbxexec}.o:

@@ -20,7 +20,7 @@
 #ifndef ZABBIX_SNMPTRAPPER_H
 #define ZABBIX_SNMPTRAPPER_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 extern char		*CONFIG_SNMPTRAP_FILE;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

@@ -25,16 +25,17 @@
 ?>
 
 <script>
-	const view = {
+	const view = new class {
+
 		init() {
 			jQuery('#filter_serviceid')
 				.multiSelect('getSelectButton')
 				.addEventListener('click', () => {
-					this.selectService();
+					this._selectService();
 				});
-		},
+		}
 
-		selectService() {
+		_selectService() {
 			const overlay = PopUp('popup.services', {
 				title: <?= json_encode(_('Service')) ?>,
 				multiple: 0

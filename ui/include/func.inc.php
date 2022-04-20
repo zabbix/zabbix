@@ -1690,9 +1690,7 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 		}
 
 		foreach ($messages as $message) {
-			foreach (explode("\n", $message['message']) as $message_part) {
-				$list->addItem($message_part);
-			}
+			$list->addItem($message['message']);
 		}
 
 		$msg_details = (new CDiv())

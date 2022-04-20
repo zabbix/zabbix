@@ -11,6 +11,7 @@ endif
 endif
 
 libzbxalgo_a_SOURCES = \
+	algodefs.h \
 	algodefs.c \
 	binaryheap.c \
 	$(EVALUATE_C) \
@@ -21,5 +22,4 @@ libzbxalgo_a_SOURCES = \
 	prediction.c \
 	queue.c \
 	vector.c \
-	vectorimpl.h \
 	serialize.c

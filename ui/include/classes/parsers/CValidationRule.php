@@ -76,6 +76,7 @@ class CValidationRule {
 									&& !$this->parseArrayDB($buffer, $pos, $rule)
 									&& !$this->parseArray($buffer, $pos, $rule)
 									&& !$this->parseFlags($buffer, $pos, $rule)
+									&& !$this->parseBool($buffer, $pos, $rule)
 									&& !$this->parseCuid($buffer, $pos, $rule)) {
 								// incorrect validation rule
 								break 3;
@@ -679,6 +680,22 @@ class CValidationRule {
 
 		$value = substr($buffer, $pos, $i - $pos);
 		$pos = $i;
+
+		return true;
+	}
+
+	/**
+	 * bool
+	 *
+	 * 'bool' => true
+	 */
+	private function parseBool($buffer, &$pos, &$rules) {
+		if (strncmp(substr($buffer, $pos), 'bool', 4) != 0) {
+			return false;
+		}
+
+		$pos += 4;
+		$rules['bool'] = true;
 
 		return true;
 	}

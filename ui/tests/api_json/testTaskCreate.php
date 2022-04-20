@@ -782,14 +782,14 @@ class testTaskCreate extends CAPITest {
 			],
 			'Test invalid type (value)' => [
 				'task' => [
-					'type' => '2',
+					'type' => '3',
 					'request' => [
 						'itemid' => $itemid
 					]
 				],
 				'expected_results' => [],
 				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.(implode(', ', [
-					ZBX_TM_DATA_TYPE_DIAGINFO, ZBX_TM_DATA_TYPE_CHECK_NOW
+					ZBX_TM_DATA_TYPE_DIAGINFO, ZBX_TM_DATA_TYPE_PROXY_HOSTIDS, ZBX_TM_DATA_TYPE_CHECK_NOW
 				])).'.'
 			],
 

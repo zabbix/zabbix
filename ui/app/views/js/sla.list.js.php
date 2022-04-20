@@ -29,21 +29,14 @@
 </script>
 
 <script>
-	const view = {
-		enable_url: null,
-		disable_url: null,
-		delete_url: null,
+	const view = new class {
 
-		init({enable_url, disable_url, delete_url}) {
-			this.enable_url = enable_url;
-			this.disable_url = disable_url;
-			this.delete_url = delete_url;
+		init() {
+			this._initTagFilter();
+			this._initActions();
+		}
 
-			this.initTagFilter();
-			this.initActionButtons();
-		},
-
-		initTagFilter() {
+		_initTagFilter() {
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
 				.on('afteradd.dynamicRows', function () {
@@ -55,52 +48,66 @@
 			document.querySelectorAll('#filter-tags .form_row').forEach((row) => {
 				new CTagFilterItem(row);
 			});
-		},
+		}
 
-		initActionButtons() {
+		_initActions() {
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-create-sla')) {
-					this.edit();
+					this._edit();
 				}
 				else if (e.target.classList.contains('js-edit-sla')) {
-					this.edit({slaid: e.target.dataset.slaid});
+					this._edit({slaid: e.target.dataset.slaid});
 				}
 				else if (e.target.classList.contains('js-enable-sla')) {
-					this.enable(e.target, [e.target.dataset.slaid]);
+					this._enable(e.target, [e.target.dataset.slaid]);
 				}
 				else if (e.target.classList.contains('js-disable-sla')) {
-					this.disable(e.target, [e.target.dataset.slaid]);
+					this._disable(e.target, [e.target.dataset.slaid]);
 				}
 				else if (e.target.classList.contains('js-massenable-sla')) {
-					this.enable(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this._enable(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (e.target.classList.contains('js-massdisable-sla')) {
-					this.disable(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this._disable(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (e.target.classList.contains('js-massdelete-sla')) {
-					this.delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 			});
-		},
+		}
 
-		edit(parameters = {}) {
+		_edit(parameters = {}) {
 			const overlay = PopUp('popup.sla.edit', parameters, {
 				dialogueid: 'sla_edit',
 				dialogue_class: 'modal-popup-static'
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+			const dialogue = overlay.$dialogue[0];
+
+			dialogue.addEventListener('dialogue.submit', (e) => {
 				postMessageOk(e.detail.title);
 
-				if (e.detail.messages !== null) {
+				if ('messages' in e.detail) {
 					postMessageDetails('success', e.detail.messages);
 				}
 
 				location.href = location.href;
 			});
-		},
 
-		enable(target, slaids) {
+			dialogue.addEventListener('dialogue.delete', (e) => {
+				uncheckTableRows('sla');
+
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
+		}
+
+		_enable(target, slaids) {
 			const confirmation = slaids.length > 1
 				? <?= json_encode(_('Enable selected SLAs?')) ?>
 				: <?= json_encode(_('Enable selected SLA?')) ?>;
@@ -109,10 +116,13 @@
 				return;
 			}
 
-			this.post(target, slaids, this.enable_url);
-		},
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'sla.enable');
 
-		disable(target, slaids) {
+			this._post(target, slaids, curl.getUrl());
+		}
+
+		_disable(target, slaids) {
 			const confirmation = slaids.length > 1
 				? <?= json_encode(_('Disable selected SLAs?')) ?>
 				: <?= json_encode(_('Disable selected SLA?')) ?>;
@@ -121,10 +131,13 @@
 				return;
 			}
 
-			this.post(target, slaids, this.disable_url);
-		},
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'sla.disable');
 
-		delete(target, slaids) {
+			this._post(target, slaids, curl.getUrl());
+		}
+
+		_delete(target, slaids) {
 			const confirmation = slaids.length > 1
 				? <?= json_encode(_('Delete selected SLAs?')) ?>
 				: <?= json_encode(_('Delete selected SLA?')) ?>;
@@ -133,10 +146,13 @@
 				return;
 			}
 
-			this.post(target, slaids, this.delete_url);
-		},
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'sla.delete');
 
-		post(target, slaids, url) {
+			this._post(target, slaids, curl.getUrl());
+		}
+
+		_post(target, slaids, url) {
 			target.classList.add('is-loading');
 
 			return fetch(url, {
@@ -153,7 +169,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						uncheckTableRows('sla', response.error.keepids);
+						uncheckTableRows('sla', response.keepids ?? []);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
@@ -168,16 +184,15 @@
 					location.href = location.href;
 				})
 				.catch(() => {
-					const title = <?= json_encode(_('Unexpected server error.')) ?>;
-					const message_box = makeMessageBox('bad', [], title, true, false)[0];
-
 					clearMessages();
+
+					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
+
 					addMessage(message_box);
 				})
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
-
 		}
 	};
 </script>

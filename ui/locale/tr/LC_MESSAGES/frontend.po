@@ -299,6 +299,10 @@ msgstr "(0 - eylem öntanımlısını kullan)"
 msgid "(Only super admins can create groups)"
 msgstr "(Yalnızca süper yöneticiler grup oluşturabilir)"
 
+#: app/partials/configuration.host.edit.html.php:131
+msgid "(linked by host discovery)"
+msgstr ""
+
 #: app/partials/configuration.host.edit.html.php:275
 #: app/views/popup.itemtestedit.view.php:241
 #: app/views/popup.massupdate.host.php:121
@@ -2110,6 +2114,11 @@ msgstr[1] "Tetikleyiciler kopyalanamıyor"
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
 msgstr "\"%1$s:%2$s\" tetikleyicisi kopyalanamıyor, çünkü ifadede birden çok ana makine var."
 
+#: app/controllers/CControllerSlaCreate.php:69
+#: app/controllers/CControllerSlaCreate.php:127
+msgid "Cannot create SLA"
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:1110
 #, c-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
@@ -2141,8 +2150,17 @@ msgstr "Keşif kuralı oluşturulamıyor"
 msgid "Cannot create icon map"
 msgstr "Simge haritası oluşturulamıyor"
 
+#: app/controllers/CControllerProxyConfigRefresh.php:79
+msgid "Cannot create request"
+msgstr ""
+
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
+msgstr ""
+
+#: app/controllers/CControllerServiceCreate.php:96
+#: app/controllers/CControllerServiceCreate.php:184
+msgid "Cannot create service"
 msgstr ""
 
 #: include/classes/api/services/CService.php:2373
@@ -2313,6 +2331,10 @@ msgstr[1] ""
 #: sysmaps.php:261
 msgid "Cannot delete network map"
 msgstr "Ağ haritası silinemiyor"
+
+#: app/controllers/CControllerProxyDelete.php:39
+msgid "Cannot delete proxies"
+msgstr ""
 
 #: app/controllers/CControllerProxyDelete.php:69
 msgid "Cannot delete proxy"
@@ -3080,6 +3102,11 @@ msgstr "Keşfedilmiş tetikleyici \"%1$s\" için \"%2$s\" güncellenemiyor."
 msgid "Cannot update API token"
 msgstr ""
 
+#: app/controllers/CControllerSlaUpdate.php:70
+#: app/controllers/CControllerSlaUpdate.php:138
+msgid "Cannot update SLA"
+msgstr ""
+
 #: include/classes/api/services/CGraphGeneral.php:67
 msgid "Cannot update a discovered graph."
 msgstr "Keşfedilmiş bir grafik güncellenemiyor."
@@ -3268,6 +3295,11 @@ msgstr "Betik güncellenemiyor"
 #: include/classes/api/services/CScript.php:445
 #, c-format
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
+msgstr ""
+
+#: app/controllers/CControllerServiceUpdate.php:97
+#: app/controllers/CControllerServiceUpdate.php:200
+msgid "Cannot update service"
 msgstr ""
 
 #: include/classes/api/services/CService.php:2310
@@ -3948,6 +3980,10 @@ msgstr "Kullanıcıların yapılandırması"
 msgid "Configuration of web monitoring"
 msgstr "Web gözlemleme yapılandırması"
 
+#: app/controllers/CControllerAuditLogList.php:199
+msgid "Configuration refresh"
+msgstr ""
+
 #: app/controllers/CControllerAuditSettingsUpdate.php:78
 #: app/controllers/CControllerAutoregUpdate.php:69
 #: app/controllers/CControllerGeomapsUpdate.php:81
@@ -4579,6 +4615,11 @@ msgstr "Özel önem derecesi adları bütün yerelleri etkiler ve elle çeviri g
 #: include/views/js/monitoring.sysmaps.js.php:118
 msgid "Custom size"
 msgstr "Özel boyut"
+
+#: app/views/administration.miscconfig.edit.php:104
+#: include/classes/setup/CSetupWizard.php:563
+msgid "CyberArk Vault"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:95
 msgid "Cycle"
@@ -5236,6 +5277,10 @@ msgstr "Seçilen medya türleri silinsin mi?"
 msgid "Delete selected proxies?"
 msgstr "Seçilen vekil sunucular silinsin mi?"
 
+#: app/views/js/proxy.list.js.php:152 app/views/popup.proxy.edit.php:249
+msgid "Delete selected proxy?"
+msgstr ""
+
 #: app/views/administration.regex.list.php:82
 msgid "Delete selected regular expressions?"
 msgstr "Seçilen düzenli ifadeler silinsin mi?"
@@ -5500,6 +5545,10 @@ msgstr "Seçilen ana makine gruplarındaki ana makineler devre dışı bırakıl
 #: app/views/administration.proxy.list.php:188
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "Seçilen vekil sunucular tarafından izlenen ana makineler devre dışı bırakılsın mi?"
+
+#: app/views/js/proxy.list.js.php:137
+msgid "Disable hosts monitored by selected proxy?"
+msgstr ""
 
 #: app/views/administration.token.list.php:199
 #: app/views/administration.user.token.list.php:151
@@ -6233,6 +6282,10 @@ msgstr "Ana makineleri etkinleştir"
 msgid "Enable hosts monitored by selected proxies?"
 msgstr "Seçilen vekil sunucular tarafından izlenen ana makineler etkinleştirilsin mi?"
 
+#: app/views/js/proxy.list.js.php:122
+msgid "Enable hosts monitored by selected proxy?"
+msgstr ""
+
 #: app/views/administration.audit.settings.edit.php:48
 #: app/views/administration.housekeeping.edit.php:44
 #: app/views/administration.housekeeping.edit.php:98
@@ -6818,6 +6871,11 @@ msgstr ""
 
 #: jsLoader.php:140
 msgid "Failed to update dashboard properties."
+msgstr ""
+
+#: app/controllers/CControllerDashboardShareUpdate.php:110
+#: app/views/js/popup.dashboard.share.edit.js.php:83
+msgid "Failed to update dashboard sharing."
 msgstr ""
 
 #: jsLoader.php:141
@@ -12147,6 +12205,10 @@ msgstr ""
 msgid "New operation"
 msgstr ""
 
+#: app/views/popup.proxy.edit.php:229 app/views/popup.proxy.edit.php:258
+msgid "New proxy"
+msgstr ""
+
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
 msgstr "Yeni düzenli ifade"
@@ -14276,6 +14338,12 @@ msgstr ""
 msgid "Properties"
 msgstr "Özellikler"
 
+#: include/classes/vaults/CVaultCyberArk.php:64
+#: include/classes/vaults/CVaultHashiCorp.php:55
+#, c-format
+msgid "Provided API endpoint \"%1$s\" is invalid."
+msgstr ""
+
 #: app/controllers/CControllerMenuPopup.php:405
 #: app/controllers/CControllerMenuPopup.php:693
 #: app/controllers/CControllerWidgetUrlView.php:64
@@ -14283,6 +14351,21 @@ msgstr "Özellikler"
 #: include/classes/helpers/CVaultHelper.php:107
 #, c-format
 msgid "Provided URL \"%1$s\" is invalid."
+msgstr ""
+
+#: include/classes/vaults/CVaultHashiCorp.php:64
+#, c-format
+msgid "Provided authentication token \"%1$s\" is empty."
+msgstr ""
+
+#: include/classes/vaults/CVaultHashiCorp.php:60
+#, c-format
+msgid "Provided secret path \"%1$s\" is invalid."
+msgstr ""
+
+#: include/classes/vaults/CVaultCyberArk.php:70
+#, c-format
+msgid "Provided secret query string \"%1$s\" is invalid."
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:157
@@ -14578,6 +14661,18 @@ msgstr "Dikdörtgen"
 #: app/views/administration.user.edit.php:276
 msgid "Refresh"
 msgstr "Tazele"
+
+#: app/views/popup.proxy.edit.php:216 app/views/proxy.list.php:178
+msgid "Refresh configuration"
+msgstr ""
+
+#: app/views/js/proxy.list.js.php:106
+msgid "Refresh configuration of the selected proxies?"
+msgstr ""
+
+#: app/views/js/proxy.list.js.php:107 app/views/popup.proxy.edit.php:217
+msgid "Refresh configuration of the selected proxy?"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetForm.php:58 jsLoader.php:169
 msgid "Refresh interval"
@@ -14921,6 +15016,10 @@ msgstr ""
 #: include/views/configuration.item.edit.php:354
 #: include/views/configuration.item.prototype.edit.php:340
 msgid "Request body type"
+msgstr ""
+
+#: app/controllers/CControllerProxyConfigRefresh.php:71
+msgid "Request created successfully"
 msgstr ""
 
 #: host_discovery.php:428 host_discovery.php:800 items.php:895 items.php:1011
@@ -16792,6 +16891,10 @@ msgstr ""
 msgid "Stopped"
 msgstr ""
 
+#: app/views/administration.miscconfig.edit.php:100
+msgid "Storage of secrets"
+msgstr ""
+
 #: app/views/popup.lldoperation.php:191 app/views/popup.lldoperation.php:212
 #: app/views/popup.massupdate.item.php:294
 #: app/views/popup.massupdate.item.php:310
@@ -16809,6 +16912,11 @@ msgstr ""
 #: include/classes/setup/CSetupWizard.php:656
 #: include/classes/setup/CSetupWizard.php:657
 msgid "Stored in HashiCorp Vault secret"
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:757
+#: include/classes/setup/CSetupWizard.php:758
+msgid "Stored in Vault secret"
 msgstr ""
 
 #: include/hosts.inc.php:35
@@ -17273,6 +17381,10 @@ msgstr "Şablonlar"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "\"%1$s\" şablonlarının \"%2$s\" ana makinelerinden bağlantıları kaldırıldı."
 
+#: app/partials/configuration.host.edit.html.php:187
+msgid "Templates linked by host discovery cannot be unlinked."
+msgstr ""
+
 #: app/controllers/CControllerPopupMassupdateTemplate.php:358
 msgid "Templates updated"
 msgstr ""
@@ -17512,6 +17624,10 @@ msgstr "Bu ay"
 
 #: include/func.inc.php:2477
 msgid "This month so far"
+msgstr ""
+
+#: app/views/popup.tophosts.column.edit.php:172
+msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr ""
 
 #: include/views/configuration.item.edit.php:125
@@ -18611,6 +18727,10 @@ msgstr ""
 msgid "Use default"
 msgstr ""
 
+#: app/partials/configuration.host.edit.html.php:188
+msgid "Use host prototype configuration form to remove automatically linked templates on upcoming discovery."
+msgstr ""
+
 #: app/views/administration.user.edit.php:300 app/views/popup.media.php:88
 msgid "Use if severity"
 msgstr "Önem derecesi ise kullan"
@@ -18929,6 +19049,10 @@ msgstr "Kullanıcı adı"
 #: app/views/administration.mediatype.edit.php:93
 msgid "Username and password"
 msgstr "Kullanıcı adı ve parola"
+
+#: include/classes/vaults/CVaultCyberArk.php:112
+msgid "Username and password must be stored in Vault secret keys \"UserName\" and \"Content\"."
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:206
 #: include/classes/setup/CSetupWizard.php:802
@@ -19393,9 +19517,18 @@ msgstr ""
 msgid "Vault authentication token"
 msgstr ""
 
+#: include/classes/setup/CSetupWizard.php:618
+#: include/classes/setup/CSetupWizard.php:817
+msgid "Vault certificates"
+msgstr ""
+
 #: include/classes/core/ZBase.php:231
 #: include/classes/setup/CSetupWizard.php:203 include/config.inc.php:53
 msgid "Vault connection failed."
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:101
+msgid "Vault provider"
 msgstr ""
 
 #: include/classes/html/CMacroValue.php:158
@@ -19405,6 +19538,11 @@ msgstr ""
 #: include/classes/setup/CSetupWizard.php:522
 #: include/classes/setup/CSetupWizard.php:700
 msgid "Vault secret path"
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:609
+#: include/classes/setup/CSetupWizard.php:813
+msgid "Vault secret query string"
 msgstr ""
 
 #: include/hosts.inc.php:249
@@ -19644,6 +19782,13 @@ msgstr ""
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr ""
 
+#: app/controllers/CControllerDashboardWidgetCheck.php:46
+#: app/controllers/CControllerDashboardWidgetConfigure.php:46
+#: app/controllers/CControllerDashboardWidgetEdit.php:47
+#: app/controllers/CControllerDashboardWidgetsSanitize.php:66
+msgid "Widget type is not supported in this context."
+msgstr ""
+
 #: graphs.php:44 include/classes/widgets/CWidgetHelper.php:923
 #: include/classes/widgets/CWidgetHelper.php:956
 #: include/classes/widgets/CWidgetHelper.php:957
@@ -19693,6 +19838,10 @@ msgstr ""
 #: app/views/monitoring.widget.problemhosts.view.php:33
 msgid "With problems"
 msgstr "Problemli"
+
+#: app/views/popup.tophosts.column.edit.php:119
+msgid "With this setting only numeric items will be displayed in this column."
+msgstr ""
 
 #: include/forms.inc.php:346 include/forms.inc.php:566
 msgid "With triggers"
@@ -21233,6 +21382,15 @@ msgstr "makro(lar)"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:770
 msgid "mad() - Median absolute deviation"
+msgstr ""
+
+#: include/classes/parsers/CVaultSecretParser.php:180
+msgid "mandatory key is missing"
+msgstr ""
+
+#: include/classes/parsers/CVaultSecretParser.php:177
+#, c-format
+msgid "mandatory parameter \"%1$s\" is missing"
 msgstr ""
 
 #: include/classes/validators/CHistFunctionValidator.php:93

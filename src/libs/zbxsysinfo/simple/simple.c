@@ -24,7 +24,6 @@
 #include "zbxcomms.h"
 #include "log.h"
 #include "cfg.h"
-#include "telnet.h"
 #include "../common/net.h"
 #include "ntp.h"
 
@@ -238,7 +237,7 @@ static int	check_telnet(const char *host, unsigned short port, int timeout, int 
 				zbx_strerror(errno));
 		}
 #endif
-		if (SUCCEED == telnet_test_login(s.socket))
+		if (SUCCEED == zbx_telnet_test_login(s.socket))
 			*value_int = 1;
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "Telnet check error: no login prompt");

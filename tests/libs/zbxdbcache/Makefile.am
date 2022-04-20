@@ -23,13 +23,18 @@ VALUECACHE_LIBS = \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
-	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
+	$(top_srcdir)/src/libs/zbxshmem/libzbxshmem.a \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a \
 	$(top_srcdir)/src/libs/zbxvault/libzbxvault.a \
+	$(top_builddir)/src/libs/zbxcyberark/libzbxcyberark.a \
+	$(top_builddir)/src/libs/zbxhashicorp/libzbxhashicorp.a \
+	$(top_builddir)/src/libs/zbxkvs/libzbxkvs.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
@@ -67,15 +72,20 @@ CACHE_LIBS = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
+	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
-	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
+	$(top_srcdir)/src/libs/zbxshmem/libzbxshmem.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxvault/libzbxvault.a \
+	$(top_builddir)/src/libs/zbxcyberark/libzbxcyberark.a \
+	$(top_builddir)/src/libs/zbxhashicorp/libzbxhashicorp.a \
+	$(top_builddir)/src/libs/zbxkvs/libzbxkvs.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxaudit/libzbxaudit.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
@@ -83,12 +93,12 @@ CACHE_LIBS = \
 COMMON_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_mutex_create \
 	-Wl,--wrap=zbx_mutex_destroy \
-	-Wl,--wrap=zbx_mem_create \
-	-Wl,--wrap=zbx_mem_destroy \
-	-Wl,--wrap=__zbx_mem_malloc \
-	-Wl,--wrap=__zbx_mem_realloc \
-	-Wl,--wrap=__zbx_mem_free \
-	-Wl,--wrap=zbx_mem_dump_stats \
+	-Wl,--wrap=zbx_shmem_create \
+	-Wl,--wrap=zbx_shmem_destroy \
+	-Wl,--wrap=__zbx_shmem_malloc \
+	-Wl,--wrap=__zbx_shmem_realloc \
+	-Wl,--wrap=__zbx_shmem_free \
+	-Wl,--wrap=zbx_shmem_dump_stats \
 	-Wl,--wrap=zbx_history_get_values \
 	-Wl,--wrap=zbx_history_add_values \
 	-Wl,--wrap=zbx_history_sql_init \
@@ -176,10 +186,10 @@ dc_expand_user_macros_in_func_params_CFLAGS = \
 	-I@top_srcdir@/tests/mocks/configcache \
 	-I@top_srcdir@/src/libs/zbxdbcache
 dc_expand_user_macros_in_func_params_SOURCES = \
-	dc_expand_user_macros_in_func_params.c 
+	dc_expand_user_macros_in_func_params.c
 dc_expand_user_macros_in_func_params_LDADD = \
 	$(top_srcdir)/tests/mocks/configcache/libconfigcachemock.a \
-	$(CACHE_LIBS) @SERVER_LIBS@ 
+	$(CACHE_LIBS) @SERVER_LIBS@
 dc_expand_user_macros_in_func_params_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=zbx_hashset_search
 

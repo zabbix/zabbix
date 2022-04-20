@@ -20,7 +20,7 @@
 #include "alerter.h"
 
 #include "log.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxmedia.h"
 #include "zbxself.h"
 #include "zbxexec.h"
@@ -28,6 +28,7 @@
 #include "dbcache.h"
 #include "alerter_protocol.h"
 #include "zbxembed.h"
+#include "zbxhash.h"
 
 #define	ALARM_ACTION_TIMEOUT	40
 

@@ -65,7 +65,8 @@
 		openTokenPopup(token_data) {
 			const overlay = PopUp('popup.token.edit', token_data, {
 				dialogueid: 'token_edit',
-				dialogue_class: 'modal-popup-generic'
+				dialogue_class: 'modal-popup-generic',
+				prevent_navigation: true
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.tokenSuccess, {once: true});
@@ -95,28 +96,32 @@
 			})
 				.then((response) => response.json())
 				.then((response) => {
-					const keepids = ('keepids' in response) ? response.keepids : [];
-
 					if ('error' in response) {
-						postMessageError(response.error.title);
+						if ('title' in response.error) {
+							postMessageError(response.error.title);
+						}
+
 						postMessageDetails('error', response.error.messages);
+
+						uncheckTableRows('token', response.keepids ?? []);
 					}
-					else if('success' in response) {
+					else if ('success' in response) {
 						postMessageOk(response.success.title);
 
 						if ('messages' in response.success) {
 							postMessageDetails('success', response.success.messages);
 						}
+
+						uncheckTableRows('token');
 					}
 
-					uncheckTableRows('token', keepids);
 					location.href = location.href;
 				})
 				.catch(() => {
-					const title = <?= json_encode(_('Unexpected server error.')) ?>;
-					const message_box = makeMessageBox('bad', [], title)[0];
-
 					clearMessages();
+
+					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
+
 					addMessage(message_box);
 				})
 				.finally(() => {

@@ -75,6 +75,11 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'verify_peer'			=> 'in 0,1'
 		];
 
+		if (getRequest('interfaceid') == INTERFACE_TYPE_OPT) {
+			unset($fields['interfaceid']);
+			unset($_REQUEST['interfaceid']);
+		}
+
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
@@ -112,11 +117,13 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			}
 		}
 
-		if (($messages = getMessages(false, null, false)) !== null) {
+		if (!$ret) {
 			$this->setResponse(
-				(new CControllerResponseData([
-					'main_block' => json_encode(['errors' => $messages->toString()])
-				]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
 			);
 		}
 

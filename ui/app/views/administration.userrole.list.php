@@ -30,11 +30,12 @@ if ($data['uncheck']) {
 $widget = (new CWidget())
 	->setTitle(_('User roles'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_USERROLE_LIST))
-	->setControls((new CTag('nav', true,
-		(new CList())
-			->addItem(new CRedirectButton(_('Create user role'),
-				(new CUrl('zabbix.php'))->setArgument('action', 'userrole.edit'))
-			)
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(new CRedirectButton(_('Create user role'),
+					(new CUrl('zabbix.php'))->setArgument('action', 'userrole.edit')
+				))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter())

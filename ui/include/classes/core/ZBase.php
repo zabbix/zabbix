@@ -50,6 +50,11 @@ class ZBase {
 	protected $config = [];
 
 	/**
+	 * @var CVault
+	 */
+	protected $vault;
+
+	/**
 	 * @var CAutoloader
 	 */
 	protected $autoloader;
@@ -182,6 +187,7 @@ class ZBase {
 				}
 
 				$this->loadConfigFile();
+				$this->initVault();
 				$this->initDB();
 				$this->setServerAddress();
 				$this->authenticateUser();
@@ -212,6 +218,7 @@ class ZBase {
 
 			case self::EXEC_MODE_API:
 				$this->loadConfigFile();
+				$this->initVault();
 				$this->initDB();
 				$this->setServerAddress();
 				$this->initLocales('en_us');
@@ -221,6 +228,7 @@ class ZBase {
 				try {
 					// try to load config file, if it exists we need to init db and authenticate user to check permissions
 					$this->loadConfigFile();
+					$this->initVault();
 					$this->initDB();
 					$this->authenticateUser();
 					$this->initComponents();
@@ -343,6 +351,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/widgets/forms',
 			$this->rootDir.'/include/classes/widgets',
 			$this->rootDir.'/include/classes/xml',
+			$this->rootDir.'/include/classes/vaults',
 			$this->rootDir.'/local/app/controllers',
 			$this->rootDir.'/app/controllers'
 		];
@@ -380,9 +389,11 @@ class ZBase {
 	/**
 	 * Load zabbix config file.
 	 */
-	protected function loadConfigFile() {
+	protected function loadConfigFile(): void {
 		$configFile = $this->getRootDir().CConfigFile::CONFIG_FILE_PATH;
+
 		$config = new CConfigFile($configFile);
+
 		$this->config = $config->load();
 	}
 
@@ -400,13 +411,71 @@ class ZBase {
 	}
 
 	/**
+	 * Vault provider initialisation if it exists in configuration file.
+	 */
+	protected function initVault(): void {
+		if (!array_key_exists('VAULT', $this->config['DB'])) {
+			return;
+		}
+
+		switch ($this->config['DB']['VAULT']) {
+			case CVaultCyberArk::NAME:
+				$this->vault = new CVaultCyberArk($this->config['DB']['VAULT_URL'],
+					$this->config['DB']['VAULT_DB_PATH'], $this->config['DB']['VAULT_CERT_FILE'],
+					$this->config['DB']['VAULT_KEY_FILE']
+				);
+				break;
+
+			case CVaultHashiCorp::NAME:
+				$this->vault = new CVaultHashiCorp($this->config['DB']['VAULT_URL'],
+					$this->config['DB']['VAULT_DB_PATH'], $this->config['DB']['VAULT_TOKEN']
+				);
+				break;
+		}
+	}
+
+	/**
 	 * Check if frontend can connect to DB.
+	 *
 	 * @throws DBException
 	 */
-	protected function initDB() {
+	protected function initDB(): void {
+		global $DB;
+
 		$error = null;
+
+		if ($this->vault !== null) {
+			$db_user = $this->config['DB']['VAULT_CACHE'] ? CDataCacheHelper::getValue('db_user', '') : '';
+			$db_password = $this->config['DB']['VAULT_CACHE'] ? CDataCacheHelper::getValue('db_password', '') : '';
+
+			if ($db_user === '' || $db_password === '') {
+				$db_credentials = $this->vault->getCredentials();
+
+				if ($db_credentials === null) {
+					throw new DBException(_('Unable to load database credentials from Vault.'));
+				}
+
+				['user' => $db_user, 'password' => $db_password] = $db_credentials;
+			}
+
+			if ($this->config['DB']['VAULT_CACHE'] && $db_user !== '' && $db_password !== '') {
+				CDataCacheHelper::setValueArray([
+					'db_user' => $db_user,
+					'db_password' => $db_password
+				]);
+			}
+			else {
+				CDataCacheHelper::clearValues(['db_user', 'db_password']);
+			}
+
+			$this->config['DB']['USER'] = $db_user;
+			$this->config['DB']['PASSWORD'] = $db_password;
+
+			$DB = $this->config['DB'];
+		}
+
 		if (!DBconnect($error)) {
-			CDataCacheHelper::clearValues(['db_username', 'db_password']);
+			CDataCacheHelper::clearValues(['db_user', 'db_password']);
 
 			throw new DBException($error);
 		}
@@ -415,9 +484,9 @@ class ZBase {
 	/**
 	 * Initialize translations, set up translated date and time constants.
 	 *
-	 * @param string $lang  Locale variant prefix like en_US, ru_RU etc.
+	 * @param string|null $language  Locale variant prefix like en_US, ru_RU etc.
 	 */
-	public function initLocales(string $language): void {
+	public function initLocales(?string $language): void {
 		if (!setupLocale($language, $error) && $error !== '') {
 			error($error);
 		}
@@ -490,7 +559,7 @@ class ZBase {
 		$action_class = $router->getController();
 
 		try {
-			if (!class_exists($action_class, true)) {
+			if (!class_exists($action_class)) {
 				throw new Exception(_s('Class %1$s not found for action %2$s.', $action_class, $action_name));
 			}
 
@@ -529,12 +598,30 @@ class ZBase {
 				$this->processResponseFinal($router, $action);
 			}
 		}
+		catch (CAccessDeniedException $e) {
+			$this->denyPageAccess($router);
+		}
 		catch (Exception $e) {
-			echo (new CView('general.warning', [
-				'header' => $e->getMessage(),
-				'messages' => [],
-				'theme' => ZBX_DEFAULT_THEME
-			]))->getOutput();
+			switch ($router->getLayout()) {
+				case 'layout.json':
+				case 'layout.widget':
+					echo (new CView('layout.json', [
+						'main_block' => json_encode([
+							'error' => [
+								'title' => $e->getMessage()
+							]
+						])
+					]))->getOutput();
+
+					break;
+
+				default:
+					echo (new CView('general.warning', [
+						'header' => $e->getMessage(),
+						'messages' => [],
+						'theme' => getUserTheme(CWebUser::$data)
+					]))->getOutput();
+			}
 
 			session_write_close();
 			exit();
@@ -615,6 +702,77 @@ class ZBase {
 			}
 
 			echo (new CView($router->getLayout(), $layout_data))->getOutput();
+		}
+
+		session_write_close();
+		exit();
+	}
+
+	private static function denyPageAccess(CRouter $router): void {
+		$request_url = (new CUrl(array_key_exists('request', $_REQUEST) ? $_REQUEST['request'] : ''))
+			->removeArgument('sid')
+			->toString();
+
+		if (CAuthenticationHelper::get(CAuthenticationHelper::HTTP_LOGIN_FORM) == ZBX_AUTH_FORM_HTTP
+				&& CAuthenticationHelper::get(CAuthenticationHelper::HTTP_AUTH_ENABLED) == ZBX_AUTH_HTTP_ENABLED
+				&& (!CWebUser::isLoggedIn() || CWebUser::isGuest())) {
+			redirect(
+				(new CUrl('index_http.php'))
+					->setArgument('request', $request_url)
+					->toString()
+			);
+		}
+
+		$view = [
+			'messages' => [],
+			'buttons' => [],
+			'theme' => getUserTheme(CWebUser::$data)
+		];
+
+		if (CWebUser::isLoggedIn()) {
+			$view['header'] = _('Access denied');
+			$view['messages'][] = _s('You are logged in as "%1$s".', CWebUser::$data['username']).' '.
+				_('You have no permissions to access this page.');
+		}
+		else {
+			$view['header'] = _('You are not logged in');
+			$view['messages'][] = _('You must login to view this page.');
+		}
+
+		$view['messages'][] = _('If you think this message is wrong, please consult your administrators about getting the necessary permissions.');
+
+		if (!CWebUser::isLoggedIn() || CWebUser::isGuest()) {
+			$view['buttons'][] = (new CButton('login', _('Login')))
+				->setAttribute('data-login-url',
+					(new CUrl('index.php'))
+						->setArgument('request', $request_url)
+						->toString()
+				)
+				->onClick('document.location = this.dataset.loginUrl;');
+		}
+
+		if (CWebUser::isLoggedIn()) {
+			$view['buttons'][] = (new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
+				->setAttribute('data-home-url', CMenuHelper::getFirstUrl())
+				->onClick('document.location = this.dataset.homeUrl;');
+		}
+
+		switch ($router->getLayout()) {
+			case 'layout.json':
+			case 'layout.widget':
+				echo (new CView('layout.json', [
+					'main_block' => json_encode([
+						'error' => [
+							'title' => $view['header'],
+							'messages' => $view['messages']
+						]
+					])
+				]))->getOutput();
+
+				break;
+
+			default:
+				echo (new CView('general.warning', $view))->getOutput();
 		}
 
 		session_write_close();
