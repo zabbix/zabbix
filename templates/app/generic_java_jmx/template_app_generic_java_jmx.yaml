@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-24T14:57:10Z'
+  date: '2022-04-06T19:27:48Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -323,7 +323,8 @@ zabbix_export:
             -
               uuid: cc6cc7942e434b8589ff28a0b3112fc7
               expression: 'min(/Generic Java JMX/jmx["java.lang:type=OperatingSystem","ProcessCpuLoad"],{$JMX.CPU.LOAD.TIME})>{$JMX.CPU.LOAD.MAX}'
-              name: 'OperatingSystem: Process CPU Load more than {$JMX.CPU.LOAD.MAX}% for {$JMX.CPU.LOAD.TIME}'
+              name: 'OperatingSystem: Process CPU Load is high'
+              event_name: 'OperatingSystem: Process CPU Load more than {$JMX.CPU.LOAD.MAX}% for {$JMX.CPU.LOAD.TIME}'
               priority: AVERAGE
               tags:
                 -
@@ -630,7 +631,8 @@ zabbix_export:
             -
               uuid: 60a9825fc01f4cc9bd79d306bb19e8e0
               expression: 'min(/Generic Java JMX/jmx["java.lang:name={#JMXNAME},type=MemoryPool","Usage.used"],{$JMX.MP.USAGE.TIME:"{#JMXNAME}"})>(last(/Generic Java JMX/jmx["java.lang:name={#JMXNAME},type=MemoryPool","Usage.max"])*{$JMX.MP.USAGE.MAX:"{#JMXNAME}"}/100) and last(/Generic Java JMX/jmx["java.lang:name={#JMXNAME},type=MemoryPool","Usage.max"])>0'
-              name: 'Memory pool: {#JMXNAME} memory usage more than {$JMX.MP.USAGE.MAX:"{#JMXNAME}"}% for {$JMX.MP.USAGE.TIME:"{#JMXNAME}"}'
+              name: 'Memory pool: {#JMXNAME} memory usage is high'
+              event_name: 'Memory pool: {#JMXNAME} memory usage more than {$JMX.MP.USAGE.MAX:"{#JMXNAME}"}% for {$JMX.MP.USAGE.TIME:"{#JMXNAME}"}'
               priority: WARNING
               tags:
                 -
@@ -721,7 +723,8 @@ zabbix_export:
     -
       uuid: 69fda060b5004d12b6af0ba5f73cec6d
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=Memory","HeapMemoryUsage.used"],{$JMX.HEAP.MEM.USAGE.TIME})>(last(/Generic Java JMX/jmx["java.lang:type=Memory","HeapMemoryUsage.max"])*{$JMX.HEAP.MEM.USAGE.MAX}/100) and last(/Generic Java JMX/jmx["java.lang:type=Memory","HeapMemoryUsage.max"])>0'
-      name: 'Memory: Heap memory usage more than {$JMX.HEAP.USAGE.MAX}% for {$JMX.HEAP.MEM.USAGE.TIME}'
+      name: 'Memory: Heap memory usage is high'
+      event_name: 'Memory: Heap memory usage more than {$JMX.HEAP.USAGE.MAX}% for {$JMX.HEAP.MEM.USAGE.TIME}'
       priority: WARNING
       tags:
         -
@@ -730,7 +733,8 @@ zabbix_export:
     -
       uuid: 2b4dfda1100d4feeaa66218e57786f38
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=Memory","NonHeapMemoryUsage.used"],{$JMX.NONHEAP.MEM.USAGE.TIME})>(last(/Generic Java JMX/jmx["java.lang:type=Memory","NonHeapMemoryUsage.max"])*{$JMX.NONHEAP.MEM.USAGE.MAX}/100) and last(/Generic Java JMX/jmx["java.lang:type=Memory","NonHeapMemoryUsage.max"])>0'
-      name: 'Memory: Non-Heap memory usage more than {$JMX.NONHEAP.MEM.USAGE.MAX}% for {$JMX.NONHEAP.MEM.USAGE.TIME}'
+      name: 'Memory: Non-Heap memory usage is high'
+      event_name: 'Memory: Non-Heap memory usage more than {$JMX.NONHEAP.MEM.USAGE.MAX}% for {$JMX.NONHEAP.MEM.USAGE.TIME}'
       priority: WARNING
       tags:
         -
@@ -739,7 +743,8 @@ zabbix_export:
     -
       uuid: 726a3b8a6209451b9a6cca63a3195a0c
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=OperatingSystem","OpenFileDescriptorCount"],{$JMX.FILE.DESCRIPTORS.TIME})>(last(/Generic Java JMX/jmx["java.lang:type=OperatingSystem","MaxFileDescriptorCount"])*{$JMX.FILE.DESCRIPTORS.MAX}/100)'
-      name: 'OperatingSystem: Opened file descriptor count more than {$JMX.FILE.DESCRIPTORS.MAX}% of maximum'
+      name: 'OperatingSystem: Opened file descriptor count is high'
+      event_name: 'OperatingSystem: Opened file descriptor count more than {$JMX.FILE.DESCRIPTORS.MAX}% of maximum'
       priority: WARNING
       tags:
         -

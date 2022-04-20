@@ -357,36 +357,6 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 	toggleVisible(obj, obj.querySelector('[name=valuemap_massupdate]:checked').value);
 })();
 
-function visibility_status_changeds(value, obj_id, replace_to) {
-	const obj = document.getElementById(obj_id);
-	if (obj === null) {
-		throw `Cannot find objects with name [${obj_id}]`;
-	}
-
-	if (replace_to && replace_to != '') {
-		if (obj.originalObject) {
-			const old_obj = obj.originalObject;
-			old_obj.originalObject = obj;
-			obj.parentNode.replaceChild(old_obj, obj);
-		}
-		else if (!value) {
-			const new_obj = document.createElement('span');
-			new_obj.setAttribute('name', obj.name);
-			new_obj.setAttribute('id', obj.id);
-
-			new_obj.innerHTML = replace_to;
-			new_obj.originalObject = obj;
-			obj.parentNode.replaceChild(new_obj, obj);
-		}
-		else {
-			throw 'Missing originalObject for restoring';
-		}
-	}
-	else {
-		obj.style.visibility = value ? 'visible' : 'hidden';
-	}
-}
-
 if (!CR && !GK) {
 	$("textarea[maxlength]").bind("paste contextmenu change keydown keypress keyup", function() {
 		var elem = $(this);

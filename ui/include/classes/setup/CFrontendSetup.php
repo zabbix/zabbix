@@ -25,7 +25,7 @@
  */
 class CFrontendSetup {
 
-	const MIN_PHP_VERSION = '7.2.0';
+	const MIN_PHP_VERSION = '7.2.5';
 	const MIN_PHP_MEMORY_LIMIT = '134217728'; // 128 * ZBX_MEBIBYTE;
 	const MIN_PHP_POST_MAX_SIZE = '16777216'; // 16 * ZBX_MEBIBYTE;
 	const MIN_PHP_UPLOAD_MAX_FILESIZE = '2097152'; // 2 * ZBX_MEBIBYTE;
@@ -250,8 +250,8 @@ class CFrontendSetup {
 	public static function getSupportedDatabases() {
 		$allowed_db = [];
 
-		if (zbx_is_callable(['mysqli_close', 'mysqli_connect', 'mysqli_connect_error', 'mysqli_error',
-				'mysqli_fetch_assoc', 'mysqli_free_result', 'mysqli_query', 'mysqli_real_escape_string'])) {
+		if (zbx_is_callable(['mysqli_close', 'mysqli_fetch_assoc', 'mysqli_free_result', 'mysqli_init', 'mysqli_query',
+				'mysqli_real_escape_string', 'mysqli_report'])) {
 			$allowed_db[ZBX_DB_MYSQL] = 'MySQL';
 		}
 

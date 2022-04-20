@@ -78,8 +78,8 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Travis: Service is unavailable |<p>Travis API is unavailable. Please check if the correct macros are set.</p> |`last(/Travis CI by HTTP/travis.get_health)=0` |HIGH |<p>Manual close: YES</p> |
-|Travis: Failed to fetch home page (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`nodata(/Travis CI by HTTP/travis.get_health,30m)=1` |WARNING |<p>Manual close: YES</p> |
-|Travis: Repo [{#SLUG}]: Percent of successful builds are < {$TRAVIS.BUILDS.SUCCESS.PERCENT}% |<p>Low successful builds rate.</p> |`last(/Travis CI by HTTP/travis.repo.builds.passed.pct[{#SLUG}])<{$TRAVIS.BUILDS.SUCCESS.PERCENT}` |WARNING |<p>Manual close: YES</p> |
+|Travis: Failed to fetch home page |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`nodata(/Travis CI by HTTP/travis.get_health,30m)=1` |WARNING |<p>Manual close: YES</p> |
+|Travis: Repo [{#SLUG}]: Percent of successful builds |<p>Low successful builds rate.</p> |`last(/Travis CI by HTTP/travis.repo.builds.passed.pct[{#SLUG}])<{$TRAVIS.BUILDS.SUCCESS.PERCENT}` |WARNING |<p>Manual close: YES</p> |
 |Travis: Repo [{#SLUG}]: Last build status is 'errored' |<p>Last build status is errored.</p> |`find(/Travis CI by HTTP/travis.repo.last_build.state[{#SLUG}],,"like","errored")=1` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback

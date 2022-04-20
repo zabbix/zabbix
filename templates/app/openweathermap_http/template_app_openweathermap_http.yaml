@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-30T13:31:18Z'
+  date: '2022-04-13T22:09:00Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -497,7 +497,8 @@ zabbix_export:
                 -
                   uuid: 3b7e55f13c6a4ba2930709d5c51c8a09
                   expression: 'min(/OpenWeatherMap by HTTP/openweathermap.temp[{#ID}],#3)>{$TEMP.CRIT.HIGH}'
-                  name: '[{#LOCATION}, {#COUNTRY}]: Temperature is too high (over {$TEMP.CRIT.HIGH} for 30m)'
+                  name: '[{#LOCATION}, {#COUNTRY}]: Temperature is too high'
+                  event_name: '[{#LOCATION}, {#COUNTRY}]: Temperature is too high (over {$TEMP.CRIT.HIGH} for 30m)'
                   opdata: 'Current temp: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Temperature value is too high.'
@@ -509,7 +510,8 @@ zabbix_export:
                 -
                   uuid: 7c98d2784a2e42faa76e67348a0df7ff
                   expression: 'max(/OpenWeatherMap by HTTP/openweathermap.temp[{#ID}],#3)<{$TEMP.CRIT.LOW}'
-                  name: '[{#LOCATION}, {#COUNTRY}]: Temperature is too low (below {$TEMP.CRIT.LOW} for 30m)'
+                  name: '[{#LOCATION}, {#COUNTRY}]: Temperature is too low'
+                  event_name: '[{#LOCATION}, {#COUNTRY}]: Temperature is too low (below {$TEMP.CRIT.LOW} for 30m)'
                   opdata: 'Current temp: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Temperature value is too low.'

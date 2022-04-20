@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-01T10:30:17Z'
+  date: '2022-04-06T19:27:44Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -471,7 +471,8 @@ zabbix_export:
             -
               uuid: f68768567f334d369d52797309f95c41
               expression: 'last(/IIS by Zabbix agent active/perf_counter_en["\Web Service(_Total)\Service Uptime"])<10m'
-              name: 'IIS: has been restarted (uptime < 10m)'
+              name: 'IIS: has been restarted'
+              event_name: 'IIS: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -758,7 +759,8 @@ zabbix_export:
                 -
                   uuid: d2a9854722a44253a39c8eaab67f7677
                   expression: 'last(/IIS by Zabbix agent active/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool Uptime"])<10m'
-                  name: 'IIS: {#APPPOOL} has been restarted (uptime < 10m)'
+                  name: 'IIS: {#APPPOOL} has been restarted'
+                  event_name: 'IIS: {#APPPOOL} has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
@@ -819,7 +821,8 @@ zabbix_export:
                 -
                   uuid: 68499a4737d24ee6846aaea2a37b7b4f
                   expression: 'min(/IIS by Zabbix agent active/perf_counter_en["\HTTP Service Request Queues({#APPPOOL})\CurrentQueueSize"],{$IIS.QUEUE.MAX.TIME})>{$IIS.QUEUE.MAX.WARN}'
-                  name: 'IIS: Request queue of {#APPPOOL} is too large (over {$IIS.QUEUE.MAX.WARN})'
+                  name: 'IIS: Request queue of {#APPPOOL} is too large'
+                  event_name: 'IIS: Request queue of {#APPPOOL} is too large (over {$IIS.QUEUE.MAX.WARN})'
                   priority: WARNING
                   dependencies:
                     -
