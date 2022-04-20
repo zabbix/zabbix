@@ -391,7 +391,7 @@ static zbx_int64_t	get_fds(struct kinfo_proc2 *proc)
 
 	if (proc->p_fd == 0 ||
 			sizeof(struct filedesc) != kvm_read(kd_files, proc->p_fd, &fds, sizeof(struct filedesc)) ||
-			sizeof(struct fdtab) != kvm_read(kd_files, fds.fd_dt, &dt, sizeof(struct fdtab)))
+			sizeof(struct fdtab) != kvm_read(kd_files, (unsigned long)fds.fd_dt, &dt, sizeof(struct fdtab)))
 	{
 		return -1;
 	}
@@ -407,7 +407,7 @@ static zbx_int64_t	get_fds(struct kinfo_proc2 *proc)
 
 	sz = lastfile * sizeof(fdfile_t*);
 
-	if (sz != kvm_read(kd_files, &fds.fd_dt->dt_ff, procfiles, sz))
+	if (sz != kvm_read(kd_files, (unsigned long)&fds.fd_dt->dt_ff, procfiles, sz))
 		return -1;
 
 	for (i = 0; i <= fds.fd_lastfile; i++) {
