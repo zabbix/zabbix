@@ -91,7 +91,6 @@ func parseProcessStatus(pid string, proc *procStatus) (err error) {
 		k := tmp[:pos]
 		v := strings.TrimSpace(tmp[pos+1:])
 
-
 		switch k {
 		case "Name":
 			proc.ThreadName = v
@@ -185,16 +184,21 @@ func getProcessCpuTimes(pid string, proc *procStatus) () {
 
 func getProcessNames(pid string, proc *procStatus) (err error) {
 	_, proc.Cmdline, err = getProcessCmdline(pid, 0)
+
 	if err != nil {
 		return err
 	}
 
+	proc.Name = strings.TrimSuffix(proc.ThreadName, ":")
+
 	f := strings.Fields(proc.Cmdline)
 	if len(f) > 0 {
-		proc.Name = strings.TrimSuffix(filepath.Base(f[0]), ":")
-	} else {
-		proc.Name = strings.TrimSuffix(proc.ThreadName, ":")
+		baseName := strings.TrimSuffix(filepath.Base(f[0]), ":")
+		if len(baseName) > len(proc.ThreadName) && strings.HasPrefix(baseName, proc.ThreadName) {
+			proc.Name = baseName
+		}
 	}
+
 	return nil
 }
 
