@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-17T17:02:12Z'
+  date: '2022-04-06T19:27:51Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -147,7 +147,8 @@ zabbix_export:
             -
               uuid: 13c32daebddd454bb5908a9a27c3a76f
               expression: 'min(/Kubernetes Controller manager by HTTP/kubernetes.controller.client_http_requests_500.rate,5m)>{$KUBE.CONTROLLER.HTTP.CLIENT.ERROR}'
-              name: 'Kubernetes Controller Manager: Too many HTTP client errors (over {$KUBE.CONTROLLER.HTTP.CLIENT.ERROR} for 5m)'
+              name: 'Kubernetes Controller Manager: Too many HTTP client errors'
+              event_name: 'Kubernetes Controller Manager: Too many HTTP client errors (over {$KUBE.CONTROLLER.HTTP.CLIENT.ERROR} for 5m)'
               priority: WARNING
               description: '"Kubernetes Controller manager is experiencing high error rate (with 5xx HTTP code).'
               tags:

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-01T10:10:36Z'
+  date: '2022-04-06T19:35:18Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -275,7 +275,8 @@ zabbix_export:
             -
               uuid: 57a906ac8f994ebaa2543a5eb4949db7
               expression: 'last(/TP-LINK SNMP/system.hw.serialnumber,#1)<>last(/TP-LINK SNMP/system.hw.serialnumber,#2) and length(last(/TP-LINK SNMP/system.hw.serialnumber))>0'
-              name: 'Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
@@ -355,7 +356,8 @@ zabbix_export:
             -
               uuid: 367bce2d38fe4ecbbe23c34bc7ec6226
               expression: 'last(/TP-LINK SNMP/system.name,#1)<>last(/TP-LINK SNMP/system.name,#2) and length(last(/TP-LINK SNMP/system.name))>0'
-              name: 'System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -414,7 +416,8 @@ zabbix_export:
             -
               uuid: 63b45803131d4391abfa313a222339e5
               expression: 'last(/TP-LINK SNMP/system.uptime[sysUpTime.0])<10m'
-              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -494,7 +497,8 @@ zabbix_export:
                 -
                   uuid: 667a09c4f1c04a1a84c7c79adb9cbc70
                   expression: 'min(/TP-LINK SNMP/system.cpu.util[tpSysMonitorCpu1Minute.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
-                  name: '#{#SNMPVALUE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  name: '#{#SNMPVALUE}: High CPU utilization'
+                  event_name: '#{#SNMPVALUE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -545,7 +549,8 @@ zabbix_export:
                 -
                   uuid: 3bd3af786eb34b5e9a05f3113fce8007
                   expression: 'min(/TP-LINK SNMP/vm.memory.util[tpSysMonitorMemoryUtilization.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
-                  name: '#{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: '#{#SNMPVALUE}: High memory utilization'
+                  event_name: '#{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
                   tags:
@@ -951,7 +956,8 @@ zabbix_export:
               recovery_expression: |
                 avg(/TP-LINK SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/TP-LINK SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) and
                 avg(/TP-LINK SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/TP-LINK SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])
-              name: 'Interface {#IFDESCR}: High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              name: 'Interface {#IFDESCR}: High bandwidth usage'
+              event_name: 'Interface {#IFDESCR}: High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -974,7 +980,8 @@ zabbix_export:
               recovery_expression: |
                 max(/TP-LINK SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and max(/TP-LINK SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFDESCR}: High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFDESCR}: High error rate'
+              event_name: 'Interface {#IFDESCR}: High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'

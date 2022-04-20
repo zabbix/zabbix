@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T19:42:12Z'
+  date: '2022-04-06T19:36:09Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -107,7 +107,8 @@ zabbix_export:
             -
               uuid: 247a25a4976a45eca78853aea112cdd6
               expression: 'min(/ZYXEL MES-3528 SNMP/zyxel.3528.cpuusage,5m)>{$CPU.UTIL.CRIT}'
-              name: 'ZYXEL MES-3528: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'ZYXEL MES-3528: High CPU utilization'
+              event_name: 'ZYXEL MES-3528: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -304,7 +305,8 @@ zabbix_export:
             -
               uuid: d08bc1ffb11e4bbc98851c30595e996c
               expression: 'last(/ZYXEL MES-3528 SNMP/zyxel.3528.serialnumber,#1)<>last(/ZYXEL MES-3528 SNMP/zyxel.3528.serialnumber,#2) and length(last(/ZYXEL MES-3528 SNMP/zyxel.3528.serialnumber))>0'
-              name: 'ZYXEL MES-3528: Device has been replaced (new serial number received)'
+              name: 'ZYXEL MES-3528: Device has been replaced'
+              event_name: 'ZYXEL MES-3528: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
@@ -340,7 +342,8 @@ zabbix_export:
             -
               uuid: d138c874f4de4f3a97a0c615d589826a
               expression: 'last(/ZYXEL MES-3528 SNMP/zyxel.3528.uptime)<10m'
-              name: 'ZYXEL MES-3528: has been restarted (uptime < 10m)'
+              name: 'ZYXEL MES-3528: has been restarted'
+              event_name: 'ZYXEL MES-3528: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -1039,7 +1042,8 @@ zabbix_export:
                 -
                   uuid: f9e2991ea38343c8b2c9815bf733aef8
                   expression: 'last(/ZYXEL MES-3528 SNMP/zyxel.3528.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}'
-                  name: 'ZYXEL MES-3528: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
+                  name: 'ZYXEL MES-3528: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION}'
+                  event_name: 'ZYXEL MES-3528: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The upper threshold value of the parameter is exceeded'
                   tags:
@@ -1049,7 +1053,8 @@ zabbix_export:
                 -
                   uuid: 341bff907cd943219bbed92773d9b005
                   expression: 'last(/ZYXEL MES-3528 SNMP/zyxel.3528.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
-                  name: 'ZYXEL MES-3528: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
+                  name: 'ZYXEL MES-3528: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION}'
+                  event_name: 'ZYXEL MES-3528: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The parameter values are less than the lower threshold'
                   tags:
@@ -1225,7 +1230,8 @@ zabbix_export:
                 -
                   uuid: 5cd22f26211a428099d2a41c5c41efab
                   expression: 'last(/ZYXEL MES-3528 SNMP/zyxel.3528.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MES-3528 SNMP/zyxel.3528.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MES-3528 SNMP/zyxel.3528.sfp.serialnumber[{#SNMPINDEX}]))>0'
-                  name: 'ZYXEL MES-3528: SFP {#SNMPINDEX} has been replaced (new serial number received)'
+                  name: 'ZYXEL MES-3528: SFP {#SNMPINDEX} has been replaced'
+                  event_name: 'ZYXEL MES-3528: SFP {#SNMPINDEX} has been replaced (new serial number received)'
                   priority: INFO
                   description: 'SFP {#SNMPINDEX} serial number has changed. Ack to close'
                   manual_close: 'YES'
