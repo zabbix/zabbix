@@ -30,31 +30,26 @@ abstract class CItemType {
 	 *
 	 * @return array
 	 */
-	abstract public static function getCreateValidationRules(array &$item): array;
+	abstract public static function getCreateValidationRules(array $item): array;
 
 	/**
-	 * @param array $item
 	 * @param array $db_item
 	 *
 	 * @return array
 	 */
-	abstract public static function getUpdateValidationRules(array &$item, array $db_item): array;
+	abstract public static function getUpdateValidationRules(array $db_item): array;
 
 	/**
-	 * @param array $item
 	 * @param array $db_item
 	 *
 	 * @return array
 	 */
-	abstract public static function getUpdateValidationRulesInherited(array &$item, array $db_item): array;
+	abstract public static function getUpdateValidationRulesInherited(array $db_item): array;
 
 	/**
-	 * @param array $item
-	 * @param array $db_item
-	 *
 	 * @return array
 	 */
-	abstract public static function getUpdateValidationRulesDiscovered(array &$item, array $db_item): array;
+	abstract public static function getUpdateValidationRulesDiscovered(): array;
 
 	/**
 	 * @param string $field_name

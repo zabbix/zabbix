@@ -28,7 +28,7 @@ class CItemTypeScript extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getCreateValidationRules(array &$item): array {
+	public static function getCreateValidationRules(array $item): array {
 		$is_item_prototype = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE;
 
 		return [
@@ -45,7 +45,7 @@ class CItemTypeScript extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRules(array &$item, array $db_item): array {
+	public static function getUpdateValidationRules(array $db_item): array {
 		return [
 			'parameters' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 								'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_parameter', 'name')],
@@ -60,7 +60,7 @@ class CItemTypeScript extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesInherited(array &$item, array $db_item): array {
+	public static function getUpdateValidationRulesInherited(array $db_item): array {
 		return [
 			'parameters' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'params' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
@@ -72,7 +72,7 @@ class CItemTypeScript extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesDiscovered(array &$item, array $db_item): array {
+	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
 			'parameters' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'params' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],

@@ -28,7 +28,7 @@ class CItemTypeZabbix extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getCreateValidationRules(array &$item): array {
+	public static function getCreateValidationRules(array $item): array {
 		return [
 			'interfaceid' =>	self::getCreateFieldRule('interfaceid'),
 			'delay' =>			['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')]
@@ -38,7 +38,7 @@ class CItemTypeZabbix extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRules(array &$item, array $db_item): array {
+	public static function getUpdateValidationRules(array $db_item): array {
 		return [
 			'interfaceid' =>	self::getUpdateFieldRule('interfaceid', $db_item),
 			'delay' =>			self::getUpdateFieldRule('delay', $db_item)
@@ -48,7 +48,7 @@ class CItemTypeZabbix extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesInherited(array &$item, array $db_item): array {
+	public static function getUpdateValidationRulesInherited(array $db_item): array {
 		return [
 			'interfaceid' =>	self::getUpdateFieldRuleInherited('interfaceid', $db_item),
 			'delay' =>			['type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')]
@@ -58,7 +58,7 @@ class CItemTypeZabbix extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesDiscovered(array &$item, array $db_item): array {
+	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
 			'interfaceid' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'delay' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]

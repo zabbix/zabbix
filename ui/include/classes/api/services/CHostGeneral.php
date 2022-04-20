@@ -642,7 +642,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		if ($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]) {
 			if ($clear) {
-				CItemGeneral::deleteForce($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]);
+				CItem::deleteForce($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]);
 			}
 			else {
 				API::getApiService('item')->updateForce($upd_items[ZBX_FLAG_DISCOVERY_NORMAL],
@@ -1307,7 +1307,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		if ($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]) {
 			if ($clear) {
-				CItemGeneral::deleteForce($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]);
+				CItem::deleteForce($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]);
 			}
 			else {
 				API::getApiService('item')->updateForce($upd_items[ZBX_FLAG_DISCOVERY_NORMAL],

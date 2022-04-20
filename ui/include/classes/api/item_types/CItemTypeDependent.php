@@ -28,7 +28,7 @@ class CItemTypeDependent extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getCreateValidationRules(array &$item): array {
+	public static function getCreateValidationRules(array $item): array {
 		return [
 			'master_itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 		];
@@ -37,7 +37,7 @@ class CItemTypeDependent extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRules(array &$item, array $db_item): array {
+	public static function getUpdateValidationRules(array $db_item): array {
 		return [
 			'master_itemid' =>	['type' => API_MULTIPLE, 'rules' => [
 									['if' => static function () use ($db_item): bool {
@@ -51,7 +51,7 @@ class CItemTypeDependent extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesInherited(array &$item, array $db_item): array {
+	public static function getUpdateValidationRulesInherited(array $db_item): array {
 		return [
 			'master_itemid' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED]
 		];
@@ -60,7 +60,7 @@ class CItemTypeDependent extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesDiscovered(array &$item, array $db_item): array {
+	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
 			'master_itemid' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
 		];

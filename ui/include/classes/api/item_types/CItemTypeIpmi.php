@@ -28,7 +28,7 @@ class CItemTypeIpmi extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getCreateValidationRules(array &$item): array {
+	public static function getCreateValidationRules(array $item): array {
 		return [
 			'interfaceid' =>	self::getCreateFieldRule('interfaceid'),
 			'ipmi_sensor' =>	['type' => API_MULTIPLE, 'rules' => [
@@ -42,7 +42,7 @@ class CItemTypeIpmi extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRules(array &$item, array $db_item): array {
+	public static function getUpdateValidationRules(array $db_item): array {
 		return [
 			'interfaceid' =>	self::getUpdateFieldRule('interfaceid', $db_item),
 			'ipmi_sensor' =>	['type' => API_MULTIPLE, 'rules' => [
@@ -59,7 +59,7 @@ class CItemTypeIpmi extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesInherited(array &$item, array $db_item): array {
+	public static function getUpdateValidationRulesInherited(array $db_item): array {
 		return [
 			'interfaceid' =>	self::getUpdateFieldRuleInherited('interfaceid', $db_item),
 			'ipmi_sensor' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
@@ -70,7 +70,7 @@ class CItemTypeIpmi extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesDiscovered(array &$item, array $db_item): array {
+	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
 			'interfaceid' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'ipmi_sensor' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],

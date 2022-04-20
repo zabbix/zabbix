@@ -32,7 +32,7 @@ class CItemTypeHttpAgent extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getCreateValidationRules(array &$item): array {
+	public static function getCreateValidationRules(array $item): array {
 		$is_item_prototype = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE;
 
 		return [
@@ -85,10 +85,8 @@ class CItemTypeHttpAgent extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRules(array &$item, array $db_item): array {
+	public static function getUpdateValidationRules(array $db_item): array {
 		$is_item_prototype = $db_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE;
-
-		$item += array_intersect_key($db_item, array_flip(['request_method', 'post_type', 'authtype', 'allow_traps']));
 
 		return [
 			'url' =>				['type' => API_MULTIPLE, 'rules' => [
@@ -145,9 +143,7 @@ class CItemTypeHttpAgent extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesInherited(array &$item, array $db_item): array {
-		$item += array_intersect_key($db_item, array_flip(['allow_traps']));
-
+	public static function getUpdateValidationRulesInherited(array $db_item): array {
 		return [
 			'url' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'query_fields' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
@@ -182,7 +178,7 @@ class CItemTypeHttpAgent extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesDiscovered(array &$item, array $db_item): array {
+	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
 			'url' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'query_fields' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],

@@ -28,7 +28,7 @@ class CItemTypeZabbixActive extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getCreateValidationRules(array &$item): array {
+	public static function getCreateValidationRules(array $item): array {
 		return [
 			'delay' =>	['type' => API_MULTIPLE, 'rules' => [
 							['if' => static function (array $data): bool {
@@ -42,7 +42,7 @@ class CItemTypeZabbixActive extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRules(array &$item, array $db_item): array {
+	public static function getUpdateValidationRules(array $db_item): array {
 		return [
 			'delay' =>	['type' => API_MULTIPLE, 'rules' => [
 							['if' => static function (array $data): bool {
@@ -59,7 +59,7 @@ class CItemTypeZabbixActive extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesInherited(array &$item, array $db_item): array {
+	public static function getUpdateValidationRulesInherited(array $db_item): array {
 		return [
 			'delay' =>	['type' => API_MULTIPLE, 'rules' => [
 							['if' => static function () use ($db_item): bool {
@@ -73,7 +73,7 @@ class CItemTypeZabbixActive extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesDiscovered(array &$item, array $db_item): array {
+	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
 			'delay' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
 		];

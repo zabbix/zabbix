@@ -28,7 +28,7 @@ class CItemTypeTrapper extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getCreateValidationRules(array &$item): array {
+	public static function getCreateValidationRules(array $item): array {
 		return [
 			'trapper_hosts' =>	['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')]
 		];
@@ -37,21 +37,21 @@ class CItemTypeTrapper extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRules(array &$item, array $db_item): array {
-		return self::getCreateValidationRules($item);
+	public static function getUpdateValidationRules(array $db_item): array {
+		return self::getCreateValidationRules([]);
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesInherited(array &$item, array $db_item): array {
-		return self::getCreateValidationRules($item);
+	public static function getUpdateValidationRulesInherited(array $db_item): array {
+		return self::getCreateValidationRules([]);
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesDiscovered(array &$item, array $db_item): array {
+	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
 			'trapper_hosts' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
 		];

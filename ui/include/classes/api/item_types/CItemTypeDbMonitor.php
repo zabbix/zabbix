@@ -28,7 +28,7 @@ class CItemTypeDbMonitor extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getCreateValidationRules(array &$item): array {
+	public static function getCreateValidationRules(array $item): array {
 		return [
 			'username' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
 			'password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
@@ -40,7 +40,7 @@ class CItemTypeDbMonitor extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRules(array &$item, array $db_item): array {
+	public static function getUpdateValidationRules(array $db_item): array {
 		return [
 			'username' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
 			'password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
@@ -52,7 +52,7 @@ class CItemTypeDbMonitor extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesInherited(array &$item, array $db_item): array {
+	public static function getUpdateValidationRulesInherited(array $db_item): array {
 		return [
 			'username' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
 			'password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
@@ -64,7 +64,7 @@ class CItemTypeDbMonitor extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public static function getUpdateValidationRulesDiscovered(array &$item, array $db_item): array {
+	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
 			'username' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'password' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],

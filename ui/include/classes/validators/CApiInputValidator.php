@@ -3445,7 +3445,7 @@ class CApiInputValidator {
 		$params = [];
 
 		foreach (explode("\n", $data) as $i => $param) {
-			$params[(string) $i + 1] = $param;
+			$params[$i + 1] = $param;
 		}
 
 		switch ($preproc_type) {
@@ -3572,7 +3572,7 @@ class CApiInputValidator {
 	private static function validatePrometheusPattern(array $rule, &$data, string $path, string &$error): bool {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
-		if (self::checkStringUtf8(($flags & API_NOT_EMPTY), $data, $path, $error) === false) {
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
 		}
 

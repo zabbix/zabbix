@@ -536,11 +536,12 @@ class CTemplate extends CHostGeneral {
 		$del_items = API::Item()->get([
 			'output' => ['itemid', 'name', 'flags'],
 			'templateids' => $templateids,
-			'nopermissions' => true
+			'nopermissions' => true,
+			'preservekeys' => true
 		]);
 
 		if ($del_items) {
-			CItemGeneral::deleteForce($del_items);
+			CItem::deleteForce($del_items);
 		}
 
 		// delete host from maps

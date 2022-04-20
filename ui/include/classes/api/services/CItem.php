@@ -1214,4 +1214,215 @@ class CItem extends CItemGeneral {
 		parent::addAffectedObjects($items, $db_items);
 		self::addAffectedTags($items, $db_items);
 	}
+
+		/**
+	 * Deletes items and related entities without permission check.
+	 *
+	 * @param array  $db_items
+	 * @param string $db_items[<num>]['itemid']
+	 * @param string $db_items[<num>]['name']
+	 * @param int    $db_items[<num>]['flags']
+	 */
+	public static function deleteForce(array $db_items) {
+		$del_itemids = [];
+		$del_items = [
+			ZBX_FLAG_DISCOVERY_NORMAL => [],
+			ZBX_FLAG_DISCOVERY_RULE => [],
+			ZBX_FLAG_DISCOVERY_CREATED => [],
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
+		];
+
+		$parent_itemids = array_column($db_items, 'itemid');
+
+		foreach ($db_items as $i => $db_item) {
+			$del_items[$db_item['flags']][$db_item['itemid']] = $db_item;
+			unset($db_items[$i]);
+		}
+
+		// Select inherited items.
+		do {
+			$child_items = DBselect(
+				'SELECT i.itemid,i.name,i.flags'.
+				' FROM items i'.
+				' WHERE '.dbConditionId('i.templateid', $parent_itemids)
+			);
+
+			$del_itemids += array_flip($parent_itemids);
+			$parent_itemids = [];
+
+			while ($child_item = DBfetch($child_items)) {
+				$itemid = $child_item['itemid'];
+				$del_items[$child_item['flags']][$itemid] = $child_item;
+
+				if (!array_key_exists($itemid, $del_itemids)) {
+					$parent_itemids[] = $itemid;
+				}
+			}
+		} while ($parent_itemids);
+
+		// Select all dependent items.
+		// Note: We are not separating normal from discovered items at this point.
+		$dep_itemids = array_keys($del_itemids);
+		$del_itemids = [];
+
+		do {
+			$dep_items = DBselect(
+				'SELECT i.itemid,i.name,i.flags'.
+				' FROM items i'.
+				' WHERE i.type='.ITEM_TYPE_DEPENDENT.
+					' AND '.dbConditionInt('i.master_itemid', $dep_itemids)
+			);
+
+			$del_itemids += array_flip($dep_itemids);
+			$dep_itemids = [];
+
+			while ($dep_item = DBfetch($dep_items)) {
+				$itemid = $dep_item['itemid'];
+				$del_items[$dep_item['flags']][$itemid] = $dep_item;
+
+				if (!array_key_exists($itemid, $del_itemids)) {
+					$dep_itemids[] = $itemid;
+				}
+			}
+
+		} while ($dep_itemids);
+
+		$del_itemids = array_keys($del_itemids);
+
+		if ($del_items[ZBX_FLAG_DISCOVERY_RULE]) {
+			CDiscoveryRuleManager::delete(array_keys($del_items[ZBX_FLAG_DISCOVERY_RULE]));
+		}
+
+		if ($del_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
+			CItemPrototype::deleteForce($del_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+			$del_itemids = array_diff_key($del_itemids, array_keys($del_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
+			unset($del_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+		}
+
+		// Delete graphs and graph prototypes, which will remain without items.
+		$del_graphids = DBfetchColumn(DBselect(
+			'SELECT DISTINCT gi.graphid'.
+			' FROM graphs_items gi'.
+			' WHERE '.dbConditionInt('gi.itemid', $del_itemids).
+				' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM graphs_items gii'.
+					' WHERE gii.graphid=gi.graphid'.
+						' AND '.dbConditionInt('gii.itemid', $del_itemids, true).
+				')'
+		), 'graphid');
+
+		if ($del_graphids) {
+			CGraphManager::delete($del_graphids);
+		}
+
+		// Cleanup ymin_itemid and ymax_itemid fields for graphs and graph prototypes.
+		DB::update('graphs', [
+			'values' => [
+				'ymin_type' => GRAPH_YAXIS_TYPE_CALCULATED,
+				'ymin_itemid' => null
+			],
+			'where' => ['ymin_itemid' => $del_itemids]
+		]);
+
+		DB::update('graphs', [
+			'values' => [
+				'ymax_type' => GRAPH_YAXIS_TYPE_CALCULATED,
+				'ymax_itemid' => null
+			],
+			'where' => ['ymax_itemid' => $del_itemids]
+		]);
+
+		// Delete triggers and trigger prototypes.
+		$db_triggers = DBselect(
+			'SELECT DISTINCT t.triggerid,t.flags'.
+			' FROM triggers t,functions f'.
+			' WHERE t.triggerid=f.triggerid'.
+				' AND '.dbConditionInt('f.itemid', $del_itemids)
+		);
+
+		$del_triggerids = [
+			ZBX_FLAG_DISCOVERY_NORMAL => [],
+			ZBX_FLAG_DISCOVERY_CREATED => [],
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
+		];
+
+		while ($db_trigger = DBfetch($db_triggers)) {
+			$del_triggerids[$db_trigger['flags']][] = $db_trigger['triggerid'];
+		}
+
+		if ($del_triggerids[ZBX_FLAG_DISCOVERY_NORMAL] || $del_triggerids[ZBX_FLAG_DISCOVERY_CREATED]) {
+			CTriggerManager::delete(array_merge(
+				$del_triggerids[ZBX_FLAG_DISCOVERY_NORMAL],
+				$del_triggerids[ZBX_FLAG_DISCOVERY_CREATED]
+			));
+		}
+
+		if ($del_triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
+			CTriggerPrototypeManager::delete($del_triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+		}
+
+		DB::delete('profiles', [
+			'idx' => 'web.favorite.graphids',
+			'source' => 'itemid',
+			'value_id' => $del_itemids
+		]);
+
+		// Clean history and trends tables from outdated items.
+		global $DB;
+		$table_names = ['trends', 'trends_uint', 'history_text', 'history_log', 'history_uint', 'history_str',
+			'history', 'events'
+		];
+		$ins_housekeeper = [];
+
+		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
+			if (CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION) === ZBX_DB_EXTENSION_TIMESCALEDB) {
+				if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_MODE) != 0
+						&& CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
+					$table_names = array_diff($table_names,
+						['history', 'history_str', 'history_uint', 'history_log', 'history_text']
+					);
+				}
+
+				if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_MODE) != 0
+						&& CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL) == 1) {
+					$table_names = array_diff($table_names, ['trends', 'trends_uint']);
+				}
+			}
+		}
+
+		foreach ($del_itemids as $del_itemid) {
+			foreach ($table_names as $table_name) {
+				$ins_housekeeper[] = [
+					'tablename' => $table_name,
+					'field' => 'itemid',
+					'value' => $del_itemid
+				];
+
+				if (count($ins_housekeeper) == ZBX_DB_MAX_INSERTS) {
+					DB::insertBatch('housekeeper', $ins_housekeeper);
+					$ins_housekeeper = [];
+				}
+			}
+		}
+
+		if ($ins_housekeeper) {
+			DB::insertBatch('housekeeper', $ins_housekeeper);
+		}
+
+		DB::delete('items', ['itemid' => $del_itemids]);
+
+		static $resource_types = [
+			ZBX_FLAG_DISCOVERY_NORMAL => CAudit::RESOURCE_ITEM,
+			ZBX_FLAG_DISCOVERY_CREATED => CAudit::RESOURCE_ITEM,
+			ZBX_FLAG_DISCOVERY_RULE => CAudit::RESOURCE_DISCOVERY_RULE,
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => CAudit::RESOURCE_ITEM_PROTOTYPE
+		];
+
+		foreach ($del_items as $flags => $db_items) {
+			if ($db_items) {
+				self::addAuditLog(CAudit::ACTION_DELETE, $resource_types[$flags], $db_items);
+			}
+		}
+	}
 }
