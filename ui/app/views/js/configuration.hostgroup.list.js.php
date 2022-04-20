@@ -61,17 +61,15 @@
 		edit(parameters = {}) {
 			const overlay = PopUp('popup.hostgroup.edit', parameters, {
 				dialogueid: 'hostgroup_edit',
-				dialogue_class: 'modal-popup-static'
+				dialogue_class: 'modal-popup-static',
+				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				postMessageOk(e.detail.title);
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail));
+			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
+				uncheckTableRows('hostgroup');
 
-				if (e.detail.messages !== null) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				location.href = location.href;
+				this._reload(e.detail);
 			});
 		},
 
@@ -82,7 +80,7 @@
 				return;
 			}
 
-			this.post(target, groupids, this.enable_url);
+			this._post(target, groupids, this.enable_url);
 		},
 
 		disable(target, groupids) {
@@ -92,7 +90,7 @@
 				return;
 			}
 
-			this.post(target, groupids, this.disable_url);
+			this._post(target, groupids, this.disable_url);
 		},
 
 		delete(target, groupids) {
@@ -104,10 +102,33 @@
 				return;
 			}
 
-			this.post(target, groupids, this.delete_url);
+			this._post(target, groupids, this.delete_url);
 		},
 
-		post(target, groupids, url) {
+		editHost(e, hostid) {
+			e.preventDefault();
+			const host_data = {hostid};
+
+			this.openHostPopup(host_data);
+		},
+
+		openHostPopup(host_data) {
+			const original_url = location.href;
+			const overlay = PopUp('popup.host.edit', host_data, {
+				dialogueid: 'host_edit',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.create', (e) => this._reload(e.detail.success));
+			overlay.$dialogue[0].addEventListener('dialogue.update', (e) => this._reload(e.detail.success));
+			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => this._reload(e.detail.success));
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', original_url);
+			});
+		},
+
+		_post(target, groupids, url) {
 			target.classList.add('is-loading');
 
 			return fetch(url, {
@@ -150,43 +171,14 @@
 				});
 		},
 
-		editHost(e, hostid) {
-			e.preventDefault();
-			const host_data = {hostid};
+		_reload(success) {
+			postMessageOk(success.title);
 
-			this.openHostPopup(host_data);
-		},
-
-		openHostPopup(host_data) {
-			const original_url = location.href;
-			const overlay = PopUp('popup.host.edit', host_data, {
-				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
-				history.replaceState({}, '', original_url);
-			}, {once: true});
-		},
-
-		events: {
-			hostSuccess(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
-					}
-				}
-
-				location.href = location.href;
+			if ('messages' in success) {
+				postMessageDetails('success', success.messages);
 			}
+
+			location.href = location.href;
 		}
 	};
 </script>

@@ -69,44 +69,11 @@ window.templategroup_edit_popup = {
 
 		const curl = new Curl(this.groupid !== null ? this.update_url : this.create_url);
 
-		fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(fields)
-		})
-			.then((response) => response.json())
-			.then((response) => {
-				if ('errors' in response) {
-					throw {html_string: response.errors};
-				}
+		this._post(curl.getUrl(), fields, (response) => {
+			overlayDialogueDestroy(this.overlay.dialogueid);
 
-				overlayDialogueDestroy(this.overlay.dialogueid);
-
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {
-					detail: {
-						title: response.title,
-						messages: ('messages' in response) ? response.messages : null
-					}
-				}));
-			})
-			.catch((error) => {
-				let message_box;
-
-				if (typeof error === 'object' && 'html_string' in error) {
-					message_box =
-						new DOMParser().parseFromString(error.html_string, 'text/html').body.firstElementChild;
-				}
-				else {
-					const error = <?= json_encode(_('Unexpected server error.')) ?>;
-
-					message_box = makeMessageBox('bad', [], error, true, false)[0];
-				}
-
-				this.form.parentNode.insertBefore(message_box, this.form);
-			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+		});
 	},
 
 	cancel() {
@@ -121,56 +88,52 @@ window.templategroup_edit_popup = {
 	},
 
 	delete() {
-		for (const el of this.form.parentNode.children) {
-			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
-				el.parentNode.removeChild(el);
-			}
-		}
-
-		this.overlay.setLoading();
-
 		const curl = new Curl(this.delete_url);
 
-		fetch(curl.getUrl(), {
+		this._post(curl.getUrl(), {groupids: [this.groupid]}, (response) => {
+			overlayDialogueDestroy(this.overlay.dialogueid);
+
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+		});
+	},
+
+	_post(url, data, success_callback) {
+		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({groupids: [this.groupid]})
+			body: JSON.stringify(data)
 		})
 			.then((response) => response.json())
 			.then((response) => {
 				if ('error' in response) {
-					throw {response_error: response.error};
+					throw {error: response.error};
 				}
 
-				if ('success' in response) {
-					postMessageOk(response.success.title);
-
-					if ('messages' in response.success) {
-						postMessageDetails('success', response.success.messages);
-					}
-
-					uncheckTableRows('templategroup');
-				}
-
-				location.href = location.href;
+				return response;
 			})
-			.catch((error) => {
-				this.overlay.unsetLoading();
+			.then(success_callback)
+			.catch((exception) => {
+				for (const element of this.form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
+				}
 
 				let title, messages;
 
-				if (typeof error === 'object' && 'response_error' in error) {
-					title = error.response_error.title;
-					messages = error.response_error.messages;
-				}
-				else {
-					title = <?= json_encode(_('Unexpected server error.')) ?>;
-					messages = [];
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				} else {
+					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 				}
 
-				const message_box = makeMessageBox('bad', messages, title, true, false)[0];
+				const message_box = makeMessageBox('bad', messages, title)[0];
 
 				this.form.parentNode.insertBefore(message_box, this.form);
 			})
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
 	}
 }

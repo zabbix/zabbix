@@ -34,17 +34,14 @@ class CControllerHostGroupCreate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			switch ($this->GetValidationError()) {
-				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('zabbix.php?action=hostgroup.edit');
-					$response->setFormData($this->getInputAll());
-					CMessageHelper::setErrorTitle(_('Cannot add host group'));
-					$this->setResponse($response);
-					break;
-				case self::VALIDATION_FATAL_ERROR:
-					$this->setResponse(new CControllerResponseFatal());
-					break;
-			}
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'title' => _('Cannot add host group'),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
 		}
 
 		return $ret;
@@ -59,16 +56,19 @@ class CControllerHostGroupCreate extends CController {
 		$result = API::HostGroup()->create(['name' => $this->getInput('name')]);
 		$result = DBend($result);
 
-		if ($result) {
-			$output = ['title' => _('Host group added')];
+		$output = [];
 
-			if ($messages = CMessageHelper::getMessages()) {
-				$output['messages'] = array_column($messages, 'message');
+		if ($result) {
+			$output['success']['title'] = _('Host group added');
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
 			}
 		}
 		else {
-			$output = [
-				'errors' => makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())->toString()
+			$output['error'] = [
+				'title' => _('Cannot add host group'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}
 		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());

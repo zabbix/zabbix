@@ -47,17 +47,15 @@
 		edit(parameters = {}) {
 			const overlay = PopUp('popup.templategroup.edit', parameters, {
 				dialogueid: 'templategroup_edit',
-				dialogue_class: 'modal-popup-static'
+				dialogue_class: 'modal-popup-static',
+				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				postMessageOk(e.detail.title);
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail));
+			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
+				uncheckTableRows('hostgroup');
 
-				if (e.detail.messages !== null) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				location.href = location.href;
+				this._reload(e.detail);
 			});
 		},
 
@@ -70,10 +68,10 @@
 				return;
 			}
 
-			this.post(target, groupids, this.delete_url);
+			this._post(target, groupids, this.delete_url);
 		},
 
-		post(target, groupids, url) {
+		_post(target, groupids, url) {
 			target.classList.add('is-loading');
 
 			return fetch(url, {
@@ -105,16 +103,26 @@
 					location.href = location.href;
 				})
 				.catch(() => {
+					clearMessages();
+
 					const title = <?= json_encode(_('Unexpected server error.')) ?>;
 					const message_box = makeMessageBox('bad', [], title, true, false)[0];
 
-					clearMessages();
 					addMessage(message_box);
 				})
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
+		},
 
+		_reload(success) {
+			postMessageOk(success.title);
+
+			if ('messages' in success) {
+				postMessageDetails('success', success.messages);
+			}
+
+			location.href = location.href;
 		}
 	}
 </script>

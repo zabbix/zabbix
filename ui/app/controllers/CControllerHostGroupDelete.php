@@ -33,7 +33,14 @@ class CControllerHostGroupDelete extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'title' => _('Cannot delete host groups'),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
 		}
 
 		return $ret;
@@ -50,12 +57,10 @@ class CControllerHostGroupDelete extends CController {
 
 		$deleted = count($groupids);
 
+		$output = [];
+
 		if ($result) {
-			$output['success']['title'] = _n(
-				'Host group deleted',
-				'Host groups deleted',
-				$deleted
-			);
+			$output['success']['title'] = _n('Host group deleted', 'Host groups deleted', $deleted);
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -70,11 +75,7 @@ class CControllerHostGroupDelete extends CController {
 			]);
 
 			$output['error'] = [
-				'title' => _n(
-					'Cannot delete host group',
-					'Cannot delete host groups',
-					$deleted
-				),
+				'title' => _n('Cannot delete host group', 'Cannot delete host groups', $deleted),
 				'messages' => array_column(get_and_clear_messages(), 'message'),
 				'keepids' => array_keys($groups)
 			];
