@@ -211,10 +211,10 @@ static int	DBpatch_6010010(void)
 				"(1,'Default LDAP server','','%s',%s,'%s','%s','%s','%s',%d)",
 				row[0], row[1], base_dn_esc, bind_dn_esc, password_esc, search_esc, 0);
 
-		zbx_free(base_dn_esc);
-		zbx_free(bind_dn_esc);
-		zbx_free(password_esc);
 		zbx_free(search_esc);
+		zbx_free(password_esc);
+		zbx_free(bind_dn_esc);
+		zbx_free(base_dn_esc);
 	}
 
 	DBfree_result(result);
