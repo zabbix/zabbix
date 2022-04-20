@@ -2314,7 +2314,10 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
 
 .subfilter {
   margin-right: 10px;
-  white-space: nowrap; }
+  white-space: nowrap;
+  line-height: 15px;
+  height: 16px;
+  margin-bottom: 2px; }
 
 .subfilter-enabled {
   background-color: #333333;
