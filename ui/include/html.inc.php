@@ -306,7 +306,7 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 				(new CUrl('zabbix.php'))->setArgument('action', 'host.list'))), $host
 			]))
 			->addItem($status)
-			->addItem(getHostAvailabilityTable($db_host['interfaces'], $db_host['hostid']), $db_host['hostid']);
+			->addItem(getHostAvailabilityTable($db_host['interfaces']));
 
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_host['hostDiscovery']['ts_delete'] != 0) {
 			$info_icons = [getHostLifetimeIndicator(time(), $db_host['hostDiscovery']['ts_delete'])];
@@ -579,11 +579,11 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
  * Create HTML helper element for host interfaces availability.
  *
  * @param array  $host_interfaces
- * @param string $hostid
  *
  * @return CHostAvailability
  */
-function getHostAvailabilityTable(array $host_interfaces, string $hostid): CHostAvailability {
+function getHostAvailabilityTable(array $host_interfaces): CHostAvailability {
+
 	$interfaces = [];
 
 	foreach ($host_interfaces as $interface) {
@@ -598,25 +598,12 @@ function getHostAvailabilityTable(array $host_interfaces, string $hostid): CHost
 			'available' => $interface['available'],
 			'interface' => getHostInterface($interface),
 			'description' => $description,
-			'error' => ($interface['available'] == INTERFACE_AVAILABLE_TRUE) ? '' : $interface['error']
+			'error' => ($interface['available'] == INTERFACE_AVAILABLE_TRUE) ? '' : $interface['error'],
+			'active_available' => $interface['active_available']
 		];
 	}
 
-	$availability_status = 0;
-
-	$host_availability_status = DB::select('host_rtdata', [
-		'output' => ['available'],
-		'filter' => [
-			'hostid' => [$hostid]
-		],
-		'limit' => 1
-	]);
-
-	if ($host_availability_status) {
-		$availability_status = $host_availability_status[0]['available'];
-	}
-
-	return (new CHostAvailability())->setInterfaces($interfaces, $availability_status);
+	return (new CHostAvailability())->setInterfaces($interfaces);
 }
 
 /**

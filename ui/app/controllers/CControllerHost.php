@@ -156,7 +156,8 @@ abstract class CControllerHost extends CController {
 
 		// Get additional data to limited host amount.
 		$hosts = API::Host()->get([
-			'output' => ['hostid', 'name', 'status', 'maintenance_status', 'maintenanceid', 'maintenance_type'],
+			'output' => ['hostid', 'name', 'status', 'maintenance_status', 'maintenanceid', 'maintenance_type',
+				'active_available'],
 			'selectInterfaces' => ['ip', 'dns', 'port', 'main', 'type', 'useip', 'available', 'error', 'details'],
 			'selectGraphs' => API_OUTPUT_COUNT,
 			'selectHttpTests' => API_OUTPUT_COUNT,
@@ -197,6 +198,9 @@ abstract class CControllerHost extends CController {
 		}
 
 		foreach ($hosts as &$host) {
+			$host['interfaces'][0]['active_available'] = $host['active_available'];
+			unset($host['active_available']);
+
 			// Count number of dashboards for each host.
 			$host['dashboards'] = count(getHostDashboards($host['hostid']));
 

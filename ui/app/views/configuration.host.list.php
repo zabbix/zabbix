@@ -472,7 +472,7 @@ foreach ($data['hosts'] as $host) {
 		$monitored_by,
 		$hostTemplates,
 		$toggle_status_link,
-		getHostAvailabilityTable($host['interfaces'], $host['hostid']),
+		getHostAvailabilityTable($host['interfaces']),
 		$encryption,
 		makeInformationList($info_icons),
 		$data['tags'][$host['hostid']]

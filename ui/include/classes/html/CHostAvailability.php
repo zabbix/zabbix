@@ -23,6 +23,7 @@ class CHostAvailability extends CTag {
 
 	public const LABELS = [
 		INTERFACE_TYPE_AGENT => 'ZBX',
+		INTERFACE_TYPE_ACTIVE_AGENT => 'ZBXACTIVE',
 		INTERFACE_TYPE_SNMP => 'SNMP',
 		INTERFACE_TYPE_IPMI => 'IPMI',
 		INTERFACE_TYPE_JMX => 'JMX'
@@ -50,21 +51,19 @@ class CHostAvailability extends CTag {
 	 *
 	 * @return CHostAvailability
 	 */
-	public function setInterfaces(array $interfaces, string $availability_status): CHostAvailability {
+	public function setInterfaces(array $interfaces): CHostAvailability {
 		$this->type_interfaces = array_fill_keys(array_keys(static::LABELS), []);
 
 		foreach ($interfaces as $interface) {
 			$this->type_interfaces[$interface['type']][] = $interface;
+			$this->type_interfaces[INTERFACE_TYPE_AGENT][] = [
+				'type' => INTERFACE_TYPE_ACTIVE_AGENT,
+				'available' => $interface['active_available'],
+				'interface' => _('Active checks'),
+				'description' => null,
+				'error' => ''
+			];
 		}
-
-		$this->type_interfaces[INTERFACE_TYPE_AGENT][] = [
-			'type' => INTERFACE_TYPE_AGENT,
-			'available' => $availability_status,
-			'interface' => _('Active checks'),
-			'description' => null,
-			'error' => ''
-		];
-
 		return $this;
 	}
 
