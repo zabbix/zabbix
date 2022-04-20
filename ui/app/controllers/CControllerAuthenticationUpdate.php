@@ -46,7 +46,7 @@ class CControllerAuthenticationUpdate extends CController {
 			'ldap_servers' =>					'array',
 			'ldap_default_row_index' =>			'int32',
 			'ldap_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'ldap_removed_userdirectoryids'  =>	 'array',
+			'ldap_removed_userdirectoryids' =>	'array',
 			'http_auth_enabled' =>				'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
 			'http_login_form' =>				'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
 			'http_strip_domains' =>				'db config.http_strip_domains',

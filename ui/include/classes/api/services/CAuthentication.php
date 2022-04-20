@@ -182,7 +182,6 @@ class CAuthentication extends CApiService {
 			}
 		}
 
-
 		return $db_auth;
 	}
 }
