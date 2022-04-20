@@ -464,6 +464,15 @@ class CHost extends CHostGeneral {
 				$sqlParts['left_join']['interface'] = ['alias' => 'hi', 'table' => 'interface', 'using' => 'hostid'];
 				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 			}
+
+			if (array_key_exists('active_available', $options['filter'])
+					&& $options['filter']['active_available'] !== null) {
+				$this->dbFilter('host_rtdata hr', ['filter' => [
+						'active_available' => $options['filter']['active_available']
+					]] + $options,
+					$sqlParts
+				);
+			}
 		}
 
 		// tags
@@ -581,16 +590,26 @@ class CHost extends CHostGeneral {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ((!$options['countOutput'] && ($this->outputIsRequested('available', $options['output'])))
-			|| (is_array($options['filter']) && array_key_exists('available', $options['filter']))) {
-			$sqlParts['select']['available'] = 'hr.available';
-			$sqlParts['left_join'][] = ['alias' => 'hr', 'table' => 'host_rtdata', 'using' => 'hostid'];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-		}
-
 		if (!$options['countOutput']) {
-			if ($this->outputIsRequested('available', $options['output'])) {
-				$sqlParts = $this->addQuerySelect('hr.available', $sqlParts);
+			if ($this->outputIsRequested('inventory_mode', $options['output'])
+					|| ($options['filter'] && array_key_exists('inventory_mode', $options['filter']))) {
+				$sqlParts['left_join'][] = ['alias' => 'hinv', 'table' => 'host_inventory', 'using' => 'hostid'];
+				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+			}
+
+			if ($this->outputIsRequested('active_available', $options['output'])
+					|| (is_array($options['filter']) && array_key_exists('active_available', $options['filter']))) {
+				$sqlParts['left_join'][] = ['alias' => 'hr', 'table' => 'host_rtdata', 'using' => 'hostid'];
+				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+			}
+
+			if ($this->outputIsRequested('inventory_mode', $options['output'])) {
+				$sqlParts['select']['inventory_mode'] =
+					dbConditionCoalesce('hinv.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode');
+			}
+
+			if ($this->outputIsRequested('active_available', $options['output'])) {
+				$sqlParts = $this->addQuerySelect('hr.active_available', $sqlParts);
 			}
 		}
 
