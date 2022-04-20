@@ -248,3 +248,4 @@ if ($db eq 'timescaledb') {
 		}
 	}
 }
+
