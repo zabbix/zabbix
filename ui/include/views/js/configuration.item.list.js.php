@@ -95,32 +95,14 @@
 				.then((response) => {
 					clearMessages();
 
-					/*
-					 * Using postMessageError or postMessageOk would mean that those messages are stored in session
-					 * messages and that would mean to reload the page and show them. Also postMessageError would be
-					 * displayed right after header is loaded. Meaning message is not inside the page form like that is
-					 * in postMessageOk case. Instead show message directly that comes from controller. Checkboxes
-					 * use uncheckTableRows which only unsets checkboxes from session storage, but not physically
-					 * deselects them. Another reason for need for page reload. Instead of page reload, manually
-					 * deselect the checkboxes that were selected previously in session storage, but only in case of
-					 * success message. In case of error message leave checkboxes checked.
-					 */
 					if ('error' in response) {
 						addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true, true));
 					}
 					else if('success' in response) {
 						addMessage(makeMessageBox('good', [], response.success.title, true, false));
 
-						let uncheckids = chkbxRange.getSelectedIds();
-						uncheckids = Object.keys(uncheckids);
-
-						// This will only unset checkboxes from session storage, but not physically deselect them.
-						uncheckTableRows('items_' + this.checkbox_hash, [], false);
-
-						// Deselect the previous checkboxes.
+						const uncheckids = Object.keys(chkbxRange.getSelectedIds());
 						chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
-
-						// Reset the buttons in footer and update main checkbox.
 						chkbxRange.update(this.checkbox_object);
 					}
 				})
@@ -153,48 +135,15 @@
 			curl.setArgument('context', new URLSearchParams(location.search).get('context'));
 
 			// Actions that are affected by status change, should be also changed in checkbox session storage.
-			const selected_ids = chkbxRange.getSelectedIds();
-			let ids = {};
+			// Get allowed and affected actions.
+			let allowed_actions_string = button.getAttribute('data-actions');
 
-			for (const [id, attr] of Object.entries(selected_ids)) {
-				if (id == item.itemid) {
-					// Get allowed and affected actions.
-					let allowed_actions = button.getAttribute('data-actions');
-
-					if (allowed_actions === null) {
-						allowed_actions = '';
-					}
-
-					const allowed_actions_list = allowed_actions.split(' ');
-
-					// Compare affected actions and existing actions and then replace them if needed.
-					if (attr !== null) {
-						const existing_action_list = attr.split(' ');
-
-						// First save the actions that are not affected by status change.
-						let actions = existing_action_list.filter(action => !allowed_actions_list.includes(action));
-
-						// Then add only affected actions.
-						for (const action of allowed_actions_list) {
-							if (item.status == <?= ITEM_STATUS_DISABLED ?>) {
-								actions.push(action);
-							}
-						}
-
-						ids[id] = actions.join(' ').trim();
-					}
-					else {
-						// If there are no exising attributes for this checkbox, new ones should be added or removed.
-						ids[id] = (item.status == <?= ITEM_STATUS_DISABLED ?>) ? allowed_actions : '';
-					}
-				}
-				else {
-					ids[id] = attr;
-				}
+			if (allowed_actions_string === null) {
+				allowed_actions_string = '';
 			}
 
-			// Store the new actions with same selected IDs in session storage.
-			chkbxRange.saveSessionStorage(chkbxRange.pageGoName, ids);
+			const allowed_actions = allowed_actions_string.split(' ');
+			chkbxRange.updateActions(item.itemid, allowed_actions, item.status == <?= ITEM_STATUS_DISABLED ?>);
 
 			// Perform redirect to item form for the massenable or massdisable.
 			location.href = curl.getUrl();
