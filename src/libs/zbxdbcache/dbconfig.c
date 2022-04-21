@@ -6007,9 +6007,6 @@ static void	zbx_dbsync_process_active_avail_diff(zbx_vector_ptr_t *diff)
 	zbx_availability_send(ZBX_IPC_AVAILMAN_CONFSYNC_DIFF, data, data_len, NULL);
 
 	zbx_ipc_message_clean(&message);
-
-	zbx_vector_ptr_clear_ext(diff, zbx_ptr_free);
-	zbx_vector_ptr_destroy(diff);
 }
 
 /******************************************************************************
@@ -6237,8 +6234,9 @@ void	DCsync_configuration(unsigned char mode)
 
 	FINISH_SYNC;
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		zbx_dbsync_process_active_avail_diff(&active_avail_diff);
+	zbx_dbsync_process_active_avail_diff(&active_avail_diff);
+	zbx_vector_ptr_clear_ext(&active_avail_diff, zbx_ptr_free);
+	zbx_vector_ptr_destroy(&active_avail_diff);
 
 	/* sync item data to support item lookups when resolving macros during configuration sync */
 
