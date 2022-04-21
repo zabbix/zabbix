@@ -18,12 +18,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/common/testFormMacros.php';
+require_once dirname(__FILE__).'/../common/testFormMacros.php';
 
 /**
- * @backup hosts
+ * @backup hosts, config
+ *
+ * @onBefore prepareHostPrototypeMacrosData
  */
 class testFormMacrosHostPrototype extends testFormMacros {
+
+	/**
+	 * Create new macros for host prototype.
+	 */
+	public function prepareHostPrototypeMacrosData() {
+		CDataHelper::call('hostprototype.update', [
+			[
+				'hostid' => 90010,
+				'macros' => [
+					'macro' => '{$NEWMACROS}',
+					'value' => 'something/value:key',
+					'type' => 2
+				]
+			]
+		]);
+	}
 
 	// Parent LLD for Host prototypes 'Discovery rule 1' host: 'Host for host prototype tests'.
 	const LLD_ID		= 90001;
@@ -53,7 +71,8 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	protected static $host_prototoypeid_remove_inherited;
 
 	public $vault_object = 'host prototype';
-	public $vault_error_field = '/1/macros/6/value';
+	public $hashi_error_field = '/1/macros/6/value';
+	public $cyber_error_field = '/1/macros/4/value';
 	public $update_vault_macro = '{$VAULT_HOST_MACRO3_CHANGED}';
 	public $vault_macro_index = 0;
 
@@ -235,27 +254,40 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 * @dataProvider getUpdateSecretMacrosData
 	 */
 	public function testFormMacrosHostPrototype_UpdateSecretMacros($data) {
-		$this->updateSecretMacros($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid=90001&hostid=99206', 'host-prototype');
+		$this->updateSecretMacros($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid=90001&hostid=99206',
+				'host-prototype');
 	}
 
 	/**
 	 * @dataProvider getRevertSecretMacrosData
 	 */
 	public function testFormMacrosHostPrototype_RevertSecretMacroChanges($data) {
-		$this->revertSecretMacroChanges($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid=90001&hostid=99206', 'host-prototype');
+		$this->revertSecretMacroChanges($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid=90001&hostid=99206',
+				'host-prototype');
+	}
+
+	/**
+	 * Check Vault macros validation.
+	 */
+	public function testFormMacrosHostPrototype_checkVaultValidation() {
+		$this->checkVaultValidation('host_prototypes.php?form=update&context=host&parent_discoveryid=90003&hostid=90010',
+				'host-prototype');
 	}
 
 	/**
 	 * @dataProvider getCreateVaultMacrosData
 	 */
 	public function testFormMacrosHostPrototype_CreateVaultMacros($data) {
-		$this->createVaultMacros($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid=90001&hostid=99205', 'host-prototype');
+		$hostid = ($data['vault'] === 'Hashicorp') ? '99205' : '90002';
+		$this->createVaultMacros($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid=90001&hostid='.$hostid,
+				'host-prototype');
 	}
 
 	/**
 	 * @dataProvider getUpdateVaultMacrosData
 	 */
 	public function testFormMacrosHostPrototype_UpdateVaultMacros($data) {
-		$this->updateVaultMacros($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid=90003&hostid=90008', 'host-prototype');
+		$this->updateVaultMacros($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid=90003&hostid=90008',
+				'host-prototype');
 	}
 }
