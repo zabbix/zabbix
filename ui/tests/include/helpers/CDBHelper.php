@@ -331,16 +331,12 @@ class CDBHelper {
 				throw new Exception('Failed to restore "'.$file.'".');
 			}
 
-			$os = defined('PHPUNIT_ENV_OS') ? strtolower(PHPUNIT_ENV_OS) : '';
-			switch ($os) {
-				case 'win':
-				case 'windows':
-					$file = str_replace('/', '\\', $file);
-					exec('rd '.$file.' /q /s');
-					break;
-
-				default:
-					exec('rm -rf '.$file);
+			if (strstr(strtolower(PHP_OS), 'win') !== false) {
+				$file = str_replace('/', '\\', $file);
+				exec('rd '.$file.' /q /s');
+			}
+			else {
+				exec('rm -rf '.$file);
 			}
 
 			if ($result_code != 0) {
