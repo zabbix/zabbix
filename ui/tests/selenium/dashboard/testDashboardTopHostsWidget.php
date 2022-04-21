@@ -50,7 +50,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 */
 	private static $updated_name = 'Top hosts update';
 
-	/*
+	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
 	 * because it can change.
 	 */
@@ -2162,7 +2162,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 *
 	 * @dataProvider getBarScreenshotsData
 	 */
-	public function testDashboardTopHostsWidget_widgetAppearance($data) {
+	public function testDashboardTopHostsWidget_WidgetAppearance($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_screenshots']);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->getWidget('Top hosts screenshots')->edit();
@@ -2239,7 +2239,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			[
 				[
 					'main_fields' =>  [
-						'Name' => 'text value item'
+						'Name' => 'Text value item'
 					],
 					'column_fields' => [
 						[
@@ -2250,11 +2250,27 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'text' => 'Text for text item'
 				]
 			],
-			// #1 text item, display Bar - value not displayed.
+			// #1 text item, history data Trends - value displayed.
 			[
 				[
 					'main_fields' =>  [
-						'Name' => 'text display bar'
+						'Name' => 'Text trends history'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_text',
+							'History data' => 'Trends'
+						]
+					],
+					'text' => 'Text for text item'
+				]
+			],
+			// #2 text item, display Bar - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Text display bar'
 					],
 					'column_fields' => [
 						[
@@ -2265,11 +2281,11 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #2 text item, display Indicators - value not displayed.
+			// #3 text item, display Indicators - value not displayed.
 			[
 				[
 					'main_fields' =>  [
-						'Name' => 'text display indicators'
+						'Name' => 'Text display indicators'
 					],
 					'column_fields' => [
 						[
@@ -2280,11 +2296,11 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #3 text item, Aggregation function max - value not displayed.
+			// #4 text item, Aggregation function max - value not displayed.
 			[
 				[
 					'main_fields' =>  [
-						'Name' => 'text aggregation function'
+						'Name' => 'Text aggregation function'
 					],
 					'column_fields' => [
 						[
@@ -2295,17 +2311,206 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #4 text item, Threshold - value not displayed.
+			// #5 text item, Threshold - value not displayed.
 			[
 				[
 					'main_fields' =>  [
-						'Name' => 'text threshold'
+						'Name' => 'Text threshold'
 					],
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
 							'Item' => 'trap_text',
-							'Aggregation function' => 'max',
+							'Thresholds' => [
+								[
+									'value' => '10'
+								]
+							]
+						]
+					]
+				]
+			],
+			// #6 log item - value displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Log value item'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_log'
+						]
+					],
+					'text' => 'Logs for text item'
+				]
+			],
+			// #7 log item, history data Trends - value displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Log trends history'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_log',
+							'History data' => 'Trends'
+						]
+					],
+					'text' => 'Logs for text item'
+				]
+			],
+			// #8 log item, display Bar - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Log display bar'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_log',
+							'Display' => 'Bar'
+						]
+					]
+				]
+			],
+			// #9 log item, display Indicators - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Log display indicators'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_log',
+							'Display' => 'Indicators'
+						]
+					]
+				]
+			],
+			// #10 log item, Aggregation function max - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Log aggregation function'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_log',
+							'Aggregation function' => 'max'
+						]
+					]
+				]
+			],
+			// #11 log item, Threshold - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Log threshold'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_log',
+							'Thresholds' => [
+								[
+									'value' => '10'
+								]
+							]
+						]
+					]
+				]
+			],
+			// #12 char item - value displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Char value item'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_char'
+						]
+					],
+					'text' => 'characters_here'
+				]
+			],
+			// #13 char item, history data Trends - value displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Char trends history'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_char',
+							'History data' => 'Trends'
+						]
+					],
+					'text' => 'characters_here'
+				]
+			],
+			// #14 char item, display Bar - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Char display bar'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_char',
+							'Display' => 'Bar'
+						]
+					]
+				]
+			],
+			// #15 char item, display Indicators - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Char display indicators'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_char',
+							'Display' => 'Indicators'
+						]
+					]
+				]
+			],
+			// #16 char item, Aggregation function max - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Char aggregation function'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_char',
+							'Aggregation function' => 'max'
+						]
+					]
+				]
+			],
+			// #17 char item, Threshold - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Char threshold'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_char',
 							'Thresholds' => [
 								[
 									'value' => '10'
@@ -2319,6 +2524,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 	}
 
 	/**
+	 * Changing column parameters, check that text value is visible/non-visible.
 	 *
 	 * @dataProvider getCheckTextItemsData
 	 */
@@ -2329,21 +2535,15 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$form->fill(['Type' => 'Top hosts']);
 		COverlayDialogElement::find()->waitUntilReady()->one();
 
-		// Add new column.
+		// Add new column and save widget.
 		$this->fillColumnForm($data, 'create');
-
-		$form->fill($data['main_fields']);
-		$form->submit();
-		$this->page->waitUntilReady();
-
+		$form->fill($data['main_fields'])->submit();
+		$dashboard->getWidget($data['main_fields']['Name'])->waitUntilReady();
 		$dashboard->save();
-		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
-		if (array_key_exists('text', $data)) {
-			$this->assertEquals($data['text'], $dashboard->getWidget($data['main_fields']['Name'])->getContent()->getText());
-		}
-		else {
-			$this->assertEquals('No data found.', $dashboard->getWidget($data['main_fields']['Name'])->getContent()->getText());
-		}
+		// Check if value displayed in column table.
+		$value = (array_key_exists('text', $data)) ? $data['text'] : 'No data found.';
+		$this->assertEquals($value, $dashboard->getWidget($data['main_fields']['Name'])->getContent()->getText());
 	}
 }
