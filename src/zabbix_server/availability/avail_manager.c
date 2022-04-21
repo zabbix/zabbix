@@ -105,26 +105,26 @@ static void	calculate_cached_active_check_availabilities(zbx_avail_active_hb_cac
 	}
 }
 
-static void	db_update_active_check_status(zbx_vector_uint64_t *hostids, int status)
+static void	db_update_active_check_status(zbx_vector_uint64_t *hostids, int status,
+	char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
-	char	*sql = NULL;
-	size_t	sql_alloc = 0, sql_offset = 0;
-
 	if (0 == hostids->values_num)
 		return;
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
 			"update host_rtdata set active_available=%i where", status);
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+	DBadd_condition_alloc(sql, sql_alloc, sql_offset, "hostid", hostids->values, hostids->values_num);
 
-	DBexecute("%s", sql);
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 
-	zbx_free(sql);
+	DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
 }
 
 static void	flush_active_hb_queue(zbx_avail_active_hb_cache_t *cache)
 {
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_hashset_iter_t	iter;
 	zbx_host_active_avail_t	*host;
 	zbx_vector_uint64_t	status_unknown, status_available, status_unavailable;
@@ -137,6 +137,9 @@ static void	flush_active_hb_queue(zbx_avail_active_hb_cache_t *cache)
 	zbx_vector_uint64_create(&status_unavailable);
 
 	zbx_hashset_iter_reset(&cache->queue, &iter);
+
+	DBbegin();
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (host = (zbx_host_active_avail_t *)zbx_hashset_iter_next(&iter)))
 	{
@@ -152,9 +155,12 @@ static void	flush_active_hb_queue(zbx_avail_active_hb_cache_t *cache)
 			zbx_vector_uint64_append(&status_unavailable, host->hostid);
 	}
 
-	db_update_active_check_status(&status_unknown, INTERFACE_AVAILABLE_UNKNOWN);
-	db_update_active_check_status(&status_available, INTERFACE_AVAILABLE_TRUE);
-	db_update_active_check_status(&status_unavailable, INTERFACE_AVAILABLE_FALSE);
+	db_update_active_check_status(&status_unknown, INTERFACE_AVAILABLE_UNKNOWN, &sql, &sql_alloc, &sql_offset);
+	db_update_active_check_status(&status_available, INTERFACE_AVAILABLE_TRUE, &sql, &sql_alloc, &sql_offset);
+	db_update_active_check_status(&status_unavailable, INTERFACE_AVAILABLE_FALSE, &sql, &sql_alloc, &sql_offset);
+
+	if (ZBX_DB_OK == DBcommit())
+		zbx_hashset_clear(&cache->queue);
 
 	zbx_vector_uint64_destroy(&status_unknown);
 	zbx_vector_uint64_destroy(&status_available);
@@ -285,8 +291,10 @@ static void	init_active_availability(zbx_avail_active_hb_cache_t *cache)
 		DBfree_result(result);
 	}
 }
-static void	flush_proxy_hostdata(zbx_ipc_message_t *message)
+static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_message_t *message)
 {
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_ptr_t	hosts;
 	zbx_proxy_hostdata_t	*host;
 	zbx_vector_uint64_t	status_unknown, status_available, status_unavailable;
@@ -316,9 +324,12 @@ static void	flush_proxy_hostdata(zbx_ipc_message_t *message)
 			zbx_vector_uint64_append(&status_unavailable, host->hostid);
 	}
 
-	db_update_active_check_status(&status_unknown, INTERFACE_AVAILABLE_UNKNOWN);
-	db_update_active_check_status(&status_available, INTERFACE_AVAILABLE_TRUE);
-	db_update_active_check_status(&status_unavailable, INTERFACE_AVAILABLE_FALSE);
+	db_update_active_check_status(&status_unknown, INTERFACE_AVAILABLE_UNKNOWN, &sql, &sql_alloc, &sql_offset);
+	db_update_active_check_status(&status_available, INTERFACE_AVAILABLE_TRUE, &sql, &sql_alloc, &sql_offset);
+	db_update_active_check_status(&status_unavailable, INTERFACE_AVAILABLE_FALSE, &sql, &sql_alloc, &sql_offset);
+
+	if (ZBX_DB_OK == DBcommit())
+		zbx_hashset_clear(&cache->queue);
 
 	zbx_vector_uint64_destroy(&status_unknown);
 	zbx_vector_uint64_destroy(&status_available);
@@ -473,7 +484,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 					process_confsync_diff(&active_hb_cache, message);
 					break;
 				case ZBX_IPC_AVAILMAN_PROCESS_PROXY_HOSTDATA:
-					flush_proxy_hostdata(message);
+					flush_proxy_hostdata(&active_hb_cache, message);
 					break;
 				case ZBX_IPC_AVAILMAN_PROXY_FLUSH_ALL_HOSTS:
 					flush_all_hosts(&active_hb_cache);
