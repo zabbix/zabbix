@@ -70,7 +70,9 @@ $form = (new CForm('post', $form_action))
 		->addItem([
 			(new CLabel(_('Search attribute'), 'search_attribute'))->setAsteriskMark(),
 			new CFormField(
-				(new CTextBox('search_attribute', $data['search_attribute'], false, DB::getFieldLength('userdirectory', 'search_attribute')))
+				(new CTextBox('search_attribute', $data['search_attribute'], false,
+					DB::getFieldLength('userdirectory', 'search_attribute')
+				))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setAriaRequired()
 			)
@@ -124,7 +126,9 @@ $form = (new CForm('post', $form_action))
 		->addItem([
 			(new CLabel(_('Search filter'), 'search_filter'))->addClass('advanced-configuration'),
 			(new CFormField(
-				(new CTextBox('search_filter', $data['search_filter'], false, DB::getFieldLength('userdirectory', 'search_filter')))
+				(new CTextBox('search_filter', $data['search_filter'], false,
+					DB::getFieldLength('userdirectory', 'search_filter')
+				))
 					->setAttribute('placeholder', '(%{attr}=%{user})')
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))->addClass('advanced-configuration')
