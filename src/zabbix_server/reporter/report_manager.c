@@ -396,9 +396,15 @@ static char	*report_create_cookie(zbx_rm_t *manager, const char *sessionid)
 	zbx_json_init(&j, 512);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSIONID, sessionid, ZBX_JSON_TYPE_STRING);
 
-	zbx_hmac(ZBX_HASH_SHA256, manager->session_key, strlen(manager->session_key), j.buffer, j.buffer_size, &out);
+	if (SUCCEED != zbx_hmac(ZBX_HASH_SHA256, manager->session_key, strlen(manager->session_key), j.buffer,
+			j.buffer_size, &out))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		out_str = zbx_strdup(NULL, "");
+	}
+	else
+		out_str = zbx_dsprintf(NULL, "\"%s\"", out);
 
-	out_str = zbx_dsprintf(NULL, "\"%s\"", out);
 	zbx_json_addraw(&j, ZBX_PROTO_TAG_SIGN, out_str);
 	str_base64_encode_dyn(j.buffer, &cookie, j.buffer_size);
 

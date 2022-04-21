@@ -97,9 +97,8 @@ static void	hmac_hash(zbx_crypto_hash_t type, const char *left, size_t left_len,
 int	zbx_hmac(zbx_crypto_hash_t hash_type, const char *key, size_t key_len, const char *text, size_t text_len,
 		char **out)
 {
-	size_t			block_size, digest_size, out_len, i;
-	char			*key_block, *key_ipad, *key_opad, *ihash, *ohash;
-	int			n;
+	size_t	block_size, digest_size, out_len, i;
+	char	*key_block, *key_ipad, *key_opad, *ihash, *ohash;
 
 	switch (hash_type)
 	{
@@ -143,19 +142,13 @@ int	zbx_hmac(zbx_crypto_hash_t hash_type, const char *key, size_t key_len, const
 	out_len = digest_size * 2 + 1;
 	*out = (char *)zbx_malloc(NULL, out_len);
 
-	n = zbx_bin2hex((const unsigned char *)ohash, digest_size, *out, out_len);
+	(void)zbx_bin2hex((const unsigned char *)ohash, digest_size, *out, out_len);
 
 	zbx_free(ohash);
 	zbx_free(ihash);
 	zbx_free(key_opad);
 	zbx_free(key_ipad);
 	zbx_free(key_block);
-
-	if ((size_t)n != 2 * digest_size)
-	{
-		zbx_free(*out);
-		return FAIL;
-	}
 
 	return SUCCEED;
 }
