@@ -28,6 +28,9 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  */
 class testLowLevelDiscovery extends CIntegrationTest {
 
+	const TEMPLATE_NAME_PRE = 'template';
+	const NUMBER_OF_TEMPLATES = 2;
+
 	private static $hostid;
 	private static $ruleid;
 
@@ -181,5 +184,94 @@ class testLowLevelDiscovery extends CIntegrationTest {
 		$this->assertEquals($value, $item['value']);
 		$this->assertGreaterThanOrEqual($from, $item['clock']);
 		$this->assertLessThanOrEqual(time(), $item['clock']);
+	}
+
+	/**
+	 * Test discovery by checking link type in host created from host prototype.
+	 */
+	public function testLowLevelDiscovery_LinkTemplates() {
+		// Create templates.
+		$templateids = array();
+
+		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES; $i++) {
+
+			$response = $this->call('template.create', [
+				'host' => self::TEMPLATE_NAME_PRE . "_" . $i,
+				'groups' => [
+					'groupid' => 1
+				]]);
+
+			$this->assertArrayHasKey('templateids', $response['result']);
+			$this->assertArrayHasKey(0, $response['result']['templateids']);
+
+			array_push($templateids, $response['result']['templateids'][0]);
+		}
+
+		// Create host prototype
+		$response = $this->call('hostprototype.create', [
+			'host' => 'host_{#KEY}',
+			'groupLinks' => [
+				[
+					'groupid' => 1
+				]
+			],
+			'ruleid' => self::$ruleid,
+			'templates' => [
+				[
+					'templateid' => $templateids[0]
+				]
+			]
+		]);
+
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['hostids']);
+		$hostprototypeid = $response['result']['hostids'][0];
+
+		$key = 'host0';
+		// Send value to discovery trapper.
+		$this->sendSenderValue('discovery', 'item_discovery', ['data' => [['{#KEY}' => $key]]]);
+
+		// Retrieve data from API.
+		$response = $this->call('host.get', [
+			'filter' => ['host' => 'host_'.$key],
+			'selectParentTemplates' => ['link_type']
+		]);
+		$this->assertArrayHasKey(0, $response['result'], json_encode($response, JSON_PRETTY_PRINT));
+		$this->assertArrayHasKey('host', $response['result'][0]);
+		$discoveredhostid = $response['result'][0]['hostid'];
+		$this->assertEquals(1, count($response['result'][0]['parentTemplates']));
+		foreach ($response['result'][0]['parentTemplates'] as $entry) {
+					$this->assertEquals(1, $entry['link_type']);
+		}
+
+		// Link other templates
+		$templates = array();
+		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES; $i++) {
+			array_push($templates, [ 'templateid' => $templateids[$i]]);
+		}
+		// Uncomment this code when API allows manual link to discovered hosts
+		$this->call('host.update', ['hostid' => $discoveredhostid, 'templates' => $templates]);
+		$this->call('hostprototype.update', ['hostid' => $hostprototypeid, 'templates' => $templates]);
+		$this->reloadConfigurationCache();
+
+		// Send value to discovery trapper.
+		$this->sendSenderValue('discovery', 'item_discovery', ['data' => [['{#KEY}' => $key]]]);
+
+		// Retrieve data from API.
+		$response = $this->call('host.get', [
+			'filter' => ['host' => 'host_'.$key],
+			'selectParentTemplates' => ['link_type']
+		]);
+		$this->assertArrayHasKey(0, $response['result'], json_encode($response, JSON_PRETTY_PRINT));
+		$this->assertArrayHasKey('host', $response['result'][0]);
+		$this->assertEquals($i, count($response['result'][0]['parentTemplates']));
+		foreach ($response['result'][0]['parentTemplates'] as $entry) {
+					$this->assertEquals(1, $entry['link_type']);
+		}
+
+		$this->call('hostprototype.delete', [$hostprototypeid]);
+
+		// Reload configuration cache.
+		$this->reloadConfigurationCache();
 	}
 }

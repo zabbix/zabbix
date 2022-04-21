@@ -26,7 +26,7 @@
 #include "nodecommand.h"
 #include "proxyconfig.h"
 #include "proxydata.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxcrypto.h"
 #include "zbxcommshigh.h"
 #include "../../libs/zbxserver/zabbix_stats.h"

@@ -24,7 +24,7 @@
 #include "trapper_auth.h"
 
 #include "../scripts/scripts.h"
-#include "../../libs/zbxaudit/audit.h"
+#include "audit/zbxaudit.h"
 #include "../../libs/zbxserver/get_host_from_event.h"
 #include "../../libs/zbxserver/zabbix_users.h"
 

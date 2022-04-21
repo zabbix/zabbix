@@ -24,12 +24,11 @@
 #	include <libxml/xpath.h>
 #endif
 
-#include "mutexs.h"
-#include "memalloc.h"
+#include "zbxmutexs.h"
+#include "zbxshmem.h"
 #include "log.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
 
 /*
  * The VMware data (zbx_vmware_service_t structure) are stored in shared memory.
@@ -69,8 +68,8 @@ extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 extern char				*CONFIG_SOURCE_IP;
 
-#define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref,  __vm_mem_malloc_func, \
-		__vm_mem_realloc_func, __vm_mem_free_func)
+#define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref,  __vm_shmem_malloc_func, \
+		__vm_shmem_realloc_func, __vm_shmem_free_func)
 
 #define ZBX_VMWARE_CACHE_UPDATE_PERIOD	CONFIG_VMWARE_FREQUENCY
 #define ZBX_VMWARE_PERF_UPDATE_PERIOD	CONFIG_VMWARE_PERF_FREQUENCY
@@ -83,9 +82,9 @@ extern char				*CONFIG_SOURCE_IP;
 
 static zbx_mutex_t	vmware_lock = ZBX_MUTEX_NULL;
 
-static zbx_mem_info_t	*vmware_mem = NULL;
+static zbx_shmem_info_t	*vmware_mem = NULL;
 
-ZBX_MEM_FUNC_IMPL(__vm, vmware_mem)
+ZBX_SHMEM_FUNC_IMPL(__vm, vmware_mem)
 
 static zbx_vmware_t	*vmware = NULL;
 
@@ -506,7 +505,7 @@ static char	*vmware_shared_strdup(const char *str)
 	strdup = vmware_strpool_strdup(str, &vmware->strpool, &len);
 
 	if (0 < len)
-		vmware->strpool_sz += zbx_mem_required_chunk_size(len);
+		vmware->strpool_sz += zbx_shmem_required_chunk_size(len);
 
 	return strdup;
 }
@@ -537,7 +536,7 @@ static void	vmware_shared_strfree(char *str)
 	vmware_strpool_strfree(str, &vmware->strpool, &len);
 
 	if (0 < len)
-		vmware->strpool_sz -= zbx_mem_required_chunk_size(len);
+		vmware->strpool_sz -= zbx_shmem_required_chunk_size(len);
 }
 
 static void	evt_msg_strpool_strfree(char *str)
@@ -898,7 +897,7 @@ static void	vmware_perf_counter_shared_free(zbx_vmware_perf_counter_t *counter)
 {
 	vmware_vector_str_uint64_pair_shared_clean(&counter->values);
 	zbx_vector_str_uint64_pair_destroy(&counter->values);
-	__vm_mem_free_func(counter);
+	__vm_shmem_free_func(counter);
 }
 
 /******************************************************************************
@@ -940,7 +939,7 @@ static void	vmware_diskextent_shared_free(zbx_vmware_diskextent_t *diskextent)
 {
 	vmware_shared_strfree(diskextent->diskname);
 
-	__vm_mem_free_func(diskextent);
+	__vm_shmem_free_func(diskextent);
 }
 
 /******************************************************************************
@@ -964,7 +963,7 @@ static void	vmware_datastore_shared_free(zbx_vmware_datastore_t *datastore)
 	zbx_vector_vmware_diskextent_clear_ext(&datastore->diskextents, vmware_diskextent_shared_free);
 	zbx_vector_vmware_diskextent_destroy(&datastore->diskextents);
 
-	__vm_mem_free_func(datastore);
+	__vm_shmem_free_func(datastore);
 }
 
 /******************************************************************************
@@ -979,7 +978,7 @@ static void	vmware_datacenter_shared_free(zbx_vmware_datacenter_t *datacenter)
 	vmware_shared_strfree(datacenter->name);
 	vmware_shared_strfree(datacenter->id);
 
-	__vm_mem_free_func(datacenter);
+	__vm_shmem_free_func(datacenter);
 }
 
 /******************************************************************************
@@ -1003,7 +1002,7 @@ static void	vmware_props_shared_free(char **props, int props_num)
 			vmware_shared_strfree(props[i]);
 	}
 
-	__vm_mem_free_func(props);
+	__vm_shmem_free_func(props);
 }
 
 /******************************************************************************
@@ -1021,7 +1020,7 @@ static void	vmware_dev_shared_free(zbx_vmware_dev_t *dev)
 	if (NULL != dev->label)
 		vmware_shared_strfree(dev->label);
 
-	__vm_mem_free_func(dev);
+	__vm_shmem_free_func(dev);
 }
 
 /******************************************************************************
@@ -1036,7 +1035,7 @@ static void	vmware_fs_shared_free(zbx_vmware_fs_t *fs)
 	if (NULL != fs->path)
 		vmware_shared_strfree(fs->path);
 
-	__vm_mem_free_func(fs);
+	__vm_shmem_free_func(fs);
 }
 
 /******************************************************************************
@@ -1062,7 +1061,7 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 
 	vmware_props_shared_free(vm->props, ZBX_VMWARE_VMPROPS_NUM);
 
-	__vm_mem_free_func(vm);
+	__vm_shmem_free_func(vm);
 }
 
 /******************************************************************************
@@ -1077,7 +1076,7 @@ static void	vmware_dsname_shared_free(zbx_vmware_dsname_t *dsname)
 	vmware_shared_strfree(dsname->name);
 	zbx_vector_vmware_hvdisk_destroy(&dsname->hvdisks);
 
-	__vm_mem_free_func(dsname);
+	__vm_shmem_free_func(dsname);
 }
 
 /******************************************************************************
@@ -1137,7 +1136,7 @@ static void	vmware_cluster_shared_free(zbx_vmware_cluster_t *cluster)
 	if (NULL != cluster->status)
 		vmware_shared_strfree(cluster->status);
 
-	__vm_mem_free_func(cluster);
+	__vm_shmem_free_func(cluster);
 }
 
 /******************************************************************************
@@ -1152,7 +1151,7 @@ static void	vmware_event_shared_free(zbx_vmware_event_t *event)
 	if (NULL != event->message)
 		vmware_shared_strfree(event->message);
 
-	__vm_mem_free_func(event);
+	__vm_shmem_free_func(event);
 }
 
 /******************************************************************************
@@ -1191,7 +1190,7 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
 		if (NULL != data->error)
 			vmware_shared_strfree(data->error);
 
-		__vm_mem_free_func(data);
+		__vm_shmem_free_func(data);
 	}
 }
 
@@ -1265,7 +1264,7 @@ static void	vmware_service_shared_free(zbx_vmware_service_t *service)
 
 	zbx_hashset_destroy(&service->counters);
 
-	__vm_mem_free_func(service);
+	__vm_shmem_free_func(service);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1283,7 +1282,7 @@ static zbx_vmware_cluster_t	*vmware_cluster_shared_dup(const zbx_vmware_cluster_
 {
 	zbx_vmware_cluster_t	*cluster;
 
-	cluster = (zbx_vmware_cluster_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_cluster_t));
+	cluster = (zbx_vmware_cluster_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_cluster_t));
 	cluster->id = vmware_shared_strdup(src->id);
 	cluster->name = vmware_shared_strdup(src->name);
 	cluster->status = vmware_shared_strdup(src->status);
@@ -1304,7 +1303,7 @@ static zbx_vmware_event_t	*vmware_event_shared_dup(const zbx_vmware_event_t *src
 {
 	zbx_vmware_event_t	*event;
 
-	event = (zbx_vmware_event_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_event_t));
+	event = (zbx_vmware_event_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_event_t));
 	event->key = src->key;
 	event->message = vmware_shared_strdup(src->message);
 	event->timestamp = src->timestamp;
@@ -1325,7 +1324,7 @@ static zbx_vmware_diskextent_t	*vmware_diskextent_shared_dup(const zbx_vmware_di
 {
 	zbx_vmware_diskextent_t	*diskextent;
 
-	diskextent = (zbx_vmware_diskextent_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_diskextent_t));
+	diskextent = (zbx_vmware_diskextent_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_diskextent_t));
 	diskextent->diskname = vmware_shared_strdup(src->diskname);
 	diskextent->partitionid = src->partitionid;
 
@@ -1346,7 +1345,7 @@ static zbx_vmware_datastore_t	*vmware_datastore_shared_dup(const zbx_vmware_data
 	int			i;
 	zbx_vmware_datastore_t	*datastore;
 
-	datastore = (zbx_vmware_datastore_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_datastore_t));
+	datastore = (zbx_vmware_datastore_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_datastore_t));
 	datastore->uuid = vmware_shared_strdup(src->uuid);
 	datastore->name = vmware_shared_strdup(src->name);
 	datastore->id = vmware_shared_strdup(src->id);
@@ -1390,7 +1389,7 @@ static zbx_vmware_datacenter_t	*vmware_datacenter_shared_dup(const zbx_vmware_da
 {
 	zbx_vmware_datacenter_t	*datacenter;
 
-	datacenter = (zbx_vmware_datacenter_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_datacenter_t));
+	datacenter = (zbx_vmware_datacenter_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_datacenter_t));
 	datacenter->name = vmware_shared_strdup(src->name);
 	datacenter->id = vmware_shared_strdup(src->id);
 
@@ -1410,7 +1409,7 @@ static zbx_vmware_dev_t	*vmware_dev_shared_dup(const zbx_vmware_dev_t *src)
 {
 	zbx_vmware_dev_t	*dev;
 
-	dev = (zbx_vmware_dev_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_dev_t));
+	dev = (zbx_vmware_dev_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_dev_t));
 	dev->type = src->type;
 	dev->instance = vmware_shared_strdup(src->instance);
 	dev->label = vmware_shared_strdup(src->label);
@@ -1432,7 +1431,7 @@ static zbx_vmware_fs_t	*vmware_fs_shared_dup(const zbx_vmware_fs_t *src)
 {
 	zbx_vmware_fs_t	*fs;
 
-	fs = (zbx_vmware_fs_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_fs_t));
+	fs = (zbx_vmware_fs_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_fs_t));
 	fs->path = vmware_shared_strdup(src->path);
 	fs->capacity = src->capacity;
 	fs->free_space = src->free_space;
@@ -1455,7 +1454,7 @@ static char	**vmware_props_shared_dup(char ** const src, int props_num)
 	char	**props;
 	int	i;
 
-	props = (char **)__vm_mem_malloc_func(NULL, sizeof(char *) * props_num);
+	props = (char **)__vm_shmem_malloc_func(NULL, sizeof(char *) * props_num);
 
 	for (i = 0; i < props_num; i++)
 		props[i] = vmware_shared_strdup(src[i]);
@@ -1477,7 +1476,7 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
 	zbx_vmware_vm_t	*vm;
 	int		i;
 
-	vm = (zbx_vmware_vm_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_vm_t));
+	vm = (zbx_vmware_vm_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_vm_t));
 
 	VMWARE_VECTOR_CREATE(&vm->devs, ptr);
 	VMWARE_VECTOR_CREATE(&vm->file_systems, ptr);
@@ -1511,7 +1510,7 @@ static zbx_vmware_dsname_t	*vmware_dsname_shared_dup(const zbx_vmware_dsname_t *
 	zbx_vmware_dsname_t	*dsname;
 	int	i;
 
-	dsname = (zbx_vmware_dsname_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_dsname_t));
+	dsname = (zbx_vmware_dsname_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_dsname_t));
 
 	dsname->name = vmware_shared_strdup(src->name);
 
@@ -1576,9 +1575,9 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 	zbx_hashset_iter_t	iter;
 	zbx_vmware_hv_t		*hv, hv_local;
 
-	data = (zbx_vmware_data_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_data_t));
-	zbx_hashset_create_ext(&data->hvs, 1, vmware_hv_hash, vmware_hv_compare, NULL, __vm_mem_malloc_func,
-			__vm_mem_realloc_func, __vm_mem_free_func);
+	data = (zbx_vmware_data_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_data_t));
+	zbx_hashset_create_ext(&data->hvs, 1, vmware_hv_hash, vmware_hv_compare, NULL, __vm_shmem_malloc_func,
+			__vm_shmem_realloc_func, __vm_shmem_free_func);
 	VMWARE_VECTOR_CREATE(&data->clusters, ptr);
 	VMWARE_VECTOR_CREATE(&data->events, ptr);
 	VMWARE_VECTOR_CREATE(&data->datastores, vmware_datastore);
@@ -1588,8 +1587,8 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 	zbx_vector_vmware_datastore_reserve(&data->datastores, src->datastores.values_num);
 	zbx_vector_vmware_datacenter_reserve(&data->datacenters, src->datacenters.values_num);
 
-	zbx_hashset_create_ext(&data->vms_index, 100, vmware_vm_hash, vmware_vm_compare, NULL, __vm_mem_malloc_func,
-			__vm_mem_realloc_func, __vm_mem_free_func);
+	zbx_hashset_create_ext(&data->vms_index, 100, vmware_vm_hash, vmware_vm_compare, NULL, __vm_shmem_malloc_func,
+			__vm_shmem_realloc_func, __vm_shmem_free_func);
 
 	data->error = vmware_shared_strdup(src->error);
 
@@ -4500,7 +4499,7 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 	zbx_vector_ptr_append(events, event);
 
 	if (0 < sz)
-		*alloc_sz += zbx_mem_required_chunk_size(sz);
+		*alloc_sz += zbx_shmem_required_chunk_size(sz);
 
 	return SUCCEED;
 }
@@ -5244,12 +5243,12 @@ static void	vmware_counters_add_new(zbx_vector_ptr_t *counters, zbx_uint64_t cou
 {
 	zbx_vmware_perf_counter_t	*counter;
 
-	counter = (zbx_vmware_perf_counter_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_perf_counter_t));
+	counter = (zbx_vmware_perf_counter_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_perf_counter_t));
 	counter->counterid = counterid;
 	counter->state = ZBX_VMWARE_COUNTER_NEW;
 
-	zbx_vector_str_uint64_pair_create_ext(&counter->values, __vm_mem_malloc_func, __vm_mem_realloc_func,
-			__vm_mem_free_func);
+	zbx_vector_str_uint64_pair_create_ext(&counter->values, __vm_shmem_malloc_func, __vm_shmem_realloc_func,
+			__vm_shmem_free_func);
 
 	zbx_vector_ptr_append(counters, counter);
 }
@@ -5387,8 +5386,8 @@ static void	vmware_service_add_perf_entity(zbx_vmware_service_t *service, const 
 
 		pentity = (zbx_vmware_perf_entity_t *)zbx_hashset_insert(&service->entities, &entity, sizeof(zbx_vmware_perf_entity_t));
 
-		zbx_vector_ptr_create_ext(&pentity->counters, __vm_mem_malloc_func, __vm_mem_realloc_func,
-				__vm_mem_free_func);
+		zbx_vector_ptr_create_ext(&pentity->counters, __vm_shmem_malloc_func, __vm_shmem_realloc_func,
+				__vm_shmem_free_func);
 
 		for (i = 0; NULL != counters[i]; i++)
 		{
@@ -5700,7 +5699,7 @@ out:
 			service->eventlog.oom = 0;
 
 		events_sz += evt_req_chunk_size * data->events.values_num +
-				zbx_mem_required_chunk_size(data->events.values_alloc * sizeof(zbx_vmware_event_t*));
+				zbx_shmem_required_chunk_size(data->events.values_alloc * sizeof(zbx_vmware_event_t*));
 
 		if (0 == service->eventlog.last_key || vmware_mem->free_size < events_sz ||
 				SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
@@ -5711,7 +5710,7 @@ out:
 
 				if (SUCCEED == vmware_shared_strsearch(event->message))
 				{
-					events_sz -= zbx_mem_required_chunk_size(strlen(event->message) +
+					events_sz -= zbx_shmem_required_chunk_size(strlen(event->message) +
 							REFCOUNT_FIELD_SIZE + 1 + ZBX_HASHSET_ENTRY_OFFSET);
 				}
 			}
@@ -5767,7 +5766,7 @@ out:
 	vmware_service_update_perf_entities(service);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
-		zbx_mem_dump_stats(LOG_LEVEL_DEBUG, vmware_mem);
+		zbx_shmem_dump_stats(LOG_LEVEL_DEBUG, vmware_mem);
 
 	zbx_snprintf(msg, sizeof(msg), "Events:%d DC:%d DS:%d CL:%d HV:%d VM:%d"
 			" VMwareCache memory usage (free/strpool/total): " ZBX_FS_UI64 " / " ZBX_FS_UI64 " / "
@@ -6387,7 +6386,7 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 		}
 	}
 
-	service = (zbx_vmware_service_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_service_t));
+	service = (zbx_vmware_service_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_service_t));
 	memset(service, 0, sizeof(zbx_vmware_service_t));
 
 	service->url = vmware_shared_strdup(url);
@@ -6402,11 +6401,11 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service->eventlog.oom = 0;
 
 	zbx_hashset_create_ext(&service->entities, 100, vmware_perf_entity_hash_func,  vmware_perf_entity_compare_func,
-			NULL, __vm_mem_malloc_func, __vm_mem_realloc_func, __vm_mem_free_func);
+			NULL, __vm_shmem_malloc_func, __vm_shmem_realloc_func, __vm_shmem_free_func);
 
 	zbx_hashset_create_ext(&service->counters, ZBX_VMWARE_COUNTERS_INIT_SIZE, vmware_counter_hash_func,
-			vmware_counter_compare_func, NULL, __vm_mem_malloc_func, __vm_mem_realloc_func,
-			__vm_mem_free_func);
+			vmware_counter_compare_func, NULL, __vm_shmem_malloc_func, __vm_shmem_realloc_func,
+			__vm_shmem_free_func);
 
 	zbx_vector_ptr_append(&vmware->services, service);
 
@@ -6493,8 +6492,8 @@ int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const cha
 		entity.type = vmware_shared_strdup(type);
 		entity.id = vmware_shared_strdup(id);
 		entity.error = NULL;
-		zbx_vector_ptr_create_ext(&entity.counters, __vm_mem_malloc_func, __vm_mem_realloc_func,
-				__vm_mem_free_func);
+		zbx_vector_ptr_create_ext(&entity.counters, __vm_shmem_malloc_func, __vm_shmem_realloc_func,
+				__vm_shmem_free_func);
 
 		pentity = (zbx_vmware_perf_entity_t *)zbx_hashset_insert(&service->entities, &entity,
 				sizeof(zbx_vmware_perf_entity_t));
@@ -6556,26 +6555,26 @@ int	zbx_vmware_init(char **error)
 	if (SUCCEED != zbx_mutex_create(&vmware_lock, ZBX_MUTEX_VMWARE, error))
 		goto out;
 
-	size_reserved = zbx_mem_required_size(1, "vmware cache size", "VMwareCacheSize");
+	size_reserved = zbx_shmem_required_size(1, "vmware cache size", "VMwareCacheSize");
 
 	CONFIG_VMWARE_CACHE_SIZE -= size_reserved;
 
-	if (SUCCEED != zbx_mem_create(&vmware_mem, CONFIG_VMWARE_CACHE_SIZE, "vmware cache size", "VMwareCacheSize", 0,
-			error))
+	if (SUCCEED != zbx_shmem_create(&vmware_mem, CONFIG_VMWARE_CACHE_SIZE, "vmware cache size", "VMwareCacheSize",
+			0, error))
 	{
 		goto out;
 	}
 
-	vmware = (zbx_vmware_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_t));
+	vmware = (zbx_vmware_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_t));
 	memset(vmware, 0, sizeof(zbx_vmware_t));
 
 	VMWARE_VECTOR_CREATE(&vmware->services, ptr);
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 	vmware->strpool_sz = 0;
 	zbx_hashset_create_ext(&vmware->strpool, 100, vmware_strpool_hash_func, vmware_strpool_compare_func, NULL,
-		__vm_mem_malloc_func, __vm_mem_realloc_func, __vm_mem_free_func);
+		__vm_shmem_malloc_func, __vm_shmem_realloc_func, __vm_shmem_free_func);
 	zbx_hashset_create(&evt_msg_strpool, 100, vmware_strpool_hash_func, vmware_strpool_compare_func);
-	evt_req_chunk_size = zbx_mem_required_chunk_size(sizeof(zbx_vmware_event_t));
+	evt_req_chunk_size = zbx_shmem_required_chunk_size(sizeof(zbx_vmware_event_t));
 #endif
 	ret = SUCCEED;
 out:
@@ -6598,7 +6597,7 @@ void	zbx_vmware_destroy(void)
 		zbx_hashset_destroy(&vmware->strpool);
 		zbx_hashset_destroy(&evt_msg_strpool);
 #endif
-		zbx_mem_destroy(vmware_mem);
+		zbx_shmem_destroy(vmware_mem);
 		vmware_mem = NULL;
 		zbx_mutex_destroy(&vmware_lock);
 	}

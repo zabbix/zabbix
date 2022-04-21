@@ -32,11 +32,12 @@ $widget = (new CWidget())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORTS_SCHEDULEDREPORT_LIST))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())->addItem(
-				(new CRedirectButton(_('Create report'),
-					(new CUrl('zabbix.php'))->setArgument('action', 'scheduledreport.edit')
-				))->setEnabled($data['allowed_edit'])
-			)
+			(new CList())
+				->addItem(
+					(new CRedirectButton(_('Create report'),
+						(new CUrl('zabbix.php'))->setArgument('action', 'scheduledreport.edit')
+					))->setEnabled($data['allowed_edit'])
+				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter())

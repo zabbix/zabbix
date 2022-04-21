@@ -21,9 +21,9 @@
 
 #include "log.h"
 #include "alias.h"
-#include "threads.h"
+#include "zbxthreads.h"
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
-#include "sighandler.h"
+#include "zbxnix.h"
 #endif
 #include "zbxalgo.h"
 #include "zbxregexp.h"

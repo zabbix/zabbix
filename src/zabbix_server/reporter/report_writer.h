@@ -20,7 +20,7 @@
 #ifndef ZABBIX_REPORT_WRITER_H
 #define ZABBIX_REPORT_WRITER_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 ZBX_THREAD_ENTRY(report_writer_thread, args);
 

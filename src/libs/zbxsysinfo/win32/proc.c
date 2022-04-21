@@ -22,7 +22,7 @@
 
 #include <tlhelp32.h>
 
-#include "symbols.h"
+#include "zbxsymbols.h"
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"

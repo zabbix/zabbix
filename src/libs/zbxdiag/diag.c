@@ -23,7 +23,7 @@
 #include "preproc.h"
 #include "zbxdiag.h"
 #include "log.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 
 void	diag_map_free(zbx_diag_map_t *map)
 {
@@ -138,7 +138,7 @@ out:
  *             stats - [IN] the memory statistics                             *
  *                                                                            *
  ******************************************************************************/
-void	diag_add_mem_stats(struct zbx_json *json, const char *name, const zbx_mem_stats_t *stats)
+void	diag_add_mem_stats(struct zbx_json *json, const char *name, const zbx_shmem_stats_t *stats)
 {
 	int	i;
 
@@ -160,14 +160,14 @@ void	diag_add_mem_stats(struct zbx_json *json, const char *name, const zbx_mem_s
 
 	zbx_json_addarray(json, "buckets");
 
-	for (i = 0; i < MEM_BUCKET_COUNT; i++)
+	for (i = 0; i < ZBX_SHMEM_BUCKET_COUNT; i++)
 	{
 		if (0 != stats->chunks_num[i])
 		{
 			char	buf[MAX_ID_LEN + 2];
 
-			zbx_snprintf(buf, sizeof(buf), "%d%s", MEM_MIN_BUCKET_SIZE + 8 * i,
-					(MEM_BUCKET_COUNT - 1 == i ? "+" : ""));
+			zbx_snprintf(buf, sizeof(buf), "%d%s", ZBX_SHMEM_MIN_BUCKET_SIZE + 8 * i,
+					(ZBX_SHMEM_BUCKET_COUNT - 1 == i ? "+" : ""));
 			zbx_json_addobject(json, NULL);
 			zbx_json_adduint64(json, buf, stats->chunks_num[i]);
 			zbx_json_close(json);
@@ -272,7 +272,7 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 
 		if (0 != (fields & ZBX_DIAG_HISTORYCACHE_MEMORY))
 		{
-			zbx_mem_stats_t	data_mem, index_mem, *pdata_mem, *pindex_mem;
+			zbx_shmem_stats_t	data_mem, index_mem, *pdata_mem, *pindex_mem;
 
 			pdata_mem = (0 != (fields & ZBX_DIAG_HISTORYCACHE_MEMORY_DATA) ? &data_mem : NULL);
 			pindex_mem = (0 != (fields & ZBX_DIAG_HISTORYCACHE_MEMORY_INDEX) ? &index_mem : NULL);

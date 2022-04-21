@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.2.0alpha1');
+define('ZABBIX_VERSION',		'6.2.0alpha2');
 define('ZABBIX_API_VERSION',	'6.2.0');
 define('ZABBIX_EXPORT_VERSION',	'6.2');
 
-define('ZABBIX_DB_VERSION',		6010003);
+define('ZABBIX_DB_VERSION',		6010005);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -299,6 +299,9 @@ define('HOST_STATUS_PROXY_PASSIVE',	6);
 
 define('HOST_DISCOVER',		0);
 define('HOST_NO_DISCOVER',	1);
+
+define('TEMPLATE_LINK_MANUAL',	0);
+define('TEMPLATE_LINK_LLD',		1);
 
 define('HOST_ENCRYPTION_NONE',			1);
 define('HOST_ENCRYPTION_PSK',			2);
@@ -1027,8 +1030,9 @@ define('ZBX_TM_TASK_DATA',			7);
 define('ZBX_TM_STATUS_NEW',			1);
 define('ZBX_TM_STATUS_INPROGRESS',	2);
 
-define('ZBX_TM_DATA_TYPE_DIAGINFO',		1);
-define('ZBX_TM_DATA_TYPE_CHECK_NOW',	6);
+define('ZBX_TM_DATA_TYPE_DIAGINFO',			1);
+define('ZBX_TM_DATA_TYPE_PROXY_HOSTIDS',	2);
+define('ZBX_TM_DATA_TYPE_CHECK_NOW',		6);
 
 define('EVENT_SOURCE_TRIGGERS',			0);
 define('EVENT_SOURCE_DISCOVERY',		1);
@@ -1713,6 +1717,7 @@ define('TAB_INDICATOR_OPERATIONS', 'operations');
 define('TAB_INDICATOR_OVERRIDES', 'overrides');
 define('TAB_INDICATOR_PERMISSIONS', 'permissions');
 define('TAB_INDICATOR_PREPROCESSING', 'preprocessing');
+define('TAB_INDICATOR_PROXY_ENCRYPTION', 'proxy-encryption');
 define('TAB_INDICATOR_SHARING', 'sharing');
 define('TAB_INDICATOR_STEPS', 'steps');
 define('TAB_INDICATOR_TAG_FILTER', 'tag-filter');

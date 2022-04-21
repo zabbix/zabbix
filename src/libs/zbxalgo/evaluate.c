@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "zbxalgo.h"
+
+#include "common.h"
 #include "zbxvariant.h"
 #include "log.h"
 
@@ -187,7 +188,7 @@ static void	variant_convert_to_double(zbx_variant_t *var)
 {
 	if (ZBX_VARIANT_STR == var->type)
 	{
-		double	var_double_value = evaluate_string_to_double(var->data.str);
+		double	var_double_value = zbx_evaluate_string_to_double(var->data.str);
 		if (ZBX_INFINITY == var_double_value)
 		{
 			zbx_snprintf(buffer, max_buffer_len, "Cannot evaluate expression:"
@@ -219,7 +220,7 @@ static double	variant_get_double(const zbx_variant_t *var)
 		case ZBX_VARIANT_DBL:
 			return var->data.dbl;
 		case ZBX_VARIANT_STR:
-			return evaluate_string_to_double(var->data.str);
+			return zbx_evaluate_string_to_double(var->data.str);
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			return ZBX_INFINITY;
@@ -953,7 +954,7 @@ static zbx_variant_t	evaluate_term1(int *unknown_idx)
  * Purpose: evaluate an expression like "(26.416>10) or (0=1)"                *
  *                                                                            *
  ******************************************************************************/
-int	evaluate(double *value, const char *expression, char *error, size_t max_error_len,
+int	zbx_evaluate(double *value, const char *expression, char *error, size_t max_error_len,
 		zbx_vector_ptr_t *unknown_msgs)
 {
 	int		unknown_idx = -13;	/* index of message in 'unknown_msgs' vector, set to invalid value */
@@ -1052,7 +1053,7 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
  *               FAIL    - expression evaluation failed                       *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_unknown(const char *expression, double *value, char *error, size_t max_error_len)
+int	zbx_evaluate_unknown(const char *expression, double *value, char *error, size_t max_error_len)
 {
 	const char	*__function_name = "evaluate_with_unknown";
 	zbx_variant_t	res;
@@ -1096,7 +1097,7 @@ int	evaluate_unknown(const char *expression, double *value, char *error, size_t 
  * Return value:  -  the resulting double                                     *
  *                                                                            *
  ******************************************************************************/
-double	evaluate_string_to_double(const char *in)
+double	zbx_evaluate_string_to_double(const char *in)
 {
 	int		len;
 	double		result_double_value;

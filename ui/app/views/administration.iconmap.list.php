@@ -27,14 +27,13 @@ $widget = (new CWidget())
 	->setTitle(_('Icon mapping'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_ICONMAP_LIST))
-	->setControls((new CTag('nav', true,
-		(new CForm())
-			->cleanItems()
-			->addItem(new CRedirectButton(_('Create icon map'), (new CUrl('zabbix.php'))
-				->setArgument('action', 'iconmap.edit')
-			))
-		))
-			->setAttribute('aria-label', _('Content controls'))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(new CRedirectButton(_('Create icon map'),
+					(new CUrl('zabbix.php'))->setArgument('action', 'iconmap.edit')
+				))
+		))->setAttribute('aria-label', _('Content controls'))
 	);
 
 $table = (new CTableInfo())->setHeader([_('Name'), _('Icon map')]);

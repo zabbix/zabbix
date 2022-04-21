@@ -23,7 +23,7 @@
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 #include "zbxhistory.h"
-#include "memalloc.h"
+#include "zbxshmem.h"
 
 /*
  * The Value Cache provides read caching of item historical data residing in history
@@ -114,7 +114,7 @@ int	zbx_vc_get_statistics(zbx_vc_stats_t *stats);
 void	zbx_vc_housekeeping_value_cache(void);
 
 void	zbx_vc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, int *mode);
-void	zbx_vc_get_mem_stats(zbx_mem_stats_t *mem);
+void	zbx_vc_get_mem_stats(zbx_shmem_stats_t *mem);
 void	zbx_vc_get_item_stats(zbx_vector_ptr_t *stats);
 void	zbx_vc_flush_stats(void);
 

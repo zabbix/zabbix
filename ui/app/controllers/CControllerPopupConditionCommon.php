@@ -38,13 +38,12 @@ abstract class CControllerPopupConditionCommon extends CController {
 		}
 
 		if (!$ret) {
-			$output = [];
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
 			);
 		}
 
@@ -57,14 +56,15 @@ abstract class CControllerPopupConditionCommon extends CController {
 
 	protected function doAction() {
 		if ($this->hasInput('validate')) {
-			return $this->setResponse(
+			$this->setResponse(
 				(new CControllerResponseData(
 					['main_block' => json_encode($this->getManuallyValidatedFields())]
 				))->disableView()
 			);
 		}
-
-		return $this->setResponse(new CControllerResponseData($this->getControllerResponseData()));
+		else {
+			$this->setResponse(new CControllerResponseData($this->getControllerResponseData()));
+		}
 	}
 
 	/**

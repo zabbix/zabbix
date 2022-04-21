@@ -36,7 +36,7 @@
 #endif
 
 #if defined(HAVE_SQLITE3)
-#	include "mutexs.h"
+#	include "zbxmutexs.h"
 #endif
 
 struct zbx_db_result

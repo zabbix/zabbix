@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "audit_item.h"
+#include "audit/zbxaudit_item.h"
 
+#include "audit/zbxaudit.h"
 #include "log.h"
 #include "audit.h"
 #include "db.h"
@@ -393,7 +394,7 @@ void	zbx_audit_item_create_entry_for_delete(zbx_uint64_t id, const char *name, i
 	{
 		zbx_audit_entry_t	*local_audit_item_entry_insert;
 
-		local_audit_item_entry_insert = zbx_audit_entry_init(id, AUDIT_ITEM_ID, name, AUDIT_ACTION_DELETE,
+		local_audit_item_entry_insert = zbx_audit_entry_init(id, AUDIT_ITEM_ID, name, ZBX_AUDIT_ACTION_DELETE,
 				resource_type);
 		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_item_entry_insert,
 				sizeof(local_audit_item_entry_insert));
