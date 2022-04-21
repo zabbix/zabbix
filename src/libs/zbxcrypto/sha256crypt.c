@@ -313,25 +313,3 @@ void	zbx_sha256_hash_len(const char *in, size_t len, char *out)
 	sha256_process_bytes (in, len, &ctx);
 	sha256_finish_ctx(&ctx, out);
 }
-
-/* helper functions for sha256 hmac*/
-
-typedef struct
-{
-	uint8_t bytes[ZBX_SHA256_DIGEST_SIZE];
-} SHA256_HASH;
-
-void*	zbx_sha256_hash_for_hmac(const void* data, const size_t datalen, void* out, const size_t outlen)
-{
-	size_t		sz;
-	sha256_ctx	ctx;
-	SHA256_HASH	hash;
-
-	sha256_init_ctx(&ctx);
-	sha256_process_bytes(data, datalen, &ctx);
-	sha256_finish_ctx(&ctx, &hash);
-
-	sz = (outlen > ZBX_SHA256_DIGEST_SIZE) ? ZBX_SHA256_DIGEST_SIZE : outlen;
-
-	return memcpy(out, hash.bytes, sz);
-}
