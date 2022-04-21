@@ -3225,8 +3225,7 @@ static void	check_vcenter_vm_discovery_disk_props_cb(struct zbx_json *j, zbx_vmw
 }
 
 static int	check_vcenter_vm_discovery_common(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result, int dev_type, const char *func_parent, void (*props_cb)(struct zbx_json *j,
-			zbx_vmware_dev_t *dev))
+		AGENT_RESULT *result, int dev_type, const char *func_parent, vmpropfunc_t props_cb)
 {
 	struct zbx_json		json_data;
 	zbx_vmware_service_t	*service;
@@ -3299,7 +3298,7 @@ int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *userna
 		AGENT_RESULT *result)
 {
 	return check_vcenter_vm_discovery_common(request, username, password, result, ZBX_VMWARE_DEV_TYPE_NIC, __func__,
-			(vmpropfunc_t)check_vcenter_vm_discovery_nic_props_cb);
+			check_vcenter_vm_discovery_nic_props_cb);
 }
 
 static int	check_vcenter_vm_common(AGENT_REQUEST *request, const char *username, const char *password,
@@ -3457,7 +3456,6 @@ int	check_vcenter_vm_tools(AGENT_REQUEST *request, const char *username, const c
 	if (NULL == param1 || '\0' == *param1)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-
 		ret = SYSINFO_RET_FAIL;
 		goto out;
 	}
@@ -3473,7 +3471,6 @@ int	check_vcenter_vm_tools(AGENT_REQUEST *request, const char *username, const c
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-
 		ret = SYSINFO_RET_FAIL;
 		goto out;
 	}
@@ -3505,7 +3502,7 @@ int	check_vcenter_vm_vfs_dev_discovery(AGENT_REQUEST *request, const char *usern
 		AGENT_RESULT *result)
 {
 	return check_vcenter_vm_discovery_common(request, username, password, result, ZBX_VMWARE_DEV_TYPE_DISK, __func__,
-			(vmpropfunc_t)check_vcenter_vm_discovery_disk_props_cb);
+			check_vcenter_vm_discovery_disk_props_cb);
 }
 
 int	check_vcenter_vm_vfs_dev_read(AGENT_REQUEST *request, const char *username, const char *password,
