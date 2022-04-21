@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-01T08:26:39Z'
+  date: '2022-04-06T19:33:11Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -94,7 +94,8 @@ zabbix_export:
             -
               uuid: eae86b6f98db49099259a466b78d1c59
               expression: 'max(/MongoDB cluster by Zabbix agent 2/mongodb.connections.available,5m)<{$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
-              name: 'MongoDB cluster: Available connections less then {$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
+              name: 'MongoDB cluster: Available connections is low'
+              event_name: 'MongoDB cluster: Available connections less then {$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
               priority: WARNING
               description: |
                 "Too few available connections.
@@ -324,7 +325,8 @@ zabbix_export:
             -
               uuid: 67db1f543818476ca0b07e2cc1709452
               expression: 'min(/MongoDB cluster by Zabbix agent 2/mongodb.cursor.open.total,5m)>{$MONGODB.CURSOR.OPEN.MAX.WARN}'
-              name: 'MongoDB cluster: Too many cursors opened by MongoDB for clients (over {$MONGODB.CURSOR.OPEN.MAX.WARN} in 5m)'
+              name: 'MongoDB cluster: Too many cursors opened by MongoDB for clients'
+              event_name: 'MongoDB cluster: Too many cursors opened by MongoDB for clients (over {$MONGODB.CURSOR.OPEN.MAX.WARN} in 5m)'
               priority: WARNING
               tags:
                 -
@@ -358,7 +360,8 @@ zabbix_export:
             -
               uuid: 5ea8cf9c955940a6a580cd6f4bb2cc78
               expression: 'min(/MongoDB cluster by Zabbix agent 2/mongodb.cursor.timed_out.rate,5m)>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}'
-              name: 'MongoDB cluster: Too many cursors are timing out (over {$MONGODB.CURSOR.TIMEOUT.MAX.WARN} per second in 5m)'
+              name: 'MongoDB cluster: Too many cursors are timing out'
+              event_name: 'MongoDB cluster: Too many cursors are timing out (over {$MONGODB.CURSOR.TIMEOUT.MAX.WARN} per second in 5m)'
               priority: WARNING
               tags:
                 -
@@ -774,7 +777,8 @@ zabbix_export:
             -
               uuid: ee70d6da232a4068b574c9c147c622c9
               expression: 'nodata(/MongoDB cluster by Zabbix agent 2/mongodb.uptime,10m)=1'
-              name: 'MongoDB cluster: Failed to fetch info data (or no data for 10m)'
+              name: 'MongoDB cluster: Failed to fetch info data'
+              event_name: 'MongoDB cluster: Failed to fetch info data (or no data for 10m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 10 minutes'
               manual_close: 'YES'
@@ -789,7 +793,8 @@ zabbix_export:
             -
               uuid: 99ff438a7e3e4b0a8190b2ab9f41f076
               expression: 'last(/MongoDB cluster by Zabbix agent 2/mongodb.uptime)<10m'
-              name: 'MongoDB cluster: has been restarted (uptime < 10m)'
+              name: 'MongoDB cluster: has been restarted'
+              event_name: 'MongoDB cluster: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -826,7 +831,8 @@ zabbix_export:
             -
               uuid: 921ee489887943838d69558f103ad646
               expression: 'last(/MongoDB cluster by Zabbix agent 2/mongodb.version,#1)<>last(/MongoDB cluster by Zabbix agent 2/mongodb.version,#2) and length(last(/MongoDB cluster by Zabbix agent 2/mongodb.version))>0'
-              name: 'MongoDB cluster: Version has changed (new version: {ITEM.VALUE})'
+              name: 'MongoDB cluster: Version has changed'
+              event_name: 'MongoDB cluster: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'MongoDB cluster version has changed. Ack to close.'
               manual_close: 'YES'

@@ -78,14 +78,14 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |Battery: Device charge in warning state |<p>-</p> |`last(/Morningstar ProStar MPPT SNMP/charge.state[chargeState.0])={$CHARGE.STATE.WARN}` |WARNING |<p>**Depends on**:</p><p>- Battery: Device charge in critical state</p> |
 |Battery: Device charge in critical state |<p>-</p> |`last(/Morningstar ProStar MPPT SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}` |HIGH | |
-|Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m) |<p>-</p> |`max(/Morningstar ProStar MPPT SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}` |WARNING |<p>**Depends on**:</p><p>- Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)</p> |
-|Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m) |<p>-</p> |`max(/Morningstar ProStar MPPT SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}` |HIGH | |
-|Battery: High battery voltage (over {#VOLTAGE.MAX.WARN}V for 5m) |<p>-</p> |`min(/Morningstar ProStar MPPT SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)</p> |
-|Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m) |<p>-</p> |`min(/Morningstar ProStar MPPT SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}` |HIGH | |
+|Battery: Low battery voltage |<p>-</p> |`max(/Morningstar ProStar MPPT SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}` |WARNING |<p>**Depends on**:</p><p>- Battery: Critically low battery voltage</p> |
+|Battery: Critically low battery voltage |<p>-</p> |`max(/Morningstar ProStar MPPT SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}` |HIGH | |
+|Battery: High battery voltage |<p>-</p> |`min(/Morningstar ProStar MPPT SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Battery: Critically high battery voltage</p> |
+|Battery: Critically high battery voltage |<p>-</p> |`min(/Morningstar ProStar MPPT SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}` |HIGH | |
 |Load: Device load in warning state |<p>-</p> |`last(/Morningstar ProStar MPPT SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar ProStar MPPT SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"override"}` |WARNING |<p>**Depends on**:</p><p>- Load: Device load in critical state</p> |
 |Load: Device load in critical state |<p>-</p> |`last(/Morningstar ProStar MPPT SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar ProStar MPPT SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}` |HIGH | |
-|Status: Device has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/Morningstar ProStar MPPT SNMP/status.uptime)<10m` |INFO |<p>Manual close: YES</p> |
-|Status: Failed to fetch data (or no data for 5m) |<p>Zabbix has not received data for items for the last 5 minutes</p> |`nodata(/Morningstar ProStar MPPT SNMP/status.uptime,5m)=1` |WARNING |<p>Manual close: YES</p> |
+|Status: Device has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Morningstar ProStar MPPT SNMP/status.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|Status: Failed to fetch data |<p>Zabbix has not received data for items for the last 5 minutes</p> |`nodata(/Morningstar ProStar MPPT SNMP/status.uptime,5m)=1` |WARNING |<p>Manual close: YES</p> |
 |Status: Device has "overcurrent" array faults flag |<p>-</p> |`count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","overcurrent")=2` |HIGH | |
 |Status: Device has "mosfetSShorted" array faults flag |<p>-</p> |`count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","mosfetSShorted")=2` |HIGH | |
 |Status: Device has "software" array faults flag |<p>-</p> |`count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","software")=2` |HIGH | |
@@ -131,10 +131,10 @@ There are no template links in this template.
 |Status: Device has "loadLvd" alarm flag |<p>-</p> |`count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","loadLvd")=2` |WARNING | |
 |Status: Device has "logTimeout" alarm flag |<p>-</p> |`count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","logTimeout")=2` |WARNING | |
 |Status: Device has "eepromAccessFailure" alarm flag |<p>-</p> |`count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","eepromAccessFailure")=2` |WARNING | |
-|Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m) |<p>-</p> |`max(/Morningstar ProStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}` |WARNING |<p>**Depends on**:</p><p>- Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)</p> |
-|Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m) |<p>-</p> |`max(/Morningstar ProStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}` |HIGH | |
-|Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m) |<p>-</p> |`min(/Morningstar ProStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)</p> |
-|Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m) |<p>-</p> |`min(/Morningstar ProStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}` |HIGH | |
+|Temperature: Low battery temperature |<p>-</p> |`max(/Morningstar ProStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}` |WARNING |<p>**Depends on**:</p><p>- Temperature: Critically low battery temperature</p> |
+|Temperature: Critically low battery temperature |<p>-</p> |`max(/Morningstar ProStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}` |HIGH | |
+|Temperature: High battery temperature |<p>-</p> |`min(/Morningstar ProStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Temperature: Critically high battery temperature</p> |
+|Temperature: Critically high battery temperature |<p>-</p> |`min(/Morningstar ProStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}` |HIGH | |
 
 ## Feedback
 
