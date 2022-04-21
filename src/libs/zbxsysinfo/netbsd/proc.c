@@ -24,12 +24,8 @@
 #include "zbxjson.h"
 
 #include <sys/sysctl.h>
-#include <sys/filedesc.h>
 
 static kvm_t	*kd = NULL;
-static kvm_t	*kd_files = NULL;
-static fdfile_t	**procfiles = NULL;
-static int	procfiles_max = 0;
 
 typedef struct
 {
@@ -44,7 +40,6 @@ typedef struct
 	zbx_uint64_t	cputime_user;
 	zbx_uint64_t	cputime_system;
 	zbx_uint64_t	ctx_switches;
-	zbx_int64_t	fds;
 	zbx_uint64_t	page_faults;
 	zbx_uint64_t	io_read_op;
 	zbx_uint64_t	io_write_op;
@@ -381,44 +376,6 @@ out:
 	return SYSINFO_RET_OK;
 }
 
-static zbx_int64_t	get_fds(struct kinfo_proc2 *proc)
-{
-	int		i, lastfile, num = 0;
-	size_t		sz;
-	struct filedesc	fds;
-	struct fdtab	dt;
-
-	if (proc->p_fd == 0 ||
-			sizeof(struct filedesc) != kvm_read(kd_files, proc->p_fd, &fds, sizeof(struct filedesc)) ||
-			sizeof(struct fdtab) != kvm_read(kd_files, (unsigned long)fds.fd_dt, &dt, sizeof(struct fdtab)))
-	{
-		return -1;
-	}
-
-	lastfile = fds.fd_lastfile + 1;
-
-	if (procfiles_max < lastfile)
-	{
-		zbx_free(procfiles);
-		procfiles = zbx_malloc(procfiles, lastfile * sizeof(fdfile_t *));
-		procfiles_max = lastfile;
-	}
-
-	sz = lastfile * sizeof(fdfile_t*);
-
-	if (sz != kvm_read(kd_files, (unsigned long)&fds.fd_dt->dt_ff, procfiles, sz))
-		return -1;
-
-	for (i = 0; i <= fds.fd_lastfile; i++) {
-		if (procfiles[i] == NULL)
-			continue;
-
-		num++;
-	}
-
-	return num;
-}
-
 static char	*get_state(struct kinfo_proc2 *proc)
 {
 	char	*state;
@@ -501,7 +458,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	pagesize = getpagesize();
 
-	if (NULL == kd_files && NULL == (kd_files = kvm_open(NULL, NULL, NULL, O_RDONLY, NULL)))
+	if (NULL == kd && NULL == (kd = kvm_open(NULL, NULL, NULL, KVM_NO_FILES, NULL)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain a descriptor to access kernel virtual memory."));
 		return SYSINFO_RET_FAIL;
@@ -518,7 +475,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		arg = 0;
 	}
 
-	if (NULL == (proc = kvm_getproc2(kd_files, op, arg, sizeof(struct kinfo_proc2), &count)))
+	if (NULL == (proc = kvm_getproc2(kd, op, arg, sizeof(struct kinfo_proc2), &count)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain process information."));
 		return SYSINFO_RET_FAIL;
@@ -553,7 +510,6 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			proc_data->state = NULL;
 		}
 
-		proc_data->fds = get_fds(&proc[i]);
 		proc_data->name = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(proc[i].p_comm));
 		proc_data->size = (proc[i].p_vm_tsize + proc[i].p_vm_dsize + proc[i].p_vm_ssize) * pagesize;
 		proc_data->rss = proc[i].p_vm_rssize * pagesize;
@@ -571,9 +527,6 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		zbx_vector_proc_data_ptr_append(&proc_data_ctx, proc_data);
 	}
-
-	zbx_free(procfiles);
-	procfiles_max = 0;
 
 	if (ZBX_PROC_MODE_SUMMARY == zbx_proc_mode)
 	{
@@ -603,11 +556,6 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 					pdata->page_faults += pdata_cmp->page_faults;
 					pdata->io_read_op += pdata_cmp->io_read_op;
 					pdata->io_write_op += pdata_cmp->io_write_op;
-
-					if (0 <= pdata->fds && 0 <= pdata_cmp->fds)
-						pdata->fds += pdata_cmp->fds;
-					else if (0 <= pdata->fds)
-						pdata->fds = -1;
 
 					proc_data_free(pdata_cmp);
 					zbx_vector_proc_data_ptr_remove(&proc_data_ctx, k--);
@@ -653,7 +601,6 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		zbx_json_adduint64(&j, "ctx_switches", pdata->ctx_switches);
 		zbx_json_adduint64(&j, "page_faults", pdata->page_faults);
-		zbx_json_addint64(&j, "fds", pdata->fds);
 		zbx_json_adduint64(&j, "swap", pdata->swap);
 		zbx_json_adduint64(&j, "io_read_op", pdata->io_read_op);
 		zbx_json_adduint64(&j, "io_write_op", pdata->io_write_op);
