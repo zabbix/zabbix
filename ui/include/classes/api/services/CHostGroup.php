@@ -31,7 +31,8 @@ class CHostGroup extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'massadd' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'massupdate' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'massremove' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+		'massremove' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'propagate' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
 	protected $tableName = 'hstgrp';
@@ -438,16 +439,6 @@ class CHostGroup extends CApiService {
 					'where' => ['groupid' => $group['groupid']]
 				];
 			}
-
-			if (array_key_exists('propagate_permissions', $group) && $group['propagate_permissions']) {
-				$result = $this->get([
-					'groupids' => $group['groupid'],
-					'output' => ['groupid', 'name']
-				]);
-
-				self::inheritPermissions($result[0]['groupid'], $result[0]['name']);
-				self::inheritTagFilters($result[0]['groupid'], $result[0]['name']);
-			}
 		}
 
 		if ($upd_groups) {
@@ -600,8 +591,7 @@ class CHostGroup extends CApiService {
 	protected function validateUpdate(array &$groups, array &$db_groups = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid'], ['name']], 'fields' => [
 			'groupid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-			'name' =>					['type' => API_HG_NAME, 'length' => DB::getFieldLength('hstgrp', 'name')],
-			'propagate_permissions' =>	['type' => API_BOOLEAN]
+			'name' =>					['type' => API_HG_NAME, 'length' => DB::getFieldLength('hstgrp', 'name')]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $groups, '/', $error)) {
@@ -1565,13 +1555,75 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
+	 *  Apply permissions to all host group's subgroups.
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	public function propagate(array $data): array {
+		$this->validatePropagate($data);
+
+		foreach ($data['groups'] as $group) {
+			$result = $this->get([
+				'groupids' => $group['groupid'],
+				'output' => ['groupid', 'name']
+			]);
+
+			$this->inheritPermissions($result[0]['groupid'], $result[0]['name']);
+			$this->inheritTagFilters($result[0]['groupid'], $result[0]['name']);
+		}
+
+		return ['groupids' => array_column($data['groups'], 'groupid')];
+	}
+
+	/**
+	 * @param array			$data
+	 *
+	 * @throws APIException if the input is invalid
+	 */
+	private function validatePropagate(array &$data): void {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+			'groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
+				'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'permissions' =>	['type' => API_BOOLEAN, 'default' => false],
+			'tag_filter' => 	['type' => API_BOOLEAN, 'default' => false]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		if ($data['permissions'] == false && $data['tag_filter'] == false) {
+			self::exception(
+				ZBX_API_ERROR_PARAMETERS,
+				_s('At least one parameter "permissions" or "tag_filter" must be enabled.')
+			);
+		}
+
+		$groupids = array_column($data['groups'], 'groupid');
+
+		$db_groups = $this->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $groupids,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		if (count($db_groups) != count($groupids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
+
+	/**
 	 * Apply host group rights to all subgroups.
 	 *
 	 * @param string $groupid  Host group ID.
 	 * @param string $name     Host group name.
 	 */
-	private static function inheritPermissions($groupid, $name) {
-		$child_groupids = self::getChildGroupIds($name);
+	private function inheritPermissions(string $groupid, string $name): void {
+		$child_groupids = $this->getChildGroupIds($name);
 
 		if (!$child_groupids) {
 			return;
@@ -1623,8 +1675,8 @@ class CHostGroup extends CApiService {
 	 * @param string $groupid  Host group ID.
 	 * @param string $name     Host group name.
 	 */
-	public static function inheritTagFilters($groupid, $name) {
-		$child_groupids = self::getChildGroupIds($name);
+	public function inheritTagFilters(string $groupid, string $name): void {
+		$child_groupids = $this->getChildGroupIds($name);
 
 		if (!$child_groupids) {
 			return;
@@ -1684,11 +1736,11 @@ class CHostGroup extends CApiService {
 	 *
 	 * @param string $name     Host group name.
 	 */
-	private static function getChildGroupIds($name) {
+	private function getChildGroupIds(string $name): array {
 		$parent = $name.'/';
 		$len = strlen($parent);
 
-		$groups = API::HostGroup()->get([
+		$groups = $this->get([
 			'output' => ['groupid', 'name'],
 			'search' => ['name' => $parent],
 			'startSearch' => true

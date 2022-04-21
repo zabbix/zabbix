@@ -67,9 +67,18 @@ class CControllerHostGroupUpdate extends CController {
 		DBstart();
 		$result = API::HostGroup()->update([
 			'groupid' => $groupid,
-			'name' => $name,
-			'propagate_permissions' => (bool) $this->getInput('subgroups', 0)
+			'name' => $name
 		]);
+
+		if ($result && $this->getInput('subgroups', 0)) {
+			$result = API::HostGroup()->propagate([
+				'groups' => [
+					'groupid' => $groupid
+				],
+				'permissions' => true,
+				'tag_filter' => true
+			]);
+		}
 		$result = DBend($result);
 
 		$output = [];

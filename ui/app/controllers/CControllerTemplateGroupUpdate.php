@@ -67,9 +67,17 @@ class CControllerTemplateGroupUpdate extends CController {
 		DBstart();
 		$result = API::TemplateGroup()->update([
 			'groupid' => $groupid,
-			'name' => $name,
-			'propagate_permissions' => (bool) $this->getInput('subgroups', 0)
+			'name' => $name
 		]);
+
+		if ($result && $this->getInput('subgroups', 0)) {
+			$result = API::TemplateGroup()->propagate([
+				'groups' => [
+					'groupid' => $groupid
+				],
+				'permissions' => true
+			]);
+		}
 		$result = DBend($result);
 
 		$output = [];
