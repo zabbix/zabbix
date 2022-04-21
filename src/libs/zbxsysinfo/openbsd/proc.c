@@ -22,7 +22,6 @@
 #include "zbxregexp.h"
 #include "log.h"
 #include "zbxjson.h"
-#include "../../zbxalgo/vectorimpl.h"
 
 #include <sys/sysctl.h>
 

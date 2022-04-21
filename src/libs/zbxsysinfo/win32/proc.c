@@ -26,7 +26,6 @@
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
-#include "../../zbxalgo/vectorimpl.h"
 
 #define MAX_PROCESSES	4096
 #define MAX_NAME	256

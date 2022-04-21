@@ -25,7 +25,6 @@
 #include "log.h"
 #include "stats.h"
 #include "zbxjson.h"
-#include "../../zbxalgo/vectorimpl.h"
 
 #define PROC_VAL_TYPE_TEXT	0
 #define PROC_VAL_TYPE_NUM	1
