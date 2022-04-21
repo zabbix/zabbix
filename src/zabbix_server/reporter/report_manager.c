@@ -403,14 +403,16 @@ static char	*report_create_cookie(zbx_rm_t *manager, const char *sessionid)
 		out_str = zbx_strdup(NULL, "");
 	}
 	else
+	{
 		out_str = zbx_dsprintf(NULL, "\"%s\"", out);
+		zbx_free(out);
+	}
 
 	zbx_json_addraw(&j, ZBX_PROTO_TAG_SIGN, out_str);
 	str_base64_encode_dyn(j.buffer, &cookie, j.buffer_size);
 
 	zbx_json_clean(&j);
 	zbx_free(out_str);
-	zbx_free(out);
 
 	return cookie;
 }
