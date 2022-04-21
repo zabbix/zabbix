@@ -3163,13 +3163,13 @@ static void	check_vcenter_vm_discovery_nic_props_cb(struct zbx_json *j, zbx_vmwa
 {
 	zbx_json_addstring(j, "{#IFNAME}", ZBX_NULL2EMPTY_STR(dev->instance), ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(j, "{#IFDESC}", ZBX_NULL2EMPTY_STR(dev->label), ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(j, "{#VM.IFMAC}", ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFMAC]),
+	zbx_json_addstring(j, "{#IFMAC}", ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFMAC]),
 			ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(j, "{#VM.IFCONNECTED}", ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFCONNECTED]),
+	zbx_json_addstring(j, "{#IFCONNECTED}", ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFCONNECTED]),
 			ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(j, "{#VM.IFTYPE}", ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFTYPE]),
+	zbx_json_addstring(j, "{#IFTYPE}", ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFTYPE]),
 			ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(j, "{#VM.IFBACKINGDEVICE}", ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE]),
+	zbx_json_addstring(j, "{#IFBACKINGDEVICE}", ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE]),
 			ZBX_JSON_TYPE_STRING);
 }
 
