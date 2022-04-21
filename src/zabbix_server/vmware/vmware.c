@@ -5727,37 +5727,39 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 	zbx_vmware_vm_t		*vm;
 	zbx_hashset_iter_t	iter;
 
-	const char			*hv_perfcounters[] = {
-						"net/packetsRx[summation]", "net/packetsTx[summation]",
-						"net/received[average]", "net/transmitted[average]",
-						"datastore/totalReadLatency[average]",
-						"datastore/totalWriteLatency[average]", "cpu/usage[average]",
-						"cpu/utilization[average]", "power/power[average]",
-						"power/powerCap[average]",
-						NULL
-					};
+	const char		*hv_perfcounters[] = {
+					"net/packetsRx[summation]", "net/packetsTx[summation]",
+					"net/received[average]", "net/transmitted[average]",
+					"datastore/totalReadLatency[average]",
+					"datastore/totalWriteLatency[average]",
+					"datastore/numberReadAveraged[average]",
+					"datastore/numberWriteAveraged[average]", "cpu/usage[average]",
+					"cpu/utilization[average]", "power/power[average]",
+					"power/powerCap[average]",
+					NULL
+				};
 
-	const char			*vm_perfcounters[] = {
-						"virtualDisk/read[average]", "virtualDisk/write[average]",
-						"virtualDisk/numberReadAveraged[average]",
-						"virtualDisk/numberWriteAveraged[average]",
-						"net/packetsRx[summation]", "net/packetsTx[summation]",
-						"net/received[average]", "net/transmitted[average]",
-						"cpu/ready[summation]", "net/usage[average]", "cpu/usage[average]",
-						"cpu/latency[average]", "cpu/readiness[average]",
-						"cpu/swapwait[summation]", "sys/osUptime[latest]",
-						"mem/consumed[average]", "mem/usage[average]", "mem/swapped[average]",
-						"net/usage[average]", "virtualDisk/readOIO[latest]",
-						"virtualDisk/writeOIO[latest]",
-						"virtualDisk/totalWriteLatency[average]",
-						"virtualDisk/totalReadLatency[average]",
-						NULL
-					};
+	const char		*vm_perfcounters[] = {
+					"virtualDisk/read[average]", "virtualDisk/write[average]",
+					"virtualDisk/numberReadAveraged[average]",
+					"virtualDisk/numberWriteAveraged[average]",
+					"net/packetsRx[summation]", "net/packetsTx[summation]",
+					"net/received[average]", "net/transmitted[average]",
+					"cpu/ready[summation]", "net/usage[average]", "cpu/usage[average]",
+					"cpu/latency[average]", "cpu/readiness[average]",
+					"cpu/swapwait[summation]", "sys/osUptime[latest]",
+					"mem/consumed[average]", "mem/usage[average]", "mem/swapped[average]",
+					"net/usage[average]", "virtualDisk/readOIO[latest]",
+					"virtualDisk/writeOIO[latest]",
+					"virtualDisk/totalWriteLatency[average]",
+					"virtualDisk/totalReadLatency[average]",
+					NULL
+				};
 
-	const char			*ds_perfcounters[] = {
-						"disk/used[latest]", "disk/provisioned[latest]",
-						"disk/capacity[latest]", NULL
-					};
+	const char		*ds_perfcounters[] = {
+					"disk/used[latest]", "disk/provisioned[latest]",
+					"disk/capacity[latest]", NULL
+				};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
