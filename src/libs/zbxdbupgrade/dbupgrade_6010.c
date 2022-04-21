@@ -127,7 +127,7 @@ static int	DBpatch_6010006(void)
 	zbx_db_insert_t	insert;
 	int		ret;
 
-	zbx_db_insert_prepare(&insert, "host_rtdata", "hostid", "available", NULL);
+	zbx_db_insert_prepare(&insert, "host_rtdata", "hostid", "active_available", NULL);
 
 	result = DBselect("select hostid from hosts where status in (%i,%i)", HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 
