@@ -157,7 +157,8 @@ abstract class CControllerHost extends CController {
 		// Get additional data to limited host amount.
 		$hosts = API::Host()->get([
 			'output' => ['hostid', 'name', 'status', 'maintenance_status', 'maintenanceid', 'maintenance_type',
-				'active_available'],
+				'active_available'
+			],
 			'selectInterfaces' => ['ip', 'dns', 'port', 'main', 'type', 'useip', 'available', 'error', 'details'],
 			'selectGraphs' => API_OUTPUT_COUNT,
 			'selectHttpTests' => API_OUTPUT_COUNT,
@@ -168,6 +169,20 @@ abstract class CControllerHost extends CController {
 		]);
 		// Re-sort the results again.
 		CArrayHelper::sort($hosts, [['field' => $filter['sort'], 'order' => $filter['sortorder']]]);
+
+		// Get count for every host with item type ITEM_TYPE_ZABBIX_ACTIVE (7).
+		$db_items_active_count = API::Item()->get([
+			'groupCount' => true,
+			'countOutput' => true,
+			'filter' => ['type' => ITEM_TYPE_ZABBIX_ACTIVE],
+			'hostids' => array_column($hosts, 'hostid')
+		]);
+
+		$item_active_by_hostid = [];
+
+		foreach ($db_items_active_count as $value) {
+			$item_active_by_hostid[$value['hostid']] = $value['rowscount'];
+		}
 
 		$maintenanceids = [];
 
@@ -198,7 +213,15 @@ abstract class CControllerHost extends CController {
 		}
 
 		foreach ($hosts as &$host) {
-			$host['interfaces'][0]['active_available'] = $host['active_available'];
+			// Add active checks interface if host have items with type ITEM_TYPE_ZABBIX_ACTIVE (7).
+			if (array_key_exists($host['hostid'], $item_active_by_hostid)
+					&& $item_active_by_hostid[$host['hostid']] > 0) {
+				$host['interfaces'][] = [
+					'type' => INTERFACE_TYPE_AGENT_ACTIVE,
+					'available' => $host['active_available'],
+					'error' => ''
+				];
+			}
 			unset($host['active_available']);
 
 			// Count number of dashboards for each host.

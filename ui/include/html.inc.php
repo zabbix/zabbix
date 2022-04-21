@@ -190,7 +190,7 @@ function get_icon($type, $params = []) {
 function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 	$options = [
 		'output' => [
-			'hostid', 'status', 'name', 'maintenance_status', 'flags'
+			'hostid', 'status', 'name', 'maintenance_status', 'flags', 'active_available'
 		],
 		'selectHostDiscovery' => ['ts_delete'],
 		'selectInterfaces' => ['type', 'useip', 'ip', 'dns', 'port', 'version', 'details', 'available', 'error'],
@@ -237,6 +237,25 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 	}
 
 	$db_host = reset($db_host);
+
+	if (!$is_template) {
+		// Get count for item type ITEM_TYPE_ZABBIX_ACTIVE (7).
+		$db_item_active_count = API::Item()->get([
+			'countOutput' => true,
+			'filter' => ['type' => ITEM_TYPE_ZABBIX_ACTIVE],
+			'hostids' => [$hostid]
+		]);
+
+		if ($db_item_active_count > 0) {
+			// Add active checks interface if host have items with type ITEM_TYPE_ZABBIX_ACTIVE (7).
+			$db_host['interfaces'][] = [
+				'type' => INTERFACE_TYPE_AGENT_ACTIVE,
+				'available' => $db_host['active_available'],
+				'error' => ''
+			];
+			unset($db_host['active_available']);
+		}
+	}
 
 	// get lld-rules
 	if ($lld_ruleid != 0) {
@@ -578,12 +597,11 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
 /**
  * Create HTML helper element for host interfaces availability.
  *
- * @param array  $host_interfaces
+ * @param array $host_interfaces
  *
  * @return CHostAvailability
  */
 function getHostAvailabilityTable(array $host_interfaces): CHostAvailability {
-
 	$interfaces = [];
 
 	foreach ($host_interfaces as $interface) {
@@ -598,8 +616,7 @@ function getHostAvailabilityTable(array $host_interfaces): CHostAvailability {
 			'available' => $interface['available'],
 			'interface' => getHostInterface($interface),
 			'description' => $description,
-			'error' => ($interface['available'] == INTERFACE_AVAILABLE_TRUE) ? '' : $interface['error'],
-			'active_available' => $interface['active_available']
+			'error' => ($interface['available'] == INTERFACE_AVAILABLE_TRUE) ? '' : $interface['error']
 		];
 	}
 
