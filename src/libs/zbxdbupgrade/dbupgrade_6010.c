@@ -188,16 +188,21 @@ static int	DBpatch_6010008(void)
 
 static int	DBpatch_6010009(void)
 {
-	return DBcreate_index("hstgrp", "hstgrp_1", "name,type", 1);
+	return DBcreate_index("hstgrp", "hstgrp_1", "type,name", 1);
 }
 
-static void	DBpatch_6010010_hstgrp_free(hstgrp_t *hstgrp)
+static int	DBpatch_6010010(void)
+{
+	return DBcreate_index("hstgrp", "hstgrp_2", "type,uuid", 1);
+}
+
+static void	DBpatch_6010011_hstgrp_free(hstgrp_t *hstgrp)
 {
 	zbx_free(hstgrp->name);
 	zbx_free(hstgrp->uuid);
 }
 
-static int	DBpatch_6010010_split_groups(void)
+static int	DBpatch_6010011_split_groups(void)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -295,18 +300,18 @@ out:
 	DBfree_result(result);
 	zbx_free(sql);
 
-	zbx_vector_hstgrp_clear_ext(&hstgrps, DBpatch_6010010_hstgrp_free);
+	zbx_vector_hstgrp_clear_ext(&hstgrps, DBpatch_6010011_hstgrp_free);
 	zbx_vector_hstgrp_destroy(&hstgrps);
 
 	return ret;
 }
 
-static int	DBpatch_6010010(void)
+static int	DBpatch_6010011(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	return DBpatch_6010010_split_groups();
+	return DBpatch_6010011_split_groups();
 }
 #endif
 
@@ -325,6 +330,6 @@ DBPATCH_ADD(6010007, 0, 1)
 DBPATCH_ADD(6010008, 0, 1)
 DBPATCH_ADD(6010009, 0, 1)
 DBPATCH_ADD(6010010, 0, 1)
-
+DBPATCH_ADD(6010011, 0, 1)
 
 DBPATCH_END()

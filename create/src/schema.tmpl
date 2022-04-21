@@ -101,7 +101,8 @@ FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
-UNIQUE		|1		|name
+UNIQUE		|1		|type,name
+UNIQUE		|2		|type,uuid
 
 TABLE|group_prototype|group_prototypeid|ZBX_TEMPLATE
 FIELD		|group_prototypeid|t_id		|	|NOT NULL	|0
@@ -1938,4 +1939,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6010010	|6010010
+ROW		|1		|6010011	|6010011

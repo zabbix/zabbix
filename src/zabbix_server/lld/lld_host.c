@@ -1480,7 +1480,7 @@ static void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 		char	*sql = NULL;
 		size_t	sql_alloc = 0, sql_offset = 0;
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select name from hstgrp where");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select name from hstgrp where type=0");
 		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "name",
 				(const char **)names.values, names.values_num);
 
