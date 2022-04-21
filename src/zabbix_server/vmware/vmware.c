@@ -2412,13 +2412,9 @@ static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node)
 	props = (char **)zbx_malloc(NULL, sizeof(char *) * ZBX_VMWARE_DEV_PROPS_NUM);
 
 	props[ZBX_VMWARE_DEV_PROPS_IFMAC] = zbx_xml_node_read_value(details, node,
-				"*[local-name()='macAddress']");
-
-	if (NULL != (value = zbx_xml_node_read_value(details, node,
-					"*[local-name()='connectable']/*[local-name()='connected']")))
-	{
-		props[ZBX_VMWARE_DEV_PROPS_IFCONNECTED] = value;
-	}
+			"*[local-name()='macAddress']");
+	props[ZBX_VMWARE_DEV_PROPS_IFCONNECTED] = zbx_xml_node_read_value(details, node,
+			"*[local-name()='connectable']/*[local-name()='connected']");
 
 	if (NULL != (attr_value = xmlGetProp(node->parent, "type")))
 		props[ZBX_VMWARE_DEV_PROPS_IFTYPE] = (char *)attr_value;
