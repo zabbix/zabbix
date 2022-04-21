@@ -71,7 +71,7 @@ static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata
 	size_t			r_size = size * nmemb;
 	zbx_es_httprequest_t	*request = (zbx_es_httprequest_t *)userdata;
 
-	zbx_strncpy_alloc(&request->data, &request->data_alloc, &request->data_offset, (const char *)ptr, r_size);
+	zbx_str_memcpy_alloc(&request->data, &request->data_alloc, &request->data_offset, (const char *)ptr, r_size);
 
 	return r_size;
 }
@@ -331,7 +331,7 @@ out:
 	if (-1 != err_index)
 		return duk_throw(ctx);
 
-	duk_push_string(ctx, request->data);
+	duk_push_lstring(ctx, request->data, request->data_offset);
 
 	return 1;
 }

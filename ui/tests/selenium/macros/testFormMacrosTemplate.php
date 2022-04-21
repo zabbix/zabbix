@@ -18,12 +18,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/common/testFormMacros.php';
+require_once dirname(__FILE__) . '/../common/testFormMacros.php';
 
 /**
- * @backup hosts
+ * @backup hosts, config
+ *
+ * @onBefore prepareTemplateMacrosData
  */
 class testFormMacrosTemplate extends testFormMacros {
+
+	/**
+	 * Create new dashboards for autotest.
+	 */
+	public function prepareTemplateMacrosData() {
+		CDataHelper::call('template.update', [
+			[
+				'templateid' => 50002,
+				'macros' => [
+					'macro' => '{$NEWMACROS}',
+					'value' => 'something/value:key',
+					'type' => 2
+				]
+			]
+		]);
+	}
 
 	use MacrosTrait;
 
@@ -49,7 +67,8 @@ class testFormMacrosTemplate extends testFormMacros {
 	protected static $templateid_remove_inherited;
 
 	public $vault_object = 'template';
-	public $vault_error_field = '/1/macros/6/value';
+	public $hashi_error_field = '/1/macros/6/value';
+	public $cyber_error_field = '/1/macros/4/value';
 	public $update_vault_macro = '{$VAULT_HOST_MACRO_CHANGED}';
 	public $vault_macro_index = 0;
 
@@ -238,10 +257,18 @@ class testFormMacrosTemplate extends testFormMacros {
 	}
 
 	/**
+	 * Check Vault macros validation.
+	 */
+	public function testFormMacrosTemplate_checkVaultValidation() {
+		$this->checkVaultValidation('templates.php?form=update&templateid=50002', 'templates');
+	}
+
+	/**
 	 * @dataProvider getCreateVaultMacrosData
 	 */
 	public function testFormMacrosTemplate_CreateVaultMacros($data) {
-		$this->createVaultMacros($data, 'templates.php?form=update&templateid=99022', 'templates');
+		$templateid = ($data['vault'] === 'Hashicorp') ? '99022' : '50000';
+		$this->createVaultMacros($data, 'templates.php?form=update&templateid='.$templateid, 'templates');
 	}
 
 	/**

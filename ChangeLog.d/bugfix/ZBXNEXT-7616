@@ -1,0 +1,1 @@
+.......PS. [ZBXNEXT-7616] fixed javascript md5 and sha256 functions to support binary data (including terminating zero character) (wiper)
