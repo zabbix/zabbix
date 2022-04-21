@@ -331,7 +331,7 @@ class CDBHelper {
 				throw new Exception('Failed to restore "'.$file.'".');
 			}
 
-			$os = strtolower(PHPUNIT_ENV_OS);
+			$os = defined('PHPUNIT_ENV_OS') ? strtolower(PHPUNIT_ENV_OS) : '';
 			switch ($os) {
 				case 'win':
 				case 'windows':
