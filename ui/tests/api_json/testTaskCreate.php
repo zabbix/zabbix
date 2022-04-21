@@ -440,7 +440,7 @@ class testTaskCreate extends CAPITest {
 						'request' => [
 							'itemid' => '1_3_lld_111'
 						]
-					],
+					]
 				],
 				'expected_results' => [
 					['itemid' => '1_item_111'],
@@ -462,7 +462,7 @@ class testTaskCreate extends CAPITest {
 						'request' => [
 							'itemid' => '1_item_111'
 						]
-					],
+					]
 				],
 				'expected_results' => [
 					['itemid' => '1_item_111'],
@@ -483,7 +483,7 @@ class testTaskCreate extends CAPITest {
 						'request' => [
 							'itemid' => '1_2_1_item_111'
 						]
-					],
+					]
 				],
 				'expected_results' => [
 					['itemid' => '1_item_111'],

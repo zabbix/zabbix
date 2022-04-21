@@ -345,7 +345,7 @@ if ($data['context'] === 'host') {
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('no-chkbxrange')
 				->setAttribute('data-required', 'execute')
-		],
+		]
 	];
 }
 

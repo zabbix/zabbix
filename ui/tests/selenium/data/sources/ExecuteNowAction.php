@@ -116,35 +116,35 @@ class ExecuteNowAction {
 					'key_' => 'I1-lvl2-dep-log',
 					'master_itemid' => $itemids['I1-lvl1-agent-num'],
 					'type' => ITEM_TYPE_DEPENDENT,
-					'value_type' => ITEM_VALUE_TYPE_LOG,
+					'value_type' => ITEM_VALUE_TYPE_LOG
 				],
 				[
 					'name' => 'I1-lvl3-dep-txt',
 					'key_' => 'I1-lvl3-dep-txt',
 					'master_itemid' => $itemids['I1-lvl1-agent-num'],
 					'type' => ITEM_TYPE_DEPENDENT,
-					'value_type' => ITEM_VALUE_TYPE_TEXT,
+					'value_type' => ITEM_VALUE_TYPE_TEXT
 				],
 				[
 					'name' => 'I2-lvl2-dep-log',
 					'key_' => 'I2-lvl2-dep-log',
 					'master_itemid' => $itemids['I2-lvl1-trap-num'],
 					'type' => ITEM_TYPE_DEPENDENT,
-					'value_type' => ITEM_VALUE_TYPE_LOG,
+					'value_type' => ITEM_VALUE_TYPE_LOG
 				],
 				[
 					'name' => 'I2-lvl3-dep-txt',
 					'key_' => 'I2-lvl3-dep-txt',
 					'master_itemid' => $itemids['I2-lvl1-trap-num'],
 					'type' => ITEM_TYPE_DEPENDENT,
-					'value_type' => ITEM_VALUE_TYPE_TEXT,
+					'value_type' => ITEM_VALUE_TYPE_TEXT
 				],
 				[
 					'name' => 'I3-web-dep',
 					'key_' => 'I3-web-dep',
 					'master_itemid' => $web_item[0]['itemid'],
 					'type' => ITEM_TYPE_DEPENDENT,
-					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'value_type' => ITEM_VALUE_TYPE_UINT64
 				]
 			]
 		];
