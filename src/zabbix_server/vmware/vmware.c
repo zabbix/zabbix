@@ -2419,7 +2419,7 @@ static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node)
 	if (NULL != (attr_value = xmlGetProp(node->parent, "type")))
 	{
 		props[ZBX_VMWARE_DEV_PROPS_IFTYPE] = zbx_strdup(NULL, (char *)attr_value);
-		zbx_free(attr_value);
+		xmlFree(attr_value);
 	}
 
 	props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE] = zbx_xml_node_read_value(details, node,
