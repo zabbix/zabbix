@@ -64,12 +64,6 @@ static void	process_new_active_check_heartbeat(zbx_avail_active_hb_cache_t *cach
 	else
 	{
 		avail_cached->heartbeat_freq = avail_new->heartbeat_freq;
-
-		if (avail_new->lastaccess_active - avail_cached->lastaccess_active <= avail_new->heartbeat_freq * 2)
-			avail_cached->active_status = INTERFACE_AVAILABLE_TRUE;
-		else
-			avail_cached->active_status = INTERFACE_AVAILABLE_FALSE;
-
 		avail_cached->lastaccess_active = avail_new->lastaccess_active;
 
 		if (NULL == zbx_hashset_search(&cache->queue, &avail_cached->hostid))
