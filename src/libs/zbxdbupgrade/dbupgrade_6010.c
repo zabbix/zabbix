@@ -129,7 +129,7 @@ static int	DBpatch_6010006(void)
 
 	zbx_db_insert_prepare(&insert, "host_rtdata", "hostid", "available", NULL);
 
-	result = DBselect("select hostid from hosts where flags != %i and uuid=''", ZBX_FLAG_DISCOVERY_PROTOTYPE);
+	result = DBselect("select hostid from hosts where status in (%i,%i)", HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 
 	while (NULL != (row = DBfetch(result)))
 	{
