@@ -257,12 +257,6 @@ static void	process_confsync_diff(zbx_avail_active_hb_cache_t *cache, zbx_ipc_me
 		else
 			cached_host->active_status = INTERFACE_AVAILABLE_UNKNOWN;
 	}
-
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-	{
-		flush_active_hb_queue(cache);
-		zbx_hashset_clear(&cache->queue);
-	}
 out:
 	zbx_vector_ptr_clear_ext(&diff, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&diff);
