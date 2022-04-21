@@ -2417,8 +2417,7 @@ static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node)
 	if (NULL != (value = zbx_xml_node_read_value(details, node,
 					"*[local-name()='connectable']/*[local-name()='connected']")))
 	{
-		props[ZBX_VMWARE_DEV_PROPS_IFCONNECTED] = (0 == strcmp(value, "true") ? "1" : "0");
-		zbx_free(value);
+		props[ZBX_VMWARE_DEV_PROPS_IFCONNECTED] = value;
 	}
 
 	if (NULL != (attr_value = xmlGetProp(node->parent, "type")))
