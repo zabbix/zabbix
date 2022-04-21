@@ -21,7 +21,7 @@
 #include "zbxalgo.h"
 #include "log.h"
 #include "zbxtrends.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "zbxshmem.h"
 #include "trends.h"
 

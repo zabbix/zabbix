@@ -31,14 +31,13 @@ $widget = (new CWidget())
 	->setTitle(_('Regular expressions'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_REGEX_LIST))
-	->setControls((new CTag('nav', true,
-		(new CForm())
-			->cleanItems()
-			->addItem(new CRedirectButton(_('New regular expression'),
-				(new CUrl('zabbix.php'))->setArgument('action', 'regex.edit')
-			))
-		))
-			->setAttribute('aria-label', _('Content controls'))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(new CRedirectButton(_('New regular expression'),
+					(new CUrl('zabbix.php'))->setArgument('action', 'regex.edit')
+				))
+		))->setAttribute('aria-label', _('Content controls'))
 	);
 
 $form = (new CForm())->setName('regularExpressionsForm');

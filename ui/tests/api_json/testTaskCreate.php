@@ -71,12 +71,12 @@ class testTaskCreate extends CAPITest {
 			],
 			[
 				'task' => [
-					'type' => '2',
+					'type' => '3',
 					'request' => [
 						'itemid' => '40068'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/type": value must be one of 1, 6.'
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of 1, 2, 6.'
 			],
 			// Check itemids validation
 			[

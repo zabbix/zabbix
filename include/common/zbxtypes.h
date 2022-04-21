@@ -20,7 +20,7 @@
 #ifndef ZABBIX_TYPES_H
 #define ZABBIX_TYPES_H
 
-#include "sysinc.h"
+#include "zbxsysinc.h"
 
 #if defined(_WINDOWS)
 #	define ZBX_THREAD_LOCAL __declspec(thread)

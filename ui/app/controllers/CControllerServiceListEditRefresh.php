@@ -44,9 +44,11 @@ class CControllerServiceListEditRefresh extends CControllerServiceListGeneral {
 
 		if (!$ret) {
 			$this->setResponse(
-				(new CControllerResponseData([
-					'main_block' => json_encode(['errors' => getMessages()->toString()])
-				]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
 			);
 		}
 
@@ -87,9 +89,10 @@ class CControllerServiceListEditRefresh extends CControllerServiceListGeneral {
 
 		foreach ($this->getInput('filter_tags', []) as $tag) {
 			if (!array_key_exists('tag', $tag) || !array_key_exists('value', $tag)
-				|| ($tag['tag'] === '' && $tag['value'] === '')) {
+					|| ($tag['tag'] === '' && $tag['value'] === '')) {
 				continue;
 			}
+
 			$filter['tags'][] = $tag;
 		}
 

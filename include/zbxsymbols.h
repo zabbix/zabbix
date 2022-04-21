@@ -20,7 +20,7 @@
 #ifndef ZABBIX_SYMBOLS_H
 #define ZABBIX_SYMBOLS_H
 
-#include "sysinc.h"
+#include "zbxsysinc.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 
@@ -55,10 +55,7 @@ BOOL	(__stdcall *zbx_GetPerformanceInfo)(PPERFORMANCE_INFORMATION, DWORD);
 BOOL	(__stdcall *zbx_GlobalMemoryStatusEx)(LPMEMORYSTATUSEX);
 BOOL	(__stdcall *zbx_GetFileInformationByHandleEx)(HANDLE, ZBX_FILE_INFO_BY_HANDLE_CLASS, LPVOID, DWORD);
 
-void	import_symbols(void);
-
-#else
-#	define import_symbols()
+void	zbx_import_symbols(void);
 #endif
 
 #endif

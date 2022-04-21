@@ -95,18 +95,22 @@ $widget = (new CWidget())
 		: CDocHelper::CONFIGURATION_TEMPLATES_HTTPCONF_LIST
 	))
 	->setControls(
-		(new CTag('nav', true, ($data['hostid'] > 0)
-			? new CRedirectButton(_('Create web scenario'), (new CUrl('httpconf.php'))
-				->setArgument('form', 'create')
-				->setArgument('hostid', $data['hostid'])
-				->setArgument('context', $data['context'])
-				->getUrl()
-			)
-			: (new CButton('form',
-				($data['context'] === 'host')
-					? _('Create web scenario (select host first)')
-					: _('Create web scenario (select template first)')
-			))->setEnabled(false)
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(
+					$data['hostid'] != 0
+						? new CRedirectButton(_('Create web scenario'),
+							(new CUrl('httpconf.php'))
+								->setArgument('form', 'create')
+								->setArgument('hostid', $data['hostid'])
+								->setArgument('context', $data['context'])
+						)
+						: (new CButton('form',
+							$data['context'] === 'host'
+								? _('Create web scenario (select host first)')
+								: _('Create web scenario (select template first)')
+						))->setEnabled(false)
+				)
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 

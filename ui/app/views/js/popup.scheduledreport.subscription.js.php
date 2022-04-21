@@ -39,24 +39,32 @@ function submitScheduledReportSubscription(overlay) {
 	})
 		.then(response => response.json())
 		.then(response => {
-			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
-
-			if (response.errors) {
-				document
-					.querySelector(`.overlay-dialogue[data-dialogueid='${overlay.dialogueid}'] .overlay-dialogue-body`)
-					.prepend($(response.errors).get(0));
-				overlay.unsetLoading();
-
-				return;
+			if ('error' in response) {
+				throw {error: response.error};
 			}
 
 			new ReportSubscription(response, response.edit ? overlay.element.closest('tr') : null);
+
 			overlayDialogueDestroy(overlay.dialogueid);
 		})
-		.catch((e) => {
-			document
-				.querySelector(`.overlay-dialogue[data-dialogueid='${overlay.dialogueid}'] .overlay-dialogue-body`)
-				.prepend(makeMessageBox('bad', e, null)[0]);
+		.catch((exception) => {
+			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
+
+			let title, messages;
+
+			if (typeof exception === 'object' && 'error' in exception) {
+				title = exception.error.title;
+				messages = exception.error.messages;
+			}
+			else {
+				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+			}
+
+			const message_box = makeMessageBox('bad', messages, title);
+
+			message_box.insertBefore($form);
+		})
+		.finally(() => {
 			overlay.unsetLoading();
 		});
 }

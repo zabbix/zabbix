@@ -299,6 +299,10 @@ msgstr "(0 - eylem öntanımlısını kullan)"
 msgid "(Only super admins can create groups)"
 msgstr "(Yalnızca süper yöneticiler grup oluşturabilir)"
 
+#: app/partials/configuration.host.edit.html.php:131
+msgid "(linked by host discovery)"
+msgstr ""
+
 #: app/partials/configuration.host.edit.html.php:275
 #: app/views/popup.itemtestedit.view.php:241
 #: app/views/popup.massupdate.host.php:121
@@ -2110,6 +2114,11 @@ msgstr[1] "Tetikleyiciler kopyalanamıyor"
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
 msgstr "\"%1$s:%2$s\" tetikleyicisi kopyalanamıyor, çünkü ifadede birden çok ana makine var."
 
+#: app/controllers/CControllerSlaCreate.php:69
+#: app/controllers/CControllerSlaCreate.php:127
+msgid "Cannot create SLA"
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:1110
 #, c-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
@@ -2141,8 +2150,17 @@ msgstr "Keşif kuralı oluşturulamıyor"
 msgid "Cannot create icon map"
 msgstr "Simge haritası oluşturulamıyor"
 
+#: app/controllers/CControllerProxyConfigRefresh.php:79
+msgid "Cannot create request"
+msgstr ""
+
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
+msgstr ""
+
+#: app/controllers/CControllerServiceCreate.php:96
+#: app/controllers/CControllerServiceCreate.php:184
+msgid "Cannot create service"
 msgstr ""
 
 #: include/classes/api/services/CService.php:2373
@@ -2313,6 +2331,10 @@ msgstr[1] ""
 #: sysmaps.php:261
 msgid "Cannot delete network map"
 msgstr "Ağ haritası silinemiyor"
+
+#: app/controllers/CControllerProxyDelete.php:39
+msgid "Cannot delete proxies"
+msgstr ""
 
 #: app/controllers/CControllerProxyDelete.php:69
 msgid "Cannot delete proxy"
@@ -3080,6 +3102,11 @@ msgstr "Keşfedilmiş tetikleyici \"%1$s\" için \"%2$s\" güncellenemiyor."
 msgid "Cannot update API token"
 msgstr ""
 
+#: app/controllers/CControllerSlaUpdate.php:70
+#: app/controllers/CControllerSlaUpdate.php:138
+msgid "Cannot update SLA"
+msgstr ""
+
 #: include/classes/api/services/CGraphGeneral.php:67
 msgid "Cannot update a discovered graph."
 msgstr "Keşfedilmiş bir grafik güncellenemiyor."
@@ -3268,6 +3295,11 @@ msgstr "Betik güncellenemiyor"
 #: include/classes/api/services/CScript.php:445
 #, c-format
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
+msgstr ""
+
+#: app/controllers/CControllerServiceUpdate.php:97
+#: app/controllers/CControllerServiceUpdate.php:200
+msgid "Cannot update service"
 msgstr ""
 
 #: include/classes/api/services/CService.php:2310
@@ -3947,6 +3979,10 @@ msgstr "Kullanıcıların yapılandırması"
 #: httpconf.php:27
 msgid "Configuration of web monitoring"
 msgstr "Web gözlemleme yapılandırması"
+
+#: app/controllers/CControllerAuditLogList.php:199
+msgid "Configuration refresh"
+msgstr ""
 
 #: app/controllers/CControllerAuditSettingsUpdate.php:78
 #: app/controllers/CControllerAutoregUpdate.php:69
@@ -5241,6 +5277,10 @@ msgstr "Seçilen medya türleri silinsin mi?"
 msgid "Delete selected proxies?"
 msgstr "Seçilen vekil sunucular silinsin mi?"
 
+#: app/views/js/proxy.list.js.php:152 app/views/popup.proxy.edit.php:249
+msgid "Delete selected proxy?"
+msgstr ""
+
 #: app/views/administration.regex.list.php:82
 msgid "Delete selected regular expressions?"
 msgstr "Seçilen düzenli ifadeler silinsin mi?"
@@ -5505,6 +5545,10 @@ msgstr "Seçilen ana makine gruplarındaki ana makineler devre dışı bırakıl
 #: app/views/administration.proxy.list.php:188
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "Seçilen vekil sunucular tarafından izlenen ana makineler devre dışı bırakılsın mi?"
+
+#: app/views/js/proxy.list.js.php:137
+msgid "Disable hosts monitored by selected proxy?"
+msgstr ""
 
 #: app/views/administration.token.list.php:199
 #: app/views/administration.user.token.list.php:151
@@ -6238,6 +6282,10 @@ msgstr "Ana makineleri etkinleştir"
 msgid "Enable hosts monitored by selected proxies?"
 msgstr "Seçilen vekil sunucular tarafından izlenen ana makineler etkinleştirilsin mi?"
 
+#: app/views/js/proxy.list.js.php:122
+msgid "Enable hosts monitored by selected proxy?"
+msgstr ""
+
 #: app/views/administration.audit.settings.edit.php:48
 #: app/views/administration.housekeeping.edit.php:44
 #: app/views/administration.housekeeping.edit.php:98
@@ -6391,6 +6439,10 @@ msgstr ""
 
 #: app/views/popup.itemtestedit.view.php:296
 msgid "End of line sequence"
+msgstr ""
+
+#: include/locales.inc.php:33
+msgid "English (en_GB)"
 msgstr ""
 
 #: include/locales.inc.php:33
@@ -6823,6 +6875,11 @@ msgstr ""
 
 #: jsLoader.php:140
 msgid "Failed to update dashboard properties."
+msgstr ""
+
+#: app/controllers/CControllerDashboardShareUpdate.php:110
+#: app/views/js/popup.dashboard.share.edit.js.php:83
+msgid "Failed to update dashboard sharing."
 msgstr ""
 
 #: jsLoader.php:141
@@ -12152,6 +12209,10 @@ msgstr ""
 msgid "New operation"
 msgstr ""
 
+#: app/views/popup.proxy.edit.php:229 app/views/popup.proxy.edit.php:258
+msgid "New proxy"
+msgstr ""
+
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
 msgstr "Yeni düzenli ifade"
@@ -14605,6 +14666,18 @@ msgstr "Dikdörtgen"
 msgid "Refresh"
 msgstr "Tazele"
 
+#: app/views/popup.proxy.edit.php:216 app/views/proxy.list.php:178
+msgid "Refresh configuration"
+msgstr ""
+
+#: app/views/js/proxy.list.js.php:106
+msgid "Refresh configuration of the selected proxies?"
+msgstr ""
+
+#: app/views/js/proxy.list.js.php:107 app/views/popup.proxy.edit.php:217
+msgid "Refresh configuration of the selected proxy?"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetForm.php:58 jsLoader.php:169
 msgid "Refresh interval"
 msgstr ""
@@ -14947,6 +15020,10 @@ msgstr ""
 #: include/views/configuration.item.edit.php:354
 #: include/views/configuration.item.prototype.edit.php:340
 msgid "Request body type"
+msgstr ""
+
+#: app/controllers/CControllerProxyConfigRefresh.php:71
+msgid "Request created successfully"
 msgstr ""
 
 #: host_discovery.php:428 host_discovery.php:800 items.php:895 items.php:1011
@@ -17308,6 +17385,10 @@ msgstr "Şablonlar"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "\"%1$s\" şablonlarının \"%2$s\" ana makinelerinden bağlantıları kaldırıldı."
 
+#: app/partials/configuration.host.edit.html.php:187
+msgid "Templates linked by host discovery cannot be unlinked."
+msgstr ""
+
 #: app/controllers/CControllerPopupMassupdateTemplate.php:358
 msgid "Templates updated"
 msgstr ""
@@ -17547,6 +17628,10 @@ msgstr "Bu ay"
 
 #: include/func.inc.php:2477
 msgid "This month so far"
+msgstr ""
+
+#: app/views/popup.tophosts.column.edit.php:172
+msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr ""
 
 #: include/views/configuration.item.edit.php:125
@@ -18646,6 +18731,10 @@ msgstr ""
 msgid "Use default"
 msgstr ""
 
+#: app/partials/configuration.host.edit.html.php:188
+msgid "Use host prototype configuration form to remove automatically linked templates on upcoming discovery."
+msgstr ""
+
 #: app/views/administration.user.edit.php:300 app/views/popup.media.php:88
 msgid "Use if severity"
 msgstr "Önem derecesi ise kullan"
@@ -19697,6 +19786,13 @@ msgstr ""
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr ""
 
+#: app/controllers/CControllerDashboardWidgetCheck.php:46
+#: app/controllers/CControllerDashboardWidgetConfigure.php:46
+#: app/controllers/CControllerDashboardWidgetEdit.php:47
+#: app/controllers/CControllerDashboardWidgetsSanitize.php:66
+msgid "Widget type is not supported in this context."
+msgstr ""
+
 #: graphs.php:44 include/classes/widgets/CWidgetHelper.php:923
 #: include/classes/widgets/CWidgetHelper.php:956
 #: include/classes/widgets/CWidgetHelper.php:957
@@ -19746,6 +19842,10 @@ msgstr ""
 #: app/views/monitoring.widget.problemhosts.view.php:33
 msgid "With problems"
 msgstr "Problemli"
+
+#: app/views/popup.tophosts.column.edit.php:119
+msgid "With this setting only numeric items will be displayed in this column."
+msgstr ""
 
 #: include/forms.inc.php:346 include/forms.inc.php:566
 msgid "With triggers"
