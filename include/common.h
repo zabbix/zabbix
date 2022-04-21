@@ -643,6 +643,10 @@ zbx_prototype_discover_t;
 #define HOST_STATUS_PROXY_ACTIVE	5
 #define HOST_STATUS_PROXY_PASSIVE	6
 
+/* host group types */
+#define HOSTGROUP_TYPE_HOST		0
+#define HOSTGROUP_TYPE_TEMPLATE		1
+
 /* host maintenance status */
 #define HOST_MAINTENANCE_STATUS_OFF	0
 #define HOST_MAINTENANCE_STATUS_ON	1

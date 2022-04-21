@@ -140,7 +140,6 @@ out:
 	return ret;
 }
 
-#define DBPATCH_TPLGRP_TYPE		1
 #define DBPATCH_HOST_STATUS_TEMPLATE	"3"
 #define DBPATCH_GROUPIDS(cmp)									\
 		"select distinct g.groupid"							\
@@ -244,7 +243,7 @@ static int	DBpatch_6010011_split_groups(void)
 	{
 		hstgrps.values[i]->newgroupid = ++nextid;
 		zbx_db_insert_add_values(&db_insert, hstgrps.values[i]->newgroupid, hstgrps.values[i]->name,
-				DBPATCH_TPLGRP_TYPE, hstgrps.values[i]->uuid);
+				HOSTGROUP_TYPE_TEMPLATE, hstgrps.values[i]->uuid);
 	}
 
 	ret = zbx_db_insert_execute(&db_insert);
