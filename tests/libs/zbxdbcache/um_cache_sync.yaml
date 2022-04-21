@@ -146,4 +146,20 @@ in:
     refs: 1
 out:
   result: SUCCEED
+---
+test case: Global macro update
+include:
+  - &include01 um_cache_sync_09.inc.yaml
+  - &include02 um_cache_sync_10.inc.yaml
+  - &include00 um_cache_sync_00.inc.yaml
+in:
+  steps:
+  - config: *include01
+    refs: 1
+  - config: *include02
+    refs: 1
+  - config: *include00
+    refs: 1
+out:
+  result: SUCCEED
 ...

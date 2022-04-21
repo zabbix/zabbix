@@ -833,7 +833,7 @@ zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_dbsync_t *gmacros, zbx_
 		zbx_dbsync_t *htmpls)
 {
 	if (ZBX_DBSYNC_INIT != gmacros->mode && ZBX_DBSYNC_INIT != hmacros->mode && ZBX_DBSYNC_INIT != htmpls->mode &&
-			gmacros->rows.values_num && 0 == hmacros->rows.values_num && 0 == htmpls->rows.values_num)
+			0 == gmacros->rows.values_num && 0 == hmacros->rows.values_num && 0 == htmpls->rows.values_num)
 	{
 		return cache;
 	}

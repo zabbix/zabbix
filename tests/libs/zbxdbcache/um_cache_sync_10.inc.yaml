@@ -22,13 +22,7 @@ hosts:
       value: "10"
     templates: []
   - hostid: 2
-    macros:
-    - macroid: 3
-      macro: "{$M2}"
-      value: "2"
-    - macroid: 4
-      macro: "{$NODE:two}"
-      value: "20"
+    macros: []
     templates: [1]
   - hostid: 3
     macros: []
@@ -40,9 +34,9 @@ hosts:
       value: "4"
     - macroid: 6
       macro: "{$NODE:four}"
-      value: "40"
+      value: "41"
     - macroid: 7
-      macro: "{$BASE:four}"
+      macro: "{$BASE:four-zero-zero}"
       value: "400"
     templates: []
   - hostid: 5
@@ -68,16 +62,10 @@ hosts:
     - macroid: 13
       macro: "{$BASE:six}"
       value: "600"
-    templates: [3]
+    templates: []
   - hostid: 7
-    macros:
-    - macroid: 17
-      macro: "{$M7}"
-      value: "7"
-    - macroid: 19
-      macro: "{$BASE:seven}"
-      value: "700"
-    templates: [4]
+    macros: []
+    templates: []
   - hostid: 8
     macros:
     - macroid: 20
