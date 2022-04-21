@@ -1,0 +1,20 @@
+CLink::__set_state(array(
+   'use_sid' => false,
+   'confirm_message' => '',
+   'url' => NULL,
+   'encStrategy' => 2,
+   'attrEncStrategy' => 1,
+   'hint' => NULL,
+   'items' => 
+  array (
+    0 => '',
+  ),
+   'attributes' => 
+  array (
+    'aria-label' => 'Home',
+    'class' => 'icon-filter',
+  ),
+   'tagname' => 'a',
+   'paired' => true,
+))
+

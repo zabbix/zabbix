@@ -431,11 +431,6 @@ class CTabFilterItem extends CBaseComponent {
 			src_query = new URLSearchParams(this._src_url),
 			ignore_fields = ['filter_name', 'filter_custom_time', 'filter_show_counter', 'from', 'to', 'action', 'page'];
 
-		if (search_params === null || !this._data.filter_configurable) {
-			// Not templated tabs does not contain form fields, no need to update unsaved state.
-			return;
-		}
-
 		for (const field of ignore_fields) {
 			src_query.delete(field);
 			search_params.delete(field);
@@ -443,8 +438,14 @@ class CTabFilterItem extends CBaseComponent {
 
 		src_query.sort();
 		search_params.sort();
-		this._unsaved = (src_query.toString() !== search_params.toString());
-		this._target.parentNode.classList.toggle(TABFILTERITEM_STYLE_UNSAVED, this._unsaved);
+
+		if (src_query.toString() !== search_params.toString()) {
+			this._target.setAttribute('data-indicator-value', '1');
+			this._target.setAttribute('data-indicator', 'mark');
+		}
+		else {
+			this.resetUnsavedState();
+		}
 	}
 
 	/**
@@ -466,7 +467,8 @@ class CTabFilterItem extends CBaseComponent {
 		src_query.sort();
 
 		this._src_url = src_query.toString();
-		this._target.parentNode.classList.remove(TABFILTERITEM_STYLE_UNSAVED);
+		this._target.removeAttribute('data-indicator-value');
+		this._target.removeAttribute('data-indicator');
 	}
 
 	/**

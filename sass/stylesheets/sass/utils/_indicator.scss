@@ -17,4 +17,8 @@
 		border-radius: 50%;
 		background: $indicator-mark-color;
 	}
+	&::before {
+		display: inline-block;
+		vertical-align: middle;
+	}
 }

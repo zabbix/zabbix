@@ -1,0 +1,5 @@
+array('name'=>'','groupids'=>array (
+),'ip'=>'','dns'=>'','port'=>'','status'=>-1,'evaltype'=>0,'tags'=>array (
+),'severities'=>array (
+),'show_suppressed'=>0,'maintenance_status'=>1,'page'=>NULL,'sort'=>'name','sortorder'=>'ASC','filter_name'=>'Untitled','filter_show_counter'=>0,'filter_custom_time'=>0)
+

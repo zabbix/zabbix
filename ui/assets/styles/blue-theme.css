@@ -147,6 +147,9 @@ svg a {
   height: 7px;
   border-radius: 50%;
   background: #009900; }
+[data-indicator="mark"][data-indicator-value]:not([data-indicator-value="0"])::before {
+  display: inline-block;
+  vertical-align: middle; }
 
 .ui-resizable-border-n {
   border-top: 1px solid #02659f;
@@ -7007,7 +7010,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   border-radius: 2px;
   outline: none; }
 
-.marker-cluster span {
+.er-cluster span {
   line-height: 30px; }
 
 .leaflet-control.disabled {
