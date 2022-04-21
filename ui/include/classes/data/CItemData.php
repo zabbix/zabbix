@@ -60,6 +60,8 @@ final class CItemData {
 			'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
 			'proc.num[<name>,<user>,<state>,<cmdline>,<zone>]',
 			'proc_info[process,<attribute>,<type>]',
+			'registry.data[key,<value name>]',
+			'registry.get[key,<mode>,<name regexp>]',
 			'sensor[device,sensor,<mode>]',
 			'service.info[service,<param>]',
 			'services[<type>,<state>,<exclude>]',
@@ -159,6 +161,8 @@ final class CItemData {
 			'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
 			'proc.num[<name>,<user>,<state>,<cmdline>,<zone>]',
 			'proc_info[process,<attribute>,<type>]',
+			'registry.data[key,<value name>]',
+			'registry.get[key,<mode>,<name regexp>]',
 			'sensor[device,sensor,<mode>]',
 			'service.info[service,<param>]',
 			'services[<type>,<state>,<exclude>]',
@@ -988,6 +992,14 @@ final class CItemData {
 			'proc_info[process,<attribute>,<type>]' => [
 				'description' => _('Various information about specific process(es). Returns float'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
+			],
+			'registry.data[key,<value name>]' => [
+				'description' => _('Value data for value name in Windows Registry key.'),
+				'value_type' => null
+			],
+			'registry.get[key,<mode>,<name regexp>]' => [
+				'description' => _(' List of Windows Registry values or keys located at given key. Returns JSON.'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'sensor[device,sensor,<mode>]' => [
 				'description' => _('Hardware sensor reading. Returns float'),
