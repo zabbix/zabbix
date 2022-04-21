@@ -886,7 +886,7 @@ int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int
 	if (ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB > db_version_info->current_version)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "PostgreSQL version %lu is not supported with TimescaleDB, minimum"
-				" required is %d", (unsigned long)db_version_info->current_version,
+				" required is %d.", (unsigned long)db_version_info->current_version,
 				ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB);
 		ret = FAIL;
 		goto out;
@@ -923,6 +923,21 @@ int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int
 		db_version_info->ext_flag = DB_VERSION_NOT_SUPPORTED_WARNING;
 		db_version_info->ext_status |= ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE;
 		goto out;
+	}
+
+	if (DB_VERSION_HIGHER_THAN_MAXIMUM == db_version_info->ext_flag)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Recommended version should not be higher than %s %s.",
+				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY, ZBX_TIMESCALE_MAX_VERSION_FRIENDLY);
+
+		if (0 == allow_unsupported_ver)
+		{
+			db_version_info->ext_flag = DB_VERSION_HIGHER_THAN_MAXIMUM_ERROR;
+			ret = FAIL;
+			goto out;
+		}
+
+		db_version_info->ext_flag = DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING;
 	}
 
 	if (0 != zbx_strcmp_null(db_version_info->ext_lic, ZBX_TIMESCALE_LICENSE_COMMUNITY))
