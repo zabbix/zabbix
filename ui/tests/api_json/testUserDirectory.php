@@ -42,14 +42,14 @@ class testUserDirectory extends CAPITest {
 
 	public static function createInvalidDataProvider() {
 		return [
-			'Test dublicate names in one request' => [
+			'Test duplicate names in one request' => [
 				'userdirectory' => [
 					['name' => 'LDAP #1', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid'],
 					['name' => 'LDAP #1', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid']
 				],
 				'expected_error' => 'Invalid parameter "/2": value (name)=(LDAP #1) already exists.'
 			],
-			'Test dublicate name' => [
+			'Test duplicate name' => [
 				'userdirectory' => [
 					['name' => 'LDAP #1', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid'],
 				],
@@ -85,13 +85,13 @@ class testUserDirectory extends CAPITest {
 
 	public static function updateInvalidDataProvider() {
 		return [
-			'Test dublicate name update' => [
+			'Test duplicate name update' => [
 				'userdirectory' => [
 					['userdirectoryid' => 'LDAP #1', 'name' => 'LDAP #2'],
 				],
 				'expected_error' => 'User directory "LDAP #2" already exists.'
 			],
-			'Test dublicate names cross name update' => [
+			'Test duplicate names cross name update' => [
 				'userdirectory' => [
 					['userdirectoryid' => 'LDAP #1', 'name' => 'LDAP #2'],
 					['userdirectoryid' => 'LDAP #2', 'name' => 'LDAP #1'],
