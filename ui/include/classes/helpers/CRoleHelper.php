@@ -289,10 +289,7 @@ class CRoleHelper {
 			$rules[] = self::ACTIONS_MANAGE_SLA;
 		}
 
-		// This rule for super admins is ignored.
-		if ($user_type === USER_TYPE_ZABBIX_USER || $user_type === USER_TYPE_ZABBIX_ADMIN) {
-			$rules[] = self::ACTIONS_INVOKE_EXECUTE_NOW;
-		}
+		$rules[] = self::ACTIONS_INVOKE_EXECUTE_NOW;
 
 		return $rules;
 	}
