@@ -357,19 +357,34 @@ switch ($data['popup_type']) {
 		foreach ($data['table_records'] as $key => $item) {
 			$item['key'] = $key;
 
-			$name = (new CLink($item['key']))
+			$values = [
+				$options['dstfld1'] => $item[$options['srcfld1']]
+			];
+
+			if ($options['dstfld2'] !== '' && $options['srcfld2'] !== '') {
+				$values[$options['dstfld2']] = $item[$options['srcfld2']];
+			}
+
+			$name = (new CLink($key))
 				->setAttribute('data-dstfld1', $options['dstfld1'])
-				->setAttribute('data-srcfld1', $item[$options['srcfld1']])
 				->setAttribute('data-dstfld2', $options['dstfld2'])
-				->setAttribute('data-srcfld2', $item[$options['srcfld2']])
+				->setAttribute('data-values', json_encode($values))
 				->onClick('
-					popup_generic.setPopupOpenerFieldValues({[this.dataset.dstfld1]: this.dataset.srcfld1});
-					document.getElementById(this.dataset.dstfld1).dispatchEvent(new CustomEvent(\'help_items.paste\'));
-					updateItemFormElements();'.
-					($options['srcfld2']
-						? 'popup_generic.setPopupOpenerFieldValues({[this.dataset.dstfld2]: this.dataset.srcfld2});'
-						: ''
-					).'popup_generic.closePopup(event);
+					const values = JSON.parse(this.dataset.values);
+
+					popup_generic.setPopupOpenerFieldValues({[this.dataset.dstfld1]: values[this.dataset.dstfld1]});
+
+					document
+						.getElementById(this.dataset.dstfld1)
+						.dispatchEvent(new CustomEvent("help_items.paste"));
+
+					updateItemFormElements();
+
+					if (this.dataset.dstfld2 in values) {
+						popup_generic.setPopupOpenerFieldValues({[this.dataset.dstfld2]: values[this.dataset.dstfld2]});
+					}
+
+					popup_generic.closePopup(event);
 				');
 			$table->addRow([$name, $item['description']]);
 		}
@@ -382,19 +397,34 @@ switch ($data['popup_type']) {
 				$name = $d_rule['name'].
 					NAME_DELIMITER.discovery_check2str($d_check['type'], $d_check['key_'], $d_check['ports']);
 
+				$values = [
+					$options['dstfld1'] => $d_check[$options['srcfld1']]
+				];
+
+				if ($options['dstfld2'] !== '' && $options['srcfld2'] === 'name') {
+					$values[$options['dstfld2']] = $name;
+				}
+
 				$table->addRow(
 					(new CLink($name))
 						->setAttribute('data-dstfld1', $options['dstfld1'])
-						->setAttribute('data-srcfld1', $d_check[$options['srcfld1']])
 						->setAttribute('data-dstfld2', $options['dstfld2'])
-						->setAttribute('data-name', $name)
+						->setAttribute('data-values', json_encode($values))
 						->onClick('
-							popup_generic.setPopupOpenerFieldValues({[this.dataset.dstfld1]: this.dataset.srcfld1});'.
-							($options['srcfld2']
-								? 'popup_generic.setPopupOpenerFieldValues({[this.dataset.dstfld2]: this.dataset.name});'
-								: ''
-							).'popup_generic.closePopup(event);'
-						)
+							const values = JSON.parse(this.dataset.values);
+
+							popup_generic.setPopupOpenerFieldValues({
+								[this.dataset.dstfld1]: values[this.dataset.dstfld1]
+							});
+
+							if (this.dataset.dstfld2 in values) {
+								popup_generic.setPopupOpenerFieldValues({
+									[this.dataset.dstfld2]: values[this.dataset.dstfld2]
+								});
+							}
+
+							popup_generic.closePopup(event);
+						')
 				);
 			}
 		}
