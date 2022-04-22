@@ -119,11 +119,10 @@ window.ldap_edit_popup = new class {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
-				else {
-					overlayDialogueDestroy(this.overlay.dialogueid);
 
-					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
-				}
+				overlayDialogueDestroy(this.overlay.dialogueid);
+
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
 			})
 			.catch((exception) => {
 				let title;

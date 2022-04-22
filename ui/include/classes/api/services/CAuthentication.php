@@ -172,8 +172,8 @@ class CAuthentication extends CApiService {
 				);
 			}
 
-			$have_userdirectories = ($auth['ldap_userdirectoryid'] > 0
-				|| API::UserDirectory()->get(['output' => ['userdirectoryid', 'limit' => 1]]));
+			$have_userdirectories = $auth['ldap_userdirectoryid'] != 0
+				|| API::UserDirectory()->get(['output' => ['userdirectoryid'], 'limit' => 1]);
 
 			if (!$have_userdirectories) {
 				static::exception(ZBX_API_ERROR_PARAMETERS,

@@ -1491,7 +1491,7 @@ class CUser extends CApiService {
 						self::exception(ZBX_API_ERROR_INTERNAL, _('LDAP authentication is disabled.'));
 					}
 
-					$id = $db_user['userdirectoryid']
+					$id = $db_user['userdirectoryid'] != 0
 						? $db_user['userdirectoryid']
 						: CAuthenticationHelper::get(CAuthenticationHelper::LDAP_USERDIRECTORYID);
 					$userdirectory = [];
@@ -1527,7 +1527,6 @@ class CUser extends CApiService {
 
 				default:
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions for system access.'));
-					break;
 			}
 		}
 		catch (APIException $e) {
@@ -2020,6 +2019,7 @@ class CUser extends CApiService {
 	 * @param array  $permissions
 	 * @param string $permissions['debug_mode']
 	 * @param string $permissions['gui_access']
+	 * @param string $permissions['userdirectoryid']
 	 */
 	private function addExtraFields(array $db_user, array $permissions): array {
 		$db_user['type'] = $this->getUserType($db_user['roleid']);
