@@ -1759,7 +1759,13 @@ class CUser extends CApiService {
 	 * @return array
 	 */
 	private function getUserGroupsPermissions(string $userid): array {
-		$permissions = [];
+		$permissions = [
+			'debug_mode' => GROUP_DEBUG_MODE_DISABLED,
+			'users_status' => GROUP_STATUS_ENABLED,
+			'gui_access' => GROUP_GUI_ACCESS_SYSTEM,
+			'userdirectoryid' => 0
+		];
+
 		$db_usrgrps = DBselect(
 			'SELECT g.debug_mode,g.users_status,g.gui_access,g.userdirectoryid'.
 			' FROM usrgrp g,users_groups ug'.
@@ -1767,28 +1773,50 @@ class CUser extends CApiService {
 				' AND ug.userid='.$userid
 		);
 
+		$userdirectoryids = [];
+
 		while ($db_usrgrp = DBfetch($db_usrgrps)) {
 			if ($db_usrgrp['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 				$permissions['debug_mode'] = GROUP_DEBUG_MODE_ENABLED;
 			}
+
 			if ($db_usrgrp['users_status'] == GROUP_STATUS_DISABLED) {
 				$permissions['users_status'] = GROUP_STATUS_DISABLED;
 			}
-			if (!array_key_exists('gui_access', $permissions)
-					|| $db_usrgrp['gui_access'] > $permissions['gui_access']) {
+
+			if ($db_usrgrp['gui_access'] > $permissions['gui_access']) {
 				$permissions['gui_access'] = $db_usrgrp['gui_access'];
-				$permissions['userdirectoryid'] = $db_usrgrp['userdirectoryid'];
+			}
+
+			if ($db_usrgrp['gui_access'] == GROUP_GUI_ACCESS_SYSTEM
+					|| $db_usrgrp['gui_access'] == GROUP_GUI_ACCESS_LDAP) {
+				$userdirectoryids[$db_usrgrp['userdirectoryid']] = true;
 			}
 		}
 
-		$permissions += [
-			'debug_mode' => GROUP_DEBUG_MODE_DISABLED,
-			'users_status' => GROUP_STATUS_ENABLED,
-			'gui_access' => GROUP_GUI_ACCESS_SYSTEM,
-			'userdirectoryid' => 0
-		];
+		if ($permissions['gui_access'] == GROUP_GUI_ACCESS_INTERNAL
+				|| $permissions['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
+			return $permissions;
+		}
 
-		return $permissions;
+		if (array_key_exists(0, $userdirectoryids)) {
+			unset($userdirectoryids[0]);
+			$userdirectoryids[CAuthenticationHelper::get(CAuthenticationHelper::LDAP_USERDIRECTORYID)] = true;
+		}
+
+		if (count($userdirectoryids) == 1) {
+			return ['userdirectoryid' => array_key_first($userdirectoryids)] + $permissions;
+		}
+
+		$db_userdirectoryids = API::UserDirectory()->get([
+			'output' => [],
+			'userdirectoryids' => array_keys($userdirectoryids),
+			'sortfield' => ['name'],
+			'limit' => 1,
+			'preservekeys' => true
+		]);
+
+		return ['userdirectoryid' => array_key_first($db_userdirectoryids)] + $permissions;
 	}
 
 	/**
