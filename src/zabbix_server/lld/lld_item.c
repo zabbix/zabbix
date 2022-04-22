@@ -2503,14 +2503,12 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_p
 
 			if (NULL == (item_index = (zbx_lld_item_index_t *)zbx_hashset_search(items_index, &item_index_local)))
 			{
-				if (NULL != (item = lld_item_make(item_prototype, item_index_local.lld_row,
-						lld_macro_paths, error)))
-				{
-					/* add the created item to items vector and update index */
-					zbx_vector_ptr_append(items, item);
-					item_index_local.item = item;
-					zbx_hashset_insert(items_index, &item_index_local, sizeof(item_index_local));
-				}
+				item = lld_item_make(item_prototype, item_index_local.lld_row, lld_macro_paths, error);
+
+				/* add the created item to items vector and update index */
+				zbx_vector_ptr_append(items, item);
+				item_index_local.item = item;
+				zbx_hashset_insert(items_index, &item_index_local, sizeof(item_index_local));
 			}
 			else
 				lld_item_update(item_prototype, item_index_local.lld_row, lld_macro_paths, item_index->item, error);
