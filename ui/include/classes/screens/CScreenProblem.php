@@ -695,8 +695,8 @@ class CScreenProblem extends CScreenBase {
 			if ($clock < $today) {
 				$breakpoint = _('Today');
 			}
-			elseif (strftime('%H', $last_clock) != strftime('%H', $clock)) {
-				$breakpoint = strftime('%H:00', $last_clock);
+			elseif (date('H', $last_clock) != date('H', $clock)) {
+				$breakpoint = date('H:00', $last_clock);
 			}
 		}
 		elseif ($last_clock >= $yesterday) {
@@ -705,10 +705,10 @@ class CScreenProblem extends CScreenBase {
 			}
 		}
 		elseif ($last_clock >= $this_year && $clock < $this_year) {
-			$breakpoint = strftime('%Y', $last_clock);
+			$breakpoint = date('Y', $last_clock);
 		}
-		elseif (strftime('%Y%m', $last_clock) != strftime('%Y%m', $clock)) {
-			$breakpoint = getMonthCaption(strftime('%m', $last_clock));
+		elseif (date('Ym', $last_clock) != date('Ym', $clock)) {
+			$breakpoint = getMonthCaption(date('m', $last_clock));
 		}
 
 		if ($breakpoint !== null) {

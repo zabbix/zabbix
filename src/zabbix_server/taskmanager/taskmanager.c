@@ -28,7 +28,7 @@
 #include "../actions.h"
 #include "export.h"
 #include "zbxdiag.h"
-#include "service_protocol.h"
+#include "zbxservice.h"
 #include "zbxjson.h"
 #include "zbxrtc.h"
 #include "audit/zbxaudit.h"
@@ -674,12 +674,18 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "failed to reload configuration cache on proxy "
 							"with id " ZBX_FS_UI64 ": failed to update nextcheck", proxyid);
+					zbx_free(name);
 				}
 				else
 				{
 					passive_proxy_count++;
 					zbx_vector_str_append(&proxynames_log, name);
 				}
+			}
+			else
+			{
+				zbx_free(name);
+				THIS_SHOULD_NEVER_HAPPEN;
 			}
 		}
 	}

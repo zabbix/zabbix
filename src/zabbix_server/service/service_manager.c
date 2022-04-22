@@ -22,7 +22,7 @@
 #include "log.h"
 #include "zbxself.h"
 #include "zbxnix.h"
-#include "service_protocol.h"
+#include "zbxservice.h"
 #include "service_actions.h"
 #include "zbxserialize.h"
 

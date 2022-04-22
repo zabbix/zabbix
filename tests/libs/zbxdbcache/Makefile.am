@@ -51,7 +51,6 @@ CACHE_LIBS = \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxservice/libzbxservice.a \
 	$(top_srcdir)/src/zabbix_server/service/libservice.a \
-	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends_baseline.a \
 	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \

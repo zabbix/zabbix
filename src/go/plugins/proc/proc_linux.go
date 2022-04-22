@@ -28,6 +28,7 @@ package proc
 import "C"
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
@@ -53,7 +54,7 @@ type Plugin struct {
 	queries map[procQuery]*cpuUtilStats
 	mutex   sync.Mutex
 	scanid  uint64
-	stats   map[int64]*cpuUtil
+	stats   map[int64]*procStat
 }
 
 type PluginExport struct {
@@ -61,7 +62,7 @@ type PluginExport struct {
 }
 
 var impl Plugin = Plugin{
-	stats:   make(map[int64]*cpuUtil),
+	stats:   make(map[int64]*procStat),
 	queries: make(map[procQuery]*cpuUtilStats),
 }
 
@@ -142,11 +143,76 @@ type procInfo struct {
 	state   string
 }
 
-type cpuUtil struct {
-	utime   uint64
-	stime   uint64
-	started uint64
-	err     error
+type procStatus struct {
+	Pid           uint64  `json:"pid"`
+	Ppid          int64  `json:"ppid"`
+	Tgid          int64  `json:"-"`
+	Name          string  `json:"name"`
+	ThreadName    string  `json:"-"`
+	Cmdline       string  `json:"cmdline"`
+	Vsize         int64  `json:"vsize"`
+	Pmem          float64 `json:"pmem"`
+	Rss           int64  `json:"rss"`
+	Data          int64  `json:"data"`
+	Exe           int64  `json:"exe"`
+	Hwm           int64  `json:"hwm"`
+	Lck           int64  `json:"lck"`
+	Lib           int64  `json:"lib"`
+	Peak          int64  `json:"peak"`
+	Pin           int64  `json:"pin"`
+	Pte           int64  `json:"pte"`
+	Size          int64  `json:"size"`
+	Stk           int64  `json:"stk"`
+	Swap          int64  `json:"swap"`
+	CpuTimeUser   float64 `json:"cputime_user"`
+	CpuTimeSystem float64 `json:"cputime_system"`
+	State         string  `json:"state"`
+	CtxSwitches   int64  `json:"ctx_switches"`
+	Threads       int64  `json:"threads"`
+	PageFaults    int64  `json:"page_faults"`
+}
+
+type procSummary struct {
+	Name          string  `json:"name"`
+	Processes     int     `json:"processes"`
+	Vsize         int64   `json:"vsize"`
+	Pmem          float64 `json:"pmem"`
+	Rss           int64   `json:"rss"`
+	Data          int64   `json:"data"`
+	Exe           int64   `json:"exe"`
+	Lck           int64   `json:"lck"`
+	Lib           int64   `json:"lib"`
+	Pin           int64   `json:"pin"`
+	Pte           int64   `json:"pte"`
+	Size          int64   `json:"size"`
+	Stk           int64   `json:"stk"`
+	Swap          int64   `json:"swap"`
+	CpuTimeUser   float64 `json:"cputime_user"`
+	CpuTimeSystem float64 `json:"cputime_system"`
+	CtxSwitches   int64   `json:"ctx_switches"`
+	Threads       int64   `json:"threads"`
+	PageFaults    int64   `json:"page_faults"`
+}
+
+type thread struct {
+	Pid           int64   `json:"pid"`
+	Ppid          int64   `json:"ppid"`
+	Name          string  `json:"name"`
+	Tid           uint64  `json:"tid"`
+	ThreadName    string  `json:"tname"`
+	CpuTimeUser   float64 `json:"cputime_user"`
+	CpuTimeSystem float64 `json:"cputime_system"`
+	State         string  `json:"state"`
+	CtxSwitches   int64   `json:"ctx_switches"`
+	PageFaults    int64   `json:"page_faults"`
+}
+
+type procStat struct {
+	utime      uint64
+	stime      uint64
+	started    uint64
+	pageFaults int64
+	err        error
 }
 
 func (q *cpuUtilQuery) match(p *procInfo) bool {
@@ -224,7 +290,7 @@ func (p *Plugin) Collect() (err error) {
 	}
 	p.Tracef("%s() queries:%d", log.Caller(), len(p.queries))
 
-	stats := make(map[int64]*cpuUtil)
+	stats := make(map[int64]*procStat)
 	// find processes matching prepared queries
 	for _, p := range processes {
 		var monitored bool
@@ -235,7 +301,7 @@ func (p *Plugin) Collect() (err error) {
 			}
 		}
 		if monitored {
-			stats[p.pid] = &cpuUtil{}
+			stats[p.pid] = &procStat{}
 		}
 	}
 
@@ -247,7 +313,7 @@ func (p *Plugin) Collect() (err error) {
 
 	now := time.Now()
 	for pid, stat := range stats {
-		p.getProcCpuUtil(pid, stat)
+		getProcessStats(fmt.Sprintf("%d", pid), stat)
 		if stat.err != nil {
 			p.Debugf("cannot get process %d CPU utilization statistics: %s", pid, stat.err)
 		}
@@ -256,7 +322,7 @@ func (p *Plugin) Collect() (err error) {
 	// gather process utilization for queries
 	for _, q := range queries {
 		for _, pid := range q.pids {
-			var stat, last *cpuUtil
+			var stat, last *procStat
 			var ok bool
 			if stat, ok = stats[pid]; !ok || stat.err != nil {
 				continue
@@ -449,6 +515,8 @@ func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextPro
 		return p.exportProcMem(params)
 	case "proc.num":
 		return p.exportProcNum(params)
+	case "proc.get":
+		return p.exportProcGet(params)
 	}
 
 	return nil, plugin.UnsupportedMetricError
@@ -694,6 +762,166 @@ func (p *PluginExport) exportProcNum(params []string) (interface{}, error) {
 	return count, nil
 }
 
+func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
+	var name, userName, cmdline, mode string
+	var uid uint64
+	switch len(params) {
+	case 4:
+		mode = params[3]
+		switch mode {
+		case "process", "", "thread", "summary":
+		default:
+			return nil, errors.New("Invalid fourth parameter")
+		}
+		fallthrough
+	case 3:
+		cmdline = params[2]
+		if cmdline != "" && mode == "summary" {
+			return nil, errors.New("Invalid fourth parameter")
+		}
+		fallthrough
+	case 2:
+		userName = params[1]
+		if userName != "" {
+			if u, err := user.Lookup(userName); err != nil {
+				return "[]", nil
+			} else {
+				uid, err = strconv.ParseUint(u.Uid, 10, 64)
+			}
+		}
+		fallthrough
+	case 1:
+		name = params[0]
+	case 0:
+	default:
+		return nil, errors.New("Too many parameters.")
+	}
+
+	array := make([]procStatus, 0)
+	threadArray := make([]thread, 0)
+	summaryArray := make([]procSummary, 0)
+
+	var pids []string
+	var err error
+	if pids, err = getPids(); err != nil {
+		return nil, fmt.Errorf("Cannot open /proc: %s", err)
+	}
+
+	query, _, err := p.prepareQuery(&procQuery{name, userName, cmdline, ""})
+	if err != nil {
+		p.Debugf("Failed to prepare query: %s", err.Error())
+		return nil, err
+	}
+
+	if mode != "thread" {
+		for _, pid := range pids {
+			data := procStatus{}
+			if err := parseProcessStatus(pid, &data); err != nil {
+				continue
+			}
+			getProcessNames(pid, &data)
+			getProcessCalculatedMetrics(pid, &data)
+			getProcessCpuTimes(pid, &data)
+
+			processUserID, err := getProcessUserID(pid)
+			if err != nil {
+				continue
+			}
+
+			pi := procInfo{int64(data.Pid), data.Name, processUserID, "", data.Name, ""}
+			if mode != "summary" {
+				pi.cmdline = data.Cmdline
+			}
+			if query.match(&pi) {
+				array = append(array, data)
+			}
+		}
+	} else {
+		var threadIds []string
+		for _, pid := range pids {
+			tids, err := getThreadIds(pid)
+			if err == nil {
+				threadIds = append(threadIds, tids...)
+			}
+		}
+		for _, tid := range threadIds {
+			data := procStatus{}
+			if err := parseProcessStatus(tid, &data); err != nil {
+				continue
+			}
+			procPath := fmt.Sprintf("%d", data.Tgid) + "/task/" + tid
+			getProcessNames(tid, &data)
+			getProcessCalculatedMetrics(tid, &data)
+			getProcessCpuTimes(procPath, &data)
+
+			pi := procInfo{int64(data.Pid), data.Name, int64(uid), data.Cmdline, data.Name, ""}
+			if query.match(&pi) {
+				threadArray = append(threadArray, thread{data.Tgid, data.Ppid, data.Name, data.Pid,
+					data.ThreadName, data.CpuTimeUser, data.CpuTimeSystem, data.State, data.CtxSwitches,
+					data.PageFaults})
+				}
+			}
+		}
+
+	var jsonArray []byte
+	switch mode {
+	case "summary":
+		var processed []string
+		processes:
+		for i, proc := range array {
+			for _, j := range processed {
+				if j == proc.Name {
+					continue processes
+				}
+			}
+
+			procSum := procSummary{proc.Name, 1, proc.Vsize, proc.Pmem, proc.Rss, proc.Data,
+				proc.Exe, proc.Lck, proc.Lib, proc.Pin, proc.Pte, proc.Size, proc.Stk,
+				proc.Swap, proc.CpuTimeUser, proc.CpuTimeSystem, proc.CtxSwitches, proc.Threads,
+				proc.PageFaults}
+
+			if len(array) > i + 1 {
+				for _, procCmp := range array[i + 1:] {
+					if procCmp.Name != proc.Name {
+						continue
+					}
+					procSum.Processes++
+					procSum.Threads += procCmp.Threads
+					addNonNegative(&procSum.Vsize, procCmp.Vsize)
+					addNonNegativeFloat(&procSum.Pmem, procCmp.Pmem)
+					addNonNegative(&procSum.Rss, procCmp.Rss)
+					addNonNegative(&procSum.Data, procCmp.Data)
+					addNonNegative(&procSum.Exe, procCmp.Exe)
+					addNonNegative(&procSum.Lck, procCmp.Lck)
+					addNonNegative(&procSum.Lib, procCmp.Lib)
+					addNonNegative(&procSum.Pin, procCmp.Pin)
+					addNonNegative(&procSum.Pte, procCmp.Pte)
+					addNonNegative(&procSum.Size, procCmp.Size)
+					addNonNegative(&procSum.Stk, procCmp.Stk)
+					addNonNegative(&procSum.Swap, procCmp.Swap)
+					addNonNegativeFloat(&procSum.CpuTimeUser, procCmp.CpuTimeUser)
+					addNonNegativeFloat(&procSum.CpuTimeSystem, procCmp.CpuTimeSystem)
+					addNonNegative(&procSum.CtxSwitches, procCmp.CtxSwitches)
+					addNonNegative(&procSum.PageFaults, procCmp.PageFaults)
+				}
+			}
+			processed = append(processed, proc.Name)
+			summaryArray = append(summaryArray, procSum)
+		}
+		jsonArray, err = json.Marshal(summaryArray)
+	case "thread":
+		jsonArray, err = json.Marshal(threadArray)
+	default:
+		jsonArray, err = json.Marshal(array)
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("Cannot create JSON array: %s", err)
+	}
+
+	return string(jsonArray), nil
+}
+
 func getMax(a, b float64) float64 {
 	if a > b {
 		return a
@@ -780,5 +1008,6 @@ func init() {
 	plugin.RegisterMetrics(&implExport, "ProcExporter",
 		"proc.mem", "Process memory utilization values.",
 		"proc.num", "The number of processes.",
+		"proc.get", "List of OS processes with statistics.",
 	)
 }
