@@ -1478,6 +1478,28 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 
 /******************************************************************************
  *                                                                            *
+ * purpose: check for dependent items with non-discovered master item         *
+ *                                                                            *
+ *****************************************************************************/
+static void	lld_item_check_dependent_items(zbx_lld_item_t *item, char **error)
+{
+	int	i;
+
+	for (i = 0; i < item->dependent_items.values_num; i++)
+	{
+		zbx_lld_item_t	*dependent;
+
+		dependent = (zbx_lld_item_t *)item->dependent_items.values[i];
+
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			dependent->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+
+		lld_item_check_dependent_items(dependent, error);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: lld_items_validate                                               *
  *                                                                            *
  * Parameters: hostid            - [IN] host id                               *
@@ -1753,18 +1775,8 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 	{
 		item = (zbx_lld_item_t *)items->values[i];
 
-		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
-		{
-			for (j = 0; j < item->dependent_items.values_num; j++)
-			{
-				zbx_lld_item_t	*dependent;
-
-				dependent = (zbx_lld_item_t *)item->dependent_items.values[j];
-				dependent->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
-			}
-
-			continue;
-		}
+		if (0 == item->master_itemid)
+			lld_item_check_dependent_items(item, error);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
