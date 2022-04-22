@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 require_once dirname(__FILE__).'/../../../include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/../../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../../conf/zabbix.conf.php';

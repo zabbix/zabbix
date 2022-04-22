@@ -66,7 +66,7 @@ class testExecuteNow extends CWebTest {
 					'message' => 'Request sent successfully. Some items are filtered due to access permissions or type.'
 				]
 			],
-			// Dependet items.
+			// Dependent items.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -88,7 +88,7 @@ class testExecuteNow extends CWebTest {
 					'message' => 'Cannot send request: wrong master item type.'
 				]
 			],
-			// Non-allowed master item type and its dependet item.
+			// Non-allowed master item type and its dependent item.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -96,7 +96,7 @@ class testExecuteNow extends CWebTest {
 					'message' => 'Cannot send request: wrong item type.'
 				]
 			],
-			// Non-allowed dependetn item and non-allowed simple item.
+			// Non-allowed dependent item and non-allowed simple item.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -112,7 +112,7 @@ class testExecuteNow extends CWebTest {
 					'message' => 'Request sent successfully. Some items are filtered due to access permissions or type.'
 				]
 			],
-			// Allowed depednent items.
+			// Allowed dependent items.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -159,7 +159,7 @@ class testExecuteNow extends CWebTest {
 					'message' => 'Request sent successfully. Some items are filtered due to access permissions or type.'
 				]
 			],
-			// Web scenario item and dependet item from web scenario item.
+			// Web scenario item and dependent item from web scenario item.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -219,7 +219,7 @@ class testExecuteNow extends CWebTest {
 					'item' => 'Download speed for scenario "Web scenario for execute now".'
 				]
 			],
-			// Dependet items.
+			// Dependent items.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -301,7 +301,7 @@ class testExecuteNow extends CWebTest {
 					'message' => 'Request sent successfully. Some items are filtered due to access permissions or type.'
 				]
 			],
-			// Dependet items.
+			// Dependent items.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -323,7 +323,7 @@ class testExecuteNow extends CWebTest {
 					'message' => 'Cannot send request: wrong master item type.'
 				]
 			],
-			// Non-allowed master item type and its dependet item.
+			// Non-allowed master item type and its dependent item.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -331,7 +331,7 @@ class testExecuteNow extends CWebTest {
 					'message' => 'Cannot send request: wrong item type.'
 				]
 			],
-			// Non-allowed dependetn item and non-allowed simple item.
+			// Non-allowed dependent item and non-allowed simple item.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -347,7 +347,7 @@ class testExecuteNow extends CWebTest {
 					'message' => 'Request sent successfully. Some items are filtered due to access permissions or type.'
 				]
 			],
-			// Allowed depednent items.
+			// Allowed dependent items.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -413,7 +413,7 @@ class testExecuteNow extends CWebTest {
 					'message' => 'Request sent successfully'
 				]
 			],
-			// Dependet items.
+			// Dependent items.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -472,7 +472,7 @@ class testExecuteNow extends CWebTest {
 					'message' => 'Request sent successfully. Some items are filtered due to access permissions or type.'
 				]
 			],
-			// Dependet items.
+			// Dependent items.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -494,7 +494,7 @@ class testExecuteNow extends CWebTest {
 					'message' => 'Cannot send request: wrong master item type.'
 				]
 			],
-			// Non-allowed item type and non-allowed dependet item.
+			// Non-allowed item type and non-allowed dependent item.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -555,7 +555,7 @@ class testExecuteNow extends CWebTest {
 					'message' => 'Request sent successfully'
 				]
 			],
-			// Dependet items.
+			// Dependent items.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -612,17 +612,14 @@ class testExecuteNow extends CWebTest {
 
 		$this->query('button:Execute now')->one()->click();
 
-		switch (CTestArrayHelper::get($data, 'expected')) {
-			case TEST_GOOD:
-				$this->assertMessage(TEST_GOOD, $data['message']);
-				// After a successful "Execute now" action, the item selection is reset.
-				$this->assertEquals('0 selected', $selected_count->getText());
-				break;
-
-			case TEST_BAD:
-				$this->assertMessage(TEST_BAD, 'Cannot execute operation', $data['message']);
-				$this->assertEquals(count($data['items']).' selected', $selected_count->getText());
-				break;
+		if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
+			$this->assertMessage(TEST_GOOD, $data['message']);
+			// After a successful "Execute now" action, the item selection is reset.
+			$this->assertEquals('0 selected', $selected_count->getText());
+		}
+		else {
+			$this->assertMessage(TEST_BAD, 'Cannot execute operation', $data['message']);
+			$this->assertEquals(count($data['items']).' selected', $selected_count->getText());
 		}
 	}
 
@@ -643,13 +640,11 @@ class testExecuteNow extends CWebTest {
 
 		$this->query('button:Execute now')->waitUntilClickable()->one()->click();
 
-		switch (CTestArrayHelper::get($data, 'expected')) {
-			case TEST_GOOD:
-				$this->assertMessage(TEST_GOOD, $data['message']);
-				break;
-			case TEST_BAD:
-				$this->assertMessage(TEST_BAD, 'Cannot execute operation', $data['message']);
-				break;
+		if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
+			$this->assertMessage(TEST_GOOD, $data['message']);
+		}
+		else {
+			$this->assertMessage(TEST_BAD, 'Cannot execute operation', $data['message']);
 		}
 	}
 }

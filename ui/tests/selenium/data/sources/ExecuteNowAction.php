@@ -104,7 +104,7 @@ class ExecuteNowAction {
 			'hostids' => $hosts['hostids']['Host for execute now permissions'],
 			'webitems' => 'extend',
 			'search' => [
-					'key_' => 'web.test.error[Web scenario for execute now]'
+				'key_' => 'web.test.error[Web scenario for execute now]'
 			]
 		]);
 
@@ -190,15 +190,7 @@ class ExecuteNowAction {
 		CDataHelper::call('role.create', [
 			[
 				'name' => 'UR1-executenow-on',
-				'type' => 1,
-				'rules' => [
-					'actions' => [
-						[
-							'name' => 'invoke_execute_now',
-							'status' => 1
-						]
-					]
-				]
+				'type' => 1
 			],
 			[
 				'name' => 'UR2-executenow-off',

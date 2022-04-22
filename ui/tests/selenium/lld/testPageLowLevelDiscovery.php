@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup items
+ * @dataSource ExecuteNowAction
  */
 class testPageLowLevelDiscovery extends CWebTest {
 
@@ -415,6 +416,11 @@ class testPageLowLevelDiscovery extends CWebTest {
 					],
 					'expected' => [
 						'Linux by Zabbix agent: Block devices discovery',
+						'DR1-agent',
+						'DR2-trap',
+						'I1-lvl1-agent-num: DR3-I1-dep-agent',
+						'I2-lvl1-trap-num: DR4-I2-dep-trap',
+						'Last error message of scenario "Web scenario for execute now".: DR5-web-dep',
 						'Zabbix server health: Zabbix stats cluster: High availability cluster node discovery',
 						'Linux by Zabbix agent: Mounted filesystem discovery',
 						'Linux by Zabbix agent: Network interface discovery'

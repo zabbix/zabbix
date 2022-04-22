@@ -574,6 +574,7 @@ class testFormUserRoles extends CWebTest {
 						'Close problems' => false,
 						'Execute scripts' => false,
 						'Manage API tokens' => false,
+						'Invoke "Execute now" on read-only hosts' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'User role created'
@@ -596,6 +597,7 @@ class testFormUserRoles extends CWebTest {
 						'Manage API tokens' => false,
 						'Manage scheduled reports' => false,
 						'Manage SLA' => false,
+						'Invoke "Execute now" on read-only hosts' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'User role created'
@@ -619,29 +621,6 @@ class testFormUserRoles extends CWebTest {
 						'Manage scheduled reports' => false,
 						'Manage SLA' => false,
 						'Default access to new actions' => false
-					],
-					'message_header' => 'User role created'
-				]
-			],
-			// Add access to "Execute now" action.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Name' => 'user_execute_now_action',
-						'User type' => 'User',
-						'Invoke "Execute now" on read-only hosts' => true
-					],
-					'message_header' => 'User role created'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Name' => 'admin_execute_now_action',
-						'User type' => 'Admin',
-						'Invoke "Execute now" on read-only hosts' => true
 					],
 					'message_header' => 'User role created'
 				]
@@ -1130,25 +1109,23 @@ class testFormUserRoles extends CWebTest {
 							.' for user role "role_for_update".'
 				]
 			],
-			// Change name and add access to "Execute now" action.
+			// Change name.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'user_changed_name',
-						'User type' => 'User',
-						'Invoke "Execute now" on read-only hosts' => true
+						'User type' => 'User'
 					],
 					'message_header' => 'User role updated'
 				]
 			],
-			// Change type to admin and remove access to "Execute now" action.
+			// Change type to admin.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'User type' => 'Admin',
-						'Invoke "Execute now" on read-only hosts' => false
+						'User type' => 'Admin'
 					],
 					'message_header' => 'User role updated'
 				]
