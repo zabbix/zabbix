@@ -57,6 +57,7 @@ final class CItemData {
 			'perf_instance.discovery[object]',
 			'perf_instance_en.discovery[object]',
 			'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
+			'proc.get[<name>,<user>,<cmdline>,<mode>]',
 			'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
 			'proc.num[<name>,<user>,<state>,<cmdline>,<zone>]',
 			'proc_info[process,<attribute>,<type>]',
@@ -156,6 +157,7 @@ final class CItemData {
 			'perf_instance.discovery[object]',
 			'perf_instance_en.discovery[object]',
 			'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
+			'proc.get[<name>,<user>,<cmdline>,<mode>]',
 			'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
 			'proc.num[<name>,<user>,<state>,<cmdline>,<zone>]',
 			'proc_info[process,<attribute>,<type>]',
@@ -976,6 +978,10 @@ final class CItemData {
 			'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]' => [
 				'description' => _('Process CPU utilization percentage. Returns float'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
+			],
+			'proc.get[<name>,<user>,<cmdline>,<mode>]' => [
+				'description' => _('List of OS processes with attributes. Returns JSON array'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]' => [
 				'description' => _('Memory used by process in bytes. Returns integer'),
