@@ -78,7 +78,7 @@ class CTemplateGroup extends CApiService {
 			'excludeSearch' =>						['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled' =>				['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', ['groupid', 'name', 'uuid', 'type']), 'default' => API_OUTPUT_EXTEND],
+			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', ['groupid', 'name', 'uuid']), 'default' => API_OUTPUT_EXTEND],
 			'selectTemplates' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $template_fields), 'default' => null],
 			'countOutput' =>						['type' => API_BOOLEAN, 'default' => false],
 			'groupCount' =>							['type' => API_BOOLEAN, 'default' => false],
@@ -288,6 +288,9 @@ class CTemplateGroup extends CApiService {
 				}
 			}
 			else {
+				// Column type is used only for internal purposes to distinguish between host group and template group.
+				unset($group['type']);
+
 				$result[$group['groupid']] = $group;
 			}
 		}

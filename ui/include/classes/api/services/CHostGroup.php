@@ -98,7 +98,7 @@ class CHostGroup extends CApiService {
 			'excludeSearch' =>						['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled' =>				['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', ['groupid', 'name', 'flags', 'uuid', 'type']), 'default' => API_OUTPUT_EXTEND],
+			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', ['groupid', 'name', 'flags', 'uuid']), 'default' => API_OUTPUT_EXTEND],
 			'selectHosts' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $host_fields), 'default' => null],
 			'selectGroupDiscovery' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $group_discovery_fields), 'default' => null],
 			'selectDiscoveryRule' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $discovery_rule_fields), 'default' => null],
@@ -372,6 +372,9 @@ class CHostGroup extends CApiService {
 				}
 			}
 			else {
+				// Column type is used only for internal purposes to distinguish between host group and template group.
+				unset($group['type']);
+
 				$result[$group['groupid']] = $group;
 			}
 		}
