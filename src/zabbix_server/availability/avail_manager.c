@@ -266,8 +266,8 @@ static void	init_active_availability(zbx_avail_active_hb_cache_t *cache)
 {
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
-		if (ZBX_DB_OK > DBexecute("update host_rtdata set active_available=%i where hostid in ("
-				"select hostid from hosts where proxy_hostid=0)", INTERFACE_AVAILABLE_UNKNOWN))
+		if (ZBX_DB_OK > DBexecute("update host_rtdata hr set active_available=%i where exists (select null "
+				"from hosts h where h.hostid=hr.hostid and proxy_hostid is null)", INTERFACE_AVAILABLE_UNKNOWN)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Failed to reset availability status for active checks");
 		}
