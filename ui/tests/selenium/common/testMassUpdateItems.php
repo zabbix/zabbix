@@ -1206,8 +1206,8 @@ class testMassUpdateItems extends CWebTest{
 				case 'Type of information':
 				case 'Authentication method':
 					$form->query('id', $value['id'])->asDropdown()->one()->select($value['value']);
-
 					break;
+
 				case 'Host interface':
 					/**
 					 * The value of an SNMP interface option element contains not only the IP and port, but also the
@@ -1218,8 +1218,8 @@ class testMassUpdateItems extends CWebTest{
 						: $value['value'];
 
 					$form->query('id', $value['id'])->asDropdown()->one()->select($interface);
-
 					break;
+
 				case 'Units':
 				case 'Description':
 				case 'User name':

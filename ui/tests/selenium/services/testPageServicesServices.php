@@ -353,8 +353,8 @@ class testPageServicesServices extends CWebTest {
 			// Link child services to the corresponding problem events.
 			if ($service !== self::ROOTCAUSE_PARENT) {
 				// Corresponding trigger problem events have ids starting from 9001 in data_test.sql, so "9000 + $i" is used.
-				DBexecute('INSERT into service_problem (service_problemid, eventid, serviceid, severity) '
-						.'VALUES ('.$i.', '.(9000 + $i).', '.$service_ids[$service].', '.$status.')'
+				DBexecute('INSERT into service_problem (service_problemid, eventid, serviceid, severity) '.
+						'VALUES ('.$i.', '.(9000 + $i).', '.$service_ids[$service].', '.$status.')'
 				);
 
 				$i++;

@@ -56,7 +56,21 @@ class testFormServicesServices extends CWebTest {
 			[
 				'name' => 'Update service',
 				'algorithm' => 1,
-				'sortorder' => 0
+				'sortorder' => 0,
+				'status_rules' => [
+					[
+						'type' => 1,
+						'limit_value' => 50,
+						'limit_status' => 3,
+						'new_status' => 4
+					],
+					[
+						'type' => 7,
+						'limit_value' => 33,
+						'limit_status' => 2,
+						'new_status' => 5
+					]
+				]
 			],
 			[
 				'name' => 'Parent1',
@@ -379,7 +393,7 @@ class testFormServicesServices extends CWebTest {
 
 		$this->checkDropdowns($rules_dropdowns, $rules_form);
 
-		// Check field "N" value nad maxlength.
+		// Check field "N" value and maxlength.
 		$n_field = $rules_form->query('name:limit_value')->one();
 		$this->assertEquals(7, $n_field->getAttribute('maxlength'));
 		$this->assertEquals(1, $n_field->getValue());
@@ -525,6 +539,111 @@ class testFormServicesServices extends CWebTest {
 			],
 			[
 				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Non-numeric weight',
+						'id:advanced_configuration' => true,
+						'Weight' => 'abc'
+					],
+					'error' => 'Incorrect value "abc" for "weight" field.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Negative weight',
+						'id:advanced_configuration' => true,
+						'Weight' => '-2'
+					],
+					'error' => 'Incorrect value for field "weight": value must be no less than "0".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Excessive weight',
+						'id:advanced_configuration' => true,
+						'Weight' => '9999999'
+					],
+					'error' => 'Incorrect value for field "weight": value must be no greater than "1000000".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Non-numeric N in additional rules',
+						'id:advanced_configuration' => true
+					],
+					'additional_rules' => [
+						[
+							'Set status to' => 'Average',
+							'Condition' => 'If at least N child services have Status status or above',
+							'name:limit_value' => 'two',
+							'Status' => 'Average'
+						]
+					],
+					'error' => 'Incorrect value "two" for "limit_value" field.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Negative N in additional rules',
+						'id:advanced_configuration' => true
+					],
+					'additional_rules' => [
+						[
+							'Set status to' => 'Warning',
+							'Condition' => 'If at least N% of child services have Status status or above',
+							'name:limit_value' => '-66',
+							'Status' => 'High'
+						]
+					],
+					'error' => 'Incorrect value for field "limit_value": value must be no less than "1".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'N more than 100% in additional rules',
+						'id:advanced_configuration' => true
+					],
+					'additional_rules' => [
+						[
+							'Set status to' => 'Information',
+							'Condition' => 'If at least N% of child services have Status status or above',
+							'name:limit_value' => 101,
+							'Status' => 'Disaster'
+						]
+					],
+					'error' => 'Incorrect value for field "N": value must be no greater than "100".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'W is equal to 0 in additional rules',
+						'id:advanced_configuration' => true
+					],
+					'additional_rules' => [
+						[
+							'Set status to' => 'Information',
+							'Condition' => 'If weight of child services with Status status or above is at least W',
+							'name:limit_value' => 0,
+							'Status' => 'Not classified'
+						]
+					],
+					'error' => 'Incorrect value for field "limit_value": value must be no less than "1".'
+				]
+			],
+			[
+				[
 					'fields' => [
 						'Name' => 'Min sort order',
 						'Sort order (0->999)' => '0'
@@ -563,6 +682,74 @@ class testFormServicesServices extends CWebTest {
 						'Status propagation rule' => 'Fixed status',
 						'id:propagation_value_status' => 'Not classified',
 						'Weight' => '0'
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Service with multiple additional rules',
+						'id:advanced_configuration' => true
+					],
+					'additional_rules' => [
+						[
+							'Set status to' => 'Not classified',
+							'Condition' => 'If at least N child services have Status status or above',
+							'name:limit_value' => 1,
+							'Status' => 'Disaster'
+						],
+						[
+							'Set status to' => 'Information',
+							'Condition' => 'If at least N% of child services have Status status or above',
+							'name:limit_value' => 50,
+							'Status' => 'High'
+						],
+						[
+							'Set status to' => 'Warning',
+							'Condition' => 'If less than N child services have Status status or below',
+							'name:limit_value' => 3,
+							'Status' => 'Average'
+						],
+						[
+							'Set status to' => 'Average',
+							'Condition' => 'If less than N% of child services have Status status or below',
+							'name:limit_value' => 35,
+							'Status' => 'Warning'
+						],
+						[
+							'Set status to' => 'High',
+							'Condition' => 'If weight of child services with Status status or above is at least W',
+							'name:limit_value' => 20,
+							'Status' => 'Information'
+						],
+						[
+							'Set status to' => 'Disaster',
+							'Condition' => 'If weight of child services with Status status or above is at least N%',
+							'name:limit_value' => 66,
+							'Status' => 'Not classified'
+						],
+						[
+							'Set status to' => 'Disaster',
+							'Condition' => 'If weight of child services with Status status or below is less than W',
+							'name:limit_value' => 21,
+							'Status' => 'Information'
+						],
+						[
+							'Set status to' => 'Information',
+							'Condition' => 'If weight of child services with Status status or below is less than N%',
+							'name:limit_value' => 67,
+							'Status' => 'Average'
+						]
+					],
+					'rule_strings' => [
+						'Not classified - If at least 1 child service has Disaster status or above',
+						'Information - If at least 50% of child services have High status or above',
+						'Warning - If less than 3 child services have Average status or below',
+						'Average - If less than 35% of child services have Warning status or below',
+						'High - If weight of child services with Information status or above is at least 20',
+						'Disaster - If weight of child services with Not classified status or above is at least 66%',
+						'Disaster - If weight of child services with Information status or below is less than 21',
+						'Information - If weight of child services with Average status or below is less than 67%'
 					]
 				]
 			],
@@ -611,7 +798,113 @@ class testFormServicesServices extends CWebTest {
 		$this->checkForm($data);
 	}
 
+	public function getUpdateAdditionalRulesData() {
+		return [
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Update rule: Non-numeric N in additional rules'
+					],
+					'existing_rule' => 'High - If at least 50% of child services have Average status or above',
+					'additional_rules' => [
+						[
+							'Set status to' => 'High',
+							'Condition' => 'If at least N child services have Status status or above',
+							'name:limit_value' => 'five',
+							'Status' => 'High'
+						]
+					],
+					'error' => 'Incorrect value "five" for "limit_value" field.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Update rule: Negative N in additional rules'
+					],
+					'existing_rule' => 'High - If at least 50% of child services have Average status or above',
+					'additional_rules' => [
+						[
+							'Set status to' => 'Warning',
+							'Condition' => 'If at least N% of child services have Status status or above',
+							'name:limit_value' => '-66',
+							'Status' => 'High'
+						]
+					],
+					'error' => 'Incorrect value for field "limit_value": value must be no less than "1".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Update rule: N more than 100% in additional rules'
+					],
+					'existing_rule' => 'High - If at least 50% of child services have Average status or above',
+					'additional_rules' => [
+						[
+							'Set status to' => 'Information',
+							'Condition' => 'If at least N% of child services have Status status or above',
+							'name:limit_value' => 101,
+							'Status' => 'Disaster'
+						]
+					],
+					'error' => 'Incorrect value for field "N": value must be no greater than "100".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Update rule: W is equal to 0 in additional rules'
+					],
+					'existing_rule' => 'High - If at least 50% of child services have Average status or above',
+					'additional_rules' => [
+						[
+							'Set status to' => 'Information',
+							'Condition' => 'If weight of child services with Status status or above is at least W',
+							'name:limit_value' => 0,
+							'Status' => 'Not classified'
+						]
+					],
+					'error' => 'Incorrect value for field "limit_value": value must be no less than "1".'
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Update additional rule'
+					],
+					'existing_rule' => 'High - If at least 50% of child services have Average status or above',
+					'additional_rules' => [
+						[
+							'Set status to' => 'Disaster',
+							'Condition' => 'If at least N child services have Status status or above',
+							'name:limit_value' => 5,
+							'Status' => 'Disaster'
+						]
+					],
+					'rule_strings' => [
+						'Disaster - If at least 5 child services have Disaster status or above'
+					]
+				]
+			],
+			// Additional rule is removed if the data provider contains the rule to be changed and doesn't have the substitute.
+			[
+				[
+					'fields' => [
+						'Name' => 'Remove additional rule'
+					],
+					'existing_rule' => 'Disaster - If weight of child services with Warning status or below is less than 33%'
+				]
+			]
+		];
+	}
+
 	/**
+	 * @dataProvider getUpdateAdditionalRulesData
 	 * @dataProvider getServicesData
 	 */
 	public function testFormServicesServices_Update($data) {
@@ -645,6 +938,40 @@ class testFormServicesServices extends CWebTest {
 		COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $this->query('id:service-form')->asForm()->one()->waitUntilReady();
 		$form->fill($data['fields']);
+
+		// Remove additional rule if no substitute rules are defined in data provider or edit rule if such exists.
+		if (array_key_exists('existing_rule', $data)) {
+			$button = (array_key_exists('additional_rules', $data)) ? 'Edit' : 'Remove';
+
+			foreach ($form->getField('Additional rules')->asTable()->getRows() as $existing_row) {
+				if ($existing_row->getColumn('Name')->getText() === $data['existing_rule']) {
+					$existing_row->query('button', $button)->one()->click();
+
+					// If a row was deleted, check that  its no longer present.
+					if ($button === 'Remove') {
+						$this->assertFalse($existing_row->isPresent());
+					}
+				}
+			}
+		}
+
+		if (array_key_exists('additional_rules', $data)) {
+			foreach ($data['additional_rules'] as $rule_fields) {
+				// Click Add button to add new rule. For editing additional rules the Additional rule dialog is already opened.
+				if (!array_key_exists('existing_rule', $data)) {
+					$form->getFieldContainer('Additional rules')->query('button:Add')->waitUntilClickable()->one()->click();
+				}
+				$rules_form = COverlayDialogElement::find()->all()->last()->waitUntilReady()->asForm();
+				$rules_form->fill($rule_fields);
+				$rules_form->submit();
+
+				if ($expected === TEST_BAD) {
+					$this->assertMessage(TEST_BAD, null, $data['error']);
+
+					return;
+				}
+			}
+		}
 
 		if (array_key_exists('children', $data)) {
 			$form->selectTab('Child services');
@@ -711,6 +1038,25 @@ class testFormServicesServices extends CWebTest {
 			}
 			$form->invalidate();
 			$form->checkValue($data['fields']);
+
+			// Check that added/updated rules are present, and that removed rules are missing in configuration form.
+			if (array_key_exists('rule_strings', $data) || array_key_exists('existing_rule', $data)) {
+				$existing_rules = [];
+
+				foreach ($form->getField('Additional rules')->asTable()->getRows() as $existing_row) {
+					$existing_rules[] = $existing_row->getColumn('Name')->getText();
+				}
+
+				// If string should be present is determined by the presence of strings to be checked in the data provider.
+				if (array_key_exists('rule_strings', $data)) {
+					foreach ($data['rule_strings'] as $string) {
+						$this->assertTrue(in_array($string, $existing_rules));
+					}
+				}
+				else {
+					$this->assertFalse(in_array($data['existing_rule'], $existing_rules));
+				}
+			}
 		}
 	}
 
