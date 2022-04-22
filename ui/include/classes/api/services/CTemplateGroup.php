@@ -837,13 +837,13 @@ class CTemplateGroup extends CApiService {
 		$templateids = array_column($data['templates'], 'templateid');
 
 		if ($templateids) {
-			$db_templates = API::Template()->get([
+			$count = API::Template()->get([
 				'countOutput' => true,
 				'templateids' => $templateids,
 				'editable' => true
 			]);
 
-			if ($db_templates != count($templateids)) {
+			if ($count != count($templateids)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
 				);
