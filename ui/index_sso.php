@@ -278,11 +278,12 @@ echo (new CView('general.warning', [
 	'messages' => array_column(get_and_clear_messages(), 'message'),
 	'buttons' => [
 		(new CButton('login', _('Login')))
-			->setAttribute('data-redirect-to',$redirect_to
-				->setArgument('request', $request)
-				->getUrl()
+			->setAttribute('data-url',
+				$redirect_to
+					->setArgument('request', $request)
+					->getUrl()
 			)
-			->onClick('document.location = this.dataset.redirectTo;')
+			->onClick('document.location = this.dataset.url;')
 	],
 	'theme' => getUserTheme(CWebUser::$data)
 ]))->getOutput();

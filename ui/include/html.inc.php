@@ -296,7 +296,7 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 				)
 			)
 			->setAttribute('data-hostid', $db_host['hostid'])
-			->onClick('view.editHost(event, this.dataset.hostid)')
+			->onClick('view.editHost(event, this.dataset.hostid);')
 		);
 
 		if ($current_element === '') {

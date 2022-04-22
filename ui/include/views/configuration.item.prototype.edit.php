@@ -549,7 +549,7 @@ if (!$readonly) {
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->removeId()
 		->setAttribute('data-hostid', $data['hostid'])
-		->setAttribute('data-excludeids', $data['itemid'])
+		->setAttribute('data-itemid', $data['itemid'])
 		->onClick('
 			PopUp("popup.generic", {
 				srctbl: "items",
@@ -559,7 +559,7 @@ if (!$readonly) {
 				dstfld1: "master_itemid",
 				dstfld2: "master_itemname",
 				only_hostid: this.dataset.hostid,
-				excludeids: [this.dataset.excludeids],
+				excludeids: [this.dataset.itemid],
 				with_webitems: 1,
 				normal_only: 1
 			}, {dialogue_class: "modal-popup-generic"});
@@ -570,7 +570,7 @@ if (!$readonly) {
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->removeId()
 		->setAttribute('data-discoveryid', $data['parent_discoveryid'])
-		->setAttribute('data-excludeids', $data['itemid'])
+		->setAttribute('data-itemid', $data['itemid'])
 		->onClick('
 			PopUp("popup.generic", {
 				srctbl: "item_prototypes",
@@ -580,7 +580,7 @@ if (!$readonly) {
 				dstfld1: "master_itemid",
 				dstfld2: "master_itemname",
 				parent_discoveryid: this.dataset.discoveryid,
-				excludeids: [this.dataset.excludeids]
+				excludeids: [this.dataset.itemid]
 			}, {dialogue_class: "modal-popup-generic"});
 		');
 }

@@ -82,7 +82,7 @@ if ($data['item_required']) {
 		$item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$item[] = (new CButton('select', _('Select prototype')))
 			->addClass(ZBX_STYLE_BTN_GREY)
-			->setAttribute('data-discoveryid', $data['parent_discoveryid'])
+			->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
 			->onClick('
 				PopUp("popup.generic", {
 					srctbl: "item_prototypes",
@@ -91,7 +91,7 @@ if ($data['item_required']) {
 					dstfrm: "'.$expression_form->getName().'",
 					dstfld1: "itemid",
 					dstfld2: "item_description",
-					parent_discoveryid: this.dataset.discoveryid
+					parent_discoveryid: this.dataset.parent_discoveryid
 				}, {dialogue_class: "modal-popup-generic"});
 			')
 			->removeId();

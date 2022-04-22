@@ -128,12 +128,11 @@ foreach ($data['auditlogs'] as $auditlog) {
 			($auditlog['details_button'] == 1)
 				? (new CDiv (
 					(new CLinkAction(_('Details')))
-						->setAttribute('data-auditlog-details', $auditlog['details'])
-						->onClick('openAuditDetails(this.dataset.auditlogDetails)')
+						->setAttribute('data-details', $auditlog['details'])
+						->onClick('openAuditDetails(this.dataset.details);')
 				))->addClass('audit-show-details-btn-wrapper')
 				: ''
 		]))->addClass('audit-details-wrapper')
-
 	]);
 }
 

@@ -129,6 +129,17 @@ if ($data['recovery_expression_field_readonly']) {
 	$triggersForm->addItem((new CVar('recovery_expression', $data['recovery_expression']))->removeId());
 }
 
+$popup_parameters = [
+	'srctbl' => $data['expression_field_name'],
+	'srcfld1' => $data['expression_field_name'],
+	'dstfrm' => $triggersForm->getName(),
+	'dstfld1' => $data['expression_field_name']
+];
+
+if ($data['hostid']) {
+	$popup_parameters['hostid'] = $data['hostid'];
+}
+
 $expression_row = [
 	(new CTextArea(
 		$data['expression_field_name'],
@@ -141,16 +152,11 @@ $expression_row = [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->setAttribute('data-expression', $data['expression_field_name'])
-		->setAttribute('data-hostid', $data['hostid'])
+		->setAttribute('data-parameters', json_encode($popup_parameters))
 		->onClick('
 			PopUp("popup.triggerexpr", {
-				srctbl: this.dataset.expression,
-				srcfld1: this.dataset.expression,
-				dstfrm: "'.$triggersForm->getName().'",
-				dstfld1: this.dataset.expression,
-				...this.dataset.hostid ? {hostid: this.dataset.hostid} : {},
-				expression: document.getElementsByName(this.dataset.expression).value
+				...JSON.parse(this.dataset.parameters),
+				expression: document.getElementsByName("'.$data['expression_field_name'].'").value
 			}, {dialogue_class: "modal-popup-generic"});
 		')
 		->setEnabled(!$readonly)
@@ -331,6 +337,17 @@ $triggersFormList->addRow(_('OK event generation'),
 		->setEnabled(!$readonly)
 );
 
+$popup_parameters = [
+	'srctbl' => $data['recovery_expression_field_name'],
+	'srcfld1' => $data['recovery_expression_field_name'],
+	'dstfrm' => $triggersForm->getName(),
+	'dstfld1' => $data['recovery_expression_field_name']
+];
+
+if ($data['hostid']) {
+	$popup_parameters['hostid'] = $data['hostid'];
+}
+
 $recovery_expression_row = [
 	(new CTextArea(
 		$data['recovery_expression_field_name'],
@@ -343,16 +360,11 @@ $recovery_expression_row = [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('insert', ($data['recovery_expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->setAttribute('data-expression', $data['recovery_expression_field_name'])
-		->setAttribute('data-hostid', $data['hostid'])
+		->setAttribute('data-parameters', json_encode($popup_parameters))
 		->onClick('
 			PopUp("popup.triggerexpr", {
-				srctbl: this.dataset.expression,
-				srcfld1: this.dataset.expression,
-				dstfrm: "'.$triggersForm->getName().'",
-				dstfld1: this.dataset.expression,
-				...this.dataset.hostid ? {hostid: this.dataset.hostid} : {},
-				expression: document.getElementsByName(this.dataset.expression).value
+				...JSON.parse(this.dataset.parameters),
+				expression: document.getElementsByName("'.$data['recovery_expression_field_name'].'").value
 			}, {dialogue_class: "modal-popup-generic"});
 		')
 		->setEnabled(!$readonly)

@@ -302,7 +302,9 @@ $operations_table->addRow(
 	(new CSimpleButton(_('Add')))
 		->setAttribute('data-actionid', $data['actionid'])
 		->setAttribute('data-eventsource', $data['eventsource'])
-		->onClick('operation_details.open(this, this.dataset.actionid, this.dataset.eventsource,'.ACTION_OPERATION.');')
+		->onClick('
+			operation_details.open(this, this.dataset.actionid, this.dataset.eventsource, '.ACTION_OPERATION.');
+		')
 		->addClass(ZBX_STYLE_BTN_LINK)
 );
 
@@ -368,7 +370,8 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 							])),
 						[
 							(new CButton('remove', _('Remove')))
-								->onClick('removeOperation('.$operationid.', '.ACTION_RECOVERY_OPERATION.');')
+								->setAttribute('data-operationid', $operationid)
+								->onClick('removeOperation(this.dataset.operationid, '.ACTION_RECOVERY_OPERATION.');')
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->removeId(),
 							new CVar('recovery_operations['.$operationid.']', $operation),
@@ -387,8 +390,9 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 			->setAttribute('data-actionid', $data['actionid'])
 			->setAttribute('data-eventsource', $data['eventsource'])
 			->onClick('
-				operation_details.open(this, this.dataset.actionid, this.dataset.eventsource,'.
-					ACTION_RECOVERY_OPERATION.');
+				operation_details.open(this, this.dataset.actionid, this.dataset.eventsource,
+					'.ACTION_RECOVERY_OPERATION.'
+				);
 			')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	);
@@ -447,7 +451,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 							])),
 						[
 							(new CButton('remove', _('Remove')))
-								->onClick('removeOperation('.$operationid.', '.ACTION_UPDATE_OPERATION.');')
+								->setAttribute('data-operationid', $operationid)
+								->onClick('removeOperation(this.dataset.operationid, '.ACTION_UPDATE_OPERATION.');')
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->removeId(),
 							new CVar('update_operations['.$operationid.']', $operation),
@@ -466,8 +471,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			->setAttribute('data-actionid', $data['actionid'])
 			->setAttribute('data-eventsource', $data['eventsource'])
 			->onClick('
-				operation_details.open(this, this.dataset.actionid, this.dataset.eventsource,'.
-					ACTION_UPDATE_OPERATION.');
+				operation_details.open(this, this.dataset.actionid, this.dataset.eventsource,
+					'.ACTION_UPDATE_OPERATION.'
+				);
 			')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	);

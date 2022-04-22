@@ -30,7 +30,7 @@ $pageHeader = (new CPageHeader(_('Fatal error, please report to the Zabbix team'
 $buttons = [
 	(new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
 		->setAttribute('data-url', CMenuHelper::getFirstUrl())
-		->onClick('document.location = this.dataset.url')
+		->onClick('document.location = this.dataset.url;')
 ];
 
 echo '<body';

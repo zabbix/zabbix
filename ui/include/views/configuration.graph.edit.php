@@ -218,7 +218,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 			$yaxisMinData[] = (new CButton('yaxis_min_prototype', _('Select prototype')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->setAttribute('data-discoveryid', $data['parent_discoveryid'])
+				->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
 				->onClick('
 					PopUp("popup.generic", {
 						srctbl: "item_prototypes",
@@ -227,7 +227,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 						dstfrm: "'.$graphForm->getName().'",
 						dstfld1: "ymin_itemid",
 						dstfld2: "ymin_name",
-						parent_discoveryid: this.dataset.discoveryid,
+						parent_discoveryid: this.dataset.parent_discoveryid,
 						numeric: 1
 					}, {dialogue_class: "modal-popup-generic"});
 				')
@@ -294,7 +294,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 			$yaxisMaxData[] = (new CButton('yaxis_max_prototype', _('Select prototype')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->setAttribute('data-discoveryid', $data['parent_discoveryid'])
+				->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
 				->onClick('
 					PopUp("popup.generic", {
 						srctbl: "item_prototypes",
@@ -303,7 +303,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 						dstfrm: "'.$graphForm->getName().'",
 						dstfld1: "ymax_itemid",
 						dstfld2: "ymax_name",
-						parent_discoveryid: this.dataset.discoveryid,
+						parent_discoveryid: this.dataset.parent_discoveryid,
 						numeric: 1
 					}, {dialogue_class: "modal-popup-generic"});
 				')
@@ -378,6 +378,23 @@ if ($data['hostid']) {
 	$parameters_add['hostid'] = $data['hostid'];
 }
 
+$parameters_add_prototype = [
+	'srctbl' => 'item_prototypes',
+	'srcfld1' => 'itemid',
+	'srcfld2' => 'name',
+	'dstfrm' => $graphForm->getName(),
+	'numeric' => '1',
+	'writeonly' => '1',
+	'multiselect' => '1',
+	'graphtype' => $data['graphtype']
+];
+if ($data['normal_only']) {
+	$parameters_add_prototype['normal_only'] = '1';
+}
+if ($data['parent_discoveryid']) {
+	$parameters_add_prototype['parent_discoveryid'] = $data['parent_discoveryid'];
+}
+
 $items_table->addRow(
 	(new CRow(
 		$readonly
@@ -385,31 +402,21 @@ $items_table->addRow(
 			: (new CCol(
 				new CHorList([
 					(new CButton('add_item', _('Add')))
+						->setAttribute('data-parameters', json_encode($parameters_add))
 						->onClick(
 							'return PopUp("popup.generic",
-								jQuery.extend('.json_encode($parameters_add).', view.getOnlyHostParam())
+								jQuery.extend(JSON.parse(this.dataset.parameters), view.getOnlyHostParam())
 							);'
 						)
 						->addClass(ZBX_STYLE_BTN_LINK),
 					$data['parent_discoveryid']
 						? (new CButton('add_protoitem', _('Add prototype')))
-							->setAttribute('data-graphtype', $data['graphtype'])
-							->setAttribute('data-discoveryid', $data['parent_discoveryid'])
-							->setAttribute('data-normal-only', $data['normal_only'])
-							->onClick('
-								PopUp("popup.generic", {
-									srctbl: "item_prototypes",
-									srcfld1: "itemid",
-									srcfld2: "name",
-									dstfrm: "'.$graphForm->getName().'",
-									numeric: 1,
-									writeonly: 1,
-									multiselect: 1,
-									graphtype: this.dataset.graphtype,
-									...this.dataset.normalOnly ? {normal_only: 1} : {},
-									...this.dataset.discoveryid ? {parent_discoveryid: this.dataset.discoveryid} : {},
-								}, {dialogue_class: "modal-popup-generic"});
-							')
+							->setAttribute('data-parameters', json_encode($parameters_add_prototype))
+							->onClick(
+								'return PopUp("popup.generic", JSON.parse(this.dataset.parameters),
+									{dialogue_class: "modal-popup-generic"}
+								);'
+							)
 							->addClass(ZBX_STYLE_BTN_LINK)
 						: null
 				])

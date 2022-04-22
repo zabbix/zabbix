@@ -96,7 +96,7 @@ $dependencies_table = (new CTable())
 $bttn_prototype = '';
 if ($data['prototype']) {
 	$bttn_prototype = (new CButton('add_dep_trigger_prototype', _('Add prototype')))
-		->setAttribute('data-discoveryid', $data['parent_discoveryid'])
+		->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
 		->onClick('
 			PopUp("popup.generic", {
 				srctbl: "trigger_prototypes",
@@ -107,7 +107,7 @@ if ($data['prototype']) {
 				reference: "deptrigger_prototype",
 				multiselect: 1,
 				objname: "triggers",
-				parent_discoveryid: this.dataset.discoveryid
+				parent_discoveryid: this.dataset.parent_discoveryid
 			}, {dialogue_class: "modal-popup-generic"});
 		')
 		->addClass(ZBX_STYLE_BTN_LINK);

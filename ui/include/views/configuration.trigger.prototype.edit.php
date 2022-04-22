@@ -101,20 +101,23 @@ if ($data['recovery_expression_field_readonly']) {
 	$triggersForm->addItem((new CVar('recovery_expression', $data['recovery_expression']))->removeId());
 }
 
+$popup_parameters = [
+	'srctbl' => 'expression',
+	'srcfld1' => 'expression',
+	'dstfrm' => $triggersForm->getName(),
+	'dstfld1' => $data['expression_field_name'],
+	'parent_discoveryid' => $data['parent_discoveryid']
+];
+if ($data['hostid']) {
+	$popup_parameters['hostid'] = $data['hostid'];
+}
 $add_expression_button = (new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 	->addClass(ZBX_STYLE_BTN_GREY)
-	->setAttribute('data-expression', $data['expression_field_name'])
-	->setAttribute('data-discoveryid', $data['parent_discoveryid'])
-	->setAttribute('data-hostid', $data['hostid'])
+	->setAttribute('data-parameters', json_encode($popup_parameters))
 	->onClick('
 		PopUp("popup.triggerexpr", {
-			srctbl: "expression",
-			srcfld1: "expression",
-			dstfrm: "'.$triggersForm->getName().'",
-			dstfld1: this.dataset.expression,
-			parent_discoveryid: this.dataset.discoveryid,
-			...this.dataset.hostid ? {hostid: this.dataset.hostid} : {},
-			expression: document.getElementsByName(this.dataset.expression).value
+			...JSON.parse(this.dataset.parameters),
+			expression: document.getElementsByName("'.$data['expression_field_name'].'").value
 		}, {dialogue_class: "modal-popup-generic"});
 	')
 	->removeId();
@@ -312,16 +315,15 @@ $add_recovery_expression_button = (new CButton('insert',
 		($data['recovery_expression_constructor'] == IM_TREE) ? _('Edit') : _('Add'))
 	)
 	->addClass(ZBX_STYLE_BTN_GREY)
-	->setAttribute('data-expression', $data['recovery_expression_field_name'])
-	->setAttribute('data-discoveryid', $data['parent_discoveryid'])
+	->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
 	->onClick('
 		PopUp("popup.triggerexpr", {
-			srctbl: this.dataset.expression,
-			srcfld1: this.dataset.expression,
+			srctbl: "'.$data['recovery_expression_field_name'].'",
+			srcfld1: "'.$data['recovery_expression_field_name'].'",
 			dstfrm: "'.$triggersForm->getName().'",
-			dstfld1: this.dataset.expression,
-			parent_discoveryid: this.dataset.discoveryid,
-			expression: document.getElementsByName(this.dataset.expression).value
+			dstfld1: "'.$data['recovery_expression_field_name'].'",
+			parent_discoveryid: this.dataset.parent_discoveryid,
+			expression: document.getElementsByName("'.$data['recovery_expression_field_name'].'").value
 		}, {dialogue_class: "modal-popup-generic"});
 	');
 
@@ -608,7 +610,7 @@ foreach ($data['db_dependencies'] as $dependency) {
 		(new CCol(
 			(new CButton('remove', _('Remove')))
 				->setAttribute('data-triggerid', $dependency['triggerid'])
-				->onClick('view.removeDependency(this.dataset.triggerid)')
+				->onClick('view.removeDependency(this.dataset.triggerid);')
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->removeId()
 		))->addClass(ZBX_STYLE_NOWRAP)
@@ -637,14 +639,14 @@ $dependenciesFormList->addRow(_('Dependencies'),
 				')
 				->addClass(ZBX_STYLE_BTN_LINK),
 			(new CButton('add_dep_trigger_prototype', _('Add prototype')))
-				->setAttribute('data-discoveryid', $data['parent_discoveryid'])
+				->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
 				->onClick('
 					PopUp("popup.generic", {
 						srctbl: "trigger_prototypes",
 						srcfld1: "triggerid",
 						reference: "deptrigger",
 						multiselect: 1,
-						parent_discoveryid: this.dataset.discoveryid
+						parent_discoveryid: this.dataset.parent_discoveryid
 					} , {dialogue_class: "modal-popup-generic"});
 				')
 				->addClass(ZBX_STYLE_BTN_LINK)

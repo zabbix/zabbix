@@ -1589,7 +1589,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 			if (CWebUser::isGuest()) {
 				$data['buttons'][] = (new CButton('login', _('Login')))
 					->setAttribute('data-url', $url)
-					->onClick('document.location = "index.php?request= this.dataset.url";');
+					->onClick('document.location = "index.php?request=" + this.dataset.url;');
 			}
 
 			$data['buttons'][] = (new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
@@ -1607,7 +1607,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 				'buttons' => [
 					(new CButton('login', _('Login')))
 						->setAttribute('data-url', $url)
-						->onClick('document.location = "index.php?request= this.dataset.url";')
+						->onClick('document.location = "index.php?request=" + this.dataset.url;')
 				]
 			];
 		}

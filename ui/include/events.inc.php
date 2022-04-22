@@ -560,11 +560,10 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 								&& array_key_exists($tag['value'], $subfilter_tags[$tag['tag']]))) {
 						$value = (new CLinkAction($value))
 							->setAttribute('data-tag', $tag['tag'])
-							->setAttribute('data-tag-value', $tag['value'])
-							->onClick(CHtml::encode('view.setSubfilter([
-								`subfilter_tags[${this.dataset.tag}][]`,
-								this.dataset.tagValue
-							])'));
+							->setAttribute('data-value', $tag['value'])
+							->onClick('
+								view.setSubfilter([`subfilter_tags[${this.dataset.tag}][]`, this.dataset.value]);
+							');
 					}
 
 					$tags[$element[$key]][] = (new CSpan($value))
@@ -592,11 +591,10 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 								&& array_key_exists($tag['value'], $subfilter_tags[$tag['tag']]))) {
 						$value = (new CLinkAction($value))
 							->setAttribute('data-tag', $tag['tag'])
-							->setAttribute('data-tag-value', $tag['value'])
-							->onClick(CHtml::encode('view.setSubfilter([
-								`subfilter_tags[${this.dataset.tag}][]`,
-								this.dataset.tagValue
-							])'));
+							->setAttribute('data-value', $tag['value'])
+							->onClick('
+								view.setSubfilter([`subfilter_tags[${this.dataset.tag}][]`, this.dataset.value]);
+							');
 					}
 
 					$hint_content[$element[$key]][] = (new CSpan($value))

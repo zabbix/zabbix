@@ -107,10 +107,8 @@ if ($data['linked_templates']) {
 						? (new CSimpleButton(_('Unlink and clear')))
 							->setAttribute('data-templateid', $template['templateid'])
 							->onClick('
-								submitFormWithParam(
-									"'.$form->getName().'",
-									`unlink_and_clear[${this.dataset.templateid}]`,
-									1
+								submitFormWithParam("'.$form->getName().'",
+									`unlink_and_clear[${this.dataset.templateid}]`, 1
 								);
 							')
 							->addClass(ZBX_STYLE_BTN_LINK)

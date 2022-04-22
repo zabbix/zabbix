@@ -55,7 +55,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 			->setArgument('hostid', $hostid)
 		))
 			->setAttribute('data-hostid', $host['hostid'])
-			->onClick('view.editHost(event, this.dataset.hostid)')
+			->onClick('view.editHost(event, this.dataset.hostid);')
 		: new CSpan($visible_name);
 
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {

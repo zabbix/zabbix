@@ -436,7 +436,7 @@ if ($data['single_host_selected']) {
 		$master_item[] = (new CButton('button', _('Select prototype')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->removeId()
-			->setAttribute('data-discoveryid', $data['parent_discoveryid'])
+			->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
 			->onClick('
 				PopUp("popup.generic", {
 					srctbl: "item_prototypes",
@@ -445,7 +445,7 @@ if ($data['single_host_selected']) {
 					dstfrm: "'.$form->getName().'",
 					dstfld1: "master_itemid",
 					dstfld2: "master_itemname",
-					parent_discoveryid: this.dataset.discoveryid
+					parent_discoveryid: this.dataset.parent_discoveryid
 				}, {dialogue_class: "modal-popup-generic"});
 			');
 	}
