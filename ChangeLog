@@ -1,6 +1,11 @@
 Changes for 6.0.4rc1
 
 New features:
+...G...PS. [ZBXNEXT-7120] added support of OpenSSL 3.0 (Andris)
+..F....... [ZBXNEXT-7611] fixed silenced errors not silenced in zbx_err_handler running PHP 8 (rdetlavs)
+..F....... [ZBXNEXT-7610] refactored in PHP 8 deprecated function strtime() (rdetlavs)
+.........T [ZBXNEXT-7506] fixed uuids in proxmox template (vkhaliev)
+..F.I...S. [ZBXNEXT-7562] added en_GB locale (agriscenko, yurii)
 .........T [ZBXNEXT-7582] moved threshold information from trigger name to the event name (abakaldin, vkhaliev)
 ..F....... [ZBXNEXT-7525] fixed inconsistent trigger links in Configuration -> Items (rdetlavs)
 ..F....... [ZBXNEXT-7564] fixed media type importing in PHP 8 (rdetlavs)
@@ -13,6 +18,12 @@ New features:
 .........T [ZBXNEXT-7507] added TrueNAS template (vkhaliev)
 
 Bug fixes:
+..F....... [ZBX-20953] fixed errors when changing status of a single host in list (averza)
+..F....... [ZBX-20947] fixed hosts not being exported into file (averza)
+........S. [ZBX-20951] fixed dependent item discovery validation in LLD (wiper)
+A..G...... [ZBX-20783] fixed Zabbix agent2 not to fail when global regular expression is received with empty delimiter (rlataria, vso)
+.......PS. [ZBXNEXT-7616] fixed javascript md5 and sha256 functions to support binary data (including terminating zero character) (wiper)
+..F....... [ZBX-20299] fixed not detecting user macros by "Test item" dialog if they are used in the calculated item formula (rdetlavs)
 ..F....... [ZBX-20678] fixed focusing and keyboard functionality for host in Geomap widget (rdetlavs)
 ..F....... [ZBX-20782] fixed non unique ids browser console errors when executing Mass update action (rdetlavs)
 ..F....... [ZBX-20458] fixed incorrect view of disabled range slider in Firefox (rdetlavs)

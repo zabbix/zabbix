@@ -1,1 +1,0 @@
-A..G...... [ZBX-20783] fixed Zabbix agent2 not to fail when global regular expression is received with empty delimiter (rlataria, vso)
