@@ -1748,6 +1748,25 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 		}
 	}
 
+	/* check for broken dependent items */
+	for (i = 0; i < items->values_num; i++)
+	{
+		item = (zbx_lld_item_t *)items->values[i];
+
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+		{
+			for (j = 0; j < item->dependent_items.values_num; j++)
+			{
+				zbx_lld_item_t	*dependent;
+
+				dependent = (zbx_lld_item_t *)item->dependent_items.values[j];
+				dependent->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+			}
+
+			continue;
+		}
+	}
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
