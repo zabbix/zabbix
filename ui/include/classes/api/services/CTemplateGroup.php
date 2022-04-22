@@ -1211,7 +1211,7 @@ class CTemplateGroup extends CApiService {
 		}
 
 		if ($data['permissions'] != true) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "permissions" must be enabled.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" must be enabled.', 'permissions'));
 		}
 
 		$groupids = array_column($data['groups'], 'groupid');

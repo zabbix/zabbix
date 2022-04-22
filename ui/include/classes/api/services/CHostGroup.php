@@ -1596,9 +1596,8 @@ class CHostGroup extends CApiService {
 		}
 
 		if ($data['permissions'] == false && $data['tag_filter'] == false) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_s('At least one parameter "permissions" or "tag_filter" must be enabled.')
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('At least one parameter "%1$s" or "%2$s" must be enabled.', 'permissions', 'tag_filter')
 			);
 		}
 
