@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-04-20 13:48+0000\n"
+"PO-Revision-Date: 2022-04-22 10:40+0000\n"
 "Last-Translator: Atsushi <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -3901,7 +3901,7 @@ msgstr "Web監視の設定"
 
 #: app/controllers/CControllerAuditLogList.php:199
 msgid "Configuration refresh"
-msgstr ""
+msgstr "設定リフレッシュ"
 
 #: app/controllers/CControllerAuditSettingsUpdate.php:78
 #: app/controllers/CControllerAutoregUpdate.php:69
@@ -6364,7 +6364,7 @@ msgstr "改行コード"
 
 #: include/locales.inc.php:33
 msgid "English (en_GB)"
-msgstr ""
+msgstr "英語 (en_GB)"
 
 #: include/locales.inc.php:33
 msgid "English (en_US)"
@@ -10768,6 +10768,10 @@ msgstr "リンク"
 msgid "List is empty"
 msgstr "リストがありません"
 
+#: include/classes/data/CItemData.php:983
+msgid "List of OS processes with attributes. Returns JSON array"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr "ブロックデバイスとそのタイプのリスト。JSONで返す"
@@ -14238,7 +14242,7 @@ msgstr "プロパティ"
 #: include/classes/vaults/CVaultHashiCorp.php:55
 #, c-format
 msgid "Provided API endpoint \"%1$s\" is invalid."
-msgstr ""
+msgstr "指定されたAPIエンドポイント \"%1$s\" は正しくありません。"
 
 #: app/controllers/CControllerMenuPopup.php:405
 #: app/controllers/CControllerMenuPopup.php:693
@@ -14252,7 +14256,7 @@ msgstr "指定されたURL \"%1$s\"は正しくありません。"
 #: include/classes/vaults/CVaultHashiCorp.php:64
 #, c-format
 msgid "Provided authentication token \"%1$s\" is empty."
-msgstr ""
+msgstr "指定された認証トークン \"%1$s\" が空です。"
 
 #: include/classes/vaults/CVaultHashiCorp.php:60
 #, c-format

@@ -10976,6 +10976,10 @@ msgstr "Связи"
 msgid "List is empty"
 msgstr "Список пустой"
 
+#: include/classes/data/CItemData.php:983
+msgid "List of OS processes with attributes. Returns JSON array"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Список блочных устройств и их типы. Возвращает JSON"
