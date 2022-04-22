@@ -1097,9 +1097,10 @@ function uncheckTableRows(page, keepids = [], mvc = true) {
 
 	if (keepids.length) {
 		let keepids_formatted = {};
+		const current = chkbxRange.getSelectedIds();
 
-		for (const [id, attr] of Object.entries(keepids)) {
-			keepids_formatted[id.toString()] = attr;
+		for (const id of Object.values(keepids)) {
+			keepids_formatted[id.toString()] = (id in current) ? current[id] : '';
 		}
 
 		sessionStorage.setItem(key, JSON.stringify(keepids_formatted));
