@@ -250,29 +250,23 @@ switch ($data['popup_type']) {
 					');
 			}
 			else {
-				if (array_key_exists('dstfld3', $options)) {
-					$description->setAttribute('data-dstfld3', $options['dstfld3']);
+				$values = [];
 
-					if (array_key_exists($options['srcfld3'], $trigger) &&
-							array_key_exists($trigger[$options['srcfld3']], $trigger)) {
-						$description->setAttribute('data-srcfld3', $trigger[$trigger[$options['srcfld3']]]);
-					}
+				if ($options['dstfld1'] !== '' && $options['srcfld1'] !== '') {
+					$values[$options['dstfld1']] = $trigger[$options['srcfld1']];
+				}
+				if ($options['dstfld2'] !== '' && $options['srcfld2'] !== '') {
+					$values[$options['dstfld2']] = $trigger[$options['srcfld2']];
+				}
+				if ($options['dstfld3'] !== '' && $options['srcfld3'] !== '') {
+					$values[$options['dstfld3']] = $trigger[$options['srcfld3']];
 				}
 
 				$description
 					->setAttribute('data-dstfrm', $options['dstfrm'])
-					->setAttribute('data-dstfld1', $options['dstfld1'])
-					->setAttribute('data-srcfld1', $trigger[$options['srcfld1']])
-					->setAttribute('data-dstfld2', $options['dstfld2'])
-					->setAttribute('data-srcfld2', $trigger[$options['srcfld2']])
+					->setAttribute('data-values', json_encode($values))
 					->onClick('
-						addValues(this.dataset.dstfrm, {
-							[this.dataset.dstfld1]: this.dataset.srcfld1,
-							[this.dataset.dstfld2]: this.dataset.srcfld2,
-							..."dstfld3" in this.dataset
-								? {[this.dataset.dstfld3]: this.dataset.srcfld3 ?? null}
-								: {}
-						});
+						addValues(this.dataset.dstfrm, JSON.parse(this.dataset.values));
 						popup_generic.closePopup(event);
 					');
 			}
@@ -334,17 +328,23 @@ switch ($data['popup_type']) {
 					');
 			}
 			else {
+				$values = [];
+
+				if ($options['dstfld1'] !== '' && $options['srcfld1'] !== '') {
+					$values[$options['dstfld1']] = $sysmap[$options['srcfld1']];
+				}
+				if ($options['dstfld2'] !== '' && $options['srcfld2'] !== '') {
+					$values[$options['dstfld2']] = $sysmap[$options['srcfld2']];
+				}
+				if ($options['dstfld3'] !== '' && $options['srcfld3'] !== '') {
+					$values[$options['dstfld3']] = $sysmap[$options['srcfld3']];
+				}
+
 				$name
 					->setAttribute('data-dstfrm', $options['dstfrm'])
-					->setAttribute('data-dstfld1', $options['dstfld1'])
-					->setAttribute('data-srcfld1', $sysmap[$options['srcfld1']])
-					->setAttribute('data-dstfld2', $options['dstfld2'])
-					->setAttribute('data-srcfld2', $sysmap[$options['srcfld2']])
+					->setAttribute('data-values', json_encode($values))
 					->onClick('
-						addValues(this.dataset.dstfrm, {
-							[this.dataset.dstfld1]: this.dataset.srcfld1,
-							[this.dataset.dstfld2]: this.dataset.srcfld2
-						});
+						addValues(this.dataset.dstfrm, JSON.parse(this.dataset.values));
 						popup_generic.closePopup(event);
 					');
 			}
@@ -428,30 +428,23 @@ switch ($data['popup_type']) {
 						');
 				}
 				else {
+					$values = [];
+
 					if ($options['dstfld1'] !== '' && $options['srcfld1'] !== '') {
-						$description
-							->setAttribute('data-dstfld1', $options['dstfld1'])
-							->setAttribute('data-srcfld1-value', $item[$options['srcfld1']]);
+						$values[$options['dstfld1']] = $item[$options['srcfld1']];
 					}
 					if ($options['dstfld2'] !== '' && $options['srcfld2'] !== '') {
-						$description
-							->setAttribute('data-dstfld2', $options['dstfld2'])
-							->setAttribute('data-srcfld2-value', $item[$options['srcfld2']]);
+						$values[$options['dstfld2']] = $item[$options['srcfld2']];
 					}
 					if ($options['dstfld3'] !== '' && $options['srcfld3'] !== '') {
-						$description
-							->setAttribute('data-dstfld3', $options['dstfld3'])
-							->setAttribute('data-srcfld3-value', $item[$options['srcfld3']]);
+						$values[$options['dstfld3']] = $item[$options['srcfld3']];
 					}
 
 					$description
 						->setAttribute('data-dstfrm', $options['dstfrm'])
+						->setAttribute('data-values', json_encode($values))
 						->onClick('
-							addValues(this.dataset.dstfrm, {
-								..."dstfld1" in this.dataset ? {[this.dataset.dstfld1]: this.dataset.srcfld1Value} : {},
-								..."dstfld2" in this.dataset ? {[this.dataset.dstfld2]: this.dataset.srcfld2Value} : {},
-								..."dstfld3" in this.dataset ? {[this.dataset.dstfld3]: this.dataset.srcfld3Value} : {}
-							}, '.(array_key_exists('submit_parent', $options) ? 'true' : 'false').');
+							addValues(this.dataset.dstfrm, JSON.parse(this.dataset.values));
 							popup_generic.closePopup(event);
 						');
 				}
@@ -714,12 +707,19 @@ switch ($data['popup_type']) {
 
 // Add submit button at footer.
 if ($data['multiselect'] && $form !== null) {
+	$form
+		->setAttribute('data-reference', $options['reference'])
+		->setAttribute('data-parentid', $options['parentid']);
+
 	$output['buttons'] = [
 		[
 			'title' => _('Select'),
 			'class' => '',
 			'isSubmit' => true,
-			'action' => 'addSelectedValues('.zbx_jsvalue($options['reference']).', '.$options['parentid'].');'
+			'action' => '
+				const form = document.getElementById("'.$form->getId().'");
+				addSelectedValues(form.dataset.reference, form.dataset.parentid ?? null);
+			'
 		]
 	];
 }
