@@ -337,34 +337,6 @@ var chkbxRange = {
 	},
 
 	/**
-	 * Update actions for single already selected entry.
-	 * Only affected actions will be added/removed based on "enable" variable.
-	 * Will not add a selected entry, if it was not previously selected.
-	 *
-	 * @param {string}  affected_id       id of entry whose actions will be changed.
-	 * @param {array}   affected_actions  action that should be changed.
-	 * @param {boolean} enable            should the affected actions be added, or removed.
-	 */
-	updateActions: function(affected_id, affected_actions, enable) {
-		const selected_ids = this.getSelectedIds();
-
-		if (selected_ids[affected_id] !== undefined) {
-			const existing_actions = selected_ids[affected_id].split(' ');
-			const actions = existing_actions.filter(action => !affected_actions.includes(action));
-
-			for (const action of affected_actions) {
-				if (enable) {
-					actions.push(action);
-				}
-			}
-
-			selected_ids[affected_id] = actions.join(' ').trim();
-		}
-
-		this.saveSessionStorage(this.pageGoName, selected_ids);
-	},
-
-	/**
 	 * Save the state of the checkboxes belonging to the given object group in SessionStorage.
 	 *
 	 * @param {string} object

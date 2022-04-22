@@ -285,32 +285,15 @@
 				.then((response) => {
 					clearMessages();
 
-					/*
-					 * Using postMessageError or postMessageOk would mean that those messages are stored in session
-					 * messages and that would mean to reload the page and show them. Also postMessageError would be
-					 * displayed right after header is loaded. Meaning message is not inside the page form like that is
-					 * in postMessageOk case. Instead show message directly that comes from controller. Checkboxes
-					 * use uncheckTableRows which only unsets checkboxes from session storage, but not physically
-					 * deselects them. Another reason for need for page reload. Instead of page reload, manually
-					 * deselect the checkboxes that were selected previously in session storage, but only in case of
-					 * success message. In case of error message leave checkboxes checked.
-					 */
 					if ('error' in response) {
 						addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true, true));
 					}
 					else if('success' in response) {
 						addMessage(makeMessageBox('good', [], response.success.title, true, false));
 
-						let uncheckids = chkbxRange.getSelectedIds();
-						uncheckids = Object.keys(uncheckids);
-
-						// This will only unset checkboxes from session storage, but not physically deselect them.
+						const uncheckids = Object.keys(chkbxRange.getSelectedIds());
 						uncheckTableRows('latest', []);
-
-						// Deselect the previous checkboxes.
 						chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
-
-						// Reset the buttons in footer and update main checkbox.
 						chkbxRange.update(this.checkbox_object);
 					}
 				})

@@ -154,25 +154,24 @@ foreach ($data['items'] as $item) {
 			->setArgument('context', $data['context'])
 	);
 
-	$status_btn = (new CButton('status', itemIndicator($item['status'], $item['state'])))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->addClass(itemIndicatorStyle($item['status'], $item['state']))
-		->setAttribute('data-item', json_encode([
-			'itemid' => $item['itemid'],
-			'hostid' => $item['hostid'],
-			'status' => $item['status']
-		]))
-		->onClick('view.statusChange(this);');
-
-	// Set execute action independently of item status.
-	if (in_array($item['type'], checkNowAllowedTypes())
-			&& $item['hosts'][0]['status'] == HOST_STATUS_MONITORED) {
-		/*
-		 * List of actions that will be affected by status change. When status changes either these actions will be
-		 * added or removed in session storage depending on new item status.
-		 */
-		$status_btn->setAttribute('data-actions', 'execute');
-	}
+	// status
+	$status = new CCol((new CLink(
+			itemIndicator($item['status'], $item['state']),
+			(new CUrl('items.php'))
+				->setArgument('group_itemid[]', $item['itemid'])
+				->setArgument('hostid', $item['hostid'])
+				->setArgument('action', ($item['status'] == ITEM_STATUS_DISABLED)
+					? 'item.massenable'
+					: 'item.massdisable'
+				)
+				->setArgument('context', $data['context'])
+				->setArgument('checkbox_hash', $data['checkbox_hash'])
+				->setArgumentSID()
+				->getUrl()
+		))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(itemIndicatorStyle($item['status'], $item['state']))
+	);
 
 	// triggers info
 	$triggerHintTable = (new CTableInfo())->setHeader([_('Severity'), _('Name'), _('Expression'), _('Status')]);
@@ -290,7 +289,7 @@ foreach ($data['items'] as $item) {
 		$item['history'],
 		$item['trends'],
 		item_type2str($item['type']),
-		new CCol($status_btn),
+		$status,
 		$data['tags'][$item['itemid']],
 		($data['context'] === 'host') ? makeInformationList($info_icons) : null
 	]);

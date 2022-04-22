@@ -1090,7 +1090,7 @@ function visibilityStatusChanges(value, objectid, replace_to) {
  *
  * @param {string}       page
  * @param {array|Object} keepids
- * @param {bool}         mvc
+ * @param {boolean}      mvc
  */
 function uncheckTableRows(page, keepids = [], mvc = true) {
 	const key = mvc ? 'cb_zabbix_'+page : 'cb_'+page;

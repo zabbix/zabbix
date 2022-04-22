@@ -102,6 +102,7 @@
 						addMessage(makeMessageBox('good', [], response.success.title, true, false));
 
 						const uncheckids = Object.keys(chkbxRange.getSelectedIds());
+						uncheckTableRows('items_' + this.checkbox_hash, [], false);
 						chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
 						chkbxRange.update(this.checkbox_object);
 					}
@@ -119,34 +120,6 @@
 					// Deselect the "Execute now" button in both success and error cases, since there is no page reload.
 					button.blur();
 				});
-		},
-
-		statusChange(button) {
-			// Create the redirect URL.
-			const item = JSON.parse(button.getAttribute('data-item'));
-
-			const curl = new Curl('items.php', true);
-			curl.setArgument('group_itemid[]', item.itemid);
-			curl.setArgument('hostid', item.hostid);
-			curl.setArgument('action', (item.status == <?= ITEM_STATUS_DISABLED ?>)
-				? 'item.massenable'
-				: 'item.massdisable'
-			);
-			curl.setArgument('context', new URLSearchParams(location.search).get('context'));
-
-			// Actions that are affected by status change, should be also changed in checkbox session storage.
-			// Get allowed and affected actions.
-			let allowed_actions_string = button.getAttribute('data-actions');
-
-			if (allowed_actions_string === null) {
-				allowed_actions_string = '';
-			}
-
-			const allowed_actions = allowed_actions_string.split(' ');
-			chkbxRange.updateActions(item.itemid, allowed_actions, item.status == <?= ITEM_STATUS_DISABLED ?>);
-
-			// Perform redirect to item form for the massenable or massdisable.
-			location.href = curl.getUrl();
 		},
 
 		events: {
