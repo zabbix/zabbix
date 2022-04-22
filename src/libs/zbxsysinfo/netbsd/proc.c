@@ -54,8 +54,8 @@ typedef struct
 }
 proc_data_t;
 
-ZBX_PTR_VECTOR_DECL(proc_data_ptr, proc_data_t *);
-ZBX_PTR_VECTOR_IMPL(proc_data_ptr, proc_data_t *);
+ZBX_PTR_VECTOR_DECL(proc_data_ptr, proc_data_t *)
+ZBX_PTR_VECTOR_IMPL(proc_data_ptr, proc_data_t *)
 
 /******************************************************************************
  *                                                                            *

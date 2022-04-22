@@ -115,8 +115,8 @@ typedef struct
 }
 proc_data_t;
 
-ZBX_PTR_VECTOR_DECL(proc_data_ptr, proc_data_t *);
-ZBX_PTR_VECTOR_IMPL(proc_data_ptr, proc_data_t *);
+ZBX_PTR_VECTOR_DECL(proc_data_ptr, proc_data_t *)
+ZBX_PTR_VECTOR_IMPL(proc_data_ptr, proc_data_t *)
 
 /******************************************************************************
  *                                                                            *
@@ -617,7 +617,7 @@ static char	*get_state(struct kinfo_proc *proc)
 int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char				*procname, *proccomm, *param, *args;
-	int				invalid_user = 0, count, i, mib[4], mibs, zbx_proc_mode, pagesize;
+	int				count, i, mib[4], mibs, zbx_proc_mode, pagesize, invalid_user = 0;
 	size_t				sz;
 	struct kinfo_proc		*proc = NULL;
 	struct passwd			*usrinfo;
