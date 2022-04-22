@@ -23,27 +23,13 @@ require_once dirname(__FILE__).'/../traits/TagTrait.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
- * @backup widget, profiles, dashboard, items
+ * @dataSource TopHostsWidget
  *
- * @onBefore prepareDashboardPageData
+ * @backup widget, profiles, dashboard, items
  */
 class testDashboardTopHostsWidget extends CWebTest {
 
 	use TagTrait;
-
-	/**
-	 * Id of dashboard by name.
-	 *
-	 * @var integer
-	 */
-	protected static $dashboardids;
-
-	/**
-	 * Id of items by name.
-	 *
-	 * @var integer
-	 */
-	protected static $itemids;
 
 	/**
 	 * Widget name for update.
@@ -71,429 +57,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 		return [
 			CMessageBehavior::class
 		];
-	}
-
-	/**
-	 * Create new dashboards for autotest.
-	 */
-	public function prepareDashboardPageData() {
-		$response = CDataHelper::call('dashboard.create', [
-			[
-				'name' => 'top_host_update',
-				'display_period' => 30,
-				'auto_start' => 1,
-				'pages' => [
-					[
-						'name' => '',
-						'widgets' => [
-							[
-								'type' => 'tophosts',
-								'name' => 'Top hosts update',
-								'x' => 0,
-								'y' => 0,
-								'width' => 12,
-								'height' => 8,
-								'view_mode' => 0,
-								'fields' => [
-									[
-										'type' => 1,
-										'name' => 'columns.name.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.data.0',
-										'value' => 1
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.item.0',
-										'value' => 'Available memory'
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.timeshift.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.aggregate_function.0',
-										'value' => 0
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.display.0',
-										'value' => 1
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.history.0',
-										'value' => 1
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.base_color.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'column',
-										'value' => 0
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.name.1',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.data.1',
-										'value' => 1
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.item.1',
-										'value' => 'Available memory in %'
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.timeshift.1',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.aggregate_function.1',
-										'value' => 0
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.display.1',
-										'value' => 1
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.history.1',
-										'value' => 1
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.base_color.1',
-										'value' => ''
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.color.1.0',
-										'value' => 'FF465C'
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.threshold.1.0',
-										'value' => '100'
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.color.1.1',
-										'value' => 'B0AF07'
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.threshold.1.1',
-										'value' => '600'
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.color.0.0',
-										'value' => 'FF465C'
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.threshold.0.0',
-										'value' => '100'
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.color.0.1',
-										'value' => 'B0AF07'
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.threshold.0.1',
-										'value' => '600'
-									]
-								]
-							]
-						]
-					]
-				]
-			],
-			[
-				'name' => 'top_host_create',
-				'display_period' => 30,
-				'auto_start' => 1,
-				'pages' => [
-					[]
-				]
-			],
-			[
-				'name' => 'top_host_delete',
-				'display_period' => 30,
-				'auto_start' => 1,
-				'pages' => [
-					[
-						'name' => '',
-						'widgets' => [
-							[
-								'type' => 'tophosts',
-								'name' => 'Top hosts delete',
-								'x' => 0,
-								'y' => 0,
-								'width' => 12,
-								'height' => 8,
-								'view_mode' => 0,
-								'fields' => [
-									[
-										'type' => 1,
-										'name' => 'columns.name.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.data.0',
-										'value' => 1
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.item.0',
-										'value' => 'Available memory'
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.timeshift.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.aggregate_function.0',
-										'value' => 0
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.display.0',
-										'value' => 1
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.history.0',
-										'value' => 1
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.base_color.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'column',
-										'value' => 0
-									]
-								]
-							]
-						]
-					]
-				]
-			],
-			[
-				'name' => 'top_host_remove',
-				'display_period' => 30,
-				'auto_start' => 1,
-				'pages' => [
-					[
-						'name' => '',
-						'widgets' => [
-							[
-								'type' => 'tophosts',
-								'name' => 'Top hosts for remove',
-								'x' => 0,
-								'y' => 0,
-								'width' => 12,
-								'height' => 8,
-								'view_mode' => 0,
-								'fields' => [
-									[
-										'type' => 1,
-										'name' => 'columns.name.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.data.0',
-										'value' => 1
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.item.0',
-										'value' => 'Available memory'
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.timeshift.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.aggregate_function.0',
-										'value' => 0
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.display.0',
-										'value' => 1
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.history.0',
-										'value' => 1
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.base_color.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'column',
-										'value' => 0
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.name.1',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.data.1',
-										'value' => 2
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.aggregate_function.1',
-										'value' => 0
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.base_color.1',
-										'value' => ''
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.color.0.0',
-										'value' => 'FF465C'
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.threshold.0.0',
-										'value' => '100'
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.color.0.1',
-										'value' => '4000FF'
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.threshold.0.1',
-										'value' => '1000'
-									],
-									[
-										'type' => 1,
-										'name' => 'tags.tag.0',
-										'value' => 'tag1'
-									],
-									[
-										'type' => 0,
-										'name' => 'tags.operator.0',
-										'value' => 0
-									],
-									[
-										'type' => 1,
-										'name' => 'tags.value.0',
-										'value' => 'val1'
-									],
-									[
-										'type' => 1,
-										'name' => 'tags.tag.1',
-										'value' => 'tag2'
-									],
-									[
-										'type' => 0,
-										'name' => 'tags.operator.1',
-										'value' => 0
-									],
-									[
-										'type' => 1,
-										'name' => 'tags.value.1',
-										'value' => 'val2'
-									]
-								]
-							]
-						]
-					]
-				]
-			],
-			[
-				'name' => 'top_host_screenshots',
-				'display_period' => 30,
-				'auto_start' => 1,
-				'pages' => [
-					[]
-				]
-			],
-			[
-				'name' => 'top_host_text_items',
-				'display_period' => 30,
-				'auto_start' => 1,
-				'pages' => [
-					[]
-				]
-			]
-		]);
-
-		$this->assertArrayHasKey('dashboardids', $response);
-		self::$dashboardids = CDataHelper::getIds('name');
-
-		// Create 3 items with different Value type.
-		$response_2 = CDataHelper::call('item.create', [
-			[
-				'name' => 'trap_text',
-				'key_' => 'trap_text',
-				'hostid' => 10084,
-				'type' => 2,
-				'value_type' => 4
-			],
-			[
-				'name' => 'trap_log',
-				'key_' => 'trap_log',
-				'hostid' => 10084,
-				'type' => 2,
-				'value_type' => 2
-			],
-			[
-				'name' => 'trap_char',
-				'key_' => 'trap_char',
-				'hostid' => 10084,
-				'type' => 2,
-				'value_type' => 1
-			]
-		]);
-
-		$this->assertArrayHasKey('itemids', $response_2);
-		self::$itemids = CDataHelper::getIds('name');
-
-		// Add value to item displayed in Top Hosts widget.
-		CDataHelper::addItemData(99086, 1000);
-		CDataHelper::addItemData(self::$itemids['trap_text'], 'Text for text item');
-		CDataHelper::addItemData(self::$itemids['trap_log'], 'Logs for text item');
-		CDataHelper::addItemData(self::$itemids['trap_char'], 'characters_here');
 	}
 
 	public static function getCreateData() {
@@ -1231,7 +794,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testDashboardTopHostsWidget_Create($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_create']);
+		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_create');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 		$form = $dashboard->edit()->addWidget()->asForm();
@@ -1287,7 +851,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 		// Hash before simple update.
 		$old_hash = CDBHelper::getHash($this->sql);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_update']);
+		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_update');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit()->getWidget(self::$updated_name)->edit()->submit();
 		$dashboard->save();
@@ -1694,7 +1259,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$old_hash = CDBHelper::getHash($this->sql);
 		}
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_update']);
+		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_update');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->getWidget(self::$updated_name)->edit();
 
@@ -1750,7 +1316,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 	public function testDashboardTopHostsWidget_Delete() {
 		$name = 'Top hosts delete';
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_delete']);
+		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_delete');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$dashboard->deleteWidget($name);
 		$this->page->waitUntilReady();
@@ -1799,7 +1366,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 * @dataProvider getRemoveData
 	 */
 	public function testDashboardTopHostsWidget_Remove($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_remove']);
+		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_remove');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->getWidget('Top hosts for remove')->edit();
 
@@ -2184,7 +1752,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 * @dataProvider getBarScreenshotsData
 	 */
 	public function testDashboardTopHostsWidget_WidgetAppearance($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_screenshots']);
+		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_screenshots');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
 		$form->fill(['Type' => 'Top hosts']);
@@ -2210,7 +1779,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$warnings = ['.//span[@id="tophosts-column-aggregate-function-warning"]', './/span[@id="tophosts-column-display-warning"]',
 				'.//span[@id="tophosts-column-thresholds-warning"]'];
 		$info = '//label[@for="history"]';
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_create']);
+		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_create');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
 		$form->fill(['Type' => 'Top hosts']);
@@ -2546,7 +2116,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 * @dataProvider getCheckTextItemsData
 	 */
 	public function testDashboardTopHostsWidget_CheckTextItems($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_text_items']);
+		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_text_items');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
 		$form->fill(['Type' => 'Top hosts']);
