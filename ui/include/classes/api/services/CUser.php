@@ -1496,7 +1496,7 @@ class CUser extends CApiService {
 						: CAuthenticationHelper::get(CAuthenticationHelper::LDAP_USERDIRECTORYID);
 					$userdirectory = [];
 
-					if ($id) {
+					if ($id != 0) {
 						$userdirectory = API::UserDirectory()->get([
 							'output' => ['userdirectoryid', 'host', 'port', 'base_dn', 'bind_dn', 'search_attribute',
 								'search_filter', 'start_tls'
@@ -1786,37 +1786,43 @@ class CUser extends CApiService {
 
 			if ($db_usrgrp['gui_access'] > $permissions['gui_access']) {
 				$permissions['gui_access'] = $db_usrgrp['gui_access'];
+				$userdirectoryids = [];
 			}
 
-			if ($db_usrgrp['gui_access'] == GROUP_GUI_ACCESS_SYSTEM
-					|| $db_usrgrp['gui_access'] == GROUP_GUI_ACCESS_LDAP) {
+			if ($db_usrgrp['gui_access'] == GROUP_GUI_ACCESS_LDAP
+					|| ($db_usrgrp['gui_access'] == GROUP_GUI_ACCESS_SYSTEM
+						&& CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE) == ZBX_AUTH_LDAP)) {
 				$userdirectoryids[$db_usrgrp['userdirectoryid']] = true;
 			}
 		}
 
-		if ($permissions['gui_access'] == GROUP_GUI_ACCESS_INTERNAL
-				|| $permissions['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
-			return $permissions;
+		if ($userdirectoryids) {
+			if (array_key_exists(0, $userdirectoryids)) {
+				unset($userdirectoryids[0]);
+				$default_userdirectoryid = CAuthenticationHelper::get(CAuthenticationHelper::LDAP_USERDIRECTORYID);
+
+				if ($default_userdirectoryid != 0) {
+					$userdirectoryids[$default_userdirectoryid] = true;
+				}
+			}
+
+			if (count($userdirectoryids) === 1) {
+				$permissions['userdirectoryid'] = array_keys($userdirectoryids)[0];
+			}
+			elseif (count($userdirectoryids) > 1) {
+				$db_userdirectoryids = API::UserDirectory()->get([
+					'output' => [],
+					'userdirectoryids' => array_keys($userdirectoryids),
+					'sortfield' => ['name'],
+					'limit' => 1,
+					'preservekeys' => true
+				]);
+
+				$permissions['userdirectoryid'] = array_keys($db_userdirectoryids)[0];
+			}
 		}
 
-		if (array_key_exists(0, $userdirectoryids)) {
-			unset($userdirectoryids[0]);
-			$userdirectoryids[CAuthenticationHelper::get(CAuthenticationHelper::LDAP_USERDIRECTORYID)] = true;
-		}
-
-		if (count($userdirectoryids) == 1) {
-			return ['userdirectoryid' => array_key_first($userdirectoryids)] + $permissions;
-		}
-
-		$db_userdirectoryids = API::UserDirectory()->get([
-			'output' => [],
-			'userdirectoryids' => array_keys($userdirectoryids),
-			'sortfield' => ['name'],
-			'limit' => 1,
-			'preservekeys' => true
-		]);
-
-		return ['userdirectoryid' => array_key_first($db_userdirectoryids)] + $permissions;
+		return $permissions;
 	}
 
 	/**

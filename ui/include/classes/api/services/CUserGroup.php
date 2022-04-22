@@ -1183,7 +1183,7 @@ class CUserGroup extends CApiService {
 	 * Check if user directories exist.
 	 *
 	 * @param array  $usrgrps
-	 * @param string $usrgrps['userdirectoryid]
+	 * @param string $usrgrps['userdirectoryid']
 	 *
 	 * @throws APIException
 	 */
