@@ -152,9 +152,9 @@ switch ($data['popup_type']) {
 					->setId('spanid'.$item['id'])
 					->setAttribute('data-reference', $options['reference'])
 					->setAttribute('data-itemid', $item['id'])
-					->setAttribute('data-parentid', trim($options['parentid'], "'"))
+					->setAttribute('data-parentid', $options['parentid'])
 					->onClick('
-						addValue(this.dataset.reference, this.dataset.itemid, this.dataset.parentid);
+						addValue(this.dataset.reference, this.dataset.itemid, this.dataset.parentid ?? null);
 						popup_generic.closePopup(event);
 					');
 			}
@@ -173,9 +173,9 @@ switch ($data['popup_type']) {
 				->setId('spanid'.$user['userid'])
 				->setAttribute('data-reference', $options['reference'])
 				->setAttribute('data-userid', $user['userid'])
-				->setAttribute('data-parentid', trim($options['parentid'], "'"))
+				->setAttribute('data-parentid', $options['parentid'])
 				->onClick('
-					addValue(this.dataset.reference, this.dataset.userid, this.dataset.parentid);
+					addValue(this.dataset.reference, this.dataset.userid, this.dataset.parentid ?? null);
 					popup_generic.closePopup(event);
 				');
 
@@ -213,9 +213,9 @@ switch ($data['popup_type']) {
 				->setId('spanid'.$item['usrgrpid'])
 				->setAttribute('data-reference', $options['reference'])
 				->setAttribute('data-usrgrpid', $item['usrgrpid'])
-				->setAttribute('data-parentid', trim($options['parentid'], "'"))
+				->setAttribute('data-parentid', $options['parentid'])
 				->onClick('
-					addValue(this.dataset.reference, this.dataset.usrgrpid, this.dataset.parentid);
+					addValue(this.dataset.reference, this.dataset.usrgrpid, this.dataset.parentid ?? null);
 					popup_generic.closePopup(event);
 				');
 
@@ -243,9 +243,9 @@ switch ($data['popup_type']) {
 				$description
 					->setAttribute('data-reference', $options['reference'])
 					->setAttribute('data-triggerid', $trigger['triggerid'])
-					->setAttribute('data-parentid', trim($options['parentid'], "'"))
+					->setAttribute('data-parentid', $options['parentid'])
 					->onClick('
-						addValue(this.dataset.reference, this.dataset.triggerid, this.dataset.parentid);
+						addValue(this.dataset.reference, this.dataset.triggerid, this.dataset.parentid ?? null);
 						popup_generic.closePopup(event);
 					');
 			}
@@ -327,9 +327,9 @@ switch ($data['popup_type']) {
 				$name
 					->setAttribute('data-reference', $options['reference'])
 					->setAttribute('data-sysmapid', $sysmap['sysmapid'])
-					->setAttribute('data-parentid', trim($options['parentid'], "'"))
+					->setAttribute('data-parentid', $options['parentid'])
 					->onClick('
-						addValue(this.dataset.reference, this.dataset.sysmapid, this.dataset.parentid);
+						addValue(this.dataset.reference, this.dataset.sysmapid, this.dataset.parentid ?? null);
 						popup_generic.closePopup(event);
 					');
 			}
@@ -421,9 +421,9 @@ switch ($data['popup_type']) {
 					$description
 						->setAttribute('data-reference', $options['reference'])
 						->setAttribute('data-itemid', $options['itemid'])
-						->setAttribute('data-parentid', trim($options['parentid'], "'"))
+						->setAttribute('data-parentid', $options['parentid'])
 						->onClick('
-							addValue(this.dataset.reference, this.dataset.itemid, this.dataset.parentid);
+							addValue(this.dataset.reference, this.dataset.itemid, this.dataset.parentid ?? null);
 							popup_generic.closePopup(event);
 						');
 				}
@@ -494,9 +494,9 @@ switch ($data['popup_type']) {
 					(new CLink($item['name']))
 						->setAttribute('data-reference', $options['reference'])
 						->setAttribute('data-itemid', $item['itemid'])
-						->setAttribute('data-parentid', trim($options['parentid'], "'"))
+						->setAttribute('data-parentid', $options['parentid'])
 						->onClick('
-							addValue(this.dataset.reference, this.dataset.itemid, this.dataset.parentid);
+							addValue(this.dataset.reference, this.dataset.itemid, this.dataset.parentid ?? null);
 							popup_generic.closePopup(event);
 						'),
 					(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
@@ -552,10 +552,10 @@ switch ($data['popup_type']) {
 				// Clickable graph name.
 				(new CLink($graph['name']))
 					->setAttribute('data-reference', $options['reference'])
-					->setAttribute('data-itemid', $graph['graphid'])
-					->setAttribute('data-parentid', trim($options['parentid'], "'"))
+					->setAttribute('data-graphid', $graph['graphid'])
+					->setAttribute('data-parentid', $options['parentid'])
 					->onClick('
-						addValue(this.dataset.reference, this.dataset.graphid, this.dataset.parentid);
+						addValue(this.dataset.reference, this.dataset.graphid, this.dataset.parentid ?? null);
 						popup_generic.closePopup(event);
 					'),
 
@@ -594,10 +594,10 @@ switch ($data['popup_type']) {
 				(new CLink($valuemap['name'], '#'))
 					->setId('spanid'.$valuemap['id'])
 					->setAttribute('data-reference', $options['reference'])
-					->setAttribute('data-parentid', trim($options['parentid'], "'"))
 					->setAttribute('data-valuemapid', $valuemap['id'])
+					->setAttribute('data-parentid', $options['parentid'])
 					->onClick('
-						addValue(this.dataset.reference, this.dataset.valuemapid, this.dataset.parentid);
+						addValue(this.dataset.reference, this.dataset.valuemapid, this.dataset.parentid ?? null);
 						popup_generic.closePopup(event);
 					')
 			]);
@@ -627,10 +627,10 @@ switch ($data['popup_type']) {
 				$name[] = (new CLink($valuemap['name'], '#'))
 					->setId('spanid'.$valuemap['id'])
 					->setAttribute('data-reference', $options['reference'])
-					->setAttribute('data-parentid', trim($options['parentid'], "'"))
 					->setAttribute('data-valuemapid', $valuemap['id'])
+					->setAttribute('data-parentid', $options['parentid'])
 					->onClick('
-						addValue(this.dataset.reference, this.dataset.valuemapid, this.dataset.parentid);
+						addValue(this.dataset.reference, this.dataset.valuemapid, this.dataset.parentid ?? null);
 						popup_generic.closePopup(event);
 					');
 			}
@@ -690,10 +690,10 @@ switch ($data['popup_type']) {
 				$name = (new CLink($item['name']))
 					->setId('spanid'.$item['id'])
 					->setAttribute('data-reference', $options['reference'])
-					->setAttribute('data-parentid', trim($options['parentid'], "'"))
 					->setAttribute('data-itemid', $item['id'])
+					->setAttribute('data-parentid', $options['parentid'])
 					->onClick('
-						addValue(this.dataset.reference, this.dataset.itemid, this.dataset.parentid);
+						addValue(this.dataset.reference, this.dataset.itemid, this.dataset.parentid ?? null);
 						popup_generic.closePopup(event);
 					');
 			}
@@ -719,7 +719,7 @@ if ($data['multiselect'] && $form !== null) {
 			'title' => _('Select'),
 			'class' => '',
 			'isSubmit' => true,
-			'action' => 'return addSelectedValues('.zbx_jsvalue($options['reference']).', '.$options['parentid'].');'
+			'action' => 'addSelectedValues('.zbx_jsvalue($options['reference']).', '.$options['parentid'].');'
 		]
 	];
 }

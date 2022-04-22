@@ -738,9 +738,7 @@ class CControllerPopupGeneric extends CController {
 			'reference' => $this->getInput('reference', $this->getInput('srcfld1', 'unknown'))
 		];
 
-		$page_options['parentid'] = ($page_options['dstfld1'] !== '')
-			? zbx_jsvalue($page_options['dstfld1'])
-			: 'null';
+		$page_options['parentid'] = $page_options['dstfld1'] !== '' ? $page_options['dstfld1'] : null;
 
 		foreach ($option_fields_binary as $field) {
 			if ($this->hasInput($field)) {
