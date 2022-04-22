@@ -76,6 +76,7 @@ require_once dirname(__FILE__).'/testFormAdministrationAuthenticationHttp.php';
 require_once dirname(__FILE__).'/testFormAdministrationAuthenticationLdap.php';
 require_once dirname(__FILE__).'/testFormAdministrationAuthenticationSaml.php';
 require_once dirname(__FILE__).'/testFormAdministrationDMProxies.php';
+require_once dirname(__FILE__).'/testFormAdministrationGeneralAuditLog.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralGUI.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralHousekeeper.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralIconMapping.php';
@@ -275,6 +276,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationAuthenticationHttp');
 		$suite->addTestSuite('testFormAdministrationAuthenticationLdap');
 		$suite->addTestSuite('testFormAdministrationDMProxies');
+		$suite->addTestSuite('testFormAdministrationGeneralAuditLog');
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
 		$suite->addTestSuite('testFormAdministrationGeneralHousekeeper');
 		$suite->addTestSuite('testFormAdministrationGeneralIconMapping');
