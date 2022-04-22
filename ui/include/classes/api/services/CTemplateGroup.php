@@ -147,11 +147,11 @@ class CTemplateGroup extends CApiService {
 		if ($options['graphids'] !== null) {
 			$sqlParts['from']['gi'] = 'graphs_items gi';
 			$sqlParts['from']['i'] = 'items i';
-			$sqlParts['from']['hg'] = 'hosts_groups tg';
+			$sqlParts['from']['hg'] = 'hosts_groups hg';
 			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
-			$sqlParts['where']['tgg'] = 'tg.groupid=g.groupid';
+			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
-			$sqlParts['where']['tgi'] = 'tg.hostid=i.hostid';
+			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
 		}
 
 		$sub_sql_common = [];
@@ -917,10 +917,10 @@ class CTemplateGroup extends CApiService {
 		$templateids = array_keys($db_templates);
 
 		$templateids_with_groups = DBfetchColumn(DBselect(
-			'SELECT DISTINCT tg.hostid'.
-			' FROM hosts_groups tg'.
-			' WHERE '.dbConditionInt('tg.groupid', $groupids, true).
-				' AND '.dbConditionInt('tg.hostid', $templateids)
+			'SELECT DISTINCT hg.hostid'.
+			' FROM hosts_groups hg'.
+			' WHERE '.dbConditionInt('hg.groupid', $groupids, true).
+				' AND '.dbConditionInt('hg.hostid', $templateids)
 		), 'hostid');
 
 		$templateids_without_groups = array_diff($templateids, $templateids_with_groups);
@@ -967,10 +967,10 @@ class CTemplateGroup extends CApiService {
 		}
 		else {
 			$db_template_groups = DBselect(
-				'SELECT tg.hostgroupid,tg.hostid,tg.groupid'.
-				' FROM hosts_groups tg,hosts h'.
-				' WHERE tg.hostid=h.hostid'.
-					' AND '.dbConditionInt('tg.groupid', array_keys($db_groups)).
+				'SELECT hg.hostgroupid,hg.hostid,hg.groupid'.
+				' FROM hosts_groups hg,hosts h'.
+				' WHERE hg.hostid=h.hostid'.
+					' AND '.dbConditionInt('hg.groupid', array_keys($db_groups)).
 					' AND h.flags='.ZBX_FLAG_DISCOVERY_NORMAL
 			);
 		}
