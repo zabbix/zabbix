@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-21T18:57:35Z'
+  date: '2022-04-22T13:32:17Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -529,7 +529,7 @@ zabbix_export:
               uuid: d025e1c521ee4f53acd896d96609beec
               expression: 'last(/Envoy Proxy by HTTP/envoy.server.days_until_first_cert_expiring)<{$ENVOY.CERT.MIN}'
               name: 'Envoy Proxy: SSL certificate expires soon'
-              event_name: 'Envoy Proxy: SSL certificate expires soon (less than {$CERT.EXPIRY.WARN} days)'
+              event_name: 'Envoy Proxy: SSL certificate expires soon (less than {$CERT.EXPIRY.MIN} days)'
               opdata: 'Expires: {ITEM.VALUE}'
               priority: WARNING
               description: 'Please check certificate. Less than {$ENVOY.CERT.MIN} days left until the next certificate being managed will expire.'
@@ -1385,6 +1385,35 @@ zabbix_export:
                   tag: connection-manager
                   value: '{#CONN_MANAGER}'
             -
+              uuid: d5f88107012a4a41a86cb9a76bf8ebc5
+              name: 'Envoy Proxy: HTTP ["{#CONN_MANAGER}"]: Bytes in, rate'
+              type: DEPENDENT
+              key: 'envoy.http.downstream_cx_rx_bytes_total.rate["{#CONN_MANAGER}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total bytes received per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_http_downstream_cx_rx_bytes_total{envoy_http_conn_manager_prefix = "{#CONN_MANAGER}"}'
+                    - function
+                    - sum
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: http
+                -
+                  tag: connection-manager
+                  value: '{#CONN_MANAGER}'
+            -
               uuid: cff73e6c597d4103bdf6445b0910a434
               name: 'Envoy Proxy: HTTP ["{#CONN_MANAGER}"]: Connections, rate'
               type: DEPENDENT
@@ -1399,6 +1428,35 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'envoy_http_downstream_cx_total{envoy_http_conn_manager_prefix = "{#CONN_MANAGER}"}'
+                    - function
+                    - sum
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: http
+                -
+                  tag: connection-manager
+                  value: '{#CONN_MANAGER}'
+            -
+              uuid: a0bc5e6a55af4fa29869f05c1c0943f6
+              name: 'Envoy Proxy: HTTP ["{#CONN_MANAGER}"]: Bytes out, rate'
+              type: DEPENDENT
+              key: 'envoy.http.downstream_cx_tx_bytes_tota.rate["{#CONN_MANAGER}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total bytes sent per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_http_downstream_cx_tx_bytes_total{envoy_http_conn_manager_prefix = "{#CONN_MANAGER}"}'
                     - function
                     - sum
                 -
@@ -1498,6 +1556,22 @@ zabbix_export:
                 -
                   tag: connection-manager
                   value: '{#CONN_MANAGER}'
+          graph_prototypes:
+            -
+              uuid: 71b114ee64d34d74a32b18e2f7d25d8c
+              name: 'Envoy Proxy: [{#CLUSTER_NAME}] Downstream traffic'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Envoy Proxy by HTTP'
+                    key: 'envoy.http.downstream_cx_rx_bytes_total.rate["{#CONN_MANAGER}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Envoy Proxy by HTTP'
+                    key: 'envoy.http.downstream_cx_tx_bytes_tota.rate["{#CONN_MANAGER}"]'
           master_item:
             key: envoy.get_metrics
           preprocessing:

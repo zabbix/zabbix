@@ -20,10 +20,10 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
-Internal service metrics are collected from /stats endpoint.
+Internal service metrics are collected from {$ENVOY.METRICS.PATH} endpoint.
 Template need to use Authorization via API token.
 
-Don't forget change macros {$ENVOY.API.URL}.
+Don't forget change macros {$ENVOY.API.URL}, {$ENVOY.METRICS.PATH}.
 Also, see the Macros section for a list of macros used to set trigger values.  
 *NOTE.* Some metrics may not be collected depending on your Envoy Proxy instance version and configuration.  
 
@@ -109,6 +109,8 @@ There are no template links in this template.
 |Envoy Proxy |Envoy Proxy: HTTP ["{#CONN_MANAGER}"]: Requests timeout, rate |<p>Total requests closed due to a timeout on the request path per second.</p> |DEPENDENT |envoy.http.downstream_rq_timeout["{#CONN_MANAGER}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `envoy_http_downstream_rq_timeout{envoy_http_conn_manager_prefix = "{#CONN_MANAGER}"}`: `function`: `sum`</p><p>- CHANGE_PER_SECOND</p> |
 |Envoy Proxy |Envoy Proxy: HTTP ["{#CONN_MANAGER}"]: Connections, rate |<p>Total connections per second.</p> |DEPENDENT |envoy.http.downstream_cx_total["{#CONN_MANAGER}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `envoy_http_downstream_cx_total{envoy_http_conn_manager_prefix = "{#CONN_MANAGER}"}`: `function`: `sum`</p><p>- CHANGE_PER_SECOND</p> |
 |Envoy Proxy |Envoy Proxy: HTTP ["{#CONN_MANAGER}"]: Connections, active |<p>Total active connections.</p> |DEPENDENT |envoy.http.downstream_cx_active["{#CONN_MANAGER}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `envoy_http_downstream_cx_active{envoy_http_conn_manager_prefix = "{#CONN_MANAGER}"}`: `function`: `sum`</p> |
+|Envoy Proxy |Envoy Proxy: HTTP ["{#CONN_MANAGER}"]: Bytes in, rate |<p>Total bytes received per second.</p> |DEPENDENT |envoy.http.downstream_cx_rx_bytes_total.rate["{#CONN_MANAGER}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `envoy_http_downstream_cx_rx_bytes_total{envoy_http_conn_manager_prefix = "{#CONN_MANAGER}"}`: `function`: `sum`</p><p>- CHANGE_PER_SECOND</p> |
+|Envoy Proxy |Envoy Proxy: HTTP ["{#CONN_MANAGER}"]: Bytes out, rate |<p>Total bytes sent per second.</p> |DEPENDENT |envoy.http.downstream_cx_tx_bytes_tota.rate["{#CONN_MANAGER}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `envoy_http_downstream_cx_tx_bytes_total{envoy_http_conn_manager_prefix = "{#CONN_MANAGER}"}`: `function`: `sum`</p><p>- CHANGE_PER_SECOND</p> |
 |Zabbix raw items |Envoy Proxy: Get node metrics |<p>Get server metrics.</p> |HTTP_AGENT |envoy.get_metrics |
 
 ## Triggers
