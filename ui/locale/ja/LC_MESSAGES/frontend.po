@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-03-19 11:54+0000\n"
+"PO-Revision-Date: 2022-04-22 10:02+0000\n"
 "Last-Translator: Atsushi <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -6325,7 +6325,7 @@ msgstr "改行コード"
 
 #: include/locales.inc.php:33
 msgid "English (en_GB)"
-msgstr ""
+msgstr "英語 (en_GB)"
 
 #: include/locales.inc.php:33
 msgid "English (en_US)"
@@ -17443,7 +17443,7 @@ msgstr "今月(現在まで)"
 
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
-msgstr ""
+msgstr "この設定は数値データにのみ適用されます。 非数値データは常にヒストリから取得されます。"
 
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109
@@ -19617,7 +19617,7 @@ msgstr "障害あり"
 
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
-msgstr ""
+msgstr "この設定では数値のアイテムのみがこの列に表示されます。"
 
 #: include/forms.inc.php:346 include/forms.inc.php:566
 msgid "With triggers"
