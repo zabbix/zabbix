@@ -1019,8 +1019,8 @@ class CHostGroup extends CApiService {
 		$ins_hosts_groups = self::getInsHostsGroups($groups, __FUNCTION__);
 
 		if ($ins_hosts_groups) {
-			$ids = DB::insertBatch('hosts_groups', $ins_hosts_groups);
-			self::addHostgroupids($groups, $ids);
+			$hostgroupids = DB::insertBatch('hosts_groups', $ins_hosts_groups);
+			self::addHostgroupids($groups, $hostgroupids);
 		}
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST_GROUP, $groups, $db_groups);
@@ -1043,8 +1043,8 @@ class CHostGroup extends CApiService {
 		$del_hostgroupids = self::getDelHostgroupids($db_groups, $db_hostgroupids);
 
 		if ($ins_hosts_groups) {
-			$ids = DB::insertBatch('hosts_groups', $ins_hosts_groups);
-			self::addHostgroupids($groups, $ids);
+			$hostgroupids = DB::insertBatch('hosts_groups', $ins_hosts_groups);
+			self::addHostgroupids($groups, $hostgroupids);
 		}
 
 		if ($del_hostgroupids) {
@@ -1439,13 +1439,13 @@ class CHostGroup extends CApiService {
 	 * Add IDs of inserted hosts on the given host groups.
 	 *
 	 * @param array $groups
-	 * @param array $ids
+	 * @param array $hostgroupids
 	 */
-	private static function addHostgroupids(array &$groups, array $ids): void {
+	private static function addHostgroupids(array &$groups, array $hostgroupids): void {
 		foreach ($groups as &$group) {
 			foreach ($group['hosts'] as &$host) {
 				if (!array_key_exists('hostgroupid', $host)) {
-					$host['hostgroupid'] = array_shift($ids);
+					$host['hostgroupid'] = array_shift($hostgroupids);
 				}
 			}
 			unset($host);

@@ -693,11 +693,11 @@ class CTemplateGroup extends CApiService {
 		$this->validateMassAdd($data, $db_groups);
 
 		$groups = self::getGroupsByData($data, $db_groups);
-		$ins_templates_groups = self::getInsTemplatesGroups($groups, __FUNCTION__);
+		$ins_hosts_groups = self::getInsHostsGroups($groups, __FUNCTION__);
 
-		if ($ins_templates_groups) {
-			$ids = DB::insertBatch('hosts_groups', $ins_templates_groups);
-			self::addTemplategroupids($groups, $ids);
+		if ($ins_hosts_groups) {
+			$hostgroupids = DB::insertBatch('hosts_groups', $ins_hosts_groups);
+			self::addHostgroupids($groups, $hostgroupids);
 		}
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE_GROUP, $groups, $db_groups);
@@ -716,16 +716,16 @@ class CTemplateGroup extends CApiService {
 		$this->validateMassUpdate($data, $db_groups);
 
 		$groups = self::getGroupsByData($data, $db_groups);
-		$ins_template_groups = self::getInsTemplatesGroups($groups, __FUNCTION__, $db_templategroupids);
-		$del_templategroupids = self::getDelTemplategroupids($db_groups, $db_templategroupids);
+		$ins_hosts_groups = self::getInsHostsGroups($groups, __FUNCTION__, $db_hostgroupids);
+		$del_hostgroupids = self::getDelHostgroupids($db_groups, $db_hostgroupids);
 
-		if ($ins_template_groups) {
-			$ids = DB::insertBatch('hosts_groups', $ins_template_groups);
-			self::addTemplategroupids($groups, $ids);
+		if ($ins_hosts_groups) {
+			$hostgroupids = DB::insertBatch('hosts_groups', $ins_hosts_groups);
+			self::addHostgroupids($groups, $hostgroupids);
 		}
 
-		if ($del_templategroupids) {
-			DB::delete('hosts_groups', ['hostgroupid' => $del_templategroupids]);
+		if ($del_hostgroupids) {
+			DB::delete('hosts_groups', ['hostgroupid' => $del_hostgroupids]);
 		}
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE_GROUP, $groups, $db_groups);
@@ -744,10 +744,10 @@ class CTemplateGroup extends CApiService {
 		$this->validateMassRemove($data, $db_groups);
 
 		$groups = self::getGroupsByData([], $db_groups);
-		$del_templategroupids = self::getDelTemplategroupids($db_groups);
+		$del_hostgroupids = self::getDelHostgroupids($db_groups);
 
-		if ($del_templategroupids) {
-			DB::delete('hosts_groups', ['hostgroupid' => $del_templategroupids]);
+		if ($del_hostgroupids) {
+			DB::delete('hosts_groups', ['hostgroupid' => $del_hostgroupids]);
 		}
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE_GROUP, $groups, $db_groups);
@@ -1059,46 +1059,45 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @param array      $groups
 	 * @param string     $method
-	 * @param array|null $db_templategroupids
+	 * @param array|null $db_hostgroupids
 	 *
 	 * @return array
 	 */
-	private static function getInsTemplatesGroups(array $groups, string $method,
-			array &$db_templategroupids = null): array {
-		$ins_templates_groups = [];
+	private static function getInsHostsGroups(array $groups, string $method, array &$db_hostgroupids = null): array {
+		$ins_hosts_groups = [];
 
 		if ($method === 'massUpdate') {
-			$db_templategroupids = [];
+			$db_hostgroupids = [];
 		}
 
 		foreach ($groups as $group) {
 			foreach ($group['templates'] as $template) {
 				if (!array_key_exists('hostgroupid', $template)) {
-					$ins_templates_groups[] = [
+					$ins_hosts_groups[] = [
 						'hostid' => $template['templateid'],
 						'groupid' => $group['groupid']
 					];
 				}
 				elseif ($method === 'massUpdate') {
-					$db_templategroupids[$template['hostgroupid']] = true;
+					$db_hostgroupids[$template['hostgroupid']] = true;
 				}
 			}
 		}
 
-		return $ins_templates_groups;
+		return $ins_hosts_groups;
 	}
 
 	/**
 	 * Add IDs of inserted templates on the given template groups.
 	 *
 	 * @param array $groups
-	 * @param array $ids
+	 * @param array $hostgroupids
 	 */
-	private static function addTemplategroupids(array &$groups, array $ids): void {
+	private static function addHostgroupids(array &$groups, array $hostgroupids): void {
 		foreach ($groups as &$group) {
 			foreach ($group['templates'] as &$template) {
 				if (!array_key_exists('hostgroupid', $template)) {
-					$template['hostgroupid'] = array_shift($ids);
+					$template['hostgroupid'] = array_shift($hostgroupids);
 				}
 			}
 			unset($template);
@@ -1112,20 +1111,20 @@ class CTemplateGroup extends CApiService {
 	 * @static
 	 *
 	 * @param array $db_groups
-	 * @param array $db_templategroupids
+	 * @param array $db_hostgroupids
 	 *
 	 * @return array
 	 */
-	private static function getDelTemplategroupids(array $db_groups, array $db_templategroupids = []): array {
-		$del_templategroupids = [];
+	private static function getDelHostgroupids(array $db_groups, array $db_hostgroupids = []): array {
+		$del_hostgroupids = [];
 
 		foreach ($db_groups as $db_group) {
-			$del_templategroupids += array_diff_key($db_group['templates'], $db_templategroupids);
+			$del_hostgroupids += array_diff_key($db_group['templates'], $db_hostgroupids);
 		}
 
-		$del_templategroupids = array_keys($del_templategroupids);
+		$del_hostgroupids = array_keys($del_hostgroupids);
 
-		return $del_templategroupids;
+		return $del_hostgroupids;
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
