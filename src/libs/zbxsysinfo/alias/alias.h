@@ -28,6 +28,6 @@ typedef struct zbx_alias
 }
 ALIAS;
 
-void		test_aliases(void);
+void	test_aliases(void);
 
 #endif	/* ZABBIX_ALIAS_H */
