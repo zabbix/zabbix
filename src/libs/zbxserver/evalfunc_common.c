@@ -155,7 +155,7 @@ int	get_function_parameter_hist_range(int from, const char *parameters, int Npar
 		char		*error = NULL;
 		int		end;
 
-		if (SUCCEED != zbx_parse_timeshift(from, shift, &tm, &error))
+		if (SUCCEED != zbx_trends_parse_timeshift(from, shift, &tm, &error))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() timeshift error:%s", __func__, error);
 			zbx_free(error);

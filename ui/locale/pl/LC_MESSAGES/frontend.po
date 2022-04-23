@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-04-18 20:11+0000\n"
+"PO-Revision-Date: 2022-04-19 21:14+0000\n"
 "Last-Translator: Robert Szulist <r.szulist+zabbix@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -6533,6 +6533,10 @@ msgid "End of line sequence"
 msgstr "Koniec linii ciągu"
 
 #: include/locales.inc.php:33
+msgid "English (en_GB)"
+msgstr ""
+
+#: include/locales.inc.php:33
 msgid "English (en_US)"
 msgstr "Angielski (en_US)"
 
@@ -10971,6 +10975,10 @@ msgstr "Łącza"
 #: include/classes/html/CList.php:39
 msgid "List is empty"
 msgstr "Lista jest pusta"
+
+#: include/classes/data/CItemData.php:983
+msgid "List of OS processes with attributes. Returns JSON array"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
@@ -22170,7 +22178,7 @@ msgstr "brakujący parametr \"%1$s\""
 #: include/classes/db/PostgresqlDbBackend.php:62
 #, c-format
 msgid "the table \"%1$s\" was not found"
-msgstr "tablica \"%1$s\" nie została znaleziona"
+msgstr "tabela \"%1$s\" nie została znaleziona"
 
 #: include/classes/export/CConfigurationExportBuilder.php:87
 #: include/classes/import/validators/C44XmlValidator.php:1971
