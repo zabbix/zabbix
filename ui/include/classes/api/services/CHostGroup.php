@@ -144,6 +144,12 @@ class CHostGroup extends CApiService {
 			'order'		=> []
 		];
 
+		if (!$options['countOutput'] && $options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = $this->getTableSchema()['fields'];
+			unset($options['output']['type']);
+			$options['output'] = array_keys($options['output']);
+		}
+
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
@@ -372,9 +378,6 @@ class CHostGroup extends CApiService {
 				}
 			}
 			else {
-				// Column type is used only for internal purposes to distinguish between host group and template group.
-				unset($group['type']);
-
 				$result[$group['groupid']] = $group;
 			}
 		}
