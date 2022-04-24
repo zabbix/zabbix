@@ -106,7 +106,7 @@ class CTemplateGroup extends CApiService {
 
 		if (!$options['countOutput'] && $options['output'] === API_OUTPUT_EXTEND) {
 			$options['output'] = $this->getTableSchema()['fields'];
-			unset($options['output']['type']);
+			unset($options['output']['flags'], $options['output']['type']);
 			$options['output'] = array_keys($options['output']);
 		}
 
