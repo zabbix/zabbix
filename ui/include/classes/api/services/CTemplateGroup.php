@@ -1206,8 +1206,8 @@ class CTemplateGroup extends CApiService {
 	 */
 	private function validatePropagate(array &$data): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-			'groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
-				'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+			'groups' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
+				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'permissions' =>	['type' => API_BOOLEAN, 'flags' => API_REQUIRED]
 		]];
@@ -1222,14 +1222,13 @@ class CTemplateGroup extends CApiService {
 
 		$groupids = array_column($data['groups'], 'groupid');
 
-		$db_groups = $this->get([
-			'output' => ['groupid', 'name'],
+		$count = $this->get([
+			'countOutput' => true,
 			'groupids' => $groupids,
-			'editable' => true,
-			'preservekeys' => true
+			'editable' => true
 		]);
 
-		if (count($db_groups) != count($groupids)) {
+		if ($count != count($groupids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
