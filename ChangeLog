@@ -1,6 +1,7 @@
 Changes for 6.2.0alpha2
 
 New features:
+..F....... [ZBXNEXT-3692] refactored inline scripts for html onClick events to avoid potential XSS threats (rdetlavs)
 ...G...... [ZBXNEXT-1711] implemented OS processes discovery with new item proc.get (asestakovs, mkrisjanis, ssimonenko)
 .......PS. [ZBXNEXT-7615] added hmac function for JavaScript (wiper)
 ..F....... [ZBXNEXT-7611] fixed silenced errors not silenced in zbx_err_handler running PHP 8 (rdetlavs)
