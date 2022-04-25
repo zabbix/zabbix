@@ -102,13 +102,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 
 	// Tab filter label li element.
 	.tabfilter-item-label {
-		&:hover {
-			color: $tab-label-hover-color;
-			background-color: darken($tab-label-hover-bg-color, 5%);
-		}
-
 		display: inline-block;
-		background-color: $tab-label-bg-color;
 		border-radius: 2px;
 		border: 1px solid transparent;
 		color: $tab-label-color;
@@ -177,7 +171,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 	// Tab filter label li clickable a element.
 	.tabfilter-item-link {
 		display: inline-block;
-		color: $tab-label-color;
+		color: $tab-label-expanded-color;
 		border: 1px transparent;
 		line-height: 22px;
 		vertical-align: middle;
@@ -238,11 +232,6 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 	width: 24px;
 	height: 24px;
 	content: '';
-	// white icon
-	background: url($sprite-path) no-repeat -87px -547px;
-}
-
-.selected.expanded .icon-filter::before {
 	// grey icon
-	background-position: -246px -547px;
+	background: url($sprite-path) no-repeat -246px -547px;
 }

@@ -2394,14 +2394,10 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
         margin-top: 0; }
   .filter-container.tabfilter-container .tabfilter-item-label {
     display: inline-block;
-    background-color: #555555;
     border-radius: 2px;
     border: 1px solid transparent;
     color: #ffffff;
     margin-right: 3px; }
-    .filter-container.tabfilter-container .tabfilter-item-label:hover {
-      color: #ffffff;
-      background-color: #484848; }
     .filter-container.tabfilter-container .tabfilter-item-label.unsaved .tabfilter-item-link {
       font-style: italic; }
       .filter-container.tabfilter-container .tabfilter-item-label.unsaved .tabfilter-item-link::before {
@@ -2437,7 +2433,7 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
       display: none; }
   .filter-container.tabfilter-container .tabfilter-item-link {
     display: inline-block;
-    color: #ffffff;
+    color: #000000;
     border: 1px transparent;
     line-height: 22px;
     vertical-align: middle;
@@ -2480,10 +2476,7 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   width: 24px;
   height: 24px;
   content: '';
-  background: url("../img/icon-sprite.svg?20211222") no-repeat -87px -547px; }
-
-.selected.expanded .icon-filter::before {
-  background-position: -246px -547px; }
+  background: url("../img/icon-sprite.svg?20211222") no-repeat -246px -547px; }
 
 .toc .toc-row {
   padding: 8px 10px;
