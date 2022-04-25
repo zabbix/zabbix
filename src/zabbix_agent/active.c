@@ -1377,9 +1377,12 @@ static void	send_heartbeat_msg(zbx_vector_ptr_t *addrs)
 
 		if (SUCCEED == (ret = zbx_tcp_send(&s, json.buffer)))
 		{
-			zabbix_log(level, "Successfully sent heartbeat message to [%s]:%d [%s]",
-					((zbx_addr_t *)addrs->values[0])->ip,
-					((zbx_addr_t *)addrs->values[0])->port, zbx_socket_strerror());
+			if (last_ret == FAIL)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Successfully sent heartbeat message to [%s]:%d [%s]",
+						((zbx_addr_t *)addrs->values[0])->ip,
+						((zbx_addr_t *)addrs->values[0])->port, zbx_socket_strerror());
+			}
 		}
 		else
 		{
