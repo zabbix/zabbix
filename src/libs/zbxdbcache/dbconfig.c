@@ -67,6 +67,9 @@ int	sync_in_progress = 0;
 		in_maintenance_without_data_collection(dc_host->maintenance_status,	\
 				dc_host->maintenance_type, dc_item->type)
 
+ZBX_PTR_VECTOR_DECL(dc_item, ZBX_DC_ITEM *)
+ZBX_PTR_VECTOR_IMPL(dc_item, ZBX_DC_ITEM *)
+
 /******************************************************************************
  *                                                                            *
  * Purpose: validate macro value when expanding user macros                   *
@@ -95,6 +98,8 @@ static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_ex
 
 static char	*dc_expand_user_macros_dyn(zbx_um_cache_t *um_cache, const char *text, const zbx_uint64_t *hostids,
 		int hostids_num);
+
+static void	dc_reschedule_items();
 
 extern char		*CONFIG_VAULTTOKEN;
 extern char		*CONFIG_VAULT;
@@ -5357,7 +5362,7 @@ void	DCsync_configuration(unsigned char mode)
 			correlation_sec, correlation_sec2, corr_condition_sec, corr_condition_sec2, corr_operation_sec,
 			corr_operation_sec2, hgroups_sec, hgroups_sec2, itempp_sec, itempp_sec2, itemscrp_sec,
 			itemscrp_sec2, total, total2, update_sec, maintenance_sec, maintenance_sec2, item_tag_sec,
-			item_tag_sec2, um_cache_sec;
+			item_tag_sec2, um_cache_sec, queues_sec;
 
 	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
 			template_items_sync, prototype_items_sync, item_discovery_sync, triggers_sync, tdep_sync,
@@ -5771,13 +5776,22 @@ void	DCsync_configuration(unsigned char mode)
 	if (0 != tdep_sync.add_num + tdep_sync.update_num + tdep_sync.remove_num)
 		update_flags |= ZBX_DBSYNC_UPDATE_TRIGGER_DEPENDENCY;
 
+	if (0 != gmacro_sync.add_num + gmacro_sync.update_num + gmacro_sync.remove_num)
+		update_flags |= ZBX_DBSYNC_UPDATE_MACROS;
+
+	if (0 != hmacro_sync.add_num + hmacro_sync.update_num + hmacro_sync.remove_num)
+		update_flags |= ZBX_DBSYNC_UPDATE_MACROS;
+
+	if (0 != htmpl_sync.add_num + htmpl_sync.update_num + htmpl_sync.remove_num)
+		update_flags |= ZBX_DBSYNC_UPDATE_MACROS;
+
 	/* update trigger topology if trigger dependency was changed */
 	if (0 != (update_flags & ZBX_DBSYNC_UPDATE_TRIGGER_DEPENDENCY))
 		dc_trigger_update_topology();
 
 	/* update various trigger related links in cache */
 	if (0 != (update_flags & (ZBX_DBSYNC_UPDATE_HOSTS | ZBX_DBSYNC_UPDATE_ITEMS | ZBX_DBSYNC_UPDATE_FUNCTIONS |
-			ZBX_DBSYNC_UPDATE_TRIGGERS)))
+			ZBX_DBSYNC_UPDATE_TRIGGERS | ZBX_DBSYNC_UPDATE_MACROS)))
 	{
 		dc_trigger_update_cache();
 		dc_schedule_trigger_timers((ZBX_DBSYNC_INIT == mode ? &trend_queue : NULL), time(NULL));
@@ -6059,6 +6073,14 @@ out:
 	config->sync_ts = time(NULL);
 
 	FINISH_SYNC;
+
+	if (ZBX_DBSYNC_INIT != mode)
+	{
+		sec = zbx_time();
+		dc_reschedule_items();
+		queues_sec = zbx_time() - sec;
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() reschedule : " ZBX_FS_DBL " sec.", __func__, queues_sec);
+	}
 
 	zbx_dbsync_clear(&config_sync);
 	zbx_dbsync_clear(&autoreg_config_sync);
@@ -13219,6 +13241,103 @@ void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 	WRLOCK_CACHE;
 	dc_reschedule_trigger_timers(timers);
 	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get items scheduled to execute later than 1 minute and having     *
+ *          user macro in delay                                               *
+ *                                                                            *
+ * Comments: This function is used only by configuration syncer, so it can    *
+ *           access most of the cached data without locking. The only         *
+ *           property that can be changed by other process is item nextcheck. *
+ *           However in worst case it will recalculate nextcheck for item     *
+ *           that is being scheduled in the next minute.                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_get_items_to_reschedule(zbx_vector_dc_item_t *items, int now)
+{
+	zbx_hashset_iter_t	iter;
+	ZBX_DC_ITEM		*item;
+	ZBX_DC_HOST		*host;
+
+	zbx_hashset_iter_reset(&config->items, &iter);
+	while (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_iter_next(&iter)))
+	{
+		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &item->hostid)))
+			continue;
+
+		if (HOST_STATUS_MONITORED != host->status || 0 != host->proxy_hostid)
+			continue;
+
+		if (ITEM_STATUS_ACTIVE != item->status ||
+				SUCCEED != is_item_processed_by_server(item->type, item->key) ||
+				SUCCEED != zbx_is_counted_in_item_queue(item->type, item->key))
+		{
+			continue;
+		}
+
+		if (item->nextcheck - SEC_PER_MIN < now)
+			continue;
+
+		if (NULL == strstr(item->delay, "{$"))
+			continue;
+
+		zbx_vector_dc_item_append(items, item);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: reschedule items with macros in delay/period that will not be     *
+ *          checked in next minute                                            *
+ *                                                                            *
+ * Comments: This must be done after configuration cache sync to ensure that  *
+ *           user macro changes affects item queues.                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_reschedule_items()
+{
+	zbx_vector_dc_item_t	items;
+	int			now;
+
+	zbx_vector_dc_item_create(&items);
+
+	now = (int)time(NULL);
+	dc_get_items_to_reschedule(&items, now);
+
+	if (0 != items.values_num)
+	{
+		int		i, flags = ZBX_ITEM_DELAY_CHANGED;
+		char		*error = NULL;
+		ZBX_DC_ITEM	*item = items.values[i];
+
+		WRLOCK_CACHE;
+
+		for (i = 0; i < items.values_num; i++)
+		{
+			ZBX_DC_INTERFACE	*interface = NULL;
+
+			if (0 != item->interfaceid)
+			{
+				interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces,
+						&item->interfaceid);
+			}
+
+			if (FAIL == DCitem_nextcheck_update(item, interface, flags, now, &error))
+			{
+				zbx_timespec_t	ts = {now, 0};
+
+				dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED,
+						error);
+				zbx_free(error);
+			}
+		}
+
+		UNLOCK_CACHE;
+	}
+
+	zbx_vector_dc_item_destroy(&items);
 }
 
 #ifdef HAVE_TESTS
