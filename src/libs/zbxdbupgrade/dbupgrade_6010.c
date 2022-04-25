@@ -116,7 +116,40 @@ static int	DBpatch_6010004(void)
 
 static int	DBpatch_6010005(void)
 {
+#ifdef HAVE_ORACLE
+	return DBcreate_serial_sequence("changelog");
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_6010006(void)
+{
+#ifdef HAVE_ORACLE
+	return DBcreate_serial_trigger("changelog", "changelogid");
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_6010007(void)
+{
 	return DBcreate_index("changelog", "changelog_1", "clock", 0);
+}
+
+static int	DBpatch_6010008(void)
+{
+	return DBcreate_changelog_insert_trigger("items", "itemid");
+}
+
+static int	DBpatch_6010009(void)
+{
+	return DBcreate_changelog_update_trigger("items", "itemid");
+}
+
+static int	DBpatch_6010010(void)
+{
+	return DBcreate_changelog_delete_trigger("items", "itemid");
 }
 #endif
 
@@ -130,5 +163,10 @@ DBPATCH_ADD(6010002, 0, 1)
 DBPATCH_ADD(6010003, 0, 1)
 DBPATCH_ADD(6010004, 0, 1)
 DBPATCH_ADD(6010005, 0, 1)
+DBPATCH_ADD(6010006, 0, 1)
+DBPATCH_ADD(6010007, 0, 1)
+DBPATCH_ADD(6010008, 0, 1)
+DBPATCH_ADD(6010009, 0, 1)
+DBPATCH_ADD(6010010, 0, 1)
 
 DBPATCH_END()

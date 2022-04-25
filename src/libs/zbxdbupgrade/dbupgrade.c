@@ -19,6 +19,7 @@
 
 #include "zbxdbupgrade.h"
 #include "dbupgrade.h"
+#include "dbschema.h"
 
 #include "db.h"
 #include "log.h"
@@ -550,6 +551,35 @@ out:
 
 #undef ZBX_OLD_FIELD
 }
+
+#define ZBX_FS_DB_SEQUENCE	"%s_seq"
+#define ZBX_FS_DB_TRIGGER	"%s_tr"
+
+int	DBcreate_serial_sequence(const char *table_name)
+{
+	if (ZBX_DB_OK > DBexecute("create sequence " ZBX_FS_DB_SEQUENCE " start with 1 increment by 1 nomaxvalue",
+			table_name))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+int	DBcreate_serial_trigger(const char *table_name, const char *field_name)
+{
+	if (ZBX_DB_OK > DBexecute("create trigger " ZBX_FS_DB_TRIGGER " before insert on %s for each row\n"
+					"begin\n"
+						"select " ZBX_FS_DB_SEQUENCE ".nextval into :new.%s from dual;\n"
+					"end;",
+				table_name, table_name, table_name, field_name))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 int	DBmodify_field_type(const char *table_name, const ZBX_FIELD *field, const ZBX_FIELD *old_field)
@@ -1083,6 +1113,137 @@ out:
 	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return ret;
+}
+
+#define ZBX_CHANGELOG_OP_INSERT	1
+#define ZBX_CHANGELOG_OP_UPDATE	2
+#define ZBX_CHANGELOG_OP_DELETE	3
+
+#define ZBX_CHANGELOG_TABLE_HOSTS	1
+#define ZBX_CHANGELOG_TABLE_HOST_TAG	2
+#define ZBX_CHANGELOG_TABLE_ITEMS	3
+#define ZBX_CHANGELOG_TABLE_ITEM_TAG	4
+#define ZBX_CHANGELOG_TABLE_TRIGGERS	5
+#define ZBX_CHANGELOG_TABLE_TRIGGER_TAG	6
+#define ZBX_CHANGELOG_TABLE_FUNCTIONS	7
+
+static int	DBget_changelog_table_by_name(const char *table_name)
+{
+	if (0 == strcmp(table_name, "hosts"))
+		return ZBX_CHANGELOG_TABLE_HOSTS;
+
+	if (0 == strcmp(table_name, "host_tag"))
+		return ZBX_CHANGELOG_TABLE_HOST_TAG;
+
+	if (0 == strcmp(table_name, "items"))
+		return ZBX_CHANGELOG_TABLE_ITEMS;
+
+	if (0 == strcmp(table_name, "item_tag"))
+		return ZBX_CHANGELOG_TABLE_ITEM_TAG;
+
+	if (0 == strcmp(table_name, "triggers"))
+		return ZBX_CHANGELOG_TABLE_TRIGGERS;
+
+	if (0 == strcmp(table_name, "trigger_tag"))
+		return ZBX_CHANGELOG_TABLE_TRIGGER_TAG;
+
+	if (0 == strcmp(table_name, "functions"))
+		return ZBX_CHANGELOG_TABLE_FUNCTIONS;
+
+	return FAIL;
+}
+
+int	DBcreate_changelog_insert_trigger(const char *table_name, const char *field_name)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	table_type, ret = FAIL;;
+
+	if (FAIL == (table_type = DBget_changelog_table_by_name(table_name)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"create trigger %s_insert after insert"
+				" on %s for each row"
+				" begin\n"
+					"insert into changelog (object,objectid,operation,clock)"
+						" values (%d,:new.%s,%d,(cast(sys_extract_utc(systimestamp) as date)"
+						"-date'1970-01-01')*86400);\n"
+				"end;", table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_INSERT);
+#endif
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = SUCCEED;
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+int	DBcreate_changelog_update_trigger(const char *table_name, const char *field_name)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	table_type, ret = FAIL;;
+
+	if (FAIL == (table_type = DBget_changelog_table_by_name(table_name)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"create trigger %s_update after update"
+				" on %s for each row"
+				" begin\n"
+					"insert into changelog (object,objectid,operation,clock)"
+						" values (%d,:old.%s,%d,(cast(sys_extract_utc(systimestamp) as date)"
+						"-date'1970-01-01')*86400);\n"
+				"end;", table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_UPDATE);
+#endif
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = SUCCEED;
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_name)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	table_type, ret = FAIL;;
+
+	if (FAIL == (table_type = DBget_changelog_table_by_name(table_name)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"create trigger %s_delete before delete"
+				" on %s for each row"
+				" begin\n"
+					"insert into changelog (object,objectid,operation,clock)"
+						" values (%d,:old.%s,%d,(cast(sys_extract_utc(systimestamp) as date)"
+						"-date'1970-01-01')*86400);\n"
+				"end;", table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_DELETE);
+#endif
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = SUCCEED;
+
+	zbx_free(sql);
 
 	return ret;
 }
