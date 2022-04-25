@@ -188,6 +188,14 @@ abstract class CControllerHost extends CController {
 			'suppressed' => ($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false
 		]);
 
+		$items = API::Item()->get([
+			'output' => [],
+			'selectHosts' => ['hostid'],
+			'hostids' => array_keys($hosts),
+			'webitems' =>true,
+			'monitored' => true
+		]);
+
 		// Group all problems per host per severity.
 		$host_problems = [];
 		foreach ($problems as $problem) {
@@ -241,6 +249,14 @@ abstract class CControllerHost extends CController {
 			}
 
 			$host['tags'] = $tags;
+
+			// Add counter for Latest data column.
+			$host['item_count'] = 0;
+			foreach ($items as $item) {
+				if (bccomp($item['hosts'][0]['hostid'], $host['hostid']) == 0) {
+					$host['item_count']++;
+				}
+			}
 		}
 		unset($host);
 

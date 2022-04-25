@@ -121,7 +121,10 @@ foreach ($data['hosts'] as $hostid => $host) {
 						->setArgument('hostids', [$host['hostid']])
 						->setArgument('filter_name', '')
 				)
-				: _('Latest data')
+				: _('Latest data'),
+			($host['item_count'] > 0)
+				? CViewHelper::showNum($host['item_count'])
+				: ''
 		],
 		$problems_link,
 		$host['graphs']
