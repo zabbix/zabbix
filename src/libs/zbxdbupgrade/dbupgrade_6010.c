@@ -95,6 +95,29 @@ static int	DBpatch_6010003(void)
 
 	return DBmodify_field_type("triggers", &field, &old_field);
 }
+
+static int	DBpatch_6010004(void)
+{
+	const ZBX_TABLE	table =
+			{"changelog", "changelogid", 0,
+				{
+					{"changelogid", NULL, NULL, NULL, 0, ZBX_TYPE_SERIAL, ZBX_NOTNULL, 0},
+					{"object", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"objectid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"operation", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6010005(void)
+{
+	return DBcreate_index("changelog", "changelog_1", "clock", 0);
+}
 #endif
 
 DBPATCH_START(6010)
@@ -105,5 +128,7 @@ DBPATCH_ADD(6010000, 0, 1)
 DBPATCH_ADD(6010001, 0, 1)
 DBPATCH_ADD(6010002, 0, 1)
 DBPATCH_ADD(6010003, 0, 1)
+DBPATCH_ADD(6010004, 0, 1)
+DBPATCH_ADD(6010005, 0, 1)
 
 DBPATCH_END()
