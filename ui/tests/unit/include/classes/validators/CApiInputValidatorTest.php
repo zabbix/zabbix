@@ -5418,7 +5418,7 @@ class CApiInputValidatorTest extends TestCase {
 			[
 				['type' => API_OBJECT, 'fields' => [
 					'real_hosts' => ['type' => API_BOOLEAN, 'flags' => API_DEPRECATED, 'replacement' => 'with_hosts'],
-					'with_hosts' => ['type' => API_BOOLEAN, 'default' => false],
+					'with_hosts' => ['type' => API_BOOLEAN, 'default' => false]
 				]],
 				[],
 				'/',
@@ -5427,7 +5427,7 @@ class CApiInputValidatorTest extends TestCase {
 			[
 				['type' => API_OBJECT, 'fields' => [
 					'real_hosts' => ['type' => API_BOOLEAN, 'flags' => API_DEPRECATED, 'replacement' => 'with_hosts'],
-					'with_hosts' => ['type' => API_BOOLEAN, 'default' => false],
+					'with_hosts' => ['type' => API_BOOLEAN, 'default' => false]
 				]],
 				['with_hosts' => true],
 				'/',
@@ -5436,7 +5436,7 @@ class CApiInputValidatorTest extends TestCase {
 			[
 				['type' => API_OBJECT, 'fields' => [
 					'real_hosts' =>	['type' => API_BOOLEAN, 'flags' => API_DEPRECATED, 'replacement' => 'with_hosts'],
-					'with_hosts' =>	['type' => API_BOOLEAN, 'default' => false],
+					'with_hosts' =>	['type' => API_BOOLEAN, 'default' => false]
 				]],
 				['real_hosts' => true, 'with_hosts' => true],
 				'/',
@@ -5445,7 +5445,7 @@ class CApiInputValidatorTest extends TestCase {
 			[
 				['type' => API_OBJECT, 'fields' => [
 					'real_hosts' =>	['type' => API_BOOLEAN, 'flags' => API_DEPRECATED, 'replacement' => 'with_hosts'],
-					'with_hosts' =>	['type' => API_BOOLEAN, 'default' => false],
+					'with_hosts' =>	['type' => API_BOOLEAN, 'default' => false]
 				]],
 				['real_hosts' => true],
 				'/',
