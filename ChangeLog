@@ -76,7 +76,7 @@ A..G...... [ZBX-20783] fixed Zabbix agent2 not to fail when global regular expre
 ...G...PS. [ZBX-20398] added mitigation for PID file not being created on time (MVekslers, yurii)
 ..F....... [ZBX-19638] fixed incorrect host name in graph prototype widget when graph have items from separate hosts (rlataria)
 ........S. [ZBX-20595] fixed server discovering dependent item with prototype as master item if prototype discovery was disabled with LLD overrides (wiper)
-.........T [ZBX-18522] updated readme for RabbitMQ templates (vkhaliev)
+.........T [ZBX-18522] updated Readme for RabbitMQ templates (vkhaliev)
 ........S. [ZBX-20794] fixed unavailable node status update at server startup (wiper)
 
 --------------------------------------------------------------------------------
