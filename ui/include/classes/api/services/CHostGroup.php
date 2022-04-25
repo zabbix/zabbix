@@ -752,7 +752,7 @@ class CHostGroup extends CApiService {
 
 		$duplicates = DB::select('hstgrp', [
 			'output' => ['name'],
-			'filter' => ['name' => $names],
+			'filter' => ['name' => $names, 'type' => HOST_GROUP_TYPE_HOST_GROUP],
 			'limit' => 1
 		]);
 
