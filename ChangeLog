@@ -18,8 +18,6 @@ New features:
 .........T [ZBXNEXT-7507] added TrueNAS template (vkhaliev)
 
 Bug fixes:
-..F....... [ZBX-20953] fixed errors when changing status of a single host in list (averza)
-..F....... [ZBX-20947] fixed hosts not being exported into file (averza)
 ........S. [ZBX-20951] fixed dependent item discovery validation in LLD (wiper)
 A..G...... [ZBX-20783] fixed Zabbix agent2 not to fail when global regular expression is received with empty delimiter (rlataria, vso)
 .......PS. [ZBXNEXT-7616] fixed javascript md5 and sha256 functions to support binary data (including terminating zero character) (wiper)
