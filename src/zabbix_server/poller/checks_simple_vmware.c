@@ -3312,10 +3312,11 @@ static int	check_vcenter_vm_discovery_common(AGENT_REQUEST *request, const char 
 			continue;
 
 		if (NULL != props_cb)
+		{
 			zbx_json_addobject(&json_data, NULL);
 			props_cb(&json_data, dev);
-
-		zbx_json_close(&json_data);
+			zbx_json_close(&json_data);
+		}
 	}
 
 	zbx_json_close(&json_data);

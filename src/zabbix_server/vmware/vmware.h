@@ -373,7 +373,7 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_HVPROP_CONNECTIONSTATE		19
 #define ZBX_VMWARE_HVPROP_HW_SERIALNUMBER		20
 
-#define ZBX_VMWARE_HVPROPS_NUM				22
+#define ZBX_VMWARE_HVPROPS_NUM				21
 
 /* virtual machine properties */
 #define ZBX_VMWARE_VMPROP_CPU_NUM			0
