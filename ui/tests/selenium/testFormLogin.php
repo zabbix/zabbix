@@ -18,7 +18,7 @@
  * * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * */
 
-require_once dirname(__FILE__) . '/../include/CWebTest.php';
+require_once dirname(__FILE__).'/../include/CWebTest.php';
 
 class testFormLogin extends CWebTest {
 
@@ -101,9 +101,9 @@ class testFormLogin extends CWebTest {
 	 *
 	 * @dataProvider getLoginLogoutData
 	 */
-	public function testFormLogin_LoginLogout($getLoginLogoutData) {
-		$this->page->userLogin($getLoginLogoutData['login'], $getLoginLogoutData['password']);
-		switch ($getLoginLogoutData['login']) {
+	public function testFormLogin_LoginLogout($data) {
+		$this->page->userLogin($data['login'], $data['password']);
+		switch ($data['login']) {
 			case 'disabled-user':
 				$this->assertEquals('No permissions for system access.', $this->query('class:red')
 						->waitUntilVisible()->one()->getText());
@@ -120,19 +120,19 @@ class testFormLogin extends CWebTest {
 				break;
 		}
 
-		if ($getLoginLogoutData['success_expected']) {
+		if ($data['success_expected']) {
 			$this->page->assertHeader('Global view');
 			$this->query('class:icon-signout')->one()->click();
 			$this->assertEquals('Remember me for 30 days', $this->query('xpath://label[@for="autologin"]')->one()->getText());
 		}
-		elseif ($getLoginLogoutData['dbCheck']) {
+		elseif ($data['dbCheck']) {
 			$this->assertEquals('Incorrect user name or password or account is temporarily blocked.', $this->query('class:red')
 					->waitUntilVisible()->one()->getText());
-			$sql = "SELECT * FROM users WHERE attempt_failed>0 AND alias='".$getLoginLogoutData['login']."'";
+			$sql = "SELECT * FROM users WHERE attempt_failed>0 AND alias='".$data['login']."'";
 			$this->assertEquals(1, CDBHelper::getCount($sql));
-			$sql = "SELECT * FROM users WHERE attempt_clock>0 AND alias='".$getLoginLogoutData['login']."'";
+			$sql = "SELECT * FROM users WHERE attempt_clock>0 AND alias='".$data['login']."'";
 			$this->assertEquals(1, CDBHelper::getCount($sql));
-			$sql = "SELECT * FROM users WHERE attempt_ip<>'' AND alias='".$getLoginLogoutData['login']."'";
+			$sql = "SELECT * FROM users WHERE attempt_ip<>'' AND alias='".$data['login']."'";
 			$this->assertEquals(1, CDBHelper::getCount($sql));
 		}
 	}
@@ -168,41 +168,18 @@ class testFormLogin extends CWebTest {
 				->waitUntilVisible()->one()->getText());
 	}
 
-	public static function getLoginWithRequestData() {
-		return [
-			[
-				[
-					'url' => 'index.php?request=hosts.php',
-					'login' => 'Admin',
-					'password' => 'zabbix',
-					'header' => 'Hosts'
-				]
-			],
-			[
-				[
-					'url' => 'index.php?request=zabbix.php%3Faction%3Dproxy.list',
-					'login' => 'Admin',
-					'password' => 'zabbix',
-					'header' => 'Proxies'
-				]
-			]
-		];
-	}
-
 	/**
 	 * Function makes two authentifications with different data to different Zabbix views, separately clicking on
 	 * sign in button and checking by views header, if correct url is opened.
-	 *
-	 * @dataProvider getLoginWithRequestData
 	 */
-	public function testFormLogin_LoginWithRequest($getLoginWithRequestData) {
-		$this->page->open($getLoginWithRequestData['url']);
-		$this->query('id:name')->one()->type($getLoginWithRequestData['login']);
-		$this->query('id:password')->one()->type($getLoginWithRequestData['password']);
-		$this->query('id:enter')->one()->click();
-		$this->page->assertHeader($getLoginWithRequestData['header']);
+	public function testFormLogin_LoginWithRequest() {
+		foreach (['index.php?request=hosts.php', 'index.php?request=zabbix.php%3Faction%3Dproxy.list'] as $url) { 
+			$this->page->userLogin('Admin', 'zabbix', $url);
+			$header = ($url === 'index.php?request=hosts.php') ? 'Hosts' : 'Proxies';
+			$this->page->assertHeader($header); 
+		}
 	}
-
+	
 	/**
 	 * Guest user needs to be out of "Disabled" group to have access to frontend.
 	 */

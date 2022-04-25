@@ -578,10 +578,11 @@ class CPage {
 	 *
 	 * @param string $alias     Username on login screen
 	 * @param string $password  Password on login screen
+	 * @param string $url		Dirrect link to certain Zabbix page 
 	 */
-	public function userLogin($alias, $password) {
+	public function userLogin($alias, $password, $url = 'index.php') {
 		$this->logout();
-		$this->open('index.php');
+		$this->open($url);
 		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);
 		$this->query('id:password')->one()->fill($password);
 		$this->query('id:enter')->one()->click();
