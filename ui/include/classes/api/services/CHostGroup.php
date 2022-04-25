@@ -103,7 +103,6 @@ class CHostGroup extends CApiService {
 			'selectGroupDiscovery' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $group_discovery_fields), 'default' => null],
 			'selectDiscoveryRule' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $discovery_rule_fields), 'default' => null],
 			'countOutput' =>						['type' => API_BOOLEAN, 'default' => false],
-			'groupCount' =>							['type' => API_BOOLEAN, 'default' => false],
 			// sort and limit
 			'sortfield' =>							['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>							['type' => API_SORTORDER, 'default' => []],
@@ -370,12 +369,8 @@ class CHostGroup extends CApiService {
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $options['limit']);
 		while ($group = DBfetch($res)) {
 			if ($options['countOutput']) {
-				if ($options['groupCount']) {
-					$result[] = $group;
-				}
-				else {
-					$result = $group['rowscount'];
-				}
+				$result = $group['rowscount'];
+
 			}
 			else {
 				$result[$group['groupid']] = $group;

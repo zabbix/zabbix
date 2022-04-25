@@ -81,7 +81,6 @@ class CTemplateGroup extends CApiService {
 			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', ['groupid', 'name', 'uuid']), 'default' => API_OUTPUT_EXTEND],
 			'selectTemplates' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $template_fields), 'default' => null],
 			'countOutput' =>						['type' => API_BOOLEAN, 'default' => false],
-			'groupCount' =>							['type' => API_BOOLEAN, 'default' => false],
 			// sort and limit
 			'sortfield' =>							['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>							['type' => API_SORTORDER, 'default' => []],
@@ -286,12 +285,7 @@ class CTemplateGroup extends CApiService {
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $options['limit']);
 		while ($group = DBfetch($res)) {
 			if ($options['countOutput']) {
-				if ($options['groupCount']) {
-					$result[] = $group;
-				}
-				else {
-					$result = $group['rowscount'];
-				}
+				$result = $group['rowscount'];
 			}
 			else {
 				$result[$group['groupid']] = $group;
