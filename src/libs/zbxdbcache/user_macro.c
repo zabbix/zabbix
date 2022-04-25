@@ -793,7 +793,9 @@ static void	um_cache_sync_hosts(zbx_um_cache_t *cache, zbx_dbsync_t *sync)
 	{
 		int	i;
 
-		if (NULL == (host = um_cache_acquire_host(cache, rowid)))
+		ZBX_STR2UINT64(hostid, row[0]);
+
+		if (NULL == (host = um_cache_acquire_host(cache, hostid)))
 			continue;
 
 		ZBX_DBROW2UINT64(templateid, row[1]);
