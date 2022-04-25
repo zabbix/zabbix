@@ -573,8 +573,8 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Template items overide ones on host with the same key.
-	 * Load host.items that should be overriden with template.item if matched by name (key).
+	 * Template items override ones on host with the same key.
+	 * Load host.items that should be overridden with template.item if matched by name (key).
 	 *
 	 * @param array      $items
 	 * @param array|null $hostids
@@ -1899,7 +1899,7 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Get dependendent item links starting from the given dependent items and till the highest dependency level.
+	 * Get dependent item links starting from the given dependent items and till the highest dependency level.
 	 *
 	 * @param  array $items
 	 * @param  array $del_links
