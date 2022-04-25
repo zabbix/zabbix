@@ -578,7 +578,7 @@ class CPage {
 	 *
 	 * @param string $alias     Username on login screen
 	 * @param string $password  Password on login screen
-	 * @param string $url		Dirrect link to certain Zabbix page 
+	 * @param string $url		Dirrect link to certain Zabbix page
 	 */
 	public function userLogin($alias, $password, $url = 'index.php') {
 		$this->logout();
