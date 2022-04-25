@@ -68,25 +68,22 @@ window.ldap_edit_popup = new class {
 	}
 
 	openTestPopup() {
+		const fields = this.preprocessFormFields(getFormFields(this.form));
+
 		const popup_params = {
-			host: this.form.host.value,
-			port: this.form.port.value,
-			base_dn: this.form.base_dn.value,
-			bind_dn: this.form.bind_dn.value,
-			search_attribute: this.form.search_attribute.value
+			host: fields.host,
+			port: fields.port,
+			base_dn: fields.base_dn,
+			bind_dn: fields.bind_dn,
+			search_attribute: fields.search_attribute
 		};
 
-		if (this.form.userdirectoryid !== undefined) {
-			popup_params.userdirectoryid = this.form.userdirectoryid.value;
-		}
+		const optional_fields = ['userdirectoryid', 'bind_password', 'start_tls', 'search_filter'];
 
-		if (this.form.bind_password.disabled === false) {
-			popup_params.bind_password = this.form.bind_password.value;
-		}
-
-		if (this.advanced_chbox.checked) {
-			popup_params.start_tls = this.form.start_tls.checked ? 1 : 0;
-			popup_params.search_filter = this.form.search_filter.value;
+		for (const field of optional_fields) {
+			if (fields[field] !== undefined) {
+				popup_params[field] = fields[field];
+			}
 		}
 
 		const test_overlay = PopUp('popup.ldap.test.edit', popup_params, {dialogueid: 'ldap_test_edit'});
@@ -100,13 +97,7 @@ window.ldap_edit_popup = new class {
 		this.removePopupMessages();
 		this.overlay.setLoading();
 
-		const fields = getFormFields(this.form);
-
-		if (fields.advanced_configuration != 1) {
-			delete fields.start_tls;
-			delete fields.search_filter;
-		}
-
+		const fields = this.preprocessFormFields(getFormFields(this.form));
 		const curl = new Curl(this.form.getAttribute('action'), false);
 
 		fetch(curl.getUrl(), {
@@ -149,6 +140,29 @@ window.ldap_edit_popup = new class {
 		for (const el of this.form.parentNode.children) {
 			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
 				el.parentNode.removeChild(el);
+			}
+		}
+	}
+
+	preprocessFormFields(fields) {
+		this.trimFields(fields);
+
+		if (fields.advanced_configuration != 1) {
+			delete fields.start_tls;
+			delete fields.search_filter;
+		}
+
+		delete fields.advanced_configuration;
+
+		return fields;
+	}
+
+	trimFields(fields) {
+		const fields_to_trim = ['name', 'host', 'base_dn', 'bind_dn', 'bind_password', 'search_attribute',
+			'search_filter', 'description'];
+		for (const field of fields_to_trim) {
+			if (field in fields) {
+				fields[field] = fields[field].trim();
 			}
 		}
 	}

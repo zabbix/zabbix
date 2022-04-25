@@ -199,12 +199,12 @@
 			template.innerHTML = template_ldap_server_row.evaluate(ldap).trim();
 			const row = template.content.firstChild;
 
-			if (!('userdirectoryid' in ldap)) {
-				row.querySelector('input[name="ldap_servers[' + ldap.row_index + '][userdirectoryid]"]').remove();
-			}
+			const optional_fields = ['userdirectoryid', 'bind_password', 'start_tls', 'search_filter'];
 
-			if (!('bind_password' in ldap)) {
-				row.querySelector('input[name="ldap_servers[' + ldap.row_index + '][bind_password]"]').remove();
+			for (const field of optional_fields) {
+				if (!(field in ldap)) {
+					row.querySelector('input[name="ldap_servers[' + ldap.row_index + '][' + field + ']"]').remove();
+				}
 			}
 
 			if (ldap.usrgrps > 0) {
