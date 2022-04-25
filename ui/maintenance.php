@@ -77,6 +77,11 @@ $fields = [
 
 check_fields($fields);
 
+SDII(API::HostGroup()->get([
+	'real_hosts' => true,
+	'with_hosts' => true
+]));
+
 /*
  * Permissions
  */

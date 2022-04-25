@@ -1163,6 +1163,9 @@ class CApiInputValidator {
 	 * @param array  $rule['fields']
 	 * @param int    $rule['fields'][<field_name>]['flags']           (optional) API_REQUIRED, API_DEPRECATED,
 	 *                                                                           API_ALLOW_UNEXPECTED
+	 * @param string $rule['fields'][<field_name>]['replacement']     (optional) Parameter name wich replaces the
+	 *                                                                           deprecated one. Can be used with
+	 *                                                                           API_DEPRECATED flag.
 	 * @param mixed  $rule['fields'][<field_name>]['default']         (optional)
 	 * @param string $rule['fields'][<field_name>]['default_source']  (optional)
 	 * @param mixed  $data
@@ -1254,7 +1257,19 @@ class CApiInputValidator {
 					return false;
 				}
 				if ($flags & API_DEPRECATED) {
-					trigger_error(_s('Parameter "%1$s" is deprecated.', $subpath), E_USER_NOTICE);
+					if (array_key_exists('replacement', $field_rule)) {
+						if (array_key_exists($field_rule['replacement'], $data)) {
+							$error = _s('Deprecated parameter "%1$s" cannot be used with "%2$s".', $subpath,
+								($path === '/' ? $path : $path.'/').$field_rule['replacement']
+							);
+							return false;
+						}
+
+						$data[$field_rule['replacement']] = $data[$field_name];
+						unset($data[$field_name]);
+					}
+
+					trigger_error(_s('Parameter "%1$s" is deprecated.', $subpath), E_USER_DEPRECATED);
 				}
 			}
 			elseif ($flags & API_REQUIRED) {

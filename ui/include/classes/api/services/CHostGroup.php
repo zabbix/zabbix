@@ -70,9 +70,9 @@ class CHostGroup extends CApiService {
 			'graphids' =>							['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'triggerids' =>							['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'maintenanceids' =>						['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'monitored_hosts' =>					['type' => API_BOOLEAN, 'flags' => API_DEPRECATED],
+			'monitored_hosts' =>					['type' => API_BOOLEAN, 'flags' => API_DEPRECATED, 'replacement' => 'with_monitored_hosts'],
 			'with_monitored_hosts' =>				['type' => API_BOOLEAN, 'default' => false],
-			'real_hosts' =>							['type' => API_BOOLEAN, 'flags' => API_DEPRECATED],
+			'real_hosts' =>							['type' => API_BOOLEAN, 'flags' => API_DEPRECATED, 'replacement' => 'with_hosts'],
 			'with_hosts' =>							['type' => API_BOOLEAN, 'default' => false],
 			'with_items' =>							['type' => API_BOOLEAN, 'default' => false],
 			'with_item_prototypes' =>				['type' => API_BOOLEAN, 'default' => false],
@@ -113,24 +113,6 @@ class CHostGroup extends CApiService {
 			'preservekeys' =>						['type' => API_BOOLEAN, 'default' => false],
 			'nopermissions' =>						['type' => API_BOOLEAN, 'default' => false]
 		]];
-
-		if (array_key_exists('real_hosts', $options)) {
-			if (array_key_exists('with_hosts', $options)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'real_hosts'));
-			}
-
-			$options['with_hosts'] = $options['real_hosts'];
-			unset($options['real_hosts']);
-		}
-
-		if (array_key_exists('monitored_hosts', $options)) {
-			if (array_key_exists('with_monitored_hosts', $options)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'monitored_hosts'));
-			}
-
-			$options['with_monitored_hosts'] = $options['monitored_hosts'];
-			unset($options['monitored_hosts']);
-		}
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
