@@ -4330,8 +4330,6 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 --------------------------------------------------------------------------------
 Changes for 4.0.40rc1
 
-New features:
-
 Bug fixes:
 .......PS. [ZBX-20844] fixed external check becoming unsupported when Zabbix server or Zabbix proxy is stopped (vso)
 
