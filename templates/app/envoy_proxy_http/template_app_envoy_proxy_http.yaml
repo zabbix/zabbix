@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-22T13:32:17Z'
+  date: '2022-04-25T14:06:28Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -747,7 +747,8 @@ zabbix_export:
             -
               uuid: 173c90200dd1451db10b8ea8b018bc54
               expression: 'nodata(/Envoy Proxy by HTTP/envoy.server.uptime,10m)=1'
-              name: 'Envoy Proxy: Failed to fetch metrics data (or no data for 10m)'
+              name: 'Envoy Proxy: Failed to fetch metrics data'
+              event_name: 'Envoy Proxy: Failed to fetch metrics data (or no data for 10m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 10 minutes.'
               manual_close: 'YES'
@@ -758,7 +759,8 @@ zabbix_export:
             -
               uuid: 01e29535e00143c9a64fe844f637f17e
               expression: 'last(/Envoy Proxy by HTTP/envoy.server.uptime)<10m'
-              name: 'Envoy Proxy: Service has been restarted (uptime < 10m)'
+              name: 'Envoy Proxy: Service has been restarted'
+              event_name: 'Envoy Proxy: Service has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'

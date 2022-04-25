@@ -118,8 +118,8 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Envoy Proxy: Server state is not live |<p>-</p> |`last(/Envoy Proxy by HTTP/envoy.server.state) > 0` |AVERAGE | |
-|Envoy Proxy: Service has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes.</p> |`last(/Envoy Proxy by HTTP/envoy.server.uptime)<10m` |INFO |<p>Manual close: YES</p> |
-|Envoy Proxy: Failed to fetch metrics data (or no data for 10m) |<p>Zabbix has not received data for items for the last 10 minutes.</p> |`nodata(/Envoy Proxy by HTTP/envoy.server.uptime,10m)=1` |WARNING |<p>Manual close: YES</p> |
+|Envoy Proxy: Service has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Envoy Proxy by HTTP/envoy.server.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|Envoy Proxy: Failed to fetch metrics data |<p>Zabbix has not received data for items for the last 10 minutes.</p> |`nodata(/Envoy Proxy by HTTP/envoy.server.uptime,10m)=1` |WARNING |<p>Manual close: YES</p> |
 |Envoy Proxy: SSL certificate expires soon |<p>Please check certificate. Less than {$ENVOY.CERT.MIN} days left until the next certificate being managed will expire.</p> |`last(/Envoy Proxy by HTTP/envoy.server.days_until_first_cert_expiring)<{$ENVOY.CERT.MIN}` |WARNING | |
 |Envoy Proxy: There are unhealthy clusters |<p>-</p> |`last(/Envoy Proxy by HTTP/envoy.cluster.membership_unhealthy["{#CLUSTER_NAME}"]) > 0` |AVERAGE | |
 
