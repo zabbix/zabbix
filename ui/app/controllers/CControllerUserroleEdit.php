@@ -162,10 +162,6 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			];
 		}
 		else {
-			/*
-			 * Since default user type from DB is 0, the edit form JS will manage changing the checkboxes to correct
-			 * default values.
-			 */
 			$data = [
 				'roleid' => null,
 				'name' => $db_defaults['name'],

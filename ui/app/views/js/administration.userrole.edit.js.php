@@ -77,7 +77,7 @@
 				return;
 			}
 
-			const access = <?= json_encode([
+			const access_min = <?= json_encode([
 				CRoleHelper::UI_MONITORING_DASHBOARD => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::UI_MONITORING_PROBLEMS => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::UI_MONITORING_HOSTS => USER_TYPE_ZABBIX_USER,
@@ -123,28 +123,34 @@
 				CRoleHelper::ACTIONS_EXECUTE_SCRIPTS => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::ACTIONS_MANAGE_API_TOKENS => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::ACTIONS_MANAGE_SLA => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW => USER_TYPE_ZABBIX_USER
+				CRoleHelper::ACTIONS_MANAGE_SLA => USER_TYPE_ZABBIX_ADMIN
 			], JSON_FORCE_OBJECT) ?>;
 
-			for (const [id, value] of Object.entries(access)) {
+			for (const [id, value] of Object.entries(access_min)) {
 				const checkbox = document.getElementById(id);
 
-				// The current CRoleHelper set up doesn't allow to set readonly for each checkbox individually.
-				if (id === '<?= CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW ?>') {
-					checkbox.readOnly = (user_type == <?= USER_TYPE_SUPER_ADMIN ?>);
+				if (user_type < value) {
+					checkbox.readOnly = true;
+					checkbox.checked = false;
 				}
 				else {
-					if (user_type < value) {
-						checkbox.readOnly = true;
-						checkbox.checked = false;
+					if (checkbox.readOnly) {
+						checkbox.checked = true;
 					}
-					else {
-						if (checkbox.readOnly) {
-							checkbox.checked = true;
-						}
-						checkbox.readOnly = false;
-					}
+					checkbox.readOnly = false;
+				}
+			}
+
+			const access_max = <?= json_encode([
+					CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW => USER_TYPE_ZABBIX_ADMIN
+			], JSON_FORCE_OBJECT) ?>;
+
+			for (const [id, value] of Object.entries(access_max)) {
+				const checkbox = document.getElementById(id);
+				checkbox.readOnly = (user_type > value);
+
+				if (checkbox.readOnly) {
+					checkbox.checked = true;
 				}
 			}
 		},
