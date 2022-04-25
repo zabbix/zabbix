@@ -598,11 +598,9 @@ function addValue(object, single_value, parentid) {
  *
  * @param {string} frame			refers to destination form
  * @param {object} values			values added to destination form
- * @param {boolean} submit_parent	indicates that after adding values, form must be submitted
  */
-function addValues(frame, values, submit_parent) {
+function addValues(frame, values) {
 	var forms = document.getElementsByTagName('FORM')[frame],
-		submit_parent = submit_parent || false,
 		frm_storage = null;
 
 	for (var key in values) {
@@ -623,10 +621,6 @@ function addValues(frame, values, submit_parent) {
 		else {
 			jQuery(frm_storage).val(values[key]).change();
 		}
-	}
-
-	if (frm_storage !== null && submit_parent) {
-		frm_storage.form.submit();
 	}
 }
 

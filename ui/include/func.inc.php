@@ -1588,11 +1588,13 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 			// display the login button only for guest users
 			if (CWebUser::isGuest()) {
 				$data['buttons'][] = (new CButton('login', _('Login')))
-					->onClick('javascript: document.location = "index.php?request='.$url.'";');
+					->setAttribute('data-url', $url)
+					->onClick('document.location = "index.php?request=" + this.dataset.url;');
 			}
 
 			$data['buttons'][] = (new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
-				->onClick('javascript: document.location = "'.CMenuHelper::getFirstUrl().'"');
+				->setAttribute('data-url', CMenuHelper::getFirstUrl())
+				->onClick('document.location = this.dataset.url');
 		}
 		// if the user is not logged in - offer to login
 		else {
@@ -1603,7 +1605,9 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 					_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
 				],
 				'buttons' => [
-					(new CButton('login', _('Login')))->onClick('javascript: document.location = "index.php?request='.$url.'";')
+					(new CButton('login', _('Login')))
+						->setAttribute('data-url', $url)
+						->onClick('document.location = "index.php?request=" + this.dataset.url;')
 				]
 			];
 		}

@@ -281,7 +281,6 @@ if (array_key_exists('render_html', $data)) {
 			popup: {
 				parameters: {
 					multiselect: '1',
-					noempty: '1',
 					srctbl: 'host_groups',
 					srcfld1: 'groupid',
 					dstfrm: 'zbx_filter',
