@@ -564,19 +564,18 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/items/item#testing'
 				]
 			],
-			// TODO: Uncomment this test case when ZBX-20782 is merged.
-//			// #57 Template item Mass update popup.
-//			[
-//				[
-//					'url' => 'items.php?filter_set=1&filter_hostids%5B0%5D=15000&context=template',
-//					'actions' => [
-//						[
-//							'callback' => 'openMassUpdate'
-//						]
-//					],
-//					'doc_link' => '/en/manual/config/items/itemupdate#using-mass-update'
-//				]
-//			],
+			// #57 Template item Mass update popup.
+			[
+				[
+					'url' => 'items.php?filter_set=1&filter_hostids%5B0%5D=15000&context=template',
+					'actions' => [
+						[
+							'callback' => 'openMassUpdate'
+						]
+					],
+					'doc_link' => '/en/manual/config/items/itemupdate#using-mass-update'
+				]
+			],
 			// #58 Template trigger list view.
 			[
 				[
@@ -598,19 +597,18 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/triggers/trigger#configuration'
 				]
 			],
-			// TODO: Uncomment this test case when ZBX-20782 is merged.
-//			// #61 Template trigger Mass update popup.
-//			[
-//				[
-//					'url' => 'triggers.php?filter_set=1&filter_hostids%5B0%5D=15000&context=template',
-//					'actions' => [
-//						[
-//							'callback' => 'openMassUpdate'
-//						]
-//					],
-//					'doc_link' => '/en/manual/config/triggers/update#using-mass-update'
-//				]
-//			],
+			// #61 Template trigger Mass update popup.
+			[
+				[
+					'url' => 'triggers.php?filter_set=1&filter_hostids%5B0%5D=15000&context=template',
+					'actions' => [
+						[
+							'callback' => 'openMassUpdate'
+						]
+					],
+					'doc_link' => '/en/manual/config/triggers/update#using-mass-update'
+				]
+			],
 			// #62 Template graph list view.
 			[
 				[
@@ -763,19 +761,18 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/items/item#testing'
 				]
 			],
-			// TODO: Uncomment this test case when ZBX-20782 is merged.
-//			// #78 Template LLD item prototype mass update popup.
-//			[
-//				[
-//					'url' => 'disc_prototypes.php?parent_discoveryid=15011&context=template',
-//					'actions' => [
-//						[
-//							'callback' => 'openMassUpdate'
-//						]
-//					],
-//					'doc_link' => '/en/manual/config/items/itemupdate#using-mass-update'
-//				]
-//			],
+			// #78 Template LLD item prototype mass update popup.
+			[
+				[
+					'url' => 'disc_prototypes.php?parent_discoveryid=15011&context=template',
+					'actions' => [
+						[
+							'callback' => 'openMassUpdate'
+						]
+					],
+					'doc_link' => '/en/manual/config/items/itemupdate#using-mass-update'
+				]
+			],
 			// #79 Template LLD trigger prototype list view.
 			[
 				[
@@ -797,19 +794,18 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
-			// TODO: Uncomment this test case when ZBX-20782 is merged.
-//			// #82 Template LLD trigger prototype mass update popup.
-//			[
-//				[
-//					'url' => 'trigger_prototypes.php?parent_discoveryid=15011&context=template',
-//					'actions' => [
-//						[
-//							'callback' => 'openMassUpdate'
-//						]
-//					],
-//					'doc_link' => '/en/manual/config/triggers/update#using-mass-update'
-//				]
-//			],
+			// #82 Template LLD trigger prototype mass update popup.
+			[
+				[
+					'url' => 'trigger_prototypes.php?parent_discoveryid=15011&context=template',
+					'actions' => [
+						[
+							'callback' => 'openMassUpdate'
+						]
+					],
+					'doc_link' => '/en/manual/config/triggers/update#using-mass-update'
+				]
+			],
 			// #83 Template LLD graph prototype list view.
 			[
 				[
@@ -944,19 +940,18 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/xml_export_import/hosts#importing'
 				]
 			],
-			// TODO: Uncomment this test case when ZBX-20782 is merged.
-//			// #98 Host mass update popup.
-//			[
-//				[
-//					'url' => 'zabbix.php?action=host.list',
-//					'actions' => [
-//						[
-//							'callback' => 'openMassUpdate'
-//						]
-//					],
-//					'doc_link' => '/en/manual/config/hosts/hostupdate#using-mass-update'
-//				]
-//			],
+			// #98 Host mass update popup.
+			[
+				[
+					'url' => 'zabbix.php?action=host.list',
+					'actions' => [
+						[
+							'callback' => 'openMassUpdate'
+						]
+					],
+					'doc_link' => '/en/manual/config/hosts/hostupdate#using-mass-update'
+				]
+			],
 			// #99 Host items list view.
 			[
 				[
@@ -992,19 +987,18 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/items/item#testing'
 				]
 			],
-			// TODO: Uncomment this test case when ZBX-20782 is merged.
-//			// #103 Host item Mass update popup.
-//			[
-//				[
-//					'url' => 'items.php?filter_set=1&filter_hostids%5B0%5D=40001&context=host',
-//					'actions' => [
-//						[
-//							'callback' => 'openMassUpdate'
-//						]
-//					],
-//					'doc_link' => '/en/manual/config/items/itemupdate#using-mass-update'
-//				]
-//			],
+			// #103 Host item Mass update popup.
+			[
+				[
+					'url' => 'items.php?filter_set=1&filter_hostids%5B0%5D=40001&context=host',
+					'actions' => [
+						[
+							'callback' => 'openMassUpdate'
+						]
+					],
+					'doc_link' => '/en/manual/config/items/itemupdate#using-mass-update'
+				]
+			],
 			// #104 Host trigger list view.
 			[
 				[
@@ -1026,19 +1020,18 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/triggers/trigger#configuration'
 				]
 			],
-			// TODO: Uncomment this test case when ZBX-20782 is merged.
-//			// #107 Host trigger Mass update popup.
-//			[
-//				[
-//					'url' => 'triggers.php?filter_set=1&filter_hostids%5B0%5D=40001&context=host',
-//					'actions' => [
-//						[
-//							'callback' => 'openMassUpdate'
-//						]
-//					],
-//					'doc_link' => '/en/manual/config/triggers/update#using-mass-update'
-//				]
-//			],
+			// #107 Host trigger Mass update popup.
+			[
+				[
+					'url' => 'triggers.php?filter_set=1&filter_hostids%5B0%5D=40001&context=host',
+					'actions' => [
+						[
+							'callback' => 'openMassUpdate'
+						]
+					],
+					'doc_link' => '/en/manual/config/triggers/update#using-mass-update'
+				]
+			],
 			// #108 Host graph list view.
 			[
 				[
@@ -1121,19 +1114,18 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/items/item#testing'
 				]
 			],
-			// TODO: Uncomment this test case when ZBX-20782 is merged.
-//			// #118 Host LLD item prototype mass update popup.
-//			[
-//				[
-//					'url' => 'disc_prototypes.php?cancel=1&parent_discoveryid=133800&context=host',
-//					'actions' => [
-//						[
-//							'callback' => 'openMassUpdate'
-//						]
-//					],
-//					'doc_link' => '/en/manual/config/items/itemupdate#using-mass-update'
-//				]
-//			],
+			// #118 Host LLD item prototype mass update popup.
+			[
+				[
+					'url' => 'disc_prototypes.php?cancel=1&parent_discoveryid=133800&context=host',
+					'actions' => [
+						[
+							'callback' => 'openMassUpdate'
+						]
+					],
+					'doc_link' => '/en/manual/config/items/itemupdate#using-mass-update'
+				]
+			],
 			// #119 Host LLD trigger prototype list view.
 			[
 				[
@@ -1155,19 +1147,18 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
-			// TODO: Uncomment this test case when ZBX-20782 is merged.
-//			// #122 Host LLD trigger prototype mass update popup.
-//			[
-//				[
-//					'url' => 'trigger_prototypes.php?cancel=1&parent_discoveryid=133800&context=host',
-//					'actions' => [
-//						[
-//							'callback' => 'openMassUpdate'
-//						]
-//					],
-//					'doc_link' => '/en/manual/config/triggers/update#using-mass-update'
-//				]
-//			],
+			// #122 Host LLD trigger prototype mass update popup.
+			[
+				[
+					'url' => 'trigger_prototypes.php?cancel=1&parent_discoveryid=133800&context=host',
+					'actions' => [
+						[
+							'callback' => 'openMassUpdate'
+						]
+					],
+					'doc_link' => '/en/manual/config/triggers/update#using-mass-update'
+				]
+			],
 			// #123 Host LLD graph prototype list view.
 			[
 				[
@@ -1601,14 +1592,26 @@ class testDocumentationLinks extends CWebTest {
 			// #179 Administration -> Create proxy view.
 			[
 				[
-					'url' => 'zabbix.php?action=proxy.edit',
+					'url' => 'zabbix.php?action=proxy.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create proxy'
+						]
+					],
 					'doc_link' => '/en/manual/distributed_monitoring/proxies#configuration'
 				]
 			],
 			// #180 Administration -> Proxies -> Edit proxy view.
 			[
 				[
-					'url' => 'zabbix.php?action=proxy.edit&proxyid=20000',
+					'url' => 'zabbix.php?action=proxy.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:Active proxy 1'
+						]
+					],
 					'doc_link' => '/en/manual/distributed_monitoring/proxies#configuration'
 				]
 			],

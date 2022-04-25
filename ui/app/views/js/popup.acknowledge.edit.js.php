@@ -49,8 +49,10 @@ function submitAcknowledge(overlay) {
 	}).done(function(response) {
 		overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
-		if ('errors' in response) {
-			jQuery(response.errors).insertBefore($form);
+		if ('error' in response) {
+			const message_box = makeMessageBox('bad', response.error.messages, response.error.title);
+
+			message_box.insertBefore($form);
 		}
 		else {
 			overlayDialogueDestroy(overlay.dialogueid);

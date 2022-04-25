@@ -104,7 +104,8 @@
 			const original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {
 				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large'
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
@@ -1161,8 +1162,12 @@
 			overlay.unsetLoading();
 		})
 		.done(function(ret) {
-			if (typeof ret.errors !== 'undefined') {
-				return jQuery(ret.errors).insertBefore(this.$form);
+			if ('error' in ret) {
+				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);
+
+				message_box.insertBefore(this.$form);
+
+				return;
 			}
 
 			if (!httpconf.steps.data[ret.params.no]) {

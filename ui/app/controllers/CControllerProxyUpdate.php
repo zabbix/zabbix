@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,53 +21,106 @@
 
 class CControllerProxyUpdate extends CController {
 
-	protected function checkInput() {
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
+	protected function checkInput(): bool {
 		$fields = [
-			'proxyid' =>			'fatal|required|db hosts.hostid',
-			'host' =>				'db hosts.host',
-			'status' =>				'db hosts.status|in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
-			'dns' =>				'db interface.dns',
-			'ip' =>					'db interface.ip',
-			'useip' =>				'db interface.useip|in 0,1',
-			'port' =>				'db interface.port',
-			'proxy_address' =>		'db hosts.proxy_address',
-			'description' =>		'db hosts.description',
-			'tls_connect' =>		'db hosts.tls_connect|in '.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
-				HOST_ENCRYPTION_CERTIFICATE,
-			'tls_accept' =>			'db hosts.tls_accept|in 0,'.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
-				(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK).','.
-				HOST_ENCRYPTION_CERTIFICATE.','.
-				(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_CERTIFICATE).','.
-				(HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE).','.
-				(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE),
-			'tls_psk_identity' =>	'db hosts.tls_psk_identity',
-			'tls_psk' =>			'db hosts.tls_psk',
-			'psk_edit_mode' =>		'in 0,1',
-			'tls_issuer' =>			'db hosts.tls_issuer',
-			'tls_subject' =>		'db hosts.tls_subject',
-			'form_refresh' =>		'int32'
+			'proxyid' =>				'required|id',
+			'host' =>					'required|string|not_empty',
+			'status' =>					'required|in '.implode(',', [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE]),
+			'ip' =>						'string',
+			'dns' =>					'string',
+			'useip' =>					'in '.implode(',', [INTERFACE_USE_IP, INTERFACE_USE_DNS]),
+			'port' =>					'string',
+			'proxy_address' =>			'string',
+			'description' =>			'string',
+			'tls_connect' =>			'in '.implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE]),
+			'tls_accept_none' =>		'in 1',
+			'tls_accept_psk' =>			'in 1',
+			'tls_accept_certificate' =>	'in 1',
+			'tls_psk_identity' =>		'string',
+			'tls_psk' =>				'string',
+			'tls_issuer' =>				'string',
+			'tls_subject' =>			'string',
+			'update_psk' =>				'required|bool'
 		];
 
 		$ret = $this->validateInput($fields);
 
-		if (!$ret) {
-			switch ($this->GetValidationError()) {
-				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('zabbix.php?action=proxy.edit');
-					$response->setFormData($this->getInputAll());
-					CMessageHelper::setErrorTitle(_('Cannot update proxy'));
-					$this->setResponse($response);
+		if ($ret) {
+			switch ($this->getInput('status')) {
+				case HOST_STATUS_PROXY_ACTIVE:
+					if (!$this->hasInput('tls_accept_none') && !$this->hasInput('tls_accept_psk')
+							&& !$this->hasInput('tls_accept_certificate')) {
+						info(_s('Incorrect value for field "%1$s": %2$s.', _('Connections from proxy'),
+							_('cannot be empty')
+						));
+
+						$ret = false;
+					}
+
 					break;
-				case self::VALIDATION_FATAL_ERROR:
-					$this->setResponse(new CControllerResponseFatal());
+
+				case HOST_STATUS_PROXY_PASSIVE:
+					if ($this->getInput('useip', INTERFACE_USE_IP) == INTERFACE_USE_IP
+							&& $this->getInput('ip', '') === '') {
+						info(_s('Incorrect value for field "%1$s": %2$s.', _('IP address'), _('cannot be empty')));
+
+						$ret = false;
+					}
+
+					if ($this->getInput('useip', INTERFACE_USE_IP) == INTERFACE_USE_DNS
+							&& $this->getInput('dns', '') === '') {
+						info(_s('Incorrect value for field "%1$s": %2$s.', _('DNS name'), _('cannot be empty')));
+
+						$ret = false;
+					}
+
+					if ($this->getInput('port', '') === '') {
+						info(_s('Incorrect value for field "%1$s": %2$s.', _('Port'), _('cannot be empty')));
+
+						$ret = false;
+					}
+
 					break;
 			}
+
+			if ($this->getInput('update_psk')) {
+				if (($this->getInput('status') == HOST_STATUS_PROXY_ACTIVE && $this->hasInput('tls_accept_psk'))
+						|| ($this->getInput('status') == HOST_STATUS_PROXY_PASSIVE
+							&& $this->getInput('tls_connect', 0) == HOST_ENCRYPTION_PSK)) {
+					if ($this->getInput('tls_psk_identity', '') === '') {
+						info(_s('Incorrect value for field "%1$s": %2$s.', _('PSK identity'), _('cannot be empty')));
+
+						$ret = false;
+					}
+
+					if ($this->getInput('tls_psk', '') === '') {
+						info(_s('Incorrect value for field "%1$s": %2$s.', _('PSK'), _('cannot be empty')));
+
+						$ret = false;
+					}
+				}
+			}
+		}
+
+		if (!$ret) {
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'title' => _('Cannot update proxy'),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
 		}
 
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)) {
 			return false;
 		}
@@ -82,40 +135,46 @@ class CControllerProxyUpdate extends CController {
 	protected function doAction() {
 		$proxy = [];
 
-		$this->getInputs($proxy, ['proxyid', 'host', 'status', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
-			'tls_subject', 'tls_psk_identity', 'tls_psk'
+		$this->getInputs($proxy, ['proxyid', 'host', 'status', 'description', 'tls_connect', 'tls_psk_identity',
+			'tls_psk', 'tls_issuer', 'tls_subject'
 		]);
 
-		if ($this->getInput('status', HOST_STATUS_PROXY_ACTIVE) == HOST_STATUS_PROXY_PASSIVE) {
-			$proxy['interface'] = [];
-			$this->getInputs($proxy['interface'], ['dns', 'ip', 'useip', 'port']);
-		}
-		else {
-			$proxy['proxy_address'] = $this->getInput('proxy_address', '');
-		}
+		switch ($this->getInput('status')) {
+			case HOST_STATUS_PROXY_ACTIVE:
+				$proxy['proxy_address'] = $this->getInput('proxy_address', '');
 
-		DBstart();
+				$proxy['tls_accept'] = ($this->hasInput('tls_accept_none') ? HOST_ENCRYPTION_NONE : 0)
+					| ($this->hasInput('tls_accept_psk') ? HOST_ENCRYPTION_PSK : 0)
+					| ($this->hasInput('tls_accept_certificate') ? HOST_ENCRYPTION_CERTIFICATE : 0);
+
+				break;
+
+			case HOST_STATUS_PROXY_PASSIVE:
+				$proxy['interface'] = [];
+
+				$this->getInputs($proxy['interface'], ['dns', 'ip', 'useip', 'port']);
+
+				break;
+		}
 
 		$result = API::Proxy()->update($proxy);
 
-		$result = DBend($result);
+		$output = [];
 
 		if ($result) {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'proxy.list')
-				->setArgument('page', CPagerHelper::loadPage('proxy.list', null))
-			);
-			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_('Proxy updated'));
+			$output['success']['title'] = _('Proxy updated');
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
 		}
 		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'proxy.edit')
-				->setArgument('proxyid', $this->getInput('proxyid'))
-			);
-			$response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot update proxy'));
+			$output['error'] = [
+				'title' => _('Cannot update proxy'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
-		$this->setResponse($response);
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

@@ -1,19 +1,30 @@
 #!/bin/bash
 
-messagetemplate=frontend.pot
+function run
+{
+	local workdir=$(realpath $(dirname $0))
+	local potfile=${workdir}/en/LC_MESSAGES/frontend.pot
 
-[[ $1 ]] || {
-	echo "Specify language code"
+	[[ -n "$1" ]] ||
+		die "specify language code!"
+
+	local pofile=${workdir}/$1/LC_MESSAGES/frontend.po
+	[[ -f $pofile  ]] &&
+		die "$pofile already exists"
+
+	if [[ -f $potfile ]]; then
+		mkdir -p $(dirname $pofile)
+		msginit --no-translator --no-wrap --locale=$1 --input=$potfile -o $pofile || die
+		git add $pofile || die
+	else
+		die "po template $potfile missing"
+	fi
+}
+
+function die
+{
+	[[ -n "$@" ]] && >&2 echo -e "$@"
 	exit 1
 }
 
-[ -f $messagetemplate ] && {
-	mkdir -p $1/LC_MESSAGES
-	msginit --no-translator --no-wrap --locale=$1 --input=frontend.pot \
-	-o $1/LC_MESSAGES/frontend.po || exit 1
-	echo "frontend.mo" >> $1/LC_MESSAGES/.gitignore
-	git add $1
-} || {
-	echo "po template $messagetemplate missing"
-	exit 1
-}
+run "$@"

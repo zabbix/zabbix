@@ -48,7 +48,8 @@ $data += [
 				->removeAttribute('id'),
 			(new CSimpleButton(_('Delete')))
 				->setAttribute('confirm', _('Delete selected host?'))
-				->onClick('view.delete('.json_encode($data['hostid']).', this);')
+				->setAttribute('data-hostid', $data['hostid'])
+				->onClick('view.delete(this.dataset.hostid, this);')
 				->removeAttribute('id'),
 			$cancel_button
 		]

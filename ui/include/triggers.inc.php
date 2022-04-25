@@ -1105,8 +1105,9 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 
 					$url = (new CLinkAction($element['expression']))
 						->setId($expressionId)
-						->onClick('javascript: copy_expression("'.$expressionId.'", '.$type.');');
+						->onClick('copy_expression(this.id, '.$type.');');
 				}
+
 				$expr = expressionLevelDraw($next, $level);
 				$expr[] = SPACE;
 				$expr[] = bold($letter);

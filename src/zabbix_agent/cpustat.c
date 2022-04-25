@@ -27,7 +27,7 @@
 extern int get_cpu_group_num_win32(void);
 extern int get_numa_node_num_win32(void);
 #endif
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "log.h"
 
 /* <sys/dkstat.h> removed in OpenBSD 5.7, only <sys/sched.h> with the same CP_* definitions remained */

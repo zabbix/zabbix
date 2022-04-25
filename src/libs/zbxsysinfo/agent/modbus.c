@@ -22,7 +22,7 @@
 #include "modbtype.h"
 
 #ifdef HAVE_LIBMODBUS
-#include "mutexs.h"
+#include "zbxmutexs.h"
 
 /* this block must be defined before <modbus.h> include */
 #ifdef _WINDOWS

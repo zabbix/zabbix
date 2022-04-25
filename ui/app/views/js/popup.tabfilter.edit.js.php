@@ -42,20 +42,24 @@ function tabFilterDelete(overlay) {
 	overlay.setLoading();
 	overlay.xhr = $.post(url.getUrl(), null, 'json')
 		.done((response) => {
-			const properties = {detail: {idx2: form_data['idx2']}, bubbles: true};
+			if ('error' in response) {
+				overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
-			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
+				const message_box = makeMessageBox('bad', response.error.messages, response.error.title);
 
-			if ('errors' in response) {
-				$(response.errors).insertBefore($form);
+				message_box.insertBefore($form);
+
+				return;
 			}
-			else {
-				overlayDialogueDestroy(overlay.dialogueid);
-				overlay.element.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_DELETE, properties));
 
-				clearMessages();
-				addMessage(makeMessageBox('good', [], <?= json_encode(_('Filter deleted')) ?>));
-			}
+			overlayDialogueDestroy(overlay.dialogueid);
+
+			overlay.element.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_DELETE,
+				{detail: {idx2: form_data['idx2']}, bubbles: true}
+			));
+
+			clearMessages();
+			addMessage(makeMessageBox('good', [], <?= json_encode(_('Filter deleted')) ?>));
 		})
 		.always(() => {
 			overlay.unsetLoading();
@@ -72,17 +76,19 @@ function tabFilterUpdate(overlay) {
 	overlay.setLoading();
 	overlay.xhr = $.post(url.getUrl(), form_data, 'json')
 		.done((response) => {
-			const properties = {detail: response, bubbles: true};
+			if ('error' in response) {
+				overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
-			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
+				const message_box = makeMessageBox('bad', response.error.messages, response.error.title);
 
-			if ('errors' in response) {
-				$(response.errors).insertBefore($form);
+				message_box.insertBefore($form);
+
+				return;
 			}
-			else {
-				overlayDialogueDestroy(overlay.dialogueid);
-				overlay.element.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_UPDATE, properties));
-			}
+
+			overlayDialogueDestroy(overlay.dialogueid);
+
+			overlay.element.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_UPDATE, {detail: response, bubbles: true}));
 		})
 		.always(() => {
 			overlay.unsetLoading();
