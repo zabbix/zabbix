@@ -6442,6 +6442,10 @@ msgid "End of line sequence"
 msgstr ""
 
 #: include/locales.inc.php:33
+msgid "English (en_GB)"
+msgstr ""
+
+#: include/locales.inc.php:33
 msgid "English (en_US)"
 msgstr "Engels (en_US)"
 
@@ -10863,6 +10867,10 @@ msgstr ""
 #: include/classes/html/CList.php:39
 msgid "List is empty"
 msgstr "Lijst is leeg"
+
+#: include/classes/data/CItemData.php:983
+msgid "List of OS processes with attributes. Returns JSON array"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
