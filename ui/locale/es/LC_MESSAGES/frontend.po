@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-04 19:52+0200\n"
-"PO-Revision-Date: 2022-04-22 11:29+0000\n"
+"PO-Revision-Date: 2022-04-25 10:10+0000\n"
 "Last-Translator: Óscar <oscar.zabbix@linaresdigital.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -8939,7 +8939,7 @@ msgstr ""
 #: include/classes/db/DB.php:349
 #, c-format
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
-msgstr ""
+msgstr "Valor incorrecto \"%1$s\" para el campo entero sin signo \"%2$s\"."
 
 #: include/classes/api/services/CCorrelation.php:606
 #: include/classes/api/services/CCorrelation.php:626
@@ -10565,7 +10565,7 @@ msgstr ""
 #: include/classes/items/CHelpItems.php:197
 #: include/classes/items/CHelpItems.php:547
 msgid "List of detected CPUs/CPU cores. Returns JSON"
-msgstr ""
+msgstr "Listado de CPUs/núcleos detectados. Devuelve JSON"
 
 #: include/classes/items/CHelpItems.php:341
 #: include/classes/items/CHelpItems.php:691
@@ -10695,7 +10695,7 @@ msgstr "Iniciar sesión"
 
 #: include/classes/api/services/CUser.php:1221
 msgid "Login failed."
-msgstr ""
+msgstr "Inicio de sesión fallido."
 
 #: include/classes/validators/CLdapAuthValidator.php:87
 msgid "Login name or password is incorrect."
@@ -10707,11 +10707,11 @@ msgstr "Finalizar sesión"
 
 #: app/views/administration.authentication.edit.php:218
 msgid "Logout requests"
-msgstr ""
+msgstr "Peticiones de cierre de sesión"
 
 #: app/views/administration.authentication.edit.php:224
 msgid "Logout responses"
-msgstr ""
+msgstr "Respuestas de cierre de sesión"
 
 #: include/discovery.inc.php:139
 msgid "Lost"
@@ -10864,7 +10864,7 @@ msgstr ""
 
 #: maintenance.php:108
 msgid "Maintenance updated"
-msgstr ""
+msgstr "Mantenimiento actualizado"
 
 #: include/html.inc.php:951
 msgid "Maintenance with data collection"
@@ -10944,7 +10944,7 @@ msgstr ""
 
 #: sysmap.php:105
 msgid "Map is updated! Return to map list?"
-msgstr ""
+msgstr "¡Mapa actualizado! ¿Volver al listado de mapas?"
 
 #: include/views/monitoring.sysmap.edit.php:205
 msgid "Map label type"
@@ -10970,7 +10970,7 @@ msgstr ""
 
 #: sysmap.php:110
 msgid "Map update failed."
-msgstr ""
+msgstr "Falló la actualización del mapa."
 
 #: include/classes/api/services/CDashboard.php:798
 #, c-format
@@ -11029,11 +11029,11 @@ msgstr "Actualizar masivamente"
 
 #: include/views/js/monitoring.sysmaps.js.php:608
 msgid "Mass update elements"
-msgstr ""
+msgstr "Elementos de actualización masiva"
 
 #: include/views/js/monitoring.sysmaps.js.php:484
 msgid "Mass update shapes"
-msgstr ""
+msgstr "Actualización masiva de formas"
 
 #: disc_prototypes.php:53 host_discovery.php:54
 #: include/views/configuration.host.discovery.edit.php:354
@@ -11234,7 +11234,7 @@ msgstr ""
 
 #: app/views/administration.mediatype.edit.php:297
 msgid "Message templates"
-msgstr ""
+msgstr "Plantillas de mensaje"
 
 #: app/views/administration.user.edit.php:376
 #: app/views/administration.user.edit.php:388
@@ -11244,7 +11244,7 @@ msgstr "Tiempo de espera de mensajes"
 #: app/views/administration.mediatype.edit.php:279
 #: app/views/popup.mediatype.message.php:44
 msgid "Message type"
-msgstr ""
+msgstr "Tipo de mensaje"
 
 #: include/actions.inc.php:1854 include/actions.inc.php:1949
 msgid "Message/Command"
@@ -11420,7 +11420,7 @@ msgstr[1] ""
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
 msgid "Module updated: %1$s."
-msgstr ""
+msgstr "Módulo actualizado: %1$s."
 
 #: include/classes/core/CModuleManager.php:222
 #, c-format
@@ -11436,7 +11436,7 @@ msgstr ""
 
 #: app/controllers/CControllerModuleScan.php:127
 msgid "Modules updated"
-msgstr ""
+msgstr "Módulos actualizados"
 
 #: include/func.inc.php:216
 msgid "Mon"
@@ -11454,7 +11454,7 @@ msgstr ""
 #: include/views/configuration.host.massupdate.php:105
 #: include/views/configuration.host.prototype.edit.php:117
 msgid "Monitored by proxy"
-msgstr ""
+msgstr "Monitorizado por proxy"
 
 #: include/classes/screens/CScreenDiscovery.php:119
 msgid "Monitored host"
@@ -12832,7 +12832,7 @@ msgstr ""
 
 #: include/classes/api/services/CUserGroup.php:285
 msgid "Only Super Admins can update user groups."
-msgstr ""
+msgstr "Solo los Súper Administradores pueden actualizar grupos de usuarios."
 
 #: include/classes/api/services/CDRule.php:481
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -12897,11 +12897,11 @@ msgstr "Solo super admins pueden definir el propietario del tablero."
 
 #: include/classes/api/services/CCorrelation.php:689
 msgid "Only super admins can update correlations."
-msgstr ""
+msgstr "Solo los súper administradores pueden actualizar las correlaciones."
 
 #: include/classes/api/services/CValueMap.php:312
 msgid "Only super admins can update value maps."
-msgstr ""
+msgstr "Solo los súper administradores pueden actualizar las asignaciones de valores."
 
 #: include/services.inc.php:270
 #, c-format
@@ -12932,7 +12932,7 @@ msgstr ""
 
 #: jsLoader.php:111
 msgid "Operation details"
-msgstr ""
+msgstr "Detalles de la operación"
 
 #: include/classes/api/services/CAction.php:1930
 msgid "Operation has no group to operate."
@@ -12997,7 +12997,7 @@ msgstr "Operador"
 
 #: app/views/administration.mediatype.edit.php:343
 msgid "Options"
-msgstr ""
+msgstr "Opciones"
 
 #: app/partials/popup.operations.php:380 app/views/monitoring.host.view.php:53
 #: app/views/monitoring.problem.view.php:243 app/views/popup.lldoverride.php:69
@@ -13887,7 +13887,7 @@ msgstr "Problema en"
 #: app/views/popup.mediatype.message.php:52
 #: include/classes/helpers/CMediatypeHelper.php:61
 msgid "Problem recovery"
-msgstr ""
+msgstr "Recuperación del problema"
 
 #: include/actions.inc.php:2088
 msgid "Problem resolved"
@@ -13900,7 +13900,7 @@ msgstr "Hora del problema"
 #: app/views/popup.mediatype.message.php:55
 #: include/classes/helpers/CMediatypeHelper.php:76
 msgid "Problem update"
-msgstr ""
+msgstr "Actualización del problema"
 
 #: include/services.inc.php:25
 msgid "Problem, if all children have problems"
@@ -14210,7 +14210,7 @@ msgstr ""
 
 #: include/views/configuration.action.edit.php:407
 msgid "Recovery operations"
-msgstr ""
+msgstr "Operaciones de recuperación"
 
 #: app/views/hintbox.eventlist.php:73
 #: app/views/monitoring.widget.problems.view.php:53
@@ -15260,13 +15260,13 @@ msgstr ""
 
 #: app/views/administration.mediatype.edit.php:120
 msgid "Script parameters"
-msgstr ""
+msgstr "Parámetros del script"
 
 #: include/classes/api/services/CMediatype.php:332
 #: include/classes/api/services/CMediatype.php:658
 #, c-format
 msgid "Script parameters \"%1$s\" are missing the last new line feed for media type \"%2$s\"."
-msgstr ""
+msgstr "Falta la última nueva línea en el parámetro del script \"%1$s\" del tipo de medio \"%2$s\"."
 
 #: include/classes/debug/CProfiler.php:145
 msgid "Script profiler"
@@ -15701,7 +15701,7 @@ msgstr ""
 
 #: include/menu.inc.php:203
 msgid "Share"
-msgstr ""
+msgstr "Compartir"
 
 #: include/views/monitoring.screen.edit.php:219
 #: include/views/monitoring.slideconf.edit.php:272
@@ -15874,15 +15874,15 @@ msgstr "Acceder"
 
 #: include/views/general.login.php:45
 msgid "Sign in with HTTP"
-msgstr ""
+msgstr "Identificarse con HTTP"
 
 #: include/views/general.login.php:49
 msgid "Sign in with Single Sign-On (SAML)"
-msgstr ""
+msgstr "Identificarse con Inicio de Sesión Único (SAML)"
 
 #: include/menu.inc.php:241 include/menu.inc.php:244
 msgid "Sign out"
-msgstr ""
+msgstr "Cerrar sesión"
 
 #: include/views/js/configuration.graph.edit.js.php:201
 #: include/views/js/configuration.graph.edit.js.php:268
@@ -17775,7 +17775,7 @@ msgstr ""
 
 #: app/views/administration.mediatype.edit.php:324
 msgid "Unlimited"
-msgstr ""
+msgstr "Ilimitadas"
 
 #: include/views/configuration.host.edit.php:268
 #: include/views/configuration.host.massupdate.php:132
@@ -17965,7 +17965,7 @@ msgstr "Intervalo de actualización"
 
 #: include/views/configuration.action.edit.php:487
 msgid "Update operations"
-msgstr ""
+msgstr "Operaciones de actualización"
 
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:174
 #: app/controllers/CControllerPopup.php:45
@@ -18236,7 +18236,7 @@ msgstr "Sesiones de usuario"
 
 #: include/menu.inc.php:233
 msgid "User settings"
-msgstr ""
+msgstr "Configuración de usuario"
 
 #: include/classes/api/services/CMap.php:701
 #: include/classes/api/services/CMap.php:1166
@@ -19158,7 +19158,7 @@ msgstr ""
 #: include/classes/import/validators/C50XmlValidator.php:1891
 msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
-msgstr ""
+msgstr "YYYY-MM-DDThh:mm:ssZ"
 
 #: app/views/report.services.php:57 app/views/report.services.php:80
 #: report4.php:116 report4.php:152
@@ -19205,7 +19205,7 @@ msgstr ""
 #: include/func.inc.php:1534
 #, c-format
 msgid "You are logged in as \"%1$s\"."
-msgstr ""
+msgstr "Has iniciado sesión como \"%1$s\"."
 
 #: app/views/administration.user.edit.php:167
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
@@ -19213,7 +19213,7 @@ msgstr "No puede elegir algunos idiomas, porque las locales para ellos no están
 
 #: include/func.inc.php:1551 index_http.php:90 index_sso.php:257
 msgid "You are not logged in"
-msgstr ""
+msgstr "No has iniciado sesión"
 
 #: app/views/popup.generic.php:91
 msgid "You can not switch hosts for current selection."
@@ -19296,7 +19296,7 @@ msgstr "Administrador Zabbix"
 
 #: include/menu.inc.php:206
 msgid "Zabbix Share"
-msgstr ""
+msgstr "Zabbix Share"
 
 #: include/users.inc.php:56
 msgid "Zabbix Super Admin"
@@ -19341,7 +19341,7 @@ msgstr "Autenticación interna de Zabbix"
 
 #: app/views/administration.authentication.edit.php:51
 msgid "Zabbix login form"
-msgstr ""
+msgstr "Formulario de inicio de sesión de Zabbix"
 
 #: app/partials/popup.operations.php:235
 #: app/views/administration.script.edit.php:57 include/actions.inc.php:880
@@ -20581,7 +20581,7 @@ msgstr "mostrar asignaciones de icono"
 #: include/views/configuration.item.prototype.edit.php:667
 #: include/views/configuration.item.prototype.massupdate.php:393
 msgid "show value mappings"
-msgstr "mostrar mapeos de valores"
+msgstr "mostrar asignaciones de valores"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:319
 msgid "str() - Find string V in last (most recent) value (1 - found, 0 - not found)"
