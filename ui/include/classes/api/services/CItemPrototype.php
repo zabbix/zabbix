@@ -86,11 +86,6 @@ class CItemPrototype extends CItemGeneral {
 	];
 
 	/**
-	 * @inheritDoc
-	 */
-	protected const AUDIT_RESOURCE = CAudit::RESOURCE_ITEM_PROTOTYPE;
-
-	/**
 	 * Get ItemPrototype data.
 	 */
 	public function get($options = []) {
@@ -900,12 +895,7 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	public static function deleteForce(array $db_items) {
 		$del_itemids = [];
-		$del_items = [
-			ZBX_FLAG_DISCOVERY_NORMAL => [],
-			ZBX_FLAG_DISCOVERY_RULE => [],
-			ZBX_FLAG_DISCOVERY_CREATED => [],
-			ZBX_FLAG_DISCOVERY_PROTOTYPE => $db_items
-		];
+		$del_items = [];
 
 		// Select parent and their inherited items.
 		$parent_itemids = array_column($db_items, 'itemid');
@@ -922,7 +912,7 @@ class CItemPrototype extends CItemGeneral {
 
 			while ($child_item = DBfetch($child_items)) {
 				$itemid = $child_item['itemid'];
-				$del_items[$child_item['flags']][$itemid] = $child_item;
+				$del_items[$itemid] = $child_item;
 
 				if (!array_key_exists($itemid, $del_itemids)) {
 					$parent_itemids[] = $child_item['itemid'];
@@ -948,7 +938,7 @@ class CItemPrototype extends CItemGeneral {
 
 			while ($dep_item = DBfetch($dep_items)) {
 				$itemid = $dep_item['itemid'];
-				$del_items[$dep_item['flags']][$itemid] = $dep_item;
+				$del_items[$itemid] = $dep_item;
 
 				if (!array_key_exists($itemid, $del_itemids)) {
 					$dep_itemids[] = $itemid;
@@ -1017,7 +1007,7 @@ class CItemPrototype extends CItemGeneral {
 		), 'itemid');
 
 		if ($del_discovered_items) {
-			CItem::deleteForce($del_discovered_items);
+			API::getApiService('item')->deleteForce($del_discovered_items);
 		}
 
 		// Deleting trigger prototypes.
@@ -1033,17 +1023,6 @@ class CItemPrototype extends CItemGeneral {
 
 		DB::delete('items', ['itemid' => $del_itemids]);
 
-		static $resource_types = [
-			ZBX_FLAG_DISCOVERY_NORMAL => CAudit::RESOURCE_ITEM,
-			ZBX_FLAG_DISCOVERY_CREATED => CAudit::RESOURCE_ITEM,
-			ZBX_FLAG_DISCOVERY_RULE => CAudit::RESOURCE_DISCOVERY_RULE,
-			ZBX_FLAG_DISCOVERY_PROTOTYPE => CAudit::RESOURCE_ITEM_PROTOTYPE
-		];
-
-		foreach ($del_items as $flags => $db_items) {
-			if ($db_items) {
-				self::addAuditLog(CAudit::ACTION_DELETE, $resource_types[$flags], $db_items);
-			}
-		}
+		self::massAddAuditLog(CAudit::ACTION_DELETE, $del_items);
 	}
 }

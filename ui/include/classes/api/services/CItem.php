@@ -86,11 +86,6 @@ class CItem extends CItemGeneral {
 	];
 
 	/**
-	 * @inheritDoc
-	 */
-	protected const AUDIT_RESOURCE = CAudit::RESOURCE_ITEM;
-
-	/**
 	 * Get items data.
 	 *
 	 * @param array  $options
@@ -1294,7 +1289,7 @@ class CItem extends CItemGeneral {
 		}
 
 		if ($del_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
-			CItemPrototype::deleteForce($del_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+			API::getApiService('itemprototype')->deleteForce($del_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 			$del_itemids = array_diff_key($del_itemids, array_keys($del_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
 			unset($del_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 		}
@@ -1412,17 +1407,13 @@ class CItem extends CItemGeneral {
 
 		DB::delete('items', ['itemid' => $del_itemids]);
 
-		static $resource_types = [
-			ZBX_FLAG_DISCOVERY_NORMAL => CAudit::RESOURCE_ITEM,
-			ZBX_FLAG_DISCOVERY_CREATED => CAudit::RESOURCE_ITEM,
-			ZBX_FLAG_DISCOVERY_RULE => CAudit::RESOURCE_DISCOVERY_RULE,
-			ZBX_FLAG_DISCOVERY_PROTOTYPE => CAudit::RESOURCE_ITEM_PROTOTYPE
-		];
+		$del_items_combined = [];
 
-		foreach ($del_items as $flags => $db_items) {
-			if ($db_items) {
-				self::addAuditLog(CAudit::ACTION_DELETE, $resource_types[$flags], $db_items);
-			}
+		foreach ($del_items as $i => $items) {
+			$del_items_combined += $items;
+			unset($del_items[$i]);
 		}
+
+		self::massAddAuditLog(CAudit::ACTION_DELETE, $del_items_combined);
 	}
 }

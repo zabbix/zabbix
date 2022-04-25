@@ -74,13 +74,6 @@ abstract class CItemGeneral extends CApiService {
 	protected const VALUE_TYPE_FIELD_NAMES = [];
 
 	/**
-	 * Value of audit log resource.
-	 *
-	 * @var int
-	 */
-	protected const AUDIT_RESOURCE = -1;
-
-	/**
 	 * @abstract
 	 *
 	 * @param array $options
@@ -1015,12 +1008,42 @@ abstract class CItemGeneral extends CApiService {
 		}
 	}
 
+	protected static function massAddAuditLog(int $action, array $items = [], array $items_old = []): void {
+		static $resource_types = [
+			ZBX_FLAG_DISCOVERY_NORMAL => CAudit::RESOURCE_ITEM,
+			ZBX_FLAG_DISCOVERY_CREATED => CAudit::RESOURCE_ITEM,
+			ZBX_FLAG_DISCOVERY_RULE => CAudit::RESOURCE_DISCOVERY_RULE,
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => CAudit::RESOURCE_ITEM_PROTOTYPE
+		];
+
+		$items_by_flag = [];
+		$items_old_by_flag = [];
+
+		foreach ($items as $itemid => $item) {
+			$items_by_flag[$item['flags']][$item['itemid']] = $item;
+			unset($items[$itemid]);
+
+			if ($items_old) {
+				$items_old_by_flag[$item['flags']][$item['itemid']] = $items_old[$item['itemid']];
+				unset($items_old[$item['itemid']]);
+			}
+		}
+
+		foreach ($items_by_flag as $flags => $items) {
+			if ($items) {
+				self::addAuditLog($action, $resource_types[$flags], $items,
+					array_key_exists($flags, $items_old_by_flag) ? $items_old_by_flag[$flags] : []
+				);
+			}
+		}
+	}
+
 	/**
 	 * Common create handler for Items and derivatives.
 	 *
 	 * @param array $items Item or derived entity (prototype, discovery rule).
 	 */
-	protected static function createForce(array &$items): void {
+	public static function createForce(array &$items): void {
 		$itemids = DB::insert('items', $items);
 
 		$ins_items_rtdata = [];
@@ -1059,7 +1082,7 @@ abstract class CItemGeneral extends CApiService {
 		self::updatePreprocessing($items);
 		self::updateTags($items);
 
-		self::addAuditLog(CAudit::ACTION_ADD, static::AUDIT_RESOURCE, $items);
+		self::massAddAuditLog(CAudit::ACTION_ADD, $items);
 
 		foreach ($items as &$item) {
 			$item['host_status'] = array_shift($host_statuses);
@@ -1070,8 +1093,13 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Common update handler for Items and derivatives.
 	 *
-	 * @param array $items     Updates to apply.
-	 * @param array $db_items  Current versions of items, indexed by itemid.
+	 * @param array  $items     Updates to apply.
+	 * @param string $items[<num>]['itemid']
+	 * @param int    $items[<num>]['type']
+	 * @param int    $items[<num>]['host_status']
+	 * @param string $items[<num>]['name']
+	 * @param int    $items[<num>]['flags']
+	 * @param array  $db_items  Current versions of items, indexed by itemid.
 	 */
 	public static function updateForce(array &$items, array $db_items): void {
 		// Helps to avoid deadlocks.
@@ -1101,7 +1129,7 @@ abstract class CItemGeneral extends CApiService {
 		self::updatePreprocessing($items, $db_items);
 		self::updateTags($items, $db_items);
 
-		self::addAuditLog(CAudit::ACTION_UPDATE, static::AUDIT_RESOURCE, $items, $db_items);
+		self::massAddAuditLog(CAudit::ACTION_UPDATE, $items, $db_items);
 	}
 
 	/**

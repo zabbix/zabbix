@@ -53,7 +53,7 @@ class CDiscoveryRuleManager {
 		));
 
 		if ($db_item_prototypes) {
-			CItemPrototype::deleteForce($db_item_prototypes);
+			API::getApiService('itemprototype')->deleteForce($db_item_prototypes);
 		}
 
 		// Delete host prototypes.

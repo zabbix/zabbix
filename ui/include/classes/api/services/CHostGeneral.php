@@ -642,7 +642,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		if ($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]) {
 			if ($clear) {
-				CItem::deleteForce($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]);
+				API::getApiService('item')->deleteForce($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]);
 			}
 			else {
 				API::getApiService('item')->updateForce($upd_items[ZBX_FLAG_DISCOVERY_NORMAL],
@@ -653,7 +653,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		if ($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
 			if ($clear) {
-				CItemPrototype::deleteForce($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+				API::getApiService('itemprototype')->deleteForce($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 			}
 			else {
 				API::getApiService('itemprototype')->updateForce($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE],
@@ -1240,7 +1240,7 @@ abstract class CHostGeneral extends CHostBase {
 			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
 		];
 
-		$hostids_condition = ($targetids !== null) ? ' AND '.dbConditionInt('i1.hostid', $targetids) : '';
+		$hostids_condition = ($targetids !== null) ? ' AND '.dbConditionId('i1.hostid', $targetids) : '';
 		$items_distinct = ($targetids !== null) ? ' DISTINCT ' : '';
 
 		if ($clear) {
@@ -1248,7 +1248,7 @@ abstract class CHostGeneral extends CHostBase {
 				'SELECT '.$items_distinct.' i1.itemid,i1.name,i1.flags'.
 				' FROM items i1,items i2'.
 				' WHERE i2.itemid=i1.templateid'.
-					' AND '.dbConditionInt('i2.hostid', $templateids).
+					' AND '.dbConditionId('i2.hostid', $templateids).
 					' AND '.dbConditionInt('i1.flags', $flags).
 					$hostids_condition
 			);
@@ -1259,7 +1259,7 @@ abstract class CHostGeneral extends CHostBase {
 					'h.status as host_status'.
 				' FROM items i1,items i2,hosts h'.
 				' WHERE i2.itemid=i1.templateid'.
-					' AND '.dbConditionInt('i2.hostid', $templateids).
+					' AND '.dbConditionId('i2.hostid', $templateids).
 					' AND '.dbConditionInt('i1.flags', $flags).
 					' AND h.hostid=i1.hostid'.
 					' AND i1.type != '.ITEM_TYPE_HTTPTEST.
@@ -1307,7 +1307,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		if ($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]) {
 			if ($clear) {
-				CItem::deleteForce($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]);
+				API::getApiService('item')->deleteForce($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]);
 			}
 			else {
 				API::getApiService('item')->updateForce($upd_items[ZBX_FLAG_DISCOVERY_NORMAL],
@@ -1318,7 +1318,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		if ($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
 			if ($clear) {
-				CItemPrototype::deleteForce($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+				API::getApiService('itemprototype')->deleteForce($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 			}
 			else {
 				API::getApiService('itemprototype')->updateForce($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE],

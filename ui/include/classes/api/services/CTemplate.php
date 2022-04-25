@@ -541,7 +541,7 @@ class CTemplate extends CHostGeneral {
 		]);
 
 		if ($del_items) {
-			CItem::deleteForce($del_items);
+			API::getApiService('item')->deleteForce($del_items);
 		}
 
 		// delete host from maps
