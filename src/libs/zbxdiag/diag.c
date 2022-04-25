@@ -23,7 +23,7 @@
 #include "preproc.h"
 #include "zbxdiag.h"
 #include "log.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 
 void	diag_map_free(zbx_diag_map_t *map)
 {

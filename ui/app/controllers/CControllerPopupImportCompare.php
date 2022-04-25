@@ -38,12 +38,13 @@ class CControllerPopupImportCompare extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$output = [];
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
-			$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
 		}
 
 		return $ret;
@@ -130,7 +131,6 @@ class CControllerPopupImportCompare extends CController {
 
 		$data = [
 			'title' => _('Templates'),
-			'errors' => null,
 			'import_overlayid' => $this->getInput('import_overlayid'),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
@@ -138,9 +138,10 @@ class CControllerPopupImportCompare extends CController {
 		];
 
 		if ($result === false) {
-			CMessageHelper::setErrorTitle(_('Import failed'));
-			$data['errors'] = makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())
-				->toString();
+			$data['error'] = [
+				'title' => _('Import failed'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 		else {
 			$data['diff'] = $this->blocksToDiff($result, 1);

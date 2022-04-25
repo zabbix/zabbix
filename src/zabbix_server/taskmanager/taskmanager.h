@@ -20,7 +20,7 @@
 #ifndef ZABBIX_TASKMANAGER_H
 #define ZABBIX_TASKMANAGER_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 ZBX_THREAD_ENTRY(taskmanager_thread, args);
 

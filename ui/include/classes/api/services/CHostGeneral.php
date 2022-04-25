@@ -1433,26 +1433,103 @@ abstract class CHostGeneral extends CHostBase {
 			$result = $relationMap->mapMany($result, $groups, 'groups');
 		}
 
-		// adding templates
+		// Add templates.
 		if ($options['selectParentTemplates'] !== null) {
 			if ($options['selectParentTemplates'] != API_OUTPUT_COUNT) {
 				$templates = [];
-				$relationMap = $this->createRelationMap($result, 'hostid', 'templateid', 'hosts_templates');
-				$related_ids = $relationMap->getRelatedIds();
 
-				if ($related_ids) {
+				// Get template IDs for each host and additional field from relation table if necessary.
+				$hosts_templates = DBfetchArray(DBselect(
+					'SELECT ht.hostid,ht.templateid'.
+						($this->outputIsRequested('link_type', $options['selectParentTemplates'])
+							? ',ht.link_type'
+							: ''
+						).
+					' FROM hosts_templates ht'.
+					' WHERE '.dbConditionId('ht.hostid', array_keys($result))
+				));
+
+				if ($hosts_templates) {
+					// Select also template ID if not selected. It can be removed from results if not requested.
+					$template_options = $this->outputIsRequested('templateid', $options['selectParentTemplates'])
+						? $options['selectParentTemplates']
+						: array_merge($options['selectParentTemplates'], ['templateid']);
+
+					/*
+					 * Since templates API does not have "link_type" field, remove it from request, so that template.get
+					 * validation may pass successfully.
+					 */
+					if ($this->outputIsRequested('link_type', $template_options) && is_array($template_options)
+							&& ($key = array_search('link_type', $template_options)) !== false) {
+						unset($template_options[$key]);
+					}
+
 					$templates = API::Template()->get([
-						'output' => $options['selectParentTemplates'],
-						'templateids' => $related_ids,
+						'output' => $template_options,
+						'templateids' => array_column($hosts_templates, 'templateid'),
 						'nopermissions' => $options['nopermissions'],
 						'preservekeys' => true
 					]);
-					if (!is_null($options['limitSelects'])) {
+
+					if ($options['limitSelects'] !== null) {
 						order_result($templates, 'host');
 					}
 				}
 
-				$result = $relationMap->mapMany($result, $templates, 'parentTemplates', $options['limitSelects']);
+				/*
+				 * In order to correctly slice the ordered templates in case of "limitSelects", first they must be
+				 * mapped for each host. Otherwise incorrect results may appear. $relation_map key is the host ID, and
+				 * values are template ID and, if selected, "link_type".
+				 */
+				$relation_map = [];
+				foreach ($hosts_templates as $host_template) {
+					if (!array_key_exists($host_template['hostid'], $relation_map)) {
+						$relation_map[$host_template['hostid']] = [];
+					}
+
+					$related_fields = ['templateid' => $host_template['templateid']];
+
+					if ($this->outputIsRequested('link_type', $options['selectParentTemplates'])) {
+						$related_fields['link_type'] = $host_template['link_type'];
+					}
+
+					$relation_map[$host_template['hostid']][] = $related_fields;
+				}
+
+				foreach ($result as $hostid => &$host) {
+					$host['parentTemplates'] = [];
+
+					if (array_key_exists($hostid, $relation_map)) {
+						$templateids = array_column($relation_map[$hostid], 'templateid');
+						$templateids = array_combine($templateids, $templateids);
+
+						// Find the matching templates and limit the results if necessary.
+						$host['parentTemplates'] = array_values(array_intersect_key($templates, $templateids));
+
+						if ($options['limitSelects'] !== null && $options['limitSelects'] != 0) {
+							$host['parentTemplates'] = array_slice($host['parentTemplates'], 0,
+								$options['limitSelects']
+							);
+						}
+
+						// Append the additional field from relation table.
+						if ($this->outputIsRequested('link_type', $options['selectParentTemplates'])) {
+							foreach ($host['parentTemplates'] as &$template) {
+								foreach ($relation_map[$hostid] as $rel_template) {
+									if (bccomp($template['templateid'], $rel_template['templateid']) == 0) {
+										$template['link_type'] = $rel_template['link_type'];
+									}
+								}
+							}
+						}
+
+						// Unset fields if they were not requested.
+						$host['parentTemplates'] = $this->unsetExtraFields($host['parentTemplates'], ['templateid'],
+							$options['selectParentTemplates']
+						);
+					}
+				}
+				unset($host);
 			}
 			else {
 				$templates = API::Template()->get([

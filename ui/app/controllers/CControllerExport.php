@@ -26,7 +26,7 @@ class CControllerExport extends CController {
 			'action' =>			'required|string',
 			'backurl' =>		'required|string',
 			'valuemapids' =>	'not_empty|array_db valuemaps.valuemapid',
-			'ids' =>			'not_empty|array_db hosts.hostid',
+			'hostids' =>		'not_empty|array_db hosts.hostid',
 			'mediatypeids' =>	'not_empty|array_db media_type.mediatypeid',
 			'maps' =>			'not_empty|array_db sysmaps.sysmapid',
 			'templates' =>		'not_empty|array_db hosts.hostid',
@@ -78,7 +78,7 @@ class CControllerExport extends CController {
 				break;
 
 			case 'export.hosts':
-				$params['options']['hosts'] = $this->getInput('ids', []);
+				$params['options']['hosts'] = $this->getInput('hostids', []);
 				break;
 
 			case 'export.mediatypes':

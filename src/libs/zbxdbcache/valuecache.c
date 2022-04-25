@@ -21,7 +21,7 @@
 
 #include "log.h"
 #include "dbcache.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 
 /*
  * The cache (zbx_vc_cache_t) is organized as a hashset of item records (zbx_vc_item_t).

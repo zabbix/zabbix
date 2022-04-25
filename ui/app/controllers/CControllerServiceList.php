@@ -76,6 +76,7 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 					|| ($tag['tag'] === '' && $tag['value'] === '')) {
 				continue;
 			}
+
 			$filter['tags'][] = $tag;
 		}
 

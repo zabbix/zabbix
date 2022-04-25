@@ -37,6 +37,7 @@ class CAudit {
 	public const ACTION_LOGIN_SUCCESS = 8;
 	public const ACTION_LOGIN_FAILED = 9;
 	public const ACTION_HISTORY_CLEAR = 10;
+	public const ACTION_CONFIG_REFRESH = 11;
 
 	/**
 	 * Audit resources.

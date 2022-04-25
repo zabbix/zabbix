@@ -62,14 +62,14 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m) |<p>-</p> |`max(/Morningstar SureSine SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}` |WARNING |<p>**Depends on**:</p><p>- Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)</p> |
-|Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m) |<p>-</p> |`max(/Morningstar SureSine SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}` |HIGH | |
-|Battery: High battery voltage (over {#VOLTAGE.MAX.WARN}V for 5m) |<p>-</p> |`min(/Morningstar SureSine SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)</p> |
-|Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m) |<p>-</p> |`min(/Morningstar SureSine SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}` |HIGH | |
+|Battery: Low battery voltage |<p>-</p> |`max(/Morningstar SureSine SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}` |WARNING |<p>**Depends on**:</p><p>- Battery: Critically low battery voltage</p> |
+|Battery: Critically low battery voltage |<p>-</p> |`max(/Morningstar SureSine SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}` |HIGH | |
+|Battery: High battery voltage |<p>-</p> |`min(/Morningstar SureSine SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Battery: Critically high battery voltage</p> |
+|Battery: Critically high battery voltage |<p>-</p> |`min(/Morningstar SureSine SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}` |HIGH | |
 |Load: Device load in warning state |<p>-</p> |`last(/Morningstar SureSine SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar SureSine SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"override"}` |WARNING |<p>**Depends on**:</p><p>- Load: Device load in critical state</p> |
 |Load: Device load in critical state |<p>-</p> |`last(/Morningstar SureSine SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar SureSine SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}` |HIGH | |
-|Status: Device has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/Morningstar SureSine SNMP/status.uptime)<10m` |INFO |<p>Manual close: YES</p> |
-|Status: Failed to fetch data (or no data for 5m) |<p>Zabbix has not received data for items for the last 5 minutes</p> |`nodata(/Morningstar SureSine SNMP/status.uptime,5m)=1` |WARNING |<p>Manual close: YES</p> |
+|Status: Device has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Morningstar SureSine SNMP/status.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|Status: Failed to fetch data |<p>Zabbix has not received data for items for the last 5 minutes</p> |`nodata(/Morningstar SureSine SNMP/status.uptime,5m)=1` |WARNING |<p>Manual close: YES</p> |
 |Status: Device has "reset" faults flag |<p>-</p> |`count(/Morningstar SureSine SNMP/status.faults[faults.0],#3,"like","reset")=2` |HIGH | |
 |Status: Device has "overcurrent" faults flag |<p>-</p> |`count(/Morningstar SureSine SNMP/status.faults[faults.0],#3,"like","overcurrent")=2` |HIGH | |
 |Status: Device has "unknownFault" faults flag |<p>-</p> |`count(/Morningstar SureSine SNMP/status.faults[faults.0],#3,"like","unknownFault")=2` |HIGH | |

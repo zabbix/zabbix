@@ -663,6 +663,13 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 #define ZBX_DBSYNC_UPDATE	1
 #define ZBX_SYNC_SECRETS	2
 
+typedef enum
+{
+	ZBX_SYNCED_NEW_CONFIG_NO,
+	ZBX_SYNCED_NEW_CONFIG_YES
+}
+zbx_synced_new_config_t;
+
 #define ZBX_ITEM_GET_MISC		0x001
 #define ZBX_ITEM_GET_DELAY		0x002
 #define ZBX_ITEM_GET_EMPTY_ERROR	0x004
@@ -683,7 +690,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
 #define ZBX_ITEM_GET_PROCESS		(ZBX_ITEM_GET_MAINTENANCE|ZBX_ITEM_GET_MISC|ZBX_ITEM_GET_LOGTIMEFMT)
 
-void	DCsync_configuration(unsigned char mode);
+void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced);
 void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths);
 int	init_configuration_cache(char **error);
 void	free_configuration_cache(void);
@@ -1054,4 +1061,22 @@ void	zbx_db_trigger_explain_expression(const DB_TRIGGER *trigger, char **express
 void	zbx_db_trigger_get_function_value(const DB_TRIGGER *trigger, int index, char **value,
 		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
 		char **), int recovery);
+
+int	zbx_dc_get_proxyid_by_name(const char *name, zbx_uint64_t *proxyid, unsigned char *type);
+int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid);
+
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	unsigned char	status;
+	char		*name;
+}
+zbx_cached_proxy_t;
+
+ZBX_PTR_VECTOR_DECL(cached_proxy, zbx_cached_proxy_t *)
+
+void	zbx_dc_get_all_proxies(zbx_vector_cached_proxy_t *proxies);
+
+int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **name);
+
 #endif

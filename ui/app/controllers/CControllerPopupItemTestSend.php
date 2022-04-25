@@ -224,18 +224,15 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			}
 		}
 
-		if (($messages = getMessages()) !== null) {
+		if ($messages = array_column(get_and_clear_messages(), 'message')) {
 			$this->setResponse(
-				(new CControllerResponseData([
-					'main_block' => json_encode([
-						'messages' => $messages->toString(),
-						'steps' => [],
-						'user' => [
-							'debug_mode' => $this->getDebugMode()
-						]
-					])
-				]))->disableView()
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => $messages
+					]
+				])])
 			);
+
 			$ret = false;
 		}
 
@@ -374,8 +371,8 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				}
 			}
 
-			if (($messages = getMessages(false)) !== null) {
-				$output['messages'] = $messages->toString();
+			if ($messages = get_and_clear_messages()) {
+				$output['error']['messages'] = array_column($messages, 'message');
 			}
 		}
 		else {
@@ -385,7 +382,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		// Test preprocessing steps.
 		$this->eol = parent::getInput('eol', ZBX_EOL_LF);
 
-		if (!array_key_exists('messages', $output)) {
+		if (!array_key_exists('error', $output)) {
 			$preproc_test_data['value_type'] = $this->getInput('value_type', ITEM_VALUE_TYPE_STR);
 
 			$preproc_test_data['steps'] = $this->resolvePreprocessingStepMacros($preproc_test_data['steps']);
@@ -469,11 +466,11 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				$output['steps'] = $preproc_test_data['steps'];
 			}
 
-			if (($messages = getMessages(false)) !== null) {
-				$output['messages'] = $messages->toString();
+			if ($messages = get_and_clear_messages()) {
+				$output['error']['messages'] = array_column($messages, 'message');
 			}
 		}
 
-		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

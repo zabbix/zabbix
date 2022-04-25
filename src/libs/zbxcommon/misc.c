@@ -2085,6 +2085,21 @@ fail:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check if custom interval contains scheduling interval             *
+ *                                                                            *
+ * Parameters: custom_intervals - [IN] custom intervals                       *
+ *                                                                            *
+ * Return value: SUCCEED if custom interval contains scheduling interval      *
+ *               FAIL otherwise                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_custom_interval_is_scheduling(const zbx_custom_interval_t *custom_intervals)
+{
+	return NULL == custom_intervals->scheduling ? FAIL : SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: frees custom update intervals                                     *
  *                                                                            *
  * Parameters: custom_intervals - [IN] custom intervals                       *

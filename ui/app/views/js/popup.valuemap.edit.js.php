@@ -75,37 +75,47 @@ $(() => {
 });
 
 function submitValueMap(overlay) {
-	var $form = overlay.$dialogue.find('form'),
-		url = new Curl($form.attr('action'));
+	const form = overlay.$dialogue.$body[0].querySelector('form');
 
-	$form.trimValues(['input[type="text"]']);
+	jQuery(form).trimValues(['input[type="text"]']);
+	const curl = new Curl(form.getAttribute('action'));
 
-	fetch(url.getUrl(), {
+	fetch(curl.getUrl(), {
 		method: 'POST',
-		body: new URLSearchParams(new FormData($form.get(0)))
+		body: new URLSearchParams(new FormData(form))
 	})
 		.then(response => response.json())
 		.then(response => {
-			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
-
-			if (response.errors) {
-				document
-					.querySelector(`.overlay-dialogue[data-dialogueid='${overlay.dialogueid}'] .overlay-dialogue-body`)
-					.prepend($(response.errors).get(0));
-				overlay.unsetLoading();
-
-				return;
+			if ('error' in response) {
+				throw {error: response.error};
 			}
 
 			new AddValueMap(response, response.edit ? overlay.element.closest('tr') : null);
+
 			overlayDialogueDestroy(overlay.dialogueid);
 		})
-		.catch((e) => {
-			document
-				.querySelector(`.overlay-dialogue[data-dialogueid='${overlay.dialogueid}'] .overlay-dialogue-body`)
-				.prepend(makeMessageBox('bad', e, null)[0]);
+		.catch((exception) => {
+			for (const element of form.parentNode.children) {
+				if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+					element.parentNode.removeChild(element);
+				}
+			}
+
+			let title, messages;
+
+			if (typeof exception === 'object' && 'error' in exception) {
+				title = exception.error.title;
+				messages = exception.error.messages;
+			}
+			else {
+				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+			}
+
+			const message_box = makeMessageBox('bad', messages, title)[0];
+
+			form.parentNode.insertBefore(message_box, form);
+		})
+		.finally(() => {
 			overlay.unsetLoading();
 		});
-
-	return;
 }
