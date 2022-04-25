@@ -173,13 +173,13 @@ class testFormLogin extends CWebTest {
 	 * sign in button and checking by views header, if correct url is opened.
 	 */
 	public function testFormLogin_LoginWithRequest() {
-		foreach (['index.php?request=hosts.php', 'index.php?request=zabbix.php%3Faction%3Dproxy.list'] as $url) { 
+		foreach (['index.php?request=hosts.php', 'index.php?request=zabbix.php%3Faction%3Dproxy.list'] as $url) {
 			$this->page->userLogin('Admin', 'zabbix', $url);
 			$header = ($url === 'index.php?request=hosts.php') ? 'Hosts' : 'Proxies';
-			$this->page->assertHeader($header); 
+			$this->page->assertHeader($header);
 		}
 	}
-	
+
 	/**
 	 * Guest user needs to be out of "Disabled" group to have access to frontend.
 	 */
