@@ -894,7 +894,7 @@ class CHostGroup extends CApiService {
 
 		$options = [
 			'output' => ['groupid', 'name'],
-			'filter' => ['name' => array_keys($parent_names)]
+			'filter' => ['name' => array_keys($parent_names), 'type' => HOST_GROUP_TYPE_HOST_GROUP]
 		];
 		$result = DBselect(DB::makeSql('hstgrp', $options));
 

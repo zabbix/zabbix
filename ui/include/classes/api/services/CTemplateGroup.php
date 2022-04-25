@@ -611,7 +611,7 @@ class CTemplateGroup extends CApiService {
 
 		$options = [
 			'output' => ['groupid', 'name'],
-			'filter' => ['name' => array_keys($parent_names)]
+			'filter' => ['name' => array_keys($parent_names), 'type' => HOST_GROUP_TYPE_TEMPLATE_GROUP]
 		];
 		$result = DBselect(DB::makeSql('hstgrp', $options));
 
