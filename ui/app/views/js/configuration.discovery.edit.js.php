@@ -367,8 +367,10 @@
 				.find('.<?= ZBX_STYLE_MSG_BAD ?>')
 				.remove();
 
-			if (typeof response.errors !== 'undefined') {
-				return jQuery(response.errors).insertBefore($form);
+			if ('error' in response) {
+				const message_box = makeMessageBox('bad', response.error.messages, response.error.title);
+
+				message_box.insertBefore($form);
 			}
 			else {
 				var dcheck = response.params;
@@ -385,7 +387,7 @@
 					|| '<?= ZBX_DISCOVERY_UNSPEC ?>';
 
 				if (hasDCheckDuplicates()) {
-					jQuery(makeMessageBox('bad', <?= json_encode(_('Check already exists.')) ?>, null, true, false))
+					jQuery(makeMessageBox('bad', [<?= json_encode(_('Check already exists.')) ?>]))
 						.insertBefore($form);
 
 					return false;

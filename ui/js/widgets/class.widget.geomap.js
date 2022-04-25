@@ -181,18 +181,34 @@ class CWidgetGeoMap extends CWidget {
 
 			node.hintBoxItem = hintBox.createBox(e, node, content, '', true, style, container.parentNode);
 
+			const cluster_bounds = cluster.originalEvent.target.getBoundingClientRect();
+			const hintbox_bounds = this._target.getBoundingClientRect();
+
+			let x = cluster_bounds.left + cluster_bounds.width / 2 - hintbox_bounds.left;
+			let y = cluster_bounds.top - hintbox_bounds.top - 10;
+
 			node.hintBoxItem.position({
 				of: node.hintBoxItem,
 				my: 'center bottom',
-				at: `left+${cluster.containerPoint.x}px top+${cluster.containerPoint.y+15}px`,
+				at: `left+${x}px top+${y}px`,
 				collision: 'fit'
 			});
+
+			Overlay.prototype.recoverFocus.call({'$dialogue': node.hintBoxItem});
+			Overlay.prototype.containFocus.call({'$dialogue': node.hintBoxItem});
 		});
 
-		this._markers.on('click', (e) => {
+		this._markers.on('click keypress', (e) => {
 			const node = e.originalEvent.srcElement;
 			if ('hintBoxItem' in node) {
 				return;
+			}
+
+			if (e.type === 'keypress') {
+				if (e.originalEvent.key !== ' ' && e.originalEvent.key !== 'Enter') {
+					return;
+				}
+				e.originalEvent.preventDefault();
 			}
 
 			const container = this._map._container;
@@ -201,12 +217,21 @@ class CWidgetGeoMap extends CWidget {
 
 			node.hintBoxItem = hintBox.createBox(e, node, content, '', true, style, container.parentNode);
 
+			const marker_bounds = e.originalEvent.target.getBoundingClientRect();
+			const hintbox_bounds = this._target.getBoundingClientRect();
+
+			let x = marker_bounds.left + marker_bounds.width / 2 - hintbox_bounds.left;
+			let y = marker_bounds.top - hintbox_bounds.top - 10;
+
 			node.hintBoxItem.position({
 				of: node.hintBoxItem,
 				my: 'center bottom',
-				at: `left+${e.containerPoint.x}px top+${e.containerPoint.y-10}px`,
+				at: `left+${x}px top+${y}px`,
 				collision: 'fit'
 			});
+
+			Overlay.prototype.recoverFocus.call({'$dialogue': node.hintBoxItem});
+			Overlay.prototype.containFocus.call({'$dialogue': node.hintBoxItem});
 		});
 
 		this._map.getContainer().addEventListener('cluster.dblclick', (e) => {
@@ -275,7 +300,14 @@ class CWidgetGeoMap extends CWidget {
 		});
 
 		// Transform 'clusterclick' event as 'cluster.click' and 'cluster.dblclick' events.
-		clusters.on('clusterclick', (c) => {
+		clusters.on('clusterclick clusterkeypress', (c) => {
+			if (c.type === 'clusterkeypress') {
+				if (c.originalEvent.key !== ' ' && c.originalEvent.key !== 'Enter') {
+					return;
+				}
+				c.originalEvent.preventDefault();
+			}
+
 			if ('event_click' in clusters) {
 				clearTimeout(clusters.event_click);
 				delete clusters.event_click;

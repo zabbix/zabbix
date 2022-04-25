@@ -28,8 +28,9 @@
  *
  * @return array    an array of locales with locale codes as keys and arrays as values
  */
-function getLocales() {
+function getLocales(): array {
 	return [
+		'en_GB' => ['name' => _('English (en_GB)'),	'display' => true],
 		'en_US' => ['name' => _('English (en_US)'),	'display' => true],
 		'bg_BG' => ['name' => _('Bulgarian (bg_BG)'),	'display' => false],
 		'ca_ES' => ['name' => _('Catalan (ca_ES)'),	'display' => false],
@@ -174,6 +175,7 @@ function zbx_locale_variants_win($language) {
 	// http://docs.moodle.org/dev/Table_of_locales#Table
 	// This array should contain all array keys from getLocales() function, but in lowercase.
 	$win_language_names = [
+		'en_gb' => ['English_United Kingdom.1252', 'english-uk'],
 		'en_us' => ['English_United States.1252', 'english-usa'],
 		'bg_bg' => ['Bulgarian_Bulgaria.1251'],
 		'ca_es' => ['Catalan_Spain.1252'],

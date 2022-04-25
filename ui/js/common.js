@@ -325,19 +325,22 @@ function getPosition(obj) {
 /**
  * Opens popup content in overlay dialogue.
  *
- * @param {string}           action           Popup controller related action.
- * @param {array|object}     parameters       Array with key/value pairs that will be used as query for popup request.
+ * @param {string}           action              Popup controller related action.
+ * @param {array|object}     parameters          Array with key/value pairs that will be used as query for popup
+ *                                               request.
  *
- * @param {string}           dialogue_class   CSS class, usually based on .modal-popup and .modal-popup-{size}.
- * @param {string|null}      dialogueid       ID of overlay dialogue.
- * @param {HTMLElement|null} trigger_element  UI element which was clicked to open overlay dialogue.
+ * @param {string}           dialogue_class      CSS class, usually based on .modal-popup and .modal-popup-{size}.
+ * @param {string|null}      dialogueid          ID of overlay dialogue.
+ * @param {HTMLElement|null} trigger_element     UI element which was clicked to open overlay dialogue.
+ * @param {bool}             prevent_navigation  Show warning when navigating away from an active dialogue.
  *
  * @returns {Overlay}
  */
 function PopUp(action, parameters, {
 	dialogueid = null,
 	dialogue_class = '',
-	trigger_element = document.activeElement
+	trigger_element = document.activeElement,
+	prevent_navigation = false
 } = {}) {
 	var overlay = overlays_stack.getById(dialogueid);
 
@@ -350,16 +353,17 @@ function PopUp(action, parameters, {
 			class: 'modal-popup ' + dialogue_class,
 			buttons: [],
 			element: trigger_element,
-			type: 'popup'
+			type: 'popup',
+			prevent_navigation
 		});
 	}
 
 	overlay
 		.load(action, parameters)
 		.then(function(resp) {
-			if (typeof resp.errors !== 'undefined') {
+			if ('error' in resp) {
 				overlay.setProperties({
-					content: resp.errors
+					content: makeMessageBox('bad', resp.error.messages, resp.error.title, false)
 				});
 			}
 			else {
@@ -390,7 +394,7 @@ function PopUp(action, parameters, {
 					doc_url: resp.doc_url,
 					content: resp.body,
 					controls: resp.controls,
-					buttons: buttons,
+					buttons,
 					debug: resp.debug,
 					script_inline: resp.script_inline,
 					data: resp.data || null
@@ -705,24 +709,27 @@ function validate_trigger_expression(overlay) {
 		success: function(ret) {
 			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 
-			if (typeof ret.errors !== 'undefined') {
-				jQuery(ret.errors).insertBefore($form);
+			if ('error' in ret) {
+				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);
+
+				message_box.insertBefore($form);
+
+				return;
+			}
+
+			var form = window.document.forms[ret.dstfrm];
+			var obj = (typeof form !== 'undefined')
+				? jQuery(form).find('#' + ret.dstfld1).get(0)
+				: document.getElementById(ret.dstfld1);
+
+			if (ret.dstfld1 === 'expression' || ret.dstfld1 === 'recovery_expression') {
+				jQuery(obj).val(jQuery(obj).val() + ret.expression);
 			}
 			else {
-				var form = window.document.forms[ret.dstfrm];
-				var obj = (typeof form !== 'undefined')
-					? jQuery(form).find('#' + ret.dstfld1).get(0)
-					: document.getElementById(ret.dstfld1);
-
-				if (ret.dstfld1 === 'expression' || ret.dstfld1 === 'recovery_expression') {
-					jQuery(obj).val(jQuery(obj).val() + ret.expression);
-				}
-				else {
-					jQuery(obj).val(ret.expression);
-				}
-
-				overlayDialogueDestroy(overlay.dialogueid);
+				jQuery(obj).val(ret.expression);
 			}
+
+			overlayDialogueDestroy(overlay.dialogueid);
 		},
 		dataType: 'json',
 		type: 'POST'
@@ -1010,7 +1017,14 @@ function openMassupdatePopup(action, parameters = {}, {
 }) {
 	const form = trigger_element.closest('form');
 
-	parameters.ids = chkbxRange.getSelectedIds();
+	switch (action) {
+		case 'popup.massupdate.host':
+			parameters.hostids = chkbxRange.getSelectedIds();
+			break;
+
+		default:
+			parameters.ids = chkbxRange.getSelectedIds();
+	}
 
 	switch (action) {
 		case 'popup.massupdate.item':

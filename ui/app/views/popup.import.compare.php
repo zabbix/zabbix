@@ -139,9 +139,9 @@ function rowsToDivs(array $rows): array {
 	return $divs;
 }
 
-if ($data['errors'] !== null) {
+if (array_key_exists('error', $data)) {
 	$output = [
-		'errors' => $data['errors']
+		'error' => $data['error']
 	];
 }
 else {

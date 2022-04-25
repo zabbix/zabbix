@@ -438,13 +438,14 @@ class testFormTabIndicators extends CWebTest {
 			// Proxy configuration form tab data.
 			[
 				[
-					'url' => 'zabbix.php?action=proxy.edit',
+					'url' => 'zabbix.php?action=proxy.list',
+					'create_button' => 'Create proxy',
 					'form' => 'id:proxy-form',
 					'tabs' => [
 						[
 							'name' => 'Encryption',
 							'entries' => [
-								'selector' => 'id:tls_in_psk',
+								'selector' => 'id:tls_accept_psk',
 								'value' => true,
 								'old_value' => false
 							],
@@ -666,6 +667,10 @@ class testFormTabIndicators extends CWebTest {
 			$form->getField('Type')->fill('Graph');
 			$form->invalidate();
 		}
+		elseif (CTestArrayHelper::get($data, 'create_button')) {
+			$this->query('button', $data['create_button'])->one()->click();
+			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		}
 		else {
 			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
 		}
@@ -697,6 +702,10 @@ class testFormTabIndicators extends CWebTest {
 			$this->updateTabFields($tab, $form, USER_ACTION_REMOVE);
 			$old_value = (CTestArrayHelper::get($tab, 'count', false)) ? 0 : $old_value;
 			$this->assertTabIndicator($tab_selector, $old_value);
+		}
+
+		if (CTestArrayHelper::get($data, 'create_button')) {
+			COverlayDialogElement::find()->one()->waitUntilReady()->close();
 		}
 	}
 

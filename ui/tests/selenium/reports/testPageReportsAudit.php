@@ -28,6 +28,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 	private $actions = [
 		-1 => 'All',
 		0 /* CAudit::ACTION_ADD */ => 'Add',
+		11 /* CAudit::ACTION_CONFIG_REFRESH */ => 'Configuration refresh',
 		2 /* CAudit::ACTION_DELETE */ => 'Delete',
 		7 /* CAudit::ACTION_EXECUTE */ => 'Execute',
 		9 /* CAudit::ACTION_LOGIN_FAILED */ => 'Failed login',
@@ -188,7 +189,9 @@ class testPageReportsAudit extends CLegacyWebTest {
 
 				case 'Discovery rule':
 				case 'Host':
-					$this->assertEquals(['Execute', 'Failed login','History clear', 'Login', 'Logout'], $disabled);
+					$this->assertEquals(['Configuration refresh', 'Execute', 'Failed login','History clear', 'Login',
+							'Logout'], $disabled
+					);
 					break;
 
 				case 'Image':
@@ -202,19 +205,25 @@ class testPageReportsAudit extends CLegacyWebTest {
 					break;
 
 				case 'Script':
-					$this->assertEquals(['Failed login', 'History clear', 'Login', 'Logout'], $disabled);
+					$this->assertEquals(['Configuration refresh', 'Failed login', 'History clear', 'Login', 'Logout'], $disabled);
+					break;
+
+				case 'Proxy':
+					$this->assertEquals(['All', 'Add', 'Configuration refresh', 'Delete', 'Update'], $enabled);
 					break;
 
 				case 'User':
-					$this->assertEquals(['Execute', 'History clear'], $disabled);
+					$this->assertEquals(['Configuration refresh', 'Execute', 'History clear'], $disabled);
 					break;
 
 				case 'Item':
-					$this->assertEquals(['Execute', 'Failed login', 'Login', 'Logout'], $disabled);
+					$this->assertEquals(['Configuration refresh', 'Execute', 'Failed login', 'Login', 'Logout'], $disabled);
 					break;
 
 				default:
-					$this->assertEquals(['Execute', 'Failed login', 'History clear', 'Login', 'Logout'], $disabled);
+					$this->assertEquals(['Configuration refresh', 'Execute', 'Failed login', 'History clear', 'Login',
+							'Logout'], $disabled
+					);
 			}
 		}
 	}
