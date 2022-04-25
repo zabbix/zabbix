@@ -107,6 +107,31 @@ static zbx_vmware_datastore_t	*ds_get(const zbx_vector_vmware_datastore_t *dss, 
 	return dss->values[i];
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: return pointer to DVSwitch data from vector with uuid             *
+ *                                                                            *
+ * Parameters: dvss - [IN] the vector with all DVSwitches                     *
+ *             uuid - [IN] the id of dvswitch                                 *
+ *                                                                            *
+ * Return value:                                                              *
+ *        zbx_vmware_dvswitch_t* - the operation has completed successfully   *
+ *        NULL                    - the operation has failed                  *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_dvswitch_t	*dvs_get(const zbx_vector_vmware_dvswitch_t *dvss, const char *uuid)
+{
+	int			i;
+	zbx_vmware_dvswitch_t	dvs_cmp;
+
+	dvs_cmp.uuid = (char *)uuid;
+
+	if (FAIL == (i = zbx_vector_vmware_dvswitch_bsearch(dvss, &dvs_cmp, vmware_dvs_uuid_compare)))
+		return NULL;
+
+	return dvss->values[i];
+}
+
 static zbx_vmware_hv_t	*service_hv_get_by_vm_uuid(zbx_vmware_service_t *service, const char *uuid)
 {
 	zbx_vmware_vm_t		vm_local = {.uuid = (char *)uuid};
@@ -2626,6 +2651,228 @@ int	check_vcenter_datastore_write(AGENT_REQUEST *request, const char *username, 
 {
 	return check_vcenter_datastore_latency(request, username, password, "datastore/totalWriteLatency[average]",
 			ZBX_VMWARE_DS_WRITE_FILTER, result);
+}
+
+int	check_vcenter_dvswitch_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	struct zbx_json		json_data;
+	const char		*url;
+	zbx_vmware_service_t	*service;
+	int			i, ret = SYSINFO_RET_FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (1 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
+
+	for (i = 0; i < service->data->dvswitches.values_num; i++)
+	{
+		zbx_vmware_dvswitch_t	*dvswitch = (zbx_vmware_dvswitch_t *)service->data->dvswitches.values[i];
+
+		zbx_json_addobject(&json_data, NULL);
+		zbx_json_addstring(&json_data, "{#DVSWITCH.UUID}", dvswitch->uuid, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#DVSWITCH.NAME}", dvswitch->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&json_data);
+	}
+
+	zbx_json_close(&json_data);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, json_data.buffer));
+
+	zbx_json_free(&json_data);
+
+	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+static int	dvs_param_validate(zbx_vector_custquery_param_t *query_params)
+{
+	int	i;
+
+	for (i = 0; i < query_params->values_num; i++)
+	{
+		zbx_vmware_custquery_param_t	*p = &query_params->values[i];
+
+		if (0 == strcmp("active", p->name) || 0 == strcmp("connected", p->name) ||
+				0 == strcmp("inside", p->name) || 0 == strcmp("nsxPort", p->name) ||
+				0 == strcmp("uplinkPort", p->name))
+		{
+			if (0 != strcmp("true", p->value) && 0 != strcmp("false", p->value))
+				return FAIL;
+		}
+		else if (0 != strcmp("host", p->name) && 0 != strcmp("portgroupKey", p->name) &&
+				0 != strcmp("portKey", p->name))
+		{
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
+static int	custquery_param_create(const char *key, zbx_vector_custquery_param_t *query_params)
+{
+	char				*left, *right, *src;
+	zbx_vmware_custquery_param_t	param = {NULL, NULL};
+	int				ret = SUCCEED;
+
+	if ('\0' == *key)
+		return ret;
+
+	src = zbx_strdup(NULL, key);
+
+	while (1)
+	{
+		zbx_strsplit_first(src, ';', &left, &right);
+
+		if (NULL == left || '\0' == *left)
+		{
+			ret = FAIL;
+			break;
+		}
+
+		zbx_strsplit_first(left, ':', &param.name, &param.value);
+
+		if (NULL == param.name || '\0' == *param.name || NULL == param.value)
+		{
+			ret = FAIL;
+			break;
+		}
+
+		zbx_vector_custquery_param_append(query_params, param);
+		param.name = NULL;
+		param.value = NULL;
+
+		if (NULL == right || '\0' == *right)
+			break;
+
+		zbx_free(src);
+		src = right;
+		right = NULL;
+		zbx_free(left);
+	}
+
+	zbx_free(param.name);
+	zbx_free(param.value);
+	zbx_free(left);
+	zbx_free(right);
+	zbx_free(src);
+
+	return ret;
+}
+
+int	check_vcenter_dvswitch_fetchports_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	const char			*mode, *url, *uuid, *key, *type = ZBX_VMWARE_SOAP_DVS;
+	zbx_vmware_service_t		*service;
+	zbx_vmware_dvswitch_t		*dvs;
+	int				ret = SYSINFO_RET_FAIL;
+	zbx_vmware_cust_query_t		*custom_query;
+	zbx_vector_custquery_param_t	query_params;
+	zbx_vmware_custom_query_type_t	query_type = VMWARE_DVSWITCH_FETCH_DV_PORTS;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_custquery_param_create(&query_params);
+
+	if (2 > request->nparam || request->nparam > 4)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+	key = get_rparam(request, 2);
+	mode = get_rparam(request, 3);
+
+	if (NULL == mode)
+	{
+		mode = "state";
+	}
+	else if (0 != strcmp(mode, "state") && 0 != strcmp(mode, "full"))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
+		goto out;
+	}
+
+	if (NULL == key)
+		key = "";
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (dvs = dvs_get(&service->data->dvswitches, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown DVSwitch uuid."));
+		goto unlock;
+	}
+
+	if (NULL == (custom_query = zbx_vmware_service_get_cust_query(service, type, dvs->id, key, query_type, mode))
+			&& ( SUCCEED != custquery_param_create(key, &query_params)
+			|| SUCCEED != dvs_param_validate(&query_params)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL,
+				"Unknown format of vmware DistributedVirtualSwitchPortCriteria."));
+		goto unlock;
+	}
+
+	/* FAIL is returned if custom query exists */
+	if (NULL == custom_query && SUCCEED == zbx_vmware_service_add_cust_query(service, type, dvs->id, key,
+			query_type, mode, &query_params))
+	{
+		ret = SYSINFO_RET_OK;
+		goto unlock;
+	}
+	else if (NULL == custom_query)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown DVSwitch query."));
+		goto unlock;
+	}
+
+	if (0 != (custom_query->state & ZBX_VMWARE_CQ_ERROR))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, custom_query->error));
+		goto unlock;
+	}
+
+	if (0 != (custom_query->state & ZBX_VMWARE_CQ_READY))
+		SET_STR_RESULT(result, zbx_strdup(NULL, custom_query->value));
+
+	if (0 != (custom_query->state & ZBX_VMWARE_CQ_PAUSED))
+		custom_query->state &= ~ ZBX_VMWARE_CQ_PAUSED;
+
+	custom_query->last_pooled = time(NULL);
+	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zbx_vector_custquery_param_clear_ext(&query_params, zbx_vmware_cq_param_free);
+	zbx_vector_custquery_param_destroy(&query_params);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
 }
 
 int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, const char *username, const char *password,

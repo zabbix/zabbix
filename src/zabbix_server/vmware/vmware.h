@@ -160,6 +160,16 @@ zbx_vmware_datacenter_t;
 int	vmware_dc_name_compare(const void *d1, const void *d2);
 ZBX_PTR_VECTOR_DECL(vmware_datacenter, zbx_vmware_datacenter_t *)
 
+typedef struct
+{
+	char			*uuid;
+	char			*id;
+	char			*name;
+}
+zbx_vmware_dvswitch_t;
+int	vmware_dvs_uuid_compare(const void *d1, const void *d2);
+ZBX_PTR_VECTOR_DECL(vmware_dvswitch, zbx_vmware_dvswitch_t *)
+
 #define ZBX_VMWARE_DEV_TYPE_NIC		1
 #define ZBX_VMWARE_DEV_TYPE_DISK	2
 typedef struct
@@ -254,8 +264,64 @@ typedef struct
 	int				max_query_metrics;	/* max count of Datastore perfCounters in one request */
 	zbx_vector_vmware_datastore_t	datastores;
 	zbx_vector_vmware_datacenter_t	datacenters;
+	zbx_vector_vmware_dvswitch_t	dvswitches;
 }
 zbx_vmware_data_t;
+
+typedef enum
+{
+	VMWARE_OBJECT_PROPERTY,
+	VMWARE_DVSWITCH_FETCH_DV_PORTS
+}
+zbx_vmware_custom_query_type_t;
+
+typedef struct
+{
+	char	*name;
+	char	*value;
+}
+zbx_vmware_custquery_param_t;
+ZBX_PTR_VECTOR_DECL(custquery_param, zbx_vmware_custquery_param_t)
+void	zbx_vmware_cq_param_free(zbx_vmware_custquery_param_t cq_param);
+
+/* the vmware custom request */
+typedef struct
+{
+	/* entity type: HostSystem, VirtualMachine etc */
+	char				*soap_type;
+
+	/* queried object id: host-18, vm-15 etc */
+	char				*id;
+
+	/* id of query: "summary.totalMemory" etc */
+	char				*key;
+
+	/* the mode of output value for custom query */
+	char				*mode;
+
+	/* the type of query OBJECT or DVSWITCH */
+	zbx_vmware_custom_query_type_t	query_type;
+
+	/* the fields name and values of query */
+	zbx_vector_custquery_param_t	*query_params;
+
+	/* timestamp when the entity was pooled last time */
+	time_t				last_pooled;
+
+	/* the result of query */
+	char				*value;
+
+#define ZBX_VMWARE_CQ_NEW	0
+#define ZBX_VMWARE_CQ_READY	1
+#define ZBX_VMWARE_CQ_ERROR	2
+#define ZBX_VMWARE_CQ_PAUSED	4
+	/* the state of query */
+	unsigned char			state;
+
+	/* error information */
+	char				*error;
+}
+zbx_vmware_cust_query_t;
 
 /* the vmware service data */
 typedef struct
@@ -286,7 +352,7 @@ typedef struct
 	/* the vmware service instance fullname */
 	char				*fullname;
 
-	/* the performance counters */
+	/* the performance counters dictionary */
 	zbx_hashset_t			counters;
 
 	/* list of entities to monitor with performance counters */
@@ -297,6 +363,9 @@ typedef struct
 
 	/* lastlogsize when vmware.eventlog[] item was polled last time and skip old flag*/
 	zbx_vmware_eventlog_state_t	eventlog;
+
+	/* list of custom queries to monitor */
+	zbx_hashset_t			cust_queries;
 }
 zbx_vmware_service_t;
 
@@ -340,6 +409,12 @@ int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const cha
 		zbx_uint64_t counterid, const char *instance);
 zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_t *service, const char *type,
 		const char *id);
+
+int	zbx_vmware_service_add_cust_query(zbx_vmware_service_t *service, const char *type, const char *id,
+		const char *key, zbx_vmware_custom_query_type_t query_type, const char *mode,
+		zbx_vector_custquery_param_t *query_instance);
+zbx_vmware_cust_query_t	*zbx_vmware_service_get_cust_query(zbx_vmware_service_t *service, const char *type,
+		const char *id, const char *key, zbx_vmware_custom_query_type_t query_type, const char *mode);
 
 /* hypervisor properties */
 #define ZBX_VMWARE_HVPROP_OVERALL_CPU_USAGE		0
@@ -401,6 +476,8 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_SOAP_DS		"Datastore"
 #define ZBX_VMWARE_SOAP_HV		"HostSystem"
 #define ZBX_VMWARE_SOAP_VM		"VirtualMachine"
+#define ZBX_VMWARE_SOAP_DC		"Datacenter"
+#define ZBX_VMWARE_SOAP_DVS		"VmwareDistributedVirtualSwitch"
 
 /* Indicates the unit of measure represented by a counter or statistical value */
 #define ZBX_VMWARE_UNIT_UNDEFINED		0
