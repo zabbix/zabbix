@@ -158,11 +158,13 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array  $templateids
 	 * @param array  $db_hosts
 	 */
-	protected function massCheckTemplatesLinks(string $method, array $templateids, array $db_hosts): void {
+	protected function massCheckTemplatesLinks(string $method, array $templateids, array $db_hosts,
+			array $templateids_clear = []): void {
 		$ins_templates = [];
 		$del_links = [];
 		$check_double_linkage = false;
 		$del_templates = [];
+		$del_links_clear  = [];
 
 		foreach ($db_hosts as $hostid => $db_host) {
 			$db_templateids = array_column($db_host['templates'], 'templateid');
@@ -211,12 +213,19 @@ abstract class CHostGeneral extends CHostBase {
 				if ($upd_templateids) {
 					$del_templates[$db_templateid][$hostid] = $upd_templateids;
 				}
+
+				if (array_key_exists($db_templateid, $templateids_clear)) {
+					$del_links_clear[$db_templateid][$hostid] = true;
+				}
 			}
 		}
 
 		if ($del_templates) {
-			$this->checkTriggerDependenciesOfUpdTemplates($del_templates);
 			$this->checkTriggerExpressionsOfDelTemplates($del_templates);
+		}
+
+		if ($del_links_clear) {
+			$this->checkTriggerDependenciesOfHostTriggers($del_links_clear);
 		}
 
 		if ($ins_templates) {
