@@ -21,7 +21,7 @@
 #define ZABBIX_ZBXSERVICE_H
 
 #include "zbxtypes.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 
 ZBX_PTR_VECTOR_DECL(service, DB_SERVICE *)

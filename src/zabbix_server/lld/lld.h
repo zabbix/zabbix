@@ -22,7 +22,7 @@
 
 #include "common.h"
 #include "zbxjson.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 
 typedef struct
 {

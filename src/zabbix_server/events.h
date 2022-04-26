@@ -20,7 +20,7 @@
 #ifndef ZABBIX_EVENTS_H
 #define ZABBIX_EVENTS_H
 
-#include "db.h"
+#include "zbxdbhigh.h"
 
 void	zbx_initialize_events(void);
 void	zbx_uninitialize_events(void);

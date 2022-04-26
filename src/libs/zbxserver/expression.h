@@ -20,7 +20,7 @@
 #ifndef ZABBIX_EXPRESSION_H
 #define ZABBIX_EXPRESSION_H
 
-#include "db.h"
+#include "zbxdbhigh.h"
 
 /* DBget_item_value() */
 #define ZBX_REQUEST_HOST_ID			101

@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ZBXALERT_H
 #define ZABBIX_ZBXALERT_H
 
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 
 typedef struct

@@ -21,7 +21,7 @@
 #define ZABBIX_REPORT_PROTOCOL_H
 
 #include "zbxalgo.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 
 #define ZBX_REPORT_PARAM_SUBJECT	"subject"
 #define ZBX_REPORT_PARAM_BODY		"body"
