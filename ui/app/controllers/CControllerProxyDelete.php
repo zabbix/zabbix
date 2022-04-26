@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,32 +21,43 @@
 
 class CControllerProxyDelete extends CController {
 
-	protected function checkInput() {
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
+	protected function checkInput(): bool {
 		$fields = [
-			'proxyids' => 'array_db hosts.hostid|required'
+			'proxyids' => 'required|array_id'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'title' => _('Cannot delete proxies'),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
 		}
 
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)) {
 			return false;
 		}
 
-		$proxies = API::Proxy()->get([
+		$num_proxies = API::Proxy()->get([
 			'proxyids' => $this->getInput('proxyids'),
 			'countOutput' => true,
 			'editable' => true
 		]);
 
-		return ($proxies == count($this->getInput('proxyids')));
+		return $num_proxies == count($this->getInput('proxyids'));
 	}
 
 	protected function doAction() {
@@ -54,20 +65,31 @@ class CControllerProxyDelete extends CController {
 
 		$result = API::Proxy()->delete($proxyids);
 
-		$deleted = count($proxyids);
-
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'proxy.list')
-			->setArgument('page', CPagerHelper::loadPage('proxy.list', null))
-		);
+		$output = [];
 
 		if ($result) {
-			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_n('Proxy deleted', 'Proxies deleted', $deleted));
+			$output['success']['title'] = _n('Proxy deleted', 'Proxies deleted', count($proxyids));
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
 		}
 		else {
-			CMessageHelper::setErrorTitle(_n('Cannot delete proxy', 'Cannot delete proxies', $deleted));
+			$output['error'] = [
+				'title' => _n('Cannot delete proxy', 'Cannot delete proxies', count($proxyids)),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
+
+			$proxies = API::Proxy()->get([
+				'output' => [],
+				'proxyids' => $proxyids,
+				'editable' => true,
+				'preservekeys' => true
+			]);
+
+			$output['keepids'] = array_keys($proxies);
 		}
-		$this->setResponse($response);
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

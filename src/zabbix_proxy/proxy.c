@@ -24,13 +24,12 @@
 #include "zbxdbupgrade.h"
 #include "log.h"
 #include "zbxgetopt.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 
 #include "sysinfo.h"
 #include "zbxmodules.h"
 
 #include "zbxnix.h"
-#include "daemon.h"
 #include "zbxself.h"
 
 #include "../zabbix_server/dbsyncer/dbsyncer.h"
@@ -52,11 +51,11 @@
 #include "zbxcrypto.h"
 #include "../zabbix_server/preprocessor/preproc_manager.h"
 #include "../zabbix_server/preprocessor/preproc_worker.h"
-#include "../zabbix_server/availability/avail_manager.h"
+#include "zbxavailability.h"
 #include "../libs/zbxvault/vault.h"
 #include "zbxdiag.h"
-#include "sighandler.h"
 #include "zbxrtc.h"
+#include "../zabbix_server/availability/avail_manager.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
@@ -195,7 +194,8 @@ int	CONFIG_PROXY_OFFLINE_BUFFER	= 1;
 
 int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
 
-int	CONFIG_PROXYCONFIG_FREQUENCY	= SEC_PER_HOUR;
+/* how often active Zabbix proxy requests configuration data from server, in seconds */
+int	CONFIG_PROXYCONFIG_FREQUENCY	= SEC_PER_MIN * 5;
 int	CONFIG_PROXYDATA_FREQUENCY	= 1;
 
 int	CONFIG_HISTSYNCER_FORKS		= 4;
@@ -1037,7 +1037,7 @@ int	main(int argc, char **argv)
 		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
-	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
+	return zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 }
 
 static void	zbx_check_db(void)

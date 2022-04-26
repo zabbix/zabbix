@@ -19,7 +19,7 @@
 
 #include "selfmon.h"
 
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
 #include "log.h"
 

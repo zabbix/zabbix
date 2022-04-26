@@ -19,7 +19,7 @@
 
 #include "report_writer.h"
 
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
 #include "log.h"
 #include "zbxjson.h"

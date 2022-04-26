@@ -19,7 +19,7 @@
 
 #include "poller.h"
 
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxserver.h"
 #include "zbxself.h"
 #include "preproc.h"
@@ -40,7 +40,6 @@
 #include "zbxcrypto.h"
 #include "zbxjson.h"
 #include "zbxhttp.h"
-#include "avail_protocol.h"
 #include "log.h"
 #include "zbxavailability.h"
 
@@ -834,6 +833,9 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				break;
 			case CONFIG_ERROR:
 				/* nothing to do */
+				break;
+			case SIG_ERROR:
+				/* nothing to do, execution was forcibly interrupted by signal */
 				break;
 			default:
 				zbx_error("unknown response code returned: %d", errcodes[i]);

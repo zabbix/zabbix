@@ -99,6 +99,7 @@ void	zbx_tm_task_clear(zbx_tm_task_t *task)
 				/* nothing to clear */
 				break;
 			case ZBX_TM_TASK_DATA:
+			case ZBX_TM_PROXYDATA:
 				tm_data_clear((zbx_tm_data_t *)task->data);
 				break;
 			case ZBX_TM_TASK_DATA_RESULT:
@@ -224,7 +225,7 @@ zbx_tm_check_now_t	*zbx_tm_check_now_create(zbx_uint64_t itemid)
  * Return value: The created data task.                                       *
  *                                                                            *
  ******************************************************************************/
-zbx_tm_data_t	*zbx_tm_data_create(zbx_uint64_t parent_taskid, const char *str, int len, int type)
+zbx_tm_data_t	*zbx_tm_data_create(zbx_uint64_t parent_taskid, const char *str, size_t len, int type)
 {
 	zbx_tm_data_t	*data;
 
@@ -445,7 +446,12 @@ static int	tm_save_data_tasks(zbx_tm_task_t **tasks, int tasks_num)
 		switch (task->type)
 		{
 			case ZBX_TM_TASK_DATA:
+			case ZBX_TM_PROXYDATA:
 				data = (zbx_tm_data_t *)task->data;
+
+				if (0 == data->parent_taskid)
+					data->parent_taskid = task->taskid;
+
 				zbx_db_insert_add_values(&db_insert, task->taskid, data->type, data->data,
 						data->parent_taskid);
 		}
@@ -538,6 +544,7 @@ static int	tm_save_tasks(zbx_tm_task_t **tasks, int tasks_num)
 				check_now_num++;
 				break;
 			case ZBX_TM_TASK_DATA:
+			case ZBX_TM_PROXYDATA:
 				data_num++;
 				break;
 			case ZBX_TM_TASK_DATA_RESULT:
@@ -791,6 +798,7 @@ void	zbx_tm_json_serialize_tasks(struct zbx_json *json, const zbx_vector_ptr_t *
 				tm_json_serialize_check_now(json, (zbx_tm_check_now_t *)task->data);
 				break;
 			case ZBX_TM_TASK_DATA:
+			case ZBX_TM_PROXYDATA:
 				tm_json_serialize_data(json, (zbx_tm_data_t *)task->data);
 				break;
 			case ZBX_TM_TASK_DATA_RESULT:
@@ -1112,6 +1120,7 @@ void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_p
 				task->data = tm_json_deserialize_check_now(&jp_task);
 				break;
 			case ZBX_TM_TASK_DATA:
+			case ZBX_TM_PROXYDATA:
 				task->data = tm_json_deserialize_data(&jp_task);
 				break;
 			case ZBX_TM_TASK_DATA_RESULT:
@@ -1144,7 +1153,7 @@ void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_p
  * Return value: The created data task id or 0 on failure.                    *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	zbx_create_task_data(const char *data, int len, zbx_uint64_t proxy_hostid)
+static zbx_uint64_t	zbx_create_task_data(const char *data, size_t len, zbx_uint64_t proxy_hostid)
 {
 	zbx_tm_task_t	*task;
 	zbx_uint64_t	taskid;
@@ -1223,7 +1232,7 @@ static int	zbx_tm_task_result_wait(zbx_uint64_t taskid, char **info)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tm_execute_task_data(const char *data, int len, zbx_uint64_t proxy_hostid, char **info)
+int	zbx_tm_execute_task_data(const char *data, size_t len, zbx_uint64_t proxy_hostid, char **info)
 {
 	zbx_uint64_t	taskid;
 

@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "threads.h"
+#include "zbxthreads.h"
 #include "zbxcommshigh.h"
 #include "cfg.h"
 #include "log.h"
 #include "zbxgetopt.h"
 #include "zbxjson.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "zbxcrypto.h"
 #if defined(_WINDOWS)
 #	include "../libs/zbxcrypto/tls.h"
@@ -1859,6 +1859,9 @@ exit:
 	}
 #endif
 	zabbix_close_log();
+#ifndef _WINDOWS
+	zbx_locks_destroy();
+#endif
 #if defined(_WINDOWS)
 	while (0 == WSACleanup())
 		;

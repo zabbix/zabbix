@@ -66,14 +66,12 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$output = [];
-
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
 			);
 		}
 
@@ -168,17 +166,17 @@ class CControllerPopupAcknowledgeCreate extends CController {
 			$output['message'] = _n('Event updated', 'Events updated', $updated_events_count);
 		}
 		else {
-			error(($data && $data['action'] == ZBX_PROBLEM_UPDATE_NONE)
+			error($data && $data['action'] == ZBX_PROBLEM_UPDATE_NONE
 				? _('At least one update operation or message is mandatory')
 				: _n('Cannot update event', 'Cannot update events', $updated_events_count)
 			);
 
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
+			$output['error'] = [
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 
 	/**

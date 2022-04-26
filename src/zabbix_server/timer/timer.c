@@ -21,7 +21,7 @@
 
 #include "log.h"
 #include "dbcache.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
 
 #define ZBX_TIMER_DELAY		SEC_PER_MIN

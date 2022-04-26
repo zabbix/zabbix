@@ -36,6 +36,44 @@
 #define ZBX_AVAIL_HOSTDATA_FREQUENCY		5
 #define ZBX_AVAIL_SERVER_CONN_TIMEOUT		3600
 
+/* agent (ZABBIX, SNMP, IPMI, JMX) availability data */
+typedef struct
+{
+	/* flags specifying which fields are set, see ZBX_FLAGS_AGENT_STATUS_* defines */
+	unsigned char	flags;
+
+	/* agent availability fields */
+	unsigned char	available;
+	char		*error;
+	int		errors_from;
+	int		disable_until;
+}
+zbx_agent_availability_t;
+
+#define ZBX_FLAGS_AGENT_STATUS_NONE		0x00000000
+#define ZBX_FLAGS_AGENT_STATUS_AVAILABLE	0x00000001
+#define ZBX_FLAGS_AGENT_STATUS_ERROR		0x00000002
+#define ZBX_FLAGS_AGENT_STATUS_ERRORS_FROM	0x00000004
+#define ZBX_FLAGS_AGENT_STATUS_DISABLE_UNTIL	0x00000008
+
+#define ZBX_FLAGS_AGENT_STATUS		(ZBX_FLAGS_AGENT_STATUS_AVAILABLE |	\
+					ZBX_FLAGS_AGENT_STATUS_ERROR |		\
+					ZBX_FLAGS_AGENT_STATUS_ERRORS_FROM |	\
+					ZBX_FLAGS_AGENT_STATUS_DISABLE_UNTIL)
+
+typedef struct
+{
+	zbx_uint64_t			interfaceid;
+	zbx_agent_availability_t	agent;
+	/* ensure chronological order in case of flapping interface availability */
+	int				id;
+}
+zbx_interface_availability_t;
+
+ZBX_PTR_VECTOR_DECL(availability_ptr, zbx_interface_availability_t *)
+
+#define ZBX_IPC_SERVICE_AVAILABILITY	"availability"
+
 void	zbx_availability_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size, zbx_ipc_message_t *response);
 void	zbx_availabilities_flush(const zbx_vector_availability_ptr_t *interface_availabilities);
 
@@ -59,4 +97,42 @@ zbx_proxy_hostdata_t;
 void	zbx_availability_serialize_json_hostdata(zbx_vector_ptr_t *hostdata, struct zbx_json *j);
 int	zbx_get_active_agent_availability(zbx_uint64_t hostid);
 
+void	zbx_interface_availability_init(zbx_interface_availability_t *availability, zbx_uint64_t interfaceid);
+void	zbx_interface_availability_clean(zbx_interface_availability_t *ia);
+void	zbx_interface_availability_free(zbx_interface_availability_t *availability);
+void	zbx_agent_availability_init(zbx_agent_availability_t *agent, unsigned char available, const char *error,
+		int errors_from, int disable_until);
+
+int	zbx_interface_availability_is_set(const zbx_interface_availability_t *ia);
+
+void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t *interface_availabilities);
+
+void	zbx_availability_serialize_interface(unsigned char **data, size_t *data_alloc, size_t *data_offset,
+		const zbx_interface_availability_t *interface_availability);
+
+void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
+		zbx_vector_availability_ptr_t  *interface_availabilities);
+
+void	zbx_availability_deserialize_active_hb(const unsigned char *data, zbx_host_active_avail_t *avail);
+
+zbx_uint32_t	zbx_availability_serialize_active_heartbeat(unsigned char **data, zbx_uint64_t hostid,
+		int heartbeat_freq);
+
+zbx_uint32_t	zbx_availability_serialize_hostdata(unsigned char **data, zbx_hashset_t *queue);
+void	zbx_availability_deserialize_hostdata(const unsigned char *data, zbx_vector_ptr_t *hostdata);
+
+zbx_uint32_t	zbx_availability_serialize_active_status_request(unsigned char **data, zbx_uint64_t hostid);
+void	zbx_availability_deserialize_active_status_request(const unsigned char *data, zbx_uint64_t *hostid);
+
+zbx_uint32_t	zbx_availability_serialize_active_status_response(unsigned char **data, int status);
+void	zbx_availability_deserialize_active_status_response(const unsigned char *data, int *status);
+
+zbx_uint32_t	zbx_availability_serialize_hostdata2(unsigned char **data, zbx_vector_ptr_t *hosts, zbx_uint64_t proxy_hostid);
+void	zbx_availability_deserialize_hostdata2(const unsigned char *data, zbx_vector_ptr_t *hostdata, zbx_uint64_t *proxy_hostid);
+
+zbx_uint32_t	zbx_availability_serialize_hostid(unsigned char **data, zbx_uint64_t hostid);
+void	zbx_availability_deserialize_hostid(const unsigned char *data, zbx_uint64_t *hostid);
+
+zbx_uint32_t	zbx_availability_serialize_hostids(unsigned char **data, zbx_vector_uint64_t *hostids);
+void	zbx_availability_deserialize_hostids(const unsigned char *data, zbx_vector_uint64_t *hostids);
 #endif /* ZABBIX_AVAILABILITY_H */

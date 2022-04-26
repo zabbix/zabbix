@@ -44,13 +44,12 @@ class CControllerPopupScheduledReportCreate extends CController {
 		$ret = $this->validateInput($fields) && $this->validateWeekdays();
 
 		if (!$ret) {
-			$output = [];
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
 			);
 		}
 
@@ -126,16 +125,17 @@ class CControllerPopupScheduledReportCreate extends CController {
 		$output = [];
 
 		if ($result) {
-			$output['title'] = _('Scheduled report created');
-			$messages = CMessageHelper::getMessages();
+			$output['success']['title'] = _('Scheduled report created');
 
-			if ($messages) {
-				$output['messages'] = array_column($messages, 'message');
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
 			}
 		}
 		else {
-			$output['errors'] = makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())
-				->toString();
+			$output['error'] = [
+				'title' => _('Cannot create scheduled report'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
 		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());

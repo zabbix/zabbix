@@ -91,7 +91,7 @@ class CControllerProfileUpdate extends CController {
 
 				case 'web.dashboard.widget.geomap.default_view':
 				case 'web.dashboard.widget.geomap.severity_filter':
-				case !!preg_match('/web.dashboard.widget.navtree.item-\d+.toggle/', $this->getInput('idx')):
+				case (bool) preg_match('/web.dashboard.widget.navtree.item-\d+.toggle/', $this->getInput('idx')):
 				case 'web.dashboard.widget.navtree.item.selected':
 					$ret = $this->hasInput('idx2');
 					break;
@@ -145,7 +145,7 @@ class CControllerProfileUpdate extends CController {
 				break;
 
 			// PROFILE_TYPE_INT
-			case !!preg_match('/web.dashboard.widget.navtree.item-\d+.toggle/', $this->getInput('idx')):
+			case (bool) preg_match('/web.dashboard.widget.navtree.item-\d+.toggle/', $this->getInput('idx')):
 				$value_int = $this->getInput('value_int');
 				if ($value_int == 1) { // default value
 					CProfile::delete($idx, $this->getInput('idx2'));

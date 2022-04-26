@@ -44,11 +44,4 @@ class CRegistryFactoryTest extends TestCase {
 		$this->assertEquals(get_class($this->factory->getObject('string')), 'DateTime');
 		$this->assertEquals(get_class($this->factory->getObject('closure')), 'DateTime');
 	}
-
-	/**
-	 * Test that the factory creates the object only once and returns the same object after that.
-	 */
-	public function testObjectSame() {
-		$this->assertTrue($this->factory->getObject('string') === $this->factory->getObject('string'));
-	}
 }

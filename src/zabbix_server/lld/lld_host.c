@@ -21,10 +21,9 @@
 
 #include "log.h"
 #include "zbxserver.h"
-#include "../../libs/zbxaudit/audit.h"
-#include "../../libs/zbxaudit/audit_host.h"
 #include "zbxavailability.h"
-#include "avail_protocol.h"
+#include "audit/zbxaudit.h"
+#include "audit/zbxaudit_host.h"
 
 typedef struct
 {
@@ -1119,7 +1118,7 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 				ZBX_STR2UINT64(hostgroupid, row[2]);
 				zbx_vector_uint64_append(del_hostgroupids, hostgroupid);
 
-				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, hostid,
+				zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_UPDATE, hostid,
 						(NULL == host->host_orig) ? host->host : host->host_orig);
 
 				zbx_audit_hostgroup_update_json_delete_group(hostid, hostgroupid, groupid);
@@ -1800,7 +1799,7 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *gr
 
 			zbx_db_insert_add_values(&db_insert, group->groupid, group->name,
 					(int)ZBX_FLAG_DISCOVERY_CREATED);
-			zbx_audit_host_group_create_entry(AUDIT_ACTION_ADD, group->groupid, group->name);
+			zbx_audit_host_group_create_entry(ZBX_AUDIT_ACTION_ADD, group->groupid, group->name);
 
 			zbx_audit_host_group_update_json_add_details(group->groupid, group->name,
 					(int)ZBX_FLAG_DISCOVERY_CREATED);
@@ -1831,7 +1830,7 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *gr
 			if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE))
 			{
 				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hstgrp set ");
-				zbx_audit_host_group_create_entry(AUDIT_ACTION_UPDATE, group->groupid, group->name);
+				zbx_audit_host_group_create_entry(ZBX_AUDIT_ACTION_UPDATE, group->groupid, group->name);
 
 				if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE_NAME))
 				{
@@ -2454,7 +2453,7 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
 		/* select already linked templates */
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select hostid,templateid"
+				"select hostid,templateid,link_type"
 				" from hosts_templates"
 				" where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
@@ -2465,8 +2464,11 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
 
 		while (NULL != (row = DBfetch(result)))
 		{
+			int	link_type;
+
 			ZBX_STR2UINT64(hostid, row[0]);
 			ZBX_STR2UINT64(templateid, row[1]);
+			link_type = atoi(row[2]);
 
 			if (FAIL == (i = zbx_vector_ptr_bsearch(hosts, &hostid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
@@ -2480,12 +2482,16 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
 				/* templates which should be unlinked */
-				zbx_vector_uint64_append(&host->del_templateids, templateid);
+				if (TEMPLATE_LINK_LLD == link_type)
+					zbx_vector_uint64_append(&host->del_templateids, templateid);
 			}
 			else
 			{
 				/* templates which are already linked */
-				zbx_vector_uint64_remove(&host->lnk_templateids, i);
+				if (TEMPLATE_LINK_MANUAL == link_type)
+					zbx_vector_uint64_append(&host->del_templateids, templateid);
+				else
+					zbx_vector_uint64_remove(&host->lnk_templateids, i);
 			}
 		}
 		DBfree_result(result);
@@ -2698,7 +2704,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		}
 		else
 		{
-			zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, host->hostid,
+			zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_UPDATE, host->hostid,
 					(NULL == host->host_orig) ? host->host : host->host_orig);
 
 			if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE))
@@ -2748,7 +2754,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			{
 				zbx_vector_uint64_append(&del_interfaceids, interface->interfaceid);
 
-				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE,
+				zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_UPDATE,
 						host->hostid, (NULL == host->host_orig) ? host->host : host->host_orig);
 
 				zbx_audit_host_update_json_delete_interface(
@@ -2759,7 +2765,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			{
 				zbx_vector_uint64_append(&del_snmp_ids, interface->interfaceid);
 
-				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE,
+				zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_UPDATE,
 						host->hostid, (NULL == host->host_orig) ? host->host : host->host_orig);
 
 				zbx_audit_host_update_json_delete_interface(
@@ -2794,7 +2800,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			{
 				zbx_vector_uint64_append(&del_hostmacroids, hostmacro->hostmacroid);
 
-				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE,
+				zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_UPDATE,
 						host->hostid, (NULL == host->host_orig) ? host->host : host->host_orig);
 
 				zbx_audit_host_update_json_delete_hostmacro(
@@ -2816,7 +2822,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			{
 				zbx_vector_uint64_append(&del_tagids, host->tags.values[j]->tagid);
 
-				zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE, host->hostid,
+				zbx_audit_host_prototype_create_entry(ZBX_AUDIT_ACTION_UPDATE, host->hostid,
 						host->host);
 				zbx_audit_host_update_json_delete_tag(host->hostid, host->tags.values[j]->tagid);
 			}
@@ -2924,7 +2930,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					(int)tls_accept, tls_issuer, tls_subject, tls_psk_identity, tls_psk,
 					(int)host->custom_interfaces);
 
-			zbx_audit_host_create_entry(AUDIT_ACTION_ADD, host->hostid, host->host);
+			zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_ADD, host->hostid, host->host);
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host->hostid, parent_hostid, host_proto);
 			zbx_db_insert_add_values(&db_insert_host_rtdata, host->hostid, INTERFACE_AVAILABLE_UNKNOWN);
@@ -3558,7 +3564,8 @@ static void	lld_templates_link(const zbx_vector_ptr_t *hosts, char **error)
 
 		if (0 != host->lnk_templateids.values_num)
 		{
-			if (SUCCEED != DBcopy_template_elements(host->hostid, &host->lnk_templateids, &err))
+			if (SUCCEED != DBcopy_template_elements(host->hostid, &host->lnk_templateids, TEMPLATE_LINK_LLD,
+					&err))
 			{
 				*error = zbx_strdcatf(*error, "Cannot link template(s) %s.\n", err);
 				zbx_free(err);

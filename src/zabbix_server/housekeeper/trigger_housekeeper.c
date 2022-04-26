@@ -21,8 +21,8 @@
 
 #include "log.h"
 #include "zbxself.h"
-#include "daemon.h"
-#include "service_protocol.h"
+#include "zbxnix.h"
+#include "zbxservice.h"
 #include "zbxrtc.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

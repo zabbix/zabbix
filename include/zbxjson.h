@@ -191,6 +191,9 @@
 #define ZBX_PROTO_TAG_HEARTBEAT_FREQ		"heartbeat_freq"
 #define ZBX_PROTO_TAG_ACTIVE_STATUS		"active_status"
 #define ZBX_PROTO_TAG_PROXY_ACTIVE_AVAIL_DATA	"host data"
+#define ZBX_PROTO_TAG_PROXY_NAME		"proxy_name"
+#define ZBX_PROTO_TAG_PROXY_NAMES		"proxy_names"
+#define ZBX_PROTO_TAG_PROXY_HOSTIDS		"proxy_hostids"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"

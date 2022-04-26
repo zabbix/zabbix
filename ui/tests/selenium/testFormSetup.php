@@ -239,15 +239,17 @@ class testFormSetup extends CWebTest {
 						$this->assertEquals($parameter, $field->getValue());
 					}
 				}
-			}
 
-			// Array of fields to be skipped by the screenshot check.
-			$skip_fields_vault = [];
-			foreach(['Database host', 'Database name', 'Store credentials in'] as $skip_field) {
-				$skip_fields_vault[] = $form->getField($skip_field);
+				// Array of fields to be skipped by the screenshot check.
+				$skip_fields_vault = [];
+
+				foreach(['Database host', 'Database name', 'Store credentials in'] as $skip_field) {
+					$skip_fields_vault[] = $form->getField($skip_field);
+				}
+
+				// Check screenshot for "Store credentials in" = Vault.
+				$this->assertScreenshotExcept($form, $skip_fields_vault, 'ConfigureDB_Vault_'.$db_type.$vault);
 			}
-			// Check screenshot for "Store credentials in" = Vault.
-			$this->assertScreenshotExcept($form, $skip_fields_vault, 'ConfigureDB_Vault_'.$db_type);
 
 			$credentials_field->select('Plain text');
 		}
@@ -485,7 +487,7 @@ class testFormSetup extends CWebTest {
 						'value' => '/etc/apache2/magic'
 					],
 					'tls_encryption' => true,
-					'mysql_error' => 'Database error code 2002'
+					'mysql_error' => 'Error connecting to database. Empty cipher.'
 				]
 			],
 			// Wrong "Database TLS key file" field format.
@@ -511,7 +513,7 @@ class testFormSetup extends CWebTest {
 					],
 					'tls_encryption' => true,
 					'fill_ca_file' => true,
-					'mysql_error' => 'Database error code 2002'
+					'mysql_error' => 'Error connecting to database. Empty cipher.'
 				]
 			],
 			// Wrong "Database TLS certificate file" field format.
@@ -537,7 +539,7 @@ class testFormSetup extends CWebTest {
 					],
 					'tls_encryption' => true,
 					'fill_ca_file' => true,
-					'mysql_error' => 'Database error code 2002'
+					'mysql_error' => 'Error connecting to database. Empty cipher.'
 				]
 			],
 			// With "Database TLS encryption" set.

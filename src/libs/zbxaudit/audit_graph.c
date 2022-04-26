@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "audit_graph.h"
+#include "audit/zbxaudit_graph.h"
 
+#include "audit/zbxaudit.h"
 #include "log.h"
 #include "db.h"
 #include "audit.h"
@@ -69,7 +70,7 @@ void	zbx_audit_graph_create_entry(int audit_action, zbx_uint64_t graphid, const 
 		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_graph_entry_insert,
 				sizeof(local_audit_graph_entry_insert));
 
-		if (AUDIT_ACTION_ADD == audit_action)
+		if (ZBX_AUDIT_ACTION_ADD == audit_action)
 		{
 			zbx_audit_update_json_append_uint64(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD,
 					GR_OR_GRP(graphid), graphid, "graphs", "graphid");
@@ -316,7 +317,7 @@ void	zbx_audit_DBselect_delete_for_graph(const char *sql, zbx_vector_uint64_t *i
 		zbx_vector_uint64_append(ids, id);
 		flags = atoi(row[2]);
 
-		zbx_audit_graph_create_entry(AUDIT_ACTION_DELETE, id, row[1], flags);
+		zbx_audit_graph_create_entry(ZBX_AUDIT_ACTION_DELETE, id, row[1], flags);
 	}
 
 	DBfree_result(result);

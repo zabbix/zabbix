@@ -26,7 +26,7 @@
 #include "nodecommand.h"
 #include "proxyconfig.h"
 #include "proxydata.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxcrypto.h"
 #include "zbxcommshigh.h"
 #include "../../libs/zbxserver/zabbix_stats.h"
@@ -36,7 +36,6 @@
 #include "trapper_expressions_evaluate.h"
 #include "trapper_item_test.h"
 #include "trapper_request.h"
-#include "avail_protocol.h"
 #include "zbxavailability.h"
 
 #ifdef HAVE_NETSNMP

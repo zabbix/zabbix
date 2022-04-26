@@ -35,7 +35,6 @@
 #include "events.h"
 #include "../zbxvault/vault.h"
 #include "zbxavailability.h"
-#include "avail_protocol.h"
 #include "zbxcommshigh.h"
 
 extern char	*CONFIG_SERVER;
