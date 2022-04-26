@@ -13286,7 +13286,19 @@ static void	dc_get_items_to_reschedule(zbx_vector_dc_item_t *items, int now)
 			continue;
 
 		if (0 != host->proxy_hostid && SUCCEED != is_item_processed_by_server(item->type, item->key))
+		{
+			ZBX_DC_INTERFACE	*interface = NULL;
+
+			if (0 != item->interfaceid)
+			{
+				interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces,
+						&item->interfaceid);
+			}
+
+			/* update nextcheck of items processed by proxies for 'queue' calculations */
+			(void)DCitem_nextcheck_update(item, interface, ZBX_ITEM_DELAY_CHANGED, now, NULL);
 			continue;
+		}
 
 		zbx_vector_dc_item_append(items, item);
 	}
@@ -13313,7 +13325,7 @@ static void	dc_reschedule_items()
 
 	if (0 != items.values_num)
 	{
-		int		i, flags = ZBX_ITEM_DELAY_CHANGED;
+		int		i;
 		char		*error = NULL;
 		ZBX_DC_ITEM	*item = items.values[i];
 
@@ -13334,7 +13346,7 @@ static void	dc_reschedule_items()
 						&item->interfaceid);
 			}
 
-			if (FAIL == DCitem_nextcheck_update(item, interface, flags, now, &error))
+			if (FAIL == DCitem_nextcheck_update(item, interface, ZBX_ITEM_DELAY_CHANGED, now, &error))
 			{
 				zbx_timespec_t	ts = {now, 0};
 
