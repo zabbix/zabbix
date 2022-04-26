@@ -218,7 +218,7 @@
 			return `
 				<tr data-row_index="#{row_index}">
 					<td>
-						<a href="#" class="wordwrap js-edit">#{name}</a>
+						<a href="javascript:void(0);" class="wordwrap js-edit">#{name}</a>
 						<input type="hidden" name="ldap_servers[#{row_index}][userdirectoryid]" value="#{userdirectoryid}">
 						<input type="hidden" name="ldap_servers[#{row_index}][name]" value="#{name}">
 						<input type="hidden" name="ldap_servers[#{row_index}][host]" value="#{host}">
