@@ -386,7 +386,7 @@ class CUserDirectory extends CApiService {
 		$db_groups = API::UserGroup()->get([
 			'output' => ['userdirectoryid'],
 			'filter' => [
-				'gui_access' => GROUP_GUI_ACCESS_LDAP,
+				'gui_access' => [GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_SYSTEM],
 				'userdirectoryid' => $userdirectoryids
 			],
 			'limit' => 1
