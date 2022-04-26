@@ -42,12 +42,13 @@ window.ldap_test_edit_popup = new class {
 		this.removePopupMessages();
 		this.overlay.setLoading();
 
+		const fields = this.trimFields(getFormFields(this.form));
 		const curl = new Curl(this.form.getAttribute('action'), false);
 
 		fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(getFormFields(this.form))
+			body: JSON.stringify(fields)
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -87,5 +88,11 @@ window.ldap_test_edit_popup = new class {
 				el.parentNode.removeChild(el);
 			}
 		}
+	}
+
+	trimFields(fields) {
+		fields.test_username = fields.test_username.trim();
+
+		return fields;
 	}
 };

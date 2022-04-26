@@ -36,8 +36,8 @@ class CControllerPopupLdapTestSend extends CController {
 			'search_attribute' =>	'required|db userdirectory.search_attribute|not_empty',
 			'start_tls' =>			'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
 			'search_filter' =>		'db userdirectory.search_filter',
-			'test_username' =>		'required|string',
-			'test_password' =>		'required|string'
+			'test_username' =>		'required|string|not_empty',
+			'test_password' =>		'required|string|not_empty'
 		];
 
 		$ret = $this->validateInput($fields);

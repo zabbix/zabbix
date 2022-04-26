@@ -158,8 +158,8 @@ window.ldap_edit_popup = new class {
 	}
 
 	trimFields(fields) {
-		const fields_to_trim = ['name', 'host', 'base_dn', 'bind_dn', 'bind_password', 'search_attribute',
-			'search_filter', 'description'];
+		const fields_to_trim = ['name', 'host', 'base_dn', 'bind_dn', 'search_attribute', 'search_filter',
+			'description'];
 		for (const field of fields_to_trim) {
 			if (field in fields) {
 				fields[field] = fields[field].trim();
