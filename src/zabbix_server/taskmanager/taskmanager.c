@@ -27,7 +27,7 @@
 #include "zbxtasks.h"
 #include "../events.h"
 #include "../actions.h"
-#include "export.h"
+#include "zbxexport.h"
 #include "zbxdiag.h"
 #include "zbxservice.h"
 #include "zbxjson.h"

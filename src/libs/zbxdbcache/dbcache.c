@@ -27,7 +27,7 @@
 #include "valuecache.h"
 #include "zbxmodules.h"
 #include "module.h"
-#include "export.h"
+#include "zbxexport.h"
 #include "zbxhistory.h"
 #include "zbxnix.h"
 #include "zbxavailability.h"

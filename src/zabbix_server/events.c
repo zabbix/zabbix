@@ -22,7 +22,7 @@
 #include "log.h"
 #include "actions.h"
 #include "zbxserver.h"
-#include "export.h"
+#include "zbxexport.h"
 #include "zbxservice.h"
 
 /* event recovery data */
