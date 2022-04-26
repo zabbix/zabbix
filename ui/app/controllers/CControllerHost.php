@@ -189,12 +189,13 @@ abstract class CControllerHost extends CController {
 		]);
 
 		$items = API::Item()->get([
-			'output' => [],
-			'selectHosts' => ['hostid'],
 			'hostids' => array_keys($hosts),
 			'webitems' =>true,
-			'monitored' => true
+			'monitored' => true,
+			'countOutput' => true,
+			'groupCount' => true
 		]);
+		$items_count = array_combine(array_column($items, 'hostid'), array_column($items, 'rowscount'));
 
 		// Group all problems per host per severity.
 		$host_problems = [];
@@ -205,6 +206,8 @@ abstract class CControllerHost extends CController {
 		}
 
 		foreach ($hosts as &$host) {
+			$host['items_count'] = array_key_exists($host['hostid'], $items_count) ? $items_count[$host['hostid']] : 0;
+
 			// Count number of dashboards for each host.
 			$host['dashboards'] = count(getHostDashboards($host['hostid']));
 
@@ -249,14 +252,6 @@ abstract class CControllerHost extends CController {
 			}
 
 			$host['tags'] = $tags;
-
-			// Add counter for Latest data column.
-			$host['item_count'] = 0;
-			foreach ($items as $item) {
-				if (bccomp($item['hosts'][0]['hostid'], $host['hostid']) == 0) {
-					$host['item_count']++;
-				}
-			}
 		}
 		unset($host);
 
