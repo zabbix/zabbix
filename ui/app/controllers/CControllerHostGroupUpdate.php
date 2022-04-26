@@ -76,7 +76,7 @@ class CControllerHostGroupUpdate extends CController {
 					'groupid' => $groupid
 				],
 				'permissions' => true,
-				'tag_filter' => true
+				'tag_filters' => true
 			]);
 		}
 		$result = DBend($result);
