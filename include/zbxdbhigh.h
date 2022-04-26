@@ -534,7 +534,7 @@ typedef struct
 {
 	zbx_uint64_t	itemid;	/* itemid should come first for correct sorting */
 	zbx_uint64_t	gitemid;
-	char		key[ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	char		key[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	int		drawtype;
 	int		sortorder;
 	char		color[GRAPH_ITEM_COLOR_LEN_MAX];

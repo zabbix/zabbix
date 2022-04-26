@@ -963,7 +963,7 @@ static int	DBpatch_2010101(void)
 
 				zbx_free(param);
 
-				if (255 /* ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
+				if (255 /* ZBX_ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
 					error_message = zbx_dsprintf(error_message, "key \"%s\" is too long", row[1]);
 			}
 
@@ -1721,7 +1721,7 @@ static int	DBpatch_2010195(void)
 			continue;
 		}
 
-		if (255 /* ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
+		if (255 /* ZBX_ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\": key is too long", row[1]);
 			continue;
