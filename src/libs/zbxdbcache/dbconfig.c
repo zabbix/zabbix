@@ -2670,6 +2670,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			dc_interface_update_agent_stats(interface, item->type, -1);
 		}
 
+
 		itemid = item->itemid;
 
 		if (ITEM_TYPE_SNMPTRAP == item->type)
@@ -2682,6 +2683,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &itemid);
 
 			dc_strpool_release(numitem->units);
+			dc_strpool_release(numitem->trends_period);
 
 			zbx_hashset_remove_direct(&config->numitems, numitem);
 		}
@@ -2867,6 +2869,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		dc_strpool_release(item->key);
 		dc_strpool_release(item->error);
 		dc_strpool_release(item->delay);
+		dc_strpool_release(item->history_period);
 
 		if (NULL != item->triggers)
 			config->items.mem_free_func(item->triggers);
@@ -13264,23 +13267,25 @@ static void	dc_get_items_to_reschedule(zbx_vector_dc_item_t *items, int now)
 	zbx_hashset_iter_reset(&config->items, &iter);
 	while (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_iter_next(&iter)))
 	{
-		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &item->hostid)))
+		if (item->nextcheck - SEC_PER_MIN < now)
 			continue;
 
-		if (HOST_STATUS_MONITORED != host->status || 0 != host->proxy_hostid)
+		if (NULL == strstr(item->delay, "{$"))
 			continue;
 
 		if (ITEM_STATUS_ACTIVE != item->status ||
-				SUCCEED != is_item_processed_by_server(item->type, item->key) ||
 				SUCCEED != zbx_is_counted_in_item_queue(item->type, item->key))
 		{
 			continue;
 		}
 
-		if (item->nextcheck - SEC_PER_MIN < now)
+		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &item->hostid)))
 			continue;
 
-		if (NULL == strstr(item->delay, "{$"))
+		if (HOST_STATUS_MONITORED != host->status)
+			continue;
+
+		if (0 != host->proxy_hostid && SUCCEED != is_item_processed_by_server(item->type, item->key))
 			continue;
 
 		zbx_vector_dc_item_append(items, item);
