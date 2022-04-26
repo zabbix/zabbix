@@ -80,7 +80,7 @@ zbx_host_template_link_type;
 #define ZBX_DB_PROXY	2
 
 
-/* #define HOST_HOST_LEN			MAX_ZBX_HOSTNAME_LEN */
+/* #define HOST_HOST_LEN			ZBX_MAX_HOSTNAME_LEN */
 /* #define HOST_HOST_LEN_MAX		(HOST_HOST_LEN + 1) */
 /* #define HOST_NAME_LEN			128 */
 

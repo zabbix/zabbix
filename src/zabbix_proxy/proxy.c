@@ -467,9 +467,9 @@ static void	zbx_set_defaults(void)
 		{
 			assert(*value);
 
-			if (MAX_ZBX_HOSTNAME_LEN < strlen(*value))
+			if (ZBX_MAX_HOSTNAME_LEN < strlen(*value))
 			{
-				(*value)[MAX_ZBX_HOSTNAME_LEN] = '\0';
+				(*value)[ZBX_MAX_HOSTNAME_LEN] = '\0';
 				zabbix_log(LOG_LEVEL_WARNING, "proxy name truncated to [%s])", *value);
 			}
 
