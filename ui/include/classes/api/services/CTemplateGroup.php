@@ -669,12 +669,12 @@ class CTemplateGroup extends CApiService {
 				];
 			}
 
-			if (!array_key_exists('rights', $db_usrgrps[$db_right['groupid']])) {
-				$db_usrgrps[$db_right['groupid']]['rights'] = [];
+			if (!array_key_exists('templategroup_rights', $db_usrgrps[$db_right['groupid']])) {
+				$db_usrgrps[$db_right['groupid']]['templategroup_rights'] = [];
 			}
 
 			foreach ($group_links[$db_right['id']] as $hstgrpid) {
-				$usrgrps[$db_right['groupid']]['rights'][] = [
+				$usrgrps[$db_right['groupid']]['templategroup_rights'][] = [
 					'permission' => $db_right['permission'],
 					'id' => $hstgrpid
 				];
@@ -1267,7 +1267,7 @@ class CTemplateGroup extends CApiService {
 			if ($usrgrp['templategroup_rights'] !== $rights) {
 				$upd_usrgrps[] = [
 					'usrgrpid' => $usrgrp['usrgrpid'],
-					'rights' => $rights
+					'templategroup_rights' => $rights
 				];
 			}
 		}

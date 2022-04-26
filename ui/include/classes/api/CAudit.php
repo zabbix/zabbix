@@ -337,7 +337,8 @@ class CAudit {
 		'templategroup.templates' => 'hosts_groups',
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups',
-		'usergroup.rights' => 'rights',
+		'usergroup.hostgroup_rights' => 'rights',
+		'usergroup.templategroup_rights' => 'rights',
 		'usergroup.tag_filters' => 'tag_filter',
 		'usergroup.users' => 'users_groups'
 	];
@@ -413,7 +414,8 @@ class CAudit {
 		'templategroup.templates' => 'hostgroupid',
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
-		'usergroup.rights' => 'rightid',
+		'usergroup.hostgroup_rights' => 'rightid',
+		'usergroup.templategroup_rights' => 'rightid',
 		'usergroup.tag_filters' => 'tag_filterid',
 		'usergroup.users' => 'id'
 	];

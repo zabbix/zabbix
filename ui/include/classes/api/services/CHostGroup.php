@@ -934,12 +934,12 @@ class CHostGroup extends CApiService {
 				];
 			}
 
-			if (!array_key_exists('rights', $db_usrgrps[$db_right['groupid']])) {
-				$db_usrgrps[$db_right['groupid']]['rights'] = [];
+			if (!array_key_exists('hostgroup_rights', $db_usrgrps[$db_right['groupid']])) {
+				$db_usrgrps[$db_right['groupid']]['hostgroup_rights'] = [];
 			}
 
 			foreach ($group_links[$db_right['id']] as $hstgrpid) {
-				$usrgrps[$db_right['groupid']]['rights'][] = [
+				$usrgrps[$db_right['groupid']]['hostgroup_rights'][] = [
 					'permission' => $db_right['permission'],
 					'id' => $hstgrpid
 				];
@@ -1639,7 +1639,7 @@ class CHostGroup extends CApiService {
 			if ($usrgrp['hostgroup_rights'] !== $rights) {
 				$upd_usrgrps[] = [
 					'usrgrpid' => $usrgrp['usrgrpid'],
-					'rights' => $rights
+					'hostgroup_rights' => $rights
 				];
 			}
 		}
