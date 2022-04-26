@@ -26,10 +26,6 @@ require_once dirname(__FILE__).'/../common/testFormHost.php';
  */
 class testFormHostDiscovered extends testFormHost {
 
-//	public $link = 'zabbix.php?action=host.list';
-//	public $monitoring = true;
-//	public $link = 'zabbix.php?action=host.view';
-
 	public static function getState() {
 		return [
 			[
@@ -46,13 +42,6 @@ class testFormHostDiscovered extends testFormHost {
 					'monitoring' => false
 				]
 			],
-//			[
-//				[
-//					'standalone' => true,
-//					'url' => 'zabbix.php?action=host.view',
-//					'monitoring' => true
-//				]
-//			],
 			[
 				[
 					'standalone' => false,
@@ -97,21 +86,12 @@ class testFormHostDiscovered extends testFormHost {
 		}
 
 		$this->assertEquals('', ($template_table->findRow('Name', 'Linux by Zabbix agent', true)->getColumn('Action')->getText()));
-
-//		var_dump($template_table->findRow('Name', 'Linux by Zabbix agent', true)->getColumn('Action')
-//				->query('xpath://button[@class="btn-link"]')->one()->getText());
-
 		$this->assertEquals('(linked by host discovery)', $template_table->findRow('Name', 'Linux by Zabbix agent', true)
-				->getColumn('Name')->query('xpath://sup')->one()->getText());
+				->getColumn('Name')->query('xpath:.//sup')->one()->getText());
 
 		if (!$this->standalone) {
 			$this->query('xpath:.//div[@class="dashboard-widget-head"]/button[@class="overlay-close-btn"]')->one()->click();
-
-//			COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()
-//				->query('button:Cancel')->one()->click();
 		}
-
-//		sleep (5);
 
 	}
 
@@ -142,6 +122,5 @@ class testFormHostDiscovered extends testFormHost {
 
 		return COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 	}
-
 }
 
