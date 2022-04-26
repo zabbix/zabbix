@@ -879,7 +879,7 @@ void	DBcheck_tsdb_capabilities(void)
 	if (NULL == (row = DBfetch(result)))
 		goto clean;
 
-	if (0 != zbx_strcmp_null((const char*)row[0], ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+	if (0 != zbx_strcmp_null((const char *)row[0], ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
 		goto clean;
 
 	DBfree_result(result);
@@ -890,9 +890,9 @@ void	DBcheck_tsdb_capabilities(void)
 	if (NULL == (row = DBfetch(result)))
 		goto clean;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: %s", (char*)row[0]);
+	zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: %s", (char *)row[0]);
 
-	sscanf((const char*)row[0], "%d.%d.%d", &major, &minor, &patch);
+	sscanf((const char *)row[0], "%d.%d.%d", &major, &minor, &patch);
 	version = major * 10000;
 	version += minor * 100;
 	version += patch;
