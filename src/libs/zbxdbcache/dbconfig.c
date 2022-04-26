@@ -13287,8 +13287,6 @@ static void	dc_get_items_to_reschedule(zbx_vector_dc_item_t *server_items, zbx_v
 
 		(void)dc_get_item_nextcheck(item, now, 0, &nextcheck, NULL);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() nextcheck:%d (+%d)", __func__, nextcheck, nextcheck - now);
-
 		if (nextcheck == item->nextcheck)
 			continue;
 
@@ -13354,6 +13352,8 @@ static void	dc_reschedule_items()
 			(void)DCitem_nextcheck_update(proxy_items.values[i], NULL, ZBX_ITEM_DELAY_CHANGED, now, NULL);
 
 		UNLOCK_CACHE;
+
+		dc_flush_history();
 	}
 
 	zbx_vector_dc_item_destroy(&server_items);
