@@ -21,7 +21,7 @@
 #define ZABBIX_DBUPGRADE_H
 
 #include "common.h"
-#include "dbschema.h"
+#include "zbxdbschema.h"
 
 typedef struct
 {

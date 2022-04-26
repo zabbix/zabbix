@@ -22,7 +22,7 @@
 
 #include "zbxalgo.h"
 #include "zbxdb.h"
-#include "dbschema.h"
+#include "zbxdbschema.h"
 
 extern char	*CONFIG_DBHOST;
 extern char	*CONFIG_DBNAME;
