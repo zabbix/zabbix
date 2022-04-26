@@ -1857,14 +1857,14 @@ static void	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
 		switch (hdata->value_type)
 		{
 			case ITEM_VALUE_TYPE_STR:
-				hdata->value.str[zbx_db_strlen_n(hdata->value.str, HISTORY_STR_VALUE_LEN)] = '\0';
+				hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_STR_VALUE_LEN)] = '\0';
 				break;
 			case ITEM_VALUE_TYPE_TEXT:
-				hdata->value.str[zbx_db_strlen_n(hdata->value.str, HISTORY_TEXT_VALUE_LEN)] = '\0';
+				hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_TEXT_VALUE_LEN)] = '\0';
 				break;
 			case ITEM_VALUE_TYPE_LOG:
 				logvalue = hdata->value.log->value;
-				logvalue[zbx_db_strlen_n(logvalue, HISTORY_LOG_VALUE_LEN)] = '\0';
+				logvalue[zbx_db_strlen_n(logvalue, ZBX_HISTORY_LOG_VALUE_LEN)] = '\0';
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
 				if (FAIL == zbx_validate_value_dbl(hdata->value.dbl, CONFIG_DOUBLE_PRECISION))
@@ -3736,7 +3736,7 @@ static void	dc_local_add_history_notsupported(zbx_uint64_t itemid, const zbx_tim
 		item_value->mtime = mtime;
 	}
 
-	item_value->value.value_str.len = zbx_db_strlen_n(error, ITEM_ERROR_LEN) + 1;
+	item_value->value.value_str.len = zbx_db_strlen_n(error, ZBX_ITEM_ERROR_LEN) + 1;
 	dc_string_buffer_realloc(item_value->value.value_str.len);
 	item_value->value.value_str.pvalue = string_values_offset;
 	memcpy(&string_values[string_values_offset], error, item_value->value.value_str.len);
