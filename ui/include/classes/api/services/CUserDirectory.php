@@ -383,13 +383,8 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default user directory.'));
 		}
 
-		if (in_array($auth['ldap_userdirectoryid'], $userdirectoryids)) {
-			// If last (default) is removed, reset default userdirectoryid to prevent from foreign key constraint.
-			API::Authentication()->update(['ldap_userdirectoryid' => 0]);
-		}
-
 		$db_groups = API::UserGroup()->get([
-			'output' => ['userdirectoryid', 'name'],
+			'output' => ['userdirectoryid'],
 			'filter' => [
 				'gui_access' => GROUP_GUI_ACCESS_LDAP,
 				'userdirectoryid' => $userdirectoryids
@@ -397,13 +392,18 @@ class CUserDirectory extends CApiService {
 			'limit' => 1
 		]);
 
-		if (!$db_groups) {
-			return;
+		if ($db_groups) {
+			$db_group = reset($db_groups);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete user directory "%1$s".',
+				$db_userdirectories[$db_group['userdirectoryid']]['name'])
+			);
 		}
 
-		$db_group = reset($db_groups);
-
-		self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete user directory "%1$s".', $db_group['name']));
+		if (in_array($auth['ldap_userdirectoryid'], $userdirectoryids)) {
+			// If last (default) is removed, reset default userdirectoryid to prevent from foreign key constraint.
+			API::Authentication()->update(['ldap_userdirectoryid' => 0]);
+		}
 	}
 
 	/**
