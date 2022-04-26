@@ -1949,6 +1949,7 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): perfcounter:%s", __func__, perfcounter);
+
 	if (access_filter != (datastore->hv_uuids_access.values[i].value & access_filter))
 	{
 		zbx_uint64_t	mi = datastore->hv_uuids_access.values[i].value;
