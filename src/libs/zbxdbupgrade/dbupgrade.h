@@ -32,6 +32,8 @@ typedef struct
 }
 zbx_dbpatch_t;
 
+#define ZBX_DBPATCH_FUNCTION_PARAM_LEN			255
+
 #define DBPATCH_VERSION(zabbix_version)			zbx_dbpatches_##zabbix_version
 
 #define DBPATCH_START(zabbix_version)			zbx_dbpatch_t	DBPATCH_VERSION(zabbix_version)[] = {

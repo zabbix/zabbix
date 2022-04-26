@@ -89,7 +89,7 @@ zbx_host_template_link_type;
 #define ZBX_INTERFACE_IP_LEN		64
 #define ZBX_INTERFACE_IP_LEN_MAX	(ZBX_INTERFACE_IP_LEN + 1)
 #define ZBX_INTERFACE_ADDR_LEN		255	/* MAX(ZBX_INTERFACE_DNS_LEN,ZBX_INTERFACE_IP_LEN) */
-/* #define ZBX_INTERFACE_ADDR_LEN_MAX	(ZBX_INTERFACE_ADDR_LEN + 1) */
+#define ZBX_INTERFACE_ADDR_LEN_MAX	(ZBX_INTERFACE_ADDR_LEN + 1)
 #define ZBX_INTERFACE_PORT_LEN		64
 #define ZBX_INTERFACE_PORT_LEN_MAX	(ZBX_INTERFACE_PORT_LEN + 1)
 #define ZBX_INTERFACE_ERROR_LEN		2048
@@ -537,7 +537,7 @@ typedef struct
 	char		key[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	int		drawtype;
 	int		sortorder;
-	char		color[GRAPH_ITEM_COLOR_LEN_MAX];
+	char		color[ZBX_GRAPH_ITEM_COLOR_LEN_MAX];
 	int		yaxisside;
 	int		calc_fnc;
 	int		type;

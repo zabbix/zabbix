@@ -19,6 +19,7 @@
 
 #include "dbupgrade_macros.h"
 
+#include "dbupgrade.h"
 #include "zbxdbhigh.h"
 
 /* Function argument descriptors.                                                */
@@ -363,7 +364,7 @@ static void	dbpatch_update_func_bitand(zbx_dbpatch_function_t *function, const z
  ******************************************************************************/
 void	dbpatch_strcpy_alloc_quoted(char **str, size_t *str_alloc, size_t *str_offset, const char *source)
 {
-	char	raw[FUNCTION_PARAM_LEN * 5 + 1], quoted[sizeof(raw)];
+	char	raw[ZBX_DBPATCH_FUNCTION_PARAM_LEN * 5 + 1], quoted[sizeof(raw)];
 
 	zbx_strlcpy(raw, source, sizeof(raw));
 	zbx_escape_string(quoted, sizeof(quoted), raw, "\"\\");

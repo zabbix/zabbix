@@ -31,8 +31,6 @@
 #define ZBX_DBPATCH_FUNCTION_CREATE			0x40
 #define ZBX_DBPATCH_FUNCTION_DELETE			0x80
 
-#define ZBX_DBPATCH_FUNCTION_PARAM_LEN			255
-
 typedef struct
 {
 	zbx_uint64_t	functionid;
