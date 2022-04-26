@@ -23,4 +23,4 @@
 int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, struct zbx_json *json,
 		char **error);
 
-#endif
+#endif /* ZABBIX_DIAG_SERVER_H */

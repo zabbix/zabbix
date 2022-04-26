@@ -84,6 +84,15 @@ static void	diag_valuecache_add_items(struct zbx_json *json, const char *field, 
 	zbx_json_close(json);
 }
 
+#define ZBX_DIAG_VALUECACHE_ITEMS		0x00000001
+#define ZBX_DIAG_VALUECACHE_VALUES		0x00000002
+#define ZBX_DIAG_VALUECACHE_MODE		0x00000004
+#define ZBX_DIAG_VALUECACHE_MEMORY		0x00000008
+
+#define ZBX_DIAG_VALUECACHE_SIMPLE	(ZBX_DIAG_VALUECACHE_ITEMS | \
+					ZBX_DIAG_VALUECACHE_VALUES | \
+					ZBX_DIAG_VALUECACHE_MODE)
+
 /******************************************************************************
  *                                                                            *
  * Purpose: add requested value cache diagnostic information to json data     *
@@ -200,6 +209,13 @@ out:
 
 	return ret;
 }
+
+#undef ZBX_DIAG_VALUECACHE_SIMPLE
+
+#undef ZBX_DIAG_VALUECACHE_ITEMS
+#undef ZBX_DIAG_VALUECACHE_VALUES
+#undef ZBX_DIAG_VALUECACHE_MODE
+#undef ZBX_DIAG_VALUECACHE_MEMORY
 
 /******************************************************************************
  *                                                                            *

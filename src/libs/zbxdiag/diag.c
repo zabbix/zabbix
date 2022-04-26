@@ -47,7 +47,7 @@
 #define ZBX_DIAG_PREPROC_SIMPLE		(ZBX_DIAG_PREPROC_VALUES | \
 					ZBX_DIAG_PREPROC_VALUES_PREPROC)
 
-zbx_diag_add_section_info_func_t	add_diag_cb;
+static zbx_diag_add_section_info_func_t	add_diag_cb;
 
 void	zbx_diag_map_free(zbx_diag_map_t *map)
 {
