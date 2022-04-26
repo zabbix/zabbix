@@ -1621,10 +1621,110 @@ int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, c
 			__func__);
 }
 
+int     check_vcenter_hv_net_if_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	int                     i, ret = SYSINFO_RET_FAIL;
+	const char              *url, *uuid;
+	struct zbx_json         json_data;
+	zbx_vmware_service_t    *service;
+	zbx_vmware_hv_t         *hv;
+	zbx_vmware_pnic_t       *nic;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (2 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+
+	zbx_vmware_lock();
+
+	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
+
+	for (i = 0; i < hv->pnics->values_num; i++)
+	{
+		nic = (zbx_vmware_pnic_t *)hv->pnics->values[i];
+
+		zbx_json_addobject(&json_data, NULL);
+		zbx_json_addstring(&json_data, "{#IFNAME}", ZBX_NULL2EMPTY_STR(nic->name), ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#IFDRIVER}", ZBX_NULL2EMPTY_STR(nic->props[ZBX_VMWARE_PNIC_PROPS_DRIVER]),
+				ZBX_JSON_TYPE_STRING);
+		zbx_json_adduint64(&json_data, "{#IFSPEED}", nic->speed);
+		zbx_json_addstring(&json_data, "{#IFDUPLEX}", 0 == strcmp(nic->props[ZBX_VMWARE_PNIC_PROPS_MAC], "true")
+				? "full" : "half", ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#IFMAC}", ZBX_NULL2EMPTY_STR(nic->props[ZBX_VMWARE_PNIC_PROPS_MAC]),
+				ZBX_JSON_TYPE_STRING);
+
+		zbx_json_close(&json_data);
+	}
+
+	zbx_json_close(&json_data);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, json_data.buffer));
+	zbx_json_free(&json_data);
+
+	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), ret: %s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
 int	check_vcenter_hv_network_linkspeed(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return SUCCEED;
+	int                     i, ret = SYSINFO_RET_FAIL;
+	const char              *url, *uuid, *name, *value = NULL;
+	struct zbx_json         json_data;
+	zbx_vmware_service_t    *service;
+	zbx_vmware_hv_t         *hv;
+	zbx_vmware_pnic_t       *nic;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (3 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+	name = get_rparam(request, 2);
+
+	zbx_vmware_lock();
+
+	for (i = 0; i < hv->pnics->values_num; i++)
+	{
+		nic = (zbx_vmware_pnic_t *)hv->pnics->values[i];
+
+		if (0 != strcmp(name, nic->name))
+			continue;
+
+		SET_UI64_RESULT(result, nic->speed);
+		break;
+	}
+
+	if (NULL == value)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown physical network interface name"));
+		goto out;
+	}
+
+	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), ret: %s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
 }
 
 int	check_vcenter_hv_datacenter_name(AGENT_REQUEST *request, const char *username, const char *password,

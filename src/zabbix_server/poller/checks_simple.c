@@ -77,6 +77,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"hv.hw.vendor", VMCHECK_FUNC(check_vcenter_hv_hw_vendor)},
 	{"hv.memory.size.ballooned", VMCHECK_FUNC(check_vcenter_hv_memory_size_ballooned)},
 	{"hv.memory.used", VMCHECK_FUNC(check_vcenter_hv_memory_used)},
+	{"hv.net.if.discovery", VMCHECK_FUNC(check_vcenter_hv_net_if_discovery)},
 	{"hv.network.in", VMCHECK_FUNC(check_vcenter_hv_network_in)},
 	{"hv.network.out", VMCHECK_FUNC(check_vcenter_hv_network_out)},
 	{"hv.network.linkspeed", VMCHECK_FUNC(check_vcenter_hv_network_linkspeed)},

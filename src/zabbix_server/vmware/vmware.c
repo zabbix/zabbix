@@ -102,6 +102,7 @@ ZBX_PTR_VECTOR_IMPL(vmware_datacenter, zbx_vmware_datacenter_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_diskextent, zbx_vmware_diskextent_t *)
 ZBX_VECTOR_IMPL(vmware_hvdisk, zbx_vmware_hvdisk_t)
 ZBX_PTR_VECTOR_IMPL(vmware_dsname, zbx_vmware_dsname_t *)
+ZBX_PTR_VECTOR_IMPL(vmware_pnic, zbx_vmware_pnic_t *)
 
 /* VMware service object name mapping for vcenter and vsphere installations */
 typedef struct
@@ -224,6 +225,9 @@ static zbx_uint64_t	evt_req_chunk_size;
 #define ZBX_XPATH_DATASTORE_MOUNT()									\
 	"/*/*/*/*/*/*[local-name()='propSet']/*/*[local-name()='DatastoreHostMount']"			\
 	"/*[local-name()='mountInfo']/*[local-name()='path']"
+
+#define ZBX_XPATH_HV_PNICS()										\
+	"/*/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='PhysicalNic']"	\
 
 #define ZBX_XPATH_HV_DATASTORES()									\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='datastore']]"		\
@@ -1788,6 +1792,29 @@ static void	vmware_dsname_free(zbx_vmware_dsname_t *dsname)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: frees resources allocated to store Datastore name data            *
+ *                                                                            *
+ * Parameters: dsname   - [IN] the Datastore name                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_pnic_free(zbx_vmware_pnic_t *nic)
+{
+	int	i;
+
+	zbx_free(nic->name);
+
+	if (NULL == nic->props)
+		return;
+
+	for (i = 0; i < ZBX_VMWARE_PNIC_PROPS_NUM; i++)
+		zbx_free(nic->props[i]);
+
+	zbx_free(nic->props);
+	zbx_free(nic);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: frees resources allocated to store vmware hypervisor              *
  *                                                                            *
  * Parameters: hv   - [IN] the vmware hypervisor                              *
@@ -1800,6 +1827,9 @@ static void	vmware_hv_clean(zbx_vmware_hv_t *hv)
 
 	zbx_vector_ptr_clear_ext(&hv->vms, (zbx_clean_func_t)vmware_vm_free);
 	zbx_vector_ptr_destroy(&hv->vms);
+
+	zbx_vector_vmware_pnic_clear_ext(hv->pnics, vmware_pnic_free);
+	zbx_vector_vmware_pnic_destroy(hv->pnics);
 
 	zbx_free(hv->uuid);
 	zbx_free(hv->id);
@@ -3403,6 +3433,7 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 					"<ns0:pathSet>parent</ns0:pathSet>"				\
 					"<ns0:pathSet>datastore</ns0:pathSet>"				\
 					"<ns0:pathSet>config.virtualNicManagerInfo.netConfig</ns0:pathSet>"\
+					"<ns0:pathSet>config.network.pnic</ns0:pathSet>"		\
 					"<ns0:pathSet>config.network.ipRouteConfig.defaultGateway</ns0:pathSet>"\
 					"<ns0:pathSet>summary.managementServerIp</ns0:pathSet>"		\
 					"<ns0:pathSet>config.storageDevice.scsiTopology</ns0:pathSet>"	\
@@ -4021,6 +4052,69 @@ int	vmware_dsname_compare(const void *d1, const void *d2)
 	return strcmp(ds1->name, ds2->name);
 }
 
+int	vmware_pnic_compare(const void *v1, const void *v2)
+{
+	const zbx_vmware_pnic_t		*nic1 = *(const zbx_vmware_pnic_t * const *)v1;
+	const zbx_vmware_pnic_t		*nic2 = *(const zbx_vmware_pnic_t * const *)v2;
+
+	return strcmp(nic1->name, nic2->name);
+}
+
+static void	vmware_service_get_hv_pnics_data(xmlDoc *details, zbx_vector_vmware_pnic_t *nics)
+{
+	int 		i;
+	char		*name;
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	xpathCtx = xmlXPathNewContext(details);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_HV_PNICS(), xpathCtx)))
+		goto clean;
+
+	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+		goto clean;
+
+	nodeset = xpathObj->nodesetval;
+	zbx_vector_vmware_pnic_reserve(nics, nodeset->nodeNr);
+
+	for (i = 0; i < nodeset->nodeNr; i++)
+	{
+		zbx_vmware_pnic_t	*nic;
+		char			*name;
+
+		if (NULL == (name = zbx_xml_node_read_value(details, nodeset->nodeTab[i], "*/*[local-name()='device']")))
+			continue;
+
+		nic = (zbx_vmware_pnic_t *)zbx_malloc(NULL, sizeof(zbx_vmware_pnic_t));
+
+		nic->name = name;
+		ZBX_STR2UINT64(nic->speed, zbx_xml_node_read_value(details, nodeset->nodeTab[i],
+				"/*/*[local-name()='linkSpeed']/*[local-name()='speedMb']"));
+
+		nic->duplex = 0 == strcmp(
+				zbx_xml_node_read_value(details, nodeset->nodeTab[i],
+					"/*/*[local-name()='linkSpeed']/*[local-name()='duplex']"),
+				"true") ? ZBX_DUPLEX_FULL : ZBX_DUPLEX_HALF;
+
+		nic->props[ZBX_VMWARE_PNIC_PROPS_DRIVER] = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
+				ZBX_XNN("driver"));
+		nic->props[ZBX_VMWARE_PNIC_PROPS_MAC] = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
+				ZBX_XNN("mac"));
+
+		zbx_vector_vmware_pnic_append(nics, nic);
+	}
+	zbx_vector_vmware_pnic_sort(nics, vmware_pnic_compare);
+clean:
+	xmlXPathFreeObject(xpathObj);
+	xmlXPathFreeContext(xpathCtx);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, nodeset->nodeNr);
+}
+
+
 /******************************************************************************
  *                                                                            *
  * Purpose: initialize vmware hypervisor object                               *
@@ -4039,10 +4133,11 @@ int	vmware_dsname_compare(const void *d1, const void *d2)
 static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, const char *id,
 		zbx_vector_vmware_datastore_t *dss, zbx_vmware_hv_t *hv, char **error)
 {
-	char			*value;
-	xmlDoc			*details = NULL, *multipath_data = NULL;
-	zbx_vector_str_t	datastores, vms;
-	int			i, j, ret = FAIL;
+	char				*value;
+	xmlDoc				*details = NULL, *multipath_data = NULL;
+	zbx_vector_str_t		datastores, vms;
+	zbx_vector_vmware_pnic_t	pnics;
+	int				i, j, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hvid:'%s'", __func__, id);
 
@@ -4053,6 +4148,8 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 
 	zbx_vector_str_create(&datastores);
 	zbx_vector_str_create(&vms);
+
+	zbx_vector_vmware_pnic_create(hv->pnics);
 
 	if (SUCCEED != vmware_service_get_hv_data(service, easyhandle, id, hv_propmap,
 			ZBX_VMWARE_HVPROPS_NUM, &details, error))
@@ -4068,6 +4165,8 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 
 	hv->uuid = zbx_strdup(NULL, hv->props[ZBX_VMWARE_HVPROP_HW_UUID]);
 	hv->id = zbx_strdup(NULL, id);
+
+	vmware_service_get_hv_pnics_data(details, hv->pnics);
 
 	if (NULL != (value = zbx_xml_doc_read_value(details, "//*[@type='" ZBX_VMWARE_SOAP_CLUSTER "']")))
 		hv->clusterid = value;

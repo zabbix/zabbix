@@ -96,6 +96,8 @@ int	check_vcenter_hv_memory_size_ballooned(AGENT_REQUEST *request, const char *u
 		AGENT_RESULT *result);
 int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_hv_net_if_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT * result);
 int	check_vcenter_hv_network_in(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, const char *password,

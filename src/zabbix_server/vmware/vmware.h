@@ -178,6 +178,24 @@ typedef struct
 }
 zbx_vmware_dev_t;
 
+#define ZBX_DUPLEX_FULL		0
+#define ZBX_DUPLEX_HALF		1
+
+/* hypervisor physical NIC data */
+#define ZBX_VMWARE_PNIC_PROPS_DRIVER		0
+#define ZBX_VMWARE_PNIC_PROPS_MAC		1
+#define ZBX_VMWARE_PNIC_PROPS_NUM		2
+typedef struct
+{
+	char		*name;
+	zbx_uint64_t	speed;
+	int		duplex;
+	char		**props;
+}
+zbx_vmware_pnic_t;
+
+ZBX_PTR_VECTOR_DECL(vmware_pnic, zbx_vmware_pnic_t *)
+
 /* file system data */
 typedef struct
 {
@@ -212,6 +230,7 @@ typedef struct
 	char				**props;
 	zbx_vector_vmware_dsname_t	dsnames;
 	zbx_vector_ptr_t		vms;
+	zbx_vector_vmware_pnic_t	*pnics;
 }
 zbx_vmware_hv_t;
 
