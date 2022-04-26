@@ -368,7 +368,6 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *in
 		/* detects item configuration changes affecting check scheduling and passes them in flags. */
 
 		item->nextcheck = ZBX_JAN_2038;
-		item->schedulable = 0;
 		return FAIL;
 	}
 
@@ -387,8 +386,6 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *in
 	}
 
 	zbx_custom_interval_free(custom_intervals);
-
-	item->schedulable = 1;
 
 	return SUCCEED;
 }
@@ -2204,7 +2201,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			item->location = ZBX_LOC_NOWHERE;
 			item->poller_type = ZBX_NO_POLLER;
 			item->queue_priority = ZBX_QUEUE_PRIORITY_NORMAL;
-			item->schedulable = 1;
 
 			zbx_vector_ptr_create_ext(&item->tags, __config_shmem_malloc_func, __config_shmem_realloc_func,
 					__config_shmem_free_func);
@@ -12379,7 +12375,7 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, 
 
 			proxy_hostid = 0;
 		}
-		else if (0 == dc_item->schedulable)
+		else if (ZBX_JAN_2038 == dc_item->nextcheck)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot perform check now for item \"%s\" on host \"%s\""
 					": item configuration error", dc_item->key, dc_host->host);

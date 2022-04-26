@@ -570,7 +570,7 @@ static void	DCdump_items(void)
 		zabbix_log(LOG_LEVEL_TRACE, "  history:%s", item->history_period);
 		zabbix_log(LOG_LEVEL_TRACE, "  poller_type:%u location:%u", item->poller_type, item->location);
 		zabbix_log(LOG_LEVEL_TRACE, "  inventory_link:%u", item->inventory_link);
-		zabbix_log(LOG_LEVEL_TRACE, "  priority:%u schedulable:%u", item->queue_priority, item->schedulable);
+		zabbix_log(LOG_LEVEL_TRACE, "  priority:%u", item->queue_priority);
 
 		for (j = 0; j < (int)ARRSIZE(trace_items); j++)
 		{

@@ -113,7 +113,6 @@ typedef struct
 	unsigned char		flags;
 	unsigned char		status;
 	unsigned char		queue_priority;
-	unsigned char		schedulable;
 	unsigned char		update_triggers;
 	zbx_uint64_t		templateid;
 
