@@ -998,7 +998,7 @@ final class CItemData {
 				'value_type' => null
 			],
 			'registry.get[key,<mode>,<name regexp>]' => [
-				'description' => _(' List of Windows Registry values or keys located at given key. Returns JSON.'),
+				'description' => _('List of Windows Registry values or keys located at given key. Returns JSON.'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'sensor[device,sensor,<mode>]' => [
