@@ -1182,7 +1182,9 @@ class CTemplateGroup extends CApiService {
 		$this->validatePropagate($data, $db_groups);
 
 		foreach ($db_groups as $db_group) {
-			$this->inheritPermissions($db_group['groupid'], $db_group['name']);
+			if ($data['permissions']) {
+				$this->inheritPermissions($db_group['groupid'], $db_group['name']);
+			}
 		}
 
 		return ['groupids' => array_column($data['groups'], 'groupid')];
