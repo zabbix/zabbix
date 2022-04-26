@@ -94,12 +94,13 @@ $form = (new CForm('post', $form_action))
 					(new CSimpleButton(_('Change password')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->setId('bind-password-btn'),
-					(new CPassBox('bind_password', ''))
+					(new CPassBox('bind_password', '', DB::getFieldLength('userdirectory', 'bind_password')))
 						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 						->addStyle('display: none;')
 						->setAttribute('disabled', 'disabled')
 				]
-				: (new CPassBox('bind_password', ''))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				: (new CPassBox('bind_password', '', DB::getFieldLength('userdirectory', 'bind_password')))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			)
 		])
 		->addItem([
