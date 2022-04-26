@@ -191,6 +191,11 @@ static int	DBpatch_6010010(void)
 
 static int	DBpatch_6010011(void)
 {
+	return DBcreate_index("usrgrp", "usrgrp_2", "userdirectoryid", 0);
+}
+
+static int	DBpatch_6010012(void)
+{
 	int		rc = ZBX_DB_OK;
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -230,7 +235,7 @@ static int	DBpatch_6010011(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6010012(void)
+static int	DBpatch_6010013(void)
 {
 	if (ZBX_DB_OK > DBexecute("update config set ldap_userdirectoryid=1 where ldap_configured=1"))
 		return FAIL;
@@ -238,32 +243,32 @@ static int	DBpatch_6010012(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6010013(void)
+static int	DBpatch_6010014(void)
 {
 	return DBdrop_field("config", "ldap_host");
 }
 
-static int	DBpatch_6010014(void)
+static int	DBpatch_6010015(void)
 {
 	return DBdrop_field("config", "ldap_port");
 }
 
-static int	DBpatch_6010015(void)
+static int	DBpatch_6010016(void)
 {
 	return DBdrop_field("config", "ldap_base_dn");
 }
 
-static int	DBpatch_6010016(void)
+static int	DBpatch_6010017(void)
 {
 	return DBdrop_field("config", "ldap_bind_dn");
 }
 
-static int	DBpatch_6010017(void)
+static int	DBpatch_6010018(void)
 {
 	return DBdrop_field("config", "ldap_bind_password");
 }
 
-static int	DBpatch_6010018(void)
+static int	DBpatch_6010019(void)
 {
 	return DBdrop_field("config", "ldap_search_attribute");
 }
@@ -292,5 +297,6 @@ DBPATCH_ADD(6010015, 0, 1)
 DBPATCH_ADD(6010016, 0, 1)
 DBPATCH_ADD(6010017, 0, 1)
 DBPATCH_ADD(6010018, 0, 1)
+DBPATCH_ADD(6010019, 0, 1)
 
 DBPATCH_END()
