@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-25T18:21:22Z'
+  date: '2022-04-26T11:06:07Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -480,7 +480,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.Node == "{#SERVICE_NAME}")].Checks[?(@.CheckID == "serfHealth" && @.Status == ''critical'')].length()'
+                    - '$[?(@.Service.Service == "{#SERVICE_NAME}")].Checks[?(@.CheckID == "serfHealth" && @.Status == ''critical'')].length()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -530,7 +530,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.Node == "{#SERVICE_NAME}")].Checks[?(@.CheckID == "serfHealth" && @.Status == ''passing'')].length()'
+                    - '$[?(@.Service.Service == "{#SERVICE_NAME}")].Checks[?(@.CheckID == "serfHealth" && @.Status == ''passing'')].length()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -555,7 +555,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.Node == "{#SERVICE_NAME}")].Checks[?(@.CheckID == "serfHealth" && @.Status == ''warning'')].length()'
+                    - '$[?(@.Service.Service == "{#SERVICE_NAME}")].Checks[?(@.CheckID == "serfHealth" && @.Status == ''warning'')].length()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:

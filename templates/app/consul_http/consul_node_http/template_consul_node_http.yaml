@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-25T18:21:10Z'
+  date: '2022-04-26T11:12:02Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -311,11 +311,9 @@ zabbix_export:
           value_type: TEXT
           params: |
             var Consul = {
-            
                 setParams: function (params) {
                     ['api_endpoint', 'token'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined'
-                            || params[field] === '') {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
@@ -332,23 +330,19 @@ zabbix_export:
                         url = Consul.params.api_endpoint + query;
             
                     request.addHeader('Content-Type: application/json');
-                    request.addHeader('X-Consul-Token' + Consul.params.token);
+                    request.addHeader('X-Consul-Token: ' + Consul.params.token);
             
                     Zabbix.log(4, '[ Consul ] Sending request: ' + url);
                     response = request.get(url);
             
                     Zabbix.log(4, '[ Consul ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if ((request.getStatus() < 200 || request.getStatus() >= 300) && (request.getStatus() !== 503 || request.getStatus() !== 429)) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
-            
                     if (response !== null) {
                         try {
                             response = JSON.parse(response);
                         }
                         catch (error) {
-                            throw 'Failed to parse response received from Consul Agent API. Check debug log for more information.';
+                            throw 'Failed to parse response received from Consul Agent API.';
                         }
                     }
             
@@ -360,63 +354,54 @@ zabbix_export:
             
                 getServices: function () {
                     var result = Consul.request('v1/agent/services'),
-                        service_list = [];
+                        services = [];
             
-                    if (typeof result.response !== 'object'
-                        || result.status != 200) {
-                        throw 'Cannot get services from Consul Agent API. Check debug log for more information.';
-                    };
+                    if (typeof result.response !== 'object' || result.status != 200) {
+                        throw 'Cannot get service list from Consul Agent API.';
+                    }
             
                     Object.keys(result.response).forEach(function (service) {
-            
-                        service_list.push(result.response[service]['ID']);
-            
+                        services.push(result.response[service]['ID']);
                     });
             
-                    return service_list;
+                    return services;
                 },
+            
                 getServiceStats: function (service_id) {
+                    var result = Consul.request('v1/agent/health/service/id/' + service_id);
             
+                    if (typeof result.response !== 'object' || [200, 429, 503].indexOf(result.status) === -1) {
+                        throw 'Cannot get service info from Consul Agent API.';
+                    }
             
-                    var result = Consul.request('v1/agent/health/service/id/' + service_id),
-                        http_codes = [200, 429, 503];
-            
-                    if (typeof result.response !== 'object'
-                        || http_codes.indexOf(result.status) === -1) {
-                        throw 'Cannot get service info from Consul Agent API. Check debug log for more information.';
-            
-                    };
                     return result.response;
                 }
             }
+            
             try {
                 Consul.setParams(JSON.parse(value));
             
                 var services = Consul.getServices(),
                     result = [];
             
-            
-                if (Object.keys(services).length === 0) {
-                    return '[]'
-                };
                 services.forEach(function (service) {
-                    var service_stats = Consul.getServiceStats(service)
+                    var service_stats = Consul.getServiceStats(service);
+            
                     result.push({
                         'id': service,
                         'name': service_stats['Service']['Service'],
-                        'AggregatedStatus': service_stats['AggregatedStatus'],
-                        'Checks': service_stats["Checks"]
-            
+                        'status': service_stats['AggregatedStatus'],
+                        'checks': service_stats["Checks"]
                     });
                 });
+            
                 return JSON.stringify(result);
-            
             }
-            
             catch (error) {
-                error += (String(error).endsWith('.')) ? '' : '.';
+                error += ((String(error).endsWith('.')) ? '' : '.');
                 Zabbix.log(3, '[ Consul ] ERROR: ' + error);
-                return JSON.stringify({ error: error });
+            
+                return JSON.stringify({error: error + ' Check debug log for more information.'});
             }
           description: 'Get all the services that are registered with the local agent and their status.'
           timeout: 15s
@@ -431,6 +416,42 @@ zabbix_export:
             -
               tag: component
               value: raw
+        -
+          uuid: f2fb4c76b4974319846d4773cfb64b0c
+          name: 'Consul: Get local services check'
+          type: DEPENDENT
+          key: consul.get_local_services.check
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Data collection check.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.error
+              error_handler: CUSTOM_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: consul.get_local_services
+          tags:
+            -
+              tag: component
+              value: status
+          triggers:
+            -
+              uuid: 5cf09b213c044033af1d8e1d8821bc38
+              expression: 'length(last(/HashiCorp Consul Node by HTTP/consul.get_local_services.check))>0'
+              name: 'Consul: Failed to get local services'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: c0e199969c19444fb68fd8497fcab047
           name: 'Consul: Get instance metrics'
@@ -1688,7 +1709,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $.AggregatedStatus.first()
+                    - '$[?(@.id == "{#SERVICE_ID}")].status.first()'
                 -
                   type: JAVASCRIPT
                   parameters:
@@ -1701,7 +1722,7 @@ zabbix_export:
                   parameters:
                     - 3h
               master_item:
-                key: 'consul.service.state["{#SERVICE_ID}"]'
+                key: consul.get_local_services
               tags:
                 -
                   tag: component
@@ -1726,13 +1747,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.Checks[?(@.CheckID == "{#SERVICE_CHECK_ID}")].Output.first()'
+                    - '$[?(@.id == "{#SERVICE_ID}")].checks[?(@.CheckID == "{#SERVICE_CHECK_ID}")].Output.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
               master_item:
-                key: 'consul.service.state["{#SERVICE_ID}"]'
+                key: consul.get_local_services
               tags:
                 -
                   tag: check
@@ -1758,7 +1779,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.Checks[?(@.CheckID == "{#SERVICE_CHECK_ID}")].Status.first()'
+                    - '$[?(@.id == "{#SERVICE_ID}")].checks[?(@.CheckID == "{#SERVICE_CHECK_ID}")].Status.first()'
                 -
                   type: JAVASCRIPT
                   parameters:
@@ -1771,38 +1792,11 @@ zabbix_export:
                   parameters:
                     - 3h
               master_item:
-                key: 'consul.service.state["{#SERVICE_ID}"]'
+                key: consul.get_local_services
               tags:
                 -
                   tag: check
                   value: '{#SERVICE_CHECK_NAME}'
-                -
-                  tag: component
-                  value: service
-                -
-                  tag: service
-                  value: '{#SERVICE_NAME}'
-            -
-              uuid: dd424e98f41d4c12a24f428b26a11bf6
-              name: 'Consul: ["{#SERVICE_NAME}"]: State'
-              type: DEPENDENT
-              key: 'consul.service.state["{#SERVICE_ID}"]'
-              delay: '0'
-              history: 7d
-              discover: NO_DISCOVER
-              description: 'Aggregated status and values of health checks for the service instance.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.id == "{#SERVICE_ID}")]'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 3h
-              master_item:
-                key: consul.get_local_services
-              tags:
                 -
                   tag: component
                   value: service
@@ -1830,8 +1824,8 @@ zabbix_export:
                           '{#SERVICE_ID}': service.id,
                       });
                   
-                      if (service['Checks'] !== 0) {
-                          service['Checks'].forEach(function (check) {
+                      if (service['checks'] !== 0) {
+                          service['checks'].forEach(function (check) {
                               result.push({
                                   '{#TYPE}': 'service_check',
                                   '{#SERVICE_NAME}': service.name,
@@ -1845,6 +1839,10 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(result)
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
           overrides:
             -
               name: 'aggregated status'
