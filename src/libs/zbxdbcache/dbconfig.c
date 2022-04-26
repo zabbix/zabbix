@@ -13325,9 +13325,7 @@ static void	dc_reschedule_items()
 
 	if (0 != items.values_num)
 	{
-		int		i;
-		char		*error = NULL;
-		ZBX_DC_ITEM	*item = items.values[i];
+		int	i;
 
 		WRLOCK_CACHE;
 
@@ -13336,6 +13334,8 @@ static void	dc_reschedule_items()
 			ZBX_DC_INTERFACE	*interface = NULL;
 			unsigned char		old_poller_type;
 			int			old_nextcheck;
+			char			*error = NULL;
+			ZBX_DC_ITEM		*item = items.values[i];
 
 			old_poller_type = item->poller_type;
 			old_nextcheck = item->nextcheck;
