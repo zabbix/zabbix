@@ -1612,13 +1612,13 @@ class CHostGroup extends CApiService {
 
 		$usrgrps = API::UserGroup()->get([
 			'output' => ['usrgrpid'],
-			'selectRights' => ['id', 'permission']
+			'selectHostGroupRights' => ['id', 'permission']
 		]);
 
 		$upd_usrgrps = [];
 
 		foreach ($usrgrps as $usrgrp) {
-			$rights = array_column($usrgrp['rights'], null, 'id');
+			$rights = array_column($usrgrp['hostgroup_rights'], null, 'id');
 
 			if (array_key_exists($groupid, $rights)) {
 				foreach ($child_groupids as $child_groupid) {
@@ -1636,7 +1636,7 @@ class CHostGroup extends CApiService {
 
 			$rights = array_values($rights);
 
-			if ($usrgrp['rights'] !== $rights) {
+			if ($usrgrp['hostgroup_rights'] !== $rights) {
 				$upd_usrgrps[] = [
 					'usrgrpid' => $usrgrp['usrgrpid'],
 					'rights' => $rights

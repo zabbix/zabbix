@@ -1240,13 +1240,13 @@ class CTemplateGroup extends CApiService {
 
 		$usrgrps = API::UserGroup()->get([
 			'output' => ['usrgrpid'],
-			'selectRights' => ['id', 'permission']
+			'selectTemplateGroupRights' => ['id', 'permission']
 		]);
 
 		$upd_usrgrps = [];
 
 		foreach ($usrgrps as $usrgrp) {
-			$rights = array_column($usrgrp['rights'], null, 'id');
+			$rights = array_column($usrgrp['templategroup_rights'], null, 'id');
 
 			if (array_key_exists($groupid, $rights)) {
 				foreach ($child_groupids as $child_groupid) {
@@ -1264,7 +1264,7 @@ class CTemplateGroup extends CApiService {
 
 			$rights = array_values($rights);
 
-			if ($usrgrp['rights'] !== $rights) {
+			if ($usrgrp['templategroup_rights'] !== $rights) {
 				$upd_usrgrps[] = [
 					'usrgrpid' => $usrgrp['usrgrpid'],
 					'rights' => $rights

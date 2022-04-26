@@ -77,6 +77,8 @@ class CUserGroup extends CApiService {
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectUsers'				=> null,
 			'selectRights'				=> null,
+			'selectHostGroupRights'		=> null,
+			'selectTemplateGroupRights'	=> null,
 			'selectTagFilters'			=> null,
 			'countOutput'				=> false,
 			'preservekeys'				=> false,
@@ -86,6 +88,8 @@ class CUserGroup extends CApiService {
 		];
 
 		$options = zbx_array_merge($defOptions, $options);
+
+		$this->checkDeprecatedParam($options, 'selectRights');
 
 		// permissions
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
@@ -1007,48 +1011,9 @@ class CUserGroup extends CApiService {
 			$result = $relationMap->mapMany($result, $dbUsers, 'users');
 		}
 
-		// adding usergroup rights
-		if ($options['selectRights'] !== null && $options['selectRights'] != API_OUTPUT_COUNT) {
-			$db_rights = [];
-			$relationMap = $this->createRelationMap($result, 'groupid', 'rightid', 'rights');
-			$related_ids = $relationMap->getRelatedIds();
-
-			if ($related_ids) {
-				if (is_array($options['selectRights'])) {
-					$pk_field = $this->pk('rights');
-
-					$output_fields = [
-						$pk_field => $this->fieldId($pk_field, 'r')
-					];
-
-					foreach ($options['selectRights'] as $field) {
-						if ($this->hasField($field, 'rights')) {
-							$output_fields[$field] = $this->fieldId($field, 'r');
-						}
-					}
-
-					$output_fields = implode(',', $output_fields);
-				}
-				else {
-					$output_fields = 'r.*';
-				}
-
-				$db_rights = DBfetchArray(DBselect(
-					'SELECT '.$output_fields.
-					' FROM rights r'.
-					' WHERE '.dbConditionInt('r.rightid', $related_ids).
-						((self::$userData['type'] == USER_TYPE_SUPER_ADMIN) ? '' : ' AND r.permission>'.PERM_DENY)
-				));
-				$db_rights = zbx_toHash($db_rights, 'rightid');
-
-				foreach ($db_rights as &$db_right) {
-					unset($db_right['rightid'], $db_right['groupid']);
-				}
-				unset($db_right);
-			}
-
-			$result = $relationMap->mapMany($result, $db_rights, 'rights');
-		}
+		self::addRelatedRights($options, $result, 'selectRights');
+		self::addRelatedRights($options, $result, 'selectHostGroupRights');
+		self::addRelatedRights($options, $result, 'selectTemplateGroupRights');
 
 		// Adding usergroup tag filters.
 		if ($options['selectTagFilters'] !== null && $options['selectTagFilters'] != API_OUTPUT_COUNT) {
@@ -1087,6 +1052,67 @@ class CUserGroup extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * @param array  $options
+	 * @param array  $result
+	 * @param string $option
+	 */
+	private static function addRelatedRights(array $options, array &$result, string $option): void {
+		if ($options[$option] === null || $options[$option] === API_OUTPUT_COUNT) {
+			return;
+		}
+
+		switch ($option) {
+			case 'selectRights':
+				$output_tag = 'rights';
+				$types = [HOST_GROUP_TYPE_HOST_GROUP];
+				break;
+
+			case 'selectHostGroupRights':
+				$output_tag = 'hostgroup_rights';
+				$types = [HOST_GROUP_TYPE_HOST_GROUP];
+				break;
+
+			case 'selectTemplateGroupRights':
+				$output_tag = 'templategroup_rights';
+				$types = [HOST_GROUP_TYPE_TEMPLATE_GROUP];
+				break;
+		}
+
+		foreach ($result as &$row) {
+			$row[$output_tag] = [];
+		}
+		unset($row);
+
+		if (is_array($options[$option])) {
+			$output_fields = ['groupid'];
+
+			foreach ($options[$option] as $field) {
+				if (in_array($field, ['id', 'permission'])) {
+					$output_fields[] = $field;
+				}
+			}
+		}
+		else {
+			$output_fields = ['groupid', 'id', 'permission'];
+		}
+
+		$sql = 'SELECT r.'.implode(',r.', $output_fields).
+			' FROM rights r,hstgrp hg'.
+			' WHERE r.id=hg.groupid'.
+				' AND '.dbConditionInt('hg.type', $types).
+				' AND '.dbConditionId('r.groupid', array_keys($result));
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			$sql .= ' AND '.dbConditionId('r.permission', [PERM_READ_WRITE, PERM_READ]);
+		}
+
+		$db_rights = DBselect($sql);
+
+		while ($db_right = DBfetch($db_rights)) {
+			$result[$db_right['groupid']][$output_tag][] = array_diff_key($db_right, array_flip(['groupid']));
+		}
 	}
 
 	/**
