@@ -50,15 +50,6 @@ zbx_diag_map_t;
 typedef int (*zbx_diag_add_section_info_func_t)(const char *section, const struct zbx_json_parse *jp,
 		struct zbx_json *json, char **error);
 
-#define ZBX_DIAG_VALUECACHE_ITEMS		0x00000001
-#define ZBX_DIAG_VALUECACHE_VALUES		0x00000002
-#define ZBX_DIAG_VALUECACHE_MODE		0x00000004
-#define ZBX_DIAG_VALUECACHE_MEMORY		0x00000008
-
-#define ZBX_DIAG_VALUECACHE_SIMPLE	(ZBX_DIAG_VALUECACHE_ITEMS | \
-					ZBX_DIAG_VALUECACHE_VALUES | \
-					ZBX_DIAG_VALUECACHE_MODE)
-
 #define ZBX_DIAG_HISTORYCACHE	"historycache"
 #define ZBX_DIAG_VALUECACHE	"valuecache"
 #define ZBX_DIAG_PREPROCESSING	"preprocessing"
