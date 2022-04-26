@@ -1568,6 +1568,8 @@ class testUserRolesPermissions extends CWebTest {
 					$this->assertEquals('0 selected', $selected_count->getText());
 					break;
 			}
+
+			CMessageElement::find()->waitUntilVisible()->one()->close();
 		}
 	}
 
@@ -1661,6 +1663,8 @@ class testUserRolesPermissions extends CWebTest {
 			else {
 				$this->assertMessage(TEST_BAD, 'Cannot execute operation', $test_case['message']);
 			}
+
+			CMessageElement::find()->waitUntilVisible()->one()->close();
 		}
 	}
 

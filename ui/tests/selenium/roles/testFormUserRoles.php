@@ -1195,8 +1195,7 @@ class testFormUserRoles extends CWebTest {
 						'Close problems' => false,
 						'Execute scripts' => false,
 						'Manage API tokens' => false,
-						'Default access to new actions' => false,
-						'Invoke "Execute now" on read-only hosts' => false
+						'Default access to new actions' => false
 					],
 					'message_header' => 'User role updated'
 				]
