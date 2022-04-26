@@ -189,11 +189,11 @@ abstract class CControllerHost extends CController {
 		]);
 
 		$items = API::Item()->get([
+			'countOutput' => true,
+			'groupCount' => true,
 			'hostids' => array_keys($hosts),
 			'webitems' =>true,
-			'monitored' => true,
-			'countOutput' => true,
-			'groupCount' => true
+			'monitored' => true
 		]);
 		$items_count = array_combine(array_column($items, 'hostid'), array_column($items, 'rowscount'));
 
