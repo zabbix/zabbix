@@ -179,7 +179,7 @@ static int	DBpatch_6010008(void)
 
 static int	DBpatch_6010009(void)
 {
-	return DBcreate_index("config", "c_config_3", "ldap_userdirectoryid", 0);
+	return DBcreate_index("config", "config_3", "ldap_userdirectoryid", 0);
 }
 
 static int	DBpatch_6010010(void)
