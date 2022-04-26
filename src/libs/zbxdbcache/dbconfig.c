@@ -13322,6 +13322,11 @@ static void	dc_reschedule_items()
 		for (i = 0; i < items.values_num; i++)
 		{
 			ZBX_DC_INTERFACE	*interface = NULL;
+			unsigned char		old_poller_type;
+			int			old_nextcheck;
+
+			old_poller_type = item->poller_type;
+			old_nextcheck = item->nextcheck;
 
 			if (0 != item->interfaceid)
 			{
@@ -13337,6 +13342,8 @@ static void	dc_reschedule_items()
 						error);
 				zbx_free(error);
 			}
+
+			DCupdate_item_queue(item, old_poller_type, old_nextcheck);
 		}
 
 		UNLOCK_CACHE;
