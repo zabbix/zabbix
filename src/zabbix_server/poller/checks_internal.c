@@ -25,7 +25,6 @@
 #include "zbxtrends.h"
 #include "../vmware/vmware.h"
 #include "zbxserver.h"
-#include "../stats/zabbix_stats.h"
 #include "../../libs/zbxsysinfo/common/zabbix_stats.h"
 
 extern unsigned char	program_type;

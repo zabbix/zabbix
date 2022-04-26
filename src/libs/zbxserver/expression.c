@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "expression.h"
-
 #include "zbxserver.h"
+#include "expression.h"
 #include "evalfunc.h"
+
 #include "log.h"
 #include "zbxregexp.h"
 #include "zbxvariant.h"
@@ -3000,14 +3000,14 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION_EXPLAIN))
 				{
 					zbx_db_trigger_explain_expression(&c_event->trigger, &replace_to,
-							zbx_evaluate_function2, 0);
+							evaluate_function2, 0);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION_RECOVERY_EXPLAIN))
 				{
 					if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == c_event->trigger.recovery_mode)
 					{
 						zbx_db_trigger_explain_expression(&c_event->trigger, &replace_to,
-								zbx_evaluate_function2, 1);
+								evaluate_function2, 1);
 					}
 					else
 						replace_to = zbx_strdup(replace_to, "");
@@ -3015,12 +3015,12 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_VALUE))
 				{
 					zbx_db_trigger_get_function_value(&c_event->trigger, N_functionid,
-							&replace_to, zbx_evaluate_function2, 0);
+							&replace_to, evaluate_function2, 0);
 				}
 				else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_RECOVERY_VALUE))
 				{
 					zbx_db_trigger_get_function_value(&c_event->trigger, N_functionid,
-							&replace_to, zbx_evaluate_function2, 1);
+							&replace_to, evaluate_function2, 1);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_HOSTGROUP_NAME))
 				{
@@ -3272,14 +3272,14 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION_EXPLAIN))
 				{
 					zbx_db_trigger_explain_expression(&c_event->trigger, &replace_to,
-							zbx_evaluate_function2, 0);
+							evaluate_function2, 0);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION_RECOVERY_EXPLAIN))
 				{
 					if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == c_event->trigger.recovery_mode)
 					{
 						zbx_db_trigger_explain_expression(&c_event->trigger, &replace_to,
-								zbx_evaluate_function2, 1);
+								evaluate_function2, 1);
 					}
 					else
 						replace_to = zbx_strdup(replace_to, "");
@@ -3287,12 +3287,12 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_VALUE))
 				{
 					zbx_db_trigger_get_function_value(&c_event->trigger, N_functionid,
-							&replace_to, zbx_evaluate_function2, 0);
+							&replace_to, evaluate_function2, 0);
 				}
 				else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_RECOVERY_VALUE))
 				{
 					zbx_db_trigger_get_function_value(&c_event->trigger, N_functionid,
-							&replace_to, zbx_evaluate_function2, 1);
+							&replace_to, evaluate_function2, 1);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_HOSTGROUP_NAME))
 				{
@@ -4119,12 +4119,12 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION_EXPLAIN))
 					{
 						zbx_db_trigger_explain_expression(&event->trigger, &replace_to,
-								zbx_evaluate_function2, 0);
+								evaluate_function2, 0);
 					}
 					else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_VALUE))
 					{
 						zbx_db_trigger_get_function_value(&event->trigger, N_functionid,
-								&replace_to, zbx_evaluate_function2, 0);
+								&replace_to, evaluate_function2, 0);
 					}
 				}
 			}
@@ -5136,7 +5136,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_u
 			continue;
 		}
 
-		if (SUCCEED != zbx_evaluate_function2(&func->value, (DC_ITEM *)item, func->function, func->parameter,
+		if (SUCCEED != evaluate_function2(&func->value, (DC_ITEM *)item, func->function, func->parameter,
 				&func->timespec, &error))
 		{
 			/* compose and store error message for future use */
