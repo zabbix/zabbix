@@ -1806,12 +1806,12 @@ static void	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type
 		case ITEM_VALUE_TYPE_STR:
 			dc_history_clean_value(hdata);
 			hdata->value.str = value->data.str;
-			hdata->value.str[zbx_db_strlen_n(hdata->value.str, HISTORY_STR_VALUE_LEN)] = '\0';
+			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_STR_VALUE_LEN)] = '\0';
 			break;
 		case ITEM_VALUE_TYPE_TEXT:
 			dc_history_clean_value(hdata);
 			hdata->value.str = value->data.str;
-			hdata->value.str[zbx_db_strlen_n(hdata->value.str, HISTORY_TEXT_VALUE_LEN)] = '\0';
+			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_TEXT_VALUE_LEN)] = '\0';
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if (ITEM_VALUE_TYPE_LOG != hdata->value_type)
@@ -1821,7 +1821,7 @@ static void	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type
 				memset(hdata->value.log, 0, sizeof(zbx_log_value_t));
 			}
 			hdata->value.log->value = value->data.str;
-			hdata->value.str[zbx_db_strlen_n(hdata->value.str, HISTORY_LOG_VALUE_LEN)] = '\0';
+			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_LOG_VALUE_LEN)] = '\0';
 	}
 
 	hdata->value_type = value_type;
@@ -3688,7 +3688,7 @@ static void	dc_local_add_history_log(zbx_uint64_t itemid, unsigned char item_val
 		item_value->value.value_str.len = zbx_db_strlen_n(log->value, ZBX_HISTORY_VALUE_LEN) + 1;
 
 		if (NULL != log->source && '\0' != *log->source)
-			item_value->source.len = zbx_db_strlen_n(log->source, HISTORY_LOG_SOURCE_LEN) + 1;
+			item_value->source.len = zbx_db_strlen_n(log->source, ZBX_HISTORY_LOG_SOURCE_LEN) + 1;
 		else
 			item_value->source.len = 0;
 	}

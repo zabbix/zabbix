@@ -21,7 +21,7 @@
 #define ZABBIX_DBCACHE_H
 
 #include "sysinfo.h" //included for convenience
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "zbxcomms.h"
 #include "zbxshmem.h"
 #include "zbxeval.h"
@@ -85,9 +85,9 @@ extern int	CONFIG_ODBCPOLLER_FORKS;
 typedef struct
 {
 	zbx_uint64_t	interfaceid;
-	char		ip_orig[INTERFACE_IP_LEN_MAX];
-	char		dns_orig[INTERFACE_DNS_LEN_MAX];
-	char		port_orig[INTERFACE_PORT_LEN_MAX];
+	char		ip_orig[ZBX_INTERFACE_IP_LEN_MAX];
+	char		dns_orig[ZBX_INTERFACE_DNS_LEN_MAX];
+	char		port_orig[ZBX_INTERFACE_PORT_LEN_MAX];
 	char		*addr;
 	unsigned short	port;
 	unsigned char	useip;
@@ -95,7 +95,7 @@ typedef struct
 	unsigned char	main;
 	unsigned char	available;
 	int		disable_until;
-	char		error[INTERFACE_ERROR_LEN_MAX];
+	char		error[ZBX_INTERFACE_ERROR_LEN_MAX];
 	int		errors_from;
 }
 DC_INTERFACE;
@@ -109,11 +109,18 @@ typedef struct
 	unsigned char	bulk;
 	unsigned char	snmp_version;
 	unsigned char	useip;
-	char		ip_orig[INTERFACE_IP_LEN_MAX];
-	char		dns_orig[INTERFACE_DNS_LEN_MAX];
-	char		port_orig[INTERFACE_PORT_LEN_MAX];
+	char		ip_orig[ZBX_INTERFACE_IP_LEN_MAX];
+	char		dns_orig[ZBX_INTERFACE_DNS_LEN_MAX];
+	char		port_orig[ZBX_INTERFACE_PORT_LEN_MAX];
 }
 DC_INTERFACE2;
+
+#define HOST_IPMI_USERNAME_LEN		16
+#define HOST_IPMI_USERNAME_LEN_MAX	(HOST_IPMI_USERNAME_LEN + 1)
+#define HOST_IPMI_PASSWORD_LEN		20
+#define HOST_IPMI_PASSWORD_LEN_MAX	(HOST_IPMI_PASSWORD_LEN + 1)
+#define HOST_PROXY_ADDRESS_LEN		255
+#define HOST_PROXY_ADDRESS_LEN_MAX	(HOST_PROXY_ADDRESS_LEN + 1)
 
 typedef struct
 {
@@ -283,8 +290,8 @@ typedef struct
 						/* or 0 if no error */
 	int		version;
 	int		lastaccess;
-	char		addr_orig[INTERFACE_ADDR_LEN_MAX];
-	char		port_orig[INTERFACE_PORT_LEN_MAX];
+	char		addr_orig[ZBX_INTERFACE_ADDR_LEN_MAX];
+	char		port_orig[ZBX_INTERFACE_PORT_LEN_MAX];
 	char		*addr;
 	unsigned short	port;
 

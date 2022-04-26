@@ -21,7 +21,7 @@
 #define ZABBIX_AVAILABILITY_H
 
 #include "zbxtypes.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 
 /* agent (ZABBIX, SNMP, IPMI, JMX) availability data */
 typedef struct

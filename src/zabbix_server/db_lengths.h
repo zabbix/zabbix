@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_LLD_DB_LENGTHS_H
-#define ZABBIX_LLD_DB_LENGTHS_H
+#ifndef ZABBIX_DB_LENGTHS_H
+#define ZABBIX_DB_LENGTHS_H
 
 #define TRIGGER_OPDATA_LEN		255
 #define TRIGGER_URL_LEN			255
@@ -35,5 +35,14 @@
 
 #define GROUP_NAME_LEN			255
 
+#define ALERT_ERROR_LEN			2048
+#define ALERT_ERROR_LEN_MAX		(ALERT_ERROR_LEN + 1)
 
-#undef ZABBIX_LLD_DB_LENGTHS_H
+#define ITEM_PREPROC_PARAMS_LEN		65535
+
+#define EVENT_NAME_LEN			2048
+
+#define REPORT_ERROR_LEN		2048
+
+
+#undef /* ZABBIX_DB_LENGTHS_H */

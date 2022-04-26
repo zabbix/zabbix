@@ -20,14 +20,14 @@
 #ifndef ZABBIX_DISCOVERY_H
 #define ZABBIX_DISCOVERY_H
 
-#include "db.h"
+#include "zbxdbhigh.h"
 
 typedef struct
 {
 	zbx_uint64_t	dcheckid;
 	unsigned short	port;
-	char		dns[INTERFACE_DNS_LEN_MAX];
-	char		value[MAX_DISCOVERED_VALUE_SIZE];
+	char		dns[ZBX_INTERFACE_DNS_LEN_MAX];
+	char		value[ZBX_MAX_DISCOVERED_VALUE_SIZE];
 	int		status;
 	time_t		itemtime;
 }

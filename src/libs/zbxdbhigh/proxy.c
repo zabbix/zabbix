@@ -59,7 +59,7 @@ zbx_drule_t;
 
 typedef struct
 {
-	char			ip[INTERFACE_IP_LEN_MAX];
+	char			ip[ZBX_INTERFACE_IP_LEN_MAX];
 	zbx_vector_ptr_t	services;
 }
 zbx_drule_ip_t;
@@ -3999,9 +3999,9 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 				service->dcheckid = dcheckid;
 				service->itemtime = (time_t)atoi(row[1]);
 				service->port = atoi(row[2]);
-				zbx_strlcpy_utf8(service->value, row[3], MAX_DISCOVERED_VALUE_SIZE);
+				zbx_strlcpy_utf8(service->value, row[3], ZBX_MAX_DISCOVERED_VALUE_SIZE);
 				service->status = atoi(row[4]);
-				zbx_strlcpy(service->dns, row[5], INTERFACE_DNS_LEN_MAX);
+				zbx_strlcpy(service->dns, row[5], ZBX_INTERFACE_DNS_LEN_MAX);
 				zbx_vector_ptr_append(&services_old, service);
 				zbx_vector_uint64_append(dcheckids, service->dcheckid);
 				dchecks++;
@@ -4100,10 +4100,10 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 	int			status, ret = SUCCEED, i, j;
 	unsigned short		port;
 	const char		*p = NULL;
-	char			ip[INTERFACE_IP_LEN_MAX],
-				tmp[MAX_STRING_LEN], *value = NULL, dns[INTERFACE_DNS_LEN_MAX];
+	char			ip[ZBX_INTERFACE_IP_LEN_MAX], tmp[MAX_STRING_LEN],
+				dns[ZBX_INTERFACE_DNS_LEN_MAX], *value = NULL;
 	time_t			itemtime;
-	size_t			value_alloc = MAX_DISCOVERED_VALUE_SIZE;
+	size_t			value_alloc = ZBX_MAX_DISCOVERED_VALUE_SIZE;
 	zbx_vector_ptr_t	drules;
 	zbx_drule_t		*drule;
 	zbx_drule_ip_t		*drule_ip;
@@ -4189,7 +4189,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 		if (FAIL == (i = zbx_vector_ptr_search(&drule->ips, ip, ZBX_DEFAULT_STR_COMPARE_FUNC)))
 		{
 			drule_ip = (zbx_drule_ip_t *)zbx_malloc(NULL, sizeof(zbx_drule_ip_t));
-			zbx_strlcpy(drule_ip->ip, ip, INTERFACE_IP_LEN_MAX);
+			zbx_strlcpy(drule_ip->ip, ip, ZBX_INTERFACE_IP_LEN_MAX);
 			zbx_vector_ptr_create(&drule_ip->services);
 			zbx_vector_ptr_append(&drule->ips, drule_ip);
 		}
@@ -4201,8 +4201,8 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 			zbx_vector_uint64_append(&drule->dcheckids, service->dcheckid);
 		service->port = port;
 		service->status = status;
-		zbx_strlcpy_utf8(service->value, value, MAX_DISCOVERED_VALUE_SIZE);
-		zbx_strlcpy(service->dns, dns, INTERFACE_DNS_LEN_MAX);
+		zbx_strlcpy_utf8(service->value, value, ZBX_MAX_DISCOVERED_VALUE_SIZE);
+		zbx_strlcpy(service->dns, dns, ZBX_INTERFACE_DNS_LEN_MAX);
 		service->itemtime = itemtime;
 		zbx_vector_ptr_append(&drule_ip->services, service);
 
@@ -4284,8 +4284,8 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 	int			ret = SUCCEED;
 	const char		*p = NULL;
 	time_t			itemtime;
-	char			host[ZBX_MAX_HOSTNAME_LEN_ESC], ip[INTERFACE_IP_LEN_MAX], dns[INTERFACE_DNS_LEN_MAX],
-				tmp[MAX_STRING_LEN], *host_metadata = NULL;
+	char			host[ZBX_MAX_HOSTNAME_LEN_ESC], ip[ZBX_INTERFACE_IP_LEN_MAX],
+				dns[ZBX_INTERFACE_DNS_LEN_MAX], tmp[MAX_STRING_LEN], *host_metadata = NULL;
 	unsigned short		port;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-terminating string */
 	zbx_vector_ptr_t	autoreg_hosts;

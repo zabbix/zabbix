@@ -853,7 +853,7 @@ static int	lld_validate_item_tag(zbx_uint64_t itemid, int type, char *tag, char 
 
 	len = zbx_strlen_utf8(tag);
 
-	if (ITEM_TAG_FIELD_LEN < len)
+	if (ZBX_ITEM_TAG_FIELD_LEN < len)
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s item: tag's %s \"%s\" is too long.\n",
 				(0 != itemid ? "update" : "create"),
@@ -1517,51 +1517,51 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 		item = (zbx_lld_item_t *)items->values[i];
 
 		lld_validate_item_field(item, &item->name, &item->name_proto,
-				ZBX_FLAG_LLD_ITEM_UPDATE_NAME, ITEM_NAME_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_NAME, ZBX_ITEM_NAME_LEN, error);
 		lld_validate_item_field(item, &item->key, &item->key_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_KEY, ITEM_KEY_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_KEY, ZBX_ITEM_KEY_LEN, error);
 		lld_validate_item_field(item, &item->delay, &item->delay_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_DELAY, ITEM_DELAY_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_DELAY, ZBX_ITEM_DELAY_LEN, error);
 		lld_validate_item_field(item, &item->history, &item->history_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_HISTORY, ITEM_HISTORY_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_HISTORY, ZBX_ITEM_HISTORY_LEN, error);
 		lld_validate_item_field(item, &item->trends, &item->trends_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_TRENDS, ITEM_TRENDS_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_TRENDS, ZBX_ITEM_TRENDS_LEN, error);
 		lld_validate_item_field(item, &item->units, &item->units_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_UNITS, ITEM_UNITS_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_UNITS, ZBX_ITEM_UNITS_LEN, error);
 		lld_validate_item_field(item, &item->params, &item->params_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS, ITEM_PARAM_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS, ZBX_ITEM_PARAM_LEN, error);
 		lld_validate_item_field(item, &item->ipmi_sensor, &item->ipmi_sensor_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_IPMI_SENSOR, ITEM_IPMI_SENSOR_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_IPMI_SENSOR, ZBX_ITEM_IPMI_SENSOR_LEN, error);
 		lld_validate_item_field(item, &item->snmp_oid, &item->snmp_oid_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID, ITEM_SNMP_OID_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID, ZBX_ITEM_SNMP_OID_LEN, error);
 		lld_validate_item_field(item, &item->username, &item->username_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_USERNAME, ITEM_USERNAME_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_USERNAME, ZBX_ITEM_USERNAME_LEN, error);
 		lld_validate_item_field(item, &item->password, &item->password_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_PASSWORD, ITEM_PASSWORD_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_PASSWORD, ZBX_ITEM_PASSWORD_LEN, error);
 		lld_validate_item_field(item, &item->description, &item->description_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION, ITEM_DESCRIPTION_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION, ZBX_ITEM_DESCRIPTION_LEN, error);
 		lld_validate_item_field(item, &item->jmx_endpoint, &item->jmx_endpoint_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_JMX_ENDPOINT, ITEM_JMX_ENDPOINT_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_JMX_ENDPOINT, ZBX_ITEM_JMX_ENDPOINT_LEN, error);
 		lld_validate_item_field(item, &item->timeout, &item->timeout_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_TIMEOUT, ITEM_TIMEOUT_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_TIMEOUT, ZBX_ITEM_TIMEOUT_LEN, error);
 		lld_validate_item_field(item, &item->url, &item->url_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_URL, ITEM_URL_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_URL, ZBX_ITEM_URL_LEN, error);
 		lld_validate_item_field(item, &item->query_fields, &item->query_fields_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_QUERY_FIELDS, ITEM_QUERY_FIELDS_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_QUERY_FIELDS, ZBX_ITEM_QUERY_FIELDS_LEN, error);
 		lld_validate_item_field(item, &item->posts, &item->posts_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_POSTS, ITEM_POSTS_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_POSTS, ZBX_ITEM_POSTS_LEN, error);
 		lld_validate_item_field(item, &item->status_codes, &item->status_codes_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_STATUS_CODES, ITEM_STATUS_CODES_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_STATUS_CODES, ZBX_ITEM_STATUS_CODES_LEN, error);
 		lld_validate_item_field(item, &item->http_proxy, &item->http_proxy_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_HTTP_PROXY, ITEM_HTTP_PROXY_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_HTTP_PROXY, ZBX_ITEM_HTTP_PROXY_LEN, error);
 		lld_validate_item_field(item, &item->headers, &item->headers_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_HEADERS, ITEM_HEADERS_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_HEADERS, ZBX_ITEM_HEADERS_LEN, error);
 		lld_validate_item_field(item, &item->ssl_cert_file, &item->ssl_cert_file_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_SSL_CERT_FILE, ITEM_SSL_CERT_FILE_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_SSL_CERT_FILE, ZBX_ITEM_SSL_CERT_FILE_LEN, error);
 		lld_validate_item_field(item, &item->ssl_key_file, &item->ssl_key_file_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_FILE, ITEM_SSL_KEY_FILE_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_FILE, ZBX_ITEM_SSL_KEY_FILE_LEN, error);
 		lld_validate_item_field(item, &item->ssl_key_password, &item->ssl_key_password_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_PASSWORD, ITEM_SSL_KEY_PASSWORD_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_PASSWORD, ZBX_ITEM_SSL_KEY_PASSWORD_LEN, error);
 	}
 
 	/* check duplicated item keys */

@@ -4692,7 +4692,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 
 		if (SUCCEED == dbpatch_is_time_function(row[2], strlen(row[2])))
 		{
-			char	func_name[FUNCTION_NAME_LEN * 4 + 1];
+			char	func_name[12 /* FUNCTION_NAME_LEN */ * 4 + 1];
 
 			func = dbpatch_new_function(functionid, itemid, row[2], row[3], 0);
 			func->hostid = hostid;
@@ -4789,9 +4789,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 
 	if (0 != (trigger->flags & ZBX_DBPATCH_TRIGGER_UPDATE_EXPRESSION))
 	{
-#define TRIGGER_EXPRESSION_LEN		2048
-
-		if (zbx_strlen_utf8(trigger->expression) > TRIGGER_EXPRESSION_LEN)
+		if (zbx_strlen_utf8(trigger->expression) > 2048 /* TRIGGER_EXPRESSION_LEN */ )
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "trigger \"" ZBX_FS_UI64 "\" expression is too long: %s",
 					trigger->triggerid, trigger->expression);
@@ -4801,14 +4799,14 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 
 	if (0 != (trigger->flags & ZBX_DBPATCH_TRIGGER_UPDATE_RECOVERY_EXPRESSION))
 	{
-		if (zbx_strlen_utf8(trigger->recovery_expression) > TRIGGER_EXPRESSION_LEN)
+		if (zbx_strlen_utf8(trigger->recovery_expression) > 2048 /* TRIGGER_EXPRESSION_LEN */)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "trigger \"" ZBX_FS_UI64 "\" recovery expression is too long: %s",
 					trigger->triggerid, trigger->recovery_expression);
 			return FAIL;
 		}
 	}
-#undef TRIGGER_EXPRESSION_LEN
+
 	return SUCCEED;
 }
 
@@ -5300,8 +5298,11 @@ static int	DBpatch_5030168(void)
 		}
 
 		zbx_strcpy_alloc(&out, &out_alloc, &out_offset, expression + last_pos);
-
-		if (ITEM_PARAM_LEN < zbx_strlen_utf8(out))
+#if defined(HAVE_ORACLE)
+		if (2048 /* ITEM_PARAM_LEN */ < zbx_strlen_utf8(out))
+#else
+		if (65535 /* ITEM_PARAM_LEN */ < zbx_strlen_utf8(out))
+#endif
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert calculated item \"" ZBX_FS_UI64 "\" formula:"
 					" too long expression", itemid);
@@ -5431,8 +5432,11 @@ static int	dbpatch_aggregate2formula(const char *itemid, const AGENT_REQUEST *re
 	}
 
 	zbx_strcpy_alloc(str, str_alloc, str_offset, "))");
-
-	if (ITEM_PARAM_LEN < zbx_strlen_utf8(*str))
+#if defined(HAVE_ORACLE)
+	if (2048 /* ITEM_PARAM_LEN */ < zbx_strlen_utf8(*str))
+#else
+	if (65535 /* ITEM_PARAM_LEN */ < zbx_strlen_utf8(*str))
+#endif
 	{
 		*error = zbx_strdup(NULL, "resulting formula is too long");
 		return FAIL;

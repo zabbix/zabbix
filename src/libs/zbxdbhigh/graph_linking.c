@@ -32,8 +32,8 @@ typedef struct
 	int		drawtype_new;
 	int		sortorder_orig;
 	int		sortorder_new;
-	char		color_orig[GRAPH_ITEM_COLOR_LEN_MAX];
-	char		color_new[GRAPH_ITEM_COLOR_LEN_MAX];
+	char		color_orig[ZBX_GRAPH_ITEM_COLOR_LEN_MAX];
+	char		color_new[ZBX_GRAPH_ITEM_COLOR_LEN_MAX];
 	int		yaxisside_orig;
 	int		yaxisside_new;
 	int		calc_fnc_orig;

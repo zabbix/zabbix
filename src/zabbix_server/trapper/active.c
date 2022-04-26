@@ -47,8 +47,8 @@ extern unsigned char	program_type;
 static void	db_register_host(const char *host, const char *ip, unsigned short port, unsigned int connection_type,
 		const char *host_metadata, zbx_conn_flags_t flag, const char *interface)
 {
-	char		dns[INTERFACE_DNS_LEN_MAX];
-	char		ip_addr[INTERFACE_IP_LEN_MAX];
+	char		dns[ZBX_INTERFACE_DNS_LEN_MAX];
+	char		ip_addr[ZBX_INTERFACE_IP_LEN_MAX];
 	const char	*p;
 	const char	*p_ip, *p_dns;
 
@@ -518,7 +518,7 @@ out:
  ******************************************************************************/
 int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
-	char			host[ZBX_MAX_HOSTNAME_LEN_ESC], tmp[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX],
+	char			host[ZBX_MAX_HOSTNAME_LEN_ESC], tmp[MAX_STRING_LEN], ip[ZBX_INTERFACE_IP_LEN_MAX],
 				error[MAX_STRING_LEN], *host_metadata = NULL, *interface = NULL, *buffer = NULL;
 	struct zbx_json		json;
 	int			ret = FAIL, i, version;

@@ -117,7 +117,7 @@ static void	interface_set_availability(DC_INTERFACE *dc_interface, const zbx_int
 		*pavailable = availability->available;
 
 	if (0 != (availability->flags & ZBX_FLAGS_AGENT_STATUS_ERROR))
-		zbx_strlcpy(perror, availability->error, INTERFACE_ERROR_LEN_MAX);
+		zbx_strlcpy(perror, availability->error, ZBX_INTERFACE_ERROR_LEN_MAX);
 
 	if (0 != (availability->flags & ZBX_FLAGS_AGENT_STATUS_ERRORS_FROM))
 		*perrors_from = availability->errors_from;

@@ -1374,19 +1374,19 @@ static int	DBpatch_3050122(void)
 		zbx_strncpy_alloc(&processed_parameter, &param_alloc, &param_offset, orig_param + param_pos + param_len,
 				sep_pos - param_pos - param_len + 1);
 
-		if (FUNCTION_PARAM_LEN < (current_len = zbx_strlen_utf8(processed_parameter)))
+		if (ZBX_DBPATCH_FUNCTION_PARAM_LEN < (current_len = zbx_strlen_utf8(processed_parameter)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert parameter \"%s\" of trigger function logsource"
 					" (functionid: %s) to regexp during database upgrade. The converted"
 					" value is too long for field \"parameter\" - " ZBX_FS_SIZE_T " characters."
 					" Allowed length is %d characters.",
-					row[1], row[0], (zbx_fs_size_t)current_len, FUNCTION_PARAM_LEN);
+					row[1], row[0], (zbx_fs_size_t)current_len, ZBX_DBPATCH_FUNCTION_PARAM_LEN);
 
 			zbx_free(processed_parameter);
 			continue;
 		}
 
-		db_parameter_esc = DBdyn_escape_string_len(processed_parameter, FUNCTION_PARAM_LEN);
+		db_parameter_esc = DBdyn_escape_string_len(processed_parameter, ZBX_DBPATCH_FUNCTION_PARAM_LEN);
 		zbx_free(processed_parameter);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,

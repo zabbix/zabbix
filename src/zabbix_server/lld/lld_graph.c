@@ -832,7 +832,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *graphs, c
 		graph = (zbx_lld_graph_t *)graphs->values[i];
 
 		lld_validate_graph_field(graph, &graph->name, &graph->name_orig,
-				ZBX_FLAG_LLD_GRAPH_UPDATE_NAME, GRAPH_NAME_LEN, error);
+				ZBX_FLAG_LLD_GRAPH_UPDATE_NAME, ZBX_GRAPH_NAME_LEN, error);
 	}
 
 	/* checking duplicated graph names */

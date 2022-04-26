@@ -1317,7 +1317,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		int			rc = SUCCEED, scope, i;
+		int			scope, i, rc = SUCCEED;
 		DC_HOST			host;
 		zbx_script_t		script;
 		zbx_alert_status_t	status = ALERT_STATUS_NOT_SENT;
