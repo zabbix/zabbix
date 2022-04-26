@@ -884,7 +884,7 @@ void	DBcheck_tsdb_capabilities(void)
 
 	DBfree_result(result);
 
-	if (NULL == (result = DBselect("select extversion from pg_extension where extname = 'timescaledb'")))
+	if (NULL == (result = DBselect("select extversion from pg_extension where extname='timescaledb'")))
 		goto out;
 
 	if (NULL == (row = DBfetch(result)))
@@ -926,7 +926,7 @@ clean:
 	DBfree_result(result);
 out:
 	if (ZBX_DB_OK > DBexecute("update config set compression_availability=%d", compression_available))
-		zabbix_log(LOG_LEVEL_ERR, "failed to set database compression availability");
+		zabbix_log(LOG_LEVEL_WARNING, "failed to set database compression availability");
 
 	DBclose();
 }

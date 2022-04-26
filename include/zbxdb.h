@@ -147,11 +147,10 @@ char		*zbx_db_dyn_escape_like_pattern(const char *src);
 
 int		zbx_db_strlen_n(const char *text, size_t maxlen);
 
-
-#define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB		100002
-#define ZBX_TIMESCALE_MIN_VERSION				10500
-#define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION 			20001
-#define ZBX_TIMESCALE_LICENSE_COMMUNITY				"timescale"
-#define ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY		"TimescaleDB Community Edition"
+#define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB	100002
+#define ZBX_TIMESCALE_MIN_VERSION			10500
+#define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION 		20001
+#define ZBX_TIMESCALE_LICENSE_COMMUNITY			"timescale"
+#define ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY	"TimescaleDB Community Edition"
 
 #endif
