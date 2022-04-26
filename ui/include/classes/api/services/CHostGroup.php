@@ -1551,7 +1551,7 @@ class CHostGroup extends CApiService {
 			if ($data['permissions']) {
 				$this->inheritPermissions($db_group['groupid'], $db_group['name']);
 			}
-			if ($data['tag_filter']) {
+			if ($data['tag_filters']) {
 				$this->inheritTagFilters($db_group['groupid'], $db_group['name']);
 			}
 		}
@@ -1571,16 +1571,16 @@ class CHostGroup extends CApiService {
 				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'permissions' =>	['type' => API_BOOLEAN, 'default' => false],
-			'tag_filter' => 	['type' => API_BOOLEAN, 'default' => false]
+			'tag_filters' => 	['type' => API_BOOLEAN, 'default' => false]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if ($data['permissions'] == false && $data['tag_filter'] == false) {
+		if ($data['permissions'] == false && $data['tag_filters'] == false) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('At least one parameter "%1$s" or "%2$s" must be enabled.', 'permissions', 'tag_filter')
+				_s('At least one parameter "%1$s" or "%2$s" must be enabled.', 'permissions', 'tag_filters')
 			);
 		}
 
