@@ -298,7 +298,6 @@ class CAudit {
 		'dashboard.pages.widgets' => 'widget',
 		'dashboard.pages.widgets.fields' => 'widget_field',
 		'hostgroup.hosts' => 'hosts_groups',
-		'hostgroup.templates' => 'hosts_groups',
 		'hostprototype.groupLinks' => 'group_prototype',
 		'hostprototype.groupPrototypes' => 'group_prototype',
 		'hostprototype.interfaces' => 'interface',
