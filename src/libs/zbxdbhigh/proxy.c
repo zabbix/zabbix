@@ -4048,7 +4048,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 			continue;
 		}
 
-		discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
+		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
 				service->status, service->value, service->itemtime);
 	}
 
@@ -4062,12 +4062,12 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 			continue;
 		}
 
-		discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
+		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
 				service->status, service->value, service->itemtime);
 	}
 
 	service = (zbx_service_t *)services->values[(*processed_num)++];
-	discovery_update_host(&dhost, service->status, service->itemtime);
+	zbx_discovery_update_host(&dhost, service->status, service->itemtime);
 
 	ret = SUCCEED;
 fail:

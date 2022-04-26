@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "discovery.h"
+#include "zbxdiscovery.h"
 
 #include "common.h"
 #include "log.h"
@@ -437,7 +437,7 @@ static void	discovery_update_host_status(DB_DHOST *dhost, int status, int now)
  * Parameters: host - host info                                               *
  *                                                                            *
  ******************************************************************************/
-void	discovery_update_host(DB_DHOST *dhost, int status, int now)
+void	zbx_discovery_update_host(DB_DHOST *dhost, int status, int now)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -454,7 +454,7 @@ void	discovery_update_host(DB_DHOST *dhost, int status, int now)
  * Parameters: service - service info                                         *
  *                                                                            *
  ******************************************************************************/
-void	discovery_update_service(const DB_DRULE *drule, zbx_uint64_t dcheckid, DB_DHOST *dhost, const char *ip,
+void	zbx_discovery_update_service(const DB_DRULE *drule, zbx_uint64_t dcheckid, DB_DHOST *dhost, const char *ip,
 		const char *dns, int port, int status, const char *value, int now)
 {
 	DB_DSERVICE	dservice;
