@@ -53,20 +53,32 @@ found_openssl_with_psk="yes",)
 AC_DEFUN([LIBOPENSSL_ACCEPT_VERSION],
 [
 	# Zabbix minimal supported version of OpenSSL.
-	# Version numbering scheme is described in /usr/include/openssl/opensslv.h. Specify version number without the
-	# last byte (status). E.g., version 1.0.1 is 0x1000100f, but without the last byte it is 0x1000100.
-	minimal_openssl_version=0x1000100
+	# Version numbering scheme is described in /usr/include/openssl/opensslv.h.
 
-	# get version
-	found_openssl_version=`grep OPENSSL_VERSION_NUMBER "$1"`
-	found_openssl_version=`expr "$found_openssl_version" : '.*\(0x[[0-f]][[0-f]][[0-f]][[0-f]][[0-f]][[0-f]][[0-f]]\).*'`
+	# Is it OpenSSL 3? Test OPENSSL_VERSION_MAJOR - it is defined only in OpenSSL 3.0.
+	found_openssl_version=`grep OPENSSL_VERSION_MAJOR "$1" | head -n 1`
+	found_openssl_version=`expr "$found_openssl_version" : '^#.*define.*OPENSSL_VERSION_MAJOR.*\(3\)$'`
 
-	# compare versions lexicographically
-	openssl_version_check=`expr $found_openssl_version \>\= $minimal_openssl_version`
-	if test "$openssl_version_check" = "1"; then
+	if test "$found_openssl_version" = "3"; then
+		# OpenSSL 3.x found
 		accept_openssl_version="yes"
-	else
-		accept_openssl_version="no"
+	else	# Is it OpenSSL 1.0.1 - 1.1.1 or LibreSSL?
+		# These versions use similar version numbering scheme:
+		# specify version number without the last byte (status). E.g., version 1.0.1 is 0x1000100f, but without the
+		# last byte it is 0x1000100.
+		minimal_openssl_version=0x1000100
+
+		found_openssl_version=`grep OPENSSL_VERSION_NUMBER "$1"`
+		found_openssl_version=`expr "$found_openssl_version" : '.*\(0x[[0-f]][[0-f]][[0-f]][[0-f]][[0-f]][[0-f]][[0-f]]\).*'`
+
+		# compare versions lexicographically
+		openssl_version_check=`expr $found_openssl_version \>\= $minimal_openssl_version`
+
+		if test "$openssl_version_check" = "1"; then
+			accept_openssl_version="yes"
+		else
+			accept_openssl_version="no"
+		fi;
 	fi;
 ])dnl
 
@@ -122,7 +134,13 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
      else						# search in the specified OpenSSL directory
        if test -f $_libopenssl_dir/include/openssl/ssl.h -a -f $_libopenssl_dir/include/openssl/crypto.h; then
          OPENSSL_CFLAGS=-I$_libopenssl_dir/include
-         OPENSSL_LDFLAGS=-L$_libopenssl_dir/lib
+
+         if test -d $_libopenssl_dir/lib64; then
+           OPENSSL_LDFLAGS=-L$_libopenssl_dir/lib64
+         else
+           OPENSSL_LDFLAGS=-L$_libopenssl_dir/lib
+         fi
+
          OPENSSL_LIBS="-lssl -lcrypto"
          found_openssl="yes"
          LIBOPENSSL_ACCEPT_VERSION([$_libopenssl_dir/include/openssl/opensslv.h])

@@ -84,15 +84,15 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|ZYXEL GS-4012F: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m) |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/ZYXEL GS-4012F SNMP/zyxel.4012f.cpuusage,5m)>{$CPU.UTIL.CRIT}` |WARNING | |
+|ZYXEL GS-4012F: High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/ZYXEL GS-4012F SNMP/zyxel.4012f.cpuusage,5m)>{$CPU.UTIL.CRIT}` |WARNING | |
 |ZYXEL GS-4012F: FAN{#SNMPINDEX} is in critical state |<p>Please check the fan unit</p> |`last(/ZYXEL GS-4012F SNMP/zyxel.4012f.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW}` |AVERAGE | |
 |ZYXEL GS-4012F: Template does not match hardware |<p>This template is for Zyxel GS-4012F, but connected to {ITEM.VALUE}</p> |`last(/ZYXEL GS-4012F SNMP/zyxel.4012f.model)<>"GS-4012F"` |INFO | |
 |ZYXEL GS-4012F: Firmware has changed |<p>Firmware version has changed. Ack to close</p> |`last(/ZYXEL GS-4012F SNMP/zyxel.4012f.fwversion,#1)<>last(/ZYXEL GS-4012F SNMP/zyxel.4012f.fwversion,#2) and length(last(/ZYXEL GS-4012F SNMP/zyxel.4012f.fwversion))>0` |INFO |<p>Manual close: YES</p> |
-|ZYXEL GS-4012F: Device has been replaced (new serial number received) |<p>Device serial number has changed. Ack to close</p> |`last(/ZYXEL GS-4012F SNMP/zyxel.4012f.serialnumber,#1)<>last(/ZYXEL GS-4012F SNMP/zyxel.4012f.serialnumber,#2) and length(last(/ZYXEL GS-4012F SNMP/zyxel.4012f.serialnumber))>0` |INFO |<p>Manual close: YES</p> |
+|ZYXEL GS-4012F: Device has been replaced |<p>Device serial number has changed. Ack to close</p> |`last(/ZYXEL GS-4012F SNMP/zyxel.4012f.serialnumber,#1)<>last(/ZYXEL GS-4012F SNMP/zyxel.4012f.serialnumber,#2) and length(last(/ZYXEL GS-4012F SNMP/zyxel.4012f.serialnumber))>0` |INFO |<p>Manual close: YES</p> |
 |ZYXEL GS-4012F: Port {#SNMPINDEX}: Link down |<p>This trigger expression works as follows:</p><p>1. Can be triggered if operations status is down.</p><p>2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)</p><p>WARNING: if closed manually - won't fire again on next poll, because of .diff.</p> |`last(/ZYXEL GS-4012F SNMP/zyxel.4012f.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL GS-4012F SNMP/zyxel.4012f.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL GS-4012F SNMP/zyxel.4012f.net.if.operstatus[{#SNMPINDEX}],#2)`<p>Recovery expression:</p>`last(/ZYXEL GS-4012F SNMP/zyxel.4012f.net.if.operstatus[{#SNMPINDEX}])<>2` |AVERAGE |<p>Manual close: YES</p> |
 |ZYXEL GS-4012F: Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state |<p>Please check the power supply</p> |`last(/ZYXEL GS-4012F SNMP/zyxel.4012f.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}` |AVERAGE | |
 |ZYXEL GS-4012F: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/ZYXEL GS-4012F SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
-|ZYXEL GS-4012F: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/ZYXEL GS-4012F SNMP/zyxel.4012f.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|ZYXEL GS-4012F: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/ZYXEL GS-4012F SNMP/zyxel.4012f.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |ZYXEL GS-4012F: Temperature {#ZYXEL.TEMP.ID} is in critical state |<p>Please check the temperature</p> |`last(/ZYXEL GS-4012F SNMP/zyxel.4012f.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}` |AVERAGE | |
 
 ## Feedback

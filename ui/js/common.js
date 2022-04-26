@@ -1008,27 +1008,71 @@ function openMassupdatePopup(action, parameters = {}, {
 }) {
 	const form = trigger_element.closest('form');
 
-	parameters.ids = chkbxRange.getSelectedIds();
+	switch (action) {
+		case 'popup.massupdate.host':
+			parameters.hostids = chkbxRange.getSelectedIds();
+			break;
+
+		default:
+			parameters.ids = chkbxRange.getSelectedIds();
+	}
 
 	switch (action) {
 		case 'popup.massupdate.item':
-			parameters.context = form.querySelector('#context').value;
+			parameters.context = form.querySelector('#form_context').value;
 			parameters.prototype = 0;
 			break;
 
 		case 'popup.massupdate.trigger':
-			parameters.context = form.querySelector('#context').value;
+			parameters.context = form.querySelector('#form_context').value;
 			break;
 
 		case 'popup.massupdate.itemprototype':
 		case 'popup.massupdate.triggerprototype':
-			parameters.parent_discoveryid = form.querySelector('#parent_discoveryid').value;
-			parameters.context = form.querySelector('#context').value;
+			parameters.parent_discoveryid = form.querySelector('#form_parent_discoveryid').value;
+			parameters.context = form.querySelector('#form_context').value;
 			parameters.prototype = 1;
 			break;
 	}
 
 	return PopUp(action, parameters, {dialogue_class, trigger_element});
+}
+
+/**
+ * @param {boolean} value
+ * @param {string} objectid
+ * @param {string} replace_to
+ */
+function visibilityStatusChanges(value, objectid, replace_to) {
+	const obj = document.getElementById(objectid);
+
+	if (obj === null) {
+		throw `Cannot find objects with name [${objectid}]`;
+	}
+
+	if (replace_to && replace_to != '') {
+		if (obj.originalObject) {
+			const old_obj = obj.originalObject;
+			old_obj.originalObject = obj;
+
+			obj.parentNode.replaceChild(old_obj, obj);
+		}
+		else if (!value) {
+			const new_obj = document.createElement('span');
+			new_obj.setAttribute('name', obj.name);
+			new_obj.setAttribute('id', obj.id);
+			new_obj.innerHTML = replace_to;
+			new_obj.originalObject = obj;
+
+			obj.parentNode.replaceChild(new_obj, obj);
+		}
+		else {
+			throw 'Missing originalObject for restoring';
+		}
+	}
+	else {
+		obj.style.visibility = value ? 'visible' : 'hidden';
+	}
 }
 
 /**

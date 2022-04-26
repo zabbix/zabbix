@@ -79,8 +79,8 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|[{#LOCATION}, {#COUNTRY}]: Temperature is too high (over {$TEMP.CRIT.HIGH} for 30m) |<p>Temperature value is too high.</p> |`min(/OpenWeatherMap by HTTP/openweathermap.temp[{#ID}],#3)>{$TEMP.CRIT.HIGH}` |AVERAGE |<p>Manual close: YES</p> |
-|[{#LOCATION}, {#COUNTRY}]: Temperature is too low (below {$TEMP.CRIT.LOW} for 30m) |<p>Temperature value is too low.</p> |`max(/OpenWeatherMap by HTTP/openweathermap.temp[{#ID}],#3)<{$TEMP.CRIT.LOW}` |AVERAGE |<p>Manual close: YES</p> |
+|[{#LOCATION}, {#COUNTRY}]: Temperature is too high |<p>Temperature value is too high.</p> |`min(/OpenWeatherMap by HTTP/openweathermap.temp[{#ID}],#3)>{$TEMP.CRIT.HIGH}` |AVERAGE |<p>Manual close: YES</p> |
+|[{#LOCATION}, {#COUNTRY}]: Temperature is too low |<p>Temperature value is too low.</p> |`max(/OpenWeatherMap by HTTP/openweathermap.temp[{#ID}],#3)<{$TEMP.CRIT.LOW}` |AVERAGE |<p>Manual close: YES</p> |
 |Openweathermap: There are errors in requests to OpenWeatherMap API |<p>Zabbix has received errors in requests to OpenWeatherMap API.</p> |`length(last(/OpenWeatherMap by HTTP/openweathermap.get.errors))>0` |AVERAGE |<p>Manual close: YES</p> |
 
 ## Feedback

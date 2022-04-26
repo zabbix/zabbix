@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:32:20Z'
+  date: '2022-04-06T19:35:59Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -81,7 +81,8 @@ zabbix_export:
             -
               uuid: 6767f9c764bb42dfa961baacf879f45c
               expression: 'max(/Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0'
-              name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
+              name: 'Zabbix agent is not available'
+              event_name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
               priority: AVERAGE
               description: 'For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.'
               manual_close: 'YES'
@@ -169,7 +170,8 @@ zabbix_export:
             -
               uuid: 6bbb74c522d44baea8c6ceb666423da2
               expression: 'nodata(/Zabbix agent active/agent.ping,{$AGENT.NODATA_TIMEOUT})=1'
-              name: 'Zabbix agent is not available (or nodata for {$AGENT.NODATA_TIMEOUT})'
+              name: 'Zabbix agent is not available'
+              event_name: 'Zabbix agent is not available (or nodata for {$AGENT.NODATA_TIMEOUT})'
               priority: AVERAGE
               description: 'For active agents, nodata() with agent.ping is used with {$AGENT.NODATA_TIMEOUT} as time threshold.'
               manual_close: 'YES'

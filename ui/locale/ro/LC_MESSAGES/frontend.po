@@ -1,32 +1,33 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2013-09-08 17:57+0300\n"
-"Last-Translator: altmir <rmircea@birotec.ro>\n"
+"PO-Revision-Date: 2022-04-20 13:34+0000\n"
+"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);;\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1378655867.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
-msgstr ""
+msgstr "Data de \"%1$s\" trebuie sa fie mai devreme de data \"%2$s\"."
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr ""
+msgstr "\"%1$s\" in loc de \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:321
 #: include/classes/import/validators/C10XmlValidator.php:338
@@ -43,24 +44,24 @@ msgstr ""
 #: include/classes/import/validators/C60XmlValidator.php:2050
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr ""
+msgstr "trebuie sa fie \"%1$s\""
 
 #: include/classes/api/services/CReport.php:229
 #: include/classes/api/services/CReport.php:636
 #, c-format
 msgid "\"%1$s\" must be an empty string or greater than \"%2$s\"."
-msgstr ""
+msgstr "\"%1$s\" nu trebuie completat sau maimare de \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1399
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
-msgstr ""
+msgstr "valoarea \"%1$s\" trebuie să fie mai mică sau egală cu valoarea \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:356
 #: include/classes/import/validators/C10XmlValidator.php:378
 #: include/classes/import/validators/C10XmlValidator.php:399
 msgid "\"host:key\" pair is expected"
-msgstr ""
+msgstr "trebuie perechea \"host:key\""
 
 #: include/classes/api/services/CItemGeneral.php:2299
 msgid "\"hostid\" of dependent item and master item should match"
@@ -80,7 +81,7 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:556
 #, c-format
 msgid "%1$d characters exceeds maximum length of %2$d characters"
-msgstr ""
+msgstr "%1$d depaseste numarul maxim de %2$d caractere"
 
 #: include/func.inc.php:488
 #, c-format
@@ -94,7 +95,7 @@ msgstr[2] "%1$d zile"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
-msgstr ""
+msgstr "am gasit %1$d potriviri pentru %2$s"
 
 #: app/controllers/CControllerWidgetProblemsView.php:55
 #, c-format
@@ -107,7 +108,7 @@ msgstr[2] ""
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:117
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "%1$d probleme selectate"
 
 #: chart4.php:94
 #, c-format
@@ -123,7 +124,7 @@ msgstr ""
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
-msgstr ""
+msgstr "%1$s [Linia: %2$s | Coloana: %3$s]"
 
 #: include/actions.inc.php:1893
 #, c-format
@@ -137,37 +138,37 @@ msgstr[2] ""
 #: jsLoader.php:328
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s caractere"
 
 #: jsLoader.php:329
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "Au mai rămas %1$s caractere"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s eveniment"
+msgstr[1] "%1$s evenimente"
+msgstr[2] "%1$s evenimente"
 
 #: include/maps.inc.php:410
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s host în mentenanță"
+msgstr[1] "%1$s hosts în mentenanță"
+msgstr[2] "%1$s hosts în mentenanță"
 
 #: include/func.inc.php:2549
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s Oră"
+msgstr[1] "%1$s Ore"
+msgstr[2] "%1$s Ore"
 
 #: app/controllers/CControllerWidgetPlainTextView.php:126
 #: app/controllers/CControllerWidgetPlainTextView.php:127
@@ -175,18 +176,18 @@ msgstr[2] ""
 #, c-format
 msgid "%1$s item"
 msgid_plural "%1$s items"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s articol"
+msgstr[1] "%1$s articole"
+msgstr[2] "%1$s articole"
 
 #: include/actions.inc.php:1731
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s message"
 msgid_plural "%1$s messages"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s mesaj"
+msgstr[1] "%1$s mesaje"
+msgstr[2] "%1$s mesaje"
 
 #: include/classes/widgets/CWidgetConfig.php:308
 #: include/classes/widgets/CWidgetConfig.php:309
@@ -196,40 +197,40 @@ msgstr[2] ""
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s minut"
+msgstr[1] "%1$s minute"
+msgstr[2] "%1$s minute"
 
 #: include/classes/helpers/CMapHelper.php:316
 #, c-format
 msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s din %2$s elemente au probleme"
+msgstr[1] "%1$s din %2$s elemente au probleme"
+msgstr[2] "%1$s din %2$s elemente au probleme"
 
 #: jsLoader.php:348
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
-msgstr ""
+msgstr "%1$s elemente preselectate, folosește săgețile SUS, JOS și tasta ENTER pentru selectare"
 
 #: include/maps.inc.php:340 include/maps.inc.php:344 include/maps.inc.php:351
 #: include/maps.inc.php:400
 #, c-format
 msgid "%1$s problem"
 msgid_plural "%1$s problems"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s problemă"
+msgstr[1] "%1$s probleme"
+msgstr[2] "%1$s probleme"
 
 #: include/classes/helpers/CMapHelper.php:319
 #, c-format
 msgid "%1$s problem in total"
 msgid_plural "%1$s problems in total"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "O problemă în total"
+msgstr[1] "%1$s probleme in total"
+msgstr[2] "%1$s probleme in total"
 
 #: app/views/monitoring.widget.actionlog.view.php:45
 #: include/actions.inc.php:2172
@@ -237,9 +238,9 @@ msgstr[2] ""
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Mai ai o singură încercare"
+msgstr[1] "Mai ai %1$s încercări"
+msgstr[2] "Mai ai %1$s încercări"
 
 #: app/views/administration.user.edit.php:667
 #: include/classes/widgets/CWidgetConfig.php:306
@@ -248,43 +249,43 @@ msgstr[2] ""
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s secundă"
+msgstr[1] "%1$s secunde"
+msgstr[2] "%1$s secunde"
 
 #: include/maps.inc.php:368 include/maps.inc.php:371 include/maps.inc.php:378
 #: include/maps.inc.php:383
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "O problemă nu a fost luată în considerare"
+msgstr[1] "%1$s probleme nu au fost luate in considerare"
+msgstr[2] "%1$s probleme nu au fost luate in considerare"
 
 #: app/views/monitoring.widget.problemhosts.view.php:108
 #: app/views/monitoring.widget.problems.view.php:207
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
-msgstr ""
+msgstr "%1$s, Severitate, %2$s"
 
 #: jsLoader.php:342
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
-msgstr ""
+msgstr "%1$s, doar citire"
 
 #: jsLoader.php:388
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
-msgstr ""
+msgstr "%1$s, selectat/e"
 
 #: include/func.inc.php:1947
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] "%4$s tentativa de logare eșuată înregistrată. Ultima tentativă eșuată a fost de la %1$s la %2$s la %3$s."
+msgstr[0] "%4$s tentativă de logare eșuată înregistrată. Ultima tentativă eșuată a fost de la %1$s la %2$s la %3$s."
 msgstr[1] "%4$s tentative de logare eșuate înregistrate. Ultima tentativă eșuată a fost de la %1$s la %2$s la %3$s."
 msgstr[2] "%4$s tentative de logare eșuate înregistrate. Ultima tentativă eșuată a fost de la %1$s la %2$s la %3$s."
 
@@ -304,7 +305,7 @@ msgstr "(%1$s %2$s)"
 
 #: app/partials/popup.operations.php:56
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - infinit)"
 
 #: app/partials/popup.operations.php:67
 msgid "(0 - use action default)"
@@ -1336,12 +1337,16 @@ msgstr "Eticheta activului"
 msgid "At %1$s:%2$s %3$s of every week"
 msgid_plural "At %1$s:%2$s %3$s of every %4$s weeks"
 msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: include/maintenances.inc.php:50
 #, c-format
 msgid "At %1$s:%2$s every day"
 msgid_plural "At %1$s:%2$s every %3$s days"
 msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: include/maintenances.inc.php:112
 #, c-format
@@ -6485,6 +6490,10 @@ msgstr ""
 
 #: app/views/popup.itemtestedit.view.php:296
 msgid "End of line sequence"
+msgstr ""
+
+#: include/locales.inc.php:33
+msgid "English (en_GB)"
 msgstr ""
 
 #: include/locales.inc.php:33
@@ -17692,6 +17701,10 @@ msgstr "Luna aceasta"
 msgid "This month so far"
 msgstr ""
 
+#: app/views/popup.tophosts.column.edit.php:172
+msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109
 msgid "This type of information may not match the key."
@@ -19886,6 +19899,10 @@ msgstr ""
 #: app/views/monitoring.widget.problemhosts.view.php:33
 msgid "With problems"
 msgstr "Cu probleme"
+
+#: app/views/popup.tophosts.column.edit.php:119
+msgid "With this setting only numeric items will be displayed in this column."
+msgstr ""
 
 #: include/forms.inc.php:346 include/forms.inc.php:566
 msgid "With triggers"

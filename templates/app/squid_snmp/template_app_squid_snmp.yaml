@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-31T08:52:21Z'
+  date: '2022-04-06T19:33:46Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -170,7 +170,8 @@ zabbix_export:
             -
               uuid: 40c41c87e46443f886506da5e580657e
               expression: 'last(/Squid SNMP/squid[cacheCurrentUnusedFDescrCnt])<{$SQUID.FILE.DESC.WARN.MIN}'
-              name: 'Squid: Squid is running out of file descriptors (<{$SQUID.FILE.DESC.WARN.MIN})'
+              name: 'Squid: Squid is running out of file descriptors'
+              event_name: 'Squid: Squid is running out of file descriptors (<{$SQUID.FILE.DESC.WARN.MIN})'
               priority: WARNING
               tags:
                 -
@@ -1053,7 +1054,8 @@ zabbix_export:
             -
               uuid: 89efc9400197427fa718395286dd3583
               expression: 'last(/Squid SNMP/squid[cacheUptime])<10m'
-              name: 'Squid: Squid has been restarted (uptime < 10m)'
+              name: 'Squid: Squid has been restarted'
+              event_name: 'Squid: Squid has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -1085,6 +1087,7 @@ zabbix_export:
               uuid: c5991152d2da4df7ae0d978233c5a859
               expression: 'last(/Squid SNMP/squid[cacheVersionId],#1)<>last(/Squid SNMP/squid[cacheVersionId],#2) and length(last(/Squid SNMP/squid[cacheVersionId]))>0'
               name: 'Squid: Squid version has been changed'
+              event_name: 'Squid: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Squid version has changed. Ack to close.'
               manual_close: 'YES'
@@ -1135,7 +1138,8 @@ zabbix_export:
     -
       uuid: 89a1cfe0f02f4da880f197c2e5605db8
       expression: 'avg(/Squid SNMP/squid[cacheSysPageFaults],5m)>avg(/Squid SNMP/squid[cacheProtoClientHttpRequests],5m)/100*{$SQUID.PAGE.FAULT.WARN}'
-      name: 'Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of received HTTP requests)'
+      name: 'Squid: High sys page faults rate'
+      event_name: 'Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of received HTTP requests)'
       priority: WARNING
       tags:
         -
@@ -1144,7 +1148,8 @@ zabbix_export:
     -
       uuid: 5676f1e02dc7413fb1a34543ccaf1384
       expression: 'last(/Squid SNMP/squid[cacheCurrentSwapSize])>last(/Squid SNMP/squid[cacheSwapHighWM])*last(/Squid SNMP/squid[cacheSwapMaxSize])/100'
-      name: 'Squid: Swap usage is more than high watermark (>{ITEM.VALUE2}%)'
+      name: 'Squid: Swap usage is more than high watermark'
+      event_name: 'Squid: Swap usage is more than high watermark (>{ITEM.VALUE2}%)'
       opdata: 'Used: {ITEM.LASTVALUE1}'
       priority: HIGH
       tags:
@@ -1157,7 +1162,8 @@ zabbix_export:
     -
       uuid: 2cf87472ebf74239bb782580448f696c
       expression: 'last(/Squid SNMP/squid[cacheCurrentSwapSize])>last(/Squid SNMP/squid[cacheSwapLowWM])*last(/Squid SNMP/squid[cacheSwapMaxSize])/100'
-      name: 'Squid: Swap usage is more than low watermark (>{ITEM.VALUE2}%)'
+      name: 'Squid: Swap usage is more than low watermark'
+      event_name: 'Squid: Swap usage is more than low watermark (>{ITEM.VALUE2}%)'
       opdata: 'Used: {ITEM.LASTVALUE1}'
       priority: WARNING
       tags:

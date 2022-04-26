@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-21T08:07:11Z'
+  date: '2022-04-06T19:27:53Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -147,7 +147,8 @@ zabbix_export:
             -
               uuid: ea92474a61214053b2cd20775817010e
               expression: 'min(/Kubernetes Scheduler by HTTP/kubernetes.scheduler.client_http_requests_500.rate,5m)>{$KUBE.SCHEDULER.HTTP.CLIENT.ERROR}'
-              name: 'Kubernetes Scheduler: Too many REST Client errors (over {$KUBE.SCHEDULER.HTTP.CLIENT.ERROR} for 5m)'
+              name: 'Kubernetes Scheduler: Too many REST Client errors'
+              event_name: 'Kubernetes Scheduler: Too many REST Client errors (over {$KUBE.SCHEDULER.HTTP.CLIENT.ERROR} for 5m)'
               priority: WARNING
               description: '"Kubernetes Scheduler REST Client requests is experiencing high error rate (with 5xx HTTP code).'
               tags:
@@ -380,7 +381,8 @@ zabbix_export:
             -
               uuid: 9116327bc14f4f189ca867b43187f6bd
               expression: 'min(/Kubernetes Scheduler by HTTP/kubernetes.scheduler.scheduler_schedule_attempts.error.rate,5m)>{$KUBE.SCHEDULER.ERROR}'
-              name: 'Kubernetes Scheduler: Too many schedule attempts with errors (over {$KUBE.SCHEDULER.ERROR} for 5m)'
+              name: 'Kubernetes Scheduler: Too many schedule attempts with errors'
+              event_name: 'Kubernetes Scheduler: Too many schedule attempts with errors (over {$KUBE.SCHEDULER.ERROR} for 5m)'
               priority: WARNING
               description: '"Number of attempts to schedule pods with ''error'' result is too high. ''error'' means an internal scheduler problem."'
               tags:
@@ -445,7 +447,8 @@ zabbix_export:
             -
               uuid: 16efba4ba322416fa2b8986273b83904
               expression: 'min(/Kubernetes Scheduler by HTTP/kubernetes.scheduler.scheduler_schedule_attempts.unschedulable.rate,5m)>{$KUBE.SCHEDULER.UNSCHEDULABLE}'
-              name: 'Kubernetes Scheduler: Too many unschedulable pods (over {$KUBE.SCHEDULER.UNSCHEDULABLE} for 5m)'
+              name: 'Kubernetes Scheduler: Too many unschedulable pods'
+              event_name: 'Kubernetes Scheduler: Too many unschedulable pods (over {$KUBE.SCHEDULER.UNSCHEDULABLE} for 5m)'
               priority: WARNING
               description: '"Number of attempts to schedule pods with ''unschedulable'' result is too high. ''unschedulable'' means a pod could not be scheduled."'
               tags:

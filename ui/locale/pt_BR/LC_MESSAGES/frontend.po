@@ -1,19 +1,20 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2021-01-25 11:38+0300\n"
-"Last-Translator: Marlon <Marlon@outlook.com>\n"
+"PO-Revision-Date: 2022-04-20 13:43+0000\n"
+"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1611567487.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
@@ -26,7 +27,7 @@ msgstr ""
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr ""
+msgstr "\"%1$s\" em vez de \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:321
 #: include/classes/import/validators/C10XmlValidator.php:338
@@ -49,7 +50,7 @@ msgstr "\"%1$s\" é aguardado"
 #: include/classes/api/services/CReport.php:636
 #, c-format
 msgid "\"%1$s\" must be an empty string or greater than \"%2$s\"."
-msgstr ""
+msgstr "\"%1$s\" deve ser uma string vazia ou maior que \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1399
 #, c-format
@@ -64,11 +65,11 @@ msgstr "é aguardado um par \"host:key\""
 
 #: include/classes/api/services/CItemGeneral.php:2299
 msgid "\"hostid\" of dependent item and master item should match"
-msgstr ""
+msgstr "\"hostid\" do item dependente e do item master devem corresponder"
 
 #: include/classes/api/services/CItemGeneral.php:2306
 msgid "\"ruleid\" of dependent item and master item should match"
-msgstr ""
+msgstr "\"ruleid\" do item dependente e do item master devem corresponder"
 
 #: include/forms.inc.php:1334
 #: include/views/configuration.host.discovery.edit.php:900
@@ -105,7 +106,7 @@ msgstr[1] "%1$d de %3$d%2$s incidentes são apresentados"
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:117
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "%1$d problemas selecionados."
 
 #: chart4.php:94
 #, c-format
@@ -134,12 +135,12 @@ msgstr[1] "%1$s ações"
 #: jsLoader.php:328
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s caracteres"
 
 #: jsLoader.php:329
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "%1$s caracteres restantes"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
@@ -153,15 +154,15 @@ msgstr[1] "%1$s eventos"
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s host em manutenção"
+msgstr[1] "%1$s hosts em manutenção"
 
 #: include/func.inc.php:2549
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s hora"
+msgstr[1] "%1$s horas"
 
 #: app/controllers/CControllerWidgetPlainTextView.php:126
 #: app/controllers/CControllerWidgetPlainTextView.php:127
@@ -328,7 +329,7 @@ msgstr "100 triggers mais ativas"
 
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
-msgstr ""
+msgstr "24x7"
 
 #: app/views/administration.queue.overview.php:48
 #: app/views/administration.queue.overview.proxy.php:48
@@ -379,7 +380,7 @@ msgstr ""
 #: jsLoader.php:185
 msgctxt "abbreviation of severity level"
 msgid "A"
-msgstr ""
+msgstr "A"
 
 #: include/classes/widgets/CWidgetHelper.php:952
 msgid "ADD OVERRIDE"
@@ -405,33 +406,33 @@ msgstr ""
 
 #: app/controllers/CControllerTokenCreate.php:98
 msgid "API token added"
-msgstr ""
+msgstr "Token da API adicionado"
 
 #: app/controllers/CControllerTokenDelete.php:61
 msgid "API token deleted"
 msgid_plural "API tokens deleted"
-msgstr[0] ""
+msgstr[0] "Token da API excluído"
 msgstr[1] ""
 
 #: app/controllers/CControllerTokenDisable.php:63
 msgid "API token disabled"
 msgid_plural "API tokens disabled"
-msgstr[0] ""
+msgstr[0] "Token da API desativado"
 msgstr[1] ""
 
 #: app/controllers/CControllerTokenEnable.php:63
 msgid "API token enabled"
 msgid_plural "API tokens enabled"
-msgstr[0] ""
+msgstr[0] "Token da API ativado"
 msgstr[1] ""
 
 #: include/classes/api/clients/CLocalApiClient.php:198
 msgid "API token expired."
-msgstr ""
+msgstr "O token da API expirou."
 
 #: app/controllers/CControllerTokenUpdate.php:114
 msgid "API token updated"
-msgstr ""
+msgstr "Token da API atualizado"
 
 #: app/controllers/CControllerTokenEdit.php:107
 #: app/controllers/CControllerTokenList.php:193
@@ -449,15 +450,15 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:397 include/html.inc.php:820
 #: include/html.inc.php:900
 msgid "API tokens"
-msgstr ""
+msgstr "Tokens da API"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:251
 msgid "Above value"
-msgstr ""
+msgstr "Acima do valor"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:370
 msgid "Abscissa"
-msgstr ""
+msgstr "Abscissa"
 
 #: include/func.inc.php:1578
 msgid "Access denied"
@@ -480,7 +481,7 @@ msgstr ""
 #: app/views/administration.user.edit.php:628
 #: app/views/administration.userrole.edit.php:320
 msgid "Access to actions"
-msgstr ""
+msgstr "Acesso a ações"
 
 #: app/views/administration.user.edit.php:570
 #: app/views/administration.userrole.edit.php:222
@@ -1091,7 +1092,7 @@ msgstr "Todos os dashboards"
 
 #: app/views/monitoring.charts.view.php:82
 msgid "All graphs"
-msgstr ""
+msgstr "Todos os gráficos"
 
 #: app/partials/administration.usergroup.grouprights.html.php:46
 #: app/views/administration.user.edit.php:425
@@ -1123,7 +1124,7 @@ msgstr "Todos os incidentes que o valor da etiqueta combine"
 
 #: app/controllers/CControllerServiceListGeneral.php:150
 msgid "All services"
-msgstr ""
+msgstr "Todos os serviços"
 
 #: app/partials/administration.usergroup.tagfilters.html.php:47
 msgid "All tags"
@@ -1203,7 +1204,7 @@ msgstr "E/OU"
 
 #: app/views/popup.sla.edit.php:78 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
-msgstr ""
+msgstr "Anualmente"
 
 #: app/partials/monitoring.host.filter.php:127
 #: app/views/administration.mediatype.list.php:59
@@ -1270,15 +1271,15 @@ msgstr "Abril"
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
-msgstr ""
+msgstr "Tem certeza de que deseja excluir este filtro?"
 
 #: app/views/js/administration.macros.edit.js.php:86
 msgid "Are you sure you want to delete?"
-msgstr ""
+msgstr "Tem certeza de que deseja excluir?"
 
 #: include/classes/html/CButtonQMessage.php:52
 msgid "Are you sure you want to perform this action?"
-msgstr ""
+msgstr "Tem certeza de que deseja realizar esta ação?"
 
 #: include/views/js/monitoring.sysmaps.js.php:116
 msgid "Area size"
@@ -1412,7 +1413,7 @@ msgstr "Tentativas"
 
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
-msgstr ""
+msgstr "Atribuição"
 
 #: app/views/administration.housekeeping.edit.php:178
 #: include/classes/helpers/CMenuHelper.php:148
@@ -1430,7 +1431,7 @@ msgstr "Log de auditoria"
 
 #: app/views/administration.housekeeping.edit.php:179
 msgid "Audit settings"
-msgstr ""
+msgstr "Configurações de auditoria"
 
 #: include/func.inc.php:243
 msgid "Aug"
@@ -1499,11 +1500,11 @@ msgstr "Configurações de autenticação atualizadas"
 #: app/views/administration.module.edit.php:40
 #: app/views/administration.module.list.php:76
 msgid "Author"
-msgstr ""
+msgstr "Autor"
 
 #: app/views/administration.miscconfig.edit.php:86
 msgid "Authorization"
-msgstr ""
+msgstr "Autorização"
 
 #: app/views/popup.tophosts.column.edit.php:162
 msgid "Auto"
@@ -1627,7 +1628,7 @@ msgstr "Imagem de fundo"
 #: include/classes/widgets/CWidgetHelper.php:971
 #: include/classes/widgets/CWidgetHelper.php:1219
 msgid "Bar"
-msgstr ""
+msgstr "Barra"
 
 #: app/views/administration.authentication.edit.php:175
 msgid "Base DN"
@@ -1695,7 +1696,7 @@ msgstr "Corpo e cabeçalhos"
 #: include/classes/widgets/forms/CWidgetFormItem.php:275
 #: include/classes/widgets/forms/CWidgetFormItem.php:335
 msgid "Bold"
-msgstr ""
+msgstr "Negrito"
 
 #: include/graphs.inc.php:59 include/views/js/monitoring.sysmaps.js.php:780
 #: include/views/js/monitoring.sysmaps.js.php:870
@@ -1810,7 +1811,7 @@ msgstr ""
 
 #: include/items.inc.php:1829
 msgid "CSV to JSON"
-msgstr ""
+msgstr "CSV para JSON"
 
 #: include/classes/validators/CApiInputValidator.php:2717
 #: include/classes/validators/CNewValidator.php:310
@@ -1869,7 +1870,7 @@ msgstr "Cancelar"
 #: app/controllers/CControllerTokenCreate.php:44
 #: app/controllers/CControllerTokenCreate.php:105
 msgid "Cannot add API token"
-msgstr ""
+msgstr "Não é possível adicionar o token da API"
 
 #: include/classes/api/services/CGraph.php:517
 #: include/classes/api/services/CGraph.php:531
@@ -1965,8 +1966,8 @@ msgstr "Não é possível adicionar o tipo de mídia"
 #, c-format
 msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não é possível adicionar o módulo: %1$s."
+msgstr[1] "Não é possível adicionar os módulos: %1$s."
 
 #: include/classes/api/services/CGraph.php:40
 #, c-format
@@ -2025,7 +2026,7 @@ msgstr "Usuário não foi incluído"
 #: app/controllers/CControllerUsergroupCreate.php:51
 #: app/controllers/CControllerUsergroupCreate.php:101
 msgid "Cannot add user group"
-msgstr ""
+msgstr "Não foi possível adicionar usuário ao grupo"
 
 #: httpconf.php:198
 msgid "Cannot add web scenario"
@@ -2038,7 +2039,7 @@ msgstr ""
 #: jsLoader.php:343
 msgctxt "screen reader"
 msgid "Cannot be removed"
-msgstr ""
+msgstr "Não pode ser removido"
 
 #: include/classes/validators/CLdapAuthValidator.php:79
 msgid "Cannot bind anonymously to LDAP server."
@@ -2092,7 +2093,7 @@ msgstr "Não foi possível conectar ao banco de dados."
 
 #: include/views/js/configuration.httpconf.edit.js.php:182
 msgid "Cannot convert POST data:"
-msgstr ""
+msgstr "Não é possível converter dados POST:"
 
 #: graphs.php:390
 msgid "Cannot copy graph"
@@ -3085,7 +3086,7 @@ msgstr "Não foi possível atualizar \"%2$s\" para a trigger descoberta \"%1$s\"
 #: app/controllers/CControllerTokenUpdate.php:47
 #: app/controllers/CControllerTokenUpdate.php:122
 msgid "Cannot update API token"
-msgstr ""
+msgstr "Não é possível atualizar o token da API"
 
 #: include/classes/api/services/CGraphGeneral.php:67
 msgid "Cannot update a discovered graph."
@@ -3094,7 +3095,7 @@ msgstr "Não é possível atualizar um gráfico descoberto."
 #: include/classes/api/services/CHostGroup.php:809
 #, c-format
 msgid "Cannot update a discovered host group \"%1$s\"."
-msgstr ""
+msgstr "Não é possível atualizar um grupo de hosts descoberto \"%1$s\"."
 
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
@@ -6402,6 +6403,10 @@ msgstr ""
 
 #: app/views/popup.itemtestedit.view.php:296
 msgid "End of line sequence"
+msgstr ""
+
+#: include/locales.inc.php:33
+msgid "English (en_GB)"
 msgstr ""
 
 #: include/locales.inc.php:33
@@ -17565,6 +17570,10 @@ msgstr "Este mês"
 msgid "This month so far"
 msgstr "Até agora neste mês"
 
+#: app/views/popup.tophosts.column.edit.php:172
+msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109
 msgid "This type of information may not match the key."
@@ -19746,6 +19755,10 @@ msgstr ""
 #: app/views/monitoring.widget.problemhosts.view.php:33
 msgid "With problems"
 msgstr "Com incidentes"
+
+#: app/views/popup.tophosts.column.edit.php:119
+msgid "With this setting only numeric items will be displayed in this column."
+msgstr ""
 
 #: include/forms.inc.php:346 include/forms.inc.php:566
 msgid "With triggers"

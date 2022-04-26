@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T19:09:53Z'
+  date: '2022-04-06T19:27:13Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -170,7 +170,8 @@ zabbix_export:
             -
               uuid: 4ecadb993aa74126a807df3af4b892ed
               expression: 'min(/ClickHouse by HTTP/clickhouse.distributed.files,5m)>{$CLICKHOUSE.DELAYED.FILES.DISTRIBUTED.COUNT.MAX.WARN}'
-              name: 'ClickHouse: Too many distributed files to insert (over {$CLICKHOUSE.DELAYED.FILES.DISTRIBUTED.COUNT.MAX.WARN} for 5 min)'
+              name: 'ClickHouse: Too many distributed files to insert'
+              event_name: 'ClickHouse: Too many distributed files to insert (over {$CLICKHOUSE.DELAYED.FILES.DISTRIBUTED.COUNT.MAX.WARN} for 5 min)'
               priority: WARNING
               description: |
                 "Clickhouse servers and <remote_servers> in config.xml
@@ -256,7 +257,8 @@ zabbix_export:
             -
               uuid: 164dc9841cdd4b77a650792cf1bac701
               expression: 'min(/ClickHouse by HTTP/clickhouse.insert.delay,5m)>{$CLICKHOUSE.DELAYED.INSERTS.MAX.WARN}'
-              name: 'ClickHouse: Too many throttled insert queries (over {$CLICKHOUSE.DELAYED.INSERTS.MAX.WARN) for 5 min)'
+              name: 'ClickHouse: Too many throttled insert queries'
+              event_name: 'ClickHouse: Too many throttled insert queries (over {$CLICKHOUSE.DELAYED.INSERTS.MAX.WARN) for 5 min)'
               priority: WARNING
               description: 'Clickhouse have INSERT queries that are throttled due to high number of active data parts for partition in a MergeTree, please decrease INSERT frequency'
               manual_close: 'YES'
@@ -431,7 +433,8 @@ zabbix_export:
             -
               uuid: 21e6d3c6047145c59cbd00032699ee99
               expression: 'min(/ClickHouse by HTTP/clickhouse.max.part.count.for.partition,5m)>{$CLICKHOUSE.PARTS.PER.PARTITION.WARN} * 0.9'
-              name: 'ClickHouse: Too many MergeTree parts (over 90% of {$CLICKHOUSE.PARTS.PER.PARTITION.WARN})'
+              name: 'ClickHouse: Too many MergeTree parts'
+              event_name: 'ClickHouse: Too many MergeTree parts (over 90% of {$CLICKHOUSE.PARTS.PER.PARTITION.WARN})'
               priority: WARNING
               description: |
                 Descease INSERT queries frequency.
@@ -659,7 +662,8 @@ zabbix_export:
             -
               uuid: d49b9e8978bd416f81ea01b935879d81
               expression: 'min(/ClickHouse by HTTP/clickhouse.network.error.rate,5m)>{$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN}'
-              name: 'ClickHouse: Too many network errors (over {$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN} in 5m)'
+              name: 'ClickHouse: Too many network errors'
+              event_name: 'ClickHouse: Too many network errors (over {$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN} in 5m)'
               priority: WARNING
               description: 'Number of errors (timeouts and connection failures) during query execution, background pool tasks and DNS cache update is too high.'
               tags:
@@ -723,7 +727,8 @@ zabbix_export:
             -
               uuid: 2410e7b63c8340b6b08ec729d7093be6
               expression: 'last(/ClickHouse by HTTP/clickhouse.process.elapsed)>{$CLICKHOUSE.QUERY_TIME.MAX.WARN}'
-              name: 'ClickHouse: There are queries running more than {$CLICKHOUSE.QUERY_TIME.MAX.WARN} seconds'
+              name: 'ClickHouse: There are queries running is long'
+              event_name: 'ClickHouse: There are queries running more than {$CLICKHOUSE.QUERY_TIME.MAX.WARN} seconds'
               priority: AVERAGE
               manual_close: 'YES'
               tags:
@@ -877,7 +882,8 @@ zabbix_export:
             -
               uuid: fc47a407b15744e79b70088ec249951a
               expression: 'min(/ClickHouse by HTTP/clickhouse.replicas.max.absolute.delay,5m)>{$CLICKHOUSE.REPLICA.MAX.WARN}'
-              name: 'ClickHouse: Replication lag is too high (over {$CLICKHOUSE.REPLICA.MAX.WARN} sec for 5min)'
+              name: 'ClickHouse: Replication lag is too high'
+              event_name: 'ClickHouse: Replication lag is too high (over {$CLICKHOUSE.REPLICA.MAX.WARN} sec for 5min)'
               priority: WARNING
               description: |
                 When replica have too much lag, it can be skipped from Distributed SELECT Queries without errors
@@ -1113,6 +1119,7 @@ zabbix_export:
               uuid: dfd9500636824ebf9d51d93650d62613
               expression: 'last(/ClickHouse by HTTP/clickhouse.system.settings,#1)<>last(/ClickHouse by HTTP/clickhouse.system.settings,#2) and length(last(/ClickHouse by HTTP/clickhouse.system.settings))>0'
               name: 'ClickHouse: Configuration has been changed'
+              event_name: 'ClickHouse: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'ClickHouse configuration has been changed. Ack to close.'
               manual_close: 'YES'
@@ -1176,7 +1183,8 @@ zabbix_export:
             -
               uuid: 975cebc1b4324f83b5a8853fd666a179
               expression: 'nodata(/ClickHouse by HTTP/clickhouse.uptime,30m)=1'
-              name: 'ClickHouse: Failed to fetch info data (or no data for 30m)'
+              name: 'ClickHouse: Failed to fetch info data'
+              event_name: 'ClickHouse: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes'
               manual_close: 'YES'
@@ -1191,7 +1199,8 @@ zabbix_export:
             -
               uuid: e1316d3a83174cc49ab96ad90c46150b
               expression: 'last(/ClickHouse by HTTP/clickhouse.uptime)<10m'
-              name: 'ClickHouse: has been restarted (uptime < 10m)'
+              name: 'ClickHouse: has been restarted'
+              event_name: 'ClickHouse: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -1233,7 +1242,8 @@ zabbix_export:
             -
               uuid: 244dcf8dc8584e1686585160c261ef85
               expression: 'last(/ClickHouse by HTTP/clickhouse.version,#1)<>last(/ClickHouse by HTTP/clickhouse.version,#2) and length(last(/ClickHouse by HTTP/clickhouse.version))>0'
-              name: 'ClickHouse: Version has changed (new version: {ITEM.VALUE})'
+              name: 'ClickHouse: Version has changed'
+              event_name: 'ClickHouse: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'ClickHouse version has changed. Ack to close.'
               manual_close: 'YES'
@@ -1772,7 +1782,8 @@ zabbix_export:
                 -
                   uuid: 0b06b448c0ad433c94c2a3788ca53e1a
                   expression: 'min(/ClickHouse by HTTP/clickhouse.replica.lag["{#DB}.{#TABLE}"],5m) > {$CLICKHOUSE.LOG_POSITION.DIFF.MAX.WARN}'
-                  name: 'ClickHouse: {#DB}.{#TABLE}: Difference between log_max_index and log_pointer is too high (More than {$CLICKHOUSE.LOG_POSITION.DIFF.MAX.WARN} for 5m)'
+                  name: 'ClickHouse: {#DB}.{#TABLE}: Difference between log_max_index and log_pointer is too high'
+                  event_name: 'ClickHouse: {#DB}.{#TABLE}: Difference between log_max_index and log_pointer is too high (More than {$CLICKHOUSE.LOG_POSITION.DIFF.MAX.WARN} for 5m)'
                   priority: WARNING
                   tags:
                     -
@@ -1907,7 +1918,8 @@ zabbix_export:
                 -
                   uuid: 6fe0a15168db4abfa1cd2a2ee45d62ad
                   expression: 'min(/ClickHouse by HTTP/clickhouse.replica.queue_size["{#DB}.{#TABLE}"],5m)>{$CLICKHOUSE.QUEUE.SIZE.MAX.WARN:"{#TABLE}"}'
-                  name: 'ClickHouse: {#DB}.{#TABLE}: Too many operations in queue (over {$CLICKHOUSE.QUEUE.SIZE.MAX.WARN} for 5m)'
+                  name: 'ClickHouse: {#DB}.{#TABLE}: Too many operations in queue'
+                  event_name: 'ClickHouse: {#DB}.{#TABLE}: Too many operations in queue (over {$CLICKHOUSE.QUEUE.SIZE.MAX.WARN} for 5m)'
                   priority: WARNING
                   tags:
                     -

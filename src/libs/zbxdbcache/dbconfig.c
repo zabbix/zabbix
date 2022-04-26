@@ -9810,6 +9810,7 @@ static void	dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
 			case CONFIG_ERROR:
+			case SIG_ERROR:
 				dc_item->queue_priority = ZBX_QUEUE_PRIORITY_NORMAL;
 				dc_requeue_item(dc_item, dc_host, dc_interface, ZBX_ITEM_COLLECTED, lastclocks[i]);
 				break;

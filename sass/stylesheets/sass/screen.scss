@@ -5619,7 +5619,8 @@ $range-input-width: 31px;
 		}
 
 		/* Special styling for WebKit/Blink */
-		&::-webkit-slider-thumb {
+		&::-webkit-slider-thumb,
+		&::-moz-range-thumb {
 			margin-top: 1px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
 			height: $range-thumb-size;
 			width: $range-thumb-size;
@@ -6566,6 +6567,11 @@ z-select,
 	margin-top: 5px;
 	height: 30px;
 	width: 30px;
+}
+.leaflet-marker-icon:focus {
+	box-shadow: 0 0 0 2px $btn-border-focus-color;
+	border-radius: 2px;
+	outline: none;
 }
 .marker-cluster span {
 	line-height: 30px;
