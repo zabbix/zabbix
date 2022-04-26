@@ -1545,27 +1545,23 @@ class CHostGroup extends CApiService {
 	 * @return array
 	 */
 	public function propagate(array $data): array {
-		$this->validatePropagate($data);
+		$this->validatePropagate($data, $db_groups);
 
-		foreach ($data['groups'] as $group) {
-			$result = $this->get([
-				'groupids' => $group['groupid'],
-				'output' => ['groupid', 'name']
-			]);
-
-			$this->inheritPermissions($result[0]['groupid'], $result[0]['name']);
-			$this->inheritTagFilters($result[0]['groupid'], $result[0]['name']);
+		foreach ($db_groups as $db_group) {
+			$this->inheritPermissions($db_group['groupid'], $db_group['name']);
+			$this->inheritTagFilters($db_group['groupid'], $db_group['name']);
 		}
 
 		return ['groupids' => array_column($data['groups'], 'groupid')];
 	}
 
 	/**
-	 * @param array			$data
+	 * @param array $data
+	 * @param array $db_groups
 	 *
 	 * @throws APIException if the input is invalid
 	 */
-	private function validatePropagate(array &$data): void {
+	private function validatePropagate(array &$data, array &$db_groups = null): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'groups' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
@@ -1586,13 +1582,13 @@ class CHostGroup extends CApiService {
 
 		$groupids = array_column($data['groups'], 'groupid');
 
-		$count = $this->get([
-			'countOutput' => true,
+		$db_groups = $this->get([
+			'output' => ['groupid', 'name'],
 			'groupids' => $groupids,
 			'editable' => true
 		]);
 
-		if ($count != count($groupids)) {
+		if (count($db_groups) != count($groupids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
