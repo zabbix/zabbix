@@ -22,7 +22,7 @@
 
 #include "zbxeval.h"
 #include "log.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "zbxregexp.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"

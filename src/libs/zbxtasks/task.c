@@ -19,7 +19,7 @@
 
 #include "common.h"
 #include "log.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "zbxjson.h"
 
 #include "zbxtasks.h"

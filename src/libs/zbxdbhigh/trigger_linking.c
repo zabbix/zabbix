@@ -19,7 +19,7 @@
 
 #include "trigger_linking.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "zbxeval.h"
 #include "log.h"
 #include "audit/zbxaudit.h"

@@ -29,7 +29,7 @@
 #include "../zbxkvs/kvs.h"
 #include "../zbxvault/vault.h"
 #include "base64.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "dbsync.h"
 #include "actions.h"
 #include "zbxtrends.h"

@@ -18,7 +18,7 @@
 **/
 
 #include "common.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "dbupgrade.h"
 
 extern unsigned char	program_type;

@@ -19,7 +19,7 @@
 
 #include "common.h"
 #include "zbxserialize.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 
 void 	zbx_db_mediatype_clean(DB_MEDIATYPE *mt)
 {

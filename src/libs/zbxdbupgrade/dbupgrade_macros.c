@@ -19,7 +19,7 @@
 
 #include "dbupgrade_macros.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 
 /* Function argument descriptors.                                                */
 /* Used in varargs list to describe following parameter mapping to old position. */

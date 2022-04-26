@@ -20,7 +20,7 @@
 #include "proxy.h"
 
 #include "cfg.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "zbxdbupgrade.h"
 #include "log.h"
 #include "zbxgetopt.h"

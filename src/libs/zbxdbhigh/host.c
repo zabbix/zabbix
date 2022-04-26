@@ -30,7 +30,7 @@
 #include "trigger_linking.h"
 #include "graph_linking.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 
 typedef struct
 {
