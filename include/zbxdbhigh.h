@@ -40,33 +40,33 @@ extern int	CONFIG_DBPORT;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 
-typedef enum
-{
-	GRAPH_TYPE_NORMAL = 0,
-	GRAPH_TYPE_STACKED = 1
-}
-zbx_graph_types;
+/* typedef enum */
+/* { */
+/* 	GRAPH_TYPE_NORMAL = 0, */
+/* 	GRAPH_TYPE_STACKED = 1 */
+/* } */
+/* zbx_graph_types; */
+
+/* typedef enum */
+/* { */
+/* 	CALC_FNC_MIN = 1, */
+/* 	CALC_FNC_AVG = 2, */
+/* 	CALC_FNC_MAX = 4, */
+/* 	CALC_FNC_ALL = 7 */
+/* } */
+/* zbx_graph_item_calc_function; */
+
+/* typedef enum */
+/* { */
+/* 	GRAPH_ITEM_SIMPLE = 0, */
+/* 	GRAPH_ITEM_AGGREGATED = 1 */
+/* } */
+/* zbx_graph_item_type; */
 
 typedef enum
 {
-	CALC_FNC_MIN = 1,
-	CALC_FNC_AVG = 2,
-	CALC_FNC_MAX = 4,
-	CALC_FNC_ALL = 7
-}
-zbx_graph_item_calc_function;
-
-typedef enum
-{
-	GRAPH_ITEM_SIMPLE = 0,
-	GRAPH_ITEM_AGGREGATED = 1
-}
-zbx_graph_item_type;
-
-typedef enum
-{
-	TEMPLATE_LINK_MANUAL = 0,
-	TEMPLATE_LINK_LLD = 1
+	ZBX_TEMPLATE_LINK_MANUAL = 0,
+	ZBX_TEMPLATE_LINK_LLD = 1
 }
 zbx_host_template_link_type;
 
@@ -79,25 +79,10 @@ zbx_host_template_link_type;
 #define ZBX_DB_SERVER	1
 #define ZBX_DB_PROXY	2
 
-#define TRIGGER_OPDATA_LEN		255
-#define TRIGGER_URL_LEN			255
-#define TRIGGER_DESCRIPTION_LEN		255
-#define TRIGGER_EXPRESSION_LEN		2048
-#define TRIGGER_EXPRESSION_LEN_MAX	(TRIGGER_EXPRESSION_LEN + 1)
-#if defined(HAVE_ORACLE)
-#	define TRIGGER_COMMENTS_LEN	2048
-#else
-#	define TRIGGER_COMMENTS_LEN	65535
-#endif
-#define TRIGGER_EVENT_NAME_LEN		2048
-#define TAG_NAME_LEN			255
-#define TAG_VALUE_LEN			255
 
-#define GROUP_NAME_LEN			255
-
-#define HOST_HOST_LEN			MAX_ZBX_HOSTNAME_LEN
-#define HOST_HOST_LEN_MAX		(HOST_HOST_LEN + 1)
-#define HOST_NAME_LEN			128
+/* #define HOST_HOST_LEN			MAX_ZBX_HOSTNAME_LEN */
+/* #define HOST_HOST_LEN_MAX		(HOST_HOST_LEN + 1) */
+/* #define HOST_NAME_LEN			128 */
 #define HOST_IPMI_USERNAME_LEN		16
 #define HOST_IPMI_USERNAME_LEN_MAX	(HOST_IPMI_USERNAME_LEN + 1)
 #define HOST_IPMI_PASSWORD_LEN		20

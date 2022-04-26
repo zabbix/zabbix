@@ -120,7 +120,7 @@ static int	DBpatch_6010005(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		/* set TEMPLATE_LINK_LLD as link_type */
+		/* set ZBX_TEMPLATE_LINK_LLD as link_type */
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update hosts_templates set link_type=1 where hosttemplateid=%s;\n", row[0]);
 

@@ -611,7 +611,7 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 
 		/* visible host name is valid utf8 sequence and has a valid length */
 		if (SUCCEED == zbx_is_utf8(host->name) && '\0' != *host->name &&
-				HOST_NAME_LEN >= zbx_strlen_utf8(host->name))
+				ZBX_MAX_HOSTNAME_LEN >= zbx_strlen_utf8(host->name))
 		{
 			continue;
 		}
@@ -2481,13 +2481,13 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
 				/* templates which should be unlinked */
-				if (TEMPLATE_LINK_LLD == link_type)
+				if (ZBX_TEMPLATE_LINK_LLD == link_type)
 					zbx_vector_uint64_append(&host->del_templateids, templateid);
 			}
 			else
 			{
 				/* templates which are already linked */
-				if (TEMPLATE_LINK_MANUAL == link_type)
+				if (ZBX_TEMPLATE_LINK_MANUAL == link_type)
 					zbx_vector_uint64_append(&host->del_templateids, templateid);
 				else
 					zbx_vector_uint64_remove(&host->lnk_templateids, i);

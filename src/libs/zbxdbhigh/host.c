@@ -3842,7 +3842,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 					host_prototype->lnk_templateids.values[j]);
 
 			zbx_audit_host_prototype_update_json_add_parent_template(host_prototype->hostid, hosttemplateid,
-					host_prototype->lnk_templateids.values[j], TEMPLATE_LINK_MANUAL);
+					host_prototype->lnk_templateids.values[j], ZBX_TEMPLATE_LINK_MANUAL);
 
 			hosttemplateid++;
 		}

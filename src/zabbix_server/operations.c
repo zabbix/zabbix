@@ -970,7 +970,7 @@ void	op_template_add(const DB_EVENT *event, zbx_config_t *cfg, zbx_vector_uint64
 	if (0 == (hostid = add_discovered_host(event, &status, cfg)))
 		goto out;
 
-	if (SUCCEED != DBcopy_template_elements(hostid, lnk_templateids, TEMPLATE_LINK_MANUAL, &error))
+	if (SUCCEED != DBcopy_template_elements(hostid, lnk_templateids, ZBX_TEMPLATE_LINK_MANUAL, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot link template(s) %s", error);
 		zbx_free(error);

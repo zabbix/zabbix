@@ -4789,6 +4789,8 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 
 	if (0 != (trigger->flags & ZBX_DBPATCH_TRIGGER_UPDATE_EXPRESSION))
 	{
+#define TRIGGER_EXPRESSION_LEN		2048
+
 		if (zbx_strlen_utf8(trigger->expression) > TRIGGER_EXPRESSION_LEN)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "trigger \"" ZBX_FS_UI64 "\" expression is too long: %s",
@@ -4806,7 +4808,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 			return FAIL;
 		}
 	}
-
+#undef TRIGGER_EXPRESSION_LEN
 	return SUCCEED;
 }
 
@@ -5085,7 +5087,7 @@ static int	DBpatch_5030167(void)
 
 		zbx_strcpy_alloc(&out, &out_alloc, &out_offset, row[1] + last_pos);
 
-		if (TRIGGER_EVENT_NAME_LEN < zbx_strlen_utf8(out))
+		if (2048 /*TRIGGER_EVENT_NAME_LEN */ < zbx_strlen_utf8(out))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert trigger \"%s\" event name: too long expression",
 					row[0]);
