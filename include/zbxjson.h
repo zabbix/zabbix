@@ -190,7 +190,7 @@
 #define ZBX_PROTO_TAG_PROCESS_NUM		"process_num"
 #define ZBX_PROTO_TAG_HEARTBEAT_FREQ		"heartbeat_freq"
 #define ZBX_PROTO_TAG_ACTIVE_STATUS		"active_status"
-#define ZBX_PROTO_TAG_HOST_DATA			"host data"
+#define ZBX_PROTO_TAG_PROXY_ACTIVE_AVAIL_DATA	"host data"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"

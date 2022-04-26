@@ -42,16 +42,13 @@ void	zbx_availability_deserialize_active_status_request(const unsigned char *dat
 zbx_uint32_t	zbx_availability_serialize_active_status_response(unsigned char **data, int status);
 void	zbx_availability_deserialize_active_status_response(const unsigned char *data, int *status);
 
-zbx_uint32_t	zbx_availability_serialize_confsync_diff(unsigned char **data, zbx_vector_ptr_t *diff);
-void	zbx_availability_deserialize_confsync_diff(const unsigned char *data, zbx_vector_ptr_t *diff);
-
-zbx_uint32_t	zbx_availability_serialize_hostdata2(unsigned char **data, zbx_vector_ptr_t *hosts);
-void	zbx_availability_deserialize_hostdata2(const unsigned char *data, zbx_vector_ptr_t *hostdata);
+zbx_uint32_t	zbx_availability_serialize_hostdata2(unsigned char **data, zbx_vector_ptr_t *hosts, zbx_uint64_t proxy_hostid);
+void	zbx_availability_deserialize_hostdata2(const unsigned char *data, zbx_vector_ptr_t *hostdata, zbx_uint64_t *proxy_hostid);
 
 zbx_uint32_t	zbx_availability_serialize_hostid(unsigned char **data, zbx_uint64_t hostid);
 void	zbx_availability_deserialize_hostid(const unsigned char *data, zbx_uint64_t *hostid);
 
-zbx_uint32_t	zbx_availability_serialize_new_hosts(unsigned char **data, zbx_vector_uint64_t *hostids);
-void	zbx_availability_deserialize_new_hosts(const unsigned char *data, zbx_vector_uint64_t *hostids);
+zbx_uint32_t	zbx_availability_serialize_hostids(unsigned char **data, zbx_vector_uint64_t *hostids);
+void	zbx_availability_deserialize_hostids(const unsigned char *data, zbx_vector_uint64_t *hostids);
 
 #endif

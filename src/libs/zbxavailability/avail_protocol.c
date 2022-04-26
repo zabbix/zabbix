@@ -190,61 +190,19 @@ void	zbx_availability_deserialize_active_status_response(const unsigned char *da
 	(void)zbx_deserialize_int(data, status);
 }
 
-zbx_uint32_t	zbx_availability_serialize_confsync_diff(unsigned char **data, zbx_vector_ptr_t *diff)
-{
-	zbx_dbsync_active_avail_host_t	*host;
-	zbx_uint32_t		data_len = 0;
-	unsigned char		*ptr;
-	int			i;
-
-	zbx_serialize_prepare_value(data_len, diff->values_num);
-
-	data_len += (zbx_uint32_t)(sizeof(zbx_uint64_t) + sizeof(int)) * (zbx_uint32_t)diff->values_num;
-
-	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_len);
-	ptr += zbx_serialize_value(ptr, diff->values_num);
-
-	for (i = 0; i < diff->values_num; i++)
-	{
-		host = (zbx_dbsync_active_avail_host_t *)diff->values[i];
-		ptr += zbx_serialize_value(ptr, host->hostid);
-		ptr += zbx_serialize_value(ptr, host->flag);
-	}
-
-	return data_len;
-}
-
-void	zbx_availability_deserialize_confsync_diff(const unsigned char *data, zbx_vector_ptr_t *diff)
-{
-	int	values_num, i;
-
-	data += zbx_deserialize_value(data, &values_num);
-
-	if (0 == values_num)
-		return;
-
-	for (i = 0; i < values_num; i++)
-	{
-		zbx_dbsync_active_avail_host_t	*h = (zbx_dbsync_active_avail_host_t *)zbx_malloc(NULL, sizeof(zbx_dbsync_active_avail_host_t));
-
-		data += zbx_deserialize_uint64(data, &h->hostid);
-		data += zbx_deserialize_char(data, &h->flag);
-
-		zbx_vector_ptr_append(diff, h);
-	}
-}
-
-zbx_uint32_t	zbx_availability_serialize_hostdata2(unsigned char **data, zbx_vector_ptr_t *hosts)
+zbx_uint32_t	zbx_availability_serialize_hostdata2(unsigned char **data, zbx_vector_ptr_t *hosts, zbx_uint64_t proxy_hostid)
 {
 	zbx_uint32_t		data_len = 0;
 	unsigned char		*ptr;
 	int			i;
 
+	zbx_serialize_prepare_value(data_len, proxy_hostid);
 	zbx_serialize_prepare_value(data_len, hosts->values_num);
 
 	data_len += (zbx_uint32_t)(sizeof(zbx_uint64_t) + sizeof(int)) * (zbx_uint32_t)hosts->values_num;
 
 	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_len);
+	ptr += zbx_serialize_value(ptr, proxy_hostid);
 	ptr += zbx_serialize_value(ptr, hosts->values_num);
 
 	for (i = 0; i < hosts->values_num; i++)
@@ -260,10 +218,11 @@ zbx_uint32_t	zbx_availability_serialize_hostdata2(unsigned char **data, zbx_vect
 	return data_len;
 }
 
-void	zbx_availability_deserialize_hostdata2(const unsigned char *data, zbx_vector_ptr_t *hostdata)
+void	zbx_availability_deserialize_hostdata2(const unsigned char *data, zbx_vector_ptr_t *hostdata, zbx_uint64_t *proxy_hostid)
 {
 	int	values_num, i;
 
+	data += zbx_deserialize_value(data, proxy_hostid);
 	data += zbx_deserialize_value(data, &values_num);
 
 	if (0 == values_num)
@@ -299,7 +258,7 @@ void	zbx_availability_deserialize_hostid(const unsigned char *data, zbx_uint64_t
 	(void)zbx_deserialize_uint64(data, hostid);
 }
 
-zbx_uint32_t	zbx_availability_serialize_new_hosts(unsigned char **data, zbx_vector_uint64_t *hostids)
+zbx_uint32_t	zbx_availability_serialize_hostids(unsigned char **data, zbx_vector_uint64_t *hostids)
 {
 	zbx_uint32_t	data_len = 0;
 	int		i;
@@ -319,7 +278,7 @@ zbx_uint32_t	zbx_availability_serialize_new_hosts(unsigned char **data, zbx_vect
 	return data_len;
 }
 
-void	zbx_availability_deserialize_new_hosts(const unsigned char *data, zbx_vector_uint64_t *hostids)
+void	zbx_availability_deserialize_hostids(const unsigned char *data, zbx_vector_uint64_t *hostids)
 {
 	int	values_num, i;
 

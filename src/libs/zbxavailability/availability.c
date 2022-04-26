@@ -71,7 +71,10 @@ void	zbx_availability_serialize_json_hostdata(zbx_vector_ptr_t *hostdata, struct
 {
 	int	i;
 
-	zbx_json_addarray(j, ZBX_PROTO_TAG_HOST_DATA);
+	if (0 == hostdata->values_num)
+		return;
+
+	zbx_json_addarray(j, ZBX_PROTO_TAG_PROXY_ACTIVE_AVAIL_DATA);
 
 	for (i = 0; i < hostdata->values_num; i++)
 	{

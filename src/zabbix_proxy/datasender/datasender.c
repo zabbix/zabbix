@@ -88,8 +88,7 @@ static void	get_hist_upload_state(const char *buffer, int *state)
  ******************************************************************************/
 static int	proxy_data_sender(int *more, int now, int *hist_upload_state, time_t *last_conn_time)
 {
-	static int		data_timestamp = 0, task_timestamp = 0, active_avail_timestamp = 0,
-				upload_state = SUCCEED;
+	static int		data_timestamp = 0, task_timestamp = 0, upload_state = SUCCEED;
 
 	zbx_socket_t		sock;
 	struct zbx_json		j;
@@ -152,11 +151,9 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, time_t 
 		flags |= ZBX_DATASENDER_TASKS_REQUEST;
 	}
 
-	if (SUCCEED == upload_state && ZBX_ACTIVE_PROXY_HOSTDATA_FREQUENCY <= now - active_avail_timestamp)
+	if (SUCCEED == upload_state)
 	{
 		zbx_ipc_message_t	response;
-
-		active_avail_timestamp = now;
 
 		zbx_ipc_message_init(&response);
 		zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_HOSTDATA, 0, 0, &response);

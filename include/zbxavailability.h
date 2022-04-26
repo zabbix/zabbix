@@ -32,8 +32,7 @@
 #define ZBX_IPC_AVAILMAN_CONFSYNC_DIFF		5
 #define ZBX_IPC_AVAILMAN_PROCESS_PROXY_HOSTDATA	6
 #define ZBX_IPC_AVAILMAN_PROXY_FLUSH_ALL_HOSTS	7
-#define ZBX_IPC_AVAILMAN_RESET_PROXY_HOSTS	8
-#define ZBX_IPC_AVAILMAN_ADD_HOSTS		9
+#define ZBX_IPC_AVAILMAN_ADD_HOSTS		8
 #define ZBX_AVAIL_HOSTDATA_FREQUENCY		5
 #define ZBX_AVAIL_SERVER_CONN_TIMEOUT		3600
 
@@ -44,9 +43,9 @@ typedef struct
 {
 	zbx_hashset_t		hosts;
 	zbx_hashset_t		queue;
-	zbx_vector_ptr_t	updated_hosts;
-	double			last_refresh;
-	zbx_vector_uint64_t	disabled_hosts;
+	zbx_hashset_t		proxy_avail;
+	double			last_status_refresh;
+	double			last_proxy_avail_refresh;
 }
 zbx_avail_active_hb_cache_t;
 
@@ -57,19 +56,7 @@ typedef struct
 }
 zbx_proxy_hostdata_t;
 
-#define ZBX_IPC_AVAIL_HOSTDATA_RESPONSE	1
-
 void	zbx_availability_serialize_json_hostdata(zbx_vector_ptr_t *hostdata, struct zbx_json *j);
 int	zbx_get_active_agent_availability(zbx_uint64_t hostid);
-
-#define ZBX_DBSYNC_ACTIVE_AVAIL_HOST_DISABLED	0x0000
-#define ZBX_DBSYNC_ACTIVE_AVAIL_HOST_MOVED	0x0001
-
-typedef struct
-{
-	unsigned char	flag;
-	zbx_uint64_t	hostid;
-}
-zbx_dbsync_active_avail_host_t;
 
 #endif /* ZABBIX_AVAILABILITY_H */

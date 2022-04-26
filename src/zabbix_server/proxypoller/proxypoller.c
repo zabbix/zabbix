@@ -30,8 +30,6 @@
 #include "../trapper/proxydata.h"
 #include "zbxcompress.h"
 #include "zbxcommshigh.h"
-#include "zbxavailability.h"
-#include "avail_protocol.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -576,16 +574,6 @@ static int	process_proxy(void)
 			}
 		}
 error:
-		if (proxy.lastaccess + ZBX_AVAIL_SERVER_CONN_TIMEOUT)
-		{
-			unsigned char	*data = NULL;
-			zbx_uint32_t	data_len;
-
-			data_len = zbx_availability_serialize_hostid(&data, proxy.hostid);
-			zbx_availability_send(ZBX_IPC_AVAILMAN_RESET_PROXY_HOSTS, data, data_len, NULL);
-
-			zbx_free(data);
-		}
 
 		if (proxy_old.version != proxy.version || proxy_old.auto_compress != proxy.auto_compress ||
 				proxy_old.lastaccess != proxy.lastaccess)

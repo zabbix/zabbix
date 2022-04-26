@@ -2628,29 +2628,6 @@ static void	lld_interface_snmp_prepare_sql(zbx_uint64_t hostid, const zbx_uint64
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where interfaceid=" ZBX_FS_UI64 ";\n", interfaceid);
 }
 
-static void	create_host_rtdata(zbx_vector_ptr_t *hosts)
-{
-	unsigned char		*data = NULL;
-	zbx_uint32_t		data_len;
-	zbx_vector_uint64_t	hostids;
-	int			i;
-	zbx_lld_host_t		*host;
-
-	if (0 == hosts->values_num)
-		return;
-
-	for (i = 0; i < hosts->values_num; i++)
-	{
-		host = (zbx_lld_host_t *)hosts->values[i];
-		zbx_vector_uint64_append(&hostids, host->hostid);
-	}
-
-	data_len = zbx_availability_serialize_new_hosts(&data, &hostids);
-	zbx_availability_send(ZBX_IPC_AVAILMAN_ADD_HOSTS, data, data_len, NULL);
-
-	zbx_vector_uint64_destroy(&hostids);
-}
-
 /******************************************************************************
  *                                                                            *
  * Parameters: parent_hostid    - [IN] parent host id                         *
@@ -2694,7 +2671,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				sql2_alloc = 0, sql2_offset = 0;
 	zbx_db_insert_t		db_insert, db_insert_hdiscovery, db_insert_hinventory, db_insert_hgroups,
 				db_insert_hmacro, db_insert_interface, db_insert_idiscovery, db_insert_snmp,
-				db_insert_tag;
+				db_insert_tag, db_insert_host_rtdata;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2877,6 +2854,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				"custom_interfaces", NULL);
 
 		zbx_db_insert_prepare(&db_insert_hdiscovery, "host_discovery", "hostid", "parent_hostid", "host", NULL);
+		zbx_db_insert_prepare(&db_insert_host_rtdata, "host_rtdata", "hostid", "active_available", NULL);
 	}
 
 	if (0 != new_host_inventories)
@@ -2949,6 +2927,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			zbx_audit_host_create_entry(AUDIT_ACTION_ADD, host->hostid, host->host);
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host->hostid, parent_hostid, host_proto);
+			zbx_db_insert_add_values(&db_insert_host_rtdata, host->hostid, INTERFACE_AVAILABLE_UNKNOWN);
 
 			if (HOST_INVENTORY_DISABLED != host->inventory_mode)
 			{
@@ -3403,7 +3382,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		zbx_db_insert_execute(&db_insert_hdiscovery);
 		zbx_db_insert_clean(&db_insert_hdiscovery);
 
-		create_host_rtdata(hosts);
+		zbx_db_insert_execute(&db_insert_host_rtdata);
+		zbx_db_insert_clean(&db_insert_host_rtdata);
 	}
 
 	if (0 != new_host_inventories)

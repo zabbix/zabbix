@@ -4705,7 +4705,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_TASKS, &jp_data))
 		process_tasks_contents(&jp_data);
 
-	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HOST_DATA, &jp_data))
+	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_PROXY_ACTIVE_AVAIL_DATA, &jp_data))
 	{
 		const char		*ptr;
 		zbx_vector_ptr_t	host_avails;
@@ -4745,7 +4745,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 			unsigned char		*data = NULL;
 			zbx_uint32_t		data_len;
 
-			data_len = zbx_availability_serialize_hostdata2(&data, &host_avails);
+			data_len = zbx_availability_serialize_hostdata2(&data, &host_avails, proxy->hostid);
 			zbx_availability_send(ZBX_IPC_AVAILMAN_PROCESS_PROXY_HOSTDATA, data, data_len, NULL);
 
 			zbx_vector_ptr_clear_ext(&host_avails, zbx_ptr_free);

@@ -1112,7 +1112,7 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 	zbx_hashset_remove_direct(&config->proxies, proxy);
 }
 
-static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_vector_ptr_t *active_avail_diff)
+static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_vector_uint64_t *active_avail_diff)
 {
 	char		**row;
 	zbx_uint64_t	rowid;
@@ -1442,16 +1442,7 @@ done:
 			/* reset host status if host status has been changed (e.g., if host has been disabled) */
 			if (status != host->status)
 			{
-				if (HOST_STATUS_NOT_MONITORED == status)
-				{
-					zbx_dbsync_active_avail_host_t *diff_host = (zbx_dbsync_active_avail_host_t *)
-							zbx_malloc(NULL, sizeof(zbx_dbsync_active_avail_host_t));
-
-					diff_host->flag = ZBX_DBSYNC_ACTIVE_AVAIL_HOST_DISABLED;
-					diff_host->hostid = host->hostid;
-
-					zbx_vector_ptr_append(active_avail_diff, diff_host);
-				}
+				zbx_vector_uint64_append(active_avail_diff, host->hostid);
 
 				reset_availability = 1;
 			}
@@ -1459,13 +1450,7 @@ done:
 			/* reset host status if host proxy assignment has been changed */
 			if (proxy_hostid != host->proxy_hostid)
 			{
-				zbx_dbsync_active_avail_host_t *diff_host = (zbx_dbsync_active_avail_host_t *)
-						zbx_malloc(NULL, sizeof(zbx_dbsync_active_avail_host_t));
-
-				diff_host->flag = ZBX_DBSYNC_ACTIVE_AVAIL_HOST_MOVED;
-				diff_host->hostid = host->hostid;
-
-				zbx_vector_ptr_append(active_avail_diff, diff_host);
+				zbx_vector_uint64_append(active_avail_diff, host->hostid);
 
 				reset_availability = 1;
 			}
@@ -1607,6 +1592,8 @@ done:
 				zbx_strpool_release(host_h->host);
 				zbx_hashset_remove_direct(&config->hosts_h, host_h);
 			}
+
+			zbx_vector_uint64_append(active_avail_diff, host->hostid);
 		}
 		else if (HOST_STATUS_PROXY_ACTIVE == host->status || HOST_STATUS_PROXY_PASSIVE == host->status)
 		{
@@ -5993,7 +5980,7 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
 	DBfree_result(result);
 }
 
-static void	zbx_dbsync_process_active_avail_diff(zbx_vector_ptr_t *diff)
+static void	zbx_dbsync_process_active_avail_diff(zbx_vector_uint64_t *diff)
 {
 	zbx_ipc_message_t	message;
 	unsigned char		*data = NULL;
@@ -6003,7 +5990,7 @@ static void	zbx_dbsync_process_active_avail_diff(zbx_vector_ptr_t *diff)
 		return;
 
 	zbx_ipc_message_init(&message);
-	data_len = zbx_availability_serialize_confsync_diff(&data, diff);
+	data_len = zbx_availability_serialize_hostids(&data, diff);
 	zbx_availability_send(ZBX_IPC_AVAILMAN_CONFSYNC_DIFF, data, data_len, NULL);
 
 	zbx_ipc_message_clean(&message);
@@ -6038,7 +6025,7 @@ void	DCsync_configuration(unsigned char mode)
 	zbx_uint64_t	update_flags = 0;
 
 	zbx_hashset_t			trend_queue;
-	zbx_vector_ptr_t		active_avail_diff;
+	zbx_vector_uint64_t		active_avail_diff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -6197,7 +6184,7 @@ void	DCsync_configuration(unsigned char mode)
 
 	START_SYNC;
 	sec = zbx_time();
-	zbx_vector_ptr_create(&active_avail_diff);
+	zbx_vector_uint64_create(&active_avail_diff);
 	DCsync_hosts(&hosts_sync, &active_avail_diff);
 	hsec2 = zbx_time() - sec;
 
@@ -6235,8 +6222,7 @@ void	DCsync_configuration(unsigned char mode)
 	FINISH_SYNC;
 
 	zbx_dbsync_process_active_avail_diff(&active_avail_diff);
-	zbx_vector_ptr_clear_ext(&active_avail_diff, zbx_ptr_free);
-	zbx_vector_ptr_destroy(&active_avail_diff);
+	zbx_vector_uint64_destroy(&active_avail_diff);
 
 	/* sync item data to support item lookups when resolving macros during configuration sync */
 
@@ -13850,7 +13836,7 @@ int	DCget_proxy_delay_by_name(const char *name, int *delay, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieves proxy lastaccess from the cache                         *
+ * Purpose: retrieves proxy lastaccess from the cache by name                 *
  *                                                                            *
  * Parameters: name       - [IN] proxy host name                              *
  *             lastaccess - [OUT] proxy lastaccess                            *
@@ -13887,6 +13873,37 @@ int	DCget_proxy_lastaccess_by_name(const char *name, int *lastaccess, char **err
 			ret = FAIL;
 		}
 	}
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieves proxy lastaccess from the cache by name                 *
+ *                                                                            *
+ * Parameters: proxy_hostid - [IN] proxy id                                   *
+ *             lastaccess   - [OUT] proxy lastaccess                          *
+ *                                                                            *
+ * Return value: SUCCEED - proxy lastaccess is retrieved                      *
+ *               FAIL    - proxy lastaccess cannot be retrieved               *
+ *                                                                            *
+ ******************************************************************************/
+int	DCget_proxy_lastaccess_by_id(zbx_uint64_t proxy_hostid, int *lastaccess)
+{
+	const ZBX_DC_PROXY	*dc_proxy;
+	int			ret;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxy_hostid)))
+	{
+		*lastaccess = dc_proxy->lastaccess;
+		ret = SUCCEED;
+	}
+	else
+		ret = FAIL;
 
 	UNLOCK_CACHE;
 

@@ -942,7 +942,8 @@ void	zbx_db_trigger_get_itemids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *
 
 int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
 
-typedef struct {
+typedef struct
+{
 	zbx_uint64_t	hostid;
 	int		lastaccess_active;
 	int		heartbeat_freq;

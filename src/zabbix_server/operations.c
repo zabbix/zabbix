@@ -195,6 +195,21 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	create_host_rtdata(zbx_uint64_t hostid)
+{
+	zbx_uint32_t		data_len;
+	zbx_vector_uint64_t	hostids;
+	unsigned char		*data = NULL;
+
+	zbx_vector_uint64_create(&hostids);
+	zbx_vector_uint64_append(&hostids, hostid);
+
+	data_len = zbx_availability_serialize_hostids(&data, &hostids);
+	zbx_availability_send(ZBX_IPC_AVAILMAN_ADD_HOSTS, data, data_len, NULL);
+
+	zbx_vector_uint64_destroy(&hostids);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: add discovered host if it was not added already                   *
@@ -451,26 +466,14 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 				zbx_free(host_unique);
 
 				add_discovered_host_groups(hostid, &groupids);
+
+				create_host_rtdata(hostid);
 			}
 			else
 			{
 				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, hostid, hostname);
 				interfaceid = DBadd_interface(hostid, interface_type, 1, row[2], row[3], port,
 						ZBX_CONN_DEFAULT);
-			}
-
-			if (0 != hostid)
-			{
-				zbx_uint32_t		data_len;
-				zbx_vector_uint64_t	hostids;
-				unsigned char		*data = NULL;
-
-				zbx_vector_uint64_create(&hostids);
-
-				data_len = zbx_availability_serialize_new_hosts(&data, &hostids);
-				zbx_availability_send(ZBX_IPC_AVAILMAN_ADD_HOSTS, data, data_len, NULL);
-
-				zbx_vector_uint64_destroy(&hostids);
 			}
 
 			if (INTERFACE_TYPE_SNMP == interface_type)
@@ -608,6 +611,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
 
 				add_discovered_host_groups(hostid, &groupids);
+				create_host_rtdata(hostid);
 			}
 			else
 			{
