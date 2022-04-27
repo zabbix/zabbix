@@ -502,33 +502,12 @@ class testHostGroup extends CAPITest {
 				'params' => [
 					'output' => ['groupid'],
 					'groupids' => ['50005', '50006'],
-					'monitored_hosts' => true
-				],
-				'expected_result' => [
-					'groupid' => '50005'
-				],
-				'expected_error' => null
-			],
-			[
-				'params' => [
-					'output' => ['groupid'],
-					'groupids' => ['50005', '50006'],
 					'monitored_hosts' => true,
 					'with_monitored_hosts' => true
 				],
 				'expected_result' => false,
-				'expected_error' => 'Parameter "monitored_hosts" is deprecated.'
-			],
-			[
-				'params' => [
-					'output' => ['groupid'],
-					'groupids' => ['50005', '50006'],
-					'real_hosts' => true
-				],
-				'expected_result' => [
-					'groupid' => '50005'
-				],
-				'expected_error' => null
+				'expected_error' =>
+					'Deprecated parameter "/monitored_hosts" cannot be used with "/with_monitored_hosts".'
 			],
 			[
 				'params' => [
@@ -538,7 +517,7 @@ class testHostGroup extends CAPITest {
 					'with_hosts' => true
 				],
 				'expected_result' => false,
-				'expected_error' => 'Parameter "real_hosts" is deprecated.'
+				'expected_error' => 'Deprecated parameter "/real_hosts" cannot be used with "/with_hosts".'
 			],
 			[
 				'params' => [
