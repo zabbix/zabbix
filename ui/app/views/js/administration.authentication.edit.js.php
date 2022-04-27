@@ -136,7 +136,7 @@
 					base_dn: row.querySelector(`[name="ldap_servers[${row_index}][base_dn]"`).value,
 					search_attribute: row.querySelector(`[name="ldap_servers[${row_index}][search_attribute]"`).value,
 					search_filter: row.querySelector(`[name="ldap_servers[${row_index}][search_filter]"`).value,
-					start_tls: row.querySelector(`[name="ldap_servers[${row_index}][start_tls]"`).checked ? 1 : 0,
+					start_tls: row.querySelector(`[name="ldap_servers[${row_index}][start_tls]"`).value,
 					bind_dn: row.querySelector(`[name="ldap_servers[${row_index}][bind_dn]"`).value,
 					description: row.querySelector(`[name="ldap_servers[${row_index}][description]"`).value
 				};
