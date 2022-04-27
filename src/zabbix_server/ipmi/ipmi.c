@@ -80,7 +80,7 @@ int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *err
 {
 	zbx_ipc_socket_t	ipmi_socket;
 	zbx_ipc_message_t	message;
-	char			*errmsg = NULL, sensor[ITEM_IPMI_SENSOR_LEN_MAX], *value = NULL;
+	char			*errmsg = NULL, sensor[ZBX_ITEM_IPMI_SENSOR_LEN_MAX], *value = NULL;
 	zbx_uint32_t		data_len;
 	unsigned char		*data = NULL;
 	int			ret = FAIL, op;

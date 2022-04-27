@@ -21,7 +21,7 @@
 
 #include "common.h"
 #include "log.h"
-/*#include "events.h"*/
+#include "../../zabbix_server/events.h"
 
 typedef struct
 {
