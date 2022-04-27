@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-26T11:06:07Z'
+  date: '2022-04-27T08:27:03Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         Get HashiCorp Consul Cluster services and nodes by HTTP agent from API endpoints.
         
-        Don't forget change macros {$CONSUL.URL}, {$CONSUL.API.TOKEN}.
+        Don't forget to change macros {$CONSUL.CLUSTER.URL}, {$CONSUL.API.TOKEN}.
         Some metrics may not be collected depending on your HashiCorp Consul instance version and configuration.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
@@ -38,7 +38,7 @@ zabbix_export:
               parameters:
                 - ''
           timeout: 15s
-          url: '{$CONSUL.URL}/v1/catalog/services'
+          url: '{$CONSUL.CLUSTER.URL}/v1/catalog/services'
           headers:
             -
               name: X-Consul-Token
@@ -62,7 +62,7 @@ zabbix_export:
               parameters:
                 - ''
           timeout: 15s
-          url: '{$CONSUL.URL}/v1/health/state/any?filter=CheckID==serfHealth'
+          url: '{$CONSUL.CLUSTER.URL}/v1/health/state/any?filter=CheckID==serfHealth'
           headers:
             -
               name: X-Consul-Token
@@ -97,7 +97,7 @@ zabbix_export:
               parameters:
                 - 1h
           timeout: 15s
-          url: '{$CONSUL.URL}/v1/status/leader'
+          url: '{$CONSUL.CLUSTER.URL}/v1/status/leader'
           headers:
             -
               name: X-Consul-Token
@@ -137,7 +137,7 @@ zabbix_export:
               parameters:
                 - ''
           timeout: 15s
-          url: '{$CONSUL.URL}/v1/catalog/nodes'
+          url: '{$CONSUL.CLUSTER.URL}/v1/catalog/nodes'
           headers:
             -
               name: X-Consul-Token
@@ -152,7 +152,7 @@ zabbix_export:
           type: HTTP_AGENT
           key: consul.get_peers
           history: 7d
-          description: 'The number of Raft peers for the datacenter in which the the agent is running.'
+          description: 'The number of Raft peers for the datacenter in which the agent is running.'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -167,7 +167,7 @@ zabbix_export:
               parameters:
                 - 3h
           timeout: 15s
-          url: '{$CONSUL.URL}/v1/status/peers'
+          url: '{$CONSUL.CLUSTER.URL}/v1/status/peers'
           headers:
             -
               name: X-Consul-Token
@@ -183,7 +183,7 @@ zabbix_export:
           key: consul.nodes_critical
           delay: '0'
           history: 7d
-          description: 'Number of agent on current dc with serf health status "critical".'
+          description: 'Number of agents on current dc with serf health status "critical".'
           preprocessing:
             -
               type: JSONPATH
@@ -205,7 +205,7 @@ zabbix_export:
               expression: 'last(/HashiCorp Consul Cluster by HTTP/consul.nodes_critical)>0'
               name: 'Consul: One or more node in cluster in ''critical'' state'
               priority: AVERAGE
-              description: 'One or more agent on current dc with serf health status "critical".'
+              description: 'One or more agents on current dc with serf health status "critical".'
               tags:
                 -
                   tag: scope
@@ -217,7 +217,7 @@ zabbix_export:
           key: consul.nodes_passing
           delay: '0'
           history: 7d
-          description: 'Number of agent on current dc with serf health status "passing".'
+          description: 'Number of agents on current dc with serf health status "passing".'
           preprocessing:
             -
               type: JSONPATH
@@ -263,7 +263,7 @@ zabbix_export:
           key: consul.nodes_warning
           delay: '0'
           history: 7d
-          description: 'Number of agent on current dc with serf health status "warning".'
+          description: 'Number of agents on current dc with serf health status "warning".'
           preprocessing:
             -
               type: JSONPATH
@@ -285,7 +285,7 @@ zabbix_export:
               expression: 'last(/HashiCorp Consul Cluster by HTTP/consul.nodes_warning)>0'
               name: 'Consul: One or more node in cluster in ''warning'' state'
               priority: WARNING
-              description: 'One or more agent on current dc with serf health status "warning".'
+              description: 'One or more agents on current dc with serf health status "warning".'
               tags:
                 -
                   tag: scope
@@ -381,7 +381,7 @@ zabbix_export:
                   name: 'HashiCorp Consul Node by HTTP'
               macros:
                 -
-                  macro: '{$CONSUL.API.URL}'
+                  macro: '{$CONSUL.NODE.API.URL}'
                   value: '{#NODE_API_URL}'
                   description: 'Consul instance URL'
               tags:
@@ -456,7 +456,7 @@ zabbix_export:
                   parameters:
                     - ''
               timeout: 15s
-              url: '{$CONSUL.URL}/v1/health/service/{#SERVICE_NAME}'
+              url: '{$CONSUL.CLUSTER.URL}/v1/health/service/{#SERVICE_NAME}'
               status_codes: '200, 429, 503'
               headers:
                 -
@@ -604,6 +604,10 @@ zabbix_export:
           value: http
           description: 'Consul API scheme. Using in node LLD.'
         -
+          macro: '{$CONSUL.CLUSTER.URL}'
+          value: 'http://localhost:8500'
+          description: 'Consul cluster URL.'
+        -
           macro: '{$CONSUL.LLD.FILTER.NODE_NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable discovered nodes.'
@@ -623,10 +627,6 @@ zabbix_export:
           macro: '{$CONSUL.TOKEN}'
           value: '<PUT YOUR AUTH TOKEN>'
           description: 'Consul auth token.'
-        -
-          macro: '{$CONSUL.URL}'
-          value: 'http://localhost:8500'
-          description: 'Consul cluster URL.'
       valuemaps:
         -
           uuid: 9c120a74ede844e6a410b7e2c2d712bb

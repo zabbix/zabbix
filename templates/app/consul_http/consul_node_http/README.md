@@ -26,7 +26,7 @@ Internal service metrics are collected from /v1/agent/metrics endpoint.
 Do not forget to enable Prometheus format for export metrics. See [documentation](https://www.consul.io/docs/agent/options#telemetry-prometheus_retention_time).
 Template need to use Authorization via API token.
 
-Don't forget change macros {$CONSUL.API.URL}, {$CONSUL.API.TOKEN}.  
+Don't forget change macros {$CONSUL.NODE.API.URL}, {$CONSUL.API.TOKEN}.  
 Also, see the Macros section for a list of macros used to set trigger values.  
 *NOTE.* Some metrics may not be collected depending on your HashiCorp Consul instance version and configuration.  
 
@@ -39,11 +39,11 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$CONSUL.API.URL} |<p>Consul instance URL.</p> |`http://localhost:8500` |
 |{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.MATCHES} |<p>Filter of discoverable discovered services on local node.</p> |`.*` |
 |{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.NOT_MATCHES} |<p>Filter to exclude discovered services on local node.</p> |`CHANGE IF NEEDED` |
 |{$CONSUL.LLD.FILTER.SERVICE_CHECK_NAME.MATCHES} |<p>Filter of discoverable discovered service checks on local node.</p> |`.*` |
 |{$CONSUL.LLD.FILTER.SERVICE_CHECK_NAME.NOT_MATCHES} |<p>Filter to exclude discovered service checks on local node.</p> |`CHANGE IF NEEDED` |
+|{$CONSUL.NODE.API.URL} |<p>Consul instance URL.</p> |`http://localhost:8500` |
 |{$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH} |<p>Maximum acceptable value of node's health score for AVERAGE trigger expression.</p> |`4` |
 |{$CONSUL.NODE.HEALTH_SCORE.MAX.WARN} |<p>Maximum acceptable value of node's health score for WARNING trigger expression.</p> |`2` |
 |{$CONSUL.OPEN.FDS.MAX.WARN} |<p>Maximum percentage of used file descriptors.</p> |`90` |
@@ -72,7 +72,7 @@ There are no template links in this template.
 |Consul |Consul: Number of checks |<p>Number of checks on current node.</p> |DEPENDENT |consul.checks_number<p>**Preprocessing**:</p><p>- JSONPATH: `$.Stats.agent.checks`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Consul |Consul: Number of check monitors |<p>Number of check monitors on current node.</p> |DEPENDENT |consul.check_monitors_number<p>**Preprocessing**:</p><p>- JSONPATH: `$.Stats.agent.check_monitors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Consul |Consul: Process CPU seconds, total |<p>Total user and system CPU time spent in seconds.</p> |DEPENDENT |consul.cpu_seconds_total.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `process_cpu_seconds_total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
-|Consul |Consul: Virtual memory size |<p>Virtual memory size in bytes..</p> |DEPENDENT |consul.virtual_memory_bytes<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `process_virtual_memory_bytes`</p> |
+|Consul |Consul: Virtual memory size |<p>Virtual memory size in bytes.</p> |DEPENDENT |consul.virtual_memory_bytes<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `process_virtual_memory_bytes`</p> |
 |Consul |Consul: RSS memory usage |<p>Resident memory size in bytes.</p> |DEPENDENT |consul.resident_memory_bytes<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `process_resident_memory_bytes`</p> |
 |Consul |Consul: Goroutine count |<p>The number of Goroutines on Consul instance.</p> |DEPENDENT |consul.goroutines<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `go_goroutines`</p> |
 |Consul |Consul: Open file descriptors |<p>Number of open file descriptors.</p> |DEPENDENT |consul.process_open_fds<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `process_open_fds`</p> |
@@ -99,7 +99,7 @@ There are no template links in this template.
 |Consul |Consul: Memberlist: push pull node, p50 |<p>The 50 percentile (median) for the number of Consul agents that have exchanged state with this agent.</p> |DEPENDENT |consul.memberlist.push_pull_node.p50<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `consul_memberlist_pushPullNode{quantile="0.5"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return (isNaN(value)) ? 0 : value; `</p> |
 |Consul |Consul: KV store: apply, p90 |<p>The 90 percentile for the time it takes to complete an update to the KV store.</p> |DEPENDENT |consul.kvs.apply.p90<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `consul_kvs_apply{quantile="0.9"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return (isNaN(value)) ? 0 : value; `</p> |
 |Consul |Consul: KV store: apply, p50 |<p>The 50 percentile (median) for the time it takes to complete an update to the KV store.</p> |DEPENDENT |consul.kvs.apply.p50<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `consul_kvs_apply{quantile="0.5"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return (isNaN(value)) ? 0 : value; `</p> |
-|Consul |Consul: KV store: apply, rate |<p>The number of updates to the KV store	per second.</p> |DEPENDENT |consul.kvs.apply.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `consul_kvs_apply_count`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
+|Consul |Consul: KV store: apply, rate |<p>The number of updates to the KV store per second.</p> |DEPENDENT |consul.kvs.apply.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `consul_kvs_apply_count`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Consul |Consul: Serf member: flap, rate |<p>Increments when an agent is marked dead and then recovers within a short time period.</p><p>This can be an indicator of overloaded agents, network problems, or configuration errors where agents cannot connect to each other on the required ports.</p><p>Shown as events per second.</p> |DEPENDENT |consul.serf.member.flap.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `consul_serf_member_flap`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Consul |Consul: Serf member: failed, rate |<p>Increments when an agent is marked dead.</p><p>This can be an indicator of overloaded agents, network problems, or configuration errors where agents cannot connect to each other on the required ports.</p><p>Shown as events per second.</p> |DEPENDENT |consul.serf.member.failed.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `consul_serf_member_failed`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Consul |Consul: Serf member: join, rate |<p>Increments when an agent joins the cluster. If an agent flapped or failed this counter also increments when it re-joins.</p><p>Shown as events per second.</p> |DEPENDENT |consul.serf.member.join.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `consul_serf_member_join`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
@@ -131,11 +131,11 @@ There are no template links in this template.
 |Consul |Consul: Raft state: commit time, p50 |<p>The 50 percentile (median) time it takes to commit a new entry to the raft log on the leader, in milliseconds.</p> |DEPENDENT |consul.raft.commit_time.p50[{#SINGLETON}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `consul_raft_commitTime{quantile="0.5"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return (isNaN(value)) ? 0 : value; `</p> |
 |Consul |Consul: Raft state: dispatch log, p90 |<p>The 90 percentile time it takes for the leader to write log entries to disk, in milliseconds.</p> |DEPENDENT |consul.raft.dispatch_log.p90[{#SINGLETON}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `consul_raft_leader_dispatchLog{quantile="0.9"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return (isNaN(value)) ? 0 : value; `</p> |
 |Consul |Consul: Raft state: dispatch log, p50 |<p>The 50 percentile (median) time it takes for the leader to write log entries to disk, in milliseconds.</p> |DEPENDENT |consul.raft.dispatch_log.p50[{#SINGLETON}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `consul_raft_leader_dispatchLog{quantile="0.5"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return (isNaN(value)) ? 0 : value; `</p> |
-|Consul |Consul: Raft state: dispatch log, rate |<p>The number of times a Raft leader writes a log to disk	per second.</p> |DEPENDENT |consul.raft.dispatch_log.rate[{#SINGLETON}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `consul_raft_leader_dispatchLog_count`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
+|Consul |Consul: Raft state: dispatch log, rate |<p>The number of times a Raft leader writes a log to disk per second.</p> |DEPENDENT |consul.raft.dispatch_log.rate[{#SINGLETON}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `consul_raft_leader_dispatchLog_count`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Consul |Consul: Raft state: commit, rate |<p>The number of commits a new entry to the Raft log on the leader per second.</p> |DEPENDENT |consul.raft.commit_time.rate[{#SINGLETON}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `consul_raft_commitTime_count`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Consul |Consul: Autopilot healthy |<p>Tracks the overall health of the local server cluster. 1 if all servers are healthy, 0 if one or more are unhealthy.</p> |DEPENDENT |consul.autopilot.healthy[{#SINGLETON}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `consul_autopilot_healthy`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Zabbix raw items |Consul: Get instance metrics |<p>Get raw metrics from Consul instance /metrics endpoint.</p> |HTTP_AGENT |consul.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Zabbix raw items |Consul: Get node info |<p>Get configuration and member information of the local agent</p> |HTTP_AGENT |consul.get_node_info<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Zabbix raw items |Consul: Get node info |<p>Get configuration and member information of the local agent.</p> |HTTP_AGENT |consul.get_node_info<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Zabbix raw items |Consul: Get local services |<p>Get all the services that are registered with the local agent and their status.</p> |SCRIPT |consul.get_local_services<p>**Expression**:</p>`The text is too long. Please see the template.` |
 
 ## Triggers
@@ -146,7 +146,7 @@ There are no template links in this template.
 |Consul: Current number of open files is too high |<p>"Heavy file descriptor usage (i.e., near the process’s file descriptor limit) indicates a potential file descriptor exhaustion issue."</p> |`min(/HashiCorp Consul Node by HTTP/consul.process_open_fds,5m)/last(/HashiCorp Consul Node by HTTP/consul.process_max_fds)*100>{$CONSUL.OPEN.FDS.MAX.WARN}` |WARNING | |
 |Consul: Node's health score is warning |<p>This metric ranges from 0 to 8, where 0 indicates "totally healthy".</p><p>This health score is used to scale the time between outgoing probes, and higher scores translate into longer probing intervals.</p><p>For more details see section IV of the Lifeguard paper: https://arxiv.org/pdf/1707.00788.pdf</p> |`max(/HashiCorp Consul Node by HTTP/consul.memberlist.health_score,#3)>{$CONSUL.NODE.HEALTH_SCORE.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Consul: Node's health score is critical</p> |
 |Consul: Node's health score is critical |<p>This metric ranges from 0 to 8, where 0 indicates "totally healthy".</p><p>This health score is used to scale the time between outgoing probes, and higher scores translate into longer probing intervals.</p><p>For more details see section IV of the Lifeguard paper: https://arxiv.org/pdf/1707.00788.pdf</p> |`max(/HashiCorp Consul Node by HTTP/consul.memberlist.health_score,#3)>{$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}` |AVERAGE | |
-|Consul: Failed to get local services |<p>-</p> |`length(last(/HashiCorp Consul Node by HTTP/consul.get_local_services.check))>0` |WARNING | |
+|Consul: Failed to get local services |<p>Failed to get local services. Check debug log for more information.</p> |`length(last(/HashiCorp Consul Node by HTTP/consul.get_local_services.check))>0` |WARNING | |
 
 ## Feedback
 

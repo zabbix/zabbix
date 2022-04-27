@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-26T11:12:02Z'
+  date: '2022-04-27T08:27:08Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         Get HashiCorp Consul Node metrics by HTTP agent from metrics endpoint.
         
-        Don't forget change macros {$CONSUL.API.URL}, {$CONSUL.API.TOKEN}.
+        Don't forget to change macros {$CONSUL.NODE.API.URL}, {$CONSUL.API.TOKEN}.
         Some metrics may not be collected depending on your HashiCorp Consul instance version and configuration.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
@@ -408,7 +408,7 @@ zabbix_export:
           parameters:
             -
               name: api_endpoint
-              value: '{$CONSUL.API.URL}'
+              value: '{$CONSUL.NODE.API.URL}'
             -
               name: token
               value: '{$CONSUL.TOKEN}'
@@ -448,6 +448,7 @@ zabbix_export:
               expression: 'length(last(/HashiCorp Consul Node by HTTP/consul.get_local_services.check))>0'
               name: 'Consul: Failed to get local services'
               priority: WARNING
+              description: 'Failed to get local services. Check debug log for more information.'
               tags:
                 -
                   tag: scope
@@ -467,7 +468,7 @@ zabbix_export:
               parameters:
                 - ''
           timeout: 15s
-          url: '{$CONSUL.API.URL}/v1/agent/metrics?format=prometheus'
+          url: '{$CONSUL.NODE.API.URL}/v1/agent/metrics?format=prometheus'
           headers:
             -
               name: X-Consul-Token
@@ -487,14 +488,14 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Get configuration and member information of the local agent'
+          description: 'Get configuration and member information of the local agent.'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
               parameters:
                 - ''
           timeout: 15s
-          url: '{$CONSUL.API.URL}/v1/agent/self'
+          url: '{$CONSUL.NODE.API.URL}/v1/agent/self'
           headers:
             -
               name: X-Consul-Token
@@ -588,7 +589,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: "The number of updates to the KV store\tper second."
+          description: 'The number of updates to the KV store per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -1539,7 +1540,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Virtual memory size in bytes..'
+          description: 'Virtual memory size in bytes.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -2063,7 +2064,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: "The number of times a Raft leader writes a log to disk\tper second."
+              description: 'The number of times a Raft leader writes a log to disk per second.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -2280,10 +2281,6 @@ zabbix_export:
           value: consul
       macros:
         -
-          macro: '{$CONSUL.API.URL}'
-          value: 'http://localhost:8500'
-          description: 'Consul instance URL.'
-        -
           macro: '{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable discovered services on local node.'
@@ -2299,6 +2296,10 @@ zabbix_export:
           macro: '{$CONSUL.LLD.FILTER.SERVICE_CHECK_NAME.NOT_MATCHES}'
           value: 'CHANGE IF NEEDED'
           description: 'Filter to exclude discovered service checks on local node.'
+        -
+          macro: '{$CONSUL.NODE.API.URL}'
+          value: 'http://localhost:8500'
+          description: 'Consul instance URL.'
         -
           macro: '{$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}'
           value: '4'
