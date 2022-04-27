@@ -27,7 +27,8 @@
 
 extern unsigned char	program_type;
 extern int	CONFIG_SERVER_STARTUP_TIME;
-zbx_get_zabbix_stats_ext_func_t stats_ex_cb;
+
+static zbx_get_zabbix_stats_ext_func_t	stats_ex_cb;
 
 /******************************************************************************
  *                                                                            *
