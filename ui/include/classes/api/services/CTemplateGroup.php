@@ -22,23 +22,7 @@
 /**
  * Class containing methods for operations with template groups.
  */
-class CTemplateGroup extends CApiService {
-
-	public const ACCESS_RULES = [
-		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'massadd' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'massupdate' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'massremove' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'propagate' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
-	];
-
-	protected $tableName = 'hstgrp';
-	protected $tableAlias = 'g';
-	protected $sortColumns = ['groupid', 'name'];
-
+class CTemplateGroup extends CGroupGeneral {
 	/**
 	 * Get template groups.
 	 *
@@ -320,7 +304,7 @@ class CTemplateGroup extends CApiService {
 			);
 		}
 
-		self::validateCreate($groups);
+		$this->validateCreate($groups);
 
 		$ins_groups = [];
 
@@ -335,52 +319,9 @@ class CTemplateGroup extends CApiService {
 		}
 		unset($group);
 
-		self::inheritUserGroupsData($groups);
+		$this->inheritUserGroupsData($groups);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_TEMPLATE_GROUP, $groups);
-
-		return ['groupids' => $groupids];
-	}
-
-	/**
-	 * @param array  $groups
-	 *
-	 * @return array
-	 */
-	public function update(array $groups): array {
-		$this->validateUpdate($groups, $db_groups);
-
-		$upd_groups = [];
-
-		foreach ($groups as $group) {
-			$upd_group = DB::getUpdatedValues('hstgrp', $group, $db_groups[$group['groupid']]);
-
-			if ($upd_group) {
-				$upd_groups[] = [
-					'values' => $upd_group,
-					'where' => ['groupid' => $group['groupid']]
-				];
-			}
-		}
-
-		if ($upd_groups) {
-			DB::update('hstgrp', $upd_groups);
-		}
-
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE_GROUP, $groups, $db_groups);
-
-		return ['groupids' => array_column($groups, 'groupid')];
-	}
-
-	/**
-	 * @param array $groupids
-	 *
-	 * @return array
-	 */
-	public function delete(array $groupids): array {
-		$this->validateDelete($groupids, $db_groups);
-
-		self::deleteForce($db_groups);
 
 		return ['groupids' => $groupids];
 	}
@@ -403,7 +344,7 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private static function validateCreate(array &$groups): void {
+	private function validateCreate(array &$groups): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['name']], 'fields' => [
 			'uuid' =>	['type' => API_UUID],
 			'name' =>	['type' => API_TG_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hstgrp', 'name')]
@@ -413,7 +354,7 @@ class CTemplateGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		self::checkDuplicates($groups);
+		$this->checkDuplicates($groups);
 		self::checkAndAddUuid($groups);
 	}
 
@@ -444,7 +385,7 @@ class CTemplateGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		self::checkDuplicates($groups, $db_groups);
+		$this->checkDuplicates($groups, $db_groups);
 	}
 
 	/**
@@ -455,7 +396,7 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array $groupids, array &$db_groups = null): void {
+	protected function validateDelete(array $groupids, array &$db_groups = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $groupids, '/', $error)) {
@@ -473,7 +414,7 @@ class CTemplateGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		self::validateDeleteForce($db_groups);
+		$this->validateDeleteForce($db_groups);
 	}
 
 	/**
@@ -481,7 +422,7 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @throws APIException if unable to delete groups.
 	 */
-	public static function validateDeleteForce(array $db_groups): void {
+	public function validateDeleteForce(array $db_groups): void {
 		$groupids = array_keys($db_groups);
 
 		$db_templates = API::Template()->get([
@@ -497,271 +438,12 @@ class CTemplateGroup extends CApiService {
 	}
 
 	/**
-	 * Check for unique template group names.
-	 *
-	 * @static
-	 *
-	 * @param array      $groups
-	 * @param array|null $db_groups
-	 *
-	 * @throws APIException if template group names are not unique.
-	 */
-	private static function checkDuplicates(array $groups, array $db_groups = null): void {
-		$names = [];
-
-		foreach ($groups as $group) {
-			if (!array_key_exists('name', $group)) {
-				continue;
-			}
-
-			if ($db_groups === null || $group['name'] !== $db_groups[$group['groupid']]['name']) {
-				$names[] = $group['name'];
-			}
-		}
-
-		if (!$names) {
-			return;
-		}
-
-		$duplicates = DB::select('hstgrp', [
-			'output' => ['name'],
-			'filter' => ['name' => $names, 'type' => HOST_GROUP_TYPE_TEMPLATE_GROUP],
-			'limit' => 1
-		]);
-
-		if ($duplicates) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Template group "%1$s" already exists.', $duplicates[0]['name'])
-			);
-		}
-	}
-
-	/**
-	 * Check that new UUIDs are not already used and generate UUIDs where missing.
-	 *
-	 * @static
-	 *
-	 * @param array $groups_to_create
-	 *
-	 * @throws APIException
-	 */
-	private static function checkAndAddUuid(array &$groups_to_create): void {
-		foreach ($groups_to_create as &$group) {
-			if (!array_key_exists('uuid', $group)) {
-				$group['uuid'] = generateUuidV4();
-			}
-		}
-		unset($group);
-
-		$db_uuid = DB::select('hstgrp', [
-			'output' => ['uuid'],
-			'filter' => ['uuid' => array_column($groups_to_create, 'uuid')],
-			'limit' => 1
-		]);
-
-		if ($db_uuid) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
-			);
-		}
-	}
-
-	/**
-	 * Inherit user groups data of parent template groups.
-	 *
-	 * @param array $groups
-	 */
-	private static function inheritUserGroupsData(array $groups): void {
-		$group_links = self::getGroupLinks($groups);
-
-		if ($group_links) {
-			$usrgrps = [];
-			$db_usrgrps = [];
-
-			self::prepareInheritedRights($group_links, $usrgrps, $db_usrgrps);
-
-			if ($usrgrps) {
-				CUserGroup::updateForce(array_values($usrgrps), $db_usrgrps);
-			}
-		}
-	}
-
-	/**
-	 * Get links of parent groups to given groups.
-	 *
-	 * @param array $groups
-	 *
-	 * @return array Array where keys are parent group IDs and values are the array of child group IDs.
-	 */
-	private static function getGroupLinks(array $groups): array {
-		$parent_names = [];
-
-		foreach ($groups as $group) {
-			$name = $group['name'];
-
-			while (($pos = strrpos($name, '/')) !== false) {
-				$name = substr($name, 0, $pos);
-				$parent_names[$name] = true;
-			}
-		}
-
-		if (!$parent_names) {
-			return [];
-		}
-
-		$options = [
-			'output' => ['groupid', 'name'],
-			'filter' => ['name' => array_keys($parent_names), 'type' => HOST_GROUP_TYPE_TEMPLATE_GROUP]
-		];
-		$result = DBselect(DB::makeSql('hstgrp', $options));
-
-		$parents_groupids = [];
-
-		while ($row = DBfetch($result)) {
-			$parents_groupids[$row['name']] = $row['groupid'];
-		}
-
-		if (!$parents_groupids) {
-			return [];
-		}
-
-		$group_links = [];
-
-		foreach ($groups as $group) {
-			$name = $group['name'];
-
-			while (($pos = strrpos($name, '/')) !== false) {
-				$name = substr($name, 0, $pos);
-
-				if (array_key_exists($name, $parents_groupids)) {
-					$group_links[$parents_groupids[$name]][] = $group['groupid'];
-					break;
-				}
-			}
-		}
-
-		return $group_links;
-	}
-
-	/**
-	 * Prepare rights to inherit from parent template groups.
-	 *
-	 * @static
-	 *
-	 * @param array  $group_links
-	 * @param array  $usrgrps
-	 * @param array  $db_usrgrps
-	 */
-	private static function prepareInheritedRights(array $group_links, array &$usrgrps, array &$db_usrgrps): void {
-		$db_rights = DBselect(
-			'SELECT r.groupid,r.permission,r.id,g.name'.
-			' FROM rights r,usrgrp g'.
-			' WHERE r.groupid=g.usrgrpid'.
-				' AND '.dbConditionInt('r.id', array_keys($group_links))
-		);
-
-		while ($db_right = DBfetch($db_rights)) {
-			if (!array_key_exists($db_right['groupid'], $usrgrps)) {
-				$usrgrps[$db_right['groupid']] = ['usrgrpid' => $db_right['groupid']];
-				$db_usrgrps[$db_right['groupid']] = [
-					'usrgrpid' => $db_right['groupid'],
-					'name' => $db_right['name']
-				];
-			}
-
-			if (!array_key_exists('templategroup_rights', $db_usrgrps[$db_right['groupid']])) {
-				$db_usrgrps[$db_right['groupid']]['templategroup_rights'] = [];
-			}
-
-			foreach ($group_links[$db_right['id']] as $hstgrpid) {
-				$usrgrps[$db_right['groupid']]['templategroup_rights'][] = [
-					'permission' => $db_right['permission'],
-					'id' => $hstgrpid
-				];
-			}
-		}
-	}
-
-	/**
-	 * Add given templates to given template groups.
-	 *
-	 * @param array $data
-	 *
-	 * @return array
-	 */
-	public function massAdd(array $data): array {
-		$this->validateMassAdd($data, $db_groups);
-
-		$groups = self::getGroupsByData($data, $db_groups);
-		$ins_hosts_groups = self::getInsHostsGroups($groups, __FUNCTION__);
-
-		if ($ins_hosts_groups) {
-			$hostgroupids = DB::insertBatch('hosts_groups', $ins_hosts_groups);
-			self::addHostgroupids($groups, $hostgroupids);
-		}
-
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE_GROUP, $groups, $db_groups);
-
-		return ['groupids' => array_column($data['groups'], 'groupid')];
-	}
-
-	/**
-	 * Replace templates on the given template groups.
-	 *
-	 * @param array $data
-	 *
-	 * @return array
-	 */
-	public function massUpdate(array $data) {
-		$this->validateMassUpdate($data, $db_groups);
-
-		$groups = self::getGroupsByData($data, $db_groups);
-		$ins_hosts_groups = self::getInsHostsGroups($groups, __FUNCTION__, $db_hostgroupids);
-		$del_hostgroupids = self::getDelHostgroupids($db_groups, $db_hostgroupids);
-
-		if ($ins_hosts_groups) {
-			$hostgroupids = DB::insertBatch('hosts_groups', $ins_hosts_groups);
-			self::addHostgroupids($groups, $hostgroupids);
-		}
-
-		if ($del_hostgroupids) {
-			DB::delete('hosts_groups', ['hostgroupid' => $del_hostgroupids]);
-		}
-
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE_GROUP, $groups, $db_groups);
-
-		return ['groupids' => array_column($data['groups'], 'groupid')];
-	}
-
-	/**
-	 * Remove given templates from given template groups.
-	 *
-	 * @param array $data
-	 *
-	 * @return array
-	 */
-	public function massRemove(array $data): array {
-		$this->validateMassRemove($data, $db_groups);
-
-		$groups = self::getGroupsByData([], $db_groups);
-		$del_hostgroupids = self::getDelHostgroupids($db_groups);
-
-		if ($del_hostgroupids) {
-			DB::delete('hosts_groups', ['hostgroupid' => $del_hostgroupids]);
-		}
-
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE_GROUP, $groups, $db_groups);
-
-		return ['groupids' => $data['groupids']];
-	}
-
-	/**
 	 * @param array      $data
 	 * @param array|null $db_groups
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateMassAdd(array &$data, ?array &$db_groups): void {
+	protected function validateMassAdd(array &$data, ?array &$db_groups): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
@@ -798,7 +480,7 @@ class CTemplateGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		self::addAffectedObjects($templateids, $db_groups);
+		$this->addAffectedObjects($templateids, $db_groups);
 	}
 
 	/**
@@ -807,7 +489,7 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateMassUpdate(array &$data, ?array &$db_groups): void {
+	protected function validateMassUpdate(array &$data, ?array &$db_groups): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
@@ -850,12 +532,12 @@ class CTemplateGroup extends CApiService {
 			}
 		}
 
-		self::addAffectedObjects([], $db_groups, $db_templateids);
+		$this->addAffectedObjects([], $db_groups, $db_templateids);
 
 		$del_templateids = array_diff($db_templateids, $templateids);
 
 		if ($del_templateids) {
-			self::checkDeletedTemplates($del_templateids, $groupids);
+			$this->checkDeletedObjects($del_templateids, $groupids);
 		}
 	}
 
@@ -865,7 +547,7 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateMassRemove(array &$data, ?array &$db_groups): void {
+	protected function validateMassRemove(array &$data, ?array &$db_groups): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'groupids' =>		['type' => API_IDS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => true],
 			'templateids' =>	['type' => API_IDS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => true]
@@ -899,7 +581,7 @@ class CTemplateGroup extends CApiService {
 
 		self::checkTemplatesWithoutGroups($db_templates, $data['groupids']);
 
-		self::addAffectedObjects($data['templateids'], $db_groups);
+		$this->addAffectedObjects($data['templateids'], $db_groups);
 	}
 
 	/**
@@ -920,7 +602,7 @@ class CTemplateGroup extends CApiService {
 			'SELECT DISTINCT hg.hostid'.
 			' FROM hosts_groups hg'.
 			' WHERE '.dbConditionInt('hg.groupid', $groupids, true).
-				' AND '.dbConditionInt('hg.hostid', $templateids)
+			' AND '.dbConditionInt('hg.hostid', $templateids)
 		), 'hostid');
 
 		$templateids_without_groups = array_diff($templateids, $templateids_with_groups);
@@ -931,200 +613,6 @@ class CTemplateGroup extends CApiService {
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-	}
-
-	/**
-	 * Add the existing templates whether these are affected by the mass methods.
-	 * If template IDs passed as empty array, all template links of given groups will be collected from database and all
-	 * existing template IDs will be collected in $db_templateids.
-	 *
-	 * @static
-	 *
-	 * @param array      $templateids
-	 * @param array      $db_groups
-	 * @param array|null $db_templateids
-	 */
-	private static function addAffectedObjects(array $templateids, array &$db_groups,
-			array &$db_templateids = null): void {
-		if (!$templateids) {
-			$db_templateids = [];
-		}
-
-		foreach ($db_groups as &$db_group) {
-			$db_group['templates'] = [];
-		}
-		unset($db_group);
-
-		if ($templateids) {
-			$options = [
-				'output' => ['hostgroupid', 'hostid', 'groupid'],
-				'filter' => [
-					'hostid' => $templateids,
-					'groupid' => array_keys($db_groups)
-				]
-			];
-			$db_template_groups = DBselect(DB::makeSql('hosts_groups', $options));
-		}
-		else {
-			$db_template_groups = DBselect(
-				'SELECT hg.hostgroupid,hg.hostid,hg.groupid'.
-				' FROM hosts_groups hg,hosts h'.
-				' WHERE hg.hostid=h.hostid'.
-					' AND '.dbConditionInt('hg.groupid', array_keys($db_groups)).
-					' AND h.flags='.ZBX_FLAG_DISCOVERY_NORMAL
-			);
-		}
-
-		while ($link = DBfetch($db_template_groups)) {
-			$db_groups[$link['groupid']]['templates'][$link['hostgroupid']] = [
-				'hostgroupid' => $link['hostgroupid'],
-				'templateid' => $link['hostid']
-			];
-
-			if (!$templateids) {
-				$db_templateids[$link['hostid']] = true;
-			}
-		}
-
-		if (!$templateids) {
-			$db_templateids = array_keys($db_templateids);
-		}
-	}
-
-	/**
-	 * Check to delete given templates from the given template groups.
-	 *
-	 * @static
-	 *
-	 * @param array  $del_templateids
-	 * @param array  $groupids
-	 *
-	 * @throws APIException
-	 */
-	private static function checkDeletedTemplates(array $del_templateids, array $groupids): void {
-		$db_templates = API::Template()->get([
-			'output' => ['host'],
-			'templateids' => $del_templateids,
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		if (count($db_templates) != count($del_templateids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		self::checkTemplatesWithoutGroups($db_templates, $groupids);
-	}
-
-	/**
-	 * Get template groups input array based on requested data and database data.
-	 *
-	 * @static
-	 *
-	 * @param array $data
-	 * @param array $db_groups
-	 *
-	 * @return array
-	 */
-	private static function getGroupsByData(array $data, array $db_groups): array {
-		$groups = [];
-
-		foreach ($db_groups as $db_group) {
-			$group = ['groupid' => $db_group['groupid']];
-
-			$group['templates'] = [];
-			$db_templates = array_column($db_group['templates'], null, 'templateid');
-
-			if (array_key_exists('templates', $data)) {
-				foreach ($data['templates'] as $template) {
-					if (array_key_exists($template['templateid'], $db_templates)) {
-						$group['templates'][] = $db_templates[$template['templateid']];
-					}
-					else {
-						$group['templates'][] = ['templateid' => $template['templateid']];
-					}
-				}
-			}
-
-			$groups[] = $group;
-		}
-
-		return $groups;
-	}
-
-	/**
-	 * Get rows to insert templates on the given template groups.
-	 *
-	 * @static
-	 *
-	 * @param array      $groups
-	 * @param string     $method
-	 * @param array|null $db_hostgroupids
-	 *
-	 * @return array
-	 */
-	private static function getInsHostsGroups(array $groups, string $method, array &$db_hostgroupids = null): array {
-		$ins_hosts_groups = [];
-
-		if ($method === 'massUpdate') {
-			$db_hostgroupids = [];
-		}
-
-		foreach ($groups as $group) {
-			foreach ($group['templates'] as $template) {
-				if (!array_key_exists('hostgroupid', $template)) {
-					$ins_hosts_groups[] = [
-						'hostid' => $template['templateid'],
-						'groupid' => $group['groupid']
-					];
-				}
-				elseif ($method === 'massUpdate') {
-					$db_hostgroupids[$template['hostgroupid']] = true;
-				}
-			}
-		}
-
-		return $ins_hosts_groups;
-	}
-
-	/**
-	 * Add IDs of inserted templates on the given template groups.
-	 *
-	 * @param array $groups
-	 * @param array $hostgroupids
-	 */
-	private static function addHostgroupids(array &$groups, array $hostgroupids): void {
-		foreach ($groups as &$group) {
-			foreach ($group['templates'] as &$template) {
-				if (!array_key_exists('hostgroupid', $template)) {
-					$template['hostgroupid'] = array_shift($hostgroupids);
-				}
-			}
-			unset($template);
-		}
-		unset($group);
-	}
-
-	/**
-	 * Get IDs to delete templates from the given template groups.
-	 *
-	 * @static
-	 *
-	 * @param array $db_groups
-	 * @param array $db_hostgroupids
-	 *
-	 * @return array
-	 */
-	private static function getDelHostgroupids(array $db_groups, array $db_hostgroupids = []): array {
-		$del_hostgroupids = [];
-
-		foreach ($db_groups as $db_group) {
-			$del_hostgroupids += array_diff_key($db_group['templates'], $db_hostgroupids);
-		}
-
-		$del_hostgroupids = array_keys($del_hostgroupids);
-
-		return $del_hostgroupids;
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
@@ -1172,31 +660,12 @@ class CTemplateGroup extends CApiService {
 	}
 
 	/**
-	 *  Apply permissions to all template group's subgroups.
-	 *
-	 * @param array $data
-	 *
-	 * @return array
-	 */
-	public function propagate(array $data): array {
-		$this->validatePropagate($data, $db_groups);
-
-		foreach ($db_groups as $db_group) {
-			if ($data['permissions']) {
-				$this->inheritPermissions($db_group['groupid'], $db_group['name']);
-			}
-		}
-
-		return ['groupids' => array_column($data['groups'], 'groupid')];
-	}
-
-	/**
 	 * @param array $data
 	 * @param array $db_groups
 	 *
 	 * @throws APIException if the input is invalid
 	 */
-	private function validatePropagate(array &$data, array &$db_groups = null): void {
+	protected function validatePropagate(array &$data, array &$db_groups = null): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'groups' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
@@ -1223,82 +692,5 @@ class CTemplateGroup extends CApiService {
 		if (count($db_groups) != count($groupids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
-	}
-
-	/**
-	 * Apply template group rights to all subgroups.
-	 *
-	 * @param string $groupid  Template group ID.
-	 * @param string $name     Template group name.
-	 */
-	private function inheritPermissions(string $groupid, string $name): void {
-		$child_groupids = $this->getChildGroupIds($name);
-
-		if (!$child_groupids) {
-			return;
-		}
-
-		$usrgrps = API::UserGroup()->get([
-			'output' => ['usrgrpid'],
-			'selectTemplateGroupRights' => ['id', 'permission']
-		]);
-
-		$upd_usrgrps = [];
-
-		foreach ($usrgrps as $usrgrp) {
-			$rights = array_column($usrgrp['templategroup_rights'], null, 'id');
-
-			if (array_key_exists($groupid, $rights)) {
-				foreach ($child_groupids as $child_groupid) {
-					$rights[$child_groupid] = [
-						'id' => $child_groupid,
-						'permission' => $rights[$groupid]['permission']
-					];
-				}
-			}
-			else {
-				foreach ($child_groupids as $child_groupid) {
-					unset($rights[$child_groupid]);
-				}
-			}
-
-			$rights = array_values($rights);
-
-			if ($usrgrp['templategroup_rights'] !== $rights) {
-				$upd_usrgrps[] = [
-					'usrgrpid' => $usrgrp['usrgrpid'],
-					'templategroup_rights' => $rights
-				];
-			}
-		}
-
-		if ($upd_usrgrps) {
-			API::UserGroup()->update($upd_usrgrps);
-		}
-	}
-
-	/**
-	 * Returns list of child groups for template group with given name.
-	 *
-	 * @param string $name     template group name.
-	 */
-	private function getChildGroupIds(string $name): array {
-		$parent = $name.'/';
-		$len = strlen($parent);
-
-		$groups = $this->get([
-			'output' => ['groupid', 'name'],
-			'search' => ['name' => $parent],
-			'startSearch' => true
-		]);
-
-		$child_groupids = [];
-		foreach ($groups as $group) {
-			if (substr($group['name'], 0, $len) === $parent) {
-				$child_groupids[] = $group['groupid'];
-			}
-		}
-
-		return $child_groupids;
 	}
 }
