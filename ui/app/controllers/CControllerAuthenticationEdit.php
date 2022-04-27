@@ -167,8 +167,8 @@ class CControllerAuthenticationEdit extends CController {
 			$data += $auth;
 
 			$data['ldap_servers'] = API::UserDirectory()->get([
-				'output' => ['userdirectoryid', 'name', 'host', 'port', 'base_dn', 'search_attribute', 'search_filter',
-					'start_tls', 'bind_dn'
+				'output' => ['userdirectoryid', 'name', 'description', 'host', 'port', 'base_dn', 'search_attribute',
+					'search_filter', 'start_tls', 'bind_dn'
 				],
 				'selectUsrgrps' => API_OUTPUT_COUNT,
 				'sortfield' => ['name'],
