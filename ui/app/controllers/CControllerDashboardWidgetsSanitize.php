@@ -46,12 +46,12 @@ class CControllerDashboardWidgetsSanitize extends CController {
 
 			foreach ($this->getInput('widgets', []) as $widget) {
 				$validator = new CNewValidator($widget, [
-					'type' => 'required|string',
-					'fields' => 'required|json'
+					'type' =>	'required|string',
+					'fields' =>	'required|json'
 				]);
 
 				foreach ($validator->getAllErrors() as $error) {
-					info($error);
+					error($error);
 				}
 
 				if ($validator->isErrorFatal() || $validator->isError()) {
@@ -63,6 +63,8 @@ class CControllerDashboardWidgetsSanitize extends CController {
 				$widget = $validator->getValidInput();
 
 				if (!CWidgetConfig::isWidgetTypeSupportedInContext($widget['type'], $this->context)) {
+					error(_('Widget type is not supported in this context.'));
+
 					$ret = false;
 
 					break;
@@ -73,11 +75,11 @@ class CControllerDashboardWidgetsSanitize extends CController {
 		}
 
 		if (!$ret) {
-			$messages = getMessages();
-
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
-					'errors' => ($messages !== null) ? $messages->toString() : ''
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
 				])])
 			);
 		}
@@ -92,7 +94,7 @@ class CControllerDashboardWidgetsSanitize extends CController {
 	protected function doAction() {
 		$widgets = [];
 
-		foreach ($this->widgets as $index => $widget) {
+		foreach ($this->widgets as $widget) {
 			$form = CWidgetConfig::getForm($widget['type'], $widget['fields'],
 				($this->context === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD) ? $this->getInput('templateid') : null
 			);

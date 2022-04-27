@@ -24,6 +24,10 @@
  * @var array $data
  */
 
+if ($data['uncheck']) {
+	uncheckTableRows('token');
+}
+
 $this->includeJsFile('administration.token.list.js.php');
 $this->addJsFile('class.calendar.js');
 

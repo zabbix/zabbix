@@ -25,14 +25,15 @@
 }
 
 %btn-remove-icon {
-	font-size: $font-h2-size;
-	font-weight: bold;
+	font-size: 20px;
 	color: $font-alt-color;
 	text-align: center;
 	cursor: pointer;
 
 	&::before {
-		content: '\00d7';
+		display: block;
+		content: '+';
+		transform: rotate(45deg);
 	}
 
 	&:hover,

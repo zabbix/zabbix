@@ -24,7 +24,6 @@
 #include "zbxregexp.h"
 #include "valuecache.h"
 #include "zbxtrends.h"
-#include "../zbxalgo/vectorimpl.h"
 #include "anomalystl.h"
 
 #include "evalfunc_common.h"
@@ -390,8 +389,8 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 			{
 				double	num1, num2;
 
-				if (ZBX_INFINITY != (num1 = evaluate_string_to_double(value)) &&
-						ZBX_INFINITY != (num2 = evaluate_string_to_double(valuemap->value)) &&
+				if (ZBX_INFINITY != (num1 = zbx_evaluate_string_to_double(value)) &&
+						ZBX_INFINITY != (num2 = zbx_evaluate_string_to_double(valuemap->value)) &&
 						SUCCEED == zbx_double_compare(num1, num2))
 				{
 					goto map_value;
@@ -417,18 +416,18 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 		}
 
 		if (ITEM_VALUE_TYPE_STR != value_type &&
-				ZBX_INFINITY != (input_value = evaluate_string_to_double(value)))
+				ZBX_INFINITY != (input_value = zbx_evaluate_string_to_double(value)))
 		{
 			double	min, max;
 
 			if (ZBX_VALUEMAP_TYPE_LESS_OR_EQUAL == valuemap->type &&
-					ZBX_INFINITY != (max = evaluate_string_to_double(valuemap->value)))
+					ZBX_INFINITY != (max = zbx_evaluate_string_to_double(valuemap->value)))
 			{
 				if (input_value <= max)
 					goto map_value;
 			}
 			else if (ZBX_VALUEMAP_TYPE_GREATER_OR_EQUAL == valuemap->type &&
-					ZBX_INFINITY != (min = evaluate_string_to_double(valuemap->value)))
+					ZBX_INFINITY != (min = zbx_evaluate_string_to_double(valuemap->value)))
 			{
 				if (input_value >= min)
 					goto map_value;
@@ -463,14 +462,14 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 
 					if (NULL == ptr)
 					{
-						min = evaluate_string_to_double(range_str);
+						min = zbx_evaluate_string_to_double(range_str);
 						found = ZBX_INFINITY != min && SUCCEED == zbx_double_compare(input_value, min);
 					}
 					else
 					{
 						*ptr = '\0';
-						min = evaluate_string_to_double(range_str);
-						max = evaluate_string_to_double(ptr + 1);
+						min = zbx_evaluate_string_to_double(range_str);
+						max = zbx_evaluate_string_to_double(ptr + 1);
 						if (ZBX_INFINITY != min && ZBX_INFINITY != max &&
 								input_value >= min && input_value <= max)
 						{

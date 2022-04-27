@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ALERTER_H
 #define ZABBIX_ALERTER_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 extern char	*CONFIG_ALERT_SCRIPTS_PATH;
 

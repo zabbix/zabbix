@@ -25,6 +25,7 @@
 #include "common.h"
 #include "zbxtrends.h"
 #include "log.h"
+#include "../../../src/libs/zbxtrends/trends.h"
 
 int	__wrap_DBis_null(const char *field);
 DB_ROW	__wrap_DBfetch(DB_RESULT result);

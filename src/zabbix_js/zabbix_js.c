@@ -21,7 +21,7 @@
 #include "log.h"
 #include "zbxgetopt.h"
 #include "zbxembed.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 
 const char	*progname;
 const char	title_message[] = "zabbix_js";
@@ -249,6 +249,9 @@ int	main(int argc, char **argv)
 	printf("\n%s\n", result);
 close:
 	zabbix_close_log();
+#ifndef _WINDOWS
+	zbx_locks_destroy();
+#endif
 clean:
 	zbx_free(result);
 	zbx_free(error);

@@ -34,7 +34,8 @@ foreach ($data['maps'] as $map) {
 			)
 			: $map['label'],
 		(new CButton())
-			->onClick("rm4favorites('sysmapid','".$map['sysmapid']."')")
+			->setAttribute('data-sysmapid', $map['sysmapid'])
+			->onClick('rm4favorites("sysmapid", this.dataset.sysmapid);')
 			->addClass(ZBX_STYLE_BTN_REMOVE)
 			->setAttribute('aria-label', _xs('Remove, %1$s', 'screen reader', $map['label']))
 			->removeId()
@@ -46,8 +47,8 @@ $output = [
 	'body' => $table->toString()
 ];
 
-if (($messages = getMessages()) !== null) {
-	$output['messages'] = $messages->toString();
+if ($messages = get_and_clear_messages()) {
+	$output['messages'] = array_column($messages, 'message');
 }
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
