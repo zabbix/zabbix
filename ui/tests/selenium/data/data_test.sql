@@ -1561,6 +1561,7 @@ INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (9
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90079,'Host prototype LLD','Host prototype LLD',0,'',4);
 INSERT INTO host_discovery (hostid, parent_hostid) VALUES (90079, 90003);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50084,90079,1,1,1,'127.0.0.1','','10050');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99990, 90079, 4);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid, link_type) VALUES (50011, 90079, 10001, 1);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50012, 90079, 10264);
 

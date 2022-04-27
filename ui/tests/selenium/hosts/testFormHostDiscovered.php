@@ -64,6 +64,33 @@ class testFormHostDiscovered extends testFormHost {
 		$host = 'Host prototype LLD';
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($host));
 		$form = $this->openForm(($this->standalone ? $this->link.$hostid : $this->link), $host);
+		$interfaces_form = ($form->getFieldContainer('Interfaces')->asHostInterfaceElement());
+		$this->assertEquals('Discovery rule 1',($form->getField('Discovered by')->gettext()));
+
+		// Check host form disabled fields.
+		foreach (['Host name', 'Visible name', 'Groups', 'Monitored by proxy'] as $field) {
+			$this->assertFalse($form->getField($field)->isEnabled());
+		}
+
+		foreach (['IP address', 'DNS name', 'Port'] as $column) {
+			$this->assertFalse($interfaces_form->getRow('Agent')->getColumn($column)->query('tag:input')->one()->isEnabled());
+		}
+
+		foreach (['Connect to', 'Default'] as $column) {
+			$this->assertFalse($interfaces_form->getRow('Agent')->getColumn($column)->query('xpath:.//input[@type="radio"]')
+					->one()->isEnabled());
+		}
+
+		// Check "Enabled" checkbox.
+		$enabled = $form->getField('Enabled');
+		$this->assertTrue($enabled->isChecked());
+		$this->assertTrue($enabled->isChecked());
+
+		// Check "Description" field.
+		$description = $form->getField('Description');
+		$this->assertTrue($description->isEnabled());
+		$form->fill(['Description' => 'Some text']);
+		$this->assertEquals('Some text', $description->getValue());
 
 		// Check hintbox.
 		$form->query('class:icon-help-hint')->one()->click();
