@@ -263,21 +263,23 @@ var chkbxRange = {
 		let selected_count = 0;
 		let actions = [];
 
-		for (const [id, attr] of Object.entries(this.getSelectedIds())) {
-			selected_count++;
+		Object
+			.entries(this.getSelectedIds())
+			.forEach(([_, value]) => {
+				selected_count++;
 
-			// Count the special attributes for checkboxes.
-			if (attr !== null) {
-				const action_list = attr.split(' ');
+				// Count the special attributes for checkboxes.
+				if (value !== null) {
+					const action_list = value.split(' ');
 
-				for (const action of action_list) {
-					if (!actions.hasOwnProperty(action)) {
-						actions[action] = 0;
+					for (const action of action_list) {
+						if (!actions.hasOwnProperty(action)) {
+							actions[action] = 0;
+						}
+						actions[action]++;
 					}
-					actions[action]++;
 				}
-			}
-		}
+			});
 
 		// Replace the selected count text.
 		const selected_count_span = document.getElementById('selected_count');
