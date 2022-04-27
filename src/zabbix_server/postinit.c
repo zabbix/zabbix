@@ -19,6 +19,7 @@
 
 #include "postinit.h"
 
+#include "db_lengths.h"
 #include "zbxtasks.h"
 #include "log.h"
 #include "zbxserver.h"

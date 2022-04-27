@@ -21,7 +21,7 @@
 
 #include "common.h"
 #include "log.h"
-#include "events.h"
+/*#include "events.h"*/
 
 static DB_RESULT	discovery_get_dhost_by_value(zbx_uint64_t dcheckid, const char *value)
 {

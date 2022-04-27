@@ -13,6 +13,8 @@ DIST_SUBDIRS = \
 	zbxcommon \
 	zbxcomms \
 	zbxcommshigh \
+	zbxdbschema \
+	zbxdiscovery \
 	zbxlog \
 	zbxnix \
 	zbxconf \
@@ -23,6 +25,7 @@ DIST_SUBDIRS = \
 	zbxserver \
 	zbxicmpping \
 	zbxexec \
+	zbxexport \
 	zbxself \
 	zbxmodules \
 	zbxregexp \
@@ -50,8 +53,9 @@ DIST_SUBDIRS = \
 if SERVER
 SERVER_SUBDIRS = \
 	zbxdb \
-	zbxdbupgrade \
 	zbxdbcache \
+	zbxdbschema \
+	zbxdbupgrade \
 	zbxdbhigh \
 	zbxhttp \
 	zbxshmem \
@@ -64,6 +68,7 @@ SERVER_SUBDIRS = \
 	zbxcompress \
 	zbxxml \
 	zbxembed \
+	zbxexport \
 	zbxprometheus \
 	zbxvault \
 	zbxcyberark \
@@ -81,8 +86,9 @@ else
 if PROXY
 PROXY_SUBDIRS = \
 	zbxdb \
-	zbxdbupgrade \
 	zbxdbcache \
+	zbxdbschema \
+	zbxdbupgrade \
 	zbxdbhigh \
 	zbxhttp \
 	zbxshmem \
@@ -94,6 +100,7 @@ PROXY_SUBDIRS = \
 	zbxcompress \
 	zbxxml \
 	zbxembed \
+	zbxexport \
 	zbxprometheus \
 	zbxvault \
 	zbxcyberark \
@@ -121,6 +128,7 @@ SUBDIRS = \
 	zbxthreads \
 	zbxmutexs \
 	zbxcommshigh \
+	zbxdiscovery \
 	zbxcomms \
 	zbxjson \
 	zbxexec \

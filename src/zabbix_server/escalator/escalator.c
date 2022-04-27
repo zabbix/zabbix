@@ -19,6 +19,7 @@
 
 #include "escalator.h"
 
+#include "../db_lengths.h"
 #include "zbxnix.h"
 #include "zbxserver.h"
 #include "zbxself.h"

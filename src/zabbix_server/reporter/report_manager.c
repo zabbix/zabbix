@@ -19,6 +19,7 @@
 
 #include "report_manager.h"
 
+#include "../db_lengths.h"
 #include "zbxself.h"
 #include "zbxnix.h"
 #include "base64.h"

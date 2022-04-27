@@ -72,6 +72,8 @@ zabbix_server_LDADD = \
 	availability/libavailability.a \
 	service/libservice.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
+	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery.a \
+	$(top_builddir)/src/libs/zbxexport/libzbxexport.a \
 	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \
 	poller/libzbxpoller_server.a \
 	lld/libzbxlld.a \
@@ -111,6 +113,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_builddir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
 	$(top_builddir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
+	$(top_builddir)/src/libs/zbxdbschema/libzbxdbschema.a \
 	$(top_builddir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_builddir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_builddir)/src/libs/zbxtasks/libzbxtasks.a \

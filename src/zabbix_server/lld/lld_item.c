@@ -19,6 +19,7 @@
 
 #include "lld.h"
 
+#include "../db_lengths.h"
 #include "log.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
@@ -1631,9 +1632,9 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 			zbx_lld_item_param_t	*item_param = (zbx_lld_item_param_t *)item->item_params.values[j];
 
 			if (SUCCEED != lld_validate_item_param(item->itemid, ZBX_ITEM_PARAMETER_FIELD_NAME,
-					ITEM_PARAMETER_NAME_LEN, item_param->name, error) ||
+					ZBX_ITEM_PARAMETER_NAME_LEN, item_param->name, error) ||
 					SUCCEED != lld_validate_item_param(item->itemid, ZBX_ITEM_PARAMETER_FIELD_VALUE,
-					ITEM_PARAMETER_VALUE_LEN, item_param->value, error))
+					ZBX_ITEM_PARAMETER_VALUE_LEN, item_param->value, error))
 			{
 				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
 				break;

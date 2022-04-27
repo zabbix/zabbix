@@ -19,6 +19,7 @@
 
 #include "lld.h"
 
+#include "../db_lengths.h"
 #include "log.h"
 #include "zbxserver.h"
 #include "audit/zbxaudit.h"
@@ -3558,7 +3559,7 @@ static void	lld_templates_link(const zbx_vector_ptr_t *hosts, char **error)
 
 		if (0 != host->lnk_templateids.values_num)
 		{
-			if (SUCCEED != DBcopy_template_elements(host->hostid, &host->lnk_templateids, TEMPLATE_LINK_LLD,
+			if (SUCCEED != DBcopy_template_elements(host->hostid, &host->lnk_templateids, ZBX_TEMPLATE_LINK_LLD,
 					&err))
 			{
 				*error = zbx_strdcatf(*error, "Cannot link template(s) %s.\n", err);

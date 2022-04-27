@@ -19,6 +19,7 @@
 
 #include "events.h"
 
+#include "db_lengths.h"
 #include "log.h"
 #include "actions.h"
 #include "zbxserver.h"
