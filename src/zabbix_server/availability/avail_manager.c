@@ -40,7 +40,7 @@ zbx_active_avail_proxy_t;
 #define ZBX_AVAILABILITY_MANAGER_DELAY				1
 #define ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC		5
 #define ZBX_AVAILABILITY_MANAGER_ACTIVE_HEARTBEAT_DELAY_SEC	10
-#define ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC	60
+#define ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC	3600
 
 static int	interface_availability_compare(const void *d1, const void *d2)
 {
@@ -413,7 +413,7 @@ static void	active_checks_calculate_proxy_availability(zbx_avail_active_hb_cache
 
 	while (NULL != (proxy_avail = (zbx_active_avail_proxy_t *)zbx_hashset_iter_next(&iter)))
 	{
-		if (proxy_avail->lastaccess + 10 <= time(NULL))
+		if (proxy_avail->lastaccess + ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC <= time(NULL))
 		{
 			if (ZBX_DB_OK > DBexecute("update host_rtdata set active_available=%i where hostid in (select hostid from hosts where "
 					"proxy_hostid=" ZBX_FS_UI64 ")", INTERFACE_AVAILABLE_UNKNOWN, proxy_avail->hostid))
