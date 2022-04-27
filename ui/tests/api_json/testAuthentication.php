@@ -183,7 +183,7 @@ class testAuthentication extends CAPITest {
 				'authentication' => [
 					'ldap_userdirectoryid' => 'userdirectory_invalidid_1'
 				],
-				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": referred object do not exist.'
+				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": referred object does not exist.'
 			],
 			'Cannot set default authentication ldap when ldap is disabled' => [
 				'authentication' => [
