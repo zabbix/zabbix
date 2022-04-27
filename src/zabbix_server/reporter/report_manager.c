@@ -1634,7 +1634,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 
 		while (NULL != (row = DBfetch(result)) && SUCCEED == ret)
 		{
-			DB_MEDIATYPE	mt;
+			ZBX_DB_MEDIATYPE	mt;
 
 			ZBX_STR2UINT64(mt.mediatypeid, row[0]);
 

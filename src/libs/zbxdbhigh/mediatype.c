@@ -21,7 +21,7 @@
 #include "zbxserialize.h"
 #include "zbxdbhigh.h"
 
-void 	zbx_db_mediatype_clean(DB_MEDIATYPE *mt)
+void 	zbx_db_mediatype_clean(ZBX_DB_MEDIATYPE *mt)
 {
 	zbx_free(mt->smtp_server);
 	zbx_free(mt->smtp_helo);
@@ -37,7 +37,7 @@ void 	zbx_db_mediatype_clean(DB_MEDIATYPE *mt)
 }
 
 void	zbx_serialize_mediatype(unsigned char **data, zbx_uint32_t *data_alloc, zbx_uint32_t *data_offset,
-		const DB_MEDIATYPE *mt)
+		const ZBX_DB_MEDIATYPE *mt)
 {
 	zbx_uint32_t	data_len = 0, smtp_server_len, smtp_helo_len, smtp_email_len, exec_path_len, gsm_modem_len,
 			username_len, passwd_len, exec_params_len, script_len, attempt_interval_len, timeout_len;
@@ -97,7 +97,7 @@ void	zbx_serialize_mediatype(unsigned char **data, zbx_uint32_t *data_alloc, zbx
 	*data_offset += data_len;
 }
 
-zbx_uint32_t	zbx_deserialize_mediatype(const unsigned char *data, DB_MEDIATYPE *mt)
+zbx_uint32_t	zbx_deserialize_mediatype(const unsigned char *data, ZBX_DB_MEDIATYPE *mt)
 {
 	zbx_uint32_t		len;
 	const unsigned char	*start = data;

@@ -55,7 +55,7 @@ int	zbx_alerter_get_top_sources(int limit, zbx_vector_ptr_t *sources, char **err
 int	zbx_alerter_begin_dispatch(zbx_alerter_dispatch_t *dispatch, const char *subject, const char *message,
 		const char *content_name, const char *content_type, const char *content, zbx_uint32_t content_size,
 		char **error);
-int	zbx_alerter_send_dispatch(zbx_alerter_dispatch_t *dispatch, const DB_MEDIATYPE *mediatype,
+int	zbx_alerter_send_dispatch(zbx_alerter_dispatch_t *dispatch, const ZBX_DB_MEDIATYPE *mediatype,
 		const zbx_vector_str_t *recipients, char **error);
 int	zbx_alerter_end_dispatch(zbx_alerter_dispatch_t *dispatch, char **error);
 void	zbx_alerter_dispatch_result_free(zbx_alerter_dispatch_result_t *result);

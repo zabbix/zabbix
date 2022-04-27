@@ -308,7 +308,7 @@ typedef struct
 }
 ZBX_DB_EVENT;
 
-typedef struct DB_MEDIATYPE
+typedef struct ZBX_DB_MEDIATYPE
 {
 	zbx_uint64_t		mediatypeid;
 	zbx_media_type_t	type;
@@ -332,12 +332,12 @@ typedef struct DB_MEDIATYPE
 	int			maxsessions;
 	int			maxattempts;
 }
-DB_MEDIATYPE;
+ZBX_DB_MEDIATYPE;
 
-void	zbx_db_mediatype_clean(DB_MEDIATYPE *mt);
+void	zbx_db_mediatype_clean(ZBX_DB_MEDIATYPE *mt);
 void	zbx_serialize_mediatype(unsigned char **data, zbx_uint32_t *data_alloc, zbx_uint32_t *data_offset,
-		const DB_MEDIATYPE *mt);
-zbx_uint32_t	zbx_deserialize_mediatype(const unsigned char *data, DB_MEDIATYPE *mt);
+		const ZBX_DB_MEDIATYPE *mt);
+zbx_uint32_t	zbx_deserialize_mediatype(const unsigned char *data, ZBX_DB_MEDIATYPE *mt);
 
 typedef struct
 {

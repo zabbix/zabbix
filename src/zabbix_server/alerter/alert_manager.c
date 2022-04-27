@@ -1927,7 +1927,7 @@ static void	am_process_begin_dispatch(zbx_ipc_client_t *client, const unsigned c
  *             content_type - [OUT] the message content type                  *
  *                                                                            *
  ******************************************************************************/
-static void	am_prepare_dispatch_message(zbx_am_dispatch_t *dispatch, DB_MEDIATYPE *mt, zbx_shared_str_t *message,
+static void	am_prepare_dispatch_message(zbx_am_dispatch_t *dispatch, ZBX_DB_MEDIATYPE *mt, zbx_shared_str_t *message,
 		unsigned char *content_type)
 {
 	char	*body = NULL;
@@ -1964,7 +1964,7 @@ static void	am_process_send_dispatch(zbx_am_t *manager, zbx_ipc_client_t *client
 	int			i;
 	zbx_vector_str_t	recipients;
 	zbx_am_alert_t		*alert;
-	DB_MEDIATYPE		mt;
+	ZBX_DB_MEDIATYPE		mt;
 	zbx_shared_str_t	message;
 	unsigned char		content_type;
 	zbx_uint64_t		id;
