@@ -119,6 +119,7 @@ SUBDIRS = \
 	zbxhash \
 	zbxcrypto \
 	zbxcommon \
+	zbxdbschema \
 	zbxlog \
 	zbxalgo \
 	zbxnix \
