@@ -25,6 +25,8 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 /**
  * @backup services
  *
+ * @dataSource Services
+ *
  * @onBefore prepareServicesData
  */
 class testFormMonitoringServices extends CWebTest {
@@ -42,6 +44,8 @@ class testFormMonitoringServices extends CWebTest {
 	private static $parentid_2;
 	private static $childid_2;
 
+	private static $service_count;
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -52,150 +56,13 @@ class testFormMonitoringServices extends CWebTest {
 	}
 
 	public static function prepareServicesData() {
-		CDataHelper::call('service.create', [
-			[
-				'name' => 'Update service',
-				'algorithm' => 1,
-				'sortorder' => 0
-			],
-			[
-				'name' => 'Parent1',
-				'algorithm' => 1,
-				'sortorder' => 0
-			],
-			[
-				'name' => 'Parent2',
-				'algorithm' => 1,
-				'sortorder' => 0
-			],
-			[
-				'name' => 'Parent3 with problem tags',
-				'algorithm' => 1,
-				'sortorder' => 0,
-				'problem_tags' => [
-					[
-						'tag' => 'test123',
-						'value' => 'test456'
-					],
-					[
-						'tag' => 'test',
-						'value' => 'test789'
-					]
-				]
-			],
-			[
-				'name' => 'Parent4',
-				'algorithm' => 1,
-				'sortorder' => 0
-			],
-			[
-				'name' => 'Parent5',
-				'algorithm' => 1,
-				'sortorder' => 0
-			],
-			[
-				'name' => 'Child1',
-				'algorithm' => 1,
-				'sortorder' => 0
-			],
-			[
-				'name' => 'Child2 with tags',
-				'algorithm' => 1,
-				'sortorder' => 0,
-				'problem_tags' => [
-					[
-						'tag' => 'test1',
-						'value' => 'value1'
-					],
-					[
-						'tag' => 'test2',
-						'value' => 'value2'
-					]
-				]
-			],
-			[
-				'name' => 'Child3',
-				'algorithm' => 1,
-				'sortorder' => 0
-			],
-			[
-				'name' => 'Child4',
-				'algorithm' => 1,
-				'sortorder' => 0
-			],
-			[
-				'name' => 'Clone_parent',
-				'algorithm' => 1,
-				'sortorder' => 0
-			],
-			[
-				'name' => 'Clone1',
-				'algorithm' => 0,
-				'weight' => 56,
-				'propagation_rule' => 1,
-				'propagation_value' => 3,
-				'sortorder' => 0,
-				'problem_tags' => [
-					[
-						'tag' => 'problem_tag_clone',
-						'value' => 'problem_value_clone'
-					]
-				],
-				'tags' => [
-					[
-						'tag' => 'tag_clone',
-						'value' => 'value_clone'
-					]
-				]
-			],
-			[
-				'name' => 'Clone2',
-				'algorithm' => 1,
-				'sortorder' => 0
-			]
-		]);
+		$services = CDataHelper::get('Services.serviceids');
 
-		$services = CDataHelper::getIds('name');
-
-		CDataHelper::call('service.update', [
-			[
-				'serviceid' => $services['Child3'],
-				'parents' => [
-					[
-						'serviceid' => $services['Parent2']
-					]
-				]
-			],
-			[
-				'serviceid' => $services['Child4'],
-				'parents' => [
-					[
-						'serviceid' => $services['Parent4']
-					]
-				]
-			],
-			[
-				'serviceid' => $services['Clone1'],
-				'parents' => [
-					[
-						'serviceid' => $services['Clone_parent']
-					]
-				]
-			],
-			[
-				'serviceid' => $services['Clone2'],
-				'parents' => [
-					[
-						'serviceid' => $services['Clone_parent']
-					]
-				]
-			]
-		]);
-
-		self::$parentid = $services['Parent2'];
-		self::$childid = $services['Child3'];
-		self::$parentid_2 = $services['Parent4'];
-		self::$childid_2 = $services['Child4'];
+		self::$parentid = $services['Parent for deletion from row'];
+		self::$childid = $services['Child 2'];
+		self::$parentid_2 = $services['Parent for child deletion from row'];
+		self::$childid_2 = $services['Child 1'];
+		self::$service_count = count($services);
 	}
 
 	/**
@@ -326,7 +193,7 @@ class testFormMonitoringServices extends CWebTest {
 		$this->assertFalse($children_dialog->query('id:serviceid_all')->asCheckbox()->one()->isChecked());
 
 		// Enter and submit filtering data.
-		$children_dialog->query('id:services-filter-name')->one()->fill('Parent1');
+		$children_dialog->query('id:services-filter-name')->one()->fill('Parent for 2 levels of child services');
 		$this->assertTrue($children_dialog->query('button:Cancel')->one()->isCLickable());
 		$children_dialog->query('button:Filter')->waitUntilClickable()->one()->click();
 		$children_dialog->waitUntilReady();
@@ -335,7 +202,8 @@ class testFormMonitoringServices extends CWebTest {
 		// Check filtering result.
 		$result = [
 			[
-				'Name' => 'Parent1',
+				'Name' => 'Parent for 2 levels of child services',
+				'Tags' => 'test: test123',
 				'Problem tags' => ''
 			]
 		];
@@ -346,7 +214,7 @@ class testFormMonitoringServices extends CWebTest {
 		$children_dialog->waitUntilReady();
 
 		// Check possible children count in table.
-		$this->assertEquals(13, $children_dialog->query('class:list-table')->asTable()->one()->getRows()->count());
+		$this->assertEquals(self::$service_count, $children_dialog->query('class:list-table')->asTable()->one()->getRows()->count());
 
 		foreach (['Add', 'Cancel'] as $button) {
 			$this->assertTrue($dialog->getFooter()->query('button', $button)->one()->isClickable());
@@ -444,7 +312,7 @@ class testFormMonitoringServices extends CWebTest {
 					],
 					'children' => [
 						'Child services' => [
-							'Service' => 'Child4',
+							'Service' => 'Child 1',
 							'Problem tags' => '',
 							'Action' => 'Remove'
 						]
@@ -455,7 +323,7 @@ class testFormMonitoringServices extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Child1'
+						'Name' => 'Service for duplitate check'
 					],
 					'duplicate' => true
 				]
@@ -465,7 +333,7 @@ class testFormMonitoringServices extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'With parent',
-						'Parent services' => 'Parent1'
+						'Parent services' => 'Parent for 2 levels of child services'
 					],
 					'update_duplicate' => true
 				]
@@ -576,7 +444,7 @@ class testFormMonitoringServices extends CWebTest {
 				$this->assertTableData([$data['children']['Child services']], 'id:children');
 			}
 			else {
-				$table->findRow('Name', $data['fields']['Name'])->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()
+				$table->findRow('Name', $data['fields']['Name'], true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()
 						->one()->click();
 				COverlayDialogElement::find()->one()->waitUntilReady();
 			}
@@ -590,17 +458,22 @@ class testFormMonitoringServices extends CWebTest {
 			// Service with children.
 			[
 				[
-					'name' => 'Clone_parent',
+					'name' => 'Clone parent',
 					'children' => [
 						'Child services' => [
 							[
-								'Service' => 'Clone1',
+								'Service' => 'Clone child 1',
 								'Problem tags' => 'problem_tag_clone: problem_value_clone',
 								'Action' => 'Remove'
 							],
 							[
-								'Service' => 'Clone2',
+								'Service' => 'Clone child 2',
 								'Problem tags' => '',
+								'Action' => 'Remove'
+							],
+							[
+								'Service' => 'Clone child 3',
+								'Problem tags' => 'test1: value1',
 								'Action' => 'Remove'
 							]
 
@@ -611,8 +484,8 @@ class testFormMonitoringServices extends CWebTest {
 			// Service with parent.
 			[
 				[
-					'name' => 'Clone1',
-					'parent' => 'Clone_parent'
+					'name' => 'Clone child 1',
+					'parent' => 'Clone parent'
 				]
 			]
 		];
@@ -697,13 +570,13 @@ class testFormMonitoringServices extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
 		$table = $this->query('class:list-table')->asTable()->waitUntilVisible()->one();
-		$table->findRow('Name', 'Child2 with tags', true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()
+		$table->findRow('Name', 'Simple actions service', true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()
 				->one()->click();
 
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$dialog->asForm()->fill([
 			'Name' => 'Updated name',
-			'Parent services' => 'Parent2',
+			'Parent services' => 'Parent for deletion from row',
 			'Sort order (0->999)' => '85',
 			'id:advanced_configuration' => true,
 			'Status propagation rule' => 'Increase by',
@@ -722,13 +595,13 @@ class testFormMonitoringServices extends CWebTest {
 			// Service without children.
 			[
 				[
-					'name' => 'Child2 with tags'
+					'name' => 'Simple actions service'
 				]
 			],
 			// Service with children.
 			[
 				[
-					'name' => 'Parent1'
+					'name' => 'Parent for 2 levels of child services'
 				]
 			]
 		];
@@ -758,7 +631,7 @@ class testFormMonitoringServices extends CWebTest {
 		return [
 			[
 				[
-					'parent' => 'Parent3 with problem tags',
+					'parent' => 'Service with problem tags',
 					'enabled' => false
 				]
 			],
@@ -766,17 +639,17 @@ class testFormMonitoringServices extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'circular' => true,
-					'parent' => 'Child3',
+					'parent' => 'Child 2',
 					'fields' => [
 						'Name' => 'Circular dependency'
 					],
-					'Child services' => 'Parent2',
+					'Child services' => 'Parent for deletion from row',
 					'error' => 'Services form a circular dependency.'
 				]
 			],
 			[
 				[
-					'parent' => 'Parent5',
+					'parent' => 'Parent for child creation',
 					'fields' => [
 						'Name' => 'With parent without tags'
 					]
@@ -865,8 +738,8 @@ class testFormMonitoringServices extends CWebTest {
 	}
 
 	public function testFormMonitoringServices_DeleteChild() {
-		$parent = 'Parent2';
-		$child = 'Child3';
+		$parent = 'Parent for deletion from row';
+		$child = 'Child 2';
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
@@ -903,8 +776,8 @@ class testFormMonitoringServices extends CWebTest {
 	}
 
 	public function testFormMonitoringServices_DeleteParent() {
-		$parent = 'Parent4';
-		$child = 'Child4';
+		$parent = 'Parent for child deletion from row';
+		$child = 'Child 1';
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
@@ -929,4 +802,23 @@ class testFormMonitoringServices extends CWebTest {
 				self::$parentid_2.' AND servicedownid ='.self::$childid_2)
 		);
 	}
+
+	// TODO: Complete this scenario once ZBX-20429 is fixed and merged.
+//	public function testFormMonitoringServices_DeleteService() {
+//		$this->page->login()->open('zabbix.php?action=service.list.edit');
+//		$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
+//		$table->findRow('Name', 'Service for delete')->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
+//		$this->page->waitUntilReady();
+
+//		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+//		$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
+//		$this->page->acceptAlert();
+//		$dialog->ensureNotPresent();
+
+//		$this->page->waitUntilReady();
+//		$this->assertMessage(TEST_GOOD, 'Service deleted');
+//		$this->assertFalse($this->query('link:Service for delete')->one(false)->isValid());
+
+//		$this->assertEquals(0, CDBHelper::getCount('SSELECT * FROM services WHERE name="Service for delete"'));
+//	}
 }
