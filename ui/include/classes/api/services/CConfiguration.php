@@ -37,9 +37,9 @@ class CConfiguration extends CApiService {
 	 */
 	public function export(array $params) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'format' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CExportWriterFactory::YAML, CExportWriterFactory::XML, CExportWriterFactory::JSON, CExportWriterFactory::RAW])],
-			'prettyprint' => ['type' => API_BOOLEAN, 'default' => false],
-			'options' =>	['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+			'format' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CExportWriterFactory::YAML, CExportWriterFactory::XML, CExportWriterFactory::JSON, CExportWriterFactory::RAW])],
+			'prettyprint' =>		['type' => API_BOOLEAN, 'default' => false],
+			'options' =>			['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
 				'host_groups' =>		['type' => API_IDS],
 				'hosts' =>				['type' => API_IDS],
 				'images' =>				['type' => API_IDS],
@@ -104,11 +104,11 @@ class CConfiguration extends CApiService {
 					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
 					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'host_groups' =>				['type' => API_OBJECT, 'fields' => [
+				'host_groups' =>		['type' => API_OBJECT, 'fields' => [
 					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
 					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'template_groups' =>				['type' => API_OBJECT, 'fields' => [
+				'template_groups' =>	['type' => API_OBJECT, 'fields' => [
 					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
 					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
 				]],
