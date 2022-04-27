@@ -164,20 +164,14 @@ ZBX_PTR_VECTOR_IMPL(hstgrp, hstgrp_t *)
 
 static int	DBpatch_6010006(void)
 {
-	if (SUCCEED == DBfield_exists("hstgrp", "internal"))
-		return DBdrop_field("hstgrp", "internal");
-	else
-		return SUCCEED;
+	return DBdrop_field("hstgrp", "internal");
 }
 
 static int	DBpatch_6010007(void)
 {
 	const ZBX_FIELD	field = {"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
-	if (SUCCEED != DBfield_exists("hstgrp", "type"))
-		return DBadd_field("hstgrp", &field);
-	else
-		return SUCCEED;
+	return DBadd_field("hstgrp", &field);
 }
 
 static int	DBpatch_6010008(void)
