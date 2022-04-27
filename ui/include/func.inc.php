@@ -1588,11 +1588,13 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 			// display the login button only for guest users
 			if (CWebUser::isGuest()) {
 				$data['buttons'][] = (new CButton('login', _('Login')))
-					->onClick('javascript: document.location = "index.php?request='.$url.'";');
+					->setAttribute('data-url', $url)
+					->onClick('document.location = "index.php?request=" + this.dataset.url;');
 			}
 
 			$data['buttons'][] = (new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
-				->onClick('javascript: document.location = "'.CMenuHelper::getFirstUrl().'"');
+				->setAttribute('data-url', CMenuHelper::getFirstUrl())
+				->onClick('document.location = this.dataset.url');
 		}
 		// if the user is not logged in - offer to login
 		else {
@@ -1603,7 +1605,9 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 					_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
 				],
 				'buttons' => [
-					(new CButton('login', _('Login')))->onClick('javascript: document.location = "index.php?request='.$url.'";')
+					(new CButton('login', _('Login')))
+						->setAttribute('data-url', $url)
+						->onClick('document.location = "index.php?request=" + this.dataset.url;')
 				]
 			];
 		}
@@ -2278,16 +2282,17 @@ function getUserGraphTheme() {
 /**
  * Custom error handler for PHP errors.
  *
- * @param int     $errno Level of the error raised.
- * @param string  $errstr Error message.
- * @param string  $errfile Filename that the error was raised in.
- * @param int     $errline Line number the error was raised in.
+ * @param int    $errno    Level of the error raised.
+ * @param string $errstr   Error message.
+ * @param string $errfile  Filename that the error was raised in.
+ * @param int    $errline  Line number the error was raised in.
  *
- * @return bool  False, to continue with the default error handler.
+ * @return bool
  */
 function zbx_err_handler($errno, $errstr, $errfile, $errline) {
-	// Necessary to suppress errors when calling with error control operator like @function_name().
-	if (error_reporting() === 0) {
+	// Suppress errors when calling with error control operator @function_name().
+	if ((error_reporting()
+			& ~(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR)) == 0) {
 		return true;
 	}
 

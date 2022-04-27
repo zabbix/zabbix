@@ -1,19 +1,20 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-02-25 13:35+0300\n"
-"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
+"PO-Revision-Date: 2022-04-24 12:35+0000\n"
+"Last-Translator: Atsushi <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1645788938.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
@@ -2088,7 +2089,7 @@ msgstr "条件式に複数のホストが使用されているため、トリガ
 #: app/controllers/CControllerSlaCreate.php:69
 #: app/controllers/CControllerSlaCreate.php:127
 msgid "Cannot create SLA"
-msgstr ""
+msgstr "SLAを作成できません"
 
 #: include/classes/api/services/CHostPrototype.php:1110
 #, c-format
@@ -2123,7 +2124,7 @@ msgstr "アイコンのマッピングを作成できません"
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
-msgstr ""
+msgstr "リクエストを作成できません"
 
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
@@ -2132,7 +2133,7 @@ msgstr "定期レポートを作成できません"
 #: app/controllers/CControllerServiceCreate.php:96
 #: app/controllers/CControllerServiceCreate.php:184
 msgid "Cannot create service"
-msgstr ""
+msgstr "サービスを作成できません"
 
 #: include/classes/api/services/CService.php:2373
 #: include/classes/api/services/CService.php:2397
@@ -2293,7 +2294,7 @@ msgstr "ネットワークマップを削除できません"
 
 #: app/controllers/CControllerProxyDelete.php:39
 msgid "Cannot delete proxies"
-msgstr ""
+msgstr "プロキシを削除できません"
 
 #: app/controllers/CControllerProxyDelete.php:69
 msgid "Cannot delete proxy"
@@ -3028,7 +3029,7 @@ msgstr "APIトークンを更新できません"
 #: app/controllers/CControllerSlaUpdate.php:70
 #: app/controllers/CControllerSlaUpdate.php:138
 msgid "Cannot update SLA"
-msgstr ""
+msgstr "SLAを更新できません"
 
 #: include/classes/api/services/CGraphGeneral.php:67
 msgid "Cannot update a discovered graph."
@@ -3220,7 +3221,7 @@ msgstr "スクリプトの範囲を更新できません。\"%1$s\"はアクシ�
 #: app/controllers/CControllerServiceUpdate.php:97
 #: app/controllers/CControllerServiceUpdate.php:200
 msgid "Cannot update service"
-msgstr ""
+msgstr "サービスを更新できません"
 
 #: include/classes/api/services/CService.php:2310
 #: include/classes/api/services/CService.php:2372
@@ -3900,7 +3901,7 @@ msgstr "Web監視の設定"
 
 #: app/controllers/CControllerAuditLogList.php:199
 msgid "Configuration refresh"
-msgstr ""
+msgstr "設定リフレッシュ"
 
 #: app/controllers/CControllerAuditSettingsUpdate.php:78
 #: app/controllers/CControllerAutoregUpdate.php:69
@@ -4544,7 +4545,7 @@ msgstr "カスタムサイズ"
 #: app/views/administration.miscconfig.edit.php:104
 #: include/classes/setup/CSetupWizard.php:563
 msgid "CyberArk Vault"
-msgstr ""
+msgstr "CyberArk Vault"
 
 #: app/partials/scheduledreport.formgrid.html.php:95
 msgid "Cycle"
@@ -5203,7 +5204,7 @@ msgstr "選択したプロキシを削除しますか？"
 
 #: app/views/js/proxy.list.js.php:152 app/views/popup.proxy.edit.php:249
 msgid "Delete selected proxy?"
-msgstr ""
+msgstr "選択したプロキシを削除しますか？"
 
 #: app/views/administration.regex.list.php:82
 msgid "Delete selected regular expressions?"
@@ -5472,7 +5473,7 @@ msgstr "選択したプロキシによるホストの監視を無効にします
 
 #: app/views/js/proxy.list.js.php:137
 msgid "Disable hosts monitored by selected proxy?"
-msgstr ""
+msgstr "選択したプロキシによるホストの監視を無効にしますか？"
 
 #: app/views/administration.token.list.php:199
 #: app/views/administration.user.token.list.php:151
@@ -6204,7 +6205,7 @@ msgstr "選択したプロキシによるホストの監視を有効にします
 
 #: app/views/js/proxy.list.js.php:122
 msgid "Enable hosts monitored by selected proxy?"
-msgstr ""
+msgstr "選択したプロキシによるホストの監視を有効にしますか？"
 
 #: app/views/administration.audit.settings.edit.php:48
 #: app/views/administration.housekeeping.edit.php:44
@@ -6360,6 +6361,10 @@ msgstr "終了日付"
 #: app/views/popup.itemtestedit.view.php:296
 msgid "End of line sequence"
 msgstr "改行コード"
+
+#: include/locales.inc.php:33
+msgid "English (en_GB)"
+msgstr "英語 (en_GB)"
 
 #: include/locales.inc.php:33
 msgid "English (en_US)"
@@ -6795,7 +6800,7 @@ msgstr "ダッシュボードのプロパティの変更に失敗しました。
 #: app/controllers/CControllerDashboardShareUpdate.php:110
 #: app/views/js/popup.dashboard.share.edit.js.php:83
 msgid "Failed to update dashboard sharing."
-msgstr ""
+msgstr "ダッシュボードの共有の更新に失敗しました。"
 
 #: jsLoader.php:141
 msgid "Failed to update widget properties."
@@ -10763,6 +10768,10 @@ msgstr "リンク"
 msgid "List is empty"
 msgstr "リストがありません"
 
+#: include/classes/data/CItemData.php:983
+msgid "List of OS processes with attributes. Returns JSON array"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr "ブロックデバイスとそのタイプのリスト。JSONで返す"
@@ -12099,7 +12108,7 @@ msgstr "実行内容の作成"
 
 #: app/views/popup.proxy.edit.php:229 app/views/popup.proxy.edit.php:258
 msgid "New proxy"
-msgstr ""
+msgstr "新規プロキシ"
 
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
@@ -14233,7 +14242,7 @@ msgstr "プロパティ"
 #: include/classes/vaults/CVaultHashiCorp.php:55
 #, c-format
 msgid "Provided API endpoint \"%1$s\" is invalid."
-msgstr ""
+msgstr "指定されたAPIエンドポイント \"%1$s\" は正しくありません。"
 
 #: app/controllers/CControllerMenuPopup.php:405
 #: app/controllers/CControllerMenuPopup.php:693
@@ -14247,7 +14256,7 @@ msgstr "指定されたURL \"%1$s\"は正しくありません。"
 #: include/classes/vaults/CVaultHashiCorp.php:64
 #, c-format
 msgid "Provided authentication token \"%1$s\" is empty."
-msgstr ""
+msgstr "指定された認証トークン \"%1$s\" が空です。"
 
 #: include/classes/vaults/CVaultHashiCorp.php:60
 #, c-format
@@ -14554,15 +14563,15 @@ msgstr "リフレッシュ"
 
 #: app/views/popup.proxy.edit.php:216 app/views/proxy.list.php:178
 msgid "Refresh configuration"
-msgstr ""
+msgstr "設定リフレッシュ"
 
 #: app/views/js/proxy.list.js.php:106
 msgid "Refresh configuration of the selected proxies?"
-msgstr ""
+msgstr "選択したプロキシの設定をリフレッシュしますか？"
 
 #: app/views/js/proxy.list.js.php:107 app/views/popup.proxy.edit.php:217
 msgid "Refresh configuration of the selected proxy?"
-msgstr ""
+msgstr "選択したプロキシの設定をリフレッシュしますか？"
 
 #: include/classes/widgets/forms/CWidgetForm.php:58 jsLoader.php:169
 msgid "Refresh interval"
@@ -14909,7 +14918,7 @@ msgstr "リクエストボディのタイプ"
 
 #: app/controllers/CControllerProxyConfigRefresh.php:71
 msgid "Request created successfully"
-msgstr ""
+msgstr "リクエストが正常に作成されました"
 
 #: host_discovery.php:428 host_discovery.php:800 items.php:895 items.php:1011
 msgid "Request sent successfully"
@@ -17262,7 +17271,7 @@ msgstr "テンプレート\"%1$s\"とホスト\"%2$s\"のリンクを削除し�
 
 #: app/partials/configuration.host.edit.html.php:187
 msgid "Templates linked by host discovery cannot be unlinked."
-msgstr ""
+msgstr "ホストのディスカバリでリンクされたテンプレートは削除できません。"
 
 #: app/controllers/CControllerPopupMassupdateTemplate.php:358
 msgid "Templates updated"
@@ -17505,7 +17514,7 @@ msgstr "今月(現在まで)"
 
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
-msgstr ""
+msgstr "この設定は数値データにだけ適用されます。非数値データは常にヒストリから取得されます。"
 
 #: include/views/configuration.item.edit.php:125
 #: include/views/configuration.item.prototype.edit.php:111
@@ -18601,7 +18610,7 @@ msgstr "デフォルトを使用"
 
 #: app/partials/configuration.host.edit.html.php:188
 msgid "Use host prototype configuration form to remove automatically linked templates on upcoming discovery."
-msgstr ""
+msgstr "ディスカバリ時に自動的にテンプレートのリンクが削除されるよう、ホストのプロトタイプを設定してください。"
 
 #: app/views/administration.user.edit.php:300 app/views/popup.media.php:88
 msgid "Use if severity"
@@ -19652,7 +19661,7 @@ msgstr "指定された列と行の数に対してウィジェットが小さす
 #: app/controllers/CControllerDashboardWidgetEdit.php:47
 #: app/controllers/CControllerDashboardWidgetsSanitize.php:66
 msgid "Widget type is not supported in this context."
-msgstr ""
+msgstr "このコンテキストでは、ウィジェットタイプはサポートされていません。"
 
 #: graphs.php:44 include/classes/widgets/CWidgetHelper.php:923
 #: include/classes/widgets/CWidgetHelper.php:956
@@ -19706,7 +19715,7 @@ msgstr "障害あり"
 
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
-msgstr ""
+msgstr "この設定では、数値アイテムだけがこの列内に表示されます。"
 
 #: include/forms.inc.php:346 include/forms.inc.php:566
 msgid "With triggers"

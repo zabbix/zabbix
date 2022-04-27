@@ -480,8 +480,6 @@ class CControllerPopupGeneric extends CController {
 			'numeric' =>							'in 1',
 			'reference' =>							'string',
 			'writeonly' =>							'in 1',
-			'noempty' =>							'in 1',
-			'submit_parent' =>						'in 1',
 			'enrich_parent_groups' =>				'in 1',
 			'filter_groupid_rst' =>					'in 1',
 			'filter_hostid_rst' =>					'in 1',
@@ -816,7 +814,7 @@ class CControllerPopupGeneric extends CController {
 	 * @return array
 	 */
 	protected function getPageOptions(): array {
-		$option_fields_binary = ['noempty', 'real_hosts', 'submit_parent', 'with_items', 'writeonly'];
+		$option_fields_binary = ['real_hosts', 'with_items', 'writeonly'];
 		$option_fields_value = ['host_templates'];
 
 		$page_options = [
@@ -833,9 +831,7 @@ class CControllerPopupGeneric extends CController {
 			'reference' => $this->getInput('reference', $this->getInput('srcfld1', 'unknown'))
 		];
 
-		$page_options['parentid'] = ($page_options['dstfld1'] !== '')
-			? zbx_jsvalue($page_options['dstfld1'])
-			: 'null';
+		$page_options['parentid'] = $page_options['dstfld1'] !== '' ? $page_options['dstfld1'] : null;
 
 		foreach ($option_fields_binary as $field) {
 			if ($this->hasInput($field)) {

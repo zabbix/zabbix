@@ -91,13 +91,6 @@ window.popup_generic = {
 		});
 	},
 
-	setEmpty(e, reset_fields) {
-		e.preventDefault();
-
-		this.setPopupOpenerFieldValues(reset_fields);
-		overlayDialogueDestroy(jQuery(e.target).closest('[data-dialogueid]').attr('data-dialogueid'));
-	},
-
 	closePopup(e) {
 		e.preventDefault();
 

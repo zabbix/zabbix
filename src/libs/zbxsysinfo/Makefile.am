@@ -2,6 +2,7 @@
 
 DIST_SUBDIRS = \
 	agent \
+	alias \
 	common \
 	aix \
 	freebsd \
@@ -17,6 +18,7 @@ DIST_SUBDIRS = \
 
 SUBDIRS = \
 	agent \
+	alias \
 	common \
 	simple \
 	$(ARCH)

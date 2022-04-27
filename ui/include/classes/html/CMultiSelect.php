@@ -248,7 +248,7 @@ class CMultiSelect extends CTag {
 				$parameters = $options['popup']['parameters'];
 
 				$valid_fields = ['srctbl', 'srcfld1', 'srcfld2', 'dstfrm', 'dstfld1', 'real_hosts', 'monitored_hosts',
-					'with_monitored_triggers', 'noempty', 'editable', 'templated_hosts', 'hostid', 'parent_discoveryid',
+					'with_monitored_triggers', 'editable', 'templated_hosts', 'hostid', 'parent_discoveryid',
 					'webitems', 'normal_only', 'numeric', 'with_graphs', 'with_graph_prototypes', 'with_items',
 					'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers', 'value_types',
 					'excludeids', 'disableids', 'enrich_parent_groups', 'with_monitored_items',
@@ -297,10 +297,6 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('numeric', $parameters) && $parameters['numeric']) {
 					$popup_parameters['numeric'] = '1';
 					$autocomplete_parameters['filter']['value_type'] = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64];
-				}
-
-				if (array_key_exists('noempty', $parameters) && $parameters['noempty']) {
-					$popup_parameters['noempty'] = '1';
 				}
 
 				if (array_key_exists('normal_only', $parameters) && $parameters['normal_only']) {

@@ -17,13 +17,23 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "diag.h"
+#include "zbxdiag.h"
+#include "diag_server.h"
 
 #include "common.h"
 #include "../../libs/zbxdbcache/valuecache.h"
 #include "zbxlld.h"
 #include "zbxalert.h"
-#include "zbxdiag.h"
+
+#define ZBX_DIAG_LLD_RULES		0x00000001
+#define ZBX_DIAG_LLD_VALUES		0x00000002
+
+#define ZBX_DIAG_LLD_SIMPLE		(ZBX_DIAG_LLD_RULES | \
+					ZBX_DIAG_LLD_VALUES)
+
+#define ZBX_DIAG_ALERTING_ALERTS	0x00000001
+
+#define ZBX_DIAG_ALERTING_SIMPLE	(ZBX_DIAG_ALERTING_ALERTS)
 
 /******************************************************************************
  *                                                                            *
@@ -74,6 +84,15 @@ static void	diag_valuecache_add_items(struct zbx_json *json, const char *field, 
 	zbx_json_close(json);
 }
 
+#define ZBX_DIAG_VALUECACHE_ITEMS		0x00000001
+#define ZBX_DIAG_VALUECACHE_VALUES		0x00000002
+#define ZBX_DIAG_VALUECACHE_MODE		0x00000004
+#define ZBX_DIAG_VALUECACHE_MEMORY		0x00000008
+
+#define ZBX_DIAG_VALUECACHE_SIMPLE	(ZBX_DIAG_VALUECACHE_ITEMS | \
+					ZBX_DIAG_VALUECACHE_VALUES | \
+					ZBX_DIAG_VALUECACHE_MODE)
+
 /******************************************************************************
  *                                                                            *
  * Purpose: add requested value cache diagnostic information to json data     *
@@ -103,7 +122,7 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 
 	zbx_vector_ptr_create(&tops);
 
-	if (SUCCEED == (ret = diag_parse_request(jp, field_map, &fields, &tops, error)))
+	if (SUCCEED == (ret = zbx_diag_parse_request(jp, field_map, &fields, &tops, error)))
 	{
 		zbx_json_addobject(json, ZBX_DIAG_VALUECACHE);
 
@@ -134,7 +153,7 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 			time2 = zbx_time();
 			time_total += time2 - time1;
 
-			diag_add_mem_stats(json, "memory", &mem);
+			zbx_diag_add_mem_stats(json, "memory", &mem);
 		}
 
 		if (0 != tops.values_num)
@@ -185,11 +204,18 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 		zbx_json_close(json);
 	}
 out:
-	zbx_vector_ptr_clear_ext(&tops, (zbx_ptr_free_func_t)diag_map_free);
+	zbx_vector_ptr_clear_ext(&tops, (zbx_ptr_free_func_t)zbx_diag_map_free);
 	zbx_vector_ptr_destroy(&tops);
 
 	return ret;
 }
+
+#undef ZBX_DIAG_VALUECACHE_SIMPLE
+
+#undef ZBX_DIAG_VALUECACHE_ITEMS
+#undef ZBX_DIAG_VALUECACHE_VALUES
+#undef ZBX_DIAG_VALUECACHE_MODE
+#undef ZBX_DIAG_VALUECACHE_MEMORY
 
 /******************************************************************************
  *                                                                            *
@@ -240,7 +266,7 @@ static int	diag_add_lld_info(const struct zbx_json_parse *jp, struct zbx_json *j
 
 	zbx_vector_ptr_create(&tops);
 
-	if (SUCCEED == (ret = diag_parse_request(jp, field_map, &fields, &tops, error)))
+	if (SUCCEED == (ret = zbx_diag_parse_request(jp, field_map, &fields, &tops, error)))
 	{
 		zbx_json_addobject(json, ZBX_DIAG_LLD);
 
@@ -303,7 +329,7 @@ static int	diag_add_lld_info(const struct zbx_json_parse *jp, struct zbx_json *j
 		zbx_json_close(json);
 	}
 out:
-	zbx_vector_ptr_clear_ext(&tops, (zbx_ptr_free_func_t)diag_map_free);
+	zbx_vector_ptr_clear_ext(&tops, (zbx_ptr_free_func_t)zbx_diag_map_free);
 	zbx_vector_ptr_destroy(&tops);
 
 	return ret;
@@ -394,7 +420,7 @@ static int	diag_add_alerting_info(const struct zbx_json_parse *jp, struct zbx_js
 
 	zbx_vector_ptr_create(&tops);
 
-	if (SUCCEED == (ret = diag_parse_request(jp, field_map, &fields, &tops, error)))
+	if (SUCCEED == (ret = zbx_diag_parse_request(jp, field_map, &fields, &tops, error)))
 	{
 		zbx_json_addobject(json, ZBX_DIAG_ALERTING);
 
@@ -476,7 +502,7 @@ static int	diag_add_alerting_info(const struct zbx_json_parse *jp, struct zbx_js
 		zbx_json_close(json);
 	}
 out:
-	zbx_vector_ptr_clear_ext(&tops, (zbx_ptr_free_func_t)diag_map_free);
+	zbx_vector_ptr_clear_ext(&tops, (zbx_ptr_free_func_t)zbx_diag_map_free);
 	zbx_vector_ptr_destroy(&tops);
 
 	return ret;
@@ -501,18 +527,18 @@ int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, 
 	int	ret = FAIL;
 
 	if (0 == strcmp(section, ZBX_DIAG_HISTORYCACHE))
-		ret = diag_add_historycache_info(jp, json, error);
+		ret = zbx_diag_add_historycache_info(jp, json, error);
 	else if (0 == strcmp(section, ZBX_DIAG_VALUECACHE))
 		ret = diag_add_valuecache_info(jp, json, error);
 	else if (0 == strcmp(section, ZBX_DIAG_PREPROCESSING))
-		ret = diag_add_preproc_info(jp, json, error);
+		ret = zbx_diag_add_preproc_info(jp, json, error);
 	else if (0 == strcmp(section, ZBX_DIAG_LLD))
 		ret = diag_add_lld_info(jp, json, error);
 	else if (0 == strcmp(section, ZBX_DIAG_ALERTING))
 		ret = diag_add_alerting_info(jp, json, error);
 	else if (0 == strcmp(section, ZBX_DIAG_LOCKS))
 	{
-		diag_add_locks_info(json);
+		zbx_diag_add_locks_info(json);
 		ret = SUCCEED;
 	}
 	else

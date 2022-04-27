@@ -54,7 +54,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 			->setArgument('action', 'host.edit')
 			->setArgument('hostid', $hostid)
 		))
-			->onClick('view.editHost(event, '.json_encode($host['hostid']).')')
+			->setAttribute('data-hostid', $host['hostid'])
+			->onClick('view.editHost(event, this.dataset.hostid);')
 		: new CSpan($visible_name);
 
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
