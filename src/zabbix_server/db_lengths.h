@@ -45,4 +45,4 @@
 #define REPORT_ERROR_LEN		2048
 
 
-#undef /* ZABBIX_DB_LENGTHS_H */
+#endif /* ZABBIX_DB_LENGTHS_H */

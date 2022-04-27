@@ -21,7 +21,7 @@
 
 #include "log.h"
 #include "zbxicmpping.h"
-#include "discovery.h"
+#include "zbxdiscovery.h"
 #include "zbxserver.h"
 #include "zbxself.h"
 #include "zbxrtc.h"
@@ -159,7 +159,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 		size_t		value_offset = 0;
 		ZBX_FPING_HOST	host;
 		DC_ITEM		item;
-		char		key[MAX_STRING_LEN], error[ITEM_ERROR_LEN_MAX];
+		char		key[MAX_STRING_LEN], error[ZBX_ITEM_ERROR_LEN_MAX];
 
 		zbx_alarm_on(CONFIG_TIMEOUT);
 
@@ -370,7 +370,7 @@ static void	process_check(const DB_DCHECK *dcheck, int *host_status, char *ip, i
 			service->dcheckid = dcheck->dcheckid;
 			service->itemtime = (time_t)now;
 			service->port = port;
-			zbx_strlcpy_utf8(service->value, value, ZXB_MAX_DISCOVERED_VALUE_SIZE);
+			zbx_strlcpy_utf8(service->value, value, ZBX_MAX_DISCOVERED_VALUE_SIZE);
 			zbx_vector_ptr_append(services, service);
 
 			/* update host status */
@@ -463,7 +463,7 @@ static int	process_services(const DB_DRULE *drule, DB_DHOST *dhost, const char *
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
-			discovery_update_service(drule, service->dcheckid, dhost, ip, dns, service->port,
+			zbx_discovery_update_service(drule, service->dcheckid, dhost, ip, dns, service->port,
 					service->status, service->value, now);
 		}
 		else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))

@@ -4,7 +4,6 @@ noinst_LIBRARIES = libzbxdbhigh.a
 
 libzbxdbhigh_a_SOURCES = \
 	db.c \
-	discovery.c \
 	event.c \
 	host.c \
 	item.c \

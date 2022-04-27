@@ -25,7 +25,7 @@
 #include "zbxserver.h"
 #include "zbxtasks.h"
 
-#include "discovery.h"
+#include "zbxdiscovery.h"
 #include "zbxalgo.h"
 #include "preproc.h"
 #include "zbxhash.h"
@@ -41,7 +41,7 @@ extern char	*CONFIG_SERVER;
 extern char	*CONFIG_VAULTDBPATH;
 
 /* the space reserved in json buffer to hold at least one record plus service data */
-#define ZBX_DATA_JSON_RESERVED		(HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
+#define ZBX_DATA_JSON_RESERVED		(ZBX_HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
 
 #define ZBX_DATA_JSON_RECORD_LIMIT	(ZBX_MAX_RECV_DATA_SIZE - ZBX_DATA_JSON_RESERVED)
 #define ZBX_DATA_JSON_BATCH_LIMIT	((ZBX_MAX_RECV_DATA_SIZE - ZBX_DATA_JSON_RESERVED) / 2)
