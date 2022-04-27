@@ -80,7 +80,8 @@ if ($data['can_update_group']) {
 		->setValue($data['userdirectoryid'])
 		->setFocusableElementId('userdirectoryid')
 		->addOption((new CSelectOption(0, _('Default')))->addClass(ZBX_STYLE_DEFAULT_OPTION))
-		->addOptions(CSelect::createOptionsFromArray($data['userdirectories']));
+		->addOptions(CSelect::createOptionsFromArray($data['userdirectories']))
+		->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px');
 
 	$form_list
 		->addRow((new CLabel(_('Frontend access'), $select_gui_access->getFocusableElementId())), $select_gui_access)
