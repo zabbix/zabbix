@@ -109,8 +109,6 @@ abstract class CGroupGeneral extends CApiService {
 	 */
 	abstract protected function validateDelete(array $groupids, array &$db_groups = null): void;
 
-
-
 	/**
 	 * Check for unique host group or template group names.
 	 *
