@@ -930,9 +930,9 @@ static int	DBpatch_2010101(void)
 
 		if (0 != strncmp(row[1], "db.odbc.select[", 15) || ']' != row[1][key_len - 1])
 			error_message = zbx_dsprintf(error_message, "key \"%s\" is invalid", row[1]);
-		else if (64 /*ITEM_USERNAME_LEN*/ < strlen(user))
+		else if (64 /* ITEM_USERNAME_LEN */ < strlen(user))
 			error_message = zbx_dsprintf(error_message, "ODBC username \"%s\" is too long", user);
-		else if (64 /*ITEM_PASSWORD_LEN*/ < strlen(password))
+		else if (64 /* ITEM_PASSWORD_LEN */ < strlen(password))
 			error_message = zbx_dsprintf(error_message, "ODBC password \"%s\" is too long", password);
 		else
 		{

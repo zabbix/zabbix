@@ -1927,8 +1927,8 @@ static void	am_process_begin_dispatch(zbx_ipc_client_t *client, const unsigned c
  *             content_type - [OUT] the message content type                  *
  *                                                                            *
  ******************************************************************************/
-static void	am_prepare_dispatch_message(zbx_am_dispatch_t *dispatch, ZBX_DB_MEDIATYPE *mt, zbx_shared_str_t *message,
-		unsigned char *content_type)
+static void	am_prepare_dispatch_message(zbx_am_dispatch_t *dispatch, ZBX_DB_MEDIATYPE *mt,
+		zbx_shared_str_t *message, unsigned char *content_type)
 {
 	char	*body = NULL;
 

@@ -115,8 +115,8 @@ extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
-static void	add_message_alert(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event, zbx_uint64_t actionid, int esc_step,
-		zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message,
+static void	add_message_alert(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event, zbx_uint64_t actionid,
+		int esc_step, zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message,
 		const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service,
 		int err_type, const char *tz);
 
@@ -1125,9 +1125,9 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	flush_user_msg(ZBX_USER_MSG **user_msg, int esc_step, const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event,
-		zbx_uint64_t actionid, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
-		const ZBX_DB_SERVICE *service)
+static void	flush_user_msg(ZBX_USER_MSG **user_msg, int esc_step, const ZBX_DB_EVENT *event,
+		const ZBX_DB_EVENT *r_event, zbx_uint64_t actionid, const DB_ACKNOWLEDGE *ack,
+		const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service)
 {
 	ZBX_USER_MSG	*p;
 
@@ -1541,7 +1541,8 @@ static void	get_mediatype_params(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_ALERT	alert = {.sendto = (char *)sendto, .subject = (char *)(uintptr_t)subject, .message = (char *)(uintptr_t)message};
+	DB_ALERT	alert = {.sendto = (char *)sendto, .subject = (char *)(uintptr_t)subject,
+			.message = (char *)(uintptr_t)message};
 	struct zbx_json	json;
 	char		*name, *value;
 	int		message_type;
@@ -1575,8 +1576,8 @@ static void	get_mediatype_params(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *
 	zbx_json_free(&json);
 }
 
-static void	add_message_alert(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event, zbx_uint64_t actionid, int esc_step,
-		zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message,
+static void	add_message_alert(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event, zbx_uint64_t actionid,
+		int esc_step, zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message,
 		const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service,
 		int err_type, const char *tz)
 {
@@ -1842,8 +1843,9 @@ succeed:
 	return ret;
 }
 
-static void	escalation_execute_operations(DB_ESCALATION *escalation, const ZBX_DB_EVENT *event, const DB_ACTION *action,
-		const ZBX_DB_SERVICE *service, const char *default_timezone, zbx_hashset_t *roles)
+static void	escalation_execute_operations(DB_ESCALATION *escalation, const ZBX_DB_EVENT *event,
+		const DB_ACTION *action, const ZBX_DB_SERVICE *service, const char *default_timezone,
+		zbx_hashset_t *roles)
 {
 	DB_RESULT	result;
 	DB_ROW		row;

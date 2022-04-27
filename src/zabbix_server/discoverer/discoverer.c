@@ -116,7 +116,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 {
 	int		ret = SUCCEED;
 	const char	*service = NULL;
-	AGENT_RESULT 	result;
+	AGENT_RESULT	result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -459,8 +459,8 @@ static void	process_checks(const ZBX_DB_DRULE *drule, int *host_status, char *ip
 	DBfree_result(result);
 }
 
-static int	process_services(const ZBX_DB_DRULE *drule, ZBX_DB_DHOST *dhost, const char *ip, const char *dns, int now,
-		const zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
+static int	process_services(const ZBX_DB_DRULE *drule, ZBX_DB_DHOST *dhost, const char *ip, const char *dns,
+		int now, const zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
 {
 	int	i, ret;
 

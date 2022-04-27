@@ -1284,9 +1284,10 @@ out:
 	return ret;
 }
 
-static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, char oids[][ZBX_ITEM_SNMP_OID_LEN_MAX],
-		AGENT_RESULT *results, int *errcodes, unsigned char *query_and_ignore_type, int num, int level,
-		char *error, size_t max_error_len, int *max_succeed, int *min_fail, unsigned char poller_type)
+static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items,
+		char oids[][ZBX_ITEM_SNMP_OID_LEN_MAX], AGENT_RESULT *results, int *errcodes,
+		unsigned char *query_and_ignore_type, int num, int level, char *error, size_t max_error_len,
+		int *max_succeed, int *min_fail, unsigned char poller_type)
 {
 	int			i, j, status, ret = SUCCEED;
 	int			mapping[MAX_SNMP_ITEMS], mapping_num = 0;

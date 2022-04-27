@@ -1097,7 +1097,8 @@ zbx_uint32_t	zbx_alerter_serialize_send_dispatch(unsigned char **data, const ZBX
 	return data_len + data_offset;
 }
 
-void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, ZBX_DB_MEDIATYPE *mt, zbx_vector_str_t *recipients)
+void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, ZBX_DB_MEDIATYPE *mt,
+		zbx_vector_str_t *recipients)
 {
 	zbx_uint32_t	len;
 	int		recipients_num, i;

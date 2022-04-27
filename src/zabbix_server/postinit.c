@@ -221,7 +221,8 @@ static void	preprocess_trigger_name(ZBX_DB_TRIGGER *trigger, int *historical)
  *           same and can be updated with a single sql query.                 *
  *                                                                            *
  ******************************************************************************/
-static int	process_event_bulk_update(const ZBX_DB_TRIGGER *trigger, char **sql, size_t *sql_alloc, size_t *sql_offset)
+static int	process_event_bulk_update(const ZBX_DB_TRIGGER *trigger, char **sql, size_t *sql_alloc,
+		size_t *sql_offset)
 {
 	char	*name_esc;
 	int	ret;

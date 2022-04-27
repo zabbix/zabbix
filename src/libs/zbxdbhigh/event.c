@@ -23,8 +23,8 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get events and flags that indicate what was filled in ZBX_DB_EVENT    *
- *          structure                                                         *
+ * Purpose: get events and flags that indicate what was filled in             *
+ *           ZBX_DB_EVENT structure                                           *
  *                                                                            *
  * Parameters: eventids   - [IN] requested event ids                          *
  *             events     - [OUT] the array of events                         *

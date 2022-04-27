@@ -464,8 +464,8 @@ void	zbx_discovery_update_host(ZBX_DB_DHOST *dhost, int status, int now)
  * Parameters: service - service info                                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_discovery_update_service(const ZBX_DB_DRULE *drule, zbx_uint64_t dcheckid, ZBX_DB_DHOST *dhost, const char *ip,
-		const char *dns, int port, int status, const char *value, int now)
+void	zbx_discovery_update_service(const ZBX_DB_DRULE *drule, zbx_uint64_t dcheckid, ZBX_DB_DHOST *dhost,
+		const char *ip, const char *dns, int port, int status, const char *value, int now)
 {
 	DB_DSERVICE	dservice;
 

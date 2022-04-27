@@ -49,7 +49,6 @@
 #	define	ZBX_SQL_EXEC_FROM	0
 #endif
 
-
 typedef struct
 {
 	zbx_uint64_t	autoreg_hostid;

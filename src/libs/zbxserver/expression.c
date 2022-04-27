@@ -62,8 +62,8 @@ ZBX_VECTOR_IMPL(rootcause, zbx_rootcause_t)
 #define ZBX_REQUEST_ITEM_LOG_EVENTID		207
 
 static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX_DB_EVENT *event,
-		const ZBX_DB_EVENT *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host,
-		const DC_ITEM *dc_item, const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack,
+		const ZBX_DB_EVENT *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid,
+		const DC_HOST *dc_host, const DC_ITEM *dc_item, const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack,
 		const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service, const char *tz, char **data,
 		int macro_type, char *error, int maxerrlen);
 
@@ -1991,7 +1991,8 @@ static void	get_event_tag_by_name(const char *text, const ZBX_DB_EVENT *event, c
  * Purpose: request recovery event value by macro                             *
  *                                                                            *
  ******************************************************************************/
-static void	get_recovery_event_value(const char *macro, const ZBX_DB_EVENT *r_event, char **replace_to, const char *tz)
+static void	get_recovery_event_value(const char *macro, const ZBX_DB_EVENT *r_event, char **replace_to,
+		const char *tz)
 {
 	if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_DATE))
 	{
@@ -2627,8 +2628,8 @@ static int	resolve_host_target_macros(const char *m, const DC_HOST *dc_host, DC_
  *                                                                            *
  ******************************************************************************/
 static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX_DB_EVENT *event,
-		const ZBX_DB_EVENT *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host,
-		const DC_ITEM *dc_item, const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack,
+		const ZBX_DB_EVENT *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid,
+		const DC_HOST *dc_host, const DC_ITEM *dc_item, const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack,
 		const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service, const char *tz, char **data,
 		int macro_type, char *error, int maxerrlen)
 {
@@ -2642,7 +2643,8 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 	const zbx_vector_uint64_t	*phostids;
 	zbx_token_t			token, inner_token;
 	zbx_token_search_t		token_search = ZBX_TOKEN_SEARCH_BASIC;
-	char				*expression = NULL, *user_username = NULL, *user_name = NULL, *user_surname = NULL;
+	char				*expression = NULL, *user_username = NULL, *user_name = NULL,
+					*user_surname = NULL;
 
 	if (NULL == data || NULL == *data || '\0' == **data)
 	{
@@ -4751,7 +4753,7 @@ zbx_trigger_func_position_t;
  ******************************************************************************/
 static int	expand_trigger_macros(zbx_eval_context_t *ctx, const ZBX_DB_EVENT *event, char *error, size_t maxerrlen)
 {
-	int 	i;
+	int	i;
 
 	for (i = 0; i < ctx->stack.values_num; i++)
 	{
@@ -6519,10 +6521,11 @@ int	substitute_simple_macros(const zbx_uint64_t *actionid, const ZBX_DB_EVENT *e
  * Purpose: substitute_simple_macros with unmasked secret macros              *
  *                                                                            *
  ******************************************************************************/
-int	substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event,
-		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
-		const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
-		const ZBX_DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error, int maxerrlen)
+int	substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const ZBX_DB_EVENT *event,
+		const ZBX_DB_EVENT *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid,
+		const DC_HOST *dc_host, const DC_ITEM *dc_item, const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack,
+		const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service, const char *tz, char **data,
+		int macro_type, char *error, int maxerrlen)
 {
 	unsigned char	old_macro_env;
 	int		ret;

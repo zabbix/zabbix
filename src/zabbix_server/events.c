@@ -692,8 +692,8 @@ static int	correlation_match_event_hostgroup(const ZBX_DB_EVENT *event, zbx_uint
  *                                depending on old events                     *
  *                                                                            *
  ******************************************************************************/
-static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *condition, const ZBX_DB_EVENT *event,
-		int old_value)
+static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *condition,
+		const ZBX_DB_EVENT *event, int old_value)
 {
 	int		i, ret;
 	zbx_tag_t	*tag;
@@ -1969,7 +1969,8 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 							query->maintenances.values[i].first,
 							(int)query->maintenances.values[i].second);
 
-					((ZBX_DB_EVENT *)event_refs->values[j])->suppressed = ZBX_PROBLEM_SUPPRESSED_TRUE;
+					((ZBX_DB_EVENT *)event_refs->values[j])->suppressed =
+							ZBX_PROBLEM_SUPPRESSED_TRUE;
 				}
 			}
 
