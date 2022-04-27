@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-04-14 21:18+0000\n"
+"PO-Revision-Date: 2022-04-20 23:09+0000\n"
 "Last-Translator: Hugo <hugopedrosantos@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_PT\n"
@@ -2151,7 +2151,7 @@ msgstr "Não foi possível criar o mapa de ícones"
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
-msgstr ""
+msgstr "Não é possível criar request"
 
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
@@ -2331,7 +2331,7 @@ msgstr "Não foi possível eliminar mapa de rede"
 
 #: app/controllers/CControllerProxyDelete.php:39
 msgid "Cannot delete proxies"
-msgstr ""
+msgstr "Não foi possível eliminar proxies"
 
 #: app/controllers/CControllerProxyDelete.php:69
 msgid "Cannot delete proxy"
@@ -6434,6 +6434,10 @@ msgstr ""
 
 #: app/views/popup.itemtestedit.view.php:296
 msgid "End of line sequence"
+msgstr ""
+
+#: include/locales.inc.php:33
+msgid "English (en_GB)"
 msgstr ""
 
 #: include/locales.inc.php:33
@@ -10857,6 +10861,10 @@ msgstr "Links"
 #: include/classes/html/CList.php:39
 msgid "List is empty"
 msgstr "A lista está vazia"
+
+#: include/classes/data/CItemData.php:983
+msgid "List of OS processes with attributes. Returns JSON array"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"

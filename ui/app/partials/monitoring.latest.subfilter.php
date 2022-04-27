@@ -50,9 +50,10 @@ foreach (['hostids', 'tagnames', 'data'] as $key) {
 	foreach ($data[$key] as $value => $element) {
 		if ($element['selected']) {
 			$subfilter_options[$key][] = (new CSpan([
-				(new CLinkAction($element['name']))->onClick(CHtml::encode(
-					'view.unsetSubfilter('.json_encode(['subfilter_'.$key.'[]', $value]).')'
-				)),
+				(new CLinkAction($element['name']))
+					->setAttribute('data-key', $key)
+					->setAttribute('data-value', $value)
+					->onClick('view.unsetSubfilter([`subfilter_${this.dataset.key}[]`, this.dataset.value]);'),
 				' ',
 				new CSup($element['count'])
 			]))
@@ -69,9 +70,10 @@ foreach (['hostids', 'tagnames', 'data'] as $key) {
 			}
 			else {
 				$subfilter_options[$key][] = (new CSpan([
-					(new CLinkAction($element['name']))->onClick(CHtml::encode(
-						'view.setSubfilter('.json_encode(['subfilter_'.$key.'[]', $value]).')'
-					)),
+					(new CLinkAction($element['name']))
+						->setAttribute('data-key', $key)
+						->setAttribute('data-value', $value)
+						->onClick('view.setSubfilter([`subfilter_${this.dataset.key}[]`, this.dataset.value]);'),
 					' ',
 					new CSup(($subfilter_used ? '+' : '').$element['count'])
 				]))->addClass(ZBX_STYLE_SUBFILTER);
@@ -108,10 +110,11 @@ if (count($data['tags']) > 0) {
 				return (new CSpan([
 					(new CLinkAction($element_name))
 						->addStyle($element_style)
-						->onClick('view.unsetSubfilter('.json_encode([
-							'subfilter_tags['.$tag.'][]',
-							$element['name']
-						]).')'),
+						->setAttribute('data-key', $tag)
+						->setAttribute('data-value', $element['name'])
+						->onClick(
+							'view.unsetSubfilter([`subfilter_tags[${this.dataset.key}][]`, this.dataset.value]);'
+						),
 					' ',
 					new CSup($element['count'])
 				]))
@@ -122,10 +125,9 @@ if (count($data['tags']) > 0) {
 				return (new CSpan([
 					(new CLinkAction($element_name))
 						->addStyle($element_style)
-						->onClick('view.setSubfilter('.json_encode([
-							'subfilter_tags['.$tag.'][]',
-							$element['name']
-						]).')'),
+						->setAttribute('data-key', $tag)
+						->setAttribute('data-value', $element['name'])
+						->onClick('view.setSubfilter([`subfilter_tags[${this.dataset.key}][]`, this.dataset.value]);'),
 					' ',
 					new CSup(($subfilter_used ? '+' : '').$element['count'])
 				]))->addClass(ZBX_STYLE_SUBFILTER);
