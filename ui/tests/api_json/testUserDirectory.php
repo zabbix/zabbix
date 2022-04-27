@@ -137,7 +137,7 @@ class testUserDirectory extends CAPITest {
 		return [
 			'Test delete userdirectory with user group' => [
 				'userdirectory' => ['API LDAP #1'],
-				'expected_error' => 'Cannot delete user directory "Auth test #1".'
+				'expected_error' => 'Cannot delete user directory "API LDAP #1".'
 			],
 			'Test delete default userdirectory' => [
 				'userdirectory' => ['API LDAP #2'],
