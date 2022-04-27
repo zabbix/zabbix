@@ -137,49 +137,44 @@ $http_tab = (new CFormList('list_http'))
 
 $ldap_tab = (new CFormList('list_ldap'))
 	->addRow(new CLabel(_('Enable LDAP authentication'), 'ldap_configured'),
-		new CFormField(
-			$data['ldap_error']
-				? (new CLabel($data['ldap_error']))->addClass(ZBX_STYLE_RED)
-				: (new CCheckBox('ldap_configured', ZBX_AUTH_LDAP_ENABLED))
-					->setChecked($data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED)
-					->setUncheckedValue(ZBX_AUTH_LDAP_DISABLED)
-		)
+		$data['ldap_error']
+			? (new CLabel($data['ldap_error']))->addClass(ZBX_STYLE_RED)
+			: (new CCheckBox('ldap_configured', ZBX_AUTH_LDAP_ENABLED))
+				->setChecked($data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED)
+				->setUncheckedValue(ZBX_AUTH_LDAP_DISABLED)
 	)
 	->addRow((new CLabel(_('Servers')))->setAsteriskMark(),
-		new CFormField(
-			(new CDiv(
-				(new CTable())
-					->setId('ldap-servers')
-					->setHeader(
-						(new CRowHeader([
-							_('Name'),
-							_('Host'),
-							_('User groups'),
-							_('Default'),
-							''
-						]))->addClass(ZBX_STYLE_GREY)
-					)
-					->addItem(
-						(new CTag('tfoot', true))
-							->addItem(
-								(new CCol(
-									(new CSimpleButton(_('Add')))
-										->addClass(ZBX_STYLE_BTN_LINK)
-										->addClass('js-add')
-								))->setColSpan(5)
-							)
-					)
-			))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		)
+		(new CDiv(
+			(new CTable())
+				->setId('ldap-servers')
+				->setHeader(
+					(new CRowHeader([
+						(new CColHeader(_('Name')))->addStyle('width: 40%'),
+						(new CColHeader(_('Host')))->addStyle('width: 40%'),
+						(new CColHeader(_('User groups')))->addClass(ZBX_STYLE_NOWRAP),
+						_('Default'),
+						''
+					]))->addClass(ZBX_STYLE_GREY)
+				)
+				->addItem(
+					(new CTag('tfoot', true))
+						->addItem(
+							(new CCol(
+								(new CSimpleButton(_('Add')))
+									->addClass(ZBX_STYLE_BTN_LINK)
+									->addClass('js-add')
+							))->setColSpan(5)
+						)
+				)
+				->addStyle('width: 100%;')
+		))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	)
 	->addRow(new CLabel(_('Case-sensitive login'), 'ldap_case_sensitive'),
-		new CFormField(
-			(new CCheckBox('ldap_case_sensitive', ZBX_AUTH_CASE_SENSITIVE))
-				->setChecked($data['ldap_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
-				->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
-		)
+		(new CCheckBox('ldap_case_sensitive', ZBX_AUTH_CASE_SENSITIVE))
+			->setChecked($data['ldap_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
+			->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
 	);
 
 // SAML authentication fields.

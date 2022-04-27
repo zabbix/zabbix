@@ -235,7 +235,7 @@
 						<input type="hidden" name="ldap_servers[#{row_index}][bind_password]" value="#{bind_password}">
 						<input type="hidden" name="ldap_servers[#{row_index}][description]" value="#{description}">
 					</td>
-					<td>#{host}</td>
+					<td class="wordbreak">#{host}</td>
 					<td class="js-ldap-usergroups">#{usrgrps}</td>
 					<td>
 						<input type="radio" name="ldap_default_row_index" value="#{row_index}" #{is_default}>
