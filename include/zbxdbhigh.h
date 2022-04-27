@@ -40,29 +40,6 @@ extern int	CONFIG_DBPORT;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 
-/* typedef enum */
-/* { */
-/* 	GRAPH_TYPE_NORMAL = 0, */
-/* 	GRAPH_TYPE_STACKED = 1 */
-/* } */
-/* zbx_graph_types; */
-
-/* typedef enum */
-/* { */
-/* 	CALC_FNC_MIN = 1, */
-/* 	CALC_FNC_AVG = 2, */
-/* 	CALC_FNC_MAX = 4, */
-/* 	CALC_FNC_ALL = 7 */
-/* } */
-/* zbx_graph_item_calc_function; */
-
-/* typedef enum */
-/* { */
-/* 	GRAPH_ITEM_SIMPLE = 0, */
-/* 	GRAPH_ITEM_AGGREGATED = 1 */
-/* } */
-/* zbx_graph_item_type; */
-
 typedef enum
 {
 	ZBX_TEMPLATE_LINK_MANUAL = 0,
@@ -78,11 +55,6 @@ zbx_host_template_link_type;
 #define ZBX_DB_UNKNOWN	0
 #define ZBX_DB_SERVER	1
 #define ZBX_DB_PROXY	2
-
-
-/* #define HOST_HOST_LEN			ZBX_MAX_HOSTNAME_LEN */
-/* #define HOST_HOST_LEN_MAX		(HOST_HOST_LEN + 1) */
-/* #define HOST_NAME_LEN			128 */
 
 #define ZBX_INTERFACE_DNS_LEN		255
 #define ZBX_INTERFACE_DNS_LEN_MAX	(ZBX_INTERFACE_DNS_LEN + 1)
@@ -176,19 +148,6 @@ zbx_host_template_link_type;
 #define ZBX_DSERVICE_VALUE_LEN		255
 #define ZBX_MAX_DISCOVERED_VALUE_SIZE	(ZBX_DSERVICE_VALUE_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1)
 
-/* #define HTTPTEST_HTTP_USER_LEN		64 */
-/* #define HTTPTEST_HTTP_PASSWORD_LEN	64 */
-
-/* #define PROXY_DHISTORY_VALUE_LEN	255 */
-
-
-/* #define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.hostid,i.value_type,i.delta,"	\ */
-/* 				"i.units,i.multiplier,i.formula,i.state,i.valuemapid,i.trends,i.data_type" */
-/* #define ZBX_SQL_ITEM_TABLES	"hosts h,items i" */
-/* /\* #define ZBX_SQL_TIME_FUNCTIONS	"'nodata','date','dayofmonth','dayofweek','time','now'" *\/ */
-/* /\* #define ZBX_SQL_ITEM_FIELDS_NUM	15 *\/ */
-/* #define ZBX_SQL_ITEM_SELECT	ZBX_SQL_ITEM_FIELDS " from " ZBX_SQL_ITEM_TABLES */
-
 #ifdef HAVE_ORACLE
 #	define ZBX_PLSQL_BEGIN	"begin\n"
 #	define ZBX_PLSQL_END	"end;"
@@ -244,11 +203,6 @@ typedef struct
 	int		lastdown;
 }
 ZBX_DB_DHOST;
-
-/* #define ZBX_DB_TRIGGER_EVAL_NONE			0x0000 */
-/* #define ZBX_DB_TRIGGER_EVAL_EXPRESSION			0x0001 */
-/* #define ZBX_DB_TRIGGER_EVAL_EXPRESSION_USERMACRO	0x0002 */
-/* #define ZBX_DB_TRIGGER_EVAL_RECOVERY_EXPRESSION		0x0004 */
 
 typedef struct
 {
