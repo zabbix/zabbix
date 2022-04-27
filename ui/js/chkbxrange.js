@@ -264,8 +264,8 @@ var chkbxRange = {
 		let actions = [];
 
 		Object
-			.entries(this.getSelectedIds())
-			.forEach(([_, value]) => {
+			.values(this.getSelectedIds())
+			.forEach(value => {
 				selected_count++;
 
 				// Count the special attributes for checkboxes.
