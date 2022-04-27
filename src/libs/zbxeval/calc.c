@@ -652,7 +652,7 @@ int	zbx_eval_calc_avg(zbx_vector_dbl_t *values, double *result, char **error)
 {
 	if (0 == values->values_num)
 	{
-		*error = zbx_strdup(*error, "not enough data");
+		*error = zbx_strdup(*error, "no data (at least one value is required)");
 		return FAIL;
 	}
 
@@ -680,7 +680,7 @@ int	zbx_eval_calc_min(zbx_vector_dbl_t *values, double *result, char **error)
 
 	if (0 == values->values_num)
 	{
-		*error = zbx_strdup(*error, "not enough data");
+		*error = zbx_strdup(*error, "no data (at least one value is required)");
 		return FAIL;
 	}
 
@@ -716,7 +716,7 @@ int	zbx_eval_calc_max(zbx_vector_dbl_t *values, double *result, char **error)
 
 	if (0 == values->values_num)
 	{
-		*error = zbx_strdup(*error, "not enough data");
+		*error = zbx_strdup(*error, "no data (at least one value is required)");
 		return FAIL;
 	}
 
@@ -749,7 +749,7 @@ int	zbx_eval_calc_sum(zbx_vector_dbl_t *values, double *result, char **error)
 
 	if (0 == values->values_num)
 	{
-		*error = zbx_strdup(*error, "not enough data");
+		*error = zbx_strdup(*error, "no data (at least one value is required)");
 		return FAIL;
 	}
 
