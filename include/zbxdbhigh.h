@@ -281,7 +281,7 @@ typedef struct
 	zbx_vector_ptr_t	events;
 	zbx_vector_tags_t	service_tags;
 }
-DB_SERVICE;
+ZBX_DB_SERVICE;
 
 typedef struct
 {

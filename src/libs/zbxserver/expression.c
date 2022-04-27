@@ -64,7 +64,7 @@ ZBX_VECTOR_IMPL(rootcause, zbx_rootcause_t)
 static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_EVENT *event,
 		const DB_EVENT *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host,
 		const DC_ITEM *dc_item, const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack,
-		const zbx_service_alarm_t *service_alarm, const DB_SERVICE *service, const char *tz, char **data,
+		const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service, const char *tz, char **data,
 		int macro_type, char *error, int maxerrlen);
 
 static int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item,
@@ -2171,7 +2171,7 @@ static int	rootcause_compare(const zbx_rootcause_t *d1, const zbx_rootcause_t *d
  * Purpose: get root cause of service being in problem state                  *
  *                                                                            *
  ******************************************************************************/
-static void	get_rootcause(const DB_SERVICE *service, char **replace_to)
+static void	get_rootcause(const ZBX_DB_SERVICE *service, char **replace_to)
 {
 	int			i;
 	char			*d = "";
@@ -2629,7 +2629,7 @@ static int	resolve_host_target_macros(const char *m, const DC_HOST *dc_host, DC_
 static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_EVENT *event,
 		const DB_EVENT *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host,
 		const DC_ITEM *dc_item, const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack,
-		const zbx_service_alarm_t *service_alarm, const DB_SERVICE *service, const char *tz, char **data,
+		const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service, const char *tz, char **data,
 		int macro_type, char *error, int maxerrlen)
 {
 	char				c, *replace_to = NULL, sql[64];
@@ -6507,7 +6507,7 @@ exit:
 int	substitute_simple_macros(const zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
 		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
-		const DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error, int maxerrlen)
+		const ZBX_DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error, int maxerrlen)
 {
 	return substitute_simple_macros_impl(actionid, event, r_event, userid, hostid, dc_host, dc_item, alert, ack,
 			service_alarm, service, tz, data, macro_type, error, maxerrlen);
@@ -6522,7 +6522,7 @@ int	substitute_simple_macros(const zbx_uint64_t *actionid, const DB_EVENT *event
 int	substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
 		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
-		const DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error, int maxerrlen)
+		const ZBX_DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error, int maxerrlen)
 {
 	unsigned char	old_macro_env;
 	int		ret;

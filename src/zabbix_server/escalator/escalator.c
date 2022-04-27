@@ -117,7 +117,7 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zbx_uint64_t actionid, int esc_step,
 		zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message,
-		const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm, const DB_SERVICE *service,
+		const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service,
 		int err_type, const char *tz);
 
 static int	get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_timezone)
@@ -564,7 +564,7 @@ static void	zbx_db_cache_service_role(zbx_service_role_t *role)
  *                   or permission otherwise                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, const DB_SERVICE *service,
+static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, const ZBX_DB_SERVICE *service,
 		zbx_hashset_t *roles)
 {
 	int			perm = PERM_DENY;
@@ -635,7 +635,7 @@ out2:
 
 static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg, const char *subj,
 		const char *msg, zbx_uint64_t actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm, const DB_SERVICE *service,
+		const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service,
 		int expand_macros, int macro_type, int err_type, const char *tz)
 {
 	ZBX_USER_MSG	*p, **pnext;
@@ -710,7 +710,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 
 static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uint64_t mediatypeid,
 		ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm, const DB_SERVICE *service,
+		const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service,
 		int macro_type, unsigned char evt_src, unsigned char op_mode, const char *default_timezone,
 		const char *user_timezone)
 {
@@ -806,7 +806,7 @@ out:
 
 static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, ZBX_USER_MSG **user_msg,
 		const DB_EVENT *event, const DB_EVENT *r_event, const DB_ACKNOWLEDGE *ack,
-		const zbx_service_alarm_t *service_alarm, const DB_SERVICE *service, int macro_type,
+		const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service, int macro_type,
 		unsigned char evt_src, unsigned char op_mode, const char *default_timezone, zbx_hashset_t *roles)
 {
 	DB_RESULT	result;
@@ -886,7 +886,7 @@ clean:
  ******************************************************************************/
 static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, zbx_uint64_t operationid,
 		const DB_EVENT *event, const DB_EVENT *r_event, const DB_ACKNOWLEDGE *ack,
-		const zbx_service_alarm_t *service_alarm, const DB_SERVICE *service, unsigned char evt_src,
+		const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service, unsigned char evt_src,
 		unsigned char op_mode,
 		const char *default_timezone, zbx_hashset_t *roles)
 {
@@ -985,7 +985,7 @@ clean:
  *                                                                            *
  ******************************************************************************/
 static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, const DB_EVENT *event,
-		const char *error, const char *default_timezone, const DB_SERVICE *service, zbx_hashset_t *roles)
+		const char *error, const char *default_timezone, const ZBX_DB_SERVICE *service, zbx_hashset_t *roles)
 {
 	char		*message_dyn, *sql = NULL;
 	DB_RESULT	result;
@@ -1127,7 +1127,7 @@ clean:
 
 static void	flush_user_msg(ZBX_USER_MSG **user_msg, int esc_step, const DB_EVENT *event, const DB_EVENT *r_event,
 		zbx_uint64_t actionid, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
-		const DB_SERVICE *service)
+		const ZBX_DB_SERVICE *service)
 {
 	ZBX_USER_MSG	*p;
 
@@ -1217,7 +1217,7 @@ static void	get_operation_groupids(zbx_uint64_t operationid, zbx_vector_uint64_t
 #endif
 
 static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, const DB_ACKNOWLEDGE *ack,
-		const zbx_service_alarm_t *service_alarm, const DB_SERVICE *service, zbx_uint64_t actionid,
+		const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service, zbx_uint64_t actionid,
 		zbx_uint64_t operationid, int esc_step, int macro_type, const char *default_timezone)
 {
 	DB_RESULT		result;
@@ -1537,7 +1537,7 @@ skip:
 static void	get_mediatype_params(const DB_EVENT *event, const DB_EVENT *r_event, zbx_uint64_t actionid,
 		zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *sendto, const char *subject,
 		const char *message, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
-		const DB_SERVICE *service, char **params, const char *tz)
+		const ZBX_DB_SERVICE *service, char **params, const char *tz)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1577,7 +1577,7 @@ static void	get_mediatype_params(const DB_EVENT *event, const DB_EVENT *r_event,
 
 static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zbx_uint64_t actionid, int esc_step,
 		zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message,
-		const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm, const DB_SERVICE *service,
+		const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service,
 		int err_type, const char *tz)
 {
 	DB_RESULT	result;
@@ -1843,7 +1843,7 @@ succeed:
 }
 
 static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EVENT *event, const DB_ACTION *action,
-		const DB_SERVICE *service, const char *default_timezone, zbx_hashset_t *roles)
+		const ZBX_DB_SERVICE *service, const char *default_timezone, zbx_hashset_t *roles)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1968,7 +1968,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
  *                                                                            *
  ******************************************************************************/
 static void	escalation_execute_recovery_operations(const DB_EVENT *event, const DB_EVENT *r_event,
-		const DB_ACTION *action, const DB_SERVICE *service, const char *default_timezone,
+		const DB_ACTION *action, const ZBX_DB_SERVICE *service, const char *default_timezone,
 		zbx_hashset_t *roles)
 {
 	DB_RESULT	result;
@@ -2034,7 +2034,7 @@ static void	escalation_execute_recovery_operations(const DB_EVENT *event, const 
  ******************************************************************************/
 static void	escalation_execute_update_operations(const DB_EVENT *event, const DB_EVENT *r_event,
 		const DB_ACTION *action, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
-		const DB_SERVICE *service, const char *default_timezone, zbx_hashset_t *roles)
+		const ZBX_DB_SERVICE *service, const char *default_timezone, zbx_hashset_t *roles)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -2395,7 +2395,7 @@ static void	escalation_log_cancel_warning(const DB_ESCALATION *escalation, const
  *                                                                            *
  ******************************************************************************/
 static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action, const DB_EVENT *event,
-		const char *error, const char *default_timezone, const DB_SERVICE *service, zbx_hashset_t *roles)
+		const char *error, const char *default_timezone, const ZBX_DB_SERVICE *service, zbx_hashset_t *roles)
 {
 	ZBX_USER_MSG	*user_msg = NULL;
 
@@ -2427,7 +2427,7 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
  *                                                                            *
  ******************************************************************************/
 static void	escalation_execute(DB_ESCALATION *escalation, const DB_ACTION *action, const DB_EVENT *event,
-		const DB_SERVICE *service, const char *default_timezone, zbx_hashset_t *roles)
+		const ZBX_DB_SERVICE *service, const char *default_timezone, zbx_hashset_t *roles)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, zbx_escalation_status_string(escalation->status));
@@ -2448,7 +2448,7 @@ static void	escalation_execute(DB_ESCALATION *escalation, const DB_ACTION *actio
  *                                                                            *
  ******************************************************************************/
 static void	escalation_recover(DB_ESCALATION *escalation, const DB_ACTION *action, const DB_EVENT *event,
-		const DB_EVENT *r_event, const DB_SERVICE *service, const char *default_timezone,
+		const DB_EVENT *r_event, const ZBX_DB_SERVICE *service, const char *default_timezone,
 		zbx_hashset_t *roles)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
@@ -2521,7 +2521,7 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
  *                                                                            *
  ******************************************************************************/
 static void	escalation_update(DB_ESCALATION *escalation, const DB_ACTION *action,
-		const DB_EVENT *event, const zbx_service_alarm_t *service_alarm, const DB_SERVICE *service,
+		const DB_EVENT *event, const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service,
 		const char *default_timezone, zbx_hashset_t *roles)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " servicealarmid:" ZBX_FS_UI64 " status:%s",
@@ -2696,14 +2696,14 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		DB_SERVICE	*service;
+		ZBX_DB_SERVICE	*service;
 		zbx_uint64_t	serviceid;
 
 		ZBX_STR2UINT64(serviceid, row[0]);
 
 		if ((zbx_int64_t)serviceid == last_serviceid)
 		{
-			DB_SERVICE	*last_service;
+			ZBX_DB_SERVICE	*last_service;
 			zbx_tag_t	*tag = zbx_malloc(NULL, sizeof(zbx_tag_t));
 
 			last_service = services->values[services->values_num - 1];
@@ -2715,7 +2715,7 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 			continue;
 		}
 
-		service = (DB_SERVICE*)zbx_malloc(NULL, sizeof(DB_SERVICE));
+		service = (ZBX_DB_SERVICE*)zbx_malloc(NULL, sizeof(ZBX_DB_SERVICE));
 		service->serviceid = serviceid;
 		service->name = zbx_strdup(NULL, row[1]);
 		service->description = zbx_strdup(NULL, row[2]);
@@ -2744,7 +2744,7 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 
 	for (i = 0; i < services->values_num; i++)
 	{
-		DB_SERVICE	*service = services->values[i];
+		ZBX_DB_SERVICE	*service = services->values[i];
 
 		for (j = 0; j < service->eventids.values_num; j++)
 			zbx_vector_uint64_append(&eventids, service->eventids.values[j]);
@@ -2756,7 +2756,7 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 
 		for (i = 0; i < services->values_num; i++)
 		{
-			DB_SERVICE	*service = services->values[i];
+			ZBX_DB_SERVICE	*service = services->values[i];
 			DB_EVENT	*event;
 
 			for (j = 0; j < service->eventids.values_num; j++)
@@ -2837,7 +2837,7 @@ static void	get_db_service_alarms(zbx_vector_ptr_t *escalations, zbx_vector_serv
 	zbx_vector_uint64_destroy(&service_alarmids);
 }
 
-static void	service_clean(DB_SERVICE *service)
+static void	service_clean(ZBX_DB_SERVICE *service)
 {
 	zbx_free(service->name);
 	zbx_free(service->description);
@@ -2867,7 +2867,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 	zbx_service_alarm_t		*service_alarm, service_alarm_local;
 	zbx_vector_service_t		services;
 	zbx_hashset_t			service_roles;
-	DB_SERVICE			service_local;
+	ZBX_DB_SERVICE			service_local;
 
 	zbx_vector_uint64_create(&escalationids);
 	zbx_vector_ptr_create(&diffs);
@@ -2899,7 +2899,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 		DB_ACTION	*action = NULL;
 		DB_EVENT	*event = NULL, *r_event;
 		DB_ESCALATION	*escalation;
-		DB_SERVICE	*service = NULL;
+		ZBX_DB_SERVICE	*service = NULL;
 
 		escalation = (DB_ESCALATION *)escalations->values[i];
 

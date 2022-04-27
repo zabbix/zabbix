@@ -283,7 +283,7 @@ void	zbx_service_deserialize_rootcause(const unsigned char *data, zbx_uint32_t s
 
 	while (data < end)
 	{
-		DB_SERVICE	*service, service_local;
+		ZBX_DB_SERVICE	*service, service_local;
 		int		values_num, i;
 
 		data += zbx_deserialize_value(data, &service_local.serviceid);
