@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-02T08:17:55Z'
+  date: '2022-04-13T22:55:23Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -249,7 +249,8 @@ zabbix_export:
             -
               uuid: fad2c1e9d0ba45bcbb47ccbb327f0b98
               expression: 'min(/MSSQL by ODBC/mssql.average_wait_time,5m)>{$MSSQL.AVERAGE_WAIT_TIME.MAX}'
-              name: 'MSSQL: Total average wait time for locks is high (over {$MSSQL.AVERAGE_WAIT_TIME.MAX}ms for 5m)'
+              name: 'MSSQL: Total average wait time for locks is high'
+              event_name: 'MSSQL: Total average wait time for locks is high (over {$MSSQL.AVERAGE_WAIT_TIME.MAX}ms for 5m)'
               priority: WARNING
               description: 'An average wait time longer than 500ms may indicate excessive blocking. This value should generally correlate to ''Lock Waits/sec'' and move up or down with it accordingly.'
               tags:
@@ -345,7 +346,8 @@ zabbix_export:
             -
               uuid: f84fa297023a4aee903e4d32bbad9360
               expression: 'max(/MSSQL by ODBC/mssql.buffer_cache_hit_ratio,5m)<{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}'
-              name: 'MSSQL: Percentage of the buffer cache efficiency is low (below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}% for 5m)'
+              name: 'MSSQL: Percentage of the buffer cache efficiency is low'
+              event_name: 'MSSQL: Percentage of the buffer cache efficiency is low (below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}% for 5m)'
               priority: HIGH
               description: 'Too low buffer cache hit ratio.'
               tags:
@@ -355,12 +357,13 @@ zabbix_export:
             -
               uuid: 42e5bf05da06425282134d3cf806d023
               expression: 'max(/MSSQL by ODBC/mssql.buffer_cache_hit_ratio,5m)<{$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}'
-              name: 'MSSQL: Percentage of the buffer cache efficiency is low (below {$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}% for 5m)'
+              name: 'MSSQL: Percentage of the buffer cache efficiency is low'
+              event_name: 'MSSQL: Percentage of the buffer cache efficiency is low (below {$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}% for 5m)'
               priority: WARNING
               description: 'Low buffer cache hit ratio.'
               dependencies:
                 -
-                  name: 'MSSQL: Percentage of the buffer cache efficiency is low (below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}% for 5m)'
+                  name: 'MSSQL: Percentage of the buffer cache efficiency is low'
                   expression: 'max(/MSSQL by ODBC/mssql.buffer_cache_hit_ratio,5m)<{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}'
               tags:
                 -
@@ -621,7 +624,8 @@ zabbix_export:
             -
               uuid: f055a294ef3b43dd8958e77c303a5fee
               expression: 'min(/MSSQL by ODBC/mssql.free_list_stalls_sec.rate,5m)>{$MSSQL.FREE_LIST_STALLS.MAX}'
-              name: 'MSSQL: Number of rps waiting for a free page is high (over {$MSSQL.FREE_LIST_STALLS.MAX} for 5m)'
+              name: 'MSSQL: Number of rps waiting for a free page is high'
+              event_name: 'MSSQL: Number of rps waiting for a free page is high (over {$MSSQL.FREE_LIST_STALLS.MAX} for 5m)'
               priority: WARNING
               description: 'Some requests have to wait for a free page.'
               tags:
@@ -810,7 +814,8 @@ zabbix_export:
             -
               uuid: 8aa547cda82f4dfcaef5ca0467590f64
               expression: 'min(/MSSQL by ODBC/mssql.lazy_writes_sec.rate,5m)>{$MSSQL.LAZY_WRITES.MAX}'
-              name: 'MSSQL: Number of buffers written per second by the lazy writer is high (over {$MSSQL.LAZY_WRITES.MAX} for 5m)'
+              name: 'MSSQL: Number of buffers written per second by the lazy writer is high'
+              event_name: 'MSSQL: Number of buffers written per second by the lazy writer is high (over {$MSSQL.LAZY_WRITES.MAX} for 5m)'
               priority: WARNING
               description: 'The number of buffers written per second by the buffer manager''s lazy writer exceeds the threshold.'
               tags:
@@ -849,7 +854,8 @@ zabbix_export:
             -
               uuid: be4e0b1aec8d494b984be248424d69cf
               expression: 'min(/MSSQL by ODBC/mssql.lock_requests_sec.rate,5m)>{$MSSQL.LOCK_REQUESTS.MAX}'
-              name: 'MSSQL: Total number of locks per second is high (over {$MSSQL.LOCK_REQUESTS.MAX} for 5m)'
+              name: 'MSSQL: Total number of locks per second is high'
+              event_name: 'MSSQL: Total number of locks per second is high (over {$MSSQL.LOCK_REQUESTS.MAX} for 5m)'
               priority: WARNING
               description: 'Number of new locks and lock conversions per second requested from the lock manager is high.'
               tags:
@@ -888,7 +894,8 @@ zabbix_export:
             -
               uuid: 9b62d84b8d9c4209b894151f59c42b27
               expression: 'min(/MSSQL by ODBC/mssql.lock_timeouts_sec.rate,5m)>{$MSSQL.LOCK_TIMEOUTS.MAX}'
-              name: 'MSSQL: Total lock requests per second that timed out is high (over {$MSSQL.LOCK_TIMEOUTS.MAX} for 5m)'
+              name: 'MSSQL: Total lock requests per second that timed out is high'
+              event_name: 'MSSQL: Total lock requests per second that timed out is high (over {$MSSQL.LOCK_TIMEOUTS.MAX} for 5m)'
               priority: WARNING
               description: 'The total number of timed out lock requests per second, including requests for NOWAIT locks, is high.'
               tags:
@@ -1149,7 +1156,8 @@ zabbix_export:
             -
               uuid: a8f77c32a7194af9b2674f0931c25212
               expression: 'min(/MSSQL by ODBC/mssql.number_deadlocks_sec.rate,5m)>{$MSSQL.DEADLOCKS.MAX}'
-              name: 'MSSQL: Number of deadlock is high (over {$MSSQL.DEADLOCKS.MAX} for 5m)'
+              name: 'MSSQL: Number of deadlock is high'
+              event_name: 'MSSQL: Number of deadlock is high (over {$MSSQL.DEADLOCKS.MAX} for 5m)'
               priority: AVERAGE
               description: 'Too many deadlocks are occurring currently.'
               tags:
@@ -1208,7 +1216,8 @@ zabbix_export:
             -
               uuid: 4eb155a86f8b4441a6707e8a3816a068
               expression: 'max(/MSSQL by ODBC/mssql.page_life_expectancy,15m)<{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}'
-              name: 'MSSQL: Page life expectancy is low (less {$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}min for 15m)'
+              name: 'MSSQL: Page life expectancy is low'
+              event_name: 'MSSQL: Page life expectancy is low (less {$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}min for 15m)'
               priority: HIGH
               description: 'The page stays in the buffer pool without references of less time than the threshold value.'
               tags:
@@ -1271,7 +1280,8 @@ zabbix_export:
             -
               uuid: c0b765b22b264d7c9086edc5cda35592
               expression: 'min(/MSSQL by ODBC/mssql.page_reads_sec.rate,5m)>{$MSSQL.PAGE_READS.MAX}'
-              name: 'MSSQL: Number of physical database page reads per second is high (over {$MSSQL.PAGE_READS.MAX} for 5m)'
+              name: 'MSSQL: Number of physical database page reads per second is high'
+              event_name: 'MSSQL: Number of physical database page reads per second is high (over {$MSSQL.PAGE_READS.MAX} for 5m)'
               priority: WARNING
               description: 'The physical database page reads are issued too frequently.'
               tags:
@@ -1336,7 +1346,8 @@ zabbix_export:
             -
               uuid: 548941f4a7cc4cadba64d8efd46655da
               expression: 'min(/MSSQL by ODBC/mssql.page_writes_sec.rate,5m)>{$MSSQL.PAGE_WRITES.MAX}'
-              name: 'MSSQL: Number of physical database page writes per second is high (over {$MSSQL.PAGE_WRITES.MAX} for 5m)'
+              name: 'MSSQL: Number of physical database page writes per second is high'
+              event_name: 'MSSQL: Number of physical database page writes per second is high (over {$MSSQL.PAGE_WRITES.MAX} for 5m)'
               priority: WARNING
               description: 'The physical database page writes are issued too frequently.'
               tags:
@@ -1364,7 +1375,8 @@ zabbix_export:
             -
               uuid: c5c1840220cd44fcaa7b47e0d52309bb
               expression: 'min(/MSSQL by ODBC/mssql.percent_of_adhoc_queries,15m) > {$MSSQL.PERCENT_COMPILATIONS.MAX}'
-              name: 'MSSQL: Percent of adhoc queries running is over {$MSSQL.PERCENT_COMPILATIONS.MAX}% for 15m'
+              name: 'MSSQL: Percent of adhoc queries running is high'
+              event_name: 'MSSQL: Percent of adhoc queries running is over {$MSSQL.PERCENT_COMPILATIONS.MAX}% for 15m'
               priority: WARNING
               description: 'The lower this value is the better. High values often indicate excessive adhoc querying and should be as low as possible. If excessive adhoc querying is happening, try rewriting the queries as procedures or invoke the queries using sp_executeSQL. When rewriting isn''t possible, consider using a plan guide or setting the database to parameterization forced mode.'
               tags:
@@ -1392,7 +1404,8 @@ zabbix_export:
             -
               uuid: d5bad8ead8704e00bf332032e22ebfdd
               expression: 'min(/MSSQL by ODBC/mssql.percent_recompilations_to_compilations,15m) > {$MSSQL.PERCENT_RECOMPILATIONS.MAX}'
-              name: 'MSSQL: Percent of times statement recompiles is over {$MSSQL.PERCENT_RECOMPILATIONS.MAX}% for 15m'
+              name: 'MSSQL: Percent of times statement recompiles is high'
+              event_name: 'MSSQL: Percent of times statement recompiles is over {$MSSQL.PERCENT_RECOMPILATIONS.MAX}% for 15m'
               priority: WARNING
               description: 'This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter''s value should follow in proportion to “Batch Requests/sec” and “SQL Compilations/sec”.'
               tags:
@@ -1756,7 +1769,8 @@ zabbix_export:
             -
               uuid: 0321c9f671394cb180fdce53b4033cf4
               expression: 'nodata(/MSSQL by ODBC/mssql.uptime,30m)=1'
-              name: 'MSSQL: Failed to fetch info data (or no data for 30m)'
+              name: 'MSSQL: Failed to fetch info data'
+              event_name: 'MSSQL: Failed to fetch info data (or no data for 30m)'
               priority: INFO
               description: 'Zabbix has not received data for items for the last 30 minutes.'
               dependencies:
@@ -1770,9 +1784,10 @@ zabbix_export:
             -
               uuid: aa10f863608a494281f41e12f0d2b1a5
               expression: 'last(/MSSQL by ODBC/mssql.uptime)<10m'
-              name: 'MSSQL: Service has been restarted (uptime < 10m)'
+              name: 'MSSQL: Service has been restarted'
+              event_name: 'MSSQL: Service has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -1853,7 +1868,8 @@ zabbix_export:
             -
               uuid: 4ece2c9172714c68b8345834cc37d927
               expression: 'last(/MSSQL by ODBC/mssql.version,#1)<>last(/MSSQL by ODBC/mssql.version,#2) and length(last(/MSSQL by ODBC/mssql.version))>0'
-              name: 'MSSQL: Version has changed (new version value received: {ITEM.VALUE})'
+              name: 'MSSQL: Version has changed'
+              event_name: 'MSSQL: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
               description: 'MSSQL version has changed. Ack to close.'
               manual_close: 'YES'
@@ -1889,7 +1905,8 @@ zabbix_export:
             -
               uuid: 2f7e2dd4a94e4e92b468f4e2e2364f71
               expression: 'min(/MSSQL by ODBC/mssql.workfiles_created_sec.rate,5m)>{$MSSQL.WORK_FILES.MAX}'
-              name: 'MSSQL: Number of work files created per second is high (over {$MSSQL.WORK_FILES.MAX} for 5m)'
+              name: 'MSSQL: Number of work files created per second is high'
+              event_name: 'MSSQL: Number of work files created per second is high (over {$MSSQL.WORK_FILES.MAX} for 5m)'
               priority: AVERAGE
               description: 'Too many work files created per second to store temporary results for hash joins and hash aggregates.'
               tags:
@@ -1924,7 +1941,8 @@ zabbix_export:
             -
               uuid: 0214004de3084ce6b35d5bba53a66947
               expression: 'min(/MSSQL by ODBC/mssql.worktables_created_sec.rate,5m)>{$MSSQL.WORK_TABLES.MAX}'
-              name: 'MSSQL: Number of work tables created per second is high (over {$MSSQL.WORK_TABLES.MAX} for 5m)'
+              name: 'MSSQL: Number of work tables created per second is high'
+              event_name: 'MSSQL: Number of work tables created per second is high (over {$MSSQL.WORK_TABLES.MAX} for 5m)'
               priority: AVERAGE
               description: 'Too many work tables created per second to store temporary results for query spool, lob variables, XML variables, and cursors.'
               tags:
@@ -1956,7 +1974,8 @@ zabbix_export:
             -
               uuid: 98dee2bc42484988b208e100cc25ae05
               expression: 'max(/MSSQL by ODBC/mssql.worktables_from_cache_ratio,5m)<{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}'
-              name: 'MSSQL: Percentage of work tables available from the work table cache is low (below {$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}% for 5m)'
+              name: 'MSSQL: Percentage of work tables available from the work table cache is low'
+              event_name: 'MSSQL: Percentage of work tables available from the work table cache is low (below {$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}% for 5m)'
               priority: HIGH
               description: 'A value less than 90% may indicate insufficient memory, since execution plans are being dropped, or on 32-bit systems, may indicate the need for an upgrade to a 64-bit system'
               tags:
@@ -2295,7 +2314,8 @@ zabbix_export:
                 -
                   uuid: 036892c6b9de41c698a4e9acd5457e6a
                   expression: 'last(/MSSQL by ODBC/mssql.backup.diff["{#DBNAME}"])>{$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
-                  name: 'MSSQL DB ''{#DBNAME}'': Diff backup older than {$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
+                  name: 'MSSQL DB ''{#DBNAME}'': Diff backup is old'
+                  event_name: 'MSSQL DB ''{#DBNAME}'': Diff backup older than {$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'The differential backup has not been executed for a long time.'
@@ -2310,14 +2330,15 @@ zabbix_export:
                 -
                   uuid: 9a294163ee034fc6a58f5534a7d79aac
                   expression: 'last(/MSSQL by ODBC/mssql.backup.diff["{#DBNAME}"])>{$MSSQL.BACKUP_DIFF.WARN:"{#DBNAME}"}'
-                  name: 'MSSQL DB ''{#DBNAME}'': Diff backup older than {$MSSQL.BACKUP_DIFF.WARN:"{#DBNAME}"}'
+                  name: 'MSSQL DB ''{#DBNAME}'': Diff backup is old'
+                  event_name: 'MSSQL DB ''{#DBNAME}'': Diff backup older than {$MSSQL.BACKUP_DIFF.WARN:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'The differential backup has not been executed for a long time.'
                   manual_close: 'YES'
                   dependencies:
                     -
-                      name: 'MSSQL DB ''{#DBNAME}'': Diff backup older than {$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
+                      name: 'MSSQL DB ''{#DBNAME}'': Diff backup is old'
                       expression: 'last(/MSSQL by ODBC/mssql.backup.diff["{#DBNAME}"])>{$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
                   tags:
                     -
@@ -2380,7 +2401,8 @@ zabbix_export:
                 -
                   uuid: 09c8e059ffa44d0eb1be626b5d820dc9
                   expression: 'last(/MSSQL by ODBC/mssql.backup.full["{#DBNAME}"])>{$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
-                  name: 'MSSQL DB ''{#DBNAME}'': Full backup older than {$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
+                  name: 'MSSQL DB ''{#DBNAME}'': Full backup is old'
+                  event_name: 'MSSQL DB ''{#DBNAME}'': Full backup older than {$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'The full backup has not been executed for a long time.'
@@ -2395,14 +2417,15 @@ zabbix_export:
                 -
                   uuid: b380d76b1055482ca8cd69c90611f1a5
                   expression: 'last(/MSSQL by ODBC/mssql.backup.full["{#DBNAME}"])>{$MSSQL.BACKUP_FULL.WARN:"{#DBNAME}"}'
-                  name: 'MSSQL DB ''{#DBNAME}'': Full backup older than {$MSSQL.BACKUP_FULL.WARN:"{#DBNAME}"}'
+                  name: 'MSSQL DB ''{#DBNAME}'': Full backup is old'
+                  event_name: 'MSSQL DB ''{#DBNAME}'': Full backup older than {$MSSQL.BACKUP_FULL.WARN:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'The full backup has not been executed for a long time.'
                   manual_close: 'YES'
                   dependencies:
                     -
-                      name: 'MSSQL DB ''{#DBNAME}'': Full backup older than {$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
+                      name: 'MSSQL DB ''{#DBNAME}'': Full backup is old'
                       expression: 'last(/MSSQL by ODBC/mssql.backup.full["{#DBNAME}"])>{$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
                   tags:
                     -
@@ -2462,7 +2485,8 @@ zabbix_export:
                 -
                   uuid: 4a6e76dc9a5148649d07e35e962b5893
                   expression: 'last(/MSSQL by ODBC/mssql.backup.log["{#DBNAME}"])>{$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
-                  name: 'MSSQL DB ''{#DBNAME}'': Log backup older than {$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
+                  name: 'MSSQL DB ''{#DBNAME}'': Log backup is old'
+                  event_name: 'MSSQL DB ''{#DBNAME}'': Log backup older than {$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'The log backup has not been executed for a long time.'
@@ -2477,14 +2501,15 @@ zabbix_export:
                 -
                   uuid: 6000420450cf453bae3652c7f7d05e2b
                   expression: 'last(/MSSQL by ODBC/mssql.backup.log["{#DBNAME}"])>{$MSSQL.BACKUP_LOG.WARN:"{#DBNAME}"}'
-                  name: 'MSSQL DB ''{#DBNAME}'': Log backup older than {$MSSQL.BACKUP_LOG.WARN:"{#DBNAME}"}'
+                  name: 'MSSQL DB ''{#DBNAME}'': Log backup is old'
+                  event_name: 'MSSQL DB ''{#DBNAME}'': Log backup older than {$MSSQL.BACKUP_LOG.WARN:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'The log backup has not been executed for a long time.'
                   manual_close: 'YES'
                   dependencies:
                     -
-                      name: 'MSSQL DB ''{#DBNAME}'': Log backup older than {$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
+                      name: 'MSSQL DB ''{#DBNAME}'': Log backup is old'
                       expression: 'last(/MSSQL by ODBC/mssql.backup.log["{#DBNAME}"])>{$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
                   tags:
                     -
@@ -2682,7 +2707,8 @@ zabbix_export:
                 -
                   uuid: b351fc1128c24faf88d36717d0a0d1a5
                   expression: 'min(/MSSQL by ODBC/mssql.db.log_flush_waits_sec.rate["{#DBNAME}"],5m)>{$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}'
-                  name: 'MSSQL DB ''{#DBNAME}'': Number of commits waiting for the log flush is high (over {$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}/sec for 5m)'
+                  name: 'MSSQL DB ''{#DBNAME}'': Number of commits waiting for the log flush is high'
+                  event_name: 'MSSQL DB ''{#DBNAME}'': Number of commits waiting for the log flush is high (over {$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}/sec for 5m)'
                   priority: WARNING
                   description: 'Too many commits are waiting for the log flush.'
                   tags:
@@ -2724,7 +2750,8 @@ zabbix_export:
                 -
                   uuid: 80351c56215148b8ab75d95dc81ff0d0
                   expression: 'min(/MSSQL by ODBC/mssql.db.log_flush_wait_time["{#DBNAME}"],5m)>{$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}'
-                  name: 'MSSQL DB ''{#DBNAME}'': Total wait time to flush the log is high (over {$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}ms for 5m)'
+                  name: 'MSSQL DB ''{#DBNAME}'': Total wait time to flush the log is high'
+                  event_name: 'MSSQL DB ''{#DBNAME}'': Total wait time to flush the log is high (over {$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}ms for 5m)'
                   priority: WARNING
                   description: 'The wait time to flush the log is too long.'
                   tags:
@@ -2828,7 +2855,8 @@ zabbix_export:
                 -
                   uuid: f02958e3ee174c6dbe900e3dd92cacdc
                   expression: 'min(/MSSQL by ODBC/mssql.db.percent_log_used["{#DBNAME}"],5m)>{$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}'
-                  name: 'MSSQL DB ''{#DBNAME}'': Percent of log using is high (over {$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}% for 5m)'
+                  name: 'MSSQL DB ''{#DBNAME}'': Percent of log using is high'
+                  event_name: 'MSSQL DB ''{#DBNAME}'': Percent of log using is high (over {$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}% for 5m)'
                   priority: WARNING
                   description: 'There''s not enough space left in the log.'
                   tags:
@@ -3158,7 +3186,8 @@ zabbix_export:
                 -
                   uuid: 7e45cb8f41114388ac8772006d929da2
                   expression: 'last(/MSSQL by ODBC/mssql.job.run_duration["{#JOBNAME}"])>{$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}'
-                  name: 'MSSQL Job ''{#JOBNAME}'': Job duration is greater than {$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}'
+                  name: 'MSSQL Job ''{#JOBNAME}'': Job duration is high'
+                  event_name: 'MSSQL Job ''{#JOBNAME}'': Job duration is greater than {$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}'
                   opdata: 'Job duration: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'The job is taking too long.'

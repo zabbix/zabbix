@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:37:20Z'
+  date: '2022-04-06T19:33:39Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -167,6 +167,7 @@ zabbix_export:
               uuid: 819b379b51c34616820f86d21c703b27
               expression: 'last(/Redis by Zabbix agent 2/redis.config["{$REDIS.CONN.URI}"],#1)<>last(/Redis by Zabbix agent 2/redis.config["{$REDIS.CONN.URI}"],#2) and length(last(/Redis by Zabbix agent 2/redis.config["{$REDIS.CONN.URI}"]))>0'
               name: 'Redis: Configuration has changed'
+              event_name: 'Redis: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Redis configuration has changed. Ack to close.'
               manual_close: 'YES'
@@ -273,7 +274,8 @@ zabbix_export:
             -
               uuid: 0a5176877ba24df8b5d38c8cc544f0a8
               expression: 'nodata(/Redis by Zabbix agent 2/redis.info["{$REDIS.CONN.URI}"],30m)=1'
-              name: 'Redis: Failed to fetch info data (or no data for 30m)'
+              name: 'Redis: Failed to fetch info data'
+              event_name: 'Redis: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes'
               manual_close: 'YES'
@@ -316,7 +318,8 @@ zabbix_export:
             -
               uuid: 629531ff1ebc4bdbb1f277848c436230
               expression: 'min(/Redis by Zabbix agent 2/redis.memory.fragmentation_ratio,15m)>{$REDIS.MEM.FRAG_RATIO.MAX.WARN}'
-              name: 'Redis: Memory fragmentation ratio is too high (over {$REDIS.MEM.FRAG_RATIO.MAX.WARN} in 15m)'
+              name: 'Redis: Memory fragmentation ratio is too high'
+              event_name: 'Redis: Memory fragmentation ratio is too high (over {$REDIS.MEM.FRAG_RATIO.MAX.WARN} in 15m)'
               priority: WARNING
               description: |
                 This ratio is an indication of memory mapping efficiency:
@@ -930,7 +933,8 @@ zabbix_export:
               uuid: d24f7aabefb345e791b3bb276f30ac8c
               expression: 'last(/Redis by Zabbix agent 2/redis.replication.role,#1)<>last(/Redis by Zabbix agent 2/redis.replication.role,#2) and length(last(/Redis by Zabbix agent 2/redis.replication.role))>0'
               recovery_mode: NONE
-              name: 'Redis: Replication role has changed (new role: {ITEM.VALUE})'
+              name: 'Redis: Replication role has changed'
+              event_name: 'Redis: Replication role has changed (new role: {ITEM.VALUE})'
               priority: WARNING
               description: 'Redis replication role has changed. Ack to close.'
               manual_close: 'YES'
@@ -1015,7 +1019,8 @@ zabbix_export:
             -
               uuid: 6e307546b26344deb83f2295c90e9a33
               expression: 'last(/Redis by Zabbix agent 2/redis.server.redis_version,#1)<>last(/Redis by Zabbix agent 2/redis.server.redis_version,#2) and length(last(/Redis by Zabbix agent 2/redis.server.redis_version))>0'
-              name: 'Redis: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Redis: Version has changed'
+              event_name: 'Redis: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Redis version has changed. Ack to close.'
               manual_close: 'YES'
@@ -1070,7 +1075,8 @@ zabbix_export:
             -
               uuid: 4961e91eed2a4e83899d135315748b0e
               expression: 'last(/Redis by Zabbix agent 2/redis.server.uptime)<10m'
-              name: 'Redis: has been restarted (uptime < 10m)'
+              name: 'Redis: has been restarted'
+              event_name: 'Redis: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -1096,7 +1102,8 @@ zabbix_export:
             -
               uuid: 37fb0255e49c42c8913e56fe4aaa1d14
               expression: 'min(/Redis by Zabbix agent 2/redis.slowlog.count["{$REDIS.CONN.URI}"],5m)>{$REDIS.SLOWLOG.COUNT.MAX.WARN}'
-              name: 'Redis: Too many entries in the slowlog (over {$REDIS.SLOWLOG.COUNT.MAX.WARN} per second in 5m)'
+              name: 'Redis: Too many entries in the slowlog'
+              event_name: 'Redis: Too many entries in the slowlog (over {$REDIS.SLOWLOG.COUNT.MAX.WARN} per second in 5m)'
               priority: INFO
               tags:
                 -
@@ -2143,7 +2150,8 @@ zabbix_export:
             -
               uuid: 0c3560588d2d421c843c006ef5fa4645
               expression: 'last(/Redis by Zabbix agent 2/redis.memory.used_memory)/min(/Redis by Zabbix agent 2/redis.memory.maxmemory[{#SINGLETON}],5m)*100>{$REDIS.MEM.PUSED.MAX.WARN}'
-              name: 'Redis: Memory usage is too high (over {$REDIS.MEM.PUSED.MAX.WARN}% in 5m)'
+              name: 'Redis: Memory usage is too high'
+              event_name: 'Redis: Memory usage is too high (over {$REDIS.MEM.PUSED.MAX.WARN}% in 5m)'
               priority: WARNING
               tags:
                 -
@@ -2780,7 +2788,8 @@ zabbix_export:
                 -
                   uuid: 292f477d970d4a138d2d1b2c45d965dd
                   expression: 'min(/Redis by Zabbix agent 2/redis.replication.master_last_io_seconds_ago[{#SINGLETON}],5m)>{$REDIS.REPL.LAG.MAX.WARN}'
-                  name: 'Redis: Replication lag with master is too high (over {$REDIS.REPL.LAG.MAX.WARN} in 5m)'
+                  name: 'Redis: Replication lag with master is too high'
+                  event_name: 'Redis: Replication lag with master is too high (over {$REDIS.REPL.LAG.MAX.WARN} in 5m)'
                   priority: WARNING
                   tags:
                     -
@@ -3264,7 +3273,8 @@ zabbix_export:
     -
       uuid: 65e4652dbebe47c4b46e47bb8a17aac6
       expression: 'min(/Redis by Zabbix agent 2/redis.clients.connected,5m)/last(/Redis by Zabbix agent 2/redis.config.maxclients)*100>{$REDIS.CLIENTS.PRC.MAX.WARN}'
-      name: 'Redis: Total number of connected clients is too high (over {$REDIS.CLIENTS.PRC.MAX.WARN}% in 5m)'
+      name: 'Redis: Total number of connected clients is too high'
+      event_name: 'Redis: Total number of connected clients is too high (over {$REDIS.CLIENTS.PRC.MAX.WARN}% in 5m)'
       priority: WARNING
       description: |
         When the number of clients reaches the value of the "maxclients" parameter, new connections will be rejected.

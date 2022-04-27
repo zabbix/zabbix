@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:50:14Z'
+  date: '2022-04-06T19:35:52Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -47,7 +47,8 @@ zabbix_export:
             -
               uuid: 926f1767aae74529a972c7b8b09f4442
               expression: 'last(/WildFly Domain by JMX/jmx["java.lang:type=Runtime","Uptime"])<10m'
-              name: 'WildFly: has been restarted (uptime < 10m)'
+              name: 'WildFly: has been restarted'
+              event_name: 'WildFly: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -145,7 +146,8 @@ zabbix_export:
             -
               uuid: 76d500211fd9479fafbd0fb7d41ffd68
               expression: 'last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"],#1)<>last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"],#2) and length(last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"]))>0'
-              name: 'WildFly: Version has changed (new version: {ITEM.VALUE})'
+              name: 'WildFly: Version has changed'
+              event_name: 'WildFly: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'WildFly version has changed. Ack to close.'
               manual_close: 'YES'
@@ -327,7 +329,8 @@ zabbix_export:
                 -
                   uuid: da5368f2eec040bbb05f13faa6375052
                   expression: 'last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group],#1)<>last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group],#2) and length(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group]))>0'
-                  name: 'WildFly domain: Server {#SERVER}: Server group has changed (new group: {ITEM.VALUE})'
+                  name: 'WildFly domain: Server {#SERVER}: Server group has changed'
+                  event_name: 'WildFly domain: Server {#SERVER}: Server group has changed (new group: {ITEM.VALUE})'
                   priority: INFO
                   description: 'Server group has changed. Ack to close.'
                   manual_close: 'YES'
@@ -363,7 +366,8 @@ zabbix_export:
                 -
                   uuid: 79409a9fae6442c9ad655655a752365d
                   expression: 'last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status],#1)<>last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status],#2) and length(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status]))>0'
-                  name: 'WildFly domain: Server {#SERVER}: Server status has changed (new status: {ITEM.VALUE})'
+                  name: 'WildFly domain: Server {#SERVER}: Server status has changed'
+                  event_name: 'WildFly domain: Server {#SERVER}: Server status has changed (new status: {ITEM.VALUE})'
                   priority: WARNING
                   description: 'Server status has changed. Ack to close.'
                   manual_close: 'YES'
