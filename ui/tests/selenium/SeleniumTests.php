@@ -20,6 +20,7 @@
 
 require_once dirname(__FILE__).'/testDocumentationLinks.php';
 require_once dirname(__FILE__).'/testGeneric.php';
+require_once dirname(__FILE__).'/testExecuteNow.php';
 require_once dirname(__FILE__).'/testGraphAxis.php';
 require_once dirname(__FILE__).'/testPageDashboard.php';
 require_once dirname(__FILE__).'/testPageDashboardWidgets.php';
@@ -213,6 +214,7 @@ class SeleniumTests {
 
 		$suite->addTestSuite('testDocumentationLinks');
 		$suite->addTestSuite('testGeneric');
+		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testGraphAxis');
 		$suite->addTestSuite('testPageActions');
 		$suite->addTestSuite('testFormAdministrationGeneralAutoregistration');

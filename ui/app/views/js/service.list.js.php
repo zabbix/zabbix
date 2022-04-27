@@ -99,7 +99,7 @@
 					});
 				}
 				else if (e.target.classList.contains('js-massdelete-service')) {
-					this._delete(e.target, Object.values(chkbxRange.getSelectedIds()));
+					this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 			});
 		}

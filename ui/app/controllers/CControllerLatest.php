@@ -123,6 +123,20 @@ abstract class CControllerLatest extends CController {
 				'preservekeys' => true
 			]);
 
+			// If user role checkbox 'Invoke "Execute now" on read-only hosts' is ON, read-write items are the same.
+			$items_rw = $items;
+
+			// If user role checkbox 'Invoke "Execute now" on read-only hosts' is OFF, get only read-write items.
+			if (!$this->hasInput('filter_counters') && $this->getUserType() < USER_TYPE_SUPER_ADMIN
+					&& !$this->checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW)) {
+				$items_rw = API::Item()->get([
+					'output' => [],
+					'itemids' => array_keys($items),
+					'editable' => true,
+					'preservekeys' => true
+				]);
+			}
+
 			if ($sort_field === 'host') {
 				$items = array_map(function ($item) use ($hosts) {
 					return $item + [
@@ -145,11 +159,13 @@ abstract class CControllerLatest extends CController {
 		else {
 			$hosts = [];
 			$items = [];
+			$items_rw = [];
 		}
 
 		return [
 			'hosts' => $hosts,
-			'items' => $items
+			'items' => $items,
+			'items_rw' => $items_rw
 		];
 	}
 

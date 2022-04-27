@@ -574,6 +574,7 @@ class testFormUserRoles extends CWebTest {
 						'Close problems' => false,
 						'Execute scripts' => false,
 						'Manage API tokens' => false,
+						'Invoke "Execute now" on read-only hosts' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'User role created'
@@ -596,6 +597,7 @@ class testFormUserRoles extends CWebTest {
 						'Manage API tokens' => false,
 						'Manage scheduled reports' => false,
 						'Manage SLA' => false,
+						'Invoke "Execute now" on read-only hosts' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'User role created'
