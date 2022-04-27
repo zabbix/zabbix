@@ -32,6 +32,7 @@ sbin_PROGRAMS = zabbix_server
 noinst_LIBRARIES = libzbxserver.a
 
 libzbxserver_a_SOURCES = \
+	db_lengths.h \
 	actions.c \
 	actions.h \
 	events.c \
