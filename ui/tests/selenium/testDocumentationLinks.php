@@ -425,7 +425,7 @@ class testDocumentationLinks extends CWebTest {
 							'callback' => 'openFormWithLink',
 							'element' => 'xpath://a[text()="Create new report"]'
 						]
-					],
+					]
 				]
 			],
 			// #40 Availability report view.
@@ -696,7 +696,7 @@ class testDocumentationLinks extends CWebTest {
 						[
 							'callback' => 'openFormWithLink',
 							'element' => 'xpath://a[text()="Add page"]'
-						],
+						]
 					]
 				]
 			],
@@ -881,7 +881,7 @@ class testDocumentationLinks extends CWebTest {
 						[
 							'callback' => 'openFormWithLink',
 							'element' => 'xpath://div[@id="stepTab"]//button[text()="Add"]'
-						],
+						]
 					],
 					'doc_link' => '/en/manual/web_monitoring#configuring-steps'
 				]
@@ -1234,7 +1234,7 @@ class testDocumentationLinks extends CWebTest {
 						[
 							'callback' => 'openFormWithLink',
 							'element' => 'xpath://div[@id="stepTab"]//button[text()="Add"]'
-						],
+						]
 					],
 					'doc_link' => '/en/manual/web_monitoring#configuring-steps'
 				]
@@ -1537,7 +1537,7 @@ class testDocumentationLinks extends CWebTest {
 						[
 							'callback' => 'openFormWithLink',
 							'element' => 'link:1st Module name'
-						],
+						]
 					],
 					'doc_link' => '/en/manual/modules#manifest-preparation'
 				]
