@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
+	diag \
 	heart \
 	housekeeper \
 	proxyconfig \
@@ -21,6 +22,7 @@ libzbxproxy_a_CFLAGS = \
 zabbix_proxy_SOURCES = proxy.c
 
 zabbix_proxy_LDADD = \
+	diag/libzbxdiag_proxy.a \
 	heart/libzbxheart.a \
 	$(top_builddir)/src/zabbix_server/dbsyncer/libzbxdbsyncer.a \
 	$(top_builddir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
@@ -83,7 +85,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_service.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_proxy.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc.a \
-	$(top_builddir)/src/libs/zbxdiag/libzbxdiag_proxy.a \
+	$(top_builddir)/src/libs/zbxdiag/libzbxdiag.a \
 	$(top_builddir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_builddir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \
