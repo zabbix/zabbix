@@ -63,12 +63,12 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 
 int	zbx_is_trigger_function(const char *name, size_t len);
 
-int	substitute_simple_macros(const zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+int	substitute_simple_macros(const zbx_uint64_t *actionid, const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event,
 		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
 		const ZBX_DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error, int maxerrlen);
 
-int	substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+int	substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event,
 		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
 		const ZBX_DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error, int maxerrlen);

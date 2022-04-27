@@ -42,7 +42,7 @@ zbx_dcheck_source_t;
  * Return value: hostid - existing hostid, 0 - if not found                   *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	select_discovered_host(const DB_EVENT *event, char **hostname)
+static zbx_uint64_t	select_discovered_host(const ZBX_DB_EVENT *event, char **hostname)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -204,7 +204,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
  * Return value: hostid - new/existing hostid                                 *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_config_t *cfg)
+static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, zbx_config_t *cfg)
 {
 	DB_RESULT		result;
 	DB_RESULT		result2;
@@ -642,7 +642,7 @@ clean:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	is_discovery_or_autoregistration(const DB_EVENT *event)
+static int	is_discovery_or_autoregistration(const ZBX_DB_EVENT *event)
 {
 	if (event->source == EVENT_SOURCE_DISCOVERY && (event->object == EVENT_OBJECT_DHOST ||
 			event->object == EVENT_OBJECT_DSERVICE))
@@ -664,7 +664,7 @@ static int	is_discovery_or_autoregistration(const DB_EVENT *event)
  *             cfg            - [IN] the global configuration data            *
  *                                                                            *
  ******************************************************************************/
-void	op_host_add(const DB_EVENT *event, zbx_config_t *cfg)
+void	op_host_add(const ZBX_DB_EVENT *event, zbx_config_t *cfg)
 {
 	int	status;
 
@@ -685,7 +685,7 @@ out:
  * Parameters: event          - [IN] source event data                        *
  *                                                                            *
  ******************************************************************************/
-void	op_host_del(const DB_EVENT *event)
+void	op_host_del(const ZBX_DB_EVENT *event)
 {
 	zbx_vector_uint64_t	hostids;
 	zbx_vector_str_t	hostnames;
@@ -725,7 +725,7 @@ out:
  *             cfg            - [IN] the global configuration data            *
  *                                                                            *
  ******************************************************************************/
-void	op_host_enable(const DB_EVENT *event, zbx_config_t *cfg)
+void	op_host_enable(const ZBX_DB_EVENT *event, zbx_config_t *cfg)
 {
 	zbx_uint64_t	hostid;
 	int		status;
@@ -759,7 +759,7 @@ out:
  *             cfg            - [IN] the global configuration data            *
  *                                                                            *
  ******************************************************************************/
-void	op_host_disable(const DB_EVENT *event, zbx_config_t *cfg)
+void	op_host_disable(const ZBX_DB_EVENT *event, zbx_config_t *cfg)
 {
 	zbx_uint64_t	hostid;
 	int		status;
@@ -798,7 +798,7 @@ out:
  *           setting manual or automatic host inventory mode is supported.    *
  *                                                                            *
  ******************************************************************************/
-void	op_host_inventory_mode(const DB_EVENT *event, zbx_config_t *cfg, int inventory_mode)
+void	op_host_inventory_mode(const ZBX_DB_EVENT *event, zbx_config_t *cfg, int inventory_mode)
 {
 	zbx_uint64_t	hostid;
 	int		status;
@@ -825,7 +825,7 @@ out:
  *             groupids - [IN] IDs of groups to add                           *
  *                                                                            *
  ******************************************************************************/
-void	op_groups_add(const DB_EVENT *event, zbx_config_t *cfg, zbx_vector_uint64_t *groupids)
+void	op_groups_add(const ZBX_DB_EVENT *event, zbx_config_t *cfg, zbx_vector_uint64_t *groupids)
 {
 	zbx_uint64_t	hostid;
 	int		status;
@@ -851,7 +851,7 @@ out:
  *             groupids - [IN] IDs of groups to delete                        *
  *                                                                            *
  ******************************************************************************/
-void	op_groups_del(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
+void	op_groups_del(const ZBX_DB_EVENT *event, zbx_vector_uint64_t *groupids)
 {
 	DB_RESULT	result;
 	zbx_uint64_t	hostid;
@@ -956,7 +956,7 @@ out:
  *             lnk_templateids - [IN] array of template IDs                   *
  *                                                                            *
  ******************************************************************************/
-void	op_template_add(const DB_EVENT *event, zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids)
+void	op_template_add(const ZBX_DB_EVENT *event, zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids)
 {
 	zbx_uint64_t	hostid;
 	char		*error = NULL;
@@ -987,7 +987,7 @@ out:
  *             del_templateids - [IN] array of template IDs                   *
  *                                                                            *
  ******************************************************************************/
-void	op_template_del(const DB_EVENT *event, zbx_vector_uint64_t *del_templateids)
+void	op_template_del(const ZBX_DB_EVENT *event, zbx_vector_uint64_t *del_templateids)
 {
 	zbx_uint64_t	hostid;
 	char		*error, *hostname = NULL;

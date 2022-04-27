@@ -115,7 +115,7 @@ static void	preprocess_trigger_name(ZBX_DB_TRIGGER *trigger, int *historical)
 	size_t		name_alloc, name_len, replace_alloc = 64, replace_offset, r, l;
 	char		*replace;
 	const char	*macro;
-	DB_EVENT	event;
+	ZBX_DB_EVENT	event;
 
 	*historical = FAIL;
 
@@ -158,7 +158,7 @@ static void	preprocess_trigger_name(ZBX_DB_TRIGGER *trigger, int *historical)
 		pos = token.loc.r;
 	}
 
-	memset(&event, 0, sizeof(DB_EVENT));
+	memset(&event, 0, sizeof(ZBX_DB_EVENT));
 	event.object = EVENT_OBJECT_TRIGGER;
 	event.objectid = trigger->triggerid;
 	event.trigger = *trigger;
@@ -276,11 +276,11 @@ static int	process_event_update(const ZBX_DB_TRIGGER *trigger, char **sql, size_
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_EVENT	event;
+	ZBX_DB_EVENT	event;
 	char		*name, *name_esc;
 	int		ret = SUCCEED;
 
-	memset(&event, 0, sizeof(DB_EVENT));
+	memset(&event, 0, sizeof(ZBX_DB_EVENT));
 
 	result = DBselect("select eventid,source,object,objectid,clock,value,acknowledged,ns,name"
 			" from events"

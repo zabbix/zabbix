@@ -61,8 +61,8 @@ ZBX_VECTOR_IMPL(rootcause, zbx_rootcause_t)
 #define ZBX_REQUEST_ITEM_LOG_NSEVERITY		206
 #define ZBX_REQUEST_ITEM_LOG_EVENTID		207
 
-static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_EVENT *event,
-		const DB_EVENT *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host,
+static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX_DB_EVENT *event,
+		const ZBX_DB_EVENT *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host,
 		const DC_ITEM *dc_item, const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack,
 		const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service, const char *tz, char **data,
 		int macro_type, char *error, int maxerrlen);
@@ -763,7 +763,7 @@ static int	DBget_trigger_event_count(zbx_uint64_t triggerid, char **replace_to, 
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_dhost_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)
+static int	DBget_dhost_value_by_event(const ZBX_DB_EVENT *event, char **replace_to, const char *fieldname)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -817,7 +817,7 @@ static int	DBget_dhost_value_by_event(const DB_EVENT *event, char **replace_to, 
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_dchecks_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)
+static int	DBget_dchecks_value_by_event(const ZBX_DB_EVENT *event, char **replace_to, const char *fieldname)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -852,7 +852,7 @@ static int	DBget_dchecks_value_by_event(const DB_EVENT *event, char **replace_to
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_dservice_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)
+static int	DBget_dservice_value_by_event(const ZBX_DB_EVENT *event, char **replace_to, const char *fieldname)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -886,7 +886,7 @@ static int	DBget_dservice_value_by_event(const DB_EVENT *event, char **replace_t
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_drule_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)
+static int	DBget_drule_value_by_event(const ZBX_DB_EVENT *event, char **replace_to, const char *fieldname)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1142,7 +1142,7 @@ static char	*format_user_fullname(const char *name, const char *surname, const c
  * Purpose: retrieve escalation history                                       *
  *                                                                            *
  ******************************************************************************/
-static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+static void	get_escalation_history(zbx_uint64_t actionid, const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event,
 			char **replace_to, const zbx_uint64_t *recipient_userid, const char *tz)
 {
 	DB_RESULT	result;
@@ -1250,7 +1250,7 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
  * Purpose: retrieve event acknowledges history                               *
  *                                                                            *
  ******************************************************************************/
-static void	get_event_update_history(const DB_EVENT *event, char **replace_to, const zbx_uint64_t *recipient_userid,
+static void	get_event_update_history(const ZBX_DB_EVENT *event, char **replace_to, const zbx_uint64_t *recipient_userid,
 		const char *tz)
 {
 	DB_RESULT	result;
@@ -1323,7 +1323,7 @@ static void	get_event_update_history(const DB_EVENT *event, char **replace_to, c
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)
+static int	get_autoreg_value_by_event(const ZBX_DB_EVENT *event, char **replace_to, const char *fieldname)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1869,7 +1869,7 @@ static int	compare_tags(const void *d1, const void *d2)
  *             replace_to - [OUT] replacement string                          *
  *                                                                            *
  ******************************************************************************/
-static void	get_event_tags(const DB_EVENT *event, char **replace_to)
+static void	get_event_tags(const ZBX_DB_EVENT *event, char **replace_to)
 {
 	size_t			replace_to_offset = 0, replace_to_alloc = 0;
 	int			i;
@@ -1920,7 +1920,7 @@ static void	get_event_tags(const DB_EVENT *event, char **replace_to)
  *             replace_to - [OUT] replacement string                          *
  *                                                                            *
  ******************************************************************************/
-static void	get_event_tags_json(const DB_EVENT *event, char **replace_to)
+static void	get_event_tags_json(const ZBX_DB_EVENT *event, char **replace_to)
 {
 	struct zbx_json	json;
 	int		i;
@@ -1951,7 +1951,7 @@ static void	get_event_tags_json(const DB_EVENT *event, char **replace_to)
  *             replace_to - [OUT] replacement string                          *
  *                                                                            *
  ******************************************************************************/
-static void	get_event_tag_by_name(const char *text, const DB_EVENT *event, char **replace_to)
+static void	get_event_tag_by_name(const char *text, const ZBX_DB_EVENT *event, char **replace_to)
 {
 	char	*name;
 
@@ -1991,7 +1991,7 @@ static void	get_event_tag_by_name(const char *text, const DB_EVENT *event, char 
  * Purpose: request recovery event value by macro                             *
  *                                                                            *
  ******************************************************************************/
-static void	get_recovery_event_value(const char *macro, const DB_EVENT *r_event, char **replace_to, const char *tz)
+static void	get_recovery_event_value(const char *macro, const ZBX_DB_EVENT *r_event, char **replace_to, const char *tz)
 {
 	if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_DATE))
 	{
@@ -2032,7 +2032,7 @@ static void	get_recovery_event_value(const char *macro, const DB_EVENT *r_event,
  * Purpose: request current event value by macro                              *
  *                                                                            *
  ******************************************************************************/
-static void	get_current_event_value(const char *macro, const DB_EVENT *event, char **replace_to)
+static void	get_current_event_value(const char *macro, const ZBX_DB_EVENT *event, char **replace_to)
 {
 	if (0 == strcmp(macro, MVAR_EVENT_STATUS))
 	{
@@ -2050,8 +2050,8 @@ static void	get_current_event_value(const char *macro, const DB_EVENT *event, ch
  * Purpose: request event value by macro                                      *
  *                                                                            *
  ******************************************************************************/
-static void	get_event_value(const char *macro, const DB_EVENT *event, char **replace_to,
-			const zbx_uint64_t *recipient_userid, const DB_EVENT *r_event, const char *tz)
+static void	get_event_value(const char *macro, const ZBX_DB_EVENT *event, char **replace_to,
+			const zbx_uint64_t *recipient_userid, const ZBX_DB_EVENT *r_event, const char *tz)
 {
 	if (0 == strcmp(macro, MVAR_EVENT_AGE))
 	{
@@ -2181,11 +2181,11 @@ static void	get_rootcause(const ZBX_DB_SERVICE *service, char **replace_to)
 
 	for (i = 0; i < service->events.values_num; i++)
 	{
-		DB_EVENT		*event;
+		ZBX_DB_EVENT		*event;
 		zbx_rootcause_t		rootcause = {0};
 		int			ret;
 
-		event = (DB_EVENT *)service->events.values[i];
+		event = (ZBX_DB_EVENT *)service->events.values[i];
 
 		if (FAIL == (ret = DBget_trigger_value(&event->trigger, &rootcause.host, 1, ZBX_REQUEST_HOST_HOST)))
 			goto fail;
@@ -2403,7 +2403,7 @@ static const char	*func_macro_in_list(const char *str, zbx_token_func_macro_t *f
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-static int	get_expression_macro_result(const DB_EVENT *event, char *data, zbx_strloc_t *loc,
+static int	get_expression_macro_result(const ZBX_DB_EVENT *event, char *data, zbx_strloc_t *loc,
 		zbx_timespec_t *ts, char **replace_to, char **error)
 {
 	int				ret = FAIL;
@@ -2499,7 +2499,7 @@ static const char	*zbx_dobject_status2str(int st)
  * Purpose: resolve {EVENT.OPDATA} macro                                      *
  *                                                                            *
  ******************************************************************************/
-static void	resolve_opdata(const DB_EVENT *event, char **replace_to, const char *tz, char *error, int maxerrlen)
+static void	resolve_opdata(const ZBX_DB_EVENT *event, char **replace_to, const char *tz, char *error, int maxerrlen)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2626,8 +2626,8 @@ static int	resolve_host_target_macros(const char *m, const DC_HOST *dc_host, DC_
  * Purpose: substitute simple macros in data string with real values          *
  *                                                                            *
  ******************************************************************************/
-static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_EVENT *event,
-		const DB_EVENT *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host,
+static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX_DB_EVENT *event,
+		const ZBX_DB_EVENT *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host,
 		const DC_ITEM *dc_item, const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack,
 		const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service, const char *tz, char **data,
 		int macro_type, char *error, int maxerrlen)
@@ -2740,7 +2740,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 		/* MACRO_TYPE_MESSAGE_NORMAL and MACRO_TYPE_MESSAGE_RECOVERY. Therefore the code is not duplicated */
 		/* but few conditions are added below where behavior differs. */
 		{
-			const DB_EVENT	*c_event;
+			const ZBX_DB_EVENT	*c_event;
 
 			c_event = ((NULL != r_event) ? r_event : event);
 
@@ -4749,7 +4749,7 @@ zbx_trigger_func_position_t;
  *             trigger - The trigger where to expand macros in                *
  *                                                                            *
  ******************************************************************************/
-static int	expand_trigger_macros(zbx_eval_context_t *ctx, const DB_EVENT *event, char *error, size_t maxerrlen)
+static int	expand_trigger_macros(zbx_eval_context_t *ctx, const ZBX_DB_EVENT *event, char *error, size_t maxerrlen)
 {
 	int 	i;
 
@@ -5377,7 +5377,7 @@ static int	evaluate_expression(zbx_eval_context_t *ctx, const zbx_timespec_t *ts
 void	evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t *history_itemids,
 		const DC_ITEM *history_items, const int *history_errcodes)
 {
-	DB_EVENT		event;
+	ZBX_DB_EVENT		event;
 	DC_TRIGGER		*tr;
 	int			i;
 	double			expr_result;
@@ -6504,7 +6504,7 @@ exit:
  *          (default setting)                                                 *
  *                                                                            *
  ******************************************************************************/
-int	substitute_simple_macros(const zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+int	substitute_simple_macros(const zbx_uint64_t *actionid, const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event,
 		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
 		const ZBX_DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error, int maxerrlen)
@@ -6519,7 +6519,7 @@ int	substitute_simple_macros(const zbx_uint64_t *actionid, const DB_EVENT *event
  * Purpose: substitute_simple_macros with unmasked secret macros              *
  *                                                                            *
  ******************************************************************************/
-int	substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+int	substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event,
 		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
 		const ZBX_DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error, int maxerrlen)
