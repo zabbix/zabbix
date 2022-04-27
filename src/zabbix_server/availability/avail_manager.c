@@ -40,7 +40,7 @@ zbx_active_avail_proxy_t;
 #define ZBX_AVAILABILITY_MANAGER_DELAY				1
 #define ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC		5
 #define ZBX_AVAILABILITY_MANAGER_ACTIVE_HEARTBEAT_DELAY_SEC	10
-#define ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC	3600
+#define ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC	60
 
 static int	interface_availability_compare(const void *d1, const void *d2)
 {
@@ -110,26 +110,28 @@ static void	calculate_cached_active_check_availabilities(zbx_avail_active_hb_cac
 	}
 }
 
-static void	db_update_active_check_status(zbx_vector_uint64_t *hostids, int status,
-	char **sql, size_t *sql_alloc, size_t *sql_offset)
+static void	db_update_active_check_status(zbx_vector_uint64_t *hostids, int status)
 {
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+
 	if (0 == hostids->values_num)
 		return;
 
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"update host_rtdata set active_available=%i where", status);
 
-	DBadd_condition_alloc(sql, sql_alloc, sql_offset, "hostid", hostids->values, hostids->values_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
-
-	DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
+	DBexecute("%s", sql);
+	zbx_free(sql);
 }
 
 static void	flush_active_hb_queue(zbx_avail_active_hb_cache_t *cache)
 {
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_hashset_iter_t	iter;
 	zbx_host_active_avail_t	*host;
 	zbx_vector_uint64_t	status_unknown, status_available, status_unavailable;
@@ -144,7 +146,6 @@ static void	flush_active_hb_queue(zbx_avail_active_hb_cache_t *cache)
 	zbx_hashset_iter_reset(&cache->queue, &iter);
 
 	DBbegin();
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (host = (zbx_host_active_avail_t *)zbx_hashset_iter_next(&iter)))
 	{
@@ -160,11 +161,9 @@ static void	flush_active_hb_queue(zbx_avail_active_hb_cache_t *cache)
 			zbx_vector_uint64_append(&status_unavailable, host->hostid);
 	}
 
-	db_update_active_check_status(&status_unknown, INTERFACE_AVAILABLE_UNKNOWN, &sql, &sql_alloc, &sql_offset);
-	db_update_active_check_status(&status_available, INTERFACE_AVAILABLE_TRUE, &sql, &sql_alloc, &sql_offset);
-	db_update_active_check_status(&status_unavailable, INTERFACE_AVAILABLE_FALSE, &sql, &sql_alloc, &sql_offset);
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	db_update_active_check_status(&status_unknown, INTERFACE_AVAILABLE_UNKNOWN);
+	db_update_active_check_status(&status_available, INTERFACE_AVAILABLE_TRUE);
+	db_update_active_check_status(&status_unavailable, INTERFACE_AVAILABLE_FALSE);
 
 	if (ZBX_DB_OK == DBcommit())
 		zbx_hashset_clear(&cache->queue);
@@ -191,6 +190,7 @@ static void	send_hostdata_response(zbx_avail_active_hb_cache_t *cache, zbx_ipc_c
 
 	data_len = zbx_availability_serialize_hostdata(&data, &cache->queue);
 	zbx_ipc_client_send(client, ZBX_IPC_AVAILMAN_ACTIVE_HOSTDATA, data, data_len);
+	zbx_free(data);
 }
 
 static void	send_avail_check_status_response(zbx_avail_active_hb_cache_t *cache, zbx_ipc_client_t *client,
@@ -237,6 +237,8 @@ static void	process_confsync_diff(zbx_avail_active_hb_cache_t *cache, zbx_ipc_me
 
 		if (NULL != (cached_host = zbx_hashset_search(&cache->hosts, &hostid)))
 		{
+			cached_host->active_status = INTERFACE_AVAILABLE_UNKNOWN;
+
 			if (NULL != (queued_host = zbx_hashset_search(&cache->queue, &hostid)))
 			{
 				queued_host->active_status = INTERFACE_AVAILABLE_UNKNOWN;
@@ -298,8 +300,6 @@ static void	init_active_availability(zbx_avail_active_hb_cache_t *cache)
 }
 static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_message_t *message)
 {
-	char				*sql = NULL;
-	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t			proxy_hostid;
 	zbx_vector_ptr_t		hosts;
 	zbx_proxy_hostdata_t		*host;
@@ -309,7 +309,7 @@ static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_mes
 
 	zbx_vector_ptr_create(&hosts);
 
-	zbx_availability_deserialize_hostdata2(message->data, &hosts, &proxy_hostid);
+	zbx_availability_deserialize_proxy_hostdata(message->data, &hosts, &proxy_hostid);
 
 	zbx_vector_uint64_create(&status_unknown);
 	zbx_vector_uint64_create(&status_available);
@@ -332,13 +332,11 @@ static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_mes
 	}
 
 	DBbegin();
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	db_update_active_check_status(&status_unknown, INTERFACE_AVAILABLE_UNKNOWN, &sql, &sql_alloc, &sql_offset);
-	db_update_active_check_status(&status_available, INTERFACE_AVAILABLE_TRUE, &sql, &sql_alloc, &sql_offset);
-	db_update_active_check_status(&status_unavailable, INTERFACE_AVAILABLE_FALSE, &sql, &sql_alloc, &sql_offset);
+	db_update_active_check_status(&status_unknown, INTERFACE_AVAILABLE_UNKNOWN);
+	db_update_active_check_status(&status_available, INTERFACE_AVAILABLE_TRUE);
+	db_update_active_check_status(&status_unavailable, INTERFACE_AVAILABLE_FALSE);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (ZBX_DB_OK == DBcommit())
 		zbx_hashset_clear(&cache->queue);
@@ -358,6 +356,8 @@ static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_mes
 	zbx_vector_uint64_destroy(&status_unknown);
 	zbx_vector_uint64_destroy(&status_available);
 	zbx_vector_uint64_destroy(&status_unavailable);
+	zbx_vector_ptr_clear_ext(&hosts, zbx_ptr_free);
+	zbx_vector_ptr_destroy(&hosts);
 }
 
 static void flush_all_hosts(zbx_avail_active_hb_cache_t *cache)
@@ -379,7 +379,7 @@ static void flush_all_hosts(zbx_avail_active_hb_cache_t *cache)
 	}
 }
 
-static void add_host_availability(zbx_ipc_message_t *message)
+static void	add_host_availability(zbx_ipc_message_t *message)
 {
 	zbx_vector_uint64_t	hosts;
 	zbx_db_insert_t		insert;
@@ -405,6 +405,7 @@ static void	active_checks_calculate_proxy_availability(zbx_avail_active_hb_cache
 	zbx_hashset_iter_t		iter;
 	zbx_active_avail_proxy_t	*proxy_avail;
 
+
 	if (0 == cache->proxy_avail.num_data)
 		return;
 
@@ -412,9 +413,9 @@ static void	active_checks_calculate_proxy_availability(zbx_avail_active_hb_cache
 
 	while (NULL != (proxy_avail = (zbx_active_avail_proxy_t *)zbx_hashset_iter_next(&iter)))
 	{
-		if (proxy_avail->lastaccess + 3600 <= time(NULL))
+		if (proxy_avail->lastaccess + 10 <= time(NULL))
 		{
-			if (ZBX_DB_OK > DBexecute("update host_rtdata set status=%i where hostid in (select hostid from hosts where "
+			if (ZBX_DB_OK > DBexecute("update host_rtdata set active_available=%i where hostid in (select hostid from hosts where "
 					"proxy_hostid=" ZBX_FS_UI64 ")", INTERFACE_AVAILABLE_UNKNOWN, proxy_avail->hostid))
 			{
 				continue;
@@ -462,7 +463,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 	/* initialize statistics */
 	time_stat = zbx_time();
 	time_flush = time_stat;
-	active_hb_cache.last_proxy_avail_refresh = active_hb_cache.last_status_refresh = (int)time(NULL);
+	active_hb_cache.last_proxy_avail_refresh = active_hb_cache.last_status_refresh = zbx_time();
 
 	zbx_vector_availability_ptr_create(&interface_availabilities);
 	zbx_hashset_create(&active_hb_cache.queue, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -571,7 +572,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 		}
 
 		if (ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC < time_now -
-				active_hb_cache.last_proxy_avail_refresh)
+				active_hb_cache.last_proxy_avail_refresh && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
 			active_hb_cache.last_proxy_avail_refresh = time_now;
 			active_checks_calculate_proxy_availability(&active_hb_cache);

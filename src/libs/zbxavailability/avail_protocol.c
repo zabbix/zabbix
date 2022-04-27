@@ -190,7 +190,7 @@ void	zbx_availability_deserialize_active_status_response(const unsigned char *da
 	(void)zbx_deserialize_int(data, status);
 }
 
-zbx_uint32_t	zbx_availability_serialize_hostdata2(unsigned char **data, zbx_vector_ptr_t *hosts, zbx_uint64_t proxy_hostid)
+zbx_uint32_t	zbx_availability_serialize_proxy_hostdata(unsigned char **data, zbx_vector_ptr_t *hosts, zbx_uint64_t proxy_hostid)
 {
 	zbx_uint32_t		data_len = 0;
 	unsigned char		*ptr;
@@ -218,7 +218,7 @@ zbx_uint32_t	zbx_availability_serialize_hostdata2(unsigned char **data, zbx_vect
 	return data_len;
 }
 
-void	zbx_availability_deserialize_hostdata2(const unsigned char *data, zbx_vector_ptr_t *hostdata, zbx_uint64_t *proxy_hostid)
+void	zbx_availability_deserialize_proxy_hostdata(const unsigned char *data, zbx_vector_ptr_t *hostdata, zbx_uint64_t *proxy_hostid)
 {
 	int	values_num, i;
 

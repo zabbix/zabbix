@@ -6009,6 +6009,7 @@ static void	zbx_dbsync_process_active_avail_diff(zbx_vector_uint64_t *diff)
 	unsigned char		*data = NULL;
 	zbx_uint32_t		data_len = 0;
 
+
 	if (0 == diff->values_num)
 		return;
 
@@ -6017,6 +6018,7 @@ static void	zbx_dbsync_process_active_avail_diff(zbx_vector_uint64_t *diff)
 	zbx_availability_send(ZBX_IPC_AVAILMAN_CONFSYNC_DIFF, data, data_len, NULL);
 
 	zbx_ipc_message_clean(&message);
+	zbx_free(data);
 }
 
 /******************************************************************************

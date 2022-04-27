@@ -135,6 +135,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, time_t 
 
 	zbx_vector_ptr_create(&tasks);
 
+
 	if (SUCCEED == upload_state && ZBX_TASK_UPDATE_FREQUENCY <= now - task_timestamp)
 	{
 		task_timestamp = now;

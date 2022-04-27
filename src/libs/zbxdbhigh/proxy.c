@@ -4744,11 +4744,12 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 			unsigned char		*data = NULL;
 			zbx_uint32_t		data_len;
 
-			data_len = zbx_availability_serialize_hostdata2(&data, &host_avails, proxy->hostid);
+			data_len = zbx_availability_serialize_proxy_hostdata(&data, &host_avails, proxy->hostid);
 			zbx_availability_send(ZBX_IPC_AVAILMAN_PROCESS_PROXY_HOSTDATA, data, data_len, NULL);
 
 			zbx_vector_ptr_clear_ext(&host_avails, zbx_ptr_free);
 			zbx_vector_ptr_destroy(&host_avails);
+			zbx_free(data);
 		}
 	}
 

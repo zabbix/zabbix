@@ -104,6 +104,7 @@ int	zbx_get_active_agent_availability(zbx_uint64_t hostid)
 		zbx_availability_deserialize_active_status_response(response.data, &status);
 
 	zbx_ipc_message_clean(&response);
+	zbx_free(data);
 
 	return status;
 }
