@@ -155,7 +155,7 @@ void	zbx_db_save_trigger_changes(const zbx_vector_ptr_t *trigger_diff)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < trigger_diff->values_num; i++)
 	{
@@ -200,7 +200,7 @@ void	zbx_db_save_trigger_changes(const zbx_vector_ptr_t *trigger_diff)
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* in ORACLE always present begin..end; */
 		DBexecute("%s", sql);

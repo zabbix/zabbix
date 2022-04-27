@@ -192,16 +192,10 @@ zbx_host_template_link_type;
 #ifdef HAVE_ORACLE
 #	define ZBX_PLSQL_BEGIN	"begin\n"
 #	define ZBX_PLSQL_END	"end;"
-#	define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)			\
+#	define	zbx_DBbegin_multiple_update(sql, sql_alloc, sql_offset)			\
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_PLSQL_BEGIN)
-#	define	DBend_multiple_update(sql, sql_alloc, sql_offset)			\
+#	define	zbx_DBend_multiple_update(sql, sql_alloc, sql_offset)			\
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_PLSQL_END)
-#	if 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
-#		define	ZBX_SQL_EXEC_FROM	ZBX_CONST_STRLEN(ZBX_PLSQL_BEGIN)
-#	else
-#		define	ZBX_SQL_EXEC_FROM	0
-#	endif
-
 #	define	ZBX_SQL_STRCMP		"%s%s%s"
 #	define	ZBX_SQL_STRVAL_EQ(str)				\
 			'\0' != *str ? "='"  : "",		\
@@ -212,10 +206,8 @@ zbx_host_template_link_type;
 			'\0' != *str ? str   : " is not null",	\
 			'\0' != *str ? "'"   : ""
 #else
-#	define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
-#	define	DBend_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
-
-#	define	ZBX_SQL_EXEC_FROM	0
+#	define	zbx_DBbegin_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
+#	define	zbx_DBend_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
 #	ifdef HAVE_MYSQL
 #		define	ZBX_SQL_STRCMP		"%s binary '%s'"
 #	else

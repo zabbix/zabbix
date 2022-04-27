@@ -362,7 +362,7 @@ static int	update_event_names(void)
 	memset(&trigger, 0, sizeof(DB_TRIGGER));
 
 	sql = (char *)zbx_malloc(NULL, sql_alloc);
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select triggerid,description,expression,priority,comments,url,recovery_expression,"
@@ -400,7 +400,7 @@ static int	update_event_names(void)
 		}
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset) /* in ORACLE always present begin..end; */
 	{

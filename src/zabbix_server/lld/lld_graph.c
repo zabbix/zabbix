@@ -1071,7 +1071,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 	if (0 != upd_graphs || 0 != upd_gitems.values_num || 0 != del_gitemids.values_num)
 	{
 		sql = (char *)zbx_malloc(sql, sql_alloc);
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
 	for (i = 0; i < graphs->values_num; i++)
@@ -1401,7 +1401,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 	if (0 != upd_graphs || 0 != upd_gitems.values_num || 0 != del_gitemids.values_num)
 	{
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 		DBexecute("%s", sql);
 		zbx_free(sql);
 	}

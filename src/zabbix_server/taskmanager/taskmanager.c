@@ -503,7 +503,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 		zbx_dc_reschedule_items(&itemids, time(NULL), proxy_hostids);
 
 		sql_offset = 0;
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = 0; i < tasks.values_num; i++)
 		{
@@ -537,7 +537,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 			DBexecute("%s", sql);

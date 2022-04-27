@@ -854,7 +854,7 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_hashset_iter_reset(zbx_host_triggers_main_data, &iter1);
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (found = (zbx_target_host_trigger_entry_t *)zbx_hashset_iter_next(&iter1)))
 	{
@@ -1018,7 +1018,7 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 		}
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)
 	{
@@ -1132,7 +1132,7 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	DBbegin_multiple_update(&sql_update_triggers_expr, &sql_update_triggers_expr_alloc,
+	zbx_DBbegin_multiple_update(&sql_update_triggers_expr, &sql_update_triggers_expr_alloc,
 			&sql_update_triggers_expr_offset);
 
 	zbx_db_insert_prepare(&db_insert, "triggers", "triggerid", "description", "priority", "status", "comments",
@@ -1288,7 +1288,7 @@ func_out:
 		res = zbx_db_insert_execute(&db_insert_funcs);
 	zbx_db_insert_clean(&db_insert_funcs);
 
-	DBend_multiple_update(&sql_update_triggers_expr, &sql_update_triggers_expr_alloc,
+	zbx_DBend_multiple_update(&sql_update_triggers_expr, &sql_update_triggers_expr_alloc,
 			&sql_update_triggers_expr_offset);
 
 	if (SUCCEED == res && 16 < sql_update_triggers_expr_offset)	/* In ORACLE always present begin..end; */

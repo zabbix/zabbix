@@ -798,7 +798,7 @@ static int	DBpatch_5030046(void)
 	zbx_db_insert_execute(&db_insert_valuemap_mapping);
 	zbx_db_insert_clean(&db_insert_valuemap_mapping);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0, valuemapid = 0; i < hosts.values_num; i++)
 	{
@@ -837,7 +837,7 @@ static int	DBpatch_5030046(void)
 		}
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 		DBexecute("%s", sql);
@@ -4082,7 +4082,7 @@ static int	DBpatch_5030130(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect("select profileid,value_str from profiles"
 			" where idx='web.monitoring.problem.properties'");
@@ -4122,7 +4122,7 @@ static int	DBpatch_5030130(void)
 	}
 	DBfree_result(result);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -4829,7 +4829,7 @@ static int	DBpatch_5030165(void)
 
 	zbx_db_insert_prepare(&db_insert_functions, "functions", "functionid", "itemid", "triggerid", "name",
 			"parameter", NULL);
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect("select triggerid,recovery_mode,expression,recovery_expression from triggers"
 			" order by triggerid");
@@ -4935,7 +4935,7 @@ static int	DBpatch_5030165(void)
 
 	DBfree_result(result);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
@@ -5032,7 +5032,7 @@ static int	DBpatch_5030167(void)
 
 	sql = zbx_malloc(NULL, sql_alloc);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect("select triggerid,event_name from triggers order by triggerid");
 
@@ -5106,7 +5106,7 @@ static int	DBpatch_5030167(void)
 	}
 	DBfree_result(result);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
@@ -5225,7 +5225,7 @@ static int	DBpatch_5030168(void)
 
 	zbx_vector_ptr_create(&functions);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect("select i.itemid,i.params"
 			" from items i,hosts h"
@@ -5327,7 +5327,7 @@ static int	DBpatch_5030168(void)
 	DBfree_result(result);
 	zbx_vector_ptr_destroy(&functions);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
@@ -5453,7 +5453,7 @@ static int	DBpatch_5030169(void)
 	char		*sql = NULL, *params = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0, params_alloc = 0, params_offset;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* ITEM_TYPE_AGGREGATE = 8 */
 	result = DBselect("select itemid,key_ from items where type=8");
@@ -5495,7 +5495,7 @@ static int	DBpatch_5030169(void)
 
 	DBfree_result(result);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
@@ -5634,7 +5634,7 @@ static int	DBpatch_5030181(void)
 
 		ZBX_DBROW2UINT64(valuemapid, row[0]);
 
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		in_result = DBselect("select valuemap_mappingid"
 				" from valuemap_mapping"
@@ -5652,7 +5652,7 @@ static int	DBpatch_5030181(void)
 				goto out;
 		}
 
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 			ret = FAIL;
@@ -5791,7 +5791,7 @@ static int	DBpatch_5030190(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select h.hostid,h.host"
@@ -5813,7 +5813,7 @@ static int	DBpatch_5030190(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -5835,7 +5835,7 @@ static int	DBpatch_5030191(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select i.itemid,i.key_,h.host"
@@ -5860,7 +5860,7 @@ static int	DBpatch_5030191(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -5882,7 +5882,7 @@ static int	DBpatch_5030192(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,t.recovery_expression"
@@ -5989,7 +5989,7 @@ static int	DBpatch_5030192(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -6011,7 +6011,7 @@ static int	DBpatch_5030193(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	result = DBselect(
 			"select distinct g.graphid,g.name"
 			" from graphs g"
@@ -6058,7 +6058,7 @@ static int	DBpatch_5030193(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -6080,7 +6080,7 @@ static int	DBpatch_5030194(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select d.dashboardid,d.name,h.host"
@@ -6105,7 +6105,7 @@ static int	DBpatch_5030194(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -6127,7 +6127,7 @@ static int	DBpatch_5030195(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select ht.httptestid,ht.name,h.host"
@@ -6152,7 +6152,7 @@ static int	DBpatch_5030195(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -6174,7 +6174,7 @@ static int	DBpatch_5030196(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select v.valuemapid,v.name,h.host"
@@ -6199,7 +6199,7 @@ static int	DBpatch_5030196(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -6221,7 +6221,7 @@ static int	DBpatch_5030197(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect("select groupid,name from hstgrp");
 
@@ -6236,7 +6236,7 @@ static int	DBpatch_5030197(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -6258,7 +6258,7 @@ static int	DBpatch_5030198(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select i.itemid,i.key_,h.host,i2.key_"
@@ -6285,7 +6285,7 @@ static int	DBpatch_5030198(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -6307,7 +6307,7 @@ static int	DBpatch_5030199(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,t.recovery_expression"
@@ -6433,7 +6433,7 @@ static int	DBpatch_5030199(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -6455,7 +6455,7 @@ static int	DBpatch_5030200(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	result = DBselect(
 			"select distinct g.graphid,g.name,h.host,i2.key_"
 			" from graphs g"
@@ -6484,7 +6484,7 @@ static int	DBpatch_5030200(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -6506,7 +6506,7 @@ static int	DBpatch_5030201(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select h.hostid,h.host,h2.host,i.key_"
@@ -6533,7 +6533,7 @@ static int	DBpatch_5030201(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;

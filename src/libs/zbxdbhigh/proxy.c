@@ -1788,7 +1788,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	/* apply update operations */
 
 	sql_offset = 0;
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	p = NULL;
 	/* iterate the entries (lines 9, 14 and 19 in T1) */
@@ -1915,7 +1915,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 	{
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (ZBX_DB_OK > DBexecute("%s", sql))
 			goto clean;
@@ -2022,7 +2022,7 @@ int	process_proxyconfig(struct zbx_json_parse *jp_data, struct zbx_json_parse *j
 
 		sql = (char *)zbx_malloc(sql, sql_alloc * sizeof(char));
 
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = tables_proxy.values_num - 1; 0 <= i; i--)
 		{
@@ -2040,7 +2040,7 @@ int	process_proxyconfig(struct zbx_json_parse *jp_data, struct zbx_json_parse *j
 
 		if (sql_offset > 16)	/* in ORACLE always present begin..end; */
 		{
-			DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+			zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 			if (ZBX_DB_OK > DBexecute("%s", sql))
 				ret = FAIL;
@@ -4734,7 +4734,7 @@ static void	zbx_db_flush_proxy_lastaccess(void)
 		sql = (char *)zbx_malloc(NULL, sql_alloc);
 
 		DBbegin();
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = 0; i < lastaccess.values_num; i++)
 		{
@@ -4748,7 +4748,7 @@ static void	zbx_db_flush_proxy_lastaccess(void)
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 			DBexecute("%s", sql);
