@@ -25,8 +25,6 @@
 #include "zbxmutexs.h"
 #include "zbxshmem.h"
 
-extern zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE;
-
 typedef struct
 {
 	zbx_uint64_t		itemid;		/* the itemid */
@@ -366,18 +364,19 @@ static const char	*tfc_state_str(zbx_trend_state_t state)
  *                                                                            *
  * Purpose: initialize trend function cache                                   *
  *                                                                            *
- * Parameters: error - [OUT] the error message                                *
+ * Parameters: func_cache_size - [IN] trend function cache size               *
+ *             error           - [OUT] the error message                      *
  *                                                                            *
  * Return value: SUCCEED - the cache was initialized successfully             *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tfc_init(char **error)
+int	zbx_tfc_init(zbx_uint64_t func_cache_size, char **error)
 {
 	zbx_uint64_t	size_reserved, size_actual;
 	int		ret = FAIL;
 
-	if (0 == CONFIG_TREND_FUNC_CACHE_SIZE)
+	if (0 == func_cache_size)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): trends function cache disabled", __func__);
 		return SUCCEED;
@@ -390,7 +389,7 @@ int	zbx_tfc_init(char **error)
 
 	size_reserved = zbx_shmem_required_size(1, "trend function cache size", "TrendFunctionCacheSize");
 
-	if (SUCCEED != zbx_shmem_create(&tfc_mem, CONFIG_TREND_FUNC_CACHE_SIZE, "trend function cache size",
+	if (SUCCEED != zbx_shmem_create(&tfc_mem, func_cache_size, "trend function cache size",
 			"TrendFunctionCacheSize", 1, error))
 	{
 		goto out;
@@ -398,7 +397,7 @@ int	zbx_tfc_init(char **error)
 
 	cache =  (zbx_tfc_t *)__tfc_shmem_realloc_func(NULL, sizeof(zbx_tfc_t));
 
-	size_actual = CONFIG_TREND_FUNC_CACHE_SIZE;
+	size_actual = func_cache_size;
 	/* (8 + 8) * 3 - overhead for 3 allocations */
 	size_actual -= size_reserved + sizeof(zbx_tfc_t) + (8 + 8) * 3;
 
@@ -435,9 +434,9 @@ out:
  * Purpose: destroy trend function cache                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tfc_destroy(void)
+void	zbx_tfc_destroy(zbx_uint64_t func_cache_size)
 {
-	if (0 != CONFIG_TREND_FUNC_CACHE_SIZE)
+	if (0 != func_cache_size)
 	{
 		zbx_shmem_destroy(tfc_mem);
 		tfc_mem = NULL;

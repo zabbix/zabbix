@@ -1231,7 +1231,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_tfc_init(&error))
+	if (SUCCEED != zbx_tfc_init(CONFIG_TREND_FUNC_CACHE_SIZE, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize trends read cache: %s", error);
 		zbx_free(error);
@@ -1514,7 +1514,7 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 		zbx_tcp_unlisten(listen_sock);
 
 	/* destroy shared caches */
-	zbx_tfc_destroy();
+	zbx_tfc_destroy(CONFIG_TREND_FUNC_CACHE_SIZE);
 	zbx_vc_destroy();
 	zbx_vmware_destroy();
 	free_selfmon_collector();
