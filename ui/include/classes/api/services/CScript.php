@@ -1223,7 +1223,7 @@ class CScript extends CApiService {
 		if ($has_write_access_level && $host_groups) {
 			$host_groups_with_write_access = API::HostGroup()->get([
 				'output' => $select_groups,
-				'groupid' => array_keys($host_groups),
+				'groupids' => array_keys($host_groups),
 				'preservekeys' => true,
 				'editable' => true
 			]);
