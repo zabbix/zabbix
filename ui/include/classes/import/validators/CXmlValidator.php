@@ -65,7 +65,7 @@ class CXmlValidator extends CXmlValidatorGeneral {
 			);
 		}
 
-		if (in_array($version, ['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4', '5.0', '5.2', '5.4'])) {
+		if (in_array($version, ['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4', '5.0', '5.2'])) {
 			unset($data['zabbix_export']['screens']);
 		}
 
