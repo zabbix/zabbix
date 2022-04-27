@@ -87,10 +87,7 @@ window.ldap_edit_popup = new class {
 		}
 
 		const test_overlay = PopUp('popup.ldap.test.edit', popup_params, {dialogueid: 'ldap_test_edit'});
-
-		test_overlay.$dialogue[0].addEventListener('overlay.close', () => {
-			this.overlay.unsetLoading();
-		}, {once: true});
+		test_overlay.xhr.then(() => this.overlay.unsetLoading());
 	}
 
 	submit() {
