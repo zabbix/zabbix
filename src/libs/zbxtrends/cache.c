@@ -16,14 +16,14 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+#include "zbxtrends.h"
+#include "trends.h"
 
 #include "common.h"
 #include "zbxalgo.h"
 #include "log.h"
-#include "zbxtrends.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "zbxshmem.h"
-#include "trends.h"
 
 extern zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE;
 

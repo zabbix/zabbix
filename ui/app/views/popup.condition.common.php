@@ -193,8 +193,7 @@ switch ($data['type']) {
 							'srcfld1' => 'triggerid',
 							'dstfrm' => $form->getName(),
 							'dstfld1' => 'trigger_new_condition',
-							'editable' => true,
-							'noempty' => true
+							'editable' => true
 						]
 					]
 				]))

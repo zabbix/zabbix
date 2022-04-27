@@ -24,7 +24,7 @@
  */
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 		<meta charset="utf-8" />
@@ -42,7 +42,7 @@
 		<meta name="msapplication-config" content="none"/>
 		<link rel="stylesheet" type="text/css" href="assets/styles/<?= ZBX_DEFAULT_THEME ?>.css" />
 	</head>
-	<body lang="en">
+	<body>
 		<div class="<?= ZBX_STYLE_LAYOUT_WRAPPER ?>">
 			<main>
 				<div class="<?= ZBX_STYLE_BROWSER_WARNING_CONTAINER ?>">

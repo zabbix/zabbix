@@ -341,7 +341,7 @@ class testUserRolesPermissions extends CWebTest {
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
 			$row = $this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Test trigger with tag');
 			$row->getColumn('Ack')->query('link:No')->waitUntilClickable()->one()->click();
-			$dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 			$this->assertTrue($dialog->query('id', $data['activityid'])->one()->isEnabled($action_status));
 			$this->changeRoleRule([$data['action'] => !$action_status]);
 

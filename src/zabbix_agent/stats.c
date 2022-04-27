@@ -21,7 +21,7 @@
 
 #include "log.h"
 
-#include "mutexs.h"
+#include "zbxmutexs.h"
 
 #ifdef _WINDOWS
 #	include "service.h"

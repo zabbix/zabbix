@@ -22,8 +22,8 @@
 #include "log.h"
 #include "zbxserver.h"
 
-#include "../../libs/zbxaudit/audit.h"
-#include "../../libs/zbxaudit/audit_trigger.h"
+#include "audit/zbxaudit.h"
+#include "audit/zbxaudit_trigger.h"
 
 typedef struct
 {
@@ -2581,7 +2581,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 
 		if (0 != trigger->triggerid)
 		{
-			zbx_audit_trigger_create_entry(AUDIT_ACTION_UPDATE, trigger->triggerid,
+			zbx_audit_trigger_create_entry(ZBX_AUDIT_ACTION_UPDATE, trigger->triggerid,
 					(NULL == trigger->description_orig) ? trigger->description :
 					trigger->description_orig, ZBX_FLAG_DISCOVERY_CREATED);
 		}
@@ -2780,7 +2780,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 					trigger->correlation_tag, (int)trigger_prototype->manual_close,
 					trigger->opdata, trigger->event_name);
 
-			zbx_audit_trigger_create_entry(AUDIT_ACTION_ADD,triggerid, trigger->description,
+			zbx_audit_trigger_create_entry(ZBX_AUDIT_ACTION_ADD,triggerid, trigger->description,
 					ZBX_FLAG_DISCOVERY_CREATED);
 
 			zbx_audit_trigger_update_json_add_data(triggerid, 0, (int)trigger_prototype->recovery_mode,

@@ -26,11 +26,16 @@
 $widget = (new CWidget())
 	->setTitle(_('Maps'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_SYSMAP_LIST))
-	->setControls((new CTag('nav', true,
-		(new CForm('get'))
-			->cleanItems()
-			->addItem((new CList())
-				->addItem((new CSubmit('form', _('Create map')))->setEnabled($data['allowed_edit']))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(
+					(new CForm('get'))
+						->cleanItems()
+						->addItem(
+							(new CSubmit('form', _('Create map')))->setEnabled($data['allowed_edit'])
+						)
+				)
 				->addItem(
 					(new CButton('form', _('Import')))
 						->onClick(
@@ -41,7 +46,7 @@ $widget = (new CWidget())
 						->setEnabled($data['allowed_edit'])
 						->removeId()
 				)
-		)))->setAttribute('aria-label', _('Content controls'))
+		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem(
 		(new CFilter())

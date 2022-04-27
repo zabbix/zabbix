@@ -17,15 +17,39 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "diag.h"
+#include "zbxdiag.h"
 
+#include "zbxjson.h"
+#include "zbxalgo.h"
+#include "zbxshmem.h"
 #include "dbcache.h"
 #include "preproc.h"
-#include "zbxdiag.h"
 #include "log.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 
-void	diag_map_free(zbx_diag_map_t *map)
+#define ZBX_DIAG_SECTION_MAX	64
+#define ZBX_DIAG_FIELD_MAX	64
+
+#define ZBX_DIAG_HISTORYCACHE_ITEMS		0x00000001
+#define ZBX_DIAG_HISTORYCACHE_VALUES		0x00000002
+#define ZBX_DIAG_HISTORYCACHE_MEMORY_DATA	0x00000004
+#define ZBX_DIAG_HISTORYCACHE_MEMORY_INDEX	0x00000008
+
+#define ZBX_DIAG_HISTORYCACHE_SIMPLE	(ZBX_DIAG_HISTORYCACHE_ITEMS | \
+					ZBX_DIAG_HISTORYCACHE_VALUES)
+
+#define ZBX_DIAG_HISTORYCACHE_MEMORY	(ZBX_DIAG_HISTORYCACHE_MEMORY_DATA | \
+					ZBX_DIAG_HISTORYCACHE_MEMORY_INDEX)
+
+#define ZBX_DIAG_PREPROC_VALUES			0x00000001
+#define ZBX_DIAG_PREPROC_VALUES_PREPROC		0x00000002
+
+#define ZBX_DIAG_PREPROC_SIMPLE		(ZBX_DIAG_PREPROC_VALUES | \
+					ZBX_DIAG_PREPROC_VALUES_PREPROC)
+
+static zbx_diag_add_section_info_func_t	add_diag_cb;
+
+void	zbx_diag_map_free(zbx_diag_map_t *map)
 {
 	zbx_free(map->name);
 	zbx_free(map);
@@ -47,7 +71,7 @@ void	diag_map_free(zbx_diag_map_t *map)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	diag_parse_request(const struct zbx_json_parse *jp, const zbx_diag_map_t *field_map,
+int	zbx_diag_parse_request(const struct zbx_json_parse *jp, const zbx_diag_map_t *field_map,
 		zbx_uint64_t *field_mask, zbx_vector_ptr_t *top_views, char **error)
 {
 	struct zbx_json_parse	jp_stats;
@@ -124,7 +148,7 @@ int	diag_parse_request(const struct zbx_json_parse *jp, const zbx_diag_map_t *fi
 	ret = SUCCEED;
 out:
 	if (FAIL == ret)
-		zbx_vector_ptr_clear_ext(top_views, (zbx_ptr_free_func_t)diag_map_free);
+		zbx_vector_ptr_clear_ext(top_views, (zbx_ptr_free_func_t)zbx_diag_map_free);
 
 	return ret;
 }
@@ -138,7 +162,7 @@ out:
  *             stats - [IN] the memory statistics                             *
  *                                                                            *
  ******************************************************************************/
-void	diag_add_mem_stats(struct zbx_json *json, const char *name, const zbx_shmem_stats_t *stats)
+void	zbx_diag_add_mem_stats(struct zbx_json *json, const char *name, const zbx_shmem_stats_t *stats)
 {
 	int	i;
 
@@ -231,7 +255,7 @@ static void	diag_historycache_add_items(struct zbx_json *json, const char *field
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
+int	zbx_diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
 {
 	zbx_vector_ptr_t	tops;
 	int			ret;
@@ -249,7 +273,7 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 
 	zbx_vector_ptr_create(&tops);
 
-	if (SUCCEED == (ret = diag_parse_request(jp, field_map, &fields, &tops, error)))
+	if (SUCCEED == (ret = zbx_diag_parse_request(jp, field_map, &fields, &tops, error)))
 	{
 		int	i;
 
@@ -283,8 +307,8 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 			time_total += time2 - time1;
 
 			zbx_json_addobject(json, "memory");
-			diag_add_mem_stats(json, "data", pdata_mem);
-			diag_add_mem_stats(json, "index", pindex_mem);
+			zbx_diag_add_mem_stats(json, "data", pdata_mem);
+			zbx_diag_add_mem_stats(json, "index", pindex_mem);
 			zbx_json_close(json);
 		}
 
@@ -331,7 +355,7 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 		zbx_json_close(json);
 	}
 
-	zbx_vector_ptr_clear_ext(&tops, (zbx_ptr_free_func_t)diag_map_free);
+	zbx_vector_ptr_clear_ext(&tops, (zbx_ptr_free_func_t)zbx_diag_map_free);
 	zbx_vector_ptr_destroy(&tops);
 
 	return ret;
@@ -378,7 +402,7 @@ static void	diag_add_preproc_items(struct zbx_json *json, const char *field, con
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
+int	zbx_diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
 {
 	zbx_vector_ptr_t	tops;
 	int			ret = FAIL;
@@ -393,7 +417,7 @@ int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json
 
 	zbx_vector_ptr_create(&tops);
 
-	if (SUCCEED == (ret = diag_parse_request(jp, field_map, &fields, &tops, error)))
+	if (SUCCEED == (ret = zbx_diag_parse_request(jp, field_map, &fields, &tops, error)))
 	{
 		zbx_json_addobject(json, ZBX_DIAG_PREPROCESSING);
 
@@ -473,7 +497,7 @@ int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json
 		zbx_json_close(json);
 	}
 out:
-	zbx_vector_ptr_clear_ext(&tops, (zbx_ptr_free_func_t)diag_map_free);
+	zbx_vector_ptr_clear_ext(&tops, (zbx_ptr_free_func_t)zbx_diag_map_free);
 	zbx_vector_ptr_destroy(&tops);
 
 	return ret;
@@ -494,7 +518,7 @@ static void	zbx_json_addhex(struct zbx_json *j, const char *name, zbx_uint64_t v
  * Parameters: json  - [IN/OUT] the json to update                            *
  *                                                                            *
  ******************************************************************************/
-void	diag_add_locks_info(struct zbx_json *json)
+void	zbx_diag_add_locks_info(struct zbx_json *json)
 {
 	int		i;
 #ifdef HAVE_VMINFO_T_UPDATES
@@ -558,7 +582,7 @@ int	zbx_diag_get_info(const struct zbx_json_parse *jp, char **info)
 			goto out;
 		}
 
-		if (FAIL == (ret = diag_add_section_info(section, &jp_section, &json, info)))
+		if (FAIL == (ret = add_diag_cb(section, &jp_section, &json, info)))
 			goto out;
 	}
 out:
@@ -936,4 +960,16 @@ void	zbx_diag_log_info(unsigned int flags, char **result)
 out:
 	zbx_free(info);
 	zbx_json_free(&j);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: init section add callback function                                *
+ *                                                                            *
+ * Parameters: cb - [IN] callback function                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_diag_init(zbx_diag_add_section_info_func_t cb)
+{
+	add_diag_cb = cb;
 }

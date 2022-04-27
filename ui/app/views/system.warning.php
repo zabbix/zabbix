@@ -23,16 +23,17 @@
  * @var CView $this
  */
 
-$pageHeader = (new CPageHeader(_('Fatal error, please report to the Zabbix team')))
+$pageHeader = (new CPageHeader(_('Fatal error, please report to the Zabbix team'), CWebUser::getLang()))
 	->addCssFile('assets/styles/'.CHtml::encode($data['theme']).'.css')
 	->display();
 
 $buttons = [
 	(new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
-		->onClick('javascript: document.location = "'.CMenuHelper::getFirstUrl().'"'
-)];
+		->setAttribute('data-url', CMenuHelper::getFirstUrl())
+		->onClick('document.location = this.dataset.url;')
+];
 
-echo '<body lang="'.CWebUser::getLang().'">';
+echo '<body';
 
 (new CDiv((new CTag('main', true,
 	new CWarning(_('Fatal error, please report to the Zabbix team'), $data['messages'], $buttons)

@@ -20,7 +20,7 @@
 #ifndef ZABBIX_DBSYNCER_H
 #define ZABBIX_DBSYNCER_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 ZBX_THREAD_ENTRY(dbsyncer_thread, args);
 

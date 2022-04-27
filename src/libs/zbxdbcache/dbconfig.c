@@ -35,6 +35,7 @@
 #include "zbxtrends.h"
 #include "zbxserialize.h"
 #include "user_macro.h"
+#include "zbxavailability.h"
 
 int	sync_in_progress = 0;
 
@@ -62,6 +63,8 @@ int	sync_in_progress = 0;
 #define ZBX_QUEUE_PRIORITY_NORMAL	1
 #define ZBX_QUEUE_PRIORITY_LOW		2
 
+#define ZBX_DEFAULT_ITEM_UPDATE_INTERVAL	60
+
 /* shorthand macro for calling in_maintenance_without_data_collection() */
 #define DCin_maintenance_without_data_collection(dc_host, dc_item)			\
 		in_maintenance_without_data_collection(dc_host->maintenance_status,	\
@@ -69,6 +72,8 @@ int	sync_in_progress = 0;
 
 ZBX_PTR_VECTOR_DECL(dc_item, ZBX_DC_ITEM *)
 ZBX_PTR_VECTOR_IMPL(dc_item, ZBX_DC_ITEM *)
+
+ZBX_PTR_VECTOR_IMPL(cached_proxy, zbx_cached_proxy_t *)
 
 /******************************************************************************
  *                                                                            *
@@ -323,6 +328,7 @@ static zbx_uint64_t	get_item_nextcheck_seed(zbx_uint64_t itemid, zbx_uint64_t in
 #define ZBX_ITEM_KEY_CHANGED		0x04
 #define ZBX_ITEM_TYPE_CHANGED		0x08
 #define ZBX_ITEM_DELAY_CHANGED		0x10
+#define ZBX_ITEM_NEW			0x20
 
 static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface)
 {
@@ -338,7 +344,8 @@ static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *
 	}
 }
 
-static int	dc_get_item_nextcheck(const ZBX_DC_ITEM *item, int now, int disable_until, int *nextcheck, char **error)
+static int	dc_get_item_nextcheck(const ZBX_DC_ITEM *item, int now, int schedule_early, int disable_until,
+		int *nextcheck, char **error)
 {
 	zbx_uint64_t		seed;
 	int			ret, simple_interval;
@@ -361,9 +368,23 @@ static int	dc_get_item_nextcheck(const ZBX_DC_ITEM *item, int now, int disable_u
 	}
 
 	if (0 != disable_until)
+	{
 		*nextcheck = calculate_item_nextcheck_unreachable(simple_interval, custom_intervals, disable_until);
+	}
 	else
-		*nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval, custom_intervals, now);
+	{
+		if (0 != schedule_early &&
+				FAIL == zbx_custom_interval_is_scheduling(custom_intervals) &&
+				ZBX_DEFAULT_ITEM_UPDATE_INTERVAL < simple_interval)
+		{
+			*nextcheck = calculate_item_nextcheck(seed, item->type, ZBX_DEFAULT_ITEM_UPDATE_INTERVAL, NULL,
+					now);
+		}
+		else
+		{
+			*nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval, custom_intervals, now);
+		}
+	}
 
 	zbx_custom_interval_free(custom_intervals);
 
@@ -373,7 +394,7 @@ static int	dc_get_item_nextcheck(const ZBX_DC_ITEM *item, int now, int disable_u
 static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface, int flags, int now,
 		char **error)
 {
-	int	disable_until;
+	int	disable_until, schedule_early = 0;
 
 	if (0 == (flags & ZBX_ITEM_COLLECTED) && 0 != item->nextcheck &&
 			0 == (flags & ZBX_ITEM_KEY_CHANGED) && 0 == (flags & ZBX_ITEM_TYPE_CHANGED) &&
@@ -382,12 +403,15 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *in
 		return SUCCEED;	/* avoid unnecessary nextcheck updates when syncing items in cache */
 	}
 
+	if (0 != (flags & ZBX_ITEM_NEW) && ITEM_TYPE_ZABBIX_ACTIVE != item->type)
+		schedule_early = 1;
+
 	if (0 != (flags & ZBX_HOST_UNREACHABLE) && NULL != interface)
 		disable_until = DCget_disable_until(item, interface);
 	else
 		disable_until = 0;
 
-	return dc_get_item_nextcheck(item, now, disable_until, &item->nextcheck, error);
+	return dc_get_item_nextcheck(item, now, schedule_early, disable_until, &item->nextcheck, error);
 }
 
 static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags)
@@ -2071,7 +2095,7 @@ static unsigned char	*config_decode_serialized_expression(const char *src)
 	return dst;
 }
 
-static void	DCsync_items(zbx_dbsync_t *sync, int flags)
+static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t synced)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -2201,6 +2225,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			item->location = ZBX_LOC_NOWHERE;
 			item->poller_type = ZBX_NO_POLLER;
 			item->queue_priority = ZBX_QUEUE_PRIORITY_NORMAL;
+
+			if (ZBX_SYNCED_NEW_CONFIG_YES == synced && 0 == host->proxy_hostid)
+				flags |= ZBX_ITEM_NEW;
 
 			zbx_vector_ptr_create_ext(&item->tags, __config_shmem_malloc_func, __config_shmem_realloc_func,
 					__config_shmem_free_func);
@@ -5351,7 +5378,7 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
  * Purpose: Synchronize configuration data from database                      *
  *                                                                            *
  ******************************************************************************/
-void	DCsync_configuration(unsigned char mode)
+void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 {
 	int		i, flags;
 	double		sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, idsec, isec, tisec, pisec, tsec, dsec, fsec, expr_sec,
@@ -5608,7 +5635,7 @@ void	DCsync_configuration(unsigned char mode)
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
 
 	sec = zbx_time();
-	DCsync_items(&items_sync, flags);
+	DCsync_items(&items_sync, flags, synced);
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -9220,6 +9247,7 @@ static void	dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
 			case CONFIG_ERROR:
+			case SIG_ERROR:
 				dc_item->queue_priority = ZBX_QUEUE_PRIORITY_NORMAL;
 				dc_requeue_item(dc_item, dc_host, dc_interface, ZBX_ITEM_COLLECTED, lastclocks[i]);
 				break;
@@ -9422,85 +9450,6 @@ static int	DCinterface_set_availability(ZBX_DC_INTERFACE *dc_interface, int now,
 		dc_interface->availability_ts = now;
 
 	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: initializes interface availability data                           *
- *                                                                            *
- * Parameters: availability - [IN/OUT] interface availability data            *
- *             interfaceid  - [IN]                                            *
- *                                                                            *
- ******************************************************************************/
-void	zbx_interface_availability_init(zbx_interface_availability_t *availability, zbx_uint64_t interfaceid)
-{
-	memset(availability, 0, sizeof(zbx_interface_availability_t));
-	availability->interfaceid = interfaceid;
-}
-
-/********************************************************************************
- *                                                                              *
- * Purpose: releases resources allocated to store interface availability data   *
- *                                                                              *
- * Parameters: ia - [IN] interface availability data                            *
- *                                                                              *
- ********************************************************************************/
-void	zbx_interface_availability_clean(zbx_interface_availability_t *ia)
-{
-	zbx_free(ia->agent.error);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: frees interface availability data                                 *
- *                                                                            *
- * Parameters: availability - [IN] interface availability data                *
- *                                                                            *
- ******************************************************************************/
-void	zbx_interface_availability_free(zbx_interface_availability_t *availability)
-{
-	zbx_interface_availability_clean(availability);
-	zbx_free(availability);
-}
-
-ZBX_PTR_VECTOR_IMPL(availability_ptr, zbx_interface_availability_t *)
-/******************************************************************************
- *                                                                            *
- * Purpose: initializes agent availability with the specified data            *
- *                                                                            *
- * Parameters: agent         - [IN/OUT] agent availability data               *
- *             available     - [IN] the availability data                     *
- *             error         - [IN] the availability error                    *
- *             errors_from   - [IN] error starting timestamp                  *
- *             disable_until - [IN] disable until timestamp                   *
- *                                                                            *
- ******************************************************************************/
-static void	zbx_agent_availability_init(zbx_agent_availability_t *agent, unsigned char available, const char *error,
-		int errors_from, int disable_until)
-{
-	agent->flags = ZBX_FLAGS_AGENT_STATUS;
-	agent->available = available;
-	agent->error = zbx_strdup(NULL, error);
-	agent->errors_from = errors_from;
-	agent->disable_until = disable_until;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: checks interface availability if agent availability field is set  *
- *                                                                            *
- * Parameters: ia - [IN] interface availability data                          *
- *                                                                            *
- * Return value: SUCCEED - an agent availability field is set                 *
- *               FAIL - no agent availability field is set                    *
- *                                                                            *
- ******************************************************************************/
-int	zbx_interface_availability_is_set(const zbx_interface_availability_t *ia)
-{
-	if (ZBX_FLAGS_AGENT_STATUS_NONE != ia->agent.flags)
-		return SUCCEED;
-
-	return FAIL;
 }
 
 /**************************************************************************************
@@ -12006,6 +11955,110 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: find proxyid and type for given proxy name                        *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     name    - [IN] the proxy name                                          *
+ *     proxyid - [OUT] the proxyid                                            *
+ *     type    - [OUT] the type of a proxy                                    *
+ *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED - id/type were retrieved successfully                          *
+ *     FAIL    - failed to find proxy in cache                                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_get_proxyid_by_name(const char *name, zbx_uint64_t *proxyid, unsigned char *type)
+{
+	int			ret = FAIL;
+	const ZBX_DC_HOST	*dc_host;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (dc_host = DCfind_proxy(name)))
+	{
+		if (NULL != type)
+			*type = dc_host->status;
+
+		*proxyid = dc_host->hostid;
+
+		ret = SUCCEED;
+	}
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid)
+{
+	int		ret = SUCCEED;
+	ZBX_DC_PROXY	*dc_proxy;
+
+	WRLOCK_CACHE;
+
+	if (NULL == (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxyid)))
+		ret = FAIL;
+	else
+		dc_proxy->proxy_config_nextcheck = (int)time(NULL);
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve proxyids for all cached proxies                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_get_all_proxies(zbx_vector_cached_proxy_t *proxies)
+{
+	ZBX_DC_HOST_H		*dc_host;
+	zbx_hashset_iter_t	iter;
+
+	RDLOCK_CACHE;
+
+	zbx_vector_cached_proxy_reserve(proxies, (size_t)config->hosts_p.num_data);
+	zbx_hashset_iter_reset(&config->hosts_p, &iter);
+
+	while (NULL != (dc_host = (ZBX_DC_HOST_H *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_cached_proxy_t	*proxy;
+
+		proxy = (zbx_cached_proxy_t *)zbx_malloc(NULL, sizeof(zbx_cached_proxy_t));
+
+		proxy->name = zbx_strdup(NULL, dc_host->host_ptr->host);
+		proxy->hostid = dc_host->host_ptr->hostid;
+		proxy->status = dc_host->host_ptr->status;
+
+		zbx_vector_cached_proxy_append(proxies, proxy);
+	}
+
+	UNLOCK_CACHE;
+}
+
+int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **name)
+{
+	int		ret = SUCCEED;
+	ZBX_DC_HOST	*dc_host;
+
+	RDLOCK_CACHE;
+
+	if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &proxyid)))
+		ret = FAIL;
+	else
+	{
+		*status = dc_host->status;
+		*name = zbx_strdup(NULL, dc_host->host);
+	}
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: updates item nextcheck values in configuration cache              *
  *                                                                            *
  * Parameters: items      - [IN] the items to update                          *
@@ -13273,7 +13326,7 @@ static void	dc_get_items_to_reschedule(zbx_vector_dc_item_t *server_items, zbx_v
 			continue;
 		}
 
-		if (item->nextcheck - SEC_PER_MIN < now)
+		if (item->nextcheck - ZBX_DEFAULT_ITEM_UPDATE_INTERVAL < now)
 			continue;
 
 		if (NULL == strstr(item->delay, "{$"))
@@ -13285,7 +13338,7 @@ static void	dc_get_items_to_reschedule(zbx_vector_dc_item_t *server_items, zbx_v
 		if (HOST_STATUS_MONITORED != host->status)
 			continue;
 
-		(void)dc_get_item_nextcheck(item, now, 0, &nextcheck, NULL);
+		(void)dc_get_item_nextcheck(item, now, 0, 0, &nextcheck, NULL);
 
 		if (nextcheck == item->nextcheck)
 			continue;

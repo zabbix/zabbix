@@ -36,6 +36,7 @@ $form->addItem(new CPartial('scheduledreport.formgrid.html', [
 
 $output = [
 	'header' => $data['title'],
+	'doc_url' => CDocHelper::getUrl(CDocHelper::REPORTS_SCHEDULEDREPORT_EDIT),
 	'body' => $form->toString(),
 	'script_inline' => $this->readJsFile('popup.scheduledreport.edit.js.php'),
 	'buttons' => [
