@@ -27,20 +27,7 @@
 #include "zbxeval.h"
 #include "valuecache.h"
 #include "macrofunc.h"
-#include "../zbxalgo/vectorimpl.h"
-
-#ifdef HAVE_LIBXML2
-#	include <libxml/parser.h>
-#	include <libxml/xpath.h>
-#	include <libxml/xmlerror.h>
-
-typedef struct
-{
-	char	*buf;
-	size_t	len;
-}
-zbx_libxml_error_t;
-#endif
+#include "zbxxml.h"
 
 typedef struct
 {
@@ -5304,7 +5291,7 @@ static void	substitute_functions(zbx_vector_ptr_t *triggers, const zbx_vector_ui
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_hashset_create_ext(&funcs, triggers->values_num, func_hash_func, func_compare_func, func_clean,
-				ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_populate_function_items(&functionids, &funcs, &ifuncs, triggers);
 
@@ -5570,7 +5557,7 @@ static void	process_lld_macro_token(char **data, zbx_token_t *token, int flags, 
 	}
 	else if (0 != (flags & ZBX_TOKEN_XPATH))
 	{
-		xml_escape_xpath(&replace_to);
+		zbx_xml_escape_xpath(&replace_to);
 	}
 	else if (0 != (flags & ZBX_TOKEN_PROMETHEUS))
 	{
@@ -6508,81 +6495,6 @@ exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
-#endif
-}
-
-#ifdef HAVE_LIBXML2
-/******************************************************************************
- *                                                                            *
- * Purpose: libxml2 callback function for error handle                        *
- *                                                                            *
- * Parameters: user_data - [IN/OUT] the user context                          *
- *             err       - [IN] the libxml2 error message                     *
- *                                                                            *
- ******************************************************************************/
-static void	libxml_handle_error(void *user_data, xmlErrorPtr err)
-{
-	zbx_libxml_error_t	*err_ctx;
-
-	if (NULL == user_data)
-		return;
-
-	err_ctx = (zbx_libxml_error_t *)user_data;
-	zbx_strlcat(err_ctx->buf, err->message, err_ctx->len);
-
-	if (NULL != err->str1)
-		zbx_strlcat(err_ctx->buf, err->str1, err_ctx->len);
-
-	if (NULL != err->str2)
-		zbx_strlcat(err_ctx->buf, err->str2, err_ctx->len);
-
-	if (NULL != err->str3)
-		zbx_strlcat(err_ctx->buf, err->str3, err_ctx->len);
-}
-#endif
-
-/******************************************************************************
- *                                                                            *
- * Purpose: validate xpath string                                             *
- *                                                                            *
- * Parameters: xpath  - [IN] the xpath value                                  *
- *             error  - [OUT] the error message buffer                        *
- *             errlen - [IN] the size of error message buffer                 *
- *                                                                            *
- * Return value: SUCCEED - the xpath component was parsed successfully        *
- *               FAIL    - xpath parsing error                                *
- *                                                                            *
- ******************************************************************************/
-int	xml_xpath_check(const char *xpath, char *error, size_t errlen)
-{
-#ifndef HAVE_LIBXML2
-	ZBX_UNUSED(xpath);
-	ZBX_UNUSED(error);
-	ZBX_UNUSED(errlen);
-	return FAIL;
-#else
-	zbx_libxml_error_t	err;
-	xmlXPathContextPtr	ctx;
-	xmlXPathCompExprPtr	p;
-
-	err.buf = error;
-	err.len = errlen;
-
-	ctx = xmlXPathNewContext(NULL);
-	xmlSetStructuredErrorFunc(&err, &libxml_handle_error);
-
-	p = xmlXPathCtxtCompile(ctx, (xmlChar *)xpath);
-	xmlSetStructuredErrorFunc(NULL, NULL);
-
-	if (NULL == p)
-	{
-		xmlXPathFreeContext(ctx);
-		return FAIL;
-	}
-
-	xmlXPathFreeCompExpr(p);
-	xmlXPathFreeContext(ctx);
-	return SUCCEED;
 #endif
 }
 

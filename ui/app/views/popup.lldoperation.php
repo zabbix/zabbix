@@ -23,9 +23,6 @@
  * @var CView $this
  */
 
-// Visibility box javascript is already added in main page. It should not be added in popup response.
-define('CVISIBILITYBOX_JAVASCRIPT_INSERTED', 1);
-
 $output = [
 	'header' => $data['title']
 ];

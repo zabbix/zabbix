@@ -19,14 +19,14 @@
 
 #include "heart.h"
 
-#include "daemon.h"
+#include "zbxnix.h"
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxself.h"
 
 #include "zbxcrypto.h"
 #include "zbxcompress.h"
-#include "comms.h"
+#include "zbxcommshigh.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -61,19 +61,19 @@ static int	send_heartbeat(void)
 
 	reserved = j.buffer_size;
 
-	if (FAIL == (ret = connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, CONFIG_HEARTBEAT_FREQUENCY,
+	if (FAIL == (ret = zbx_connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, CONFIG_HEARTBEAT_FREQUENCY,
 			CONFIG_TIMEOUT, configured_tls_connect_mode, 0, LOG_LEVEL_DEBUG))) /* do not retry */
 	{
 		goto clean;
 	}
 
-	if (SUCCEED != (ret = put_data_to_server(&sock, &buffer, buffer_size, reserved, &error)))
+	if (SUCCEED != (ret = zbx_put_data_to_server(&sock, &buffer, buffer_size, reserved, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send heartbeat message to server at \"%s\": %s", sock.peer,
 				error);
 	}
 
-	disconnect_server(&sock);
+	zbx_disconnect_from_server(&sock);
 	zbx_free(error);
 clean:
 	zbx_free(buffer);

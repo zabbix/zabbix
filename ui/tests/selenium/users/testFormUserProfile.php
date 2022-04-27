@@ -542,12 +542,7 @@ class testFormUserProfile extends CLegacyWebTest {
 			$this->zbxTestDropdownSelect('mediatypeid', $data['type']);
 		}
 
-		if (array_key_exists('send_to', $data) & !array_key_exists('type', $data)) {
-			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="sendto"]', $data['send_to']);
-		}
-		else {
-			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="sendto"]', $data['send_to']);
-		}
+		$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="sendto"]', $data['send_to']);
 
 		if (array_key_exists('period', $data)) {
 			$this->zbxTestInputClearAndTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="period"]', $data['period']);

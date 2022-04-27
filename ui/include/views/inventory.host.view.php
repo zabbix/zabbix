@@ -73,7 +73,7 @@ foreach ($data['host']['interfaces'] as $interface) {
 
 $header_is_set = false;
 
-foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $type) {
+foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $type) {
 	if ($interfaces[$type]) {
 		$ifTab = (new CTable());
 
@@ -176,7 +176,8 @@ $overviewFormList->addRow(_('Monitoring'),
 // configuration
 if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
 	$hostLink = (new CLink(_('Host')))
-		->onClick('view.editHost({hostid:\''.$data['host']['hostid'].'\'})');
+		->setAttribute('data-hostid', $data['host']['hostid'])
+		->onClick('view.editHost({hostid: this.dataset.hostid});');
 	$itemsLink = new CLink(_('Items'),
 		(new CUrl('items.php'))
 			->setArgument('filter_set', '1')

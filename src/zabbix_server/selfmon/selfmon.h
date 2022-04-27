@@ -20,7 +20,7 @@
 #ifndef ZABBIX_SELFMON_H
 #define ZABBIX_SELFMON_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 ZBX_THREAD_ENTRY(selfmon_thread, args);
 

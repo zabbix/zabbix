@@ -340,21 +340,22 @@ function orderItemsByStatus(array &$items, $sortorder = ZBX_SORT_UP) {
  *
  * @param int $type
  *
- * @return null
+ * @return ?string
  */
 function interfaceType2str($type) {
 	$interfaceGroupLabels = [
+		INTERFACE_TYPE_OPT => _('None'),
 		INTERFACE_TYPE_AGENT => _('Agent'),
 		INTERFACE_TYPE_SNMP => _('SNMP'),
 		INTERFACE_TYPE_JMX => _('JMX'),
 		INTERFACE_TYPE_IPMI => _('IPMI')
 	];
 
-	return isset($interfaceGroupLabels[$type]) ? $interfaceGroupLabels[$type] : null;
+	return array_key_exists($type, $interfaceGroupLabels) ? $interfaceGroupLabels[$type] : null;
 }
 
 function itemTypeInterface($type = null) {
-	$types = [
+	static $types = [
 		ITEM_TYPE_SNMP => INTERFACE_TYPE_SNMP,
 		ITEM_TYPE_SNMPTRAP => INTERFACE_TYPE_SNMP,
 		ITEM_TYPE_IPMI => INTERFACE_TYPE_IPMI,
@@ -364,17 +365,35 @@ function itemTypeInterface($type = null) {
 		ITEM_TYPE_SSH => INTERFACE_TYPE_ANY,
 		ITEM_TYPE_TELNET => INTERFACE_TYPE_ANY,
 		ITEM_TYPE_JMX => INTERFACE_TYPE_JMX,
-		ITEM_TYPE_HTTPAGENT => INTERFACE_TYPE_ANY
+		ITEM_TYPE_HTTPAGENT => INTERFACE_TYPE_OPT
 	];
+
 	if (is_null($type)) {
 		return $types;
 	}
-	elseif (isset($types[$type])) {
+	elseif (array_key_exists($type, $types)) {
 		return $types[$type];
 	}
-	else {
-		return false;
+
+	return false;
+}
+
+/**
+ * Convert a list of interfaces to an array of interface type => interfaceids.
+ *
+ * @param array $interfaces  List of (host) interfaces.
+ *
+ * @return array  Interface IDs grouped by type.
+ */
+
+function interfaceIdsByType(array $interfaces) {
+	$interface_ids_by_type = [];
+
+	foreach ($interfaces as $interface) {
+		$interface_ids_by_type[$interface['type']][] = $interface['interfaceid'];
 	}
+
+	return $interface_ids_by_type;
 }
 
 /**
@@ -482,7 +501,7 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 		$interfaceids = [];
 
 		foreach ($dstHost['interfaces'] as $interface) {
-			if ($interface['main'] == 1) {
+			if ($interface['main'] == INTERFACE_PRIMARY) {
 				$interfaceids[$interface['type']] = $interface['interfaceid'];
 			}
 		}
@@ -514,23 +533,26 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 				$type = itemTypeInterface($item['type']);
 
 				if ($type == INTERFACE_TYPE_ANY) {
-					foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $itype) {
-						if (isset($interfaceids[$itype])) {
+					foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $itype) {
+						if (array_key_exists($type, $interfaceids)) {
 							$item['interfaceid'] = $interfaceids[$itype];
 							break;
 						}
 					}
 				}
-				elseif ($type !== false) {
+				elseif ($type !== false && $type != INTERFACE_TYPE_OPT) {
 					if (!isset($interfaceids[$type])) {
 						error(_s('Cannot find host interface on "%1$s" for item key "%2$s".', $dstHost['host'],
 							$item['key_']
 						));
+
 						return false;
 					}
+
 					$item['interfaceid'] = $interfaceids[$type];
 				}
 			}
+
 			unset($item['itemid']);
 
 			if ($item['valuemapid'] != 0) {
@@ -587,12 +609,12 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 	return true;
 }
 
-function copyItems($srcHostId, $dstHostId) {
+function copyItems($srcHostId, $dstHostId, $assign_opt_interface = false) {
 	$srcItems = API::Item()->get([
 		'output' => ['type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type',
 			'trapper_hosts', 'units', 'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username',
-			'password', 'publickey', 'privatekey', 'flags', 'description', 'inventory_link', 'jmx_endpoint',
-			'master_itemid', 'templateid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes',
+			'password', 'publickey', 'privatekey', 'flags', 'interfaceid', 'description', 'inventory_link',
+			'jmx_endpoint', 'master_itemid', 'templateid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes',
 			'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method',
 			'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
 			'allow_traps', 'parameters'
@@ -691,12 +713,17 @@ function copyItems($srcHostId, $dstHostId) {
 		}
 
 		if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
-			// find a matching interface
 			$interface = CItem::findInterfaceForItem($srcItem['type'], $dstHost['interfaces']);
+
+			if ($interface === false && $assign_opt_interface
+					&& itemTypeInterface($srcItem['type']) == INTERFACE_TYPE_OPT
+					&& $srcItem['interfaceid'] != 0) {
+				$interface = CItem::findInterfaceByPriority($dstHost['interfaces']);
+			}
+
 			if ($interface) {
 				$srcItem['interfaceid'] = $interface['interfaceid'];
 			}
-			// no matching interface found, throw an error
 			elseif ($interface !== false) {
 				error(_s('Cannot find host interface on "%1$s" for item key "%2$s".', $dstHost['host'], $srcItem['key_']));
 			}
@@ -1107,8 +1134,7 @@ function getDataOverviewCellData(array $db_items, array $data, int $show_suppres
  *
  * @return array
  */
-function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?array $tags,
-		int $evaltype = TAG_EVAL_TYPE_AND_OR): array {
+function getDataOverviewItems(?array $groupids, ?array $hostids, ?array $tags, int $evaltype): array {
 
 	if ($hostids === null) {
 		$limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE) + 1;
@@ -1255,6 +1281,8 @@ function getInterfaceSelect(array $interfaces): CSelect {
 	/** @var CSelectOption[] $options_by_type */
 	$options_by_type = [];
 
+	$interface_select->addOption(new CSelectOption(INTERFACE_TYPE_OPT, interfaceType2str(INTERFACE_TYPE_OPT)));
+
 	foreach ($interfaces as $interface) {
 		$option = new CSelectOption($interface['interfaceid'], getHostInterface($interface));
 
@@ -1265,7 +1293,7 @@ function getInterfaceSelect(array $interfaces): CSelect {
 		$options_by_type[$interface['type']][] = $option;
 	}
 
-	foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $interface_type) {
+	foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $interface_type) {
 		if (array_key_exists($interface_type, $options_by_type)) {
 			$interface_group = new CSelectOptionGroup((string) interfaceType2str($interface_type));
 

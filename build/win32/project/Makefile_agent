@@ -37,32 +37,32 @@ ADD_RFLAGS = /d "ZABBIX_AGENT"
 OBJS = \
 	..\..\..\src\libs\zbxalgo\algodefs.o \
 	..\..\..\src\libs\zbxalgo\vector.o \
-	..\..\..\src\libs\zbxcommon\alias.o \
 	..\..\..\src\libs\zbxcommon\comms.o \
 	..\..\..\src\libs\zbxcommon\iprange.o \
 	..\..\..\src\libs\zbxcommon\misc.o \
 	..\..\..\src\libs\zbxcommon\variant.o \
 	..\..\..\src\libs\zbxcommon\str.o \
-	..\..\..\src\libs\zbxcommon\xml.o \
 	..\..\..\src\libs\zbxcommon\zbxgetopt.o \
 	..\..\..\src\libs\zbxcommon\file.o \
 	..\..\..\src\libs\zbxcommon\time.o \
-	..\..\..\src\libs\zbxcommshigh\comms.o \
+	..\..\..\src\libs\zbxcommshigh\commshigh.o \
 	..\..\..\src\libs\zbxcomms\comms.o \
 	..\..\..\src\libs\zbxcomms\telnet.o \
 	..\..\..\src\libs\zbxcompress\compress.o \
 	..\..\..\src\libs\zbxconf\cfg.o \
 	..\..\..\src\libs\zbxcrypto\base64.o \
-	..\..\..\src\libs\zbxcrypto\md5.o \
+	..\..\..\src\libs\zbxhash\md5.o \
 	..\..\..\src\libs\zbxcrypto\sha256crypt.o \
+	..\..\..\src\libs\zbxcrypto\crypto.o \
 	..\..\..\src\libs\zbxjson\json.o \
 	..\..\..\src\libs\zbxjson\json_parser.o \
 	..\..\..\src\libs\zbxjson\jsonpath.o \
 	..\..\..\src\libs\zbxlog\log.o \
-	..\..\..\src\libs\zbxsys\mutexs.o \
-	..\..\..\src\libs\zbxsys\symbols.o \
-	..\..\..\src\libs\zbxsys\threads.o \
+	..\..\..\src\libs\zbxmutexs\mutexs.o \
+	..\..\..\src\libs\zbxsymbols\symbols.o \
+	..\..\..\src\libs\zbxthreads\threads.o \
 	..\..\..\src\libs\zbxexec\execute.o \
+	..\..\..\src\libs\zbxhash\zbxhash.o \
 	..\..\..\src\libs\zbxhttp\http.o \
 	..\..\..\src\libs\zbxhttp\punycode.o \
 	..\..\..\src\libs\zbxhttp\urlencode.o \
@@ -96,6 +96,7 @@ OBJS = \
 	..\..\..\src\libs\zbxsysinfo\win32\software.o \
 	..\..\..\src\libs\zbxsysinfo\win32\system.o \
 	..\..\..\src\libs\zbxsysinfo\win32\hostname.o \
+	..\..\..\src\libs\zbxsysinfo\alias\alias.o \
 	..\..\..\src\libs\zbxwin32\perfmon.o \
 	..\..\..\src\libs\zbxwin32\service.o \
 	..\..\..\src\zabbix_agent\active.o \
@@ -109,6 +110,7 @@ OBJS = \
 	..\..\..\src\zabbix_agent\zabbix_agentd.o \
 	..\..\..\src\zabbix_agent\zbxconf.o \
 	..\..\..\src\libs\zbxregexp\zbxregexp.o \
+	..\..\..\src\libs\zbxxml\xml.o \
 	..\..\..\src\libs\zbxwin32\fatal.o \
 	..\..\..\src\libs\zbxwin32\disk.o
 

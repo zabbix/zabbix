@@ -13,7 +13,7 @@ Template `RabbitMQ Cluster` — collects metrics by polling [RabbitMQ management
 
 This template was tested on:
 
-- RabbitMQ, version 3.5.7, 3.7.17, 3.7.18, 3.8.5, 3.8.12
+- RabbitMQ, version 3.5.7, 3.7.17, 3.7.18, 3.7.7, 3.8.5, 3.8.12
 
 ## Setup
 
@@ -122,7 +122,7 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |RabbitMQ: There are active alarms in the cluster |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`last(/RabbitMQ cluster by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/health/checks/alarms{#SINGLETON}"])=0` |AVERAGE | |
-|RabbitMQ: Failed to fetch overview data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes</p> |`nodata(/RabbitMQ cluster by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"],30m)=1` |WARNING |<p>Manual close: YES</p> |
+|RabbitMQ: Failed to fetch overview data |<p>Zabbix has not received data for items for the last 30 minutes</p> |`nodata(/RabbitMQ cluster by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"],30m)=1` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
 
@@ -146,7 +146,7 @@ It also uses Zabbix agent to collect `RabbitMQ` Linux process stats like CPU usa
 
 This template was tested on:
 
-- RabbitMQ, version 3.5.7, 3.7.17, 3.7.18, 3.8.5, 3.8.12
+- RabbitMQ, version 3.5.7, 3.7.17, 3.7.18, 3.7.7, 3.8.5, 3.8.12
 
 ## Setup
 
@@ -258,23 +258,23 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|RabbitMQ: Version has changed (new version: {ITEM.VALUE}) |<p>RabbitMQ version has changed. Ack to close.</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version,#1)<>last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version,#2) and length(last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version))>0` |INFO |<p>Manual close: YES</p> |
-|RabbitMQ: Number of network partitions is too high (more than 0 for 5m) |<p>https://www.rabbitmq.com/partitions.html#detecting</p> |`min(/RabbitMQ node by Zabbix agent/rabbitmq.node.partitions,5m)>0` |WARNING | |
+|RabbitMQ: Version has changed |<p>RabbitMQ version has changed. Ack to close.</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version,#1)<>last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version,#2) and length(last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version))>0` |INFO |<p>Manual close: YES</p> |
+|RabbitMQ: Number of network partitions is too high |<p>https://www.rabbitmq.com/partitions.html#detecting</p> |`min(/RabbitMQ node by Zabbix agent/rabbitmq.node.partitions,5m)>0` |WARNING | |
 |RabbitMQ: Node is not running |<p>RabbitMQ node is not running</p> |`max(/RabbitMQ node by Zabbix agent/rabbitmq.node.running,5m)=0` |AVERAGE |<p>**Depends on**:</p><p>- RabbitMQ: Process is not running</p><p>- RabbitMQ: Service is down</p> |
-|RabbitMQ: Memory alarm (Memory usage threshold has been reached) |<p>https://www.rabbitmq.com/memory.html</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.mem_alarm)=1` |AVERAGE | |
-|RabbitMQ: Free disk space alarm (Free space threshold has been reached) |<p>https://www.rabbitmq.com/disk-alarms.html</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.disk_free_alarm)=1` |AVERAGE | |
-|RabbitMQ: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|RabbitMQ: Memory alarm |<p>https://www.rabbitmq.com/memory.html</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.mem_alarm)=1` |AVERAGE | |
+|RabbitMQ: Free disk space alarm |<p>https://www.rabbitmq.com/disk-alarms.html</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.disk_free_alarm)=1` |AVERAGE | |
+|RabbitMQ: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |RabbitMQ: Process is not running |<p>-</p> |`last(/RabbitMQ node by Zabbix agent/proc.num["{$RABBITMQ.PROCESS_NAME}"])=0` |HIGH | |
 |RabbitMQ: Service is down |<p>-</p> |`last(/RabbitMQ node by Zabbix agent/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0` |AVERAGE |<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Process is not running</p> |
-|RabbitMQ: Service response time is too high (over {$RABBITMQ.RESPONSE_TIME.MAX.WARN}s for 5m) |<p>-</p> |`min(/RabbitMQ node by Zabbix agent/net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Process is not running</p><p>- RabbitMQ: Service is down</p> |
+|RabbitMQ: Service response time is too high |<p>-</p> |`min(/RabbitMQ node by Zabbix agent/net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Process is not running</p><p>- RabbitMQ: Service is down</p> |
 |RabbitMQ: There are active alarms in the node |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms{#SINGLETON}"])=0` |AVERAGE | |
 |RabbitMQ: There are valid TLS certificates expiring in the next month |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/certificate-expiration/1/months{#SINGLETON}"])=0` |AVERAGE | |
 |RabbitMQ: There are not running virtual hosts |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/virtual-hosts{#SINGLETON}"])=0` |AVERAGE | |
 |RabbitMQ: There are queues that could potentially lose data if this node goes offline. |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-mirror-sync-critical{#SINGLETON}"])=0` |AVERAGE | |
-|RabbitMQ: There are queues that would lose their quorum and availability if the this node is shut down. |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-quorum-critical{#SINGLETON}"])=0` |AVERAGE | |
+|RabbitMQ: There are queues that would lose their quorum and availability if this node is shut down. |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-quorum-critical{#SINGLETON}"])=0` |AVERAGE | |
 |RabbitMQ: Node healthcheck failed |<p>https://www.rabbitmq.com/monitoring.html#health-checks</p> |`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/healthchecks/node{#SINGLETON}"])=0` |AVERAGE | |
-|RabbitMQ: Too many messages in queue [{#VHOST}][{#QUEUE}] (over {$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"} for 5m) |<p>-</p> |`min(/RabbitMQ node by Zabbix agent/rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"],5m)>{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}` |WARNING | |
-|RabbitMQ: Failed to fetch nodes data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`nodata(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"],30m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Process is not running</p><p>- RabbitMQ: Service is down</p> |
+|RabbitMQ: Too many messages in queue [{#VHOST}][{#QUEUE}] |<p>-</p> |`min(/RabbitMQ node by Zabbix agent/rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"],5m)>{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}` |WARNING | |
+|RabbitMQ: Failed to fetch nodes data |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`nodata(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"],30m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Process is not running</p><p>- RabbitMQ: Service is down</p> |
 
 ## Feedback
 

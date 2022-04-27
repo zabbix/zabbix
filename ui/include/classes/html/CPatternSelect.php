@@ -20,6 +20,7 @@
 
 
 class CPatternSelect extends CMultiSelect {
+
 	/**
 	 * Search method used for auto-suggestions.
 	 */
@@ -41,8 +42,19 @@ class CPatternSelect extends CMultiSelect {
 	}
 
 	protected function mapOptions(array $options): array {
+		$wildcard_allowed = false;
+
+		if (array_key_exists('wildcard_allowed', $options) && $options['wildcard_allowed']) {
+			$wildcard_allowed = true;
+			unset($options['wildcard_allowed']);
+		}
+
 		$options = parent::mapOptions($options);
 		$options['popup']['parameters']['patternselect'] = '1';
+
+		if ($wildcard_allowed) {
+			$options['objectOptions']['wildcard_allowed'] = true;
+		}
 
 		return $options;
 	}

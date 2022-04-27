@@ -19,19 +19,16 @@
 
 #include "vmware.h"
 
-#include "mutexs.h"
-
-/* LIBXML2 is used */
+#include "zbxxml.h"
 #ifdef HAVE_LIBXML2
-#	include <libxml/parser.h>
 #	include <libxml/xpath.h>
 #endif
 
-#include "memalloc.h"
+#include "zbxmutexs.h"
+#include "zbxshmem.h"
 #include "log.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
 
 /*
  * The VMware data (zbx_vmware_service_t structure) are stored in shared memory.
@@ -71,8 +68,8 @@ extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 extern char				*CONFIG_SOURCE_IP;
 
-#define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref,  __vm_mem_malloc_func, \
-		__vm_mem_realloc_func, __vm_mem_free_func)
+#define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref,  __vm_shmem_malloc_func, \
+		__vm_shmem_realloc_func, __vm_shmem_free_func)
 
 #define ZBX_VMWARE_CACHE_UPDATE_PERIOD	CONFIG_VMWARE_FREQUENCY
 #define ZBX_VMWARE_PERF_UPDATE_PERIOD	CONFIG_VMWARE_PERF_FREQUENCY
@@ -85,20 +82,13 @@ extern char				*CONFIG_SOURCE_IP;
 
 static zbx_mutex_t	vmware_lock = ZBX_MUTEX_NULL;
 
-static zbx_mem_info_t	*vmware_mem = NULL;
+static zbx_shmem_info_t	*vmware_mem = NULL;
 
-ZBX_MEM_FUNC_IMPL(__vm, vmware_mem)
+ZBX_SHMEM_FUNC_IMPL(__vm, vmware_mem)
 
 static zbx_vmware_t	*vmware = NULL;
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-
-/* according to libxml2 changelog XML_PARSE_HUGE option was introduced in version 2.7.0 */
-#if 20700 <= LIBXML_VERSION	/* version 2.7.0 */
-#	define ZBX_XML_PARSE_OPTS	XML_PARSE_HUGE
-#else
-#	define ZBX_XML_PARSE_OPTS	0
-#endif
 
 #define ZBX_VMWARE_COUNTERS_INIT_SIZE	500
 
@@ -515,7 +505,7 @@ static char	*vmware_shared_strdup(const char *str)
 	strdup = vmware_strpool_strdup(str, &vmware->strpool, &len);
 
 	if (0 < len)
-		vmware->strpool_sz += zbx_mem_required_chunk_size(len);
+		vmware->strpool_sz += zbx_shmem_required_chunk_size(len);
 
 	return strdup;
 }
@@ -546,7 +536,7 @@ static void	vmware_shared_strfree(char *str)
 	vmware_strpool_strfree(str, &vmware->strpool, &len);
 
 	if (0 < len)
-		vmware->strpool_sz -= zbx_mem_required_chunk_size(len);
+		vmware->strpool_sz -= zbx_shmem_required_chunk_size(len);
 }
 
 static void	evt_msg_strpool_strfree(char *str)
@@ -561,14 +551,6 @@ typedef struct
 	size_t	offset;
 }
 ZBX_HTTPPAGE;
-
-static int	zbx_xml_read_values(xmlDoc *xdoc, const char *xpath, zbx_vector_str_t *values);
-static int	zbx_xml_node_read_values(xmlDoc *xdoc, xmlNode *node, const char *xpath, zbx_vector_str_t *values);
-static int	zbx_xml_try_read_value(const char *data, size_t len, const char *xpath, xmlDoc **xdoc, char **value,
-		char **error);
-static int	zbx_xml_doc_read_num(xmlDoc *xdoc, const char *xpath, int *num);
-static char	*zbx_xml_node_read_value(xmlDoc *doc, xmlNode *node, const char *xpath);
-static char	*zbx_xml_doc_read_value(xmlDoc *xdoc, const char *xpath);
 
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
@@ -915,7 +897,7 @@ static void	vmware_perf_counter_shared_free(zbx_vmware_perf_counter_t *counter)
 {
 	vmware_vector_str_uint64_pair_shared_clean(&counter->values);
 	zbx_vector_str_uint64_pair_destroy(&counter->values);
-	__vm_mem_free_func(counter);
+	__vm_shmem_free_func(counter);
 }
 
 /******************************************************************************
@@ -957,7 +939,7 @@ static void	vmware_diskextent_shared_free(zbx_vmware_diskextent_t *diskextent)
 {
 	vmware_shared_strfree(diskextent->diskname);
 
-	__vm_mem_free_func(diskextent);
+	__vm_shmem_free_func(diskextent);
 }
 
 /******************************************************************************
@@ -981,7 +963,7 @@ static void	vmware_datastore_shared_free(zbx_vmware_datastore_t *datastore)
 	zbx_vector_vmware_diskextent_clear_ext(&datastore->diskextents, vmware_diskextent_shared_free);
 	zbx_vector_vmware_diskextent_destroy(&datastore->diskextents);
 
-	__vm_mem_free_func(datastore);
+	__vm_shmem_free_func(datastore);
 }
 
 /******************************************************************************
@@ -996,7 +978,7 @@ static void	vmware_datacenter_shared_free(zbx_vmware_datacenter_t *datacenter)
 	vmware_shared_strfree(datacenter->name);
 	vmware_shared_strfree(datacenter->id);
 
-	__vm_mem_free_func(datacenter);
+	__vm_shmem_free_func(datacenter);
 }
 
 /******************************************************************************
@@ -1020,7 +1002,7 @@ static void	vmware_props_shared_free(char **props, int props_num)
 			vmware_shared_strfree(props[i]);
 	}
 
-	__vm_mem_free_func(props);
+	__vm_shmem_free_func(props);
 }
 
 /******************************************************************************
@@ -1038,7 +1020,7 @@ static void	vmware_dev_shared_free(zbx_vmware_dev_t *dev)
 	if (NULL != dev->label)
 		vmware_shared_strfree(dev->label);
 
-	__vm_mem_free_func(dev);
+	__vm_shmem_free_func(dev);
 }
 
 /******************************************************************************
@@ -1053,7 +1035,7 @@ static void	vmware_fs_shared_free(zbx_vmware_fs_t *fs)
 	if (NULL != fs->path)
 		vmware_shared_strfree(fs->path);
 
-	__vm_mem_free_func(fs);
+	__vm_shmem_free_func(fs);
 }
 
 /******************************************************************************
@@ -1079,7 +1061,7 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 
 	vmware_props_shared_free(vm->props, ZBX_VMWARE_VMPROPS_NUM);
 
-	__vm_mem_free_func(vm);
+	__vm_shmem_free_func(vm);
 }
 
 /******************************************************************************
@@ -1094,7 +1076,7 @@ static void	vmware_dsname_shared_free(zbx_vmware_dsname_t *dsname)
 	vmware_shared_strfree(dsname->name);
 	zbx_vector_vmware_hvdisk_destroy(&dsname->hvdisks);
 
-	__vm_mem_free_func(dsname);
+	__vm_shmem_free_func(dsname);
 }
 
 /******************************************************************************
@@ -1154,7 +1136,7 @@ static void	vmware_cluster_shared_free(zbx_vmware_cluster_t *cluster)
 	if (NULL != cluster->status)
 		vmware_shared_strfree(cluster->status);
 
-	__vm_mem_free_func(cluster);
+	__vm_shmem_free_func(cluster);
 }
 
 /******************************************************************************
@@ -1169,7 +1151,7 @@ static void	vmware_event_shared_free(zbx_vmware_event_t *event)
 	if (NULL != event->message)
 		vmware_shared_strfree(event->message);
 
-	__vm_mem_free_func(event);
+	__vm_shmem_free_func(event);
 }
 
 /******************************************************************************
@@ -1208,7 +1190,7 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
 		if (NULL != data->error)
 			vmware_shared_strfree(data->error);
 
-		__vm_mem_free_func(data);
+		__vm_shmem_free_func(data);
 	}
 }
 
@@ -1282,7 +1264,7 @@ static void	vmware_service_shared_free(zbx_vmware_service_t *service)
 
 	zbx_hashset_destroy(&service->counters);
 
-	__vm_mem_free_func(service);
+	__vm_shmem_free_func(service);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1300,7 +1282,7 @@ static zbx_vmware_cluster_t	*vmware_cluster_shared_dup(const zbx_vmware_cluster_
 {
 	zbx_vmware_cluster_t	*cluster;
 
-	cluster = (zbx_vmware_cluster_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_cluster_t));
+	cluster = (zbx_vmware_cluster_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_cluster_t));
 	cluster->id = vmware_shared_strdup(src->id);
 	cluster->name = vmware_shared_strdup(src->name);
 	cluster->status = vmware_shared_strdup(src->status);
@@ -1321,7 +1303,7 @@ static zbx_vmware_event_t	*vmware_event_shared_dup(const zbx_vmware_event_t *src
 {
 	zbx_vmware_event_t	*event;
 
-	event = (zbx_vmware_event_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_event_t));
+	event = (zbx_vmware_event_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_event_t));
 	event->key = src->key;
 	event->message = vmware_shared_strdup(src->message);
 	event->timestamp = src->timestamp;
@@ -1342,7 +1324,7 @@ static zbx_vmware_diskextent_t	*vmware_diskextent_shared_dup(const zbx_vmware_di
 {
 	zbx_vmware_diskextent_t	*diskextent;
 
-	diskextent = (zbx_vmware_diskextent_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_diskextent_t));
+	diskextent = (zbx_vmware_diskextent_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_diskextent_t));
 	diskextent->diskname = vmware_shared_strdup(src->diskname);
 	diskextent->partitionid = src->partitionid;
 
@@ -1363,7 +1345,7 @@ static zbx_vmware_datastore_t	*vmware_datastore_shared_dup(const zbx_vmware_data
 	int			i;
 	zbx_vmware_datastore_t	*datastore;
 
-	datastore = (zbx_vmware_datastore_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_datastore_t));
+	datastore = (zbx_vmware_datastore_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_datastore_t));
 	datastore->uuid = vmware_shared_strdup(src->uuid);
 	datastore->name = vmware_shared_strdup(src->name);
 	datastore->id = vmware_shared_strdup(src->id);
@@ -1407,7 +1389,7 @@ static zbx_vmware_datacenter_t	*vmware_datacenter_shared_dup(const zbx_vmware_da
 {
 	zbx_vmware_datacenter_t	*datacenter;
 
-	datacenter = (zbx_vmware_datacenter_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_datacenter_t));
+	datacenter = (zbx_vmware_datacenter_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_datacenter_t));
 	datacenter->name = vmware_shared_strdup(src->name);
 	datacenter->id = vmware_shared_strdup(src->id);
 
@@ -1427,7 +1409,7 @@ static zbx_vmware_dev_t	*vmware_dev_shared_dup(const zbx_vmware_dev_t *src)
 {
 	zbx_vmware_dev_t	*dev;
 
-	dev = (zbx_vmware_dev_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_dev_t));
+	dev = (zbx_vmware_dev_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_dev_t));
 	dev->type = src->type;
 	dev->instance = vmware_shared_strdup(src->instance);
 	dev->label = vmware_shared_strdup(src->label);
@@ -1449,7 +1431,7 @@ static zbx_vmware_fs_t	*vmware_fs_shared_dup(const zbx_vmware_fs_t *src)
 {
 	zbx_vmware_fs_t	*fs;
 
-	fs = (zbx_vmware_fs_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_fs_t));
+	fs = (zbx_vmware_fs_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_fs_t));
 	fs->path = vmware_shared_strdup(src->path);
 	fs->capacity = src->capacity;
 	fs->free_space = src->free_space;
@@ -1472,7 +1454,7 @@ static char	**vmware_props_shared_dup(char ** const src, int props_num)
 	char	**props;
 	int	i;
 
-	props = (char **)__vm_mem_malloc_func(NULL, sizeof(char *) * props_num);
+	props = (char **)__vm_shmem_malloc_func(NULL, sizeof(char *) * props_num);
 
 	for (i = 0; i < props_num; i++)
 		props[i] = vmware_shared_strdup(src[i]);
@@ -1494,7 +1476,7 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
 	zbx_vmware_vm_t	*vm;
 	int		i;
 
-	vm = (zbx_vmware_vm_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_vm_t));
+	vm = (zbx_vmware_vm_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_vm_t));
 
 	VMWARE_VECTOR_CREATE(&vm->devs, ptr);
 	VMWARE_VECTOR_CREATE(&vm->file_systems, ptr);
@@ -1528,7 +1510,7 @@ static zbx_vmware_dsname_t	*vmware_dsname_shared_dup(const zbx_vmware_dsname_t *
 	zbx_vmware_dsname_t	*dsname;
 	int	i;
 
-	dsname = (zbx_vmware_dsname_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_dsname_t));
+	dsname = (zbx_vmware_dsname_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_dsname_t));
 
 	dsname->name = vmware_shared_strdup(src->name);
 
@@ -1593,9 +1575,9 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 	zbx_hashset_iter_t	iter;
 	zbx_vmware_hv_t		*hv, hv_local;
 
-	data = (zbx_vmware_data_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_data_t));
-	zbx_hashset_create_ext(&data->hvs, 1, vmware_hv_hash, vmware_hv_compare, NULL, __vm_mem_malloc_func,
-			__vm_mem_realloc_func, __vm_mem_free_func);
+	data = (zbx_vmware_data_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_data_t));
+	zbx_hashset_create_ext(&data->hvs, 1, vmware_hv_hash, vmware_hv_compare, NULL, __vm_shmem_malloc_func,
+			__vm_shmem_realloc_func, __vm_shmem_free_func);
 	VMWARE_VECTOR_CREATE(&data->clusters, ptr);
 	VMWARE_VECTOR_CREATE(&data->events, ptr);
 	VMWARE_VECTOR_CREATE(&data->datastores, vmware_datastore);
@@ -1605,8 +1587,8 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 	zbx_vector_vmware_datastore_reserve(&data->datastores, src->datastores.values_num);
 	zbx_vector_vmware_datacenter_reserve(&data->datacenters, src->datacenters.values_num);
 
-	zbx_hashset_create_ext(&data->vms_index, 100, vmware_vm_hash, vmware_vm_compare, NULL, __vm_mem_malloc_func,
-			__vm_mem_realloc_func, __vm_mem_free_func);
+	zbx_hashset_create_ext(&data->vms_index, 100, vmware_vm_hash, vmware_vm_compare, NULL, __vm_shmem_malloc_func,
+			__vm_shmem_realloc_func, __vm_shmem_free_func);
 
 	data->error = vmware_shared_strdup(src->error);
 
@@ -1948,8 +1930,8 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 		}
 	}
 
-	username_esc = xml_escape_dyn(service->username);
-	password_esc = xml_escape_dyn(service->password);
+	username_esc = zbx_xml_escape_dyn(service->username);
+	password_esc = zbx_xml_escape_dyn(service->password);
 
 	if (ZBX_VMWARE_TYPE_UNKNOWN == service->type)
 	{
@@ -2076,7 +2058,7 @@ static int	zbx_property_collection_next(zbx_property_collection_iter *iter, xmlD
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() continue retrieving properties with token: '%s'", __func__,
 			iter->token);
 
-	token_esc = xml_escape_dyn(iter->token);
+	token_esc = zbx_xml_escape_dyn(iter->token);
 	zbx_snprintf(post, sizeof(post), ZBX_POST_CONTINUE_RETRIEVE_PROPERTIES, iter->property_collector, token_esc);
 	zbx_free(token_esc);
 
@@ -2177,7 +2159,7 @@ static int	vmware_service_get_perf_counter_refreshrate(zbx_vmware_service_t *ser
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type: %s id: %s", __func__, type, id);
 
-	id_esc = xml_escape_dyn(id);
+	id_esc = zbx_xml_escape_dyn(id);
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VCENTER_PERF_COUNTERS_REFRESH_RATE,
 			vmware_service_objects[service->type].performance_manager, type, id_esc);
 	zbx_free(id_esc);
@@ -2713,7 +2695,7 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 		zbx_strlcat(props, "</ns0:pathSet>", sizeof(props));
 	}
 
-	vmid_esc = xml_escape_dyn(vmid);
+	vmid_esc = zbx_xml_escape_dyn(vmid);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_VM_STATUS_EX,
 			vmware_service_objects[service->type].property_collector, props, vmid_esc);
@@ -2752,7 +2734,7 @@ static int	vmware_service_get_vm_folder(xmlDoc *xdoc, char **vm_folder)
 	{
 		char	*id_esc;
 
-		id_esc = xml_escape_dyn(id);
+		id_esc = zbx_xml_escape_dyn(id);
 		zbx_free(id);
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_GET_FOLDER_NAME("%s"), id_esc);
 
@@ -2998,7 +2980,7 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datastore:'%s'", __func__, id);
 
-	id_esc = xml_escape_dyn(id);
+	id_esc = zbx_xml_escape_dyn(id);
 
 	if (ZBX_VMWARE_TYPE_VSPHERE == service->type && NULL != service->version &&
 			ZBX_VMWARE_DS_REFRESH_VERSION > service->major_version && SUCCEED !=
@@ -3155,7 +3137,7 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 		zbx_strlcat(props, "</ns0:pathSet>", sizeof(props));
 	}
 
-	hvid_esc = xml_escape_dyn(hvid);
+	hvid_esc = zbx_xml_escape_dyn(hvid);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_HV_DETAILS, vmware_service_objects[service->type].property_collector,
 			props, hvid_esc, hvid_esc, hvid_esc, hvid_esc);
@@ -3375,7 +3357,7 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 		char	*tmp, *hvid_esc;
 
 		zbx_vector_str_clear_ext(&scsi_luns, zbx_str_free);
-		hvid_esc = xml_escape_dyn(hvid);
+		hvid_esc = zbx_xml_escape_dyn(hvid);
 		tmp = zbx_dsprintf(NULL, ZBX_POST_HV_MP_DETAILS,
 				vmware_service_objects[service->type].property_collector, scsi_req, hvid_esc);
 		zbx_free(hvid_esc);
@@ -4238,7 +4220,7 @@ static int	vmware_service_reset_event_history_collector(CURL *easyhandle, const 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	event_session_esc = xml_escape_dyn(event_session);
+	event_session_esc = zbx_xml_escape_dyn(event_session);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_RESET_EVENT_COLLECTOR, event_session_esc);
 
@@ -4287,7 +4269,7 @@ static int	vmware_service_read_previous_events(CURL *easyhandle, const char *eve
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() soap_count: %d", __func__, soap_count);
 
-	event_session_esc = xml_escape_dyn(event_session);
+	event_session_esc = zbx_xml_escape_dyn(event_session);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_READ_PREVIOUS_EVENTS, event_session_esc, soap_count);
 
@@ -4343,7 +4325,7 @@ static int	vmware_service_get_event_latestpage(const zbx_vmware_service_t *servi
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	event_session_esc = xml_escape_dyn(event_session);
+	event_session_esc = zbx_xml_escape_dyn(event_session);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_READ_EVENT_LATEST_PAGE,
 			vmware_service_objects[service->type].property_collector, event_session_esc);
@@ -4389,7 +4371,7 @@ static int	vmware_service_destroy_event_session(CURL *easyhandle, const char *ev
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	event_session_esc = xml_escape_dyn(event_session);
+	event_session_esc = zbx_xml_escape_dyn(event_session);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_DESTROY_EVENT_COLLECTOR, event_session_esc);
 
@@ -4517,7 +4499,7 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 	zbx_vector_ptr_append(events, event);
 
 	if (0 < sz)
-		*alloc_sz += zbx_mem_required_chunk_size(sz);
+		*alloc_sz += zbx_shmem_required_chunk_size(sz);
 
 	return SUCCEED;
 }
@@ -5064,7 +5046,7 @@ static int	vmware_service_get_cluster_status(CURL *easyhandle, const char *clust
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() clusterid:'%s'", __func__, clusterid);
 
-	clusterid_esc = xml_escape_dyn(clusterid);
+	clusterid_esc = zbx_xml_escape_dyn(clusterid);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_CLUSTER_STATUS, clusterid_esc);
 
@@ -5261,12 +5243,12 @@ static void	vmware_counters_add_new(zbx_vector_ptr_t *counters, zbx_uint64_t cou
 {
 	zbx_vmware_perf_counter_t	*counter;
 
-	counter = (zbx_vmware_perf_counter_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_perf_counter_t));
+	counter = (zbx_vmware_perf_counter_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_perf_counter_t));
 	counter->counterid = counterid;
 	counter->state = ZBX_VMWARE_COUNTER_NEW;
 
-	zbx_vector_str_uint64_pair_create_ext(&counter->values, __vm_mem_malloc_func, __vm_mem_realloc_func,
-			__vm_mem_free_func);
+	zbx_vector_str_uint64_pair_create_ext(&counter->values, __vm_shmem_malloc_func, __vm_shmem_realloc_func,
+			__vm_shmem_free_func);
 
 	zbx_vector_ptr_append(counters, counter);
 }
@@ -5404,8 +5386,8 @@ static void	vmware_service_add_perf_entity(zbx_vmware_service_t *service, const 
 
 		pentity = (zbx_vmware_perf_entity_t *)zbx_hashset_insert(&service->entities, &entity, sizeof(zbx_vmware_perf_entity_t));
 
-		zbx_vector_ptr_create_ext(&pentity->counters, __vm_mem_malloc_func, __vm_mem_realloc_func,
-				__vm_mem_free_func);
+		zbx_vector_ptr_create_ext(&pentity->counters, __vm_shmem_malloc_func, __vm_shmem_realloc_func,
+				__vm_shmem_free_func);
 
 		for (i = 0; NULL != counters[i]; i++)
 		{
@@ -5717,7 +5699,7 @@ out:
 			service->eventlog.oom = 0;
 
 		events_sz += evt_req_chunk_size * data->events.values_num +
-				zbx_mem_required_chunk_size(data->events.values_alloc * sizeof(zbx_vmware_event_t*));
+				zbx_shmem_required_chunk_size(data->events.values_alloc * sizeof(zbx_vmware_event_t*));
 
 		if (0 == service->eventlog.last_key || vmware_mem->free_size < events_sz ||
 				SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
@@ -5728,7 +5710,7 @@ out:
 
 				if (SUCCEED == vmware_shared_strsearch(event->message))
 				{
-					events_sz -= zbx_mem_required_chunk_size(strlen(event->message) +
+					events_sz -= zbx_shmem_required_chunk_size(strlen(event->message) +
 							REFCOUNT_FIELD_SIZE + 1 + ZBX_HASHSET_ENTRY_OFFSET);
 				}
 			}
@@ -5784,7 +5766,7 @@ out:
 	vmware_service_update_perf_entities(service);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
-		zbx_mem_dump_stats(LOG_LEVEL_DEBUG, vmware_mem);
+		zbx_shmem_dump_stats(LOG_LEVEL_DEBUG, vmware_mem);
 
 	zbx_snprintf(msg, sizeof(msg), "Events:%d DC:%d DS:%d CL:%d HV:%d VM:%d"
 			" VMwareCache memory usage (free/strpool/total): " ZBX_FS_UI64 " / " ZBX_FS_UI64 " / "
@@ -6072,7 +6054,7 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
 
 			entity = (zbx_vmware_perf_entity_t *)entities->values[i];
 
-			id_esc = xml_escape_dyn(entity->id);
+			id_esc = zbx_xml_escape_dyn(entity->id);
 
 			/* add entity performance counter request */
 			zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:querySpec>"
@@ -6404,7 +6386,7 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 		}
 	}
 
-	service = (zbx_vmware_service_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_service_t));
+	service = (zbx_vmware_service_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_service_t));
 	memset(service, 0, sizeof(zbx_vmware_service_t));
 
 	service->url = vmware_shared_strdup(url);
@@ -6419,11 +6401,11 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service->eventlog.oom = 0;
 
 	zbx_hashset_create_ext(&service->entities, 100, vmware_perf_entity_hash_func,  vmware_perf_entity_compare_func,
-			NULL, __vm_mem_malloc_func, __vm_mem_realloc_func, __vm_mem_free_func);
+			NULL, __vm_shmem_malloc_func, __vm_shmem_realloc_func, __vm_shmem_free_func);
 
 	zbx_hashset_create_ext(&service->counters, ZBX_VMWARE_COUNTERS_INIT_SIZE, vmware_counter_hash_func,
-			vmware_counter_compare_func, NULL, __vm_mem_malloc_func, __vm_mem_realloc_func,
-			__vm_mem_free_func);
+			vmware_counter_compare_func, NULL, __vm_shmem_malloc_func, __vm_shmem_realloc_func,
+			__vm_shmem_free_func);
 
 	zbx_vector_ptr_append(&vmware->services, service);
 
@@ -6510,8 +6492,8 @@ int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const cha
 		entity.type = vmware_shared_strdup(type);
 		entity.id = vmware_shared_strdup(id);
 		entity.error = NULL;
-		zbx_vector_ptr_create_ext(&entity.counters, __vm_mem_malloc_func, __vm_mem_realloc_func,
-				__vm_mem_free_func);
+		zbx_vector_ptr_create_ext(&entity.counters, __vm_shmem_malloc_func, __vm_shmem_realloc_func,
+				__vm_shmem_free_func);
 
 		pentity = (zbx_vmware_perf_entity_t *)zbx_hashset_insert(&service->entities, &entity,
 				sizeof(zbx_vmware_perf_entity_t));
@@ -6573,26 +6555,26 @@ int	zbx_vmware_init(char **error)
 	if (SUCCEED != zbx_mutex_create(&vmware_lock, ZBX_MUTEX_VMWARE, error))
 		goto out;
 
-	size_reserved = zbx_mem_required_size(1, "vmware cache size", "VMwareCacheSize");
+	size_reserved = zbx_shmem_required_size(1, "vmware cache size", "VMwareCacheSize");
 
 	CONFIG_VMWARE_CACHE_SIZE -= size_reserved;
 
-	if (SUCCEED != zbx_mem_create(&vmware_mem, CONFIG_VMWARE_CACHE_SIZE, "vmware cache size", "VMwareCacheSize", 0,
-			error))
+	if (SUCCEED != zbx_shmem_create(&vmware_mem, CONFIG_VMWARE_CACHE_SIZE, "vmware cache size", "VMwareCacheSize",
+			0, error))
 	{
 		goto out;
 	}
 
-	vmware = (zbx_vmware_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_t));
+	vmware = (zbx_vmware_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_t));
 	memset(vmware, 0, sizeof(zbx_vmware_t));
 
 	VMWARE_VECTOR_CREATE(&vmware->services, ptr);
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 	vmware->strpool_sz = 0;
 	zbx_hashset_create_ext(&vmware->strpool, 100, vmware_strpool_hash_func, vmware_strpool_compare_func, NULL,
-		__vm_mem_malloc_func, __vm_mem_realloc_func, __vm_mem_free_func);
+		__vm_shmem_malloc_func, __vm_shmem_realloc_func, __vm_shmem_free_func);
 	zbx_hashset_create(&evt_msg_strpool, 100, vmware_strpool_hash_func, vmware_strpool_compare_func);
-	evt_req_chunk_size = zbx_mem_required_chunk_size(sizeof(zbx_vmware_event_t));
+	evt_req_chunk_size = zbx_shmem_required_chunk_size(sizeof(zbx_vmware_event_t));
 #endif
 	ret = SUCCEED;
 out:
@@ -6615,7 +6597,7 @@ void	zbx_vmware_destroy(void)
 		zbx_hashset_destroy(&vmware->strpool);
 		zbx_hashset_destroy(&evt_msg_strpool);
 #endif
-		zbx_mem_destroy(vmware_mem);
+		zbx_shmem_destroy(vmware_mem);
 		vmware_mem = NULL;
 		zbx_mutex_destroy(&vmware_lock);
 	}
@@ -6833,270 +6815,3 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats)
 
 	return SUCCEED;
 }
-
-#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-
-/*
- * XML support
- */
-/******************************************************************************
- *                                                                            *
- * Purpose: libxml2 callback function for error handle                        *
- *                                                                            *
- * Parameters: user_data - [IN/OUT] the user context                          *
- *             err       - [IN] the libxml2 error message                     *
- *                                                                            *
- ******************************************************************************/
-static void	libxml_handle_error(void *user_data, xmlErrorPtr err)
-{
-	ZBX_UNUSED(user_data);
-	ZBX_UNUSED(err);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieve a value from xml data and return status of operation     *
- *                                                                            *
- * Parameters: data   - [IN] XML data                                         *
- *             len    - [IN] XML data length (optional)                       *
- *             xpath  - [IN] XML XPath                                        *
- *             xdoc   - [OUT] parsed xml document                             *
- *             value  - [OUT] selected xml node value                         *
- *             error  - [OUT] error of xml or xpath formats                   *
- *                                                                            *
- * Return: SUCCEED - select xpath successfully, result stored in 'value'      *
- *         FAIL - failed select xpath expression                              *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_xml_try_read_value(const char *data, size_t len, const char *xpath, xmlDoc **xdoc, char **value,
-		char **error)
-{
-	xmlXPathContext	*xpathCtx;
-	xmlXPathObject	*xpathObj;
-	xmlNodeSetPtr	nodeset;
-	xmlChar		*val;
-	int		ret = FAIL;
-
-	if (NULL == data)
-		goto out;
-
-	xmlSetStructuredErrorFunc(NULL, &libxml_handle_error);
-
-	if (NULL == (*xdoc = xmlReadMemory(data, (0 == len ? strlen(data) : len), ZBX_VM_NONAME_XML, NULL,
-			ZBX_XML_PARSE_OPTS)))
-	{
-		if (NULL != error)
-			*error = zbx_dsprintf(*error, "Received response has no valid XML data.");
-
-		xmlSetStructuredErrorFunc(NULL, NULL);
-		goto out;
-	}
-
-	xpathCtx = xmlXPathNewContext(*xdoc);
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
-	{
-		if (NULL != error)
-			*error = zbx_dsprintf(*error, "Invalid xpath expression: \"%s\".", xpath);
-
-		goto clean;
-	}
-
-	ret = SUCCEED;
-
-	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-		goto clean;
-
-	nodeset = xpathObj->nodesetval;
-
-	if (NULL != (val = xmlNodeListGetString(*xdoc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
-	{
-		*value = zbx_strdup(*value, (const char *)val);
-		xmlFree(val);
-	}
-clean:
-	xmlXPathFreeObject(xpathObj);
-	xmlSetStructuredErrorFunc(NULL, NULL);
-	xmlXPathFreeContext(xpathCtx);
-	xmlResetLastError();
-out:
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieve a value from xml data relative to the specified node     *
- *                                                                            *
- * Parameters: doc    - [IN] the XML document                                 *
- *             node   - [IN] the XML node                                     *
- *             xpath  - [IN] the XML XPath                                    *
- *                                                                            *
- * Return: The allocated value string or NULL if the xml data does not        *
- *         contain the value specified by xpath.                              *
- *                                                                            *
- ******************************************************************************/
-static char	*zbx_xml_node_read_value(xmlDoc *doc, xmlNode *node, const char *xpath)
-{
-	xmlXPathContext	*xpathCtx;
-	xmlXPathObject	*xpathObj;
-	xmlNodeSetPtr	nodeset;
-	xmlChar		*val;
-	char		*value = NULL;
-
-	xpathCtx = xmlXPathNewContext(doc);
-
-	xpathCtx->node = node;
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
-		goto clean;
-
-	if (XPATH_STRING == xpathObj->type)
-	{
-		value = zbx_strdup(NULL, (const char *)xpathObj->stringval);
-		goto clean;
-	}
-
-	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-		goto clean;
-
-	nodeset = xpathObj->nodesetval;
-
-	if (NULL != (val = xmlNodeListGetString(doc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
-	{
-		value = zbx_strdup(NULL, (const char *)val);
-		xmlFree(val);
-	}
-clean:
-	xmlXPathFreeObject(xpathObj);
-	xmlXPathFreeContext(xpathCtx);
-
-	return value;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieve a value from xml document relative to the root node      *
- *                                                                            *
- * Parameters: xdoc   - [IN] the XML document                                 *
- *             xpath  - [IN] the XML XPath                                    *
- *                                                                            *
- * Return: The allocated value string or NULL if the xml data does not        *
- *         contain the value specified by xpath.                              *
- *                                                                            *
- ******************************************************************************/
-static char	*zbx_xml_doc_read_value(xmlDoc *xdoc, const char *xpath)
-{
-	xmlNode	*root_element;
-
-	root_element = xmlDocGetRootElement(xdoc);
-	return zbx_xml_node_read_value(xdoc, root_element, xpath);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieves numeric xpath value                                     *
- *                                                                            *
- * Parameters: xdoc  - [IN] xml document                                      *
- *             xpath - [IN] xpath                                             *
- *             num   - [OUT] numeric value                                    *
- *                                                                            *
- * Return value: SUCCEED - the count was retrieved successfully               *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_xml_doc_read_num(xmlDoc *xdoc, const char *xpath, int *num)
-{
-	int		ret = FAIL;
-	xmlXPathContext	*xpathCtx;
-	xmlXPathObject	*xpathObj;
-
-	xpathCtx = xmlXPathNewContext(xdoc);
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
-		goto out;
-
-	if (XPATH_NUMBER == xpathObj->type)
-	{
-		*num = (int)xpathObj->floatval;
-		ret = SUCCEED;
-	}
-
-	xmlXPathFreeObject(xpathObj);
-out:
-	xmlXPathFreeContext(xpathCtx);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: populate array of values from an xml data                         *
- *                                                                            *
- * Parameters: xdoc   - [IN] XML document                                     *
- *             xpath  - [IN] XML XPath                                        *
- *             values - [OUT] list of requested values                        *
- *                                                                            *
- * Return: Upon successful completion the function return SUCCEED.            *
- *         Otherwise, FAIL is returned.                                       *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_xml_read_values(xmlDoc *xdoc, const char *xpath, zbx_vector_str_t *values)
-{
-	return zbx_xml_node_read_values(xdoc, NULL, xpath, values);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: populate array of values from an xml data                         *
- *                                                                            *
- * Parameters: xdoc   - [IN] XML document                                     *
- *             node   - [IN] the XML node                                     *
- *             xpath  - [IN] XML XPath                                        *
- *             values - [OUT] list of requested values                        *
- *                                                                            *
- * Return: Upon successful completion the function return SUCCEED.            *
- *         Otherwise, FAIL is returned.                                       *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_xml_node_read_values(xmlDoc *xdoc, xmlNode *node, const char *xpath, zbx_vector_str_t *values)
-{
-	xmlXPathContext	*xpathCtx;
-	xmlXPathObject	*xpathObj;
-	xmlNodeSetPtr	nodeset;
-	xmlChar		*val;
-	int		i, ret = FAIL;
-
-	if (NULL == xdoc)
-		goto out;
-
-	xpathCtx = xmlXPathNewContext(xdoc);
-
-	if (NULL != node)
-		xpathCtx->node = node;
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
-		goto clean;
-
-	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-		goto clean;
-
-	nodeset = xpathObj->nodesetval;
-
-	for (i = 0; i < nodeset->nodeNr; i++)
-	{
-		if (NULL != (val = xmlNodeListGetString(xdoc, nodeset->nodeTab[i]->xmlChildrenNode, 1)))
-		{
-			zbx_vector_str_append(values, zbx_strdup(NULL, (const char *)val));
-			xmlFree(val);
-		}
-	}
-
-	ret = SUCCEED;
-clean:
-	xmlXPathFreeObject(xpathObj);
-	xmlXPathFreeContext(xpathCtx);
-out:
-	return ret;
-}
-
-#endif

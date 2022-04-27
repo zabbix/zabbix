@@ -19,3 +19,6 @@ EXTRA_DIST = \
 	double.sql \
 	$(DB_EXTENSION).sql \
 	history_pk_prepare.sql
+
+clean:
+	rm -f schema.sql data.sql timescaledb.sql

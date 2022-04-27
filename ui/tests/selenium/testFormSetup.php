@@ -188,41 +188,68 @@ class testFormSetup extends CWebTest {
 			$credentials_field = $form->getField('Store credentials in');
 			$this->assertEquals('Plain text', $credentials_field->getSelected());
 
-			$vault_fields = [
+			// All vault fields labels.
+			$labels = [
 				'Vault API endpoint',
 				'Vault secret path',
-				'Vault authentication token'
+				'Vault authentication token',
+				'Vault secret query string',
+				'Vault certificates'
 			];
-			foreach ($vault_fields as $field_name) {
-				$this->assertFalse($form->getField($field_name)->isVisible());
+			foreach ($labels as $label_name) {
+				$this->assertFalse($form->getField($label_name)->isVisible());
 			}
 
-			// Check layout when "Store credentials in" is set to "HashiCorp Vault".
-			$credentials_field->select('HashiCorp Vault');
-			$form->invalidate();
-			foreach (['User', 'Password'] as $field_name) {
-				$this->assertFalse($form->getField($field_name)->isVisible());
-			}
+			// HashiCorp and Cyberark vault fields.
+			$vaults = [
+				'HashiCorp Vault' => [
+					'Vault API endpoint' => 'https://localhost:8200',
+					'Vault secret path' => 'path/to/secret',
+					'Vault authentication token' => ''
+				],
+				'CyberArk Vault' => [
+					'Vault API endpoint' => 'https://localhost:1858',
+					'Vault secret query string' => 'AppID=foo&Query=Safe=bar;Object=buzz',
+					'SSL certificate file' => 'conf/certs/cyberark-cert.pem',
+					'SSL key file' => 'conf/certs/cyberark-key.pem'
+				]
+			];
 
-			foreach ($vault_fields as $field_name) {
-				$vault_maxlength = ($field_name === 'Vault authentication token') ? 2048 : 255;
-				$field = $form->getField($field_name);
-				$this->assertEquals($vault_maxlength, $field->getAttribute('maxlength'));
-				if ($field_name === 'Vault API endpoint') {
-					$this->assertEquals('https://localhost:8200', $field->getValue());
+			// Check layout when "Store credentials in" is set to "HashiCorp Vault" or "CyberArk Vault".
+			foreach ($vaults as $vault => $vault_fields) {
+				$credentials_field->select($vault);
+				$form->invalidate();
+
+				if ($vault === 'CyberArk Vault') {
+					$form->fill(['Vault certificates' => true]);
 				}
-				elseif ($field_name === 'Vault secret path') {
-					$this->assertEquals('path/to/secret', $field->getAttribute('placeholder'));
-				}
-			}
 
-			// Array of fields to be skipped by the screenshot check.
-			$skip_fields_vault = [];
-			foreach(['Database host', 'Database name', 'Store credentials in'] as $skip_field) {
-				$skip_fields_vault[] = $form->getField($skip_field);
+				foreach (['User', 'Password'] as $parameter) {
+					$this->assertFalse($form->getField($parameter)->isVisible());
+				}
+
+				foreach ($vault_fields as $field_name => $parameter) {
+					$vault_maxlength = ($field_name === 'Vault API endpoint' || $field_name === 'Vault secret path') ? 255 : 2048;
+					$field = $form->getField($field_name);
+					$this->assertEquals($vault_maxlength, $field->getAttribute('maxlength'));
+					if (in_array($field_name, ['Vault secret query string', 'Vault secret path'])) {
+						$this->assertEquals($parameter, $field->getAttribute('placeholder'));
+					}
+					else {
+						$this->assertEquals($parameter, $field->getValue());
+					}
+				}
+
+				// Array of fields to be skipped by the screenshot check.
+				$skip_fields_vault = [];
+
+				foreach(['Database host', 'Database name', 'Store credentials in'] as $skip_field) {
+					$skip_fields_vault[] = $form->getField($skip_field);
+				}
+
+				// Check screenshot for "Store credentials in" = Vault.
+				$this->assertScreenshotExcept($form, $skip_fields_vault, 'ConfigureDB_Vault_'.$db_type.$vault);
 			}
-			// Check screenshot for "Store credentials in" = Vault.
-			$this->assertScreenshotExcept($form, $skip_fields_vault, 'ConfigureDB_Vault_'.$db_type);
 
 			$credentials_field->select('Plain text');
 		}
@@ -460,7 +487,7 @@ class testFormSetup extends CWebTest {
 						'value' => '/etc/apache2/magic'
 					],
 					'tls_encryption' => true,
-					'mysql_error' => 'Database error code 2002'
+					'mysql_error' => 'Error connecting to database. Empty cipher.'
 				]
 			],
 			// Wrong "Database TLS key file" field format.
@@ -486,7 +513,7 @@ class testFormSetup extends CWebTest {
 					],
 					'tls_encryption' => true,
 					'fill_ca_file' => true,
-					'mysql_error' => 'Database error code 2002'
+					'mysql_error' => 'Error connecting to database. Empty cipher.'
 				]
 			],
 			// Wrong "Database TLS certificate file" field format.
@@ -512,7 +539,7 @@ class testFormSetup extends CWebTest {
 					],
 					'tls_encryption' => true,
 					'fill_ca_file' => true,
-					'mysql_error' => 'Database error code 2002'
+					'mysql_error' => 'Error connecting to database. Empty cipher.'
 				]
 			],
 			// With "Database TLS encryption" set.

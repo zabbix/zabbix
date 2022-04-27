@@ -14,3 +14,6 @@ EXTRA_DIST = \
 	schema.sql \
 	double.sql \
 	history_pk_prepare.sql
+
+clean:
+	rm -f schema.sql data.sql

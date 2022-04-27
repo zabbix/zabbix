@@ -53,7 +53,7 @@ class testLanguage extends CWebTest {
 					],
 					'message' => 'Configuration updated',
 					'page_title' => 'Настройка веб-интерфейса',
-					'body_lang' => 'ru',
+					'html_lang' => 'ru',
 					'defaultdb_lang' => 'ru_RU',
 					'info' => self::INFO_RUS,
 					'login_info' => [
@@ -69,7 +69,7 @@ class testLanguage extends CWebTest {
 					],
 					'message' => 'Настройки обновлены',
 					'page_title' => 'Configuration of GUI',
-					'body_lang' => 'en',
+					'html_lang' => 'en',
 					'defaultdb_lang' => 'en_US',
 					'info' => self::INFO,
 					'login_info' => [
@@ -93,7 +93,7 @@ class testLanguage extends CWebTest {
 		$form->fill($data['field']);
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->checkLanguage($data['message'], $data['page_title'], $data['body_lang'], $data['defaultdb_lang']);
+		$this->checkLanguage($data['message'], $data['page_title'], $data['html_lang'], $data['defaultdb_lang']);
 
 		// Red info icon check.
 		$this->query('xpath://a[@class="icon-info status-red"]')->one()->click();
@@ -102,10 +102,10 @@ class testLanguage extends CWebTest {
 		// After logout, warning message and login menu has system language.
 		$this->page->logout();
 		$this->page->refresh();
-		$warning = ($data['body_lang'] == 'ru') ? self::WARNING_TITLE_RUS : self::WARNING_TITLE;
+		$warning = ($data['html_lang'] == 'ru') ? self::WARNING_TITLE_RUS : self::WARNING_TITLE;
 		$this->assertMessage(TEST_BAD, $warning);
 		$this->query('id:login')->one()->click();
-		$this->assertEquals($data['body_lang'], $this->query('xpath://body')->one()->getAttribute('lang'));
+		$this->assertEquals($data['html_lang'], $this->query('xpath://html')->one()->getAttribute('lang'));
 
 		foreach ($data['login_info'] as $key => $value) {
 			$this->assertEquals($value, $this->query('xpath://label[@for="'.$key.'"]')->one()->getText());
@@ -121,7 +121,7 @@ class testLanguage extends CWebTest {
 					],
 					'message' => 'User updated',
 					'page_title' => 'Панель',
-					'body_lang' => 'ru',
+					'html_lang' => 'ru',
 					'menu_lang' => 'en',
 					'userdb_lang' => 'ru_RU',
 					'defaultdb_lang' => 'en_US',
@@ -135,7 +135,7 @@ class testLanguage extends CWebTest {
 					],
 					'message' => 'Пользователь обновлен',
 					'page_title' => 'Dashboard',
-					'body_lang' => 'en',
+					'html_lang' => 'en',
 					'menu_lang' => 'en',
 					'userdb_lang' => 'en_US',
 					'defaultdb_lang' => 'en_US',
@@ -149,7 +149,7 @@ class testLanguage extends CWebTest {
 					],
 					'message' => 'User updated',
 					'page_title' => 'Dashboard',
-					'body_lang' => 'en',
+					'html_lang' => 'en',
 					'menu_lang' => 'en',
 					'userdb_lang' => 'default',
 					'defaultdb_lang' => 'en_US',
@@ -175,7 +175,7 @@ class testLanguage extends CWebTest {
 		$form->fill($data['field']);
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->checkLanguage($data['message'], $data['page_title'], $data['body_lang'], $data['defaultdb_lang']);
+		$this->checkLanguage($data['message'], $data['page_title'], $data['html_lang'], $data['defaultdb_lang']);
 		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE username='.zbx_dbstr('user-zabbix')));
 
 
@@ -184,7 +184,7 @@ class testLanguage extends CWebTest {
 		$this->page->refresh();
 		$this->assertMessage(TEST_BAD, self::WARNING_TITLE);
 		$this->query('button:Login')->one()->click();
-		$this->assertEquals($data['menu_lang'], $this->query('xpath://body')->one()->getAttribute('lang'));
+		$this->assertEquals($data['menu_lang'], $this->query('xpath://html')->one()->getAttribute('lang'));
 		$this->assertEquals('Username', $this->query('xpath://label[@for="name"]')->one()->getText());
 		$this->assertEquals('Password', $this->query('xpath://label[@for="password"]')->one()->getText());
 	}
@@ -203,7 +203,7 @@ class testLanguage extends CWebTest {
 						'Language' => 'Russian (ru_RU)'
 					],
 					'page_title' => 'Панель',
-					'body_lang' => 'ru',
+					'html_lang' => 'ru',
 					'userdb_lang' => 'ru_RU',
 					'defaultdb_lang' => 'en_US'
 				]
@@ -220,7 +220,7 @@ class testLanguage extends CWebTest {
 						'Language' => 'System default'
 					],
 					'page_title' => 'Dashboard',
-					'body_lang' => 'en',
+					'html_lang' => 'en',
 					'userdb_lang' => 'default',
 					'defaultdb_lang' => 'en_US'
 				]
@@ -237,7 +237,7 @@ class testLanguage extends CWebTest {
 						'Language' => 'English (en_US)'
 					],
 					'page_title' => 'Dashboard',
-					'body_lang' => 'en',
+					'html_lang' => 'en',
 					'userdb_lang' => 'en_US',
 					'defaultdb_lang' => 'en_US'
 				]
@@ -260,16 +260,16 @@ class testLanguage extends CWebTest {
 		$this->page->logout();
 		$this->page->userLogin($data['fields']['Username'], $data['fields']['Password']);
 		$this->page->assertTitle($data['page_title']);
-		$this->assertEquals($data['body_lang'], $this->query('xpath://body')->one()->getAttribute('lang'));
+		$this->assertEquals($data['html_lang'], $this->query('xpath://html')->one()->getAttribute('lang'));
 		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE username='.
 				zbx_dbstr($data['fields']['Username'])));
 		$this->assertEquals($data['defaultdb_lang'], CDBHelper::getValue('SELECT default_lang FROM config'));
 	}
 
-	private function checkLanguage($message, $page_title, $body_lang, $defaultdb_lang) {
+	private function checkLanguage($message, $page_title, $html_lang, $defaultdb_lang) {
 		$this->assertMessage(TEST_GOOD, $message);
 		$this->page->assertTitle($page_title);
-		$this->assertEquals($body_lang, $this->query('xpath://body')->one()->getAttribute('lang'));
+		$this->assertEquals($html_lang, $this->query('xpath://html')->one()->getAttribute('lang'));
 		$this->assertEquals($defaultdb_lang, CDBHelper::getValue('SELECT default_lang FROM config'));
 	}
 }

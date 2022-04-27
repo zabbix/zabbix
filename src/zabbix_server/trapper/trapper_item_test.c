@@ -23,6 +23,7 @@
 #include "zbxserver.h"
 #include "../poller/poller.h"
 #include "zbxtasks.h"
+#include "zbxcommshigh.h"
 #ifdef HAVE_OPENIPMI
 #include "../ipmi/ipmi.h"
 #endif
@@ -146,7 +147,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 
 	if (0 != proxy_hostid && FAIL == is_item_processed_by_server(item.type, item.key))
 	{
-		ret = zbx_tm_execute_task_data(jp_data->start, jp_data->end - jp_data->start + 1, proxy_hostid, info);
+		ret = zbx_tm_execute_task_data(jp_data->start, (size_t)(jp_data->end - jp_data->start + 1),
+				proxy_hostid, info);
 		goto out;
 	}
 

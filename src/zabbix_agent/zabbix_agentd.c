@@ -20,7 +20,7 @@
 #include "log.h"
 #include "zbxconf.h"
 #include "zbxgetopt.h"
-#include "comms.h"
+#include "zbxcomms.h"
 #include "modbtype.h"
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
@@ -96,26 +96,21 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 #	include "zbxmodules.h"
 #endif
 
-#include "comms.h"
-#include "alias.h"
-
 #include "stats.h"
 #ifdef _WINDOWS
 #	include "perfstat.h"
 #else
 #	include "zbxnix.h"
-#	include "sighandler.h"
-#	include "daemon.h"
 #endif
 #include "active.h"
 #include "listener.h"
 
-#include "symbols.h"
+#include "zbxsymbols.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
 #elif defined(ZABBIX_DAEMON)
-#	include "daemon.h"
+#	include "zbxnix.h"
 #endif
 
 #include "setproctitle.h"
@@ -361,7 +356,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				break;
 #ifndef _WINDOWS
 			case 'R':
-				if (SUCCEED != parse_rtc_options(zbx_optarg, &t->data))
+				if (SUCCEED != zbx_parse_rtc_options(zbx_optarg, &t->data))
 					exit(EXIT_FAILURE);
 
 				t->task = ZBX_TASK_RUNTIME_CONTROL;
@@ -1272,7 +1267,7 @@ void	zbx_free_service_resources(int ret)
 	zbx_locks_disable();
 #endif
 	free_metrics();
-	alias_list_free();
+	zbx_alias_list_free();
 	free_collector_data();
 	zbx_deinit_modbus();
 #ifdef _WINDOWS
@@ -1333,9 +1328,9 @@ int	main(int argc, char **argv)
 
 	if (SUCCEED != parse_commandline(argc, argv, &t))
 		exit(EXIT_FAILURE);
-
-	import_symbols();
-
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	zbx_import_symbols();
+#endif
 #ifdef _WINDOWS
 	if (ZBX_TASK_SHOW_USAGE != t.task && ZBX_TASK_SHOW_VERSION != t.task && ZBX_TASK_SHOW_HELP != t.task &&
 			SUCCEED != zbx_socket_start(&error))
@@ -1443,7 +1438,7 @@ int	main(int argc, char **argv)
 			zbx_unload_modules();
 #endif
 			free_metrics();
-			alias_list_free();
+			zbx_alias_list_free();
 			exit(EXIT_SUCCESS);
 			break;
 		case ZBX_TASK_SHOW_VERSION:
@@ -1465,7 +1460,7 @@ int	main(int argc, char **argv)
 			break;
 	}
 
-	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
+	ZBX_START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 
 	exit(EXIT_SUCCESS);
 }

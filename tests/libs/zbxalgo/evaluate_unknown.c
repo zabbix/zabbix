@@ -44,7 +44,7 @@ void	zbx_mock_test_entry(void **state)
 			fail_msg("out.value parameter \"%s\" is not double or is out of range.", tmp);
 	}
 
-	if (expected_result != (actual_result = evaluate_unknown(expression, &actual_value, actual_error,
+	if (expected_result != (actual_result = zbx_evaluate_unknown(expression, &actual_value, actual_error,
 			sizeof(actual_error))))
 	{
 		fail_msg("Got %s instead of %s as a result. Error: %s", zbx_sysinfo_ret_string(actual_result),

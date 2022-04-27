@@ -21,7 +21,6 @@
 
 #include "common.h"
 #include "zbxalgo.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
 
 typedef struct
 {

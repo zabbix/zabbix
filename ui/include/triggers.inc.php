@@ -1044,8 +1044,7 @@ function analyzeExpression(string $expression, int $type, string &$error = null)
  * @return array  Array containing the trigger expression formula as the first element and an array describing the
  *                expression tree as the second.
  */
-function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNum, $level = 0, $operator = null,
-		$type) {
+function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNum, $level, $operator, $type) {
 	$treeList = [];
 	$outline = '';
 
@@ -1106,8 +1105,9 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 
 					$url = (new CLinkAction($element['expression']))
 						->setId($expressionId)
-						->onClick('javascript: copy_expression("'.$expressionId.'", '.$type.');');
+						->onClick('copy_expression(this.id, '.$type.');');
 				}
+
 				$expr = expressionLevelDraw($next, $level);
 				$expr[] = SPACE;
 				$expr[] = bold($letter);

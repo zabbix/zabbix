@@ -17,14 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "sighandler.h"
+#include "zbxnix.h"
+#include "sigcommon.h"
 
 #include "common.h"
 #include "log.h"
 #include "fatal.h"
-#include "sigcommon.h"
 #include "zbxcrypto.h"
-#include "daemon.h"
 
 int			sig_parent_pid = -1;
 volatile sig_atomic_t	sig_exiting;

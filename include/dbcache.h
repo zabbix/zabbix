@@ -22,9 +22,10 @@
 
 #include "sysinfo.h" //included for convenience
 #include "db.h"
-#include "comms.h"
-#include "memalloc.h"
+#include "zbxcomms.h"
+#include "zbxshmem.h"
 #include "zbxeval.h"
+#include "zbxavailability.h"
 
 #define ZBX_SYNC_DONE		0
 #define	ZBX_SYNC_MORE		1
@@ -54,6 +55,13 @@
 #define ZBX_IPC_SERVICE_CONFIG		"config"
 #define ZBX_IPC_CONFIG_RELOAD_REQUEST	1
 #define ZBX_IPC_CONFIG_RELOAD_RESPONSE	2
+
+#define ZBX_AGENT_ZABBIX	(INTERFACE_TYPE_AGENT - 1)
+#define ZBX_AGENT_SNMP		(INTERFACE_TYPE_SNMP - 1)
+#define ZBX_AGENT_IPMI		(INTERFACE_TYPE_IPMI - 1)
+#define ZBX_AGENT_JMX		(INTERFACE_TYPE_JMX - 1)
+#define ZBX_AGENT_UNKNOWN	255
+#define ZBX_AGENT_MAX		INTERFACE_TYPE_COUNT
 
 extern int	CONFIG_TIMEOUT;
 
@@ -655,6 +663,13 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 #define ZBX_DBSYNC_UPDATE	1
 #define ZBX_SYNC_SECRETS	2
 
+typedef enum
+{
+	ZBX_SYNCED_NEW_CONFIG_NO,
+	ZBX_SYNCED_NEW_CONFIG_YES
+}
+zbx_synced_new_config_t;
+
 #define ZBX_ITEM_GET_MISC		0x001
 #define ZBX_ITEM_GET_DELAY		0x002
 #define ZBX_ITEM_GET_EMPTY_ERROR	0x004
@@ -675,7 +690,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
 #define ZBX_ITEM_GET_PROCESS		(ZBX_ITEM_GET_MAINTENANCE|ZBX_ITEM_GET_MISC|ZBX_ITEM_GET_LOGTIMEFMT)
 
-void	DCsync_configuration(unsigned char mode);
+void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced);
 void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths);
 int	init_configuration_cache(char **error);
 void	free_configuration_cache(void);
@@ -830,11 +845,6 @@ void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags);
 
 int	DCget_interfaces_availability(zbx_vector_ptr_t *interfaces, int *ts);
 void	DCtouch_interfaces_availability(const zbx_vector_uint64_t *interfaceids);
-
-void	zbx_interface_availability_init(zbx_interface_availability_t *availability, zbx_uint64_t interfaceid);
-void	zbx_interface_availability_clean(zbx_interface_availability_t *ia);
-void	zbx_interface_availability_free(zbx_interface_availability_t *availability);
-int	zbx_interface_availability_is_set(const zbx_interface_availability_t *ia);
 
 void	zbx_set_availability_diff_ts(int ts);
 
@@ -1012,7 +1022,7 @@ int	zbx_dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_
 
 /* diagnostic data */
 void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num);
-void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index);
+void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index);
 void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items);
 
 typedef struct
@@ -1051,4 +1061,22 @@ void	zbx_db_trigger_explain_expression(const DB_TRIGGER *trigger, char **express
 void	zbx_db_trigger_get_function_value(const DB_TRIGGER *trigger, int index, char **value,
 		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
 		char **), int recovery);
+
+int	zbx_dc_get_proxyid_by_name(const char *name, zbx_uint64_t *proxyid, unsigned char *type);
+int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid);
+
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	unsigned char	status;
+	char		*name;
+}
+zbx_cached_proxy_t;
+
+ZBX_PTR_VECTOR_DECL(cached_proxy, zbx_cached_proxy_t *)
+
+void	zbx_dc_get_all_proxies(zbx_vector_cached_proxy_t *proxies);
+
+int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **name);
+
 #endif

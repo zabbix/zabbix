@@ -1670,7 +1670,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description'
 					],
-					'title' => ucfirst($this->vault_object).' updated'
+					'title' => ucfirst($this->vault_object).' updated',
+					'vault' => 'Hashicorp'
 				]
 			],
 			[
@@ -1682,9 +1683,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'text' => 'one/two/three/four/five/six:key',
 							'type' => 'Vault secret'
 						],
-						'description' => 'vault description7'
+						'description' => 'vault description1'
 					],
-					'title' => ucfirst($this->vault_object).' updated'
+					'title' => ucfirst($this->vault_object).' updated',
+					'vault' => 'Hashicorp'
 				]
 			],
 			[
@@ -1699,7 +1701,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 						'description' => 'vault description2'
 					],
 					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near "path:".'
+					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "path:".',
+					'vault' => 'Hashicorp'
 				]
 			],
 			[
@@ -1714,7 +1717,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 						'description' => 'vault description3'
 					],
 					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near "/path:key".'
+					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "/path:key".',
+					'vault' => 'Hashicorp'
 				]
 			],
 			[
@@ -1729,7 +1733,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 						'description' => 'vault description4'
 					],
 					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near "path:key".'
+					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "path:key".',
+					'vault' => 'Hashicorp'
 				]
 			],
 			[
@@ -1744,7 +1749,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 						'description' => 'vault description5'
 					],
 					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near ":key".'
+					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near ":key".',
+					'vault' => 'Hashicorp'
 				]
 			],
 			[
@@ -1759,7 +1765,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 						'description' => 'vault description6'
 					],
 					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near "path".'
+					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "path".',
+					'vault' => 'Hashicorp'
 				]
 			],
 			[
@@ -1774,7 +1781,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 						'description' => 'vault description8'
 					],
 					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near "/secret/path:key".'
+					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "/secret/path:key".',
+					'vault' => 'Hashicorp'
 				]
 			],
 			[
@@ -1789,13 +1797,164 @@ abstract class testFormMacros extends CLegacyWebTest {
 						'description' => 'vault description9'
 					],
 					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->vault_error_field.'": cannot be empty.'
+					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": cannot be empty.',
+					'vault' => 'Hashicorp'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO10}',
+						'value' => [
+							'text' => 'AppID=zabbix:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'cyberark description10'
+					],
+					'title' => ucfirst($this->vault_object).' updated',
+					'vault' => 'Cyberark'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO11}',
+						'value' => [
+							'text' => 'AppID=zabbix;SomethingElse=value;AndMoreValue=values:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'cyberark description11'
+					],
+					'title' => ucfirst($this->vault_object).' updated',
+					'vault' => 'Cyberark'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO12}',
+						'value' => [
+							'text' => 'AppID=:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'cyberark description12'
+					],
+					'title' => ucfirst($this->vault_object).' updated',
+					'vault' => 'Cyberark'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO13}',
+						'value' => [
+							'text' => '',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description13'
+					],
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": cannot be empty.',
+					'vault' => 'Cyberark'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO14}',
+						'value' => [
+							'text' => 'AppID=zabbix:',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description14'
+					],
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": mandatory key is missing.',
+					'vault' => 'Cyberark'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO15}',
+						'value' => [
+							'text' => 'AppID:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description15'
+					],
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": incorrect syntax near "AppID:key".',
+					'vault' => 'Cyberark'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO16}',
+						'value' => [
+							'text' => 'APPID=something:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description16'
+					],
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": mandatory parameter "AppID" is missing.',
+					'vault' => 'Cyberark'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO17}',
+						'value' => [
+							'text' => 'NotApp=something:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description17'
+					],
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": mandatory parameter "AppID" is missing.',
+					'vault' => 'Cyberark'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO18}',
+						'value' => [
+							'text' => 'NotApp=something:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description18'
+					],
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": mandatory parameter "AppID" is missing.',
+					'vault' => 'Cyberark'
 				]
 			]
 		];
 	}
 
+	/**
+	 * Create Hashicorp or Cyberark vault macros.
+	 *
+	 * @param string $data		data provider
+	 * @param string $url		link to page where source exists
+	 * @param string $source	source type - host/template/host prototype
+	 * @param string $name		source name
+	 */
 	public function createVaultMacros($data, $url, $source, $name = null) {
+		$this->selectVault($data['vault']);
 		$form = $this->openMacrosTab($url, $source, true, $name);
 		$this->fillMacros([$data['macro_fields']]);
 		$form->submit();
@@ -1827,62 +1986,213 @@ abstract class testFormMacros extends CLegacyWebTest {
 		return [
 			[
 				[
-					'action' => USER_ACTION_UPDATE,
-					'index' => $this->vault_macro_index,
-					'macro' => $this->update_vault_macro,
-					'value' => [
-						'text' => 'secret/path:key'
+					'fields' => [
+						'action' => USER_ACTION_UPDATE,
+						'index' => $this->vault_macro_index,
+						'macro' => $this->update_vault_macro,
+						'value' => [
+							'text' => 'secret/path:key'
+						],
+						'description' => ''
 					],
-					'description' => ''
+					'vault' => 'Hashicorp'
 				]
 			],
 			[
 				[
-					'action' => USER_ACTION_UPDATE,
-					'index' => $this->vault_macro_index,
-					'macro' => $this->update_vault_macro,
-					'value' => [
-						'text' => 'new/path/to/secret:key'
+					'fields' => [
+						'action' => USER_ACTION_UPDATE,
+						'index' => $this->vault_macro_index,
+						'macro' => $this->update_vault_macro,
+						'value' => [
+							'text' => 'new/path/to/secret:key'
+						],
+						'description' => ''
 					],
-					'description' => ''
+					'vault' => 'Hashicorp'
 				]
 			],
 			[
 				[
-					'action' => USER_ACTION_UPDATE,
-					'index' => $this->vault_macro_index,
-					'macro' => $this->update_vault_macro,
-					'value' => [
-						'text' => 'new/path/to/secret:key'
+					'fields' => [
+						'action' => USER_ACTION_UPDATE,
+						'index' => $this->vault_macro_index,
+						'macro' => $this->update_vault_macro,
+						'value' => [
+							'text' => 'new/path/to/secret:key'
+						],
+						'description' => 'Changing description'
 					],
-					'description' => 'Changing description'
+					'vault' => 'Hashicorp'
+				]
+			],
+			[
+				[
+					'fields' => [
+						'action' => USER_ACTION_UPDATE,
+						'index' => $this->vault_macro_index,
+						'macro' => $this->update_vault_macro,
+						'value' => [
+							'text' => 'AppID=zabbix:key'
+						],
+						'description' => ''
+					],
+					'vault' => 'Cyberark'
+				]
+			],
+			[
+				[
+					'fields' => [
+						'action' => USER_ACTION_UPDATE,
+						'index' => $this->vault_macro_index,
+						'macro' => $this->update_vault_macro,
+						'value' => [
+							'text' => 'AppID=zabbix;Object=something:key'
+						],
+						'description' => ''
+					],
+					'vault' => 'Cyberark'
+				]
+			],
+			[
+				[
+					'fields' => [
+						'action' => USER_ACTION_UPDATE,
+						'index' => $this->vault_macro_index,
+						'macro' => $this->update_vault_macro,
+						'value' => [
+							'text' => 'AppID=zabbix;Object=something:key'
+						],
+						'description' => 'Changing description'
+					],
+					'vault' => 'Cyberark'
 				]
 			]
 		];
 	}
 
+	/**
+	 * Update Hashicorp and Cyberark vault macros.
+	 *
+	 * @param string $data		data provider
+	 * @param string $url		link to page where source exists
+	 * @param string $source	source type - host/template/host prototype
+	 * @param string $name		source name
+	 */
 	public function updateVaultMacros($data, $url, $source, $name = null) {
+		$this->selectVault($data['vault']);
 		$form = $this->openMacrosTab($url, $source, true, $name);
-		$this->fillMacros([$data]);
+		$this->fillMacros([$data['fields']]);
 		$form->submit();
+
 		if ($source === 'host') {
 			COverlayDialogElement::ensureNotPresent();
 		}
-		$this->assertMessage(TEST_GOOD);
 
+		$this->assertMessage(TEST_GOOD);
 		$this->openMacrosTab($url, $source, false, $name);
+
 		$result = [];
 		foreach (['macro', 'value', 'description'] as $field) {
-			$result[] = $this->query('xpath://textarea[@id="macros_'.$data['index'].'_'.$field.'"]')->one()->getText();
+			$result[] = $this->query('xpath://textarea[@id="macros_'.$data['fields']['index'].'_'.$field.'"]')->one()->getText();
 		}
-		$this->assertEquals([$data['macro'], $data['value']['text'], $data['description']], $result);
+
+		$this->assertEquals([$data['fields']['macro'], $data['fields']['value']['text'], $data['fields']['description']], $result);
 		array_push($result, ZBX_MACRO_TYPE_VAULT);
-		$sql = 'SELECT macro, value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($data['macro']);
+		$sql = 'SELECT macro, value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($data['fields']['macro']);
 		$this->assertEquals($result, array_values(CDBHelper::getRow($sql)));
 
 		if ($source === 'hosts') {
 			COverlayDialogElement::find()->one()->close();
 			COverlayDialogElement::ensureNotPresent();
+		}
+	}
+
+	/**
+	 * Select vault provider.
+	 *
+	 * @param string $vault		vault provider Hashicorp or Cyberark
+	 */
+	public function selectVault($vault) {
+		$vaultid = ($vault === 'Hashicorp') ? 0 : 1;
+
+		if ($vaultid !== CDBHelper::getValue('SELECT vault_provider FROM config')) {
+			DBexecute('UPDATE config SET vault_provider='.zbx_dbstr($vaultid));
+		}
+	}
+
+	/**
+	 * Check vault macros validation after changing vault type.
+	 *
+	 * @param string $url		URL that leads to the configuration form of corresponding entity
+	 * @param string $source    type of entity that is being checked (host, hostPrototype, template)
+	 * @param type $name		name of a host where macros are updated
+	 */
+	public function checkVaultValidation($url, $source, $name = null) {
+		$cyberark = [
+			'fields' =>
+				[
+				'action' => USER_ACTION_UPDATE,
+				'index' => 0,
+				'macro' => '{$VAULT}',
+				'value' => [
+					'text' => 'AppID=zabbix:key',
+					'type' => 'Vault secret'
+				],
+				'description' => 'CyberArk vault description'
+			],
+			'error' => 'Invalid parameter "/1/macros/1/value": incorrect syntax near "AppID=zabbix:key".'
+		];
+		$hashicorp = [
+			'fields' =>
+				[
+				'action' => USER_ACTION_UPDATE,
+				'index' => 0,
+				'macro' => '{$VAULT}',
+				'value' => [
+					'text' => 'secret/path:key',
+					'type' => 'Vault secret'
+				],
+				'description' => 'HashiCorp vault description'
+			],
+			'error' => 'Invalid parameter "/1/macros/1/value": incorrect syntax near "secret/path:key".'
+		];
+
+		$this->page->login();
+		for ($i=0; $i<=1; $i++) {
+			$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
+
+			// Check in setting what Vault is enabled.
+			$setting_form = $this->query('name:otherForm')->asForm()->one();
+			$vault = $setting_form->getField('Vault provider')->getText();
+
+			// Try to create macros with Vault type different from settings.
+			$form = $this->openMacrosTab($url, $source, false, $name);
+			$vault_values = ($vault === 'CyberArk Vault') ? $hashicorp : $cyberark;
+			$this->fillMacros([$vault_values['fields']]);
+			$form->submit();
+			$this->assertMessage(TEST_BAD, 'Cannot update '.$this->vault_object, $vault_values['error']);
+
+			// Hosts in edit view opens in overlay and need to be closed manually.
+			if ($source === 'hosts') {
+				COverlayDialogElement::find()->one()->close();
+				COverlayDialogElement::ensureNotPresent();
+			}
+
+			// Change Vault in settings to correct one.
+			$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
+			$vault_settings = ($vault === 'CyberArk Vault') ? 'HashiCorp Vault' : 'CyberArk Vault';
+			$setting_form->fill(['Vault provider' => $vault_settings])->submit();
+
+			// Check simple update.
+			$this->openMacrosTab($url, $source, false, $name);
+			$form->submit();
+			$this->assertMessage(TEST_BAD, 'Cannot update '.$this->vault_object);
+
+			// Create macros with correct value.
+			$this->fillMacros([$vault_values['fields']]);
+			$form->submit();
+			$this->assertMessage(TEST_GOOD, ucfirst($this->vault_object).' updated');
 		}
 	}
 

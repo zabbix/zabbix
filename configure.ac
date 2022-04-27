@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[6.2.0alpha1])
+AC_INIT([Zabbix],[6.2.0beta1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects filename-length-max=99])
 
@@ -27,7 +27,9 @@ AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
 AC_PROG_MAKE_SET
 
-AM_CONFIG_HEADER(include/config.h)
+AM_CONFIG_HEADER(include/common/config.h)
+
+AC_SUBST(DEFAULT_INCLUDES, ['-I$(top_srcdir)/include/common -I$(top_srcdir)/include'])
 
 AC_CANONICAL_HOST
 
@@ -1966,23 +1968,27 @@ if test "x$agent2" = "xyes"; then
 	CGO_CFLAGS="$TLS_CFLAGS $LIBPCRE_CFLAGS $LIBPCRE2_CFLAGS"
 	CGO_LDFLAGS="$AGENT2_LDFLAGS $LD_START_GROUP \
 		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
-		\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
+		\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
 		\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
-		\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
-		\${abs_top_builddir}/src/libs/zbxsys/libzbxsys.a \
-		\${abs_top_builddir}/src/libs/zbxnix/libzbxnix.a \
-		\${abs_top_builddir}/src/libs/zbxconf/libzbxconf.a \
-		\${abs_top_builddir}/src/libs/zbxhttp/libzbxhttp.a \
+		\${abs_top_builddir}/src/libs/zbxhash/libzbxhash.a \
+		\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
 		\${abs_top_builddir}/src/libs/zbxcompress/libzbxcompress.a \
+		\${abs_top_builddir}/src/libs/zbxconf/libzbxconf.a \
+		\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
+		\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
+		\${abs_top_builddir}/src/libs/zbxhttp/libzbxhttp.a \
+		\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
+		\${abs_top_builddir}/src/libs/zbxnix/libzbxnix.a \
 		\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
-		\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagent2sysinfo.a \
-		\${abs_top_builddir}/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
-		\${abs_top_builddir}/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+		\${abs_top_builddir}/src/libs/zbxthreads/libzbxthreads.a \
+		\${abs_top_builddir}/src/libs/zbxmutexs/libzbxmutexs.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspechostnamesysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspecsysinfo.a \
-		\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
-		\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
-		\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
+		\${abs_top_builddir}/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+		\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagent2sysinfo.a \
+		\${abs_top_builddir}/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+		\${abs_top_builddir}/src/libs/zbxsysinfo/alias/libalias.a \
+		\${abs_top_builddir}/src/libs/zbxxml/libzbxxml.a \
 		$LIBS $AGENT2_LIBS $LD_END_GROUP"
 
 	AC_SUBST(CGO_CFLAGS)
@@ -2056,6 +2062,7 @@ m4_ifdef([CONF_TESTS],[CONF_TESTS])
 
 AC_OUTPUT([
 	Makefile
+	include/Makefile
 	database/Makefile
 	database/mysql/Makefile
 	database/oracle/Makefile
@@ -2067,7 +2074,8 @@ AC_OUTPUT([
 	src/libs/Makefile
 	src/libs/zbxlog/Makefile
 	src/libs/zbxalgo/Makefile
-	src/libs/zbxmemory/Makefile
+	src/libs/zbxshmem/Makefile
+	src/libs/zbxhash/Makefile
 	src/libs/zbxcrypto/Makefile
 	src/libs/zbxconf/Makefile
 	src/libs/zbxdbcache/Makefile
@@ -2076,6 +2084,7 @@ AC_OUTPUT([
 	src/libs/zbxsysinfo/Makefile
 	src/libs/zbxcommon/Makefile
 	src/libs/zbxsysinfo/agent/Makefile
+	src/libs/zbxsysinfo/alias/Makefile
 	src/libs/zbxsysinfo/common/Makefile
 	src/libs/zbxsysinfo/simple/Makefile
 	src/libs/zbxsysinfo/linux/Makefile
@@ -2089,7 +2098,8 @@ AC_OUTPUT([
 	src/libs/zbxsysinfo/netbsd/Makefile
 	src/libs/zbxsysinfo/unknown/Makefile
 	src/libs/zbxnix/Makefile
-	src/libs/zbxsys/Makefile
+	src/libs/zbxthreads/Makefile
+	src/libs/zbxmutexs/Makefile
 	src/libs/zbxcomms/Makefile
 	src/libs/zbxcommshigh/Makefile
 	src/libs/zbxdb/Makefile
@@ -2110,6 +2120,9 @@ AC_OUTPUT([
 	src/libs/zbxembed/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/libs/zbxvault/Makefile
+	src/libs/zbxhashicorp/Makefile
+	src/libs/zbxcyberark/Makefile
+	src/libs/zbxkvs/Makefile
 	src/libs/zbxdiag/Makefile
 	src/libs/zbxtrends/Makefile
 	src/libs/zbxavailability/Makefile
@@ -2127,6 +2140,7 @@ AC_OUTPUT([
 	src/zabbix_server/alerter/Makefile
 	src/zabbix_server/dbsyncer/Makefile
 	src/zabbix_server/dbconfig/Makefile
+	src/zabbix_server/diag/Makefile
 	src/zabbix_server/discoverer/Makefile
 	src/zabbix_server/ha/Makefile
 	src/zabbix_server/housekeeper/Makefile
@@ -2150,6 +2164,7 @@ AC_OUTPUT([
 	src/zabbix_server/lld/Makefile
 	src/zabbix_server/reporter/Makefile
 	src/zabbix_proxy/Makefile
+	src/zabbix_proxy/diag/Makefile
 	src/zabbix_proxy/heart/Makefile
 	src/zabbix_proxy/housekeeper/Makefile
 	src/zabbix_proxy/proxyconfig/Makefile
