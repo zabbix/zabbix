@@ -91,7 +91,11 @@
 				});
 			});
 
-			this.form.addEventListener('submit', () => this._authFormSubmit());
+			this.form.addEventListener('submit', (e) => {
+				if (!this._authFormSubmit()) {
+					e.preventDefault();
+				}
+			});
 		}
 
 		_authFormSubmit() {
