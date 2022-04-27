@@ -3917,11 +3917,11 @@ static void	zbx_drule_free(zbx_drule_t *drule)
 static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zbx_uint64_t druleid,
 		zbx_vector_uint64_t *dcheckids, zbx_uint64_t unique_dcheckid, int *processed_num, int ip_idx)
 {
-	DB_DHOST		dhost;
+	ZBX_DB_DHOST		dhost;
 	zbx_service_t		*service;
 	int			services_num, ret = FAIL, i, dchecks = 0;
 	zbx_vector_ptr_t	services_old;
-	DB_DRULE		drule = {.druleid = druleid, .unique_dcheckid = unique_dcheckid};
+	ZBX_DB_DRULE		drule = {.druleid = druleid, .unique_dcheckid = unique_dcheckid};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

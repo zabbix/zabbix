@@ -233,24 +233,8 @@ typedef struct
 	char		*iprange;
 	char		*name;
 }
-DB_DRULE;
+ZBX_DB_DRULE;
 
-typedef struct
-{
-	zbx_uint64_t	dcheckid;
-	char		*ports;
-	char		*key_;
-	char		*snmp_community;
-	char		*snmpv3_securityname;
-	char		*snmpv3_authpassphrase;
-	char		*snmpv3_privpassphrase;
-	char		*snmpv3_contextname;
-	int		type;
-	unsigned char	snmpv3_securitylevel;
-	unsigned char	snmpv3_authprotocol;
-	unsigned char	snmpv3_privprotocol;
-}
-DB_DCHECK;
 
 typedef struct
 {
@@ -259,17 +243,7 @@ typedef struct
 	int		lastup;
 	int		lastdown;
 }
-DB_DHOST;
-
-typedef struct
-{
-	zbx_uint64_t	dserviceid;
-	int		status;
-	int		lastup;
-	int		lastdown;
-	char		*value;
-}
-DB_DSERVICE;
+ZBX_DB_DHOST;
 
 #define ZBX_DB_TRIGGER_EVAL_NONE			0x0000
 #define ZBX_DB_TRIGGER_EVAL_EXPRESSION			0x0001

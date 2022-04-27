@@ -39,6 +39,23 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 #define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
 
+typedef struct
+{
+	zbx_uint64_t	dcheckid;
+	char		*ports;
+	char		*key_;
+	char		*snmp_community;
+	char		*snmpv3_securityname;
+	char		*snmpv3_authpassphrase;
+	char		*snmpv3_privpassphrase;
+	char		*snmpv3_contextname;
+	int		type;
+	unsigned char	snmpv3_securitylevel;
+	unsigned char	snmpv3_authprotocol;
+	unsigned char	snmpv3_privprotocol;
+}
+DB_DCHECK;
+
 /******************************************************************************
  *                                                                            *
  * Purpose: process new service status                                        *
@@ -391,7 +408,7 @@ static void	process_check(const DB_DCHECK *dcheck, int *host_status, char *ip, i
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	process_checks(const DB_DRULE *drule, int *host_status, char *ip, int unique, int now,
+static void	process_checks(const ZBX_DB_DRULE *drule, int *host_status, char *ip, int unique, int now,
 		zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
 {
 	DB_RESULT	result;
@@ -442,7 +459,7 @@ static void	process_checks(const DB_DRULE *drule, int *host_status, char *ip, in
 	DBfree_result(result);
 }
 
-static int	process_services(const DB_DRULE *drule, DB_DHOST *dhost, const char *ip, const char *dns, int now,
+static int	process_services(const ZBX_DB_DRULE *drule, ZBX_DB_DHOST *dhost, const char *ip, const char *dns, int now,
 		const zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
 {
 	int	i, ret;
@@ -483,9 +500,9 @@ fail:
  * Purpose: process single discovery rule                                     *
  *                                                                            *
  ******************************************************************************/
-static void	process_rule(DB_DRULE *drule)
+static void	process_rule(ZBX_DB_DRULE *drule)
 {
-	DB_DHOST		dhost;
+	ZBX_DB_DHOST		dhost;
 	int			host_status, now;
 	char			ip[ZBX_INTERFACE_IP_LEN_MAX], *start, *comma, dns[ZBX_INTERFACE_DNS_LEN_MAX];
 	int			ipaddress[8];
@@ -779,7 +796,7 @@ static int	process_discovery(void)
 
 		if (SUCCEED == DBis_null(row[4]))
 		{
-			DB_DRULE	drule;
+			ZBX_DB_DRULE	drule;
 
 			memset(&drule, 0, sizeof(drule));
 
