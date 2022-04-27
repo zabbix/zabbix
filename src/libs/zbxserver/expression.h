@@ -39,7 +39,7 @@
 #define ZBX_REQUEST_ITEM_VALUETYPE		114
 #define	ZBX_REQUEST_ITEM_ERROR			115
 
-int	DBget_trigger_value(const DB_TRIGGER *trigger, char **replace_to, int N_functionid, int request);
+int	DBget_trigger_value(const ZBX_DB_TRIGGER *trigger, char **replace_to, int N_functionid, int request);
 int	zbx_host_macro_index(const char *macro);
 
 #endif

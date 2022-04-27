@@ -108,7 +108,7 @@ static const char	*convert_historical_macro(int macro)
  *           better match the trigger name at event creation time.            *
  *                                                                            *
  ******************************************************************************/
-static void	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
+static void	preprocess_trigger_name(ZBX_DB_TRIGGER *trigger, int *historical)
 {
 	int		pos = 0, macro_len, macro_type;
 	zbx_token_t	token;
@@ -221,7 +221,7 @@ static void	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
  *           same and can be updated with a single sql query.                 *
  *                                                                            *
  ******************************************************************************/
-static int	process_event_bulk_update(const DB_TRIGGER *trigger, char **sql, size_t *sql_alloc, size_t *sql_offset)
+static int	process_event_bulk_update(const ZBX_DB_TRIGGER *trigger, char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
 	char	*name_esc;
 	int	ret;
@@ -272,7 +272,7 @@ static int	process_event_bulk_update(const DB_TRIGGER *trigger, char **sql, size
  *           event.                                                           *
  *                                                                            *
  ******************************************************************************/
-static int	process_event_update(const DB_TRIGGER *trigger, char **sql, size_t *sql_alloc, size_t *sql_offset)
+static int	process_event_update(const ZBX_DB_TRIGGER *trigger, char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -349,7 +349,7 @@ static int	update_event_names(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_TRIGGER	trigger;
+	ZBX_DB_TRIGGER	trigger;
 	int		ret = SUCCEED, historical, triggers_num, processed_num = 0, completed, last_completed = 0;
 	char		*sql;
 	size_t		sql_alloc = 4096, sql_offset = 0;
@@ -359,7 +359,7 @@ static int	update_event_names(void)
 	if (0 == (triggers_num = get_trigger_count()))
 		goto out;
 
-	memset(&trigger, 0, sizeof(DB_TRIGGER));
+	memset(&trigger, 0, sizeof(ZBX_DB_TRIGGER));
 
 	sql = (char *)zbx_malloc(NULL, sql_alloc);
 	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);

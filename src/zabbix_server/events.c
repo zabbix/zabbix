@@ -153,7 +153,7 @@ static void	process_item_tag(DB_EVENT* event, const zbx_item_tag_t *item_tag)
 	validate_and_add_tag(event, t);
 }
 
-static void	get_item_tags_by_expression(const DB_TRIGGER *trigger, zbx_vector_ptr_t *item_tags)
+static void	get_item_tags_by_expression(const ZBX_DB_TRIGGER *trigger, zbx_vector_ptr_t *item_tags)
 {
 	zbx_vector_uint64_t	functionids;
 
@@ -276,7 +276,7 @@ DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t
 		switch (object)
 		{
 			case EVENT_OBJECT_TRIGGER:
-				memset(&event->trigger, 0, sizeof(DB_TRIGGER));
+				memset(&event->trigger, 0, sizeof(ZBX_DB_TRIGGER));
 
 				event->trigger.expression = zbx_strdup(NULL, trigger_expression);
 				event->trigger.recovery_expression = zbx_strdup(NULL, trigger_recovery_expression);
@@ -1716,7 +1716,7 @@ void	zbx_clean_events(void)
  *           expression                                                       *
  *                                                                            *
  ******************************************************************************/
-static void	db_trigger_get_hosts(zbx_hashset_t *hosts, DB_TRIGGER *trigger)
+static void	db_trigger_get_hosts(zbx_hashset_t *hosts, ZBX_DB_TRIGGER *trigger)
 {
 	zbx_vector_uint64_t	functionids;
 

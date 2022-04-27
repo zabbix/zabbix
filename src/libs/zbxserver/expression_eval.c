@@ -1951,7 +1951,7 @@ static void	host_index_free(zbx_host_index_t *index)
  *             trigger - [IN] the calculated item                             *
  *                                                                            *
  ******************************************************************************/
-void	zbx_expression_eval_resolve_trigger_hosts(zbx_expression_eval_t *eval, const DB_TRIGGER *trigger)
+void	zbx_expression_eval_resolve_trigger_hosts(zbx_expression_eval_t *eval, const ZBX_DB_TRIGGER *trigger)
 {
 	int			i, func_num, index;
 	zbx_vector_ptr_t	hosts;

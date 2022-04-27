@@ -245,10 +245,10 @@ typedef struct
 }
 ZBX_DB_DHOST;
 
-#define ZBX_DB_TRIGGER_EVAL_NONE			0x0000
-#define ZBX_DB_TRIGGER_EVAL_EXPRESSION			0x0001
-#define ZBX_DB_TRIGGER_EVAL_EXPRESSION_USERMACRO	0x0002
-#define ZBX_DB_TRIGGER_EVAL_RECOVERY_EXPRESSION		0x0004
+/* #define ZBX_DB_TRIGGER_EVAL_NONE			0x0000 */
+/* #define ZBX_DB_TRIGGER_EVAL_EXPRESSION			0x0001 */
+/* #define ZBX_DB_TRIGGER_EVAL_EXPRESSION_USERMACRO	0x0002 */
+/* #define ZBX_DB_TRIGGER_EVAL_RECOVERY_EXPRESSION		0x0004 */
 
 typedef struct
 {
@@ -270,7 +270,7 @@ typedef struct
 	/* temporary trigger cache for related data */
 	void		*cache;
 }
-DB_TRIGGER;
+ZBX_DB_TRIGGER;
 
 typedef struct
 {
@@ -286,7 +286,7 @@ DB_SERVICE;
 typedef struct
 {
 	zbx_uint64_t		eventid;
-	DB_TRIGGER		trigger;
+	ZBX_DB_TRIGGER		trigger;
 	zbx_uint64_t		objectid;
 	char			*name;
 	int			source;
@@ -717,9 +717,9 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 void	zbx_db_free_event(DB_EVENT *event);
 void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
 		zbx_vector_uint64_t *r_eventids);
-void	zbx_db_trigger_get_expression(const DB_TRIGGER *trigger, char **expression);
-void	zbx_db_trigger_get_recovery_expression(const DB_TRIGGER *trigger, char **expression);
-void	zbx_db_trigger_clean(DB_TRIGGER *trigger);
+void	zbx_db_trigger_get_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
+void	zbx_db_trigger_get_recovery_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
+void	zbx_db_trigger_clean(ZBX_DB_TRIGGER *trigger);
 
 typedef struct
 {
@@ -828,12 +828,12 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 
 #define ZBX_TIMEZONE_DEFAULT_VALUE	"default"
 
-void	zbx_db_trigger_get_all_functionids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
-void	zbx_db_trigger_get_functionids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
-int	zbx_db_trigger_get_all_hostids(const DB_TRIGGER *trigger, const zbx_vector_uint64_t **hostids);
-int	zbx_db_trigger_get_constant(const DB_TRIGGER *trigger, int index, char **out);
-int	zbx_db_trigger_get_itemid(const DB_TRIGGER *trigger, int index, zbx_uint64_t *itemid);
-void	zbx_db_trigger_get_itemids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
+void	zbx_db_trigger_get_all_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
+void	zbx_db_trigger_get_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
+int	zbx_db_trigger_get_all_hostids(const ZBX_DB_TRIGGER *trigger, const zbx_vector_uint64_t **hostids);
+int	zbx_db_trigger_get_constant(const ZBX_DB_TRIGGER *trigger, int index, char **out);
+int	zbx_db_trigger_get_itemid(const ZBX_DB_TRIGGER *trigger, int index, zbx_uint64_t *itemid);
+void	zbx_db_trigger_get_itemids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
 
 int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
 
