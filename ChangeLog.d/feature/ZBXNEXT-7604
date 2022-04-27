@@ -1,1 +1,1 @@
-.......PS. [ZBXNEXT-7604] added functionality to ignore NaN in Prometheus preprocessing aggregate functions (akozlovs)
+.......PS. [ZBXNEXT-7604] modified functionality to ignore NaN in Prometheus preprocessing aggregate functions (akozlovs)

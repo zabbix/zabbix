@@ -739,15 +739,26 @@ int	zbx_eval_calc_max(zbx_vector_dbl_t *values, double *result, char **error)
  *                                                                            *
  * Parameters: values - [IN] non-empty vector with input data                 *
  *             result - [OUT] calculated value                                *
+ *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
  ******************************************************************************/
-void	zbx_eval_calc_sum(zbx_vector_dbl_t *values, double *result)
+int	zbx_eval_calc_sum(zbx_vector_dbl_t *values, double *result, char **error)
 {
-	double	value = 0;
+	double	value;
 	int	i;
+
+	if (0 == values->values_num)
+	{
+		*error = zbx_strdup(*error, "not enough data");
+		return FAIL;
+	}
+
+	value = 0;
 
 	for (i = 0; i < values->values_num; i++)
 		value += values->values[i];
 
 	*result = value;
+
+	return SUCCEED;
 }

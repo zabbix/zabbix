@@ -1540,8 +1540,7 @@ static int	prometheus_aggregate_values(const zbx_vector_ptr_t *rows, const char 
 	}
 	else if (0 == strcmp(function, "sum"))
 	{
-		zbx_eval_calc_sum(&values, &value_dbl);
-		ret = SUCCEED;
+		ret = zbx_eval_calc_sum(&values, &value_dbl, error);
 	}
 	else if (0 == strcmp(function, "count"))
 	{
