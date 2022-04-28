@@ -37,6 +37,30 @@ class CControllerAuditLogList extends CController {
 
 		$ret = $this->validateInput($fields);
 
+		if ($ret) {
+			$fields = [];
+
+			if ($this->getInput('filter_resourceid', '') !== '') {
+				$fields['filter_resourceid'] = 'id';
+			}
+
+			if ($this->getInput('filter_recordsetid', '') !== '') {
+				$fields['filter_recordsetid'] = 'cuid';
+			}
+
+			if ($fields) {
+				$validator = new CNewValidator($this->getInputAll(), $fields);
+
+				foreach ($validator->getAllErrors() as $error) {
+					info($error);
+				}
+
+				if ($validator->isErrorFatal() || $validator->isError()) {
+					$ret = false;
+				}
+			}
+		}
+
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
@@ -81,21 +105,20 @@ class CControllerAuditLogList extends CController {
 		];
 		$users = [];
 		$non_existent_userids = [];
-		$filter = [];
 
-		if ($data['auditlog_actions']) {
-			$filter['action'] = $data['auditlog_actions'];
-		}
+		$filter = [
+			'action' => $data['auditlog_actions']
+		];
 
-		if (array_key_exists((int) $data['resourcetype'], $data['resources'])) {
+		if ($data['resourcetype'] != -1) {
 			$filter['resourcetype'] = $data['resourcetype'];
 		}
 
-		if ($data['resourceid'] !== '' && CNewValidator::is_id($data['resourceid'])) {
+		if ($data['resourceid'] !== '') {
 			$filter['resourceid'] = $data['resourceid'];
 		}
 
-		if ($data['recordsetid'] !== '' && CNewValidator::isCuid($data['recordsetid'])) {
+		if ($data['recordsetid'] !== '') {
 			$filter['recordsetid'] = $data['recordsetid'];
 		}
 
