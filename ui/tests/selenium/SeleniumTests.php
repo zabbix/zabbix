@@ -20,6 +20,7 @@
 
 require_once dirname(__FILE__).'/testDocumentationLinks.php';
 require_once dirname(__FILE__).'/testGeneric.php';
+require_once dirname(__FILE__).'/testExecuteNow.php';
 require_once dirname(__FILE__).'/testGraphAxis.php';
 require_once dirname(__FILE__).'/testPageDashboard.php';
 require_once dirname(__FILE__).'/testPageDashboardWidgets.php';
@@ -81,7 +82,6 @@ require_once dirname(__FILE__).'/testFormAdministrationGeneralGUI.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralHousekeeper.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralIconMapping.php';
 //require_once dirname(__FILE__).'/testFormAdministrationGeneralImages.php';
-require_once dirname(__FILE__).'/testFormAdministrationGeneralMacros.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralOtherParams.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralRegexp.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralTrigDisplOptions.php';
@@ -113,9 +113,10 @@ require_once dirname(__FILE__).'/lld/testFormTestLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/lld/testFormLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryOverrides.php';
-require_once dirname(__FILE__).'/testFormMacrosHost.php';
-require_once dirname(__FILE__).'/testFormMacrosHostPrototype.php';
-require_once dirname(__FILE__).'/testFormMacrosTemplate.php';
+require_once dirname(__FILE__).'/macros/testFormMacrosAdministrationGeneral.php';
+require_once dirname(__FILE__).'/macros/testFormMacrosHost.php';
+require_once dirname(__FILE__).'/macros/testFormMacrosHostPrototype.php';
+require_once dirname(__FILE__).'/macros/testFormMacrosTemplate.php';
 require_once dirname(__FILE__).'/testFormMaintenance.php';
 require_once dirname(__FILE__).'/testFormMap.php';
 require_once dirname(__FILE__).'/testFormNetworkDiscovery.php';
@@ -213,6 +214,7 @@ class SeleniumTests {
 
 		$suite->addTestSuite('testDocumentationLinks');
 		$suite->addTestSuite('testGeneric');
+		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testGraphAxis');
 		$suite->addTestSuite('testPageActions');
 		$suite->addTestSuite('testFormAdministrationGeneralAutoregistration');
@@ -281,7 +283,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationGeneralHousekeeper');
 		$suite->addTestSuite('testFormAdministrationGeneralIconMapping');
 //		$suite->addTestSuite('testFormAdministrationGeneralImages');
-		$suite->addTestSuite('testFormAdministrationGeneralMacros');
 		$suite->addTestSuite('testFormAdministrationGeneralOtherParams');
 		$suite->addTestSuite('testFormAdministrationGeneralRegexp');
 		$suite->addTestSuite('testFormAdministrationGeneralTrigDisplOptions');
@@ -315,6 +316,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormLowLevelDiscovery');
 		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
+		$suite->addTestSuite('testFormMacrosAdministrationGeneral');
 		$suite->addTestSuite('testFormMacrosHost');
 		$suite->addTestSuite('testFormMacrosHostPrototype');
 		$suite->addTestSuite('testFormMacrosTemplate');

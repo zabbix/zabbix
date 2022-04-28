@@ -149,7 +149,7 @@ $action_buttons = new CActionButtonList('action', 'serviceids', [
 			->addClass('js-massdelete-service')
 			->addClass('no-chkbxrange')
 	]
-], $path !== null ? 'service_'.implode('_', $path) : 'service');
+], ($path !== null && $path) ? 'service_'.implode('_', $path) : 'service');
 
 $form
 	->addItem([$table, $data['paging'], $action_buttons])

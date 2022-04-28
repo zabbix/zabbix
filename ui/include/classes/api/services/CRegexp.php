@@ -224,10 +224,12 @@ class CRegexp extends CApiService {
 					})
 				);
 
-				if ($expression['expression_type'] == EXPRESSION_TYPE_ANY_INCLUDED) {
-					// Set default value for expression delimiter.
-					$expression += ['exp_delimiter' => ','];
-				}
+				/**
+				 * Set default value for expression delimiter.
+				 * Because Zabbix agent 2 cannot work with regular expression when delimiter is empty.
+				 * Bugfix for Zabbix agent 2 5.0.22 and less.
+				 */
+				$expression += ['exp_delimiter' => ','];
 
 				if ($db_expression) {
 					$expression['expressionid'] = $db_expression['expressionid'];
@@ -244,6 +246,13 @@ class CRegexp extends CApiService {
 				}
 				else {
 					$ins_expressions[] = ['regexpid' => $regex['regexpid']] + $expression;
+				}
+
+				/**
+				 * Unset exp_delimiter from array for audit log records.
+				 */
+				if ($expression['expression_type'] != EXPRESSION_TYPE_ANY_INCLUDED) {
+					unset($expression['exp_delimiter']);
 				}
 			}
 			unset($expression);

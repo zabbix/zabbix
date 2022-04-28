@@ -2717,8 +2717,7 @@ ZABBIX.apps.map = (function($) {
 						dstfld1: 'elementNameTriggers',
 						with_triggers: '1',
 						real_hosts: '1',
-						multiselect: '1',
-						noempty: '1'
+						multiselect: '1'
 					}
 				}
 			});

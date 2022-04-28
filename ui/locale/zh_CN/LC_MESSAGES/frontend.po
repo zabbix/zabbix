@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-04-14 12:41+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2022-04-21 10:44+0000\n"
+"Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -48,13 +48,13 @@ msgstr "\"%1$s\" 替换 \"%2$s\""
 #: include/classes/import/validators/C62XmlValidator.php:2050
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr "\"%1$s\" 预计"
+msgstr "预期\"%1$s\" "
 
 #: include/classes/api/services/CReport.php:229
 #: include/classes/api/services/CReport.php:636
 #, c-format
 msgid "\"%1$s\" must be an empty string or greater than \"%2$s\"."
-msgstr "\"%1$s\" 必须是空字符串或大于 \"%2$s\"。"
+msgstr "\"%1$s\" 必须为空或大于 \"%2$s\"。"
 
 #: include/classes/api/services/CItemGeneral.php:1399
 #, c-format
@@ -65,7 +65,7 @@ msgstr "\"%1$s\" 的值必须小于或等于 \"%2$s\" 的值"
 #: include/classes/import/validators/C10XmlValidator.php:383
 #: include/classes/import/validators/C10XmlValidator.php:405
 msgid "\"host:key\" pair is expected"
-msgstr "“主机：key值” 关键的预计"
+msgstr "期望“主机:键值” 对形式"
 
 #: include/classes/api/services/CItemGeneral.php:2299
 msgid "\"hostid\" of dependent item and master item should match"
@@ -85,7 +85,7 @@ msgstr "$.节点.路径"
 #: include/classes/api/services/CDRule.php:556
 #, c-format
 msgid "%1$d characters exceeds maximum length of %2$d characters"
-msgstr "%1$d 个字符超出了 %2$d 个字符的最大长度"
+msgstr "%1$d 个字符超出最大长度 %2$d 个字符"
 
 #: include/func.inc.php:488
 #, c-format
@@ -97,23 +97,23 @@ msgstr[0] "%1$d 天"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
-msgstr "%1$d 匹配找到的 %2$s"
+msgstr "找到%1$d个可匹配%2$s"
 
 #: app/controllers/CControllerWidgetProblemsView.php:55
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
-msgstr[0] "%1$d of %3$d%2$s 问题显示"
+msgstr[0] "问题显示 %1$d / %3$d%2$s"
 
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:117
 #, c-format
 msgid "%1$d problems selected."
-msgstr "%1$d 个问题被选择。"
+msgstr "选中%1$d 个问题。"
 
 #: chart4.php:94
 #, c-format
 msgid "%1$s (year %2$s)"
-msgstr "%1$s (年 %2$s)"
+msgstr "%1$s (%2$s 年)"
 
 #: include/classes/core/CModuleManager.php:228
 #, c-format
@@ -2094,7 +2094,7 @@ msgstr "无法复制触发器 \"%1$s:%2$s\", 因为在其表达式中有多个�
 #: app/controllers/CControllerSlaCreate.php:69
 #: app/controllers/CControllerSlaCreate.php:127
 msgid "Cannot create SLA"
-msgstr ""
+msgstr "无法创建SLA"
 
 #: include/classes/api/services/CHostPrototype.php:1110
 #, c-format
@@ -2129,7 +2129,7 @@ msgstr "无法创建图标映射"
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
-msgstr ""
+msgstr "无法创建请求"
 
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
@@ -2138,7 +2138,7 @@ msgstr "无法创建定时报表"
 #: app/controllers/CControllerServiceCreate.php:96
 #: app/controllers/CControllerServiceCreate.php:184
 msgid "Cannot create service"
-msgstr ""
+msgstr "无法创建服务"
 
 #: include/classes/api/services/CService.php:2373
 #: include/classes/api/services/CService.php:2397
@@ -2301,7 +2301,7 @@ msgstr "无法删除网络拓扑图"
 
 #: app/controllers/CControllerProxyDelete.php:39
 msgid "Cannot delete proxies"
-msgstr ""
+msgstr "无法删除agent代理程序"
 
 #: app/controllers/CControllerProxyDelete.php:69
 msgid "Cannot delete proxy"
@@ -3036,7 +3036,7 @@ msgstr "无法更新API token"
 #: app/controllers/CControllerSlaUpdate.php:70
 #: app/controllers/CControllerSlaUpdate.php:138
 msgid "Cannot update SLA"
-msgstr ""
+msgstr "无法更新SLA"
 
 #: include/classes/api/services/CGraphGeneral.php:67
 msgid "Cannot update a discovered graph."
@@ -3228,7 +3228,7 @@ msgstr ""
 #: app/controllers/CControllerServiceUpdate.php:97
 #: app/controllers/CControllerServiceUpdate.php:200
 msgid "Cannot update service"
-msgstr ""
+msgstr "无法更新服务"
 
 #: include/classes/api/services/CService.php:2310
 #: include/classes/api/services/CService.php:2372
@@ -3908,7 +3908,7 @@ msgstr "配置 web 监控"
 
 #: app/controllers/CControllerAuditLogList.php:199
 msgid "Configuration refresh"
-msgstr ""
+msgstr "配置刷新"
 
 #: app/controllers/CControllerAuditSettingsUpdate.php:78
 #: app/controllers/CControllerAutoregUpdate.php:69
@@ -5206,7 +5206,7 @@ msgstr "删除所选的代理?"
 
 #: app/views/js/proxy.list.js.php:152 app/views/popup.proxy.edit.php:249
 msgid "Delete selected proxy?"
-msgstr ""
+msgstr "删除所选的proxy？"
 
 #: app/views/administration.regex.list.php:82
 msgid "Delete selected regular expressions?"
@@ -5475,7 +5475,7 @@ msgstr "禁用所选的agent代理程序所监测的主机?"
 
 #: app/views/js/proxy.list.js.php:137
 msgid "Disable hosts monitored by selected proxy?"
-msgstr ""
+msgstr "禁用所选的agent代理程序上监测的主机？"
 
 #: app/views/administration.token.list.php:199
 #: app/views/administration.user.token.list.php:151
@@ -6362,6 +6362,10 @@ msgstr "结束日期"
 
 #: app/views/popup.itemtestedit.view.php:296
 msgid "End of line sequence"
+msgstr ""
+
+#: include/locales.inc.php:33
+msgid "English (en_GB)"
 msgstr ""
 
 #: include/locales.inc.php:33
@@ -8431,7 +8435,7 @@ msgstr "假如您认为这个信息是错的, 请咨询您的管理员关于如�
 
 #: app/views/administration.miscconfig.edit.php:125
 msgid "Iframe sandboxing exceptions"
-msgstr ""
+msgstr "iframe 沙盒异常"
 
 #: include/classes/helpers/CServiceHelper.php:151
 msgid "Ignore this service"
@@ -8724,15 +8728,15 @@ msgstr "错误的动作条件时间类型."
 
 #: include/classes/api/services/CAction.php:2999
 msgid "Incorrect action condition or operation host group. Host group does not exist or you have no access to it."
-msgstr ""
+msgstr "动作条件或主机组操作不正确。主机组不存在或您无权访问它。"
 
 #: include/classes/api/services/CAction.php:3059
 msgid "Incorrect action condition or operation host. Host does not exist or you have no access to it."
-msgstr ""
+msgstr "动作条件或主机操作不正确。主机不存在或您无权访问它。"
 
 #: include/classes/api/services/CAction.php:3197
 msgid "Incorrect action condition or operation template. Template does not exist or you have no access to it."
-msgstr ""
+msgstr "动作条件或模板操作不正确。模板不存在或您无权访问它。"
 
 #: include/classes/validators/CActionCondValidator.php:131
 #, c-format
@@ -10767,6 +10771,10 @@ msgstr "链接"
 #: include/classes/html/CList.php:39
 msgid "List is empty"
 msgstr "清单是空的"
+
+#: include/classes/data/CItemData.php:983
+msgid "List of OS processes with attributes. Returns JSON array"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"

@@ -48,7 +48,8 @@ $data += [
 				->removeAttribute('id'),
 			(new CSimpleButton(_('Delete')))
 				->setAttribute('confirm', _('Delete selected host?'))
-				->onClick('view.delete('.json_encode($data['hostid']).', this);')
+				->setAttribute('data-hostid', $data['hostid'])
+				->onClick('view.delete(this.dataset.hostid, this);')
 				->removeAttribute('id'),
 			$cancel_button
 		]
@@ -63,6 +64,7 @@ if ($data['warning']) {
 
 (new CWidget())
 	->setTitle(($data['hostid'] == 0) ? _('New host') : _('Host'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOST_EDIT))
 	->addItem(new CPartial('configuration.host.edit.html', $data))
 	->show();
 

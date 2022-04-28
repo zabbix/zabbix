@@ -72,7 +72,7 @@ class testPageItems extends CLegacyWebTest {
 			);
 		}
 
-		$this->zbxTestAssertElementText("//button[@value='item.masscheck_now'][@disabled]", 'Execute now');
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Execute now'][@disabled]");
 
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 		$this->zbxTestTextPresent('Enable', 'Disable', 'Mass update', 'Copy', 'Clear history', 'Delete');

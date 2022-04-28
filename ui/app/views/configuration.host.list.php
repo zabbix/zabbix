@@ -242,12 +242,13 @@ foreach ($data['hosts'] as $host) {
 			->setArgument('action', 'host.edit')
 			->setArgument('hostid', $host['hostid'])
 	))
-		->onClick('view.editHost(event, '.json_encode($host['hostid']).')');
+		->setAttribute('data-hostid', $host['hostid'])
+		->onClick('view.editHost(event, this.dataset.hostid);');
 
 	$maintenance_icon = false;
 	$status_toggle_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'popup.massupdate.host')
-		->setArgument('ids', [$host['hostid']])
+		->setArgument('hostids', [$host['hostid']])
 		->setArgument('visible[status]', 1)
 		->setArgument('update', 1)
 		->setArgument('backurl',
