@@ -1163,7 +1163,7 @@ class CSetupWizard extends CForm {
 
 		$result = true;
 
-		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && $DB['SCHEMA'] !== '') {
+		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL && $DB['SCHEMA'] !== '') {
 			$db_schema = DBselect(
 				'SELECT NULL'.
 					' FROM information_schema.schemata'.
