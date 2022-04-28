@@ -19,11 +19,23 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
- * @backup config
+ * @backup config, userdirectory
  */
 class testFormAdministrationAuthenticationLdap extends CWebTest {
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class
+		];
+	}
 
 	public function getLdapData() {
 		return [
@@ -34,96 +46,79 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 			],
 			[
 				[
-					'ldap_settings' => [
-						'Enable LDAP authentication' => true
+					'ldap_settings' => [],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Incorrect value for field "name": cannot be empty.',
+						'Incorrect value for field "host": cannot be empty.',
+						'Incorrect value for field "base_dn": cannot be empty.',
+						'Incorrect value for field "search_attribute": cannot be empty.'
 					],
-					'error' => 'Incorrect value for field "ldap_host": cannot be empty.'
+					'error' => 'At least one LDAP server must exist.'
 				]
 			],
 			[
 				[
 					'ldap_settings' => [
-						'Enable LDAP authentication' => true,
-						'LDAP host' => 'ldap.forumsys.com'
+						'Host' => 'ldap.forumsys.com'
 					],
-					'error' => 'Incorrect value for field "ldap_base_dn": cannot be empty.'
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Incorrect value for field "name": cannot be empty.',
+						'Incorrect value for field "base_dn": cannot be empty.',
+						'Incorrect value for field "search_attribute": cannot be empty.'
+					],
+					'error' => 'At least one LDAP server must exist.'
 				]
 			],
 			[
 				[
 					'ldap_settings' => [
-						'Enable LDAP authentication' => true,
-						'LDAP host' => 'ldap.forumsys.com',
+						'Host' => 'ldap.forumsys.com',
 						'Base DN' => 'dc=example,dc=com'
 					],
-					'error' => 'Incorrect value for field "ldap_search_attribute": cannot be empty.'
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Incorrect value for field "name": cannot be empty.',
+						'Incorrect value for field "search_attribute": cannot be empty.'
+					],
+					'error' => 'At least one LDAP server must exist.'
 				]
 			],
 			[
 				[
 					'ldap_settings' => [
-						'Enable LDAP authentication' => true,
-						'LDAP host' => 'ldap.forumsys.com',
+						'Host' => 'ldap.forumsys.com',
 						'Base DN' => 'dc=example,dc=com',
 						'Search attribute' => 'uid'
 					],
-					'error' => 'Login name or password is incorrect.'
-				]
-			],
-			[
-				[
-					'ldap_settings' => [
-						'Enable LDAP authentication' => true,
-						'LDAP host' => 'ldap.forumsys.com',
-						'Base DN' => 'dc=example,dc=com',
-						'Search attribute' => 'uid',
-						'Login' => 'galieleo'
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Incorrect value for field "name": cannot be empty.'
 					],
-					'error' => 'Login name or password is incorrect.'
+					'error' => 'At least one LDAP server must exist.'
 				]
 			],
 			[
 				[
+					'expected' => TEST_GOOD,
 					'ldap_settings' => [
-						'Enable LDAP authentication' => true,
-						'LDAP host' => 'ldap.forumsys.com',
-						'Base DN' => 'dc=example,dc=com',
-						'Search attribute' => 'uid',
-						'Bind password' => 'password'
-					],
-					'error' => 'Incorrect value for field "ldap_bind_dn": cannot be empty.'
-				]
-			],
-			[
-				[
-					'user' => 'Admin',
-					'password' => 'zabbix',
-					'ldap_settings' => [
-						'Enable LDAP authentication' => true,
-						'LDAP host' => 'ldap.forumsys.com',
+						'Name' => 'LDAP',
+						'Host' => 'ldap.forumsys.com',
 						'Port' => '389',
 						'Base DN' => 'dc=example,dc=com',
 						'Search attribute' => 'uid',
 						'Bind DN' => 'cn=read-only-admin,dc=example,dc=com',
-						'Case-sensitive login' => true,
-						'Bind password' => 'password',
-						'Login' => 'galieleo',
-						'User password' => 'password'
+						'Bind password' => 'password'
 					],
 					'db_check' => [
-						'authentication_type' => '1',
-						'ldap_host' => 'ldap.forumsys.com',
-						'ldap_port' => '389',
-						'ldap_base_dn' => 'dc=example,dc=com',
-						'ldap_bind_dn' => 'cn=read-only-admin,dc=example,dc=com',
-						'ldap_bind_password' => 'password',
-						'ldap_search_attribute' => 'uid',
-						'http_auth_enabled' => '0',
-						'http_login_form' => '0',
-						'http_strip_domains' => '',
-						'http_case_sensitive' => '1',
-						'ldap_configured' => '1',
-						'ldap_case_sensitive' => '1'
+						'name' => 'LDAP',
+						'host' => 'ldap.forumsys.com',
+						'port' => '389',
+						'base_dn' => 'dc=example,dc=com',
+						'bind_dn' => 'cn=read-only-admin,dc=example,dc=com',
+						'bind_password' => 'password',
+						'search_attribute' => 'uid'
 					]
 				]
 			]
@@ -140,33 +135,35 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 		$this->assertEquals('Authentication', $this->query('tag:h1')->one()->getText());
 		$this->page->assertTitle('Configuration of authentication');
 
-		$form = $this->query('name:form_auth')->asForm()->one();
+		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->fill(['Default authentication' => 'LDAP']);
 
 		// Configuration at 'LDAP settings' tab.
 		if (array_key_exists('ldap_settings', $data)) {
 			$form->selectTab('LDAP settings');
-			$form->fill($data['ldap_settings']);
+			$this->query('id:ldap_configured')->asCheckbox()->one()->check();
+			$form->query('button:Add')->one()->click();
+			$ldap_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->all()->last();
+			$ldap_form->fill($data['ldap_settings'])->submit();
+
+			// Check error message in ldap creation form.
+			if (array_key_exists('ldap_error', $data)) {
+				$this->assertMessage(TEST_BAD, $data['ldap_error'], $data['ldap_error_details']);
+			}
 		}
 
 		$form->submit();
 		$this->page->acceptAlert();
 
-		$message = CMessageElement::find()->one();
-		if (array_key_exists('error', $data)) {
-			$this->assertTrue($message->isBad());
-			$this->assertEquals($data['error'], $message->getTitle());
-		}
-		else {
-			$this->assertTrue($message->isGood());
-			$this->assertEquals('Authentication settings updated', $message->getTitle());
+		if (CTestArrayHelper::get($data, 'expected', TEST_BAD) === TEST_GOOD) {
+			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 			// Check DB configuration.
-			$sql = 'SELECT authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,'.
-					'ldap_search_attribute,http_auth_enabled,http_login_form,http_strip_domains,http_case_sensitive,'.
-					'ldap_configured,ldap_case_sensitive'.
-					' FROM config';
+			$sql = 'SELECT name, host, port, base_dn, bind_dn, bind_password, search_attribute FROM userdirectory';
 			$result = CDBHelper::getRow($sql);
 			$this->assertEquals($data['db_check'], $result);
+		}
+		else {
+			$this->assertMessage(TEST_BAD, $data['error']);
 		}
 	}
 }

@@ -599,7 +599,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 		$this->page->assertTitle('Configuration of authentication');
 
 		// Fill fields in 'HTTP settings' tab.
-		$form = $this->query('name:form_auth')->asForm()->one();
+		$form = $this->query('id:authentication-form')->asForm()->one();
 		$http_options = CTestArrayHelper::get($data, 'http_authentication', ['Enable HTTP authentication' => false]);
 		$form->selectTab('HTTP settings');
 		$form->fill($http_options);
@@ -616,19 +616,12 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 		// Check DB configuration.
 		$defautl_values = [
 			'authentication_type' => '0',
-			'ldap_host' => '',
-			'ldap_port' => '389',
-			'ldap_base_dn' => '',
-			'ldap_bind_dn' => '',
-			'ldap_bind_password' => '',
-			'ldap_search_attribute' => '',
 			'ldap_configured' => '0',
 			'ldap_case_sensitive' => '1'
 		];
-		$sql = 'SELECT authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,'.
-				'ldap_search_attribute,ldap_configured,ldap_case_sensitive,http_auth_enabled,http_login_form,'.
-				'http_strip_domains,http_case_sensitive'.
-				' FROM config';
+		$sql = 'SELECT authentication_type,ldap_configured,ldap_case_sensitive,http_auth_enabled,http_login_form,'.
+				'http_strip_domains,http_case_sensitive FROM config';
+
 		$result = CDBHelper::getRow($sql);
 		$this->assertEquals(array_merge($defautl_values, $data['db_check']), $result);
 
