@@ -18,12 +18,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/common/testFormMacros.php';
+require_once dirname(__FILE__).'/../common/testFormMacros.php';
 
 /**
- * @backup hosts
+ * @backup hosts, config
+ *
+ * @onBefore prepareHostMacrosData
  */
 class testFormMacrosHost extends testFormMacros {
+
+	/**
+	 * Create new macros for host.
+	 */
+	public function prepareHostMacrosData() {
+		CDataHelper::call('host.update', [
+			[
+				'hostid' => 50010,
+				'macros' => [
+					'macro' => '{$NEWMACROS}',
+					'value' => 'something/value:key',
+					'type' => 2
+				]
+			]
+		]);
+	}
 
 	use MacrosTrait;
 
@@ -52,7 +70,8 @@ class testFormMacrosHost extends testFormMacros {
 	public $macro_resolve_hostid = 99135;
 
 	public $vault_object = 'host';
-	public $vault_error_field = '/1/macros/6/value';
+	public $hashi_error_field = '/1/macros/3/value';
+	public $cyber_error_field = '/1/macros/4/value';
 	public $update_vault_macro = '{$VAULT_HOST_MACRO3_CHANGED}';
 	public $vault_macro_index = 2;
 
@@ -306,11 +325,19 @@ class testFormMacrosHost extends testFormMacros {
 	}
 
 	/**
+	 * Check Vault macros validation.
+	 */
+	public function testFormMacrosHost_checkVaultValidation() {
+		$this->checkVaultValidation('zabbix.php?action=host.view', 'hosts', 'Host for different items types');
+	}
+
+	/**
 	 * @dataProvider getCreateVaultMacrosData
 	 *
 	 */
 	public function testFormMacrosHost_CreateVaultMacros($data) {
-		$this->createVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', 'Available host');
+		$host = ($data['vault'] === 'Hashicorp') ? 'Host 1 from first group' : 'Empty host';
+		$this->createVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', $host);
 	}
 
 	/**

@@ -10860,6 +10860,10 @@ msgstr ""
 msgid "List is empty"
 msgstr ""
 
+#: include/classes/data/CItemData.php:983
+msgid "List of OS processes with attributes. Returns JSON array"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr ""

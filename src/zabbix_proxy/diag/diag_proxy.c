@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "zbxdiag.h"
+#include "diag_proxy.h"
 
-#include "diag.h"
+#include "common.h"
 
 /******************************************************************************
  *                                                                            *
@@ -41,12 +41,12 @@ int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, 
 	int	ret = FAIL;
 
 	if (0 == strcmp(section, ZBX_DIAG_HISTORYCACHE))
-		ret = diag_add_historycache_info(jp, json, error);
+		ret = zbx_diag_add_historycache_info(jp, json, error);
 	else if (0 == strcmp(section, ZBX_DIAG_PREPROCESSING))
-		ret = diag_add_preproc_info(jp, json, error);
+		ret = zbx_diag_add_preproc_info(jp, json, error);
 	else if (0 == strcmp(section, ZBX_DIAG_LOCKS))
 	{
-		diag_add_locks_info(json);
+		zbx_diag_add_locks_info(json);
 		ret = SUCCEED;
 	}
 	else

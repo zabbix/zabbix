@@ -17,20 +17,33 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ALIAS_H
-#define ZABBIX_ALIAS_H
+package proc
 
-typedef struct zbx_alias
-{
-	struct zbx_alias	*next;
-	char			*name;
-	char			*value;
+func addNonNegative(dst *int64, val int64) () {
+	if *dst == -1 {
+		return
+	}
+
+	if val == -1 {
+		*dst = -1
+		return
+	}
+
+	*dst += val
+	return
 }
-ALIAS;
 
-void		test_aliases(void);
-void		add_alias(const char *name, const char *value);
-void		alias_list_free(void);
-const char	*zbx_alias_get(const char *orig);
+func addNonNegativeFloat(dst *float64, val float64) () {
+	if *dst == -1.0 {
+		return
+	}
 
-#endif	/* ZABBIX_ALIAS_H */
+	if val == -1.0 {
+		*dst = -1.0
+		return
+	}
+
+	*dst += val
+	return
+}
+

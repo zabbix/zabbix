@@ -26,6 +26,8 @@ class ScheduledReports {
 	 * @return array
 	 */
 	public static function load() {
+		CDataHelper::reset();
+
 		CDataHelper::call('user.create', [
 			[
 				'username' => 'admin user for testFormScheduledReport',

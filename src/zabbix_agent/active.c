@@ -26,7 +26,6 @@
 #include "zbxcommshigh.h"
 #include "zbxthreads.h"
 #include "zbxjson.h"
-#include "alias.h"
 #include "zbxregexp.h"
 
 extern unsigned char			program_type;

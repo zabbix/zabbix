@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup items
+ * @dataSource ExecuteNowAction
  */
 class testPageLowLevelDiscovery extends CWebTest {
 
@@ -201,9 +202,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'names' => [
 						'Discovery rule 2'
 					],
-					'disabled' => true,
-					'message' => 'Cannot send request',
-					'details' => 'Cannot send request: discovery rule "Discovery rule 2" on host "Host for host prototype tests" is not monitored.',
+					'type' => 'disabled',
 					'hostid' => self::HOST_ID
 				]
 			],
@@ -213,8 +212,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'names' => [
 						'Discovery rule for triggers filtering'
 					],
-					'message' => 'Cannot send request',
-					'details' => 'Cannot send request: wrong discovery rule type.',
+					'type' => 'trapper',
 					'hostid' => 99062
 				]
 			],
@@ -224,7 +222,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'names' => [
 						'Temp Status Discovery'
 					],
-					'template' => true,
+					'type' => 'template',
 					'hostid' => 10250
 				]
 			]
@@ -237,25 +235,30 @@ class testPageLowLevelDiscovery extends CWebTest {
 	 * @dataProvider getCheckNowData
 	 */
 	public function testPageLowLevelDiscovery_CheckNow($data) {
-		$context = array_key_exists('template', $data) ? '&context=template' : '&context=host';
+		$context = CTestArrayHelper::get($data, 'type') === 'template' ? '&context=template' : '&context=host';
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid'].$context);
-		// Enable all LLDs, so Check now can be sent successfully.
+		// Enable all LLDs, so Execute now can be sent successfully.
 		$this->massChangeStatus('Enable');
 		$this->selectTableRows($data['names'], 'Name', $this->selector);
 
-		if (CTestArrayHelper::get($data, 'disabled')) {
-			$this->query('button:Disable')->one()->click();
-			$this->page->acceptAlert();
-			$this->selectTableRows($data['names'], 'Name', $this->selector);
+		switch (CTestArrayHelper::get($data, 'type')) {
+			case 'disabled':
+				$this->query('button:Disable')->one()->click();
+				$this->page->acceptAlert();
+				$this->selectTableRows($data['names'], 'Name', $this->selector);
+				$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());
+				break;
+			case 'template';
+				$this->assertFalse($this->query('button:Execute now')->one(false)->isValid());
+				break;
+			case 'trapper';
+				$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());
+				break;
+			default:
+				$this->query('button:Execute now')->one()->click();
+				$this->assertMessage($data['expected'], $data['message'], CTestArrayHelper::get($data, 'details'));
 		}
 
-		if (CTestArrayHelper::get($data, 'template', false)) {
-			$this->assertFalse($this->query('button:Execute now')->one(false)->isValid());
-		}
-		else {
-			$this->query('button:Execute now')->one()->click();
-			$this->assertMessage($data['expected'], $data['message'], CTestArrayHelper::get($data, 'details'));
-		}
 		$this->page->logout();
 	}
 
@@ -413,6 +416,11 @@ class testPageLowLevelDiscovery extends CWebTest {
 					],
 					'expected' => [
 						'Linux by Zabbix agent: Block devices discovery',
+						'DR1-agent',
+						'DR2-trap',
+						'I1-lvl1-agent-num: DR3-I1-dep-agent',
+						'I2-lvl1-trap-num: DR4-I2-dep-trap',
+						'Last error message of scenario "Web scenario for execute now".: DR5-web-dep',
 						'Zabbix server health: Zabbix stats cluster: High availability cluster node discovery',
 						'Linux by Zabbix agent: Mounted filesystem discovery',
 						'Linux by Zabbix agent: Network interface discovery'
