@@ -186,7 +186,7 @@ static int	DBpatch_6010009(void)
 
 static int	DBpatch_6010010(void)
 {
-	return DBcreate_index("hstgrp", "hstgrp_2", "type,uuid", 1);
+	return DBcreate_index("hstgrp", "hstgrp_2", "groupid,uuid", 1);
 }
 
 static void	DBpatch_6010011_hstgrp_free(hstgrp_t *hstgrp)
@@ -268,10 +268,9 @@ static int	DBpatch_6010011_split_groups(void)
 				" set hg.groupid ="  ZBX_FS_UI64
 				" where groupid=" ZBX_FS_UI64
 				" and hostid in ("
-				"  select h.hostid"
-				"   from hosts h"
-				"    where status=" DBPATCH_HOST_STATUS_TEMPLATE
-				");\n",
+				" select h.hostid"
+				" from hosts h"
+				" where status=" DBPATCH_HOST_STATUS_TEMPLATE ");\n",
 				hstgrps.values[i]->newgroupid,
 				hstgrps.values[i]->groupid);
 
@@ -283,11 +282,9 @@ static int	DBpatch_6010011_split_groups(void)
 	ret = zbx_db_insert_execute(&db_insert);
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-	if (0 == hstgrps.values_num)
-		goto out;
 
-	if (ZBX_DB_OK > DBexecute("%s", sql))
-		ret = FAIL;
+	if (0 == hstgrps.values_num || ZBX_DB_OK > DBexecute("%s", sql))
+		goto out;
 out:
 	zbx_db_insert_clean(&db_insert);
 	DBfree_result(result);
