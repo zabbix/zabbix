@@ -1213,9 +1213,7 @@ class testMassUpdateItems extends CWebTest{
 					 * The value of an SNMP interface option element contains not only the IP and port, but also the
 					 * interface type and context name or community. In this case the address and details must be merged.
 					 */
-					$interface = (array_key_exists('interface_text_part', $data))
-						? $value['value'].$data['interface_text_part']
-						: $value['value'];
+					$interface = $value['value'].CTestArrayHelper::get($data, 'interface_text_part', '');
 
 					$form->query('id', $value['id'])->asDropdown()->one()->select($interface);
 					break;

@@ -70,6 +70,8 @@ trait CastableTrait {
 	/**
 	 * Cast object to List element.
 	 *
+	 * @deprecated List element is present only in IPMI tab of host configuration form.
+	 *
 	 * @param array $options    additional casting options
 	 *
 	 * @return CListElement

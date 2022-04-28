@@ -260,26 +260,23 @@ class testFormServicesServices extends CWebTest {
 			$this->assertTrue($form->getLabel($label)->isDisplayed());
 		}
 
-		$service_tab_tables = [
-			'problem_tags' => ['Name', 'Operation', 'Value', 'Action'],
-			'status_rules' => ['Name', 'Action']
-		];
+		// Check Problem tags table headers.
+		$problem_tags_table = $form->query('id', 'problem_tags')->asMultifieldTable()->one();
+		$this->assertSame(['Name', 'Operation', 'Value', 'Action'], $problem_tags_table->getHeadersText());
 
-		// Check layout of tables in Service tab.
-		foreach ($service_tab_tables as $table_id => $columns) {
-			$table = $form->query('id', $table_id)->asMultifieldTable()->one();
-			$this->assertSame($columns, $table->getHeadersText());
+		// Check Problem tags table fields.
+		$problem_tags_table->checkValue([['tag' => '', 'operator' => 'Equals', 'value' => '']]);
 
-			if ($table_id === 'problem_tags') {
-				// Check Problem tags table fields.
-				$table->checkValue([['tag' => '', 'operator' => 'Equals', 'value' => '']]);
-
-				// Check table tags placeholders.
-				foreach (['tag', 'value'] as $placeholder) {
-					$this->assertEquals($placeholder, $table->query('id:problem_tags_0_'.$placeholder)->one()->getAttribute('placeholder'));
-				}
-			}
+		// Check table tags placeholders.
+		foreach (['tag', 'value'] as $placeholder) {
+			$this->assertEquals($placeholder, $problem_tags_table->query('id:problem_tags_0_'.$placeholder)
+					->one()->getAttribute('placeholder')
+			);
 		}
+
+		// Check Status rules table headers.
+		$status_rules_table = $form->query('id', 'status_rules')->asMultifieldTable()->one();
+		$this->assertSame(['Name', 'Action'], $status_rules_table->getHeadersText());
 
 		// Check Service tab fields' maxlengths.
 		$service_tab_limits = [
@@ -350,7 +347,7 @@ class testFormServicesServices extends CWebTest {
 
 		foreach ($radio_buttons as $radio_params) {
 			$propagation_rule_field->select($radio_params['propagation_rule']);
-			$radio_element = $form->query($radio_params['locator'])->waitUntilVisible()->one()->asSegmentedRadio();
+			$radio_element = $form->query($radio_params['locator'])->waitUntilVisible()->asSegmentedRadio()->one();
 			$this->assertEquals($radio_params['default'], $radio_element->getText());
 			$this->assertEquals($radio_params['values'], $radio_element->getLabels()->asText());
 		}
@@ -955,21 +952,19 @@ class testFormServicesServices extends CWebTest {
 			}
 		}
 
-		if (array_key_exists('additional_rules', $data)) {
-			foreach ($data['additional_rules'] as $rule_fields) {
-				// Click Add button to add new rule. For editing additional rules the Additional rule dialog is already opened.
-				if (!array_key_exists('existing_rule', $data)) {
-					$form->getFieldContainer('Additional rules')->query('button:Add')->waitUntilClickable()->one()->click();
-				}
-				$rules_form = COverlayDialogElement::find()->all()->last()->waitUntilReady()->asForm();
-				$rules_form->fill($rule_fields);
-				$rules_form->submit();
+		foreach (CTestArrayHelper::get($data, 'additional_rules', []) as $rule_fields) {
+			// Click Add button to add new rule. For editing additional rules the Additional rule dialog is already opened.
+			if (!array_key_exists('existing_rule', $data)) {
+				$form->getFieldContainer('Additional rules')->query('button:Add')->waitUntilClickable()->one()->click();
+			}
+			$rules_form = COverlayDialogElement::find()->all()->last()->waitUntilReady()->asForm();
+			$rules_form->fill($rule_fields);
+			$rules_form->submit();
 
-				if ($expected === TEST_BAD) {
-					$this->assertMessage(TEST_BAD, null, $data['error']);
+			if ($expected === TEST_BAD) {
+				$this->assertMessage(TEST_BAD, null, $data['error']);
 
-					return;
-				}
+				return;
 			}
 		}
 
@@ -1419,7 +1414,7 @@ class testFormServicesServices extends CWebTest {
 			$this->assertEquals($options['default'], $dropdown->getText());
 
 			// Check all possible dropdown values.
-			$this->assertSame($options['values'], $dropdown->asDropdown()->getOptions()->asText());
+			$this->assertSame($options['values'], $dropdown->getOptions()->asText());
 		}
 	}
 }

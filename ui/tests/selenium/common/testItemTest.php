@@ -666,9 +666,7 @@ class testItemTest extends CWebTest {
 				 * The value of an SNMP interface option element contains not only the IP and port, but also the
 				 * interface type and context name or community. In this case the address and details must be merged.
 				 */
-				$interface = (array_key_exists('interface_text_part', $data))
-					? $data['host_interface'].$data['interface_text_part']
-					: $data['host_interface'];
+				$interface = $data['host_interface'].CTestArrayHelper::get($data, 'interface_text_part', '');
 
 				$item_form->getField('Host interface')->fill($interface);
 			}
