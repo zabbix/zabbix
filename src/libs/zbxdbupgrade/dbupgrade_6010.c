@@ -377,7 +377,10 @@ static int	DBpatch_6010014_update_empty_groups(void)
 			" where groupid=%d;\n", HOSTGROUP_TYPE_TEMPLATE, ids.values[i]);
 
 		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+		{
+			ret = FAIL;
 			goto out;
+		}
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
