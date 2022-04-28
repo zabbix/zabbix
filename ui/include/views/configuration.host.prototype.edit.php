@@ -75,8 +75,8 @@ $host_tab->addRow(
 $name = ($host_prototype['name'] != $host_prototype['host']) ? $host_prototype['name'] : '';
 
 $host_tab->addRow(
-	_('Visible name'),
-	(new CTextBox('name', $name, (bool) $host_prototype['templateid']))
+    (new CLabel(_('Visible name'), 'visiblename')),
+	(new CTextBox('visiblename', $name, (bool) $host_prototype['templateid']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('maxlength', 128)
 );
