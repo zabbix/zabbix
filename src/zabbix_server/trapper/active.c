@@ -17,17 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
-#include "dbcache.h"
+#include "active.h"
+
 #include "log.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
 #include "zbxcompress.h"
 
 #include "../../libs/zbxcrypto/tls_tcp_active.h"
-
-#include "active.h"
 
 extern unsigned char	program_type;
 

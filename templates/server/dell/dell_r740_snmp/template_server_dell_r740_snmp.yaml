@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-27T18:35:33Z'
+  date: '2022-04-06T19:27:16Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -154,7 +154,8 @@ zabbix_export:
             -
               uuid: 21ee92eed6f04ea59864dd09b1fac68a
               expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.serialnumber[systemServiceTag],#1)<>last(/DELL PowerEdge R740 SNMP/dell.server.hw.serialnumber[systemServiceTag],#2) and length(last(/DELL PowerEdge R740 SNMP/dell.server.hw.serialnumber[systemServiceTag]))>0'
-              name: 'Dell R740: Device has been replaced (new serial number received)'
+              name: 'Dell R740: Device has been replaced'
+              event_name: 'Dell R740: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
@@ -212,7 +213,8 @@ zabbix_export:
             -
               uuid: edc8087b2d2b423fb637b7caefeb50fb
               expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.name[sysName],#1)<>last(/DELL PowerEdge R740 SNMP/dell.server.name[sysName],#2) and length(last(/DELL PowerEdge R740 SNMP/dell.server.name[sysName]))>0'
-              name: 'Dell R740: System name has changed (new name: {ITEM.VALUE})'
+              name: 'Dell R740: System name has changed'
+              event_name: 'Dell R740: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -365,7 +367,8 @@ zabbix_export:
             -
               uuid: 91449180f6dd435f8104a51ae5645fc3
               expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.uptime[sysUpTime])<10m'
-              name: 'Dell R740: {HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'Dell R740: has been restarted'
+              event_name: 'Dell R740: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -805,7 +808,8 @@ zabbix_export:
                 -
                   uuid: 6a99f1c73c9644369947c25d187e812c
                   expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#1)<>last(/DELL PowerEdge R740 SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#2) and length(last(/DELL PowerEdge R740 SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]))>0'
-                  name: 'Dell R740: {#DISK_NAME} has been replaced (new serial number received)'
+                  name: 'Dell R740: {#DISK_NAME} has been replaced'
+                  event_name: 'Dell R740: {#DISK_NAME} has been replaced (new serial number received)'
                   priority: INFO
                   description: '{#DISK_NAME} serial number has changed. Ack to close'
                   manual_close: 'YES'

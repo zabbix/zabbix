@@ -9810,6 +9810,7 @@ static void	dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
 			case CONFIG_ERROR:
+			case SIG_ERROR:
 				dc_item->queue_priority = ZBX_QUEUE_PRIORITY_NORMAL;
 				dc_requeue_item(dc_item, dc_host, dc_interface, ZBX_ITEM_COLLECTED, lastclocks[i]);
 				break;
@@ -11254,11 +11255,6 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
-		if (NULL == (dc_interface = (const ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces,
-				&dc_item->interfaceid)))
-		{
-			continue;
-		}
 
 		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 			continue;
@@ -11269,6 +11265,12 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 			case ITEM_TYPE_SNMP:
 			case ITEM_TYPE_IPMI:
 			case ITEM_TYPE_JMX:
+				if (NULL == (dc_interface = (const ZBX_DC_INTERFACE *)zbx_hashset_search(
+						&config->interfaces, &dc_item->interfaceid)))
+				{
+					continue;
+				}
+
 				if (INTERFACE_AVAILABLE_TRUE != dc_interface->available)
 					continue;
 				break;

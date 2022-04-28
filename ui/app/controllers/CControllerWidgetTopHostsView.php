@@ -76,8 +76,11 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 
 		$time_now = time();
 
-		$master_items = self::getItems($configuration[$fields['column']]['item'], $groupids, $hostids);
-		$master_item_values = self::getItemValues($master_items, $configuration[$fields['column']], $time_now);
+		$master_column = $configuration[$fields['column']];
+		$master_items_only_numeric_allowed = self::isNumericOnlyColumn($master_column);
+
+		$master_items = self::getItems($master_column['item'], $master_items_only_numeric_allowed, $groupids, $hostids);
+		$master_item_values = self::getItemValues($master_items, $master_column, $time_now);
 
 		if (!$master_item_values) {
 			return [
@@ -86,17 +89,33 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			];
 		}
 
-		if ($fields['order'] == CWidgetFormTopHosts::ORDER_TOPN) {
-			arsort($master_item_values, SORT_NUMERIC);
+		$master_items_only_numeric_present = $master_items_only_numeric_allowed && !array_filter($master_items,
+			static function(array $item): bool {
+				return !in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
+			}
+		);
 
-			$master_items_min = end($master_item_values);
-			$master_items_max = reset($master_item_values);
+		if ($fields['order'] == CWidgetFormTopHosts::ORDER_TOPN) {
+			if ($master_items_only_numeric_present) {
+				arsort($master_item_values, SORT_NUMERIC);
+
+				$master_items_min = end($master_item_values);
+				$master_items_max = reset($master_item_values);
+			}
+			else {
+				asort($master_item_values, SORT_NATURAL);
+			}
 		}
 		else {
-			asort($master_item_values, SORT_NUMERIC);
+			if ($master_items_only_numeric_present) {
+				asort($master_item_values, SORT_NUMERIC);
 
-			$master_items_min = reset($master_item_values);
-			$master_items_max = end($master_item_values);
+				$master_items_min = reset($master_item_values);
+				$master_items_max = end($master_item_values);
+			}
+			else {
+				arsort($master_item_values, SORT_NATURAL);
+			}
 		}
 
 		$master_item_values = array_slice($master_item_values, 0, $fields['count'], true);
@@ -154,9 +173,10 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 				}
 			}
 			else {
+				$numeric_only = self::isNumericOnlyColumn($column);
 				$column_items = !$calc_extremes || $column['min'] !== '' && $column['max'] !== ''
-					? self::getItems($column['item'], $groupids, array_keys($master_hostids))
-					: self::getItems($column['item'], $groupids, $hostids);
+					? self::getItems($column['item'], $numeric_only, $groupids, array_keys($master_hostids))
+					: self::getItems($column['item'], $numeric_only, $groupids, $hostids);
 
 				$column_item_values = self::getItemValues($column_items, $column, $time_now);
 
@@ -250,13 +270,25 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 	}
 
 	/**
+	 * @param array $column
+	 *
+	 * @return bool
+	 */
+	private static function isNumericOnlyColumn(array $column): bool {
+		return $column['aggregate_function'] != AGGREGATE_NONE
+			|| $column['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS
+			|| array_key_exists('thresholds', $column);
+	}
+
+	/**
 	 * @param string     $name
+	 * @param bool       $numeric_only
 	 * @param array|null $groupids
 	 * @param array|null $hostids
 	 *
 	 * @return array
 	 */
-	private static function getItems(string $name, ?array $groupids, ?array $hostids): array {
+	private static function getItems(string $name, bool $numeric_only, ?array $groupids, ?array $hostids): array {
 		$items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'key_', 'history', 'trends', 'value_type', 'units'],
 			'selectValueMap' => ['mappings'],
@@ -267,7 +299,7 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			'filter' => [
 				'name' => $name,
 				'status' => ITEM_STATUS_ACTIVE,
-				'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
+				'value_type' => $numeric_only ? [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] : null
 			],
 			'sortfield' => 'key_',
 			'preservekeys' => true
@@ -318,18 +350,30 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 
 		$result = [];
 
-		if ($timeshift == 0 && $column['aggregate_function'] == AGGREGATE_NONE) {
+		if ($column['aggregate_function'] == AGGREGATE_NONE) {
 			$items_by_source = ['history' => [], 'trends' => []];
 
 			foreach ($items as $itemid => $item) {
 				$items_by_source[$item['source']][$itemid] = $item;
 			}
 
-			$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period);
-			$values = array_column(array_column($values, 0), 'value', 'itemid');
+			if ($timeshift != 0) {
+				$values = [];
+
+				foreach ($items_by_source['history'] as $itemid => $item) {
+					$history = Manager::History()->getValueAt($item, $time_to, 0);
+
+					if (is_array($history)) {
+						$values[$itemid] = $history['value'];
+					}
+				}
+			}
+			else {
+				$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period);
+				$values = array_column(array_column($values, 0), 'value', 'itemid');
+			}
 
 			$result += $values;
-
 			$items = $items_by_source['trends'];
 		}
 
@@ -355,7 +399,10 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 		if ($data_source == CWidgetFieldColumnsList::HISTORY_DATA_HISTORY
 				|| $data_source == CWidgetFieldColumnsList::HISTORY_DATA_TRENDS) {
 			foreach ($items as &$item) {
-				$item['source'] = $data_source == CWidgetFieldColumnsList::HISTORY_DATA_HISTORY ? 'history' : 'trends';
+				$item['source'] = $data_source == CWidgetFieldColumnsList::HISTORY_DATA_TRENDS
+					&& ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
+						? 'trends'
+						: 'history';
 			}
 			unset($item);
 
@@ -401,7 +448,7 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 
 			$processed_items = [];
 
-			foreach ($items as $item) {
+			foreach ($items as $itemid => $item) {
 				if (!$global_trends_time) {
 					$item['history'] = timeUnitToSeconds($item['history']);
 
@@ -426,7 +473,7 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 					}
 				}
 
-				$processed_items[] = $item;
+				$processed_items[$itemid] = $item;
 			}
 
 			$items = $processed_items;

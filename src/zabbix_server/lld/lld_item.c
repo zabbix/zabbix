@@ -17,13 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "db.h"
+#include "lld.h"
+
 #include "log.h"
-#include "zbxalgo.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
 #include "zbxprometheus.h"
-#include "zbxvariant.h"
 
 #include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_item.h"
@@ -1836,6 +1835,8 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 				dependent = (zbx_lld_item_t *)item->dependent_items.values[j];
 				dependent->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
 			}
+
+			continue;
 		}
 	}
 
@@ -2078,7 +2079,6 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	item->publickey_orig = NULL;
 	item->privatekey_orig = NULL;
 
-	item->flags = ZBX_FLAG_LLD_ITEM_DISCOVERED;
 	item->lld_row = lld_row;
 
 	zbx_vector_ptr_create(&item->preproc_ops);
@@ -2086,11 +2086,10 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	zbx_vector_ptr_create(&item->item_params);
 	zbx_vector_ptr_create(&item->item_tags);
 
-	if (SUCCEED != ret || ZBX_PROTOTYPE_NO_DISCOVER == discover)
-	{
-		lld_item_free(item);
-		item = NULL;
-	}
+	if (SUCCEED == ret && ZBX_PROTOTYPE_NO_DISCOVER != discover)
+		item->flags = ZBX_FLAG_LLD_ITEM_DISCOVERED;
+	else
+		item->flags = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
@@ -2536,14 +2535,12 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_p
 
 			if (NULL == (item_index = (zbx_lld_item_index_t *)zbx_hashset_search(items_index, &item_index_local)))
 			{
-				if (NULL != (item = lld_item_make(item_prototype, item_index_local.lld_row,
-						lld_macro_paths, error)))
-				{
-					/* add the created item to items vector and update index */
-					zbx_vector_ptr_append(items, item);
-					item_index_local.item = item;
-					zbx_hashset_insert(items_index, &item_index_local, sizeof(item_index_local));
-				}
+				item = lld_item_make(item_prototype, item_index_local.lld_row, lld_macro_paths, error);
+
+				/* add the created item to items vector and update index */
+				zbx_vector_ptr_append(items, item);
+				item_index_local.item = item;
+				zbx_hashset_insert(items_index, &item_index_local, sizeof(item_index_local));
 			}
 			else
 				lld_item_update(item_prototype, item_index_local.lld_row, lld_macro_paths, item_index->item, error);

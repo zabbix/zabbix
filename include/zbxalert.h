@@ -20,7 +20,6 @@
 #ifndef ZABBIX_ZBXALERT_H
 #define ZABBIX_ZBXALERT_H
 
-#include "common.h"
 #include "db.h"
 #include "zbxipcservice.h"
 

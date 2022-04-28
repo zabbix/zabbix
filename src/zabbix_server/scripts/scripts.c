@@ -17,7 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "scripts.h"
+
 #include "../poller/checks_agent.h"
 #include "../ipmi/ipmi.h"
 #include "../poller/checks_ssh.h"
@@ -27,10 +28,7 @@
 #include "db.h"
 #include "log.h"
 #include "zbxtasks.h"
-#include "zbxjson.h"
 #include "zbxembed.h"
-
-#include "scripts.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_IPMIPOLLER_FORKS;
@@ -460,8 +458,11 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const ch
 					break;
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 				case ZBX_SCRIPT_EXECUTE_ON_PROXY:
-					ret = zbx_execute(script->command, result, error, max_error_len,
-							CONFIG_TRAPPER_TIMEOUT, ZBX_EXIT_CODE_CHECKS_ENABLED, NULL);
+					if (SUCCEED != (ret = zbx_execute(script->command, result, error, max_error_len,
+							CONFIG_TRAPPER_TIMEOUT, ZBX_EXIT_CODE_CHECKS_ENABLED, NULL)))
+					{
+						ret = FAIL;
+					}
 					break;
 				default:
 					zbx_snprintf(error, max_error_len, "Invalid 'Execute on' option \"%d\".",

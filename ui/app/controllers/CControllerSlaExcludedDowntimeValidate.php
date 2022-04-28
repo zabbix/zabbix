@@ -21,16 +21,6 @@
 
 class CControllerSlaExcludedDowntimeValidate extends CController {
 
-	/**
-	 * @var int
-	 */
-	private $period_from;
-
-	/**
-	 * @var int
-	 */
-	private $period_to;
-
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
@@ -42,63 +32,13 @@ class CControllerSlaExcludedDowntimeValidate extends CController {
 		$fields = [
 			'row_index' =>			'required|int32',
 			'name' =>				'required|db sla.name|not_empty',
-			'start_time' =>			'required|string|not_empty',
+			'start_time' =>			'required|abs_time',
 			'duration_days' =>		'required|ge 0',
 			'duration_hours' =>		'required|in '.implode(',', range(0, 23)),
 			'duration_minutes' =>	'required|in '.implode(',', range(0, 59))
 		];
 
 		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			$datetime_from = DateTime::createFromFormat('!'.DATE_TIME_FORMAT, $this->getInput('start_time'));
-			$last_errors = DateTime::getLastErrors();
-
-			if ($datetime_from === false || $last_errors['warning_count'] > 0 || $last_errors['error_count'] > 0) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', 'start_time', _('a time is expected')));
-				$ret = false;
-			}
-
-			$this->period_from = $datetime_from->getTimestamp();
-
-			if ($this->period_from < 0 || $this->period_from > ZBX_MAX_DATE) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', 'start_time',
-					_s('a time not later than %1$s is expected', zbx_date2str(DATE_TIME_FORMAT, ZBX_MAX_DATE))
-				));
-
-				$ret = false;
-			}
-
-			if ($ret) {
-				$duration_days = $this->getInput('duration_days');
-				$duration_hours = $this->getInput('duration_hours');
-				$duration_minutes = $this->getInput('duration_minutes');
-
-				try {
-					$duration = new DateInterval("P{$duration_days}DT{$duration_hours}H{$duration_minutes}M");
-
-					$datetime_to = clone $datetime_from;
-					$datetime_to->add($duration);
-
-					$this->period_to = $datetime_to->getTimestamp();
-
-					if ($this->period_to <= $this->period_from || $this->period_to > ZBX_MAX_DATE) {
-						error(_s('Incorrect value for field "%1$s": %2$s.', 'duration',
-							_s('a time not later than %1$s is expected', zbx_date2str(DATE_TIME_FORMAT, ZBX_MAX_DATE))
-						));
-
-						$ret = false;
-					}
-				}
-				catch (Exception $e) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', 'duration',
-						_s('a time not later than %1$s is expected', zbx_date2str(DATE_TIME_FORMAT, ZBX_MAX_DATE))
-					));
-
-					$ret = false;
-				}
-			}
-		}
 
 		if (!$ret) {
 			$this->setResponse(
@@ -119,14 +59,30 @@ class CControllerSlaExcludedDowntimeValidate extends CController {
 	 * @throws Exception
 	 */
 	protected function doAction(): void {
+		$parser = new CAbsoluteTimeParser();
+		$parser->parse($this->getInput('start_time'));
+		$datetime_from = $parser->getDateTime(true);
+
+		$duration_days = $this->getInput('duration_days');
+		$duration_hours = $this->getInput('duration_hours');
+		$duration_minutes = $this->getInput('duration_minutes');
+
+		$duration = new DateInterval("P{$duration_days}DT{$duration_hours}H{$duration_minutes}M");
+
+		$datetime_to = clone $datetime_from;
+		$datetime_to->add($duration);
+
+		$period_from = $datetime_from->getTimestamp();
+		$period_to = $datetime_to->getTimestamp();
+
 		$data = [
 			'body' => [
 				'row_index' => $this->getInput('row_index'),
 				'name' => $this->getInput('name'),
-				'period_from' => $this->period_from,
-				'period_to' => $this->period_to,
-				'start_time' => zbx_date2str(DATE_TIME_FORMAT, $this->period_from),
-				'duration' => convertUnitsS($this->period_to - $this->period_from, true)
+				'period_from' => $period_from,
+				'period_to' => $period_to,
+				'start_time' => zbx_date2str(DATE_TIME_FORMAT, $period_from),
+				'duration' => convertUnitsS($period_to - $period_from, true)
 			]
 		];
 

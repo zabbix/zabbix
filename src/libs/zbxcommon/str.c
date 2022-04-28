@@ -1427,6 +1427,8 @@ const char	*zbx_interface_type_string(zbx_interface_type_t type)
 			return "IPMI";
 		case INTERFACE_TYPE_JMX:
 			return "JMX";
+		case INTERFACE_TYPE_OPT:
+			return "optional";
 		case INTERFACE_TYPE_ANY:
 			return "any";
 		case INTERFACE_TYPE_UNKNOWN:
@@ -1468,6 +1470,10 @@ const char	*zbx_result_string(int result)
 			return "AGENT_ERROR";
 		case GATEWAY_ERROR:
 			return "GATEWAY_ERROR";
+		case SIG_ERROR:
+			return "SIG_ERROR";
+		case SYSINFO_RET_FAIL:
+			return "SYSINFO_RET_FAIL";
 		default:
 			return "unknown";
 	}
@@ -1646,6 +1652,16 @@ const char	*zbx_event_value_string(unsigned char source, unsigned char object, u
 }
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
+/******************************************************************************
+ *                                                                            *
+ * Parameters: encoding - [IN] non-empty string, code page identifier         *
+ *                        (as in libiconv or Windows SDK docs)                *
+ *             codepage - [OUT] code page number                              *
+ *                                                                            *
+ * Return value: SUCCEED on success                                           *
+ *               FAIL on failure                                              *
+ *                                                                            *
+ ******************************************************************************/
 static int	get_codepage(const char *encoding, unsigned int *codepage)
 {
 	typedef struct
@@ -1693,12 +1709,6 @@ static int	get_codepage(const char *encoding, unsigned int *codepage)
 			{57002, "X-ISCII-DE"}, {57003, "X-ISCII-BE"}, {57004, "X-ISCII-TA"}, {57005, "X-ISCII-TE"},
 			{57006, "X-ISCII-AS"}, {57007, "X-ISCII-OR"}, {57008, "X-ISCII-KA"}, {57009, "X-ISCII-MA"},
 			{57010, "X-ISCII-GU"}, {57011, "X-ISCII-PA"}, {65000, "UTF-7"}, {65001, "UTF-8"}, {0, NULL}};
-
-	if ('\0' == *encoding)
-	{
-		*codepage = 0;	/* ANSI */
-		return SUCCEED;
-	}
 
 	/* by name */
 	for (i = 0; 0 != cp[i].codepage || NULL != cp[i].name; i++)

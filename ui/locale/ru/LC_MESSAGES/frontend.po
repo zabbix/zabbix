@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-03-02 20:59+0000\n"
+"PO-Revision-Date: 2022-03-25 14:16+0000\n"
 "Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -890,7 +890,7 @@ msgstr "Добавить узел сети"
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
-msgstr ""
+msgstr "Добавить колонку элементов данных"
 
 #: app/partials/massupdate.macros.tab.php:95
 #: app/partials/massupdate.valuemaps.tab.php:37
@@ -1113,7 +1113,7 @@ msgstr "Все панели"
 
 #: app/views/monitoring.charts.view.php:82
 msgid "All graphs"
-msgstr ""
+msgstr "Все графики"
 
 #: app/partials/administration.usergroup.grouprights.html.php:46
 #: app/views/administration.user.edit.php:425
@@ -1383,7 +1383,7 @@ msgstr "Должен существовать, по крайней мере, о�
 
 #: include/classes/api/services/CMaintenance.php:683
 msgid "At least one day of the week or day of the month must be specified."
-msgstr ""
+msgstr "Как минимум один день недели или один день месяца должен быть указан."
 
 #: include/classes/api/services/CMaintenance.php:382
 #: include/classes/api/services/CMaintenance.php:574
@@ -6492,6 +6492,10 @@ msgstr "Дата окончания"
 #: app/views/popup.itemtestedit.view.php:296
 msgid "End of line sequence"
 msgstr "Конец строки"
+
+#: include/locales.inc.php:33
+msgid "English (en_GB)"
+msgstr ""
 
 #: include/locales.inc.php:33
 msgid "English (en_US)"
@@ -17689,6 +17693,10 @@ msgstr "Этот месяц"
 msgid "This month so far"
 msgstr "В этом месяце"
 
+#: app/views/popup.tophosts.column.edit.php:172
+msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109
 msgid "This type of information may not match the key."
@@ -19858,7 +19866,7 @@ msgstr "Ширина"
 
 #: app/controllers/CControllerLatest.php:530
 msgid "With data"
-msgstr ""
+msgstr "C данными"
 
 #: include/views/configuration.maintenance.edit.php:104
 #: include/views/configuration.maintenance.list.php:111
@@ -19883,13 +19891,17 @@ msgstr "С именем проблемы"
 msgid "With problems"
 msgstr "С проблемами"
 
+#: app/views/popup.tophosts.column.edit.php:119
+msgid "With this setting only numeric items will be displayed in this column."
+msgstr ""
+
 #: include/forms.inc.php:346 include/forms.inc.php:566
 msgid "With triggers"
 msgstr "С триггерами"
 
 #: app/controllers/CControllerLatest.php:535
 msgid "Without data"
-msgstr ""
+msgstr "Без данных"
 
 #: app/views/monitoring.widget.problemhosts.view.php:32
 msgid "Without problems"
@@ -21616,7 +21628,7 @@ msgstr "нет данных"
 #: include/classes/api/services/CHostPrototype.php:1205
 #, c-format
 msgid "no default interface for \"%1$s\" type."
-msgstr ""
+msgstr "для типа \"%1$s\" нет интерфейса по умолчанию."
 
 #: include/classes/api/services/CEvent.php:773
 msgid "no permissions to acknowledge problems"

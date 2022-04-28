@@ -40,3 +40,13 @@ void	zbx_audit_settings_create_entry(int audit_action, zbx_uint64_t configid)
 		zbx_hashset_insert(zbx_get_audit_hashset(), &new_entry, sizeof(new_entry));
 	}
 }
+
+void	zbx_audit_settings_update_field_int(zbx_uint64_t configid, const char *key, int old_value, int new_value)
+{
+	zbx_audit_entry_t	*entry;
+
+	RETURN_IF_AUDIT_OFF();
+
+	entry = zbx_audit_get_entry(configid, NULL, AUDIT_CONFIG_ID);
+	zbx_audit_entry_append_int(entry, AUDIT_ACTION_UPDATE, key, old_value, new_value);
+}

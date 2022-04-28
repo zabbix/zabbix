@@ -21,19 +21,19 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
- * Trait for filter related tests.
+ * Trait for tag related tests.
  */
-trait FilterTrait {
+trait TagTrait {
 
-	protected $filter_selector = 'id:filter-tags';
+	protected $tag_selector = 'id:filter-tags';
 
 	/**
-	 * Set custom selector for filter table.
+	 * Set custom selector for tag table.
 	 *
-	 * @param string $selector    filter table selector
+	 * @param string $selector    tag table selector
 	 */
-	public function setFilterSelector($selector) {
-		$this->filter_selector = $selector;
+	public function setTagSelector($selector) {
+		$this->tag_selector = $selector;
 	}
 
 	/**
@@ -42,7 +42,7 @@ trait FilterTrait {
 	 * @return CMultifieldTable
 	 */
 	protected function getTagTable() {
-		return $this->query($this->filter_selector)->asMultifieldTable([
+		return $this->query($this->tag_selector)->asMultifieldTable([
 			'mapping' => [
 				[
 					'name' => 'name',

@@ -57,7 +57,7 @@ class CWidgetFormSlaReport extends CWidgetForm
 		$this->fields[$field_show_periods->getName()] = $field_show_periods;
 
 		// Date from.
-		$field_date_from = new CWidgetFieldDatePicker('date_from', _('From'), [DATE_FORMAT], true);
+		$field_date_from = new CWidgetFieldDatePicker('date_from', _('From'), true);
 
 		if (array_key_exists('date_from', $this->data)) {
 			$field_date_from->setValue($this->data['date_from']);
@@ -66,7 +66,7 @@ class CWidgetFormSlaReport extends CWidgetForm
 		$this->fields[$field_date_from->getName()] = $field_date_from;
 
 		// Date to.
-		$field_date_to = new CWidgetFieldDatePicker('date_to', _('To'), [DATE_FORMAT], true);
+		$field_date_to = new CWidgetFieldDatePicker('date_to', _('To'), true);
 
 		if (array_key_exists('date_to', $this->data)) {
 			$field_date_to->setValue($this->data['date_to']);

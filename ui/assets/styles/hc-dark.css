@@ -668,6 +668,11 @@ footer {
     grid-column-start: 4 !important; }
   .form-grid .form-field table {
     width: 100%; }
+  .form-grid .form-field th {
+    padding: 0 5px 0 0;
+    color: #cacaca; }
+    .form-grid .form-field th:last-child {
+      padding: 0; }
   .form-grid .form-field td {
     padding: 0 5px 5px 0; }
   .form-grid .form-field .list-check-radio {
@@ -6333,7 +6338,7 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
     /* Special styling for WebKit/Blink */ }
     .range-control input[type=range]:focus {
       outline: none; }
-    .range-control input[type=range]::-webkit-slider-thumb {
+    .range-control input[type=range]::-webkit-slider-thumb, .range-control input[type=range]::-moz-range-thumb {
       margin-top: 1px;
       /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
       height: 10px;
@@ -6918,6 +6923,11 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   margin-top: 5px;
   height: 30px;
   width: 30px; }
+
+.leaflet-marker-icon:focus {
+  box-shadow: 0 0 0 2px #ffffff;
+  border-radius: 2px;
+  outline: none; }
 
 .marker-cluster span {
   line-height: 30px; }

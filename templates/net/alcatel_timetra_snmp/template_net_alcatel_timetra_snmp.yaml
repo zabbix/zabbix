@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T13:49:11Z'
+  date: '2022-04-14T09:48:29Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -177,7 +177,8 @@ zabbix_export:
             -
               uuid: 4167b064eb19478da13531f629082ef1
               expression: 'min(/Alcatel Timetra TiMOS SNMP/system.cpu.util[sgiCpuUsage.0],5m)>{$CPU.UTIL.CRIT}'
-              name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -285,7 +286,8 @@ zabbix_export:
             -
               uuid: 5f11cacfd4a94cf696897b3f3fa80601
               expression: 'last(/Alcatel Timetra TiMOS SNMP/system.name,#1)<>last(/Alcatel Timetra TiMOS SNMP/system.name,#2) and length(last(/Alcatel Timetra TiMOS SNMP/system.name))>0'
-              name: 'System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -354,7 +356,7 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 -
-                  name: 'System name has changed (new name: {ITEM.VALUE})'
+                  name: 'System name has changed'
                   expression: 'last(/Alcatel Timetra TiMOS SNMP/system.name,#1)<>last(/Alcatel Timetra TiMOS SNMP/system.name,#2) and length(last(/Alcatel Timetra TiMOS SNMP/system.name))>0'
               tags:
                 -
@@ -386,9 +388,10 @@ zabbix_export:
             -
               uuid: 3b6324116e5940b5aaea72adca4dbbf6
               expression: 'last(/Alcatel Timetra TiMOS SNMP/system.uptime[sysUpTime.0])<10m'
-              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -426,7 +429,7 @@ zabbix_export:
           history: 7d
           units: B
           params: 'last(//vm.memory.available[sgiKbMemoryAvailable.0])+last(//vm.memory.used[sgiKbMemoryUsed.0])'
-          description: 'Total memory in Bytes'
+          description: 'Total memory in Bytes.'
           tags:
             -
               tag: component
@@ -460,7 +463,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: 'last(//vm.memory.used[sgiKbMemoryUsed.0])/(last(//vm.memory.available[sgiKbMemoryAvailable.0])+last(//vm.memory.used[sgiKbMemoryUsed.0]))*100'
-          description: 'Memory utilization in %'
+          description: 'Memory utilization in %.'
           tags:
             -
               tag: component
@@ -469,7 +472,8 @@ zabbix_export:
             -
               uuid: a22f13e245b944e991c2c9850a731a3c
               expression: 'min(/Alcatel Timetra TiMOS SNMP/vm.memory.util[vm.memory.util.0],5m)>{$MEMORY.UTIL.MAX}'
-              name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               tags:
@@ -556,7 +560,8 @@ zabbix_export:
                 -
                   uuid: ccdcfdbe1a6243949857c764aed9c9ea
                   expression: 'last(/Alcatel Timetra TiMOS SNMP/system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}],#1)<>last(/Alcatel Timetra TiMOS SNMP/system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}],#2) and length(last(/Alcatel Timetra TiMOS SNMP/system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}]))>0'
-                  name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
+                  name: '{#ENT_NAME}: Device has been replaced'
+                  event_name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
@@ -945,7 +950,7 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 The type of interface.
-                Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),
+                Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),
                 through updating the syntax of the IANAifType textual convention.
               valuemap:
                 name: 'IF-MIB::ifType'
@@ -1007,7 +1012,8 @@ zabbix_export:
               recovery_expression: |
                 avg(/Alcatel Timetra TiMOS SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Alcatel Timetra TiMOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
                 avg(/Alcatel Timetra TiMOS SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Alcatel Timetra TiMOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
-              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -1030,7 +1036,8 @@ zabbix_export:
               recovery_expression: |
                 max(/Alcatel Timetra TiMOS SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and max(/Alcatel Timetra TiMOS SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
@@ -1303,10 +1310,11 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 8f478386378349e7a4e4586c5ba74c78
-                  expression: 'avg(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
+                  expression: 'avg(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
-                  name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                  recovery_expression: 'max(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+                  name: '{#SNMPVALUE}: Temperature is above critical threshold'
+                  event_name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1319,18 +1327,19 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 90ba726922f74d1d971b3f07781fc035
-                  expression: 'avg(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
+                  expression: 'avg(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
-                  name: '{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
+                  recovery_expression: 'max(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
+                  name: '{#SNMPVALUE}: Temperature is above warning threshold'
+                  event_name: '{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                   dependencies:
                     -
-                      name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
-                      expression: 'avg(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
-                      recovery_expression: 'max(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+                      name: '{#SNMPVALUE}: Temperature is above critical threshold'
+                      expression: 'avg(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
+                      recovery_expression: 'max(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
                   tags:
                     -
                       tag: scope
@@ -1340,10 +1349,11 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 6035fc6733614ae1b4ed22c7d73466b0
-                  expression: 'avg(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
+                  expression: 'avg(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
-                  name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
+                  recovery_expression: 'min(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}+3'
+                  name: '{#SNMPVALUE}: Temperature is too low'
+                  event_name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:

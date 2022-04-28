@@ -267,10 +267,15 @@ sub process_field
 	my $fk_flags = "";
 
 	($name, $type, $default, $null, $flags, $relN, $fk_table, $fk_field, $fk_flags) = split(/\|/, $line, 9);
-	my ($type_short, $length) = split(/\(/, $type, 2);
 
 	if ($output{"type"} eq "code")
 	{
+		if ($table_name eq "triggers" && $name eq "description" && $type eq "t_shorttext") {
+			$type = "t_varchar(255)";
+		}
+
+		my ($type_short, $length) = split(/\(/, $type, 2);
+
 		$type = $output{$type_short};
 		if ($type eq "ZBX_TYPE_CHAR")
 		{
@@ -367,6 +372,7 @@ sub process_field
 	}
 	else
 	{
+		my ($type_short, $length) = split(/\(/, $type, 2);
 		my @text_fields;
 		$a = $output{$type_short};
 		$_ = $type;

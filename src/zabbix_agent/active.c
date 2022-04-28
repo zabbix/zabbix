@@ -17,10 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "zbxconf.h"
+#include "active.h"
 
-#include "cfg.h"
+#include "zbxconf.h"
 #include "log.h"
 #include "sysinfo.h"
 #include "logfiles/logfiles.h"
@@ -28,10 +27,7 @@
 #include "threads.h"
 #include "zbxjson.h"
 #include "alias.h"
-#include "metrics.h"
 #include "zbxregexp.h"
-
-#include "active.h"
 
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
@@ -1462,7 +1458,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	zbx_free(session_token);
 
 #ifdef _WINDOWS
-	zbx_addr_free(&activechk_args.addrs);
+	zbx_vector_ptr_clear_ext(&activechk_args.addrs, (zbx_clean_func_t)zbx_addr_free);
+	zbx_vector_ptr_destroy(&activechk_args.addrs);
 	free_active_metrics();
 
 	ZBX_DO_EXIT();

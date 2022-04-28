@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/common/testFormFilter.php';
+require_once dirname(__FILE__).'/../common/testFormFilter.php';
 
 /**
  * @backup profiles
@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/common/testFormFilter.php';
 class testFormFilterHosts extends testFormFilter {
 
 	public $url = 'zabbix.php?action=host.view';
+	public $table_selector = 'class:list-table';
 
 	public static function getCheckCreatedFilterData() {
 		return [
@@ -105,7 +106,7 @@ class testFormFilterHosts extends testFormFilter {
 						'Host groups' => ['Group to check Overview']
 					],
 					'filter' => [
-						'Name' => 'кирилица'
+						'Name' => 'кириллица'
 					],
 					'tab_id' => '4'
 				]
@@ -138,28 +139,28 @@ class testFormFilterHosts extends testFormFilter {
 	 * @dataProvider getCheckCreatedFilterData
 	 */
 	public function testFormFilterHosts_CheckCreatedFilter($data) {
-		$this->createFilter($data, 'filter-create');
-		$this->checkFilters($data);
+		$this->createFilter($data, 'filter-create', 'zabbix');
+		$this->checkFilters($data, $this->table_selector);
 	}
 
 	/**
 	 * Delete created filter.
 	 */
 	public function testFormFilterHosts_Delete() {
-		$this->deleteFilter('filter-delete');
+		$this->deleteFilter('filter-delete', 'zabbix');
 	}
 
 	/**
 	 * Updating filter form.
 	 */
 	public function testFormFilterHosts_UpdateForm() {
-		$this->updateFilterForm('filter-update');
+		$this->updateFilterForm('filter-update', 'zabbix', $this->table_selector);
 	}
 
 	/**
 	 * Updating saved filter properties.
 	 */
 	public function testFormFilterHosts_UpdateProperties() {
-		$this->updateFilterProperties('filter-update');
+		$this->updateFilterProperties('filter-update', 'zabbix');
 	}
 }

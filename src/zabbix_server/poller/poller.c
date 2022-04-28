@@ -17,17 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "poller.h"
 
-#include "db.h"
-#include "dbcache.h"
 #include "daemon.h"
 #include "zbxserver.h"
 #include "zbxself.h"
 #include "preproc.h"
 #include "zbxrtc.h"
-
-#include "poller.h"
 
 #include "checks_agent.h"
 #include "checks_external.h"
@@ -838,6 +834,9 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				break;
 			case CONFIG_ERROR:
 				/* nothing to do */
+				break;
+			case SIG_ERROR:
+				/* nothing to do, execution was forcibly interrupted by signal */
 				break;
 			default:
 				zbx_error("unknown response code returned: %d", errcodes[i]);
