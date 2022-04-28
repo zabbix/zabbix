@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-25T14:06:28Z'
+  date: '2022-04-28T14:19:08Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -12,8 +12,9 @@ zabbix_export:
       name: 'Envoy Proxy by HTTP'
       description: |
         Get Envoy Proxy metrics by HTTP agent from metrics endpoint.
+        https://www.envoyproxy.io/docs/envoy/v1.20.0/operations/stats_overview
         
-        Don't forget change macros {$ENVOY.API.URL}.
+        Don't forget change macros {$ENVOY.API.URL}, {$ENVOY.METRICS.PATH}.
         Some metrics may not be collected depending on your Envoy Proxy instance version and configuration.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
@@ -282,6 +283,11 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Get server metrics.'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
           url: '{$ENVOY.URL}{$ENVOY.METRICS.PATH}'
           tags:
             -
@@ -737,6 +743,7 @@ zabbix_export:
                 - envoy_server_uptime
                 - value
                 - ''
+              error_handler: DISCARD_VALUE
           master_item:
             key: envoy.get_metrics
           tags:

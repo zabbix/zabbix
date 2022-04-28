@@ -8,7 +8,7 @@ The template to monitor Envoy Proxy by Zabbix that works without any external sc
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
 
-Template `Envoy Proxy by HTTP` — collects metrics by HTTP agent from /v1/agent/metrics endpoint.
+Template `Envoy Proxy by HTTP` — collects metrics by HTTP agent from  metrics endoiint {$ENVOY.METRICS.PATH} endpoint (default: /stats/prometheus).
 
 
 
@@ -20,8 +20,9 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
-Internal service metrics are collected from {$ENVOY.METRICS.PATH} endpoint.
-Template need to use Authorization via API token.
+Internal service metrics are collected from {$ENVOY.METRICS.PATH} endpoint (default: /stats/prometheus).
+https://www.envoyproxy.io/docs/envoy/v1.20.0/operations/stats_overview
+
 
 Don't forget change macros {$ENVOY.API.URL}, {$ENVOY.METRICS.PATH}.
 Also, see the Macros section for a list of macros used to set trigger values.  
@@ -58,7 +59,7 @@ There are no template links in this template.
 |-----|----|-----------|----|---------------------|
 |Envoy Proxy |Envoy Proxy: Server state |<p>State of the server.</p><p>Live - (default) ⁣Server is live and serving traffic.</p><p>Draining - ⁣Server is draining listeners in response to external health checks failing.</p><p>Pre initializing - ⁣Server has not yet completed cluster manager initialization.</p><p>Initializing - Server is running the cluster manager initialization callbacks (e.g., RDS).</p> |DEPENDENT |envoy.server.state<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `envoy_server_state`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Envoy Proxy |Envoy Proxy: Server live |<p>1 if the server is not currently draining, 0 otherwise.</p> |DEPENDENT |envoy.server.live<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `envoy_server_live`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Envoy Proxy |Envoy Proxy: Uptime |<p>Current server uptime in seconds.</p> |DEPENDENT |envoy.server.uptime<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `envoy_server_uptime`</p> |
+|Envoy Proxy |Envoy Proxy: Uptime |<p>Current server uptime in seconds.</p> |DEPENDENT |envoy.server.uptime<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `envoy_server_uptime`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Envoy Proxy |Envoy Proxy: Certificate expiration, day before |<p>Number of days until the next certificate being managed will expire.</p> |DEPENDENT |envoy.server.days_until_first_cert_expiring<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `envoy_server_days_until_first_cert_expiring`</p> |
 |Envoy Proxy |Envoy Proxy: Server concurrency |<p>Number of worker threads.</p> |DEPENDENT |envoy.server.concurrency<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `envoy_server_concurrency`</p> |
 |Envoy Proxy |Envoy Proxy: Memory allocated |<p>Current amount of allocated memory in bytes. Total of both new and old Envoy processes on hot restart.</p> |DEPENDENT |envoy.server.memory_allocated<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `envoy_server_memory_allocated`</p> |
@@ -111,7 +112,7 @@ There are no template links in this template.
 |Envoy Proxy |Envoy Proxy: HTTP ["{#CONN_MANAGER}"]: Connections, active |<p>Total active connections.</p> |DEPENDENT |envoy.http.downstream_cx_active["{#CONN_MANAGER}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `envoy_http_downstream_cx_active{envoy_http_conn_manager_prefix = "{#CONN_MANAGER}"}`: `function`: `sum`</p> |
 |Envoy Proxy |Envoy Proxy: HTTP ["{#CONN_MANAGER}"]: Bytes in, rate |<p>Total bytes received per second.</p> |DEPENDENT |envoy.http.downstream_cx_rx_bytes_total.rate["{#CONN_MANAGER}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `envoy_http_downstream_cx_rx_bytes_total{envoy_http_conn_manager_prefix = "{#CONN_MANAGER}"}`: `function`: `sum`</p><p>- CHANGE_PER_SECOND</p> |
 |Envoy Proxy |Envoy Proxy: HTTP ["{#CONN_MANAGER}"]: Bytes out, rate |<p>Total bytes sent per second.</p> |DEPENDENT |envoy.http.downstream_cx_tx_bytes_tota.rate["{#CONN_MANAGER}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `envoy_http_downstream_cx_tx_bytes_total{envoy_http_conn_manager_prefix = "{#CONN_MANAGER}"}`: `function`: `sum`</p><p>- CHANGE_PER_SECOND</p> |
-|Zabbix raw items |Envoy Proxy: Get node metrics |<p>Get server metrics.</p> |HTTP_AGENT |envoy.get_metrics |
+|Zabbix raw items |Envoy Proxy: Get node metrics |<p>Get server metrics.</p> |HTTP_AGENT |envoy.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 
 ## Triggers
 
