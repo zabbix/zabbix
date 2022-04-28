@@ -741,6 +741,9 @@ int	zbx_eval_calc_max(zbx_vector_dbl_t *values, double *result, char **error)
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
+ * Return value: SUCCEED - evaluated successfully                             *
+ *               FAIL - failed to evaluate function (see 'error')             *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_eval_calc_sum(zbx_vector_dbl_t *values, double *result, char **error)
 {
