@@ -228,16 +228,11 @@ typedef struct
 {
 	char			*id;
 	char			*parentid;
-#define ZBX_VMWARE_RESOURCE_TYPE_RESOURCEPOOL	1
-#define ZBX_VMWARE_RESOURCE_TYPE_CLUSTER	2
-#define ZBX_VMWARE_RESOURCE_TYPE_COMPUTE	3
-	int			parenttype;
 	char			*path;
-	char			*name;
 }
 zbx_vmware_resourcepool_t;
 
-int	vmware_resourcepool_id_search(const void *rp, const void *id);
+int	vmware_resourcepool_compare(const void *r1, const void *r2);
 ZBX_PTR_VECTOR_DECL(vmware_resourcepool, zbx_vmware_resourcepool_t *)
 
 /* the vmware eventlog state */
@@ -422,6 +417,7 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_SOAP_DS		"Datastore"
 #define ZBX_VMWARE_SOAP_HV		"HostSystem"
 #define ZBX_VMWARE_SOAP_VM		"VirtualMachine"
+#define ZBX_VMWARE_SOAP_RESOURCEPOOL	"ResourcePool"
 
 /* Indicates the unit of measure represented by a counter or statistical value */
 #define ZBX_VMWARE_UNIT_UNDEFINED		0
