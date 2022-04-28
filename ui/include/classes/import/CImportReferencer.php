@@ -50,7 +50,6 @@ class CImportReferencer {
 	protected $httptests = [];
 	protected $httpsteps = [];
 
-	protected $db_groups;
 	protected $db_template_groups;
 	protected $db_host_groups;
 	protected $db_templates;
