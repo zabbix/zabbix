@@ -87,16 +87,8 @@ class CControllerHousekeepingUpdate extends CController {
 			CHousekeepingHelper::HK_HISTORY_MODE => $this->getInput('hk_history_mode', 0),
 			CHousekeepingHelper::HK_HISTORY_GLOBAL => $this->getInput('hk_history_global', 0),
 			CHousekeepingHelper::HK_TRENDS_MODE => $this->getInput('hk_trends_mode', 0),
-			CHousekeepingHelper::HK_TRENDS_GLOBAL => $this->getInput('hk_trends_global', 0),
-			CHousekeepingHelper::COMPRESSION_STATUS => $this->getInput('compression_status', 0),
-			CHousekeepingHelper::COMPRESS_OLDER => $this->getInput('compress_older', DB::getDefault('config',
-				'compress_older'
-			))
+			CHousekeepingHelper::HK_TRENDS_GLOBAL => $this->getInput('hk_trends_global', 0)
 		];
-
-		if ($hk[CHousekeepingHelper::COMPRESSION_STATUS] === 0) {
-			unset($hk[CHousekeepingHelper::COMPRESS_OLDER]);
-		}
 
 		if ($hk[CHousekeepingHelper::HK_EVENTS_MODE] == 1) {
 			$this->getInputs($hk, [CHousekeepingHelper::HK_EVENTS_TRIGGER, CHousekeepingHelper::HK_EVENTS_SERVICE,
@@ -119,6 +111,24 @@ class CControllerHousekeepingUpdate extends CController {
 
 		if ($hk[CHousekeepingHelper::HK_TRENDS_GLOBAL] == 1) {
 			$hk[CHousekeepingHelper::HK_TRENDS] = $this->getInput('hk_trends');
+		}
+
+		if (CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION) === ZBX_DB_EXTENSION_TIMESCALEDB) {
+			foreach (json_decode(CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS), true) as $dbversion) {
+				if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB
+						&& array_key_exists('compression_availability', $dbversion)
+						&& $dbversion['compression_availability']) {
+					$hk[CHousekeepingHelper::COMPRESSION_STATUS] = $this->getInput('compression_status', 0);
+
+					if ($hk[CHousekeepingHelper::COMPRESSION_STATUS] == 1) {
+						$hk[CHousekeepingHelper::COMPRESS_OLDER] = $this->getInput('compress_older',
+							DB::getDefault('config', 'compress_older')
+						);
+					}
+
+					break;
+				}
+			}
 		}
 
 		$result = API::Housekeeping()->update($hk);

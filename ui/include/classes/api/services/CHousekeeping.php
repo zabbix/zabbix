@@ -86,7 +86,7 @@ class CHousekeeping extends CApiService {
 			);
 		}
 
-		$db_hk = $this->validateUpdate($hk);
+		$this->validateUpdate($hk, $db_hk);
 
 		$upd_config = DB::getUpdatedValues('config', $hk, $db_hk);
 
@@ -105,43 +105,70 @@ class CHousekeeping extends CApiService {
 	}
 
 	/**
-	 * @param array $hk
+	 * @param array      $hk
+	 * @param array|null $db_hk
 	 *
 	 * @throws APIException if the input is invalid.
-	 *
-	 * @return array
 	 */
-	protected function validateUpdate(array $hk): array {
+	private function validateUpdate(array &$hk, ?array &$db_hk): void {
+		$output_fields = $this->output_fields;
+		$output_fields[] = 'configid';
+		$output_fields[] = 'dbversion_status';
+
+		$db_hk = DB::select('config', ['output' => $output_fields])[0];
+		$hk['compression_availability'] = 0;
+
+		if ($db_hk['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
+			foreach (json_decode($db_hk['dbversion_status'], true) as $dbversion) {
+				if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB
+						&& array_key_exists('compression_availability', $dbversion)) {
+					$hk['compression_availability'] = (int) $dbversion['compression_availability'];
+					break;
+				}
+			}
+		}
+		unset($db_hk['db_extension'], $db_hk['dbversion_status']);
+
+		if ($hk['compression_availability'] == 1) {
+			$hk += array_intersect_key($db_hk, array_flip(['compression_status']));
+		}
+
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-			'hk_events_mode' =>			['type' => API_INT32, 'in' => '0,1'],
-			'hk_events_trigger' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
-			'hk_events_service' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
-			'hk_events_internal' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
-			'hk_events_discovery' =>	['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
-			'hk_events_autoreg' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
-			'hk_services_mode' =>		['type' => API_INT32, 'in' => '0,1'],
-			'hk_services' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
-			'hk_audit_mode' =>			['type' => API_INT32, 'in' => '0,1'],
-			'hk_audit' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
-			'hk_sessions_mode' =>		['type' => API_INT32, 'in' => '0,1'],
-			'hk_sessions' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
-			'hk_history_mode' =>		['type' => API_INT32, 'in' => '0,1'],
-			'hk_history_global' =>		['type' => API_INT32, 'in' => '0,1'],
-			'hk_history' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR])],
-			'hk_trends_mode' =>			['type' => API_INT32, 'in' => '0,1'],
-			'hk_trends_global' =>		['type' => API_INT32, 'in' => '0,1'],
-			'hk_trends' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,'.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
-			'compression_status' =>		['type' => API_INT32, 'in' => '0,1'],
-			'compress_older' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [7 * SEC_PER_DAY, 25 * SEC_PER_YEAR])]
+			'hk_events_mode' =>				['type' => API_INT32, 'in' => '0,1'],
+			'hk_events_trigger' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_events_service' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_events_internal' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_events_discovery' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_events_autoreg' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_services_mode' =>			['type' => API_INT32, 'in' => '0,1'],
+			'hk_services' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_audit_mode' =>				['type' => API_INT32, 'in' => '0,1'],
+			'hk_audit' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_sessions_mode' =>			['type' => API_INT32, 'in' => '0,1'],
+			'hk_sessions' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_history_mode' =>			['type' => API_INT32, 'in' => '0,1'],
+			'hk_history_global' =>			['type' => API_INT32, 'in' => '0,1'],
+			'hk_history' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR])],
+			'hk_trends_mode' =>				['type' => API_INT32, 'in' => '0,1'],
+			'hk_trends_global' =>			['type' => API_INT32, 'in' => '0,1'],
+			'hk_trends' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,'.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'compression_availability' =>	['type' => API_INT32],
+			'compression_status' =>			['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'compression_availability', 'in' => '1'], 'type' => API_INT32, 'in' => '0,1'],
+												['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'compress_older' =>				['type' => API_MULTIPLE, 'rules' => [
+												['if' => static function (array $data): bool {
+													return array_key_exists('compression_status', $data) && $data['compression_status'] == 1;
+												}, 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [7 * SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+												['else' => true, 'type' => API_UNEXPECTED]
+			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $hk, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$output_fields = array_diff($this->output_fields, ['db_extension']);
-		$output_fields[] = 'configid';
-
-		return DB::select('config', ['output' => $output_fields])[0];
+		unset($hk['compression_availability']);
 	}
 }

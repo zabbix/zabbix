@@ -102,6 +102,7 @@ class CControllerHousekeepingEdit extends CController {
 				CHousekeepingHelper::HK_TRENDS_GLOBAL
 			)),
 			'hk_trends' => $this->getInput('hk_trends', CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)),
+			'compression_availability' => 0,
 			'compression_status' => $this->getInput('compression_status', CHousekeepingHelper::get(
 				CHousekeepingHelper::COMPRESSION_STATUS
 			)),
@@ -110,6 +111,16 @@ class CControllerHousekeepingEdit extends CController {
 			)),
 			'db_extension' => CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION)
 		];
+
+		if ($data['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
+			foreach (json_decode(CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS), true) as $dbversion) {
+				if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB
+						&& array_key_exists('compression_availability', $dbversion)) {
+					$data['compression_availability'] = (int) $dbversion['compression_availability'];
+					break;
+				}
+			}
+		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of housekeeping'));

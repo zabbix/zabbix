@@ -153,13 +153,14 @@ $house_keeper_tab = (new CFormList())
 			->setAriaRequired()
 	);
 
-	if ($data['db_extension'] == ZBX_DB_EXTENSION_TIMESCALEDB) {
+	if ($data['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
 		$house_keeper_tab
 			->addRow((new CTag('h4', true, _('History and trends compression')))->addClass('input-section-header'))
 			->addRow(
 				new CLabel(_('Enable compression'), 'compression_status'),
 				(new CCheckBox('compression_status'))
 					->setChecked($data['compression_status'] == 1)
+					->setEnabled($data['compression_availability'] == 1)
 			)
 			->addRow(
 				(new CLabel(_('Compress records older than'), 'compress_older'))
