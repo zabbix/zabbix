@@ -23,8 +23,129 @@ require_once dirname(__FILE__).'/../common/testFormHost.php';
 
 /**
  * @backup hosts
+ *
+ * @onBefore createTemplate
  */
 class testFormHostDiscovered extends testFormHost {
+
+	protected static $host = 'Host prototype LLD';
+
+	public static function createTemplate() {
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr(self::$host));
+
+		// Create templates.
+		$templates = CDataHelper::createTemplates([
+			[
+				'host' => 'Template for link testing',
+				'groups' => [
+					'groupid' => 4
+				],
+				'tags' => [
+					[
+						'tag' => 'action',
+						'value' => 'simple'
+					],
+					[
+						'tag' => 'tag',
+						'value' => 'TEMPLATE'
+					],
+					[
+						'tag' => 'templateTag without value'
+					],
+					[
+						'tag' => 'common tag on template and element',
+						'value' => 'common value'
+					]
+				],
+				'items' => [
+					[
+						'name' => 'Template item',
+						'key_' => 'trap.template',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
+						'name' => 'Template item with tags',
+						'key_' => 'template.tags.clone',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'tags' => [
+							[
+								'tag' => 'a',
+								'value' => ':a'
+							],
+							[
+								'tag' => 'action',
+								'value' => 'fullclone'
+							],
+							[
+								'tag' => 'itemTag without value'
+							],
+							[
+								'tag' => 'common tag on template and element',
+								'value' => 'common value'
+							]
+						]
+					]
+				],
+				'discoveryrules' => [
+					[
+						'name' => 'Template trapper discovery',
+						'key_' => 'template_trap_discovery',
+						'type' => ITEM_TYPE_TRAPPER
+					]
+				]
+			],
+			[
+				'host' => '1 template with tags for link',
+				'groups' => [
+					'groupid' => 4
+				],
+				'tags' => [
+					[
+						'tag' => 'action',
+						'value' => 'clone'
+					],
+					[
+						'tag' => 'tag',
+						'value' => 'clone'
+					],
+					[
+						'tag' => 'tag'
+					]
+				]
+			],
+			[
+				'host' => '2 template with tags for link',
+				'groups' => [
+					'groupid' => 4
+				],
+				'tags' => [
+					[
+						'tag' => 'action',
+						'value' => 'update'
+					],
+					[
+						'tag' => 'tag without value'
+					],
+					[
+						'tag' => 'test',
+						'value' => 'update'
+					]
+				]
+			]
+		]);
+
+		foreach ($templates['templateids'] as $value) {
+			$templateids[] = $value;
+		}
+
+		// Link templates.
+		$template_link = CDataHelper::call('host.update',[
+			'hostid' => $hostid,
+			'templates' => $templateids
+		]);
+	}
 
 	public static function getState() {
 		return [
@@ -61,9 +182,8 @@ class testFormHostDiscovered extends testFormHost {
 		$this->standalone = $data['standalone'];
 		$this->link = $data['url'];
 		$this->monitoring = $data['monitoring'];
-		$host = 'Host prototype LLD';
-		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($host));
-		$form = $this->openForm(($this->standalone ? $this->link.$hostid : $this->link), $host);
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr(self::$host));
+		$form = $this->openForm(($this->standalone ? $this->link.$hostid : $this->link), self::$host);
 		$interfaces_form = ($form->getFieldContainer('Interfaces')->asHostInterfaceElement());
 		$this->assertEquals('Discovery rule 1',($form->getField('Discovered by')->gettext()));
 
@@ -108,7 +228,7 @@ class testFormHostDiscovered extends testFormHost {
 		$template_table = $form->query('id:linked-templates')->asTable()->one()->waitUntilVisible();
 
 		foreach (['Unlink', 'Unlink and clear'] as $button) {
-			$this->assertTrue($template_table->findRow('Name', 'Apache by Zabbix agent')->getColumn('Action')
+			$this->assertTrue($template_table->findRow('Name', 'Template for link testing')->getColumn('Action')
 					->query('button:'.$button)->one()->isClickable());
 		}
 
