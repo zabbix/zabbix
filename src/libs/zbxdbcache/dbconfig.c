@@ -6100,7 +6100,7 @@ out:
 
 	FINISH_SYNC;
 
-	if (ZBX_DBSYNC_INIT != mode)
+	if (ZBX_DBSYNC_INIT != mode && 0 != (update_flags & (ZBX_DBSYNC_UPDATE_HOSTS | ZBX_DBSYNC_UPDATE_MACROS)))
 	{
 		sec = zbx_time();
 		dc_reschedule_items();
