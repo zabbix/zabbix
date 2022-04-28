@@ -427,7 +427,7 @@ if (hasRequest('form')) {
 	// add parent host
 	$parentHost = API::Host()->get([
 		'output' => API_OUTPUT_EXTEND,
-		'selectGroups' => ['groupid', 'name'],
+		'selectHostGroups' => ['groupid', 'name'],
 		'selectInterfaces' => API_OUTPUT_EXTEND,
 		'hostids' => $discoveryRule['hostid'],
 		'templated_hosts' => true

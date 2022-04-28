@@ -203,7 +203,7 @@ else {
 		$options = [
 			'output' => ['hostid', 'name', 'status'],
 			'selectInventory' => ['name', 'type', 'os', 'serialno_a', 'tag', 'macaddress_a', $data['filter']['field']],
-			'selectGroups' => API_OUTPUT_EXTEND,
+			'selectHostGroups' => API_OUTPUT_EXTEND,
 			'groupids' => $filter_groupids,
 			'filter' => ['inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]]
 		];

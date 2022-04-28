@@ -141,7 +141,7 @@ class CControllerHostEdit extends CController {
 						'tls_subject', 'flags', 'inventory_mode'
 					],
 					'selectDiscoveryRule' => ['itemid', 'name', 'parent_hostid'],
-					'selectGroups' => ['groupid'],
+					'selectHostGroups' => ['groupid'],
 					'selectHostDiscovery' => ['parent_hostid'],
 					'selectInterfaces' => ['interfaceid', 'type', 'main', 'available', 'error', 'details', 'ip', 'dns',
 						'port', 'useip'

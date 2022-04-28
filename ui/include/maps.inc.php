@@ -565,13 +565,13 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 	if ($hostGroupIdToSelementIds) {
 		$hostsFromHostGroups = API::Host()->get([
 			'output' => ['name', 'status', 'maintenance_status'],
-			'selectGroups' => ['groupid'],
+			'selectHostGroups' => ['groupid'],
 			'groupids' => array_keys($hostGroupIdToSelementIds),
 			'preservekeys' => true
 		]);
 
 		foreach ($hostsFromHostGroups as $hostId => $host) {
-			foreach ($host['groups'] as $group) {
+			foreach ($host['hostgroups'] as $group) {
 				$groupId = $group['groupid'];
 
 				if (isset($hostGroupIdToSelementIds[$groupId])) {

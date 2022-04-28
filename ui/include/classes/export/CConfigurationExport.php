@@ -356,7 +356,7 @@ class CConfigurationExport {
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'selectInventory' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
-			'selectGroups' => ['groupid', 'name', 'uuid'],
+			'selectHostGroups' => ['groupid', 'name', 'uuid'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
 			'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
@@ -366,7 +366,7 @@ class CConfigurationExport {
 
 		foreach ($hosts as &$host) {
 			// merge host groups with all groups
-			$this->data['host_groups'] += zbx_toHash($host['groups'], 'groupid');
+			$this->data['host_groups'] += zbx_toHash($host['hostgroups'], 'groupid');
 
 			$host['discoveryRules'] = [];
 			$host['items'] = [];
