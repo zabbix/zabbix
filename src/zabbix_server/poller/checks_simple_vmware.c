@@ -2831,6 +2831,8 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 
 		for (i = 0; i < hv->vms.values_num; i++)
 		{
+			char	*rpool_path;
+
 			vm = (zbx_vmware_vm_t *)hv->vms.values[i];
 
 			if (NULL == (vm_name = vm->props[ZBX_VMWARE_VMPROP_NAME]))
@@ -2838,6 +2840,9 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 
 			if (NULL == (hv_name = hv->props[ZBX_VMWARE_HVPROP_NAME]))
 				continue;
+
+			rpool_path = zbx_vmware_get_vm_resourcepool_path(&service->data->resourcepools,
+					vm->props[ZBX_VMWARE_VMPROP_RESOURCEPOOL]);
 
 			zbx_json_addobject(&json_data, NULL);
 			zbx_json_addstring(&json_data, "{#VM.UUID}", vm->uuid, ZBX_JSON_TYPE_STRING);
@@ -2861,15 +2866,14 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#VM.FOLDER}",
 					ZBX_NULL2EMPTY_STR(vm->props[ZBX_VMWARE_VMPROP_FOLDER]), ZBX_JSON_TYPE_STRING);
-
+			zbx_json_addstring(&json_data, "{#VM.RPOOLPATH}", ZBX_NULL2EMPTY_STR(rpool_path),
+					ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&json_data);
 		}
 	}
 
 	zbx_json_close(&json_data);
-
 	SET_STR_RESULT(result, zbx_strdup(NULL, json_data.buffer));
-
 	zbx_json_free(&json_data);
 
 	ret = SYSINFO_RET_OK;
