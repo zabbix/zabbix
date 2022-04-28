@@ -146,7 +146,7 @@ static int	DBpatch_6010006(void)
 			{"host_rtdata", "hostid", 0,
 				{
 					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"available", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"active_available", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -172,7 +172,8 @@ static int	DBpatch_6010008(void)
 
 	zbx_db_insert_prepare(&insert, "host_rtdata", "hostid", "active_available", NULL);
 
-	result = DBselect("select hostid from hosts where status in (%i,%i)", HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
+	result = DBselect("select hostid from hosts where flags!=%i and status in (%i,%i)",
+			ZBX_FLAG_DISCOVERY_PROTOTYPE, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 
 	while (NULL != (row = DBfetch(result)))
 	{
