@@ -225,47 +225,30 @@ static void	process_confsync_diff(zbx_avail_active_hb_cache_t *cache, zbx_ipc_me
 
 	zbx_availability_deserialize_hostids(message->data, &hostids);
 
-	if (0 == hostids.values_num)
-		goto out;
-
 	for (i = 0; i < hostids.values_num; i++)
 	{
-		zbx_host_active_avail_t	*cached_host, *queued_host;
+		zbx_host_active_avail_t	*queued_host;
 		zbx_uint64_t		hostid;
 
 		hostid = hostids.values[i];
 
-		if (NULL != (cached_host = zbx_hashset_search(&cache->hosts, &hostid)))
+		zbx_hashset_remove(&cache->hosts, &hostid);
+
+		if (NULL != (queued_host = zbx_hashset_search(&cache->queue, &hostid)))
 		{
-			cached_host->active_status = INTERFACE_AVAILABLE_UNKNOWN;
-
-			if (NULL != (queued_host = zbx_hashset_search(&cache->queue, &hostid)))
-			{
-				queued_host->active_status = INTERFACE_AVAILABLE_UNKNOWN;
-			}
-			else
-				zbx_hashset_insert(&cache->queue, cached_host, sizeof(zbx_host_active_avail_t));
-
-			zbx_hashset_remove(&cache->hosts, &hostid);
+			queued_host->active_status = INTERFACE_AVAILABLE_UNKNOWN;
 		}
 		else
 		{
-			if (NULL != (queued_host = zbx_hashset_search(&cache->queue, &hostid)))
-			{
-				queued_host->active_status = INTERFACE_AVAILABLE_UNKNOWN;
-			}
-			else
-			{
-				zbx_host_active_avail_t	host_local;
+			zbx_host_active_avail_t	host_local;
 
-				host_local.active_status = INTERFACE_AVAILABLE_UNKNOWN;
-				host_local.hostid = hostid;
+			host_local.active_status = INTERFACE_AVAILABLE_UNKNOWN;
+			host_local.hostid = hostid;
 
-				zbx_hashset_insert(&cache->queue, &host_local, sizeof(zbx_host_active_avail_t));
-			}
+			zbx_hashset_insert(&cache->queue, &host_local, sizeof(zbx_host_active_avail_t));
 		}
 	}
-out:
+
 	zbx_vector_uint64_destroy(&hostids);
 }
 
