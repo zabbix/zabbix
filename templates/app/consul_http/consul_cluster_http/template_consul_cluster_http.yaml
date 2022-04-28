@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-27T08:27:03Z'
+  date: '2022-04-28T08:28:48Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -203,7 +203,7 @@ zabbix_export:
             -
               uuid: 8660702ae3674eb083d6dacb81ec3a4d
               expression: 'last(/HashiCorp Consul Cluster by HTTP/consul.nodes_critical)>0'
-              name: 'Consul: One or more node in cluster in ''critical'' state'
+              name: 'Consul: One or more nodes in cluster in ''critical'' state'
               priority: AVERAGE
               description: 'One or more agents on current dc with serf health status "critical".'
               tags:
@@ -283,7 +283,7 @@ zabbix_export:
             -
               uuid: 92136d6ee73b4bb5b88b9f1da1afe740
               expression: 'last(/HashiCorp Consul Cluster by HTTP/consul.nodes_warning)>0'
-              name: 'Consul: One or more node in cluster in ''warning'' state'
+              name: 'Consul: One or more nodes in cluster in ''warning'' state'
               priority: WARNING
               description: 'One or more agents on current dc with serf health status "warning".'
               tags:

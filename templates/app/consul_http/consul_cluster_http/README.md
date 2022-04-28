@@ -79,8 +79,8 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Consul: One or more node in cluster in 'critical' state |<p>One or more agents on current dc with serf health status "critical".</p> |`last(/HashiCorp Consul Cluster by HTTP/consul.nodes_critical)>0` |AVERAGE | |
-|Consul: One or more node in cluster in 'warning' state |<p>One or more agents on current dc with serf health status "warning".</p> |`last(/HashiCorp Consul Cluster by HTTP/consul.nodes_warning)>0` |WARNING | |
+|Consul: One or more nodes in cluster in 'critical' state |<p>One or more agents on current dc with serf health status "critical".</p> |`last(/HashiCorp Consul Cluster by HTTP/consul.nodes_critical)>0` |AVERAGE | |
+|Consul: One or more nodes in cluster in 'warning' state |<p>One or more agents on current dc with serf health status "warning".</p> |`last(/HashiCorp Consul Cluster by HTTP/consul.nodes_warning)>0` |WARNING | |
 |Consul cluster: Leader has been changed |<p>Consul cluster version has changed. Ack to close.</p> |`last(/HashiCorp Consul Cluster by HTTP/consul.get_leader,#1)<>last(/HashiCorp Consul Cluster by HTTP/consul.get_leader,#2) and length(last(/HashiCorp Consul Cluster by HTTP/consul.get_leader))>0` |INFO |<p>Manual close: YES</p> |
 
 ## Feedback
