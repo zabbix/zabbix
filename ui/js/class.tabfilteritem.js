@@ -447,8 +447,6 @@ class CTabFilterItem extends CBaseComponent {
 		search_params.sort();
 		default_params.sort();
 
-
-
 		search_params.forEach((value, key) => {
 			if (value) {
 				if (!default_params.has(key) || value != default_params.get(key)) {
