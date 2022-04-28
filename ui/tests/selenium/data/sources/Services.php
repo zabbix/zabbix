@@ -135,6 +135,21 @@ class Services {
 						'tag' => 'tag1',
 						'operator' => 0,
 						'value' => 'value1'
+					],
+					[
+						'tag' => 'tag2',
+						'operator' => 0,
+						'value' => 'value2'
+					],
+					[
+						'tag' => 'tag3',
+						'operator' => 0,
+						'value' => 'value3'
+					],
+					[
+						'tag' => 'tag4',
+						'operator' => 0,
+						'value' => 'value4'
 					]
 				],
 				'tags' => [
@@ -145,6 +160,14 @@ class Services {
 					[
 						'tag' => 'remove_tag_2',
 						'value' => 'remove_value_2'
+					],
+					[
+						'tag' => '3rd_tag',
+						'value' => '3rd_value'
+					],
+					[
+						'tag' => '4th_tag',
+						'value' => '4th_value'
 					]
 				]
 			],

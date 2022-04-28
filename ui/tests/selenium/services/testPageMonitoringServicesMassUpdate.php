@@ -246,6 +246,14 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 					'expected_tags' => [
 						'Service for delete 2' => [
 							[
+								'tag' => '3rd_tag',
+								'value' => '3rd_value'
+							],
+							[
+								'tag' => '4th_tag',
+								'value' => '4th_value'
+							],
+							[
 								'tag' => 'remove_tag_1',
 								'value' => 'remove_value_1'
 							],
@@ -283,6 +291,14 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 					],
 					'expected_tags' => [
 						'Service for delete 2' => [
+							[
+								'tag' => '3rd_tag',
+								'value' => '3rd_value'
+							],
+							[
+								'tag' => '4th_tag',
+								'value' => '4th_value'
+							],
 							[
 								'tag' => 'remove_tag_1',
 								'value' => 'remove_value_1'
