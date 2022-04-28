@@ -145,7 +145,9 @@ class CConfigurationExport {
 			}
 
 			if ($this->data['template_groups']) {
-				$this->builder->buildTemplateGroups($schema['rules']['template_groups'], $this->data['template_groups']);
+				$this->builder->buildTemplateGroups($schema['rules']['template_groups'],
+					$this->data['template_groups']
+				);
 			}
 
 			if ($this->data['host_groups']) {
@@ -280,12 +282,12 @@ class CConfigurationExport {
 	/**
 	 * Get host groups for export from database.
 	 *
-	 * @param array $groupIds
+	 * @param array $groupids
 	 */
-	protected function gatherHostGroups(array $groupIds) {
+	protected function gatherHostGroups(array $groupids) {
 		$this->data['host_groups'] = API::HostGroup()->get([
 			'output' => ['name', 'uuid'],
-			'groupids' => $groupIds,
+			'groupids' => $groupids,
 			'preservekeys' => true
 		]);
 	}
@@ -293,12 +295,12 @@ class CConfigurationExport {
 	/**
 	 * Get template groups for export from database.
 	 *
-	 * @param array $groupIds
+	 * @param array $groupids
 	 */
-	protected function gatherTemplateGroups(array $groupIds) {
+	protected function gatherTemplateGroups(array $groupids) {
 		$this->data['template_groups'] = API::TemplateGroup()->get([
 			'output' => ['name', 'uuid'],
-			'groupids' => $groupIds,
+			'groupids' => $groupids,
 			'preservekeys' => true
 		]);
 	}
@@ -323,7 +325,7 @@ class CConfigurationExport {
 
 		foreach ($templates as &$template) {
 			// merge host groups with all groups
-			$this->data['template_groups'] += zbx_toHash($template['groups'], 'groupid');
+			$this->data['template_groups'] += array_column($template['groups'], null, 'groupid');
 
 			$template['dashboards'] = [];
 			$template['discoveryRules'] = [];
@@ -366,7 +368,7 @@ class CConfigurationExport {
 
 		foreach ($hosts as &$host) {
 			// merge host groups with all groups
-			$this->data['host_groups'] += zbx_toHash($host['groups'], 'groupid');
+			$this->data['host_groups'] += array_column($host['groups'], null, 'groupid');
 
 			$host['discoveryRules'] = [];
 			$host['items'] = [];

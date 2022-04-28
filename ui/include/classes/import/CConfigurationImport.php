@@ -66,9 +66,10 @@ class CConfigurationImport {
 	public function __construct(array $options, CImportReferencer $referencer,
 			CImportedObjectContainer $importedObjectContainer) {
 		$default_options = [
-			'groups' => ['updateExisting' => false, 'createMissing' => false],
-			'hosts' => ['updateExisting' => false, 'createMissing' => false],
+			'template_groups' => ['updateExisting' => false, 'createMissing' => false],
 			'templates' => ['updateExisting' => false, 'createMissing' => false],
+			'host_groups' => ['updateExisting' => false, 'createMissing' => false],
+			'hosts' => ['updateExisting' => false, 'createMissing' => false],
 			'templateDashboards' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'templateLinkage' => ['createMissing' => false, 'deleteMissing' => false],
 			'items' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
@@ -82,10 +83,9 @@ class CConfigurationImport {
 			'valueMaps' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false]
 		];
 
+		$options += $default_options;
 		foreach ($default_options as $entity => $rules) {
-			$options[$entity] = array_key_exists($entity, $options)
-				? array_merge($rules, $options[$entity])
-				: $rules;
+			$options[$entity] += $rules;
 		}
 
 		$object_options = (
@@ -135,8 +135,8 @@ class CConfigurationImport {
 		$this->gatherReferences();
 
 		$this->processTemplateGroups();
-		$this->processHostGroups();
 		$this->processTemplates();
+		$this->processHostGroups();
 		$this->processHosts();
 
 		// Delete missing objects from processed hosts and templates.
@@ -170,8 +170,8 @@ class CConfigurationImport {
 	 */
 	protected function gatherReferences(): void {
 		$template_groups_refs = [];
-		$host_groups_refs = [];
 		$templates_refs = [];
+		$host_groups_refs = [];
 		$hosts_refs = [];
 		$items_refs = [];
 		$valuemaps_refs = [];
@@ -193,10 +193,6 @@ class CConfigurationImport {
 			$template_groups_refs[$group['name']] = ['uuid' => $group['uuid']];
 		}
 
-		foreach ($this->getFormattedHostGroups() as $group) {
-			$host_groups_refs[$group['name']] = ['uuid' => $group['uuid']];
-		}
-
 		foreach ($this->getFormattedTemplates() as $template) {
 			$templates_refs[$template['host']] = ['uuid' => $template['uuid']];
 
@@ -215,6 +211,10 @@ class CConfigurationImport {
 					$templates_refs += [$linked_template['name'] => []];
 				}
 			}
+		}
+
+		foreach ($this->getFormattedHostGroups() as $group) {
+			$host_groups_refs[$group['name']] = ['uuid' => $group['uuid']];
 		}
 
 		foreach ($this->getFormattedHosts() as $host) {
@@ -582,8 +582,8 @@ class CConfigurationImport {
 		}
 
 		$this->referencer->addTemplateGroups($template_groups_refs);
-		$this->referencer->addHostGroups($host_groups_refs);
 		$this->referencer->addTemplates($templates_refs);
+		$this->referencer->addHostGroups($host_groups_refs);
 		$this->referencer->addHosts($hosts_refs);
 		$this->referencer->addItems($items_refs);
 		$this->referencer->addValuemaps($valuemaps_refs);
@@ -606,10 +606,6 @@ class CConfigurationImport {
 	 * Import template groups.
 	 */
 	protected function processTemplateGroups(): void {
-		if (!isset($this->options['template_groups'])) {
-			return;
-		}
-
 		if (!$this->options['template_groups']['createMissing'] && !$this->options['template_groups']['updateExisting']) {
 			return;
 		}
@@ -652,10 +648,6 @@ class CConfigurationImport {
 	 * Import host groups.
 	 */
 	protected function processHostGroups(): void {
-		if (!isset($this->options['host_groups'])) {
-			return;
-		}
-
 		if (!$this->options['host_groups']['createMissing'] && !$this->options['host_groups']['updateExisting']) {
 			return;
 		}
