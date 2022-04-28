@@ -51,6 +51,7 @@ class CControllerLatestView extends CControllerLatest {
 			'filter_custom_time' =>		'in 1,0',
 			'filter_show_counter' =>	'in 1,0',
 			'filter_counters' =>		'in 1',
+			'filter_selected' =>		'int32',
 			'filter_reset' =>			'in 1',
 			'counter_index' =>			'ge 0',
 			'subfilter_hostids' =>		'array',
@@ -117,10 +118,10 @@ class CControllerLatestView extends CControllerLatest {
 	}
 
 	protected function doAction(): void {
-
+		$inputs = $this->cleanInput($this->getInputAll());
 		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))
 			->read()
-			->setInput($this->cleanInput($this->getInputAll()));
+			->setInput($inputs);
 
 		$filter_tabs = [];
 		foreach ($profile->getTabsWithDefaults() as $index => $filter_tab) {
@@ -187,7 +188,8 @@ class CControllerLatestView extends CControllerLatest {
 				'selected' => $profile->selected,
 				'support_custom_time' => 0,
 				'expanded' => $profile->expanded,
-				'page' => $filter['page']
+				'page' => $filter['page'],
+				'default' => self::FILTER_FIELDS_DEFAULT
 			],
 			'filter' => $filter,
 			'subfilters' => $subfilters,

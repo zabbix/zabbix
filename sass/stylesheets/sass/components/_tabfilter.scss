@@ -143,11 +143,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		}
 
 		&.selected {
-			background-color: darken($tab-label-selected-bg-color, 5%);
-
-			.tabfilter-item-link {
-				color: $tab-label-selected-color;
-			}
+			background-color: $tab-label-expanded-bg-color;
 
 			.tabfilter-item-link[data-counter]::after {
 				display: none;

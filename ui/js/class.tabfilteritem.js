@@ -50,6 +50,7 @@ class CTabFilterItem extends CBaseComponent {
 		this._template_rendered = false;
 		this._src_url = null;
 		this._apply_url = null;
+		this._default = options.default;
 
 		this.init();
 		this.registerEvents();
@@ -429,22 +430,50 @@ class CTabFilterItem extends CBaseComponent {
 	updateUnsavedState() {
 		let search_params = this.getFilterParams(),
 			src_query = new URLSearchParams(this._src_url),
-			ignore_fields = ['filter_name', 'filter_custom_time', 'filter_show_counter', 'from', 'to', 'action', 'page'];
+			ignore_fields = ['filter_name', 'filter_custom_time', 'filter_show_counter', 'from', 'to', 'action', 'page',
+			'tags[0][operator]', 'inventory[0][field]'];
+
+		let default_params = new URLSearchParams(this._default);
 
 		for (const field of ignore_fields) {
 			src_query.delete(field);
 			search_params.delete(field);
+			default_params.delete(field);
 		}
+
+		let has_filter = false;
 
 		src_query.sort();
 		search_params.sort();
+		default_params.sort();
 
-		if (src_query.toString() !== search_params.toString()) {
-			this._target.setAttribute('data-indicator-value', '1');
-			this._target.setAttribute('data-indicator', 'mark');
+
+
+		search_params.forEach((value, key) => {
+			if (value) {
+				if (!default_params.has(key) || value != default_params.get(key)) {
+					has_filter = true;
+				}
+			}
+		})
+
+		if(this._index === 0) {
+			if (has_filter) {
+				this._target.setAttribute('data-indicator-value', '1');
+				this._target.setAttribute('data-indicator', 'mark');
+			}
+			else {
+				this.resetUnsavedState();
+			}
 		}
 		else {
-			this.resetUnsavedState();
+			if (src_query.toString() !== search_params.toString()) {
+				this._target.setAttribute('data-indicator-value', '1');
+				this._target.setAttribute('data-indicator', 'mark');
+			}
+			else {
+				this.resetUnsavedState();
+			}
 		}
 	}
 

@@ -58,6 +58,7 @@ class CControllerProblemView extends CControllerProblem {
 			'filter_custom_time' =>		'in 1,0',
 			'filter_show_counter' =>	'in 1,0',
 			'filter_counters' =>		'in 1',
+			'filter_selected' =>		'int32',
 			'filter_reset' =>			'in 1',
 			'counter_index' =>			'ge 0'
 		];
@@ -136,7 +137,8 @@ class CControllerProblemView extends CControllerProblem {
 					'from' => $profile->from,
 					'to' => $profile->to,
 					'disabled' => ($filter['show'] != TRIGGERS_OPTION_ALL || $filter['filter_custom_time'])
-				] + getTimeselectorActions($profile->from, $profile->to)
+				] + getTimeselectorActions($profile->from, $profile->to),
+				'default' => self::FILTER_FIELDS_DEFAULT
 			],
 			'filter_tabs' => $filter_tabs,
 			'refresh_interval' => CWebUser::getRefresh() * 1000,

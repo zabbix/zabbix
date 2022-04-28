@@ -2430,9 +2430,7 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
       .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded .icon-edit {
         background: url("../img/icon-sprite.svg?20211222") no-repeat -42px -621px; }
     .filter-container.tabfilter-container .tabfilter-item-label.selected {
-      background-color: #02659f; }
-      .filter-container.tabfilter-container .tabfilter-item-label.selected .tabfilter-item-link {
-        color: #ffffff; }
+      background-color: #ffffff; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected .tabfilter-item-link[data-counter]::after {
         display: none; }
     .filter-container.tabfilter-container .tabfilter-item-label.focused {

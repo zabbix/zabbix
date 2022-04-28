@@ -46,6 +46,7 @@ class CControllerHostView extends CControllerHost {
 			'filter_custom_time' =>		'in 1,0',
 			'filter_show_counter' =>	'in 1,0',
 			'filter_counters' =>		'in 1',
+			'filter_selected' =>		'int32',
 			'filter_reset' =>			'in 1',
 			'counter_index' =>			'ge 0'
 		];
@@ -86,9 +87,10 @@ class CControllerHostView extends CControllerHost {
 
 	protected function doAction(): void {
 		$filter_tabs = [];
+		$inputs = $this->cleanInput($this->getInputAll());
 		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))
 			->read()
-			->setInput($this->cleanInput($this->getInputAll()));
+			->setInput($inputs);
 
 		foreach ($profile->getTabsWithDefaults() as $index => $filter_tab) {
 			if ($index == $profile->selected) {
@@ -117,7 +119,8 @@ class CControllerHostView extends CControllerHost {
 				'selected' => $profile->selected,
 				'support_custom_time' => 0,
 				'expanded' => $profile->expanded,
-				'page' => $filter['page']
+				'page' => $filter['page'],
+				'default' => self::FILTER_FIELDS_DEFAULT
 			]
 		] + $this->getData($filter);
 

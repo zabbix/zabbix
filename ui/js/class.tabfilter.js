@@ -161,7 +161,8 @@ class CTabFilter extends CBaseComponent {
 			container: container,
 			data: data,
 			template: this._templates[data.tab_view] || null,
-			support_custom_time: this._options.support_custom_time
+			support_custom_time: this._options.support_custom_time,
+			default: this._options.default
 		});
 
 		this._items.push(item);
@@ -628,6 +629,20 @@ class CTabFilter extends CBaseComponent {
 			 * Action on 'Apply' button press.
 			 */
 			buttonApplyAction: () => {
+				if (this._active_item._index === 0) {
+					var params = this._active_item.getFilterParams();
+
+					this.profileUpdate('properties', {
+						idx2: this._active_item._index,
+						value_str: params.toString()
+					}).then(() => {
+						this._active_item.emptySubfilter();
+						this._active_item.updateUnsavedState();
+						this._active_item.updateApplyUrl();
+						this._active_item.setBrowserLocationToApplyUrl();
+					});
+				}
+
 				this._active_item.emptySubfilter();
 				this._active_item.updateUnsavedState();
 				this._active_item.updateApplyUrl();
@@ -642,6 +657,7 @@ class CTabFilter extends CBaseComponent {
 					url = new Curl('zabbix.php', false);
 
 				url.setArgument('action', current_url.getArgument('action'));
+				url.setArgument('filter_selected', this._options.selected);
 				url.setArgument('filter_reset', 1);
 				window.location.href = url.getUrl();
 			},

@@ -298,6 +298,9 @@ abstract class CControllerHost extends CController {
 	 */
 	protected function cleanInput(array $input): array {
 		if (array_key_exists('filter_reset', $input) && $input['filter_reset']) {
+			if ($input['filter_selected'] == 0) {
+				CProfile::update(self::FILTER_IDX.'.properties', json_encode(['filter_name' => '']), PROFILE_TYPE_STR);
+			}
 			return array_intersect_key(['filter_name' => ''], $input);
 		}
 
