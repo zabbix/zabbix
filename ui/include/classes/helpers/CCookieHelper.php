@@ -19,15 +19,10 @@
 **/
 
 
-/**
- * Cookie helper.
- */
 class CCookieHelper {
 
 	/**
-	 * Check cookie exists.
-	 *
-	 * @static
+	 * Check if cookie exists.
 	 *
 	 * @param string $name
 	 *
@@ -38,9 +33,7 @@ class CCookieHelper {
 	}
 
 	/**
-	 * Get cookie value.
-	 *
-	 * @static
+	 * Get cookie.
 	 *
 	 * @param string $name
 	 *
@@ -53,27 +46,15 @@ class CCookieHelper {
 	/**
 	 * Add cookie.
 	 *
-	 * @static
-	 *
 	 * @param string  $name
 	 * @param string  $value
 	 * @param integer $time
 	 *
 	 * @return boolean
-	 *
-	 * @throws Exception
 	 */
 	public static function set(string $name, string $value, int $time = 0): bool {
-		if (headers_sent()) {
-			throw new \Exception(_('Headers already sent.'));
-		}
-
 		$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 		$path = rtrim(substr($path, 0, strrpos($path, '/')), '/');
-
-		if (mb_strlen($value) === 0) {
-			throw new \Exception(_('Value cannot be empty.'));
-		}
 
 		if (!setcookie($name, $value, $time, $path, '', HTTPS, true)) {
 			return false;
@@ -87,30 +68,22 @@ class CCookieHelper {
 	/**
 	 * Delete cookie.
 	 *
-	 * @static
-	 *
 	 * @param string $name
 	 *
 	 * @return boolean
 	 */
 	public static function unset(string $name): bool {
-		if (!self::has($name)) {
+		if (!setcookie($name, '', 0)) {
 			return false;
-		}
-
-		if (headers_sent()) {
-			throw new \Exception(_('Headers already sent.'));
 		}
 
 		unset($_COOKIE[$name]);
 
-		return setcookie($name, '', 0);
+		return true;
 	}
 
 	/**
 	 * Get all cookies.
-	 *
-	 * @static
 	 *
 	 * @return array
 	 */
