@@ -311,7 +311,7 @@ class CConfigurationExport {
 	protected function gatherTemplates(array $templateids) {
 		$templates = API::Template()->get([
 			'output' => ['host', 'name', 'description', 'uuid'],
-			'selectGroups' => ['groupid', 'name', 'uuid'],
+			'selectTemplateGroups' => ['groupid', 'name', 'uuid'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectDashboards' => API_OUTPUT_EXTEND,

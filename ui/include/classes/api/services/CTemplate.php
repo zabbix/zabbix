@@ -71,6 +71,7 @@ class CTemplate extends CHostGeneral {
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectGroups'				=> null,
+			'selectTemplateGroups'		=> null,
 			'selectHosts'				=> null,
 			'selectTemplates'			=> null,
 			'selectParentTemplates'		=> null,
@@ -93,6 +94,8 @@ class CTemplate extends CHostGeneral {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 		$this->validateGet($options);
+
+		$this->checkDeprecatedParam($options, 'selectGroups');
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -1154,17 +1157,9 @@ class CTemplate extends CHostGeneral {
 
 		$templateids = array_keys($result);
 
-		// adding groups
-		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'hostid', 'groupid', 'hosts_groups');
-			$groups = API::TemplateGroup()->get([
-				'output' => $options['selectGroups'],
-				'groupids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
-
-			$result = $relationMap->mapMany($result, $groups, 'groups');
-		}
+		// adding template groups
+		$this->addRelatedGroups($options, $result, 'selectGroups');
+		$this->addRelatedGroups($options, $result, 'selectTemplateGroups');
 
 		// Adding Templates
 		if ($options['selectTemplates'] !== null) {
@@ -1272,5 +1267,34 @@ class CTemplate extends CHostGeneral {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * @param array  $options
+	 * @param array  $result
+	 * @param string $option
+	 */
+	private function addRelatedGroups(array $options, array &$result, string $option): void {
+		if ($options[$option] === null || $options[$option] === API_OUTPUT_COUNT) {
+			return;
+		}
+
+		switch ($option) {
+			case 'selectGroups':
+				$output_tag = 'groups';
+				break;
+			case 'selectTemplateGroups':
+				$output_tag = 'templategroups';
+				break;
+		}
+
+		$relationMap = $this->createRelationMap($result, 'hostid', 'groupid', 'hosts_groups');
+		$groups = API::TemplateGroup()->get([
+			'output' => $options[$option],
+			'groupids' => $relationMap->getRelatedIds(),
+			'preservekeys' => true
+		]);
+
+		$result = $relationMap->mapMany($result, $groups, $output_tag);
 	}
 }

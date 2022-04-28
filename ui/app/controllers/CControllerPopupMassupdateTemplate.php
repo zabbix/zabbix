@@ -106,7 +106,7 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 				];
 
 				if (array_key_exists('groups', $visible)) {
-					$options['selectGroups'] = ['groupid'];
+					$options['selectTemplateGroups'] = ['groupid'];
 				}
 
 				if (array_key_exists('linked_templates', $visible)

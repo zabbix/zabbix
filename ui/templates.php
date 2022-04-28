@@ -562,7 +562,7 @@ if (hasRequest('form')) {
 	if ($data['templateid'] != 0) {
 		$dbTemplates = API::Template()->get([
 			'output' => API_OUTPUT_EXTEND,
-			'selectGroups' => API_OUTPUT_EXTEND,
+			'selectTemplateGroups' => API_OUTPUT_EXTEND,
 			'selectParentTemplates' => ['templateid', 'name'],
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
