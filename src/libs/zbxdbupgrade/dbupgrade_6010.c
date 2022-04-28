@@ -138,6 +138,28 @@ out:
 
 	return ret;
 }
+
+static int	DBpatch_6010006(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.auditlog.filter.action' and value_int=-1"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6010007(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.auditlog.filter.actions' where idx='web.auditlog.filter.action'"))
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(6010)
@@ -150,5 +172,7 @@ DBPATCH_ADD(6010002, 0, 1)
 DBPATCH_ADD(6010003, 0, 1)
 DBPATCH_ADD(6010004, 0, 1)
 DBPATCH_ADD(6010005, 0, 1)
+DBPATCH_ADD(6010006, 0, 1)
+DBPATCH_ADD(6010007, 0, 1)
 
 DBPATCH_END()
