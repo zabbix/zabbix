@@ -87,7 +87,7 @@
 			$('#correlation_tag_row')
 				.toggle((recovery_mode == <?= ZBX_RECOVERY_MODE_EXPRESSION ?>
 					|| recovery_mode == <?= ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION ?>)
-                    && correlation_mode == <?= ZBX_TRIGGER_CORRELATION_TAG ?>
+					&& correlation_mode == <?= ZBX_TRIGGER_CORRELATION_TAG ?>
 				);
 		},
 
