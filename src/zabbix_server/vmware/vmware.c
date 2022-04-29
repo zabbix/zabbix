@@ -1102,7 +1102,7 @@ static void	vmware_dsname_shared_free(zbx_vmware_dsname_t *dsname)
  *                                                                            *
  * Purpose: frees shared resources allocated to store physical NIC data       *
  *                                                                            *
- * Parameters: vm   - [IN] the virtual machine                                *
+ * Parameters: vm   - [IN] the physical NIC                                   *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_pnic_shared_free(zbx_vmware_pnic_t *nic)
@@ -1566,11 +1566,11 @@ static zbx_vmware_dsname_t	*vmware_dsname_shared_dup(const zbx_vmware_dsname_t *
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copies vmware hypervisor datastore name object into shared memory *
+ * Purpose: copies vmware physical NIC object into shared memory              *
  *                                                                            *
- * Parameters: src   - [IN] the vmware datastore name object                  *
+ * Parameters: src   - [IN] the vmware physical NIC object                    *
  *                                                                            *
- * Return value: a duplicated vmware datastore name object                    *
+ * Return value: a duplicated vmware physical NIC object                      *
  *                                                                            *
  ******************************************************************************/
 static zbx_vmware_pnic_t	*vmware_pnic_shared_dup(const zbx_vmware_pnic_t *src)
