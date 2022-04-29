@@ -4168,7 +4168,6 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, nodeset->nodeNr);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: initialize vmware hypervisor object                               *
