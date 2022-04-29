@@ -835,6 +835,9 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			case CONFIG_ERROR:
 				/* nothing to do */
 				break;
+			case SIG_ERROR:
+				/* nothing to do, execution was forcibly interrupted by signal */
+				break;
 			default:
 				zbx_error("unknown response code returned: %d", errcodes[i]);
 				THIS_SHOULD_NEVER_HAPPEN;

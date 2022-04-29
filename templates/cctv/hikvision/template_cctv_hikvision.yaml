@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-31T08:51:43Z'
+  date: '2022-04-06T19:27:32Z'
   groups:
     -
       uuid: d37f71c7e3f7469bab645852a69a2018
@@ -96,7 +96,8 @@ zabbix_export:
             -
               uuid: 0ae4dbcc05544fb7b67183fcf3b9654b
               expression: 'min(/Hikvision camera by HTTP/hikvision_cam.cpu.util,5m)>{$CPU.UTIL.CRIT}'
-              name: 'Hikvision camera: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'Hikvision camera: High CPU utilization'
+              event_name: 'Hikvision camera: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -362,7 +363,8 @@ zabbix_export:
             -
               uuid: 3c0b5a0046894a54803cd984cda13fa2
               expression: 'last(/Hikvision camera by HTTP/hikvision_cam.firmware_version,#1)<>last(/Hikvision camera by HTTP/hikvision_cam.firmware_version,#2) and length(last(/Hikvision camera by HTTP/hikvision_cam.firmware_version))>0'
-              name: 'Hikvision camera: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Hikvision camera: Version has changed'
+              event_name: 'Hikvision camera: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Hikvision camera version has changed. Ack to close.'
               manual_close: 'YES'
@@ -643,7 +645,8 @@ zabbix_export:
             -
               uuid: 62cfa0b87f234f1cb67b9b5b6b2fa8f2
               expression: 'min(/Hikvision camera by HTTP/hikvision_cam.memory.usage,5m)>{$MEMORY.UTIL.MAX}'
-              name: 'Hikvision camera: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'Hikvision camera: High memory utilization'
+              event_name: 'Hikvision camera: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               tags:
@@ -706,9 +709,10 @@ zabbix_export:
             -
               uuid: 281999cbd6324aacbbb86b4945000c60
               expression: 'last(/Hikvision camera by HTTP/hikvision_cam.serial_number,#1)<>last(/Hikvision camera by HTTP/hikvision_cam.serial_number,#2) and length(last(/Hikvision camera by HTTP/hikvision_cam.serial_number))>0'
-              name: 'Hikvision camera: __RESOURCE_TYPE__ has been replaced (new serial number received)'
+              name: 'Hikvision camera: Camera has been replaced'
+              event_name: 'Hikvision camera: Camera has been replaced (new serial number received)'
               priority: INFO
-              description: '__RESOURCE_TYPE__ serial number has changed. Ack to close'
+              description: 'Camera serial number has changed. Ack to close'
               manual_close: 'YES'
               tags:
                 -
@@ -841,7 +845,8 @@ zabbix_export:
             -
               uuid: f46b43fe9b354990929e7fdb80b792ec
               expression: 'last(/Hikvision camera by HTTP/hikvision_cam.uptime)<10m'
-              name: 'Hikvision camera: has been restarted (uptime < 10m)'
+              name: 'Hikvision camera: has been restarted'
+              event_name: 'Hikvision camera: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'

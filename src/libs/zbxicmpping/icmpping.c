@@ -148,7 +148,7 @@ static int	get_interval_option(const char *fping, ZBX_FPING_HOST *hosts, int hos
 				goto out;
 			}
 
-			if (FAIL == ret_exec)
+			if (SUCCEED != ret_exec)
 			{
 				zbx_snprintf(error, max_error_len, "Cannot execute \"%s\": %s", tmp, err);
 				goto out;
