@@ -1279,6 +1279,16 @@ class CTemplate extends CHostGeneral {
 			return;
 		}
 
+		switch ($option) {
+			case 'selectGroups':
+				$output_tag = 'groups';
+				break;
+
+			case 'selectTemplateGroups':
+				$output_tag = 'templategroups';
+				break;
+		}
+
 		$relationMap = $this->createRelationMap($result, 'hostid', 'groupid', 'hosts_groups');
 		$groups = API::TemplateGroup()->get([
 			'output' => $options[$option],
@@ -1286,6 +1296,6 @@ class CTemplate extends CHostGeneral {
 			'preservekeys' => true
 		]);
 
-		$result = $relationMap->mapMany($result, $groups, 'templategroups');
+		$result = $relationMap->mapMany($result, $groups, $output_tag);
 	}
 }
