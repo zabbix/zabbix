@@ -2109,6 +2109,7 @@ AC_OUTPUT([
 	src/libs/zbxserver/Makefile
 	src/libs/zbxicmpping/Makefile
 	src/libs/zbxeval/Makefile
+	src/libs/zbxserialize/Makefile
 	src/libs/zbxexec/Makefile
 	src/libs/zbxself/Makefile
 	src/libs/zbxmodules/Makefile
