@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-29T08:17:48Z'
+  date: '2022-04-29T11:03:02Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -224,10 +224,73 @@ zabbix_export:
         -
           uuid: d5b8a74991d34652973a78d58203d5fd
           name: 'HPE Primera: Disks total'
-          type: DEPENDENT
+          type: SCRIPT
           key: hpe.primera.disks.total
-          delay: '0'
+          delay: 10m
           history: 7d
+          params: |
+            var params = JSON.parse(value);
+            var fields = ['username', 'password', 'method', 'base_url'];
+            var result = {};
+            
+            fields.forEach(function (field) {
+            	if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
+            		throw 'Required param is not set: "' + field + '".';
+            	}
+            });
+            
+            if (!params.base_url.endsWith('/')) {
+            	params.base_url += '/';
+            }
+            
+            var response, request = new HttpRequest();
+            request.addHeader('Content-Type: application/json');
+            
+            credentials = {'user' : params.username, 'password' : params.password};
+            
+            response = request.post(params.base_url + 'api/v1/credentials', JSON.stringify(credentials));
+            
+            if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            	throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
+            }
+            
+            if (response !== null) {
+            	try {
+            		auth_data = JSON.parse(response);
+            	}
+            	catch (error) {
+            		throw 'Failed to parse auth response received from device API. Check debug log for more information.';
+            	}
+            }
+            
+            sessionKey = auth_data['key'];
+            
+            request = new HttpRequest();
+            request.addHeader('X-HP3PAR-WSAPI-SessionKey: ' + sessionKey);
+            
+            data = request.get(params.base_url + 'api/v1/' + params.method);
+            
+            if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            	throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            }
+            
+            if (data !== null) {
+            	try {
+            		result = JSON.stringify(data);
+            	}
+            	catch (error) {
+            		throw 'Failed to parse response received from device API. Check debug log for more information.';
+            	}
+            }
+            
+            request = new HttpRequest();
+            response = request.delete(params.base_url + 'api/v1/credentials/' + sessionKey)
+            
+            if (request.getStatus() !== 200) {
+            	throw 'Logout request failed with status code ' + request.getStatus() + ': ' + response;
+            }
+            
+            return data;
           description: 'Number of physical disks.'
           preprocessing:
             -
@@ -238,8 +301,20 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
-          master_item:
-            key: hpe.primera.disks
+          timeout: '{$HPE.PRIMERA.DATA.TIMEOUT}'
+          parameters:
+            -
+              name: base_url
+              value: 'https://{HOST.CONN}'
+            -
+              name: method
+              value: disks
+            -
+              name: password
+              value: '{$HPE.PRIMERA.PASSWORD}'
+            -
+              name: username
+              value: '{$HPE.PRIMERA.USERNAME}'
           tags:
             -
               tag: component
@@ -1147,72 +1222,6 @@ zabbix_export:
           delay: '0'
           description: 'List of CPGs resources.'
           item_prototypes:
-            -
-              uuid: ae3e249556334ab49ed126f854e65386
-              name: 'CPG [{#NAME}]: Additional State'
-              type: DEPENDENT
-              key: 'hpe.primera.cpg.additional.states["{#NAME}"]'
-              delay: '0'
-              history: 7d
-              trends: '0'
-              value_type: CHAR
-              description: |
-                Detailed state of the CPG:
-                
-                LDS_NOT_STARTED (1) - LDs not started.
-                NOT_STARTED (2) - VV not started.
-                NEEDS_CHECK (3) - Check for consistency.
-                NEEDS_MAINT_CHECK (4) - Maintenance check is required.
-                INTERNAL_CONSISTENCY_ERROR (5) - Internal consistency error.
-                SNAPDATA_INVALID (6) - Invalid snapshot data.
-                PRESERVED (7) - Unavailable LD sets due to missing chunklets. Preserved remaining VV data.
-                STALE (8) - Parts of the VV contain old data because of a copy-on-write operation.
-                COPY_FAILED (9) - A promote or copy operation to this volume failed.
-                DEGRADED_AVAIL (10) - Degraded due to availability.
-                DEGRADED_PERF (11) - Degraded due to performance.
-                PROMOTING (12) - Volume is the current target of a promote operation.
-                COPY_TARGET (13) - Volume is the current target of a physical copy operation.
-                RESYNC_TARGET (14) - Volume is the current target of a resynchronized copy operation.
-                TUNING (15) - Volume tuning is in progress.
-                CLOSING (16) - Volume is closing.
-                REMOVING (17) - Removing the volume.
-                REMOVING_RETRY (18) - Retrying a volume removal operation.
-                CREATING (19) - Creating a volume.
-                COPY_SOURCE (20) - Copy source.
-                IMPORTING (21) - Importing a volume.
-                CONVERTING (22) - Converting a volume.
-                INVALID (23) - Invalid.
-                EXCLUSIVE (24) - Local storage system has exclusive access to the volume.
-                CONSISTENT (25) - Volume is being imported consistently along with other volumes in the VV set.
-                STANDBY (26) - Volume in Standby mode.
-                SD_META_INCONSISTENT (27) - SD Meta Inconsistent.
-                SD_NEEDS_FIX (28) - SD needs fix.
-                SD_META_FIXING (29) - SD meta fix.
-                UNKNOWN (999) - Unknown state.
-                NOT_SUPPORTED_BY_WSAPI (1000) - State not supported by WSAPI.
-              valuemap:
-                name: 'Primera: Volume detailed state enum'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.name == "{#NAME}")].additionalStates.first()'
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - 'return JSON.stringify(JSON.parse(value));'
-              master_item:
-                key: hpe.primera.cpgs
-              tags:
-                -
-                  tag: component
-                  value: cpg
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: cpg
-                  value: '{#NAME}'
             -
               uuid: a7e2188d600a4715a58deba46f3b46ac
               name: 'CPG [{#NAME}]: Degraded State'
@@ -2285,10 +2294,15 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$[?(@.position == "{#POSITION}")].loopA0.degraded.first()'
+                  error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 10m
+                -
+                  type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
               master_item:
                 key: hpe.primera.disks
               tags:
@@ -2308,18 +2322,23 @@ zabbix_export:
               key: 'hpe.primera.disk.loop.a1.degraded["{#POSITION}"]'
               delay: '0'
               history: 7d
-              trends: '0'
-              value_type: CHAR
               description: 'Indicates if this is a degraded path for the disk.'
+              valuemap:
+                name: 'Primera: Boolean'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
                     - '$[?(@.position == "{#POSITION}")].loopA1.degraded.first()'
+                  error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 10m
+                -
+                  type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
               master_item:
                 key: hpe.primera.disks
               tags:
@@ -2339,18 +2358,23 @@ zabbix_export:
               key: 'hpe.primera.disk.loop.b0.degraded["{#POSITION}"]'
               delay: '0'
               history: 7d
-              trends: '0'
-              value_type: CHAR
               description: 'Indicates if this is a degraded path for the disk.'
+              valuemap:
+                name: 'Primera: Boolean'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
                     - '$[?(@.position == "{#POSITION}")].loopB0.degraded.first()'
+                  error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 10m
+                -
+                  type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
               master_item:
                 key: hpe.primera.disks
               tags:
@@ -2370,18 +2394,23 @@ zabbix_export:
               key: 'hpe.primera.disk.loop.b1.degraded["{#POSITION}"]'
               delay: '0'
               history: 7d
-              trends: '0'
-              value_type: CHAR
               description: 'Indicates if this is a degraded path for the disk.'
+              valuemap:
+                name: 'Primera: Boolean'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
                     - '$[?(@.position == "{#POSITION}")].loopB1.degraded.first()'
+                  error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 10m
+                -
+                  type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
               master_item:
                 key: hpe.primera.disks
               tags:
@@ -3255,72 +3284,6 @@ zabbix_export:
           delay: '0'
           description: 'List of storage volume resources.'
           item_prototypes:
-            -
-              uuid: 35457814e61a432c95820d38607b402f
-              name: 'Volume [{#NAME}]: Additional State'
-              type: DEPENDENT
-              key: 'hpe.primera.volume.additional.states["{#NAME}"]'
-              delay: '0'
-              history: 7d
-              trends: '0'
-              value_type: CHAR
-              description: |
-                Detailed state of the VV:
-                
-                LDS_NOT_STARTED (1) - LDs not started.
-                NOT_STARTED (2) - VV not started.
-                NEEDS_CHECK (3) - Check for consistency.
-                NEEDS_MAINT_CHECK (4) - Maintenance check is required.
-                INTERNAL_CONSISTENCY_ERROR (5) - Internal consistency error.
-                SNAPDATA_INVALID (6) - Invalid snapshot data.
-                PRESERVED (7) - Unavailable LD sets due to missing chunklets. Preserved remaining VV data.
-                STALE (8) - Parts of the VV contain old data because of a copy-on-write operation.
-                COPY_FAILED (9) - A promote or copy operation to this volume failed.
-                DEGRADED_AVAIL (10) - Degraded due to availability.
-                DEGRADED_PERF (11) - Degraded due to performance.
-                PROMOTING (12) - Volume is the current target of a promote operation.
-                COPY_TARGET (13) - Volume is the current target of a physical copy operation.
-                RESYNC_TARGET (14) - Volume is the current target of a resynchronized copy operation.
-                TUNING (15) - Volume tuning is in progress.
-                CLOSING (16) - Volume is closing.
-                REMOVING (17) - Removing the volume.
-                REMOVING_RETRY (18) - Retrying a volume removal operation.
-                CREATING (19) - Creating a volume.
-                COPY_SOURCE (20) - Copy source.
-                IMPORTING (21) - Importing a volume.
-                CONVERTING (22) - Converting a volume.
-                INVALID (23) - Invalid.
-                EXCLUSIVE (24) - Local storage system has exclusive access to the volume.
-                CONSISTENT (25) - Volume is being imported consistently along with other volumes in the VV set.
-                STANDBY (26) - Volume in Standby mode.
-                SD_META_INCONSISTENT (27) - SD Meta Inconsistent.
-                SD_NEEDS_FIX (28) - SD needs fix.
-                SD_META_FIXING (29) - SD meta fix.
-                UNKNOWN (999) - Unknown state.
-                NOT_SUPPORTED_BY_WSAPI (1000) - State not supported by WSAPI.
-              valuemap:
-                name: 'Primera: Volume detailed state enum'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.name == "{#NAME}")].additionalStates.first()'
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - 'return JSON.stringify(JSON.parse(value));'
-              master_item:
-                key: hpe.primera.volumes
-              tags:
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: component
-                  value: volume
-                -
-                  tag: volume
-                  value: '{#NAME}'
             -
               uuid: bb78eda6a941407581f78cf29ef2b647
               name: 'Volume [{#NAME}]: Administrative Free space'
@@ -4445,6 +4408,16 @@ zabbix_export:
           value: zabbix
           description: 'Specify user name for WSAPI.'
       valuemaps:
+        -
+          uuid: 79ba0611293541f29f8b43b34e64465d
+          name: 'Primera: Boolean'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'No'
+            -
+              value: '1'
+              newvalue: 'Yes'
         -
           uuid: fd9a3483b02f45c6836b9a126b669402
           name: 'Primera: diskState enum'
