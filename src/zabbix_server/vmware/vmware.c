@@ -1037,8 +1037,7 @@ static void	vmware_dev_shared_free(zbx_vmware_dev_t *dev)
 	if (NULL != dev->label)
 		vmware_shared_strfree(dev->label);
 
-	if (NULL != dev->props)
-		vmware_props_shared_free(dev->props, ZBX_VMWARE_DEV_PROPS_NUM);
+	vmware_props_shared_free(dev->props, ZBX_VMWARE_DEV_PROPS_NUM);
 
 	__vm_shmem_free_func(dev);
 }
