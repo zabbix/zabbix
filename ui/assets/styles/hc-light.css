@@ -6338,7 +6338,7 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
     /* Special styling for WebKit/Blink */ }
     .range-control input[type=range]:focus {
       outline: none; }
-    .range-control input[type=range]::-webkit-slider-thumb {
+    .range-control input[type=range]::-webkit-slider-thumb, .range-control input[type=range]::-moz-range-thumb {
       margin-top: 1px;
       /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
       height: 10px;
@@ -6923,6 +6923,11 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   margin-top: 5px;
   height: 30px;
   width: 30px; }
+
+.leaflet-marker-icon:focus {
+  box-shadow: 0 0 0 2px #000000;
+  border-radius: 2px;
+  outline: none; }
 
 .marker-cluster span {
   line-height: 30px; }
