@@ -50,11 +50,13 @@ else {
 						}
 						$style_group = 'date';
 						break;
+
 					case WIDGET_CLOCK_SHOW_TIME:
 						$div->addClass('clock-time');
 						$div->addItem('00:00:00');
 						$style_group = 'time';
 						break;
+
 					case WIDGET_CLOCK_SHOW_TIMEZONE:
 						$div->addClass('clock-time-zone');
 						if ($clock['time_zone'] !== null && $clock['time_zone'] !== TIMEZONE_DEFAULT_LOCAL) {
@@ -72,7 +74,9 @@ else {
 			}
 		}
 		else {
-			$rows[] = (new CDiv())->addItem('00:00:00')->addClass('clock-disabled');
+			$rows[] = (new CDiv())
+				->addItem('00:00:00')
+				->addClass('clock-disabled');
 		}
 
 		$content = (new CDiv($rows))->addClass('digital-clock');
@@ -101,7 +105,9 @@ if ($messages = get_and_clear_messages()) {
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
+	$output['debug'] = CProfiler::getInstance()
+		->make()
+		->toString();
 }
 
 echo json_encode($output);

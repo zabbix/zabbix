@@ -44,16 +44,17 @@ class CControllerWidgetClockView extends CControllerWidget {
 			'is_enabled' => true,
 			'critical_error' => null
 		];
-		$styles = self::groupFieldStyles($fields);
 
 		switch ($fields['time_type']) {
 			case TIME_TYPE_HOST:
 				$clock_data = $this->configureHostTime($fields, $config_defaults);
 				break;
+
 			case TIME_TYPE_SERVER:
 				$clock_data = $this->configureFields($fields, $config_defaults);
 				$clock_data['name'] = _('Server');
 				break;
+
 			default:
 				$clock_data = $this->configureFields($fields, $config_defaults);
 				$clock_data['name'] = _('Local');
@@ -72,7 +73,7 @@ class CControllerWidgetClockView extends CControllerWidget {
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $clock_data['name']),
 			'clock_data' => $clock_data,
-			'styles' => $styles,
+			'styles' => self::getFieldStyles($fields),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -110,24 +111,44 @@ class CControllerWidgetClockView extends CControllerWidget {
 		return str_replace('_', ' ', $zone);
 	}
 
+	/**
+	 * @param array $fields
+	 *
+	 * @return boolean
+	 */
 	protected function showDate(array $fields): bool {
 		return ($fields['clock_type'] === WIDGET_CLOCK_TYPE_DIGITAL
 			&& in_array(WIDGET_CLOCK_SHOW_DATE, $fields['show'])
 		);
 	}
 
+	/**
+	 * @param array $fields
+	 *
+	 * @return boolean
+	 */
 	protected function showTime(array $fields): bool {
 		return ($fields['clock_type'] === WIDGET_CLOCK_TYPE_ANALOG
 			|| in_array(WIDGET_CLOCK_SHOW_TIMEZONE, $fields['show'])
 		);
 	}
 
+	/**
+	 * @param array $fields
+	 *
+	 * @return boolean
+	 */
 	protected function showTimeZone(array $fields): bool {
 		return ($fields['clock_type'] === WIDGET_CLOCK_TYPE_DIGITAL
 			&& in_array(WIDGET_CLOCK_SHOW_TIMEZONE, $fields['show'])
 		);
 	}
 
+	/**
+	 * @param DateTime $date
+	 *
+	 * @return array
+	 */
 	protected function makeTimeFromDateTime(DateTime $date): array {
 		$time = [];
 
@@ -144,7 +165,7 @@ class CControllerWidgetClockView extends CControllerWidget {
 	 *
 	 * @return DateTime|null  Returns created DateTime object or null if time zone is set by browser.
 	 */
-	protected function makeDateTimeFromTimeZone(string $time_zone) {
+	protected function makeDateTimeFromTimeZone(string $time_zone): ?DateTime {
 		if ($time_zone === TIMEZONE_DEFAULT_LOCAL) {
 			return null;
 		}
@@ -161,8 +182,8 @@ class CControllerWidgetClockView extends CControllerWidget {
 	/**
 	 * Create required clock field values both for analog and digital clock.
 	 *
-	 * @param array $fields   Saved clock configuration.
-	 * @param array $defaults Clock configuration default values.
+	 * @param array $fields    Saved clock configuration.
+	 * @param array $defaults  Clock configuration default values.
 	 *
 	 * @return array  Return prepared clock configuration.
 	 */
@@ -186,6 +207,12 @@ class CControllerWidgetClockView extends CControllerWidget {
 		return $clock;
 	}
 
+	/**
+	 * @param array $fields
+	 * @param array $defaults
+	 *
+	 * @return array
+	 */
 	protected function configureHostTime(array $fields, array $defaults): array {
 		$clock = $defaults;
 
@@ -271,9 +298,10 @@ class CControllerWidgetClockView extends CControllerWidget {
 	 * Groups enabled field styles by field name (Date, Time, Time zone).
 	 *
 	 * @param array $fields
+	 *
 	 * @return array
 	 */
-	protected static function groupFieldStyles(array $fields): array {
+	protected static function getFieldStyles(array $fields): array {
 		$cells = [];
 
 		if ($fields['clock_type'] === WIDGET_CLOCK_TYPE_DIGITAL) {

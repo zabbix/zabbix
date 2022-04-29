@@ -46,8 +46,7 @@ class CWidgetFormClock extends CWidgetForm {
 			TIME_TYPE_LOCAL => _('Local time'),
 			TIME_TYPE_SERVER => _('Server time'),
 			TIME_TYPE_HOST => _('Host time')
-		]))
-			->setDefault(TIME_TYPE_LOCAL);
+		]))->setDefault(TIME_TYPE_LOCAL);
 
 		if (array_key_exists('time_type', $this->data)) {
 			$field_time_type->setValue($this->data['time_type']);
@@ -104,8 +103,7 @@ class CWidgetFormClock extends CWidgetForm {
 		$this->fields[$field_adv_conf->getName()] = $field_adv_conf;
 
 		// background color
-		$field_bg_color = (new CWidgetFieldColor('bg_color', _('Background color')))
-			->setDefault('');
+		$field_bg_color = (new CWidgetFieldColor('bg_color', _('Background color')))->setDefault('');
 
 		if (array_key_exists('bg_color', $this->data)) {
 			$field_bg_color->setValue($this->data['bg_color']);
@@ -134,8 +132,7 @@ class CWidgetFormClock extends CWidgetForm {
 		$this->fields[$field_date_bold->getName()] = $field_date_bold;
 
 		// date color
-		$field_date_color = (new CWidgetFieldColor('date_color', _('Color')))
-			->setDefault('');
+		$field_date_color = (new CWidgetFieldColor('date_color', _('Color')))->setDefault('');
 
 		if (array_key_exists('date_color', $this->data)) {
 			$field_date_color->setValue($this->data['date_color']);
@@ -146,7 +143,7 @@ class CWidgetFormClock extends CWidgetForm {
 		// time size
 		$field_time_size = (new CWidgetFieldIntegerBox('time_size', _('Size'), self::WIDGET_CLOCK_PERCENT_MIN,
 			self::WIDGET_CLOCK_PERCENT_MAX
-		))->setDefault(60);
+		))->setDefault(30);
 
 		if (array_key_exists('time_size', $this->data)) {
 			$field_time_size->setValue($this->data['time_size']);
@@ -164,8 +161,7 @@ class CWidgetFormClock extends CWidgetForm {
 		$this->fields[$field_time_bold->getName()] = $field_time_bold;
 
 		// time color
-		$field_time_color = (new CWidgetFieldColor('time_color', _('Color')))
-			->setDefault('');
+		$field_time_color = (new CWidgetFieldColor('time_color', _('Color')))->setDefault('');
 
 		if (array_key_exists('time_color', $this->data)) {
 			$field_time_color->setValue($this->data['time_color']);
@@ -217,8 +213,7 @@ class CWidgetFormClock extends CWidgetForm {
 		$this->fields[$field_tzone_bold->getName()] = $field_tzone_bold;
 
 		// time zone color
-		$field_tzone_color = (new CWidgetFieldColor('tzone_color', _('Color')))
-			->setDefault('');
+		$field_tzone_color = (new CWidgetFieldColor('tzone_color', _('Color')))->setDefault('');
 
 		if (array_key_exists('tzone_color', $this->data)) {
 			$field_tzone_color->setValue($this->data['tzone_color']);

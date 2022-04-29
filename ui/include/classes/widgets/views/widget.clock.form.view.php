@@ -172,7 +172,7 @@ $scripts[] =
 		'$("#adv_conf").trigger("change");'.
 	'});'.
 
-	'function isDigital(){'.
+	'function isDigital() {'.
 		'return $(\'input[name="clock_type"]:checked\').val() == '.WIDGET_CLOCK_TYPE_DIGITAL.';'.
 	'}'.
 

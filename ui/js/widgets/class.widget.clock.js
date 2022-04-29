@@ -19,13 +19,17 @@
 
 
 class CWidgetClock extends CWidget {
+
 	static TYPE_ANALOG = 0;
 	static TYPE_DIGITAL = 1;
+
 	static HOUR_TWENTY_FOUR = 0;
 	static HOUR_TWELVE = 1;
+
 	static TIMEZONE_SHORT = 0;
 	static TIMEZONE_FULL = 1;
 	static TIMEZONE_LOCAL = 'local';
+
 	static SHOW_DATE = 1;
 	static SHOW_TIME = 2;
 	static SHOW_TIMEZONE = 3;
@@ -140,15 +144,17 @@ class CWidgetClock extends CWidget {
 	}
 
 	_startClock() {
-		if (this._has_contents) {
-			if (this._clock_type === CWidgetClock.TYPE_ANALOG) {
-				this._interval_id = setInterval(() => this._clockHandsRotate(), 1000);
-				this._clockHandsRotate();
-			}
-			else if (this._show.includes(CWidgetClock.SHOW_TIME)) {
-				this._interval_id = setInterval(() => this._clockDisplayUpdate(), 1000);
-				this._clockDisplayUpdate();
-			}
+		if (!this._has_contents) {
+			return;
+		}
+
+		if (this._clock_type === CWidgetClock.TYPE_ANALOG) {
+			this._interval_id = setInterval(() => this._clockHandsRotate(), 1000);
+			this._clockHandsRotate();
+		}
+		else if (this._show.includes(CWidgetClock.SHOW_TIME)) {
+			this._interval_id = setInterval(() => this._clockDisplayUpdate(), 1000);
+			this._clockDisplayUpdate();
 		}
 	}
 
@@ -162,47 +168,50 @@ class CWidgetClock extends CWidget {
 	_clockDisplayUpdate() {
 		const clock_display = this._target.querySelector('.clock-time');
 
-		if (clock_display !== null) {
-			const now = new Date();
-			let options = {hour: '2-digit', minute: '2-digit', hour12: false};
-			let locale = 'en-US';
+		if (clock_display === null) {
+			return;
+		}
 
-			now.setTime(now.getTime() - this._time_offset);
+		const now = new Date();
+		now.setTime(now.getTime() - this._time_offset);
 
-			if (this._time_format === CWidgetClock.HOUR_TWELVE) {
-				options['hour12'] = true;
-				locale = navigator.language ?? 'en-US';
-			}
+		let options = {hour: '2-digit', minute: '2-digit', hour12: false};
+		let locale = 'en-US';
 
-			if (this._show_seconds) {
-				options.second = '2-digit';
-			}
+		if (this._time_format === CWidgetClock.HOUR_TWELVE) {
+			options['hour12'] = true;
+			locale = navigator.language ?? 'en-US';
+		}
 
-			let time = now.toLocaleTimeString(locale, options);
+		if (this._show_seconds) {
+			options.second = '2-digit';
+		}
 
-			if (this._is_enabled) {
-				clock_display.innerHTML = time;
-			}
+		let time = now.toLocaleTimeString(locale, options);
+
+		if (this._is_enabled) {
+			clock_display.innerHTML = time;
 		}
 	}
 
 	_clockHandsRotate() {
 		const clock_svg = this._target.querySelector('.clock-svg');
 
-		if (clock_svg !== null) {
-			const now = new Date();
+		if (clock_svg === null) {
+			return;
+		}
 
-			now.setTime(now.getTime() - this._time_offset);
+		const now = new Date();
+		now.setTime(now.getTime() - this._time_offset);
 
-			let h = now.getHours() % 12;
-			let m = now.getMinutes();
-			let s = now.getSeconds();
+		let h = now.getHours() % 12;
+		let m = now.getMinutes();
+		let s = now.getSeconds();
 
-			if (clock_svg !== null && !clock_svg.classList.contains('disabled')) {
-				this._clockHandRotate(clock_svg.querySelector('.clock-hand-h'), 30 * (h + m / 60 + s / 3600));
-				this._clockHandRotate(clock_svg.querySelector('.clock-hand-m'), 6 * (m + s / 60));
-				this._clockHandRotate(clock_svg.querySelector('.clock-hand-s'), 6 * s);
-			}
+		if (clock_svg !== null && !clock_svg.classList.contains('disabled')) {
+			this._clockHandRotate(clock_svg.querySelector('.clock-hand-h'), 30 * (h + m / 60 + s / 3600));
+			this._clockHandRotate(clock_svg.querySelector('.clock-hand-m'), 6 * (m + s / 60));
+			this._clockHandRotate(clock_svg.querySelector('.clock-hand-s'), 6 * s);
 		}
 	}
 
@@ -213,48 +222,62 @@ class CWidgetClock extends CWidget {
 	_fillDate() {
 		const date_display = this._target.querySelector('.clock-date');
 
-		if (date_display) {
-			const now = new Date();
+		if (!date_display) {
+			return;
+		}
 
-			let year = now.getFullYear().toString();
-			let month = (now.getMonth() + 1).toString().padStart(2, 0);
-			let day = now.getDate().toString().padStart(2, 0);
+		const now = new Date();
+		let year = now
+			.getFullYear()
+			.toString();
+		let month = (now.getMonth() + 1)
+			.toString()
+			.padStart(2, 0);
+		let day = now
+			.getDate()
+			.toString()
+			.padStart(2, 0);
 
-			if (this._is_enabled) {
-				date_display.innerText = `${year}/${month}/${day}`;
-			}
+		if (this._is_enabled) {
+			date_display.innerText = `${year}/${month}/${day}`;
 		}
 	}
 
 	_fillTimeZone() {
 		const tzone_display = this._target.querySelector('.clock-time-zone');
 
-		if (tzone_display) {
-			const now = new Date();
-			let time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+		if (!tzone_display) {
+			return;
+		}
 
-			if (this._tzone_format === CWidgetClock.TIMEZONE_SHORT) {
-				let pos = time_zone.lastIndexOf('/');
-				if (pos !== -1) {
-					time_zone = time_zone.substring(pos + 1);
-				}
+		const now = new Date();
+		let time_zone = Intl
+			.DateTimeFormat()
+			.resolvedOptions()
+			.timeZone;
+
+		if (this._tzone_format === CWidgetClock.TIMEZONE_SHORT) {
+			let pos = time_zone.lastIndexOf('/');
+
+			if (pos !== -1) {
+				time_zone = time_zone.substring(pos + 1);
 			}
-			else {
-				let offset = now.getTimezoneOffset();
-				let offset_hours = (offset > 0 ? '(UTC-' : '(UTC+');
+		}
+		else {
+			let offset = now.getTimezoneOffset();
+			let offset_hours = (offset > 0 ? '(UTC-' : '(UTC+');
 
-				offset = Math.abs(offset);
-				offset_hours += Math.floor(offset / 60).toString().padStart(2, 0)
-					+ ':' + (offset % 60).toString().padStart(2, 0) + ')';
+			offset = Math.abs(offset);
+			offset_hours += Math.floor(offset / 60).toString().padStart(2, 0)
+				+ ':' + (offset % 60).toString().padStart(2, 0) + ')';
 
-				time_zone = `${offset_hours} ${time_zone}`;
-			}
+			time_zone = `${offset_hours} ${time_zone}`;
+		}
 
-			time_zone = time_zone.replace(/_/g, ' ');
+		time_zone = time_zone.replace(/_/g, ' ');
 
-			if (this._is_enabled) {
-				tzone_display.innerText = time_zone;
-			}
+		if (this._is_enabled) {
+			tzone_display.innerText = time_zone;
 		}
 	}
 }
