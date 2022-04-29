@@ -1857,10 +1857,10 @@ out:
 #define	DATASTORE_METRIC_MODE_MAX_LATENCY	1
 #define DATASTORE_METRIC_MODE_RPS		2
 
-static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char *username, const char *password,
+static int	check_vcenter_hv_datastore_metrics(AGENT_REQUEST *request, const char *username, const char *password,
 		int direction, AGENT_RESULT *result)
 {
-	const char		*url, *mode, *uuid, *name, *perfcounter;
+	const char		*url, *mode, *hv_uuid, *ds_name, *perfcounter;
 	zbx_uint64_t		access_filter;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
@@ -1878,8 +1878,8 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 	}
 
 	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
-	name = get_rparam(request, 2);
+	hv_uuid = get_rparam(request, 1);
+	ds_name = get_rparam(request, 2);
 	mode = get_rparam(request, 3);
 
 	if (NULL == mode || '\0' == *mode || (0 == strcmp(mode, "latency")))
@@ -1901,13 +1901,13 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	if (NULL == (hv = hv_get(&service->data->hvs, hv_uuid)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 		goto unlock;
 	}
 
-	datastore = ds_get(&service->data->datastores, name);
+	datastore = ds_get(&service->data->datastores, ds_name);
 
 	if (NULL == datastore)
 	{
@@ -1944,6 +1944,7 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 	{
 		case ZBX_DATASTORE_DIRECTION_READ:
 			access_filter = ZBX_VMWARE_DS_READ_FILTER;
+
 			switch (metric_mode)
 			{
 				case DATASTORE_METRIC_MODE_RPS:
@@ -1955,6 +1956,7 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 			break;
 		case ZBX_DATASTORE_DIRECTION_WRITE:
 			access_filter = ZBX_VMWARE_DS_WRITE_FILTER;
+
 			switch (metric_mode)
 			{
 				case DATASTORE_METRIC_MODE_RPS:
@@ -1966,6 +1968,7 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
+			goto unlock;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): perfcounter:%s", __func__, perfcounter);
@@ -1982,8 +1985,8 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 		goto unlock;
 	}
 
-	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id, perfcounter, datastore->uuid, 1,
-			result);
+	ret = vmware_service_get_counter_value_by_path(service, ZBX_VMWARE_SOAP_HV, hv->id, perfcounter,
+			datastore->uuid, 1, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -1992,10 +1995,10 @@ out:
 	return ret;
 }
 
-static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *username, const char *password,
+static int	check_vcenter_datastore_metrics(AGENT_REQUEST *request, const char *username, const char *password,
 		int direction, AGENT_RESULT *result)
 {
-	const char		*url, *mode, *name, *perfcounter;
+	const char		*url, *mode, *ds_name, *perfcounter;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_datastore_t	*datastore;
@@ -2011,7 +2014,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 	}
 
 	url = get_rparam(request, 0);
-	name = get_rparam(request, 1);
+	ds_name = get_rparam(request, 1);
 	mode = get_rparam(request, 2);
 
 	if (NULL == mode || '\0' == *mode || (0 == strcmp(mode, "latency")))
@@ -2037,7 +2040,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	datastore = ds_get(&service->data->datastores, name);
+	datastore = ds_get(&service->data->datastores, ds_name);
 
 	if (NULL == datastore)
 	{
@@ -2055,6 +2058,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 	{
 		case ZBX_DATASTORE_DIRECTION_READ:
 			access_filter = ZBX_VMWARE_DS_READ_FILTER;
+
 			switch (metric_mode)
 			{
 				case DATASTORE_METRIC_MODE_RPS:
@@ -2066,6 +2070,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 			break;
 		case ZBX_DATASTORE_DIRECTION_WRITE:
 			access_filter = ZBX_VMWARE_DS_WRITE_FILTER;
+
 			switch (metric_mode)
 			{
 				case DATASTORE_METRIC_MODE_RPS:
@@ -2077,6 +2082,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
+			goto unlock;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): perfcounter:%s", __func__, perfcounter);
@@ -2127,7 +2133,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 		if (0 == ISSET_VALUE(result))
 			continue;
 
-		if (DATASTORE_METRIC_MODE_MAX_LATENCY == metric_mode || DATASTORE_METRIC_MODE_RPS == metric_mode)
+		if (DATASTORE_METRIC_MODE_MAX_LATENCY != metric_mode)
 		{
 			value += *GET_UI64_RESULT(result);
 			count++;
@@ -2144,7 +2150,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 		goto unlock;
 	}
 
-	if (DATASTORE_METRIC_MODE_MAX_LATENCY == metric_mode && 0 != count)
+	if (DATASTORE_METRIC_MODE_MAX_LATENCY != metric_mode && 0 != count)
 		value = value / count;
 
 	SET_UI64_RESULT(result, value);
@@ -2163,25 +2169,25 @@ out:
 int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_hv_datastore_latency(request, username, password, ZBX_DATASTORE_DIRECTION_READ, result);
+	return check_vcenter_hv_datastore_metrics(request, username, password, ZBX_DATASTORE_DIRECTION_READ, result);
 }
 
 int	check_vcenter_hv_datastore_write(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_hv_datastore_latency(request, username, password, ZBX_DATASTORE_DIRECTION_WRITE, result);
+	return check_vcenter_hv_datastore_metrics(request, username, password, ZBX_DATASTORE_DIRECTION_WRITE, result);
 }
 
 int	check_vcenter_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_datastore_latency(request, username, password, ZBX_DATASTORE_DIRECTION_READ, result);
+	return check_vcenter_datastore_metrics(request, username, password, ZBX_DATASTORE_DIRECTION_READ, result);
 }
 
 int	check_vcenter_datastore_write(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_datastore_latency(request, username, password, ZBX_DATASTORE_DIRECTION_WRITE, result);
+	return check_vcenter_datastore_metrics(request, username, password, ZBX_DATASTORE_DIRECTION_WRITE, result);
 }
 
 static int	check_vcenter_hv_datastore_size_vsphere(int mode, const zbx_vmware_datastore_t *datastore,
@@ -3598,18 +3604,15 @@ int	check_vcenter_vm_storage_uncommitted(AGENT_REQUEST *request, const char *use
 	return ret;
 }
 
-#define ZBX_VMWARE_VM_TOOLS_VERSION             0
-#define ZBX_VMWARE_VM_TOOLS_RUNNING_STATUS      1
 int	check_vcenter_vm_tools(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		mode, ret;
+	int		mode, ret = SYSINFO_RET_FAIL;
 	const char	*param1;
 
 	if (1 != request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		ret = SYSINFO_RET_FAIL;
 		goto out;
 	}
 
@@ -3618,22 +3621,20 @@ int	check_vcenter_vm_tools(AGENT_REQUEST *request, const char *username, const c
 	if (NULL == param1 || '\0' == *param1)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		ret = SYSINFO_RET_FAIL;
 		goto out;
 	}
 
 	if (0 == strcmp(param1, "version"))
 	{
-		mode = ZBX_VMWARE_VM_TOOLS_VERSION;
+		mode = ZBX_VMWARE_VMPROP_TOOLS_VERSION;
 	}
 	else if (0 == strcmp(param1, "status"))
 	{
-		mode = ZBX_VMWARE_VM_TOOLS_RUNNING_STATUS;
+		mode = ZBX_VMWARE_VMPROP_TOOLS_RUNNING_STATUS;
 	}
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		ret = SYSINFO_RET_FAIL;
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter value."));
 		goto out;
 	}
 
@@ -3643,8 +3644,6 @@ out:
 
 	return ret;
 }
-#undef ZBX_VMWARE_VM_TOOLS_VERSION
-#undef ZBX_VMWARE_VM_TOOLS_RUNNING_STATUS
 
 int	check_vcenter_vm_uptime(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)

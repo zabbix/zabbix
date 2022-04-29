@@ -86,7 +86,7 @@ int	check_vcenter_hv_hw_memory(AGENT_REQUEST *request, const char *username, con
 		AGENT_RESULT *result);
 int	check_vcenter_hv_hw_model(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
-int	check_vcenter_hv_hw_serialnumebr(AGENT_REQUEST *request, const char *username, const char *password,
+int	check_vcenter_hv_hw_serialnumber(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_hw_uuid(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
