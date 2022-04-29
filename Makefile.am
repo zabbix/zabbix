@@ -76,11 +76,11 @@ dbschema_postgresql:
 	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
 	$(MAKE) $(AM_MAKEFLAGS) timescaledb.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) tsdb_history_pk.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) tsdb_history_pk_uint.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) tsdb_history_pk_log.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) tsdb_history_pk_str.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) tsdb_history_pk_text.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) tsdb/history_pk.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) tsdb/history_pk_uint.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) tsdb/history_pk_log.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) tsdb/history_pk_str.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) tsdb/history_pk_text.sql && \
 	$(MAKE) $(AM_MAKEFLAGS) history_pk_prepare.sql
 
 dbschema_sqlite3:
