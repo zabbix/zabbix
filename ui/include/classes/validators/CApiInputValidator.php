@@ -1238,6 +1238,24 @@ class CApiInputValidator {
 
 			$flags = array_key_exists('flags', $field_rule) ? $field_rule['flags'] : 0x00;
 
+			if (array_key_exists($field_name, $data) && ($flags & API_DEPRECATED)) {
+				$subpath = ($path === '/' ? $path : $path.'/').$field_name;
+
+				if (array_key_exists('replacement', $field_rule)) {
+					if (array_key_exists($field_rule['replacement'], $data)) {
+						$error = _s('Deprecated parameter "%1$s" cannot be used with "%2$s".', $subpath,
+							($path === '/' ? $path : $path.'/').$field_rule['replacement']
+						);
+						return false;
+					}
+
+					$data[$field_rule['replacement']] = $data[$field_name];
+					unset($data[$field_name]);
+				}
+
+				trigger_error(_s('Parameter "%1$s" is deprecated.', $subpath), E_USER_DEPRECATED);
+			}
+
 			if (array_key_exists('default', $field_rule) && !array_key_exists($field_name, $data)) {
 				$data[$field_name] = $field_rule['default'];
 			}
@@ -1255,21 +1273,6 @@ class CApiInputValidator {
 				$subpath = ($path === '/' ? $path : $path.'/').$field_name;
 				if (!self::validateData($field_rule, $data[$field_name], $subpath, $error)) {
 					return false;
-				}
-				if ($flags & API_DEPRECATED) {
-					if (array_key_exists('replacement', $field_rule)) {
-						if (array_key_exists($field_rule['replacement'], $data)) {
-							$error = _s('Deprecated parameter "%1$s" cannot be used with "%2$s".', $subpath,
-								($path === '/' ? $path : $path.'/').$field_rule['replacement']
-							);
-							return false;
-						}
-
-						$data[$field_rule['replacement']] = $data[$field_name];
-						unset($data[$field_name]);
-					}
-
-					trigger_error(_s('Parameter "%1$s" is deprecated.', $subpath), E_USER_DEPRECATED);
 				}
 			}
 			elseif ($flags & API_REQUIRED) {
