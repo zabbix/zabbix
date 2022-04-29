@@ -762,7 +762,7 @@ class CTemplateGroup extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateMassAdd(array &$data, ?array &$db_groups): void {
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -808,7 +808,7 @@ class CTemplateGroup extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateMassUpdate(array &$data, ?array &$db_groups): void {
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -866,7 +866,7 @@ class CTemplateGroup extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateMassRemove(array &$data, ?array &$db_groups): void {
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'groupids' =>		['type' => API_IDS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => true],
 			'templateids' =>	['type' => API_IDS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => true]
 		]];
@@ -1197,7 +1197,7 @@ class CTemplateGroup extends CApiService {
 	 * @throws APIException if the input is invalid
 	 */
 	private function validatePropagate(array &$data, array &$db_groups = null): void {
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'groups' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
