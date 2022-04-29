@@ -1029,11 +1029,16 @@ static void	vmware_props_shared_free(char **props, int props_num)
  ******************************************************************************/
 static void	vmware_dev_shared_free(zbx_vmware_dev_t *dev)
 {
+	int	i;
+
 	if (NULL != dev->instance)
 		vmware_shared_strfree(dev->instance);
 
 	if (NULL != dev->label)
 		vmware_shared_strfree(dev->label);
+
+	if (NULL != dev->props)
+		vmware_props_shared_free(dev->props, ZBX_VMWARE_DEV_PROPS_NUM);
 
 	__vm_shmem_free_func(dev);
 }
@@ -1413,27 +1418,6 @@ static zbx_vmware_datacenter_t	*vmware_datacenter_shared_dup(const zbx_vmware_da
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copies vmware virtual machine device object into shared memory    *
- *                                                                            *
- * Parameters: src   - [IN] the vmware device object                          *
- *                                                                            *
- * Return value: a duplicated vmware device object                            *
- *                                                                            *
- ******************************************************************************/
-static zbx_vmware_dev_t	*vmware_dev_shared_dup(const zbx_vmware_dev_t *src)
-{
-	zbx_vmware_dev_t	*dev;
-
-	dev = (zbx_vmware_dev_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_dev_t));
-	dev->type = src->type;
-	dev->instance = vmware_shared_strdup(src->instance);
-	dev->label = vmware_shared_strdup(src->label);
-
-	return dev;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: copies vmware virtual machine file system object into shared      *
  *          memory                                                            *
  *                                                                            *
@@ -1475,6 +1459,28 @@ static char	**vmware_props_shared_dup(char ** const src, int props_num)
 		props[i] = vmware_shared_strdup(src[i]);
 
 	return props;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: copies vmware virtual machine device object into shared memory    *
+ *                                                                            *
+ * Parameters: src   - [IN] the vmware device object                          *
+ *                                                                            *
+ * Return value: a duplicated vmware device object                            *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_dev_t	*vmware_dev_shared_dup(const zbx_vmware_dev_t *src)
+{
+	zbx_vmware_dev_t	*dev;
+
+	dev = (zbx_vmware_dev_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_dev_t));
+	dev->type = src->type;
+	dev->instance = vmware_shared_strdup(src->instance);
+	dev->label = vmware_shared_strdup(src->label);
+	dev->props = vmware_props_shared_dup(src->props, ZBX_VMWARE_DEV_PROPS_NUM);
+
+	return dev;
 }
 
 /******************************************************************************
@@ -1733,12 +1739,13 @@ static void	vmware_dev_free(zbx_vmware_dev_t *dev)
 	zbx_free(dev->label);
 
 	if (NULL == dev->props)
-		return;
+		goto out;
 
 	for (i = 0; i < ZBX_VMWARE_DEV_PROPS_NUM; i++)
 			zbx_free(dev->props[i]);
 
 	zbx_free(dev->props);
+out:
 	zbx_free(dev);
 }
 
