@@ -1,6 +1,0 @@
-array('idx'=>'web.monitoring.hosts','selected'=>0,'support_custom_time'=>0,'expanded'=>true,'page'=>NULL)
-
-array('idx'=>'web.monitoring.hosts','selected'=>0,'support_custom_time'=>0,'expanded'=>true,'page'=>NULL)
-
-array('idx'=>'web.monitoring.hosts','selected'=>0,'support_custom_time'=>0,'expanded'=>true,'page'=>NULL)
-
