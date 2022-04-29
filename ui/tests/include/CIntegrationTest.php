@@ -331,27 +331,24 @@ class CIntegrationTest extends CAPITest {
 		self::validateComponent($component);
 
 		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
-			$pid = @file_get_contents(self::getPidPath($component));
-			if ($pid && is_numeric($pid) && posix_kill($pid, 0)) {
-				switch ($component) {
-					case self::COMPONENT_SERVER_HANODE1:
-						self::waitForLogLineToBePresent($component, 'HA manager started', false, 5, 1);
-						break;
-					case self::COMPONENT_SERVER:
-					case self::COMPONENT_PROXY:
-						$line = empty($waitLogLineOverride) ? 'started [trapper #1]' : $waitLogLineOverride;
-						self::waitForLogLineToBePresent($component, $line, false, 5, 1);
-						break;
-					case self::COMPONENT_AGENT:
-						self::waitForLogLineToBePresent($component, 'started [listener #1]', false, 5, 1);
-						break;
+			switch ($component) {
+				case self::COMPONENT_SERVER_HANODE1:
+					self::waitForLogLineToBePresent($component, 'HA manager started', false, 5, 1);
+					break;
+				case self::COMPONENT_SERVER:
+				case self::COMPONENT_PROXY:
+					$line = empty($waitLogLineOverride) ? 'started [trapper #1]' : $waitLogLineOverride;
+					self::waitForLogLineToBePresent($component, $line, false, 5, 1);
+					break;
+				case self::COMPONENT_AGENT:
+					self::waitForLogLineToBePresent($component, 'started [listener #1]', false, 5, 1);
+					break;
 
-					case self::COMPONENT_AGENT2:
-						self::waitForLogLineToBePresent($component, 'Zabbix Agent2 hostname', false, 5, 1);
-						break;
-				}
-				return;
+				case self::COMPONENT_AGENT2:
+					self::waitForLogLineToBePresent($component, 'Zabbix Agent2 hostname', false, 5, 1);
+					break;
 			}
+			return;
 
 			sleep(self::WAIT_ITERATION_DELAY);
 		}
