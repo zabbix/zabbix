@@ -1179,12 +1179,11 @@ class CScript extends CApiService {
 	 * @return array $result
 	 */
 	private function addRelatedGroupsAndHosts(array $options, array $result, array $hostids = null) {
-		$is_groups_select = $options['selectGroups'] !== null && $options['selectGroups'];
-		$is_hostgroups_select = $options['selectHostGroups'] !== null && $options['selectHostGroups'];
-		$option = $is_groups_select ? 'selectGroups' : 'selectHostGroups';
-		$is_hosts_select = $options['selectHosts'] !== null && $options['selectHosts'];
+		$is_groups_select = $options['selectGroups'] !== null;
+		$is_hostgroups_select = $options['selectHostGroups'] !== null;
+		$is_hosts_select = $options['selectHosts'] !== null;
 
-		if (!$is_hostgroups_select && !$is_hosts_select && !$is_groups_select) {
+		if (!$is_groups_select && !$is_hostgroups_select && !$is_hosts_select) {
 			return $result;
 		}
 
@@ -1214,8 +1213,17 @@ class CScript extends CApiService {
 			}
 		}
 
-		$select_groups = ['name', 'groupid'];
-		$select_groups = $this->outputExtend($options[$option], $select_groups);
+		if ($options['selectGroups'] === API_OUTPUT_EXTEND || $options['selectHostGroups'] === API_OUTPUT_EXTEND) {
+			$select_groups = API_OUTPUT_EXTEND;
+		}
+		else {
+			$select_groups = array_unique(array_merge(
+				is_array($options['selectGroups']) ? $options['selectGroups'] : [],
+				is_array($options['selectHostGroups']) ? $options['selectHostGroups'] : []
+			));
+		}
+
+		$select_groups = $this->outputExtend($select_groups, ['groupid', 'name']);
 
 		$host_groups = API::HostGroup()->get([
 			'output' => $select_groups,
@@ -1282,11 +1290,6 @@ class CScript extends CApiService {
 			]);
 		}
 
-		$host_groups = $this->unsetExtraFields($host_groups, ['name', 'groupid'], $options[$option]);
-		$host_groups_with_write_access = $this->unsetExtraFields(
-			$host_groups_with_write_access, ['name', 'groupid'], $options[$option]
-		);
-
 		foreach ($result as &$script) {
 			if ($script['groupid'] == 0) {
 				$script_groups = ($script['host_access'] == PERM_READ_WRITE)
@@ -1299,12 +1302,16 @@ class CScript extends CApiService {
 					: array_intersect_key($host_groups, $hstgrp_branch[$script['groupid']]);
 			}
 
-			if ($is_hostgroups_select) {
-				$script['hostgroups'] = array_values($script_groups);
+			if ($is_groups_select) {
+				$script['groups'] = array_values($this->unsetExtraFields($script_groups,
+					['groupid', 'name', 'flags', 'uuid'], $options['selectGroups']
+				));
 			}
 
-			if ($is_groups_select) {
-				$script['groups'] = array_values($script_groups);
+			if ($is_hostgroups_select) {
+				$script['hostgroups'] = array_values($this->unsetExtraFields($script_groups,
+					['groupid', 'name', 'flags', 'uuid'], $options['selectHostGroups']
+				));
 			}
 
 			if ($is_hosts_select) {
