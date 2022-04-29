@@ -2797,7 +2797,9 @@ static void	vmware_vm_snapshot_disksize(xmlDoc *xdoc, const char *key, xmlNode *
 
 	if (NULL != (value = zbx_xml_node_read_value(xdoc, layout_node, xpath)))
 	{
-		is_uint64(value, sz);
+		if (SUCCEED != is_uint64(value, sz))
+			*sz = 0;
+
 		zbx_free(value);
 	}
 	else
@@ -2807,7 +2809,9 @@ static void	vmware_vm_snapshot_disksize(xmlDoc *xdoc, const char *key, xmlNode *
 
 		if (NULL != (value = zbx_xml_node_read_value(xdoc, layout_node, xpath)))
 		{
-			is_uint64(value, sz);
+			if (SUCCEED != is_uint64(value, sz))
+				*sz = 0;
+
 			zbx_free(value);
 			*usz = 0;
 			return;
@@ -2821,7 +2825,9 @@ static void	vmware_vm_snapshot_disksize(xmlDoc *xdoc, const char *key, xmlNode *
 
 	if (NULL != (value = zbx_xml_node_read_value(xdoc, layout_node, xpath)))
 	{
-		is_uint64(value, usz);
+		if (SUCCEED != is_uint64(value, usz))
+			*usz = 0;
+
 		zbx_free(value);
 	}
 	else
