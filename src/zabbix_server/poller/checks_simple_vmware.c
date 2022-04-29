@@ -3610,7 +3610,7 @@ int	check_vcenter_vm_tools(AGENT_REQUEST *request, const char *username, const c
 	}
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter value."));
 		ret = SYSINFO_RET_FAIL;
 		goto out;
 	}
