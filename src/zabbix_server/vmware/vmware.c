@@ -327,8 +327,8 @@ static zbx_uint64_t	evt_req_chunk_size;
 #define ZBX_VMPROPMAP(property)										\
 	{property, ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE(property), NULL}
 
-typedef void	(*nodeprocfunc_t)(void *, char **);
-static void	vmware_service_get_vm_snapshot(void *xml_node, char **jstr);
+typedef int	(*nodeprocfunc_t)(void *, char **);
+static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr);
 
 typedef struct
 {
@@ -2959,7 +2959,7 @@ out:
  *             jstr - [OUT] json with vm snapshot info                        *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_service_get_vm_snapshot(void *xml_node, char **jstr)
+static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr)
 {
 	xmlNode			*root_node, *layout_node, *node = (xmlNode *)xml_node;
 	xmlDoc			*xdoc = node->doc;
@@ -3013,6 +3013,7 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, FAIL == ret ? zbx_result_string(ret) :
 			ZBX_NULL2EMPTY_STR(*jstr));
+	return ret;
 }
 
 /******************************************************************************
