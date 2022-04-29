@@ -377,7 +377,6 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 	ZBX_VMPROPMAP("summary.quickStats.privateMemory"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_PRIVATE */
 	ZBX_VMPROPMAP("summary.quickStats.sharedMemory"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_SHARED */
 	ZBX_VMPROPMAP("summary.runtime.powerState"),		/* ZBX_VMWARE_VMPROP_POWER_STATE */
-	ZBX_VMPROPMAP("summary.runtime.consolidationNeeded"),	/* ZBX_VMWARE_VMPROP_CONSOLIDATION_NEEDED */
 	ZBX_VMPROPMAP("summary.storage.committed"),		/* ZBX_VMWARE_VMPROP_STORAGE_COMMITED */
 	ZBX_VMPROPMAP("summary.storage.unshared"),		/* ZBX_VMWARE_VMPROP_STORAGE_UNSHARED */
 	ZBX_VMPROPMAP("summary.storage.uncommitted"),		/* ZBX_VMWARE_VMPROP_STORAGE_UNCOMMITTED */
@@ -391,7 +390,8 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 			ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE("snapshot"),
 			vmware_service_get_vm_snapshot},
 	{"datastore", ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM)/* ZBX_VMWARE_VMPROP_DATASTOREID */
-			ZBX_XPATH_PROP_NAME_NODE("datastore") ZBX_XPATH_LN("ManagedObjectReference"), NULL}
+			ZBX_XPATH_PROP_NAME_NODE("datastore") ZBX_XPATH_LN("ManagedObjectReference"), NULL},
+	ZBX_VMPROPMAP("summary.runtime.consolidationNeeded")	/* ZBX_VMWARE_VMPROP_CONSOLIDATION_NEEDED */
 };
 
 #define ZBX_XPATH_OBJECTS_BY_TYPE(type)									\
@@ -2848,8 +2848,8 @@ static void	vmware_vm_snapshot_disksize(xmlDoc *xdoc, const char *key, xmlNode *
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_vm_snapshot_parse(xmlDoc *xdoc, xmlNode *snap_node, xmlNode *layout_node, zbx_vector_uint64_t *disks_used,
-		zbx_uint64_t *size, zbx_uint64_t *uniquesize, int *count, char **latestdate, struct zbx_json *json_data)
+static int	vmware_vm_snapshot_collect(xmlDoc *xdoc, xmlNode *snap_node, xmlNode *layout_node, zbx_vector_uint64_t *disks_used,
+		zbx_uint64_t *size, zbx_uint64_t *uniquesize, zbx_uint64_t *count, char **latestdate, struct zbx_json *json_data)
 {
 	int			i, ret = FAIL;
 	char			*value, xpath[MAX_STRING_LEN], *name, *desc, *crtime;
@@ -2857,7 +2857,7 @@ static int	vmware_vm_snapshot_parse(xmlDoc *xdoc, xmlNode *snap_node, xmlNode *l
 	zbx_uint64_t		snap_size, snap_usize;
 	xmlNode			*next_node;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() count:%d", __func__, *count);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() count:" ZBX_FS_UI64, __func__, *count);
 
 	zbx_vector_str_create(&ids);
 
@@ -2925,7 +2925,7 @@ static int	vmware_vm_snapshot_parse(xmlDoc *xdoc, xmlNode *snap_node, xmlNode *l
 
 	if (NULL != (next_node = zbx_xml_node_get(xdoc, snap_node, ZBX_XNN("childSnapshotList"))))
 	{
-		ret = vmware_vm_snapshot_parse(xdoc, next_node, layout_node, disks_used, size, uniquesize, count,
+		ret = vmware_vm_snapshot_collect(xdoc, next_node, layout_node, disks_used, size, uniquesize, count,
 				latestdate, json_data);
 	}
 	else
@@ -2964,9 +2964,9 @@ static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr)
 	xmlNode			*root_node, *layout_node, *node = (xmlNode *)xml_node;
 	xmlDoc			*xdoc = node->doc;
 	struct zbx_json		json_data;
-	int			count, ret = FAIL;
+	int			ret = FAIL;
 	char			*latestdate = NULL;
-	zbx_uint64_t		size, uniquesize;
+	zbx_uint64_t		count, size, uniquesize;
 	zbx_vector_uint64_t	disks_used;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -2992,14 +2992,14 @@ static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr)
 	size = 0;
 	uniquesize = 0;
 
-	if (FAIL == (ret = vmware_vm_snapshot_parse(xdoc, root_node, layout_node, &disks_used, &size, &uniquesize,
+	if (FAIL == (ret = vmware_vm_snapshot_collect(xdoc, root_node, layout_node, &disks_used, &size, &uniquesize,
 			&count, &latestdate, &json_data)))
 	{
 		goto out;
 	}
 
 	zbx_json_close(&json_data);
-	zbx_json_adduint64(&json_data, "count", (unsigned int)count);
+	zbx_json_adduint64(&json_data, "count", count);
 	zbx_json_addstring(&json_data, "latestdate", ZBX_NULL2EMPTY_STR(latestdate), ZBX_JSON_TYPE_STRING);
 	zbx_json_adduint64(&json_data, "size", size);
 	zbx_json_adduint64(&json_data, "uniquesize", uniquesize);
