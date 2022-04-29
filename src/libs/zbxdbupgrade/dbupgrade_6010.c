@@ -279,6 +279,7 @@ static int	DBpatch_6010020(void)
 {
 	return DBdrop_field("config", "ldap_search_attribute");
 }
+
 #endif
 
 DBPATCH_START(6010)
