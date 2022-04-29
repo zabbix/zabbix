@@ -1,8 +1,15 @@
 Changes for 6.2.0beta1
 
 New features:
+A.F.I..... [ZBXNEXT-2289] implemented multiple LDAP sources for user authentication (gcalenko, vmurzins)
+..F....... [ZBXNEXT-7526] added number of items for Latest data column in Monitoring -> Hosts page (Ivo)
+A.F....... [ZBXNEXT-7491] fixed PHP 8.1 runtime warnings with PostgreSQL backend (Sasha)
+.........T [ZBXNEXT-7547] added CockroachDB template (drasihov)
+A.F....... [ZBXNEXT-4768] improved usability of "Execute now" (Ivo)
 
 Bug fixes:
+A......... [ZBXNEXT-7523] removed unnecessary field validation for "link_type" in template.get "selectParentTemplates" option (Ivo)
+..F....... [ZBX-20773] added documentation link for host create view in standalone mode (rdetlavs)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.0alpha2
