@@ -617,9 +617,10 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 		$defautl_values = [
 			'authentication_type' => '0',
 			'ldap_configured' => '0',
-			'ldap_case_sensitive' => '1'
+			'ldap_case_sensitive' => '1',
+			'ldap_userdirectoryid' => '0'
 		];
-		$sql = 'SELECT authentication_type,ldap_configured,ldap_case_sensitive,http_auth_enabled,http_login_form,'.
+		$sql = 'SELECT authentication_type,ldap_configured,ldap_case_sensitive,ldap_userdirectoryid,http_auth_enabled,http_login_form,'.
 				'http_strip_domains,http_case_sensitive FROM config';
 
 		$result = CDBHelper::getRow($sql);

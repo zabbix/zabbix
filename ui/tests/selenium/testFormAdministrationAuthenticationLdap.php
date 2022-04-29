@@ -143,7 +143,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 			$form->selectTab('LDAP settings');
 			$this->query('id:ldap_configured')->asCheckbox()->one()->check();
 			$form->query('button:Add')->one()->click();
-			$ldap_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->all()->last();
+			$ldap_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 			$ldap_form->fill($data['ldap_settings'])->submit();
 
 			// Check error message in ldap creation form.
