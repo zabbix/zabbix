@@ -65,6 +65,8 @@ int	sync_in_progress = 0;
 
 #define ZBX_DEFAULT_ITEM_UPDATE_INTERVAL	60
 
+#define ZBX_TRIGGER_POLL_INTERVAL		(SEC_PER_MIN * 10)
+
 /* shorthand macro for calling in_maintenance_without_data_collection() */
 #define DCin_maintenance_without_data_collection(dc_host, dc_item)			\
 		in_maintenance_without_data_collection(dc_host->maintenance_status,	\
@@ -123,6 +125,17 @@ static char	*dc_strdup(const char *source)
 	memcpy(dst, source, len);
 	return dst;
 }
+
+/* user macro cache */
+
+struct zbx_dc_um_handle_t
+{
+	zbx_dc_um_handle_t	*prev;
+	zbx_um_cache_t		**cache;
+	unsigned char		macro_env;
+};
+
+static zbx_dc_um_handle_t	*dc_um_handle = NULL;
 
 /******************************************************************************
  *                                                                            *
@@ -3500,6 +3513,8 @@ static void	dc_schedule_trigger_timer(zbx_trigger_timer_t *timer, const zbx_time
 		timer->eval_ts = *eval_ts;
 
 	timer->exec_ts = *exec_ts;
+	timer->check_ts.sec = MIN(exec_ts->sec, ZBX_TRIGGER_POLL_INTERVAL);
+	timer->check_ts.ns = exec_ts->ns;
 
 	elem.key = 0;
 	elem.data = (void *)timer;
@@ -5817,7 +5832,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 
 	/* update various trigger related links in cache */
 	if (0 != (update_flags & (ZBX_DBSYNC_UPDATE_HOSTS | ZBX_DBSYNC_UPDATE_ITEMS | ZBX_DBSYNC_UPDATE_FUNCTIONS |
-			ZBX_DBSYNC_UPDATE_TRIGGERS | ZBX_DBSYNC_UPDATE_MACROS)))
+			ZBX_DBSYNC_UPDATE_TRIGGERS)))
 	{
 		dc_trigger_update_cache();
 		dc_schedule_trigger_timers((ZBX_DBSYNC_INIT == mode ? &trend_queue : NULL), time(NULL));
@@ -6396,7 +6411,7 @@ static int	__config_timer_compare(const void *d1, const void *d2)
 
 	int	ret;
 
-	if (0 != (ret = zbx_timespec_compare(&t1->exec_ts, &t2->exec_ts)))
+	if (0 != (ret = zbx_timespec_compare(&t1->check_ts, &t2->check_ts)))
 		return ret;
 
 	ZBX_RETURN_IF_NOT_EQUAL(t1->triggerid, t2->triggerid);
@@ -8418,6 +8433,7 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 	zbx_trigger_timer_t	*first_timer = NULL, *timer;
 	int			found = 0;
 	zbx_binary_heap_elem_t	*elem;
+	zbx_dc_um_handle_t	*um_handle;
 
 	RDLOCK_CACHE;
 
@@ -8426,7 +8442,7 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 		elem = zbx_binary_heap_find_min(&config->trigger_queue);
 		timer = (zbx_trigger_timer_t *)elem->data;
 
-		if (timer->exec_ts.sec <= now)
+		if (timer->check_ts.sec <= now)
 			found = 1;
 	}
 
@@ -8437,6 +8453,8 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 
 	WRLOCK_CACHE;
 
+	um_handle = zbx_dc_open_user_macros();
+
 	while (SUCCEED != zbx_binary_heap_empty(&config->trigger_queue) && timers->values_num < hard_limit)
 	{
 		ZBX_DC_TRIGGER		*dc_trigger;
@@ -8444,8 +8462,24 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 		elem = zbx_binary_heap_find_min(&config->trigger_queue);
 		timer = (zbx_trigger_timer_t *)elem->data;
 
-		if (timer->exec_ts.sec > now)
+		if (timer->check_ts.sec > now)
 			break;
+
+		if (timer->check_ts.sec < timer->exec_ts.sec)
+		{
+			/* recalculate nextcheck for timers that are scheduled to evaluate future data */
+			if (timer->eval_ts.sec > now)
+			{
+				timer->exec_ts.sec = dc_function_calculate_nextcheck(*um_handle->cache, timer, now,
+						timer->triggerid);
+			}
+
+			if (timer->exec_ts.sec > now)
+			{
+				dc_schedule_trigger_timer(timer, &timer->eval_ts, &timer->check_ts);
+				continue;
+			}
+		}
 
 		/* first_timer stores the first timer from a list of timers of the same trigger with the same */
 		/* evaluation timestamp. Reset first_timer if the conditions do not apply.                    */
@@ -8482,7 +8516,7 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 		{
 			/* resetting execution timer will cause a new execution time to be set */
 			/* when timer is put back into queue                                   */
-			timer->exec_ts.sec = 0;
+			timer->check_ts.sec = 0;
 		}
 
 		/* remember if the timer locked trigger, so it would unlock during rescheduling */
@@ -8492,6 +8526,8 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 		if (NULL == first_timer)
 			first_timer = timer;
 	}
+
+	zbx_dc_close_user_macros(um_handle);
 
 	UNLOCK_CACHE;
 }
@@ -8514,7 +8550,7 @@ static void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers)
 		timer->lock = 0;
 
 		/* schedule calculation error can result in 0 execution time */
-		if (0 == timer->exec_ts.sec)
+		if (0 == timer->check_ts.sec)
 		{
 			if (0 != (timer->type & ZBX_TRIGGER_TIMER_FUNCTION))
 			{
@@ -8539,7 +8575,7 @@ static void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers)
 			dc_trigger_timer_free(timer);
 		}
 		else
-			dc_schedule_trigger_timer(timer, &timer->eval_ts, &timer->exec_ts);
+			dc_schedule_trigger_timer(timer, &timer->eval_ts, &timer->check_ts);
 	}
 }
 
@@ -13092,15 +13128,6 @@ int	zbx_dc_maintenance_has_tags(void)
 
 /* external user macro cache API */
 
-struct zbx_dc_um_handle_t
-{
-	zbx_dc_um_handle_t	*prev;
-	zbx_um_cache_t		**cache;
-	unsigned char		macro_env;
-};
-
-static zbx_dc_um_handle_t	*dc_um_handle = NULL;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: open handle for user macro resolving in the specified security    *
@@ -13278,12 +13305,12 @@ void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 	{
 		zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)timers->values[i];
 
-		if (0 == timer->exec_ts.sec)
+		if (0 == timer->check_ts.sec)
 		{
-			if (0 != (timer->exec_ts.sec = dc_function_calculate_nextcheck(*um_handle->cache, timer, now,
+			if (0 != (timer->check_ts.sec = dc_function_calculate_nextcheck(*um_handle->cache, timer, now,
 					timer->triggerid)))
 			{
-				timer->eval_ts = timer->exec_ts;
+				timer->eval_ts = timer->check_ts;
 			}
 		}
 	}
