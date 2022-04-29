@@ -221,9 +221,7 @@ class TopHostsWidget {
 				'name' => 'top_host_create',
 				'display_period' => 30,
 				'auto_start' => 1,
-				'pages' => [
-					[]
-				]
+				'pages' => [[]]
 			],
 			[
 				'name' => 'top_host_delete',
@@ -435,17 +433,13 @@ class TopHostsWidget {
 				'name' => 'top_host_screenshots',
 				'display_period' => 30,
 				'auto_start' => 1,
-				'pages' => [
-					[]
-				]
+				'pages' => [[]]
 			],
 			[
 				'name' => 'top_host_text_items',
 				'display_period' => 30,
 				'auto_start' => 1,
-				'pages' => [
-					[]
-				]
+				'pages' => [[]]
 			]
 		]);
 

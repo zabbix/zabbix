@@ -1752,23 +1752,11 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 * @dataProvider getBarScreenshotsData
 	 */
 	public function testDashboardTopHostsWidget_WidgetAppearance($data) {
-		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_screenshots');
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
-		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->edit()->addWidget()->asForm();
-		$form->fill(['Type' => 'Top hosts']);
-		COverlayDialogElement::find()->waitUntilReady()->one();
+		$this->createTopHostsWidget($data, 'top_host_screenshots');
 
-		// Add new column and save widget.
-		$this->fillColumnForm($data, 'create');
-		$form->fill($data['main_fields'])->submit();
-		$dashboard->getWidget($data['main_fields']['Name'])->waitUntilReady();
-		$dashboard->save();
-		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-
-		// Check message that widget added and assert screenshots.
-		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-		$element = $dashboard->getWidget($data['main_fields']['Name'])->query('class:list-table')->one();
+		// Check widget added and assert screenshots.
+		$element = CDashboardElement::find()->one()->getWidget($data['main_fields']['Name'])
+				->query('class:list-table')->one();
 		$this->assertScreenshot($element, $data['screen_name']);
 	}
 
@@ -2116,7 +2104,22 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 * @dataProvider getCheckTextItemsData
 	 */
 	public function testDashboardTopHostsWidget_CheckTextItems($data) {
-		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_text_items');
+		$this->createTopHostsWidget($data, 'top_host_text_items');
+
+		// Check if value displayed in column table.
+		$value = (array_key_exists('text', $data)) ? $data['text'] : 'No data found.';
+		$this->assertEquals($value, CDashboardElement::find()->one()->getWidget($data['main_fields']['Name'])
+				->getContent()->getText());
+	}
+
+	/**
+	 * Function used to create Top Hosts widget with special columns for CheckTextItems and WidgetAppearance scenarios.
+	 *
+	 * @param type $data	dataprovider values.
+	 * @param type $name	name of the dashboard where to create Top Hosts widget.
+	 */
+	private function createTopHostsWidget($data, $name) {
+		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.'.$name);
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
@@ -2126,12 +2129,9 @@ class testDashboardTopHostsWidget extends CWebTest {
 		// Add new column and save widget.
 		$this->fillColumnForm($data, 'create');
 		$form->fill($data['main_fields'])->submit();
+		COverlayDialogElement::ensureNotPresent();
 		$dashboard->getWidget($data['main_fields']['Name'])->waitUntilReady();
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-
-		// Check if value displayed in column table.
-		$value = (array_key_exists('text', $data)) ? $data['text'] : 'No data found.';
-		$this->assertEquals($value, $dashboard->getWidget($data['main_fields']['Name'])->getContent()->getText());
 	}
 }
