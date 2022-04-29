@@ -48,7 +48,9 @@ class CUserMacro extends CApiService {
 	 * @param array $options['globalmacroids'] global macros ids
 	 * @param array $options['templateids'] template ids
 	 * @param boolean $options['globalmacro'] only global macros
-	 * @param boolean $options['selectGroups'] select groups
+	 * @param boolean $options['selectGroups'] select groups - deprecated!
+	 * @param boolean $options['selectHostGroups'] select host groups
+	 * @param boolean $options['selectTemplateGroups'] select template groups
 	 * @param boolean $options['selectHosts'] select hosts
 	 * @param boolean $options['selectTemplates'] select templates
 	 *
@@ -94,6 +96,8 @@ class CUserMacro extends CApiService {
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectGroups'				=> null,
+			'selectHostGroups'			=> null,
+			'selectTemplateGroups'		=> null,
 			'selectHosts'				=> null,
 			'selectTemplates'			=> null,
 			'countOutput'				=> false,
@@ -103,6 +107,8 @@ class CUserMacro extends CApiService {
 			'limit'						=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
+
+		$this->checkDeprecatedParam($options, 'selectGroups');
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -136,6 +142,8 @@ class CUserMacro extends CApiService {
 			$options['hostids'] = null;
 			$options['itemids'] = null;
 			$options['selectGroups'] = null;
+			$options['selectHostGroups'] = null;
+			$options['selectTemplateGroups'] = null;
 			$options['selectTemplates'] = null;
 			$options['selectHosts'] = null;
 			$options['inherited'] = null;
@@ -983,7 +991,9 @@ class CUserMacro extends CApiService {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if ($options['output'] != API_OUTPUT_COUNT && $options['globalmacro'] === null) {
-			if ($options['selectGroups'] !== null || $options['selectHosts'] !== null || $options['selectTemplates'] !== null) {
+			if ($options['selectGroups'] !== null || $options['selectHostGroups'] !== null
+					|| $options['selectTemplateGroups'] !== null || $options['selectHosts'] !== null
+					|| $options['selectTemplates'] !== null) {
 				$sqlParts = $this->addQuerySelect($this->fieldId('hostid'), $sqlParts);
 			}
 		}
@@ -1042,25 +1052,9 @@ class CUserMacro extends CApiService {
 			 * Adding objects
 			 */
 			// adding groups
-			if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
-				$res = DBselect(
-					'SELECT hm.hostmacroid,hg.groupid'.
-						' FROM hostmacro hm,hosts_groups hg'.
-						' WHERE '.dbConditionInt('hm.hostmacroid', $hostMacroIds).
-						' AND hm.hostid=hg.hostid'
-				);
-				$relationMap = new CRelationMap();
-				while ($relation = DBfetch($res)) {
-					$relationMap->addRelation($relation['hostmacroid'], $relation['groupid']);
-				}
-
-				$groups = API::HostGroup()->get([
-					'output' => $options['selectGroups'],
-					'groupids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
-				$result = $relationMap->mapMany($result, $groups, 'groups');
-			}
+			$this->addRelatedGroups($options, $result, $hostMacroIds, 'selectGroups');
+			$this->addRelatedGroups($options, $result, $hostMacroIds, 'selectHostGroups');
+			$this->addRelatedGroups($options, $result, $hostMacroIds, 'selectTemplateGroups');
 
 			// adding templates
 			if ($options['selectTemplates'] !== null && $options['selectTemplates'] != API_OUTPUT_COUNT) {
@@ -1086,6 +1080,58 @@ class CUserMacro extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 * @param array $hostMacroIds
+	 * @param string $option
+	 */
+	private function addRelatedGroups(array $options, array &$result, array $hostMacroIds, string $option): void {
+		if ($options[$option] === null || $options[$option] === API_OUTPUT_COUNT) {
+			return;
+		}
+
+		$res = DBselect(
+			'SELECT hm.hostmacroid,hg.groupid'.
+			' FROM hostmacro hm,hosts_groups hg'.
+			' WHERE '.dbConditionInt('hm.hostmacroid', $hostMacroIds).
+			' AND hm.hostid=hg.hostid'
+		);
+		$relationMap = new CRelationMap();
+		while ($relation = DBfetch($res)) {
+			$relationMap->addRelation($relation['hostmacroid'], $relation['groupid']);
+		}
+
+		switch ($option) {
+			case 'selectGroups':
+				$output_tag = 'groups';
+				$entities = [API::HostGroup(), API::TemplateGroup()];
+				break;
+
+			case 'selectHostGroups':
+				$entities = [API::HostGroup()];
+				$output_tag = 'hostgroups';
+				break;
+
+			case 'selectTemplateGroups':
+				$entities = [API::TemplateGroup()];
+				$output_tag = 'templategroups';
+				break;
+		}
+
+		$groups = [];
+		foreach ($entities as $entity) {
+			$groups += $entity->get([
+				'output' => $options[$option],
+				'groupids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			]);
+		}
+
+		$result = $relationMap->mapMany($result, $groups, $output_tag);
+
 	}
 
 	protected function unsetExtraFields(array $objects, array $fields, $output = []) {
