@@ -118,7 +118,7 @@ class CHousekeeping extends CApiService {
 		$db_hk = DB::select('config', ['output' => $output_fields])[0];
 		$hk['compression_availability'] = 0;
 
-		if ($db_hk['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
+		if ($db_hk['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB && $db_hk['dbversion_status'] !== '') {
 			foreach (json_decode($db_hk['dbversion_status'], true) as $dbversion) {
 				if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB
 						&& array_key_exists('compression_availability', $dbversion)) {

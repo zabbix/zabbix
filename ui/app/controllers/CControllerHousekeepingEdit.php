@@ -113,11 +113,15 @@ class CControllerHousekeepingEdit extends CController {
 		];
 
 		if ($data['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
-			foreach (json_decode(CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS), true) as $dbversion) {
-				if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB
-						&& array_key_exists('compression_availability', $dbversion)) {
-					$data['compression_availability'] = (int) $dbversion['compression_availability'];
-					break;
+			$dbversion_status = CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS);
+
+			if ($dbversion_status !== '') {
+				foreach (json_decode($dbversion_status, true) as $dbversion) {
+					if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB
+							&& array_key_exists('compression_availability', $dbversion)) {
+						$data['compression_availability'] = (int) $dbversion['compression_availability'];
+						break;
+					}
 				}
 			}
 		}
