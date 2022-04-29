@@ -22,6 +22,8 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
+ * @onBefore  prepareTestData
+ *
  * @backup config
  */
 class testAuthentication extends CAPITest {
@@ -31,9 +33,8 @@ class testAuthentication extends CAPITest {
 			'Test getting authentication general data' => [
 				'authentication' => [
 					'output' => ['authentication_type', 'passwd_min_length', 'passwd_check_rules', 'http_auth_enabled',
-						'http_login_form', 'http_strip_domains', 'http_case_sensitive', 'ldap_configured', 'ldap_host',
-						'ldap_port', 'ldap_base_dn', 'ldap_search_attribute', 'ldap_bind_dn', 'ldap_case_sensitive',
-						'ldap_bind_password', 'saml_auth_enabled', 'saml_idp_entityid', 'saml_sso_url', 'saml_slo_url',
+						'http_login_form', 'http_strip_domains', 'http_case_sensitive', 'ldap_configured',
+						'ldap_userdirectoryid', 'saml_auth_enabled', 'saml_idp_entityid', 'saml_sso_url', 'saml_slo_url',
 						'saml_username_attribute', 'saml_sp_entityid', 'saml_nameid_format', 'saml_sign_messages',
 						'saml_sign_assertions', 'saml_sign_authn_requests', 'saml_sign_logout_requests',
 						'saml_sign_logout_responses', 'saml_encrypt_nameid', 'saml_encrypt_assertions',
@@ -57,13 +58,6 @@ class testAuthentication extends CAPITest {
 
 					// LDAP fields.
 					'ldap_configured' =>	[ZBX_AUTH_LDAP_DISABLED, ZBX_AUTH_LDAP_ENABLED],
-					'ldap_host' => '',
-					'ldap_port' =>	['min' => 0, 'max' => '65535'],
-					'ldap_base_dn' => '',
-					'ldap_search_attribute' => '',
-					'ldap_bind_dn' => '',
-					'ldap_case_sensitive' => [ZBX_AUTH_CASE_INSENSITIVE ,ZBX_AUTH_CASE_SENSITIVE],
-					'ldap_bind_password' =>	'',
 
 					// SAML fields.
 					'saml_auth_enabled' => [ZBX_AUTH_SAML_DISABLED, ZBX_AUTH_SAML_ENABLED],
@@ -110,14 +104,6 @@ class testAuthentication extends CAPITest {
 
 			// LDAP fields.
 			$this->assertContains($result['ldap_configured'], $get_result['ldap_configured']);
-			$this->assertContains('ldap_host', array_keys($result));
-			$this->assertGreaterThanOrEqual($get_result['ldap_port']['min'], $result['ldap_port']);
-			$this->assertLessThanOrEqual($get_result['ldap_port']['max'], $result['ldap_port']);
-			$this->assertContains('ldap_base_dn', array_keys($result));
-			$this->assertContains('ldap_search_attribute', array_keys($result));
-			$this->assertContains('ldap_bind_dn', array_keys($result));
-			$this->assertContains($result['ldap_case_sensitive'], $get_result['ldap_case_sensitive']);
-			$this->assertContains('ldap_bind_password', array_keys($result));
 
 			// SAML fields.
 			$this->assertContains($result['saml_auth_enabled'], $get_result['saml_auth_enabled']);
@@ -193,36 +179,18 @@ class testAuthentication extends CAPITest {
 				'expected_error' => 'Invalid parameter "/ldap_configured": value must be one of '.
 					implode(', ', [ZBX_AUTH_LDAP_DISABLED, ZBX_AUTH_LDAP_ENABLED]).'.'
 			],
-			'Test invalid LDAP host' => [
+			'Test invalid userdirectoryid' => [
 				'authentication' => [
-					'ldap_host' => ''
+					'ldap_userdirectoryid' => 'userdirectory_invalidid_1'
 				],
-				'expected_error' => 'Invalid parameter "/ldap_host": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": referred object does not exist.'
 			],
-			'Test invalid LDAP port' => [
+			'Cannot set default authentication ldap when ldap is disabled' => [
 				'authentication' => [
-					'ldap_port' => 99999
+					'authentication_type' => ZBX_AUTH_LDAP,
+					'ldap_configured' => ZBX_AUTH_LDAP_DISABLED
 				],
-				'expected_error' => 'Invalid parameter "/ldap_port": value must be one of 0-65535.'
-			],
-			'Test invalid LDAP Base DN' => [
-				'authentication' => [
-					'ldap_base_dn' => ''
-				],
-				'expected_error' => 'Invalid parameter "/ldap_base_dn": cannot be empty.'
-			],
-			'Test invalid LDAP Search attribute' => [
-				'authentication' => [
-					'ldap_search_attribute' => ''
-				],
-				'expected_error' => 'Invalid parameter "/ldap_search_attribute": cannot be empty.'
-			],
-			'Test invalid case sensitive for LDAP auth' => [
-				'authentication' => [
-					'ldap_case_sensitive' => 999
-				],
-				'expected_error' => 'Invalid parameter "/ldap_case_sensitive": value must be one of '.
-					implode(', ', [ZBX_AUTH_CASE_INSENSITIVE, ZBX_AUTH_CASE_SENSITIVE]).'.'
+				'expected_error' => 'Incorrect value for field "/authentication_type": LDAP must be enabled.'
 			],
 
 			// Invalid SAML auth tests.
@@ -367,49 +335,13 @@ class testAuthentication extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Test valid LDAP host' => [
+			'Test userdirectory can be set as default server' => [
 				'authentication' => [
-					'ldap_host' => 'test.ldap.host'
+					'ldap_configured' => ZBX_AUTH_LDAP_ENABLED,
+					'ldap_userdirectoryid' => 'userdirectory_1'
 				],
 				'expected_error' => null
 			],
-			'Test valid LDAP port' => [
-				'authentication' => [
-					'ldap_port' => 23
-				],
-				'expected_error' => null
-			],
-			'Test valid LDAP Base DN' => [
-				'authentication' => [
-					'ldap_base_dn' => 'test.base.dn'
-				],
-				'expected_error' => null
-			],
-			'Test valid LDAP Search attribute' => [
-				'authentication' => [
-					'ldap_search_attribute' => 'test.search.attribute'
-				],
-				'expected_error' => null
-			],
-			'Test valid LDAP Bind DN' => [
-				'authentication' => [
-					'ldap_bind_dn' => 'test.bind.dn'
-				],
-				'expected_error' => null
-			],
-			'Test valid case sensitive for LDAP auth' => [
-				'authentication' => [
-					'ldap_case_sensitive' => ZBX_AUTH_CASE_SENSITIVE
-				],
-				'expected_error' => null
-			],
-			'Test valid LDAP Bind Password' => [
-				'authentication' => [
-					'ldap_bind_password' => 'test.bind.passwd'
-				],
-				'expected_error' => null
-			],
-
 			// Valid SAML auth tests.
 			'Test valid SAML auth' => [
 				'authentication' => [
@@ -509,6 +441,10 @@ class testAuthentication extends CAPITest {
 	 * @dataProvider authentication_update_data_valid
 	 */
 	public function testAuthentication_Update($authentication, $expected_error) {
+		if (array_key_exists('ldap_userdirectoryid', $authentication)) {
+			$authentication['ldap_userdirectoryid'] = static::$data[$authentication['ldap_userdirectoryid']];
+		}
+
 		if ($expected_error === null) {
 			// Before updating, collect old authentication data.
 			$fields = '';
@@ -549,5 +485,24 @@ class testAuthentication extends CAPITest {
 			// Call method and make sure it really returns the error.
 			$this->call('authentication.update', $authentication, $expected_error);
 		}
+	}
+
+	/**
+	 * Test data used by test.
+	 */
+	protected static $data = [
+		'userdirectory_1' => null,
+		'userdirectory_invalidid_1' => 999
+	];
+
+	/**
+	 * Prepare data for tests. Create user, group, userdirectory.
+	 */
+	public function prepareTestData() {
+		$response = CDataHelper::call('userdirectory.create', [
+			['name' => 'LDAP #1', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid'],
+		]);
+		$this->assertArrayHasKey('userdirectoryids', $response);
+		self::$data['userdirectory_1'] = reset($response['userdirectoryids']);
 	}
 }
