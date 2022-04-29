@@ -352,7 +352,7 @@ static int	DBpatch_6010012_update_empty_parents(void)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"update hstgrp set type=%d"
-			" where groupid=%d;\n", HOSTGROUP_TYPE_TEMPLATE, ids.values[i]);
+			" where groupid=" ZBX_FS_UI64 ";\n", HOSTGROUP_TYPE_TEMPLATE, ids.values[i]);
 
 		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 		{
@@ -419,7 +419,7 @@ static int	DBpatch_6010013_update_empty_children(void)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"update hstgrp set type=%d"
-			" where groupid=%d;\n", HOSTGROUP_TYPE_TEMPLATE, ids.values[i]);
+			" where groupid=" ZBX_FS_UI64 ";\n", HOSTGROUP_TYPE_TEMPLATE, ids.values[i]);
 
 		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 		{
