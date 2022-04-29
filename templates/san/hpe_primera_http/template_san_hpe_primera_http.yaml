@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-29T00:27:43Z'
+  date: '2022-04-29T08:17:48Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -21,7 +21,7 @@ zabbix_export:
              Start the WSAPI server by command: `startwsapi`.
              To check WSAPI state use command: `showwsapi`.
           3. Link template to the host.
-          4. Configure macros {$USERNAME} and {$PASSWORD}.
+          4. Configure macros {$HPE.PRIMERA.USERNAME} and {$HPE.PRIMERA.PASSWORD}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -117,10 +117,10 @@ zabbix_export:
               value: cpgs
             -
               name: password
-              value: '{$PASSWORD}'
+              value: '{$HPE.PRIMERA.PASSWORD}'
             -
               name: username
-              value: '{$USERNAME}'
+              value: '{$HPE.PRIMERA.USERNAME}'
           tags:
             -
               tag: component
@@ -213,10 +213,10 @@ zabbix_export:
               value: disks
             -
               name: password
-              value: '{$PASSWORD}'
+              value: '{$HPE.PRIMERA.PASSWORD}'
             -
               name: username
-              value: '{$USERNAME}'
+              value: '{$HPE.PRIMERA.USERNAME}'
           tags:
             -
               tag: component
@@ -332,10 +332,10 @@ zabbix_export:
               value: hosts
             -
               name: password
-              value: '{$PASSWORD}'
+              value: '{$HPE.PRIMERA.PASSWORD}'
             -
               name: username
-              value: '{$USERNAME}'
+              value: '{$HPE.PRIMERA.USERNAME}'
           tags:
             -
               tag: component
@@ -427,10 +427,10 @@ zabbix_export:
               value: ports
             -
               name: password
-              value: '{$PASSWORD}'
+              value: '{$HPE.PRIMERA.PASSWORD}'
             -
               name: username
-              value: '{$USERNAME}'
+              value: '{$HPE.PRIMERA.USERNAME}'
           tags:
             -
               tag: component
@@ -709,10 +709,10 @@ zabbix_export:
               value: system
             -
               name: password
-              value: '{$PASSWORD}'
+              value: '{$HPE.PRIMERA.PASSWORD}'
             -
               name: username
-              value: '{$USERNAME}'
+              value: '{$HPE.PRIMERA.USERNAME}'
           tags:
             -
               tag: component
@@ -1034,10 +1034,10 @@ zabbix_export:
               value: tasks
             -
               name: password
-              value: '{$PASSWORD}'
+              value: '{$HPE.PRIMERA.PASSWORD}'
             -
               name: username
-              value: '{$USERNAME}'
+              value: '{$HPE.PRIMERA.USERNAME}'
           tags:
             -
               tag: component
@@ -1130,10 +1130,10 @@ zabbix_export:
               value: volumes
             -
               name: password
-              value: '{$PASSWORD}'
+              value: '{$HPE.PRIMERA.PASSWORD}'
             -
               name: username
-              value: '{$USERNAME}'
+              value: '{$HPE.PRIMERA.USERNAME}'
           tags:
             -
               tag: component
@@ -2917,7 +2917,7 @@ zabbix_export:
                       value: capacity
             -
               uuid: 8abba6d6f6e749b0be277056421a1958
-              name: 'Port [{#NODE}:{#SLOT}:{#CARD_PORT}]: Type'
+              name: 'Port [{#NODE}:{#SLOT}:{#CARD_PORT}]: Hardware type'
               type: DEPENDENT
               key: 'hpe.primera.port.hw.type["{#NODE}:{#SLOT}:{#CARD_PORT}"]'
               delay: '0'
@@ -3099,11 +3099,11 @@ zabbix_export:
             conditions:
               -
                 macro: '{#NAME}'
-                value: '{$PRIMERA.LLD.FILTER.TASK.NAME.MATCHES}'
+                value: '{$HPE.PRIMERA.LLD.FILTER.TASK.NAME.MATCHES}'
                 formulaid: A
               -
                 macro: '{#NAME}'
-                value: '{$PRIMERA.LLD.FILTER.TASK.NAME.NOT_MATCHES}'
+                value: '{$HPE.PRIMERA.LLD.FILTER.TASK.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'List of task resources.'
@@ -4429,19 +4429,19 @@ zabbix_export:
           value: 3s
           description: 'Response timeout for WSAPI.'
         -
-          macro: '{$PASSWORD}'
-          type: SECRET_TEXT
-          description: 'Specify password for WSAPI.'
-        -
-          macro: '{$PRIMERA.LLD.FILTER.TASK.NAME.MATCHES}'
+          macro: '{$HPE.PRIMERA.LLD.FILTER.TASK.NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable tasks by name.'
         -
-          macro: '{$PRIMERA.LLD.FILTER.TASK.NAME.NOT_MATCHES}'
+          macro: '{$HPE.PRIMERA.LLD.FILTER.TASK.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered tasks by name.'
         -
-          macro: '{$USERNAME}'
+          macro: '{$HPE.PRIMERA.PASSWORD}'
+          type: SECRET_TEXT
+          description: 'Specify password for WSAPI.'
+        -
+          macro: '{$HPE.PRIMERA.USERNAME}'
           value: zabbix
           description: 'Specify user name for WSAPI.'
       valuemaps:
