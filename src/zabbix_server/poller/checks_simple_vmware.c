@@ -1837,10 +1837,10 @@ out:
 #define	DATASTORE_METRIC_MODE_MAX_LATENCY	1
 #define DATASTORE_METRIC_MODE_RPS		2
 
-static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char *username, const char *password,
+static int	check_vcenter_hv_datastore_metrics(AGENT_REQUEST *request, const char *username, const char *password,
 		int direction, AGENT_RESULT *result)
 {
-	const char		*url, *mode, *uuid, *name, *perfcounter;
+	const char		*url, *mode, *hv_uuid, *ds_name, *perfcounter;
 	zbx_uint64_t		access_filter;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
@@ -1858,8 +1858,8 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 	}
 
 	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
-	name = get_rparam(request, 2);
+	hv_uuid = get_rparam(request, 1);
+	ds_name = get_rparam(request, 2);
 	mode = get_rparam(request, 3);
 
 	if (NULL == mode || '\0' == *mode || (0 == strcmp(mode, "latency")))
@@ -1881,13 +1881,13 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	if (NULL == (hv = hv_get(&service->data->hvs, hv_uuid)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 		goto unlock;
 	}
 
-	datastore = ds_get(&service->data->datastores, name);
+	datastore = ds_get(&service->data->datastores, ds_name);
 
 	if (NULL == datastore)
 	{
@@ -1933,7 +1933,6 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 				default:
 					perfcounter = "datastore/totalReadLatency[average]";
 			}
-
 			break;
 		case ZBX_DATASTORE_DIRECTION_WRITE:
 			access_filter = ZBX_VMWARE_DS_WRITE_FILTER;
@@ -1946,7 +1945,6 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 				default:
 					perfcounter = "datastore/totalWriteLatency[average]";
 			}
-
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -1967,8 +1965,8 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 		goto unlock;
 	}
 
-	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id, perfcounter, datastore->uuid, 1,
-			result);
+	ret = vmware_service_get_counter_value_by_path(service, ZBX_VMWARE_SOAP_HV, hv->id, perfcounter,
+			datastore->uuid, 1, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -2148,13 +2146,13 @@ out:
 int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_hv_datastore_latency(request, username, password, ZBX_DATASTORE_DIRECTION_READ, result);
+	return check_vcenter_hv_datastore_metrics(request, username, password, ZBX_DATASTORE_DIRECTION_READ, result);
 }
 
 int	check_vcenter_hv_datastore_write(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_hv_datastore_latency(request, username, password, ZBX_DATASTORE_DIRECTION_WRITE, result);
+	return check_vcenter_hv_datastore_metrics(request, username, password, ZBX_DATASTORE_DIRECTION_WRITE, result);
 }
 
 int	check_vcenter_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
