@@ -37,8 +37,8 @@
 #define ZBX_DATASTORE_COUNTER_USED		0x02
 #define ZBX_DATASTORE_COUNTER_PROVISIONED	0x04
 
-#define ZBX_DIRECTION_IN	0
-#define ZBX_DIRECTION_OUT	1
+#define ZBX_IF_DIRECTION_IN	0
+#define ZBX_IF_DIRECTION_OUT	1
 
 static int	vmware_set_powerstate_result(AGENT_RESULT *result)
 {
@@ -1556,24 +1556,24 @@ static int	check_vcenter_hv_network_common(AGENT_REQUEST *request, const char *u
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bps"))
 	{
-		counter_name = ZBX_DIRECTION_IN == direction ? "net/received[average]" : "net/transmitted[average]";
+		counter_name = ZBX_IF_DIRECTION_IN == direction ? "net/received[average]" : "net/transmitted[average]";
 		coeff = ZBX_KIBIBYTE;
 	}
 	else if (0 == strcmp(mode, "packets"))
 	{
-		counter_name = ZBX_DIRECTION_IN == direction ? "net/packetsRx[summation]" : "net/packetsTx[summation]";
+		counter_name = ZBX_IF_DIRECTION_IN == direction ? "net/packetsRx[summation]" : "net/packetsTx[summation]";
 	}
 	else if (0 == strcmp(mode, "dropped"))
 	{
-		counter_name = ZBX_DIRECTION_IN == direction ? "net/droppedRx[summation]" : "net/droppedTx[summation]";
+		counter_name = ZBX_IF_DIRECTION_IN == direction ? "net/droppedRx[summation]" : "net/droppedTx[summation]";
 	}
 	else if (0 == strcmp(mode, "errors"))
 	{
-		counter_name = ZBX_DIRECTION_IN == direction ? "net/errorsRx[summation]" : "net/errorsTx[summation]";
+		counter_name = ZBX_IF_DIRECTION_IN == direction ? "net/errorsRx[summation]" : "net/errorsTx[summation]";
 	}
 	else if (0 == strcmp(mode, "broadcast"))
 	{
-		counter_name = ZBX_DIRECTION_IN == direction ? "net/broadcastRx[summation]" : "net/broadcastTx[summation]";
+		counter_name = ZBX_IF_DIRECTION_IN == direction ? "net/broadcastRx[summation]" : "net/broadcastTx[summation]";
 	}
 	else
 	{
@@ -1606,13 +1606,13 @@ out:
 int	check_vcenter_hv_network_in(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return	check_vcenter_hv_network_common(request, username, password, result, ZBX_DIRECTION_IN, __func__);
+	return	check_vcenter_hv_network_common(request, username, password, result, ZBX_IF_DIRECTION_IN, __func__);
 }
 
 int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return	check_vcenter_hv_network_common(request, username, password, result, ZBX_DIRECTION_OUT, __func__);
+	return	check_vcenter_hv_network_common(request, username, password, result, ZBX_IF_DIRECTION_OUT, __func__);
 }
 
 int	check_vcenter_hv_datacenter_name(AGENT_REQUEST *request, const char *username, const char *password,
