@@ -1975,10 +1975,10 @@ out:
 	return ret;
 }
 
-static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *username, const char *password,
+static int	check_vcenter_datastore_metrics(AGENT_REQUEST *request, const char *username, const char *password,
 		int direction, AGENT_RESULT *result)
 {
-	const char		*url, *mode, *name, *perfcounter;
+	const char		*url, *mode, *ds_name, *perfcounter;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_datastore_t	*datastore;
@@ -1994,7 +1994,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 	}
 
 	url = get_rparam(request, 0);
-	name = get_rparam(request, 1);
+	ds_name = get_rparam(request, 1);
 	mode = get_rparam(request, 2);
 
 	if (NULL == mode || '\0' == *mode || (0 == strcmp(mode, "latency")))
@@ -2020,7 +2020,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	datastore = ds_get(&service->data->datastores, name);
+	datastore = ds_get(&service->data->datastores, ds_name);
 
 	if (NULL == datastore)
 	{
@@ -2038,6 +2038,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 	{
 		case ZBX_DATASTORE_DIRECTION_READ:
 			access_filter = ZBX_VMWARE_DS_READ_FILTER;
+
 			switch (metric_mode)
 			{
 				case DATASTORE_METRIC_MODE_RPS:
@@ -2049,6 +2050,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 			break;
 		case ZBX_DATASTORE_DIRECTION_WRITE:
 			access_filter = ZBX_VMWARE_DS_WRITE_FILTER;
+
 			switch (metric_mode)
 			{
 				case DATASTORE_METRIC_MODE_RPS:
@@ -2060,6 +2062,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
+			goto unlock;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): perfcounter:%s", __func__, perfcounter);
@@ -2110,7 +2113,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 		if (0 == ISSET_VALUE(result))
 			continue;
 
-		if (DATASTORE_METRIC_MODE_MAX_LATENCY == metric_mode || DATASTORE_METRIC_MODE_RPS == metric_mode)
+		if (DATASTORE_METRIC_MODE_MAX_LATENCY != metric_mode)
 		{
 			value += *GET_UI64_RESULT(result);
 			count++;
@@ -2127,7 +2130,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 		goto unlock;
 	}
 
-	if (DATASTORE_METRIC_MODE_MAX_LATENCY == metric_mode && 0 != count)
+	if (DATASTORE_METRIC_MODE_MAX_LATENCY != metric_mode && 0 != count)
 		value = value / count;
 
 	SET_UI64_RESULT(result, value);
@@ -2158,13 +2161,13 @@ int	check_vcenter_hv_datastore_write(AGENT_REQUEST *request, const char *usernam
 int	check_vcenter_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_datastore_latency(request, username, password, ZBX_DATASTORE_DIRECTION_READ, result);
+	return check_vcenter_datastore_metrics(request, username, password, ZBX_DATASTORE_DIRECTION_READ, result);
 }
 
 int	check_vcenter_datastore_write(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_datastore_latency(request, username, password, ZBX_DATASTORE_DIRECTION_WRITE, result);
+	return check_vcenter_datastore_metrics(request, username, password, ZBX_DATASTORE_DIRECTION_WRITE, result);
 }
 
 static int	check_vcenter_hv_datastore_size_vsphere(int mode, const zbx_vmware_datastore_t *datastore,
