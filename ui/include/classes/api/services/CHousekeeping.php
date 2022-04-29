@@ -110,7 +110,7 @@ class CHousekeeping extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateUpdate(array &$hk, ?array &$db_hk): void {
+	private function validateUpdate(array $hk, ?array &$db_hk): void {
 		$output_fields = $this->output_fields;
 		$output_fields[] = 'configid';
 		$output_fields[] = 'dbversion_status';
@@ -133,7 +133,7 @@ class CHousekeeping extends CApiService {
 			$hk += array_intersect_key($db_hk, array_flip(['compression_status']));
 		}
 
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'hk_events_mode' =>				['type' => API_INT32, 'in' => '0,1'],
 			'hk_events_trigger' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
 			'hk_events_service' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
@@ -160,7 +160,7 @@ class CHousekeeping extends CApiService {
 			'compress_older' =>				['type' => API_MULTIPLE, 'rules' => [
 												['if' => static function (array $data): bool {
 													return array_key_exists('compression_status', $data) && $data['compression_status'] == 1;
-												}, 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [7 * SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+												}, 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [7 * SEC_PER_DAY, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('config', 'compress_older')],
 												['else' => true, 'type' => API_UNEXPECTED]
 			]]
 		]];
@@ -168,7 +168,5 @@ class CHousekeeping extends CApiService {
 		if (!CApiInputValidator::validate($api_input_rules, $hk, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-
-		unset($hk['compression_availability']);
 	}
 }
