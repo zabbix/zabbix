@@ -1856,8 +1856,8 @@ class CApiInputValidatorTest extends TestCase {
 			[
 				['type' => API_OBJECTS, 'fields' => [
 					'name' => ['type' => API_STRING_UTF8],
-					'col' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'default' => '0'],
-					'row' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'default' => '1'],
+					'col' => ['type' => API_INT32, 'default' => '0'],
+					'row' => ['type' => API_INT32, 'default' => '1'],
 					'width' => ['type' => API_INT32],
 					'height' => ['type' => API_INT32]
 				]],
