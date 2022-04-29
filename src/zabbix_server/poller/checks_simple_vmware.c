@@ -3578,8 +3578,6 @@ int	check_vcenter_vm_storage_uncommitted(AGENT_REQUEST *request, const char *use
 	return ret;
 }
 
-#define ZBX_VMWARE_VM_TOOLS_VERSION             0
-#define ZBX_VMWARE_VM_TOOLS_RUNNING_STATUS      1
 int	check_vcenter_vm_tools(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
@@ -3604,11 +3602,11 @@ int	check_vcenter_vm_tools(AGENT_REQUEST *request, const char *username, const c
 
 	if (0 == strcmp(param1, "version"))
 	{
-		mode = ZBX_VMWARE_VM_TOOLS_VERSION;
+		mode = ZBX_VMWARE_VMPROP_TOOLS_VERSION;
 	}
 	else if (0 == strcmp(param1, "status"))
 	{
-		mode = ZBX_VMWARE_VM_TOOLS_RUNNING_STATUS;
+		mode = ZBX_VMWARE_VMPROP_TOOLS_RUNNING_STATUS;
 	}
 	else
 	{
@@ -3623,8 +3621,6 @@ out:
 
 	return ret;
 }
-#undef ZBX_VMWARE_VM_TOOLS_VERSION
-#undef ZBX_VMWARE_VM_TOOLS_RUNNING_STATUS
 
 int	check_vcenter_vm_uptime(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
