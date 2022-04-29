@@ -1003,6 +1003,7 @@ class CScript extends CApiService {
 		]);
 
 		$scripts = $this->addRelatedGroupsAndHosts([
+			'selectGroups' => null,
 			'selectHostGroups' => null,
 			'selectHosts' => ['hostid']
 		], $scripts, $hostids);
