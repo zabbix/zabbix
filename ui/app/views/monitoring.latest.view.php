@@ -64,7 +64,7 @@ else {
 
 $widget->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key($data,
 	array_flip(['filter', 'sort_field', 'sort_order', 'view_curl', 'paging', 'hosts', 'items', 'history', 'config',
-		'tags', 'maintenances'
+		'tags', 'maintenances', 'items_rw'
 	])
 )));
 
@@ -75,7 +75,8 @@ $widget->show();
 		'filter_options' => $data['filter_options'],
 		'refresh_url' => $data['refresh_url'],
 		'refresh_data' => $data['refresh_data'],
-		'refresh_interval' => $data['refresh_interval']
+		'refresh_interval' => $data['refresh_interval'],
+		'checkbox_object' => 'itemids'
 	]).');
 '))
 	->setOnDocumentReady()
