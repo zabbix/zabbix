@@ -1924,6 +1924,7 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 	{
 		case ZBX_DATASTORE_DIRECTION_READ:
 			access_filter = ZBX_VMWARE_DS_READ_FILTER;
+
 			switch (metric_mode)
 			{
 				case DATASTORE_METRIC_MODE_RPS:
@@ -1932,9 +1933,11 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 				default:
 					perfcounter = "datastore/totalReadLatency[average]";
 			}
+
 			break;
 		case ZBX_DATASTORE_DIRECTION_WRITE:
 			access_filter = ZBX_VMWARE_DS_WRITE_FILTER;
+
 			switch (metric_mode)
 			{
 				case DATASTORE_METRIC_MODE_RPS:
@@ -1943,9 +1946,11 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 				default:
 					perfcounter = "datastore/totalWriteLatency[average]";
 			}
+
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
+			goto unlock;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): perfcounter:%s", __func__, perfcounter);
