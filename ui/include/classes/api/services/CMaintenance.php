@@ -1309,6 +1309,7 @@ class CMaintenance extends CApiService {
 			]);
 		}
 
-		$result = $relationMap->mapMany($result, $groups, 'hostgroups');
+		$output_tag = $option === 'selectGroups' ? 'groups' : 'hostgroups';
+		$result = $relationMap->mapMany($result, $groups, $output_tag);
 	}
 }

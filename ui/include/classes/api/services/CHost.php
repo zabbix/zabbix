@@ -1750,15 +1750,6 @@ class CHost extends CHostGeneral {
 			return;
 		}
 
-		switch ($option) {
-			case 'selectGroups':
-				$output_tag = 'groups';
-				break;
-			case 'selectHostGroups':
-				$output_tag = 'hostgroups';
-				break;
-		}
-
 		$relationMap = $this->createRelationMap($result, 'hostid', 'groupid', 'hosts_groups');
 		$groups = API::HostGroup()->get([
 			'output' => $options[$option],
@@ -1766,6 +1757,7 @@ class CHost extends CHostGeneral {
 			'preservekeys' => true
 		]);
 
+		$output_tag = $option === 'selectGroups' ? 'groups' : 'hostgroups';
 		$result = $relationMap->mapMany($result, $groups, $output_tag);
 	}
 
