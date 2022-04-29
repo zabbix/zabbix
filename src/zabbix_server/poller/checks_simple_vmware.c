@@ -3586,13 +3586,12 @@ int	check_vcenter_vm_storage_uncommitted(AGENT_REQUEST *request, const char *use
 int	check_vcenter_vm_tools(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		mode, ret;
+	int		mode, ret = SYSINFO_RET_FAIL;
 	const char	*param1;
 
 	if (1 != request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		ret = SYSINFO_RET_FAIL;
 		goto out;
 	}
 
@@ -3601,7 +3600,6 @@ int	check_vcenter_vm_tools(AGENT_REQUEST *request, const char *username, const c
 	if (NULL == param1 || '\0' == *param1)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		ret = SYSINFO_RET_FAIL;
 		goto out;
 	}
 
@@ -3616,7 +3614,6 @@ int	check_vcenter_vm_tools(AGENT_REQUEST *request, const char *username, const c
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter value."));
-		ret = SYSINFO_RET_FAIL;
 		goto out;
 	}
 
