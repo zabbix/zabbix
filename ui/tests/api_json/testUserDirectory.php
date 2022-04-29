@@ -51,7 +51,7 @@ class testUserDirectory extends CAPITest {
 			],
 			'Test duplicate name' => [
 				'userdirectory' => [
-					['name' => 'LDAP #1', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid'],
+					['name' => 'LDAP #1', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid']
 				],
 				'expected_error' => 'User directory "LDAP #1" already exists.'
 			]
@@ -76,7 +76,7 @@ class testUserDirectory extends CAPITest {
 		return [
 			'Test host update' => [
 				'userdirectory' => [
-					['userdirectoryid' => 'LDAP #1', 'host' => 'localhost'],
+					['userdirectoryid' => 'LDAP #1', 'host' => 'localhost']
 				],
 				'expected_error' => null
 			]
@@ -87,20 +87,20 @@ class testUserDirectory extends CAPITest {
 		return [
 			'Test duplicate name update' => [
 				'userdirectory' => [
-					['userdirectoryid' => 'LDAP #1', 'name' => 'LDAP #2'],
+					['userdirectoryid' => 'LDAP #1', 'name' => 'LDAP #2']
 				],
 				'expected_error' => 'User directory "LDAP #2" already exists.'
 			],
 			'Test duplicate names cross name update' => [
 				'userdirectory' => [
 					['userdirectoryid' => 'LDAP #1', 'name' => 'LDAP #2'],
-					['userdirectoryid' => 'LDAP #2', 'name' => 'LDAP #1'],
+					['userdirectoryid' => 'LDAP #2', 'name' => 'LDAP #1']
 				],
 				'expected_error' => 'User directory "LDAP #1" already exists.'
 			],
 			'Test update not existing' => [
 				'userdirectory' => [
-					['userdirectoryid' => 1234, 'name' => 'LDAP #1234'],
+					['userdirectoryid' => 1234, 'name' => 'LDAP #1234']
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			]
@@ -228,7 +228,7 @@ class testUserDirectory extends CAPITest {
 	public function prepareTestData() {
 		$response = CDataHelper::call('userdirectory.create', [
 			['name' => 'API LDAP #1', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid'],
-			['name' => 'API LDAP #2', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid'],
+			['name' => 'API LDAP #2', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid']
 		]);
 		$this->assertArrayHasKey('userdirectoryids', $response);
 		self::$data['userdirectoryid'] = array_combine(['API LDAP #1', 'API LDAP #2'], $response['userdirectoryids']);

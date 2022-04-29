@@ -500,7 +500,7 @@ class testAuthentication extends CAPITest {
 	 */
 	public function prepareTestData() {
 		$response = CDataHelper::call('userdirectory.create', [
-			['name' => 'LDAP #1', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid'],
+			['name' => 'LDAP #1', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid']
 		]);
 		$this->assertArrayHasKey('userdirectoryids', $response);
 		self::$data['userdirectory_1'] = reset($response['userdirectoryids']);
