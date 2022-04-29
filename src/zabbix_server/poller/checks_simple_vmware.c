@@ -1621,15 +1621,15 @@ int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, c
 			__func__);
 }
 
-int     check_vcenter_hv_net_if_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+int	check_vcenter_hv_net_if_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int                     i, ret = SYSINFO_RET_FAIL;
-	const char              *url, *uuid;
-	struct zbx_json         json_data;
-	zbx_vmware_service_t    *service;
-	zbx_vmware_hv_t         *hv;
-	zbx_vmware_pnic_t       *nic;
+	int			i, ret = SYSINFO_RET_FAIL;
+	const char		*url, *uuid;
+	struct zbx_json		json_data;
+	zbx_vmware_service_t	*service;
+	zbx_vmware_hv_t		*hv;
+	zbx_vmware_pnic_t	*nic;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1644,11 +1644,20 @@ int     check_vcenter_hv_net_if_discovery(AGENT_REQUEST *request, const char *us
 
 	zbx_vmware_lock();
 
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
+		goto unlock;
+	}
+
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < hv->pnics->values_num; i++)
+	for (i = 0; i < hv->pnics.values_num; i++)
 	{
-		nic = (zbx_vmware_pnic_t *)hv->pnics->values[i];
+		nic = hv->pnics.values[i];
 
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#IFNAME}", ZBX_NULL2EMPTY_STR(nic->name), ZBX_JSON_TYPE_STRING);
@@ -1680,12 +1689,13 @@ out:
 int	check_vcenter_hv_network_linkspeed(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int                     i, ret = SYSINFO_RET_FAIL;
-	const char              *url, *uuid, *name, *value = NULL;
-	struct zbx_json         json_data;
-	zbx_vmware_service_t    *service;
-	zbx_vmware_hv_t         *hv;
-	zbx_vmware_pnic_t       *nic;
+	int			i, ret = SYSINFO_RET_FAIL;
+	const char		*url, *uuid, *name;
+	struct zbx_json		json_data;
+	zbx_uint64_t		value = 0;
+	zbx_vmware_service_t	*service;
+	zbx_vmware_hv_t		*hv;
+	zbx_vmware_pnic_t	*nic;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1701,23 +1711,33 @@ int	check_vcenter_hv_network_linkspeed(AGENT_REQUEST *request, const char *usern
 
 	zbx_vmware_lock();
 
-	for (i = 0; i < hv->pnics->values_num; i++)
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
 	{
-		nic = (zbx_vmware_pnic_t *)hv->pnics->values[i];
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
+		goto unlock;
+	}
+
+	for (i = 0; i < hv->pnics.values_num; i++)
+	{
+		nic = hv->pnics.values[i];
 
 		if (0 != strcmp(name, nic->name))
 			continue;
 
-		SET_UI64_RESULT(result, nic->speed);
+		value = nic->speed;
 		break;
 	}
 
-	if (NULL == value)
+	if (0 == value)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown physical network interface name"));
 		goto out;
 	}
 
+	SET_UI64_RESULT(result, nic->speed);
 	ret = SYSINFO_RET_OK;
 unlock:
 	zbx_vmware_unlock();

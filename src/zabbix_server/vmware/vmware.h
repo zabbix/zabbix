@@ -230,7 +230,7 @@ typedef struct
 	char				**props;
 	zbx_vector_vmware_dsname_t	dsnames;
 	zbx_vector_ptr_t		vms;
-	zbx_vector_vmware_pnic_t	*pnics;
+	zbx_vector_vmware_pnic_t	pnics;
 }
 zbx_vmware_hv_t;
 
