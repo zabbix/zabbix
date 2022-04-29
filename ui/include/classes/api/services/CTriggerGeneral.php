@@ -693,26 +693,9 @@ abstract class CTriggerGeneral extends CApiService {
 		$triggerids = array_keys($result);
 
 		// adding groups
-		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
-			$res = DBselect(
-				'SELECT f.triggerid,hg.groupid'.
-					' FROM functions f,items i,hosts_groups hg'.
-					' WHERE '.dbConditionInt('f.triggerid', $triggerids).
-					' AND f.itemid=i.itemid'.
-					' AND i.hostid=hg.hostid'
-			);
-			$relationMap = new CRelationMap();
-			while ($relation = DBfetch($res)) {
-				$relationMap->addRelation($relation['triggerid'], $relation['groupid']);
-			}
-
-			$groups = API::HostGroup()->get([
-				'output' => $options['selectGroups'],
-				'groupids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
-			$result = $relationMap->mapMany($result, $groups, 'groups');
-		}
+		$this->addRelatedGroups($options, $result, $triggerids,'selectGroups');
+		$this->addRelatedGroups($options, $result, $triggerids, 'selectHostGroups');
+		$this->addRelatedGroups($options, $result, $triggerids, 'selectTemplateGroups');
 
 		// adding hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
@@ -774,6 +757,58 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 * @param array $triggerids
+	 * @param string $option
+	 */
+	private function addRelatedGroups(array $options, array &$result, array $triggerids, string $option): void {
+		if ($options[$option] === null || $options[$option] === API_OUTPUT_COUNT) {
+			return;
+		}
+
+		$res = DBselect(
+			'SELECT f.triggerid,hg.groupid'.
+			' FROM functions f,items i,hosts_groups hg'.
+			' WHERE '.dbConditionInt('f.triggerid', $triggerids).
+			' AND f.itemid=i.itemid'.
+			' AND i.hostid=hg.hostid'
+		);
+		$relationMap = new CRelationMap();
+		while ($relation = DBfetch($res)) {
+			$relationMap->addRelation($relation['triggerid'], $relation['groupid']);
+		}
+
+		switch ($option) {
+			case 'selectGroups':
+				$output_tag = 'groups';
+				$entities = [API::HostGroup(), API::TemplateGroup()];
+				break;
+
+			case 'selectHostGroups':
+				$entities = [API::HostGroup()];
+				$output_tag = 'hostgroups';
+				break;
+
+			case 'selectTemplateGroups':
+				$entities = [API::TemplateGroup()];
+				$output_tag = 'templategroups';
+				break;
+		}
+
+		$groups = [];
+		foreach ($entities as $entity) {
+			$groups += $entity->get([
+				'output' => $options[$option],
+				'groupids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			]);
+		}
+
+		$result = $relationMap->mapMany($result, $groups, $output_tag);
 	}
 
 	/**
