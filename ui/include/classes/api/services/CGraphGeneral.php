@@ -370,28 +370,9 @@ abstract class CGraphGeneral extends CApiService {
 		}
 
 		// adding HostGroups
-		if ($options['selectGroups'] !== null && $options['selectGroups'] !== API_OUTPUT_COUNT) {
-			$relationMap = new CRelationMap();
-			// discovered items
-			$dbRules = DBselect(
-				'SELECT gi.graphid,hg.groupid'.
-				' FROM graphs_items gi,items i,hosts_groups hg'.
-				' WHERE '.dbConditionInt('gi.graphid', $graphids).
-				' AND gi.itemid=i.itemid'.
-				' AND i.hostid=hg.hostid'
-			);
-			while ($relation = DBfetch($dbRules)) {
-				$relationMap->addRelation($relation['graphid'], $relation['groupid']);
-			}
-
-			$groups = API::HostGroup()->get([
-				'output' => $options['selectGroups'],
-				'groupids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
-			$result = $relationMap->mapMany($result, $groups, 'groups');
-		}
+		$this->addRelatedGroups($options, $result, $graphids, 'selectGroups');
+		$this->addRelatedGroups($options, $result, $graphids, 'selectHostGroups');
+		$this->addRelatedGroups($options, $result, $graphids, 'selectTemplateGroups');
 
 		// adding Hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] !== API_OUTPUT_COUNT) {
@@ -453,6 +434,60 @@ abstract class CGraphGeneral extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 * @param array $graphids
+	 * @param string $option
+	 */
+	private function addRelatedGroups(array $options, array &$result, array $graphids, string $option): void {
+		if ($options[$option] === null || $options[$option] === API_OUTPUT_COUNT) {
+			return;
+		}
+
+		$relationMap = new CRelationMap();
+		// discovered items
+		$dbRules = DBselect(
+			'SELECT gi.graphid,hg.groupid'.
+			' FROM graphs_items gi,items i,hosts_groups hg'.
+			' WHERE '.dbConditionInt('gi.graphid', $graphids).
+			' AND gi.itemid=i.itemid'.
+			' AND i.hostid=hg.hostid'
+		);
+		while ($relation = DBfetch($dbRules)) {
+			$relationMap->addRelation($relation['graphid'], $relation['groupid']);
+		}
+
+		switch ($option) {
+			case 'selectGroups':
+				$output_tag = 'groups';
+				$entities = [API::HostGroup(), API::TemplateGroup()];
+				break;
+
+			case 'selectHostGroups':
+				$entities = [API::HostGroup()];
+				$output_tag = 'hostgroups';
+				break;
+
+			case 'selectTemplateGroups':
+				$entities = [API::TemplateGroup()];
+				$output_tag = 'templategroups';
+				break;
+		}
+
+		$groups = [];
+		foreach ($entities as $entity) {
+			$groups += $entity->get([
+				'output' => $options[$option],
+				'groupids' => $relationMap->getRelatedIds(),
+				'nopermissions' => true,
+				'preservekeys' => true
+			]);
+		}
+
+		$result = $relationMap->mapMany($result, $groups, $output_tag);
 	}
 
 	/**
