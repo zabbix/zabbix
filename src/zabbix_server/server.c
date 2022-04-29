@@ -1514,7 +1514,7 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 		zbx_tcp_unlisten(listen_sock);
 
 	/* destroy shared caches */
-	zbx_tfc_destroy(CONFIG_TREND_FUNC_CACHE_SIZE);
+	zbx_tfc_destroy();
 	zbx_vc_destroy();
 	zbx_vmware_destroy();
 	free_selfmon_collector();
