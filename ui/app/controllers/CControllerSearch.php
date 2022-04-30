@@ -113,7 +113,6 @@ class CControllerSearch extends CController {
 	protected function getTemplatesData() {
 		$templates = API::Template()->get([
 			'output' => ['name', 'host'],
-			'selectTemplateGroups' => ['groupid'],
 			'selectItems' => API_OUTPUT_COUNT,
 			'selectTriggers' => API_OUTPUT_COUNT,
 			'selectGraphs' => API_OUTPUT_COUNT,
