@@ -325,7 +325,7 @@ class CConfigurationExport {
 
 		foreach ($templates as &$template) {
 			// merge host groups with all groups
-			$this->data['template_groups'] += array_column($template['groups'], null, 'groupid');
+			$this->data['template_groups'] += array_column($template['templategroups'], null, 'groupid');
 
 			$template['dashboards'] = [];
 			$template['discoveryRules'] = [];

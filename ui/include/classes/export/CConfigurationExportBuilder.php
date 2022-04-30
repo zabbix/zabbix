@@ -262,7 +262,7 @@ class CConfigurationExportBuilder {
 				'template' => $template['host'],
 				'name' => $template['name'],
 				'description' => $template['description'],
-				'groups' => $this->formatGroups($template['groups']),
+				'groups' => $this->formatGroups($template['templategroups']),
 				'items' => $this->formatItems($template['items'], $simple_triggers),
 				'discovery_rules' => $this->formatDiscoveryRules($template['discoveryRules']),
 				'httptests' => $this->formatHttpTests($template['httptests']),
