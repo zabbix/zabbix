@@ -98,6 +98,7 @@ typedef struct
 	const char		*port;
 	const char		*error;
 	const char		*delay;
+	const char		*delay_ex;
 	const char		*history_period;
 	ZBX_DC_TRIGGER		**triggers;
 	int			nextcheck;

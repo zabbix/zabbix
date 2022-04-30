@@ -72,9 +72,6 @@ int	sync_in_progress = 0;
 		in_maintenance_without_data_collection(dc_host->maintenance_status,	\
 				dc_host->maintenance_type, dc_item->type)
 
-ZBX_PTR_VECTOR_DECL(dc_item, ZBX_DC_ITEM *)
-ZBX_PTR_VECTOR_IMPL(dc_item, ZBX_DC_ITEM *)
-
 ZBX_PTR_VECTOR_IMPL(cached_proxy, zbx_cached_proxy_t *)
 
 /******************************************************************************
@@ -103,8 +100,7 @@ ZBX_SHMEM_FUNC_IMPL(__config, config_mem)
 static void	dc_maintenance_precache_nested_groups(void);
 static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_exclude);
 
-static char	*dc_expand_user_macros_dyn(zbx_um_cache_t *um_cache, const char *text, const zbx_uint64_t *hostids,
-		int hostids_num);
+static char	*dc_expand_user_macros_dyn(const char *text, const zbx_uint64_t *hostids, int hostids_num);
 
 static void	dc_reschedule_items();
 
@@ -357,57 +353,13 @@ static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *
 	}
 }
 
-static int	dc_get_item_nextcheck(const ZBX_DC_ITEM *item, int now, int schedule_early, int disable_until,
-		int *nextcheck, char **error)
-{
-	zbx_uint64_t		seed;
-	int			ret, simple_interval;
-	zbx_custom_interval_t	*custom_intervals;
-	char			*delay_s;
-
-	seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, item->type, item->key);
-
-	delay_s = dc_expand_user_macros_dyn(config->um_cache, item->delay, &item->hostid, 1);
-	ret = zbx_interval_preproc(delay_s, &simple_interval, &custom_intervals, error);
-	zbx_free(delay_s);
-
-	if (SUCCEED != ret)
-	{
-		/* Polling items with invalid update intervals repeatedly does not make sense because they */
-		/* can only be healed by editing configuration (either update interval or macros involved) */
-		/* and such changes will be applied during configuration synchronization.                  */
-		*nextcheck = ZBX_JAN_2038;
-		return FAIL;
-	}
-
-	if (0 != disable_until)
-	{
-		*nextcheck = calculate_item_nextcheck_unreachable(simple_interval, custom_intervals, disable_until);
-	}
-	else
-	{
-		if (0 != schedule_early &&
-				FAIL == zbx_custom_interval_is_scheduling(custom_intervals) &&
-				ZBX_DEFAULT_ITEM_UPDATE_INTERVAL < simple_interval)
-		{
-			*nextcheck = calculate_item_nextcheck(seed, item->type, ZBX_DEFAULT_ITEM_UPDATE_INTERVAL, NULL,
-					now);
-		}
-		else
-		{
-			*nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval, custom_intervals, now);
-		}
-	}
-
-	zbx_custom_interval_free(custom_intervals);
-
-	return SUCCEED;
-}
-
 static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface, int flags, int now,
 		char **error)
 {
-	int	disable_until, schedule_early = 0;
+	zbx_uint64_t		seed;
+	int			simple_interval, disable_until, ret;
+	zbx_custom_interval_t	*custom_intervals;
+	char			*delay_s;
 
 	if (0 == (flags & ZBX_ITEM_COLLECTED) && 0 != item->nextcheck &&
 			0 == (flags & ZBX_ITEM_KEY_CHANGED) && 0 == (flags & ZBX_ITEM_TYPE_CHANGED) &&
@@ -416,15 +368,51 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *in
 		return SUCCEED;	/* avoid unnecessary nextcheck updates when syncing items in cache */
 	}
 
-	if (0 != (flags & ZBX_ITEM_NEW) && ITEM_TYPE_ZABBIX_ACTIVE != item->type)
-		schedule_early = 1;
+	seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, item->type, item->key);
 
-	if (0 != (flags & ZBX_HOST_UNREACHABLE) && NULL != interface)
-		disable_until = DCget_disable_until(item, interface);
+	delay_s = dc_expand_user_macros_dyn(item->delay, &item->hostid, 1);
+	ret = zbx_interval_preproc(delay_s, &simple_interval, &custom_intervals, error);
+	zbx_free(delay_s);
+
+	if (SUCCEED != ret)
+	{
+		/* Polling items with invalid update intervals repeatedly does not make sense because they */
+		/* can only be healed by editing configuration (either update interval or macros involved) */
+		/* and such changes will be detected during configuration synchronization. DCsync_items()  */
+		/* detects item configuration changes affecting check scheduling and passes them in flags. */
+
+		item->nextcheck = ZBX_JAN_2038;
+		return FAIL;
+	}
+
+	if (0 != (flags & ZBX_HOST_UNREACHABLE) && NULL != interface && 0 != (disable_until =
+			DCget_disable_until(item, interface)))
+	{
+		item->nextcheck = calculate_item_nextcheck_unreachable(simple_interval,
+				custom_intervals, disable_until);
+	}
 	else
-		disable_until = 0;
+	{
+		if (0 != (flags & ZBX_ITEM_NEW) &&
+				FAIL == zbx_custom_interval_is_scheduling(custom_intervals) &&
+				ITEM_TYPE_ZABBIX_ACTIVE != item->type &&
+				ZBX_DEFAULT_ITEM_UPDATE_INTERVAL < simple_interval)
+		{
+			item->nextcheck = calculate_item_nextcheck(seed, item->type, ZBX_DEFAULT_ITEM_UPDATE_INTERVAL,
+					NULL, now);
+		}
+		else
+		{
+			/* supported items and items that could not have been scheduled previously, but had */
+			/* their update interval fixed, should be scheduled using their update intervals */
+			item->nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval, custom_intervals,
+					now);
+		}
+	}
 
-	return dc_get_item_nextcheck(item, now, schedule_early, disable_until, &item->nextcheck, error);
+	zbx_custom_interval_free(custom_intervals);
+
+	return SUCCEED;
 }
 
 static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags)
@@ -2238,6 +2226,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 			item->location = ZBX_LOC_NOWHERE;
 			item->poller_type = ZBX_NO_POLLER;
 			item->queue_priority = ZBX_QUEUE_PRIORITY_NORMAL;
+			item->delay_ex = NULL;
 
 			if (ZBX_SYNCED_NEW_CONFIG_YES == synced && 0 == host->proxy_hostid)
 				flags |= ZBX_ITEM_NEW;
@@ -2287,7 +2276,16 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 		/* process item intervals and update item nextcheck */
 
 		if (SUCCEED == dc_strpool_replace(found, &item->delay, row[8]))
+		{
 			flags |= ZBX_ITEM_DELAY_CHANGED;
+
+			/* reset expanded delay if raw value was changed */
+			if (NULL != item->delay_ex)
+			{
+				dc_strpool_release(item->delay_ex);
+				item->delay_ex = NULL;
+			}
+		}
 
 		/* numeric items */
 
@@ -2907,6 +2905,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 		dc_strpool_release(item->delay);
 		dc_strpool_release(item->history_period);
 
+		if (NULL != item->delay_ex)
+			dc_strpool_release(item->delay_ex);
+
 		if (NULL != item->triggers)
 			config->items.mem_free_func(item->triggers);
 
@@ -3314,7 +3315,7 @@ static int	dc_function_calculate_trends_nextcheck(const zbx_dc_um_handle_t *um_h
 	{
 		char	*tmp;
 
-		tmp = dc_expand_user_macros_dyn(config->um_cache, param, &timer->hostid, 1);
+		tmp = dc_expand_user_macros_dyn(param, &timer->hostid, 1);
 		zbx_free(param);
 		param = tmp;
 	}
@@ -10215,8 +10216,7 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int pr
  *          macros                                                            *
  *                                                                            *
  ******************************************************************************/
-static char	*dc_expand_user_macros_dyn(zbx_um_cache_t *um_cache, const char *text, const zbx_uint64_t *hostids,
-		int hostids_num)
+static char	*dc_expand_user_macros_dyn(const char *text, const zbx_uint64_t *hostids, int hostids_num)
 {
 	zbx_token_t	token;
 	int		pos = 0, last_pos = 0;
@@ -10234,7 +10234,7 @@ static char	*dc_expand_user_macros_dyn(zbx_um_cache_t *um_cache, const char *tex
 			continue;
 
 		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
-		um_cache_resolve_const(um_cache, hostids, hostids_num, text + token.loc.l, &value);
+		um_cache_resolve_const(config->um_cache, hostids, hostids_num, text + token.loc.l, &value);
 
 		if (NULL != value)
 		{
@@ -10340,7 +10340,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 				if (dc_host->data_expected_from > (data_expected_from = dc_item->data_expected_from))
 					data_expected_from = dc_host->data_expected_from;
 
-				delay_s = dc_expand_user_macros_dyn(config->um_cache, dc_item->delay, &dc_item->hostid, 1);
+				delay_s = dc_expand_user_macros_dyn(dc_item->delay, &dc_item->hostid, 1);
 				ret = zbx_interval_preproc(delay_s, &delay, NULL, NULL);
 				zbx_free(delay_s);
 
@@ -10549,8 +10549,7 @@ static void	dc_status_update(void)
 					int	delay;
 					char	*delay_s;
 
-					delay_s = dc_expand_user_macros_dyn(config->um_cache, dc_item->delay,
-							&dc_item->hostid, 1);
+					delay_s = dc_expand_user_macros_dyn(dc_item->delay, &dc_item->hostid, 1);
 
 					if (SUCCEED == zbx_interval_preproc(delay_s, &delay, NULL, NULL) &&
 							0 != delay)
@@ -13338,25 +13337,38 @@ void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 	UNLOCK_CACHE;
 }
 
+typedef struct
+{
+	ZBX_DC_ITEM	*item;
+	char		*delay_ex;
+	zbx_uint64_t	proxy_hostid;
+}
+zbx_item_delay_t;
+
+ZBX_PTR_VECTOR_DECL(item_delay, zbx_item_delay_t *)
+ZBX_PTR_VECTOR_IMPL(item_delay, zbx_item_delay_t *)
+
+static void	zbx_item_delay_free(zbx_item_delay_t *item_delay)
+{
+	zbx_free(item_delay->delay_ex);
+	zbx_free(item_delay);
+}
+
 /******************************************************************************
  *                                                                            *
- * Purpose: get items scheduled to execute later than 1 minute and having     *
- *          user macro in delay                                               *
+ * Purpose: get items with changed expanded delay value                       *
  *                                                                            *
- * Comments: This function is used only by configuration syncer, so it can    *
- *           access most of the cached data without locking. The only         *
- *           property that can be changed by other process is item nextcheck. *
- *           However in worst case it will recalculate nextcheck for item     *
- *           that is being scheduled in the next minute.                      *
+ * Comments: This function is used only by configuration syncer, so it cache  *
+ *           locking is not needed to access data changed only by the syncer  *
+ *           itself.                                                          *
  *                                                                            *
  ******************************************************************************/
-static void	dc_get_items_to_reschedule(zbx_vector_dc_item_t *server_items, zbx_vector_dc_item_t *proxy_items,
-		int now)
+static void	dc_get_items_to_reschedule(zbx_vector_item_delay_t *items)
 {
 	zbx_hashset_iter_t	iter;
 	ZBX_DC_ITEM		*item;
 	ZBX_DC_HOST		*host;
-	int			nextcheck;
+	char			*delay_ex;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -13369,9 +13381,6 @@ static void	dc_get_items_to_reschedule(zbx_vector_dc_item_t *server_items, zbx_v
 			continue;
 		}
 
-		if (item->nextcheck - ZBX_DEFAULT_ITEM_UPDATE_INTERVAL < now)
-			continue;
-
 		if (NULL == strstr(item->delay, "{$"))
 			continue;
 
@@ -13381,19 +13390,22 @@ static void	dc_get_items_to_reschedule(zbx_vector_dc_item_t *server_items, zbx_v
 		if (HOST_STATUS_MONITORED != host->status)
 			continue;
 
-		(void)dc_get_item_nextcheck(item, now, 0, 0, &nextcheck, NULL);
+		delay_ex = dc_expand_user_macros_dyn(item->delay, &item->hostid, 1);
 
-		if (nextcheck == item->nextcheck)
-			continue;
+		if (NULL == item->delay_ex || 0 != strcmp(item->delay_ex, delay_ex))
+		{
+			zbx_item_delay_t	*item_delay;
 
-		if (0 != host->proxy_hostid && SUCCEED != is_item_processed_by_server(item->type, item->key))
-			zbx_vector_dc_item_append(proxy_items, item);
-		else
-			zbx_vector_dc_item_append(server_items, item);
+			item_delay = (zbx_item_delay_t *)zbx_malloc(NULL, sizeof(zbx_item_delay_t));
+			item_delay->item = item;
+			item_delay->delay_ex = delay_ex;
+			item_delay->proxy_hostid = host->proxy_hostid;
+
+			zbx_vector_item_delay_append(items, item_delay);
+		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() server_items:%d proxy_items:%d", __func__, server_items->values_num,
-			proxy_items->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() items:%d", __func__, items->values_num);
 }
 
 /******************************************************************************
@@ -13407,53 +13419,57 @@ static void	dc_get_items_to_reschedule(zbx_vector_dc_item_t *server_items, zbx_v
  ******************************************************************************/
 static void	dc_reschedule_items()
 {
-	zbx_vector_dc_item_t	server_items, proxy_items;
-	int			now;
+	zbx_vector_item_delay_t	items;
 
-	zbx_vector_dc_item_create(&server_items);
-	zbx_vector_dc_item_create(&proxy_items);
+	zbx_vector_item_delay_create(&items);
+	dc_get_items_to_reschedule(&items);
 
-	now = (int)time(NULL);
-	dc_get_items_to_reschedule(&server_items, &proxy_items, now);
-
-	if (0 != server_items.values_num || 0 != proxy_items.values_num)
+	if (0 != items.values_num)
 	{
-		int	i;
+		int	i, now;
+
+		now = (int)time(NULL);
 
 		WRLOCK_CACHE;
 
-		for (i = 0; i < server_items.values_num; i++)
+		for (i = 0; i < items.values_num; i++)
 		{
-			unsigned char	old_poller_type;
-			int		old_nextcheck;
-			char		*error = NULL;
-			ZBX_DC_ITEM	*item = server_items.values[i];
+			ZBX_DC_ITEM	*item = items.values[i]->item;
 
-			old_poller_type = item->poller_type;
-			old_nextcheck = item->nextcheck;
-
-			if (FAIL == DCitem_nextcheck_update(item, NULL, ZBX_ITEM_DELAY_CHANGED, now, &error))
+			if (ITEM_TYPE_ZABBIX_ACTIVE == item->type || 0 != items.values[i]->proxy_hostid)
 			{
-				zbx_timespec_t	ts = {now, 0};
+				/* update nextcheck for active and monitored by proxy items */
+				/* for queue requests by frontend                           */
+				(void)DCitem_nextcheck_update(item, NULL, ZBX_ITEM_DELAY_CHANGED, now, NULL);
+			}
+			else if (NULL != item->delay_ex || ITEM_STATE_NORMAL != item->state)
+			{
+				int	old_nextcheck = item->nextcheck;
+				char	*error = NULL;
 
-				dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED,
-						error);
-				zbx_free(error);
+				if (SUCCEED == DCitem_nextcheck_update(item, NULL, ZBX_ITEM_DELAY_CHANGED, now, &error))
+				{
+					DCupdate_item_queue(item, item->poller_type, old_nextcheck);
+				}
+				else
+				{
+					zbx_timespec_t	ts = {now, 0};
+					dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
+							ITEM_STATE_NOTSUPPORTED, error);
+					zbx_free(error);
+				}
 			}
 
-			DCupdate_item_queue(item, old_poller_type, old_nextcheck);
+			dc_strpool_replace(NULL != item->delay_ex, &item->delay_ex, items.values[i]->delay_ex);
 		}
-
-		for (i = 0; i < proxy_items.values_num; i++)
-			(void)DCitem_nextcheck_update(proxy_items.values[i], NULL, ZBX_ITEM_DELAY_CHANGED, now, NULL);
 
 		UNLOCK_CACHE;
 
 		dc_flush_history();
 	}
 
-	zbx_vector_dc_item_destroy(&server_items);
-	zbx_vector_dc_item_destroy(&proxy_items);
+	zbx_vector_item_delay_clear_ext(&items, zbx_item_delay_free);
+	zbx_vector_item_delay_destroy(&items);
 }
 
 #ifdef HAVE_TESTS
