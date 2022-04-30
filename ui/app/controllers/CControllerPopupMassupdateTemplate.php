@@ -186,7 +186,7 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 				foreach ($templates as &$template) {
 					if (array_key_exists('groups', $visible)) {
 						if ($new_groupids && $mass_update_groups == ZBX_ACTION_ADD) {
-							$current_groupids = array_column($template['groups'], 'groupid');
+							$current_groupids = array_column($template['templategroups'], 'groupid');
 							$template['groups'] = zbx_toObject(array_unique(array_merge($current_groupids, $new_groupids)),
 								'groupid'
 							);
@@ -195,9 +195,10 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 							$template['groups'] = zbx_toObject($new_groupids, 'groupid');
 						}
 						elseif ($remove_groupids) {
-							$current_groupids = array_column($template['groups'], 'groupid');
+							$current_groupids = array_column($template['templategroups'], 'groupid');
 							$template['groups'] = zbx_toObject(array_diff($current_groupids, $remove_groupids), 'groupid');
 						}
+						unset($template['templategroups']);
 					}
 
 					if (array_key_exists('linked_templates', $visible)) {
