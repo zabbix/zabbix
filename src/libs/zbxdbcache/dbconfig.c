@@ -3283,32 +3283,114 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 
 #define ZBX_TIMER_DELAY		30
 
-static int	dc_function_calculate_trends_nextcheck(time_t from, const char *period_shift, zbx_time_unit_t base,
-		time_t *nextcheck, char **error)
+static int	dc_function_calculate_trends_nextcheck(const zbx_dc_um_handle_t *um_handle,
+		const zbx_trigger_timer_t *timer, time_t from, zbx_uint64_t seed, time_t *nextcheck, char **error)
 {
-	time_t		next = from;
-	struct tm	tm;
+	int		offsets[ZBX_TIME_UNIT_COUNT] = {0, 0, 0, SEC_PER_MIN * 10,
+			SEC_PER_HOUR + SEC_PER_MIN * 10, SEC_PER_HOUR + SEC_PER_MIN * 10,
+			SEC_PER_HOUR + SEC_PER_MIN * 10, SEC_PER_HOUR + SEC_PER_MIN * 10,
+			SEC_PER_HOUR + SEC_PER_MIN * 10};
+	int		periods[ZBX_TIME_UNIT_COUNT] = {0, 0, 0, SEC_PER_MIN * 10, SEC_PER_HOUR,
+			SEC_PER_HOUR * 11, SEC_PER_DAY - SEC_PER_HOUR, SEC_PER_DAY - SEC_PER_HOUR,
+			SEC_PER_DAY - SEC_PER_HOUR};
 
-	localtime_r(&next, &tm);
+	time_t		next;
+	struct tm	tm;
+	char		*param, *period_shift;
+	int		ret;
+	zbx_time_unit_t trend_base;
+
+	if (NULL == (param = zbx_function_get_param_dyn(timer->parameter, 1)))
+	{
+		*error = zbx_strdup(NULL, "no first parameter");
+		return FAIL;
+	}
+
+	if (NULL != um_handle)
+	{
+		(void)zbx_dc_expand_user_macros(um_handle, &param, &timer->hostid, 1, NULL);
+	}
+	else
+	{
+		char	*tmp;
+
+		tmp = dc_expand_user_macros_dyn(config->um_cache, param, &timer->hostid, 1);
+		zbx_free(param);
+		param = tmp;
+	}
+
+	if (FAIL == zbx_trends_parse_base(param, &trend_base, error))
+		goto out;
+
+	if (trend_base < ZBX_TIME_UNIT_HOUR)
+	{
+		*error = zbx_strdup(NULL, "invalid first parameter");
+		goto out;
+	}
+
+	localtime_r(&from, &tm);
+
+	if (ZBX_TIME_UNIT_HOUR == trend_base)
+	{
+		zbx_tm_round_up(&tm, trend_base);
+
+		if (-1 == (*nextcheck = mktime(&tm)))
+		{
+			*error = zbx_strdup(NULL, zbx_strerror(errno));
+			goto out;
+		}
+
+		goto finish;
+	}
+
+	if (NULL == (period_shift = strchr(param, ':')))
+	{
+		*error = zbx_strdup(NULL, "invalid first parameter");
+		goto out;
+
+	}
+
+	period_shift++;
+	next = from;
 
 	while (SUCCEED == zbx_trends_parse_nextcheck(next, period_shift, nextcheck, error))
 	{
 		if (*nextcheck > from)
-			return SUCCEED;
+			break;
 
-		zbx_tm_add(&tm, 1, base);
+		zbx_tm_add(&tm, 1, trend_base);
 		if (-1 == (next = mktime(&tm)))
 		{
 			*error = zbx_strdup(*error, zbx_strerror(errno));
-			return FAIL;
+			goto out;
 		}
 	}
+finish:
+	*nextcheck += offsets[trend_base] + seed % periods[trend_base];
 
-	return FAIL;
+	ret = SUCCEED;
+out:
+	zbx_free(param);
+
+	return ret;
 }
 
-static int	dc_function_calculate_nextcheck(zbx_um_cache_t *um_cache, const zbx_trigger_timer_t *timer, time_t from,
-		zbx_uint64_t seed)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: calculate nextcheck for trigger timer                             *
+ *                                                                            *
+ * Parameters: um_handle - [IN] user macro cache handle (optional)            *
+ *             timer     - [IN] the timer                                     *
+ *             from      - [IN] the time from which the nextcheck must be     *
+ *                              calculated                                    *
+ *             seed      - [IN] timer seed to spread out the nextchecks       *
+ *                                                                            *
+ * Comments: When called within configuration cache lock pass NULL um_handle  *
+ *           to directly use user macro cache                                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_function_calculate_nextcheck(const zbx_dc_um_handle_t *um_handle, const zbx_trigger_timer_t *timer,
+		time_t from, zbx_uint64_t seed)
 {
 	if (ZBX_TRIGGER_TIMER_FUNCTION_TIME == timer->type || ZBX_TRIGGER_TIMER_TRIGGER == timer->type)
 	{
@@ -3324,67 +3406,19 @@ static int	dc_function_calculate_nextcheck(zbx_um_cache_t *um_cache, const zbx_t
 	}
 	else if (ZBX_TRIGGER_TIMER_FUNCTION_TREND == timer->type)
 	{
-		struct tm	tm;
-		time_t		nextcheck;
-		int		offsets[ZBX_TIME_UNIT_COUNT] = {0, 0, 0, SEC_PER_MIN * 10,
-				SEC_PER_HOUR + SEC_PER_MIN * 10, SEC_PER_HOUR + SEC_PER_MIN * 10,
-				SEC_PER_HOUR + SEC_PER_MIN * 10, SEC_PER_HOUR + SEC_PER_MIN * 10,
-				SEC_PER_HOUR + SEC_PER_MIN * 10};
-		int		periods[ZBX_TIME_UNIT_COUNT] = {0, 0, 0, SEC_PER_MIN * 10, SEC_PER_HOUR,
-				SEC_PER_HOUR * 11, SEC_PER_DAY - SEC_PER_HOUR, SEC_PER_DAY - SEC_PER_HOUR,
-				SEC_PER_DAY - SEC_PER_HOUR};
+		time_t	nextcheck;
+		char	*error = NULL;
 
-		if (ZBX_TIME_UNIT_HOUR == timer->trend_base)
+		if (SUCCEED != dc_function_calculate_trends_nextcheck(um_handle, timer, from, seed, &nextcheck, &error))
 		{
-			localtime_r(&from, &tm);
-			zbx_tm_round_up(&tm, timer->trend_base);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot calculate trend function \"" ZBX_FS_UI64
+					"\" schedule: %s", timer->objectid, error);
+			zbx_free(error);
 
-			if (-1 == (nextcheck = mktime(&tm)))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot calculate trend function \"" ZBX_FS_UI64
-						"\" schedule: %s", timer->objectid, zbx_strerror(errno));
-				THIS_SHOULD_NEVER_HAPPEN;
-
-				return 0;
-			}
-		}
-		else
-		{
-			int	ret = FAIL;
-			char	*error = NULL, *period_shift, *param = NULL;
-
-			if (NULL != (param = zbx_function_get_param_dyn(timer->parameter, 1)))
-			{
-				char	*period;
-
-				period = dc_expand_user_macros_dyn(um_cache, param, &timer->hostid, 1);
-
-				if (NULL != (period_shift = strchr(param, ':')))
-				{
-					period_shift++;
-					ret = dc_function_calculate_trends_nextcheck(from, period_shift,
-							timer->trend_base, &nextcheck, &error);
-				}
-
-				zbx_free(period);
-			}
-
-			zbx_free(param);
-
-			if (FAIL == ret)
-			{
-				if (NULL == error)
-					error = zbx_strdup(NULL, "invalid first parameter");
-
-				zabbix_log(LOG_LEVEL_WARNING, "cannot calculate trend function \"" ZBX_FS_UI64
-						"\" schedule: %s", timer->objectid, error);
-				zbx_free(error);
-
-				return 0;
-			}
+			return 0;
 		}
 
-		return nextcheck + offsets[timer->trend_base] + seed % periods[timer->trend_base];
+		return nextcheck;
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
@@ -3399,32 +3433,21 @@ static int	dc_function_calculate_nextcheck(zbx_um_cache_t *um_cache, const zbx_t
  * Return value:  Created timer or NULL in the case of error.                 *
  *                                                                            *
  ******************************************************************************/
-static zbx_trigger_timer_t	*dc_trigger_function_timer_create(ZBX_DC_FUNCTION *function)
+static zbx_trigger_timer_t	*dc_trigger_function_timer_create(ZBX_DC_FUNCTION *function, int now)
 {
 	zbx_trigger_timer_t	*timer;
-	zbx_time_unit_t		trend_base;
 	zbx_uint32_t		type;
 	ZBX_DC_ITEM		*item;
 
 	if (ZBX_FUNCTION_TYPE_TRENDS == function->type)
 	{
-		char	*error = NULL;
-
-		if (FAIL == zbx_trends_parse_base(function->parameter, &trend_base, &error))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot parse function " ZBX_FS_UI64 " period base: %s",
-					function->functionid, error);
-			zbx_free(error);
-			return NULL;
-		}
-		type = ZBX_TRIGGER_TIMER_FUNCTION_TREND;
-
 		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &function->itemid)))
 			return NULL;
+
+		type = ZBX_TRIGGER_TIMER_FUNCTION_TREND;
 	}
 	else
 	{
-		trend_base = ZBX_TIME_UNIT_UNKNOWN;
 		type = ZBX_TRIGGER_TIMER_FUNCTION_TIME;
 	}
 
@@ -3433,9 +3456,9 @@ static zbx_trigger_timer_t	*dc_trigger_function_timer_create(ZBX_DC_FUNCTION *fu
 	timer->objectid = function->functionid;
 	timer->triggerid = function->triggerid;
 	timer->revision = function->revision;
-	timer->trend_base = trend_base;
 	timer->lock = 0;
 	timer->type = type;
+	timer->lastcheck = now;
 
 	function->timer_revision = function->revision;
 
@@ -3443,7 +3466,6 @@ static zbx_trigger_timer_t	*dc_trigger_function_timer_create(ZBX_DC_FUNCTION *fu
 	{
 		dc_strpool_replace(0, &timer->parameter, function->parameter);
 		timer->hostid = item->hostid;
-
 	}
 	else
 	{
@@ -3470,7 +3492,6 @@ static zbx_trigger_timer_t	*dc_trigger_timer_create(ZBX_DC_TRIGGER *trigger)
 	timer->objectid = trigger->triggerid;
 	timer->triggerid = trigger->triggerid;
 	timer->revision = trigger->revision;
-	timer->trend_base = ZBX_TIME_UNIT_UNKNOWN;
 	timer->lock = 0;
 	timer->parameter = NULL;
 
@@ -3497,12 +3518,13 @@ static void	dc_trigger_timer_free(zbx_trigger_timer_t *timer)
  * Purpose: schedule trigger timer to be executed at the specified time       *
  *                                                                            *
  * Parameter: timer   - [IN] the timer to schedule                            *
+ *            now     - [IN] current time                                     *
  *            eval_ts - [IN] the history snapshot time, by default (NULL)     *
  *                           execution time will be used.                     *
  *            exec_ts - [IN] the tiemer execution time                        *
  *                                                                            *
  ******************************************************************************/
-static void	dc_schedule_trigger_timer(zbx_trigger_timer_t *timer, const zbx_timespec_t *eval_ts,
+static void	dc_schedule_trigger_timer(zbx_trigger_timer_t *timer, int now, const zbx_timespec_t *eval_ts,
 		const zbx_timespec_t *exec_ts)
 {
 	zbx_binary_heap_elem_t	elem;
@@ -3513,8 +3535,8 @@ static void	dc_schedule_trigger_timer(zbx_trigger_timer_t *timer, const zbx_time
 		timer->eval_ts = *eval_ts;
 
 	timer->exec_ts = *exec_ts;
-	timer->check_ts.sec = MIN(exec_ts->sec, ZBX_TRIGGER_POLL_INTERVAL);
-	timer->check_ts.ns = exec_ts->ns;
+	timer->check_ts.sec = MIN(exec_ts->sec, now + ZBX_TRIGGER_POLL_INTERVAL);
+	timer->check_ts.ns = 0;
 
 	elem.key = 0;
 	elem.data = (void *)timer;
@@ -3555,7 +3577,7 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 		if (TRIGGER_STATUS_ENABLED != trigger->status || TRIGGER_FUNCTIONAL_TRUE != trigger->functional)
 			continue;
 
-		if (NULL == (timer = dc_trigger_function_timer_create(function)))
+		if (NULL == (timer = dc_trigger_function_timer_create(function, now)))
 			continue;
 
 		if (NULL != trend_queue && NULL != (old = (zbx_trigger_timer_t *)zbx_hashset_search(trend_queue,
@@ -3568,18 +3590,17 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 			else
 				ts.sec = old->eval_ts.sec;
 
-			dc_schedule_trigger_timer(timer, &old->eval_ts, &ts);
+			dc_schedule_trigger_timer(timer, now, &old->eval_ts, &ts);
 		}
 		else
 		{
-			if (0 == (ts.sec = dc_function_calculate_nextcheck(config->um_cache, timer, now,
-					timer->triggerid)))
+			if (0 == (ts.sec = dc_function_calculate_nextcheck(NULL, timer, now, timer->triggerid)))
 			{
 				dc_trigger_timer_free(timer);
 				function->timer_revision = 0;
 			}
 			else
-				dc_schedule_trigger_timer(timer, NULL, &ts);
+				dc_schedule_trigger_timer(timer, now, NULL, &ts);
 		}
 	}
 
@@ -3601,14 +3622,13 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 		if (NULL == (timer = dc_trigger_timer_create(trigger)))
 			continue;
 
-		if (0 == (ts.sec = dc_function_calculate_nextcheck(config->um_cache, timer, now, timer->triggerid)))
+		if (0 == (ts.sec = dc_function_calculate_nextcheck(NULL, timer, now, timer->triggerid)))
 		{
 			dc_trigger_timer_free(timer);
 			trigger->timer_revision = 0;
 		}
 		else
-			dc_schedule_trigger_timer(timer, NULL, &ts);
-
+			dc_schedule_trigger_timer(timer, now, NULL, &ts);
 	}
 }
 
@@ -8433,7 +8453,6 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 	zbx_trigger_timer_t	*first_timer = NULL, *timer;
 	int			found = 0;
 	zbx_binary_heap_elem_t	*elem;
-	zbx_dc_um_handle_t	*um_handle;
 
 	RDLOCK_CACHE;
 
@@ -8453,11 +8472,10 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 
 	WRLOCK_CACHE;
 
-	um_handle = zbx_dc_open_user_macros();
-
 	while (SUCCEED != zbx_binary_heap_empty(&config->trigger_queue) && timers->values_num < hard_limit)
 	{
 		ZBX_DC_TRIGGER		*dc_trigger;
+		zbx_timespec_t		*eval_ts;
 
 		elem = zbx_binary_heap_find_min(&config->trigger_queue);
 		timer = (zbx_trigger_timer_t *)elem->data;
@@ -8467,16 +8485,21 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 
 		if (timer->check_ts.sec < timer->exec_ts.sec)
 		{
-			/* recalculate nextcheck for timers that are scheduled to evaluate future data */
+			/* recalculate nextcheck/eval time for timers that are scheduled to evaluate data in future */
 			if (timer->eval_ts.sec > now)
 			{
-				timer->exec_ts.sec = dc_function_calculate_nextcheck(*um_handle->cache, timer, now,
+				timer->exec_ts.sec = dc_function_calculate_nextcheck(NULL, timer, timer->lastcheck,
 						timer->triggerid);
+
+				eval_ts = NULL;
 			}
+			else
+				eval_ts = & timer->eval_ts;
 
 			if (timer->exec_ts.sec > now)
 			{
-				dc_schedule_trigger_timer(timer, &timer->eval_ts, &timer->check_ts);
+				zbx_binary_heap_remove_min(&config->trigger_queue);
+				dc_schedule_trigger_timer(timer, now, eval_ts,  &timer->exec_ts);
 				continue;
 			}
 		}
@@ -8527,8 +8550,6 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 			first_timer = timer;
 	}
 
-	zbx_dc_close_user_macros(um_handle);
-
 	UNLOCK_CACHE;
 }
 
@@ -8539,7 +8560,7 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
  * Comments: Triggers are unlocked by DCconfig_unlock_triggers()              *
  *                                                                            *
  ******************************************************************************/
-static void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers)
+static void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 {
 	int	i;
 
@@ -8575,7 +8596,7 @@ static void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers)
 			dc_trigger_timer_free(timer);
 		}
 		else
-			dc_schedule_trigger_timer(timer, &timer->eval_ts, &timer->check_ts);
+			dc_schedule_trigger_timer(timer, now, &timer->eval_ts, &timer->check_ts);
 	}
 }
 
@@ -13307,18 +13328,20 @@ void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 
 		if (0 == timer->check_ts.sec)
 		{
-			if (0 != (timer->check_ts.sec = dc_function_calculate_nextcheck(*um_handle->cache, timer, now,
+			if (0 != (timer->check_ts.sec = dc_function_calculate_nextcheck(um_handle, timer, now,
 					timer->triggerid)))
 			{
 				timer->eval_ts = timer->check_ts;
 			}
+
+			timer->lastcheck = now;
 		}
 	}
 
 	zbx_dc_close_user_macros(um_handle);
 
 	WRLOCK_CACHE;
-	dc_reschedule_trigger_timers(timers);
+	dc_reschedule_trigger_timers(timers, now);
 	UNLOCK_CACHE;
 }
 

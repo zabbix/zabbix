@@ -1033,9 +1033,9 @@ typedef struct
 	zbx_uint64_t		triggerid;
 	zbx_uint64_t		hostid;
 	zbx_uint32_t		type;
-	zbx_time_unit_t		trend_base;
 	unsigned char		lock;		/* 1 if the timer has locked trigger, 0 otherwise */
 	int			revision;	/* revision */
+	int			lastcheck;
 	zbx_timespec_t		eval_ts;	/* the history time for which trigger must be recalculated */
 	zbx_timespec_t		check_ts;	/* time when timer must be checked */
 	zbx_timespec_t		exec_ts;	/* real time when the timer must be executed */
