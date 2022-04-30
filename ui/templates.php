@@ -647,7 +647,7 @@ if (hasRequest('form')) {
 
 	if (!hasRequest('form_refresh')) {
 		if ($data['templateid'] != 0) {
-			$groups = zbx_objectValues($data['dbTemplate']['groups'], 'groupid');
+			$groups = array_column($data['dbTemplate']['templategroups'], 'groupid');
 		}
 		else {
 			$groups = getRequest('groupids', []);
