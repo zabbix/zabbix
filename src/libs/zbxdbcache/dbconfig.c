@@ -8500,40 +8500,13 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 
 	while (SUCCEED != zbx_binary_heap_empty(&config->trigger_queue) && timers->values_num < hard_limit)
 	{
-		ZBX_DC_TRIGGER		*dc_trigger;
-		zbx_timespec_t		*eval_ts;
+		ZBX_DC_TRIGGER	*dc_trigger;
 
 		elem = zbx_binary_heap_find_min(&config->trigger_queue);
 		timer = (zbx_trigger_timer_t *)elem->data;
 
 		if (timer->check_ts.sec > now)
 			break;
-
-		if (timer->check_ts.sec < timer->exec_ts.sec)
-		{
-			/* recalculate nextcheck/eval time for timers that are scheduled to evaluate data in future */
-			if (timer->eval_ts.sec > now)
-			{
-				if (0 == (timer->exec_ts.sec = dc_function_calculate_nextcheck(NULL, timer,
-						timer->lastcheck, timer->triggerid)))
-				{
-					zbx_binary_heap_remove_min(&config->trigger_queue);
-					dc_remove_invalid_timer(timer);
-					continue;
-				}
-
-				eval_ts = NULL;
-			}
-			else
-				eval_ts = & timer->eval_ts;
-
-			if (timer->exec_ts.sec > now)
-			{
-				zbx_binary_heap_remove_min(&config->trigger_queue);
-				dc_schedule_trigger_timer(timer, now, eval_ts,  &timer->exec_ts);
-				continue;
-			}
-		}
 
 		/* first_timer stores the first timer from a list of timers of the same trigger with the same */
 		/* evaluation timestamp. Reset first_timer if the conditions do not apply.                    */
@@ -8558,6 +8531,17 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 
 		zbx_vector_ptr_append(timers, timer);
 
+		/* timers scheduled to executed in future are taken from queue only */
+		/* for rescheduling later - skip locking                            */
+		if (timer->exec_ts.sec > now)
+		{
+			/* recalculate next execution time only for timers */
+			/* scheduled to evaluate future data period        */
+			if (timer->eval_ts.sec > now)
+				timer->check_ts.sec = 0;
+			continue;
+		}
+
 		/* Trigger expression must be calculated using function evaluation time. If a trigger is locked   */
 		/* keep rescheduling its timer until trigger is unlocked and can be calculated using the required */
 		/* evaluation time. However there are exceptions when evaluation time of a locked trigger is      */
@@ -8571,6 +8555,8 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 			/* resetting execution timer will cause a new execution time to be set */
 			/* when timer is put back into queue                                   */
 			timer->check_ts.sec = 0;
+
+			timer->lastcheck = now;
 		}
 
 		/* remember if the timer locked trigger, so it would unlock during rescheduling */
@@ -13342,8 +13328,6 @@ void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 			{
 				timer->eval_ts = timer->check_ts;
 			}
-
-			timer->lastcheck = now;
 		}
 	}
 
