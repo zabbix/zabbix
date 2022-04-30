@@ -368,9 +368,7 @@ class CConfigurationExport {
 
 		foreach ($hosts as &$host) {
 			// merge host groups with all groups
-
 			$this->data['host_groups'] += array_column($host['hostgroups'], null, 'groupid');
-
 
 			$host['discoveryRules'] = [];
 			$host['items'] = [];
