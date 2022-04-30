@@ -302,7 +302,7 @@ class CConfigurationExportBuilder {
 				'ipmi_username' => $host['ipmi_username'],
 				'ipmi_password' => $host['ipmi_password'],
 				'templates' => $this->formatTemplateLinkage($host['parentTemplates']),
-				'groups' => $this->formatGroups($host['groups']),
+				'groups' => $this->formatGroups($host['hostgroups']),
 				'interfaces' => $this->formatHostInterfaces($host['interfaces']),
 				'items' => $this->formatItems($host['items'], $simple_triggers),
 				'discovery_rules' => $this->formatDiscoveryRules($host['discoveryRules']),
