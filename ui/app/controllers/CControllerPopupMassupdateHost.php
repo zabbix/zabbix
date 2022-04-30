@@ -252,6 +252,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 							$current_groupids = array_column($host['hostgroups'], 'groupid');
 							$host['groups'] = zbx_toObject(array_diff($current_groupids, $remove_groupids), 'groupid');
 						}
+						unset($host['hostgroups']);
 					}
 
 					if (array_key_exists('templates', $visible)) {
