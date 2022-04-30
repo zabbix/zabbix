@@ -155,6 +155,8 @@ class CControllerHostEdit extends CController {
 				]);
 
 				$this->host = $hosts[0];
+				$this->host['groups'] = $this->host['hostgroups'];
+				unset($this->host['hostgroups']);
 			}
 		}
 
