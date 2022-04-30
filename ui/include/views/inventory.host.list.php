@@ -94,17 +94,13 @@ $table = (new CTableInfo())
 	]);
 
 foreach ($this->data['hosts'] as $host) {
-	$hostGroups = [];
-	foreach ($host['groups'] as $group) {
-		$hostGroups[] = $group['name'];
-	}
-	natsort($hostGroups);
-	$hostGroups = implode(', ', $hostGroups);
+	$hostgroups = array_column($host['hostgroups'], 'name');
+	natsort($hostgroups);
 
 	$row = [
 		(new CLink($host['name'], (new CUrl('hostinventories.php'))->setArgument('hostid', $host['hostid'])))
 			->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null),
-		$hostGroups,
+		implode(', ', $hostgroups),
 		zbx_str2links($host['inventory']['name']),
 		zbx_str2links($host['inventory']['type']),
 		zbx_str2links($host['inventory']['os']),
