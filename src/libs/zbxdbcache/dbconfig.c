@@ -3297,7 +3297,7 @@ static int	dc_function_calculate_trends_nextcheck(const zbx_dc_um_handle_t *um_h
 	time_t		next;
 	struct tm	tm;
 	char		*param, *period_shift;
-	int		ret;
+	int		ret = FAIL;
 	zbx_time_unit_t trend_base;
 
 	if (NULL == (param = zbx_function_get_param_dyn(timer->parameter, 1)))
@@ -5852,7 +5852,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 
 	/* update various trigger related links in cache */
 	if (0 != (update_flags & (ZBX_DBSYNC_UPDATE_HOSTS | ZBX_DBSYNC_UPDATE_ITEMS | ZBX_DBSYNC_UPDATE_FUNCTIONS |
-			ZBX_DBSYNC_UPDATE_TRIGGERS)))
+			ZBX_DBSYNC_UPDATE_TRIGGERS | ZBX_DBSYNC_UPDATE_MACROS)))
 	{
 		dc_trigger_update_cache();
 		dc_schedule_trigger_timers((ZBX_DBSYNC_INIT == mode ? &trend_queue : NULL), time(NULL));
@@ -8430,6 +8430,32 @@ static int	trigger_timer_validate(zbx_trigger_timer_t *timer, ZBX_DC_TRIGGER **d
 	return SUCCEED;
 }
 
+static void	dc_remove_invalid_timer(zbx_trigger_timer_t *timer)
+{
+	if (0 != (timer->type & ZBX_TRIGGER_TIMER_FUNCTION))
+	{
+		ZBX_DC_FUNCTION	*function;
+
+		if (NULL != (function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
+				&timer->objectid)) && function->timer_revision == timer->revision)
+		{
+			function->timer_revision = 0;
+		}
+	}
+	else if (ZBX_TRIGGER_TIMER_TRIGGER == timer->type)
+	{
+		ZBX_DC_TRIGGER	*trigger;
+
+		if (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers,
+				&timer->objectid)) && trigger->timer_revision == timer->revision)
+		{
+			trigger->timer_revision = 0;
+		}
+	}
+
+	dc_trigger_timer_free(timer);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: gets timers from trigger queue                                    *
@@ -8488,8 +8514,13 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 			/* recalculate nextcheck/eval time for timers that are scheduled to evaluate data in future */
 			if (timer->eval_ts.sec > now)
 			{
-				timer->exec_ts.sec = dc_function_calculate_nextcheck(NULL, timer, timer->lastcheck,
-						timer->triggerid);
+				if (0 == (timer->exec_ts.sec = dc_function_calculate_nextcheck(NULL, timer,
+						timer->lastcheck, timer->triggerid)))
+				{
+					zbx_binary_heap_remove_min(&config->trigger_queue);
+					dc_remove_invalid_timer(timer);
+					continue;
+				}
 
 				eval_ts = NULL;
 			}
@@ -8521,7 +8552,7 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 
 		if (SUCCEED != trigger_timer_validate(timer, &dc_trigger))
 		{
-			dc_trigger_timer_free(timer);
+			dc_remove_invalid_timer(timer);
 			continue;
 		}
 
@@ -8572,29 +8603,7 @@ static void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 
 		/* schedule calculation error can result in 0 execution time */
 		if (0 == timer->check_ts.sec)
-		{
-			if (0 != (timer->type & ZBX_TRIGGER_TIMER_FUNCTION))
-			{
-				ZBX_DC_FUNCTION	*function;
-
-				if (NULL != (function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
-						&timer->objectid)) && function->timer_revision == timer->revision)
-				{
-					function->timer_revision = 0;
-				}
-			}
-			else if (ZBX_TRIGGER_TIMER_TRIGGER == timer->type)
-			{
-				ZBX_DC_TRIGGER	*trigger;
-
-				if (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers,
-						&timer->objectid)) && trigger->timer_revision == timer->revision)
-				{
-					trigger->timer_revision = 0;
-				}
-			}
-			dc_trigger_timer_free(timer);
-		}
+			dc_remove_invalid_timer(timer);
 		else
 			dc_schedule_trigger_timer(timer, now, &timer->eval_ts, &timer->check_ts);
 	}
