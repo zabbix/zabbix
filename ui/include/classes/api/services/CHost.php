@@ -1566,11 +1566,11 @@ class CHost extends CHostGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$hostids = array_keys($result);
-
 		// adding groups
 		$this->addRelatedGroups($options, $result, 'selectGroups');
 		$this->addRelatedGroups($options, $result, 'selectHostGroups');
+
+		$hostids = array_keys($result);
 
 		// adding inventory
 		if ($options['selectInventory'] !== null) {

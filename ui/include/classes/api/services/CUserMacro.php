@@ -1046,15 +1046,13 @@ class CUserMacro extends CApiService {
 		$result = parent::addRelatedObjects($options, $result);
 
 		if ($options['globalmacro'] === null) {
-			$hostMacroIds = array_keys($result);
-
 			/*
 			 * Adding objects
 			 */
 			// adding groups
-			$this->addRelatedGroups($options, $result, $hostMacroIds, 'selectGroups');
-			$this->addRelatedGroups($options, $result, $hostMacroIds, 'selectHostGroups');
-			$this->addRelatedGroups($options, $result, $hostMacroIds, 'selectTemplateGroups');
+			$this->addRelatedGroups($options, $result, 'selectGroups');
+			$this->addRelatedGroups($options, $result, 'selectHostGroups');
+			$this->addRelatedGroups($options, $result, 'selectTemplateGroups');
 
 			// adding templates
 			if ($options['selectTemplates'] !== null && $options['selectTemplates'] != API_OUTPUT_COUNT) {
@@ -1085,10 +1083,9 @@ class CUserMacro extends CApiService {
 	/**
 	 * @param array $options
 	 * @param array $result
-	 * @param array $hostMacroIds
 	 * @param string $option
 	 */
-	private function addRelatedGroups(array $options, array &$result, array $hostMacroIds, string $option): void {
+	private function addRelatedGroups(array $options, array &$result, string $option): void {
 		if ($options[$option] === null || $options[$option] === API_OUTPUT_COUNT) {
 			return;
 		}
@@ -1096,8 +1093,8 @@ class CUserMacro extends CApiService {
 		$res = DBselect(
 			'SELECT hm.hostmacroid,hg.groupid'.
 			' FROM hostmacro hm,hosts_groups hg'.
-			' WHERE '.dbConditionInt('hm.hostmacroid', $hostMacroIds).
-			' AND hm.hostid=hg.hostid'
+			' WHERE '.dbConditionInt('hm.hostmacroid', array_keys($result)).
+				' AND hm.hostid=hg.hostid'
 		);
 		$relationMap = new CRelationMap();
 		while ($relation = DBfetch($res)) {

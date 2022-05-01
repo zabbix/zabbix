@@ -370,9 +370,9 @@ abstract class CGraphGeneral extends CApiService {
 		}
 
 		// adding HostGroups
-		$this->addRelatedGroups($options, $result, $graphids, 'selectGroups');
-		$this->addRelatedGroups($options, $result, $graphids, 'selectHostGroups');
-		$this->addRelatedGroups($options, $result, $graphids, 'selectTemplateGroups');
+		$this->addRelatedGroups($options, $result, 'selectGroups');
+		$this->addRelatedGroups($options, $result, 'selectHostGroups');
+		$this->addRelatedGroups($options, $result, 'selectTemplateGroups');
 
 		// adding Hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] !== API_OUTPUT_COUNT) {
@@ -439,10 +439,9 @@ abstract class CGraphGeneral extends CApiService {
 	/**
 	 * @param array $options
 	 * @param array $result
-	 * @param array $graphids
 	 * @param string $option
 	 */
-	private function addRelatedGroups(array $options, array &$result, array $graphids, string $option): void {
+	private function addRelatedGroups(array $options, array &$result, string $option): void {
 		if ($options[$option] === null || $options[$option] === API_OUTPUT_COUNT) {
 			return;
 		}
@@ -452,9 +451,9 @@ abstract class CGraphGeneral extends CApiService {
 		$dbRules = DBselect(
 			'SELECT gi.graphid,hg.groupid'.
 			' FROM graphs_items gi,items i,hosts_groups hg'.
-			' WHERE '.dbConditionInt('gi.graphid', $graphids).
-			' AND gi.itemid=i.itemid'.
-			' AND i.hostid=hg.hostid'
+			' WHERE '.dbConditionInt('gi.graphid', array_keys($result)).
+				' AND gi.itemid=i.itemid'.
+				' AND i.hostid=hg.hostid'
 		);
 		while ($relation = DBfetch($dbRules)) {
 			$relationMap->addRelation($relation['graphid'], $relation['groupid']);

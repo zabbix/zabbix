@@ -1155,11 +1155,11 @@ class CTemplate extends CHostGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$templateids = array_keys($result);
-
 		// adding template groups
 		$this->addRelatedGroups($options, $result, 'selectGroups');
 		$this->addRelatedGroups($options, $result, 'selectTemplateGroups');
+
+		$templateids = array_keys($result);
 
 		// Adding Templates
 		if ($options['selectTemplates'] !== null) {

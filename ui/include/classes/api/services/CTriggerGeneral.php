@@ -693,9 +693,9 @@ abstract class CTriggerGeneral extends CApiService {
 		$triggerids = array_keys($result);
 
 		// adding groups
-		$this->addRelatedGroups($options, $result, $triggerids,'selectGroups');
-		$this->addRelatedGroups($options, $result, $triggerids, 'selectHostGroups');
-		$this->addRelatedGroups($options, $result, $triggerids, 'selectTemplateGroups');
+		$this->addRelatedGroups($options, $result, 'selectGroups');
+		$this->addRelatedGroups($options, $result, 'selectHostGroups');
+		$this->addRelatedGroups($options, $result, 'selectTemplateGroups');
 
 		// adding hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
@@ -762,10 +762,9 @@ abstract class CTriggerGeneral extends CApiService {
 	/**
 	 * @param array $options
 	 * @param array $result
-	 * @param array $triggerids
 	 * @param string $option
 	 */
-	private function addRelatedGroups(array $options, array &$result, array $triggerids, string $option): void {
+	private function addRelatedGroups(array $options, array &$result, string $option): void {
 		if ($options[$option] === null || $options[$option] === API_OUTPUT_COUNT) {
 			return;
 		}
@@ -773,9 +772,9 @@ abstract class CTriggerGeneral extends CApiService {
 		$res = DBselect(
 			'SELECT f.triggerid,hg.groupid'.
 			' FROM functions f,items i,hosts_groups hg'.
-			' WHERE '.dbConditionInt('f.triggerid', $triggerids).
-			' AND f.itemid=i.itemid'.
-			' AND i.hostid=hg.hostid'
+			' WHERE '.dbConditionInt('f.triggerid', array_keys($result)).
+				' AND f.itemid=i.itemid'.
+				' AND i.hostid=hg.hostid'
 		);
 		$relationMap = new CRelationMap();
 		while ($relation = DBfetch($res)) {
