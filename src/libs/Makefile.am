@@ -13,6 +13,7 @@ DIST_SUBDIRS = \
 	zbxcommon \
 	zbxcomms \
 	zbxcommshigh \
+	zbxgetopt \
 	zbxlog \
 	zbxnix \
 	zbxconf \
@@ -115,6 +116,7 @@ SUBDIRS = \
 	zbxhash \
 	zbxcrypto \
 	zbxcommon \
+	zbxgetopt \
 	zbxlog \
 	zbxalgo \
 	zbxnix \

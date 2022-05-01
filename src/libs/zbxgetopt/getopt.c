@@ -53,6 +53,11 @@
 
 char *zbx_optarg = NULL;
 
+const char	*zbx_get_optarg(void)
+{
+	return zbx_optarg;
+}
+
 /* Index in ARGV of the next element to be scanned.
    This is used for communication to and from the caller
    and for communication between successive calls to `getopt'.
@@ -588,18 +593,10 @@ static int zbx_getopt_internal (int argc, char **argv, const char *optstring,
   }
 }
 
-int zbx_getopt(int argc, char **argv, const char *optstring)
+int	zbx_getopt_long(int argc, char **argv, const char *options, const struct zbx_option *long_options,
+		int *opt_index)
 {
-  return zbx_getopt_internal (argc, argv, optstring,
-                           (const struct zbx_option *) 0,
-                           (int *) 0,
-                           0);
-}
-
-int zbx_getopt_long(int argc, char **argv, const char *options,
-                    const struct zbx_option *long_options, int *opt_index)
-{
-  return zbx_getopt_internal (argc, argv, options, long_options, opt_index, 0);
+	return zbx_getopt_internal (argc, argv, options, long_options, opt_index, 0);
 }
 
 #ifdef TEST2

@@ -959,11 +959,11 @@ int	main(int argc, char **argv)
 			case 'c':
 				opt_c++;
 				if (NULL == CONFIG_FILE)
-					CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
+					CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_get_optarg();
 				break;
 			case 'R':
 				opt_r++;
-				t.opts = zbx_strdup(t.opts, zbx_optarg);
+				t.opts = zbx_strdup(t.opts, zbx_get_optarg());
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 			case 'h':
