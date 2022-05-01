@@ -6136,7 +6136,7 @@ out:
 
 	FINISH_SYNC;
 
-	if (ZBX_DBSYNC_INIT != mode && 0 != (update_flags & (ZBX_DBSYNC_UPDATE_HOSTS | ZBX_DBSYNC_UPDATE_MACROS)))
+	if (0 != (update_flags & (ZBX_DBSYNC_UPDATE_HOSTS | ZBX_DBSYNC_UPDATE_MACROS)))
 	{
 		sec = zbx_time();
 		dc_reschedule_items();
@@ -13381,18 +13381,23 @@ static void	dc_get_items_to_reschedule(zbx_vector_item_delay_t *items)
 			continue;
 		}
 
-		if (NULL == strstr(item->delay, "{$"))
-			continue;
-
 		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &item->hostid)))
 			continue;
 
 		if (HOST_STATUS_MONITORED != host->status)
 			continue;
 
-		delay_ex = dc_expand_user_macros_dyn(item->delay, &item->hostid, 1);
+		if (NULL == strstr(item->delay, "{$"))
+		{
+			if (NULL == item->delay_ex)
+				continue;
 
-		if (NULL == item->delay_ex || 0 != strcmp(item->delay_ex, delay_ex))
+			delay_ex = NULL;
+		}
+		else
+			delay_ex = dc_expand_user_macros_dyn(item->delay, &item->hostid, 1);
+
+		if (0 != zbx_strcmp_null(item->delay_ex, delay_ex))
 		{
 			zbx_item_delay_t	*item_delay;
 
@@ -13436,11 +13441,21 @@ static void	dc_reschedule_items()
 		{
 			ZBX_DC_ITEM	*item = items.values[i]->item;
 
+			if (NULL == items.values[i]->delay_ex)
+			{
+				/* Macro is removed form item delay, which means item was already */
+				/* rescheduled by syncer. Just reset the delay_ex in cache.       */
+				dc_strpool_release(item->delay_ex);
+				item->delay_ex = NULL;
+				continue;
+			}
+
 			if (ITEM_TYPE_ZABBIX_ACTIVE == item->type || 0 != items.values[i]->proxy_hostid)
 			{
 				/* update nextcheck for active and monitored by proxy items */
-				/* for queue requests by frontend                           */
-				(void)DCitem_nextcheck_update(item, NULL, ZBX_ITEM_DELAY_CHANGED, now, NULL);
+				/* for queue requests by frontend.                          */
+				if (NULL != item->delay_ex)
+					(void)DCitem_nextcheck_update(item, NULL, ZBX_ITEM_DELAY_CHANGED, now, NULL);
 			}
 			else if (NULL != item->delay_ex || ITEM_STATE_NORMAL != item->state)
 			{
