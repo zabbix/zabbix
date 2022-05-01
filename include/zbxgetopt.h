@@ -84,15 +84,16 @@ struct zbx_option
 {
 	const char	*name;
 	/*
-		has_arg can't be an enum because some compilers complain about
-		type mismatches in all the code that assumes it is an int.  */
+	has_arg can't be an enum because some compilers complain about
+	type mismatches in all the code that assumes it is an int.
+	*/
 	int		has_arg;
 	int		*flag;
 	int		val;
 };
 
 int	zbx_getopt_long(int argc, char **argv, const char *options, const struct zbx_option *long_options,
-		int *opt_index);
+		int *opt_index, char **zbx_optarg, int *zbx_optind);
 
 #ifdef __cplusplus
 }
