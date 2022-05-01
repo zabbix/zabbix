@@ -165,7 +165,7 @@ function getSystemStatusData(array $filter) {
 
 		$options = [
 			'output' => ['priority', 'manual_close'],
-			'selectGroups' => ['groupid'],
+			'selectHostGroups' => ['groupid'],
 			'selectHosts' => ['name'],
 			'triggerids' => array_keys($triggerids),
 			'monitored' => true,
@@ -222,7 +222,7 @@ function getSystemStatusData(array $filter) {
 			}
 
 			// groups
-			foreach ($trigger['groups'] as $trigger_group) {
+			foreach ($trigger['hostgroups'] as $trigger_group) {
 				if (!array_key_exists($trigger_group['groupid'], $data['groups'])) {
 					continue;
 				}
