@@ -362,27 +362,6 @@ static void flush_all_hosts(zbx_avail_active_hb_cache_t *cache)
 	}
 }
 
-static void	add_host_availability(zbx_ipc_message_t *message)
-{
-	zbx_vector_uint64_t	hosts;
-	zbx_db_insert_t		insert;
-	int			i;
-
-	zbx_vector_uint64_create(&hosts);
-
-	zbx_availability_deserialize_hostids(message->data, &hosts);
-
-	for (i = 0; i < hosts.values_num; i++)
-	{
-		zbx_db_insert_add_values(&insert, hosts.values[i], INTERFACE_AVAILABLE_UNKNOWN);
-	}
-
-	zbx_db_insert_execute(&insert);
-	zbx_db_insert_clean(&insert);
-
-	zbx_vector_uint64_destroy(&hosts);
-}
-
 static void	active_checks_calculate_proxy_availability(zbx_avail_active_hb_cache_t *cache)
 {
 	zbx_hashset_iter_t		iter;
@@ -511,9 +490,6 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 					break;
 				case ZBX_IPC_AVAILMAN_PROXY_FLUSH_ALL_HOSTS:
 					flush_all_hosts(&active_hb_cache);
-					break;
-				case ZBX_IPC_AVAILMAN_ADD_HOSTS:
-					add_host_availability(message);
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
