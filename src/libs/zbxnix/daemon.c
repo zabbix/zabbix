@@ -326,7 +326,7 @@ static void	set_daemon_signal_handlers(void)
  *                                                                            *
  ******************************************************************************/
 int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
-		zbx_get_pid_file_pathname_f get_pid_file_cb)
+		zbx_get_pid_file_pathname_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg)
 {
 	struct passwd	*pwd;
 
@@ -431,7 +431,7 @@ int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
 
 	parent_pid = (int)getpid();
 
-	zbx_set_common_signal_handlers();
+	zbx_set_common_signal_handlers(zbx_on_exit_cb_arg);
 	set_daemon_signal_handlers();
 
 	/* Set SIGCHLD now to avoid race conditions when a child process is created before */

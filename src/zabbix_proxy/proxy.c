@@ -1047,7 +1047,7 @@ int	main(int argc, char **argv)
 		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
-	return zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags, get_pid_file_path);
+	return zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit);
 }
 
 static void	zbx_check_db(void)
@@ -1438,14 +1438,16 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (0 < (ret = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "PROCESS EXIT: %d", ret);
-			sig_exiting = ZBX_EXIT_FAILURE;
+			//sig_exiting = ZBX_EXIT_FAILURE;
+			zbx_fail_sig_exiting();
 			break;
 		}
 
 		if (-1 == ret && EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
-			sig_exiting = ZBX_EXIT_FAILURE;
+			//sig_exiting = ZBX_EXIT_FAILURE;
+			zbx_fail_sig_exiting();
 			break;
 		}
 	}

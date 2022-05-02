@@ -37,22 +37,22 @@ int	zbx_coredump_disable(void);
 #	error "This module allowed only for Unix OS"
 #endif
 
-#define ZBX_EXIT_NONE		0
-#define ZBX_EXIT_SUCCESS	1
-#define ZBX_EXIT_FAILURE	2
+typedef void (*zbx_on_exit_t)(int);
+void	zbx_on_exit(int ret);
+void	zbx_fail_sig_exiting(void);
+void	zbx_succeed_sig_exiting(void);
+int	ZBX_IS_RUNNING(void);
+int	ZBX_EXIT_STATUS(void);
 
 /* callback function prototype for getting PID file path */
 typedef const char* (*zbx_get_pid_file_pathname_f)(void);
 
 int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
-		zbx_get_pid_file_pathname_f get_pid_file_cb);
+		zbx_get_pid_file_pathname_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg);
 void	zbx_daemon_stop(void);
 
 int	zbx_sigusr_send(int flags, const char *pid_file_pathname);
 void	zbx_set_sigusr_handler(void (*handler)(int flags));
-
-int	ZBX_IS_RUNNING(void);
-int	ZBX_EXIT_STATUS(void);
 
 #define ZBX_DO_EXIT()
 
@@ -110,7 +110,8 @@ void	zbx_dshm_unlock(zbx_dshm_t *shm);
 /* IPC end*/
 
 /* sighandler start */
-void	zbx_set_common_signal_handlers(void);
+void	zbx_fail_sig_exiting(void);
+void	zbx_set_common_signal_handlers(zbx_on_exit_t zbx_on_exit_cb_arg);
 void	zbx_set_child_signal_handler(void);
 void	zbx_unset_child_signal_handler(void);
 void	zbx_set_metric_thread_signal_handler(void);

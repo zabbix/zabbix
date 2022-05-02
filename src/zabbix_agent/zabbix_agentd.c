@@ -1251,7 +1251,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
-			sig_exiting = ZBX_EXIT_FAILURE;
+			//sig_exiting = ZBX_EXIT_FAILURE;
+			zbx_fail_sig_exiting();
 			break;
 		}
 	}
@@ -1416,7 +1417,7 @@ int	main(int argc, char **argv)
 
 			load_perf_counters(CONFIG_PERF_COUNTERS, CONFIG_PERF_COUNTERS_EN);
 #else
-			zbx_set_common_signal_handlers();
+			zbx_set_common_signal_handlers(zbx_on_exit);
 #endif
 #ifndef _WINDOWS
 			if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 0))
@@ -1477,7 +1478,7 @@ int	main(int argc, char **argv)
 #if defined(ZABBIX_SERVICE)
 	service_start(flags);
 #elif defined(ZABBIX_DAEMON)
-	zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags, get_pid_file_path);
+	zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit);
 #endif
 	exit(EXIT_SUCCESS);
 }

@@ -1110,7 +1110,7 @@ int	main(int argc, char **argv)
 		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
-	return zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags, get_pid_file_path);
+	return zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit);
 }
 
 static void	zbx_check_db(void)
@@ -1761,7 +1761,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start server: %s", error);
 		zbx_free(error);
-		sig_exiting = ZBX_EXIT_FAILURE;
+		//sig_exiting = ZBX_EXIT_FAILURE;
+		zbx_fail_sig_exiting();
 	}
 
 	zbx_diag_init(diag_add_section_info);
@@ -1770,7 +1771,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc))
 		{
-			sig_exiting = ZBX_EXIT_FAILURE;
+			zbx_fail_sig_exiting();
+			//sig_exiting = ZBX_EXIT_FAILURE;
 			ha_status = ZBX_NODE_STATUS_ERROR;
 		}
 		else
@@ -1809,7 +1811,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			if (SUCCEED != zbx_ha_dispatch_message(message, &ha_status, &ha_failover_delay, &error))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "HA manager error: %s", error);
-				sig_exiting = ZBX_EXIT_FAILURE;
+				//sig_exiting = ZBX_EXIT_FAILURE;
+				zbx_fail_sig_exiting();
 			}
 		}
 		else
@@ -1848,7 +1851,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				case ZBX_NODE_STATUS_ACTIVE:
 					if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc))
 					{
-						sig_exiting = ZBX_EXIT_FAILURE;
+						zbx_fail_sig_exiting();
+						//sig_exiting = ZBX_EXIT_FAILURE;
 						ha_status = ZBX_NODE_STATUS_ERROR;
 						continue;
 					}
@@ -1866,7 +1870,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				default:
 					zabbix_log(LOG_LEVEL_CRIT, "unsupported status %d received from HA manager",
 							ha_status);
-					sig_exiting = ZBX_EXIT_FAILURE;
+					zbx_fail_sig_exiting();
+					//sig_exiting = ZBX_EXIT_FAILURE;
 					continue;
 			}
 		}
@@ -1884,14 +1889,16 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (0 < (ret = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "PROCESS EXIT: %d", ret);
-			sig_exiting = ZBX_EXIT_FAILURE;
+			//sig_exiting = ZBX_EXIT_FAILURE;
+			zbx_fail_sig_exiting();
 			break;
 		}
 
 		if (-1 == ret && EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
-			sig_exiting = ZBX_EXIT_FAILURE;
+			//sig_exiting = ZBX_EXIT_FAILURE;
+			zbx_fail_sig_exiting();
 			break;
 		}
 	}
