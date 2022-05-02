@@ -3181,6 +3181,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 		if (0 != history_num)
 		{
+			zbx_dc_um_handle_t	*um_handle;
+
 			hc_get_item_values(history, &history_items);	/* copy item data from history cache */
 
 			items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * (size_t)history_num);
@@ -3195,6 +3197,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 			DCconfig_get_items_by_itemids_partial(items, itemids.values, errcodes, history_num,
 					item_retrieve_mode);
+
+			um_handle = zbx_dc_open_user_macros();
 
 			DCmass_prepare_history(history, &itemids, items, errcodes, history_num, &item_diff,
 					&inventory_values, compression_age, &proxy_subscribtions);
@@ -3226,6 +3230,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 				}
 				while (ZBX_DB_DOWN == txn_error);
 			}
+
+			zbx_dc_close_user_macros(um_handle);
 
 			zbx_clean_events();
 
