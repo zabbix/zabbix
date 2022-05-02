@@ -3089,7 +3089,6 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 				"\"latestdate\":null,\"size\":0,\"uniquesize\":0}");
 	}
 
-
 	vmware_vm_get_nic_devices(vm, details);
 	vmware_vm_get_disk_devices(vm, details);
 	vmware_vm_get_file_systems(vm, details);
