@@ -4870,8 +4870,8 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 		ZBX_STR2UCHAR(op->type, row[2]);
 		dc_strpool_replace(found, &op->params, row[3]);
 		op->step = atoi(row[4]);
-		op->error_handler = atoi(row[6]);
-		dc_strpool_replace(found, &op->error_handler_params, row[7]);
+		op->error_handler = atoi(row[5]);
+		dc_strpool_replace(found, &op->error_handler_params, row[6]);
 
 		if (0 == found)
 		{

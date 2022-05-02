@@ -3605,10 +3605,10 @@ static int	dbsync_compare_item_preproc(const zbx_dc_preproc_op_t *preproc, const
 	if (FAIL == dbsync_compare_int(dbrow[4], preproc->step))
 		return FAIL;
 
-	if (FAIL == dbsync_compare_int(dbrow[6], preproc->error_handler))
+	if (FAIL == dbsync_compare_int(dbrow[5], preproc->error_handler))
 		return FAIL;
 
-	if (FAIL == dbsync_compare_str(dbrow[7], preproc->error_handler_params))
+	if (FAIL == dbsync_compare_str(dbrow[6], preproc->error_handler_params))
 		return FAIL;
 
 	return SUCCEED;
@@ -3634,7 +3634,7 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 	zbx_dc_preproc_op_t	*preproc;
 
 	if (NULL == (result = DBselect(
-			"select pp.item_preprocid,pp.itemid,pp.type,pp.params,pp.step,h.hostid,pp.error_handler,"
+			"select pp.item_preprocid,pp.itemid,pp.type,pp.params,pp.step,pp.error_handler,"
 				"pp.error_handler_params"
 			" from item_preproc pp,items i,hosts h"
 			" where pp.itemid=i.itemid"
