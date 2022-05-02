@@ -94,6 +94,7 @@ static zbx_vmcheck_t	vmchecks[] =
 
 	{"vm.cluster.name", VMCHECK_FUNC(check_vcenter_vm_cluster_name)},
 	{"vm.cpu.num", VMCHECK_FUNC(check_vcenter_vm_cpu_num)},
+	{"vm.consolidationneeded", VMCHECK_FUNC(check_vcenter_vm_consolidationneeded)},
 	{"vm.cpu.ready", VMCHECK_FUNC(check_vcenter_vm_cpu_ready)},
 	{"vm.cpu.usage", VMCHECK_FUNC(check_vcenter_vm_cpu_usage)},
 	{"vm.cpu.usage.perf", VMCHECK_FUNC(check_vcenter_vm_cpu_usage_perf)},

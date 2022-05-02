@@ -1349,7 +1349,7 @@ char	*zbx_xml_doc_read_value(xmlDoc *xdoc, const char *xpath)
  *                                                                            *
  * Purpose: retrieve a xmlNode from xml data relative to the specified node   *
  *                                                                            *
- * Parameters: xdoc    - [IN] the XML document                                 *
+ * Parameters: xdoc    - [IN] the XML document                                *
  *             node   - [IN] the XML node                                     *
  *             xpath  - [IN] the XML XPath                                    *
  *                                                                            *
@@ -1389,8 +1389,8 @@ clean:
  *                                                                            *
  * Purpose: retrieve a xmlNode from xml document                              *
  *                                                                            *
- * Parameters: doc    - [IN] the XML document                                 *
- *             xpath  - [IN] the XML XPath                                    *
+ * Parameters: xdoc  - [IN] the XML document                                  *
+ *             xpath - [IN] the XML XPath                                     *
  *                                                                            *
  * Return: The pointer to xmlNode or NULL if the xml data does not            *
  *         contain the value specified by xpath.                              *

@@ -22,7 +22,6 @@
 #include "config.h"
 #include "threads.h"
 #include "zbxalgo.h"
-#include "log.h"
 #include "zbxjson.h"
 
 /* the vmware service state */
@@ -418,11 +417,12 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_VMPROP_FOLDER			20
 #define ZBX_VMWARE_VMPROP_SNAPSHOT			21
 #define ZBX_VMWARE_VMPROP_DATASTOREID			22
-#define ZBX_VMWARE_VMPROP_TOOLS_VERSION			23
-#define ZBX_VMWARE_VMPROP_TOOLS_RUNNING_STATUS		24
-#define ZBX_VMWARE_VMPROP_STATE				25
+#define ZBX_VMWARE_VMPROP_CONSOLIDATION_NEEDED		23
+#define ZBX_VMWARE_VMPROP_TOOLS_VERSION			24
+#define ZBX_VMWARE_VMPROP_TOOLS_RUNNING_STATUS		25
+#define ZBX_VMWARE_VMPROP_STATE				26
 
-#define ZBX_VMWARE_VMPROPS_NUM				26
+#define ZBX_VMWARE_VMPROPS_NUM				27
 
 /* vmware service types */
 #define ZBX_VMWARE_TYPE_UNKNOWN	0
