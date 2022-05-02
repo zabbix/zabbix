@@ -55,6 +55,7 @@ int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
 void	proxy_set_hist_lastid(const zbx_uint64_t lastid);
 void	proxy_set_dhis_lastid(const zbx_uint64_t lastid);
 void	proxy_set_areg_lastid(const zbx_uint64_t lastid);
+int	proxy_get_host_active_availability(struct zbx_json *j);
 
 void	calc_timestamp(const char *line, int *timestamp, const char *format);
 

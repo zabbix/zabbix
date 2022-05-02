@@ -2771,6 +2771,33 @@ int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 	return records_num;
 }
 
+int	proxy_get_host_active_availability(struct zbx_json *j)
+{
+	zbx_ipc_message_t	response;
+	int			records_num = 0;
+
+	zbx_ipc_message_init(&response);
+	zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_HOSTDATA, 0, 0, &response);
+
+	if (0 != response.size)
+	{
+		zbx_vector_ptr_t	hostdata;
+
+		zbx_vector_ptr_create(&hostdata);
+		zbx_availability_deserialize_hostdata(response.data, &hostdata);
+		zbx_availability_serialize_json_hostdata(&hostdata, j);
+
+		records_num = hostdata.values_num;
+
+		zbx_vector_ptr_clear_ext(&hostdata, (zbx_clean_func_t)zbx_ptr_free);
+		zbx_vector_ptr_destroy(&hostdata);
+	}
+
+	zbx_ipc_message_clean(&response);
+
+	return records_num;
+}
+
 void	calc_timestamp(const char *line, int *timestamp, const char *format)
 {
 	int		hh, mm, ss, yyyy, dd, MM;

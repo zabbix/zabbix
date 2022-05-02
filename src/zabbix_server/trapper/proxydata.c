@@ -214,28 +214,6 @@ static int	send_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_
 	return SUCCEED;
 }
 
-static void	send_active_host_data(struct zbx_json *j)
-{
-	zbx_ipc_message_t	response;
-
-	zbx_ipc_message_init(&response);
-	zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_HOSTDATA, 0, 0, &response);
-
-	if (0 != response.size)
-	{
-		zbx_vector_ptr_t	hostdata;
-
-		zbx_vector_ptr_create(&hostdata);
-		zbx_availability_deserialize_hostdata(response.data, &hostdata);
-		zbx_availability_serialize_json_hostdata(&hostdata, j);
-
-		zbx_vector_ptr_clear_ext(&hostdata, (zbx_clean_func_t)zbx_ptr_free);
-		zbx_vector_ptr_destroy(&hostdata);
-	}
-
-	zbx_ipc_message_clean(&response);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: sends 'proxy data' request to server                              *
@@ -270,11 +248,10 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 	proxy_get_hist_data(&j, &history_lastid, &more_history);
 	proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
 	proxy_get_areg_data(&j, &areg_lastid, &more_areg);
+	proxy_get_host_active_availability(&j);
 
 	zbx_vector_ptr_create(&tasks);
 	zbx_tm_get_remote_tasks(&tasks, 0);
-
-	send_active_host_data(&j);
 
 	if (0 != tasks.values_num)
 		zbx_tm_json_serialize_tasks(&j, &tasks);

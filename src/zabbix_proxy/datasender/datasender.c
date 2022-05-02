@@ -93,7 +93,8 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, time_t 
 	struct zbx_json		j;
 	struct zbx_json_parse	jp, jp_tasks;
 	int			availability_ts, history_records = 0, discovery_records = 0,
-				areg_records = 0, more_history = 0, more_discovery = 0, more_areg = 0, proxy_delay;
+				areg_records = 0, more_history = 0, more_discovery = 0, more_areg = 0, proxy_delay,
+				host_avail_records = 0;
 	zbx_uint64_t		history_lastid = 0, discovery_lastid = 0, areg_lastid = 0, flags = 0;
 	zbx_timespec_t		ts;
 	char			*error = NULL, *buffer = NULL;
@@ -126,6 +127,8 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, time_t 
 		if (0 != areg_records)
 			flags |= ZBX_DATASENDER_AUTOREGISTRATION;
 
+		host_avail_records = proxy_get_host_active_availability(&j);
+
 		if (ZBX_PROXY_DATA_MORE != more_history && ZBX_PROXY_DATA_MORE != more_discovery &&
 						ZBX_PROXY_DATA_MORE != more_areg)
 		{
@@ -134,7 +137,6 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, time_t 
 	}
 
 	zbx_vector_ptr_create(&tasks);
-
 
 	if (SUCCEED == upload_state && ZBX_TASK_UPDATE_FREQUENCY <= now - task_timestamp)
 	{
@@ -149,28 +151,6 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, time_t 
 		}
 
 		flags |= ZBX_DATASENDER_TASKS_REQUEST;
-	}
-
-	if (SUCCEED == upload_state)
-	{
-		zbx_ipc_message_t	response;
-
-		zbx_ipc_message_init(&response);
-		zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_HOSTDATA, 0, 0, &response);
-
-		if (0 != response.size)
-		{
-			zbx_vector_ptr_t	hostdata;
-
-			zbx_vector_ptr_create(&hostdata);
-			zbx_availability_deserialize_hostdata(response.data, &hostdata);
-			zbx_availability_serialize_json_hostdata(&hostdata, &j);
-
-			zbx_vector_ptr_clear_ext(&hostdata, (zbx_clean_func_t)zbx_ptr_free);
-			zbx_vector_ptr_destroy(&hostdata);
-		}
-
-		zbx_ipc_message_clean(&response);
 	}
 
 	if (SUCCEED != upload_state)
