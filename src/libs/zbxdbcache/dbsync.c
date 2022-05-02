@@ -1755,10 +1755,6 @@ static char	**dbsync_item_preproc_row(char **row)
 	{
 		zbx_eval_context_t	ctx;
 		char			*error = NULL;
-		zbx_uint64_t		hostid;
-
-		/* get associated host identifier */
-		ZBX_STR2UINT64(hostid, row[1]);
 
 		if (FAIL == zbx_eval_parse_expression(&ctx, row[11], ZBX_EVAL_PARSE_CALC_EXPRESSION, &error))
 		{
