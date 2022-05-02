@@ -2982,10 +2982,7 @@ static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr)
 
 	if (NULL == (root_node = zbx_xml_node_get(xdoc, node, ZBX_XNN("rootSnapshotList"))))
 	{
-		*jstr = zbx_strdup(NULL, "{\"snapshot\":[],\"count\":0,\"latestdate\":null,\"size\":0,"
-				"\"uniquesize\":0}");
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rootSnapshotList empty", __func__);
-		ret = SUCCEED;
 		goto out;
 	}
 
@@ -3086,6 +3083,12 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 		zbx_json_value_by_name(&jp, "count", count, sizeof(count), NULL);
 		vm->snapshot_count = (unsigned int)atoi(count);
 	}
+	else
+	{
+		vm->props[ZBX_VMWARE_VMPROP_SNAPSHOT] = zbx_strdup(NULL, "{\"snapshot\":[],\"count\":0,"
+				"\"latestdate\":null,\"size\":0,\"uniquesize\":0}");
+	}
+
 
 	vmware_vm_get_nic_devices(vm, details);
 	vmware_vm_get_disk_devices(vm, details);
