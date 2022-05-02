@@ -1150,15 +1150,12 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_vector_uint64_t *active_avail_d
 	zbx_ptr_pair_t	*psk_owner, psk_owner_local;
 	zbx_hashset_t	psk_owners;
 #endif
-	zbx_vector_uint64_t	disabled_hostids;
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_create(&psk_owners, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 #endif
 	now = time(NULL);
-
-	zbx_vector_uint64_create(&disabled_hostids);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -1191,7 +1188,6 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_vector_uint64_t *active_avail_d
 					zbx_hashset_remove_direct(&config->hosts_h, host_h);
 				}
 			}
-
 
 			host_h_local.host = row[2];
 			host_h = (ZBX_DC_HOST_H *)zbx_hashset_search(&config->hosts_h, &host_h_local);
@@ -13926,37 +13922,6 @@ int	DCget_proxy_lastaccess_by_name(const char *name, int *lastaccess, char **err
 			ret = FAIL;
 		}
 	}
-
-	UNLOCK_CACHE;
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieves proxy lastaccess from the cache by name                 *
- *                                                                            *
- * Parameters: proxy_hostid - [IN] proxy id                                   *
- *             lastaccess   - [OUT] proxy lastaccess                          *
- *                                                                            *
- * Return value: SUCCEED - proxy lastaccess is retrieved                      *
- *               FAIL    - proxy lastaccess cannot be retrieved               *
- *                                                                            *
- ******************************************************************************/
-int	DCget_proxy_lastaccess_by_id(zbx_uint64_t proxy_hostid, int *lastaccess)
-{
-	const ZBX_DC_PROXY	*dc_proxy;
-	int			ret;
-
-	RDLOCK_CACHE;
-
-	if (NULL != (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxy_hostid)))
-	{
-		*lastaccess = dc_proxy->lastaccess;
-		ret = SUCCEED;
-	}
-	else
-		ret = FAIL;
 
 	UNLOCK_CACHE;
 

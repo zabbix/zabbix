@@ -17,8 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxavailability.h"
-
 #include "zbxserialize.h"
 #include "zbxavailability.h"
 #include "log.h"
@@ -132,7 +130,7 @@ zbx_uint32_t	zbx_availability_serialize_hostdata(unsigned char **data, zbx_hashs
 	return data_len;
 }
 
-void	zbx_availability_deserialize_hostdata(const unsigned char *data, zbx_vector_ptr_t *hostdata)
+void	zbx_availability_deserialize_hostdata(const unsigned char *data, zbx_vector_proxy_hostdata_ptr_t *hostdata)
 {
 	int	values_num, i;
 
@@ -148,7 +146,7 @@ void	zbx_availability_deserialize_hostdata(const unsigned char *data, zbx_vector
 		data += zbx_deserialize_uint64(data, &h->hostid);
 		data += zbx_deserialize_int(data, &h->status);
 
-		zbx_vector_ptr_append(hostdata, h);
+		zbx_vector_proxy_hostdata_ptr_append(hostdata, h);
 	}
 }
 
@@ -190,7 +188,8 @@ void	zbx_availability_deserialize_active_status_response(const unsigned char *da
 	(void)zbx_deserialize_int(data, status);
 }
 
-zbx_uint32_t	zbx_availability_serialize_proxy_hostdata(unsigned char **data, zbx_vector_ptr_t *hosts, zbx_uint64_t proxy_hostid)
+zbx_uint32_t	zbx_availability_serialize_proxy_hostdata(unsigned char **data, zbx_vector_proxy_hostdata_ptr_t *hosts,
+		zbx_uint64_t proxy_hostid)
 {
 	zbx_uint32_t		data_len = 0;
 	unsigned char		*ptr;
@@ -209,7 +208,7 @@ zbx_uint32_t	zbx_availability_serialize_proxy_hostdata(unsigned char **data, zbx
 	{
 		zbx_proxy_hostdata_t	*host;
 
-		host = (zbx_proxy_hostdata_t *)hosts->values[i];
+		host = hosts->values[i];
 
 		ptr += zbx_serialize_value(ptr, host->hostid);
 		ptr += zbx_serialize_value(ptr, host->status);
@@ -218,7 +217,8 @@ zbx_uint32_t	zbx_availability_serialize_proxy_hostdata(unsigned char **data, zbx
 	return data_len;
 }
 
-void	zbx_availability_deserialize_proxy_hostdata(const unsigned char *data, zbx_vector_ptr_t *hostdata, zbx_uint64_t *proxy_hostid)
+void	zbx_availability_deserialize_proxy_hostdata(const unsigned char *data, zbx_vector_proxy_hostdata_ptr_t *hostdata,
+		zbx_uint64_t *proxy_hostid)
 {
 	int	values_num, i;
 
@@ -235,7 +235,7 @@ void	zbx_availability_deserialize_proxy_hostdata(const unsigned char *data, zbx_
 		data += zbx_deserialize_uint64(data, &h->hostid);
 		data += zbx_deserialize_int(data, &h->status);
 
-		zbx_vector_ptr_append(hostdata, h);
+		zbx_vector_proxy_hostdata_ptr_append(hostdata, h);
 	}
 }
 

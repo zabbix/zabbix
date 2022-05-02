@@ -180,6 +180,7 @@ static void	process_active_hb(zbx_avail_active_hb_cache_t *cache, zbx_ipc_messag
 	zbx_availability_deserialize_active_hb(message->data, &avail);
 
 	avail.lastaccess_active = (int)time(NULL);
+	zabbix_log(1, "DBG processing active hb from %i", avail.hostid);
 	process_new_active_check_heartbeat(cache, &avail);
 }
 
@@ -283,14 +284,14 @@ static void	init_active_availability(zbx_avail_active_hb_cache_t *cache)
 }
 static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_message_t *message)
 {
-	zbx_uint64_t			proxy_hostid;
-	zbx_vector_ptr_t		hosts;
-	zbx_proxy_hostdata_t		*host;
-	zbx_vector_uint64_t		status_unknown, status_available, status_unavailable;
-	zbx_active_avail_proxy_t	*proxy_avail;
-	int				i;
+	zbx_uint64_t				proxy_hostid;
+	zbx_vector_proxy_hostdata_ptr_t		hosts;
+	zbx_proxy_hostdata_t			*host;
+	zbx_vector_uint64_t			status_unknown, status_available, status_unavailable;
+	zbx_active_avail_proxy_t		*proxy_avail;
+	int					i;
 
-	zbx_vector_ptr_create(&hosts);
+	zbx_vector_proxy_hostdata_ptr_create(&hosts);
 
 	zbx_availability_deserialize_proxy_hostdata(message->data, &hosts, &proxy_hostid);
 
@@ -300,7 +301,8 @@ static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_mes
 
 	for (i = 0; i < hosts.values_num; i++)
 	{
-		host = (zbx_proxy_hostdata_t	*)hosts.values[i];
+		host = hosts.values[i];
+		zabbix_log(1, "flushing proxy hostdata for %i, status = %i", host->hostid, host->status);
 
 		if (host->status == INTERFACE_AVAILABLE_UNKNOWN)
 		{
@@ -339,8 +341,8 @@ static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_mes
 	zbx_vector_uint64_destroy(&status_unknown);
 	zbx_vector_uint64_destroy(&status_available);
 	zbx_vector_uint64_destroy(&status_unavailable);
-	zbx_vector_ptr_clear_ext(&hosts, zbx_ptr_free);
-	zbx_vector_ptr_destroy(&hosts);
+	zbx_vector_proxy_hostdata_ptr_clear_ext(&hosts, (zbx_proxy_hostdata_ptr_free_func_t)zbx_ptr_free);
+	zbx_vector_proxy_hostdata_ptr_destroy(&hosts);
 }
 
 static void flush_all_hosts(zbx_avail_active_hb_cache_t *cache)

@@ -906,16 +906,4 @@ void	zbx_db_trigger_get_itemids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *
 
 int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
 
-typedef struct
-{
-	zbx_uint64_t	hostid;
-	int		lastaccess_active;
-	int		heartbeat_freq;
-	int		active_status;
-}
-zbx_host_active_avail_t;
-
-#define ZBX_ACTIVE_CHECK_AVAILS_DATA_VECTOR	0
-#define ZBX_ACTIVE_CHECK_AVAILS_DATA_HASHSET	1
-
 #endif

@@ -2781,16 +2781,16 @@ int	proxy_get_host_active_availability(struct zbx_json *j)
 
 	if (0 != response.size)
 	{
-		zbx_vector_ptr_t	hostdata;
+		zbx_vector_proxy_hostdata_ptr_t	hostdata;
 
-		zbx_vector_ptr_create(&hostdata);
+		zbx_vector_proxy_hostdata_ptr_create(&hostdata);
 		zbx_availability_deserialize_hostdata(response.data, &hostdata);
 		zbx_availability_serialize_json_hostdata(&hostdata, j);
 
 		records_num = hostdata.values_num;
 
-		zbx_vector_ptr_clear_ext(&hostdata, (zbx_clean_func_t)zbx_ptr_free);
-		zbx_vector_ptr_destroy(&hostdata);
+		zbx_vector_proxy_hostdata_ptr_clear_ext(&hostdata, (zbx_proxy_hostdata_ptr_free_func_t)zbx_ptr_free);
+		zbx_vector_proxy_hostdata_ptr_destroy(&hostdata);
 	}
 
 	zbx_ipc_message_clean(&response);
@@ -4733,12 +4733,12 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_PROXY_ACTIVE_AVAIL_DATA, &jp_data))
 	{
-		const char		*ptr;
-		zbx_vector_ptr_t	host_avails;
-		struct zbx_json_parse	jp_host;
-		char			buffer[ZBX_KIBIBYTE];
+		const char			*ptr;
+		zbx_vector_proxy_hostdata_ptr_t	host_avails;
+		struct zbx_json_parse		jp_host;
+		char				buffer[ZBX_KIBIBYTE];
 
-		zbx_vector_ptr_create(&host_avails);
+		zbx_vector_proxy_hostdata_ptr_create(&host_avails);
 
 		for (ptr = NULL; NULL != (ptr = zbx_json_next(&jp_data, ptr));)
 		{
@@ -4763,7 +4763,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 
 			host->status = atoi(buffer);
 
-			zbx_vector_ptr_append(&host_avails, host);
+			zbx_vector_proxy_hostdata_ptr_append(&host_avails, host);
 		}
 
 		if (0 != host_avails.values_num)
@@ -4774,10 +4774,11 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 			data_len = zbx_availability_serialize_proxy_hostdata(&data, &host_avails, proxy->hostid);
 			zbx_availability_send(ZBX_IPC_AVAILMAN_PROCESS_PROXY_HOSTDATA, data, data_len, NULL);
 
-			zbx_vector_ptr_clear_ext(&host_avails, zbx_ptr_free);
-			zbx_vector_ptr_destroy(&host_avails);
+			zbx_vector_proxy_hostdata_ptr_clear_ext(&host_avails, (zbx_proxy_hostdata_ptr_free_func_t)zbx_ptr_free);
 			zbx_free(data);
 		}
+
+		zbx_vector_proxy_hostdata_ptr_destroy(&host_avails);
 	}
 
 out:

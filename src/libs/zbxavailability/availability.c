@@ -22,6 +22,9 @@
 #include "log.h"
 #include "zbxipcservice.h"
 
+ZBX_PTR_VECTOR_IMPL(proxy_hostdata_ptr, zbx_proxy_hostdata_t *)
+ZBX_PTR_VECTOR_IMPL(host_active_avail_ptr, zbx_host_active_avail_t *)
+
 void	zbx_availability_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size, zbx_ipc_message_t *response)
 {
 	static zbx_ipc_socket_t	socket;
@@ -67,7 +70,7 @@ void	zbx_availabilities_flush(const zbx_vector_availability_ptr_t *interface_ava
 	zbx_free(data);
 }
 
-void	zbx_availability_serialize_json_hostdata(zbx_vector_ptr_t *hostdata, struct zbx_json *j)
+void	zbx_availability_serialize_json_hostdata(zbx_vector_proxy_hostdata_ptr_t *hostdata, struct zbx_json *j)
 {
 	int	i;
 

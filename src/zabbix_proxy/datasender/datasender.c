@@ -283,7 +283,7 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d flags:0x" ZBX_FS_UX64, __func__,
 			zbx_result_string(upload_state), *more, flags);
 
-	return history_records + discovery_records + areg_records;
+	return history_records + discovery_records + areg_records + host_avail_records;
 }
 
 /******************************************************************************
