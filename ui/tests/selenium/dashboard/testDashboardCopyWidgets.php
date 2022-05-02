@@ -54,13 +54,13 @@ class testDashboardCopyWidgets extends CWebTest {
 	}
 
 	public static function prepareIds() {
-		self::$new_page_ids	= CDBHelper::getColumn("SELECT * FROM dashboard_page WHERE name = 'Test_page' ORDER BY dashboard_pageid",
-				'dashboard_pageid');
-		self::$paste_dashboard_id = CDBHelper::getValue("SELECT dashboardid FROM dashboard WHERE name = 'Dashboard for Paste widgets'");
-		self::$dashboardid_with_widgets = CDBHelper::getValue("SELECT dashboardid FROM dashboard WHERE name = ".
-				"'Templated dashboard with all widgets'");
-		self::$empty_dashboardid = CDBHelper::getValue("SELECT dashboardid FROM dashboard WHERE name = ".
-				"'Dashboard without widgets'");
+		self::$new_page_ids	= CDBHelper::getColumn('SELECT * FROM dashboard_page WHERE name ='.zbx_dbstr('Test_page').
+				' ORDER BY dashboard_pageid', 'dashboard_pageid');
+		self::$paste_dashboard_id = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.zbx_dbstr('Dashboard for Paste widgets'));
+		self::$dashboardid_with_widgets = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
+				zbx_dbstr('Templated dashboard with all widgets'));
+		self::$empty_dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
+				zbx_dbstr('Dashboard without widgets'));
 		self::$templated_page_id = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE name='.
 				zbx_dbstr(self::TEMPLATED_PAGE_NAME));
 	}
