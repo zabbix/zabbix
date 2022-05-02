@@ -13408,6 +13408,8 @@ static void	dc_get_items_to_reschedule(zbx_vector_item_delay_t *items)
 
 			zbx_vector_item_delay_append(items, item_delay);
 		}
+		else
+			zbx_free(delay_ex);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() items:%d", __func__, items->values_num);
