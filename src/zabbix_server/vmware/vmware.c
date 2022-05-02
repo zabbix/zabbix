@@ -4124,7 +4124,7 @@ static void	vmware_service_get_hv_pnics_data(xmlDoc *details, zbx_vector_vmware_
 	nodeset = xpathObj->nodesetval;
 	zbx_vector_vmware_pnic_reserve(nics, nodeset->nodeNr);
 
-	for (i = 0; i < nodeset->nodeNr; i++)
+	for (; i < nodeset->nodeNr; i++)
 	{
 		zbx_vmware_pnic_t	*nic;
 		char			*value;
@@ -4158,6 +4158,7 @@ static void	vmware_service_get_hv_pnics_data(xmlDoc *details, zbx_vector_vmware_
 clean:
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, i);
 }
 

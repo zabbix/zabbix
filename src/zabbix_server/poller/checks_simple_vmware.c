@@ -1677,7 +1677,8 @@ int	check_vcenter_hv_net_if_discovery(AGENT_REQUEST *request, const char *userna
 		zbx_json_addstring(&json_data, "{#IFNAME}", nic->name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#IFDRIVER}", ZBX_NULL2EMPTY_STR(nic->driver), ZBX_JSON_TYPE_STRING);
 		zbx_json_adduint64(&json_data, "{#IFSPEED}", nic->speed);
-		zbx_json_addstring(&json_data, "{#IFDUPLEX}", 0 == nic->duplex ? "half" : "full", ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#IFDUPLEX}", ZBX_DUPLEX_FULL == nic->duplex ? "full" : "half",
+				ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#IFMAC}", ZBX_NULL2EMPTY_STR(nic->mac), ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&json_data);
