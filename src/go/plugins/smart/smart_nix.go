@@ -39,7 +39,7 @@ func (p *Plugin) executeSmartctl(args string, strict bool) ([]byte, error) {
 	var out string
 	var err error
 
-	executable := fmt.Sprintf("sudo %s %s", path, args)
+	executable := fmt.Sprintf("sudo -n %s %s", path, args)
 
 	p.Tracef("executing smartctl command: %s", executable)
 

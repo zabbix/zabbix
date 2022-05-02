@@ -288,27 +288,27 @@
 	<target name="create-db-mysql" depends="drop-db-mysql">
 		<!-- Create MySQL database -->
 		<exec executable="mysql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="--execute='create database ${dbname} character set utf8 collate utf8_bin'"/>
 		</exec>
 		<exec executable="mysql" input="database/mysql/schema.sql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="${dbname}"/>
 		</exec>
 		<exec executable="mysql" input="database/mysql/images.sql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="${dbname}"/>
 		</exec>
 		<exec executable="mysql" input="database/mysql/data.sql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="${dbname}"/>
 		</exec>
 	</target>
@@ -316,9 +316,9 @@
 	<target name="drop-db-mysql">
 		<!-- Drop MySQL database -->
 		<exec executable="mysql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="--execute='drop database if exists ${dbname}'"/>
 		</exec>
 	</target>
@@ -326,48 +326,48 @@
 	<target name="init-proxy-mysql" depends="">
 		<!-- Create MySQL database -->
 		<exec executable="mysql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="--execute='drop database if exists ${dbname}_proxy'"/>
 		</exec>
 		<exec executable="mysql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="--execute='create database ${dbname}_proxy character set utf8 collate utf8_bin'"/>
 		</exec>
 		<exec executable="mysql" input="database/mysql/schema.sql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="${dbname}_proxy"/>
 		</exec>
 	</target>
 
 	<target name="init-frontend-mysql" depends="create-configs,create-saml-configs,make-dbschema,make-gettext,create-db-mysql,init-frontend-modules">
 		<exec executable="mysql" input="ui/tests/selenium/data/data_test.sql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="${dbname}"/>
 		</exec>
 	</target>
 
 	<target name="init-api-mysql" depends="create-configs,make-dbschema,create-db-mysql">
 		<exec executable="mysql" input="ui/tests/api_json/data/data_test.sql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="${dbname}"/>
 		</exec>
 	</target>
 
 	<target name="init-integration-mysql" depends="create-configs,init-integration,make-binaries-mysql,create-db-mysql,init-proxy-mysql">
 		<exec executable="mysql" input="ui/tests/integration/data/data_test.sql" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
 			<arg line="${dbname}"/>
 		</exec>
 	</target>

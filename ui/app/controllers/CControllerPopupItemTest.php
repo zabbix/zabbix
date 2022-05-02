@@ -886,13 +886,12 @@ abstract class CControllerPopupItemTest extends CController {
 	/**
 	 * Resolve macros used in the calculates item formula.
 	 *
-	 * @param string $formula  Calculated item formula.
+	 * @param string $formula        Calculated item formula.
+	 * @param array  $macros_posted  Macros.
 	 *
-	 * @return array
+	 * @return string
 	 */
-	private function resolveCalcFormulaMacros(string $formula) {
-		$macros_posted = $this->getInput('macros', []);
-
+	private function resolveCalcFormulaMacros(string $formula, array $macros_posted): string {
 		if (!$macros_posted) {
 			return $formula;
 		}
@@ -908,20 +907,8 @@ abstract class CControllerPopupItemTest extends CController {
 		}
 
 		$expression = [];
-		$pos_left = 0;
 
 		foreach ($result->getTokens() as $token) {
-			switch ($token['type']) {
-				case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
-				case CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO:
-				case CTriggerExprParserResult::TOKEN_TYPE_STRING:
-					if ($pos_left != $token['pos']) {
-						$expression[] = substr($formula, $pos_left, $token['pos'] - $pos_left);
-					}
-					$pos_left = $token['pos'] + $token['length'];
-					break;
-			}
-
 			switch ($token['type']) {
 				case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
 				case CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO:
@@ -934,13 +921,25 @@ abstract class CControllerPopupItemTest extends CController {
 					$string = strtr($token['data']['string'], $macros_posted);
 					$expression[] = CTriggerExpression::quoteString($string, false, true);
 					break;
+
+				case CTriggerExprParserResult::TOKEN_TYPE_FUNCTION:
+					$expression[] = $token['data']['functionName'];
+					$expression[] = '(';
+					$expression[] = array_shift($token['data']['functionParams']);
+
+					foreach ($token['data']['functionParams'] as $param) {
+						$expression[] = ',';
+						$string = strtr($param, $macros_posted) ? : $param;
+						$expression[] = CTriggerExpression::quoteString(trim($string),false,true);
+					}
+
+					$expression[] = ')' ;
+					break;
+
+				default:
+					$expression[] = $token['value'];
 			}
 		}
-
-		if ($pos_left != strlen($formula)) {
-			$expression[] = substr($formula, $pos_left);
-		}
-
 		return implode('', $expression);
 	}
 

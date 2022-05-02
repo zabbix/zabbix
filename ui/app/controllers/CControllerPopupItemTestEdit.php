@@ -164,6 +164,12 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 								$texts_support_user_macros[] = $token['data']['string'];
 								$texts_support_lld_macros[] = $token['data']['string'];
 								break;
+
+							case CTriggerExprParserResult::TOKEN_TYPE_FUNCTION:
+								$texts_support_user_macros = array_merge($token['data']['functionParams'],
+									$texts_support_user_macros
+								);
+								break;
 						}
 					}
 				}

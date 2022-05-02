@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-03-15T07:13:24Z</date>
+   <date>2022-04-10T22:56:35Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -165,7 +165,7 @@ and are waiting to be executed.</description>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>CPU utilization in %</description>
+               <description>CPU utilization in %.</description>
                <applications>
                   <application>
                      <name>CPU</name>
@@ -321,32 +321,32 @@ and are waiting to be executed.</description>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
-(({Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})&lt;5G or {Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
+(({Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})&lt;{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or {Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
                      <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>AVERAGE</priority>
                      <description>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.&#13;
  Second condition should be one of the following:&#13;
- - The disk free space is less than 5G.&#13;
+ - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}.&#13;
  - The disk will be full in less than 24 hours.</description>
                      <manual_close>YES</manual_close>
                   </trigger_prototype>
                   <trigger_prototype>
                      <expression>{Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and&#13;
-(({Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})&lt;10G or {Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
+(({Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})&lt;{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or {Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is low (used &gt; {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)</name>
                      <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>WARNING</priority>
                      <description>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.&#13;
  Second condition should be one of the following:&#13;
- - The disk free space is less than 10G.&#13;
+ - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}.&#13;
  - The disk will be full in less than 24 hours.</description>
                      <manual_close>YES</manual_close>
                      <dependencies>
                         <dependency>
                            <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
                            <expression>{Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
-(({Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})&lt;5G or {Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
+(({Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})&lt;{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or {Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -383,6 +383,16 @@ and are waiting to be executed.</description>
             </discovery_rule>
          </discovery_rules>
          <macros>
+            <macro>
+               <macro>{$VFS.FS.FREE.MIN.CRIT}</macro>
+               <value>5G</value>
+               <description>The critical threshold of the filesystem utilization.</description>
+            </macro>
+            <macro>
+               <macro>{$VFS.FS.FREE.MIN.WARN}</macro>
+               <value>10G</value>
+               <description>The warning threshold of the filesystem utilization.</description>
+            </macro>
             <macro>
                <macro>{$VFS.FS.FSDRIVETYPE.MATCHES}</macro>
                <value>fixed</value>
@@ -788,7 +798,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                <key>vm.memory.size[total]</key>
                <history>7d</history>
                <units>B</units>
-               <description>Total memory in Bytes</description>
+               <description>Total memory in Bytes.</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -801,7 +811,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                <key>vm.memory.size[used]</key>
                <history>7d</history>
                <units>B</units>
-               <description>Used memory in Bytes</description>
+               <description>Used memory in Bytes.</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -816,7 +826,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <params>last("vm.memory.size[used]") / last("vm.memory.size[total]") * 100</params>
-               <description>Memory utilization in %</description>
+               <description>Memory utilization in %.</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -2063,7 +2073,7 @@ Template tooling version used: 0.39</description>
          <name>High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)</name>
          <opdata>Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>WARNING</priority>
-         <description>This trigger is ignored, if there is no swap configured</description>
+         <description>This trigger is ignored, if there is no swap configured.</description>
          <dependencies>
             <dependency>
                <name>High memory utilization (&gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
