@@ -180,7 +180,6 @@ static void	process_active_hb(zbx_avail_active_hb_cache_t *cache, zbx_ipc_messag
 	zbx_availability_deserialize_active_hb(message->data, &avail);
 
 	avail.lastaccess_active = (int)time(NULL);
-	zabbix_log(1, "DBG processing active hb from %i", avail.hostid);
 	process_new_active_check_heartbeat(cache, &avail);
 }
 
@@ -302,7 +301,6 @@ static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_mes
 	for (i = 0; i < hosts.values_num; i++)
 	{
 		host = hosts.values[i];
-		zabbix_log(1, "flushing proxy hostdata for %i, status = %i", host->hostid, host->status);
 
 		if (host->status == INTERFACE_AVAILABLE_UNKNOWN)
 		{
