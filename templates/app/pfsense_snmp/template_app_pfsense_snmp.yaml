@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-01T09:26:54Z'
+  date: '2022-04-13T22:23:06Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -16,7 +16,6 @@ zabbix_export:
           1. Enable SNMP daemon at Services in pfSense web interface https://docs.netgate.com/pfsense/en/latest/services/snmp.html
           2. Setup firewall rule to get access from Zabbix proxy or Zabbix server by SNMP https://docs.netgate.com/pfsense/en/latest/firewall/index.html#managing-firewall-rules
           3. Link template to the host
-          
         
         
         MIBs used:
@@ -84,7 +83,7 @@ zabbix_export:
               name: 'PFSense: High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'ICMP packets loss detected'
+              description: 'ICMP packets loss detected.'
               dependencies:
                 -
                   name: 'PFSense: Unavailable by ICMP ping'
@@ -231,7 +230,7 @@ zabbix_export:
               name: 'PFSense: Web server is not running'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Please check nginx service status'
+              description: 'Please check nginx service status.'
               tags:
                 -
                   tag: scope
@@ -247,7 +246,7 @@ zabbix_export:
           units: pps
           description: |
             MIB: BEGEMOT-PF-MIB
-            True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory
+            True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory.
           preprocessing:
             -
               type: CHANGE_PER_SECOND
@@ -268,7 +267,7 @@ zabbix_export:
           units: pps
           description: |
             MIB: BEGEMOT-PF-MIB
-            True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory
+            True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory.
           preprocessing:
             -
               type: CHANGE_PER_SECOND
@@ -289,7 +288,7 @@ zabbix_export:
           units: pps
           description: |
             MIB: BEGEMOT-PF-MIB
-            True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory
+            True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory.
           preprocessing:
             -
               type: CHANGE_PER_SECOND
@@ -310,7 +309,7 @@ zabbix_export:
           units: pps
           description: |
             MIB: BEGEMOT-PF-MIB
-            True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory
+            True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory.
           preprocessing:
             -
               type: CHANGE_PER_SECOND
@@ -331,7 +330,7 @@ zabbix_export:
           units: pps
           description: |
             MIB: BEGEMOT-PF-MIB
-            True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory
+            True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory.
           preprocessing:
             -
               type: CHANGE_PER_SECOND
@@ -352,7 +351,7 @@ zabbix_export:
           units: pps
           description: |
             MIB: BEGEMOT-PF-MIB
-            True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory
+            True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory.
           preprocessing:
             -
               type: CHANGE_PER_SECOND
@@ -371,7 +370,7 @@ zabbix_export:
           history: 7d
           description: |
             MIB: BEGEMOT-PF-MIB
-            True if packet filter is currently enabled
+            True if packet filter is currently enabled.
           valuemap:
             name: 'SNMPv2-TC::TruthValue'
           tags:
@@ -388,7 +387,7 @@ zabbix_export:
               name: 'PFSense: Packet filter is not running'
               opdata: 'Current running state: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'Please check PF status'
+              description: 'Please check PF status.'
               tags:
                 -
                   tag: scope
@@ -453,7 +452,8 @@ zabbix_export:
             -
               uuid: 7983ee28646d4327ae0814c88c7b213f
               expression: 'min(/PFSense SNMP/pfsense.source.tracking.table.pused,#3)>{$SOURCE.TRACKING.TABLE.UTIL.MAX}'
-              name: 'PFSense: Source tracking table usage more than {$SOURCE.TRACKING.TABLE.UTIL.MAX}.'
+              name: 'PFSense: Source tracking table usage is high'
+              event_name: 'PFSense: Source tracking table usage more than {$SOURCE.TRACKING.TABLE.UTIL.MAX}.'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Please check the number of sticky connections https://docs.netgate.com/pfsense/en/latest/monitoring/status/firewall-states-sources.html'
@@ -507,7 +507,8 @@ zabbix_export:
             -
               uuid: ce0e7dec597e4148abd9b699c787decd
               expression: 'min(/PFSense SNMP/pfsense.state.table.pused,#3)>{$STATE.TABLE.UTIL.MAX}'
-              name: 'PFSense: State table usage more than {$STATE.TABLE.UTIL.MAX}.'
+              name: 'PFSense: State table usage is high'
+              event_name: 'PFSense: State table usage more than {$STATE.TABLE.UTIL.MAX}.'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Please check the number of connections https://docs.netgate.com/pfsense/en/latest/config/advanced-firewall-nat.html#config-advanced-firewall-maxstates'
@@ -548,7 +549,7 @@ zabbix_export:
           value_type: FLOAT
           description: |
             MIB: UCD-SNMP-MIB
-            Number of interrupts processed
+            Number of interrupts processed.
           preprocessing:
             -
               type: CHANGE_PER_SECOND
@@ -612,7 +613,7 @@ zabbix_export:
           history: 7d
           description: |
             MIB: HOST-RESOURCES-MIB
-            Count the number of CPU cores by counting number of cores discovered in hrProcessorTable using LLD
+            Count the number of CPU cores by counting number of cores discovered in hrProcessorTable using LLD.
           preprocessing:
             -
               type: JAVASCRIPT
@@ -634,7 +635,7 @@ zabbix_export:
           value_type: FLOAT
           description: |
             MIB: UCD-SNMP-MIB
-            Number of context switches
+            Number of context switches.
           preprocessing:
             -
               type: CHANGE_PER_SECOND
@@ -716,7 +717,8 @@ zabbix_export:
             -
               uuid: d00224077a90496099c2622e3c662624
               expression: 'last(/PFSense SNMP/system.name,#1)<>last(/PFSense SNMP/system.name,#2) and length(last(/PFSense SNMP/system.name))>0'
-              name: 'PFSense: System name has changed (new name: {ITEM.VALUE})'
+              name: 'PFSense: System name has changed'
+              event_name: 'PFSense: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -838,9 +840,10 @@ zabbix_export:
             -
               uuid: 9da88806fff147f8aa7a79e526f0f7d1
               expression: 'last(/PFSense SNMP/system.uptime)<10m'
-              name: 'PFSense: has been restarted (uptime < 10m)'
+              name: 'PFSense: has been restarted'
+              event_name: 'PFSense: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -929,7 +932,7 @@ zabbix_export:
           units: B
           description: |
             MIB: UCD-SNMP-MIB
-            Total memory in Bytes
+            Total memory in Bytes.
           preprocessing:
             -
               type: MULTIPLIER
@@ -957,12 +960,13 @@ zabbix_export:
             -
               uuid: 786ef350e20f4dfc9371a54e4ffeda63
               expression: 'min(/PFSense SNMP/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
-              name: 'PFSense: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'PFSense: High memory utilization'
+              event_name: 'PFSense: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               dependencies:
                 -
-                  name: 'PFSense: Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+                  name: 'PFSense: Lack of available memory'
                   expression: 'min(/PFSense SNMP/vm.memory.available,5m)<{$MEMORY.AVAILABLE.MIN} and last(/PFSense SNMP/vm.memory.total)>0'
               tags:
                 -
@@ -1177,7 +1181,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'CPU utilization in %'
+              description: 'CPU utilization in %.'
               preprocessing:
                 -
                   type: JAVASCRIPT
@@ -1195,13 +1199,14 @@ zabbix_export:
                 -
                   uuid: 76857a00f1fe4d639dbb5cfe775f36d6
                   expression: 'min(/PFSense SNMP/system.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
-                  name: 'PFSense: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  name: 'PFSense: High CPU utilization'
+                  event_name: 'PFSense: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
                   dependencies:
                     -
-                      name: 'PFSense: Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
+                      name: 'PFSense: Load average is too high'
                       expression: |
                         min(/PFSense SNMP/system.cpu.load.avg1,5m)/last(/PFSense SNMP/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN}
                         and last(/PFSense SNMP/system.cpu.load.avg5)>0
@@ -1343,7 +1348,7 @@ zabbix_export:
               history: 7d
               units: bps
               description: |
-                BEGEMOT-PF-MIB
+                MIB: BEGEMOT-PF-MIB
                 IPv4 bits per second blocked coming in on this interface.
               preprocessing:
                 -
@@ -1376,7 +1381,7 @@ zabbix_export:
               history: 7d
               units: pps
               description: |
-                BEGEMOT-PF-MIB
+                MIB: BEGEMOT-PF-MIB
                 The number of IPv4 packets blocked coming in on this interface.
               preprocessing:
                 -
@@ -1405,7 +1410,7 @@ zabbix_export:
               history: 7d
               units: bps
               description: |
-                BEGEMOT-PF-MIB
+                MIB: BEGEMOT-PF-MIB
                 IPv6 bits per second blocked coming in on this interface.
               preprocessing:
                 -
@@ -1438,7 +1443,7 @@ zabbix_export:
               history: 7d
               units: pps
               description: |
-                BEGEMOT-PF-MIB
+                MIB: BEGEMOT-PF-MIB
                 The number of IPv6 packets blocked coming in on this interface.
               preprocessing:
                 -
@@ -1518,13 +1523,14 @@ zabbix_export:
                   expression: 'min(/PFSense SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/PFSense SNMP/net.if.in.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
-                  name: 'PFSense: High input error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+                  name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High input error rate'
+                  event_name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High input error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors in: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
+                  description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.'
                   dependencies:
                     -
-                      name: 'PFSense: Link down'
+                      name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
                       expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
                   tags:
                     -
@@ -1539,7 +1545,7 @@ zabbix_export:
               history: 7d
               units: bps
               description: |
-                BEGEMOT-PF-MIB
+                MIB: BEGEMOT-PF-MIB
                 IPv4 bits per second passed coming in on this interface.
               preprocessing:
                 -
@@ -1572,7 +1578,7 @@ zabbix_export:
               history: 7d
               units: pps
               description: |
-                BEGEMOT-PF-MIB
+                MIB: BEGEMOT-PF-MIB
                 The number of IPv4 packets passed coming in on this interface.
               preprocessing:
                 -
@@ -1601,7 +1607,7 @@ zabbix_export:
               history: 7d
               units: bps
               description: |
-                BEGEMOT-PF-MIB
+                MIB: BEGEMOT-PF-MIB
                 IPv6 bits per second passed coming in on this interface.
               preprocessing:
                 -
@@ -1634,7 +1640,7 @@ zabbix_export:
               history: 7d
               units: pps
               description: |
-                BEGEMOT-PF-MIB
+                MIB: BEGEMOT-PF-MIB
                 The number of IPv6 packets passed coming in on this interface.
               preprocessing:
                 -
@@ -1693,7 +1699,7 @@ zabbix_export:
               history: 7d
               units: bps
               description: |
-                BEGEMOT-PF-MIB
+                MIB: BEGEMOT-PF-MIB
                 IPv4 bits per second blocked going out on this interface.
               preprocessing:
                 -
@@ -1726,7 +1732,7 @@ zabbix_export:
               history: 7d
               units: pps
               description: |
-                BEGEMOT-PF-MIB
+                MIB: BEGEMOT-PF-MIB
                 The number of IPv4 packets blocked going out on this interface.
               preprocessing:
                 -
@@ -1755,7 +1761,7 @@ zabbix_export:
               history: 7d
               units: bps
               description: |
-                BEGEMOT-PF-MIB
+                MIB: BEGEMOT-PF-MIB
                 IPv6 bits per second blocked going out on this interface.
               preprocessing:
                 -
@@ -1788,7 +1794,7 @@ zabbix_export:
               history: 7d
               units: pps
               description: |
-                BEGEMOT-PF-MIB
+                MIB: BEGEMOT-PF-MIB
                 The number of IPv6 packets blocked going out on this interface.
               preprocessing:
                 -
@@ -1868,13 +1874,14 @@ zabbix_export:
                   expression: 'min(/PFSense SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/PFSense SNMP/net.if.out.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
-                  name: 'PFSense: High output error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+                  name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High output error rate'
+                  event_name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High output error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors out: {ITEM.LASTVALUE2}'
                   priority: WARNING
-                  description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
+                  description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.'
                   dependencies:
                     -
-                      name: 'PFSense: Link down'
+                      name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
                       expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
                   tags:
                     -
@@ -1889,7 +1896,7 @@ zabbix_export:
               history: 7d
               units: bps
               description: |
-                BEGEMOT-PF-MIB
+                MIB: BEGEMOT-PF-MIB
                 IPv4 bits per second passed going out on this interface.
               preprocessing:
                 -
@@ -1922,7 +1929,7 @@ zabbix_export:
               history: 7d
               units: pps
               description: |
-                BEGEMOT-PF-MIB
+                MIB: BEGEMOT-PF-MIB
                 The number of IPv4 packets passed going out on this interface.
               preprocessing:
                 -
@@ -1951,7 +1958,7 @@ zabbix_export:
               history: 7d
               units: bps
               description: |
-                BEGEMOT-PF-MIB
+                MIB: BEGEMOT-PF-MIB
                 IPv6 bits per second passed going out on this interface.
               preprocessing:
                 -
@@ -1984,7 +1991,7 @@ zabbix_export:
               history: 7d
               units: pps
               description: |
-                BEGEMOT-PF-MIB
+                MIB: BEGEMOT-PF-MIB
                 The number of IPv6 packets passed going out on this interface.
               preprocessing:
                 -
@@ -2042,7 +2049,7 @@ zabbix_export:
               key: 'net.if.rules.refs[{#SNMPINDEX}]'
               history: 7d
               description: |
-                BEGEMOT-PF-MIB
+                MIB: BEGEMOT-PF-MIB
                 The number of rules referencing this interface.
               tags:
                 -
@@ -2124,7 +2131,7 @@ zabbix_export:
                 -
                   uuid: d4392162d62541aeb148718ddd7f5d57
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
-                  name: 'PFSense: Link down'
+                  name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -2183,13 +2190,13 @@ zabbix_export:
               recovery_expression: |
                 (change(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])>0 and last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}],#2)>0) or
                 (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)
-              name: 'PFSense: Ethernet has changed to lower speed than it was before'
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.'
               dependencies:
                 -
-                  name: 'PFSense: Link down'
+                  name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
               tags:
                 -
@@ -2202,13 +2209,14 @@ zabbix_export:
                 last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/PFSense SNMP/net.if.in[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])'
-              name: 'PFSense: High inbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage'
+              event_name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'In: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
               dependencies:
                 -
-                  name: 'PFSense: Link down'
+                  name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
               tags:
                 -
@@ -2221,13 +2229,14 @@ zabbix_export:
                 last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/PFSense SNMP/net.if.out[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])'
-              name: 'PFSense: High outbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage'
+              event_name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'Out: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
               dependencies:
                 -
-                  name: 'PFSense: Link down'
+                  name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
               tags:
                 -
@@ -2236,7 +2245,7 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: 4679de2da218418e9564f0cc5a13e31a
-              name: 'PFSense: Inbound packet filter traffic interface [{#IFNAME}({#IFALIAS})]'
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Inbound packet filter traffic'
               graph_items:
                 -
                   color: 1A7C11
@@ -2291,7 +2300,7 @@ zabbix_export:
                     key: 'net.if.in.block.v6.pps[{#SNMPINDEX}]'
             -
               uuid: 3acc01b7ad11441ca2ea4dab13274efa
-              name: 'PFSense: Network traffic interface [{#IFNAME}({#IFALIAS})]'
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Network traffic'
               graph_items:
                 -
                   drawtype: GRADIENT_LINE
@@ -2336,7 +2345,7 @@ zabbix_export:
                     key: 'net.if.in.discards[{#SNMPINDEX}]'
             -
               uuid: 58b7aa7618274c9e9285d4c0b63c2ca8
-              name: 'PFSense: Outbound packet filter traffic interface [{#IFNAME}({#IFALIAS})]'
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Outbound packet filter traffic'
               graph_items:
                 -
                   color: 1A7C11
@@ -2408,7 +2417,7 @@ zabbix_export:
                 value: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Block devices are discovered from UCD-DISKIO-MIB::diskIOTable (http://net-snmp.sourceforge.net/docs/mibs/ucdDiskIOMIB.html#diskIOTable)'
+          description: 'Block devices are discovered from UCD-DISKIO-MIB::diskIOTable (http://net-snmp.sourceforge.net/docs/mibs/ucdDiskIOMIB.html#diskIOTable).'
           item_prototypes:
             -
               uuid: afda1ff507ea43f39dceaf76f3552690
@@ -2445,7 +2454,7 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: UCD-DISKIO-MIB
-                The 1 minute average load of disk (%)
+                The 1 minute average load of disk (%).
               tags:
                 -
                   tag: component
@@ -2480,7 +2489,7 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: 68683d3f206245639c89bda5da17e0d3
-              name: 'PFSense: Disk [{#DEVNAME}] read/write rates'
+              name: 'PFSense: [{#DEVNAME}]: Disk read/write rates'
               graph_items:
                 -
                   color: 1A7C11
@@ -2522,7 +2531,7 @@ zabbix_export:
                 value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'HOST-RESOURCES-MIB::hrFS discovery with filter'
+          description: 'HOST-RESOURCES-MIB::hrFS discovery with filter.'
           item_prototypes:
             -
               uuid: 73c51f990076413f959abe81cdcd5225
@@ -2552,7 +2561,8 @@ zabbix_export:
                 -
                   uuid: 55324e1072f34c5fbc67a7f0566f64d6
                   expression: 'min(/PFSense SNMP/vfs.fs.inode.pfree[{#SNMPINDEX}],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
-                  name: 'PFSense: {#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
+                  name: 'PFSense: [{#FSNAME}]: Running out of free inodes'
+                  event_name: 'PFSense: [{#FSNAME}]: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -2565,7 +2575,8 @@ zabbix_export:
                 -
                   uuid: 48917b7fd7cd4e16a7746ce9cf88a7b6
                   expression: 'min(/PFSense SNMP/vfs.fs.inode.pfree[{#SNMPINDEX}],5m)<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}'
-                  name: 'PFSense: {#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)'
+                  name: 'PFSense: [{#FSNAME}]: Running out of free inodes'
+                  event_name: 'PFSense: [{#FSNAME}]: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)'
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: |
@@ -2573,7 +2584,7 @@ zabbix_export:
                     As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.
                   dependencies:
                     -
-                      name: 'PFSense: {#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
+                      name: 'PFSense: [{#FSNAME}]: Running out of free inodes'
                       expression: 'min(/PFSense SNMP/vfs.fs.inode.pfree[{#SNMPINDEX}],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
                   tags:
                     -
@@ -2649,15 +2660,16 @@ zabbix_export:
               uuid: 711e2c5b136e4a51a2fb745d847a9fc5
               expression: |
                 last(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/PFSense SNMP/vfs.fs.total[{#SNMPINDEX}])-last(/PFSense SNMP/vfs.fs.used[{#SNMPINDEX}]))<5G or timeleft(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}],1h,100)<1d)
-              name: 'PFSense: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"PFSense"}%)'
+                ((last(/PFSense SNMP/vfs.fs.total[{#SNMPINDEX}])-last(/PFSense SNMP/vfs.fs.used[{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}],1h,100)<1d)
+              name: 'PFSense: [{#FSNAME}]: Disk space is critically low'
+              event_name: 'PFSense: [{#FSNAME}]: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
               description: |
-                Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"PFSense"}.
-                 Second condition should be one of the following:
-                 - The disk free space is less than 5G.
-                 - The disk will be full in less than 24 hours.
+                Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.
+                Second condition should be one of the following:
+                  - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}.
+                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               tags:
                 -
@@ -2670,22 +2682,23 @@ zabbix_export:
               uuid: ef0273e1092a40ff888e0ea87c859abb
               expression: |
                 last(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/PFSense SNMP/vfs.fs.total[{#SNMPINDEX}])-last(/PFSense SNMP/vfs.fs.used[{#SNMPINDEX}]))<10G or timeleft(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}],1h,100)<1d)
-              name: 'PFSense: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"PFSense"}%)'
+                ((last(/PFSense SNMP/vfs.fs.total[{#SNMPINDEX}])-last(/PFSense SNMP/vfs.fs.used[{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}],1h,100)<1d)
+              name: 'PFSense: [{#FSNAME}]: Disk space is low'
+              event_name: 'PFSense: [{#FSNAME}]: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
               description: |
-                Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"PFSense"}.
-                 Second condition should be one of the following:
-                 - The disk free space is less than 10G.
-                 - The disk will be full in less than 24 hours.
+                Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.
+                Second condition should be one of the following:
+                  - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}.
+                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               dependencies:
                 -
-                  name: 'PFSense: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"PFSense"}%)'
+                  name: 'PFSense: [{#FSNAME}]: Disk space is critically low'
                   expression: |
                     last(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/PFSense SNMP/vfs.fs.total[{#SNMPINDEX}])-last(/PFSense SNMP/vfs.fs.used[{#SNMPINDEX}]))<5G or timeleft(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}],1h,100)<1d)
+                    ((last(/PFSense SNMP/vfs.fs.total[{#SNMPINDEX}])-last(/PFSense SNMP/vfs.fs.used[{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -2696,7 +2709,7 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: af57ea943b0f45f6b03028ef48c07605
-              name: 'PFSense: Disk [{#FSNAME}] space usage'
+              name: 'PFSense: [{#FSNAME}]: Disk space usage'
               width: '600'
               height: '340'
               type: PIE
@@ -2832,6 +2845,14 @@ zabbix_export:
           macro: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
           value: '^(loop[0-9]*|sd[a-z][0-9]+|nbd[0-9]+|sr[0-9]+|fd[0-9]+|dm-[0-9]+|ram[0-9]+|ploop[a-z0-9]+|md[0-9]*|hcp[0-9]*|cd[0-9]*|pass[0-9]*|zram[0-9]*)'
           description: 'This macro is used in block devices discovery. Can be overridden on the host or linked template level'
+        -
+          macro: '{$VFS.FS.FREE.MIN.CRIT}'
+          value: 5G
+          description: 'The critical threshold of the filesystem utilization.'
+        -
+          macro: '{$VFS.FS.FREE.MIN.WARN}'
+          value: 10G
+          description: 'The warning threshold of the filesystem utilization.'
         -
           macro: '{$VFS.FS.FSNAME.MATCHES}'
           value: .+
@@ -3799,16 +3820,17 @@ zabbix_export:
     -
       uuid: fe568255690f4125847230be3ba88f54
       expression: 'min(/PFSense SNMP/system.swap.pfree,5m)<{$SWAP.PFREE.MIN.WARN} and last(/PFSense SNMP/system.swap.total)>0'
-      name: 'PFSense: High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
+      name: 'PFSense: High swap space usage'
+      event_name: 'PFSense: High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: WARNING
-      description: 'This trigger is ignored, if there is no swap configured'
+      description: 'This trigger is ignored, if there is no swap configured.'
       dependencies:
         -
-          name: 'PFSense: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+          name: 'PFSense: High memory utilization'
           expression: 'min(/PFSense SNMP/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
         -
-          name: 'PFSense: Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+          name: 'PFSense: Lack of available memory'
           expression: 'min(/PFSense SNMP/vm.memory.available,5m)<{$MEMORY.AVAILABLE.MIN} and last(/PFSense SNMP/vm.memory.total)>0'
       tags:
         -
@@ -3820,10 +3842,11 @@ zabbix_export:
     -
       uuid: d890efaff23f49e8ba05d22390f9e21b
       expression: 'min(/PFSense SNMP/vm.memory.available,5m)<{$MEMORY.AVAILABLE.MIN} and last(/PFSense SNMP/vm.memory.total)>0'
-      name: 'PFSense: Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+      name: 'PFSense: Lack of available memory'
+      event_name: 'PFSense: Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
       opdata: 'Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: AVERAGE
-      description: 'The system is running out of memory'
+      description: 'The system is running out of memory.'
       tags:
         -
           tag: scope
@@ -3837,7 +3860,8 @@ zabbix_export:
         min(/PFSense SNMP/system.cpu.load.avg1,5m)/last(/PFSense SNMP/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN}
         and last(/PFSense SNMP/system.cpu.load.avg5)>0
         and last(/PFSense SNMP/system.cpu.load.avg15)>0
-      name: 'PFSense: Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
+      name: 'PFSense: Load average is too high'
+      event_name: 'PFSense: Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
       opdata: 'Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}'
       priority: AVERAGE
       description: 'Per CPU load average is too high. Your system may be slow to respond.'

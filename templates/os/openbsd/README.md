@@ -94,7 +94,7 @@ There are no template links in this template.
 |Too many processes running on {HOST.NAME} |<p>-</p> |`avg(/OpenBSD by Zabbix agent/proc.num[,,run],5m)>30` |WARNING | |
 |Too many processes on {HOST.NAME} |<p>-</p> |`avg(/OpenBSD by Zabbix agent/proc.num[],5m)>300` |WARNING | |
 |/etc/passwd has been changed on {HOST.NAME} |<p>-</p> |`last(/OpenBSD by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/OpenBSD by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)` |WARNING | |
-|Zabbix agent is not available (for {$AGENT.TIMEOUT}) |<p>For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.</p> |`max(/OpenBSD by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0` |AVERAGE |<p>Manual close: YES</p> |
+|Zabbix agent is not available |<p>For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.</p> |`max(/OpenBSD by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0` |AVERAGE |<p>Manual close: YES</p> |
 
 ## Feedback
 

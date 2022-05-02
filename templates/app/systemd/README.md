@@ -73,7 +73,7 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |{#UNIT.NAME}: Service is not running |<p>-</p> |`last(/Systemd by Zabbix agent 2/systemd.service.active_state["{#UNIT.NAME}"])<>1` |WARNING |<p>Manual close: YES</p> |
-|{#UNIT.NAME}: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/Systemd by Zabbix agent 2/systemd.service.uptime["{#UNIT.NAME}"])<10m` |INFO |<p>Manual close: YES</p> |
+|{#UNIT.NAME}: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Systemd by Zabbix agent 2/systemd.service.uptime["{#UNIT.NAME}"])<10m` |INFO |<p>Manual close: YES</p> |
 
 ## Feedback
 

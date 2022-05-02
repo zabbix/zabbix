@@ -48,8 +48,8 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|System name has changed (new name: {ITEM.VALUE}) |<p>System name has changed. Ack to close.</p> |`last(/Generic SNMP/system.name,#1)<>last(/Generic SNMP/system.name,#2) and length(last(/Generic SNMP/system.name))>0` |INFO |<p>Manual close: YES</p> |
-|{HOST.NAME} has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/Generic SNMP/system.uptime[sysUpTime.0])<10m` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- No SNMP data collection</p> |
+|System name has changed |<p>System name has changed. Ack to close.</p> |`last(/Generic SNMP/system.name,#1)<>last(/Generic SNMP/system.name,#2) and length(last(/Generic SNMP/system.name))>0` |INFO |<p>Manual close: YES</p> |
+|has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Generic SNMP/system.uptime[sysUpTime.0])<10m` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- No SNMP data collection</p> |
 |No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/Generic SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING |<p>**Depends on**:</p><p>- Unavailable by ICMP ping</p> |
 |Unavailable by ICMP ping |<p>Last three attempts returned timeout.  Please check device connectivity.</p> |`max(/Generic SNMP/icmpping,#3)=0` |HIGH | |
 |High ICMP ping loss |<p>-</p> |`min(/Generic SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Generic SNMP/icmppingloss,5m)<100` |WARNING |<p>**Depends on**:</p><p>- Unavailable by ICMP ping</p> |

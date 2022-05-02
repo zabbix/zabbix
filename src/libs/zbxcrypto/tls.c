@@ -311,7 +311,7 @@ static void	zbx_openssl_info_cb(const SSL *ssl, int where, int ret)
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_OPENSSL)
-void	zbx_tls_error_msg(char **error, size_t *error_alloc, size_t *error_offset)
+static void	zbx_tls_error_msg(char **error, size_t *error_alloc, size_t *error_offset)
 {
 	unsigned long	error_code;
 	const char	*file, *data;
@@ -319,13 +319,22 @@ void	zbx_tls_error_msg(char **error, size_t *error_alloc, size_t *error_offset)
 	char		err[1024];
 
 	/* concatenate all error messages in the queue into one string */
+#if defined(OPENSSL_VERSION_MAJOR) && OPENSSL_VERSION_NUMBER >=	3	/* OpenSSL 3.0.0 or newer */
+	const char	*func;
 
+	while (0 != (error_code = ERR_get_error_all(&file, &line, &func, &data, &flags)))
+#else									/* OpenSSL 1.x.x or LibreSSL */
 	while (0 != (error_code = ERR_get_error_line_data(&file, &line, &data, &flags)))
+#endif
 	{
 		ERR_error_string_n(error_code, err, sizeof(err));
 
+#if defined(OPENSSL_VERSION_MAJOR) && OPENSSL_VERSION_NUMBER >=	3	/* OpenSSL 3.0.0 or newer */
+		zbx_snprintf_alloc(error, error_alloc, error_offset, " file %s line %d func %s: %s",
+				file, line, func, err);
+#else									/* OpenSSL 1.x.x or LibreSSL */
 		zbx_snprintf_alloc(error, error_alloc, error_offset, " file %s line %d: %s", file, line, err);
-
+#endif
 		if (NULL != data && 0 != (flags & ERR_TXT_STRING))
 			zbx_snprintf_alloc(error, error_alloc, error_offset, ": %s", data);
 	}
@@ -2466,12 +2475,21 @@ static const char	*zbx_ctx_name(SSL_CTX *param)
 static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
 {
 	const char	*msg = "Perfect Forward Secrecy ECDHE ciphersuites will not be available for";
-	EC_KEY		*ecdh;
 	long		res;
 	int		ret = SUCCEED;
+#if defined(OPENSSL_VERSION_MAJOR) && OPENSSL_VERSION_NUMBER >= 3	/* OpenSSL 3.0.0 or newer */
+	int		grp_list[1] = { NID_X9_62_prime256v1 };	/* use curve secp256r1/prime256v1/NIST P-256 */
+
+	if (1 != (res = SSL_CTX_set1_groups(ctx, grp_list, ARRSIZE(grp_list))))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s() SSL_CTX_set1_groups() returned %ld. %s %s",
+				__func__, res, msg, zbx_ctx_name(ctx));
+		ret = FAIL;
+	}
+#else									/* OpenSSL 1.x.x or LibreSSL */
+	EC_KEY	*ecdh;
 
 	/* use curve secp256r1/prime256v1/NIST P-256 */
-
 	if (NULL == (ecdh = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s() EC_KEY_new_by_curve_name() failed. %s %s",
@@ -2489,7 +2507,7 @@ static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
 	}
 
 	EC_KEY_free(ecdh);
-
+#endif
 	return ret;
 }
 

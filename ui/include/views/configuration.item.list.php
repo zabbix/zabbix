@@ -64,7 +64,7 @@ $url = (new CUrl('items.php'))
 $itemForm = (new CForm('post', $url))
 	->setName('items')
 	->addVar('checkbox_hash', $data['checkbox_hash'])
-	->addVar('context', $data['context']);
+	->addVar('context', $data['context'], 'form_context');
 
 if (!empty($data['hostid'])) {
 	$itemForm->addVar('hostid', $data['hostid']);
@@ -184,20 +184,15 @@ foreach ($data['items'] as $item) {
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 
-		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-			$trigger_description[] = new CSpan(CHtml::encode($trigger['description']));
-		}
-		else {
-			$trigger_description[] = new CLink(
-				CHtml::encode($trigger['description']),
-				(new CUrl('triggers.php'))
-					->setArgument('form', 'update')
-					->setArgument('hostid', key($trigger['hosts']))
-					->setArgument('triggerid', $trigger['triggerid'])
-					->setArgument('context', $data['context'])
-					->setArgument('backurl', $backurl)
-			);
-		}
+		$trigger_description[] = new CLink(
+			CHtml::encode($trigger['description']),
+			(new CUrl('triggers.php'))
+				->setArgument('form', 'update')
+				->setArgument('hostid', key($trigger['hosts']))
+				->setArgument('triggerid', $trigger['triggerid'])
+				->setArgument('context', $data['context'])
+				->setArgument('backurl', $backurl)
+		);
 
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$trigger['error'] = '';

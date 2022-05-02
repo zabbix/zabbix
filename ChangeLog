@@ -1,3 +1,49 @@
+Changes for 6.0.4rc1
+
+New features:
+...G...PS. [ZBXNEXT-7120] added support of OpenSSL 3.0 (Andris)
+..F....... [ZBXNEXT-7611] fixed silenced errors not silenced in zbx_err_handler running PHP 8 (rdetlavs)
+..F....... [ZBXNEXT-7610] refactored in PHP 8 deprecated function strtime() (rdetlavs)
+.........T [ZBXNEXT-7506] fixed uuids in proxmox template (vkhaliev)
+..F.I...S. [ZBXNEXT-7562] added en_GB locale (agriscenko, yurii)
+.........T [ZBXNEXT-7582] moved threshold information from trigger name to the event name (abakaldin, vkhaliev)
+..F....... [ZBXNEXT-7525] fixed inconsistent trigger links in Configuration -> Items (rdetlavs)
+..F....... [ZBXNEXT-7564] fixed media type importing in PHP 8 (rdetlavs)
+.........T [ZBXNEXT-5580] added macros and fixed filesystem utilization triggers for Windows, Linux and some other templates (vkhaliev)
+..F....... [ZBXNEXT-7477] updated MySQL database error handling for PHP 8 (averza, jfreibergs)
+.........T [ZBXNEXT-7506] added Proxmox Virtual Environment template (abakaldin)
+..F....... [ZBXNEXT-7472] added support of text data for top hosts widget (agriscenko)
+.........T [ZBXNEXT-7505] added new GLPi media type (abiba)
+...G.....T [ZBXNEXT-7559] updated smart.disk.discovery and smart.disk.get metrics for Zabbix agent 2 and updated S.M.A.R.T passive and active templates (abiba, esneiders)
+.........T [ZBXNEXT-7507] added TrueNAS template (vkhaliev)
+
+Bug fixes:
+........S. [ZBX-20951] fixed dependent item discovery validation in LLD (wiper)
+A..G...... [ZBX-20783] fixed Zabbix agent2 not to fail when global regular expression is received with empty delimiter (rlataria, vso)
+.......PS. [ZBXNEXT-7616] fixed javascript md5 and sha256 functions to support binary data (including terminating zero character) (wiper)
+..F....... [ZBX-20299] fixed not detecting user macros by "Test item" dialog if they are used in the calculated item formula (rdetlavs)
+..F....... [ZBX-20678] fixed focusing and keyboard functionality for host in Geomap widget (rdetlavs)
+..F....... [ZBX-20782] fixed non unique ids browser console errors when executing Mass update action (rdetlavs)
+..F....... [ZBX-20458] fixed incorrect view of disabled range slider in Firefox (rdetlavs)
+..F....... [ZBX-20545] fixed trend storage period field wrong appearance when item type of information is character/text/log (rdetlavs)
+.......PS. [ZBX-20844] fixed external check becoming unsupported when Zabbix server or Zabbix proxy is stopped (vso)
+..F....... [ZBX-20658] fixed missing CR (carriage return) characters in line endings, in popup forms (averza)
+..F....... [ZBX-20821] fixed required PHP version in setup wizard (acikuns)
+...G...... [ZBX-20754] fixed Zabbix sender and Zabbix JS not releasing semaphores upon exit (vso)
+...G...... [ZBX-20538] changed PostgreSQL plugin to handle connection per user and not per database for Zabbix agent 2 (esneiders)
+.......PS. [ZBX-20567] improved preprocessor queue performance with items taking long time to preprocess (wiper)
+...G...PS. [ZBX-20398] added mitigation for PID file not being created on time (MVekslers, yurii)
+..F....... [ZBX-19638] fixed incorrect host name in graph prototype widget when graph have items from separate hosts (rlataria)
+........S. [ZBX-20595] fixed server discovering dependent item with prototype as master item if prototype discovery was disabled with LLD overrides (wiper)
+.........T [ZBX-18522] updated Readme for RabbitMQ templates (vkhaliev)
+........S. [ZBX-20794] fixed unavailable node status update at server startup (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.3
+
+6.0.3rc1 was released as 6.0.3 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.3rc1
 
 New features:
@@ -33,6 +79,7 @@ A.F....... [ZBX-19118] made Host interface field non-required for HTTP agent ite
 ...G...... [ZBX-19407] removed the redundant encoding check in get_codepage() for Windows (arimdjonoks)
 ...G...... [ZBX-20390] fixed Oracle Solaris vm.memory.size[available] item kstats memory read (arimdjonoks)
 .........T [ZBX-20521] corrected missed typos in templates and README (drasihov)
+A......... [ZBX-20698] fixed import from 2.0-4.4 to 5.0 and above with SNMP interfaces (acikuns)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.2
@@ -522,6 +569,11 @@ Bug fixes:
 .........T [ZBX-19395] changed version in links of the templates and the media (mchudinov)
 
 --------------------------------------------------------------------------------
+Changes for 5.4.12
+
+5.4.12rc1 was released as 5.4.12 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.4.12rc1
 
 New features:
@@ -534,6 +586,7 @@ Bug fixes:
 ..F....... [ZBX-20640] fixed X-axis field placement in different rows in Axis tab in Graph widget (acikuns)
 ..F....... [ZBX-20049] implemented keyboard control for info icons (acikuns, ashubin)
 ........S. [ZBX-19965] fixed database upgrade for SNMP interfaces (akozlovs)
+A......... [ZBX-20698] fixed import from 2.0-4.4 to 5.0 and above with SNMP interfaces (acikuns)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.11
@@ -1802,6 +1855,37 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.23
+
+5.0.23rc1 was released as 5.0.23 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.23rc1
+
+New features:
+.........T [ZBXNEXT-5580] added macros and fixed filesystem utilization triggers for Windows, Linux and some other templates (vkhaliev)
+...G.....T [ZBXNEXT-7559] updated smart.disk.discovery and smart.disk.get metrics for Zabbix agent 2 and updated S.M.A.R.T passive and active templates (abiba, esneiders)
+
+Bug fixes:
+........S. [ZBX-20951] fixed dependent item discovery validation in LLD (wiper)
+...G...... [ZBX-20783] fixed Zabbix agent2 not to fail when global regular expression is received with empty delimiter (vso)
+..F....... [ZBX-20746] fixed auto-suggest in graph widget configuration not showing discovered item names (agriscenko)
+.......PS. [ZBX-20844] fixed external check becoming unsupported when Zabbix server or Zabbix proxy is stopped (vso)
+..F....... [ZBX-20299] fixed not detecting user macros by "Test item" dialog if they are used in the calculated item formula (rdetlavs)
+..F....... [ZBX-20458] fixed incorrect view of disabled range slider in Firefox (rdetlavs)
+...G...... [ZBX-20538] changed PostgreSQL plugin to handle connection per user and not per database for Zabbix agent 2 (esneiders)
+.......PS. [ZBX-20567] improved preprocessor queue performance with items taking long time to preprocess (wiper)
+...G...PS. [ZBX-20398] added mitigation for PID file not being created in time (MVekslers, yurii)
+........S. [ZBX-20595] fixed server discovering dependent item with prototype as master item if prototype discovery was disabled with LLD overrides (wiper)
+..F....... [ZBX-19638] fixed incorrect host name in graph prototype widget when graph have items from separate hosts (rlataria)
+.........T [ZBX-18522] updated Readme for RabbitMQ templates (vkhaliev)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.22
+
+5.0.22rc1 was released as 5.0.22 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.22rc1
 
 New features:
@@ -1826,6 +1910,7 @@ A......... [ZBX-20681] fixed undefined index error when accessing module page wi
 ..F....... [ZBX-20640] fixed X-axis field placement in different rows in Axis tab in Graph widget (acikuns)
 ..F....... [ZBX-20049] implemented keyboard control for info icons (acikuns, ashubin)
 ........S. [ZBX-19965] fixed database upgrade for SNMP interfaces (akozlovs)
+A......... [ZBX-20698] fixed import from 2.0-4.4 to 5.0 and above with SNMP interfaces (acikuns)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.21
@@ -4248,11 +4333,15 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
+Changes for 4.0.40
+
+4.0.40rc1 was released as 4.0.40 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.40rc1
 
-New features:
-
 Bug fixes:
+.......PS. [ZBX-20844] fixed external check becoming unsupported when Zabbix server or Zabbix proxy is stopped (vso)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.39
