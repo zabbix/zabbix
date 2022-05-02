@@ -85,7 +85,7 @@ static char	*nextchar;
 Callers store zero here to inhibit the error message
 for unrecognized options.  */
 
-int	zbx_opterr = 1;
+static int	zbx_opterr = 1;
 
 /*
 Set to an option character which was unrecognized.
@@ -93,7 +93,7 @@ This must be initialized on some systems to avoid linking in the
 system's own getopt implementation.  */
 
 #define BAD_OPTION	'\0'
-int	zbx_optopt = BAD_OPTION;
+static int	zbx_optopt = BAD_OPTION;
 
 /* Describe how to deal with options that follow non-option ARGV-elements.
 
