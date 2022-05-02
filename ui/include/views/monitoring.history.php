@@ -237,6 +237,7 @@ if ($data['plaintext']) {
 else {
 	$historyWidget
 		->setTitle($header['left'])
+		->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_HISTORY))
 		->setControls((new CTag('nav', true, $header['right']))->setAttribute('aria-label', _('Content controls')));
 
 	if ($data['itemids'] && $data['action'] !== HISTORY_LATEST) {

@@ -22,7 +22,6 @@
 #include "common.h"
 #include "cfg.h"
 #include "log.h"
-#include "alias.h"
 #include "zbxconf.h"
 #include "perfmon.h"
 

@@ -559,7 +559,7 @@ class ZBase {
 		$action_class = $router->getController();
 
 		try {
-			if (!class_exists($action_class, true)) {
+			if (!class_exists($action_class)) {
 				throw new Exception(_s('Class %1$s not found for action %2$s.', $action_class, $action_name));
 			}
 
@@ -598,12 +598,30 @@ class ZBase {
 				$this->processResponseFinal($router, $action);
 			}
 		}
+		catch (CAccessDeniedException $e) {
+			$this->denyPageAccess($router);
+		}
 		catch (Exception $e) {
-			echo (new CView('general.warning', [
-				'header' => $e->getMessage(),
-				'messages' => [],
-				'theme' => ZBX_DEFAULT_THEME
-			]))->getOutput();
+			switch ($router->getLayout()) {
+				case 'layout.json':
+				case 'layout.widget':
+					echo (new CView('layout.json', [
+						'main_block' => json_encode([
+							'error' => [
+								'title' => $e->getMessage()
+							]
+						])
+					]))->getOutput();
+
+					break;
+
+				default:
+					echo (new CView('general.warning', [
+						'header' => $e->getMessage(),
+						'messages' => [],
+						'theme' => getUserTheme(CWebUser::$data)
+					]))->getOutput();
+			}
 
 			session_write_close();
 			exit();
@@ -684,6 +702,77 @@ class ZBase {
 			}
 
 			echo (new CView($router->getLayout(), $layout_data))->getOutput();
+		}
+
+		session_write_close();
+		exit();
+	}
+
+	private static function denyPageAccess(CRouter $router): void {
+		$request_url = (new CUrl(array_key_exists('request', $_REQUEST) ? $_REQUEST['request'] : ''))
+			->removeArgument('sid')
+			->toString();
+
+		if (CAuthenticationHelper::get(CAuthenticationHelper::HTTP_LOGIN_FORM) == ZBX_AUTH_FORM_HTTP
+				&& CAuthenticationHelper::get(CAuthenticationHelper::HTTP_AUTH_ENABLED) == ZBX_AUTH_HTTP_ENABLED
+				&& (!CWebUser::isLoggedIn() || CWebUser::isGuest())) {
+			redirect(
+				(new CUrl('index_http.php'))
+					->setArgument('request', $request_url)
+					->toString()
+			);
+		}
+
+		$view = [
+			'messages' => [],
+			'buttons' => [],
+			'theme' => getUserTheme(CWebUser::$data)
+		];
+
+		if (CWebUser::isLoggedIn()) {
+			$view['header'] = _('Access denied');
+			$view['messages'][] = _s('You are logged in as "%1$s".', CWebUser::$data['username']).' '.
+				_('You have no permissions to access this page.');
+		}
+		else {
+			$view['header'] = _('You are not logged in');
+			$view['messages'][] = _('You must login to view this page.');
+		}
+
+		$view['messages'][] = _('If you think this message is wrong, please consult your administrators about getting the necessary permissions.');
+
+		if (!CWebUser::isLoggedIn() || CWebUser::isGuest()) {
+			$view['buttons'][] = (new CButton('login', _('Login')))
+				->setAttribute('data-login-url',
+					(new CUrl('index.php'))
+						->setArgument('request', $request_url)
+						->toString()
+				)
+				->onClick('document.location = this.dataset.loginUrl;');
+		}
+
+		if (CWebUser::isLoggedIn()) {
+			$view['buttons'][] = (new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
+				->setAttribute('data-home-url', CMenuHelper::getFirstUrl())
+				->onClick('document.location = this.dataset.homeUrl;');
+		}
+
+		switch ($router->getLayout()) {
+			case 'layout.json':
+			case 'layout.widget':
+				echo (new CView('layout.json', [
+					'main_block' => json_encode([
+						'error' => [
+							'title' => $view['header'],
+							'messages' => $view['messages']
+						]
+					])
+				]))->getOutput();
+
+				break;
+
+			default:
+				echo (new CView('general.warning', $view))->getOutput();
 		}
 
 		session_write_close();

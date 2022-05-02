@@ -53,9 +53,13 @@ class CControllerTemplateDashboardUpdate extends CController {
 		}
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData([
-				'main_block' => json_encode(['errors' => getMessages()->toString()])
-			]));
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
 		}
 
 		return $ret;
@@ -80,8 +84,6 @@ class CControllerTemplateDashboardUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$data = [];
-
 		$save_dashboard = [
 			'name' => $this->getInput('name'),
 			'display_period' => $this->getInput('display_period'),
@@ -131,28 +133,35 @@ class CControllerTemplateDashboardUpdate extends CController {
 
 		if ($this->hasInput('dashboardid')) {
 			$result = API::TemplateDashboard()->update($save_dashboard);
-			$message = _('Dashboard updated');
-			$error_msg =  _('Failed to update dashboard');
+
+			$success_title = _('Dashboard updated');
+			$error_title = _('Failed to update dashboard');
 		}
 		else {
 			$result = API::TemplateDashboard()->create($save_dashboard);
-			$message = _('Dashboard created');
-			$error_msg = _('Failed to create dashboard');
+
+			$success_title = _('Dashboard created');
+			$error_title = _('Failed to create dashboard');
 		}
+
+		$output = [];
 
 		if ($result) {
-			$data['system-message-ok'] = $message;
+			$output['success']['title'] = $success_title;
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
+
+			$output['dashboardid'] = $result['dashboardids'][0];
 		}
 		else {
-			if (!hasErrorMessages()) {
-				error($error_msg);
-			}
+			$output['error'] = [
+				'title' => $error_title,
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		if (($messages = getMessages()) !== null) {
-			$data['errors'] = $messages->toString();
-		}
-
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

@@ -46,8 +46,8 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			error(_('Page received incorrect data'));
 		}
 
-		if (($messages = getMessages()) !== null) {
-			$data = ['messages' => $messages->toString()];
+		if ($messages = get_and_clear_messages()) {
+			$data['error']['messages'] = array_column($messages, 'message');
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));

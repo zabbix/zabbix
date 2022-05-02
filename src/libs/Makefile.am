@@ -17,7 +17,8 @@ DIST_SUBDIRS = \
 	zbxnix \
 	zbxconf \
 	zbxsysinfo \
-	zbxsys \
+	zbxthreads \
+	zbxmutexs \
 	zbxjson \
 	zbxserver \
 	zbxicmpping \
@@ -42,6 +43,7 @@ DIST_SUBDIRS = \
 	zbxservice \
 	zbxaudit \
 	zbxeval \
+	zbxserialize \
 	zbxxml \
 	zbxha \
 	zbxrtc
@@ -74,6 +76,7 @@ SERVER_SUBDIRS = \
 	zbxservice \
 	zbxaudit \
 	zbxeval \
+	zbxserialize \
 	zbxha \
 	zbxrtc
 else
@@ -103,6 +106,7 @@ PROXY_SUBDIRS = \
 	zbxavailability \
 	zbxaudit \
 	zbxeval \
+	zbxserialize \
 	zbxrtc
 endif
 endif
@@ -117,7 +121,8 @@ SUBDIRS = \
 	zbxconf \
 	zbxhttp \
 	zbxsysinfo \
-	zbxsys \
+	zbxthreads \
+	zbxmutexs \
 	zbxcommshigh \
 	zbxcomms \
 	zbxjson \
@@ -131,4 +136,6 @@ SUBDIRS = \
 	$(SERVER_SUBDIRS) \
 	$(AGENT_SUBDIRS)
 
-EXTRA_DIST = zbxwin32
+EXTRA_DIST = \
+	zbxsymbols \
+	zbxwin32

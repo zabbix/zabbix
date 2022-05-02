@@ -28,15 +28,17 @@ $this->includeJsFile('configuration.hostgroups.list.js.php');
 $widget = (new CWidget())
 	->setTitle(_('Host groups'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOSTGROUPS_LIST))
-	->setControls((new CTag('nav', true, (new CList())
-			->addItem(CWebUser::getType() == USER_TYPE_SUPER_ADMIN
-				? new CRedirectButton(_('Create host group'), (new CUrl('hostgroups.php'))
-					->setArgument('form', 'create')
-					->getUrl()
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(
+					CWebUser::getType() == USER_TYPE_SUPER_ADMIN
+						? new CRedirectButton(_('Create host group'),
+							(new CUrl('hostgroups.php'))->setArgument('form', 'create')
+						)
+						: (new CSubmit('form', _('Create host group').' '._('(Only super admins can create groups)')))
+							->setEnabled(false)
 				)
-				: (new CSubmit('form', _('Create host group').' '._('(Only super admins can create groups)')))
-					->setEnabled(false)
-			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter())
@@ -127,8 +129,9 @@ foreach ($this->data['groups'] as $group) {
 				->setArgument('action', 'host.edit')
 				->setArgument('hostid', $host['hostid'])
 			))
-				->onClick('view.editHost(event, '.json_encode($host['hostid']).')')
-				->addClass(ZBX_STYLE_LINK_ALT);
+			->setAttribute('data-hostid', $host['hostid'])
+			->onClick('view.editHost(event, this.dataset.hostid);')
+			->addClass(ZBX_STYLE_LINK_ALT);
 		}
 		else {
 			$host_output = new CSpan($host['name']);

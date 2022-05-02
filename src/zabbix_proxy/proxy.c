@@ -24,7 +24,7 @@
 #include "zbxdbupgrade.h"
 #include "log.h"
 #include "zbxgetopt.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 
 #include "sysinfo.h"
 #include "zbxmodules.h"
@@ -54,6 +54,7 @@
 #include "../zabbix_server/availability/avail_manager.h"
 #include "../libs/zbxvault/vault.h"
 #include "zbxdiag.h"
+#include "diag/diag_proxy.h"
 #include "zbxrtc.h"
 
 #ifdef HAVE_OPENIPMI
@@ -193,7 +194,8 @@ int	CONFIG_PROXY_OFFLINE_BUFFER	= 1;
 
 int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
 
-int	CONFIG_PROXYCONFIG_FREQUENCY	= SEC_PER_HOUR;
+/* how often active Zabbix proxy requests configuration data from server, in seconds */
+int	CONFIG_PROXYCONFIG_FREQUENCY	= SEC_PER_MIN * 5;
 int	CONFIG_PROXYDATA_FREQUENCY	= 1;
 
 int	CONFIG_HISTSYNCER_FORKS		= 4;
@@ -209,7 +211,6 @@ zbx_uint64_t	CONFIG_CONF_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE	= 16 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 0;
-zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 0;
 zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE		= 0;
 zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_EXPORT_FILE_SIZE;
@@ -1302,6 +1303,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_tls_init_parent();
 #endif
 	zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
+
+	zbx_diag_init(diag_add_section_info);
 
 	for (i = 0; i < threads_num; i++)
 	{

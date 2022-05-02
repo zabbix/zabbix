@@ -96,8 +96,6 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 #	include "zbxmodules.h"
 #endif
 
-#include "alias.h"
-
 #include "stats.h"
 #ifdef _WINDOWS
 #	include "perfstat.h"
@@ -107,7 +105,7 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 #include "active.h"
 #include "listener.h"
 
-#include "symbols.h"
+#include "zbxsymbols.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
@@ -1269,7 +1267,7 @@ void	zbx_free_service_resources(int ret)
 	zbx_locks_disable();
 #endif
 	free_metrics();
-	alias_list_free();
+	zbx_alias_list_free();
 	free_collector_data();
 	zbx_deinit_modbus();
 #ifdef _WINDOWS
@@ -1330,9 +1328,9 @@ int	main(int argc, char **argv)
 
 	if (SUCCEED != parse_commandline(argc, argv, &t))
 		exit(EXIT_FAILURE);
-
-	import_symbols();
-
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	zbx_import_symbols();
+#endif
 #ifdef _WINDOWS
 	if (ZBX_TASK_SHOW_USAGE != t.task && ZBX_TASK_SHOW_VERSION != t.task && ZBX_TASK_SHOW_HELP != t.task &&
 			SUCCEED != zbx_socket_start(&error))
@@ -1440,7 +1438,7 @@ int	main(int argc, char **argv)
 			zbx_unload_modules();
 #endif
 			free_metrics();
-			alias_list_free();
+			zbx_alias_list_free();
 			exit(EXIT_SUCCESS);
 			break;
 		case ZBX_TASK_SHOW_VERSION:

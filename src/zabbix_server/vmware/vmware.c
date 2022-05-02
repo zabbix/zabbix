@@ -24,7 +24,7 @@
 #	include <libxml/xpath.h>
 #endif
 
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "zbxshmem.h"
 #include "zbxnix.h"
 #include "zbxself.h"
