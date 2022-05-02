@@ -613,7 +613,13 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 			break;
 
 		if (SUCCEED != zbx_user_macro_parse_dyn(row[offset], &name, &context, NULL, &context_op))
+		{
+			if (2 == offset)
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\"", row[1], row[2]);
+			else
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse global macro \"%s\"", row[1]);
 			continue;
+		}
 
 		ZBX_STR2UINT64(macroid, row[0]);
 
