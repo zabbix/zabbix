@@ -2301,6 +2301,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 			/* remove parameters for non-numeric item */
 
 			dc_strpool_release(numitem->units);
+			dc_strpool_release(numitem->trends_period);
 
 			zbx_hashset_remove_direct(&config->numitems, numitem);
 		}
