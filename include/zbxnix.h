@@ -37,25 +37,26 @@ int	zbx_coredump_disable(void);
 #	error "This module allowed only for Unix OS"
 #endif
 
-extern char			*CONFIG_PID_FILE;
 extern volatile sig_atomic_t	sig_exiting;
 
 #define ZBX_EXIT_NONE		0
 #define ZBX_EXIT_SUCCESS	1
 #define ZBX_EXIT_FAILURE	2
 
-int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags);
+/* callback function prototype for geting PID file path */
+typedef const char* (*zbx_get_pid_file_pathname_f)(void);
+
+int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
+		zbx_get_pid_file_pathname_f get_pid_file_cb);
 void	zbx_daemon_stop(void);
 
-int	zbx_sigusr_send(int flags);
+int	zbx_sigusr_send(int flags, const char *pid_file_pathname);
 void	zbx_set_sigusr_handler(void (*handler)(int flags));
 
 #define ZBX_IS_RUNNING()	(ZBX_EXIT_NONE == sig_exiting)
 #define ZBX_EXIT_STATUS()	(ZBX_EXIT_SUCCESS == sig_exiting ? SUCCEED : FAIL)
 
 #define ZBX_DO_EXIT()
-
-#define ZBX_START_MAIN_ZABBIX_ENTRY(allow_root, user, flags)	zbx_daemon_start(allow_root, user, flags)
 
 void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **out);
 void	zbx_signal_process_by_pid(int pid, int flags, char **out);

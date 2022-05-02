@@ -23,6 +23,8 @@
 #include "zbxcomms.h"
 #include "modbtype.h"
 
+static char	*CONFIG_PID_FILE = NULL;
+
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAMES		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
@@ -1003,6 +1005,18 @@ static void	zbx_free_config(void)
 #endif
 }
 
+#if defined(ZABBIX_DAEMON)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: callback function for providing PID file path to libraries        *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*get_pid_file_path(void)
+{
+	return CONFIG_PID_FILE;
+}
+#endif
+
 #ifdef _WINDOWS
 static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 {
@@ -1353,7 +1367,7 @@ int	main(int argc, char **argv)
 #ifndef _WINDOWS
 		case ZBX_TASK_RUNTIME_CONTROL:
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
-			exit(SUCCEED == zbx_sigusr_send(t.data) ? EXIT_SUCCESS : EXIT_FAILURE);
+			exit(SUCCEED == zbx_sigusr_send(t.data, CONFIG_PID_FILE) ? EXIT_SUCCESS : EXIT_FAILURE);
 			break;
 #else
 		case ZBX_TASK_INSTALL_SERVICE:
@@ -1460,7 +1474,10 @@ int	main(int argc, char **argv)
 			break;
 	}
 
-	ZBX_START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
-
+#if defined(ZABBIX_SERVICE)
+	service_start(flags);
+#elif defined(ZABBIX_DAEMON)
+	zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags, get_pid_file_path);
+#endif
 	exit(EXIT_SUCCESS);
 }

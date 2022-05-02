@@ -177,6 +177,7 @@ static int	*threads_flags;
 static int	ha_status = ZBX_NODE_STATUS_UNKNOWN;
 static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
 zbx_cuid_t	ha_sessionid;
+static char	*CONFIG_PID_FILE = NULL;
 
 unsigned char			program_type	= ZBX_PROGRAM_TYPE_SERVER;
 ZBX_THREAD_LOCAL unsigned char	process_type	= ZBX_PROCESS_TYPE_UNKNOWN;
@@ -1000,6 +1001,16 @@ static void	zbx_free_config(void)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: callback function for providing PID file path to libraries        *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*get_pid_file_path(void)
+{
+	return CONFIG_PID_FILE;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: executes server processes                                         *
  *                                                                            *
  ******************************************************************************/
@@ -1099,7 +1110,7 @@ int	main(int argc, char **argv)
 		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
-	return zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
+	return zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags, get_pid_file_path);
 }
 
 static void	zbx_check_db(void)
