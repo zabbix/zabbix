@@ -20,15 +20,15 @@
 
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
+ * @onBefore prepareIds
+ *
  * @backup widget, profiles
  */
 class testDashboardCopyWidgets extends CWebTest {
 
-	const DASHBOARD_IDS = [13000, 14000];
-	const PASTE_DASHBOARD_ID = 1310;
-	const NEW_PAGE_IDS = [13001, 14001];
 	const NEW_PAGE_NAME = 'Test_page';
 	const UPDATE_TEMPLATEID = 50000;
 	const TEMPLATED_PAGE_NAME = 'Page for pasting widgets';
@@ -40,15 +40,18 @@ class testDashboardCopyWidgets extends CWebTest {
 	private static $empty_dashboardid;
 	private static $templated_page_id;
 
+	protected static $dashboard_id1;
+	protected static $dashboard_id2;
+	protected static $new_page_ids;
+	protected static $paste_dashboard_id;
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [
-			'class' => CMessageBehavior::class
-		];
+		return ['class' => CMessageBehavior::class];
 	}
 
 	/**
@@ -168,94 +171,123 @@ class testDashboardCopyWidgets extends CWebTest {
 
 		self::$dashboardid_with_widgets = $response['dashboardids'][0];
 		self::$empty_dashboardid = $response['dashboardids'][1];
-		self::$templated_page_id = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE name='
-				.zbx_dbstr(self::TEMPLATED_PAGE_NAME)
+		self::$templated_page_id = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE name='.
+				zbx_dbstr(self::TEMPLATED_PAGE_NAME)
 		);
+	}
+
+	public static function prepareIds() {
+		self::$new_page_ids	= CDBHelper::getColumn("SELECT * FROM dashboard_page WHERE name = 'Test_page' ORDER BY dashboard_pageid",
+				'dashboard_pageid');
+		self::$paste_dashboard_id = CDBHelper::getValue("SELECT dashboardid FROM dashboard WHERE name = 'Dashboard for Paste widgets'");
 	}
 
 	/**
 	 * Data provider for copying widgets from the first dashboard.
 	 */
 	public static function getCopyWidgetsFirstData() {
-		return CDBHelper::getDataProvider('SELECT * FROM widget w'.
-			' WHERE EXISTS ('.
-				'SELECT NULL'.
-				' FROM dashboard_page dp'.
-				' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
-					' AND dp.dashboardid='.self::DASHBOARD_IDS[0].
-			') ORDER BY w.widgetid DESC'
-		);
+		static $data = null;
+		if ($data === null) {
+			global $DB;
+			if (!isset($DB['DB'])) {
+				DBconnect($error);
+			}
+			CDataHelper::load('CopyWidgetsDashboards');
+
+			self::$dashboard_id1 = CDBHelper::getValue("SELECT dashboardid FROM dashboard WHERE name = 'Dashboard_1 for Copying widgets'");
+			$data = CDBHelper::getDataProvider('SELECT * FROM widget w'.
+				' WHERE EXISTS ('.
+					'SELECT NULL'.
+					' FROM dashboard_page dp'.
+					' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
+						' AND dp.dashboardid='.self::$dashboard_id1.
+				') ORDER BY w.widgetid DESC'
+			);
+		}
+
+		return $data;
 	}
 
 	/**
 	 * Data provider for copying widgets from the second dashboard.
 	 */
 	public static function getCopyWidgetsSecondData() {
-		return CDBHelper::getDataProvider('SELECT * FROM widget w'.
-			' WHERE EXISTS ('.
-				'SELECT NULL'.
-				' FROM dashboard_page dp'.
-				' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
-					' AND dp.dashboardid='.self::DASHBOARD_IDS[1].
-			') ORDER BY w.widgetid DESC'
-		);
+		static $data = null;
+		if ($data === null) {
+			global $DB;
+			if (!isset($DB['DB'])) {
+				DBconnect($error);
+			}
+			CDataHelper::load('CopyWidgetsDashboards');
+
+			self::$dashboard_id2 = CDBHelper::getValue("SELECT dashboardid FROM dashboard WHERE name = 'Dashboard_2 for Copying widgets'");
+			$data = CDBHelper::getDataProvider('SELECT * FROM widget w'.
+				' WHERE EXISTS ('.
+					'SELECT NULL'.
+					' FROM dashboard_page dp'.
+					' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
+						' AND dp.dashboardid='.self::$dashboard_id2.
+				') ORDER BY w.widgetid DESC'
+			);
+		}
+
+		return $data;
 	}
 
 	/**
 	 * @dataProvider getCopyWidgetsFirstData
 	 */
 	public function testDashboardCopyWidgets_SameDashboard_1($data) {
-		$this->copyWidgets($data, self::DASHBOARD_IDS[0]);
+		$this->copyWidgets($data, self::$dashboard_id1);
 	}
 
 	/**
 	 * @dataProvider getCopyWidgetsSecondData
 	 */
 	public function testDashboardCopyWidgets_SameDashboard_2($data) {
-		$this->copyWidgets($data, self::DASHBOARD_IDS[1]);
+		$this->copyWidgets($data, self::$dashboard_id2);
 	}
-
 
 	/**
 	 * @dataProvider getCopyWidgetsFirstData
 	 */
 	public function testDashboardCopyWidgets_OtherDashboard_1($data) {
-		$this->copyWidgets($data, self::DASHBOARD_IDS[0], null, true);
+		$this->copyWidgets($data, self::$dashboard_id1, null, true);
 	}
 
 	/**
 	 * @dataProvider getCopyWidgetsSecondData
 	 */
 	public function testDashboardCopyWidgets_OtherDashboard_2($data) {
-		$this->copyWidgets($data, self::DASHBOARD_IDS[1], null, true);
+		$this->copyWidgets($data, self::$dashboard_id2, null, true);
 	}
 
 	/**
 	 * @dataProvider getCopyWidgetsFirstData
 	 */
 	public function testDashboardCopyWidgets_ReplaceWidget_1($data) {
-		$this->copyWidgets($data, self::DASHBOARD_IDS[0], null, true, true);
+		$this->copyWidgets($data, self::$dashboard_id1, null, true, true);
 	}
 
 	/**
 	 * @dataProvider getCopyWidgetsSecondData
 	 */
 	public function testDashboardCopyWidgets_ReplaceWidget_2($data) {
-		$this->copyWidgets($data, self::DASHBOARD_IDS[1], null, true, true);
+		$this->copyWidgets($data, self::$dashboard_id2, null, true, true);
 	}
 
 	/**
 	 * @dataProvider getCopyWidgetsFirstData
 	 */
 	public function testDashboardCopyWidgets_NewPage_1($data) {
-		$this->copyWidgets($data, self::DASHBOARD_IDS[0], self::NEW_PAGE_IDS[0], false, false, true);
+		$this->copyWidgets($data, self::$dashboard_id1, self::$new_page_ids[0], false, false, true);
 	}
 
 	/**
 	 * @dataProvider getCopyWidgetsSecondData
 	 */
 	public function testDashboardCopyWidgets_NewPage_2($data) {
-		$this->copyWidgets($data, self::DASHBOARD_IDS[1], self::NEW_PAGE_IDS[1], false, false, true);
+		$this->copyWidgets($data, self::$dashboard_id2, self::$new_page_ids[1], false, false, true);
 	}
 
 	private function copyWidgets($data, $start_dashboard, $paste_page_id = null, $new_dashboard = false, $replace = false,
@@ -284,7 +316,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		}
 		else {
 			$dashboard_id = $start_dashboard;
-			$new_dashboard_id = self::PASTE_DASHBOARD_ID;
+			$new_dashboard_id = self::$paste_dashboard_id;
 			$new_page_name = self::NEW_PAGE_NAME;
 			$new_page_id = $paste_page_id;
 			$url = 'zabbix.php?action=dashboard.view&dashboardid=';
