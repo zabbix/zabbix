@@ -341,10 +341,8 @@ class CConfigurationImport {
 						$host_prototypes_refs['host'][$host][$discovery_rule['key_']][] = $host_prototype['host'];
 					}
 
-					foreach ($host_prototype['group_prototypes'] as $group_prototype) {
-						if (isset($group_prototype['group'])) {
-							$host_groups_refs += [$group_prototype['group']['name'] => []];
-						}
+					foreach ($host_prototype['group_links'] as $group_prototype) {
+						$host_groups_refs += [$group_prototype['group']['name'] => []];
 					}
 
 					if (array_key_exists('macros', $host_prototype)) {

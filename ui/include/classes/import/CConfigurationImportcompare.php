@@ -41,6 +41,7 @@ class CConfigurationImportcompare {
 	public function __construct(array $options) {
 		$this->uuid_structure = [
 			'template_groups' => [],
+			'host_groups' => [],
 			'templates' => [
 				'groups' => [],
 				'items' => [
@@ -52,7 +53,10 @@ class CConfigurationImportcompare {
 					],
 					'trigger_prototypes' => [],
 					'graph_prototypes' => [],
-					'host_prototypes' => []
+					'host_prototypes' => [
+						'group_links' => [
+						]
+					]
 				],
 				'dashboards' => [],
 				'httptests' => [],
@@ -218,6 +222,8 @@ class CConfigurationImportcompare {
 	protected function applyOptions(array $options, string $entity_key, array $diff): array {
 		$option_key_map = [
 			'template_groups' => 'template_groups',
+			'host_groups' => 'host_groups',
+			'group_links' => 'host_groups',
 			'groups' => 'template_groups',
 			'templates' => 'templates',
 			'items' => 'items',

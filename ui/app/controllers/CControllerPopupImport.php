@@ -80,6 +80,7 @@ class CControllerPopupImport extends CController {
 				break;
 
 			case 'template':
+				$rules['host_groups'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['template_groups'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['templates'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
