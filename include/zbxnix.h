@@ -43,7 +43,7 @@ extern volatile sig_atomic_t	sig_exiting;
 #define ZBX_EXIT_SUCCESS	1
 #define ZBX_EXIT_FAILURE	2
 
-/* callback function prototype for geting PID file path */
+/* callback function prototype for getting PID file path */
 typedef const char* (*zbx_get_pid_file_pathname_f)(void);
 
 int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
