@@ -161,7 +161,7 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 							}
 
 							if ($ins_groups) {
-								if (!$result = API::HostGroup()->create($ins_groups)) {
+								if (!$result = API::TemplateGroup()->create($ins_groups)) {
 									throw new Exception();
 								}
 
