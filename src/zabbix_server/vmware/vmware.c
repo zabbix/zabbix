@@ -2982,7 +2982,10 @@ static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr)
 
 	if (NULL == (root_node = zbx_xml_node_get(xdoc, node, ZBX_XNN("rootSnapshotList"))))
 	{
+		*jstr = zbx_strdup(NULL, "{\"snapshot\":[],\"count\":0,\"latestdate\":null,\"size\":0,"
+				"\"uniquesize\":0}");
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rootSnapshotList empty", __func__);
+		ret = SUCCEED;
 		goto out;
 	}
 
