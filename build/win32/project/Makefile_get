@@ -35,13 +35,13 @@ OBJS = \
 	..\..\..\src\libs\zbxcommon\variant.o \
 	..\..\..\src\libs\zbxcommon\str.o \
 	..\..\..\src\libs\zbxcommon\time.o \
-	..\..\..\src\libs\zbxcommon\zbxgetopt.o \
 	..\..\..\src\libs\zbxcommshigh\commshigh.o \
 	..\..\..\src\libs\zbxcomms\comms.o \
 	..\..\..\src\libs\zbxcompress\compress.o \
 	..\..\..\src\libs\zbxconf\cfg.o \
 	..\..\..\src\libs\zbxcrypto\base64.o \
 	..\..\..\src\libs\zbxcrypto\crypto.o \
+	..\..\..\src\libs\zbxgetopt\getopt.o \
 	..\..\..\src\libs\zbxhash\md5.o \
 	..\..\..\src\libs\zbxhash\zbxhash.o \
 	..\..\..\src\libs\zbxjson\json.o \
