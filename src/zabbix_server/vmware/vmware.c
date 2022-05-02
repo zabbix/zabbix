@@ -331,8 +331,8 @@ static zbx_uint64_t	evt_req_chunk_size;
 #define ZBX_VMPROPMAP(property)										\
 	{property, ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE(property), NULL}
 
-typedef void	(*nodeprocfunc_t)(void *, char **);
-static void	vmware_service_get_vm_snapshot(void *xml_node, char **jstr);
+typedef int	(*nodeprocfunc_t)(void *, char **);
+static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr);
 
 typedef struct
 {
@@ -362,12 +362,14 @@ static zbx_vmware_propmap_t	hv_propmap[] = {
 	ZBX_HVPROPMAP("overallStatus"),				/* ZBX_VMWARE_HVPROP_STATUS */
 	ZBX_HVPROPMAP("runtime.inMaintenanceMode"),		/* ZBX_VMWARE_HVPROP_MAINTENANCE */
 	ZBX_HVPROPMAP_EXT("summary.runtime.healthSystemRuntime.systemHealthInfo.numericSensorInfo",
-			(nodeprocfunc_t)zbx_xmlnode_to_json),	/* ZBX_VMWARE_HVPROP_SENSOR */
+			zbx_xmlnode_to_json),			/* ZBX_VMWARE_HVPROP_SENSOR */
 	{"config.network.dnsConfig", "concat("			/* ZBX_VMWARE_HVPROP_NET_NAME */
 			ZBX_XPATH_PROP_NAME("config.network.dnsConfig") "/*[local-name()='hostName']" ",'.',"
 			ZBX_XPATH_PROP_NAME("config.network.dnsConfig") "/*[local-name()='domainName'])", NULL},
 	ZBX_HVPROPMAP("runtime.connectionState"),		/* ZBX_VMWARE_HVPROP_CONNECTIONSTATE */
-	ZBX_HVPROPMAP("hardware.systemInfo.serialNumber")	/* ZBX_VMWARE_HVPROP_HW_SERIALNUMBER */
+	ZBX_HVPROPMAP("hardware.systemInfo.serialNumber"),	/* ZBX_VMWARE_HVPROP_HW_SERIALNUMBER */
+	ZBX_HVPROPMAP_EXT("runtime.healthSystemRuntime.hardwareStatusInfo",
+			zbx_xmlnode_to_json)			/* ZBX_VMWARE_HVPROP_SENSOR */
 };
 
 static zbx_vmware_propmap_t	vm_propmap[] = {
@@ -3081,7 +3083,7 @@ out:
  *             jstr - [OUT] json with vm snapshot info                        *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_service_get_vm_snapshot(void *xml_node, char **jstr)
+static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr)
 {
 	xmlNode			*root_node, *layout_node, *node = (xmlNode *)xml_node;
 	xmlDoc			*xdoc = node->doc;
@@ -3135,6 +3137,7 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, FAIL == ret ? zbx_result_string(ret) :
 			ZBX_NULL2EMPTY_STR(*jstr));
+	return ret;
 }
 
 /******************************************************************************
