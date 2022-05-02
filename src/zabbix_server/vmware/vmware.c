@@ -1103,7 +1103,7 @@ static void	vmware_dsname_shared_free(zbx_vmware_dsname_t *dsname)
  *                                                                            *
  * Purpose: frees shared resources allocated to store physical NIC data       *
  *                                                                            *
- * Parameters: vm   - [IN] the physical NIC                                   *
+ * Parameters: nic - [IN] the physical NIC of hv                              *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_pnic_shared_free(zbx_vmware_pnic_t *nic)
@@ -1848,7 +1848,7 @@ static void	vmware_dsname_free(zbx_vmware_dsname_t *dsname)
  *                                                                            *
  * Purpose: frees resources allocated to store Datastore name data            *
  *                                                                            *
- * Parameters: dsname   - [IN] the Datastore name                             *
+ * Parameters: nic - [IN] the pnic of hv                                      *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_pnic_free(zbx_vmware_pnic_t *nic)
@@ -4153,6 +4153,7 @@ static void	vmware_service_get_hv_pnics_data(xmlDoc *details, zbx_vector_vmware_
 				ZBX_XPATH_LN2("linkSpeed", "speedMb"))))
 		{
 			ZBX_STR2UINT64(nic->speed, value);
+			zbx_free(value);
 		}
 
 		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
