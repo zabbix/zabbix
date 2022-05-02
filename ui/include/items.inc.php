@@ -1241,20 +1241,9 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 	$db_hosts = array_slice($db_hosts, 0, $data_display_limit, true);
 	$host_names = array_column($db_hosts, 'name', 'name');
 
-	$data = array_slice($data, 0, $data_display_limit, true);
-	$items_left = $data_display_limit;
 	$itemids = [];
 
 	foreach ($data as &$item_columns) {
-		if ($items_left != 0) {
-			$item_columns = array_slice($item_columns, 0, min($data_display_limit, $items_left));
-			$items_left -= count($item_columns);
-		}
-		else {
-			$item_columns = null;
-			break;
-		}
-
 		foreach ($item_columns as &$item_column) {
 			CArrayHelper::ksort($item_column);
 			$item_column = array_slice($item_column, 0, $data_display_limit, true);
@@ -1275,6 +1264,7 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 	unset($item_columns);
 
 	$data = array_filter($data);
+	$data = array_slice($data, 0, $data_display_limit, true);
 
 	$has_hidden_items = (count($db_items) != count($itemids));
 
