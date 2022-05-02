@@ -30,7 +30,6 @@ the argument value is returned here.
 Also, when `ordering' is RETURN_IN_ORDER,
 each non-option ARGV-element is returned here.  */
 
-//extern char *zbx_optarg;
 const char	*zbx_get_optarg(void);
 
 /*
@@ -46,17 +45,11 @@ non-option elements that the caller should itself scan.
 Otherwise, `optind' communicates from one call to the next
 how much of ARGV has been scanned so far.  */
 
-//extern int zbx_optind;
-
 /*
 Callers store zero here to inhibit the error message `getopt' prints
 for unrecognized options.  */
 
-//extern int zbx_opterr;
-
 /* Set to an option character which was unrecognized.  */
-
-//extern int zbx_optopt;
 
 /*
 Describe the long-named options requested by the application.

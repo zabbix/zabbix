@@ -55,13 +55,6 @@ each non-option ARGV-element is returned here.  */
 #include "zbxgetopt.h"
 #include "common.h"
 
-/* char	*zbx_optarg = NULL; */
-
-/* const char	*zbx_get_optarg(void) */
-/* { */
-/* 	return zbx_optarg; */
-/* } */
-
 /*
 Index in ARGV of the next element to be scanned.
 This is used for communication to and from the caller
@@ -76,7 +69,7 @@ Otherwise, `zbx_optind' communicates from one call to the next
 how much of ARGV has been scanned so far.  */
 
 /* XXX 1003.2 says this must be 1 before any call.  */
-//int	zbx_optind = 0;
+/* int	zbx_optind = 0; //defined in binaries */
 
 /*
 The next char to be scanned in the option-element
