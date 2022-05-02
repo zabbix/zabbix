@@ -1543,6 +1543,115 @@ class CopyWidgetsDashboards {
 			]
 		]);
 
+		CDataHelper::call('templatedashboard.create', [
+			[
+				'templateid' => 50000,
+				'name' => 'Templated dashboard with all widgets',
+				'pages' => [
+					[
+						'name' => 'Page with widgets',
+						'widgets' => [
+							[
+								'type' => 'clock',
+								'name' => 'Clock widget',
+								'width' => 4,
+								'height' => 4
+							],
+							[
+								'type' => 'graph',
+								'name' => 'Graph (classic) widget',
+								'x' => 4,
+								'y' => 0,
+								'width' => 8,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source_type',
+										'value' => 1
+									],
+									[
+										'type' => 4,
+										'name' => 'itemid',
+										'value' => 400410
+									]
+								]
+							],
+							[
+								'type' => 'plaintext',
+								'name' => 'Plain text widget',
+								'x' => 12,
+								'y' => 0,
+								'width' => 6,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 4,
+										'name' => 'itemids',
+										'value' => 400410
+									]
+								]
+							],
+							[
+								'type' => 'url',
+								'name' => 'URL widget',
+								'x' => 18,
+								'y' => 0,
+								'width' => 6,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'url',
+										'value' => 'http://zabbix.com'
+									]
+								]
+							],
+							[
+								'type' => 'graphprototype',
+								'name' => 'Graph prototype widget',
+								'x' => 0,
+								'y' => 4,
+								'width' => 12,
+								'height' => 6,
+								'fields' => [
+									[
+										'type' => 7,
+										'name' => 'graphid',
+										'value' => 700016
+									]
+								]
+							],
+							[
+								'type' => 'item',
+								'name' => 'Item value widget',
+								'x' => 13,
+								'y' => 4,
+								'width' => 4,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'itemid',
+										'value' => 400410
+									]
+								]
+							]
+						]
+					],
+					[
+						'name' => 'Page for pasting widgets',
+						'widgets' => []
+					]
+				]
+			],
+			[
+				'templateid' => 50000,
+				'name' => 'Dashboard without widgets',
+				'pages' => [[]]
+			]
+		]);
+
 		return ['dashboardids' => CDataHelper::getIds('name')];
 	}
 }
