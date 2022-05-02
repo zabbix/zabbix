@@ -13450,14 +13450,14 @@ static void	dc_reschedule_items()
 				continue;
 			}
 
-			if (ITEM_TYPE_ZABBIX_ACTIVE == item->type || 0 != items.values[i]->proxy_hostid)
+			if (0 != items.values[i]->proxy_hostid)
 			{
 				/* update nextcheck for active and monitored by proxy items */
 				/* for queue requests by frontend.                          */
 				if (NULL != item->delay_ex)
 					(void)DCitem_nextcheck_update(item, NULL, ZBX_ITEM_DELAY_CHANGED, now, NULL);
 			}
-			else if (NULL != item->delay_ex || ITEM_STATE_NORMAL != item->state)
+			else if (NULL != item->delay_ex)
 			{
 				int	old_nextcheck = item->nextcheck;
 				char	*error = NULL;
