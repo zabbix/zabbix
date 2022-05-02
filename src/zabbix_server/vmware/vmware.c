@@ -1029,8 +1029,6 @@ static void	vmware_props_shared_free(char **props, int props_num)
  ******************************************************************************/
 static void	vmware_dev_shared_free(zbx_vmware_dev_t *dev)
 {
-	int	i;
-
 	if (NULL != dev->instance)
 		vmware_shared_strfree(dev->instance);
 
@@ -1108,7 +1106,8 @@ static void	vmware_dsname_shared_free(zbx_vmware_dsname_t *dsname)
 static void	vmware_pnic_shared_free(zbx_vmware_pnic_t *nic)
 {
 	vmware_shared_strfree(nic->name);
-	vmware_props_shared_free(nic->props, ZBX_VMWARE_PNIC_PROPS_NUM);
+	vmware_shared_strfree(nic->driver);
+	vmware_shared_strfree(nic->mac);
 
 	__vm_shmem_free_func(nic);
 }
@@ -1581,7 +1580,8 @@ static zbx_vmware_pnic_t	*vmware_pnic_shared_dup(const zbx_vmware_pnic_t *src)
 	pnic->name = vmware_shared_strdup(src->name);
 	pnic->speed = src->speed;
 	pnic->duplex = src->duplex;
-	pnic->props = vmware_props_shared_dup(src->props, ZBX_VMWARE_PNIC_PROPS_NUM);
+	pnic->driver = vmware_shared_strdup(src->driver);
+	pnic->mac = vmware_shared_strdup(src->mac);
 
 	return pnic;
 }
@@ -1850,17 +1850,9 @@ static void	vmware_dsname_free(zbx_vmware_dsname_t *dsname)
  ******************************************************************************/
 static void	vmware_pnic_free(zbx_vmware_pnic_t *nic)
 {
-	int	i;
-
 	zbx_free(nic->name);
-
-	if (NULL == nic->props)
-		return;
-
-	for (i = 0; i < ZBX_VMWARE_PNIC_PROPS_NUM; i++)
-		zbx_free(nic->props[i]);
-
-	zbx_free(nic->props);
+	zbx_free(nic->driver);
+	zbx_free(nic->mac);
 	zbx_free(nic);
 }
 
@@ -2487,25 +2479,23 @@ out:
  ******************************************************************************/
 static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node)
 {
-	char	*value;
 	char	**props;
 	xmlChar	*attr_value;
 
 	props = (char **)zbx_malloc(NULL, sizeof(char *) * ZBX_VMWARE_DEV_PROPS_NUM);
 
-	props[ZBX_VMWARE_DEV_PROPS_IFMAC] = zbx_xml_node_read_value(details, node,
-			"*[local-name()='macAddress']");
+	props[ZBX_VMWARE_DEV_PROPS_IFMAC] = zbx_xml_node_read_value(details, node, ZBX_XNN("macAddress"));
 	props[ZBX_VMWARE_DEV_PROPS_IFCONNECTED] = zbx_xml_node_read_value(details, node,
-			"*[local-name()='connectable']/*[local-name()='connected']");
+			ZBX_XNN("connectable") ZBX_XPATH_LN("connected"));
 
-	if (NULL != (attr_value = xmlGetProp(node->parent, "type")))
+	if (NULL != (attr_value = xmlGetProp(node->parent, (const xmlChar *)"type")))
 	{
-		props[ZBX_VMWARE_DEV_PROPS_IFTYPE] = zbx_strdup(NULL, (char *)attr_value);
+		props[ZBX_VMWARE_DEV_PROPS_IFTYPE] = zbx_strdup(NULL, (const char *)attr_value);
 		xmlFree(attr_value);
 	}
 
 	props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE] = zbx_xml_node_read_value(details, node,
-			"*[local-name()='backing']/*[local-name()='deviceName']");
+			ZBX_XNN("backing") ZBX_XPATH_LN("deviceName"));
 
 	return props;
 }
@@ -4103,7 +4093,7 @@ int	vmware_dsname_compare(const void *d1, const void *d2)
 	return strcmp(ds1->name, ds2->name);
 }
 
-int	vmware_pnic_compare(const void *v1, const void *v2)
+static int	vmware_pnic_compare(const void *v1, const void *v2)
 {
 	const zbx_vmware_pnic_t		*nic1 = *(const zbx_vmware_pnic_t * const *)v1;
 	const zbx_vmware_pnic_t		*nic2 = *(const zbx_vmware_pnic_t * const *)v2;
@@ -4113,11 +4103,10 @@ int	vmware_pnic_compare(const void *v1, const void *v2)
 
 static void	vmware_service_get_hv_pnics_data(xmlDoc *details, zbx_vector_vmware_pnic_t *nics)
 {
-	int 		i;
-	char		*name, *speed, *duplex;
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
+	int 		i = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4135,37 +4124,38 @@ static void	vmware_service_get_hv_pnics_data(xmlDoc *details, zbx_vector_vmware_
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
 		zbx_vmware_pnic_t	*nic;
-		char			*name;
+		char			*value;
 
-		if (NULL == (name = zbx_xml_node_read_value(details, nodeset->nodeTab[i], "*/*[local-name()='device']")))
+		if (NULL == (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], ZBX_XNN("device"))))
 			continue;
 
 		nic = (zbx_vmware_pnic_t *)zbx_malloc(NULL, sizeof(zbx_vmware_pnic_t));
+		memset(nic, 0, sizeof(zbx_vmware_pnic_t));
+		nic->name = value;
 
-		nic->name = name;
-		if (NULL != (speed = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
-						"/*/*[local-name()='linkSpeed']/*[local-name()='speedMb']")))
-			ZBX_STR2UINT64(nic->speed, speed);
+		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
+				ZBX_XPATH_LN2("linkSpeed", "speedMb"))))
+		{
+			ZBX_STR2UINT64(nic->speed, value);
+		}
 
-		if (NULL != (duplex = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
-						"/*/*[local-name()='linkSpeed']/*[local-name()='duplex']")))
-			nic->duplex = 0 == strcmp(duplex, "true") ? ZBX_DUPLEX_FULL : ZBX_DUPLEX_HALF;
+		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
+				ZBX_XPATH_LN2("linkSpeed", "duplex"))))
+		{
+			nic->duplex = 0 == strcmp(value, "true") ? ZBX_DUPLEX_FULL : ZBX_DUPLEX_HALF;
+			zbx_free(value);
+		}
 
-		nic->props[ZBX_VMWARE_PNIC_PROPS_DRIVER] = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
-				ZBX_XNN("driver"));
-		nic->props[ZBX_VMWARE_PNIC_PROPS_MAC] = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
-				ZBX_XNN("mac"));
-
+		nic->driver = zbx_xml_node_read_value(details, nodeset->nodeTab[i], ZBX_XNN("driver"));
+		nic->mac = zbx_xml_node_read_value(details, nodeset->nodeTab[i], ZBX_XNN("mac"));
 		zbx_vector_vmware_pnic_append(nics, nic);
 	}
+
 	zbx_vector_vmware_pnic_sort(nics, vmware_pnic_compare);
 clean:
-	zbx_free(speed);
-	zbx_free(duplex);
-
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, nodeset->nodeNr);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, i);
 }
 
 /******************************************************************************
@@ -4189,7 +4179,6 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 	char				*value;
 	xmlDoc				*details = NULL, *multipath_data = NULL;
 	zbx_vector_str_t		datastores, vms;
-	zbx_vector_vmware_pnic_t	pnics;
 	int				i, j, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hvid:'%s'", __func__, id);

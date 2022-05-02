@@ -182,15 +182,13 @@ zbx_vmware_dev_t;
 #define ZBX_DUPLEX_HALF		1
 
 /* hypervisor physical NIC data */
-#define ZBX_VMWARE_PNIC_PROPS_DRIVER		0
-#define ZBX_VMWARE_PNIC_PROPS_MAC		1
-#define ZBX_VMWARE_PNIC_PROPS_NUM		2
 typedef struct
 {
 	char		*name;
 	zbx_uint64_t	speed;
 	int		duplex;
-	char		**props;
+	char		*driver;
+	char		*mac;
 }
 zbx_vmware_pnic_t;
 

@@ -1660,14 +1660,11 @@ int	check_vcenter_hv_net_if_discovery(AGENT_REQUEST *request, const char *userna
 		nic = hv->pnics.values[i];
 
 		zbx_json_addobject(&json_data, NULL);
-		zbx_json_addstring(&json_data, "{#IFNAME}", ZBX_NULL2EMPTY_STR(nic->name), ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json_data, "{#IFDRIVER}", ZBX_NULL2EMPTY_STR(nic->props[ZBX_VMWARE_PNIC_PROPS_DRIVER]),
-				ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#IFNAME}", nic->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#IFDRIVER}", ZBX_NULL2EMPTY_STR(nic->driver), ZBX_JSON_TYPE_STRING);
 		zbx_json_adduint64(&json_data, "{#IFSPEED}", nic->speed);
-		zbx_json_addstring(&json_data, "{#IFDUPLEX}", 0 == strcmp(nic->props[ZBX_VMWARE_PNIC_PROPS_MAC], "true")
-				? "full" : "half", ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json_data, "{#IFMAC}", ZBX_NULL2EMPTY_STR(nic->props[ZBX_VMWARE_PNIC_PROPS_MAC]),
-				ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#IFDUPLEX}", 0 == nic->duplex ? "half" : "full", ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#IFMAC}", ZBX_NULL2EMPTY_STR(nic->mac), ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&json_data);
 	}
