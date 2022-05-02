@@ -976,7 +976,8 @@ class testFormUserRoles extends CWebTest {
 						'token.get', 'token.update', 'trend.get', 'trigger.adddependencies', 'trigger.create', 'trigger.delete',
 						'trigger.deletedependencies', 'trigger.get', 'trigger.update', 'triggerprototype.create',
 						'triggerprototype.delete', 'triggerprototype.get', 'triggerprototype.update', 'user.create',
-						'user.delete', 'user.get', 'user.logout', 'user.unblock', 'user.update', 'usergroup.create',
+						'user.delete', 'user.get', 'user.logout', 'user.unblock', 'user.update', 'userdirectory.create',
+						'userdirectory.delete', 'userdirectory.get', 'userdirectory.test', 'userdirectory.update', 'usergroup.create',
 						'usergroup.delete', 'usergroup.get', 'usergroup.update', 'usermacro.create', 'usermacro.createglobal',
 						'usermacro.delete', 'usermacro.deleteglobal', 'usermacro.get', 'usermacro.update', 'usermacro.updateglobal',
 						'valuemap.create', 'valuemap.delete', 'valuemap.get', 'valuemap.update'

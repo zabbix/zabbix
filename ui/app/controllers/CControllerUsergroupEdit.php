@@ -64,7 +64,7 @@ class CControllerUsergroupEdit extends CController {
 
 		if ($this->hasInput('usrgrpid')) {
 			$user_groups = API::UserGroup()->get([
-				'output' => ['name', 'gui_access', 'users_status', 'debug_mode'],
+				'output' => ['name', 'gui_access', 'users_status', 'debug_mode', 'userdirectoryid'],
 				'selectTagFilters' => ['groupid', 'tag', 'value'],
 				'usrgrpids' => $this->getInput('usrgrpid'),
 				'editable' => true
@@ -87,6 +87,7 @@ class CControllerUsergroupEdit extends CController {
 			'usrgrpid' => 0,
 			'name' => $db_defaults['name'],
 			'gui_access' => $db_defaults['gui_access'],
+			'userdirectoryid' => 0,
 			'users_status' => $db_defaults['users_status'],
 			'debug_mode' => $db_defaults['debug_mode'],
 			'form_refresh' => 0
@@ -99,6 +100,7 @@ class CControllerUsergroupEdit extends CController {
 			$data['gui_access'] = $this->user_group['gui_access'];
 			$data['users_status'] = $this->user_group['users_status'];
 			$data['debug_mode'] = $this->user_group['debug_mode'];
+			$data['userdirectoryid'] = $this->user_group['userdirectoryid'];
 		}
 
 		// overwrite with input variables
@@ -125,6 +127,14 @@ class CControllerUsergroupEdit extends CController {
 		$data['users_ms'] = $this->getUsersMs();
 
 		$data['can_update_group'] = (!$this->hasInput('usrgrpid') || granted2update_group($this->getInput('usrgrpid')));
+
+		if ($data['can_update_group']) {
+			$userdirectories = API::UserDirectory()->get([
+				'output' => ['userdirectoryid', 'name']
+			]);
+			CArrayHelper::sort($userdirectories, ['name']);
+			$data['userdirectories'] = array_column($userdirectories, 'name', 'userdirectoryid');
+		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of user groups'));

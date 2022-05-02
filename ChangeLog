@@ -1,8 +1,15 @@
 Changes for 6.2.0beta1
 
 New features:
+A.F.I..... [ZBXNEXT-2289] implemented multiple LDAP sources for user authentication (gcalenko, vmurzins)
+..F....... [ZBXNEXT-7526] added number of items for Latest data column in Monitoring -> Hosts page (Ivo)
+A.F....... [ZBXNEXT-7491] fixed PHP 8.1 runtime warnings with PostgreSQL backend (Sasha)
+.........T [ZBXNEXT-7547] added CockroachDB template (drasihov)
+A.F....... [ZBXNEXT-4768] improved usability of "Execute now" (Ivo)
 
 Bug fixes:
+A......... [ZBXNEXT-7523] removed unnecessary field validation for "link_type" in template.get "selectParentTemplates" option (Ivo)
+..F....... [ZBX-20773] added documentation link for host create view in standalone mode (rdetlavs)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.0alpha2
@@ -1899,6 +1906,11 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.23
+
+5.0.23rc1 was released as 5.0.23 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.23rc1
@@ -4372,6 +4384,11 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.40
+
+4.0.40rc1 was released as 4.0.40 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.40rc1
