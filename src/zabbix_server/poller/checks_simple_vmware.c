@@ -1687,12 +1687,10 @@ int	check_vcenter_hv_network_linkspeed(AGENT_REQUEST *request, const char *usern
 		AGENT_RESULT *result)
 {
 	int			i, ret = SYSINFO_RET_FAIL;
-	const char		*url, *uuid, *name;
-	struct zbx_json		json_data;
-	zbx_uint64_t		value = 0;
+	const char		*url, *uuid, *if_name;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
-	zbx_vmware_pnic_t	*nic;
+	zbx_vmware_pnic_t	nic_cmp;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1704,7 +1702,7 @@ int	check_vcenter_hv_network_linkspeed(AGENT_REQUEST *request, const char *usern
 
 	url = get_rparam(request, 0);
 	uuid = get_rparam(request, 1);
-	name = get_rparam(request, 2);
+	if_name = get_rparam(request, 2);
 
 	zbx_vmware_lock();
 
@@ -1717,24 +1715,15 @@ int	check_vcenter_hv_network_linkspeed(AGENT_REQUEST *request, const char *usern
 		goto unlock;
 	}
 
-	for (i = 0; i < hv->pnics.values_num; i++)
-	{
-		nic = hv->pnics.values[i];
+	nic_cmp.name = (char *)if_name;
 
-		if (0 != strcmp(name, nic->name))
-			continue;
-
-		value = nic->speed;
-		break;
-	}
-
-	if (0 == value)
+	if (FAIL == (i = zbx_vector_vmware_pnic_bsearch(&hv->pnics, &nic_cmp, vmware_pnic_compare)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown physical network interface name"));
 		goto out;
 	}
 
-	SET_UI64_RESULT(result, nic->speed);
+	SET_UI64_RESULT(result, hv->pnics.values[i]->speed);
 	ret = SYSINFO_RET_OK;
 unlock:
 	zbx_vmware_unlock();

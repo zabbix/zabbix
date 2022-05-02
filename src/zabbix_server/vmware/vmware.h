@@ -192,6 +192,7 @@ typedef struct
 }
 zbx_vmware_pnic_t;
 
+int	vmware_pnic_compare(const void *v1, const void *v2);
 ZBX_PTR_VECTOR_DECL(vmware_pnic, zbx_vmware_pnic_t *)
 
 /* file system data */

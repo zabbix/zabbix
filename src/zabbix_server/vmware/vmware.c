@@ -4093,7 +4093,7 @@ int	vmware_dsname_compare(const void *d1, const void *d2)
 	return strcmp(ds1->name, ds2->name);
 }
 
-static int	vmware_pnic_compare(const void *v1, const void *v2)
+int	vmware_pnic_compare(const void *v1, const void *v2)
 {
 	const zbx_vmware_pnic_t		*nic1 = *(const zbx_vmware_pnic_t * const *)v1;
 	const zbx_vmware_pnic_t		*nic2 = *(const zbx_vmware_pnic_t * const *)v2;
