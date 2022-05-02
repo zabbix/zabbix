@@ -30,7 +30,22 @@
 static	SERVICE_STATUS		serviceStatus;
 static	SERVICE_STATUS_HANDLE	serviceHandle;
 
-int	application_status = ZBX_APP_RUNNING;
+#define ZBX_APP_STOPPED	0
+#define ZBX_APP_RUNNING	1
+/* required for closing application from service */
+static int	application_status = ZBX_APP_RUNNING;
+
+int	ZBX_IS_RUNNING(void)
+{
+	return application_status;
+}
+
+int	ZBX_DO_EXIT(void)
+{
+	application_status = ZBX_APP_STOPPED;
+}
+#undef ZBX_APP_STOPPED
+#undef ZBX_APP_RUNNING
 
 /* free resources allocated by MAIN_ZABBIX_ENTRY() */
 void	zbx_free_service_resources(int ret);

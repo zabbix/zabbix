@@ -37,12 +37,8 @@ int	ZabbixStopService(void);
 
 void	set_parent_signal_handler(void);
 
-int	application_status;	/* required for closing application from service */
-
-#define ZBX_APP_STOPPED	0
-#define ZBX_APP_RUNNING	1
-
 int	ZBX_IS_RUNNING(void);
 int	ZBX_DO_EXIT(void);
+void	zbx_on_exit(int ret);
 
 #endif /* ZABBIX_SERVICE_H */
