@@ -435,7 +435,7 @@ static void	um_macro_register_kvs(zbx_um_macro_t *macro, const char *location)
 	zbx_hashset_t		*macro_kv = (0 == macro->hostid ? &config->gmacro_kv : &config->hmacro_kv);
 	zbx_dc_macro_kv_t	*mkv;
 
-	zbx_strsplit_first(location, ':', &path, &key);
+	zbx_strsplit_last(location, ':', &path, &key);
 
 	if (NULL == key)
 	{
