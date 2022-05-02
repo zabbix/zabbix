@@ -347,7 +347,8 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	t->task = ZBX_TASK_START;
 
 	/* parse the command-line */
-	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg, &zbx_optind)))
+	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
+			&zbx_optind)))
 	{
 		opt_count[(unsigned char)ch]++;
 
