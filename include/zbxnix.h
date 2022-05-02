@@ -37,8 +37,6 @@ int	zbx_coredump_disable(void);
 #	error "This module allowed only for Unix OS"
 #endif
 
-extern volatile sig_atomic_t	sig_exiting;
-
 #define ZBX_EXIT_NONE		0
 #define ZBX_EXIT_SUCCESS	1
 #define ZBX_EXIT_FAILURE	2
@@ -53,8 +51,8 @@ void	zbx_daemon_stop(void);
 int	zbx_sigusr_send(int flags, const char *pid_file_pathname);
 void	zbx_set_sigusr_handler(void (*handler)(int flags));
 
-#define ZBX_IS_RUNNING()	(ZBX_EXIT_NONE == sig_exiting)
-#define ZBX_EXIT_STATUS()	(ZBX_EXIT_SUCCESS == sig_exiting ? SUCCEED : FAIL)
+int	ZBX_IS_RUNNING(void);
+int	ZBX_EXIT_STATUS(void);
 
 #define ZBX_DO_EXIT()
 

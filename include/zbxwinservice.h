@@ -42,7 +42,7 @@ int	application_status;	/* required for closing application from service */
 #define ZBX_APP_STOPPED	0
 #define ZBX_APP_RUNNING	1
 
-#define ZBX_IS_RUNNING()	(ZBX_APP_RUNNING == application_status)
-#define ZBX_DO_EXIT()		application_status = ZBX_APP_STOPPED
+int	ZBX_IS_RUNNING(void);
+int	ZBX_DO_EXIT(void);
 
 #endif /* ZABBIX_SERVICE_H */

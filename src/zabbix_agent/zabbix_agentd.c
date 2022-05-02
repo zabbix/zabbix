@@ -110,7 +110,7 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 #include "zbxsymbols.h"
 
 #if defined(ZABBIX_SERVICE)
-#	include "service.h"
+#	include "zbxwinservice.h"
 #elif defined(ZABBIX_DAEMON)
 #	include "zbxnix.h"
 #endif
