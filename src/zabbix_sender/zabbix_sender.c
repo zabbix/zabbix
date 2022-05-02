@@ -1009,9 +1009,12 @@ static void	parse_commandline(int argc, char **argv)
 	char		ch;
 	unsigned int	opt_mask = 0;
 	unsigned short	opt_count[256] = {0};
+	char		*zbx_optarg = NULL;
+	int		zbx_optind = 0;
 
 	/* parse the command-line */
-	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
+	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
+			&zbx_optind)))
 	{
 		opt_count[(unsigned char)ch]++;
 

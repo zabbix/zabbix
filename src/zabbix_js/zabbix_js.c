@@ -147,11 +147,14 @@ int	main(int argc, char **argv)
 	int	ret = FAIL, loglevel = LOG_LEVEL_WARNING, timeout = 0;
 	char	*script_file = NULL, *input_file = NULL, *param = NULL, ch, *script = NULL, *error = NULL,
 		*result = NULL, script_error[MAX_STRING_LEN];
+	char		*zbx_optarg = NULL;
+	int		zbx_optind = 0;
 
 	progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
-	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
+	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
+			&zbx_optind)))
 	{
 		switch (ch)
 		{
