@@ -3526,7 +3526,7 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 		if (NULL == propmap[i].name)
 			continue;
 
-		if (0 != propmap[i].vc_min && propmap[i].vc_min < service->major_version * 10 + service->minor_version)
+		if (0 != propmap[i].vc_min && propmap[i].vc_min > service->major_version * 10 + service->minor_version)
 			continue;
 
 		zbx_strlcat(props, "<ns0:pathSet>", sizeof(props));
