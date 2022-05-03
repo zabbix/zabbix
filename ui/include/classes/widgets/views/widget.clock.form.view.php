@@ -145,106 +145,17 @@ $form_list
 		'tzone-row'
 	);
 
-
-$scripts[] =
-	'$("#time_type").on("change", () => {'.
-		'ZABBIX.Dashboard.reloadWidgetProperties();'.
-		'toggleTimeZoneFields();'.
-	'});'.
-
-	'$(".'.ZBX_STYLE_COLOR_PICKER.' input", $(".overlay-dialogue-body"))'.
-		'.colorpicker({appendTo: ".overlay-dialogue-body", use_default: true, onUpdate: window.setIndicatorColor});'.
-
-	'var $show = $(\'input[id^="show_"]\', "#widget-dialogue-form").not("#show_header");'.
-
-	'$("#adv_conf").change(function() {'.
-		'$show.trigger("change");'.
-
-		'$("#bg-color-row")'.
-			'.toggle(this.checked && isDigital())'.
-			'.find("input")'.
-			'.prop("disabled", !(this.checked && isDigital()));'.
-	'});'.
-
-	'$("#clock_type").on("change", () => {'.
-		'toggleShowFields();'.
-		'toggleAdvConfField();'.
-		'$("#adv_conf").trigger("change");'.
-	'});'.
-
-	'function isDigital() {'.
-		'return $(\'input[name="clock_type"]:checked\').val() == '.WIDGET_CLOCK_TYPE_DIGITAL.';'.
-	'}'.
-
-	'$show.on("click", () => {'.
-		'return Boolean($show'.
-			'.filter(\''.
-				'input[id="show_'.WIDGET_CLOCK_SHOW_DATE.'"]:checked,'.
-				'input[id="show_'.WIDGET_CLOCK_SHOW_TIME.'"]:checked\')'.
-			'.length);'.
-	'});'.
-
-	'$show.change(function() {'.
-		'let adv_conf_checked = $("#adv_conf").prop("checked");'.
-		'let is_digital = $(\'input[name="clock_type"]:checked\').val() == '.WIDGET_CLOCK_TYPE_DIGITAL.';'.
-		'let show_field = (adv_conf_checked && this.checked && is_digital);'.
-
-		'switch($(this).val()) {'.
-			'case "'.WIDGET_CLOCK_SHOW_DATE.'":'.
-				'$("#date-row")'.
-					'.toggle(show_field)'.
-					'.find("input, textarea")'.
-					'.prop("disabled", !show_field);'.
-				'break;'.
-
-			'case "'.WIDGET_CLOCK_SHOW_TIME.'":'.
-				'$("#time-row")'.
-					'.toggle(show_field)'.
-					'.find("input")'.
-					'.prop("disabled", !show_field);'.
-				'break;'.
-
-			'case "'.WIDGET_CLOCK_SHOW_TIMEZONE.'":'.
-				'toggleTimeZoneFields();'.
-				'$("#tzone-row")'.
-					'.toggle(show_field)'.
-					'.find("input")'.
-					'.prop("disabled", !show_field);'.
-				'break;'.
-		'}'.
-	'});'.
-
-	'function toggleTimeZoneFields() {'.
-		'let adv_conf_checked = $("#adv_conf").prop("checked");'.
-		'let is_host_time = $("#time_type").val() == '.TIME_TYPE_HOST.';'.
-		'let enabled = $(\'input[id^="show_'.WIDGET_CLOCK_SHOW_TIMEZONE.'"]\').is(":checked");'.
-
-		'$(\'label[for="tzone_timezone"], #tzone_timezone, label[for="tzone_format"], #tzone_format\')'.
-			'.toggle(!is_host_time && enabled && adv_conf_checked)'.
-			'.find("input")'.
-			'.prop("disabled", !(!is_host_time && enabled && adv_conf_checked));'.
-	'};'.
-
-	'function toggleShowFields() {'.
-		'let enable = isDigital();'.
-		'$("#show-row")'.
-			'.toggle(enable)'.
-			'.find("input")'.
-			'.prop("disabled", !enable);'.
-	'}'.
-
-	'function toggleAdvConfField() {'.
-		'let enable = isDigital();'.
-		'$("#adv-conf-row")'.
-			'.toggle(enable)'.
-			'.find("input")'.
-			'.prop("disabled", !enable);'.
-	'}'.
-
-	'$("#clock_type").trigger("change");'.
-	'$("#adv_conf").trigger("change");';
-
 $form->addItem($form_list);
+
+$form->addItem(
+	(new CScriptTag('
+		widget_clock_form.init('.json_encode([
+			'form_id' => $form->getId()
+		]).');
+	'))->setOnDocumentReady()
+);
+
+$scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.clock.form.view.js.php')];
 
 return [
 	'form' => $form,

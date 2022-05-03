@@ -67,7 +67,7 @@ class CWidgetFieldTimeZone extends CWidgetField {
 			var local_list_item = timezone_select.getOptionByValue("'.TIMEZONE_DEFAULT_LOCAL.'");
 
 			if (timezone_from_list && local_list_item) {
-				var title = local_list_item.label + ": " + timezone_from_list.label;
+				const title = local_list_item.label + ": " + timezone_from_list.label;
 				local_list_item.label = title;
 				local_list_item._node.innerText = title;
 

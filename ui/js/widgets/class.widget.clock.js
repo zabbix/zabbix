@@ -34,8 +34,10 @@ class CWidgetClock extends CWidget {
 	static SHOW_TIME = 2;
 	static SHOW_TIMEZONE = 3;
 
-	_init() {
-		super._init();
+	static DEFAULT_LOCALE = 'en-US';
+
+	constructor(params) {
+		super(params);
 
 		this._time_offset = 0;
 		this._interval_id = null;
@@ -49,14 +51,8 @@ class CWidgetClock extends CWidget {
 		this._is_enabled = true;
 	}
 
-	_initLocal() {
-		if (this._show.includes(CWidgetClock.SHOW_DATE)) {
-			this._fillDate();
-		}
-
-		if (this._show.includes(CWidgetClock.SHOW_TIMEZONE)) {
-			this._fillTimeZone();
-		}
+	_init() {
+		super._init();
 	}
 
 	_registerEvents() {
@@ -105,11 +101,12 @@ class CWidgetClock extends CWidget {
 
 		if (response.clock_data !== undefined) {
 			this._has_contents = true;
+			this._is_enabled = response.clock_data.is_enabled;
 			this._time_offset = 0;
 
-			const now = new Date();
-
 			this._clock_type = response.clock_data.type;
+
+			const now = new Date();
 
 			if (response.clock_data.time !== null) {
 				this._time_offset = now.getTime() - response.clock_data.time * 1000;
@@ -125,36 +122,41 @@ class CWidgetClock extends CWidget {
 				this._time_format = response.clock_data.time_format;
 				this._tzone_format = response.clock_data.tzone_format;
 				this._show = response.clock_data.show;
-				this._is_enabled = response.clock_data.is_enabled;
-
-				if (this._time_zone === CWidgetClock.TIMEZONE_LOCAL) {
-					this._initLocal();
-				}
 			}
 
-			if (this._is_enabled) {
-				this._startClock();
-			}
+			this._startClock();
 		}
 		else {
-			this._time = null;
-			this._time_zone_offset = null;
 			this._has_contents = false;
+			this._is_enabled = false;
+			this._time_offset = null;
 		}
 	}
 
 	_startClock() {
-		if (!this._has_contents) {
+		if (!this._is_enabled || !this._has_contents) {
 			return;
 		}
 
-		if (this._clock_type === CWidgetClock.TYPE_ANALOG) {
-			this._interval_id = setInterval(() => this._clockHandsRotate(), 1000);
-			this._clockHandsRotate();
-		}
-		else if (this._show.includes(CWidgetClock.SHOW_TIME)) {
-			this._interval_id = setInterval(() => this._clockDisplayUpdate(), 1000);
-			this._clockDisplayUpdate();
+		switch (this._clock_type) {
+			case CWidgetClock.TYPE_ANALOG:
+				this._interval_id = setInterval(() => this._clockAnalogUpdate(), 1000);
+				this._clockAnalogUpdate();
+				break;
+			case CWidgetClock.TYPE_DIGITAL:
+				if (this._time_zone === CWidgetClock.TIMEZONE_LOCAL) {
+					if (this._show.includes(CWidgetClock.SHOW_DATE)) {
+						this._fillDate();
+					}
+
+					if (this._show.includes(CWidgetClock.SHOW_TIMEZONE)) {
+						this._fillTimeZone();
+					}
+				}
+
+				this._interval_id = setInterval(() => this._clockDigitalUpdate(), 1000);
+				this._clockDigitalUpdate();
+				break;
 		}
 	}
 
@@ -165,36 +167,7 @@ class CWidgetClock extends CWidget {
 		}
 	}
 
-	_clockDisplayUpdate() {
-		const clock_display = this._target.querySelector('.clock-time');
-
-		if (clock_display === null) {
-			return;
-		}
-
-		const now = new Date();
-		now.setTime(now.getTime() - this._time_offset);
-
-		let options = {hour: '2-digit', minute: '2-digit', hour12: false};
-		let locale = 'en-US';
-
-		if (this._time_format === CWidgetClock.HOUR_TWELVE) {
-			options['hour12'] = true;
-			locale = navigator.language ?? 'en-US';
-		}
-
-		if (this._show_seconds) {
-			options.second = '2-digit';
-		}
-
-		let time = now.toLocaleTimeString(locale, options);
-
-		if (this._is_enabled) {
-			clock_display.innerHTML = time;
-		}
-	}
-
-	_clockHandsRotate() {
+	_clockAnalogUpdate() {
 		const clock_svg = this._target.querySelector('.clock-svg');
 
 		if (clock_svg === null) {
@@ -219,34 +192,57 @@ class CWidgetClock extends CWidget {
 		clock_hand.setAttribute('transform', `rotate(${degree} 50 50)`);
 	}
 
-	_fillDate() {
-		const date_display = this._target.querySelector('.clock-date');
+	_clockDigitalUpdate() {
+		const clock_display = this._target.querySelector('.clock-time');
 
-		if (!date_display) {
+		if (clock_display === null) {
 			return;
 		}
 
 		const now = new Date();
-		let year = now
+		now.setTime(now.getTime() - this._time_offset);
+
+		let options = {hour: '2-digit', minute: '2-digit', hour12: false};
+		let locale = CWidgetClock.DEFAULT_LOCALE;
+
+		if (this._time_format === CWidgetClock.HOUR_TWELVE) {
+			options['hour12'] = true;
+			locale = navigator.language ?? CWidgetClock.DEFAULT_LOCALE;
+		}
+
+		if (this._show_seconds) {
+			options.second = '2-digit';
+		}
+
+		clock_display.innerHTML = now.toLocaleTimeString(locale, options);
+	}
+
+	_fillDate() {
+		const date_display = this._target.querySelector('.clock-date');
+
+		if (date_display === null) {
+			return;
+		}
+
+		const now = new Date();
+		const year = now
 			.getFullYear()
 			.toString();
-		let month = (now.getMonth() + 1)
+		const month = (now.getMonth() + 1)
 			.toString()
 			.padStart(2, 0);
-		let day = now
+		const day = now
 			.getDate()
 			.toString()
 			.padStart(2, 0);
 
-		if (this._is_enabled) {
-			date_display.innerText = `${year}/${month}/${day}`;
-		}
+		date_display.innerText = `${year}/${month}/${day}`;
 	}
 
 	_fillTimeZone() {
 		const tzone_display = this._target.querySelector('.clock-time-zone');
 
-		if (!tzone_display) {
+		if (tzone_display === null) {
 			return;
 		}
 
@@ -257,7 +253,7 @@ class CWidgetClock extends CWidget {
 			.timeZone;
 
 		if (this._tzone_format === CWidgetClock.TIMEZONE_SHORT) {
-			let pos = time_zone.lastIndexOf('/');
+			const pos = time_zone.lastIndexOf('/');
 
 			if (pos !== -1) {
 				time_zone = time_zone.substring(pos + 1);
@@ -274,10 +270,6 @@ class CWidgetClock extends CWidget {
 			time_zone = `${offset_hours} ${time_zone}`;
 		}
 
-		time_zone = time_zone.replace(/_/g, ' ');
-
-		if (this._is_enabled) {
-			tzone_display.innerText = time_zone;
-		}
+		tzone_display.innerText = time_zone.replace(/_/g, ' ');
 	}
 }

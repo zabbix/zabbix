@@ -79,22 +79,19 @@ else {
 				->addClass('clock-disabled');
 		}
 
-		$content = (new CDiv($rows))->addClass('digital-clock');
+		$body = (new CDiv($rows))->addClass('digital-clock');
 
 		if ($clock['bg_color'] !== '') {
-			$content->addStyle('background-color: #'.$clock['bg_color']);
+			$body->addStyle('background-color: #'.$clock['bg_color']);
 		}
-
-		$body = $content->toString();
 	}
 	else {
-		$body = (new CClock())
-			->setEnabled($data['clock_data']['is_enabled'])
-			->toString();
+		$body = (new CClock())->setEnabled($data['clock_data']['is_enabled']);
 	}
+
 	$output = [
 		'name' => $data['name'],
-		'body' => $body,
+		'body' => $body->toString(),
 		'clock_data' => $data['clock_data']
 	];
 }
