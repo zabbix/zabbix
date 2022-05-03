@@ -2497,6 +2497,10 @@ static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node)
 		props[ZBX_VMWARE_DEV_PROPS_IFTYPE] = zbx_strdup(NULL, (const char *)attr_value);
 		xmlFree(attr_value);
 	}
+	else
+	{
+		props[ZBX_VMWARE_DEV_PROPS_IFTYPE] = NULL;
+	}
 
 	props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE] = zbx_xml_node_read_value(details, node,
 			ZBX_XNN("backing") ZBX_XPATH_LN("deviceName"));
