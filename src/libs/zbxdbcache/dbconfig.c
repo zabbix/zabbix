@@ -3342,7 +3342,8 @@ static int	dc_function_calculate_trends_nextcheck(const zbx_dc_um_handle_t *um_h
 			goto out;
 		}
 
-		goto finish;
+		ret = SUCCEED;
+		goto out;
 	}
 
 	if (NULL == (period_shift = strchr(param, ':')))
@@ -3358,20 +3359,22 @@ static int	dc_function_calculate_trends_nextcheck(const zbx_dc_um_handle_t *um_h
 	while (SUCCEED == zbx_trends_parse_nextcheck(next, period_shift, nextcheck, error))
 	{
 		if (*nextcheck > timer->lastcheck)
+		{
+			ret = SUCCEED;
 			break;
+		}
 
 		zbx_tm_add(&tm, 1, trend_base);
 		if (-1 == (next = mktime(&tm)))
 		{
 			*error = zbx_strdup(*error, zbx_strerror(errno));
-			goto out;
+			break;
 		}
 	}
-finish:
-	*nextcheck += offsets[trend_base] + seed % periods[trend_base];
-
-	ret = SUCCEED;
 out:
+	if (SUCCEED == ret)
+		*nextcheck += offsets[trend_base] + seed % periods[trend_base];
+
 	zbx_free(param);
 
 	return ret;
