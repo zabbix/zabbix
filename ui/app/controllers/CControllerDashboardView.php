@@ -74,7 +74,9 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		list($this->dashboard, $error) = $this->getDashboard();
 
 		if ($error !== null) {
-			$this->setResponse(new CControllerResponseData(['error' => $error]));
+			$response = new CControllerResponseData(['error' => $error]);
+			$response->setTitle(_('Dashboard'));
+			$this->setResponse($response);
 
 			return;
 		}
