@@ -969,7 +969,7 @@ static int	process_active_check_heartbeat(struct zbx_json_parse *jp)
 	if (FAIL == DCget_host_by_hostid(&dc_host, hostid))
 		return FAIL;
 
-	if (HOST_STATUS_NOT_MONITORED == dc_host.status)
+	if (0 != dc_host.proxy_hostid || HOST_STATUS_NOT_MONITORED == dc_host.status)
 		return SUCCEED;
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HEARTBEAT_FREQ, hbfreq, sizeof(hbfreq), NULL))
