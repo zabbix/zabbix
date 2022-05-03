@@ -1251,7 +1251,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
-			//sig_exiting = ZBX_EXIT_FAILURE;
 			zbx_fail_sig_exiting();
 			break;
 		}

@@ -314,4 +314,3 @@ void	zbx_unblock_signals(const sigset_t *orig_mask)
 	if (0 > sigprocmask(SIG_SETMASK, orig_mask, NULL))
 		zabbix_log(LOG_LEVEL_WARNING,"cannot restore sigprocmask");
 }
-
