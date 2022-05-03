@@ -324,12 +324,12 @@ static zbx_uint64_t	evt_req_chunk_size;
 
 #define ZBX_VM_NONAME_XML	"noname.xml"
 
-#define ZBX_HVPROPMAP_EXT(property, func)								\
-	{property, ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE(property), func}
+#define ZBX_HVPROPMAP_EXT(property, func, ver)								\
+	{property, ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE(property), func, ver}
 #define ZBX_HVPROPMAP(property)										\
-	ZBX_HVPROPMAP_EXT(property, NULL)
+	ZBX_HVPROPMAP_EXT(property, NULL, 0)
 #define ZBX_VMPROPMAP(property)										\
-	{property, ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE(property), NULL}
+	{property, ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE(property), NULL, 0}
 
 typedef int	(*nodeprocfunc_t)(void *, char **);
 static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr);
@@ -339,6 +339,7 @@ typedef struct
 	const char	*name;
 	const char	*xpath;
 	nodeprocfunc_t	func;
+	unsigned short	vc_min;
 }
 zbx_vmware_propmap_t;
 
@@ -355,21 +356,21 @@ static zbx_vmware_propmap_t	hv_propmap[] = {
 	ZBX_HVPROPMAP("summary.hardware.vendor"), 		/* ZBX_VMWARE_HVPROP_HW_VENDOR */
 	ZBX_HVPROPMAP("summary.quickStats.overallMemoryUsage"),	/* ZBX_VMWARE_HVPROP_MEMORY_USED */
 	{NULL, ZBX_XPATH_HV_SENSOR_STATUS("runtime.healthSystemRuntime.systemHealthInfo.numericSensorInfo",
-			"VMware Rollup Health State"), NULL},	/* ZBX_VMWARE_HVPROP_HEALTH_STATE */
+			"VMware Rollup Health State"), NULL, 0},/* ZBX_VMWARE_HVPROP_HEALTH_STATE */
 	ZBX_HVPROPMAP("summary.quickStats.uptime"),		/* ZBX_VMWARE_HVPROP_UPTIME */
 	ZBX_HVPROPMAP("summary.config.product.version"),	/* ZBX_VMWARE_HVPROP_VERSION */
 	ZBX_HVPROPMAP("summary.config.name"),			/* ZBX_VMWARE_HVPROP_NAME */
 	ZBX_HVPROPMAP("overallStatus"),				/* ZBX_VMWARE_HVPROP_STATUS */
 	ZBX_HVPROPMAP("runtime.inMaintenanceMode"),		/* ZBX_VMWARE_HVPROP_MAINTENANCE */
 	ZBX_HVPROPMAP_EXT("summary.runtime.healthSystemRuntime.systemHealthInfo.numericSensorInfo",
-			zbx_xmlnode_to_json),			/* ZBX_VMWARE_HVPROP_SENSOR */
+			zbx_xmlnode_to_json, 0),		/* ZBX_VMWARE_HVPROP_SENSOR */
 	{"config.network.dnsConfig", "concat("			/* ZBX_VMWARE_HVPROP_NET_NAME */
 			ZBX_XPATH_PROP_NAME("config.network.dnsConfig") "/*[local-name()='hostName']" ",'.',"
-			ZBX_XPATH_PROP_NAME("config.network.dnsConfig") "/*[local-name()='domainName'])", NULL},
+			ZBX_XPATH_PROP_NAME("config.network.dnsConfig") "/*[local-name()='domainName'])", NULL, 0},
 	ZBX_HVPROPMAP("runtime.connectionState"),		/* ZBX_VMWARE_HVPROP_CONNECTIONSTATE */
-	ZBX_HVPROPMAP("hardware.systemInfo.serialNumber"),	/* ZBX_VMWARE_HVPROP_HW_SERIALNUMBER */
+	ZBX_HVPROPMAP_EXT("hardware.systemInfo.serialNumber", NULL, 67),/* ZBX_VMWARE_HVPROP_HW_SERIALNUMBER */
 	ZBX_HVPROPMAP_EXT("runtime.healthSystemRuntime.hardwareStatusInfo",
-			zbx_xmlnode_to_json)			/* ZBX_VMWARE_HVPROP_SENSOR */
+			zbx_xmlnode_to_json, 0)			/* ZBX_VMWARE_HVPROP_SENSOR */
 };
 
 static zbx_vmware_propmap_t	vm_propmap[] = {
@@ -396,9 +397,9 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 	ZBX_VMPROPMAP("parent"),				/* ZBX_VMWARE_VMPROP_FOLDER */
 	{"layoutEx</ns0:pathSet><ns0:pathSet>snapshot",		/* ZBX_VMWARE_VMPROP_SNAPSHOT */
 			ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE("snapshot"),
-			vmware_service_get_vm_snapshot},
+			vmware_service_get_vm_snapshot, 0},
 	{"datastore", ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM)/* ZBX_VMWARE_VMPROP_DATASTOREID */
-			ZBX_XPATH_PROP_NAME_NODE("datastore") ZBX_XPATH_LN("ManagedObjectReference"), NULL},
+			ZBX_XPATH_PROP_NAME_NODE("datastore") ZBX_XPATH_LN("ManagedObjectReference"), NULL, 0},
 	ZBX_VMPROPMAP("summary.runtime.consolidationNeeded"),	/* ZBX_VMWARE_VMPROP_CONSOLIDATION_NEEDED */
 	ZBX_VMPROPMAP("guest.toolsVersion"),			/* ZBX_VMWARE_VMPROP_TOOLS_VERSION */
 	ZBX_VMPROPMAP("guest.toolsRunningStatus"),		/* ZBX_VMWARE_VMPROP_TOOLS_RUNNING_STATUS */
@@ -3526,6 +3527,9 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 	for (i = 0; i < props_num; i++)
 	{
 		if (NULL == propmap[i].name)
+			continue;
+
+		if (0 != propmap[i].vc_min && propmap[i].vc_min < service->major_version * 10 + service->minor_version)
 			continue;
 
 		zbx_strlcat(props, "<ns0:pathSet>", sizeof(props));
