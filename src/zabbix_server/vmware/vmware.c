@@ -1473,6 +1473,9 @@ static char	**vmware_props_shared_dup(char ** const src, int props_num)
 	char	**props;
 	int	i;
 
+	if (NULL == src)
+		return NULL;
+
 	props = (char **)__vm_shmem_malloc_func(NULL, sizeof(char *) * props_num);
 
 	for (i = 0; i < props_num; i++)
@@ -1776,24 +1779,14 @@ static void	vmware_props_free(char **props, int props_num)
  *                                                                            *
  * Purpose: frees resources allocated to store vm device object               *
  *                                                                            *
- * Parameters: dev   - [IN] the vm device                                     *
+ * Parameters: dev - [IN] the vm device                                       *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_dev_free(zbx_vmware_dev_t *dev)
 {
-	int	i;
-
 	zbx_free(dev->instance);
 	zbx_free(dev->label);
-
-	if (NULL == dev->props)
-		goto out;
-
-	for (i = 0; i < ZBX_VMWARE_DEV_PROPS_NUM; i++)
-			zbx_free(dev->props[i]);
-
-	zbx_free(dev->props);
-out:
+	vmware_props_free(dev->props, ZBX_VMWARE_DEV_PROPS_NUM);
 	zbx_free(dev);
 }
 
@@ -2555,7 +2548,6 @@ static void	vmware_vm_get_nic_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 		dev->instance = key;
 		dev->label = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
 				"*[local-name()='deviceInfo']/*[local-name()='label']");
-
 		dev->props = vmware_vm_get_nic_device_props(details, nodeset->nodeTab[i]);
 
 		zbx_vector_ptr_append(&vm->devs, dev);
@@ -2645,6 +2637,7 @@ static void	vmware_vm_get_disk_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 
 			dev = (zbx_vmware_dev_t *)zbx_malloc(NULL, sizeof(zbx_vmware_dev_t));
 			dev->type =  ZBX_VMWARE_DEV_TYPE_DISK;
+			dev->props = NULL;
 
 			/* the virtual disk instance has format <controller type><busNumber>:<unitNumber>     */
 			/* where controller type is either ide, sata or scsi depending on the controller type */
@@ -6245,7 +6238,6 @@ out:
 		zbx_vector_ptr_append_array(&service->data->events, events.values, events.values_num);
 
 	service->lastcheck = time(NULL);
-
 	vmware_service_update_perf_entities(service);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
