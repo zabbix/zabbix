@@ -3622,38 +3622,71 @@ int	check_vcenter_vm_storage_uncommitted(AGENT_REQUEST *request, const char *use
 int	check_vcenter_vm_tools(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		mode, ret = SYSINFO_RET_FAIL;
-	const char	*param1;
+	zbx_vmware_service_t	*service;
+	zbx_vmware_vm_t		*vm = NULL;
+	int			propid, ret = SYSINFO_RET_FAIL;
+	const char		*url, *uuid, *mode, *value;
 
-	if (1 != request->nparam)
+	if (3 != request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
 	}
 
-	param1  = get_rparam(request, 0);
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+	mode = get_rparam(request, 2);
 
-	if (NULL == param1 || '\0' == *param1)
+	if ('\0' == *uuid)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		goto out;
 	}
 
-	if (0 == strcmp(param1, "version"))
+	if (NULL == mode || '\0' == *mode)
 	{
-		mode = ZBX_VMWARE_VMPROP_TOOLS_VERSION;
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		goto out;
 	}
-	else if (0 == strcmp(param1, "status"))
+	else if (0 == strcmp(mode, "version"))
 	{
-		mode = ZBX_VMWARE_VMPROP_TOOLS_RUNNING_STATUS;
+		propid = ZBX_VMWARE_VMPROP_TOOLS_VERSION;
+	}
+	else if (0 == strcmp(mode, "status"))
+	{
+		propid = ZBX_VMWARE_VMPROP_TOOLS_RUNNING_STATUS;
 	}
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter value."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter value."));
 		goto out;
 	}
 
-	ret = get_vcenter_vmprop(request, username, password, mode, result);
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (vm = service_vm_get(service, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown virtual machine uuid."));
+		goto unlock;
+	}
+
+	if (NULL == (value = vm->props[propid]))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Value is not available."));
+		goto unlock;
+	}
+
+	if (ZBX_VMWARE_VMPROP_TOOLS_VERSION == propid)
+		SET_UI64_RESULT(result, atoi(value));
+	else
+		SET_STR_RESULT(result, zbx_strdup(NULL, value));
+
+	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
