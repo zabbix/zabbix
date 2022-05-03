@@ -32,7 +32,7 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
 );
 
-$scripts = [];
+$scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.clock.form.view.js.php')];
 
 // Time type.
 $form_list->addRow(CWidgetHelper::getLabel($fields['time_type']), CWidgetHelper::getSelect($fields['time_type']));
@@ -154,8 +154,6 @@ $form->addItem(
 		]).');
 	'))->setOnDocumentReady()
 );
-
-$scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.clock.form.view.js.php')];
 
 return [
 	'form' => $form,
