@@ -73,6 +73,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"hv.hw.cpu.threads", VMCHECK_FUNC(check_vcenter_hv_hw_cpu_threads)},
 	{"hv.hw.memory", VMCHECK_FUNC(check_vcenter_hv_hw_memory)},
 	{"hv.hw.model", VMCHECK_FUNC(check_vcenter_hv_hw_model)},
+	{"hv.hw.serialnumber", VMCHECK_FUNC(check_vcenter_hv_hw_serialnumber)},
 	{"hv.hw.uuid", VMCHECK_FUNC(check_vcenter_hv_hw_uuid)},
 	{"hv.hw.vendor", VMCHECK_FUNC(check_vcenter_hv_hw_vendor)},
 	{"hv.memory.size.ballooned", VMCHECK_FUNC(check_vcenter_hv_memory_size_ballooned)},
