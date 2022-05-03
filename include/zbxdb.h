@@ -183,7 +183,7 @@ int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 
 #define ZBX_DBVERSION_UNDEFINED				0
 
-#define ZBX_DB_EXTENSION_TIMESCALE				"timescaledb"
+#define ZBX_DB_EXTENSION_TIMESCALEDB				"timescaledb"
 
 #define ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE	0x00000001
 #define ZBX_DB_EXT_STATUS_FLAGS_TSDB_DISABLE_COMPRESSION	0x00000002

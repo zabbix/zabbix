@@ -2546,7 +2546,7 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 
 		zbx_json_addint64(json, "flag", info->ext_flag);
 
-		if (0 == zbx_strcmp_null(info->extension, ZBX_DB_EXTENSION_TIMESCALE))
+		if (0 == zbx_strcmp_null(info->extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 		{
 			if (0 != (ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE & info->ext_status))
 			{
@@ -2838,7 +2838,7 @@ void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info)
 {
 	int	tsdb_ver;
 
-	if (0 != zbx_strcmp_null(version_info->extension, ZBX_DB_EXTENSION_TIMESCALE))
+	if (0 != zbx_strcmp_null(version_info->extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 		return;
 
 	tsdb_ver = zbx_tsdb_get_version();

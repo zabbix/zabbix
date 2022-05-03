@@ -875,7 +875,7 @@ int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int
 {
 	int	ret = SUCCEED;
 
-	if (0 != zbx_strcmp_null(db_version_info->extension, ZBX_DB_EXTENSION_TIMESCALE))
+	if (0 != zbx_strcmp_null(db_version_info->extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 	{
 		goto out;
 	}
