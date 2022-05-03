@@ -36,8 +36,8 @@ class CWidgetClock extends CWidget {
 
 	static DEFAULT_LOCALE = 'en-US';
 
-	constructor(params) {
-		super(params);
+	_init() {
+		super._init();
 
 		this._time_offset = 0;
 		this._interval_id = null;
@@ -49,10 +49,6 @@ class CWidgetClock extends CWidget {
 		this._show = [];
 		this._has_contents = false;
 		this._is_enabled = true;
-	}
-
-	_init() {
-		super._init();
 	}
 
 	_registerEvents() {

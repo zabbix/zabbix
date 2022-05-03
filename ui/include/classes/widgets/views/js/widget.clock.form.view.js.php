@@ -25,26 +25,26 @@ window.widget_clock_form = new class {
 	init(options) {
 		this.form = document.getElementById(options.form_id);
 
-		this.time_type = this.form.querySelector('#time_type');
+		this.time_type = document.getElementById('time_type');
 
-		this.clock_type_row = this.form.querySelector('#clock_type');
+		this.clock_type_row = document.getElementById('clock_type');
 
-		this.show_row = this.form.querySelector('#show-row');
+		this.show_row = document.getElementById('show-row');
 
-		this.show_date = this.form.querySelector('#show_1');
-		this.show_time = this.form.querySelector('#show_2');
-		this.show_tzone = this.form.querySelector('#show_3');
+		this.show_date = document.getElementById('show_1');
+		this.show_time = document.getElementById('show_2');
+		this.show_tzone = document.getElementById('show_3');
 
 		const show = [this.show_date, this.show_time, this.show_tzone];
 
-		this.advance_configuration_row = this.form.querySelector('#adv-conf-row');
-		this.advance_configuration = this.form.querySelector('#adv_conf');
+		this.advance_configuration_row = document.getElementById('adv-conf-row');
+		this.advance_configuration = document.getElementById('adv_conf');
 
-		this.bg_color_row = this.form.querySelector('#bg-color-row');
+		this.bg_color_row = document.getElementById('bg-color-row');
 
-		this.date_row = this.form.querySelector('#date-row');
-		this.time_row = this.form.querySelector('#time-row');
-		this.tzone_row = this.form.querySelector('#tzone-row');
+		this.date_row = document.getElementById('date-row');
+		this.time_row = document.getElementById('time-row');
+		this.tzone_row = document.getElementById('tzone-row');
 
 		this.form
 			.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')
