@@ -55,9 +55,14 @@ class CControllerPopupGeneric extends CController {
 	 *
 	 * @array
 	 */
-	const POPUPS_HAVING_HOST_FILTER = ['triggers', 'items', 'graphs', 'graph_prototypes',
-		'item_prototypes'
-	];
+	const POPUPS_HAVING_HOST_FILTER = ['triggers', 'items', 'graphs', 'graph_prototypes', 'item_prototypes'];
+
+	/**
+	 * Popups having host filter selector.
+	 *
+	 * @array
+	 */
+	const POPUPS_HAVING_TEMPLATE_FILTER = ['template_triggers'];
 
 	/**
 	 * General properties for supported dialog types.
@@ -95,11 +100,25 @@ class CControllerPopupGeneric extends CController {
 	protected $hostids = [];
 
 	/**
+	 * Template set in filter.
+	 *
+	 * @var array
+	 */
+	protected $templateids = [];
+
+	/**
 	 * Either Host filter need to be filled to load results.
 	 *
 	 * @var bool
 	 */
 	protected $host_preselect_required;
+
+	/**
+	 * Either template filter need to be filled to load results.
+	 *
+	 * @var bool
+	 */
+	protected $template_preselect_required;
 
 	/**
 	 * Either Host group filter need to be filled to load results.
@@ -199,6 +218,20 @@ class CControllerPopupGeneric extends CController {
 				]
 			],
 			'triggers' => [
+				'title' => _('Triggers'),
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
+				'allowed_src_fields' => 'description,triggerid,expression',
+				'form' => [
+					'name' => 'triggerform',
+					'id' => 'triggers'
+				],
+				'table_columns' => [
+					_('Name'),
+					_('Severity'),
+					_('Status')
+				]
+			],
+			'template_triggers' => [
 				'title' => _('Triggers'),
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
 				'allowed_src_fields' => 'description,triggerid,expression',
@@ -446,6 +479,7 @@ class CControllerPopupGeneric extends CController {
 			'group' =>								'string',
 			'templategroup' =>						'string',
 			'hostid' =>								'db hosts.hostid',
+			'templateid' =>							'db hosts.hostid',
 			'host' =>								'string',
 			'parent_discoveryid' =>					'db items.itemid',
 			'templates' =>							'string|not_empty',
@@ -601,6 +635,26 @@ class CControllerPopupGeneric extends CController {
 			$this->hostids = array_keys($hosts);
 		}
 
+		// Check template permissions.
+		$template_options = [];
+
+		if ($this->hasInput('templateid')) {
+			$template_options['templateids'] = $this->getInput('templateid');
+		}
+
+		if ($template_options) {
+			$templates = API::Template()->get([
+					'output' => [],
+					'preservekeys' => true
+				] + $template_options);
+
+			if (!$templates) {
+				return false;
+			}
+
+			$this->templateids = array_keys($templates);
+		}
+
 		// Check discovery rule permissions.
 		if ($this->hasInput('parent_discoveryid')) {
 			$lld_rules = API::DiscoveryRule()->get([
@@ -627,22 +681,25 @@ class CControllerPopupGeneric extends CController {
 		$group_options = [];
 		$host_options = [];
 		$templategroup_options = [];
+		$template_options = [];
+
 
 		if ($this->hasInput('writeonly')) {
 			$group_options['editable'] = 1;
 			$host_options['editable'] = 1;
 			$templategroup_options['editable'] = 1;
+			$template_options['editable'] = 1;
 		}
 
 		if ($this->hasInput('with_items')) {
 			$group_options['with_items'] = 1;
 			$host_options['with_items'] = 1;
 			$templategroup_options['with_items'] = 1;
+			$template_options['with_items'] = 1;
 		}
 		elseif ($this->hasInput('with_monitored_items')) {
 			$group_options['with_monitored_items'] = 1;
 			$host_options['with_monitored_items'] = 1;
-			$templategroup_options['with_monitored_items'] = 1;
 		}
 
 		if ($this->hasInput('with_httptests')) {
@@ -697,6 +754,7 @@ class CControllerPopupGeneric extends CController {
 				$group_options[$name] = 1;
 				$host_options[$name] = 1;
 				$templategroup_options[$name] = 1;
+				$template_options[$name] = 1;
 				break;
 			}
 		}
@@ -805,6 +863,39 @@ class CControllerPopupGeneric extends CController {
 			];
 		}
 
+		// Template dropdown.
+		if (in_array($this->source_table, self::POPUPS_HAVING_TEMPLATE_FILTER)) {
+
+			$src_name = 'templates';
+
+			$templates = $this->templateids
+				? API::Template()->get([
+					'output' => ['name', 'hostid'],
+					'templateids' => $this->templateids
+				])
+				: [];
+
+			$templates = CArrayHelper::renameObjectsKeys($templates, ['templateid' => 'id']);
+
+			$this->templateids = array_column($templates, 'id');
+			$filter['templates'] = [
+				'multiple' => false,
+				'name' => 'popup_template',
+				'object_name' => $src_name,
+				'data' => array_values($templates),
+				'selectedLimit' => 1,
+				'disabled' => $this->hasInput('only_hostid'),
+				'popup' => [
+					'parameters' => [
+							'srctbl' => $src_name,
+							'srcfld1' => 'hostid',
+							'dstfld1' => 'popup_template'
+						] + $template_options
+				],
+				'add_post_js' => false
+			];
+		}
+
 		return $filter;
 	}
 
@@ -889,6 +980,16 @@ class CControllerPopupGeneric extends CController {
 			$this->hostids = CProfile::getArray('web.popup.generic.filter_hostid', []);
 		}
 
+		if ($this->templateids) {
+			CProfile::updateArray('web.popup.generic.filter_templateid', $this->templateids, PROFILE_TYPE_ID);
+		}
+		elseif ($this->hasInput('filter_templateid_rst')) {
+			CProfile::delete('web.popup.generic.filter_templateid');
+		}
+		else {
+			$this->templateids = CProfile::getArray('web.popup.generic.filter_templateid', []);
+		}
+
 		// Set popup options.
 		$this->host_preselect_required = in_array($this->source_table, self::POPUPS_HAVING_HOST_FILTER);
 		$this->group_preselect_required = in_array($this->source_table, self::POPUPS_HAVING_GROUP_FILTER)
@@ -897,6 +998,8 @@ class CControllerPopupGeneric extends CController {
 			$this->source_table,
 			self::POPUPS_HAVING_TEMPLATE_GROUP_FILTER
 		);
+		$this->template_preselect_required = in_array($this->source_table,
+			self::POPUPS_HAVING_TEMPLATE_FILTER);
 		$this->page_options = $this->getPageOptions();
 
 		// Make control filters. Must be called before extending groupids.
@@ -923,7 +1026,8 @@ class CControllerPopupGeneric extends CController {
 			'table_records' => $records,
 			'preselect_required' => (($this->host_preselect_required && !$this->hostids)
 				|| ($this->group_preselect_required && !$this->groupids)
-				|| ($this->template_group_preselect_required && !$this->template_groupids)),
+				|| ($this->template_group_preselect_required && !$this->template_groupids)
+				|| ($this->template_preselect_required && !$this->templateids)),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -1236,6 +1340,31 @@ class CControllerPopupGeneric extends CController {
 				}
 
 				if (!$this->host_preselect_required || $this->hostids) {
+					$records = API::Trigger()->get($options);
+				}
+				else {
+					$records = [];
+				}
+
+				CArrayHelper::sort($records, ['description']);
+				break;
+
+			case 'template_triggers':
+				$options += [
+					'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'state'],
+					'selectHosts' => ['name'],
+					'selectDependencies' => ['triggerid', 'expression', 'description'],
+					'expandDescription' => true
+				];
+
+				if ($this->templateids) {
+					$options['templateids'] = $this->templateids;
+				}
+				elseif ($this->groupids) {
+					$options['groupids'] = $this->groupids;
+				}
+
+				if (!$this->template_preselect_required || $this->templateids) {
 					$records = API::Trigger()->get($options);
 				}
 				else {

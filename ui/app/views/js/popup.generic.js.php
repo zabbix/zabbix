@@ -85,6 +85,21 @@ window.popup_generic = {
 		});
 	},
 
+	initTemplatesFilter() {
+		var overlay = overlays_stack.end();
+
+		jQuery('.multiselect', overlay.$dialogue).each(function (i, ms) {
+			jQuery(ms).on('change', {overlay: overlay}, function (e) {
+				const templates = jQuery(this).multiSelect('getData').map((item) => item.id);
+				const parameters = templates.length ? {templateid: templates[0]} : {filter_templateid_rst: 1, templateid: []};
+
+				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...parameters}, {
+					dialogueid: e.data.overlay.dialogueid
+				});
+			});
+		});
+	},
+
 	initHelpItems() {
 		$('#itemtype').on('change', (e) => {
 			reloadPopup(e.target.closest('form'));

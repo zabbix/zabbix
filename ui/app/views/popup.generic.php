@@ -77,6 +77,20 @@ if (array_key_exists('hosts', $data['filter'])) {
 	$script_inline .= $host_ms->getPostJS(). 'popup_generic.initHostsFilter();';
 }
 
+// Add template multiselect.
+if (array_key_exists('templates', $data['filter'])) {
+	$multiselect_options = $data['filter']['templates'];
+	$multiselect_options['popup']['parameters']['dstfrm'] = $header_form->getId();
+
+	$template_ms = (new CMultiSelect($multiselect_options))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
+	if ($multiselect_options['disabled']) {
+		$template_ms->setTitle(_('You cannot switch templates for current selection.'));
+	}
+	$controls[] = (new CFormList())->addRow(new CLabel(_('Template'), 'popup_template_ms'), $template_ms);
+
+	$script_inline .= $template_ms->getPostJS(). 'popup_generic.initTemplatesFilter();';
+}
+
 // Show Type dropdown in header for help items.
 if ($data['popup_type'] === 'help_items') {
 	$types_select = (new CSelect('itemtype'))
@@ -239,6 +253,7 @@ switch ($data['popup_type']) {
 		break;
 
 	case 'triggers':
+	case 'template_triggers':
 	case 'trigger_prototypes':
 		foreach ($data['table_records'] as &$trigger) {
 			$host = reset($trigger['hosts']);
