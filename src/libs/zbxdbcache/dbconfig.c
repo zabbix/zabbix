@@ -3286,7 +3286,7 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 #define ZBX_TIMER_DELAY		30
 
 static int	dc_function_calculate_trends_nextcheck(const zbx_dc_um_handle_t *um_handle,
-		const zbx_trigger_timer_t *timer, time_t from, zbx_uint64_t seed, time_t *nextcheck, char **error)
+		const zbx_trigger_timer_t *timer, zbx_uint64_t seed, time_t *nextcheck, char **error)
 {
 	int		offsets[ZBX_TIME_UNIT_COUNT] = {0, 0, 0, SEC_PER_MIN * 10,
 			SEC_PER_HOUR + SEC_PER_MIN * 10, SEC_PER_HOUR + SEC_PER_MIN * 10,
@@ -3330,7 +3330,7 @@ static int	dc_function_calculate_trends_nextcheck(const zbx_dc_um_handle_t *um_h
 		goto out;
 	}
 
-	localtime_r(&from, &tm);
+	localtime_r(&timer->lastcheck, &tm);
 
 	if (ZBX_TIME_UNIT_HOUR == trend_base)
 	{
@@ -3353,11 +3353,11 @@ static int	dc_function_calculate_trends_nextcheck(const zbx_dc_um_handle_t *um_h
 	}
 
 	period_shift++;
-	next = from;
+	next = timer->lastcheck;
 
 	while (SUCCEED == zbx_trends_parse_nextcheck(next, period_shift, nextcheck, error))
 	{
-		if (*nextcheck > from)
+		if (*nextcheck > timer->lastcheck)
 			break;
 
 		zbx_tm_add(&tm, 1, trend_base);
@@ -3411,7 +3411,7 @@ static int	dc_function_calculate_nextcheck(const zbx_dc_um_handle_t *um_handle, 
 		time_t	nextcheck;
 		char	*error = NULL;
 
-		if (SUCCEED != dc_function_calculate_trends_nextcheck(um_handle, timer, from, seed, &nextcheck, &error))
+		if (SUCCEED != dc_function_calculate_trends_nextcheck(um_handle, timer, seed, &nextcheck, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot calculate trend function \"" ZBX_FS_UI64
 					"\" schedule: %s", timer->objectid, error);
@@ -3460,7 +3460,7 @@ static zbx_trigger_timer_t	*dc_trigger_function_timer_create(ZBX_DC_FUNCTION *fu
 	timer->revision = function->revision;
 	timer->lock = 0;
 	timer->type = type;
-	timer->lastcheck = now;
+	timer->lastcheck = (time_t)now;
 
 	function->timer_revision = function->revision;
 
@@ -8558,7 +8558,7 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 			/* when timer is put back into queue                                   */
 			timer->check_ts.sec = 0;
 
-			timer->lastcheck = now;
+			timer->lastcheck = (time_t)now;
 		}
 
 		/* remember if the timer locked trigger, so it would unlock during rescheduling */
@@ -8595,6 +8595,43 @@ static void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 		else
 			dc_schedule_trigger_timer(timer, now, &timer->eval_ts, &timer->check_ts);
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: reschedule trigger timers while locking configuration cache       *
+ *                                                                            *
+ * Comments: Triggers are unlocked by DCconfig_unlock_triggers()              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
+{
+	int			i;
+	zbx_dc_um_handle_t	*um_handle;
+
+	um_handle = zbx_dc_open_user_macros();
+
+	/* calculate new execution/evaluation time for the evaluated triggers */
+	/* (timers with reset execution time)                                 */
+	for (i = 0; i < timers->values_num; i++)
+	{
+		zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)timers->values[i];
+
+		if (0 == timer->check_ts.sec)
+		{
+			if (0 != (timer->check_ts.sec = dc_function_calculate_nextcheck(um_handle, timer, now,
+					timer->triggerid)))
+			{
+				timer->eval_ts = timer->check_ts;
+			}
+		}
+	}
+
+	zbx_dc_close_user_macros(um_handle);
+
+	WRLOCK_CACHE;
+	dc_reschedule_trigger_timers(timers, now);
+	UNLOCK_CACHE;
 }
 
 /******************************************************************************
@@ -13299,43 +13336,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() '%s'", __func__, *text);
 
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: reschedule trigger timers while locking configuration cache       *
- *                                                                            *
- * Comments: Triggers are unlocked by DCconfig_unlock_triggers()              *
- *                                                                            *
- ******************************************************************************/
-void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
-{
-	int			i;
-	zbx_dc_um_handle_t	*um_handle;
-
-	um_handle = zbx_dc_open_user_macros();
-
-	/* calculate new execution/evaluation time for the evaluated triggers */
-	/* (timers with reset execution time)                                 */
-	for (i = 0; i < timers->values_num; i++)
-	{
-		zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)timers->values[i];
-
-		if (0 == timer->check_ts.sec)
-		{
-			if (0 != (timer->check_ts.sec = dc_function_calculate_nextcheck(um_handle, timer, now,
-					timer->triggerid)))
-			{
-				timer->eval_ts = timer->check_ts;
-			}
-		}
-	}
-
-	zbx_dc_close_user_macros(um_handle);
-
-	WRLOCK_CACHE;
-	dc_reschedule_trigger_timers(timers, now);
-	UNLOCK_CACHE;
 }
 
 typedef struct
