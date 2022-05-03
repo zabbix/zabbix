@@ -8514,6 +8514,28 @@ void	DCconfig_get_hosts_by_itemids(DC_HOST *hosts, const zbx_uint64_t *itemids, 
 	UNLOCK_CACHE;
 }
 
+void	DCconfig_get_hosts_by_hostids(DC_HOST *hosts, const zbx_uint64_t *hostids, int *errcodes, int num)
+{
+	int			i;
+	const ZBX_DC_HOST	*dc_host;
+
+	RDLOCK_CACHE;
+
+	for (i = 0; i < num; i++)
+	{
+		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostids[i])))
+		{
+			errcodes[i] = FAIL;
+			continue;
+		}
+
+		DCget_host(&hosts[i], dc_host, ZBX_ITEM_GET_ALL);
+		errcodes[i] = SUCCEED;
+	}
+
+	UNLOCK_CACHE;
+}
+
 int	DCconfig_trigger_exists(zbx_uint64_t triggerid)
 {
 	int	ret = SUCCEED;

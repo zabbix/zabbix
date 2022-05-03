@@ -4768,12 +4768,39 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 
 		if (0 != host_avails.values_num)
 		{
-			unsigned char		*data = NULL;
-			zbx_uint32_t		data_len;
+			unsigned char			*data = NULL;
+			zbx_uint32_t			data_len;
+			DC_HOST				*hosts;
+			int				i, hosts_num, *errcodes;
+			zbx_vector_uint64_t		hostids;
+			zbx_vector_proxy_hostdata_ptr_t	proxy_host_avails;
 
-			data_len = zbx_availability_serialize_proxy_hostdata(&data, &host_avails, proxy->hostid);
+			zbx_vector_uint64_create(&hostids);
+
+			for (i = 0; i < host_avails.values_num; i++)
+				zbx_vector_uint64_append(&hostids, host_avails.values[i]->hostid);
+
+			hosts = (DC_HOST *)zbx_malloc(NULL, sizeof(DC_HOST) * host_avails.values_num);
+			errcodes = (int *)zbx_malloc(NULL, sizeof(int) * host_avails.values_num);
+			DCconfig_get_hosts_by_hostids(hosts, hostids.values, errcodes, hostids.values_num);
+
+			zbx_vector_uint64_destroy(&hostids);
+
+			zbx_vector_proxy_hostdata_ptr_create(&proxy_host_avails);
+
+			for (i = 0; i < host_avails.values_num; i++)
+			{
+				if (SUCCEED == errcodes[i] && hosts[i].proxy_hostid == proxy->hostid)
+					zbx_vector_proxy_hostdata_ptr_append(&proxy_host_avails, host_avails.values[i]);
+			}
+
+			zbx_free(errcodes);
+			zbx_free(hosts);
+
+			data_len = zbx_availability_serialize_proxy_hostdata(&data, &proxy_host_avails, proxy->hostid);
 			zbx_availability_send(ZBX_IPC_AVAILMAN_PROCESS_PROXY_HOSTDATA, data, data_len, NULL);
 
+			zbx_vector_proxy_hostdata_ptr_destroy(&proxy_host_avails);
 			zbx_vector_proxy_hostdata_ptr_clear_ext(&host_avails, (zbx_proxy_hostdata_ptr_free_func_t)zbx_ptr_free);
 			zbx_free(data);
 		}
