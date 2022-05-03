@@ -46,25 +46,25 @@
 			form
 				.querySelector('.js-refresh-proxy-config')
 				.addEventListener('click', (e) => {
-					this._refreshConfig(e.target, Object.values(chkbxRange.getSelectedIds()));
+					this._refreshConfig(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				});
 
 			form
 				.querySelector('.js-massenable-proxy-host')
 				.addEventListener('click', (e) => {
-					this._enableHosts(e.target, Object.values(chkbxRange.getSelectedIds()));
+					this._enableHosts(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				});
 
 			form
 				.querySelector('.js-massdisable-proxy-host')
 				.addEventListener('click', (e) => {
-					this._disableHosts(e.target, Object.values(chkbxRange.getSelectedIds()));
+					this._disableHosts(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				});
 
 			form
 				.querySelector('.js-massdelete-proxy')
 				.addEventListener('click', (e) => {
-					this._delete(e.target, Object.values(chkbxRange.getSelectedIds()));
+					this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				});
 		}
 

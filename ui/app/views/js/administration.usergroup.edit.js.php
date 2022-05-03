@@ -37,6 +37,8 @@
 			$ms_tag_filter_groups                = $new_tag_filter_table.find('.multiselect'),
 			$ms_group_right_groups               = $new_group_right_table.find('.multiselect'),
 			$ms_templategroup_right_groups       = $new_templategroup_right_table.find('.multiselect'),
+			$userdirectory                       = $form.find('[name="userdirectoryid"]'),
+			$gui_access                          = $form.find('[name="gui_access"]'),
 			timeoutid_new_group_right,
 			timeoutid_new_templategroup_right,
 			timeoutid_new_tag_filter,
@@ -44,9 +46,26 @@
 			xhr_new_templategroup_right,
 			xhr_new_tag_filter;
 
+		$gui_access.on('change', onFrontendAccessChange);
+		onFrontendAccessChange.apply($gui_access);
+
 		$form.submit(function() {
 			$form.trimValues(['#name']);
 		});
+
+		/**
+		 * Handle "Frontend access" selector change.
+		 */
+		function onFrontendAccessChange() {
+			let gui_access = $(this).val();
+
+			if (gui_access == <?= GROUP_GUI_ACCESS_INTERNAL ?> || gui_access == <?= GROUP_GUI_ACCESS_DISABLED ?>) {
+				$userdirectory.attr('disabled', 'disabled');
+			}
+			else {
+				$userdirectory.removeAttr('disabled');
+			}
+		}
 
 		/**
 		 * Collects data.

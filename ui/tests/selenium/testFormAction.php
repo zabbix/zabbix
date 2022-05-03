@@ -1483,6 +1483,7 @@ class testFormAction extends CLegacyWebTest {
 				$condition_form = $this->query('id:popup.condition')->asForm()->one();
 				$condition_form->fill($condition);
 				$condition_form->submit();
+				COverlayDialogElement::ensureNotPresent();
 			}
 		}
 

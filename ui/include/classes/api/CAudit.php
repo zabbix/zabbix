@@ -83,7 +83,9 @@ class CAudit {
 	public const RESOURCE_SCHEDULED_REPORT = 46;
 	public const RESOURCE_HA_NODE = 47;
 	public const RESOURCE_SLA = 48;
-	public const RESOURCE_TEMPLATE_GROUP = 49;
+	public const RESOURCE_USERDIRECTORY = 49;
+	public const RESOURCE_TEMPLATE_GROUP = 50;
+
 
 	/**
 	 * Audit details actions.
@@ -136,6 +138,7 @@ class CAudit {
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'dashboard',
 		self::RESOURCE_TEMPLATE_GROUP => 'hstgrp',
 		self::RESOURCE_USER => 'users',
+		self::RESOURCE_USERDIRECTORY => 'userdirectory',
 		self::RESOURCE_USER_GROUP => 'usrgrp'
 	];
 
@@ -185,6 +188,7 @@ class CAudit {
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'name',
 		self::RESOURCE_TEMPLATE_GROUP => 'name',
 		self::RESOURCE_USER => 'username',
+		self::RESOURCE_USERDIRECTORY => 'name',
 		self::RESOURCE_USER_GROUP => 'name'
 	];
 
@@ -223,6 +227,7 @@ class CAudit {
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'templatedashboard',
 		self::RESOURCE_TEMPLATE_GROUP => 'templategroup',
 		self::RESOURCE_USER => 'user',
+		self::RESOURCE_USERDIRECTORY => 'userdirectory',
 		self::RESOURCE_USER_GROUP => 'usergroup'
 	];
 
@@ -252,7 +257,8 @@ class CAudit {
 			'paths' => ['template.macros.value'],
 			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
 		],
-		self::RESOURCE_USER => ['paths' => ['user.passwd']]
+		self::RESOURCE_USER => ['paths' => ['user.passwd']],
+		self::RESOURCE_USERDIRECTORY => ['paths' => ['userdirectory.bind_dn', 'userdirectory.bind_password']]
 	];
 
 	/**

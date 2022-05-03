@@ -72,6 +72,7 @@ class CRoleHelper {
 	public const ACTIONS_MANAGE_API_TOKENS = 'actions.manage_api_tokens';
 	public const ACTIONS_MANAGE_SCHEDULED_REPORTS = 'actions.manage_scheduled_reports';
 	public const ACTIONS_MANAGE_SLA = 'actions.manage_sla';
+	public const ACTIONS_INVOKE_EXECUTE_NOW = 'actions.invoke_execute_now';
 
 	public const UI_SECTION_MONITORING = 'ui.monitoring';
 	public const UI_SECTION_SERVICES = 'ui.services';
@@ -290,6 +291,8 @@ class CRoleHelper {
 			$rules[] = self::ACTIONS_MANAGE_SLA;
 		}
 
+		$rules[] = self::ACTIONS_INVOKE_EXECUTE_NOW;
+
 		return $rules;
 	}
 
@@ -475,6 +478,10 @@ class CRoleHelper {
 				self::ACTIONS_MANAGE_SLA => _('Manage SLA')
 			];
 		}
+
+		$labels += [
+			self::ACTIONS_INVOKE_EXECUTE_NOW => _('Invoke "Execute now" on read-only hosts')
+		];
 
 		return $labels;
 	}

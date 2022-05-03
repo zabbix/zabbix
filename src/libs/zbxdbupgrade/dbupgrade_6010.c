@@ -140,6 +140,147 @@ out:
 	return ret;
 }
 
+static int	DBpatch_6010006(void)
+{
+	const ZBX_TABLE	table =
+		{"userdirectory", "userdirectoryid", 0,
+			{
+				{"userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"description", "", NULL, NULL, 255, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{"host", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"port", "389", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"base_dn", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"bind_dn", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"bind_password", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"search_attribute", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"start_tls", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"search_filter", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6010007(void)
+{
+	const ZBX_FIELD	field = {"ldap_userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6010008(void)
+{
+	const ZBX_FIELD	field = {"ldap_userdirectoryid", NULL, "userdirectory", "userdirectoryid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("config", 3, &field);
+}
+
+static int	DBpatch_6010009(void)
+{
+	return DBcreate_index("config", "config_3", "ldap_userdirectoryid", 0);
+}
+
+static int	DBpatch_6010010(void)
+{
+	const ZBX_FIELD	field = {"userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("usrgrp", &field);
+}
+
+static int	DBpatch_6010011(void)
+{
+	const ZBX_FIELD	field = {"userdirectoryid", NULL, "userdirectory", "userdirectoryid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("usrgrp", 2, &field);
+}
+
+static int	DBpatch_6010012(void)
+{
+	return DBcreate_index("usrgrp", "usrgrp_2", "userdirectoryid", 0);
+}
+
+static int	DBpatch_6010013(void)
+{
+	int		rc = ZBX_DB_OK;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	if (NULL == (result = DBselect("select ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,"
+			"ldap_bind_password,ldap_search_attribute"
+			" from config where ldap_configured=1")))
+	{
+		return FAIL;
+	}
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		char	*base_dn_esc, *bind_dn_esc, *password_esc, *search_esc;
+
+		base_dn_esc = DBdyn_escape_string(row[2]);
+		bind_dn_esc = DBdyn_escape_string(row[3]);
+		password_esc = DBdyn_escape_string(row[4]);
+		search_esc = DBdyn_escape_string(row[5]);
+
+		rc = DBexecute("insert into userdirectory (userdirectoryid,name,description,host,port,"
+				"base_dn,bind_dn,bind_password,search_attribute,start_tls) values "
+				"(1,'Default LDAP server','','%s',%s,'%s','%s','%s','%s',%d)",
+				row[0], row[1], base_dn_esc, bind_dn_esc, password_esc, search_esc, 0);
+
+		zbx_free(search_esc);
+		zbx_free(password_esc);
+		zbx_free(bind_dn_esc);
+		zbx_free(base_dn_esc);
+	}
+
+	DBfree_result(result);
+
+	if (ZBX_DB_OK > rc)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6010014(void)
+{
+	if (ZBX_DB_OK > DBexecute("update config set ldap_userdirectoryid=1 where ldap_configured=1"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6010015(void)
+{
+	return DBdrop_field("config", "ldap_host");
+}
+
+static int	DBpatch_6010016(void)
+{
+	return DBdrop_field("config", "ldap_port");
+}
+
+static int	DBpatch_6010017(void)
+{
+	return DBdrop_field("config", "ldap_base_dn");
+}
+
+static int	DBpatch_6010018(void)
+{
+	return DBdrop_field("config", "ldap_bind_dn");
+}
+
+static int	DBpatch_6010019(void)
+{
+	return DBdrop_field("config", "ldap_bind_password");
+}
+
+static int	DBpatch_6010020(void)
+{
+	return DBdrop_field("config", "ldap_search_attribute");
+}
+
 #define DBPATCH_HOST_STATUS_TEMPLATE	"3"
 #define DBPATCH_GROUPIDS(cmp)									\
 		"select distinct g.groupid"							\
@@ -162,35 +303,35 @@ hstgrp_t;
 ZBX_PTR_VECTOR_DECL(hstgrp, hstgrp_t *)
 ZBX_PTR_VECTOR_IMPL(hstgrp, hstgrp_t *)
 
-static int	DBpatch_6010006(void)
+static int	DBpatch_6010021(void)
 {
 	return DBdrop_field("hstgrp", "internal");
 }
 
-static int	DBpatch_6010007(void)
+static int	DBpatch_6010022(void)
 {
 	const ZBX_FIELD	field = {"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hstgrp", &field);
 }
 
-static int	DBpatch_6010008(void)
+static int	DBpatch_6010023(void)
 {
 	return DBdrop_index("hstgrp", "hstgrp_1");
 }
 
-static int	DBpatch_6010009(void)
+static int	DBpatch_6010024(void)
 {
 	return DBcreate_index("hstgrp", "hstgrp_1", "type,name", 1);
 }
 
-static void	DBpatch_6010010_hstgrp_free(hstgrp_t *hstgrp)
+static void	DBpatch_6010025_hstgrp_free(hstgrp_t *hstgrp)
 {
 	zbx_free(hstgrp->name);
 	zbx_free(hstgrp->uuid);
 }
 
-static int	DBpatch_6010010_split_groups(void)
+static int	DBpatch_6010025_split_groups(void)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -285,21 +426,21 @@ out:
 	DBfree_result(result);
 	zbx_free(sql);
 
-	zbx_vector_hstgrp_clear_ext(&hstgrps, DBpatch_6010010_hstgrp_free);
+	zbx_vector_hstgrp_clear_ext(&hstgrps, DBpatch_6010025_hstgrp_free);
 	zbx_vector_hstgrp_destroy(&hstgrps);
 
 	return ret;
 }
 
-static int	DBpatch_6010010(void)
+static int	DBpatch_6010025(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	return DBpatch_6010010_split_groups();
+	return DBpatch_6010025_split_groups();
 }
 
-static int	DBpatch_6010011(void)
+static int	DBpatch_6010026(void)
 {
 	int	ret = SUCCEED;
 
@@ -316,7 +457,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6010012_update_empty_parents(void)
+static int	DBpatch_6010027_update_empty_parents(void)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -374,15 +515,15 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6010012(void)
+static int	DBpatch_6010027(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	return DBpatch_6010012_update_empty_parents();
+	return DBpatch_6010027_update_empty_parents();
 }
 
-static int	DBpatch_6010013_update_empty_children(void)
+static int	DBpatch_6010028_update_empty_children(void)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -441,12 +582,12 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6010013(void)
+static int	DBpatch_6010028(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	return DBpatch_6010013_update_empty_children();
+	return DBpatch_6010028_update_empty_children();
 }
 #endif
 
@@ -468,5 +609,20 @@ DBPATCH_ADD(6010010, 0, 1)
 DBPATCH_ADD(6010011, 0, 1)
 DBPATCH_ADD(6010012, 0, 1)
 DBPATCH_ADD(6010013, 0, 1)
+DBPATCH_ADD(6010014, 0, 1)
+DBPATCH_ADD(6010015, 0, 1)
+DBPATCH_ADD(6010016, 0, 1)
+DBPATCH_ADD(6010017, 0, 1)
+DBPATCH_ADD(6010018, 0, 1)
+DBPATCH_ADD(6010019, 0, 1)
+DBPATCH_ADD(6010020, 0,	1)
+DBPATCH_ADD(6010021, 0,	1)
+DBPATCH_ADD(6010022, 0,	1)
+DBPATCH_ADD(6010023, 0,	1)
+DBPATCH_ADD(6010024, 0,	1)
+DBPATCH_ADD(6010025, 0,	1)
+DBPATCH_ADD(6010026, 0,	1)
+DBPATCH_ADD(6010027, 0,	1)
+DBPATCH_ADD(6010028, 0,	1)
 
 DBPATCH_END()

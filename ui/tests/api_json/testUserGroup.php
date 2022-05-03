@@ -22,6 +22,8 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
+ * @onBefore  prepareTestData
+ *
  * @backup usrgrp
  */
 class testUserGroup extends CAPITest {
@@ -760,5 +762,182 @@ class testUserGroup extends CAPITest {
 	public function testUserGroup_UserPermissions($method, $user, $group, $expected_error) {
 		$this->authorize($user['user'], $user['password']);
 		$this->call($method, $group, $expected_error);
+	}
+
+	public static function crateValidDataProvider() {
+		return [
+			'Create group with userdirectory ldap' => [
+				'group' => [
+					[
+						'name' => 'API group ldap #1',
+						'gui_access' =>  GROUP_GUI_ACCESS_LDAP,
+						'userdirectoryid' => 'API LDAP #1'
+					]
+				],
+				'expected_error' => null
+			],
+			'Create group with default userdirectory ldap' => [
+				'group' => [
+					[
+						'name' => 'API group ldap #2',
+						'gui_access' =>  GROUP_GUI_ACCESS_LDAP,
+						'userdirectoryid' => 0
+					]
+				],
+				'expected_error' => null
+			],
+			'Create group with userdirectory system' => [
+				'group' => [
+					[
+						'name' => 'API group ldap #3',
+						'gui_access' =>  GROUP_GUI_ACCESS_SYSTEM,
+						'userdirectoryid' => 'API LDAP #1'
+					]
+				],
+				'expected_error' => null
+			],
+			'Create group with default userdirectory system' => [
+				'group' => [
+					[
+						'name' => 'API group ldap #4',
+						'gui_access' =>  GROUP_GUI_ACCESS_SYSTEM,
+						'userdirectoryid' => 0
+					]
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	public static function crateInvalidDataProvider() {
+		return [
+			'Create group with userdirectory disabled' => [
+				'group' => [
+					[
+						'name' => 'API group ldap #5',
+						'gui_access' =>  GROUP_GUI_ACCESS_DISABLED,
+						'userdirectoryid' => 'API LDAP #1'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "userdirectoryid".'
+			],
+			'Create group with default userdirectory internal' => [
+				'group' => [
+					[
+						'name' => 'API group ldap #5',
+						'gui_access' =>  GROUP_GUI_ACCESS_INTERNAL,
+						'userdirectoryid' => 'API LDAP #1'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "userdirectoryid".'
+			]
+		];
+	}
+
+	/**
+	* @dataProvider crateValidDataProvider
+	* @dataProvider crateInvalidDataProvider
+	*/
+	public function testCreateWithUserdirectory(array $groups, $expected_error) {
+		$response = $this->call('usergroup.create', self::resolveIds($groups), $expected_error);
+
+		if ($expected_error === null) {
+			$this->assertArrayHasKey('usrgrpids', $response['result']);
+			self::$data['usrgrpid'] += array_combine(array_column($groups, 'name'), $response['result']['usrgrpids']);
+		}
+	}
+
+	public static function updateValidDataProvider() {
+		return [
+			'Update group to gui internal' => [
+				'group' => [
+					[
+						'usrgrpid' => 'API group ldap #1',
+						'gui_access' =>  GROUP_GUI_ACCESS_INTERNAL
+					]
+				],
+				'expected_error' => null
+			],
+			'Update group to gui ldap with userdirectory' => [
+				'group' => [
+					[
+						'usrgrpid' => 'API group ldap #1',
+						'gui_access' =>  GROUP_GUI_ACCESS_LDAP,
+						'userdirectoryid' => 'API LDAP #1'
+					]
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	public static function updateInvalidDataProvider() {
+		return [
+			'Update group with gui internal' => [
+				'group' => [
+					[
+						'usrgrpid' => 'API group ldap #1',
+						'gui_access' =>  GROUP_GUI_ACCESS_INTERNAL,
+						'userdirectoryid' => 'API LDAP #1'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "userdirectoryid".'
+			],
+			'Update group with gui disabled' => [
+				'group' => [
+					[
+						'usrgrpid' => 'API group ldap #1',
+						'gui_access' =>  GROUP_GUI_ACCESS_DISABLED,
+						'userdirectoryid' => 'API LDAP #1'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "userdirectoryid".'
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider updateValidDataProvider
+	 * @dataProvider updateInvalidDataProvider
+	 */
+	public function testUpdateWithUserdirectory(array $groups, $expected_error) {
+		$this->call('usergroup.update', self::resolveIds($groups), $expected_error);
+	}
+
+	public static $data = [
+		'usrgrpid' => [],
+		'userdirectoryid' => []
+	];
+
+	/**
+	 * Replace name by value for property names in self::$data.
+	 *
+	 * @param array $rows
+	 */
+	public static function resolveIds(array $rows): array {
+		$result = [];
+
+		foreach ($rows as $row) {
+			foreach (array_intersect_key(self::$data, $row) as $key => $ids) {
+				if (array_key_exists($row[$key], $ids)) {
+					$row[$key] = $ids[$row[$key]];
+				}
+			}
+
+			$result[] = $row;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Create data to be used in tests.
+	 */
+	public function prepareTestData() {
+		$response = CDataHelper::call('userdirectory.create', [
+			['name' => 'API LDAP #1', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid']
+		]);
+		$this->assertArrayHasKey('userdirectoryids', $response);
+		self::$data['userdirectoryid'] = array_combine(['API LDAP #1'], $response['userdirectoryids']);
 	}
 }

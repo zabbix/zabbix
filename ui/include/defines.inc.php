@@ -22,8 +22,7 @@ define('ZABBIX_VERSION',		'6.2.0beta1');
 define('ZABBIX_API_VERSION',	'6.2.0');
 define('ZABBIX_EXPORT_VERSION',	'6.2');
 
-
-define('ZABBIX_DB_VERSION',		6010013);
+define('ZABBIX_DB_VERSION',		6010028);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -140,6 +139,8 @@ define('ZBX_AUTH_FORM_ZABBIX',	0);
 define('ZBX_AUTH_FORM_HTTP',	1);
 define('ZBX_AUTH_CASE_INSENSITIVE',	0);
 define('ZBX_AUTH_CASE_SENSITIVE',	1);
+define('ZBX_AUTH_START_TLS_OFF',	0);
+define('ZBX_AUTH_START_TLS_ON',		1);
 
 // password policy
 define('PASSWD_CHECK_CASE', 0x01);
@@ -2057,6 +2058,7 @@ define('ZBX_STYLE_ZABBIX_LOGO', 'zabbix-logo');
 define('ZBX_STYLE_ZABBIX_SIDEBAR_LOGO', 'zabbix-sidebar-logo');
 define('ZBX_STYLE_ZABBIX_SIDEBAR_LOGO_COMPACT', 'zabbix-sidebar-logo-compact');
 define('ZBX_STYLE_WIDGET_ITEM_LABEL', 'widget-item-label');
+define('ZBX_STYLE_DEFAULT_OPTION', 'default-option');
 
 // HTML column layout.
 define('ZBX_STYLE_COLUMNS', 'columns-wrapper');

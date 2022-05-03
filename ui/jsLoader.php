@@ -365,6 +365,7 @@ $translate_strings = [
 		'Delete' => _('Delete'),
 		'Delete dashboard?' => _('Delete dashboard?'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
+		'Execute now' => _('Execute now'),
 		'Item' => _('Item'),
 		'Insert expression' => _('Insert expression'),
 		'Sharing' => _('Sharing'),
