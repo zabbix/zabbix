@@ -175,7 +175,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 						 * In case there is a numeric value, for example 0.001234 and decimal places are set to 2,
 						 * convertUnitsRaw would return 0.0012, however in this widget we need to show the exact
 						 * number. So we convert the value again which results in 0.00. In case decimal places are set
-						 * to 10 (maximum), the value will be converted to 0.0012000000.
+						 * to 10 (maximum), the value will be converted to 0.0012340000.
 						 */
 						if ($raw_units['is_numeric']) {
 							$value = self::convertNumeric($value, $fields['decimal_places'], $value_type);
@@ -338,7 +338,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 	 *
 	 * @param string $value       Value to convert.
 	 * @param int    $decimals    Number of decimal places.
-	 * @param string $value_type  Item value type
+	 * @param string $value_type  Item value type.
 	 *
 	 * @return string
 	 */
