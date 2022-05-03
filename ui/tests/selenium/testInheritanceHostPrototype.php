@@ -574,8 +574,8 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		}
 
 		$sql = 'SELECT macro,type,value,description FROM hostmacro WHERE hostid=%d ORDER BY hostmacroid';
-		$this->assertSame(CDBHelper::getHash(vsprintf($sql, $template_prototype_id)),
-			CDBHelper::getHash(vsprintf($sql, $host_prototype_id))
+		$this->assertSame(CDBHelper::getHash(vsprintf($sql, [$template_prototype_id])),
+			CDBHelper::getHash(vsprintf($sql, [$host_prototype_id]))
 		);
 	}
 
