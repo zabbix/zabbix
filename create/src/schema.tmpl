@@ -94,6 +94,7 @@ INDEX		|2		|status
 INDEX		|3		|proxy_hostid
 INDEX		|4		|name
 INDEX		|5		|maintenanceid
+CHANGELOG
 
 TABLE|hstgrp|groupid|ZBX_DATA
 FIELD		|groupid	|t_id		|	|NOT NULL	|0
@@ -271,6 +272,7 @@ INDEX		|5		|valuemapid
 INDEX		|6		|interfaceid
 INDEX		|7		|master_itemid
 INDEX		|8		|key_(768)
+CHANGELOG
 
 TABLE|httpstepitem|httpstepitemid|ZBX_TEMPLATE
 FIELD		|httpstepitemid	|t_id		|	|NOT NULL	|0
@@ -624,6 +626,7 @@ FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
 INDEX		|1		|status
 INDEX		|2		|value,lastchange
 INDEX		|3		|templateid
+CHANGELOG
 
 TABLE|trigger_depends|triggerdepid|ZBX_TEMPLATE
 FIELD		|triggerdepid	|t_id		|	|NOT NULL	|0
@@ -640,6 +643,7 @@ FIELD		|name		|t_varchar(12)	|''	|NOT NULL	|0
 FIELD		|parameter	|t_varchar(255)	|'0'	|NOT NULL	|0
 INDEX		|1		|triggerid
 INDEX		|2		|itemid,name,parameter
+CHANGELOG
 
 TABLE|graphs|graphid|ZBX_TEMPLATE
 FIELD		|graphid	|t_id		|	|NOT NULL	|0
@@ -1356,6 +1360,7 @@ FIELD		|triggerid	|t_id		|	|NOT NULL	|0			|1|triggers
 FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|triggerid
+CHANGELOG
 
 TABLE|event_tag|eventtagid|0
 FIELD		|eventtagid	|t_id		|	|NOT NULL	|0
@@ -1656,6 +1661,7 @@ FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
 FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|hostid
+CHANGELOG
 
 TABLE|config_autoreg_tls|autoreg_tlsid|ZBX_DATA
 FIELD		|autoreg_tlsid	|t_id		|	|NOT NULL	|0
@@ -1800,6 +1806,7 @@ FIELD		|itemid		|t_id		|	|NOT NULL	|0			|1|items
 FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|itemid
+CHANGELOG
 
 TABLE|httptest_tag|httptesttagid|ZBX_TEMPLATE
 FIELD		|httptesttagid	|t_id		|	|NOT NULL	|0

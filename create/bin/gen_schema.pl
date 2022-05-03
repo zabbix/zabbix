@@ -21,8 +21,8 @@ use File::Basename;
 
 my $file = dirname($0)."/../src/schema.tmpl";	# name the file
 
-my ($state, %output, $eol, $fk_bol, $fk_eol, $ltab, $pkey, $table_name);
-my ($szcol1, $szcol2, $szcol3, $szcol4, $sequences, $sql_suffix);
+my ($state, %output, $eol, $fk_bol, $fk_eol, $ltab, $pkey, $table_name, $pkey_name);
+my ($szcol1, $szcol2, $szcol3, $szcol4, $sequences, $sql_suffix, $triggers);
 my ($fkeys, $fkeys_prefix, $fkeys_suffix, $uniq);
 
 my %c = (
@@ -209,7 +209,7 @@ sub process_table
 
 	newstate("table");
 
-	($table_name, $pkey, $flags) = split(/\|/, $line, 3);
+	($table_name, $pkey_name, $flags) = split(/\|/, $line, 3);
 
 	if ($output{"type"} eq "code")
 	{
@@ -234,9 +234,13 @@ sub process_table
 	}
 	else
 	{
-		if ($pkey ne "")
+		if ($pkey_name ne "")
 		{
-			$pkey = ",${eol}\n${ltab}PRIMARY KEY (${pkey})";
+			$pkey = ",${eol}\n${ltab}PRIMARY KEY (${pkey_name})";
+		}
+		else
+		{
+			$pkey = ""
 		}
 
 		if ($output{"database"} eq "mysql")
@@ -401,7 +405,7 @@ sub process_field
 				$sequences = "${sequences}BEFORE INSERT ON ${table_name}${eol}\n";
 				$sequences = "${sequences}FOR EACH ROW${eol}\n";
 				$sequences = "${sequences}BEGIN${eol}\n";
-				$sequences = "${sequences}SELECT ${table_name}_seq.nextval INTO :new.id FROM dual;${eol}\n";
+				$sequences = "${sequences}SELECT ${table_name}_seq.nextval INTO :new.${name} FROM dual;${eol}\n";
 				$sequences = "${sequences}END;${eol}\n/${eol}\n";
 			}
 		}
@@ -697,6 +701,192 @@ sub usage
 	exit;
 }
 
+sub unix_timestamp
+{
+	if ($output{"database"} eq "mysql")
+	{
+		return "UNIX_TIMESTAMP()";
+	}
+	if ($output{"database"} eq "oracle")
+	{
+		return "(CAST(SYS_EXTRACT_UTC(SYSTIMESTAMP) AS DATE)-DATE'1970-01-01')*86400";
+	}
+	if ($output{"database"} eq "postgresql")
+	{
+		return "CAST(EXTRACT(EPOCH FROM NOW()) AS INT)";
+	}
+	if ($output{"database"} eq "sqlite3")
+	{
+		return "CAST(STRFTIME('%s', 'NOW') AS INTEGER)";
+	}
+}
+
+sub table_type
+{
+	if (${table_name} eq "hosts")
+	{
+		return 1;
+	}
+	if (${table_name} eq "host_tag")
+	{
+		return 2;
+	}
+	if (${table_name} eq "items")
+	{
+		return 3;
+	}
+	if (${table_name} eq "item_tag")
+	{
+		return 4;
+	}
+	if (${table_name} eq "triggers")
+	{
+		return 5;
+	}
+	if (${table_name} eq "trigger_tag")
+	{
+		return 6;
+	}
+	if (${table_name} eq "functions")
+	{
+		return 7;
+	}
+}
+
+sub open_trigger
+{
+	my ($type) = @_;
+	my ($out);
+	
+	$out = "CREATE TRIGGER ${table_name}_${type}${eol}\n";
+	if ($type eq "insert")
+	{
+		$out = "${out}BEFORE INSERT";
+	}
+	elsif ($type eq "update")
+	{
+		$out = "${out}AFTER UPDATE";
+	}
+	elsif ($type eq "delete")
+	{
+		$out = "${out}AFTER DELETE";
+	}
+	
+	$out = "${out} ON ${table_name}${eol}\n";
+	$out = "${out}FOR EACH ROW${eol}\n";
+	
+	if ($output{"database"} eq "mysql" || $output{"database"} eq "oracle"  || $output{"database"} eq "sqlite3")
+	{
+		$out = "${out}BEGIN${eol}\n";
+		$out = "${out}INSERT INTO changelog (object,objectid,operation,clock)${eol}\n";
+	}
+	elsif ($output{"database"} eq "postgresql")
+	{
+		$out = "${out}execute procedure changelog_${table_name}_${type}();${eol}\n";
+	}
+	
+	return $out;
+}
+
+sub close_trigger
+{
+	if ($output{"database"} eq "mysql")
+	{
+		return "END\$\$${eol}\n";
+	}
+	elsif ($output{"database"} eq "postgresql")
+	{
+		return "";
+	}
+	elsif ($output{"database"} eq "oracle")
+	{
+		return "END;${eol}\n/${eol}\n";
+	}
+	elsif ($output{"database"} eq "sqlite3")
+	{
+		return "END;${eol}\n";
+	}
+}
+
+sub open_function
+{
+	my ($type) = @_;
+	my ($out);
+	
+	$out = "create or replace function changelog_${table_name}_${type}() returns trigger as \$\$${eol}\n";
+	$out = "${out}begin${eol}\n";
+	$out = "${out}insert into changelog (object,objectid,operation,clock)";
+	
+	return $out;
+}
+
+sub close_function
+{
+	my ($out);
+	
+	$out = "return new;${eol}\n";
+	$out = "${out}end;${eol}\n";
+	$out = "${out}\$\$ language plpgsql;${eol}\n";
+	
+	return $out;
+}
+
+sub process_changelog
+{
+	if ($output{"database"} eq "c")
+	{
+		return
+	}
+	elsif ($output{"database"} eq "mysql" || $output{"database"} eq "sqlite3")
+	{
+		$triggers = "${triggers}@{[open_trigger('insert')]}";
+		$triggers = "${triggers}VALUES (@{[table_type()]},new.${pkey_name},1,@{[unix_timestamp()]});${eol}\n";
+		$triggers = "${triggers}@{[close_trigger()]}";
+		
+		$triggers = "${triggers}@{[open_trigger('update')]}";
+		$triggers = "${triggers}VALUES (@{[table_type()]},old.${pkey_name},2,@{[unix_timestamp()]});${eol}\n";
+		$triggers = "${triggers}@{[close_trigger()]}";
+		
+		$triggers = "${triggers}@{[open_trigger('delete')]}";
+		$triggers = "${triggers}VALUES (@{[table_type()]},old.${pkey_name},3,@{[unix_timestamp()]});${eol}\n";
+		$triggers = "${triggers}@{[close_trigger()]}";
+	}
+	elsif ($output{"database"} eq "postgresql")
+	{
+		$triggers = "${triggers}@{[open_function('insert')]}";
+		$triggers = "${triggers} values (@{[table_type()]},new.${pkey_name},1,@{[unix_timestamp()]});${eol}\n";
+		$triggers = "${triggers}@{[close_function()]}";
+		$triggers = "${triggers}@{[open_trigger('insert')]}";
+		$triggers = "${triggers}@{[close_trigger()]}";
+		
+		$triggers = "${triggers}@{[open_function('update')]}";
+		$triggers = "${triggers} values (@{[table_type()]},old.${pkey_name},2,@{[unix_timestamp()]});${eol}\n";
+		$triggers = "${triggers}@{[close_function()]}";
+		$triggers = "${triggers}@{[open_trigger('update')]}";
+		$triggers = "${triggers}@{[close_trigger()]}";
+		
+		$triggers = "${triggers}@{[open_function('delete')]}";
+		$triggers = "${triggers} values (@{[table_type()]},old.${pkey_name},3,@{[unix_timestamp()]});${eol}\n";
+		$triggers = "${triggers}@{[close_function()]}";
+		$triggers = "${triggers}@{[open_trigger('delete')]}";
+		$triggers = "${triggers}@{[close_trigger()]}";
+	}
+	elsif ($output{"database"} eq "oracle")
+	{
+		$triggers = "${triggers}@{[open_trigger('insert')]}";
+		$triggers = "${triggers}VALUES (@{[table_type()]},:new.${pkey_name},1,@{[unix_timestamp()]});${eol}\n";
+		$triggers = "${triggers}@{[close_trigger()]}";
+
+		$triggers = "${triggers}@{[open_trigger('update')]}";
+		$triggers = "${triggers}VALUES (@{[table_type()]},:old.${pkey_name},2,@{[unix_timestamp()]});${eol}\n";
+		$triggers = "${triggers}@{[close_trigger()]}";
+
+		$triggers = "${triggers}@{[open_trigger('delete')]}";
+		$triggers = "${triggers}VALUES (@{[table_type()]},:old.${pkey_name},3,@{[unix_timestamp()]});${eol}\n";
+		$triggers = "${triggers}@{[close_trigger()]}";
+	}
+}
+
 sub process
 {
 	print $output{"before"};
@@ -704,6 +894,7 @@ sub process
 	$state = "bof";
 	$fkeys = "";
 	$sequences = "";
+	$triggers = "";
 	$uniq = "";
 	my ($type, $line);
 
@@ -724,13 +915,26 @@ sub process
 			elsif ($type eq 'INDEX')	{ process_index($line, 0); }
 			elsif ($type eq 'TABLE')	{ process_table($line); }
 			elsif ($type eq 'UNIQUE')	{ process_index($line, 1); }
+			elsif ($type eq 'CHANGELOG')	{ process_changelog(); }
 			elsif ($type eq 'ROW' && $output{"type"} ne "code")		{ process_row($line); }
 		}
 	}
 
 	newstate("table");
 
+	if ($output{"database"} eq "mysql")
+	{
+		print "DELIMITER \$\$${eol}\n";
+	}
+
 	print $sequences.$sql_suffix;
+	print $triggers.$sql_suffix;
+	
+	if ($output{"database"} eq "mysql")
+	{
+		print "DELIMITER ;${eol}\n";
+	}
+
 	print $fkeys_prefix.$fkeys.$fkeys_suffix;
 	print $output{"after"};
 }
