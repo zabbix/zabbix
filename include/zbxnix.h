@@ -37,7 +37,7 @@ int	zbx_coredump_disable(void);
 #	error "This module allowed only for Unix OS"
 #endif
 
-typedef void (*zbx_on_exit_t)(int);
+typedef void	(*zbx_on_exit_t)(int);
 void	zbx_on_exit(int ret);
 void	zbx_fail_sig_exiting(void);
 void	zbx_succeed_sig_exiting(void);
@@ -45,7 +45,7 @@ int	ZBX_IS_RUNNING(void);
 int	ZBX_EXIT_STATUS(void);
 
 /* callback function prototype for getting PID file path */
-typedef const char* (*zbx_get_pid_file_pathname_f)(void);
+typedef const char*	(*zbx_get_pid_file_pathname_f)(void);
 
 int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
 		zbx_get_pid_file_pathname_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg);
@@ -67,7 +67,7 @@ int	zbx_shm_create(size_t size);
 int	zbx_shm_destroy(int shmid);
 
 /* data copying callback function prototype */
-typedef void (*zbx_shm_copy_func_t)(void *dst, size_t size_dst, const void *src);
+typedef void	(*zbx_shm_copy_func_t)(void *dst, size_t size_dst, const void *src);
 
 /* dynamic shared memory data structure */
 typedef struct

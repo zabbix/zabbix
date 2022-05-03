@@ -188,7 +188,8 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: set the commonly used signal handlers                             *
+ * Purpose: set the commonly used signal handlers and the callback function   *
+ *          which would run when terminating signal handler                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_set_common_signal_handlers(zbx_on_exit_t zbx_on_exit_cb_arg)

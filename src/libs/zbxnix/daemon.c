@@ -321,6 +321,8 @@ static void	set_daemon_signal_handlers(void)
  *             flags      - daemon startup flags                              *
  *        get_pid_file_cb - callback function for getting absolute path and   *
  *                          name of PID file                                  *
+ *       zbx_on_exit_cb_arg - callback function called when terminating       *
+ *                            signal handler                                  *
  *                                                                            *
  * Comments: it doesn't allow running under 'root' if allow_root is zero      *
  *                                                                            *

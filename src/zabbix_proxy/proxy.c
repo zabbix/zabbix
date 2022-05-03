@@ -1438,7 +1438,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (0 < (ret = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "PROCESS EXIT: %d", ret);
-			//sig_exiting = ZBX_EXIT_FAILURE;
 			zbx_fail_sig_exiting();
 			break;
 		}
@@ -1446,7 +1445,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (-1 == ret && EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
-			//sig_exiting = ZBX_EXIT_FAILURE;
 			zbx_fail_sig_exiting();
 			break;
 		}
@@ -1466,7 +1464,7 @@ void	zbx_on_exit(int ret)
 
 	if (NULL != threads)
 	{
-		zbx_threads_wait(threads, threads_flags, threads_num, ret);	/* wait for all child processes to exit */
+		zbx_threads_wait(threads, threads_flags, threads_num, ret); /* wait for all child processes to exit */
 		zbx_free(threads);
 		zbx_free(threads_flags);
 	}
