@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-28T14:19:08Z'
+  date: '2022-05-04T13:39:22Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1032,7 +1032,7 @@ zabbix_export:
                   value: cluster
                 -
                   tag: component
-                  value: requets
+                  value: requests
             -
               uuid: 248d268966ed4999916d77b340f82fa1
               name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Requests 3xx, rate'
@@ -1064,7 +1064,7 @@ zabbix_export:
                   value: cluster
                 -
                   tag: component
-                  value: requets
+                  value: requests
             -
               uuid: 65e956c129e2436896f1a3d46a1f9090
               name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Requests 4xx, rate'
@@ -1096,7 +1096,7 @@ zabbix_export:
                   value: cluster
                 -
                   tag: component
-                  value: requets
+                  value: requests
             -
               uuid: a85872e72792460e97d8fd322e0919a1
               name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Requests 5xx, rate'
@@ -1128,7 +1128,7 @@ zabbix_export:
                   value: cluster
                 -
                   tag: component
-                  value: requets
+                  value: requests
             -
               uuid: a06b43daf8e2493eb61d27cea8baba79
               name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Requests active'
@@ -1156,7 +1156,7 @@ zabbix_export:
                   value: cluster
                 -
                   tag: component
-                  value: requets
+                  value: requests
             -
               uuid: bd1c6766c9e047f1a40f6b1f22f00623
               name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Requests completed, rate'
@@ -1188,7 +1188,7 @@ zabbix_export:
                   value: cluster
                 -
                   tag: component
-                  value: requets
+                  value: requests
             -
               uuid: 267c3d01aa614dbdb0f0dcbe3ab2e11b
               name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Requests pending'
@@ -1216,7 +1216,7 @@ zabbix_export:
                   value: cluster
                 -
                   tag: component
-                  value: requets
+                  value: requests
             -
               uuid: 2489b20b43044020a3ace164f6049af6
               name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Requests timeout, rate'
@@ -1248,7 +1248,7 @@ zabbix_export:
                   value: cluster
                 -
                   tag: component
-                  value: requets
+                  value: requests
             -
               uuid: b807e34a608042419d69eae46aa4338c
               name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Requests total, rate'
@@ -1280,7 +1280,7 @@ zabbix_export:
                   value: cluster
                 -
                   tag: component
-                  value: requets
+                  value: requests
           graph_prototypes:
             -
               uuid: a1ecd91cb0a44c39923d4b806aae4039
