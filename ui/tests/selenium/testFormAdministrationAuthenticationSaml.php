@@ -186,7 +186,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
-			$form = $this->query('name:form_auth')->asForm()->one();
+			$form = $this->query('id:authentication-form')->asForm()->one();
 			$form->selectTab('SAML settings');
 			$this->assertTrue($form->getField('Enable SAML authentication')->isChecked());
 			// Trim trailing and leading spaces in expected values before comparison.
@@ -223,7 +223,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 		$this->assertStringContainsString('index_sso.php', $link->getAttribute('href'));
 		// Login and disable SAML authentication.
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
-		$form = $this->query('name:form_auth')->asForm()->one();
+		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->selectTab('SAML settings');
 		$form->getField('Enable SAML authentication')->uncheck();
 		$form->submit();
@@ -387,7 +387,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 	 * fills SAML settings, and submits the form.
 	 */
 	private function configureSamlAuthentication($fields, $check_enabled = false) {
-		$form = $this->query('name:form_auth')->asForm()->one();
+		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->selectTab('SAML settings');
 		// Check that SAML settings are disabled by default.
 		if ($check_enabled === true) {

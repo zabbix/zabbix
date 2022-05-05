@@ -43,6 +43,7 @@ DIST_SUBDIRS = \
 	zbxservice \
 	zbxaudit \
 	zbxeval \
+	zbxserialize \
 	zbxxml \
 	zbxha \
 	zbxrtc
@@ -75,6 +76,7 @@ SERVER_SUBDIRS = \
 	zbxservice \
 	zbxaudit \
 	zbxeval \
+	zbxserialize \
 	zbxha \
 	zbxrtc
 else
@@ -104,6 +106,7 @@ PROXY_SUBDIRS = \
 	zbxavailability \
 	zbxaudit \
 	zbxeval \
+	zbxserialize \
 	zbxrtc
 endif
 endif

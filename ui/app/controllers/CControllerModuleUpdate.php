@@ -67,12 +67,8 @@ class CControllerModuleUpdate extends CController {
 
 	protected function doAction() {
 		$set_status = ($this->getAction() === 'module.update')
-			? $this->hasInput('status')
-				? MODULE_STATUS_ENABLED
-				: MODULE_STATUS_DISABLED
-			: ($this->getAction() === 'module.enable')
-				? MODULE_STATUS_ENABLED
-				: MODULE_STATUS_DISABLED;
+			? ($this->hasInput('status') ? MODULE_STATUS_ENABLED : MODULE_STATUS_DISABLED)
+			: ($this->getAction() === 'module.enable' ? MODULE_STATUS_ENABLED : MODULE_STATUS_DISABLED);
 
 		$db_modules_update_names = [];
 

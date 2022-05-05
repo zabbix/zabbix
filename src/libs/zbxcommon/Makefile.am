@@ -3,7 +3,6 @@
 noinst_LIBRARIES = libzbxcommon.a
 
 libzbxcommon_a_SOURCES = \
-	alias.c \
 	comms.c \
 	file.c \
 	iprange.c \

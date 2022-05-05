@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -95,7 +95,7 @@ if ($data['warning']) {
 
 $output = [
 	'header' => ($data['hostid'] == 0) ? _('New host') : _('Host'),
-	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_HOST_EDIT),
+	'doc_url' => CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOST_EDIT),
 	'body' => (new CPartial('configuration.host.edit.html', $data))->getOutput(),
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('popup.host.edit.js.php').

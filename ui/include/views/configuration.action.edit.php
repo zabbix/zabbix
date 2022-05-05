@@ -97,7 +97,7 @@ if ($data['action']['filter']['conditions']) {
 				)))->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK),
 				(new CCol([
 					(new CButton('remove', _('Remove')))
-						->onClick('javascript: removeCondition('.$i.');')
+						->onClick('removeCondition('.$i.');')
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->removeId(),
 					new CVar('conditions['.$i.']', $condition)
@@ -135,12 +135,13 @@ $action_tab->addRow(new CLabel(_('Type of calculation'), 'label-evaltype'), [
 
 $condition_table->addRow([
 	(new CSimpleButton(_('Add')))
-		->onClick(
-			'return PopUp("popup.condition.actions", '.json_encode([
-				'type' => ZBX_POPUP_CONDITION_TYPE_ACTION,
-				'source' => $data['eventsource']
-			]).', {dialogue_class: "modal-popup-medium"});'
-		)
+		->setAttribute('data-eventsource', $data['eventsource'])
+		->onClick('
+			PopUp("popup.condition.actions", {
+				type: '.ZBX_POPUP_CONDITION_TYPE_ACTION.',
+				source: this.dataset.eventsource,
+			}, {dialogue_class: "modal-popup-medium"});
+		')
 		->addClass(ZBX_STYLE_BTN_LINK)
 ]);
 
@@ -299,7 +300,11 @@ if ($data['action']['operations']) {
 
 $operations_table->addRow(
 	(new CSimpleButton(_('Add')))
-		->onClick('operation_details.open(this,'.$data['actionid'].','.$data['eventsource'].','.ACTION_OPERATION.')')
+		->setAttribute('data-actionid', $data['actionid'])
+		->setAttribute('data-eventsource', $data['eventsource'])
+		->onClick('
+			operation_details.open(this, this.dataset.actionid, this.dataset.eventsource, '.ACTION_OPERATION.');
+		')
 		->addClass(ZBX_STYLE_BTN_LINK)
 );
 
@@ -365,9 +370,8 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 							])),
 						[
 							(new CButton('remove', _('Remove')))
-								->onClick(
-									'javascript: removeOperation('.$operationid.', '.ACTION_RECOVERY_OPERATION.');'
-								)
+								->setAttribute('data-operationid', $operationid)
+								->onClick('removeOperation(this.dataset.operationid, '.ACTION_RECOVERY_OPERATION.');')
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->removeId(),
 							new CVar('recovery_operations['.$operationid.']', $operation),
@@ -383,9 +387,13 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 
 	$operations_table->addRow(
 		(new CSimpleButton(_('Add')))
-			->onClick('operation_details.open(this,'.$data['actionid'].','.$data['eventsource'].','.
-				ACTION_RECOVERY_OPERATION.')'
-			)
+			->setAttribute('data-actionid', $data['actionid'])
+			->setAttribute('data-eventsource', $data['eventsource'])
+			->onClick('
+				operation_details.open(this, this.dataset.actionid, this.dataset.eventsource,
+					'.ACTION_RECOVERY_OPERATION.'
+				);
+			')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	);
 
@@ -443,7 +451,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 							])),
 						[
 							(new CButton('remove', _('Remove')))
-								->onClick('javascript: removeOperation('.$operationid.', '.ACTION_UPDATE_OPERATION.');')
+								->setAttribute('data-operationid', $operationid)
+								->onClick('removeOperation(this.dataset.operationid, '.ACTION_UPDATE_OPERATION.');')
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->removeId(),
 							new CVar('update_operations['.$operationid.']', $operation),
@@ -459,9 +468,13 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 	$operations_table->addRow(
 		(new CSimpleButton(_('Add')))
-			->onClick('operation_details.open(this,'.$data['actionid'].','.$data['eventsource'].','.
-				ACTION_UPDATE_OPERATION.')'
-			)
+			->setAttribute('data-actionid', $data['actionid'])
+			->setAttribute('data-eventsource', $data['eventsource'])
+			->onClick('
+				operation_details.open(this, this.dataset.actionid, this.dataset.eventsource,
+					'.ACTION_UPDATE_OPERATION.'
+				);
+			')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	);
 

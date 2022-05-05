@@ -23,9 +23,11 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
+use Facebook\WebDriver\WebDriverKeys;
+
 /**
  * @backup role, module, users, report, services
- *
+ * @dataSource ExecuteNowAction
  * @onBefore prepareUserData, prepareReportData, prepareServiceData
  */
 class testUserRolesPermissions extends CWebTest {
@@ -341,7 +343,7 @@ class testUserRolesPermissions extends CWebTest {
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
 			$row = $this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Test trigger with tag');
 			$row->getColumn('Ack')->query('link:No')->waitUntilClickable()->one()->click();
-			$dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 			$this->assertTrue($dialog->query('id', $data['activityid'])->one()->isEnabled($action_status));
 			$this->changeRoleRule([$data['action'] => !$action_status]);
 
@@ -1438,6 +1440,231 @@ class testUserRolesPermissions extends CWebTest {
 						->filter(new CElementFilter($property))->count()
 				);
 			}
+		}
+	}
+
+	public static function getExecuteNowButtonData() {
+		return [
+			[
+				[
+					'user' => 'U1-r-on',
+					'test_cases' => [
+						// Simple items.
+						[
+							'items' => ['I4-trap-log']
+						],
+						[
+							'expected' => TEST_GOOD,
+							'items' => ['I5-agent-txt', 'I4-trap-log'],
+							'message' => 'Request sent successfully. Some items are filtered due to access permissions or type.'
+						],
+						// Dependet items.
+						[
+							'expected' => TEST_GOOD,
+							'items' => ['I1-lvl2-dep-log'],
+							'message' => 'Request sent successfully'
+						],
+						[
+							'expected' => TEST_BAD,
+							'items' => ['I2-lvl2-dep-log'],
+							'message' => 'Cannot send request: wrong master item type.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'user' => 'U2-r-off',
+					'test_cases' => [
+						// Simple items.
+						[
+							'items' => ['I4-trap-log']
+						],
+						[
+							'items' => ['I5-agent-txt', 'I4-trap-log']
+						],
+						// Dependet items.
+						[
+							'items' => ['I1-lvl2-dep-log']
+						],
+						[
+							'items' => ['I2-lvl2-dep-log']
+						]
+					]
+				]
+			],
+			[
+				[
+					'user' => 'U3-rw-off',
+					'test_cases' => [
+						// Simple items.
+						[
+							'items' => ['I4-trap-log']
+						],
+						// Dependet items.
+						[
+							'expected' => TEST_GOOD,
+							'items' => ['I1-lvl2-dep-log', 'I4-trap-log'],
+							'message' => 'Request sent successfully. Some items are filtered due to access permissions or type.'
+						],
+						[
+							'expected' => TEST_BAD,
+							'items' => ['I2-lvl2-dep-log'],
+							'message' => 'Cannot send request: wrong master item type.'
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check permissions to "Execute now" button on Latest data page based on user role.
+	 *
+	 * @dataProvider getExecuteNowButtonData
+	 */
+	public function testUserRolesPermissions_ExecuteNowButton($data) {
+		// Login and select host group for testing.
+		$this->page->userLogin($data['user'], 'zabbixzabbix');
+		$this->page->open('zabbix.php?action=latest.view')->waitUntilReady();
+		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
+		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
+		$filter_form->submit();
+		$this->page->waitUntilReady();
+
+		$table = $this->query('xpath://table['.CXPathHelper::fromClass('overflow-ellipsis').']')->asTable()->one();
+		$selected_count = $this->query('id:selected_count')->one();
+		$select_all = $this->query('id:all_items')->asCheckbox()->one();
+
+		foreach ($data['test_cases'] as $test_case) {
+			$table->findRows('Name', $test_case['items'])->select();
+			$this->assertEquals(count($test_case['items']).' selected', $selected_count->getText());
+
+			// Disabled "Execute now" button.
+			if (!array_key_exists('expected', $test_case)) {
+				$this->assertTrue($this->query('button:Execute now')->one()->isEnabled(false));
+				// Reset selected items.
+				$select_all->check();
+				$select_all->uncheck();
+				$this->assertEquals('0 selected', $selected_count->getText());
+				continue;
+			}
+
+			$this->query('button:Execute now')->one()->click();
+
+			switch (CTestArrayHelper::get($test_case, 'expected')) {
+				case TEST_GOOD:
+					$this->assertMessage(TEST_GOOD, $test_case['message']);
+					// After a successful "Execute now" action, the item selection is reset.
+					$this->assertEquals('0 selected', $selected_count->getText());
+					break;
+
+				case TEST_BAD:
+					$this->assertMessage(TEST_BAD, 'Cannot execute operation', $test_case['message']);
+					// Reset selected items after a failed "Execute now" action.
+					$this->assertEquals(count($test_case['items']).' selected', $selected_count->getText());
+					$select_all->check();
+					$select_all->uncheck();
+					$this->assertEquals('0 selected', $selected_count->getText());
+					break;
+			}
+
+			CMessageElement::find()->waitUntilVisible()->one()->close();
+		}
+	}
+
+	public static function getExecuteNowContextMenuData() {
+		return [
+			[
+				[
+					'user' => 'U1-r-on',
+					'test_cases' => [
+						[
+							'items' => ['I4-trap-log', 'I2-lvl1-trap-num']
+						],
+						[
+							'expected' => TEST_GOOD,
+							'items' => 'I1-lvl2-dep-log'
+						],
+						[
+							'expected' => TEST_BAD,
+							'items' => 'I2-lvl2-dep-log',
+							'message' => 'Cannot send request: wrong master item type.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'user' => 'U2-r-off',
+					'test_cases' => [
+						[
+							'items' => ['I4-trap-log', 'I5-agent-txt', 'I1-lvl2-dep-log', 'I2-lvl2-dep-log']
+						]
+					]
+				]
+			],
+			[
+				[
+					'user' => 'U3-rw-off',
+					'test_cases' => [
+						[
+							'items' => ['I4-trap-log', 'I2-lvl1-trap-num']
+						],
+						[
+							'expected' => TEST_GOOD,
+							'items' => 'I1-lvl2-dep-log'
+						],
+						[
+							'expected' => TEST_BAD,
+							'items' => 'I2-lvl2-dep-log',
+							'message' => 'Cannot send request: wrong master item type.'
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check permissions to "Execute now" link in context menu on Latest data page based on user role.
+	 *
+	 * @dataProvider getExecuteNowContextMenuData
+	 */
+	public function testUserRolesPermissions_ExecuteNowContextMenu($data) {
+		// Login and select host group for testing.
+		$this->page->userLogin($data['user'], 'zabbixzabbix');
+		$this->page->open('zabbix.php?action=latest.view')->waitUntilReady();
+		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
+		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
+		$filter_form->submit();
+		$this->page->waitUntilReady();
+
+		foreach ($data['test_cases'] as $test_case) {
+			// Disabled "Execute now" option in context menu.
+			if (!array_key_exists('expected', $test_case)) {
+				foreach ($test_case['items'] as $item) {
+					$this->query('link', $item)->one()->click();
+					$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
+					$this->assertFalse($popup->getItem('Execute now')->isEnabled());
+					$this->page->pressKey(WebDriverKeys::ESCAPE);
+				}
+
+				continue;
+			}
+
+			$this->query('link', $test_case['items'])->one()->click();
+			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
+			$popup->fill('Execute now');
+
+			if ($test_case['expected'] === TEST_GOOD) {
+				$this->assertMessage(TEST_GOOD, 'Request sent successfully');
+			}
+			else {
+				$this->assertMessage(TEST_BAD, 'Cannot execute operation', $test_case['message']);
+			}
+
+			CMessageElement::find()->waitUntilVisible()->one()->close();
 		}
 	}
 

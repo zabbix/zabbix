@@ -2014,6 +2014,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			}
 
 			$column_form->waitUntilNotVisible();
+			COverlayDialogElement::find()->waitUntilReady()->one();
 		}
 	}
 
@@ -2128,10 +2129,12 @@ class testDashboardTopHostsWidget extends CWebTest {
 
 		if (array_key_exists('main_fields', $data)) {
 			$form->fill($data['main_fields']);
-			$form->submit();
-			$this->page->waitUntilReady();
 		}
 
+		$form->submit();
+		COverlayDialogElement::ensureNotPresent();
+
+		$this->page->waitUntilReady();
 		$dashboard->save();
 
 		// Check message that widget added.

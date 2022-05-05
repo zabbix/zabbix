@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -131,6 +131,7 @@ class CRouter {
 		'image.edit'								=> ['CControllerImageEdit',								'layout.htmlpage',		'administration.image.edit'],
 		'image.list'								=> ['CControllerImageList',								'layout.htmlpage',		'administration.image.list'],
 		'image.update'								=> ['CControllerImageUpdate',							null,					null],
+		'item.masscheck_now'						=> ['CControllerItemMassCheckNow',						'layout.json',			null],
 		'latest.view'								=> ['CControllerLatestView',							'layout.htmlpage',		'monitoring.latest.view'],
 		'latest.view.refresh'						=> ['CControllerLatestViewRefresh',						'layout.json',			'monitoring.latest.view.refresh'],
 		'macros.edit'								=> ['CControllerMacrosEdit',							'layout.htmlpage',		'administration.macros.edit'],
@@ -171,6 +172,10 @@ class CRouter {
 		'popup.itemtest.edit'						=> ['CControllerPopupItemTestEdit',						'layout.json',			'popup.itemtestedit.view'],
 		'popup.itemtest.getvalue'					=> ['CControllerPopupItemTestGetValue',					'layout.json',			null],
 		'popup.itemtest.send'						=> ['CControllerPopupItemTestSend',						'layout.json',			null],
+		'popup.ldap.check'							=> ['CControllerPopupLdapCheck',						'layout.json',			null],
+		'popup.ldap.edit'							=> ['CControllerPopupLdapEdit',							'layout.json',			'popup.ldap.edit'],
+		'popup.ldap.test.edit'						=> ['CControllerPopupLdapTestEdit',						'layout.json',			'popup.ldap.test.edit'],
+		'popup.ldap.test.send'						=> ['CControllerPopupLdapTestSend',						'layout.json',			null],
 		'popup.lldoperation'						=> ['CControllerPopupLldOperation',						'layout.json',			'popup.lldoperation'],
 		'popup.lldoverride'							=> ['CControllerPopupLldOverride',						'layout.json',			'popup.lldoverride'],
 		'popup.maintenance.period'					=> ['CControllerPopupMaintenancePeriod',				'layout.json',			'popup.maintenance.period'],

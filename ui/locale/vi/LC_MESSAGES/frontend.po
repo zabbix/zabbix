@@ -1317,6 +1317,10 @@ msgstr "Tại %1$s:%2$s ngày %3$s của %4$s"
 msgid "At (hour:minute)"
 msgstr "Tại (giờ: phút)"
 
+#: app/controllers/CControllerAuthenticationUpdate.php:125
+msgid "At least one LDAP server must exist."
+msgstr ""
+
 #: app/views/administration.userrole.edit.php:117
 msgid "At least one UI element must be checked."
 msgstr ""
@@ -2189,6 +2193,10 @@ msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
 msgstr[0] "Không thể xóa bảng điểu khiển"
 
+#: include/classes/api/services/CUserDirectory.php:383
+msgid "Cannot delete default user directory."
+msgstr ""
+
 #: include/classes/api/services/CTrigger.php:882
 #: include/classes/api/services/CTriggerPrototype.php:570
 msgid "Cannot delete dependency"
@@ -2407,6 +2415,11 @@ msgid "Cannot delete user"
 msgid_plural "Cannot delete users"
 msgstr[0] "Không thể xóa người dùng"
 
+#: include/classes/api/services/CUserDirectory.php:398
+#, c-format
+msgid "Cannot delete user directory \"%1$s\"."
+msgstr ""
+
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
@@ -2559,6 +2572,11 @@ msgstr[0] "Không thể kích hoạt web scenarioKhông thể kích hoạt c
 msgid "Cannot evaluate expression"
 msgstr ""
 
+#: app/controllers/CControllerItemMassCheckNow.php:243
+#: app/controllers/CControllerItemMassCheckNow.php:251
+msgid "Cannot execute operation"
+msgstr ""
+
 #: app/controllers/CControllerPopupScriptExec.php:123
 msgid "Cannot execute script."
 msgstr ""
@@ -2685,6 +2703,10 @@ msgstr ""
 #, c-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Không thể tìm thấy trigger \"%1$s\" được sử dụng trong sơ đồ \"%2$s\"."
+
+#: include/classes/api/services/CUser.php:1510
+msgid "Cannot find user directory for LDAP."
+msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:732
 #, c-format
@@ -4886,6 +4908,10 @@ msgstr "Mặc định"
 msgid "Default (%1$s)"
 msgstr ""
 
+#: app/controllers/CControllerAuthenticationUpdate.php:134
+msgid "Default LDAP server must be specified."
+msgstr ""
+
 #: app/views/administration.userrole.edit.php:123
 msgid "Default access to new UI elements"
 msgstr ""
@@ -6360,6 +6386,10 @@ msgid "End of line sequence"
 msgstr ""
 
 #: include/locales.inc.php:33
+msgid "English (en_GB)"
+msgstr ""
+
+#: include/locales.inc.php:33
 msgid "English (en_US)"
 msgstr "English (en_US)"
 
@@ -6773,6 +6803,10 @@ msgstr ""
 
 #: jsLoader.php:138
 msgid "Failed to paste widget."
+msgstr ""
+
+#: app/controllers/CControllerAuthenticationUpdate.php:390
+msgid "Failed to select default LDAP server."
 msgstr ""
 
 #: app/controllers/CControllerDashboardUpdate.php:141
@@ -9642,6 +9676,13 @@ msgstr "Địa chỉ IP \"%1$s\" không hợp lệ."
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
 msgstr "JSON không hợp lệ. Một lỗi xảy ra trên máy chủ trong khi phân tích văn bản JSON."
 
+#: app/controllers/CControllerPopupLdapCheck.php:52
+#: app/controllers/CControllerPopupLdapEdit.php:49
+#: app/controllers/CControllerPopupLdapTestEdit.php:44
+#: app/controllers/CControllerPopupLdapTestSend.php:50
+msgid "Invalid LDAP configuration"
+msgstr ""
+
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
 msgstr ""
@@ -10031,6 +10072,10 @@ msgstr "Trường kiểm kê"
 #: app/views/popup.massupdate.host.php:179
 msgid "Inventory mode"
 msgstr "Chế độ kiểm kê"
+
+#: include/classes/helpers/CRoleHelper.php:480
+msgid "Invoke \"Execute now\" on read-only hosts"
+msgstr ""
 
 #: app/views/administration.user.list.php:112
 msgid "Is online?"
@@ -10446,9 +10491,18 @@ msgstr "Korean (ko_KR)"
 msgid "LDAP"
 msgstr "LDAP"
 
+#: app/views/administration.usergroup.edit.php:88
+#: app/views/popup.ldap.edit.php:157
+msgid "LDAP Server"
+msgstr ""
+
 #: include/perm.inc.php:49
 msgid "LDAP authentication"
 msgstr "Xác thực LDAP"
+
+#: include/classes/api/services/CUser.php:1491
+msgid "LDAP authentication is disabled."
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:163
 msgid "LDAP host"
@@ -10461,6 +10515,10 @@ msgstr "LDAP không được cấu hình"
 #: app/controllers/CControllerAuthenticationUpdate.php:273
 msgid "LDAP login successful"
 msgstr "Đăng nhập LDAP thành công"
+
+#: include/classes/api/services/CAuthentication.php:171
+msgid "LDAP must be enabled"
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:336
 msgid "LDAP settings"
@@ -10761,6 +10819,10 @@ msgstr "Liên kết"
 msgid "List is empty"
 msgstr "Danh sách rỗng"
 
+#: include/classes/data/CItemData.php:983
+msgid "List of OS processes with attributes. Returns JSON array"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr ""
@@ -10893,9 +10955,17 @@ msgstr ""
 msgid "Login blocking interval"
 msgstr ""
 
+#: app/controllers/CControllerPopupLdapTestSend.php:86
+msgid "Login failed"
+msgstr ""
+
 #: include/classes/validators/CLdapAuthValidator.php:87
 msgid "Login name or password is incorrect."
 msgstr "Tên đăng nhập hoặc mật khẩu không chính xác."
+
+#: app/controllers/CControllerPopupLdapTestSend.php:76
+msgid "Login successful"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:193
 msgid "Logout"
@@ -12040,6 +12110,10 @@ msgstr "Không bao giờ"
 
 #: app/views/popup.token.edit.php:162
 msgid "New API token"
+msgstr ""
+
+#: app/views/popup.ldap.edit.php:145
+msgid "New LDAP server"
 msgstr ""
 
 #: app/views/popup.sla.edit.php:255 app/views/popup.sla.edit.php:283
@@ -14913,6 +14987,10 @@ msgstr ""
 msgid "Request sent successfully"
 msgstr "Yêu cầu gửi thành công"
 
+#: app/controllers/CControllerItemMassCheckNow.php:236
+msgid "Request sent successfully. Some items are filtered due to access permissions or type."
+msgstr ""
+
 #: include/views/configuration.host.discovery.edit.php:271
 #: include/views/configuration.item.edit.php:328
 #: include/views/configuration.item.prototype.edit.php:314
@@ -15713,6 +15791,10 @@ msgstr "Tìm kiếm"
 msgid "Search attribute"
 msgstr "Tìm kiếm thuộc tính"
 
+#: app/views/popup.ldap.edit.php:128
+msgid "Search filter"
+msgstr ""
+
 #: app/controllers/CControllerSearch.php:73
 msgid "Search pattern is empty"
 msgstr "Tìm kiếm mẫu là trống"
@@ -15924,6 +16006,10 @@ msgstr "Máy chủ (proxy)"
 #: include/classes/widgets/forms/CWidgetFormClock.php:33
 msgid "Server time"
 msgstr "thời gian máy chủ"
+
+#: app/views/administration.authentication.edit.php:146
+msgid "Servers"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:225
 #: app/views/js/slareport.list.js.php:39
@@ -16577,6 +16663,10 @@ msgstr ""
 #: include/classes/api/services/CSla.php:605
 #, c-format
 msgid "Start time must be less than end time for excluded downtime \"%2$s\" of SLA \"%1$s\"."
+msgstr ""
+
+#: app/views/popup.ldap.edit.php:121
+msgid "StartTLS"
 msgstr ""
 
 #: include/classes/validators/CLdapAuthValidator.php:81
@@ -18698,6 +18788,15 @@ msgstr ""
 msgid "User deleted"
 msgid_plural "Users deleted"
 msgstr[0] "Người dùng đã bị xóa"
+
+#: app/controllers/CControllerAuditLogList.php:246
+msgid "User directory"
+msgstr ""
+
+#: include/classes/api/services/CUserDirectory.php:330
+#, c-format
+msgid "User directory \"%1$s\" already exists."
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: app/partials/js/scheduledreport.subscription.js.php:83
@@ -21431,6 +21530,10 @@ msgctxt "new element in multiselect"
 msgid "new"
 msgstr "new"
 
+#: include/classes/api/services/CAuthentication.php:180
+msgid "no LDAP servers"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1464
 #: include/classes/graphdraw/CPieGraphDraw.php:320
 msgid "no data"
@@ -21626,6 +21729,11 @@ msgstr ""
 
 #: include/classes/widgets/fields/CWidgetFieldNavTree.php:110
 msgid "reference to a non-existent tree element"
+msgstr ""
+
+#: include/classes/api/services/CAuthentication.php:154
+#: include/classes/api/services/CUserGroup.php:1208
+msgid "referred object does not exist"
 msgstr ""
 
 #: app/controllers/CControllerQueueDetails.php:110
@@ -22303,6 +22411,11 @@ msgstr "phát hiện sai loại quy tắc"
 #: include/classes/api/services/CTask.php:444
 msgid "wrong item type"
 msgstr "Loại item sai"
+
+#: app/controllers/CControllerItemMassCheckNow.php:178
+#: include/classes/api/services/CTask.php:591
+msgid "wrong master item type"
+msgstr ""
 
 #: include/func.inc.php:591 jsLoader.php:221
 msgctxt "year short"

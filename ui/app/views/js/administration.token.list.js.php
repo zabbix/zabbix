@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -41,7 +41,7 @@
 					this.editToken(e.target.dataset.tokenid);
 				}
 				else if (e.target.classList.contains('js-massdelete-token')) {
-					this.massDeleteToken(e.target, Object.values(chkbxRange.getSelectedIds()));
+					this.massDeleteToken(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 			});
 		},
@@ -91,7 +91,7 @@
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					tokenids: chkbxRange.getSelectedIds()
+					tokenids: Object.keys(chkbxRange.getSelectedIds())
 				})
 			})
 				.then((response) => response.json())
