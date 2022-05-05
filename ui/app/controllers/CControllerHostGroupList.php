@@ -82,7 +82,7 @@ class CControllerHostGroupList extends CController {
 		$groups = API::HostGroup()->get([
 			'output' => ['groupid', $sort_field],
 			'search' => [
-				'name' => ($filter['name'] === '') ? null : $filter['name']
+				'name' => $filter['name'] === '' ? null : $filter['name']
 			],
 			'editable' => true,
 			'sortfield' => $sort_field,
@@ -103,12 +103,12 @@ class CControllerHostGroupList extends CController {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
-		$groupIds = array_column($groups, 'groupid');
+		$groupids = array_column($groups, 'groupid');
 
 		// get host count
 		$data['groupCounts'] = API::HostGroup()->get([
 			'output' => ['groupid'],
-			'groupids' => $groupIds,
+			'groupids' => $groupids,
 			'selectHosts' => API_OUTPUT_COUNT,
 			'preservekeys' => true
 		]);
@@ -117,7 +117,7 @@ class CControllerHostGroupList extends CController {
 		$limit = CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE) + 1;
 		$data['groups'] = API::HostGroup()->get([
 			'output' => ['groupid', 'name', 'flags'],
-			'groupids' => $groupIds,
+			'groupids' => $groupids,
 			'selectHosts' => ['hostid', 'name', 'status'],
 			'selectGroupDiscovery' => ['ts_delete'],
 			'selectDiscoveryRule' => ['itemid', 'name'],

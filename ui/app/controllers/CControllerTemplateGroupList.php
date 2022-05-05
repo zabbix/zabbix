@@ -82,7 +82,7 @@ class CControllerTemplateGroupList extends CController {
 		$groups = API::TemplateGroup()->get([
 			'output' => ['groupid', $sort_field],
 			'search' => [
-				'name' => ($filter['name'] === '') ? null : $filter['name']
+				'name' => $filter['name'] === '' ? null : $filter['name']
 			],
 			'editable' => true,
 			'sortfield' => $sort_field,
@@ -103,12 +103,12 @@ class CControllerTemplateGroupList extends CController {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
-		$groupIds = array_column($groups, 'groupid');
+		$groupids = array_column($groups, 'groupid');
 
 		// get templates count
 		$data['groupCounts'] = API::TemplateGroup()->get([
 			'output' => ['groupid'],
-			'groupids' => $groupIds,
+			'groupids' => $groupids,
 			'selectTemplates' => API_OUTPUT_COUNT,
 			'preservekeys' => true
 		]);
@@ -117,7 +117,7 @@ class CControllerTemplateGroupList extends CController {
 		$limit = CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE) + 1;
 		$data['groups'] = API::TemplateGroup()->get([
 			'output' => ['groupid', 'name'],
-			'groupids' => $groupIds,
+			'groupids' => $groupids,
 			'selectTemplates' => ['templateid', 'name'],
 			'limitSelects' => $limit
 		]);
