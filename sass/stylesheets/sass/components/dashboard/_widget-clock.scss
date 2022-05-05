@@ -1,3 +1,5 @@
+// Widget configuration.
+
 form.dashboard-grid-widget-clock {
 	.field-group-date,
 	.field-group-time,
@@ -38,35 +40,38 @@ form.dashboard-grid-widget-clock {
 
 // Widget view.
 
-div.digital-clock {
-	$line-height: 1.14;
-	box-sizing: border-box;
-	height: 100%;
-	padding: 10px;
-	overflow-x: hidden;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
+div.dashboard-grid-widget-clock {
+	&.clock-digital {
+		$line-height: 1.14;
 
-	.clock-date,
-	.clock-time,
-	.clock-time-zone {
-		max-width: 100%;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		font-size: calc(var(--content-height) * var(--widget-clock-font) / #{$line-height});
-		line-height: $line-height;
-	}
+		box-sizing: border-box;
+		height: 100%;
+		padding: 10px;
+		overflow-x: hidden;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
 
-	.bold {
-		font-weight: bold;
-	}
+		.clock-date,
+		.clock-time,
+		.clock-time-zone {
+			max-width: 100%;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			font-size: calc(var(--content-height) * var(--widget-clock-font) / #{$line-height});
+			line-height: $line-height;
+		}
 
-	.clock-disabled {
-		font-size: calc(var(--content-height) * 0.6 / #{$line-height});
-		color: $font-alt-color;
-		font-weight: bold;
+		.bold {
+			font-weight: bold;
+		}
+
+		.clock-disabled {
+			font-size: calc(var(--content-height) * 0.6 / #{$line-height});
+			color: $font-alt-color;
+			font-weight: bold;
+		}
 	}
 }

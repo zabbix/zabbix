@@ -77,12 +77,4 @@ class CWidgetFieldTimeZone extends CWidgetField {
 			}
 		';
 	}
-
-	public function setAction($action) {
-		throw new RuntimeException(sprintf('Method is not implemented: "%s".', __METHOD__));
-	}
-
-	public function getAction() {
-		throw new RuntimeException(sprintf('Method is not implemented: "%s".', __METHOD__));
-	}
 }

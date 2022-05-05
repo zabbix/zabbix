@@ -149,9 +149,7 @@ $form->addItem($form_list);
 
 $form->addItem(
 	(new CScriptTag('
-		widget_clock_form.init('.json_encode([
-			'form_id' => $form->getId()
-		]).');
+		widget_clock_form.init();
 	'))->setOnDocumentReady()
 );
 

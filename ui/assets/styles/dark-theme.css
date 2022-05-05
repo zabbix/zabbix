@@ -1462,6 +1462,54 @@ footer {
 .wrapper.layout-kioskmode .dashboard-navigation {
   display: none; }
 
+form.dashboard-grid-widget-clock .field-group-date,
+form.dashboard-grid-widget-clock .field-group-time,
+form.dashboard-grid-widget-clock .field-group-tzone {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(60px, max-content) auto);
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 5px; }
+  form.dashboard-grid-widget-clock .field-group-date label,
+  form.dashboard-grid-widget-clock .field-group-time label,
+  form.dashboard-grid-widget-clock .field-group-tzone label {
+    text-align: right; }
+  form.dashboard-grid-widget-clock .field-group-date .field-size input,
+  form.dashboard-grid-widget-clock .field-group-time .field-size input,
+  form.dashboard-grid-widget-clock .field-group-tzone .field-size input {
+    margin-right: 5px; }
+form.dashboard-grid-widget-clock .field-group-time .field-format {
+  grid-column: 4 / -1; }
+form.dashboard-grid-widget-clock .field-group-tzone .field-format {
+  grid-column: 2 / -1; }
+form.dashboard-grid-widget-clock .field-group-tzone .field-timezone {
+  grid-column: 2 / -1; }
+
+div.dashboard-grid-widget-clock.clock-digital {
+  box-sizing: border-box;
+  height: 100%;
+  padding: 10px;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; }
+  div.dashboard-grid-widget-clock.clock-digital .clock-date,
+  div.dashboard-grid-widget-clock.clock-digital .clock-time,
+  div.dashboard-grid-widget-clock.clock-digital .clock-time-zone {
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: calc(var(--content-height) * var(--widget-clock-font) / 1.14);
+    line-height: 1.14; }
+  div.dashboard-grid-widget-clock.clock-digital .bold {
+    font-weight: bold; }
+  div.dashboard-grid-widget-clock.clock-digital .clock-disabled {
+    font-size: calc(var(--content-height) * 0.6 / 1.14);
+    color: #737373;
+    font-weight: bold; }
+
 form.dashboard-grid-widget-item .field-group-description,
 form.dashboard-grid-widget-item .field-group-value,
 form.dashboard-grid-widget-item .field-group-time,
@@ -1609,6 +1657,13 @@ div.dashboard-grid-widget-item {
 .dashboard-grid-widget-item .svg-arrow-up-down {
   fill: #3DC51D; }
 
+div.dashboard-grid-widget-slareport .date-vertical {
+  writing-mode: vertical-lr;
+  transform: rotate(180deg); }
+
+.overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .table-forms-container, .overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .browser-warning-container {
+  border: 1px solid #303030; }
+
 form.dashboard-grid-widget-tophosts #list_columns .text {
   max-width: 150px; }
 form.dashboard-grid-widget-tophosts #column {
@@ -1623,54 +1678,6 @@ div.dashboard-grid-widget-tophosts .link-action {
 div.dashboard-grid-widget-tophosts z-bar-gauge {
   min-width: 64px;
   height: 20px; }
-
-form.dashboard-grid-widget-clock .field-group-date,
-form.dashboard-grid-widget-clock .field-group-time,
-form.dashboard-grid-widget-clock .field-group-tzone {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(60px, max-content) auto);
-  align-items: center;
-  column-gap: 10px;
-  row-gap: 5px; }
-  form.dashboard-grid-widget-clock .field-group-date label,
-  form.dashboard-grid-widget-clock .field-group-time label,
-  form.dashboard-grid-widget-clock .field-group-tzone label {
-    text-align: right; }
-  form.dashboard-grid-widget-clock .field-group-date .field-size input,
-  form.dashboard-grid-widget-clock .field-group-time .field-size input,
-  form.dashboard-grid-widget-clock .field-group-tzone .field-size input {
-    margin-right: 5px; }
-form.dashboard-grid-widget-clock .field-group-time .field-format {
-  grid-column: 4 / -1; }
-form.dashboard-grid-widget-clock .field-group-tzone .field-format {
-  grid-column: 2 / -1; }
-form.dashboard-grid-widget-clock .field-group-tzone .field-timezone {
-  grid-column: 2 / -1; }
-
-div.digital-clock {
-  box-sizing: border-box;
-  height: 100%;
-  padding: 10px;
-  overflow-x: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center; }
-  div.digital-clock .clock-date,
-  div.digital-clock .clock-time,
-  div.digital-clock .clock-time-zone {
-    max-width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: calc(var(--content-height) * var(--widget-clock-font) / 1.14);
-    line-height: 1.14; }
-  div.digital-clock .bold {
-    font-weight: bold; }
-  div.digital-clock .clock-disabled {
-    font-size: calc(var(--content-height) * 0.6 / 1.14);
-    color: #737373;
-    font-weight: bold; }
 
 .diff {
   padding: 4px;
@@ -2703,13 +2710,6 @@ z-select,
     z-select[readonly] button:focus,
     .z-select[readonly] button:focus {
       border-color: #768d99; }
-
-div.dashboard-grid-widget-slareport .date-vertical {
-  writing-mode: vertical-lr;
-  transform: rotate(180deg); }
-
-.overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .table-forms-container, .overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .browser-warning-container {
-  border: 1px solid #303030; }
 
 .link-action {
   border-bottom: 1px dotted;

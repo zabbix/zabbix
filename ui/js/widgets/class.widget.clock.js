@@ -56,7 +56,9 @@ class CWidgetClock extends CWidget {
 
 		this._events.resize = () => {
 			const padding = 25;
-			const header_height = this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER ? 0 : 33;
+			const header_height = this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
+				? 0
+				: this._content_header.offsetHeight;
 
 			this._target.style.setProperty(
 				'--content-height',
@@ -139,6 +141,7 @@ class CWidgetClock extends CWidget {
 				this._interval_id = setInterval(() => this._clockAnalogUpdate(), 1000);
 				this._clockAnalogUpdate();
 				break;
+
 			case CWidgetClock.TYPE_DIGITAL:
 				if (this._time_zone === CWidgetClock.TIMEZONE_LOCAL) {
 					if (this._show.includes(CWidgetClock.SHOW_DATE)) {
@@ -210,43 +213,33 @@ class CWidgetClock extends CWidget {
 			options.second = '2-digit';
 		}
 
-		clock_display.innerHTML = now.toLocaleTimeString(locale, options);
+		clock_display.textContent = now.toLocaleTimeString(locale, options);
 	}
 
 	_fillDate() {
-		const date_display = this._target.querySelector('.clock-date');
+		const clock_date = this._target.querySelector('.clock-date');
 
-		if (date_display === null) {
+		if (clock_date === null) {
 			return;
 		}
 
 		const now = new Date();
-		const year = now
-			.getFullYear()
-			.toString();
-		const month = (now.getMonth() + 1)
-			.toString()
-			.padStart(2, 0);
-		const day = now
-			.getDate()
-			.toString()
-			.padStart(2, 0);
+		const year = now.getFullYear().toString();
+		const month = (now.getMonth() + 1).toString().padStart(2, '0');
+		const day = now.getDate().toString().padStart(2, '0');
 
-		date_display.innerText = `${year}/${month}/${day}`;
+		clock_date.innerText = `${year}/${month}/${day}`;
 	}
 
 	_fillTimeZone() {
-		const tzone_display = this._target.querySelector('.clock-time-zone');
+		const clock_time_zone = this._target.querySelector('.clock-time-zone');
 
-		if (tzone_display === null) {
+		if (clock_time_zone === null) {
 			return;
 		}
 
 		const now = new Date();
-		let time_zone = Intl
-			.DateTimeFormat()
-			.resolvedOptions()
-			.timeZone;
+		let time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 		if (this._tzone_format === CWidgetClock.TIMEZONE_SHORT) {
 			const pos = time_zone.lastIndexOf('/');
@@ -257,15 +250,13 @@ class CWidgetClock extends CWidget {
 		}
 		else {
 			let offset = now.getTimezoneOffset();
-			let offset_hours = (offset > 0 ? '(UTC-' : '(UTC+');
 
-			offset = Math.abs(offset);
-			offset_hours += Math.floor(offset / 60).toString().padStart(2, 0)
-				+ ':' + (offset % 60).toString().padStart(2, 0) + ')';
+			const hours = Math.floor(Math.abs(offset) / 60).toString().padStart(2, '0');
+			const minutes = (Math.abs(offset) % 60).toString().padStart(2, '0');
 
-			time_zone = `${offset_hours} ${time_zone}`;
+			time_zone = `(UTC${offset > 0 ? '-' : '+'}${hours}:${minutes}) ${time_zone}`;
 		}
 
-		tzone_display.innerText = time_zone.replace(/_/g, ' ');
+		clock_time_zone.innerText = time_zone.replace(/_/g, ' ');
 	}
 }

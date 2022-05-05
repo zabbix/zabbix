@@ -22,32 +22,16 @@
 
 window.widget_clock_form = new class {
 
-	init(options) {
-		this.form = document.getElementById(options.form_id);
-
+	init() {
 		this.time_type = document.getElementById('time_type');
-
-		this.clock_type_row = document.getElementById('clock_type');
-
-		this.show_row = document.getElementById('show-row');
 
 		this.show_date = document.getElementById('show_1');
 		this.show_time = document.getElementById('show_2');
 		this.show_tzone = document.getElementById('show_3');
 
-		const show = [this.show_date, this.show_time, this.show_tzone];
-
-		this.advance_configuration_row = document.getElementById('adv-conf-row');
 		this.advance_configuration = document.getElementById('adv_conf');
 
-		this.bg_color_row = document.getElementById('bg-color-row');
-
-		this.date_row = document.getElementById('date-row');
-		this.time_row = document.getElementById('time-row');
-		this.tzone_row = document.getElementById('tzone-row');
-
-		this.form
-			.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')
+		document.querySelectorAll('#widget-dialogue-form .<?= ZBX_STYLE_COLOR_PICKER ?> input')
 			.forEach((colorpicker) => {
 				$(colorpicker).colorpicker({
 					appendTo: '.overlay-dialogue-body',
@@ -56,18 +40,20 @@ window.widget_clock_form = new class {
 				});
 			});
 
-		this.time_type.addEventListener('change', (e) => {
+		this.time_type.addEventListener('change', () => {
 			ZABBIX.Dashboard.reloadWidgetProperties();
 			this.updateForm();
 		});
 
-		[...this.clock_type_row.querySelectorAll('input')].map((checkbox) => {
-			checkbox.addEventListener('change', (e) => this.updateForm());
-		});
+		for (const checkbox of document.getElementById('clock_type').querySelectorAll('input')) {
+			checkbox.addEventListener('change', () => this.updateForm());
+		}
 
-		this.advance_configuration.addEventListener('change', (e) => this.updateForm());
+		this.advance_configuration.addEventListener('change', () => this.updateForm());
 
-		show.map((checkbox) => {
+		const show = [this.show_date, this.show_time, this.show_tzone];
+
+		for (const checkbox of show) {
 			checkbox.addEventListener('change', (e) => {
 				if (show.filter((checkbox) => checkbox.checked).length > 0) {
 					this.updateForm();
@@ -76,59 +62,35 @@ window.widget_clock_form = new class {
 					e.target.checked = true;
 				}
 			});
-		});
+		}
 
 		this.updateForm();
 	}
 
 	updateForm() {
-		const is_digital = this
-							.form
-							.querySelector('input[name="clock_type"]:checked')
-							.value == <?= WIDGET_CLOCK_TYPE_DIGITAL ?>;;
+		const is_digital = document.querySelector('#clock_type input:checked').value == <?= WIDGET_CLOCK_TYPE_DIGITAL ?>;
 
 		const show_date_row = is_digital && this.advance_configuration.checked && this.show_date.checked;
 		const show_time_row = is_digital && this.advance_configuration.checked && this.show_time.checked;
 		const show_tzone_row = is_digital && this.advance_configuration.checked && this.show_tzone.checked;
 
-		this
-			.show_row
-			.classList
-			.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !is_digital);
+		document.getElementById('show-row').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !is_digital);
+		document.getElementById('adv-conf-row').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !is_digital);
+		document.getElementById('bg-color-row').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !is_digital
+			|| (is_digital && !this.advance_configuration.checked));
 
-		this
-			.advance_configuration_row
-			.classList
-			.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !is_digital);
+		document.getElementById('date-row').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_date_row);
+		document.getElementById('time-row').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_time_row);
 
-		this
-			.bg_color_row
-			.classList
-			.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !is_digital || (is_digital && !this.advance_configuration.checked));
+		const tzone_row = document.getElementById('tzone-row');
 
-		this
-			.date_row
-			.classList
-			.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_date_row);
+		tzone_row.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_tzone_row);
 
-		this
-			.time_row
-			.classList
-			.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_time_row);
+		const timezone_settings = tzone_row
+			.querySelectorAll('label[for="tzone_timezone"], .field-timezone, label[for="tzone_format"], .field-format');
 
-		this
-			.tzone_row
-			.classList
-			.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_tzone_row);
-
-		const is_time_type_host = this.time_type.value == <?= TIME_TYPE_HOST ?>;
-
-		const timezone_settings = this
-									.tzone_row
-									.querySelectorAll('label[for="tzone_timezone"], .field-timezone, label[for="tzone_format"], .field-format');
-
-		[...timezone_settings].map((elem) => {
-			elem.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', is_time_type_host);
-		});
+		for (const element of timezone_settings) {
+			element.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', this.time_type.value == <?= TIME_TYPE_HOST ?>);
+		}
 	}
-}();
+};
