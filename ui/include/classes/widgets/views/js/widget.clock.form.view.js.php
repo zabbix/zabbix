@@ -77,7 +77,7 @@ window.widget_clock_form = new class {
 		document.getElementById('show-row').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !is_digital);
 		document.getElementById('adv-conf-row').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !is_digital);
 		document.getElementById('bg-color-row').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !is_digital
-			|| (is_digital && !this.advance_configuration.checked));
+			|| !this.advance_configuration.checked);
 
 		document.getElementById('date-row').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_date_row);
 		document.getElementById('time-row').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_time_row);
