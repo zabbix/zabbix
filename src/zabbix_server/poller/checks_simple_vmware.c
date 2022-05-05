@@ -2882,7 +2882,7 @@ int	check_vcenter_vm_attribute_get(AGENT_REQUEST *request, const char *username,
 	url = get_rparam(request, 0);
 	vm_uuid = get_rparam(request, 1);
 	attr_name = get_rparam(request, 2);
-	
+
 	if ('\0' == *vm_uuid)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
@@ -2899,12 +2899,6 @@ int	check_vcenter_vm_attribute_get(AGENT_REQUEST *request, const char *username,
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown virtual machine uuid."));
 		goto unlock;
 	}
-
-	/*
-	if (NULL == (value = vm->props[propid]))
-		goto unlock;
-	}
-	*/
 
 	custom_attr.name = attr_name;
 
@@ -3458,6 +3452,12 @@ static void	check_vcenter_vm_discovery_nic_props_cb(struct zbx_json *j, zbx_vmwa
 			ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(j, "{#IFBACKINGDEVICE}", ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE]),
 			ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "{#IFDVSWITCH.UUID}", ZBX_NULL2EMPTY_STR(
+			dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID]), ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "{#IFDVSWITCH.PORTGROUP}", ZBX_NULL2EMPTY_STR(
+			dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP]), ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "{#IFDVSWITCH.PORT}", ZBX_NULL2EMPTY_STR(
+			dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORT]), ZBX_JSON_TYPE_STRING);
 }
 
 static void	check_vcenter_vm_discovery_disk_props_cb(struct zbx_json *j, zbx_vmware_dev_t *dev)
