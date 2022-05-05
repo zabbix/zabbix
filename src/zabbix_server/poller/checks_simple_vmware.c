@@ -3098,7 +3098,7 @@ out:
 int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	struct zbx_json		json_data;
+	struct zbx_json		json_data, json_attr_data;
 	const char		*url, *vm_name, *hv_name, *hv_uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
@@ -3133,7 +3133,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 
 		for (i = 0; i < hv->vms.values_num; i++)
 		{
-			int			j;
+			int			j, k;
 			zbx_vmware_datastore_t	*datastore = NULL;
 
 			vm = (zbx_vmware_vm_t *)hv->vms.values[i];
@@ -3165,6 +3165,13 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 				zabbix_log(LOG_LEVEL_WARNING, "%s() Unknown datastore id:%s", __func__,
 						ZBX_NULL2EMPTY_STR(vm->props[ZBX_VMWARE_VMPROP_DATASTOREID]));
 				continue;
+			}
+
+			zbx_json_addobject(&json_attr_data, NULL);
+			for (k = 0; k < vm->custom_attrs.values_num; k++)
+			{
+				zbx_json_addstring(&json_attr_data, vm->custom_attrs.values[i]->name,
+						vm->custom_attrs.values[i]->value, ZBX_JSON_TYPE_STRING);
 			}
 
 			zbx_json_addobject(&json_data, NULL);
@@ -3199,6 +3206,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#DATASTORE.NAME}", datastore->name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#DATASTORE.UUID}", datastore->uuid, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "{#VM.CUSTOMATRIBUTE}", json_attr_data.buffer, ZBX_JSON_TYPE_STRING);
 
 			zbx_json_close(&json_data);
 		}
