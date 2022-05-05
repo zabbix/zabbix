@@ -2497,6 +2497,12 @@ static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node)
 
 	props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE] = zbx_xml_node_read_value(details, node,
 			ZBX_XNN("backing") ZBX_XPATH_LN("deviceName"));
+	props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID] = zbx_xml_node_read_value(details, node,
+			ZBX_XNN("backing") ZBX_XPATH_LN2("port", "switchUuid"));
+	props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP] = zbx_xml_node_read_value(details, node,
+			ZBX_XNN("backing") ZBX_XPATH_LN2("port", "portgroupKey"));
+	props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORT] = zbx_xml_node_read_value(details, node,
+			ZBX_XNN("backing") ZBX_XPATH_LN2("port", "portKey"));
 
 	return props;
 }
@@ -4151,14 +4157,14 @@ static void	vmware_service_get_hv_pnics_data(xmlDoc *details, zbx_vector_vmware_
 		nic->name = value;
 
 		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
-				ZBX_XPATH_LN2("linkSpeed", "speedMb"))))
+				ZBX_XNN("linkSpeed") ZBX_XPATH_LN("speedMb"))))
 		{
 			ZBX_STR2UINT64(nic->speed, value);
 			zbx_free(value);
 		}
 
 		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
-				ZBX_XPATH_LN2("linkSpeed", "duplex"))))
+				ZBX_XNN("linkSpeed") ZBX_XPATH_LN("duplex"))))
 		{
 			nic->duplex = 0 == strcmp(value, "true") ? ZBX_DUPLEX_FULL : ZBX_DUPLEX_HALF;
 			zbx_free(value);
