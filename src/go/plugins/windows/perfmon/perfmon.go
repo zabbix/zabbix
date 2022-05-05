@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 /*
@@ -261,8 +262,12 @@ func (p *Plugin) Start() {
 }
 
 func (p *Plugin) Stop() {
-	_ = win32.PdhCloseQuery(p.query)
-	p.query = 0
+	for index, c := range p.counters {
+		if cerr := win32.PdhRemoveCounter(c.handle); cerr != nil {
+			p.Debugf("error while removing counter '%s': %s", index.path, cerr)
+		}
+		delete(p.counters, index)
+	}
 }
 
 func init() {
