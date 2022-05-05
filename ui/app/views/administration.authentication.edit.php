@@ -55,35 +55,45 @@ $auth_tab = (new CFormGrid())
 		new CLabel([_('Password must contain'),
 			makeHelpIcon([
 				_('Password requirements:'),
-				new CFormField(
-					(new CList([
-						new CListItem([
-							_('must contain at least one lowercase and one uppercase Latin letter'),
-							' (', (new CSpan('A-Z'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ', ',
-							(new CSpan('a-z'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ')'
-						])
-					]))->addClass(ZBX_STYLE_LIST_DASHED)
-				)
+				(new CList([
+					new CListItem([
+						_('must contain at least one lowercase and one uppercase Latin letter'),
+						' (', (new CSpan('A-Z'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ', ',
+						(new CSpan('a-z'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ')'
+					]),
+					new CListItem([
+						_('must contain at least one digit'),
+						' (', (new CSpan('0-9'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ')'
+					]),
+					new CListItem([
+						_('must contain at least one special character'),
+						' (', (new CSpan(
+							' !"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~'))->addClass(ZBX_STYLE_MONOSPACE_FONT
+						), ')'
+					])
+				]))->addClass(ZBX_STYLE_LIST_DASHED)
 			])
 		]),
-		(new CList([
-			(new CCheckBox('passwd_check_rules[]', PASSWD_CHECK_CASE))
-				->setLabel(_('an uppercase and a lowercase Latin letter'))
-				->setChecked(($data['passwd_check_rules'] & PASSWD_CHECK_CASE) == PASSWD_CHECK_CASE)
-				->setUncheckedValue(0x00)
-				->setId('passwd_check_rules_case'),
-			(new CCheckBox('passwd_check_rules[]', PASSWD_CHECK_DIGITS))
-				->setLabel(_('a digit'))
-				->setChecked(($data['passwd_check_rules'] & PASSWD_CHECK_DIGITS) == PASSWD_CHECK_DIGITS)
-				->setUncheckedValue(0x00)
-				->setId('passwd_check_rules_digits'),
-			(new CCheckBox('passwd_check_rules[]', PASSWD_CHECK_SPECIAL))
-				->setLabel(_('a special character'))
-				->setChecked(($data['passwd_check_rules'] & PASSWD_CHECK_SPECIAL) == PASSWD_CHECK_SPECIAL)
-				->setUncheckedValue(0x00)
-				->setId('passwd_check_rules_special')
-		]))
-			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
+		new CFormField(
+			(new CList([
+				(new CCheckBox('passwd_check_rules[]', PASSWD_CHECK_CASE))
+					->setLabel(_('an uppercase and a lowercase Latin letter'))
+					->setChecked(($data['passwd_check_rules'] & PASSWD_CHECK_CASE) == PASSWD_CHECK_CASE)
+					->setUncheckedValue(0x00)
+					->setId('passwd_check_rules_case'),
+				(new CCheckBox('passwd_check_rules[]', PASSWD_CHECK_DIGITS))
+					->setLabel(_('a digit'))
+					->setChecked(($data['passwd_check_rules'] & PASSWD_CHECK_DIGITS) == PASSWD_CHECK_DIGITS)
+					->setUncheckedValue(0x00)
+					->setId('passwd_check_rules_digits'),
+				(new CCheckBox('passwd_check_rules[]', PASSWD_CHECK_SPECIAL))
+					->setLabel(_('a special character'))
+					->setChecked(($data['passwd_check_rules'] & PASSWD_CHECK_SPECIAL) == PASSWD_CHECK_SPECIAL)
+					->setUncheckedValue(0x00)
+					->setId('passwd_check_rules_special')
+			]))
+				->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
+		)
 	])
 	->addItem([
 		new CLabel([_('Avoid easy-to-guess passwords'),
