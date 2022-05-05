@@ -1159,7 +1159,7 @@ int	DBcreate_changelog_insert_trigger(const char *table_name, const char *field_
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
-	int	table_type, ret = FAIL;;
+	int	table_type, ret = FAIL;
 
 	if (FAIL == (table_type = DBget_changelog_table_by_name(table_name)))
 	{
@@ -1176,6 +1176,27 @@ int	DBcreate_changelog_insert_trigger(const char *table_name, const char *field_
 						" values (%d,:new.%s,%d,(cast(sys_extract_utc(systimestamp) as date)"
 						"-date'1970-01-01')*86400);\n"
 				"end;", table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_INSERT);
+#elif HAVE_MYSQL
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"create trigger %s_insert after insert"
+				" on %s for each row"
+					" insert into changelog (object,objectid,operation,clock)"
+						" values (%d,new.%s,%d,unix_timestamp())",
+				table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_INSERT);
+#elif HAVE_POSTGRESQL
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"create or replace function changelog_%s_insert() returns trigger as $$"
+			" begin"
+				" insert into changelog (object,objectid,operation,clock)"
+					" values (%d,new.%s,%d,cast(extract(epoch from now()) as int));"
+				"return new;"
+			"end;"
+			"$$ language plpgsql;"
+			"create trigger %s_insert after insert"
+				" on %s for each row"
+					"  execute procedure changelog_%s_insert();",
+				table_name, table_type, field_name, ZBX_CHANGELOG_OP_INSERT, table_name, table_name,
+				table_name);
 #endif
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
@@ -1207,6 +1228,27 @@ int	DBcreate_changelog_update_trigger(const char *table_name, const char *field_
 						" values (%d,:old.%s,%d,(cast(sys_extract_utc(systimestamp) as date)"
 						"-date'1970-01-01')*86400);\n"
 				"end;", table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_UPDATE);
+#elif HAVE_MYSQL
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"create trigger %s_update after update"
+				" on %s for each row"
+					" insert into changelog (object,objectid,operation,clock)"
+						" values (%d,old.%s,%d,unix_timestamp())",
+				table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_UPDATE);
+#elif HAVE_POSTGRESQL
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"create or replace function changelog_%s_update() returns trigger as $$"
+			" begin"
+				" insert into changelog (object,objectid,operation,clock)"
+					" values (%d,old.%s,%d,cast(extract(epoch from now()) as int));"
+				"return new;"
+			"end;"
+			"$$ language plpgsql;"
+			"create trigger %s_update after update"
+				" on %s for each row"
+					"  execute procedure changelog_%s_update();",
+				table_name, table_type, field_name, ZBX_CHANGELOG_OP_UPDATE, table_name, table_name,
+				table_name);
 #endif
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
@@ -1238,6 +1280,27 @@ int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_
 						" values (%d,:old.%s,%d,(cast(sys_extract_utc(systimestamp) as date)"
 						"-date'1970-01-01')*86400);\n"
 				"end;", table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_DELETE);
+#elif HAVE_MYSQL
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"create trigger %s_delete before delete"
+				" on %s for each row"
+					" insert into changelog (object,objectid,operation,clock)"
+						" values (%d,old.%s,%d,unix_timestamp())",
+				table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_DELETE);
+#elif HAVE_POSTGRESQL
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"create or replace function changelog_%s_delete() returns trigger as $$"
+			" begin"
+				" insert into changelog (object,objectid,operation,clock)"
+					" values (%d,old.%s,%d,cast(extract(epoch from now()) as int));"
+				"return new;"
+			"end;"
+			"$$ language plpgsql;"
+			"create trigger %s_delete after delete"
+				" on %s for each row"
+					"  execute procedure changelog_%s_delete();",
+				table_name, table_type, field_name, ZBX_CHANGELOG_OP_DELETE, table_name, table_name,
+				table_name);
 #endif
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))

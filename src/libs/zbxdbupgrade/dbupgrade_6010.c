@@ -182,17 +182,107 @@ static int	DBpatch_6010009(void)
 
 static int	DBpatch_6010010(void)
 {
-	return DBcreate_changelog_insert_trigger("items", "itemid");
+	return DBcreate_changelog_insert_trigger("hosts", "hostid");
 }
 
 static int	DBpatch_6010011(void)
 {
-	return DBcreate_changelog_update_trigger("items", "itemid");
+	return DBcreate_changelog_update_trigger("hosts", "hostid");
 }
 
 static int	DBpatch_6010012(void)
 {
+	return DBcreate_changelog_delete_trigger("hosts", "hostid");
+}
+
+static int	DBpatch_6010013(void)
+{
+	return DBcreate_changelog_insert_trigger("host_tag", "hosttagid");
+}
+
+static int	DBpatch_6010014(void)
+{
+	return DBcreate_changelog_update_trigger("host_tag", "hosttagid");
+}
+
+static int	DBpatch_6010015(void)
+{
+	return DBcreate_changelog_delete_trigger("host_tag", "hosttagid");
+}
+
+static int	DBpatch_6010016(void)
+{
+	return DBcreate_changelog_insert_trigger("items", "itemid");
+}
+
+static int	DBpatch_6010017(void)
+{
+	return DBcreate_changelog_update_trigger("items", "itemid");
+}
+
+static int	DBpatch_6010018(void)
+{
 	return DBcreate_changelog_delete_trigger("items", "itemid");
+}
+
+static int	DBpatch_6010019(void)
+{
+	return DBcreate_changelog_insert_trigger("item_tag", "itemtagid");
+}
+
+static int	DBpatch_6010020(void)
+{
+	return DBcreate_changelog_update_trigger("item_tag", "itemtagid");
+}
+
+static int	DBpatch_6010021(void)
+{
+	return DBcreate_changelog_delete_trigger("item_tag", "itemtagid");
+}
+
+static int	DBpatch_6010022(void)
+{
+	return DBcreate_changelog_insert_trigger("triggers", "triggerid");
+}
+
+static int	DBpatch_6010023(void)
+{
+	return DBcreate_changelog_update_trigger("triggers", "triggerid");
+}
+
+static int	DBpatch_6010024(void)
+{
+	return DBcreate_changelog_delete_trigger("triggers", "triggerid");
+}
+
+static int	DBpatch_6010025(void)
+{
+	return DBcreate_changelog_insert_trigger("trigger_tag", "triggertagid");
+}
+
+static int	DBpatch_6010026(void)
+{
+	return DBcreate_changelog_update_trigger("trigger_tag", "triggertagid");
+}
+
+static int	DBpatch_6010027(void)
+{
+	return DBcreate_changelog_delete_trigger("trigger_tag", "triggertagid");
+}
+
+static int	DBpatch_6010028(void)
+{
+	return DBcreate_changelog_insert_trigger("functions", "functionid");
+}
+
+static int	DBpatch_6010029(void)
+{
+	return DBcreate_changelog_update_trigger("functions", "functionid");
+}
+
+static int	DBpatch_6010030(void)
+{
+	return DBcreate_changelog_delete_trigger("functions", "functionid");
 }
 #endif
 
@@ -213,5 +303,23 @@ DBPATCH_ADD(6010009, 0, 1)
 DBPATCH_ADD(6010010, 0, 1)
 DBPATCH_ADD(6010011, 0, 1)
 DBPATCH_ADD(6010012, 0, 1)
+DBPATCH_ADD(6010013, 0, 1)
+DBPATCH_ADD(6010014, 0, 1)
+DBPATCH_ADD(6010015, 0, 1)
+DBPATCH_ADD(6010016, 0, 1)
+DBPATCH_ADD(6010017, 0, 1)
+DBPATCH_ADD(6010018, 0, 1)
+DBPATCH_ADD(6010019, 0, 1)
+DBPATCH_ADD(6010020, 0, 1)
+DBPATCH_ADD(6010021, 0, 1)
+DBPATCH_ADD(6010022, 0, 1)
+DBPATCH_ADD(6010023, 0, 1)
+DBPATCH_ADD(6010024, 0, 1)
+DBPATCH_ADD(6010025, 0, 1)
+DBPATCH_ADD(6010026, 0, 1)
+DBPATCH_ADD(6010027, 0, 1)
+DBPATCH_ADD(6010028, 0, 1)
+DBPATCH_ADD(6010029, 0, 1)
+DBPATCH_ADD(6010030, 0, 1)
 
 DBPATCH_END()
