@@ -22,6 +22,8 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
+ * @onBefore prepareTestData
+ *
  * @backup hstgrp
  */
 class testHostGroup extends CAPITest {
@@ -554,5 +556,233 @@ class testHostGroup extends CAPITest {
 				}
 			}
 		}
+	}
+
+	public static function hostgroup_propagate() {
+		return [
+			// Check groupid
+			[
+				'hostgroup' => [
+					'groups' => [
+						'groupid' => '12345'
+					],
+					'permissions' => true
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			[
+				'hostgroup' => [
+					'permissions' => true
+				],
+				'expected_error' => 'Invalid parameter "/": the parameter "groups" is missing.'
+			],
+			[
+				'hosstgroup' => [
+					'groups' => [],
+					'permissions' => true
+				],
+				'expected_error' => 'Invalid parameter "/groups": cannot be empty.'
+			],
+			[
+				'hostgroup' => [
+					'groups' => [
+						'groupid' => ''
+					],
+					'permissions' => true
+				],
+				'expected_error' => 'Invalid parameter "/groups/1/groupid": a number is expected.'
+			],
+			// Check permissions parameter
+			[
+				'hostgroup' => [
+					'groups' => [
+						'groupid' => '12345'
+					],
+					'permissions' => false
+				],
+				'expected_error' => 'At least one parameter "permissions" or "tag_filters" must be enabled.'
+			],
+			[
+				'hostgroup' => [
+					'groups' => [
+						'groupid' => '12345'
+					]
+				],
+				'expected_error' => 'At least one parameter "permissions" or "tag_filters" must be enabled.'
+			],
+			[
+				'hostgroup' => [
+					'groups' => [
+						'groupid' => '12345'
+					],
+					'permissions' => ''
+				],
+				'expected_error' => 'Invalid parameter "/permissions": a boolean is expected.'
+			],
+			// Check tag_filters parameter
+			[
+				'hostgroup' => [
+					'groups' => [
+						'groupid' => '12345'
+					],
+					'tag_filters' => false
+				],
+				'expected_error' => 'At least one parameter "permissions" or "tag_filters" must be enabled.'
+			],
+			[
+				'hostgroup' => [
+					'groups' => [
+						'groupid' => '12345'
+					],
+					'tag_filters' => ''
+				],
+				'expected_error' => 'Invalid parameter "/tag_filters": a boolean is expected.'
+			],
+			// Check successful propagation
+			[
+				'hostgroup' => [
+					'groups' => [
+						['groupid' => 'groupid_1']
+					],
+					'permissions' => true
+				],
+				'expected_error' => null
+			],
+			[
+				'hostgroup' => [
+					'groups' => [
+						['groupid' => 'groupid_1']
+					],
+					'tag_filters' => true
+				],
+				'expected_error' => null
+			],
+			[
+				'hostgroup' => [
+					'groups' => [
+						['groupid' => 'groupid_3'],
+						['groupid' => 'groupid_5']
+					],
+					'permissions' => true,
+					'tag_filters' => true
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider hostgroup_propagate
+	 */
+	public function testHostGroup_propagate($hostgroups, $expected_error) {
+		if ($expected_error === null) {
+			foreach($hostgroups['groups'] as &$hostgroup) {
+				$hostgroup['groupid'] = self::$data['groupids'][$hostgroup['groupid']];
+			}
+			unset($hostgroup);
+		}
+
+		$result = $this->call('hostgroup.propagate', $hostgroups, $expected_error);
+
+		if ($expected_error === null) {
+			foreach ($result['result']['groupids'] as $groupid) {
+				$db_host_groups = DBselect('select * from hstgrp where groupid='.zbx_dbstr($groupid));
+				$db_host_groups_row = DBfetch($db_host_groups);
+				$group_name = $db_host_groups_row['name'].'/%';
+				$db_subgroups = DBselect('select * from hstgrp where name like '.zbx_dbstr($group_name));
+				$db_subgroups_row = DBfetchArray($db_subgroups);
+				$groupids = [];
+				$groupids[] = $db_host_groups_row['groupid'];
+				$groupids = array_merge($groupids, array_column($db_subgroups_row, 'groupid'));
+			}
+
+			if (array_key_exists('permissions', $hostgroups)) {
+				$db_rights = DBSelect('select * from rights where groupid='.zbx_dbstr(self::$data['usrgrpids']));
+				$db_rights_row = DBfetchArray($db_rights);
+				$rights_groupids = array_flip(array_column($db_rights_row, 'id'));
+				foreach ($groupids as $groupid) {
+					$this->assertArrayHasKey($groupid, $rights_groupids);
+				}
+			}
+
+			if (array_key_exists('tag_filters', $hostgroups)) {
+				$db_tag_filters = DBSelect(
+					'select * from tag_filter where usrgrpid='.zbx_dbstr(self::$data['usrgrpids'])
+				);
+				$db_tag_filters_row = DBfetchArray($db_tag_filters);
+				$tag_filters_groupids = array_flip(array_column($db_tag_filters_row, 'groupid'));
+				foreach ($groupids as $groupid) {
+					$this->assertArrayHasKey($groupid, $tag_filters_groupids);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Test data used by tests.
+	 */
+	protected static $data = [
+		'groupids' => ['groupid_1', 'groupid_2', 'groupid_3', 'groupid_4', 'groupid_5', 'groupid_6'],
+		'usrgrpids' => null
+	];
+
+	/**
+	 * Prepare data for tests. Set permissions to host groups.
+	 */
+	public function prepareTestData() {
+		$response = CDataHelper::call('hostgroup.create', [
+			['name' => 'Propagate group 1'],
+			['name' => 'Propagate group 1/Group 1'],
+			['name' => 'Propagate group 2'],
+			['name' => 'Propagate group 2/Group 1'],
+			['name' => 'Propagate group 3'],
+			['name' => 'Propagate group 3/Group 1'],
+		]);
+		$this->assertArrayHasKey('groupids', $response);
+		self::$data['groupids'] = array_combine(self::$data['groupids'], $response['groupids']);
+
+		$response = CDataHelper::call('usergroup.create', [
+			['name' => 'API host group propagate test']
+		]);
+		$this->assertArrayHasKey('usrgrpids', $response);
+		self::$data['usrgrpids'] = $response['usrgrpids'][0];
+
+		$response = CDataHelper::call('usergroup.update', [
+			[
+				'usrgrpid' => self::$data['usrgrpids'],
+				'hostgroup_rights' => [
+					[
+						'id' => self::$data['groupids']['groupid_1'],
+						'permission' => 3
+					],
+					[
+						'id' => self::$data['groupids']['groupid_3'],
+						'permission' => 3
+					],
+					[
+						'id' => self::$data['groupids']['groupid_5'],
+						'permission' => 3
+					]
+				],
+				'tag_filters' => [
+					[
+						'groupid' => self::$data['groupids']['groupid_1'],
+						'tag' => 'Tag',
+						'value' => 'Value'
+					],
+					[
+						'groupid' => self::$data['groupids']['groupid_3'],
+						'tag' => 'Tag',
+						'value' => 'Value'
+					],
+					[
+						'groupid' => self::$data['groupids']['groupid_5'],
+						'tag' => 'Tag',
+						'value' => 'Value'
+					]
+				]
+			]
+		]);
+		$this->assertArrayHasKey('usrgrpids', $response);
 	}
 }

@@ -22,8 +22,9 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
+ * @onBefore prepareTestData
+ *
  * @backup hstgrp
- * @backup hosts_groups
  */
 class testTemplateGroup extends CAPITest {
 	public static function templategroup_create() {
@@ -815,9 +816,179 @@ class testTemplateGroup extends CAPITest {
 					$dbRow = DBFetch($dbResult);
 					$this->assertEquals($dbRow['groupid'], false);
 				}
-
 			}
 		}
+	}
+
+	public static function templategroup_propagate() {
+		return [
+			// Check groupid
+			[
+				'templategroup' => [
+					'groups' => [
+						'groupid' => '12345'
+					],
+					'permissions' => true
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			[
+				'templategroup' => [
+					'permissions' => true
+				],
+				'expected_error' => 'Invalid parameter "/": the parameter "groups" is missing.'
+			],
+			[
+				'templategroup' => [
+					'groups' => [],
+					'permissions' => true
+				],
+				'expected_error' => 'Invalid parameter "/groups": cannot be empty.'
+			],
+			[
+				'templategroup' => [
+					'groups' => [
+						'groupid' => ''
+					],
+					'permissions' => true
+				],
+				'expected_error' => 'Invalid parameter "/groups/1/groupid": a number is expected.'
+			],
+			// Check permissions parameter
+			[
+				'templategroup' => [
+					'groups' => [
+						'groupid' => '12345'
+					],
+					'permissions' => false
+				],
+				'expected_error' => 'Parameter "permissions" must be enabled.'
+			],
+			[
+				'templategroup' => [
+					'groups' => [
+						'groupid' => '12345'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/": the parameter "permissions" is missing.'
+			],
+			[
+				'templategroup' => [
+					'groups' => [
+						'groupid' => '12345'
+					],
+					'permissions' => ''
+				],
+				'expected_error' => 'Invalid parameter "/permissions": a boolean is expected.'
+			],
+			// Check successful propagation
+			[
+				'templategroup' => [
+					'groups' => [
+						['groupid' => 'groupid_1']
+					],
+					'permissions' => true
+				],
+				'expected_error' => null
+			],
+			[
+				'templategroup' => [
+					'groups' => [
+						['groupid' => 'groupid_3'],
+						['groupid' => 'groupid_5']
+					],
+					'permissions' => true
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider templategroup_propagate
+	 */
+	public function testTemplateGroup_propagate($templategroups, $expected_error) {
+		if ($expected_error === null) {
+			foreach($templategroups['groups'] as &$templategroup) {
+				$templategroup['groupid'] = self::$data['groupids'][$templategroup['groupid']];
+			}
+			unset($templategroup);
+		}
+
+		$result = $this->call('templategroup.propagate', $templategroups, $expected_error);
+
+		if ($expected_error === null) {
+			$db_rights = DBSelect('select * from rights where groupid='.zbx_dbstr(self::$data['usrgrpids']));
+			$db_rights_row = DBfetchArray($db_rights);
+			$rights_groupids = array_column($db_rights_row, 'id');
+			$rights_groupids = array_flip($rights_groupids);
+
+			foreach ($result['result']['groupids'] as $groupid) {
+				$db_template_groups = DBselect('select * from hstgrp where groupid='.zbx_dbstr($groupid));
+				$db_template_groups_row = DBfetch($db_template_groups);
+				$group_name = $db_template_groups_row['name'].'/%';
+				$db_subgroups = DBselect('select * from hstgrp where name like '.zbx_dbstr($group_name));
+				$db_subgroups_row = DBfetchArray($db_subgroups);
+				$groupids = [];
+				$groupids[] = $db_template_groups_row['groupid'];
+				$groupids = array_merge($groupids, array_column($db_subgroups_row, 'groupid'));
+			}
+
+			foreach ($groupids as $groupid) {
+				$this->assertArrayHasKey($groupid, $rights_groupids);
+			}
+		}
+	}
+
+	/**
+	 * Test data used by test.
+	 */
+	protected static $data = [
+		'groupids' => ['groupid_1', 'groupid_2', 'groupid_3', 'groupid_4', 'groupid_5', 'groupid_6'],
+		'usrgrpids' => null
+	];
+
+	/**
+	 * Prepare data for tests. Set permissions to template groups.
+	 */
+	public function prepareTestData() {
+		$response = CDataHelper::call('templategroup.create', [
+			['name' => 'Propagate group 1'],
+			['name' => 'Propagate group 1/Group 1'],
+			['name' => 'Propagate group 2'],
+			['name' => 'Propagate group 2/Group 1'],
+			['name' => 'Propagate group 3'],
+			['name' => 'Propagate group 3/Group 1'],
+		]);
+		$this->assertArrayHasKey('groupids', $response);
+		self::$data['groupids'] = array_combine(self::$data['groupids'], $response['groupids']);
+
+		$response = CDataHelper::call('usergroup.create', [
+			['name' => 'API template group propagate test']
+		]);
+		$this->assertArrayHasKey('usrgrpids', $response);
+		self::$data['usrgrpids'] = $response['usrgrpids'][0];
+
+		$response = CDataHelper::call('usergroup.update', [
+			[
+				'usrgrpid' => self::$data['usrgrpids'],
+				'templategroup_rights' => [
+					[
+						'id' => self::$data['groupids']['groupid_1'],
+						'permission' => 3
+					],
+					[
+						'id' => self::$data['groupids']['groupid_3'],
+						'permission' => 3
+					],
+					[
+						'id' => self::$data['groupids']['groupid_5'],
+						'permission' => 3
+					]
+				]
+			]
+		]);
+		$this->assertArrayHasKey('usrgrpids', $response);
 	}
 }
 
