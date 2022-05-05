@@ -1,4 +1,6 @@
 /*
+NOTICE, this file was modified by Zabbix
+
 Getopt for GNU.
 NOTE: getopt is now part of the C library, so if you don't know what
 "Keep this file name-space clean" means, talk to roland@gnu.ai.mit.edu
@@ -19,12 +21,14 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.  */
+Foundation, 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
 
 /*
 If GETOPT_COMPAT is defined, `+' as well as `--' can introduce a
 long-named option.  Because this is not POSIX.2 compliant, it is
-being phased out.  */
+being phased out.
+*/
 /* #define GETOPT_COMPAT */
 #undef GETOPT_COMPAT
 
@@ -41,16 +45,10 @@ Setting the environment variable POSIXLY_CORRECT disables permutation.
 Then the behavior is completely standard.
 
 GNU application programs can use a third alternative mode in which
-they can distinguish the relative order of options and other arguments.  */
+they can distinguish the relative order of options and other arguments.
+*/
 
 #undef BAD_OPTION
-
-/*
-For communication from `getopt' to the caller.
-When `getopt' finds an option that takes an argument,
-the argument value is returned here.
-Also, when `ordering' is RETURN_IN_ORDER,
-each non-option ARGV-element is returned here.  */
 
 #include "zbxgetopt.h"
 #include "common.h"
@@ -66,7 +64,8 @@ When `getopt' returns EOF, this is the index of the first of the
 non-option elements that the caller should itself scan.
 
 Otherwise, `zbx_optind' communicates from one call to the next
-how much of ARGV has been scanned so far.  */
+how much of ARGV has been scanned so far.
+*/
 
 /* XXX 1003.2 says this must be 1 before any call.  */
 /* int	zbx_optind = 0; //defined in binaries */
@@ -77,20 +76,16 @@ in which the last option character we returned was found.
 This allows us to pick up the scan where we left off.
 
 If this is zero, or a null string, it means resume the scan
-by advancing to the next ARGV-element.  */
+by advancing to the next ARGV-element.
+*/
 
 static char	*nextchar;
 
 /*
-Callers store zero here to inhibit the error message
-for unrecognized options.  */
-
-static int	zbx_opterr = 1;
-
-/*
 Set to an option character which was unrecognized.
 This must be initialized on some systems to avoid linking in the
-system's own getopt implementation.  */
+system's own getopt implementation.
+*/
 
 #define BAD_OPTION	'\0'
 static int	zbx_optopt = BAD_OPTION;
@@ -122,7 +117,8 @@ selects this mode of operation.
 
 The special argument `--' forces an end of option-scanning regardless
 of the value of `ordering'.  In the case of RETURN_IN_ORDER, only
-`--' can cause `getopt' to return EOF with `zbx_optind' != ARGC.  */
+`--' can cause `getopt' to return EOF with `zbx_optind' != ARGC.
+*/
 
 static enum
 {
@@ -134,7 +130,8 @@ static enum
 /*
 Describe the part of ARGV that contains non-options that have
 been skipped.  `first_nonopt' is the index in ARGV of the first of them;
-`last_nonopt' is the index after the last of them.  */
+`last_nonopt' is the index after the last of them.
+*/
 
 static int	first_nonopt;
 static int	last_nonopt;
@@ -210,8 +207,7 @@ so that those that are not options now come last.)
 
 OPTSTRING is a string containing the legitimate option characters.
 If an option character is seen that is not listed in OPTSTRING,
-return BAD_OPTION after printing an error message.  If you set `zbx_opterr' to
-zero, the error message is suppressed but we still return BAD_OPTION.
+return BAD_OPTION after printing an error message.
 
 If a char in OPTSTRING is followed by a colon, that means it wants an arg,
 so the following text in the same ARGV-element, or the text of the following
@@ -240,7 +236,8 @@ It is only valid when a long-named option has been found by the most
 recent call.
 
 If LONG_ONLY is non-zero, '-' as well as '--' can introduce
-long-named options.  */
+long-named options.
+*/
 
 static int	zbx_getopt_internal (int argc, char **argv, const char *optstring, const struct zbx_option *longopts,
 		int *longind, int long_only, char **zbx_optarg, int *zbx_optind)
@@ -321,7 +318,7 @@ static int	zbx_getopt_internal (int argc, char **argv, const char *optstring, co
 					&& (longopts == NULL
 					|| argv[*zbx_optind][0] != '+' || argv[*zbx_optind][1] == '\0')
 #endif /* GETOPT_COMPAT */
-			)
+					)
 			{
 				(*zbx_optind)++;
 			}
@@ -345,7 +342,7 @@ static int	zbx_getopt_internal (int argc, char **argv, const char *optstring, co
 			}
 			else if (first_nonopt == last_nonopt)
 			{
-				first_nonopt = (*zbx_optind);
+				first_nonopt = *zbx_optind;
 			}
 			last_nonopt = argc;
 
@@ -380,7 +377,7 @@ static int	zbx_getopt_internal (int argc, char **argv, const char *optstring, co
 				&& (longopts == NULL
 				|| argv[*zbx_optind][0] != '+' || argv[*zbx_optind][1] == '\0')
 #endif /* GETOPT_COMPAT */
-		)
+				)
 		{
 			if (ordering == REQUIRE_ORDER)
 			{
@@ -415,101 +412,93 @@ static int	zbx_getopt_internal (int argc, char **argv, const char *optstring, co
 		int	needexact = 0;
 
 #if ON
-	/*
-	allow `--option#value' because you cannot assign a '='
-	to an environment variable under DOS command.com
-	*/
-	while (*s && *s != '=' && * s != '#')
-	{
-		s++;
-	}
+		/*
+		allow `--option#value' because you cannot assign a '='
+		to an environment variable under DOS command.com
+		*/
+		while (*s && *s != '=' && * s != '#')
+		{
+			s++;
+		}
 #else
-	while (*s && *s != '=')
-	{
-		s++;
-	}
+		while (*s && *s != '=')
+		{
+			s++;
+		}
 #endif
 
-	/* Test all options for either exact match or abbreviated matches.  */
-	for (p = longopts, option_index = 0; p->name; p++, option_index++)
-	{
-		if (!strncmp (p->name, nextchar, (unsigned) (s - nextchar)))
+		/* Test all options for either exact match or abbreviated matches.  */
+		for (p = longopts, option_index = 0; p->name; p++, option_index++)
 		{
-			if (p->has_arg & 0x10)
+			if (!strncmp (p->name, nextchar, (unsigned) (s - nextchar)))
 			{
-				needexact = 1;
-			}
-			if ((unsigned) (s - nextchar) == strlen (p->name))
-			{
-				/* Exact match found.  */
-				pfound = p;
-				indfound = option_index;
-				exact = 1;
-				break;
-			}
+				if (p->has_arg & 0x10)
+				{
+					needexact = 1;
+				}
+				if ((unsigned) (s - nextchar) == strlen (p->name))
+				{
+					/* Exact match found.  */
+					pfound = p;
+					indfound = option_index;
+					exact = 1;
+					break;
+				}
 #if OFF /* ZBX: disable long option partial matching */
-			else if (pfound == NULL)
-			{
-				/* First nonexact match found.  */
-				pfound = p;
-				indfound = option_index;
-			}
-			else
-			{
-				/* Second nonexact match found.  */
-				ambig = 1;
-			}
+				else if (pfound == NULL)
+				{
+					/* First nonexact match found.  */
+					pfound = p;
+					indfound = option_index;
+				}
+				else
+				{
+					/* Second nonexact match found.  */
+					ambig = 1;
+				}
 #endif
+			}
 		}
-	}
-	/* don't allow nonexact longoptions */
-	if (needexact && !exact)
-	{
-		if (zbx_opterr)
+		/* don't allow nonexact longoptions */
+		if (needexact && !exact)
 		{
 			zbx_error("unrecognized option `%s'", argv[*zbx_optind]);
-		}
 
-		nextchar += strlen (nextchar);
-		(*zbx_optind)++;
-		return BAD_OPTION;
-	}
+			nextchar += strlen (nextchar);
+			(*zbx_optind)++;
+			return BAD_OPTION;
+		}
 #if OFF /* disable since ambig is always 0*/
-	if (ambig && !exact)
-	{
-		if (zbx_opterr)
+		if (ambig && !exact)
 		{
 			zbx_error("option `%s' is ambiguous", argv[*zbx_optind]);
-		}
 
-		nextchar += strlen (nextchar);
-		(*zbx_optind)++;
-		return BAD_OPTION;
-	}
+			nextchar += strlen (nextchar);
+			(*zbx_optind)++;
+			return BAD_OPTION;
+		}
 #endif
 
-	if (pfound != NULL)
-	{
-		int	have_arg = (s[0] != '\0');
-		if (have_arg && (pfound->has_arg & 0xf))
+		if (pfound != NULL)
 		{
-			have_arg = (s[1] != '\0');
-		}
-		option_index = indfound;
-		(*zbx_optind)++;
-		if (have_arg)
-		{
-			/*
-			Don't test has_arg with >, because some C compilers don't
-			allow it to be used on enums.
-			*/
-			if (pfound->has_arg & 0xf)
+			int	have_arg = (s[0] != '\0');
+			if (have_arg && (pfound->has_arg & 0xf))
 			{
-				*zbx_optarg = s + 1;
+				have_arg = (s[1] != '\0');
 			}
-			else
+			option_index = indfound;
+			(*zbx_optind)++;
+			if (have_arg)
 			{
-				if (zbx_opterr)
+				/*
+				Don't test has_arg with >, because some C compilers don't
+				allow it to be used on enums.
+				*/
+				if (pfound->has_arg & 0xf)
+				{
+					*zbx_optarg = s + 1;
+				}
+				else
 				{
 					if (argv[(*zbx_optind) - 1][1] == '-')
 					{
@@ -522,57 +511,51 @@ static int	zbx_getopt_internal (int argc, char **argv, const char *optstring, co
 						zbx_error("option `%c%s' doesn't allow an argument",
 								argv[(*zbx_optind) - 1][0], pfound->name);
 					}
+					nextchar += strlen (nextchar);
+					return BAD_OPTION;
 				}
-				nextchar += strlen (nextchar);
-				return BAD_OPTION;
 			}
-		}
-		else if ((pfound->has_arg & 0xf) == 1)
-		{
+			else if ((pfound->has_arg & 0xf) == 1)
+			{
 #if OFF
-			if ((*zbx_optind) < argc)
+				if ((*zbx_optind) < argc)
 #else
-			if ((*zbx_optind) < argc && (pfound->has_arg & 0x20) == 0)
+				if ((*zbx_optind) < argc && (pfound->has_arg & 0x20) == 0)
 #endif
-			{
-				*zbx_optarg = argv[(*zbx_optind)++];
-			}
-			else
-			{
-				if (zbx_opterr)
+				{
+					*zbx_optarg = argv[(*zbx_optind)++];
+				}
+				else
 				{
 					zbx_error("option `--%s%s' requires an argument",
 							pfound->name, (pfound->has_arg & 0x20) ? "=" : "");
+					nextchar += strlen (nextchar);
+					return optstring[0] == ':' ? ':' : BAD_OPTION;
 				}
-				nextchar += strlen (nextchar);
-				return optstring[0] == ':' ? ':' : BAD_OPTION;
 			}
+			nextchar += strlen (nextchar);
+			if (longind != NULL)
+			{
+				*longind = option_index;
+			}
+			if (pfound->flag)
+			{
+				*(pfound->flag) = pfound->val;
+				return 0;
+			}
+			return pfound->val;
 		}
-		nextchar += strlen (nextchar);
-		if (longind != NULL)
-		{
-			*longind = option_index;
-		}
-		if (pfound->flag)
-		{
-			*(pfound->flag) = pfound->val;
-			return 0;
-		}
-		return pfound->val;
-	}
-	/*
-	Can't find it as a long option.  If this is not getopt_long_only,
-	or the option starts with '--' or is not a valid short
-	option, then it's an error.
-	Otherwise interpret it as a short option.
-	*/
-	if (!long_only || argv[(*zbx_optind)][1] == '-'
+		/*
+		Can't find it as a long option.  If this is not getopt_long_only,
+		or the option starts with '--' or is not a valid short
+		option, then it's an error.
+		Otherwise interpret it as a short option.
+		*/
+		if (!long_only || argv[(*zbx_optind)][1] == '-'
 #ifdef GETOPT_COMPAT
 		|| argv[(*zbx_optind)][0] == '+'
 #endif /* GETOPT_COMPAT */
 		|| strchr (optstring, *nextchar) == NULL)
-	{
-		if (zbx_opterr)
 		{
 			if (argv[(*zbx_optind)][1] == '-')
 			{
@@ -584,12 +567,11 @@ static int	zbx_getopt_internal (int argc, char **argv, const char *optstring, co
 				/* +option or -option */
 				zbx_error("unrecognized option `%c%s'", argv[(*zbx_optind)][0], nextchar);
 			}
+			nextchar = empty_string;
+			(*zbx_optind)++;
+			return BAD_OPTION;
 		}
-		nextchar = empty_string;
-		(*zbx_optind)++;
-		return BAD_OPTION;
-	}
-	(void) &ambig; /* UNUSED */
+		(void) &ambig; /* UNUSED */
 	}
 
 	/* Look at and handle the next option-character.  */
@@ -606,22 +588,19 @@ static int	zbx_getopt_internal (int argc, char **argv, const char *optstring, co
 
 		if (temp == NULL || c == ':')
 		{
-			if (zbx_opterr)
-			{
 #if OFF
-				if (c < 040 || c >= 0177)
-				{
-					zbx_error("unrecognized option, character code 0%o", c);
-				}
-				else
-				{
-					zbx_error("unrecognized option `-%c'", c);
-				}
-#else
-				/* 1003.2 specifies the format of this message.  */
-				zbx_error("invalid option -- %c", c);
-#endif
+			if (c < 040 || c >= 0177)
+			{
+				zbx_error("unrecognized option, character code 0%o", c);
 			}
+			else
+			{
+				zbx_error("unrecognized option `-%c'", c);
+			}
+#else
+			/* 1003.2 specifies the format of this message.  */
+			zbx_error("invalid option -- %c", c);
+#endif
 			zbx_optopt = c;
 			return BAD_OPTION;
 		}
@@ -655,15 +634,12 @@ static int	zbx_getopt_internal (int argc, char **argv, const char *optstring, co
 				}
 				else if ((*zbx_optind) == argc)
 				{
-					if (zbx_opterr)
-					{
 #if OFF
-						zbx_error("option `-%c' requires an argument", c);
+					zbx_error("option `-%c' requires an argument", c);
 #else
-						/* 1003.2 specifies the format of this message.  */
-						zbx_error("option requires an argument -- %c", c);
+					/* 1003.2 specifies the format of this message.  */
+					zbx_error("option requires an argument -- %c", c);
 #endif
-					}
 					zbx_optopt = c;
 					if (optstring[0] == ':')
 					{
@@ -694,83 +670,3 @@ int	zbx_getopt_long(int argc, char **argv, const char *options, const struct zbx
 {
 	return zbx_getopt_internal (argc, argv, options, long_options, opt_index, 0, zbx_optarg, zbx_optind);
 }
-
-#ifdef TEST2
-
-/*
-Compile with -DTEST to make an executable for use in testing
-the above definition of `getopt'.
-*/
-
-int
-main (argc, argv)
-int argc;
-char **argv;
-{
-	int	c;
-	int	digit_optind = 0;
-
-	while (1)
-	{
-		int	this_option_optind = zbx_optind ? zbx_optind : 1;
-
-		c = getopt (argc, argv, "abc:d:0123456789");
-		if (c == EOF)
-		{
-			break;
-		}
-
-		switch (c)
-		{
-		case '0':
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
-			if (digit_optind != 0 && digit_optind != this_option_optind)
-			{
-				printf ("digits occur in two different argv-elements.\n");
-			}
-			digit_optind = this_option_optind;
-			printf ("option %c\n", c);
-			break;
-
-		case 'a':
-			printf ("option a\n");
-			break;
-
-		case 'b':
-			printf ("option b\n");
-			break;
-
-		case 'c':
-			printf ("option c with value `%s'\n", *zbx_optarg);
-			break;
-
-		case BAD_OPTION:
-			break;
-
-		default:
-			printf ("?? getopt returned character code 0%o ??\n", c);
-		}
-	}
-
-	if (zbx_optind < argc)
-	{
-		printf ("non-option ARGV-elements: ");
-		while (zbx_optind < argc)
-		{
-			printf ("%s ", argv[zbx_optind++]);
-		}
-		printf ("\n");
-	}
-
-	exit (0);
-}
-
-#endif /* TEST */
