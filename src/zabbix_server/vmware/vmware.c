@@ -2485,7 +2485,7 @@ static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node)
 	props[ZBX_VMWARE_DEV_PROPS_IFCONNECTED] = zbx_xml_node_read_value(details, node,
 			ZBX_XNN("connectable") ZBX_XPATH_LN("connected"));
 
-	if (NULL != (attr_value = xmlGetProp(node->parent, (const xmlChar *)"type")))
+	if (NULL != (attr_value = xmlGetProp(node, (const xmlChar *)"type")))
 	{
 		props[ZBX_VMWARE_DEV_PROPS_IFTYPE] = zbx_strdup(NULL, (const char *)attr_value);
 		xmlFree(attr_value);
