@@ -667,7 +667,7 @@ class testTemplateGroup extends CAPITest {
 			[
 				'templategroup' => [
 					'groups' => [
-						'groupid' => '52013'
+						'groupid' => '50013'
 					],
 					'templates' => [
 						'templateid' => '50020'
@@ -690,7 +690,7 @@ class testTemplateGroup extends CAPITest {
 			[
 				'templategroup' => [
 					'groups' => [
-						'groupid' => '52013'
+						'groupid' => '50013'
 					],
 					'templates' => []
 				],
