@@ -249,7 +249,7 @@ class CWidgetClock extends CWidget {
 			}
 		}
 		else {
-			let offset = now.getTimezoneOffset();
+			const offset = now.getTimezoneOffset();
 
 			const hours = Math.floor(Math.abs(offset) / 60).toString().padStart(2, '0');
 			const minutes = (Math.abs(offset) % 60).toString().padStart(2, '0');
