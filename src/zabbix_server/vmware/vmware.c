@@ -4236,6 +4236,7 @@ out:
  *             hvs          - [OUT] list of vmware hypervisor ids             *
  *             dss          - [OUT] list of vmware datastore ids              *
  *             datacenters  - [OUT] list of vmware datacenters                *
+ *             dvswitches   - [OUT] list of vmware DVSwitch                   *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
@@ -5821,7 +5822,7 @@ static void	vmware_service_copy_cust_query_response(zbx_vector_cq_value_t *cq_va
  * Purpose: collect custom requests of the selected type                      *
  *                                                                            *
  * Parameters: cust_queries - [IN] the hashset with all type custom queries   *
- *             type         - [IN] - the type of custom query
+ *             type         - [IN] - the type of custom query                 *
  *             cq_values    - [OUT] the vector with custom query entries and  *
  *                              responses                                     *
  *                                                                            *
@@ -5868,8 +5869,7 @@ static void	vmware_service_cust_query_prep(zbx_hashset_t *cust_queries, const zb
  *                                                                            *
  * Purpose: load DVSwitch info from VC                                        *
  *                                                                            *
- * Parameters: service    - [IN] the vmware service                           *
- *             easyhandle - [IN] the CURL handle                              *
+ * Parameters: easyhandle - [IN] the CURL handle                              *
  *             cq_values  - [IN/OUT] the vector with custom query entries     *
  *                                     and responses                          *
  *                                                                            *
@@ -7010,7 +7010,7 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
  * Purpose: start monitoring custom query of the specified entity             *
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
- *             type         - [IN] the entity type                            *
+ *             soap_type    - [IN] the entity type                            *
  *             id           - [IN] the entity id                              *
  *             key          - [IN] the custom query id                        *
  *             query_type   - [IN] the type of query                          *
@@ -7078,11 +7078,14 @@ int	zbx_vmware_service_add_cust_query(zbx_vmware_service_t *service, const char 
  *                                                                            *
  * Purpose: gets performance entity by type and id                            *
  *                                                                            *
- * Parameters: service - [IN] the vmware service                              *
- *             type    - [IN] the performance entity type                     *
- *             id      - [IN] the performance entity id                       *
+ * Parameters: service      - [IN] the vmware service                         *
+ *             soap_type    - [IN] the entity type                            *
+ *             id           - [IN] the entity id                              *
+ *             key          - [IN] the custom query id                        *
+ *             query_type   - [IN] the type of query                          *
+ *             mode         - [IN] the mode of output value for custom query  *
  *                                                                            *
- * Return value: the performance entity or NULL if not found                  *
+ * Return value: the custom query entity or NULL if not found                 *
  *                                                                            *
  ******************************************************************************/
 zbx_vmware_cust_query_t	*zbx_vmware_service_get_cust_query(zbx_vmware_service_t *service, const char *soap_type,

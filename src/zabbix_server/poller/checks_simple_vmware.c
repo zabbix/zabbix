@@ -2830,7 +2830,7 @@ int	check_vcenter_dvswitch_fetchports_get(AGENT_REQUEST *request, const char *us
 	}
 
 	if (NULL == (custom_query = zbx_vmware_service_get_cust_query(service, type, dvs->id, key, query_type, mode))
-			&& ( SUCCEED != custquery_param_create(key, &query_params)
+			&& (SUCCEED != custquery_param_create(key, &query_params)
 			|| SUCCEED != dvs_param_validate(&query_params)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL,
@@ -2861,7 +2861,7 @@ int	check_vcenter_dvswitch_fetchports_get(AGENT_REQUEST *request, const char *us
 		SET_STR_RESULT(result, zbx_strdup(NULL, custom_query->value));
 
 	if (0 != (custom_query->state & ZBX_VMWARE_CQ_PAUSED))
-		custom_query->state &= ~ ZBX_VMWARE_CQ_PAUSED;
+		custom_query->state &= ~ZBX_VMWARE_CQ_PAUSED;
 
 	custom_query->last_pooled = time(NULL);
 	ret = SYSINFO_RET_OK;
