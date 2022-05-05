@@ -1487,9 +1487,8 @@ form.dashboard-grid-widget-clock .field-group-tzone .field-timezone {
 
 div.dashboard-grid-widget-clock.clock-digital {
   box-sizing: border-box;
-  height: 100%;
+  min-height: 100%;
   padding: 10px;
-  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1502,7 +1501,8 @@ div.dashboard-grid-widget-clock.clock-digital {
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: calc(var(--content-height) * var(--widget-clock-font) / 1.14);
-    line-height: 1.14; }
+    line-height: 1.14;
+    flex-shrink: 0; }
   div.dashboard-grid-widget-clock.clock-digital .bold {
     font-weight: bold; }
   div.dashboard-grid-widget-clock.clock-digital .clock-disabled {

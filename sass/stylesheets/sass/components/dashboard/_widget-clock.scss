@@ -45,9 +45,8 @@ div.dashboard-grid-widget-clock {
 		$line-height: 1.14;
 
 		box-sizing: border-box;
-		height: 100%;
+		min-height: 100%;
 		padding: 10px;
-		overflow-x: hidden;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
@@ -62,6 +61,7 @@ div.dashboard-grid-widget-clock {
 			text-overflow: ellipsis;
 			font-size: calc(var(--content-height) * var(--widget-clock-font) / #{$line-height});
 			line-height: $line-height;
+			flex-shrink: 0;
 		}
 
 		.bold {
