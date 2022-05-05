@@ -20,7 +20,7 @@
 #ifndef ZABBIX_DBCONFIG_H
 #define ZABBIX_DBCONFIG_H
 
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
 #include "user_macro.h"
@@ -98,6 +98,7 @@ typedef struct
 	const char		*port;
 	const char		*error;
 	const char		*delay;
+	const char		*delay_ex;
 	const char		*history_period;
 	ZBX_DC_TRIGGER		**triggers;
 	int			nextcheck;
@@ -113,7 +114,6 @@ typedef struct
 	unsigned char		flags;
 	unsigned char		status;
 	unsigned char		queue_priority;
-	unsigned char		schedulable;
 	unsigned char		update_triggers;
 	zbx_uint64_t		templateid;
 
@@ -898,8 +898,6 @@ char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t item
 char	*dc_expand_user_macros_in_calcitem(const char *formula, zbx_uint64_t hostid);
 
 char	*dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int hostids_num);
-int	dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *hostids, int hostids_num,
-		char **value, char **error);
 
 #define ZBX_TRIGGER_TIMER_NONE			0x0000
 #define ZBX_TRIGGER_TIMER_TRIGGER		0x0001

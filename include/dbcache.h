@@ -25,6 +25,7 @@
 #include "zbxcomms.h"
 #include "zbxshmem.h"
 #include "zbxeval.h"
+#include "zbxavailability.h"
 
 #define ZBX_SYNC_DONE		0
 #define	ZBX_SYNC_MORE		1
@@ -54,6 +55,13 @@
 #define ZBX_IPC_SERVICE_CONFIG		"config"
 #define ZBX_IPC_CONFIG_RELOAD_REQUEST	1
 #define ZBX_IPC_CONFIG_RELOAD_RESPONSE	2
+
+#define ZBX_AGENT_ZABBIX	(INTERFACE_TYPE_AGENT - 1)
+#define ZBX_AGENT_SNMP		(INTERFACE_TYPE_SNMP - 1)
+#define ZBX_AGENT_IPMI		(INTERFACE_TYPE_IPMI - 1)
+#define ZBX_AGENT_JMX		(INTERFACE_TYPE_JMX - 1)
+#define ZBX_AGENT_UNKNOWN	255
+#define ZBX_AGENT_MAX		INTERFACE_TYPE_COUNT
 
 extern int	CONFIG_TIMEOUT;
 
@@ -658,6 +666,13 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 #define ZBX_DBSYNC_UPDATE	1
 #define ZBX_SYNC_SECRETS	2
 
+typedef enum
+{
+	ZBX_SYNCED_NEW_CONFIG_NO,
+	ZBX_SYNCED_NEW_CONFIG_YES
+}
+zbx_synced_new_config_t;
+
 #define ZBX_ITEM_GET_MISC		0x0001
 #define ZBX_ITEM_GET_DELAY		0x0002
 #define ZBX_ITEM_GET_EMPTY_ERROR	0x0004
@@ -686,7 +701,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 #define ZBX_TRIGGER_GET_DEFAULT		(~(unsigned int)ZBX_TRIGGER_GET_ITEMIDS)
 #define ZBX_TRIGGER_GET_ALL		(~(unsigned int)0)
 
-void	DCsync_configuration(unsigned char mode);
+void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced);
 void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths);
 int	init_configuration_cache(char **error);
 void	free_configuration_cache(void);
@@ -839,11 +854,6 @@ void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags);
 
 int	DCget_interfaces_availability(zbx_vector_ptr_t *interfaces, int *ts);
 void	DCtouch_interfaces_availability(const zbx_vector_uint64_t *interfaceids);
-
-void	zbx_interface_availability_init(zbx_interface_availability_t *availability, zbx_uint64_t interfaceid);
-void	zbx_interface_availability_clean(zbx_interface_availability_t *ia);
-void	zbx_interface_availability_free(zbx_interface_availability_t *availability);
-int	zbx_interface_availability_is_set(const zbx_interface_availability_t *ia);
 
 void	zbx_set_availability_diff_ts(int ts);
 
@@ -1023,10 +1033,11 @@ typedef struct
 	zbx_uint64_t		triggerid;
 	zbx_uint64_t		hostid;
 	zbx_uint32_t		type;
-	zbx_time_unit_t		trend_base;
 	unsigned char		lock;		/* 1 if the timer has locked trigger, 0 otherwise */
 	int			revision;	/* revision */
+	time_t			lastcheck;
 	zbx_timespec_t		eval_ts;	/* the history time for which trigger must be recalculated */
+	zbx_timespec_t		check_ts;	/* time when timer must be checked */
 	zbx_timespec_t		exec_ts;	/* real time when the timer must be executed */
 	const char		*parameter;	/* function parameters (for trend functions) */
 }
@@ -1071,5 +1082,22 @@ int	zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, char **text, 
 		int hostids_num, char **error);
 
 char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
+
+int	zbx_dc_get_proxyid_by_name(const char *name, zbx_uint64_t *proxyid, unsigned char *type);
+int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid);
+
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	unsigned char	status;
+	char		*name;
+}
+zbx_cached_proxy_t;
+
+ZBX_PTR_VECTOR_DECL(cached_proxy, zbx_cached_proxy_t *)
+
+void	zbx_dc_get_all_proxies(zbx_vector_cached_proxy_t *proxies);
+
+int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **name);
 
 #endif

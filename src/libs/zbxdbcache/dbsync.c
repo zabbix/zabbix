@@ -1755,10 +1755,6 @@ static char	**dbsync_item_preproc_row(char **row)
 	{
 		zbx_eval_context_t	ctx;
 		char			*error = NULL;
-		zbx_uint64_t		hostid;
-
-		/* get associated host identifier */
-		ZBX_STR2UINT64(hostid, row[1]);
 
 		if (FAIL == zbx_eval_parse_expression(&ctx, row[11], ZBX_EVAL_PARSE_CALC_EXPRESSION, &error))
 		{
@@ -3609,10 +3605,10 @@ static int	dbsync_compare_item_preproc(const zbx_dc_preproc_op_t *preproc, const
 	if (FAIL == dbsync_compare_int(dbrow[4], preproc->step))
 		return FAIL;
 
-	if (FAIL == dbsync_compare_int(dbrow[6], preproc->error_handler))
+	if (FAIL == dbsync_compare_int(dbrow[5], preproc->error_handler))
 		return FAIL;
 
-	if (FAIL == dbsync_compare_str(dbrow[7], preproc->error_handler_params))
+	if (FAIL == dbsync_compare_str(dbrow[6], preproc->error_handler_params))
 		return FAIL;
 
 	return SUCCEED;
@@ -3636,10 +3632,9 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 	zbx_hashset_iter_t	iter;
 	zbx_uint64_t		rowid;
 	zbx_dc_preproc_op_t	*preproc;
-	char			**row;
 
 	if (NULL == (result = DBselect(
-			"select pp.item_preprocid,pp.itemid,pp.type,pp.params,pp.step,h.hostid,pp.error_handler,"
+			"select pp.item_preprocid,pp.itemid,pp.type,pp.params,pp.step,pp.error_handler,"
 				"pp.error_handler_params"
 			" from item_preproc pp,items i,hosts h"
 			" where pp.itemid=i.itemid"
@@ -3655,7 +3650,7 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 8, NULL);
+	dbsync_prepare(sync, 7, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
@@ -3673,18 +3668,16 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(rowid, dbrow[0]);
 		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
 
-		row = dbsync_preproc_row(sync, dbrow);
-
 		if (NULL == (preproc = (zbx_dc_preproc_op_t *)zbx_hashset_search(&dbsync_env.cache->preprocops,
 				&rowid)))
 		{
 			tag = ZBX_DBSYNC_ROW_ADD;
 		}
-		else if (FAIL == dbsync_compare_item_preproc(preproc, row))
+		else if (FAIL == dbsync_compare_item_preproc(preproc, dbrow))
 			tag = ZBX_DBSYNC_ROW_UPDATE;
 
 		if (ZBX_DBSYNC_ROW_NONE != tag)
-			dbsync_add_row(sync, rowid, tag, row);
+			dbsync_add_row(sync, rowid, tag, dbrow);
 	}
 
 	zbx_hashset_iter_reset(&dbsync_env.cache->preprocops, &iter);

@@ -31,12 +31,15 @@ window.widget_tophosts_form = new class {
 	}
 
 	initSortable(element) {
+		const is_disabled = element.querySelectorAll('tr.sortable').length < 2;
+
 		$(element).sortable({
+			disabled: is_disabled,
 			items: 'tbody tr.sortable',
 			axis: 'y',
 			containment: 'parent',
 			cursor: 'grabbing',
-			handle: 'div.drag-icon',
+			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			tolerance: 'pointer',
 			opacity: 0.6,
 			helper: function(e, ui) {
@@ -61,6 +64,10 @@ window.widget_tophosts_form = new class {
 				$(ui.placeholder).height($(ui.helper).height());
 			}
 		});
+
+		for (const drag_icon of element.querySelectorAll('div.<?= ZBX_STYLE_DRAG_ICON ?>')) {
+			drag_icon.classList.toggle('<?= ZBX_STYLE_DISABLED ?>', is_disabled);
+		}
 	}
 
 	processColumnsAction(e) {

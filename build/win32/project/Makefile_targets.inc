@@ -52,7 +52,13 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\libs\zbxregexp}.c{..\..\..\src\libs\zbxregexp}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
-{..\..\..\src\libs\zbxsys}.c{..\..\..\src\libs\zbxsys}.o:
+{..\..\..\src\libs\zbxthreads}.c{..\..\..\src\libs\zbxthreads}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
+{..\..\..\src\libs\zbxmutexs}.c{..\..\..\src\libs\zbxmutexs}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
+{..\..\..\src\libs\zbxsymbols}.c{..\..\..\src\libs\zbxsymbols}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
 {..\..\..\src\libs\zbxexec}.c{..\..\..\src\libs\zbxexec}.o:
@@ -78,6 +84,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 
 {..\..\..\src\libs\zbxsysinfo\win32}.cpp{..\..\..\src\libs\zbxsysinfo\win32}.o:
 	$(CC) $? /Fo"$@" $(CPPFLAGS)
+
+{..\..\..\src\libs\zbxsysinfo\alias}.c{..\..\..\src\libs\zbxsysinfo\alias}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
 
 {..\..\..\src\libs\zbxwin32}.c{..\..\..\src\libs\zbxwin32}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)

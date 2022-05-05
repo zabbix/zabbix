@@ -18,7 +18,7 @@
 **/
 
 #include "common.h"
-#include "threads.h"
+#include "zbxthreads.h"
 #include "module.h"
 
 #include "zbxcrypto.h"
@@ -1470,6 +1470,8 @@ const char	*zbx_result_string(int result)
 			return "AGENT_ERROR";
 		case GATEWAY_ERROR:
 			return "GATEWAY_ERROR";
+		case SIG_ERROR:
+			return "SIG_ERROR";
 		case SYSINFO_RET_FAIL:
 			return "SYSINFO_RET_FAIL";
 		default:

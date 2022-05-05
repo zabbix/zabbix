@@ -90,5 +90,8 @@ hosts:
       macro: "{$BASE:eight}"
       value: "800"
     templates: [1]
+  - hostid: 9
+    macros: []
+    templates: []
 vault: []
 ...

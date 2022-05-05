@@ -41,7 +41,7 @@ class CWidgetProblemsBySv extends CWidget {
 
 				clearMessages();
 
-				addMessage(makeMessageBox('good', [], response.message, true, false));
+				addMessage(makeMessageBox('good', [], response.message));
 
 				if (this._state === WIDGET_STATE_ACTIVE) {
 					this._startUpdating();

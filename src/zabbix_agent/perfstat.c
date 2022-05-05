@@ -20,9 +20,8 @@
 #include "perfstat.h"
 
 #include "stats.h"
-#include "alias.h"
 #include "log.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "sysinfo.h"
 
 #define OBJECT_CACHE_REFRESH_INTERVAL	60
@@ -151,7 +150,7 @@ zbx_perf_counter_data_t	*add_perf_counter(const char *name, const char *counterp
 		char	*alias_name;
 
 		alias_name = zbx_dsprintf(NULL, "__UserPerfCounter[%s]", name);
-		add_alias(name, alias_name);
+		zbx_add_alias(name, alias_name);
 		zbx_free(alias_name);
 	}
 out:

@@ -24,7 +24,7 @@
 #include "zbxserver.h"
 #include "zbxregexp.h"
 
-#include "../../libs/zbxaudit/audit.h"
+#include "audit/zbxaudit.h"
 
 #define OVERRIDE_STOP_TRUE	1
 

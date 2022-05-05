@@ -26,7 +26,7 @@
 #include "common.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "dbconfig.h"
 
 #include "configcache_mock.h"

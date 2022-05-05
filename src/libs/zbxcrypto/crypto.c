@@ -69,3 +69,35 @@ int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len)
 
 	return len;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: convert binary data to hex string                                 *
+ *                                                                            *
+ * Parameters: bin     - [IN] the data to convert                             *
+ *             bin_len - [IN] the number of bytes to convert                  *
+ *             out     - [OUT] the output buffer                              *
+ *             out_len - [IN] the size of output buffer (should be at least   *
+ *                            2 * bin_len + 1)                                *
+ *                                                                            *
+ * Return value: The number of bytes written (excluding terminating zero)     *
+ *                                                                            *
+ ******************************************************************************/
+int    zbx_bin2hex(const unsigned char *bin, size_t bin_len, char *out, size_t out_len)
+{
+	const char	*hex = "0123456789abcdef";
+	size_t		i;
+
+	if (bin_len * 2 + 1 > out_len)
+		bin_len = (out_len - 1) / 2;
+
+	for (i = 0; i < bin_len; i++)
+	{
+		*out++ = hex[bin[i] >> 4];
+		*out++ = hex[bin[i] & 15];
+	}
+
+	*out = '\0';
+
+	return bin_len * 2;
+}

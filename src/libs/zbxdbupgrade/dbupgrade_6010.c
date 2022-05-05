@@ -98,6 +98,49 @@ static int	DBpatch_6010003(void)
 
 static int	DBpatch_6010004(void)
 {
+	const ZBX_FIELD	field = {"link_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts_templates", &field);
+}
+
+static int	DBpatch_6010005(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = SUCCEED;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	result = DBselect(
+		"select ht.hosttemplateid"
+		" from hosts_templates ht, hosts h"
+		" where ht.hostid=h.hostid and h.flags=4"); /* ZBX_FLAG_DISCOVERY_CREATED */
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		/* set TEMPLATE_LINK_LLD as link_type */
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update hosts_templates set link_type=1 where hosttemplateid=%s;\n", row[0]);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_6010006(void)
+{
 	const ZBX_TABLE	table =
 			{"changelog", "changelogid", 0,
 				{
@@ -114,7 +157,7 @@ static int	DBpatch_6010004(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6010005(void)
+static int	DBpatch_6010007(void)
 {
 #ifdef HAVE_ORACLE
 	return DBcreate_serial_sequence("changelog");
@@ -123,7 +166,7 @@ static int	DBpatch_6010005(void)
 #endif
 }
 
-static int	DBpatch_6010006(void)
+static int	DBpatch_6010008(void)
 {
 #ifdef HAVE_ORACLE
 	return DBcreate_serial_trigger("changelog", "changelogid");
@@ -132,22 +175,22 @@ static int	DBpatch_6010006(void)
 #endif
 }
 
-static int	DBpatch_6010007(void)
+static int	DBpatch_6010009(void)
 {
 	return DBcreate_index("changelog", "changelog_1", "clock", 0);
 }
 
-static int	DBpatch_6010008(void)
+static int	DBpatch_6010010(void)
 {
 	return DBcreate_changelog_insert_trigger("items", "itemid");
 }
 
-static int	DBpatch_6010009(void)
+static int	DBpatch_6010011(void)
 {
 	return DBcreate_changelog_update_trigger("items", "itemid");
 }
 
-static int	DBpatch_6010010(void)
+static int	DBpatch_6010012(void)
 {
 	return DBcreate_changelog_delete_trigger("items", "itemid");
 }
@@ -168,5 +211,7 @@ DBPATCH_ADD(6010007, 0, 1)
 DBPATCH_ADD(6010008, 0, 1)
 DBPATCH_ADD(6010009, 0, 1)
 DBPATCH_ADD(6010010, 0, 1)
+DBPATCH_ADD(6010011, 0, 1)
+DBPATCH_ADD(6010012, 0, 1)
 
 DBPATCH_END()

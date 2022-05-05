@@ -51,7 +51,6 @@ static int	str_to_timer_type(const char *str)
 
 void	zbx_mock_test_entry(void **state)
 {
-	char			*error = NULL;
 	zbx_timespec_t		ts_from, ts_returned, ts_expected;
 	zbx_trigger_timer_t	timer = {0};
 
@@ -67,17 +66,6 @@ void	zbx_mock_test_entry(void **state)
 
 	timer.type = str_to_timer_type(zbx_mock_get_parameter_string("in.type"));
 	timer.parameter = zbx_mock_get_parameter_string("in.params");
-
-	if (ZBX_TRIGGER_TIMER_FUNCTION_TREND == timer.type)
-	{
-		if (SUCCEED != zbx_trends_parse_base(timer.parameter, &timer.trend_base, &error))
-		{
-			fail_msg("cannot parse trends function base: %s", error);
-			zbx_free(error);
-		}
-	}
-	else
-		timer.trend_base = ZBX_TIME_UNIT_UNKNOWN;
 
 	ts_returned.ns = 0;
 	ts_returned.sec = zbx_dc_function_calculate_nextcheck(&timer, ts_from.sec, 0);

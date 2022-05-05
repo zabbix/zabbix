@@ -435,7 +435,7 @@ static void	um_macro_register_kvs(zbx_um_macro_t *macro, const char *location)
 	zbx_hashset_t		*macro_kv = (0 == macro->hostid ? &config->gmacro_kv : &config->hmacro_kv);
 	zbx_dc_macro_kv_t	*mkv;
 
-	zbx_strsplit_first(location, ':', &path, &key);
+	zbx_strsplit_last(location, ':', &path, &key);
 
 	if (NULL == key)
 	{
@@ -613,7 +613,13 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 			break;
 
 		if (SUCCEED != zbx_user_macro_parse_dyn(row[offset], &name, &context, NULL, &context_op))
+		{
+			if (2 == offset)
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\"", row[1], row[2]);
+			else
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse global macro \"%s\"", row[1]);
 			continue;
+		}
 
 		ZBX_STR2UINT64(macroid, row[0]);
 
@@ -793,7 +799,9 @@ static void	um_cache_sync_hosts(zbx_um_cache_t *cache, zbx_dbsync_t *sync)
 	{
 		int	i;
 
-		if (NULL == (host = um_cache_acquire_host(cache, rowid)))
+		ZBX_STR2UINT64(hostid, row[0]);
+
+		if (NULL == (host = um_cache_acquire_host(cache, hostid)))
 			continue;
 
 		ZBX_DBROW2UINT64(templateid, row[1]);

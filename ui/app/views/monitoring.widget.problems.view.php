@@ -264,7 +264,8 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 			->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 			->addClass(ZBX_STYLE_LINK_ALT)
-			->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);')
+			->setAttribute('data-eventid', $problem['eventid'])
+			->onClick('acknowledgePopUp({eventids: [this.dataset.eventid]}, this);')
 		: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
 			$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
 		);
@@ -302,8 +303,8 @@ $output = [
 	'body' => $table->toString()
 ];
 
-if (($messages = getMessages()) !== null) {
-	$output['messages'] = $messages->toString();
+if ($messages = get_and_clear_messages()) {
+	$output['messages'] = array_column($messages, 'message');
 }
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

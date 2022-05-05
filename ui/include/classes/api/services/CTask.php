@@ -151,16 +151,18 @@ class CTask extends CApiService {
 		$this->validateCreate($tasks);
 
 		$tasks_by_types = [
-			ZBX_TM_DATA_TYPE_CHECK_NOW => [],
-			ZBX_TM_DATA_TYPE_DIAGINFO => []
+			ZBX_TM_DATA_TYPE_DIAGINFO => [],
+			ZBX_TM_DATA_TYPE_PROXY_HOSTIDS => [],
+			ZBX_TM_DATA_TYPE_CHECK_NOW => []
 		];
 
 		foreach ($tasks as $index => $task) {
 			$tasks_by_types[$task['type']][$index] = $task;
 		}
 
-		$return = $this->createTasksCheckNow($tasks_by_types[ZBX_TM_DATA_TYPE_CHECK_NOW]);
-		$return += $this->createTasksDiagInfo($tasks_by_types[ZBX_TM_DATA_TYPE_DIAGINFO]);
+		$return = $this->createTasksDiagInfo($tasks_by_types[ZBX_TM_DATA_TYPE_DIAGINFO])
+			+ $this->createTasksProxyHostids($tasks_by_types[ZBX_TM_DATA_TYPE_PROXY_HOSTIDS])
+			+ $this->createTasksCheckNow($tasks_by_types[ZBX_TM_DATA_TYPE_CHECK_NOW]);
 
 		ksort($return);
 
@@ -176,47 +178,50 @@ class CTask extends CApiService {
 	 */
 	protected function validateCreate(array &$tasks) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
-			'type' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_TM_DATA_TYPE_DIAGINFO, ZBX_TM_DATA_TYPE_CHECK_NOW])],
-			'request' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-								['if' => ['field' => 'type', 'in' => ZBX_TM_DATA_TYPE_DIAGINFO], 'type' => API_OBJECT, 'fields' => [
-				'historycache' =>	['type' => API_OBJECT, 'fields' => [
-					'stats' =>			['type' => API_OUTPUT, 'in' => implode(',', ['items', 'values', 'memory', 'memory.data', 'memory.index']), 'default' => API_OUTPUT_EXTEND],
-					'top' =>			['type' => API_OBJECT, 'fields' => [
-						'values' =>			['type' => API_INT32]
-					]]
-				]],
-				'valuecache' =>		['type' => API_OBJECT, 'fields' => [
-					'stats' =>			['type' => API_OUTPUT, 'in' => implode(',', ['items', 'values', 'memory', 'mode']), 'default' => API_OUTPUT_EXTEND],
-					'top' =>			['type' => API_OBJECT, 'fields' => [
-						'values' =>			['type' => API_INT32],
-						'request.values' =>	['type' => API_INT32]
-					]]
-				]],
-				'preprocessing' =>	['type' => API_OBJECT, 'fields' => [
-					'stats' =>			['type' => API_OUTPUT, 'in' => implode(',', ['values', 'preproc.values']), 'default' => API_OUTPUT_EXTEND],
-					'top' =>			['type' => API_OBJECT, 'fields' => [
-						'values' =>			['type' => API_INT32]
-					]]
-				]],
-				'alerting' =>		['type' => API_OBJECT, 'fields' => [
-					'stats' =>			['type' => API_OUTPUT, 'in' => 'alerts', 'default' => API_OUTPUT_EXTEND],
-					'top' =>			['type' => API_OBJECT, 'fields' => [
-						'media.alerts' =>	['type' => API_INT32],
-						'source.alerts' =>	['type' => API_INT32]
-					]]
-				]],
-				'lld' =>			['type' => API_OBJECT, 'fields' => [
-					'stats' =>			['type' => API_OUTPUT, 'in' => implode(',', ['rules', 'values']), 'default' => API_OUTPUT_EXTEND],
-					'top' =>			['type' => API_OBJECT, 'fields' => [
-						'values' =>			['type' => API_INT32]
-					]]
-				]]
+			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_TM_DATA_TYPE_DIAGINFO, ZBX_TM_DATA_TYPE_PROXY_HOSTIDS, ZBX_TM_DATA_TYPE_CHECK_NOW])],
+			'request' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+									['if' => ['field' => 'type', 'in' => ZBX_TM_DATA_TYPE_DIAGINFO], 'type' => API_OBJECT, 'fields' => [
+										'historycache' =>	['type' => API_OBJECT, 'fields' => [
+											'stats' =>			['type' => API_OUTPUT, 'in' => implode(',', ['items', 'values', 'memory', 'memory.data', 'memory.index']), 'default' => API_OUTPUT_EXTEND],
+											'top' =>			['type' => API_OBJECT, 'fields' => [
+												'values' =>			['type' => API_INT32]
+											]]
+										]],
+										'valuecache' =>		['type' => API_OBJECT, 'fields' => [
+											'stats' =>			['type' => API_OUTPUT, 'in' => implode(',', ['items', 'values', 'memory', 'mode']), 'default' => API_OUTPUT_EXTEND],
+											'top' =>			['type' => API_OBJECT, 'fields' => [
+												'values' =>			['type' => API_INT32],
+												'request.values' =>	['type' => API_INT32]
+											]]
+										]],
+										'preprocessing' =>	['type' => API_OBJECT, 'fields' => [
+											'stats' =>			['type' => API_OUTPUT, 'in' => implode(',', ['values', 'preproc.values']), 'default' => API_OUTPUT_EXTEND],
+											'top' =>			['type' => API_OBJECT, 'fields' => [
+												'values' =>			['type' => API_INT32]
+											]]
+										]],
+										'alerting' =>		['type' => API_OBJECT, 'fields' => [
+											'stats' =>			['type' => API_OUTPUT, 'in' => 'alerts', 'default' => API_OUTPUT_EXTEND],
+											'top' =>			['type' => API_OBJECT, 'fields' => [
+												'media.alerts' =>	['type' => API_INT32],
+												'source.alerts' =>	['type' => API_INT32]
+											]]
+										]],
+										'lld' =>			['type' => API_OBJECT, 'fields' => [
+											'stats' =>			['type' => API_OUTPUT, 'in' => implode(',', ['rules', 'values']), 'default' => API_OUTPUT_EXTEND],
+											'top' =>			['type' => API_OBJECT, 'fields' => [
+												'values' =>			['type' => API_INT32]
+											]]
+										]]
+									]],
+									['if' => ['field' => 'type', 'in' => ZBX_TM_DATA_TYPE_PROXY_HOSTIDS], 'type' => API_OBJECT, 'fields' => [
+										'proxy_hostids' =>	['type' => API_IDS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => true]
+									]],
+									['if' => ['field' => 'type', 'in' => ZBX_TM_DATA_TYPE_CHECK_NOW], 'type' => API_OBJECT, 'fields' => [
+										'itemid' => ['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+									]]
 								]],
-								['if' => ['field' => 'type', 'in' => ZBX_TM_DATA_TYPE_CHECK_NOW], 'type' => API_OBJECT, 'fields' => [
-				'itemid' => ['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
-								]]
-			]],
-			'proxy_hostid' => ['type' => API_ID, 'default' => 0]
+			'proxy_hostid' =>	['type' => API_ID, 'default' => 0]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $tasks, '/', $error)) {
@@ -233,6 +238,12 @@ class CTask extends CApiService {
 					$min_permissions = USER_TYPE_SUPER_ADMIN;
 
 					$proxy_hostids[$task['proxy_hostid']] = true;
+					break;
+
+				case ZBX_TM_DATA_TYPE_PROXY_HOSTIDS:
+					$min_permissions = USER_TYPE_SUPER_ADMIN;
+
+					$proxy_hostids = array_fill_keys($task['request']['proxy_hostids'], true);
 					break;
 
 				case ZBX_TM_DATA_TYPE_CHECK_NOW:
@@ -366,6 +377,66 @@ class CTask extends CApiService {
 
 		DB::insertBatch('task', $task_rows, false);
 		DB::insertBatch('task_data', $task_data_rows, false);
+
+		return $return;
+	}
+
+	/**
+	 * @param array $tasks
+	 *
+	 * @return array
+	 */
+	protected function createTasksProxyHostids(array $tasks): array {
+		$task_rows = [];
+		$task_data_rows = [];
+		$proxy_hostids = [];
+		$return = [];
+		$taskid = DB::reserveIds('task', count($tasks));
+
+		foreach ($tasks as $index => $task) {
+			$task_rows[] = [
+				'taskid' => $taskid,
+				'type' => ZBX_TM_TASK_DATA,
+				'status' => ZBX_TM_STATUS_NEW,
+				'clock' => time(),
+				'ttl' => SEC_PER_HOUR,
+				'proxy_hostid' => null
+			];
+
+			$task_data_rows[] = [
+				'taskid' => $taskid,
+				'type' => ZBX_TM_DATA_TYPE_PROXY_HOSTIDS,
+				'data' => json_encode([
+					'proxy_hostids' => $task['request']['proxy_hostids']
+				]),
+				'parent_taskid' => $taskid
+			];
+
+			$proxy_hostids += array_flip($task['request']['proxy_hostids']);
+
+			$return[$index] = $taskid;
+			$taskid = bcadd($taskid, 1, 0);
+		}
+
+		DB::insertBatch('task', $task_rows, false);
+		DB::insertBatch('task_data', $task_data_rows, false);
+
+		if ($proxy_hostids) {
+			$proxies = API::Proxy()->get([
+				'output' => ['host'],
+				'proxyids' => array_keys($proxy_hostids),
+				'preservekeys' => true
+			]);
+
+			foreach ($proxies as $proxyid => $proxy) {
+				self::addAuditLog(CAudit::ACTION_CONFIG_REFRESH, CAudit::RESOURCE_PROXY, [
+					$proxyid => [
+						'proxyid' => $proxyid,
+						'host' => $proxy['host']
+					]
+				]);
+			}
+		}
 
 		return $return;
 	}

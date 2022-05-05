@@ -16,14 +16,14 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+#include "zbxtrends.h"
+#include "trends.h"
 
 #include "common.h"
 #include "zbxalgo.h"
 #include "log.h"
-#include "zbxtrends.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "zbxshmem.h"
-#include "trends.h"
 
 extern zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE;
 
@@ -513,8 +513,13 @@ int	zbx_tfc_get_value(zbx_uint64_t itemid, int start, int end, zbx_trend_functio
 		{
 			char	buf[ZBX_MAX_DOUBLE_LEN + 1];
 
+			if (data->state == ZBX_TREND_STATE_NODATA)
+				zbx_strlcpy(buf, "none", sizeof(buf));
+			else
+				zbx_print_double(buf, sizeof(buf), data->value);
+
 			zabbix_log(LOG_LEVEL_DEBUG, "End of %s() state:%s value:%s", __func__,
-					tfc_state_str(data->state), zbx_print_double(buf, sizeof(buf), data->value));
+					tfc_state_str(data->state), buf);
 		}
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():not cached", __func__);

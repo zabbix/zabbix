@@ -434,7 +434,7 @@ static void	um_mock_dbsync_add_htmpl(zbx_dbsync_t *sync, unsigned char tag, zbx_
 		sync->columns_num = 2;
 
 	row = (zbx_dbsync_row_t *)zbx_malloc(NULL, sizeof(zbx_dbsync_row_t));
-	row->rowid = hostid;
+	row->rowid = 0;
 	row->tag = tag;
 
 	row->row = (char **)zbx_malloc(NULL, sizeof(char *) * (size_t)sync->columns_num);

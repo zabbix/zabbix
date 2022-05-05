@@ -502,6 +502,7 @@ static int	eval_query_expand_user_macros(const char *itemquery, size_t len, cons
 		if (FAIL == ret)
 		{
 			zbx_free(value);
+			zbx_eval_clear(&ctx);
 			goto out;
 		}
 
