@@ -39,7 +39,7 @@ class Utils
     /**
      * @var bool Control if the `Forwarded-For-*` headers are used
      */
-    private static $_proxyVars = false;
+    private static $_proxyVars = true;
 
     /**
      * @var string|null
