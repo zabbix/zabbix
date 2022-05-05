@@ -228,7 +228,7 @@ class CWidgetClock extends CWidget {
 		const month = (now.getMonth() + 1).toString().padStart(2, '0');
 		const day = now.getDate().toString().padStart(2, '0');
 
-		clock_date.innerText = `${year}/${month}/${day}`;
+		clock_date.textContent = `${year}/${month}/${day}`;
 	}
 
 	_fillTimeZone() {
@@ -257,6 +257,6 @@ class CWidgetClock extends CWidget {
 			time_zone = `(UTC${offset > 0 ? '-' : '+'}${hours}:${minutes}) ${time_zone}`;
 		}
 
-		clock_time_zone.innerText = time_zone.replace(/_/g, ' ');
+		clock_time_zone.textContent = time_zone.replace(/_/g, ' ');
 	}
 }
