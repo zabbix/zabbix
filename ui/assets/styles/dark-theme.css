@@ -7014,7 +7014,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   border-radius: 2px;
   outline: none; }
 
-.er-cluster span {
+.marker-cluster span {
   line-height: 30px; }
 
 .leaflet-control.disabled {

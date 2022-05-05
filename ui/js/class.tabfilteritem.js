@@ -453,9 +453,9 @@ class CTabFilterItem extends CBaseComponent {
 					has_filter = true;
 				}
 			}
-		})
+		});
 
-		if(this._index === 0) {
+		if (this._index === 0) {
 			if (has_filter) {
 				this._target.parentNode.setAttribute('data-indicator-value', '1');
 				this._target.parentNode.setAttribute('data-indicator', 'mark');
