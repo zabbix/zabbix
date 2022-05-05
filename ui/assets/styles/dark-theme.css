@@ -156,6 +156,7 @@ svg a {
   content: '';
   display: inline-block;
   margin-left: .4em;
+  margin-right: 7px;
   width: 7px;
   height: 7px;
   border-radius: 50%;
@@ -2476,8 +2477,9 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   margin-left: .4em;
   padding: 0.1em 0.4em;
   font-size: 0.917em;
-  background-color: #2b2b2b;
+  background-color: #ffffff;
   border-radius: 2px;
+  border: 1px solid;
   color: #e1e3ed;
   content: attr(data-counter); }
 

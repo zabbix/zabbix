@@ -199,8 +199,9 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 	margin-left: .4em;
 	padding: 0.1em 0.4em;
 	font-size: $font-h3-size;
-	background-color: $tab-label-counter-bg-color;
+	background-color: $white;
 	border-radius: 2px;
+	border: 1px solid;
 	color: $tab-label-counter-color;
 	content: attr(data-counter);
 }

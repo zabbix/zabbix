@@ -457,8 +457,8 @@ class CTabFilterItem extends CBaseComponent {
 
 		if(this._index === 0) {
 			if (has_filter) {
-				this._target.setAttribute('data-indicator-value', '1');
-				this._target.setAttribute('data-indicator', 'mark');
+				this._target.parentNode.setAttribute('data-indicator-value', '1');
+				this._target.parentNode.setAttribute('data-indicator', 'mark');
 			}
 			else {
 				this.resetUnsavedState();
@@ -466,8 +466,8 @@ class CTabFilterItem extends CBaseComponent {
 		}
 		else {
 			if (src_query.toString() !== search_params.toString()) {
-				this._target.setAttribute('data-indicator-value', '1');
-				this._target.setAttribute('data-indicator', 'mark');
+				this._target.parentNode.setAttribute('data-indicator-value', '1');
+				this._target.parentNode.setAttribute('data-indicator', 'mark');
 			}
 			else {
 				this.resetUnsavedState();
@@ -494,8 +494,8 @@ class CTabFilterItem extends CBaseComponent {
 		src_query.sort();
 
 		this._src_url = src_query.toString();
-		this._target.removeAttribute('data-indicator-value');
-		this._target.removeAttribute('data-indicator');
+		this._target.parentNode.removeAttribute('data-indicator-value');
+		this._target.parentNode.removeAttribute('data-indicator');
 	}
 
 	/**
