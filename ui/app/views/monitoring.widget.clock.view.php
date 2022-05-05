@@ -86,7 +86,7 @@ else {
 		}
 		else {
 			$rows[] = (new CDiv())
-				->addItem('00:00:00')
+				->addItem(_('No data'))
 				->addClass('clock-disabled');
 		}
 
