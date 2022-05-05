@@ -40,23 +40,23 @@ class CControllerWidgetClockView extends CControllerWidget {
 			'time' => null,
 			'time_zone_offset' => null,
 			'date' => null,
-			'time_zone' => null,
+			'time_zone' => TIMEZONE_DEFAULT_LOCAL,
 			'is_enabled' => true,
 			'critical_error' => null
 		];
 
 		switch ($fields['time_type']) {
 			case TIME_TYPE_HOST:
-				$clock_data = $this->configureHostTime($fields, $config_defaults);
+				$clock_data = $this->configureHostTime($fields) + $config_defaults;
 				break;
 
 			case TIME_TYPE_SERVER:
-				$clock_data = $this->configureFields($fields, $config_defaults);
+				$clock_data = $this->configureFields($fields) + $config_defaults;
 				$clock_data['name'] = _('Server');
 				break;
 
 			default:
-				$clock_data = $this->configureFields($fields, $config_defaults);
+				$clock_data = $this->configureFields($fields) + $config_defaults;
 				$clock_data['name'] = _('Local');
 				break;
 		}
@@ -182,13 +182,12 @@ class CControllerWidgetClockView extends CControllerWidget {
 	/**
 	 * Create required clock field values both for analog and digital clock.
 	 *
-	 * @param array $fields    Saved clock configuration.
-	 * @param array $defaults  Clock configuration default values.
+	 * @param array $fields  Saved clock configuration.
 	 *
 	 * @return array  Return prepared clock configuration.
 	 */
-	protected function configureFields(array $fields, array $defaults): array {
-		$clock = $defaults;
+	protected function configureFields(array $fields): array {
+		$clock = [];
 
 		$date = $this->makeDateTimeFromTimeZone($fields['tzone_timezone']);
 
@@ -208,13 +207,12 @@ class CControllerWidgetClockView extends CControllerWidget {
 	}
 
 	/**
-	 * @param array $fields
-	 * @param array $defaults
+	 * @param array $fields  Saved clock configuration.
 	 *
 	 * @return array
 	 */
-	protected function configureHostTime(array $fields, array $defaults): array {
-		$clock = $defaults;
+	protected function configureHostTime(array $fields): array {
+		$clock = ['is_enabled' => true];
 
 		if ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD) {
 			if ($this->hasInput('dynamic_hostid')) {
@@ -253,42 +251,44 @@ class CControllerWidgetClockView extends CControllerWidget {
 			]);
 		}
 
-		if ($clock['is_enabled']) {
-			if ($items) {
-				$item = $items[0];
-				$clock['name'] = $item['hosts'][0]['name'];
+		if (!$clock['is_enabled']) {
+			return $clock;
+		}
 
-				$last_value = Manager::History()->getLastValues([$item]);
+		if ($items) {
+			$item = $items[0];
+			$clock['name'] = $item['hosts'][0]['name'];
 
-				if ($last_value) {
-					$last_value = $last_value[$item['itemid']][0];
+			$last_value = Manager::History()->getLastValues([$item]);
 
-					try {
-						$now = new DateTime($last_value['value']);
+			if ($last_value) {
+				$last_value = $last_value[$item['itemid']][0];
 
-						if ($this->showDate($fields)) {
-							$clock['date'] = $now->format('Y/m/d');
-						}
+				try {
+					$now = new DateTime($last_value['value']);
 
-						$clock['time_zone_offset'] = (int) $now->format('Z');
-
-						$clock['time'] = time() - ($last_value['clock'] - $now->getTimestamp());
-
-						if ($this->showTimeZone($fields)) {
-							$clock['time_zone'] = 'UTC'.$now->format('P');
-						}
+					if ($this->showDate($fields)) {
+						$clock['date'] = $now->format('Y/m/d');
 					}
-					catch (Exception $e) {
-						$clock['is_enabled'] = false;
+
+					$clock['time_zone_offset'] = (int) $now->format('Z');
+
+					$clock['time'] = time() - ($last_value['clock'] - $now->getTimestamp());
+
+					if ($this->showTimeZone($fields)) {
+						$clock['time_zone'] = 'UTC'.$now->format('P');
 					}
 				}
-				else {
+				catch (Exception $e) {
 					$clock['is_enabled'] = false;
 				}
 			}
 			else {
-				$clock['critical_error'] = _('No permissions to referred object or it does not exist!');
+				$clock['is_enabled'] = false;
 			}
+		}
+		else {
+			$clock['critical_error'] = _('No permissions to referred object or it does not exist!');
 		}
 
 		return $clock;
@@ -297,7 +297,7 @@ class CControllerWidgetClockView extends CControllerWidget {
 	/**
 	 * Groups enabled field styles by field name (Date, Time, Time zone).
 	 *
-	 * @param array $fields
+	 * @param array $fields  Saved clock configuration.
 	 *
 	 * @return array
 	 */
