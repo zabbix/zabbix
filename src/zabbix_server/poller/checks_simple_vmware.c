@@ -2868,7 +2868,7 @@ int	check_vcenter_vm_attribute_get(AGENT_REQUEST *request, const char *username,
 	const char			*url, *vm_uuid, *attr_name, *value;
 	zbx_vmware_service_t		*service;
 	zbx_vmware_vm_t			*vm;
-	zbx_vmware_custom_attr_t	custom_attr;
+	zbx_vmware_custom_attr_t	custom_attr_cmp;
 	int				index, ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -2900,9 +2900,10 @@ int	check_vcenter_vm_attribute_get(AGENT_REQUEST *request, const char *username,
 		goto unlock;
 	}
 
-	custom_attr.name = attr_name;
+	custom_attr_cmp.name = attr_name;
 
-	if (FAIL == (index = zbx_vector_vmware_custom_attr_bsearch(&vm->custom_attrs, &custom_attr, vmware_custom_attr_compare)))
+	if (FAIL == (index = zbx_vector_vmware_custom_attr_bsearch(&vm->custom_attrs, &custom_attr_cmp,
+					vmware_custom_attr_compare)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Custom attribute is not available."));
 		goto unlock;
