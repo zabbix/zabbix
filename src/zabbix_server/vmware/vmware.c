@@ -2864,6 +2864,7 @@ static int	vmware_service_get_vm_folder(xmlDoc *xdoc, char **vm_folder)
 static int	vmware_service_get_resourcepool_data(xmlDoc *xdoc, const char *r_id, char **parentid, char **path)
 {
 	char	tmp[MAX_STRING_LEN], *id, *name;
+	int	ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() resource pool id:'%s'", __func__, r_id);
 	id = zbx_strdup(NULL, r_id);
@@ -2882,7 +2883,8 @@ static int	vmware_service_get_resourcepool_data(xmlDoc *xdoc, const char *r_id, 
 			zbx_free(*parentid);
 			zbx_free(*path);
 			zbx_free(id_esc);
-			return FAIL;
+			ret = FAIL;
+			break;
 		}
 
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_GET_RESOURCEPOOL_PARENTID("%s"), id_esc);
@@ -2906,9 +2908,10 @@ static int	vmware_service_get_resourcepool_data(xmlDoc *xdoc, const char *r_id, 
 	}
 	while (NULL != id);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): resource pool:%s", __func__, r_id);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s resource pool path: '%s', parentid: '%s'", __func__,
+			zbx_result_string(ret), ZBX_NULL2EMPTY_STR(*path), ZBX_NULL2EMPTY_STR(*parentid));
 
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
@@ -3861,7 +3864,7 @@ int	vmware_dsname_compare(const void *d1, const void *d2)
  * Purpose: sorting function to sort Resource pool names vector by name       *
  *                                                                            *
  ******************************************************************************/
-int	vmware_resourcepool_compare(const void *r1, const void *r2)
+int	vmware_resourcepool_compare_id(const void *r1, const void *r2)
 {
 	const zbx_vmware_resourcepool_t	*rp1 = *(const zbx_vmware_resourcepool_t * const *)r1;
 	const zbx_vmware_resourcepool_t	*rp2 = *(const zbx_vmware_resourcepool_t * const *)r2;
@@ -4130,7 +4133,6 @@ static int	vmware_service_get_hv_ds_dc_list(const zbx_vmware_service_t *service,
 			"<ns0:specSet>"								\
 				"<ns0:propSet>"							\
 					"<ns0:type>HostSystem</ns0:type>"			\
-					/*"<ns0:pathSet>parent</ns0:pathSet>"			*/\
 				"</ns0:propSet>"						\
 				"<ns0:propSet>"							\
 					"<ns0:type>Datastore</ns0:type>"			\
@@ -5294,7 +5296,6 @@ static int	vmware_service_get_clusters_and_resourcepools(CURL *easyhandle, zbx_v
 
 		if (SUCCEED != vmware_service_get_cluster_status(easyhandle, ids.values[i], &status, error))
 		{
-			zbx_vector_str_clear_ext(&rpools_all, zbx_str_free);
 			zbx_free(name);
 			goto out;
 		}
@@ -5333,7 +5334,7 @@ static int	vmware_service_get_clusters_and_resourcepools(CURL *easyhandle, zbx_v
 		zbx_vector_vmware_resourcepool_append(resourcepools, rpool);
 	}
 
-	zbx_vector_vmware_resourcepool_sort(resourcepools, vmware_resourcepool_compare);
+	zbx_vector_vmware_resourcepool_sort(resourcepools, vmware_resourcepool_compare_id);
 	zbx_vector_str_clear_ext(&rpools_all, zbx_str_free);
 	zbx_vector_str_destroy(&rpools_all);
 	zbx_vector_str_destroy(&rpools_uniq);

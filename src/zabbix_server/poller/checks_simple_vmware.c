@@ -2873,7 +2873,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 				rpool_cmp.id = vm->props[ZBX_VMWARE_VMPROP_RESOURCEPOOL];
 
 				if (FAIL != (idx = zbx_vector_vmware_resourcepool_bsearch(&service->data->resourcepools,
-						&rpool_cmp, vmware_resourcepool_compare)))
+						&rpool_cmp, vmware_resourcepool_compare_id)))
 				{
 					zbx_json_addstring(&json_data, "{#VM.RPOOL.PATH}",
 							ZBX_NULL2EMPTY_STR(service->data->resourcepools.values[idx]->path),
