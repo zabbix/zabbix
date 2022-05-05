@@ -29,7 +29,7 @@ window.widget_clock_form = new class {
 		this.show_time = document.getElementById('show_2');
 		this.show_tzone = document.getElementById('show_3');
 
-		this.advance_configuration = document.getElementById('adv_conf');
+		this.advanced_configuration = document.getElementById('adv_conf');
 
 		document.querySelectorAll('#widget-dialogue-form .<?= ZBX_STYLE_COLOR_PICKER ?> input')
 			.forEach((colorpicker) => {
@@ -49,7 +49,7 @@ window.widget_clock_form = new class {
 			checkbox.addEventListener('change', () => this.updateForm());
 		}
 
-		this.advance_configuration.addEventListener('change', () => this.updateForm());
+		this.advanced_configuration.addEventListener('change', () => this.updateForm());
 
 		const show = [this.show_date, this.show_time, this.show_tzone];
 
@@ -70,14 +70,14 @@ window.widget_clock_form = new class {
 	updateForm() {
 		const is_digital = document.querySelector('#clock_type input:checked').value == <?= WIDGET_CLOCK_TYPE_DIGITAL ?>;
 
-		const show_date_row = is_digital && this.advance_configuration.checked && this.show_date.checked;
-		const show_time_row = is_digital && this.advance_configuration.checked && this.show_time.checked;
-		const show_tzone_row = is_digital && this.advance_configuration.checked && this.show_tzone.checked;
+		const show_date_row = is_digital && this.advanced_configuration.checked && this.show_date.checked;
+		const show_time_row = is_digital && this.advanced_configuration.checked && this.show_time.checked;
+		const show_tzone_row = is_digital && this.advanced_configuration.checked && this.show_tzone.checked;
 
 		document.getElementById('show-row').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !is_digital);
 		document.getElementById('adv-conf-row').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !is_digital);
 		document.getElementById('bg-color-row').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !is_digital
-			|| !this.advance_configuration.checked);
+			|| !this.advanced_configuration.checked);
 
 		document.getElementById('date-row').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_date_row);
 		document.getElementById('time-row').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_time_row);
