@@ -1387,7 +1387,7 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve a xmlNode from xml document                              *
+ * Purpose: retrieve an xmlNode from xml document                             *
  *                                                                            *
  * Parameters: xdoc  - [IN] the XML document                                  *
  *             xpath - [IN] the XML XPath                                     *

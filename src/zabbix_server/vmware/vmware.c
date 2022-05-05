@@ -2960,9 +2960,8 @@ out:
  *                                                                            *
  * Purpose: create json with info about vm snapshots                          *
  *                                                                            *
- * Parameters: xdoc - [IN] the xml document with all vm details               *
- *             node - [IN] the xml node with last vm snapshot                 *
- *             jstr - [OUT] json with vm snapshot info                        *
+ * Parameters: xml_node - [IN] the xml node with last vm snapshot             *
+ *             jstr     - [OUT] json with vm snapshot info                    *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr)
@@ -3019,6 +3018,7 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, FAIL == ret ? zbx_result_string(ret) :
 			ZBX_NULL2EMPTY_STR(*jstr));
+
 	return ret;
 }
 
