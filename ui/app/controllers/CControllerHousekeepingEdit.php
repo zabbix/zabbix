@@ -102,7 +102,8 @@ class CControllerHousekeepingEdit extends CController {
 				CHousekeepingHelper::HK_TRENDS_GLOBAL
 			)),
 			'hk_trends' => $this->getInput('hk_trends', CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)),
-			'compression_availability' => 0,
+			'compression_availability' => false,
+			'compression_state' => ZBX_STATE_UNKNOWN,
 			'compression_status' => $this->getInput('compression_status', CHousekeepingHelper::get(
 				CHousekeepingHelper::COMPRESSION_STATUS
 			)),
@@ -119,7 +120,11 @@ class CControllerHousekeepingEdit extends CController {
 				foreach (json_decode($dbversion_status, true) as $dbversion) {
 					if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB
 							&& array_key_exists('compression_availability', $dbversion)) {
-						$data['compression_availability'] = (int) $dbversion['compression_availability'];
+						$data['timescaledb_min_version'] = $dbversion['min_version'];
+						$data['timescaledb_max_version'] = $dbversion['max_version'];
+						$data['timescaledb_min_supported_version'] = $dbversion['min_supported_version'];
+						$data['compression_availability'] = $dbversion['compression_availability'];
+						$data['compression_state'] = $dbversion['compression_state'];
 						break;
 					}
 				}

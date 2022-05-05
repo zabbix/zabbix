@@ -154,13 +154,63 @@ $house_keeper_tab = (new CFormList())
 	);
 
 	if ($data['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
+		switch ($data['compression_state']) {
+			case ZBX_STATE_UNKNOWN:
+				$timescaledb_error = _('Unable to retrieve TimescaleDB compression support status.');
+				break;
+
+			case ZBX_TIMESCALEDB_POSTGRES_TOO_OLD:
+				$timescaledb_error = _('Compression is not supported.').' '.
+					_('PostgreSQL database server version is too old.');
+				break;
+
+			case ZBX_TIMESCALEDB_VERSION_FAILED_TO_RETRIEVE:
+				$timescaledb_error = _('Compression is not supported.').' '.
+					_('Unable to retrieve TimescaleDB version.');
+				break;
+
+			case ZBX_TIMESCALEDB_VERSION_LOWER_THAN_MINIMUM:
+				$timescaledb_error = _('Compression is not supported.').' '.
+					_s('Minimum required TimescaleDB version is %1$s.', $data['timescaledb_min_version']);
+				break;
+
+			case ZBX_TIMESCALEDB_VERSION_NOT_SUPPORTED:
+				$timescaledb_error = _s('Unsupported TimescaleDB version. Should be at least %1$s.',
+					$data['timescaledb_min_supported_version']
+				);
+
+				if (!$data['compression_availability']) {
+					$timescaledb_error = _('Compression is not supported.').' '.$timescaledb_error;
+				}
+				break;
+
+			case ZBX_TIMESCALEDB_VERSION_HIGHER_THAN_MAXIMUM:
+				$timescaledb_error = _s('Unsupported TimescaleDB version. Must not be higher than %1$s.',
+					$data['timescaledb_max_version']
+				);
+				break;
+
+			case ZBX_TIMESCALEDB_LICENSE_NOT_COMMUNITY:
+				$timescaledb_error = _('Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition.');
+				break;
+
+			case ZBX_TIMESCALEDB_COMPRESSION_SUPPORTED:
+			default:
+				$timescaledb_error = '';
+		}
+
+		$timescaledb_error = $timescaledb_error !== ''
+			? (makeErrorIcon($timescaledb_error))->addStyle('margin-left: 5px;')
+			: null;
+		$compression_status_checkbox = (new CCheckBox('compression_status'))
+			->setChecked($data['compression_status'] == 1)
+			->setEnabled($data['compression_availability']);
+
 		$house_keeper_tab
 			->addRow((new CTag('h4', true, _('History and trends compression')))->addClass('input-section-header'))
 			->addRow(
 				new CLabel(_('Enable compression'), 'compression_status'),
-				(new CCheckBox('compression_status'))
-					->setChecked($data['compression_status'] == 1)
-					->setEnabled($data['compression_availability'] == 1)
+				[$compression_status_checkbox, $timescaledb_error]
 			)
 			->addRow(
 				(new CLabel(_('Compress records older than'), 'compress_older'))
@@ -173,7 +223,6 @@ $house_keeper_tab = (new CFormList())
 					->setAriaRequired()
 			);
 	}
-
 
 $house_keeper_tab
 	->addRow((new CTag('h4', true, _('Audit')))->addClass('input-section-header'))
