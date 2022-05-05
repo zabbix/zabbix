@@ -54,6 +54,7 @@
 			<arg line="-j5"/>
 			<arg line="-I/usr/include"/>
 			<arg line="-I/usr/local/include"/>
+			<arg line="-I./include/common"/>
 			<arg line="-I./include"/>
 			<!-- Exclude Duktape library from checking -->
 			<arg line="-isrc/libs/zbxembed/duk_config.h"/>
