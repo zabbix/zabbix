@@ -52,8 +52,6 @@ void	zbx_daemon_stop(void);
 int	zbx_sigusr_send(int flags, const char *pid_file_pathname);
 void	zbx_set_sigusr_handler(void (*handler)(int flags));
 
-#define ZBX_DO_EXIT()
-
 void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **out);
 void	zbx_signal_process_by_pid(int pid, int flags, char **out);
 /* daemon end */
