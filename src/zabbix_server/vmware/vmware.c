@@ -3089,9 +3089,8 @@ out:
  *                                                                            *
  * Purpose: create json with info about vm snapshots                          *
  *                                                                            *
- * Parameters: xdoc - [IN] the xml document with all vm details               *
- *             node - [IN] the xml node with last vm snapshot                 *
- *             jstr - [OUT] json with vm snapshot info                        *
+ * Parameters: xml_node - [IN] the xml node with last vm snapshot             *
+ *             jstr     - [OUT] json with vm snapshot info                    *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr)
@@ -3148,6 +3147,7 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, FAIL == ret ? zbx_result_string(ret) :
 			ZBX_NULL2EMPTY_STR(*jstr));
+
 	return ret;
 }
 
@@ -3217,7 +3217,6 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 		vm->props[ZBX_VMWARE_VMPROP_SNAPSHOT] = zbx_strdup(NULL, "{\"snapshot\":[],\"count\":0,"
 				"\"latestdate\":null,\"size\":0,\"uniquesize\":0}");
 	}
-
 
 	vmware_vm_get_nic_devices(vm, details);
 	vmware_vm_get_disk_devices(vm, details);
@@ -5903,9 +5902,12 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 					"datastore/totalReadLatency[average]",
 					"datastore/totalWriteLatency[average]",
 					"datastore/numberReadAveraged[average]",
-					"datastore/numberWriteAveraged[average]", "cpu/usage[average]",
-					"cpu/utilization[average]", "power/power[average]",
-					"power/powerCap[average]",
+					"datastore/numberWriteAveraged[average]",
+					"cpu/usage[average]", "cpu/utilization[average]",
+					"power/power[average]", "power/powerCap[average]",
+					"net/droppedRx[summation]", "net/droppedTx[summation]",
+					"net/errorsRx[summation]", "net/errorsTx[summation]",
+					"net/broadcastRx[summation]", "net/broadcastTx[summation]",
 					NULL
 				};
 

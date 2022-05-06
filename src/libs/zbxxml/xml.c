@@ -1347,7 +1347,7 @@ char	*zbx_xml_doc_read_value(xmlDoc *xdoc, const char *xpath)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve a xmlNode from xml data relative to the specified node   *
+ * Purpose: retrieve an xmlNode from xml data relative to the specified node  *
  *                                                                            *
  * Parameters: xdoc    - [IN] the XML document                                *
  *             node   - [IN] the XML node                                     *
@@ -1387,7 +1387,7 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve a xmlNode from xml document                              *
+ * Purpose: retrieve an xmlNode from xml document                             *
  *                                                                            *
  * Parameters: xdoc  - [IN] the XML document                                  *
  *             xpath - [IN] the XML XPath                                     *

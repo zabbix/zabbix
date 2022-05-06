@@ -22,7 +22,7 @@ package oracle
 import (
 	"context"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 func asmDiskGroupsDiscovery(ctx context.Context, conn OraClient, params map[string]string,

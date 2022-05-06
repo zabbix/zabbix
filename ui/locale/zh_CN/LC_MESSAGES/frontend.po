@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-04-29 10:42+0000\n"
+"PO-Revision-Date: 2022-05-01 14:39+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -334,7 +334,7 @@ msgstr "3D 视图"
 #: app/views/administration.queue.overview.php:51
 #: app/views/administration.queue.overview.proxy.php:51
 msgid "5 minutes"
-msgstr "5分"
+msgstr "5分钟"
 
 #: app/views/administration.queue.overview.php:47
 #: app/views/administration.queue.overview.proxy.php:47
@@ -393,7 +393,7 @@ msgstr "API token"
 #: include/classes/api/services/CToken.php:299
 #, c-format
 msgid "API token \"%1$s\" already exists for userid \"%2$s\"."
-msgstr "API令牌 \"%1$s\"已分配给用户\"%2$s\"。"
+msgstr "API token \"%1$s\"已分配给用户\"%2$s\"。"
 
 #: app/controllers/CControllerTokenCreate.php:109
 #: app/controllers/CControllerTokenCreate.php:131

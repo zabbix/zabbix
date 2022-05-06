@@ -1,1 +1,1 @@
-.......PS. [ZBXNEXT-2043] added support for collecting snapshot info for vmware and support for the new functions vmware.vm.snapshot.get and vmware.vmconsolidationneeded (MVekslers)
+.......PS. [ZBXNEXT-2043] added support for collecting vmware snapshot information and new items vmware.vm.snapshot.get and vmware.vm.consolidationneeded (MVekslers)

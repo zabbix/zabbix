@@ -285,7 +285,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Host groups' => 'Templates/Databases'
 					],
 					'context' => 'template',
-					'rows' => 84
+					'rows' => 85
 				]
 			],
 			[
@@ -553,6 +553,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$this->page->acceptAlert();
 		$string = ($table->getRows()->count() == 1) ? 'Discovery rule ' : 'Discovery rules ';
 		$this->assertEquals($string.lcfirst($action).'d', CMessageElement::find()->one()->getTitle());
+		CMessageElement::find()->one()->close();
 	}
 
 	public static function getDeleteAllButtonData() {
