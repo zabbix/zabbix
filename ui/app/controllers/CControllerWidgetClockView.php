@@ -192,7 +192,7 @@ class CControllerWidgetClockView extends CControllerWidget {
 		$date = $this->makeDateTimeFromTimeZone($fields['tzone_timezone']);
 
 		if ($this->showDate($fields) && $date !== null) {
-			$clock['date'] = $date->format('Y/m/d');
+			$clock['date'] = $date->format(ZBX_DATE);
 		}
 
 		if ($this->showTime($fields) && $date !== null) {
