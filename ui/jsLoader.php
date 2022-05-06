@@ -78,6 +78,7 @@ $available_js = [
 	'class.cdate.js' => '',
 	'class.cdebug.js' => '',
 	'class.cmap.js' => '',
+	'class.expandable.subfilter.js' => '',
 	'class.geomaps.js' => '',
 	'class.localstorage.js' => '',
 	'class.menu.js' => '',

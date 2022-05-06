@@ -63,6 +63,8 @@ define('ZBX_GEOMAP_MAX_ZOOM', 30); // Max zoom level for geomap.
 
 define('ZBX_MAX_GRAPHS_PER_PAGE', 20);
 
+define('SUBFILTER_VALUES_PER_GROUP', 1000); // Number of subfilter values per group.
+
 // Date and time format separators must be synced with setSDateFromOuterObj() in class.calendar.js.
 define('ZBX_FULL_DATE_TIME',	'Y-m-d H:i:s'); // Time selector full date and time presentation format.
 define('ZBX_DATE_TIME',			'Y-m-d H:i'); // Time selector date and time without seconds presentation format.
@@ -1750,6 +1752,7 @@ define('ZBX_STYLE_BTN_KIOSK', 'btn-kiosk');
 define('ZBX_STYLE_BTN_MIN', 'btn-min');
 define('ZBX_STYLE_BTN_REMOVE', 'btn-remove');
 define('ZBX_STYLE_BTN_REMOVE_FAV', 'btn-remove-fav');
+define('ZBX_STYLE_BTN_TAG', 'btn-tag');
 define('ZBX_STYLE_BTN_TIME', 'btn-time');
 define('ZBX_STYLE_BTN_TIME_LEFT', 'btn-time-left');
 define('ZBX_STYLE_BTN_TIME_OUT', 'btn-time-out');
@@ -1866,7 +1869,7 @@ define('ZBX_STYLE_ICON_INVISIBLE', 'icon-invisible');
 define('ZBX_STYLE_ICON_USER', 'icon-user');
 define('ZBX_STYLE_ICON_USER_GROUP', 'icon-user-group');
 define('ZBX_STYLE_ICON_MAINTENANCE', 'icon-maintenance');
-define('ZBX_STYLE_ICON_WZRD_ACTION', 'icon-wzrd-action');
+define('ZBX_STYLE_ICON_WIZARD_ACTION', 'icon-wizard-action');
 define('ZBX_STYLE_ACTION_COMMAND', 'icon-action-command');
 define('ZBX_STYLE_ACTION_ICON_CLOSE', 'icon-action-close');
 define('ZBX_STYLE_ACTION_ICON_MSG', 'icon-action-msg');
