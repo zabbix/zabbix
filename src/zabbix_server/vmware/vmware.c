@@ -26,7 +26,6 @@
 
 #include "zbxmutexs.h"
 #include "zbxshmem.h"
-#include "log.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 
@@ -189,7 +188,8 @@ static zbx_uint64_t	evt_req_chunk_size;
 /*
  * SOAP support
  */
-#define	ZBX_XML_HEADER1		"Soapaction:urn:vim25/4.1"
+#define	ZBX_XML_HEADER1_V4	"Soapaction:urn:vim25/4.1"
+#define	ZBX_XML_HEADER1_V6	"Soapaction:urn:vim25/6.0"
 #define ZBX_XML_HEADER2		"Content-Type:text/xml; charset=utf-8"
 /* cURL specific attribute to prevent the use of "Expect" directive */
 /* according to RFC 7231/5.1.1 if xml request is larger than 1k */
@@ -328,6 +328,7 @@ static zbx_uint64_t	evt_req_chunk_size;
 	{property, ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE(property), NULL}
 
 typedef int	(*nodeprocfunc_t)(void *, char **);
+static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr);
 
 typedef struct
 {
@@ -384,7 +385,13 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 	ZBX_VMPROPMAP("guest.hostName"),			/* ZBX_VMWARE_VMPROP_GUESTHOSTNAME */
 	ZBX_VMPROPMAP("guest.guestFamily"),			/* ZBX_VMWARE_VMPROP_GUESTFAMILY */
 	ZBX_VMPROPMAP("guest.guestFullName"),			/* ZBX_VMWARE_VMPROP_GUESTFULLNAME */
-	ZBX_VMPROPMAP("parent")					/* ZBX_VMWARE_VMPROP_FOLDER */
+	ZBX_VMPROPMAP("parent"),				/* ZBX_VMWARE_VMPROP_FOLDER */
+	{"layoutEx</ns0:pathSet><ns0:pathSet>snapshot",		/* ZBX_VMWARE_VMPROP_SNAPSHOT */
+			ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE("snapshot"),
+			vmware_service_get_vm_snapshot},
+	{"datastore", ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM)/* ZBX_VMWARE_VMPROP_DATASTOREID */
+			ZBX_XPATH_PROP_NAME_NODE("datastore") ZBX_XPATH_LN("ManagedObjectReference"), NULL},
+	ZBX_VMPROPMAP("summary.runtime.consolidationNeeded")	/* ZBX_VMWARE_VMPROP_CONSOLIDATION_NEEDED */
 };
 
 #define ZBX_XPATH_OBJECTS_BY_TYPE(type)									\
@@ -1486,6 +1493,7 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
 	vm->uuid = vmware_shared_strdup(src->uuid);
 	vm->id = vmware_shared_strdup(src->id);
 	vm->props = vmware_props_shared_dup(src->props, ZBX_VMWARE_VMPROPS_NUM);
+	vm->snapshot_count = src->snapshot_count;
 
 	for (i = 0; i < src->devs.values_num; i++)
 		zbx_vector_ptr_append(&vm->devs, vmware_dev_shared_dup((zbx_vmware_dev_t *)src->devs.values[i]));
@@ -2770,6 +2778,252 @@ static int	vmware_service_get_vm_folder(xmlDoc *xdoc, char **vm_folder)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: collect info about snapshot disk size                             *
+ *                                                                            *
+ * Parameters: xdoc       - [IN] the xml document with all details            *
+ *             key        - [IN] the id of snapshot disk                      *
+ *             layout_node- [IN] the xml node with snapshot disk info         *
+ *             sz         - [OUT] size of snapshot disk                       *
+ *             usz        - [OUT] uniquesize of snapshot disk                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_vm_snapshot_disksize(xmlDoc *xdoc, const char *key, xmlNode *layout_node, zbx_uint64_t *sz,
+		zbx_uint64_t *usz)
+{
+	char	*value, xpath[MAX_STRING_LEN];
+
+	zbx_snprintf(xpath, sizeof(xpath), ZBX_XNN("file") "[" ZBX_XNN("key") "='%s' and " ZBX_XNN("accessible")
+			"='true'][1]/" ZBX_XNN("size"), key);
+
+	if (NULL != (value = zbx_xml_node_read_value(xdoc, layout_node, xpath)))
+	{
+		if (SUCCEED != is_uint64(value, sz))
+			*sz = 0;
+
+		zbx_free(value);
+	}
+	else
+	{
+		zbx_snprintf(xpath, sizeof(xpath), ZBX_XNN("file") "[" ZBX_XNN("key") "='%s'][1]/" ZBX_XNN("size"),
+				key);	/* snapshot version < 6 */
+
+		if (NULL != (value = zbx_xml_node_read_value(xdoc, layout_node, xpath)))
+		{
+			if (SUCCEED != is_uint64(value, sz))
+				*sz = 0;
+
+			zbx_free(value);
+			*usz = 0;
+			return;
+		}
+
+		*sz = 0;
+	}
+
+	zbx_snprintf(xpath, sizeof(xpath), ZBX_XNN("file") "[" ZBX_XNN("key") "='%s' and " ZBX_XNN("accessible")
+			"='true'][1]/" ZBX_XNN("uniqueSize"), key);
+
+	if (NULL != (value = zbx_xml_node_read_value(xdoc, layout_node, xpath)))
+	{
+		if (SUCCEED != is_uint64(value, usz))
+			*usz = 0;
+
+		zbx_free(value);
+	}
+	else
+	{
+		*usz = 0;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: collect info about snapshots and create json                      *
+ *                                                                            *
+ * Parameters: xdoc       - [IN] the xml document with all details            *
+ *             snap_node  - [IN] the xml node with snapshot info              *
+ *             layout_node- [IN] the xml node with snapshot disk info         *
+ *             disks_used - [IN/OUT] processed disk id                        *
+ *             size       - [IN/OUT] total size of all snapshots              *
+ *             uniquesize - [IN/OUT] total uniquesize of all snapshots        *
+ *             count      - [IN/OUT] total number of all snapshots            *
+ *             latestdate - [OUT] the date of last snapshot                   *
+ *             json_data  - [OUT] json with info about snapshot               *
+ *                                                                            *
+ * Return value: SUCCEED - the operation has completed successfully           *
+ *               FAIL    - the operation has failed                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_vm_snapshot_collect(xmlDoc *xdoc, xmlNode *snap_node, xmlNode *layout_node, zbx_vector_uint64_t *disks_used,
+		zbx_uint64_t *size, zbx_uint64_t *uniquesize, zbx_uint64_t *count, char **latestdate, struct zbx_json *json_data)
+{
+	int			i, ret = FAIL;
+	char			*value, xpath[MAX_STRING_LEN], *name, *desc, *crtime;
+	zbx_vector_str_t	ids;
+	zbx_uint64_t		snap_size, snap_usize;
+	xmlNode			*next_node;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() count:" ZBX_FS_UI64, __func__, *count);
+
+	zbx_vector_str_create(&ids);
+
+	if (NULL == (value = zbx_xml_node_read_value(xdoc, snap_node, ZBX_XNN("snapshot"))))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s() snapshot empty", __func__);
+		goto out;
+	}
+
+	zbx_snprintf(xpath, sizeof(xpath), ZBX_XNN("snapshot") "[" ZBX_XNN("key") "='%s'][1]" ZBX_XPATH_LN("disk")
+			ZBX_XPATH_LN("chain") ZBX_XPATH_LN("fileKey"), value);
+
+	if (FAIL == zbx_xml_node_read_values(xdoc, layout_node, xpath, &ids))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s() empty list of fileKey", __func__);
+		goto out;
+	}
+
+	zbx_snprintf(xpath, sizeof(xpath), ZBX_XNN("snapshot") "[" ZBX_XNN("key") "='%s'][1]"
+			ZBX_XPATH_LN("dataKey"), value);
+	zbx_free(value);
+
+	if (NULL == (value = zbx_xml_node_read_value(xdoc, layout_node, xpath)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s() dataKey empty", __func__);
+		goto out;
+	}
+
+	if (0 <= atoi(value))
+	{
+		vmware_vm_snapshot_disksize(xdoc, value, layout_node, &snap_size, &snap_usize);
+	}
+	else
+	{
+		snap_size = 0;
+		snap_usize = 0;
+	}
+
+	zbx_free(value);
+
+	for (i = 0; i < ids.values_num; i++)
+	{
+		zbx_uint64_t	dsize, dusize, disk_id =  (unsigned int)atoi(ids.values[i]);
+
+		if (FAIL != zbx_vector_uint64_search(disks_used, disk_id, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			continue;
+
+		zbx_vector_uint64_append(disks_used, disk_id);
+		vmware_vm_snapshot_disksize(xdoc, ids.values[i], layout_node, &dsize, &dusize);
+		snap_size += dsize;
+		snap_usize += dusize;
+	}
+
+	name = zbx_xml_node_read_value(xdoc, snap_node, ZBX_XNN("name"));
+	desc = zbx_xml_node_read_value(xdoc, snap_node, ZBX_XNN("description"));
+	crtime = zbx_xml_node_read_value(xdoc, snap_node, ZBX_XNN("createTime"));
+
+	zbx_json_addobject(json_data, NULL);
+	zbx_json_addstring(json_data, "name", ZBX_NULL2EMPTY_STR(name), ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json_data, "description", ZBX_NULL2EMPTY_STR(desc), ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json_data, "createtime", ZBX_NULL2EMPTY_STR(crtime), ZBX_JSON_TYPE_STRING);
+	zbx_json_adduint64(json_data, "size", snap_size);
+	zbx_json_adduint64(json_data, "uniquesize", snap_usize);
+	zbx_json_close(json_data);
+
+	if (NULL != (next_node = zbx_xml_node_get(xdoc, snap_node, ZBX_XNN("childSnapshotList"))))
+	{
+		ret = vmware_vm_snapshot_collect(xdoc, next_node, layout_node, disks_used, size, uniquesize, count,
+				latestdate, json_data);
+	}
+	else
+	{
+		*latestdate = crtime;
+		crtime = NULL;
+		ret = SUCCEED;
+	}
+
+	*count += 1;
+	*size += snap_size;
+	*uniquesize += snap_usize;
+
+	zbx_free(name);
+	zbx_free(desc);
+	zbx_free(crtime);
+out:
+	zbx_vector_str_clear_ext(&ids, zbx_str_free);
+	zbx_vector_str_destroy(&ids);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create json with info about vm snapshots                          *
+ *                                                                            *
+ * Parameters: xml_node - [IN] the xml node with last vm snapshot             *
+ *             jstr     - [OUT] json with vm snapshot info                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr)
+{
+	xmlNode			*root_node, *layout_node, *node = (xmlNode *)xml_node;
+	xmlDoc			*xdoc = node->doc;
+	struct zbx_json		json_data;
+	int			ret = FAIL;
+	char			*latestdate = NULL;
+	zbx_uint64_t		count, size, uniquesize;
+	zbx_vector_uint64_t	disks_used;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_json_init(&json_data, ZBX_JSON_STAT_BUF_LEN);
+	zbx_vector_uint64_create(&disks_used);
+
+	if (NULL == (root_node = zbx_xml_node_get(xdoc, node, ZBX_XNN("rootSnapshotList"))))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() rootSnapshotList empty", __func__);
+		goto out;
+	}
+
+	if (NULL == (layout_node = zbx_xml_doc_get(xdoc, ZBX_XPATH_PROP_NAME("layoutEx"))))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s() layoutEx empty", __func__);
+		goto out;
+	}
+
+	zbx_json_addarray(&json_data, "snapshot");
+
+	count = 0;
+	size = 0;
+	uniquesize = 0;
+
+	if (FAIL == (ret = vmware_vm_snapshot_collect(xdoc, root_node, layout_node, &disks_used, &size, &uniquesize,
+			&count, &latestdate, &json_data)))
+	{
+		goto out;
+	}
+
+	zbx_json_close(&json_data);
+	zbx_json_adduint64(&json_data, "count", count);
+	zbx_json_addstring(&json_data, "latestdate", ZBX_NULL2EMPTY_STR(latestdate), ZBX_JSON_TYPE_STRING);
+	zbx_json_adduint64(&json_data, "size", size);
+	zbx_json_adduint64(&json_data, "uniquesize", uniquesize);
+	zbx_json_close(&json_data);
+
+	*jstr = zbx_strdup(NULL, json_data.buffer);
+out:
+	zbx_free(latestdate);
+	zbx_vector_uint64_destroy(&disks_used);
+	zbx_json_free(&json_data);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, FAIL == ret ? zbx_result_string(ret) :
+			ZBX_NULL2EMPTY_STR(*jstr));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: create virtual machine object                                     *
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
@@ -2818,6 +3072,21 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): can't find vm folder name for id:%s", __func__,
 				vm->props[ZBX_VMWARE_VMPROP_FOLDER]);
+	}
+
+	if (NULL != vm->props[ZBX_VMWARE_VMPROP_SNAPSHOT])
+	{
+		struct zbx_json_parse	jp;
+		char			count[ZBX_MAX_UINT64_LEN];
+
+		zbx_json_open(vm->props[ZBX_VMWARE_VMPROP_SNAPSHOT], &jp);
+		zbx_json_value_by_name(&jp, "count", count, sizeof(count), NULL);
+		vm->snapshot_count = (unsigned int)atoi(count);
+	}
+	else
+	{
+		vm->props[ZBX_VMWARE_VMPROP_SNAPSHOT] = zbx_strdup(NULL, "{\"snapshot\":[],\"count\":0,"
+				"\"latestdate\":null,\"size\":0,\"uniquesize\":0}");
 	}
 
 	vmware_vm_get_nic_devices(vm, details);
@@ -5512,7 +5781,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	ZBX_HTTPPAGE		page;	/* 347K/87K */
 	unsigned char		evt_pause = 0, evt_skip_old;
 	zbx_uint64_t		evt_last_key, events_sz = 0;
-	char			msg[MAX_STRING_LEN / 8];
+	char			msg[MAX_STRING_LEN / 8], soapver[MAX_STRING_LEN / 32];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, service->username, service->url);
 
@@ -5532,6 +5801,12 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	zbx_vmware_lock();
 	evt_last_key = service->eventlog.last_key;
 	evt_skip_old = service->eventlog.skip_old;
+
+	if (6 > service->major_version)
+		zbx_strlcpy(soapver, ZBX_XML_HEADER1_V4, sizeof(soapver));
+	else
+		zbx_strlcpy(soapver, ZBX_XML_HEADER1_V6, sizeof(soapver));
+
 	zbx_vmware_unlock();
 
 	if (NULL == (easyhandle = curl_easy_init()))
@@ -5542,7 +5817,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 
 	page.alloc = ZBX_INIT_UPD_XML_SIZE;
 	page.data = (char *)zbx_malloc(NULL, page.alloc);
-	headers = curl_slist_append(headers, ZBX_XML_HEADER1);
+	headers = curl_slist_append(headers, soapver);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER3);
 
@@ -6186,7 +6461,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 
 	page.alloc = INIT_PERF_XML_SIZE;
 	page.data = (char *)zbx_malloc(NULL, page.alloc);
-	headers = curl_slist_append(headers, ZBX_XML_HEADER1);
+	headers = curl_slist_append(headers, ZBX_XML_HEADER1_V4);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER3);
 

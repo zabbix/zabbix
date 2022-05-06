@@ -23,8 +23,6 @@
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-#include "log.h"
-#include "zbxjson.h"
 #include"../vmware/vmware.h"
 
 #define ZBX_VMWARE_DATASTORE_SIZE_TOTAL		0
@@ -2380,16 +2378,7 @@ int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	for (i = 0; i < service->data->datastores.values_num; i++)
-	{
-		if (0 != strcmp(ds_name, service->data->datastores.values[i]->name))
-			continue;
-
-		datastore = service->data->datastores.values[i];
-		break;
-	}
-
-	if (NULL == datastore)
+	if (NULL == (datastore = ds_get(&service->data->datastores, ds_name)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
 		goto unlock;
@@ -2668,6 +2657,20 @@ int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, const char *username, const
 	return ret;
 }
 
+int	check_vcenter_vm_consolidationneeded(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	int	ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_CONSOLIDATION_NEEDED, result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
 int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
@@ -2857,6 +2860,9 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 
 		for (i = 0; i < hv->vms.values_num; i++)
 		{
+			int			j;
+			zbx_vmware_datastore_t	*datastore = NULL;
+
 			vm = (zbx_vmware_vm_t *)hv->vms.values[i];
 
 			if (NULL == (vm_name = vm->props[ZBX_VMWARE_VMPROP_NAME]))
@@ -2864,6 +2870,26 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 
 			if (NULL == (hv_name = hv->props[ZBX_VMWARE_HVPROP_NAME]))
 				continue;
+
+			for (j = 0; NULL != vm->props[ZBX_VMWARE_VMPROP_DATASTOREID] &&
+				j < service->data->datastores.values_num; j++)
+			{
+				if (0 != strcmp(vm->props[ZBX_VMWARE_VMPROP_DATASTOREID],
+						service->data->datastores.values[j]->id))
+				{
+					continue;
+				}
+
+				datastore = service->data->datastores.values[j];
+				break;
+			}
+
+			if (NULL == datastore)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "%s() Unknown datastore id:%s", __func__,
+						ZBX_NULL2EMPTY_STR(vm->props[ZBX_VMWARE_VMPROP_DATASTOREID]));
+				continue;
+			}
 
 			zbx_json_addobject(&json_data, NULL);
 			zbx_json_addstring(&json_data, "{#VM.UUID}", vm->uuid, ZBX_JSON_TYPE_STRING);
@@ -2887,6 +2913,9 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#VM.FOLDER}",
 					ZBX_NULL2EMPTY_STR(vm->props[ZBX_VMWARE_VMPROP_FOLDER]), ZBX_JSON_TYPE_STRING);
+			zbx_json_adduint64(&json_data, "{#VM.SNAPSHOT.COUNT}", vm->snapshot_count);
+			zbx_json_addstring(&json_data, "{#DATASTORE.NAME}", datastore->name, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "{#DATASTORE.UUID}", datastore->uuid, ZBX_JSON_TYPE_STRING);
 
 			zbx_json_close(&json_data);
 		}
@@ -3106,6 +3135,20 @@ int	check_vcenter_vm_powerstate(AGENT_REQUEST *request, const char *username, co
 
 	if (SYSINFO_RET_OK == ret)
 		ret = vmware_set_powerstate_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_vm_snapshot_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	int	ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_SNAPSHOT, result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
