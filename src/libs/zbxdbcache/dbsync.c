@@ -3244,40 +3244,6 @@ int	zbx_dbsync_compare_host_groups(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compares item preproc table row with cached configuration data    *
- *                                                                            *
- * Parameter: preproc - [IN] the cached item preprocessing operation          *
- *            dbrow   - [IN] the database row                                 *
- *                                                                            *
- * Return value: SUCCEED - the row matches configuration data                 *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	dbsync_compare_item_preproc(const zbx_dc_preproc_op_t *preproc, const DB_ROW dbrow)
-{
-	if (FAIL == dbsync_compare_uint64(dbrow[1], preproc->itemid))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_uchar(dbrow[2], preproc->type))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_str(dbrow[3], preproc->params))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_int(dbrow[4], preproc->step))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_int(dbrow[5], preproc->error_handler))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_str(dbrow[6], preproc->error_handler_params))
-		return FAIL;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: compares item preproc tables with cached configuration data       *
  *                                                                            *
  * Parameter: sync - [OUT] the changeset                                      *
@@ -3288,14 +3254,11 @@ static int	dbsync_compare_item_preproc(const zbx_dc_preproc_op_t *preproc, const
  ******************************************************************************/
 int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 {
-	DB_ROW			dbrow;
-	DB_RESULT		result;
-	zbx_hashset_t		ids;
-	zbx_hashset_iter_t	iter;
-	zbx_uint64_t		rowid;
-	zbx_dc_preproc_op_t	*preproc;
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
 
-	if (NULL == (result = DBselect(
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select pp.item_preprocid,pp.itemid,pp.type,pp.params,pp.step,pp.error_handler,"
 				"pp.error_handler_params"
 			" from item_preproc pp,items i,hosts h"
@@ -3307,53 +3270,23 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 				" and i.flags<>%d",
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-			ZBX_FLAG_DISCOVERY_PROTOTYPE)))
-	{
-		return FAIL;
-	}
+			ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	dbsync_prepare(sync, 7, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		sync->dbresult = result;
-		return SUCCEED;
+		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+			ret = FAIL;
+		goto out;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->hostgroups.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "pp.item_preprocid", "and", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM_PREPROC)]);
+out:
+	zbx_free(sql);
 
-	while (NULL != (dbrow = DBfetch(result)))
-	{
-		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
-
-		ZBX_STR2UINT64(rowid, dbrow[0]);
-		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
-
-		if (NULL == (preproc = (zbx_dc_preproc_op_t *)zbx_hashset_search(&dbsync_env.cache->preprocops,
-				&rowid)))
-		{
-			tag = ZBX_DBSYNC_ROW_ADD;
-		}
-		else if (FAIL == dbsync_compare_item_preproc(preproc, dbrow))
-			tag = ZBX_DBSYNC_ROW_UPDATE;
-
-		if (ZBX_DBSYNC_ROW_NONE != tag)
-			dbsync_add_row(sync, rowid, tag, dbrow);
-	}
-
-	zbx_hashset_iter_reset(&dbsync_env.cache->preprocops, &iter);
-
-	while (NULL != (preproc = (zbx_dc_preproc_op_t *)zbx_hashset_iter_next(&iter)))
-	{
-		if (NULL == zbx_hashset_search(&ids, &preproc->item_preprocid))
-			dbsync_add_row(sync, preproc->item_preprocid, ZBX_DBSYNC_ROW_REMOVE, NULL);
-	}
-
-	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
-
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
