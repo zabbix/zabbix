@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-27T18:35:54Z'
+  date: '2022-04-06T19:27:20Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -154,7 +154,8 @@ zabbix_export:
             -
               uuid: 89f591b666d34aceb71715bfcdda6bff
               expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.hw.serialnumber[systemServiceTag],#1)<>last(/DELL PowerEdge R840 SNMP/dell.server.hw.serialnumber[systemServiceTag],#2) and length(last(/DELL PowerEdge R840 SNMP/dell.server.hw.serialnumber[systemServiceTag]))>0'
-              name: 'Dell R840: Device has been replaced (new serial number received)'
+              name: 'Dell R840: Device has been replaced'
+              event_name: 'Dell R840: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
@@ -212,7 +213,8 @@ zabbix_export:
             -
               uuid: 7a56b961a858470d82c6fdef62f88f43
               expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.name[sysName],#1)<>last(/DELL PowerEdge R840 SNMP/dell.server.name[sysName],#2) and length(last(/DELL PowerEdge R840 SNMP/dell.server.name[sysName]))>0'
-              name: 'Dell R840: System name has changed (new name: {ITEM.VALUE})'
+              name: 'Dell R840: System name has changed'
+              event_name: 'Dell R840: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -365,7 +367,8 @@ zabbix_export:
             -
               uuid: def9f4b7093f421893d2a65f6416cfe5
               expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.uptime[sysUpTime])<10m'
-              name: 'Dell R840: {HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'Dell R840: has been restarted'
+              event_name: 'Dell R840: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -805,7 +808,8 @@ zabbix_export:
                 -
                   uuid: 98c1eb636c534d20ba14d19efe174d9c
                   expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#1)<>last(/DELL PowerEdge R840 SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#2) and length(last(/DELL PowerEdge R840 SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]))>0'
-                  name: 'Dell R840: {#DISK_NAME} has been replaced (new serial number received)'
+                  name: 'Dell R840: {#DISK_NAME} has been replaced'
+                  event_name: 'Dell R840: {#DISK_NAME} has been replaced (new serial number received)'
                   priority: INFO
                   description: '{#DISK_NAME} serial number has changed. Ack to close'
                   manual_close: 'YES'

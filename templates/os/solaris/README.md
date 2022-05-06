@@ -90,7 +90,7 @@ There are no template links in this template.
 |Server has just been restarted |<p>-</p> |`change(/Solaris/system.uptime)<0` |INFO | |
 |/etc/passwd has been changed |<p>-</p> |`last(/Solaris/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/Solaris/vfs.file.cksum[/etc/passwd,sha256],#2)` |WARNING | |
 |Lack of available memory on server |<p>-</p> |`last(/Solaris/vm.memory.size[available])<20M` |AVERAGE | |
-|Zabbix agent is not available (for {$AGENT.TIMEOUT}) |<p>For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.</p> |`max(/Solaris/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0` |AVERAGE |<p>Manual close: YES</p> |
+|Zabbix agent is not available |<p>For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.</p> |`max(/Solaris/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0` |AVERAGE |<p>Manual close: YES</p> |
 |{#FSNAME}: Free inodes is less than 20% |<p>-</p> |`last(/Solaris/vfs.fs.inode[{#FSNAME},pfree])<20` |WARNING | |
 |{#FSNAME}: Free disk space is less than 20% |<p>-</p> |`last(/Solaris/vfs.fs.size[{#FSNAME},pfree])<20` |WARNING | |
 

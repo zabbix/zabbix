@@ -1,25 +1,26 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-01-28 12:08+0300\n"
-"Last-Translator: cesar.fernandez <cesar.fernandez@mrinformatica.es>\n"
+"PO-Revision-Date: 2022-04-22 20:59+0000\n"
+"Last-Translator: mauricio.gafforelli <mauricio.gafforelli@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1643364496.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
-msgstr "La fecha \"%1$s\" debe ser menor que la fecha \"%2$s\"."
+msgstr "La fecha \"%1$s\" debe ser anterior a la fecha \"%2$s\"."
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -502,7 +503,7 @@ msgstr "Reconocer"
 
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
-msgstr "Aceptada"
+msgstr "Reconocer"
 
 #: include/classes/helpers/CRoleHelper.php:463
 msgid "Acknowledge problems"
@@ -867,7 +868,7 @@ msgstr "Agregar equipo"
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
-msgstr ""
+msgstr "Añadir elemento a la columna"
 
 #: app/partials/massupdate.macros.tab.php:95
 #: app/partials/massupdate.valuemaps.tab.php:37
@@ -1090,7 +1091,7 @@ msgstr "Todos los tableros"
 
 #: app/views/monitoring.charts.view.php:82
 msgid "All graphs"
-msgstr ""
+msgstr "Todos los gráficos"
 
 #: app/partials/administration.usergroup.grouprights.html.php:46
 #: app/views/administration.user.edit.php:425
@@ -1587,15 +1588,15 @@ msgstr "Promedio"
 
 #: include/classes/data/CItemData.php:1529
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "Número promedio de solicitudes de lectura excesivas en el disco virtual durante el intervalo de recopilación, <url>: URL del servicio de VMware, <uuid>: nombre de la máquina virtual de VMware, <instance>: instancia del dispositivo de disco"
 
 #: include/classes/data/CItemData.php:1549
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "Número promedio de solicitudes de escritura excesivas en el disco virtual durante el intervalo de recopilación, <url>: URL del servicio de VMware, <uuid>: nombre la máquina virtual de VMware, <instance>: instancia del dispositivo de disco"
 
 #: app/views/administration.authentication.edit.php:93
 msgid "Avoid easy-to-guess passwords"
-msgstr ""
+msgstr "Evite contraseñas fáciles de adivinar"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:307
 msgid "Axes"
@@ -1665,7 +1666,7 @@ msgstr "Bits a desplazar"
 
 #: app/views/popup.triggerexpr.php:110
 msgid "Bitwise functions"
-msgstr ""
+msgstr "Funciones bit a bit"
 
 #: app/views/administration.user.list.php:143
 msgid "Blocked"
@@ -1680,21 +1681,21 @@ msgstr "Azul"
 #: include/views/configuration.item.edit.php:456
 #: include/views/configuration.item.prototype.edit.php:434
 msgid "Body"
-msgstr ""
+msgstr "Cuerpo"
 
 #: app/views/popup.httpstep.php:162
 #: include/views/configuration.host.discovery.edit.php:401
 #: include/views/configuration.item.edit.php:458
 #: include/views/configuration.item.prototype.edit.php:436
 msgid "Body and headers"
-msgstr ""
+msgstr "Cuerpo y cabeceras"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:131
 #: include/classes/widgets/forms/CWidgetFormItem.php:212
 #: include/classes/widgets/forms/CWidgetFormItem.php:275
 #: include/classes/widgets/forms/CWidgetFormItem.php:335
 msgid "Bold"
-msgstr ""
+msgstr "Negrita"
 
 #: include/graphs.inc.php:59 include/views/js/monitoring.sysmaps.js.php:780
 #: include/views/js/monitoring.sysmaps.js.php:870
@@ -1711,7 +1712,7 @@ msgstr "Borde"
 
 #: include/views/js/monitoring.sysmaps.js.php:595
 msgid "Border color"
-msgstr ""
+msgstr "Color de borde"
 
 #: include/views/js/monitoring.sysmaps.js.php:573
 msgid "Border type"
@@ -1723,7 +1724,7 @@ msgstr "Ancho del borde"
 
 #: app/controllers/CControllerUserUpdateGeneral.php:106
 msgid "Both passwords must be equal."
-msgstr ""
+msgstr "Ambas contraseñas deben ser iguales."
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:108
 #: include/classes/widgets/forms/CWidgetFormItem.php:189
@@ -1737,7 +1738,7 @@ msgstr "Debajo"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:133
 msgid "Bottom N"
-msgstr ""
+msgstr "N inferior"
 
 #: jsLoader.php:276
 msgid "Bring forward"
@@ -1785,36 +1786,36 @@ msgstr "Carga de CPU. Devuelve un decimal"
 
 #: include/classes/data/CItemData.php:1429
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
-msgstr ""
+msgstr "Tiempo de CPU dedicado a esperar el intercambio (swap-in), <url>: URL de servicio de VMware, <uuid>: nombre de la máquina virtual de VMware, <instance>: instancia de CPU"
 
 #: include/classes/data/CItemData.php:1281
 msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "El uso de la CPU como porcentaje durante el intervalo depende de la administración de energía o HT, <url>: URL del servicio de VMware, <uuid>: nombre del hipervisor de VMware"
 
 #: include/classes/data/CItemData.php:1273
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Uso de la CPU como porcentaje durante el intervalo, <url>: URL del servicio de VMware, <uuid>: nombre del hipervisor de VMware"
 
 #: include/classes/data/CItemData.php:1433
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Uso de la CPU como porcentaje durante el intervalo, <url>: URL del servicio de VMware, <uuid>: nombre de la máquina virtual de VMware"
 
 #: include/classes/data/CItemData.php:1061
 msgid "CPU utilization percentage. Returns float"
-msgstr ""
+msgstr "Porcentaje de utilización de CPU. Devuelve un número con coma flotante"
 
 #: app/views/popup.itemtestedit.view.php:300
 msgid "CRLF"
-msgstr ""
+msgstr "CRLF"
 
 #: include/items.inc.php:1829
 msgid "CSV to JSON"
-msgstr ""
+msgstr "CSV a JSON"
 
 #: include/classes/validators/CApiInputValidator.php:2717
 #: include/classes/validators/CNewValidator.php:310
 msgid "CUID is expected"
-msgstr ""
+msgstr "Se esperaba CUID"
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:177
 #: include/views/configuration.graph.edit.php:252
@@ -1823,7 +1824,7 @@ msgstr "Calculado"
 
 #: jsLoader.php:232
 msgid "Calendar"
-msgstr ""
+msgstr "Calendario"
 
 #: include/hosts.inc.php:60
 msgid "Callback"
@@ -1868,7 +1869,7 @@ msgstr "Cancelar"
 #: app/controllers/CControllerTokenCreate.php:44
 #: app/controllers/CControllerTokenCreate.php:105
 msgid "Cannot add API token"
-msgstr ""
+msgstr "No se puede agregar el token de API"
 
 #: include/classes/api/services/CGraph.php:517
 #: include/classes/api/services/CGraph.php:531
@@ -1894,7 +1895,7 @@ msgstr "No se pudo agregar la correlación"
 #: jsLoader.php:133
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
-msgstr ""
+msgstr "No se puede agregar la página al panel: se ha añadido el número máximo de %1$d páginas del panel."
 
 #: include/classes/api/services/CTrigger.php:979
 #: include/classes/api/services/CTriggerPrototype.php:788
@@ -1953,7 +1954,7 @@ msgstr "No se pudo agregar el periodo de mantenimiento"
 #: include/classes/api/services/CMap.php:1559
 #, c-format
 msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
-msgstr ""
+msgstr "No se puede añadir el elemento al mapa \"%1$s\" debido a una referencia circular."
 
 #: app/controllers/CControllerMediatypeCreate.php:76
 #: app/controllers/CControllerMediatypeCreate.php:165
@@ -1964,8 +1965,8 @@ msgstr "No se pudo agregar el tipo de medios"
 #, c-format
 msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede añadir el módulo: %1$s."
+msgstr[1] "No se pueden añadir los módulos: %1$s."
 
 #: include/classes/api/services/CGraph.php:40
 #, c-format
@@ -1993,7 +1994,7 @@ msgstr "No se pudo agregar la expresión regular"
 
 #: app/controllers/CControllerScheduledReportCreate.php:152
 msgid "Cannot add scheduled report"
-msgstr ""
+msgstr "No se puede añadir el informe programado"
 
 #: app/controllers/CControllerScriptCreate.php:60
 #: app/controllers/CControllerScriptCreate.php:155
@@ -2024,7 +2025,7 @@ msgstr "No se pudo agregar el usuario"
 #: app/controllers/CControllerUsergroupCreate.php:51
 #: app/controllers/CControllerUsergroupCreate.php:101
 msgid "Cannot add user group"
-msgstr ""
+msgstr "No se puede añadir un grupo de usuarios"
 
 #: httpconf.php:198
 msgid "Cannot add web scenario"
@@ -2032,31 +2033,31 @@ msgstr "No se pudo agregar el escenario web"
 
 #: jsLoader.php:134
 msgid "Cannot add widget: not enough free space on the dashboard."
-msgstr ""
+msgstr "No se puede añadir el widget: no hay suficiente espacio libre en el panel."
 
 #: jsLoader.php:343
 msgctxt "screen reader"
 msgid "Cannot be removed"
-msgstr ""
+msgstr "No se puede eliminar"
 
 #: include/classes/validators/CLdapAuthValidator.php:79
 msgid "Cannot bind anonymously to LDAP server."
-msgstr ""
+msgstr "No se puede unir de forma anónima al servidor LDAP."
 
 #: include/classes/validators/CLdapAuthValidator.php:78
 msgid "Cannot bind to LDAP server."
-msgstr ""
+msgstr "No se puede unir al servidor LDAP."
 
 #: include/forms.inc.php:1932 include/forms.inc.php:1939
 #: include/forms.inc.php:1949 include/forms.inc.php:1983
 #: include/forms.inc.php:1990 include/forms.inc.php:2000
 #, c-format
 msgid "Cannot build expression tree: %1$s."
-msgstr ""
+msgstr "No se puede construir el árbol de expresión: %1$s."
 
 #: include/classes/api/services/CRole.php:792
 msgid "Cannot change the user type of own role."
-msgstr ""
+msgstr "No se puede cambiar el tipo de usuario del propio rol."
 
 #: httpconf.php:189 httpconf.php:433 items.php:901 items.php:981
 msgid "Cannot clear history"
@@ -2083,7 +2084,7 @@ msgstr "No se pudo cerrar el problema: %1$s."
 
 #: include/classes/validators/CLdapAuthValidator.php:77
 msgid "Cannot connect to LDAP server."
-msgstr ""
+msgstr "No es posible conectarse al servidor LDAP."
 
 #: include/classes/setup/CSetupWizard.php:593
 msgid "Cannot connect to the database."
@@ -2091,7 +2092,7 @@ msgstr "No se pudo conectar a la base de datos."
 
 #: include/views/js/configuration.httpconf.edit.js.php:182
 msgid "Cannot convert POST data:"
-msgstr ""
+msgstr "No se pueden convertir datos POST:"
 
 #: graphs.php:390
 msgid "Cannot copy graph"
@@ -2149,13 +2150,13 @@ msgstr "No se puede crear la asignación de icono"
 
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
-msgstr ""
+msgstr "No se puede crear un informe programado"
 
 #: include/classes/api/services/CService.php:2373
 #: include/classes/api/services/CService.php:2397
 #, c-format
 msgid "Cannot create service \"%1$s\": %2$s."
-msgstr ""
+msgstr "No se puede crear el servicio \"%1$s\": %2$s."
 
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Cannot create the configuration file."
@@ -2164,19 +2165,19 @@ msgstr "No se pudo crear el archivo de configuración."
 #: app/controllers/CControllerUserroleCreate.php:103
 #: app/controllers/CControllerUserroleCreate.php:150
 msgid "Cannot create user role"
-msgstr ""
+msgstr "No se puede crear el rol de usuario"
 
 #: app/controllers/CControllerTokenDelete.php:64
 msgid "Cannot delete API token"
 msgid_plural "Cannot delete API tokens"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede eliminar el token de API"
+msgstr[1] "No se pueden borrar los tokens de API"
 
 #: app/controllers/CControllerSlaDelete.php:79
 msgid "Cannot delete SLA"
 msgid_plural "Cannot delete SLAs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede eliminar SLA"
+msgstr[1] "No se pueden eliminar las SLAs"
 
 #: include/classes/api/services/CUser.php:1257
 #, c-format
@@ -2190,10 +2191,9 @@ msgstr "No es posible eliminar la acción"
 #: include/classes/api/services/CRole.php:375
 #, c-format
 msgid "Cannot delete assigned user role \"%1$s\"."
-msgstr ""
+msgstr "No se puede eliminar el rol de usuario asignado \"%1$s\"."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
-#, fuzzy
 msgid "Cannot delete correlation"
 msgid_plural "Cannot delete correlations"
 msgstr[0] "No se pudo borrar la correlación"
@@ -2212,7 +2212,6 @@ msgid "Cannot delete dependency"
 msgstr "No es posible eliminar la dependecia"
 
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:416
-#, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "No es posible eliminar la regla"
@@ -2252,8 +2251,8 @@ msgstr "No se pudo eliminar el equipo"
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete hosts %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede eliminar el host %1$s porque el mantenimiento \"%2$s\" debe contener al menos un host o grupo de hosts."
+msgstr[1] "No se pueden eliminar los equipos %1$s porque el mantenimiento \"%2$s\" debe contener al menos un equipo o grupo de equipos."
 
 #: include/classes/api/services/CHostGroup.php:849
 #, c-format
@@ -2359,7 +2358,6 @@ msgid "Cannot delete selected actions"
 msgstr "No es posible eliminar las acciones seleccionadas"
 
 #: app/controllers/CControllerServiceDelete.php:78
-#, fuzzy
 msgid "Cannot delete service"
 msgid_plural "Cannot delete services"
 msgstr[0] "No es posible eliminar el servicio"
@@ -3175,7 +3173,6 @@ msgid "Cannot update host encryption settings. Connection settings for both dire
 msgstr "No pude actualizar la configuración del cifrado del host. Debería ser especificada la configuración de la conexión en ambos sentidos."
 
 #: host_prototypes.php:286 host_prototypes.php:320 host_prototypes.php:341
-#, fuzzy
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "No se pudo actualizar el prototipo de equipo"
@@ -3205,7 +3202,6 @@ msgid "Cannot update item"
 msgstr "No es posible actualizar el monitor"
 
 #: disc_prototypes.php:556 disc_prototypes.php:583 disc_prototypes.php:617
-#, fuzzy
 msgid "Cannot update item prototype"
 msgid_plural "Cannot update item prototypes"
 msgstr[0] "No se pudo actualizar el prototipo de ítem"
@@ -3315,7 +3311,6 @@ msgstr "No se pudo actualizar el iniciador \"%1$s\": %2$s."
 
 #: trigger_prototypes.php:365 trigger_prototypes.php:440
 #: trigger_prototypes.php:488
-#, fuzzy
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
 msgstr[0] "No se pudo actualizar el prototipo de disparador"
@@ -4201,7 +4196,6 @@ msgid "Correlation added"
 msgstr "Correlación agregada"
 
 #: app/controllers/CControllerCorrelationDelete.php:65
-#, fuzzy
 msgid "Correlation deleted"
 msgid_plural "Correlations deleted"
 msgstr[0] "Correlación borrada"
@@ -5779,7 +5773,6 @@ msgid "Discovery rule created"
 msgstr "Regla de descubrimiento creada"
 
 #: app/controllers/CControllerDiscoveryDelete.php:66 host_discovery.php:416
-#, fuzzy
 msgid "Discovery rule deleted"
 msgid_plural "Discovery rules deleted"
 msgstr[0] "Regla de descubrimiento eliminada"
@@ -5822,7 +5815,6 @@ msgid "Discovery status"
 msgstr "Estado del descubrimiento"
 
 #: include/classes/data/CItemData.php:1137
-#, fuzzy
 msgid "Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "Estadísticas de lectura de disco. Devuelve entero si tipo es sectores, operaciones, bytes; decimal si tipo es sps, ops, bps"
 
@@ -6406,6 +6398,10 @@ msgid "End of line sequence"
 msgstr ""
 
 #: include/locales.inc.php:33
+msgid "English (en_GB)"
+msgstr ""
+
+#: include/locales.inc.php:33
 msgid "English (en_US)"
 msgstr "Inglés (en_US)"
 
@@ -6701,7 +6697,6 @@ msgid "Expires in less than"
 msgstr ""
 
 #: app/views/popup.generic.php:503 include/graphs.inc.php:27
-#, fuzzy
 msgid "Exploded"
 msgstr "Separado"
 
@@ -7867,7 +7862,6 @@ msgid "Host IP"
 msgstr "IP del equipo"
 
 #: app/views/administration.script.list.php:82
-#, fuzzy
 msgid "Host access"
 msgstr "Acceso al equipo"
 
@@ -8070,7 +8064,6 @@ msgid "Host prototype macros"
 msgstr ""
 
 #: host_prototypes.php:286 host_prototypes.php:320 host_prototypes.php:340
-#, fuzzy
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
 msgstr[0] "Prototipo de equipo actualizado"
@@ -8794,7 +8787,6 @@ msgid "Incorrect action condition service. Service does not exist or you have no
 msgstr ""
 
 #: include/classes/validators/CActionCondValidator.php:155
-#, fuzzy
 msgid "Incorrect action condition trigger severity."
 msgstr "Gravedad del iniciador de la acción de la condición incorrecta"
 
@@ -9008,7 +9000,6 @@ msgid "Incorrect inventory field \"%1$s\"."
 msgstr ""
 
 #: app/controllers/CControllerActionOperationValidate.php:176
-#, fuzzy
 msgid "Incorrect inventory mode in action operation."
 msgstr "Modo de inventario incorrecto en operación de acción."
 
@@ -16032,7 +16023,6 @@ msgid "Service data storage period"
 msgstr ""
 
 #: app/controllers/CControllerServiceDelete.php:63
-#, fuzzy
 msgid "Service deleted"
 msgid_plural "Services deleted"
 msgstr[0] "Servicio eliminado"
@@ -17564,6 +17554,10 @@ msgstr "Este mes"
 
 #: include/func.inc.php:2477
 msgid "This month so far"
+msgstr ""
+
+#: app/views/popup.tophosts.column.edit.php:172
+msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr ""
 
 #: include/views/configuration.item.edit.php:123
@@ -19747,6 +19741,10 @@ msgstr ""
 #: app/views/monitoring.widget.problemhosts.view.php:33
 msgid "With problems"
 msgstr "Con problemas"
+
+#: app/views/popup.tophosts.column.edit.php:119
+msgid "With this setting only numeric items will be displayed in this column."
+msgstr ""
 
 #: include/forms.inc.php:346 include/forms.inc.php:566
 msgid "With triggers"

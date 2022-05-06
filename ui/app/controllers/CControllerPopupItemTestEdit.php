@@ -198,20 +198,33 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 								break;
 
 							case CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION:
-								foreach ($token['data']['parameters'][0]['data']['filter']['tokens'] as $filter_token) {
-									switch ($filter_token['type']) {
-										case CFilterParser::TOKEN_TYPE_USER_MACRO:
-											$texts_support_user_macros[] = $filter_token['match'];
+								foreach ($token['data']['parameters'] as $parameter) {
+									switch ($parameter['type']) {
+										case CHistFunctionParser::PARAM_TYPE_QUERY:
+											foreach ($parameter['data']['filter']['tokens'] as $filter_token) {
+												switch ($filter_token['type']) {
+													case CFilterParser::TOKEN_TYPE_USER_MACRO:
+														$texts_support_user_macros[] = $filter_token['match'];
+														break;
+
+													case CFilterParser::TOKEN_TYPE_LLD_MACRO:
+														$texts_support_lld_macros[] = $filter_token['match'];
+														break;
+
+													case CFilterParser::TOKEN_TYPE_STRING:
+														$text = CFilterParser::unquoteString($filter_token['match']);
+														$texts_support_user_macros[] = $text;
+														$texts_support_lld_macros[] = $text;
+														break;
+												}
+											}
 											break;
 
-										case CFilterParser::TOKEN_TYPE_LLD_MACRO:
-											$texts_support_lld_macros[] = $filter_token['match'];
-											break;
-
-										case CFilterParser::TOKEN_TYPE_STRING:
-											$text = CFilterParser::unquoteString($filter_token['match']);
-											$texts_support_user_macros[] = $text;
-											$texts_support_lld_macros[] = $text;
+										case CHistFunctionParser::PARAM_TYPE_PERIOD:
+										case CHistFunctionParser::PARAM_TYPE_QUOTED:
+										case CHistFunctionParser::PARAM_TYPE_UNQUOTED:
+											$texts_support_user_macros[] = $parameter['match'];
+											$texts_support_lld_macros[] = $parameter['match'] ;
 											break;
 									}
 								}

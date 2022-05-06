@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T19:42:11Z'
+  date: '2022-04-06T19:36:08Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -229,7 +229,8 @@ zabbix_export:
             -
               uuid: 7a52520cc3dc4350bd7aa14260899f1c
               expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.uptime)<10m'
-              name: 'ZYXEL IES-6000: has been restarted (uptime < 10m)'
+              name: 'ZYXEL IES-6000: has been restarted'
+              event_name: 'ZYXEL IES-6000: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -271,7 +272,8 @@ zabbix_export:
                 -
                   uuid: 1173ae0cf9f440f595366a6da7a4c672
                   expression: 'min(/ZYXEL IES-6000 SNMP/zyxel.ies6000.buffer[{#SNMPINDEX}],5m)>{#ZYXEL.BUFFERHIGHTHRESH}'
-                  name: 'ZYXEL IES-6000: High Packet buffer utilization in Slot {#ZYXEL.SLOT.ID} (>{#ZYXEL.BUFFERHIGHTHRESH}% for 5m)'
+                  name: 'ZYXEL IES-6000: High Packet buffer utilization in Slot {#ZYXEL.SLOT.ID}'
+                  event_name: 'ZYXEL IES-6000: High Packet buffer utilization in Slot {#ZYXEL.SLOT.ID} (>{#ZYXEL.BUFFERHIGHTHRESH}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free buffer.'
                   tags:
@@ -336,7 +338,8 @@ zabbix_export:
                 -
                   uuid: 0d882e8f017e46c78727437bd55759d4
                   expression: 'min(/ZYXEL IES-6000 SNMP/zyxel.ies6000.cpu[{#SNMPINDEX}],5m)>{#ZYXEL.CPU.THRESH.HIGH}'
-                  name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} high CPU utilization (over {#ZYXEL.CPU.THRESH.HIGH}% for 5m)'
+                  name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} high CPU utilization'
+                  event_name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} high CPU utilization (over {#ZYXEL.CPU.THRESH.HIGH}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -454,7 +457,8 @@ zabbix_export:
                 -
                   uuid: 64108d56dc6d43148f67503383fc6705
                   expression: 'min(/ZYXEL IES-6000 SNMP/zyxel.ies6000.memory[{#SNMPINDEX}],5m)>{#ZYXEL.MEMORYHIGHTHRESH}'
-                  name: 'ZYXEL IES-6000: High memory utilization in Slot {#ZYXEL.SLOT.ID} pool (>{#ZYXEL.MEMORYHIGHTHRESH}% for 5m)'
+                  name: 'ZYXEL IES-6000: High memory utilization in Slot {#ZYXEL.SLOT.ID} pool'
+                  event_name: 'ZYXEL IES-6000: High memory utilization in Slot {#ZYXEL.SLOT.ID} pool (>{#ZYXEL.MEMORYHIGHTHRESH}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
                   tags:
@@ -583,7 +587,8 @@ zabbix_export:
                 -
                   uuid: e1233b29eb764b0bb5a2ce35f79060bf
                   expression: 'min(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.adsl.atuc.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}'
-                  name: 'ZYXEL IES-6000: High the DSL line attenuation in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
+                  name: 'ZYXEL IES-6000: High the DSL line attenuation in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  event_name: 'ZYXEL IES-6000: High the DSL line attenuation in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
                   priority: WARNING
                   description: 'The reductions in amplitude of the downstream and upstream DSL signals.'
                   tags:
@@ -659,7 +664,8 @@ zabbix_export:
                 -
                   uuid: d7392fd0c372459bb21b9a85a47ccb8c
                   expression: 'min(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.adsl.atuc.snrmgn[{#SNMPINDEX}],5m)<{$ZYXEL.ADSL.SNR.MIN}'
-                  name: 'ZYXEL IES-6000: Low the DSL line noise margins in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
+                  name: 'ZYXEL IES-6000: Low the DSL line noise margins in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  event_name: 'ZYXEL IES-6000: Low the DSL line noise margins in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
                   priority: WARNING
                   description: 'Signal-to-noise margin (SNR Margin) which is the difference between the actual SNR and the SNR required to sync at a specific speed'
                   tags:
@@ -703,7 +709,8 @@ zabbix_export:
                 -
                   uuid: 2ef5b800bb4148ce82bed8c4bf977a35
                   expression: 'min(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.adsl.atur.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}'
-                  name: 'ZYXEL IES-6000: High the DSL line attenuation in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
+                  name: 'ZYXEL IES-6000: High the DSL line attenuation in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  event_name: 'ZYXEL IES-6000: High the DSL line attenuation in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
                   priority: WARNING
                   description: 'The reductions in amplitude of the downstream and upstream DSL signals.'
                   tags:
@@ -779,7 +786,8 @@ zabbix_export:
                 -
                   uuid: ba6eb4b3b6904b5dac4c057d3f6f3c17
                   expression: 'min(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.adsl.atur.snrmgn[{#SNMPINDEX}],5m)<{$ZYXEL.ADSL.SNR.MIN}'
-                  name: 'ZYXEL IES-6000: Low the DSL line noise margins in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
+                  name: 'ZYXEL IES-6000: Low the DSL line noise margins in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  event_name: 'ZYXEL IES-6000: Low the DSL line noise margins in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
                   priority: WARNING
                   description: 'Signal-to-noise margin (SNR Margin) which is the difference between the actual SNR and the SNR required to sync at a specific speed'
                   tags:
@@ -2160,7 +2168,8 @@ zabbix_export:
                 -
                   uuid: 3fbbcffe1c46497d89fe0d987a5f6eff
                   expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.serial[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.serial[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.serial[{#SNMPINDEX}]))>0'
-                  name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} has been replaced (new serial number received)'
+                  name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} has been replaced'
+                  event_name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Slot {#ZYXEL.SLOT.ID} serial number has changed. Ack to close'
                   manual_close: 'YES'
@@ -2238,7 +2247,8 @@ zabbix_export:
                 -
                   uuid: 50e43c41d0e241238b65da25c12d1616
                   expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.uptime[{#SNMPINDEX}])<10m'
-                  name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} has been restarted (uptime < 10m)'
+                  name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} has been restarted'
+                  event_name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'

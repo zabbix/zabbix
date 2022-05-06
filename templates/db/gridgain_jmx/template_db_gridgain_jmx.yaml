@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-01T13:25:00Z'
+  date: '2022-04-06T19:27:29Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -247,7 +247,8 @@ zabbix_export:
             -
               uuid: 9a7d7c745faa4f1fa4ffd1ca8c1ac602
               expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",UsedCheckpointBufferSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",CheckpointBufferSize])*100>{$GRIDGAIN.CHECKPOINT.PUSED.MAX.HIGH}'
-              name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$GRIDGAIN.CHECKPOINT.PUSED.MAX.HIGH} in 5m)'
+              name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high'
+              event_name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$GRIDGAIN.CHECKPOINT.PUSED.MAX.HIGH} in 5m)'
               priority: HIGH
               description: 'Checkpoint buffer utilization is high. Threads will be throttled to avoid buffer overflow. It can be caused by high disk utilization.'
               tags:
@@ -257,12 +258,13 @@ zabbix_export:
             -
               uuid: 02ce52a2067147238969a4fd24f85bdc
               expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",UsedCheckpointBufferSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",CheckpointBufferSize])*100>{$GRIDGAIN.CHECKPOINT.PUSED.MAX.WARN}'
-              name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$GRIDGAIN.CHECKPOINT.PUSED.MAX.WARN} in 5m)'
+              name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high'
+              event_name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$GRIDGAIN.CHECKPOINT.PUSED.MAX.WARN} in 5m)'
               priority: WARNING
               description: 'Checkpoint buffer utilization is high. Threads will be throttled to avoid buffer overflow. It can be caused by high disk utilization.'
               dependencies:
                 -
-                  name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$GRIDGAIN.CHECKPOINT.PUSED.MAX.HIGH} in 5m)'
+                  name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high'
                   expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",UsedCheckpointBufferSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",CheckpointBufferSize])*100>{$GRIDGAIN.CHECKPOINT.PUSED.MAX.HIGH}'
               tags:
                 -
@@ -271,7 +273,8 @@ zabbix_export:
             -
               uuid: 92c2772aa8d7425e8bee5d760ba5b607
               expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH}'
-              name: 'Data region {#JMXNAME}: Data region utilization is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
+              name: 'Data region {#JMXNAME}: Data region utilization is too high'
+              event_name: 'Data region {#JMXNAME}: Data region utilization is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
               priority: HIGH
               description: 'Data region utilization is high. Increase data region size or delete any data.'
               tags:
@@ -281,12 +284,13 @@ zabbix_export:
             -
               uuid: 3694e6d813b04b51a77c842de617503c
               expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$GRIDGAIN.DATA.REGION.PUSED.MAX.WARN}'
-              name: 'Data region {#JMXNAME}: Data region utilization is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.WARN} in 5m)'
+              name: 'Data region {#JMXNAME}: Data region utilization is too high'
+              event_name: 'Data region {#JMXNAME}: Data region utilization is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.WARN} in 5m)'
               priority: WARNING
               description: 'Data region utilization is high. Increase data region size or delete any data.'
               dependencies:
                 -
-                  name: 'Data region {#JMXNAME}: Data region utilization is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
+                  name: 'Data region {#JMXNAME}: Data region utilization is too high'
                   expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH}'
               tags:
                 -
@@ -408,7 +412,8 @@ zabbix_export:
                 -
                   uuid: a2672171fa374810b95b72f6014f3998
                   expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$GRIDGAIN.PME.DURATION.MAX.HIGH}'
-                  name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$GRIDGAIN.PME.DURATION.MAX.HIGH} for 5 min)'
+                  name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long'
+                  event_name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$GRIDGAIN.PME.DURATION.MAX.HIGH} for 5 min)'
                   priority: HIGH
                   description: 'PME duration is over {$GRIDGAIN.PME.DURATION.MAX.HIGH}ms. Looks like PME is hung.'
                   tags:
@@ -418,12 +423,13 @@ zabbix_export:
                 -
                   uuid: f21e1cee28354fcd945d58955831641b
                   expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$GRIDGAIN.PME.DURATION.MAX.WARN}'
-                  name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$GRIDGAIN.PME.DURATION.MAX.WARN} for 5 min)'
+                  name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long'
+                  event_name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$GRIDGAIN.PME.DURATION.MAX.WARN} for 5 min)'
                   priority: WARNING
                   description: 'PME duration is over {$GRIDGAIN.PME.DURATION.MAX.WARN}ms.'
                   dependencies:
                     -
-                      name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$GRIDGAIN.PME.DURATION.MAX.HIGH} for 5 min)'
+                      name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long'
                       expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$GRIDGAIN.PME.DURATION.MAX.HIGH}'
                   tags:
                     -
@@ -467,12 +473,13 @@ zabbix_export:
                 -
                   uuid: 124c9738a384481fb39f5e8078cca0e4
                   expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",CurrentThreadCount],15m) > {$GRIDGAIN.THREADS.COUNT.MAX.WARN}'
-                  name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Number of running threads is too high (over {$GRIDGAIN.THREADS.COUNT.MAX.WARN} for 15 min)'
+                  name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Number of running threads is too high'
+                  event_name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Number of running threads is too high (over {$GRIDGAIN.THREADS.COUNT.MAX.WARN} for 15 min)'
                   priority: WARNING
                   description: 'Number of running threads is over {$GRIDGAIN.THREADS.COUNT.MAX.WARN}.'
                   dependencies:
                     -
-                      name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$GRIDGAIN.PME.DURATION.MAX.HIGH} for 5 min)'
+                      name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long'
                       expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$GRIDGAIN.PME.DURATION.MAX.HIGH}'
                   tags:
                     -
@@ -499,7 +506,8 @@ zabbix_export:
                 -
                   uuid: 71d259fbdcd74888a4bedc646fc4bc54
                   expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",CurrentWaitingJobs],15m) > {$GRIDGAIN.JOBS.QUEUE.MAX.WARN}'
-                  name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Number of queued jobs is too high (over {$GRIDGAIN.JOBS.QUEUE.MAX.WARN} for 15 min)'
+                  name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Number of queued jobs is too high'
+                  event_name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Number of queued jobs is too high (over {$GRIDGAIN.JOBS.QUEUE.MAX.WARN} for 15 min)'
                   priority: WARNING
                   description: 'Number of queued jobs is over {$GRIDGAIN.JOBS.QUEUE.MAX.WARN}.'
                   tags:
@@ -854,7 +862,8 @@ zabbix_export:
                 -
                   uuid: 4cc201fb67664fc49d36bbec95b574ce
                   expression: 'last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion]))>0'
-                  name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Version has changed (new version: {ITEM.VALUE})'
+                  name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Version has changed'
+                  event_name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
                   description: 'GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.'
                   manual_close: 'YES'
@@ -907,7 +916,8 @@ zabbix_export:
                 -
                   uuid: d7b2be3a707f49d2897e7cce356cafa5
                   expression: 'nodata(/GridGain by JMX/jmx["{#JMXOBJ}",UpTime],10m)=1'
-                  name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Failed to fetch info data (or no data for 10m)'
+                  name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Failed to fetch info data'
+                  event_name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Failed to fetch info data (or no data for 10m)'
                   priority: WARNING
                   description: 'Zabbix has not received data for items for the last 10 minutes.'
                   manual_close: 'YES'
@@ -918,7 +928,8 @@ zabbix_export:
                 -
                   uuid: 23cd9dbb498f4bb095ec8be1693fccf0
                   expression: 'last(/GridGain by JMX/jmx["{#JMXOBJ}",UpTime])<10m'
-                  name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: has been restarted (uptime < 10m)'
+                  name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: has been restarted'
+                  event_name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
@@ -1105,6 +1116,7 @@ zabbix_export:
                   uuid: 40641263a3d840e89e46ba6f57076a0a
                   expression: 'last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator]))>0'
                   name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Coordinator has changed'
+                  event_name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Version has changed (new version: {ITEM.VALUE})'
                   priority: WARNING
                   description: 'GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.'
                   manual_close: 'YES'
@@ -1474,6 +1486,7 @@ zabbix_export:
                   uuid: 94d82f9db4f449e491782e14f6973f9b
                   expression: 'last(/GridGain by JMX/jmx["{#JMXOBJ}",Caches],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",Caches],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",Caches]))>0'
                   name: 'Cache group [{#JMXNAME}]: List of caches has changed'
+                  event_name: 'Cache group [{#JMXNAME}]: Version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
                   description: 'List of caches has changed. Significant changes have occurred in the cluster. Ack to close.'
                   manual_close: 'YES'
@@ -1745,7 +1758,8 @@ zabbix_export:
                 -
                   uuid: f2a7aa098ed245f48b455ed747ee42c3
                   expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",QueueSize],5m) > {$GRIDGAIN.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"}'
-                  name: 'Thread pool [{#JMXNAME}]: Too many messages in queue (over {$GRIDGAIN.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"} for 5 min)'
+                  name: 'Thread pool [{#JMXNAME}]: Too many messages in queue'
+                  event_name: 'Thread pool [{#JMXNAME}]: Too many messages in queue (over {$GRIDGAIN.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"} for 5 min)'
                   priority: AVERAGE
                   description: 'Number of messages in queue more than {$GRIDGAIN.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"}.'
                   tags:

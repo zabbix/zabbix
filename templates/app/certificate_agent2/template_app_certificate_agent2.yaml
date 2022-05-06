@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:02:35Z'
+  date: '2022-04-06T19:27:03Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -108,7 +108,8 @@ zabbix_export:
             -
               uuid: 8a0e3e73527a45618afe94707234f4c6
               expression: '(last(/Website certificate by Zabbix agent 2/cert.not_after) - now()) / 86400 < {$CERT.EXPIRY.WARN}'
-              name: 'Cert: SSL certificate expires soon (less than {$CERT.EXPIRY.WARN} days)'
+              name: 'Cert: SSL certificate expires soon'
+              event_name: 'Cert: SSL certificate expires soon (less than {$CERT.EXPIRY.WARN} days)'
               priority: WARNING
               description: 'The SSL certificate should be updated or it will become untrusted.'
               dependencies:
@@ -206,7 +207,8 @@ zabbix_export:
             -
               uuid: 7a4c69a5235e444cb7294e6b7189b2b6
               expression: 'last(/Website certificate by Zabbix agent 2/cert.sha1_fingerprint) <> last(/Website certificate by Zabbix agent 2/cert.sha1_fingerprint,#2)'
-              name: 'Cert: Fingerprint has changed (new version: {ITEM.VALUE})'
+              name: 'Cert: Fingerprint has changed'
+              event_name: 'Cert: Fingerprint has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: |
                 The SSL certificate fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Ack to close.
