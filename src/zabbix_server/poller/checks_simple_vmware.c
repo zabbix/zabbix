@@ -1561,11 +1561,13 @@ static int	check_vcenter_hv_network_common(AGENT_REQUEST *request, const char *u
 	}
 	else if (0 == strcmp(mode, "packets"))
 	{
-		counter_name = ZBX_IF_DIRECTION_IN == direction ? "net/packetsRx[summation]" : "net/packetsTx[summation]";
+		counter_name = ZBX_IF_DIRECTION_IN ==
+				direction ? "net/packetsRx[summation]" : "net/packetsTx[summation]";
 	}
 	else if (0 == strcmp(mode, "dropped"))
 	{
-		counter_name = ZBX_IF_DIRECTION_IN == direction ? "net/droppedRx[summation]" : "net/droppedTx[summation]";
+		counter_name = ZBX_IF_DIRECTION_IN ==
+				direction ? "net/droppedRx[summation]" : "net/droppedTx[summation]";
 	}
 	else if (0 == strcmp(mode, "errors"))
 	{
@@ -1573,7 +1575,8 @@ static int	check_vcenter_hv_network_common(AGENT_REQUEST *request, const char *u
 	}
 	else if (0 == strcmp(mode, "broadcast"))
 	{
-		counter_name = ZBX_IF_DIRECTION_IN == direction ? "net/broadcastRx[summation]" : "net/broadcastTx[summation]";
+		counter_name = ZBX_IF_DIRECTION_IN ==
+				direction ? "net/broadcastRx[summation]" : "net/broadcastTx[summation]";
 	}
 	else
 	{
