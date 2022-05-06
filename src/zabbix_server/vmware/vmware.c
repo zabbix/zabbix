@@ -799,7 +799,7 @@ static int	vmware_cust_query_compare_func(const void *d1, const void *d2)
 	if (0 == (ret = strcmp(e1->soap_type, e2->soap_type)) && 0 == (ret = strcmp(e1->id, e2->id)) &&
 			0 == (ret = strcmp(e1->key, e2->key)) && 0 == (ret = strcmp(e1->mode, e2->mode)))
 	{
-		ret = e1->query_type - e2->query_type;
+		ret = (int)e1->query_type - e2->query_type;
 	}
 
 	return ret;
@@ -1398,7 +1398,7 @@ static void	vmware_service_shared_free(zbx_vmware_service_t *service)
 	while (NULL != (cust_query = (zbx_vmware_cust_query_t *)zbx_hashset_iter_next(&iter)))
 		vmware_shared_cust_query_clean(cust_query);
 
-	zbx_hashset_destroy(&service->entities);
+	zbx_hashset_destroy(&service->cust_queries);
 
 	zbx_hashset_iter_reset(&service->counters, &iter);
 	while (NULL != (counter = (zbx_vmware_counter_t *)zbx_hashset_iter_next(&iter)))
@@ -1750,7 +1750,7 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 	zbx_vector_ptr_reserve(&data->events, src->events.values_alloc);
 	zbx_vector_vmware_datastore_reserve(&data->datastores, src->datastores.values_num);
 	zbx_vector_vmware_datacenter_reserve(&data->datacenters, src->datacenters.values_num);
-	zbx_vector_vmware_dvswitch_reserve(&data->dvswitches, src->dvswitches.values_num);
+	zbx_vector_vmware_dvswitch_reserve(&data->dvswitches, (size_t)src->dvswitches.values_num);
 
 	zbx_hashset_create_ext(&data->vms_index, 100, vmware_vm_hash, vmware_vm_compare, NULL, __vm_shmem_malloc_func,
 			__vm_shmem_realloc_func, __vm_shmem_free_func);
@@ -3005,7 +3005,7 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 	if (NULL != vm->props[ZBX_VMWARE_VMPROP_FOLDER] &&
 			SUCCEED != vmware_service_get_vm_folder(details, &vm->props[ZBX_VMWARE_VMPROP_FOLDER]))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): can't find vm folder name for id:%s", __func__,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot find vm folder name for id:%s", __func__,
 				vm->props[ZBX_VMWARE_VMPROP_FOLDER]);
 	}
 
@@ -4176,8 +4176,11 @@ static int	vmware_service_get_dvswitch_list(xmlDoc *doc, zbx_vector_vmware_dvswi
 
 	xpathCtx = xmlXPathNewContext(doc);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *) ZBX_XPATH_OBJECTS_BY_TYPE(ZBX_VMWARE_SOAP_DVS), xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_OBJECTS_BY_TYPE(ZBX_VMWARE_SOAP_DVS),
+			xpathCtx)))
+	{
 		goto out;
+	}
 
 	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 	{
@@ -4186,7 +4189,7 @@ static int	vmware_service_get_dvswitch_list(xmlDoc *doc, zbx_vector_vmware_dvswi
 	}
 
 	nodeset = xpathObj->nodesetval;
-	zbx_vector_vmware_dvswitch_reserve(dvsitches, nodeset->nodeNr);
+	zbx_vector_vmware_dvswitch_reserve(dvsitches, (size_t)nodeset->nodeNr);
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
@@ -4196,16 +4199,19 @@ static int	vmware_service_get_dvswitch_list(xmlDoc *doc, zbx_vector_vmware_dvswi
 			continue;
 		}
 
-		if (NULL == (name = zbx_xml_node_read_value(doc, nodeset->nodeTab[i], ZBX_XPATH_PROP_NAME_NODE("name"))))
+		if (NULL == (name = zbx_xml_node_read_value(doc, nodeset->nodeTab[i],
+				ZBX_XPATH_PROP_NAME_NODE("name"))))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s(): Cannot get DVSwitch name for id: %s.", __func__, id);
 			zbx_free(id);
 			continue;
 		}
 
-		if (NULL == (uuid = zbx_xml_node_read_value(doc, nodeset->nodeTab[i], ZBX_XPATH_PROP_NAME_NODE("uuid"))))
+		if (NULL == (uuid = zbx_xml_node_read_value(doc, nodeset->nodeTab[i],
+				ZBX_XPATH_PROP_NAME_NODE("uuid"))))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s(): Cannot get DVSwitch uuid for id: %s.", __func__, id);
+			zbx_free(name);
 			zbx_free(id);
 			continue;
 		}
@@ -5885,7 +5891,8 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_t
 		ZBX_POST_VSPHERE_FOOTER
 
 	char	*error, tmp[MAX_STRING_LEN], criteria[MAX_STRING_LEN];
-	int	i, j, offset;
+	int	i, j;
+	size_t	offset;
 	xmlDoc	*doc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() dvs count:%d", __func__, cq_values->values_num);
@@ -5927,14 +5934,14 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_t
 		if (0 == strcmp(cqv->instance->mode, "state") &&
 				SUCCEED != zbx_xml_node_remove(doc ,node, ZBX_XNN("returnval") ZBX_XPATH_LN("config")))
 		{
-			cqv->response = zbx_strdup(NULL, "Can't remove \"config\" node from FetchDVPortsResponse.");
+			cqv->response = zbx_strdup(NULL, "Cannot remove \"config\" node from FetchDVPortsResponse.");
 			cqv->status = ZBX_VMWARE_CQV_ERROR;
 			continue;
 		}
 
 		if (SUCCEED != zbx_xmlnode_to_json(node, &cqv->response))
 		{
-			cqv->response = zbx_strdup(NULL, "Can't parse FetchDVPortsResponse.");
+			cqv->response = zbx_strdup(NULL, "Cannot parse FetchDVPortsResponse.");
 			cqv->status = ZBX_VMWARE_CQV_ERROR;
 			continue;
 		}

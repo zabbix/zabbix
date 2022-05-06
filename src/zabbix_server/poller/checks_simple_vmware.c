@@ -2741,7 +2741,7 @@ static int	custquery_param_create(const char *key, zbx_vector_custquery_param_t 
 
 	while (1)
 	{
-		zbx_strsplit_first(src, ';', &left, &right);
+		zbx_strsplit_first(src, ',', &left, &right);
 
 		if (NULL == left || '\0' == *left)
 		{
