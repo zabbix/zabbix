@@ -1825,7 +1825,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start server: %s", error);
 		zbx_free(error);
-		zbx_fail_sig_exiting();
+		zbx_set_exiting_with_fail();
 	}
 
 	zbx_diag_init(diag_add_section_info);
@@ -1834,7 +1834,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc))
 		{
-			zbx_fail_sig_exiting();
+			zbx_set_exiting_with_fail();
 			ha_status = ZBX_NODE_STATUS_ERROR;
 		}
 		else
@@ -1873,7 +1873,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			if (SUCCEED != zbx_ha_dispatch_message(message, &ha_status, &ha_failover_delay, &error))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "HA manager error: %s", error);
-				zbx_fail_sig_exiting();
+				zbx_set_exiting_with_fail();
 			}
 		}
 		else
@@ -1912,7 +1912,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				case ZBX_NODE_STATUS_ACTIVE:
 					if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc))
 					{
-						zbx_fail_sig_exiting();
+						zbx_set_exiting_with_fail();
 						ha_status = ZBX_NODE_STATUS_ERROR;
 						continue;
 					}
@@ -1930,7 +1930,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				default:
 					zabbix_log(LOG_LEVEL_CRIT, "unsupported status %d received from HA manager",
 							ha_status);
-					zbx_fail_sig_exiting();
+					zbx_set_exiting_with_fail();
 					continue;
 			}
 		}
@@ -1948,14 +1948,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (0 < (ret = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "PROCESS EXIT: %d", ret);
-			zbx_fail_sig_exiting();
+			zbx_set_exiting_with_fail();
 			break;
 		}
 
 		if (-1 == ret && EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
-			zbx_fail_sig_exiting();
+			zbx_set_exiting_with_fail();
 			break;
 		}
 	}

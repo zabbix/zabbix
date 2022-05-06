@@ -34,12 +34,12 @@ static volatile sig_atomic_t	sig_exiting;
 static volatile sig_atomic_t	sig_exit_on_terminate = 1;
 static zbx_on_exit_t		zbx_on_exit_cb = NULL;
 
-void	zbx_fail_sig_exiting(void)
+void	zbx_set_exiting_with_fail(void)
 {
 	sig_exiting = ZBX_EXIT_FAILURE;
 }
 
-void	zbx_succeed_sig_exiting(void)
+void	zbx_set_exiting_with_succeed(void)
 {
 	sig_exiting = ZBX_EXIT_SUCCESS;
 }

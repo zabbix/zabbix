@@ -37,8 +37,8 @@ int	zbx_coredump_disable(void);
 #endif
 
 typedef void	(*zbx_on_exit_t)(int);
-void	zbx_fail_sig_exiting(void);
-void	zbx_succeed_sig_exiting(void);
+void	zbx_set_exiting_with_fail(void);
+void	zbx_set_exiting_with_succeed(void);
 int	ZBX_IS_RUNNING(void);
 int	ZBX_EXIT_STATUS(void);
 
@@ -108,7 +108,6 @@ void	zbx_dshm_unlock(zbx_dshm_t *shm);
 /* IPC end*/
 
 /* sighandler start */
-void	zbx_fail_sig_exiting(void);
 void	zbx_set_common_signal_handlers(zbx_on_exit_t zbx_on_exit_cb_arg);
 void	zbx_set_child_signal_handler(void);
 void	zbx_unset_child_signal_handler(void);
