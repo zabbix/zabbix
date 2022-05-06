@@ -2706,31 +2706,6 @@ int	zbx_dbsync_compare_trigger_tags(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compares item tags table row with cached configuration data       *
- *                                                                            *
- * Parameter: tag   - [IN] the cached item tag                                *
- *            dbrow - [IN] the database row                                   *
- *                                                                            *
- * Return value: SUCCEED - the row matches configuration data                 *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	dbsync_compare_item_tag(const zbx_dc_item_tag_t *tag, const DB_ROW dbrow)
-{
-	if (FAIL == dbsync_compare_uint64(dbrow[1], tag->itemid))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_str(dbrow[2], tag->tag))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_str(dbrow[3], tag->value))
-		return FAIL;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: compares item tags table with cached configuration data           *
  *                                                                            *
  * Parameter: sync - [OUT] the changeset                                      *
@@ -2741,61 +2716,27 @@ static int	dbsync_compare_item_tag(const zbx_dc_item_tag_t *tag, const DB_ROW db
  ******************************************************************************/
 int	zbx_dbsync_compare_item_tags(zbx_dbsync_t *sync)
 {
-	DB_ROW			dbrow;
-	DB_RESULT		result;
-	zbx_hashset_t		ids;
-	zbx_hashset_iter_t	iter;
-	zbx_uint64_t		rowid, itemid;
-	zbx_dc_item_tag_t	*item_tag;
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
 
-	if (NULL == (result = DBselect("select itemtagid,itemid,tag,value from item_tag")))
-		return FAIL;
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select itemtagid,itemid,tag,value from item_tag");
 
 	dbsync_prepare(sync, 4, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		sync->dbresult = result;
-		return SUCCEED;
+		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+			ret = FAIL;
+		goto out;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->item_tags.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "itemtagid", "where", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM_TAG)]);
+out:
+	zbx_free(sql);
 
-	while (NULL != (dbrow = DBfetch(result)))
-	{
-		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
-
-		ZBX_STR2UINT64(itemid, dbrow[1]);
-		if (NULL == zbx_hashset_search(&dbsync_env.cache->items, &itemid))
-			continue;
-
-		ZBX_STR2UINT64(rowid, dbrow[0]);
-		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
-
-		if (NULL == (item_tag = (zbx_dc_item_tag_t *)zbx_hashset_search(&dbsync_env.cache->item_tags,
-				&rowid)))
-		{
-			tag = ZBX_DBSYNC_ROW_ADD;
-		}
-		else if (FAIL == dbsync_compare_item_tag(item_tag, dbrow))
-			tag = ZBX_DBSYNC_ROW_UPDATE;
-
-		if (ZBX_DBSYNC_ROW_NONE != tag)
-			dbsync_add_row(sync, rowid, tag, dbrow);
-	}
-	DBfree_result(result);
-
-	zbx_hashset_iter_reset(&dbsync_env.cache->item_tags, &iter);
-	while (NULL != (item_tag = (zbx_dc_item_tag_t *)zbx_hashset_iter_next(&iter)))
-	{
-		if (NULL == zbx_hashset_search(&ids, &item_tag->itemtagid))
-			dbsync_add_row(sync, item_tag->itemtagid, ZBX_DBSYNC_ROW_REMOVE, NULL);
-	}
-
-	zbx_hashset_destroy(&ids);
-
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
