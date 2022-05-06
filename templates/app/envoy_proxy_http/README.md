@@ -8,7 +8,7 @@ The template to monitor Envoy Proxy by Zabbix that works without any external sc
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
 
-Template `Envoy Proxy by HTTP` — collects metrics by HTTP agent from  metrics endoiint {$ENVOY.METRICS.PATH} endpoint (default: /stats/prometheus).
+Template `Envoy Proxy by HTTP` — collects metrics by HTTP agent from  metrics endpoint {$ENVOY.METRICS.PATH} endpoint (default: /stats/prometheus).
 
 
 
@@ -24,7 +24,7 @@ Internal service metrics are collected from {$ENVOY.METRICS.PATH} endpoint (defa
 https://www.envoyproxy.io/docs/envoy/v1.20.0/operations/stats_overview
 
 
-Don't forget change macros {$ENVOY.API.URL}, {$ENVOY.METRICS.PATH}.
+Don't forget to change macros {$ENVOY.API.URL}, {$ENVOY.METRICS.PATH}.
 Also, see the Macros section for a list of macros used to set trigger values.  
 *NOTE.* Some metrics may not be collected depending on your Envoy Proxy instance version and configuration.  
 
