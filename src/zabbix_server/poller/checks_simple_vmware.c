@@ -2861,7 +2861,7 @@ int	check_vcenter_dvswitch_fetchports_get(AGENT_REQUEST *request, const char *us
 		SET_STR_RESULT(result, zbx_strdup(NULL, custom_query->value));
 
 	if (0 != (custom_query->state & ZBX_VMWARE_CQ_PAUSED))
-		custom_query->state &= ~ZBX_VMWARE_CQ_PAUSED;
+		custom_query->state &= ~(unsigned char)ZBX_VMWARE_CQ_PAUSED;
 
 	custom_query->last_pooled = time(NULL);
 	ret = SYSINFO_RET_OK;

@@ -798,7 +798,7 @@ static int	vmware_cust_query_compare_func(const void *d1, const void *d2)
 	if (0 == (ret = strcmp(e1->soap_type, e2->soap_type)) && 0 == (ret = strcmp(e1->id, e2->id)) &&
 			0 == (ret = strcmp(e1->key, e2->key)) && 0 == (ret = strcmp(e1->mode, e2->mode)))
 	{
-		ret = (int)e1->query_type - e2->query_type;
+		ret = (int)e1->query_type - (int)e2->query_type;
 	}
 
 	return ret;
@@ -5949,6 +5949,8 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_t
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() SUCCEED id:%s response:%d", __func__, cqv->instance->id,
 				(int)strlen(cqv->response));
 	}
+
+	zbx_xml_free_doc(doc);
 }
 
 /******************************************************************************
