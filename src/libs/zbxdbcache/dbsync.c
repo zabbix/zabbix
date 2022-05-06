@@ -405,6 +405,13 @@ int	zbx_dbsync_prepare_env(unsigned char mode)
 	}
 	DBfree_result(result);
 
+	for (i = 0; i < ARRSIZE(dbsync_env.journals); i++)
+	{
+		zbx_vector_uint64_sort(&dbsync_env.journals[i].inserts, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_sort(&dbsync_env.journals[i].updates, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_sort(&dbsync_env.journals[i].deletes, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	}
+
 	return dbsync_env.changelog.num_data - changelog_num;
 }
 
@@ -424,7 +431,7 @@ void	zbx_dbsync_clear_env(void)
  *                                                                            *
  ******************************************************************************/
 static void	dbsync_get_rows(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const char *field, const char *order, zbx_vector_uint64_t *ids, unsigned char tag)
+		const char *field, const char *order, const zbx_vector_uint64_t *ids, unsigned char tag)
 {
 	DB_ROW		dbrow;
 	DB_RESULT	result;
@@ -432,8 +439,6 @@ static void	dbsync_get_rows(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, s
 	size_t		sql_offset_reset = *sql_offset;
 	zbx_uint64_t	rowid, *batch;
 	int		batch_size;
-
-	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	for (batch = ids->values; batch < ids->values + ids->values_num; batch += ZBX_DBSYNC_BATCH_SIZE)
 	{
@@ -453,6 +458,42 @@ static void	dbsync_get_rows(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, s
 		}
 		DBfree_result(result);
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: read query data based on changelog journal                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	dbsync_read_journal(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *field, const char *keyword, const char *order, const zbx_dbsync_journal_t *journal)
+{
+	int	i;
+
+	if (0 != journal->inserts.values_num || 0 != journal->updates.values_num)
+	{
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ' ');
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, keyword);
+
+		if (0 != journal->inserts.values_num)
+		{
+			dbsync_get_rows(sync, sql, sql_alloc, sql_offset, field, order, &journal->inserts,
+					ZBX_DBSYNC_ROW_ADD);
+		}
+
+		if (0 != journal->updates.values_num)
+		{
+			dbsync_get_rows(sync, sql, sql_alloc, sql_offset, field, order, &journal->updates,
+					ZBX_DBSYNC_ROW_UPDATE);
+		}
+	}
+
+	for (i = 0; i < journal->deletes.values_num; i++)
+		dbsync_add_row(sync, journal->deletes.values[i], ZBX_DBSYNC_ROW_REMOVE, NULL);
+
+	sync->add_num = journal->inserts.values_num;
+	sync->update_num = journal->updates.values_num;
+	sync->remove_num = journal->deletes.values_num;
 }
 
 /******************************************************************************
@@ -785,11 +826,9 @@ int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
  ******************************************************************************/
 int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 {
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	int			i, ret = SUCCEED;
-	zbx_dbsync_journal_t	*journal;
-
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -828,31 +867,8 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	journal = &dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST)];
-
-	if (0 != journal->inserts.values_num || 0 != journal->updates.values_num)
-	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
-
-		if (0 != journal->inserts.values_num)
-		{
-			dbsync_get_rows(sync, &sql, &sql_alloc, &sql_offset, "hostid", NULL, &journal->inserts,
-					ZBX_DBSYNC_ROW_ADD);
-		}
-
-		if (0 != journal->updates.values_num)
-		{
-			dbsync_get_rows(sync, &sql, &sql_alloc, &sql_offset, "hostid", NULL, &journal->updates,
-					ZBX_DBSYNC_ROW_UPDATE);
-		}
-	}
-
-	for (i = 0; i < journal->deletes.values_num; i++)
-		dbsync_add_row(sync, journal->deletes.values[i], ZBX_DBSYNC_ROW_REMOVE, NULL);
-
-	sync->add_num = journal->inserts.values_num;
-	sync->update_num = journal->updates.values_num;
-	sync->remove_num = journal->deletes.values_num;
+	dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "hostid", "and", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST)]);
 out:
 	zbx_free(sql);
 
@@ -3174,31 +3190,6 @@ int	zbx_dbsync_compare_item_tags(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compares host tags table row with cached configuration data       *
- *                                                                            *
- * Parameter: tag   - [IN] the cached host tag                                *
- *            dbrow - [IN] the database row                                   *
- *                                                                            *
- * Return value: SUCCEED - the row matches configuration data                 *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	dbsync_compare_host_tag(const zbx_dc_host_tag_t *tag, const DB_ROW dbrow)
-{
-	if (FAIL == dbsync_compare_uint64(dbrow[1], tag->hostid))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_str(dbrow[2], tag->tag))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_str(dbrow[3], tag->value))
-		return FAIL;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: compares host tags table with cached configuration data           *
  *                                                                            *
  * Parameter: sync - [OUT] the changeset                                      *
@@ -3209,61 +3200,27 @@ static int	dbsync_compare_host_tag(const zbx_dc_host_tag_t *tag, const DB_ROW db
  ******************************************************************************/
 int	zbx_dbsync_compare_host_tags(zbx_dbsync_t *sync)
 {
-	DB_ROW			dbrow;
-	DB_RESULT		result;
-	zbx_hashset_t		ids;
-	zbx_hashset_iter_t	iter;
-	zbx_uint64_t		rowid;
-	zbx_dc_host_tag_t	*host_tag;
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
 
-	if (NULL == (result = DBselect(
-			"select * from host_tag")))
-	{
-		printf("db query failed!\n");
-		return FAIL;
-	}
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select hosttagid,hostid,tag,value from host_tag");
 
 	dbsync_prepare(sync, 4, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		sync->dbresult = result;
-		return SUCCEED;
+		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+			ret = FAIL;
+		goto out;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->host_tags.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "hosttagid", "where", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST_TAG)]);
+out:
+	zbx_free(sql);
 
-	while (NULL != (dbrow = DBfetch(result)))
-	{
-		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
-
-		ZBX_STR2UINT64(rowid, dbrow[0]);
-		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
-
-		if (NULL == (host_tag = (zbx_dc_host_tag_t *)zbx_hashset_search(&dbsync_env.cache->host_tags,
-				&rowid)))
-		{
-			tag = ZBX_DBSYNC_ROW_ADD;
-		}
-		else if (FAIL == dbsync_compare_host_tag(host_tag, dbrow))
-			tag = ZBX_DBSYNC_ROW_UPDATE;
-
-		if (ZBX_DBSYNC_ROW_NONE != tag)
-			dbsync_add_row(sync, rowid, tag, dbrow);
-	}
-
-	zbx_hashset_iter_reset(&dbsync_env.cache->host_tags, &iter);
-	while (NULL != (host_tag = (zbx_dc_host_tag_t *)zbx_hashset_iter_next(&iter)))
-	{
-		if (NULL == zbx_hashset_search(&ids, &host_tag->hosttagid))
-			dbsync_add_row(sync, host_tag->hosttagid, ZBX_DBSYNC_ROW_REMOVE, NULL);
-	}
-
-	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
-
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
