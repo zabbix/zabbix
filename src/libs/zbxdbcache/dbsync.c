@@ -642,54 +642,6 @@ static char	*encode_expression(const zbx_eval_context_t *ctx)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compare serialized expression                                     *
- *                                                                            *
- * Parameter: col   - [IN] the base64 encoded expression                      *
- *            data2 - [IN] the serialized expression in cache                 *
- *                                                                            *
- * Return value: SUCCEED - the expressions are identical                      *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	dbsync_compare_serialized_expression(const char *col, const unsigned char *data2)
-{
-	zbx_uint32_t	offset1, len1, offset2, len2;
-	unsigned char	*data1;
-	int		col_len, data1_len, ret = FAIL;
-
-	if (NULL == data2)
-	{
-		if (NULL == col || '\0' == *col)
-			return SUCCEED;
-		return FAIL;
-	}
-
-	if (NULL == col || '\0' == *col)
-		return FAIL;
-
-	col_len = strlen(col);
-	data1 = zbx_malloc(NULL, col_len);
-
-	str_base64_decode(col, (char *)data1, col_len, &data1_len);
-
-	offset1 = zbx_deserialize_uint31_compact((const unsigned char *)data1, &len1);
-	offset2 = zbx_deserialize_uint31_compact((const unsigned char *)data2, &len2);
-
-	if (offset1 != offset2 || len1 != len2)
-		goto out;
-
-	if (0 != memcmp(data1 + offset1, data2 + offset2, len1))
-		goto out;
-
-	ret = SUCCEED;
-out:
-	zbx_free(data1);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: compares config table with cached configuration data              *
  *                                                                            *
  * Parameter: sync - [OUT] the changeset                                      *
@@ -1806,67 +1758,6 @@ int	zbx_dbsync_compare_prototype_items(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compares triggers table row with cached configuration data        *
- *                                                                            *
- * Parameter: trigger - [IN] the cached trigger                               *
- *            dbrow   - [IN] the database row                                 *
- *                                                                            *
- * Return value: SUCCEED - the row matches configuration data                 *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	dbsync_compare_trigger(const ZBX_DC_TRIGGER *trigger, const DB_ROW dbrow)
-{
-	if (ZBX_FLAG_DISCOVERY_PROTOTYPE == atoi(dbrow[19]))
-		return dbsync_compare_uchar(dbrow[19], trigger->flags);
-
-	if (FAIL == dbsync_compare_str(dbrow[1], trigger->description))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_str(dbrow[2], trigger->expression))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_uchar(dbrow[4], trigger->priority))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_uchar(dbrow[5], trigger->type))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_uchar(dbrow[9], trigger->status))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_uchar(dbrow[10], trigger->recovery_mode))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_str(dbrow[11], trigger->recovery_expression))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_uchar(dbrow[12], trigger->correlation_mode))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_str(dbrow[13], trigger->correlation_tag))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_str(dbrow[14], trigger->opdata))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_str(dbrow[15], trigger->event_name))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_serialized_expression(dbrow[16], trigger->expression_bin))
-		return FAIL;
-
-	if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == atoi(dbrow[10]) &&
-			FAIL == dbsync_compare_serialized_expression(dbrow[17], trigger->recovery_expression_bin))
-	{
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: applies necessary preprocessing before row is compared/used       *
  *                                                                            *
  * Parameter: row - [IN] the row to preprocess                                *
@@ -1950,63 +1841,31 @@ static char	**dbsync_trigger_preproc_row(char **row)
  ******************************************************************************/
 int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 {
-	DB_ROW			dbrow;
-	DB_RESULT		result;
-	zbx_hashset_t		ids;
-	zbx_hashset_iter_t	iter;
-	zbx_uint64_t		rowid;
-	ZBX_DC_TRIGGER		*trigger;
-	char			**row;
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
 
-	if (NULL == (result = DBselect(
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select triggerid,description,expression,error,priority,type,value,state,lastchange,status,"
 			"recovery_mode,recovery_expression,correlation_mode,correlation_tag,opdata,event_name,null,"
 			"null,null,flags"
-			" from triggers")))
-	{
-		return FAIL;
-	}
+			" from triggers");
 
 	dbsync_prepare(sync, 20, dbsync_trigger_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		sync->dbresult = result;
-		return SUCCEED;
+		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+			ret = FAIL;
+		goto out;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->triggers.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "triggerid", "where", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_TRIGGER)]);
+out:
+	zbx_free(sql);
 
-	while (NULL != (dbrow = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(rowid, dbrow[0]);
-		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
-
-		row = dbsync_preproc_row(sync, dbrow);
-
-		if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&dbsync_env.cache->triggers, &rowid)))
-		{
-			dbsync_add_row(sync, rowid, ZBX_DBSYNC_ROW_ADD, row);
-		}
-		else
-		{
-			if (FAIL == dbsync_compare_trigger(trigger, row))
-				dbsync_add_row(sync, rowid, ZBX_DBSYNC_ROW_UPDATE, row);
-		}
-	}
-
-	zbx_hashset_iter_reset(&dbsync_env.cache->triggers, &iter);
-	while (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
-	{
-		if (NULL == zbx_hashset_search(&ids, &trigger->triggerid))
-			dbsync_add_row(sync, trigger->triggerid, ZBX_DBSYNC_ROW_REMOVE, NULL);
-	}
-
-	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
-
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
