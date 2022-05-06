@@ -1026,6 +1026,13 @@ static void	zbx_on_exit(int ret)
 		zbx_locks_disable();
 #endif
 
+	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
+	{
+		DBconnect(ZBX_DB_CONNECT_EXIT);
+		free_database_cache(ZBX_SYNC_ALL);
+		DBclose();
+	}
+
 	if (SUCCEED != zbx_ha_stop(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
@@ -1037,13 +1044,6 @@ static void	zbx_on_exit(int ret)
 	{
 		free_metrics();
 		zbx_ipc_service_free_env();
-
-		DBconnect(ZBX_DB_CONNECT_EXIT);
-
-		free_database_cache(ZBX_SYNC_ALL);
-
-		DBclose();
-
 		free_configuration_cache();
 
 		/* free history value cache */

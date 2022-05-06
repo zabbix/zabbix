@@ -258,19 +258,18 @@ class LogoutResponse
     {
 
         $spData = $this->_settings->getSPData();
-        $idpData = $this->_settings->getIdPData();
 
         $this->id = Utils::generateUniqueID();
         $issueInstant = Utils::parseTime2SAML(time());
-
         $spEntityId = htmlspecialchars($spData['entityId'], ENT_QUOTES);
+        $destination = $this->_settings->getIdPSLOResponseUrl();
         $logoutResponse = <<<LOGOUTRESPONSE
 <samlp:LogoutResponse xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
                   xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
                   ID="{$this->id}"
                   Version="2.0"
                   IssueInstant="{$issueInstant}"
-                  Destination="{$idpData['singleLogoutService']['url']}"
+                  Destination="{$destination}"
                   InResponseTo="{$inResponseTo}"
                   >
     <saml:Issuer>{$spEntityId}</saml:Issuer>
