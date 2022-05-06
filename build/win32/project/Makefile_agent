@@ -87,6 +87,7 @@ OBJS = \
 	..\..\..\src\libs\zbxsysinfo\win32\memory.o \
 	..\..\..\src\libs\zbxsysinfo\win32\net.o \
 	..\..\..\src\libs\zbxsysinfo\win32\pdhmon.o \
+	..\..\..\src\libs\zbxsysinfo\win32\registry.o \
 	..\..\..\src\libs\zbxsysinfo\win32\proc.o \
 	..\..\..\src\libs\zbxsysinfo\win32\services.o \
 	..\..\..\src\libs\zbxsysinfo\win32\swap.o \

@@ -309,6 +309,8 @@ int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	WMI_GETALL(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VM_VMEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	REGISTRY_DATA(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	REGISTRY_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif
 
 #ifdef _AIX

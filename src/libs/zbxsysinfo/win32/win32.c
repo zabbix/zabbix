@@ -70,5 +70,8 @@ ZBX_METRIC	parameters_specific[] =
 	{"wmi.get",		CF_HAVEPARAMS,	WMI_GET,		"root\\cimv2,select Caption from Win32_OperatingSystem"},
 	{"wmi.getall",		CF_HAVEPARAMS,	WMI_GETALL,		"root\\cimv2,select * from Win32_OperatingSystem"},
 
+	{"registry.data",		CF_HAVEPARAMS,	REGISTRY_DATA,		NULL},
+	{"registry.get",		CF_HAVEPARAMS,	REGISTRY_GET,		NULL},
+
 	{NULL}
 };
