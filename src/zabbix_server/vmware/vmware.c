@@ -1064,6 +1064,24 @@ static void	vmware_fs_shared_free(zbx_vmware_fs_t *fs)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: frees shared resources allocated to store attributes object       *
+ *                                                                            *
+ * Parameters: custom_attr   - [IN] the custom attributes object              *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_custom_attr_shared_free(zbx_vmware_custom_attr_t *custom_attr)
+{
+	if (NULL != custom_attr->name)
+		vmware_shared_strfree(custom_attr->name);
+
+	if (NULL != custom_attr->value)
+		vmware_shared_strfree(custom_attr->value);
+
+	__vm_shmem_free_func(custom_attr);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: frees shared resources allocated to store virtual machine         *
  *                                                                            *
  * Parameters: vm   - [IN] the virtual machine                                *
@@ -1076,6 +1094,9 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 
 	zbx_vector_ptr_clear_ext(&vm->file_systems, (zbx_mem_free_func_t)vmware_fs_shared_free);
 	zbx_vector_ptr_destroy(&vm->file_systems);
+
+	zbx_vector_vmware_custom_attr_clear_ext(&vm->custom_attrs, (zbx_mem_free_func_t)vmware_attr_shared_free);
+	zbx_vector_vmware_custom_attr_destroy(&vm->custom_attrs);
 
 	if (NULL != vm->uuid)
 		vmware_shared_strfree(vm->uuid);
@@ -1465,6 +1486,27 @@ static zbx_vmware_fs_t	*vmware_fs_shared_dup(const zbx_vmware_fs_t *src)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: copies vmware virtual machine custom attribute object into shared *
+ *          memory                                                            *
+ *                                                                            *
+ * Parameters: src   - [IN] the vmware custom attribute object                *
+ *                                                                            *
+ * Return value: a duplicated vmware custom attribute object                  *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_custom_attr_t	*vmware_attr_shared_dup(const zbx_vmware_custom_attr_t *src)
+{
+	zbx_vmware_custom_attr_t	*custom_attr;
+
+	custom_attr = (zbx_vmware_custom_attr_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_custom_attr_t));
+	custom_attr->name = vmware_shared_strdup(src->name);
+	custom_attr->value = vmware_shared_strdup(src->value);
+
+	return custom_attr;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: copies object properties list into shared memory                  *
  *                                                                            *
  * Parameters: src       - [IN] the properties list                           *
@@ -1506,6 +1548,7 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
 	VMWARE_VECTOR_CREATE(&vm->file_systems, ptr);
 	zbx_vector_ptr_reserve(&vm->devs, src->devs.values_num);
 	zbx_vector_ptr_reserve(&vm->file_systems, src->file_systems.values_num);
+	zbx_vector_vmware_custom_attr_reserve(&vm->custom_attrs, src->custom_attrs.values_num);
 
 	vm->uuid = vmware_shared_strdup(src->uuid);
 	vm->id = vmware_shared_strdup(src->id);
@@ -1516,6 +1559,10 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
 
 	for (i = 0; i < src->file_systems.values_num; i++)
 		zbx_vector_ptr_append(&vm->file_systems, vmware_fs_shared_dup((zbx_vmware_fs_t *)src->file_systems.values[i]));
+
+	for (i = 0; i < src->custom_attrs.values_num; i++)
+		zbx_vector_vmware_custom_attr_append(&vm->custom_attrs,
+				vmware_attr_shared_dup((zbx_vmware_custom_attr_t *)src->custom_attrs.values[i]));
 
 	return vm;
 }
