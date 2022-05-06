@@ -88,6 +88,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"hv.sensors.get", VMCHECK_FUNC(check_vcenter_hv_sensors_get)},
 	{"hv.vm.num", VMCHECK_FUNC(check_vcenter_hv_vm_num)},
 
+	{"vm.attribute.get", VMCHECK_FUNC(check_vcenter_vm_attribute_get)},
 	{"vm.cluster.name", VMCHECK_FUNC(check_vcenter_vm_cluster_name)},
 	{"vm.cpu.num", VMCHECK_FUNC(check_vcenter_vm_cpu_num)},
 	{"vm.cpu.ready", VMCHECK_FUNC(check_vcenter_vm_cpu_ready)},
