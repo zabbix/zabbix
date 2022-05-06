@@ -115,7 +115,7 @@ int	check_vcenter_hv_sensors_get(AGENT_REQUEST *request, const char *username, c
 int	check_vcenter_hv_vm_num(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 
-int	check_vcenter_vm_attribute_get(AGENT_REQUEST *request, const char *username, const char *password,
+int	check_vcenter_vm_attribute(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);

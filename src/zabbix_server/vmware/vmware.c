@@ -260,13 +260,8 @@ static zbx_uint64_t	evt_req_chunk_size;
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.instanceUuid']]"	\
 		"/*[local-name()='val']"
 
-#define ZBX_XPATH_VM_AVAILABLE_FIELDS()									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='availableField']]"		\
-		"/*[local-name()='val']/*[local-name()='CustomFieldDef']"
-
 #define ZBX_XPATH_VM_CUSTOM_FIELD_VALUES()								\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='customValue']]"		\
-		"/*[local-name()='val']/*[local-name()='CustomFieldValue']"
+	ZBX_XPATH_PROP_NAME("customValue") ZBX_XPATH_LN("CustomFieldValue")
 
 #define ZBX_XPATH_HV_SENSOR_STATUS(node, sensor)							\
 	ZBX_XPATH_PROP_NAME(node) "/*[local-name()='HostNumericSensorInfo']"				\
@@ -600,21 +595,6 @@ int	zbx_str_uint64_pair_name_compare(const void *p1, const void *p2)
 	const zbx_str_uint64_pair_t	*v2 = (const zbx_str_uint64_pair_t *)p2;
 
 	return strcmp(v1->name, v2->name);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: sorting function to sort zbx_str_uint64_pair_t vector by value    *
- *                                                                            *
- ******************************************************************************/
-int	zbx_str_uint64_pair_value_compare(const void *p1, const void *p2)
-{
-	const zbx_str_uint64_pair_t	*v1 = (const zbx_str_uint64_pair_t *)p1;
-	const zbx_str_uint64_pair_t	*v2 = (const zbx_str_uint64_pair_t *)p1;
-
-	ZBX_RETURN_IF_NOT_EQUAL(v1->value, v2->value);
-
-	return 0;
 }
 
 /******************************************************************************
@@ -1095,7 +1075,7 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 	zbx_vector_ptr_clear_ext(&vm->file_systems, (zbx_mem_free_func_t)vmware_fs_shared_free);
 	zbx_vector_ptr_destroy(&vm->file_systems);
 
-	zbx_vector_vmware_custom_attr_clear_ext(&vm->custom_attrs, (zbx_mem_free_func_t)vmware_attr_shared_free);
+	zbx_vector_vmware_custom_attr_clear_ext(&vm->custom_attrs, vmware_custom_attr_shared_free);
 	zbx_vector_vmware_custom_attr_destroy(&vm->custom_attrs);
 
 	if (NULL != vm->uuid)
@@ -1546,6 +1526,7 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
 
 	VMWARE_VECTOR_CREATE(&vm->devs, ptr);
 	VMWARE_VECTOR_CREATE(&vm->file_systems, ptr);
+	VMWARE_VECTOR_CREATE(&vm->custom_attrs, vmware_custom_attr);
 	zbx_vector_ptr_reserve(&vm->devs, src->devs.values_num);
 	zbx_vector_ptr_reserve(&vm->file_systems, src->file_systems.values_num);
 	zbx_vector_vmware_custom_attr_reserve(&vm->custom_attrs, src->custom_attrs.values_num);
@@ -1561,8 +1542,10 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
 		zbx_vector_ptr_append(&vm->file_systems, vmware_fs_shared_dup((zbx_vmware_fs_t *)src->file_systems.values[i]));
 
 	for (i = 0; i < src->custom_attrs.values_num; i++)
+	{
 		zbx_vector_vmware_custom_attr_append(&vm->custom_attrs,
-				vmware_attr_shared_dup((zbx_vmware_custom_attr_t *)src->custom_attrs.values[i]));
+				vmware_attr_shared_dup(src->custom_attrs.values[i]));
+	}
 
 	return vm;
 }
@@ -2703,40 +2686,13 @@ static void	vmware_vm_get_custom_attrs(zbx_vmware_vm_t *vm, xmlDoc *details)
 	xmlXPathContext			*xpathCtx;
 	xmlXPathObject			*xpathObj;
 	xmlNodeSetPtr			nodeset;
-	int				i, index;
+	xmlNode				*node;
+	int				i;
 	char				*value;
-	zbx_vector_str_uint64_pair_t	defs;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	xpathCtx = xmlXPathNewContext(details);
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_VM_AVAILABLE_FIELDS(), xpathCtx)))
-		goto clean;
-
-	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-		goto clean;
-
-	nodeset = xpathObj->nodesetval;
-	zbx_vector_str_uint64_pair_reserve(&defs, nodeset->nodeNr);
-
-	for (i = 0; i < nodeset->nodeNr; i++)
-	{
-		zbx_str_uint64_pair_t   *def;
-
-		if (NULL == (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], "*[local-name()='name']")))
-			continue;
-
-		def->name = value;
-
-		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], "*[local-name()='key']")))
-		{
-			ZBX_STR2UINT64(def->value, value);
-			zbx_free(value);
-		}
-
-		zbx_vector_str_uint64_pair_append_ptr(&defs, def);
-	}
 
 	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_VM_CUSTOM_FIELD_VALUES(), xpathCtx)))
 		goto clean;
@@ -2744,38 +2700,43 @@ static void	vmware_vm_get_custom_attrs(zbx_vmware_vm_t *vm, xmlDoc *details)
 	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 		goto clean;
 
+	if (NULL == (node = zbx_xml_doc_get(details, ZBX_XPATH_PROP_NAME("availableField"))))
+		goto clean;
+
 	nodeset = xpathObj->nodesetval;
-	zbx_vector_vmware_custom_attr_reserve(&vm->custom_attrs, nodeset->nodeNr);
+	zbx_vector_vmware_custom_attr_reserve(&vm->custom_attrs, (size_t)nodeset->nodeNr);
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
-		zbx_str_uint64_pair_t		def_cmp;
+		char				xpath[MAX_STRING_LEN];
 		zbx_vmware_custom_attr_t	*attr;
 
+		if (NULL == (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], ZBX_XNN("key"))))
+			continue;
+
+		zbx_snprintf(xpath, sizeof(xpath),
+				ZBX_XNN("CustomFieldDef") "[" ZBX_XNN("key") "=%s][1]/" ZBX_XNN("name"), value);
+		zbx_free(value);
+
+		if (NULL == (value = zbx_xml_node_read_value(details, node, xpath)))
+			continue;
+
 		attr = (zbx_vmware_custom_attr_t *)zbx_malloc(NULL, sizeof(zbx_vmware_custom_attr_t));
-		memset(attr, 0, sizeof(zbx_vmware_custom_attr_t));
+		attr->name = value;
+		value = NULL;
 
-		if (NULL == (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], "*[local-name()='key']")))
-			continue;
-
-		ZBX_STR2UINT64(def_cmp.value, value);
-
-		if (FAIL == (index = zbx_vector_str_uint64_pair_bsearch(&defs, def_cmp, zbx_str_uint64_pair_value_compare)))
-			continue;
-
-		attr->name = defs.values[index].name;
-
-		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], "*[local-name()='value']")))
-			attr->value = value;
+		if (NULL == (attr->value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], ZBX_XNN("value"))))
+			attr->value = zbx_strdup(NULL, "");
 
 		zbx_vector_vmware_custom_attr_append(&vm->custom_attrs, attr);
 	}
+
+	zbx_vector_vmware_custom_attr_sort(&vm->custom_attrs, vmware_custom_attr_compare_name);
 clean:
-	zbx_vector_str_uint64_pair_destroy(&defs);
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() attributes:%d", __func__, vm->custom_attrs.values_num);
 }
 
 /******************************************************************************
@@ -2808,6 +2769,8 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 					"<ns0:pathSet>config.uuid</ns0:pathSet>"	\
 					"<ns0:pathSet>config.instanceUuid</ns0:pathSet>"\
 					"<ns0:pathSet>guest.disk</ns0:pathSet>"		\
+					"<ns0:pathSet>customValue</ns0:pathSet>"	\
+					"<ns0:pathSet>availableField</ns0:pathSet>"	\
 					"%s"						\
 				"</ns0:propSet>"					\
 				"<ns0:propSet>"						\
@@ -3578,7 +3541,7 @@ static int	vmware_dc_id_compare(const void *d1, const void *d2)
 	return strcmp(dc1->id, dc2->id);
 }
 
-int	vmware_custom_attr_compare(const void *a1, const void *a2)
+int	vmware_custom_attr_compare_name(const void *a1, const void *a2)
 {
 	const zbx_vmware_custom_attr_t	*attr1 = *(const zbx_vmware_custom_attr_t * const *)a1;
 	const zbx_vmware_custom_attr_t	*attr2 = *(const zbx_vmware_custom_attr_t * const *)a2;

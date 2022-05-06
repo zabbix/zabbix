@@ -53,7 +53,6 @@ zbx_str_uint64_pair_t;
 
 ZBX_PTR_VECTOR_DECL(str_uint64_pair, zbx_str_uint64_pair_t)
 int	zbx_str_uint64_pair_name_compare(const void *p1, const void *p2);
-int	zbx_str_uint64_pair_value_compare(const void *p1, const void *p2);
 
 /* performance counter data */
 typedef struct
@@ -187,7 +186,7 @@ typedef struct
 }
 zbx_vmware_custom_attr_t;
 ZBX_PTR_VECTOR_DECL(vmware_custom_attr, zbx_vmware_custom_attr_t *);
-int	vmware_custom_attr_compare(const void *a1, const void *a2);
+int	vmware_custom_attr_compare_name(const void *a1, const void *a2);
 
 /* the vmware virtual machine data */
 typedef struct
