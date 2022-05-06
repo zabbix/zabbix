@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:39:41Z'
+  date: '2022-04-06T19:33:23Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -660,7 +660,8 @@ zabbix_export:
             -
               uuid: 4a2936f068ed486f8c8a2cf2cfa7440b
               expression: 'last(/NetApp AFF A700 by HTTP/netapp.cluster.version,#1)<>last(/NetApp AFF A700 by HTTP/netapp.cluster.version,#2) and length(last(/NetApp AFF A700 by HTTP/netapp.cluster.version))>0'
-              name: 'Version has changed (new version: {ITEM.VALUE})'
+              name: 'Version has changed'
+              event_name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: '__RESOURCE__ version has changed. Ack to close.'
               manual_close: 'YES'
@@ -1244,7 +1245,8 @@ zabbix_export:
                 -
                   uuid: 34092a7ade784221ae50eb74a6fbcb5d
                   expression: 'last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}],#2) and length(last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}]))>0'
-                  name: '{#NODENAME}: Version has changed (new version: {ITEM.VALUE})'
+                  name: '{#NODENAME}: Version has changed'
+                  event_name: '{#NODENAME}: Version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
                   description: '{#NODENAME} version has changed. Ack to close.'
                   manual_close: 'YES'
@@ -1438,7 +1440,8 @@ zabbix_export:
                 -
                   uuid: 61357dfdb08846c4935f62ba894b159a
                   expression: 'last(/NetApp AFF A700 by HTTP/netapp.nodes.uptime[{#NODENAME}])<10m'
-                  name: '{#NODENAME}: Node has been restarted (uptime < 10m)'
+                  name: '{#NODENAME}: Node has been restarted'
+                  event_name: '{#NODENAME}: Node has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'

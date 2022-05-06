@@ -25,69 +25,69 @@
 ?>
 
 <script>
-	const view = {
-		editHost({hostid}) {
-			const original_url = location.href;
+	const view = new class {
 
+		constructor() {
+			this._registerEvents();
+		}
+
+		editHost({hostid}) {
+			this._openHostPopup({hostid});
+		}
+
+		_openHostPopup(host_data) {
+			const original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {
 				dialogueid: 'host_edit',
 				dialogue_class: 'modal-popup-large'
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostCreate, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostUpdate, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.create', this._events.hostCreate);
+			overlay.$dialogue[0].addEventListener('dialogue.update', this._events.hostUpdate);
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this._events.hostDelete);
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
-			}, {once: true});
-		},
+			});
+		}
 
-		events: {
-			hostCreate: (e) => {
-				const data = e.detail;
+		_registerEvents() {
+			this._events = {
+				hostCreate(e) {
+					if ('success' in e.detail) {
+						clearMessages();
 
-				if ('success' in data) {
-					const title = data.success.title;
-					let messages = [];
+						const message_box = makeMessageBox('good', e.detail.success.messages ?? [],
+							e.detail.success.title
+						);
 
-					if ('messages' in data.success) {
-						messages = data.success.messages;
+						addMessage(message_box);
+					}
+				},
+
+				hostUpdate(e) {
+					if ('success' in e.detail) {
+						postMessageOk(e.detail.success.title);
+
+						if ('messages' in e.detail.success) {
+							postMessageDetails('success', e.detail.success.messages);
+						}
 					}
 
-					const message_box = makeMessageBox('good', messages, title)[0];
+					location.href = location.href;
+				},
 
-					clearMessages();
-					addMessage(message_box);
-				}
-			},
+				hostDelete(e) {
+					if ('success' in e.detail) {
+						postMessageOk(e.detail.success.title);
 
-			hostUpdate: (e) => {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
+						if ('messages' in e.detail.success) {
+							postMessageDetails('success', e.detail.success.messages);
+						}
 					}
+
+					location.href = new Curl('hostinventories.php', false).getUrl();
 				}
-
-				location.href = location.href;
-			},
-
-			hostDelete: (e) => {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
-					}
-				}
-
-				location.href = new Curl('hostinventories.php', false).getUrl();
-			}
+			};
 		}
 	};
 </script>

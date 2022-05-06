@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-01T09:45:10Z'
+  date: '2022-04-06T19:33:55Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -408,7 +408,8 @@ zabbix_export:
               recovery_expression: |
                 avg(/Interfaces Simple SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Interfaces Simple SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) and
                 avg(/Interfaces Simple SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Interfaces Simple SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])
-              name: 'Interface {#IFDESCR}: High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              name: 'Interface {#IFDESCR}: High bandwidth usage'
+              event_name: 'Interface {#IFDESCR}: High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -431,7 +432,8 @@ zabbix_export:
               recovery_expression: |
                 max(/Interfaces Simple SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and max(/Interfaces Simple SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFDESCR}: High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFDESCR}: High error rate'
+              event_name: 'Interface {#IFDESCR}: High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'

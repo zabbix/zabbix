@@ -6398,6 +6398,10 @@ msgid "End of line sequence"
 msgstr ""
 
 #: include/locales.inc.php:33
+msgid "English (en_GB)"
+msgstr ""
+
+#: include/locales.inc.php:33
 msgid "English (en_US)"
 msgstr "Inglese (en_US)"
 
@@ -17554,6 +17558,10 @@ msgstr "Questo mese"
 msgid "This month so far"
 msgstr ""
 
+#: app/views/popup.tophosts.column.edit.php:172
+msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109
 msgid "This type of information may not match the key."
@@ -19735,6 +19743,10 @@ msgstr ""
 #: app/views/monitoring.widget.problemhosts.view.php:33
 msgid "With problems"
 msgstr "Con problemi"
+
+#: app/views/popup.tophosts.column.edit.php:119
+msgid "With this setting only numeric items will be displayed in this column."
+msgstr ""
 
 #: include/forms.inc.php:346 include/forms.inc.php:566
 msgid "With triggers"

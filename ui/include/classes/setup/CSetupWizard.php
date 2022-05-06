@@ -1009,13 +1009,13 @@ class CSetupWizard extends CForm {
 
 		$result = true;
 
-		if (!zbx_empty($DB['SCHEMA']) && $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
+		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL && $DB['SCHEMA'] !== '') {
 			$db_schema = DBselect(
-				"SELECT schema_name".
-				" FROM information_schema.schemata".
-				" WHERE schema_name='".pg_escape_string($DB['SCHEMA'])."'"
+				'SELECT NULL'.
+					' FROM information_schema.schemata'.
+					' WHERE schema_name='.zbx_dbstr($DB['SCHEMA'])
 			);
-			$result = DBfetch($db_schema);
+			$result = (bool) DBfetch($db_schema);
 		}
 
 		$db = DB::getDbBackend();

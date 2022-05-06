@@ -284,7 +284,7 @@ func (c *Connector) refreshActiveChecks() {
 			return
 		}
 
-		if len(*response.Expressions[i].Delimiter) != 1 {
+		if len(*response.Expressions[i].Delimiter) > 1 {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: invalid tag "exp_delimiter" value "%s"`,
 				c.clientID, c.addresses[0], *response.Expressions[i].Delimiter)
 			return

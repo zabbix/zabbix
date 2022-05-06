@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:01:58Z'
+  date: '2022-04-06T19:33:47Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -175,7 +175,8 @@ zabbix_export:
                 -
                   uuid: e2292c5ead924500a06d38b6356930c7
                   expression: 'last(/Systemd by Zabbix agent 2/systemd.service.uptime["{#UNIT.NAME}"])<10m'
-                  name: '{#UNIT.NAME}: has been restarted (uptime < 10m)'
+                  name: '{#UNIT.NAME}: has been restarted'
+                  event_name: '{#UNIT.NAME}: has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'

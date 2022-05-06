@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-01T10:10:01Z'
+  date: '2022-04-06T19:35:21Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -194,7 +194,8 @@ zabbix_export:
             -
               uuid: 0a779320c2ba4494b8c55aef969e7c9d
               expression: 'min(/Ubiquiti AirOS SNMP/system.cpu.util[loadValue.2],5m)>{$CPU.UTIL.CRIT}'
-              name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -334,7 +335,8 @@ zabbix_export:
             -
               uuid: 15523bce03a24cd6a4818ab655d1d2ad
               expression: 'last(/Ubiquiti AirOS SNMP/system.name,#1)<>last(/Ubiquiti AirOS SNMP/system.name,#2) and length(last(/Ubiquiti AirOS SNMP/system.name))>0'
-              name: 'System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -393,7 +395,8 @@ zabbix_export:
             -
               uuid: 2d9ed5a3b714461bbcdc4c530f955e5b
               expression: 'last(/Ubiquiti AirOS SNMP/system.uptime[sysUpTime.0])<10m'
-              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -501,7 +504,8 @@ zabbix_export:
             -
               uuid: 30c0c80ae6df45bb96c434016e394bba
               expression: 'min(/Ubiquiti AirOS SNMP/vm.memory.util[memoryUsedPercentage],5m)>{$MEMORY.UTIL.MAX}'
-              name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               tags:
@@ -932,7 +936,8 @@ zabbix_export:
               recovery_expression: |
                 avg(/Ubiquiti AirOS SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Ubiquiti AirOS SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) and
                 avg(/Ubiquiti AirOS SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Ubiquiti AirOS SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])
-              name: 'Interface {#IFDESCR}: High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              name: 'Interface {#IFDESCR}: High bandwidth usage'
+              event_name: 'Interface {#IFDESCR}: High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -955,7 +960,8 @@ zabbix_export:
               recovery_expression: |
                 max(/Ubiquiti AirOS SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and max(/Ubiquiti AirOS SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFDESCR}: High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFDESCR}: High error rate'
+              event_name: 'Interface {#IFDESCR}: High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'

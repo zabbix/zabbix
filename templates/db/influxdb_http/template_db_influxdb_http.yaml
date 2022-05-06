@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-27T19:03:24Z'
+  date: '2022-04-06T19:27:44Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -260,7 +260,8 @@ zabbix_export:
             -
               uuid: f0d2137905bc477f979d035c06111844
               expression: 'min(/InfluxDB by HTTP/influxdb.task_executor_complete.failed.rate,5m)>{$INFLUXDB.TASK.RUN.FAIL.MAX.WARN}'
-              name: 'InfluxDB: Too many tasks failure runs (over {$INFLUXDB.TASK.RUN.FAIL.MAX.WARN} for 5m)'
+              name: 'InfluxDB: Too many tasks failure runs'
+              event_name: 'InfluxDB: Too many tasks failure runs (over {$INFLUXDB.TASK.RUN.FAIL.MAX.WARN} for 5m)'
               priority: WARNING
               description: '"Number of failure runs completed across all tasks is too high."'
               tags:
@@ -429,7 +430,8 @@ zabbix_export:
             -
               uuid: 335f27fb002544838f7150b11238d86b
               expression: 'last(/InfluxDB by HTTP/influxdb.uptime)<10m'
-              name: 'InfluxDB: has been restarted (uptime < 10m)'
+              name: 'InfluxDB: has been restarted'
+              event_name: 'InfluxDB: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -490,7 +492,8 @@ zabbix_export:
             -
               uuid: d2b02cc426c748608968ae08c0823461
               expression: 'last(/InfluxDB by HTTP/influxdb.version,#1)<>last(/InfluxDB by HTTP/influxdb.version,#2) and length(last(/InfluxDB by HTTP/influxdb.version))>0'
-              name: 'InfluxDB: Version has changed (new version: {ITEM.VALUE})'
+              name: 'InfluxDB: Version has changed'
+              event_name: 'InfluxDB: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'InfluxDB version has changed. Ack to close.'
               manual_close: 'YES'
@@ -610,7 +613,8 @@ zabbix_export:
                 -
                   uuid: 893fa5755b514c36aa177c4f4e25b254
                   expression: 'min(/InfluxDB by HTTP/influxdb.org.query_request.failed.rate["{#ORG_NAME}"],5m)>{$INFLUXDB.REQ.FAIL.MAX.WARN}'
-                  name: 'InfluxDB: [{#ORG_NAME}]: Too many requests failures (over {$INFLUXDB.REQ.FAIL.MAX.WARN} for 5m)'
+                  name: 'InfluxDB: [{#ORG_NAME}]: Too many requests failures'
+                  event_name: 'InfluxDB: [{#ORG_NAME}]: Too many requests failures (over {$INFLUXDB.REQ.FAIL.MAX.WARN} for 5m)'
                   priority: WARNING
                   description: 'Too many query requests failed.'
                   tags:

@@ -46,7 +46,7 @@ class CCookieSession implements SessionHandlerInterface {
 	 *
 	 * @return boolean
 	 */
-	public function close() {
+	public function close(): bool {
 		echo ob_get_clean();
 
 		return true;
@@ -55,14 +55,12 @@ class CCookieSession implements SessionHandlerInterface {
 	/**
 	 * @inheritDoc
 	 *
-	 * @param string $session_id
+	 * @param string $id
 	 *
 	 * @return boolean
 	 */
-	public function destroy($session_id) {
-		CCookieHelper::unset(self::COOKIE_NAME);
-
-		return true;
+	public function destroy($id): bool {
+		return CCookieHelper::unset(self::COOKIE_NAME);
 	}
 
 	/**
@@ -72,6 +70,7 @@ class CCookieSession implements SessionHandlerInterface {
 	 *
 	 * @return integer
 	 */
+	#[\ReturnTypeWillChange]
 	public function gc($maxlifetime) {
 		return true;
 	}
@@ -79,12 +78,12 @@ class CCookieSession implements SessionHandlerInterface {
 	/**
 	 * @inheritDoc
 	 *
-	 * @param string $save_path
-	 * @param string $session_name
+	 * @param string $path
+	 * @param string $name
 	 *
 	 * @return boolean
 	 */
-	public function open($save_path, $session_name) {
+	public function open($path, $name): bool {
 		ob_start();
 
 		return session_status() === PHP_SESSION_ACTIVE;
@@ -93,11 +92,12 @@ class CCookieSession implements SessionHandlerInterface {
 	/**
 	 * @inheritDoc
 	 *
-	 * @param string $session_id
+	 * @param string $id
 	 *
 	 * @return string
 	 */
-	public function read($session_id) {
+	#[\ReturnTypeWillChange]
+	public function read($id) {
 		$session_data = json_decode($this->parseData(), true);
 
 		if (!is_array($session_data)) {
@@ -114,20 +114,18 @@ class CCookieSession implements SessionHandlerInterface {
 	/**
 	 * @inheritDoc
 	 *
-	 * @param string $session_id
-	 * @param string $session_data
+	 * @param string $id
+	 * @param string $data
 	 *
 	 * @return boolean
 	 */
-	public function write($session_id, $session_data) {
-		session_decode($session_data);
-		$session_data = $this->prepareData(CSessionHelper::getAll());
+	public function write($id, $data): bool {
+		session_decode($data);
+		$data = $this->prepareData(CSessionHelper::getAll());
 
-		if (!CCookieHelper::set(self::COOKIE_NAME, $session_data, $this->isAutologinEnabled() ? time() + SEC_PER_MONTH : 0)) {
-			throw new \Exception(_('Cannot set session cookie.'));
-		}
-
-		return true;
+		return CCookieHelper::set(self::COOKIE_NAME, $data,
+			$this->isAutologinEnabled() ? time() + SEC_PER_MONTH : 0
+		);
 	}
 
 	/**

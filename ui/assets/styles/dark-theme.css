@@ -6978,6 +6978,11 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   height: 30px;
   width: 30px; }
 
+.leaflet-marker-icon:focus {
+  box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
+  border-radius: 2px;
+  outline: none; }
+
 .marker-cluster span {
   line-height: 30px; }
 
