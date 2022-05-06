@@ -3657,8 +3657,8 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
 			break;
 
-		ZBX_STR2UINT64(itemid, row[0]);
-		ZBX_STR2UINT64(functionid, row[1]);
+		ZBX_STR2UINT64(itemid, row[1]);
+		ZBX_STR2UINT64(functionid, row[0]);
 		ZBX_STR2UINT64(triggerid, row[4]);
 
 		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))

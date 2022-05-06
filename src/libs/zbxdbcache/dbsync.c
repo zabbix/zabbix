@@ -2098,34 +2098,6 @@ int	zbx_dbsync_compare_trigger_dependency(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compares functions table row with cached configuration data       *
- *                                                                            *
- * Parameter: function - [IN] the cached function                             *
- *            dbrow    - [IN] the database row                                *
- *                                                                            *
- * Return value: SUCCEED - the row matches configuration data                 *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	dbsync_compare_function(const ZBX_DC_FUNCTION *function, const DB_ROW dbrow)
-{
-	if (FAIL == dbsync_compare_uint64(dbrow[0], function->itemid))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_uint64(dbrow[4], function->triggerid))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_str(dbrow[2], function->function))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_str(dbrow[3], function->parameter))
-		return FAIL;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: applies necessary preprocessing before row is compared/used       *
  *                                                                            *
  * Parameter: row - [IN] the row to preprocess                                *
@@ -2163,61 +2135,28 @@ static char	**dbsync_function_preproc_row(char **row)
  ******************************************************************************/
 int	zbx_dbsync_compare_functions(zbx_dbsync_t *sync)
 {
-	DB_ROW			dbrow;
-	DB_RESULT		result;
-	zbx_hashset_t		ids;
-	zbx_hashset_iter_t	iter;
-	zbx_uint64_t		rowid, itemid;
-	ZBX_DC_FUNCTION		*function;
-	char			**row;
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
 
-	if (NULL == (result = DBselect("select itemid,functionid,name,parameter,triggerid from functions")))
-		return FAIL;
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select functionid,itemid,name,parameter,triggerid from functions");
 
 	dbsync_prepare(sync, 5, dbsync_function_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		sync->dbresult = result;
-		return SUCCEED;
+		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+			ret = FAIL;
+		goto out;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->functions.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "functionid", "where", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_FUNCTION)]);
+out:
+	zbx_free(sql);
 
-	while (NULL != (dbrow = DBfetch(result)))
-	{
-		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
-
-		ZBX_STR2UINT64(itemid, dbrow[0]);
-		if (NULL == (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid))
-			continue;
-
-		ZBX_STR2UINT64(rowid, dbrow[1]);
-		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
-
-		row = dbsync_preproc_row(sync, dbrow);
-
-		if (NULL == (function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&dbsync_env.cache->functions, &rowid)))
-			tag = ZBX_DBSYNC_ROW_ADD;
-		else if (FAIL == dbsync_compare_function(function, row))
-			tag = ZBX_DBSYNC_ROW_UPDATE;
-
-		if (ZBX_DBSYNC_ROW_NONE != tag)
-			dbsync_add_row(sync, rowid, tag, row);
-	}
-
-	zbx_hashset_iter_reset(&dbsync_env.cache->functions, &iter);
-	while (NULL != (function = (ZBX_DC_FUNCTION *)zbx_hashset_iter_next(&iter)))
-	{
-		if (NULL == zbx_hashset_search(&ids, &function->functionid))
-			dbsync_add_row(sync, function->functionid, ZBX_DBSYNC_ROW_REMOVE, NULL);
-	}
-
-	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
-
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
