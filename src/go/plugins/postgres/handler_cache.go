@@ -23,8 +23,8 @@ import (
 	"context"
 	"errors"
 
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/jackc/pgx/v4"
-	"zabbix.com/pkg/zbxerr"
 )
 
 // cacheHandler finds cache hit percent and returns int64 if all is OK or nil otherwise.

@@ -826,12 +826,12 @@ ROW   |158                |33         |1          |0       |Discovery: {DISCOVER
 ROW   |159                |33         |2          |0       |Autoregistration: {HOST.HOST}                                    |Host name: {HOST.HOST}&eol;Host IP: {HOST.IP}&eol;Agent port: {HOST.PORT}                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 
 TABLE |usrgrp
-FIELDS|usrgrpid|name                     |gui_access|users_status|debug_mode|
-ROW   |7       |Zabbix administrators    |0         |0           |0         |
-ROW   |8       |Guests                   |1         |0           |0         |
-ROW   |9       |Disabled                 |0         |1           |0         |
-ROW   |11      |Enabled debug mode       |0         |0           |1         |
-ROW   |12      |No access to the frontend|3         |0           |0         |
+FIELDS|usrgrpid|name                     |gui_access|users_status|debug_mode|userdirectoryid|
+ROW   |7       |Zabbix administrators    |0         |0           |0         |NULL           |
+ROW   |8       |Guests                   |1         |0           |0         |NULL           |
+ROW   |9       |Disabled                 |0         |1           |0         |NULL           |
+ROW   |11      |Enabled debug mode       |0         |0           |1         |NULL           |
+ROW   |12      |No access to the frontend|3         |0           |0         |NULL           |
 
 TABLE |users_groups
 FIELDS|id  |usrgrpid|userid|
@@ -898,8 +898,8 @@ ROW   |7          |5       |23           |0       |2    |      |
 ROW   |8          |6       |23           |0       |4    |      |
 
 TABLE |config
-FIELDS|configid|work_period    |alert_usrgrpid|discovery_groupid|dbversion_status|geomaps_tile_provider|
-ROW   |1       |1-5,09:00-18:00|7             |5                |                |OpenStreetMap.Mapnik |
+FIELDS|configid|work_period    |alert_usrgrpid|discovery_groupid|dbversion_status|geomaps_tile_provider|ldap_userdirectoryid|
+ROW   |1       |1-5,09:00-18:00|7             |5                |                |OpenStreetMap.Mapnik |NULL                |
 
 TABLE |graph_theme
 FIELDS|graphthemeid|theme     |backgroundcolor|graphcolor|gridcolor|maingridcolor|gridbordercolor|textcolor|highlightcolor|leftpercentilecolor|rightpercentilecolor|nonworktimecolor|colorpalette                                                                                                                                      |
