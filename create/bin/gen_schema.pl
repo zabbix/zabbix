@@ -230,7 +230,7 @@ sub process_table
 			s/^$/0/;
 		}
 
-		print "\t{\"${table_name}\",\t\"${pkey}\",\t${flags},\n\t\t{\n";
+		print "\t{\"${table_name}\",\t\"${pkey_name}\",\t${flags},\n\t\t{\n";
 	}
 	else
 	{
