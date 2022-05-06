@@ -5903,6 +5903,7 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_t
 
 		criteria[0] = '\0';
 		offset = 0;
+		zbx_xml_free_doc(doc);
 
 		for (j = 0; j < cqv->instance->query_params->values_num; j++)
 		{
