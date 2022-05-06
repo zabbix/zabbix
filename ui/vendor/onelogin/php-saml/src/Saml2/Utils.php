@@ -82,11 +82,16 @@ class Utils
         assert($dom instanceof DOMDocument);
         assert(is_string($xml));
 
-        $oldEntityLoader = libxml_disable_entity_loader(true);
+        $oldEntityLoader = null;
+        if (PHP_VERSION_ID < 80000) {
+            $oldEntityLoader = libxml_disable_entity_loader(true);
+        }
 
         $res = $dom->loadXML($xml);
 
-        libxml_disable_entity_loader($oldEntityLoader);
+        if (PHP_VERSION_ID < 80000) {
+            libxml_disable_entity_loader($oldEntityLoader);
+        }
 
         foreach ($dom->childNodes as $child) {
             if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
@@ -141,9 +146,14 @@ class Utils
             $schemaFile = __DIR__ . '/schemas/' . $schema;
         }
 
-        $oldEntityLoader = libxml_disable_entity_loader(false);
+        $oldEntityLoader = null;
+        if (PHP_VERSION_ID < 80000) {
+            $oldEntityLoader = libxml_disable_entity_loader(false);
+        }
         $res = $dom->schemaValidate($schemaFile);
-        libxml_disable_entity_loader($oldEntityLoader);
+        if (PHP_VERSION_ID < 80000) {
+            libxml_disable_entity_loader($oldEntityLoader);
+        }
         if (!$res) {
             $xmlErrors = libxml_get_errors();
             syslog(LOG_INFO, 'Error validating the metadata: '.var_export($xmlErrors, true));
@@ -644,7 +654,7 @@ class Utils
 
         $pos = strpos($selfRoutedURLNoQuery, "?");
         if ($pos !== false) {
-            $selfRoutedURLNoQuery = substr($selfRoutedURLNoQuery, 0, $pos-1);
+            $selfRoutedURLNoQuery = substr($selfRoutedURLNoQuery, 0, $pos);
         }
 
         return $selfRoutedURLNoQuery;
@@ -964,12 +974,12 @@ class Utils
      */
     public static function deleteLocalSession()
     {
-
         if (Utils::isSessionStarted()) {
+            session_unset();
             session_destroy();
+        } else {
+            $_SESSION = array();
         }
-
-        unset($_SESSION);
     }
 
     /**
@@ -1046,12 +1056,13 @@ class Utils
      * @param string|null $format SP Format
      * @param string|null $cert   IdP Public cert to encrypt the nameID
      * @param string|null $nq     IdP Name Qualifier
+     * @param string|null $encAlg Encryption algorithm
      *
      * @return string $nameIDElement DOMElement | XMLSec nameID
      *
      * @throws Exception
      */
-    public static function generateNameId($value, $spnq, $format = null, $cert = null, $nq = null)
+    public static function generateNameId($value, $spnq, $format = null, $cert = null, $nq = null, $encAlg = XMLSecurityKey::AES128_CBC)
     {
 
         $doc = new DOMDocument();
@@ -1071,14 +1082,18 @@ class Utils
         $doc->appendChild($nameId);
 
         if (!empty($cert)) {
-            $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'public'));
+            if ($encAlg == XMLSecurityKey::AES128_CBC) {
+                $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'public'));
+            } else {
+                $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_OAEP_MGF1P, array('type'=>'public'));
+            }
             $seckey->loadKey($cert);
 
             $enc = new XMLSecEnc();
             $enc->setNode($nameId);
             $enc->type = XMLSecEnc::Element;
 
-            $symmetricKey = new XMLSecurityKey(XMLSecurityKey::AES128_CBC);
+            $symmetricKey = new XMLSecurityKey($encAlg);
             $symmetricKey->generateSessionKey();
             $enc->encryptKey($seckey, $symmetricKey);
 
@@ -1390,7 +1405,7 @@ class Utils
      * Validates a signature (Message or Assertion).
      *
      * @param string|\DomNode   $xml            The element we should validate
-     * @param string|null       $cert           The pubic cert
+     * @param string|null       $cert           The public cert
      * @param string|null       $fingerprint    The fingerprint of the public cert
      * @param string|null       $fingerprintalg The algorithm used to get the fingerprint
      * @param string|null       $xpath          The xpath of the signed element
