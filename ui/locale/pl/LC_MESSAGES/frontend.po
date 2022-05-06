@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-04-23 19:05+0000\n"
+"PO-Revision-Date: 2022-04-29 19:57+0000\n"
 "Last-Translator: Robert Szulist <r.szulist+zabbix@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -1362,6 +1362,10 @@ msgstr "O %1$s:%2$s w %3$s w każdy(ą) %4$s"
 msgid "At (hour:minute)"
 msgstr "O (godzina:minuta)"
 
+#: app/controllers/CControllerAuthenticationUpdate.php:125
+msgid "At least one LDAP server must exist."
+msgstr "Musi istnieć co najmniej jeden serwer LDAP."
+
 #: app/views/administration.userrole.edit.php:117
 msgid "At least one UI element must be checked."
 msgstr "Przynajmniej jeden element UI musi być sprawdzony."
@@ -2249,6 +2253,10 @@ msgstr[0] "Nie można usunąć pulpitu"
 msgstr[1] "Nie można usunąć pulpitów"
 msgstr[2] "Nie można usunąć pulpitów"
 
+#: include/classes/api/services/CUserDirectory.php:383
+msgid "Cannot delete default user directory."
+msgstr "Nie można usunąć domyślnego katalogu użytkownika."
+
 #: include/classes/api/services/CTrigger.php:882
 #: include/classes/api/services/CTriggerPrototype.php:570
 msgid "Cannot delete dependency"
@@ -2489,6 +2497,11 @@ msgstr[0] "Nie można usunąć użytkownika"
 msgstr[1] "Nie można usunąć użytkowników"
 msgstr[2] "Nie można usunąć użytkowników"
 
+#: include/classes/api/services/CUserDirectory.php:398
+#, c-format
+msgid "Cannot delete user directory \"%1$s\"."
+msgstr "Nie można usunąć katalogu użytkownika \"%1$s\"."
+
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
@@ -2693,6 +2706,11 @@ msgstr[2] "Nie można włączyć scenariuszy sieci www"
 msgid "Cannot evaluate expression"
 msgstr "Nie można ocenić wyrażenia"
 
+#: app/controllers/CControllerItemMassCheckNow.php:243
+#: app/controllers/CControllerItemMassCheckNow.php:251
+msgid "Cannot execute operation"
+msgstr "Nie można wykonać operacji"
+
 #: app/controllers/CControllerPopupScriptExec.php:123
 msgid "Cannot execute script."
 msgstr "Nie można wykonać skryptu."
@@ -2819,6 +2837,10 @@ msgstr "Nie można znaleźć szablonu \"%1$s\" nadpisującego \"%2$s\" regułę 
 #, c-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Nie można znaleźć wyzwalacza \"%1$s\" użytego na mapie \"%2$s\"."
+
+#: include/classes/api/services/CUser.php:1510
+msgid "Cannot find user directory for LDAP."
+msgstr "Nie można znaleźć katalogu użytkownika dla LDAP."
 
 #: include/classes/import/CConfigurationImport.php:732
 #, c-format
@@ -5054,6 +5076,10 @@ msgstr "Domyślnie"
 msgid "Default (%1$s)"
 msgstr "Domyślne (%1$s)"
 
+#: app/controllers/CControllerAuthenticationUpdate.php:134
+msgid "Default LDAP server must be specified."
+msgstr "Należy określić domyślny serwer LDAP."
+
 #: app/views/administration.userrole.edit.php:123
 msgid "Default access to new UI elements"
 msgstr "Domyślny dostęp do nowych elementów UI"
@@ -6953,6 +6979,10 @@ msgstr "Nie udało się wkleić strony pulpitu."
 #: jsLoader.php:138
 msgid "Failed to paste widget."
 msgstr "Wklejenie widżetu nie powiodło się."
+
+#: app/controllers/CControllerAuthenticationUpdate.php:390
+msgid "Failed to select default LDAP server."
+msgstr "Nie udało się wybrać domyślnego serwera LDAP."
 
 #: app/controllers/CControllerDashboardUpdate.php:141
 #: app/controllers/CControllerTemplateDashboardUpdate.php:135
@@ -9837,6 +9867,13 @@ msgstr "Nieprawidłowy adres IP \"%1$s\"."
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
 msgstr "Nieprawidłowe dane JSON. Wystąpił błąd serwera podczas przetwarzania tekstu JSON."
 
+#: app/controllers/CControllerPopupLdapCheck.php:52
+#: app/controllers/CControllerPopupLdapEdit.php:49
+#: app/controllers/CControllerPopupLdapTestEdit.php:44
+#: app/controllers/CControllerPopupLdapTestSend.php:50
+msgid "Invalid LDAP configuration"
+msgstr "Nieprawidłowa konfiguracja LDAP"
+
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
 msgstr "Nieprawidłowa treść pliku YAML"
@@ -10226,6 +10263,10 @@ msgstr "Pole inwentarza"
 #: app/views/popup.massupdate.host.php:179
 msgid "Inventory mode"
 msgstr "Tryb inwentarzowy"
+
+#: include/classes/helpers/CRoleHelper.php:480
+msgid "Invoke \"Execute now\" on read-only hosts"
+msgstr "Wywołaj \"Wykonaj teraz\" na hostach tylko do odczytu"
 
 #: app/views/administration.user.list.php:112
 msgid "Is online?"
@@ -10649,9 +10690,18 @@ msgstr "Koreański (ko_KR)"
 msgid "LDAP"
 msgstr "LDAP"
 
+#: app/views/administration.usergroup.edit.php:88
+#: app/views/popup.ldap.edit.php:157
+msgid "LDAP Server"
+msgstr "Serwer LDAP"
+
 #: include/perm.inc.php:49
 msgid "LDAP authentication"
 msgstr "Uwierzytelnianie LDAP"
+
+#: include/classes/api/services/CUser.php:1491
+msgid "LDAP authentication is disabled."
+msgstr "Uwierzytelnianie LDAP jest wyłączone."
 
 #: app/views/administration.authentication.edit.php:163
 msgid "LDAP host"
@@ -10664,6 +10714,10 @@ msgstr "LDAP nie jest skonfigurowany"
 #: app/controllers/CControllerAuthenticationUpdate.php:273
 msgid "LDAP login successful"
 msgstr "Pomyślnie zalogowano z LDAP"
+
+#: include/classes/api/services/CAuthentication.php:171
+msgid "LDAP must be enabled"
+msgstr "LDAP musi być włączony"
 
 #: app/views/administration.authentication.edit.php:336
 msgid "LDAP settings"
@@ -11112,9 +11166,17 @@ msgstr "Próby logowania"
 msgid "Login blocking interval"
 msgstr "Okres blokady logowania"
 
+#: app/controllers/CControllerPopupLdapTestSend.php:86
+msgid "Login failed"
+msgstr "Logowanie nie powiodło się"
+
 #: include/classes/validators/CLdapAuthValidator.php:87
 msgid "Login name or password is incorrect."
 msgstr "Podany login i/lub hasło są niepoprawne."
+
+#: app/controllers/CControllerPopupLdapTestSend.php:76
+msgid "Login successful"
+msgstr "Logowanie powiodło się"
 
 #: app/controllers/CControllerAuditLogList.php:193
 msgid "Logout"
@@ -12278,6 +12340,10 @@ msgstr "Nigdy"
 #: app/views/popup.token.edit.php:162
 msgid "New API token"
 msgstr "Nowy token API"
+
+#: app/views/popup.ldap.edit.php:145
+msgid "New LDAP server"
+msgstr "Nowy serwer LDAP"
 
 #: app/views/popup.sla.edit.php:255 app/views/popup.sla.edit.php:283
 msgid "New SLA"
@@ -15156,6 +15222,10 @@ msgstr "Żądanie utworzone z powodzeniem"
 msgid "Request sent successfully"
 msgstr "Żądanie wysłane z powodzeniem"
 
+#: app/controllers/CControllerItemMassCheckNow.php:236
+msgid "Request sent successfully. Some items are filtered due to access permissions or type."
+msgstr "Żądanie wysłane pomyślnie. Niektóre elementy zostały odfiltrowane ze względu na uprawnienia dostępu lub typ."
+
 #: include/views/configuration.host.discovery.edit.php:271
 #: include/views/configuration.item.edit.php:328
 #: include/views/configuration.item.prototype.edit.php:314
@@ -15970,6 +16040,10 @@ msgstr "Szukaj"
 msgid "Search attribute"
 msgstr "Atrybut wyszukiwania"
 
+#: app/views/popup.ldap.edit.php:128
+msgid "Search filter"
+msgstr "Filtr wyszukiwania"
+
 #: app/controllers/CControllerSearch.php:73
 msgid "Search pattern is empty"
 msgstr "Pusty wzorzec wyszukiwania"
@@ -16181,6 +16255,10 @@ msgstr "Serwer (proxy)"
 #: include/classes/widgets/forms/CWidgetFormClock.php:33
 msgid "Server time"
 msgstr "Czas serwera"
+
+#: app/views/administration.authentication.edit.php:146
+msgid "Servers"
+msgstr "Serwery"
 
 #: app/controllers/CControllerAuditLogList.php:225
 #: app/views/js/slareport.list.js.php:39
@@ -16836,6 +16914,10 @@ msgstr "Czas rozpoczęcia musi być mniejszy niż czas zakończenia dla SLA \"%1
 #, c-format
 msgid "Start time must be less than end time for excluded downtime \"%2$s\" of SLA \"%1$s\"."
 msgstr "Czas rozpoczęcia musi być mniejszy niż czas zakończenia wykluczonego czasu przestoju \"%2$s\" dla SLA \"%1$s\"."
+
+#: app/views/popup.ldap.edit.php:121
+msgid "StartTLS"
+msgstr "StartTLS"
 
 #: include/classes/validators/CLdapAuthValidator.php:81
 msgid "Starting TLS failed."
@@ -18972,6 +19054,15 @@ msgid_plural "Users deleted"
 msgstr[0] "Usunięto użytkownika"
 msgstr[1] "Usunięto użytkowników"
 msgstr[2] "Usunięto użytkowników"
+
+#: app/controllers/CControllerAuditLogList.php:246
+msgid "User directory"
+msgstr "Katalog użytkowników"
+
+#: include/classes/api/services/CUserDirectory.php:330
+#, c-format
+msgid "User directory \"%1$s\" already exists."
+msgstr "Katalog użytkowników \"%1$s\" już istnieje."
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: app/partials/js/scheduledreport.subscription.js.php:83
@@ -21720,6 +21811,10 @@ msgctxt "new element in multiselect"
 msgid "new"
 msgstr "nowy"
 
+#: include/classes/api/services/CAuthentication.php:180
+msgid "no LDAP servers"
+msgstr "brak serwerów LDAP"
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1464
 #: include/classes/graphdraw/CPieGraphDraw.php:320
 msgid "no data"
@@ -21916,6 +22011,11 @@ msgstr "wymagane jest zachowanie uprawnień a do edycji usługi podrzędnej"
 #: include/classes/widgets/fields/CWidgetFieldNavTree.php:110
 msgid "reference to a non-existent tree element"
 msgstr "odniesienie do nieistniejącego elementu drzewa"
+
+#: include/classes/api/services/CAuthentication.php:154
+#: include/classes/api/services/CUserGroup.php:1208
+msgid "referred object does not exist"
+msgstr "wskazany obiekt nie istnieje"
 
 #: app/controllers/CControllerQueueDetails.php:110
 #: app/controllers/CControllerQueueOverview.php:82
@@ -22596,6 +22696,11 @@ msgstr "nieprawidłowy typ reguły wykrywania"
 #: include/classes/api/services/CTask.php:444
 msgid "wrong item type"
 msgstr "nieprawidłowy typ elementu"
+
+#: app/controllers/CControllerItemMassCheckNow.php:178
+#: include/classes/api/services/CTask.php:591
+msgid "wrong master item type"
+msgstr "zły typ pozycji nadrzędnej"
 
 #: include/func.inc.php:591 jsLoader.php:221
 msgctxt "year short"

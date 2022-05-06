@@ -6,6 +6,10 @@ z-select,
 		outline: none;
 	}
 
+	ul > li.default-option {
+		font-style: italic;
+	}
+
 	button.focusable {
 		position: relative;
 		width: 100%;

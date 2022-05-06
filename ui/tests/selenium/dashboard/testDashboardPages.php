@@ -584,6 +584,7 @@ class testDashboardPages extends CWebTest {
 			}
 
 			$page_dialog->query('button:Apply')->one()->click();
+			COverlayDialogElement::ensureNotPresent();
 			$dashboard->waitUntilReady();
 			$allpage_name = ($page_name === 'not_page_number') ? ['Page 1', 'not_page_number'] : ['Page 1', 'not_page_number', 'Page 3'];
 			$this->assertEquals($allpage_name, $this->getPagesTitles());
