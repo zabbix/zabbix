@@ -3532,7 +3532,7 @@ zabbix_export:
                 BACKGROUND_TASK (16) - track commands started using the starttask command;
                 IMPORT_VV (17) - track tasks that migrate data to the local storage system;
                 ONLINE_COPY (18) - track physical copy of the volume while online (createvvcopy-online command);
-                CONVERT_VV (19) - track tasks that convert a volume from an FPVV to a TPVV, andthe reverse;
+                CONVERT_VV (19) - track tasks that convert a volume from an FPVV to a TPVV, and the reverse;
                 BACKGROUND_COMMAND (20) - track background command tasks;
                 CLX_SYNC (21) - track CLX synchronization tasks;
                 CLX_RECOVERY (22) - track CLX recovery tasks;
@@ -3557,7 +3557,7 @@ zabbix_export:
                 DEDUP_DRYRUN (42) - preview dedup ratio;
                 COMPR_DRYRUN (43) - compression estimation;
                 DEDUP_COMPR_DRYRUN (44) - compression and dedup estimation;
-                UKNOWN (99) - unknown task type.
+                UNKNOWN (99) - unknown task type.
               valuemap:
                 name: 'taskType enum'
               preprocessing:
