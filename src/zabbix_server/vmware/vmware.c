@@ -103,7 +103,6 @@ ZBX_PTR_VECTOR_IMPL(vmware_diskextent, zbx_vmware_diskextent_t *)
 ZBX_VECTOR_IMPL(vmware_hvdisk, zbx_vmware_hvdisk_t)
 ZBX_PTR_VECTOR_IMPL(vmware_dsname, zbx_vmware_dsname_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_pnic, zbx_vmware_pnic_t *)
-ZBX_PTR_VECTOR_IMPL(vmware_custom_attr, zbx_vmware_custom_attr_t *)
 
 /* VMware service object name mapping for vcenter and vsphere installations */
 typedef struct
@@ -263,14 +262,6 @@ static zbx_uint64_t	evt_req_chunk_size;
 #define ZBX_XPATH_VM_INSTANCE_UUID()									\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.instanceUuid']]"	\
 		"/*[local-name()='val']"
-
-#define ZBX_XPATH_VM_AVAILABLE_FIELDS()									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='availableField']]"		\
-		"/*[local-name()='val']/*[local-name()='CustomFieldDef']"
-
-#define ZBX_XPATH_VM_CUSTOM_FIELD_VALUES()								\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='customValue']]"		\
-		"/*[local-name()='val']/*[local-name()='CustomFieldValue']"
 
 #define ZBX_XPATH_HV_SENSOR_STATUS(node, sensor)							\
 	ZBX_XPATH_PROP_NAME(node) "/*[local-name()='HostNumericSensorInfo']"				\
@@ -619,21 +610,6 @@ int	zbx_str_uint64_pair_name_compare(const void *p1, const void *p2)
 	const zbx_str_uint64_pair_t	*v2 = (const zbx_str_uint64_pair_t *)p2;
 
 	return strcmp(v1->name, v2->name);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: sorting function to sort zbx_str_uint64_pair_t vector by value    *
- *                                                                            *
- ******************************************************************************/
-int	zbx_str_uint64_pair_value_compare(const void *p1, const void *p2)
-{
-	const zbx_str_uint64_pair_t	*v1 = (const zbx_str_uint64_pair_t *)p1;
-	const zbx_str_uint64_pair_t	*v2 = (const zbx_str_uint64_pair_t *)p1;
-
-	ZBX_RETURN_IF_NOT_EQUAL(v1->value, v2->value);
-
-	return 0;
 }
 
 /******************************************************************************
@@ -2509,7 +2485,7 @@ static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node)
 	props[ZBX_VMWARE_DEV_PROPS_IFCONNECTED] = zbx_xml_node_read_value(details, node,
 			ZBX_XNN("connectable") ZBX_XPATH_LN("connected"));
 
-	if (NULL != (attr_value = xmlGetProp(node, (const xmlChar *)"type")))
+	if (NULL != (attr_value = xmlGetProp(node->parent, (const xmlChar *)"type")))
 	{
 		props[ZBX_VMWARE_DEV_PROPS_IFTYPE] = zbx_strdup(NULL, (const char *)attr_value);
 		xmlFree(attr_value);
@@ -2521,12 +2497,6 @@ static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node)
 
 	props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE] = zbx_xml_node_read_value(details, node,
 			ZBX_XNN("backing") ZBX_XPATH_LN("deviceName"));
-	props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID] = zbx_xml_node_read_value(details, node,
-			ZBX_XNN("backing") ZBX_XPATH_LN2("port", "switchUuid"));
-	props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP] = zbx_xml_node_read_value(details, node,
-			ZBX_XNN("backing") ZBX_XPATH_LN2("port", "portgroupKey"));
-	props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORT] = zbx_xml_node_read_value(details, node,
-			ZBX_XNN("backing") ZBX_XPATH_LN2("port", "portKey"));
 
 	return props;
 }
@@ -2778,94 +2748,6 @@ clean:
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, vm->file_systems.values_num);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: gets custom attributes data of the virtual machine                *
- *                                                                            *
- * Parameters: vm      - [OUT] the virtual machine                            *
- *             details - [IN] a xml document containing virtual machine data  *
- *                                                                            *
- ******************************************************************************/
-static void	vmware_vm_get_custom_attrs(zbx_vmware_vm_t *vm, xmlDoc *details)
-{
-	xmlXPathContext			*xpathCtx;
-	xmlXPathObject			*xpathObj;
-	xmlNodeSetPtr			nodeset;
-	int				i, index;
-	char				*value;
-	zbx_vector_str_uint64_pair_t	defs;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	xpathCtx = xmlXPathNewContext(details);
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_VM_AVAILABLE_FIELDS(), xpathCtx)))
-		goto clean;
-
-	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-		goto clean;
-
-	nodeset = xpathObj->nodesetval;
-	zbx_vector_str_uint64_pair_reserve(&defs, nodeset->nodeNr);
-
-	for (i = 0; i < nodeset->nodeNr; i++)
-	{
-		zbx_str_uint64_pair_t   *def;
-
-		if (NULL == (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], "*[local-name()='name']")))
-			continue;
-
-		def->name = value;
-
-		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], "*[local-name()='key']")))
-		{
-			ZBX_STR2UINT64(def->value, value);
-			zbx_free(value);
-		}
-
-		zbx_vector_str_uint64_pair_append_ptr(&defs, def);
-	}
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_VM_CUSTOM_FIELD_VALUES(), xpathCtx)))
-		goto clean;
-
-	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-		goto clean;
-
-	nodeset = xpathObj->nodesetval;
-	zbx_vector_vmware_custom_attr_reserve(&vm->custom_attrs, nodeset->nodeNr);
-
-	for (i = 0; i < nodeset->nodeNr; i++)
-	{
-		zbx_str_uint64_pair_t		def_cmp;
-		zbx_vmware_custom_attr_t	*attr;
-
-		attr = (zbx_vmware_custom_attr_t *)zbx_malloc(NULL, sizeof(zbx_vmware_custom_attr_t));
-		memset(attr, 0, sizeof(zbx_vmware_custom_attr_t));
-
-		if (NULL == (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], "*[local-name()='key']")))
-			continue;
-
-		ZBX_STR2UINT64(def_cmp.value, value);
-
-		if (FAIL == (index = zbx_vector_str_uint64_pair_bsearch(&defs, def_cmp, zbx_str_uint64_pair_value_compare)))
-			continue;
-
-		attr->name = defs.values[index].name;
-
-		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], "*[local-name()='value']")))
-			attr->value = value;
-
-		zbx_vector_vmware_custom_attr_append(&vm->custom_attrs, attr);
-	}
-clean:
-	zbx_vector_str_uint64_pair_destroy(&defs);
-	xmlXPathFreeObject(xpathObj);
-	xmlXPathFreeContext(xpathCtx);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -3292,7 +3174,6 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 
 	zbx_vector_ptr_create(&vm->devs);
 	zbx_vector_ptr_create(&vm->file_systems);
-	zbx_vector_vmware_custom_attr_create(&vm->custom_attrs);
 
 	if (SUCCEED != vmware_service_get_vm_data(service, easyhandle, id, vm_propmap,
 			ZBX_VMWARE_VMPROPS_NUM, &details, error))
@@ -3335,7 +3216,6 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 	vmware_vm_get_nic_devices(vm, details);
 	vmware_vm_get_disk_devices(vm, details);
 	vmware_vm_get_file_systems(vm, details);
-	vmware_vm_get_custom_attrs(vm, details);
 
 	ret = SUCCEED;
 out:
@@ -4238,14 +4118,6 @@ int	vmware_pnic_compare(const void *v1, const void *v2)
 	return strcmp(nic1->name, nic2->name);
 }
 
-int	vmware_custom_attr_compare(const void *a1, const void *a2)
-{
-	const zbx_vmware_custom_attr_t	*attr1 = *(const zbx_vmware_custom_attr_t * const *)a1;
-	const zbx_vmware_custom_attr_t	*attr2 = *(const zbx_vmware_custom_attr_t * const *)a2;
-
-	return strcmp(attr1->name, attr2->name);
-}
-
 static void	vmware_service_get_hv_pnics_data(xmlDoc *details, zbx_vector_vmware_pnic_t *nics)
 {
 	xmlXPathContext	*xpathCtx;
@@ -4279,14 +4151,14 @@ static void	vmware_service_get_hv_pnics_data(xmlDoc *details, zbx_vector_vmware_
 		nic->name = value;
 
 		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
-				ZBX_XNN("linkSpeed") ZBX_XPATH_LN("speedMb"))))
+				ZBX_XPATH_LN2("linkSpeed", "speedMb"))))
 		{
 			ZBX_STR2UINT64(nic->speed, value);
 			zbx_free(value);
 		}
 
 		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
-				ZBX_XNN("linkSpeed") ZBX_XPATH_LN("duplex"))))
+				ZBX_XPATH_LN2("linkSpeed", "duplex"))))
 		{
 			nic->duplex = 0 == strcmp(value, "true") ? ZBX_DUPLEX_FULL : ZBX_DUPLEX_HALF;
 			zbx_free(value);

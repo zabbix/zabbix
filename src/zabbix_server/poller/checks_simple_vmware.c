@@ -2862,60 +2862,6 @@ out:
 	return ret;
 }
 
-int	check_vcenter_vm_attribute_get(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result)
-{
-	const char			*url, *vm_uuid, *attr_name, *value;
-	zbx_vmware_service_t		*service;
-	zbx_vmware_vm_t			*vm;
-	zbx_vmware_custom_attr_t	custom_attr;
-	int				index, ret = SYSINFO_RET_FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (3 != request->nparam)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		goto out;
-	}
-
-	url = get_rparam(request, 0);
-	vm_uuid = get_rparam(request, 1);
-	attr_name = get_rparam(request, 2);
-
-	if ('\0' == *vm_uuid)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		goto out;
-	}
-
-	zbx_vmware_lock();
-
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
-		goto unlock;
-
-	if (NULL == (vm = service_vm_get(service, vm_uuid)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown virtual machine uuid."));
-		goto unlock;
-	}
-
-	custom_attr.name = attr_name;
-
-	if (FAIL == (index = zbx_vector_vmware_custom_attr_bsearch(&vm->custom_attrs, &custom_attr, vmware_custom_attr_compare)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Custom attribute is not available."));
-		goto unlock;
-	}
-
-	SET_STR_RESULT(result, zbx_strdup(NULL, vm->custom_attrs.values[index]->value));
-	ret = SYSINFO_RET_OK;
-unlock:
-	zbx_vmware_unlock();
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
-}
-
 int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
@@ -3098,7 +3044,7 @@ out:
 int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	struct zbx_json		json_data, json_attr_data;
+	struct zbx_json		json_data;
 	const char		*url, *vm_name, *hv_name, *hv_uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
@@ -3133,7 +3079,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 
 		for (i = 0; i < hv->vms.values_num; i++)
 		{
-			int			j, k;
+			int			j;
 			zbx_vmware_datastore_t	*datastore = NULL;
 
 			vm = (zbx_vmware_vm_t *)hv->vms.values[i];
@@ -3165,13 +3111,6 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 				zabbix_log(LOG_LEVEL_WARNING, "%s() Unknown datastore id:%s", __func__,
 						ZBX_NULL2EMPTY_STR(vm->props[ZBX_VMWARE_VMPROP_DATASTOREID]));
 				continue;
-			}
-
-			zbx_json_addobject(&json_attr_data, NULL);
-			for (k = 0; k < vm->custom_attrs.values_num; k++)
-			{
-				zbx_json_addstring(&json_attr_data, vm->custom_attrs.values[i]->name,
-						vm->custom_attrs.values[i]->value, ZBX_JSON_TYPE_STRING);
 			}
 
 			zbx_json_addobject(&json_data, NULL);
@@ -3206,7 +3145,6 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#DATASTORE.NAME}", datastore->name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#DATASTORE.UUID}", datastore->uuid, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "{#VM.CUSTOMATRIBUTE}", json_attr_data.buffer, ZBX_JSON_TYPE_STRING);
 
 			zbx_json_close(&json_data);
 		}
@@ -3460,12 +3398,6 @@ static void	check_vcenter_vm_discovery_nic_props_cb(struct zbx_json *j, zbx_vmwa
 			ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(j, "{#IFBACKINGDEVICE}", ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE]),
 			ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(j, "{#IFDVSWITCH.UUID}", ZBX_NULL2EMPTY_STR(
-			dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID]), ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(j, "{#IFDVSWITCH.PORTGROUP}", ZBX_NULL2EMPTY_STR(
-			dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP]), ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(j, "{#IFDVSWITCH.PORT}", ZBX_NULL2EMPTY_STR(
-			dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORT]), ZBX_JSON_TYPE_STRING);
 }
 
 static void	check_vcenter_vm_discovery_disk_props_cb(struct zbx_json *j, zbx_vmware_dev_t *dev)

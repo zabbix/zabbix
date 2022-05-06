@@ -54,7 +54,6 @@ zbx_str_uint64_pair_t;
 
 ZBX_PTR_VECTOR_DECL(str_uint64_pair, zbx_str_uint64_pair_t)
 int	zbx_str_uint64_pair_name_compare(const void *p1, const void *p2);
-int	zbx_str_uint64_pair_value_compare(const void *p1, const void *p2);
 
 /* performance counter data */
 typedef struct
@@ -162,17 +161,13 @@ zbx_vmware_datacenter_t;
 int	vmware_dc_name_compare(const void *d1, const void *d2);
 ZBX_PTR_VECTOR_DECL(vmware_datacenter, zbx_vmware_datacenter_t *)
 
-#define ZBX_VMWARE_DEV_TYPE_NIC				1
-#define ZBX_VMWARE_DEV_TYPE_DISK			2
-#define ZBX_VMWARE_DEV_PROPS_IFMAC			0
-#define ZBX_VMWARE_DEV_PROPS_IFCONNECTED		1
-#define ZBX_VMWARE_DEV_PROPS_IFTYPE			2
-#define ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE		3
-#define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID		4
-#define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP	5
-#define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORT		6
-
-#define ZBX_VMWARE_DEV_PROPS_NUM			7
+#define ZBX_VMWARE_DEV_TYPE_NIC			1
+#define ZBX_VMWARE_DEV_TYPE_DISK		2
+#define ZBX_VMWARE_DEV_PROPS_IFMAC		0
+#define ZBX_VMWARE_DEV_PROPS_IFCONNECTED	1
+#define ZBX_VMWARE_DEV_PROPS_IFTYPE		2
+#define ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE	3
+#define ZBX_VMWARE_DEV_PROPS_NUM		4
 typedef struct
 {
 	int	type;
@@ -208,25 +203,15 @@ typedef struct
 }
 zbx_vmware_fs_t;
 
-typedef struct
-{
-	char		*name;
-	char		*value;
-}
-zbx_vmware_custom_attr_t;
-ZBX_PTR_VECTOR_DECL(vmware_custom_attr, zbx_vmware_custom_attr_t *);
-int	vmware_custom_attr_compare(const void *a1, const void *a2);
-
 /* the vmware virtual machine data */
 typedef struct
 {
-	char				*uuid;
-	char				*id;
-	char				**props;
-	zbx_vector_ptr_t		devs;
-	zbx_vector_ptr_t		file_systems;
-	zbx_vector_vmware_custom_attr_t	custom_attrs;
-	unsigned int			snapshot_count;
+	char			*uuid;
+	char			*id;
+	char			**props;
+	zbx_vector_ptr_t	devs;
+	zbx_vector_ptr_t	file_systems;
+	unsigned int		snapshot_count;
 }
 zbx_vmware_vm_t;
 
