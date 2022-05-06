@@ -228,7 +228,7 @@ class CWidgetClock extends CWidget {
 		const month = (now.getMonth() + 1).toString().padStart(2, '0');
 		const day = now.getDate().toString().padStart(2, '0');
 
-		clock_date.textContent = `${year}/${month}/${day}`;
+		clock_date.textContent = `${year}-${month}-${day}`;
 	}
 
 	_fillTimeZone() {
