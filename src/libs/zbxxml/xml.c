@@ -1440,6 +1440,7 @@ int	zbx_xml_node_remove(xmlDoc *xdoc, xmlNode *node, const char *xpath)
 	{
 		xmlUnlinkNode(nodeset->nodeTab[i]);
 		xmlFreeNode(nodeset->nodeTab[i]);
+		nodeset->nodeTab[i] = NULL;
 	}
 
 	ret = SUCCEED;
