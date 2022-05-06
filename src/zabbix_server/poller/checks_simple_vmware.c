@@ -2656,10 +2656,10 @@ int	check_vcenter_datastore_write(AGENT_REQUEST *request, const char *username, 
 int	check_vcenter_dvswitch_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	zbx_vmware_service_t	*service;
-	struct zbx_json		json_data;
 	const char		*url;
 	int			i, ret = SYSINFO_RET_FAIL;
+	zbx_vmware_service_t	*service;
+	struct zbx_json		json_data;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2782,13 +2782,13 @@ static int	custquery_param_create(const char *key, zbx_vector_custquery_param_t 
 int	check_vcenter_dvswitch_fetchports_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
+	const char			*mode, *url, *uuid, *key, *type = ZBX_VMWARE_SOAP_DVS;
+	int				ret = SYSINFO_RET_FAIL;
 	zbx_vmware_service_t		*service;
 	zbx_vmware_dvswitch_t		*dvs;
 	zbx_vmware_cust_query_t		*custom_query;
 	zbx_vector_custquery_param_t	query_params;
 	zbx_vmware_custom_query_type_t	query_type = VMWARE_DVSWITCH_FETCH_DV_PORTS;
-	const char			*mode, *url, *uuid, *key, *type = ZBX_VMWARE_SOAP_DVS;
-	int				ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

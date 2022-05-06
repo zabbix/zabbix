@@ -4163,12 +4163,12 @@ out:
  ******************************************************************************/
 static int	vmware_service_get_dvswitch_list(xmlDoc *doc, zbx_vector_vmware_dvswitch_t *dvsitches)
 {
+	char			*id, *name, *uuid;
+	int			i, ret = FAIL;
 	xmlXPathContext		*xpathCtx;
 	xmlXPathObject		*xpathObj;
 	xmlNodeSetPtr		nodeset;
 	zbx_vmware_dvswitch_t	*dvswitch;
-	char			*id, *name, *uuid;
-	int			i, ret = FAIL;
 
 	if (NULL == doc)
 		return ret;
@@ -4395,10 +4395,10 @@ static int	vmware_service_get_hv_ds_dc_dvs_list(const zbx_vmware_service_t *serv
 		"</ns0:RetrievePropertiesEx>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
-	xmlDoc				*doc = NULL;
-	zbx_property_collection_iter	*iter = NULL;
 	char				tmp[MAX_STRING_LEN * 2];
 	int				ret = FAIL;
+	xmlDoc				*doc = NULL;
+	zbx_property_collection_iter	*iter = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -5889,10 +5889,10 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_t
 			"</ns0:FetchDVPorts>"									\
 		ZBX_POST_VSPHERE_FOOTER
 
-	xmlDoc	*doc = NULL;
 	size_t	offset;
 	char	*error, tmp[MAX_STRING_LEN], criteria[MAX_STRING_LEN];
 	int	i, j;
+	xmlDoc	*doc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() dvs count:%d", __func__, cq_values->values_num);
 

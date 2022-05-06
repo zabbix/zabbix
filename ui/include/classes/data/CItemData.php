@@ -1257,7 +1257,7 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.dvswitch.fetchports.get[<url>,<filter>,<mode>]' => [
-				'description' => _('VMware FetchDVPorts wraper, <url> - VMware service URL, <filter> - vmware data object DistributedVirtualSwitchPortCriteria, <mode> - state(default)/full. Returns JSON'),
+				'description' => _('VMware FetchDVPorts wrapper, <url> - VMware service URL, <filter> - vmware data object DistributedVirtualSwitchPortCriteria, <mode> - state(default)/full. Returns JSON'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.eventlog[<url>,<mode>]' => [
