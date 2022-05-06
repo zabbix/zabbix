@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-29T11:03:02Z'
+  date: '2022-05-06T08:01:43Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -12,14 +12,14 @@ zabbix_export:
       name: 'HPE Primera by HTTP'
       description: |
         The template to monitor HPE Primera by HTTP.
-        It works without any external scripts and uses the Script items.
+        It works without any external scripts and uses the script items.
         
         Setup:
           1. Create user zabbix on the storage with browse role and enable it for all domains.
           2. The WSAPI server does not start automatically.
-             Log in to the CLI as Super, Service, or any role granted the wsapi_set right.
-             Start the WSAPI server by command: `startwsapi`.
-             To check WSAPI state use command: `showwsapi`.
+             - Log in to the CLI as Super, Service, or any role granted the wsapi_set right.
+             - Start the WSAPI server by command: `startwsapi`.
+             - To check WSAPI state use command: `showwsapi`.
           3. Link template to the host.
           4. Configure macros {$HPE.PRIMERA.USERNAME} and {$HPE.PRIMERA.PASSWORD}.
         
@@ -32,7 +32,7 @@ zabbix_export:
       items:
         -
           uuid: fff2354ba48b4deb861e47e980e9ed35
-          name: 'HPE Primera: Get Common Provisioning Groups'
+          name: 'HPE Primera: Get common provisioning groups'
           type: SCRIPT
           key: hpe.primera.cpgs
           history: 0d
@@ -101,7 +101,7 @@ zabbix_export:
             }
             
             return data;
-          description: 'A list of cpgs.'
+          description: 'A list of common provisioning groups.'
           preprocessing:
             -
               type: JSONPATH
@@ -111,26 +111,25 @@ zabbix_export:
           parameters:
             -
               name: base_url
-              value: 'https://{HOST.CONN}'
+              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
             -
               name: method
               value: cpgs
             -
               name: password
-              value: '{$HPE.PRIMERA.PASSWORD}'
+              value: '{$HPE.PRIMERA.API.PASSWORD}'
             -
               name: username
-              value: '{$HPE.PRIMERA.USERNAME}'
+              value: '{$HPE.PRIMERA.API.USERNAME}'
           tags:
             -
               tag: component
               value: raw
         -
           uuid: 2b1fef9aacde40f2bc66cc918adad7ac
-          name: 'HPE Primera: Get Physical disks'
+          name: 'HPE Primera: Get disks'
           type: SCRIPT
           key: hpe.primera.disks
-          delay: 5m
           history: 0d
           trends: '0'
           value_type: TEXT
@@ -197,7 +196,7 @@ zabbix_export:
             }
             
             return data;
-          description: 'A list of disks.'
+          description: 'A list of physical disks.'
           preprocessing:
             -
               type: JSONPATH
@@ -207,16 +206,16 @@ zabbix_export:
           parameters:
             -
               name: base_url
-              value: 'https://{HOST.CONN}'
+              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
             -
               name: method
               value: disks
             -
               name: password
-              value: '{$HPE.PRIMERA.PASSWORD}'
+              value: '{$HPE.PRIMERA.API.PASSWORD}'
             -
               name: username
-              value: '{$HPE.PRIMERA.USERNAME}'
+              value: '{$HPE.PRIMERA.API.USERNAME}'
           tags:
             -
               tag: component
@@ -305,23 +304,26 @@ zabbix_export:
           parameters:
             -
               name: base_url
-              value: 'https://{HOST.CONN}'
+              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
             -
               name: method
               value: disks
             -
               name: password
-              value: '{$HPE.PRIMERA.PASSWORD}'
+              value: '{$HPE.PRIMERA.API.PASSWORD}'
             -
               name: username
-              value: '{$HPE.PRIMERA.USERNAME}'
+              value: '{$HPE.PRIMERA.API.USERNAME}'
           tags:
+            -
+              tag: component
+              value: disks
             -
               tag: component
               value: storage
         -
           uuid: fcd8380a5313449eb6cdbb06b0180a7c
-          name: 'HPE Primera: Get Hosts'
+          name: 'HPE Primera: Get hosts'
           type: SCRIPT
           key: hpe.primera.hosts
           delay: 10m
@@ -401,23 +403,23 @@ zabbix_export:
           parameters:
             -
               name: base_url
-              value: 'https://{HOST.CONN}'
+              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
             -
               name: method
               value: hosts
             -
               name: password
-              value: '{$HPE.PRIMERA.PASSWORD}'
+              value: '{$HPE.PRIMERA.API.PASSWORD}'
             -
               name: username
-              value: '{$HPE.PRIMERA.USERNAME}'
+              value: '{$HPE.PRIMERA.API.USERNAME}'
           tags:
             -
               tag: component
               value: raw
         -
           uuid: 2aaa287a0d3849439ea16d7da4d822fe
-          name: 'HPE Primera: Get Ports'
+          name: 'HPE Primera: Get ports'
           type: SCRIPT
           key: hpe.primera.ports
           history: 0d
@@ -496,16 +498,16 @@ zabbix_export:
           parameters:
             -
               name: base_url
-              value: 'https://{HOST.CONN}'
+              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
             -
               name: method
               value: ports
             -
               name: password
-              value: '{$HPE.PRIMERA.PASSWORD}'
+              value: '{$HPE.PRIMERA.API.PASSWORD}'
             -
               name: username
-              value: '{$HPE.PRIMERA.USERNAME}'
+              value: '{$HPE.PRIMERA.API.USERNAME}'
           tags:
             -
               tag: component
@@ -514,7 +516,7 @@ zabbix_export:
           uuid: efc450d0682c4c5d93df41d05c10eceb
           name: 'HPE Primera: Allocated capacity'
           type: DEPENDENT
-          key: hpe.primera.system.allocated.capacity
+          key: hpe.primera.system.capacity.allocated
           delay: '0'
           history: 7d
           units: B
@@ -524,6 +526,99 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.allocatedCapacityMiB
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1048576'
+          master_item:
+            key: hpe.primera.system.info
+          tags:
+            -
+              tag: component
+              value: storage
+            -
+              tag: component
+              value: system
+        -
+          uuid: e3842eec2e45443681670d3c1d194900
+          name: 'HPE Primera: Failed capacity'
+          type: DEPENDENT
+          key: hpe.primera.system.capacity.failed
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Failed capacity in the system.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.failedCapacityMiB
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1048576'
+          master_item:
+            key: hpe.primera.system.info
+          tags:
+            -
+              tag: component
+              value: storage
+            -
+              tag: component
+              value: system
+        -
+          uuid: d23e888299d344238468481689f55e2d
+          name: 'HPE Primera: Free capacity'
+          type: DEPENDENT
+          key: hpe.primera.system.capacity.free
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Free capacity in the system.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.freeCapacityMiB
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1048576'
+          master_item:
+            key: hpe.primera.system.info
+          tags:
+            -
+              tag: component
+              value: storage
+            -
+              tag: component
+              value: system
+        -
+          uuid: 1e6fc0d68d18474e84b4fe2e4d3374d1
+          name: 'HPE Primera: Total capacity'
+          type: DEPENDENT
+          key: hpe.primera.system.capacity.total
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Total capacity in the system.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.totalCapacityMiB
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -588,6 +683,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.contact
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -599,75 +695,13 @@ zabbix_export:
               tag: component
               value: system
         -
-          uuid: e3842eec2e45443681670d3c1d194900
-          name: 'HPE Primera: Failed capacity'
-          type: DEPENDENT
-          key: hpe.primera.system.failed.capacity
-          delay: '0'
-          history: 7d
-          units: B
-          description: 'Failed capacity in the system.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.failedCapacityMiB
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-            -
-              type: MULTIPLIER
-              parameters:
-                - '1048576'
-          master_item:
-            key: hpe.primera.system.info
-          tags:
-            -
-              tag: component
-              value: storage
-            -
-              tag: component
-              value: system
-        -
-          uuid: d23e888299d344238468481689f55e2d
-          name: 'HPE Primera: Free capacity'
-          type: DEPENDENT
-          key: hpe.primera.system.free.capacity
-          delay: '0'
-          history: 7d
-          units: B
-          description: 'Free capacity in the system.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.freeCapacityMiB
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-            -
-              type: MULTIPLIER
-              parameters:
-                - '1048576'
-          master_item:
-            key: hpe.primera.system.info
-          tags:
-            -
-              tag: component
-              value: storage
-            -
-              tag: component
-              value: system
-        -
           uuid: c1b34efe07d641698cefffe4beff50fc
           name: 'HPE Primera: Health'
           type: DEPENDENT
           key: hpe.primera.system.health
           delay: '0'
           history: 7d
-          description: 'System availability.'
+          description: 'System availability by WSAPI.'
           preprocessing:
             -
               type: JSONPATH
@@ -688,16 +722,20 @@ zabbix_export:
             -
               uuid: 570d440e7ec9445585003208eca06e63
               expression: 'last(/HPE Primera by HTTP/hpe.primera.system.health)=0'
-              name: 'HPE Primera: The host is not available by API'
+              name: 'HPE Primera: WSAPI is not responding'
               priority: HIGH
-              description: 'ID from system information is 0 or can not retrieve system information.'
+              description: 'ID from system information is 0 or unable to retrieve system information.'
+              dependencies:
+                -
+                  name: 'HPE Primera: Service is unavailable'
+                  expression: 'last(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{HOST.CONN}","{$HPE.PRIMERA.API.PORT}"])=0'
               tags:
                 -
                   tag: scope
                   value: availability
         -
           uuid: 0e0e4c5c08dd420ab26862bfa140d729
-          name: 'HPE Primera: Get System Information'
+          name: 'HPE Primera: Get system information'
           type: SCRIPT
           key: hpe.primera.system.info
           history: 0d
@@ -766,7 +804,7 @@ zabbix_export:
             }
             
             return data;
-          description: 'General System information.'
+          description: 'General system information.'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -778,16 +816,16 @@ zabbix_export:
           parameters:
             -
               name: base_url
-              value: 'https://{HOST.CONN}'
+              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
             -
               name: method
               value: system
             -
               name: password
-              value: '{$HPE.PRIMERA.PASSWORD}'
+              value: '{$HPE.PRIMERA.API.PASSWORD}'
             -
               name: username
-              value: '{$HPE.PRIMERA.USERNAME}'
+              value: '{$HPE.PRIMERA.API.USERNAME}'
           tags:
             -
               tag: component
@@ -873,9 +911,9 @@ zabbix_export:
               value: system
         -
           uuid: acf6d37022884dc99a3b55c95f6b19c8
-          name: 'HPE Primera: Online nodes count'
+          name: 'HPE Primera: Nodes: Online'
           type: DEPENDENT
-          key: hpe.primera.system.online.nodes
+          key: hpe.primera.system.nodes.online
           delay: '0'
           history: 7d
           description: 'Number of online nodes in the system.'
@@ -883,11 +921,30 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.onlineNodes
+                - $.onlineNodes.length()
             -
-              type: JAVASCRIPT
+              type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 'return value.length'
+                - 1h
+          master_item:
+            key: hpe.primera.system.info
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: 65b22e04d7334aaf970a8961a46c22c9
+          name: 'HPE Primera: Nodes: Total'
+          type: DEPENDENT
+          key: hpe.primera.system.nodes.total
+          delay: '0'
+          history: 7d
+          description: 'Total number of nodes in the system.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.totalNodes
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -900,9 +957,9 @@ zabbix_export:
               value: system
         -
           uuid: d194672ea7f64dd58296d7fb2537f35b
-          name: 'HPE Primera: Serial Number'
+          name: 'HPE Primera: Serial number'
           type: DEPENDENT
-          key: hpe.primera.system.serial.number
+          key: hpe.primera.system.serial_number
           delay: '0'
           history: 7d
           trends: '0'
@@ -928,7 +985,7 @@ zabbix_export:
           uuid: e0f0ff7657784c8eab1a71a68ceefc19
           name: 'HPE Primera: Software version number'
           type: DEPENDENT
-          key: hpe.primera.system.sw.version
+          key: hpe.primera.system.sw_version
           delay: '0'
           history: 7d
           trends: '0'
@@ -950,62 +1007,8 @@ zabbix_export:
               tag: component
               value: system
         -
-          uuid: 1e6fc0d68d18474e84b4fe2e4d3374d1
-          name: 'HPE Primera: Total capacity'
-          type: DEPENDENT
-          key: hpe.primera.system.total.capacity
-          delay: '0'
-          history: 7d
-          units: B
-          description: 'Total capacity in the system.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.totalCapacityMiB
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-            -
-              type: MULTIPLIER
-              parameters:
-                - '1048576'
-          master_item:
-            key: hpe.primera.system.info
-          tags:
-            -
-              tag: component
-              value: storage
-            -
-              tag: component
-              value: system
-        -
-          uuid: 65b22e04d7334aaf970a8961a46c22c9
-          name: 'HPE Primera: Total nodes'
-          type: DEPENDENT
-          key: hpe.primera.system.total.nodes
-          delay: '0'
-          history: 7d
-          description: 'Total number of nodes in the system.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.totalNodes
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: hpe.primera.system.info
-          tags:
-            -
-              tag: component
-              value: system
-        -
           uuid: 05fd350143374c73a5502011dd05b119
-          name: 'HPE Primera: Get Tasks'
+          name: 'HPE Primera: Get tasks'
           type: SCRIPT
           key: hpe.primera.tasks
           history: 0d
@@ -1103,26 +1106,25 @@ zabbix_export:
           parameters:
             -
               name: base_url
-              value: 'https://{HOST.CONN}'
+              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
             -
               name: method
               value: tasks
             -
               name: password
-              value: '{$HPE.PRIMERA.PASSWORD}'
+              value: '{$HPE.PRIMERA.API.PASSWORD}'
             -
               name: username
-              value: '{$HPE.PRIMERA.USERNAME}'
+              value: '{$HPE.PRIMERA.API.USERNAME}'
           tags:
             -
               tag: component
               value: raw
         -
           uuid: d1744dbb6e21418cb314e77041890f67
-          name: 'HPE Primera: Get Volumes'
+          name: 'HPE Primera: Get volumes'
           type: SCRIPT
           key: hpe.primera.volumes
-          delay: 5m
           history: 0d
           trends: '0'
           value_type: TEXT
@@ -1199,166 +1201,87 @@ zabbix_export:
           parameters:
             -
               name: base_url
-              value: 'https://{HOST.CONN}'
+              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
             -
               name: method
               value: volumes
             -
               name: password
-              value: '{$HPE.PRIMERA.PASSWORD}'
+              value: '{$HPE.PRIMERA.API.PASSWORD}'
             -
               name: username
-              value: '{$HPE.PRIMERA.USERNAME}'
+              value: '{$HPE.PRIMERA.API.USERNAME}'
           tags:
             -
               tag: component
               value: raw
+        -
+          uuid: a0b4fdee38a64c5f82fd051ea74a7b2d
+          name: 'HPE Primera: Service''s TCP port state'
+          type: SIMPLE
+          key: 'net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{HOST.CONN}","{$HPE.PRIMERA.API.PORT}"]'
+          history: 7d
+          description: 'Checks if the service is running and accepting TCP connections.'
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          tags:
+            -
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: 8e7aa46322c643878e509461dbb9169d
+              expression: 'last(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{HOST.CONN}","{$HPE.PRIMERA.API.PORT}"])=0'
+              name: 'HPE Primera: Service is unavailable'
+              priority: HIGH
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: b9132b095eb349c99e868ea40364596d
-          name: 'Common Provisioning Groups Discovery'
+          name: 'Common provisioning groups discovery'
           type: DEPENDENT
           key: hpe.primera.cpg.discovery
           delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ID}'
+                value: '{$HPE.PRIMERA.CPG.ID.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#ID}'
+                value: '{$HPE.PRIMERA.CPG.ID.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              -
+                macro: '{#NAME}'
+                value: '{$HPE.PRIMERA.CPG.NAME.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#NAME}'
+                value: '{$HPE.PRIMERA.CPG.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'List of CPGs resources.'
           item_prototypes:
-            -
-              uuid: a7e2188d600a4715a58deba46f3b46ac
-              name: 'CPG [{#NAME}]: Degraded State'
-              type: DEPENDENT
-              key: 'hpe.primera.cpg.degraded.states["{#NAME}"]'
-              delay: '0'
-              history: 7d
-              trends: '0'
-              value_type: CHAR
-              description: |
-                Detailed state of the CPG:
-                
-                LDS_NOT_STARTED (1) - LDs not started.
-                NOT_STARTED (2) - VV not started.
-                NEEDS_CHECK (3) - Check for consistency.
-                NEEDS_MAINT_CHECK (4) - Maintenance check is required.
-                INTERNAL_CONSISTENCY_ERROR (5) - Internal consistency error.
-                SNAPDATA_INVALID (6) - Invalid snapshot data.
-                PRESERVED (7) - Unavailable LD sets due to missing chunklets. Preserved remaining VV data.
-                STALE (8) - Parts of the VV contain old data because of a copy-on-write operation.
-                COPY_FAILED (9) - A promote or copy operation to this volume failed.
-                DEGRADED_AVAIL (10) - Degraded due to availability.
-                DEGRADED_PERF (11) - Degraded due to performance.
-                PROMOTING (12) - Volume is the current target of a promote operation.
-                COPY_TARGET (13) - Volume is the current target of a physical copy operation.
-                RESYNC_TARGET (14) - Volume is the current target of a resynchronized copy operation.
-                TUNING (15) - Volume tuning is in progress.
-                CLOSING (16) - Volume is closing.
-                REMOVING (17) - Removing the volume.
-                REMOVING_RETRY (18) - Retrying a volume removal operation.
-                CREATING (19) - Creating a volume.
-                COPY_SOURCE (20) - Copy source.
-                IMPORTING (21) - Importing a volume.
-                CONVERTING (22) - Converting a volume.
-                INVALID (23) - Invalid.
-                EXCLUSIVE (24) - Local storage system has exclusive access to the volume.
-                CONSISTENT (25) - Volume is being imported consistently along with other volumes in the VV set.
-                STANDBY (26) - Volume in Standby mode.
-                SD_META_INCONSISTENT (27) - SD Meta Inconsistent.
-                SD_NEEDS_FIX (28) - SD needs fix.
-                SD_META_FIXING (29) - SD meta fix.
-                UNKNOWN (999) - Unknown state.
-                NOT_SUPPORTED_BY_WSAPI (1000) - State not supported by WSAPI.
-              valuemap:
-                name: 'Primera: Volume detailed state enum'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.name == "{#NAME}")].degradedStates.first()'
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - 'return JSON.stringify(JSON.parse(value));'
-              master_item:
-                key: hpe.primera.cpgs
-              tags:
-                -
-                  tag: component
-                  value: cpg
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: cpg
-                  value: '{#NAME}'
-            -
-              uuid: 837b48053400487885bf051a78f2200a
-              name: 'CPG [{#NAME}]: Failed State'
-              type: DEPENDENT
-              key: 'hpe.primera.cpg.failed.states["{#NAME}"]'
-              delay: '0'
-              history: 7d
-              trends: '0'
-              value_type: CHAR
-              description: |
-                Detailed state of the CPG:
-                
-                LDS_NOT_STARTED (1) - LDs not started.
-                NOT_STARTED (2) - VV not started.
-                NEEDS_CHECK (3) - Check for consistency.
-                NEEDS_MAINT_CHECK (4) - Maintenance check is required.
-                INTERNAL_CONSISTENCY_ERROR (5) - Internal consistency error.
-                SNAPDATA_INVALID (6) - Invalid snapshot data.
-                PRESERVED (7) - Unavailable LD sets due to missing chunklets. Preserved remaining VV data.
-                STALE (8) - Parts of the VV contain old data because of a copy-on-write operation.
-                COPY_FAILED (9) - A promote or copy operation to this volume failed.
-                DEGRADED_AVAIL (10) - Degraded due to availability.
-                DEGRADED_PERF (11) - Degraded due to performance.
-                PROMOTING (12) - Volume is the current target of a promote operation.
-                COPY_TARGET (13) - Volume is the current target of a physical copy operation.
-                RESYNC_TARGET (14) - Volume is the current target of a resynchronized copy operation.
-                TUNING (15) - Volume tuning is in progress.
-                CLOSING (16) - Volume is closing.
-                REMOVING (17) - Removing the volume.
-                REMOVING_RETRY (18) - Retrying a volume removal operation.
-                CREATING (19) - Creating a volume.
-                COPY_SOURCE (20) - Copy source.
-                IMPORTING (21) - Importing a volume.
-                CONVERTING (22) - Converting a volume.
-                INVALID (23) - Invalid.
-                EXCLUSIVE (24) - Local storage system has exclusive access to the volume.
-                CONSISTENT (25) - Volume is being imported consistently along with other volumes in the VV set.
-                STANDBY (26) - Volume in Standby mode.
-                SD_META_INCONSISTENT (27) - SD Meta Inconsistent.
-                SD_NEEDS_FIX (28) - SD needs fix.
-                SD_META_FIXING (29) - SD meta fix.
-                UNKNOWN (999) - Unknown state.
-                NOT_SUPPORTED_BY_WSAPI (1000) - State not supported by WSAPI.
-              valuemap:
-                name: 'Primera: Volume detailed state enum'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.name == "{#NAME}")].failedStates.first()'
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - 'return JSON.stringify(JSON.parse(value));'
-              master_item:
-                key: hpe.primera.cpgs
-              tags:
-                -
-                  tag: component
-                  value: cpg
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: cpg
-                  value: '{#NAME}'
             -
               uuid: 6d070a747a01498b94c56da721a63192
               name: 'CPG [{#NAME}]: Number of FPVVs'
               type: DEPENDENT
-              key: 'hpe.primera.cpg.fpvvs.number["{#NAME}"]'
+              key: 'hpe.primera.cpg.fpvv["{#NAME}",count]'
               delay: '0'
               history: 7d
               description: 'Number of FPVVs (Fully Provisioned Virtual Volumes) allocated in the CPG.'
@@ -1384,44 +1307,10 @@ zabbix_export:
                   tag: cpg
                   value: '{#NAME}'
             -
-              uuid: a6cd977f27a8463cb385715327e34955
-              name: 'CPG [{#NAME}]: Free CPG space'
-              type: DEPENDENT
-              key: 'hpe.primera.cpg.free.space["{#NAME}"]'
-              delay: '0'
-              history: 7d
-              units: B
-              description: 'Free CPG space.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.name == "{#NAME}")].freeSpaceMiB.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 10m
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '1048576'
-              master_item:
-                key: hpe.primera.cpgs
-              tags:
-                -
-                  tag: component
-                  value: cpg
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: cpg
-                  value: '{#NAME}'
-            -
               uuid: a7fccd5afcf5469ca11a9436240eab5c
-              name: 'CPG [{#NAME}]: Raw free space'
+              name: 'CPG [{#NAME}]: Raw space: Free'
               type: DEPENDENT
-              key: 'hpe.primera.cpg.raw.free.space["{#NAME}"]'
+              key: 'hpe.primera.cpg.raw.space["{#NAME}",free]'
               delay: '0'
               history: 7d
               units: B
@@ -1453,9 +1342,9 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 8f26a54327f54e968f422081e6045217
-              name: 'CPG [{#NAME}]: Raw shared space'
+              name: 'CPG [{#NAME}]: Raw space: Shared'
               type: DEPENDENT
-              key: 'hpe.primera.cpg.raw.shared.space["{#NAME}"]'
+              key: 'hpe.primera.cpg.raw.space["{#NAME}",shared]'
               delay: '0'
               history: 7d
               units: B
@@ -1484,9 +1373,9 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: e3ac07e2707a44fd8c166f4618fd79a1
-              name: 'CPG [{#NAME}]: Raw total space'
+              name: 'CPG [{#NAME}]: Raw space: Total'
               type: DEPENDENT
-              key: 'hpe.primera.cpg.raw.total.space["{#NAME}"]'
+              key: 'hpe.primera.cpg.raw.space["{#NAME}",total]'
               delay: '0'
               history: 7d
               units: B
@@ -1518,13 +1407,13 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 6dfd722ad85b481a9c2b04a4a5eb91fe
-              name: 'CPG [{#NAME}]: Total (raw) logical disk space in Snapshot administration'
+              name: 'CPG [{#NAME}]: Logical disk space: Snapshot administration: Total (raw)'
               type: DEPENDENT
-              key: 'hpe.primera.cpg.sa.usage.raw.total["{#NAME}"]'
+              key: 'hpe.primera.cpg.sa.usage["{#NAME}",raw_total]'
               delay: '0'
               history: 7d
               units: B
-              description: 'Snapshot administration usage. Total physical (raw) logical disk space.'
+              description: 'Total physical (raw) logical disk space in snapshot administration.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1552,13 +1441,13 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 8b2dc75fdcfa48908ece97768641f055
-              name: 'CPG [{#NAME}]: Used (raw) logical disk space in Snapshot administration'
+              name: 'CPG [{#NAME}]: Logical disk space: Snapshot administration: Used (raw)'
               type: DEPENDENT
-              key: 'hpe.primera.cpg.sa.usage.raw.used["{#NAME}"]'
+              key: 'hpe.primera.cpg.sa.usage["{#NAME}",raw_used]'
               delay: '0'
               history: 7d
               units: B
-              description: 'Snapshot administration usage. Amount of physical (raw) logical disk used.'
+              description: 'Amount of physical (raw) logical disk used in snapshot administration.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1567,7 +1456,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
                 -
                   type: MULTIPLIER
                   parameters:
@@ -1586,13 +1475,13 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: d55f0eab811641fdbb9a8bc8c54815ee
-              name: 'CPG [{#NAME}]: Total logical disk space in Snapshot administration'
+              name: 'CPG [{#NAME}]: Logical disk space: Snapshot administration: Total'
               type: DEPENDENT
-              key: 'hpe.primera.cpg.sa.usage.total["{#NAME}"]'
+              key: 'hpe.primera.cpg.sa.usage["{#NAME}",total]'
               delay: '0'
               history: 7d
               units: B
-              description: 'Snapshot administration usage. Total logical disk space.'
+              description: 'Total logical disk space in snapshot administration.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1620,13 +1509,13 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: cf467bc7d9ac45259f284eeab6ae7f6a
-              name: 'CPG [{#NAME}]: Used logical disk space in Snapshot administration'
+              name: 'CPG [{#NAME}]: Logical disk space: Snapshot administration: Used'
               type: DEPENDENT
-              key: 'hpe.primera.cpg.sa.usage.used["{#NAME}"]'
+              key: 'hpe.primera.cpg.sa.usage["{#NAME}",used]'
               delay: '0'
               history: 7d
               units: B
-              description: 'Snapshot administration usage. Amount of logical disk used.'
+              description: 'Amount of logical disk used in snapshot administration.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1635,7 +1524,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
                 -
                   type: MULTIPLIER
                   parameters:
@@ -1654,13 +1543,13 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 61dd9aa18c714863b606d18b2fff6c57
-              name: 'CPG [{#NAME}]: Total (raw) logical disk space in Snapshot data'
+              name: 'CPG [{#NAME}]: Logical disk space: Snapshot data: Total (raw)'
               type: DEPENDENT
-              key: 'hpe.primera.cpg.sd.usage.raw.total["{#NAME}"]'
+              key: 'hpe.primera.cpg.sd.usage["{#NAME}",raw_total]'
               delay: '0'
               history: 7d
               units: B
-              description: 'Snapshot data space usage. Total physical (raw) logical disk space.'
+              description: 'Total physical (raw) logical disk space in snapshot data space.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1688,13 +1577,13 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: f95ee3c4c0c64d46a47dd68b346f2fa5
-              name: 'CPG [{#NAME}]: Used (raw) logical disk space in Snapshot data'
+              name: 'CPG [{#NAME}]: Logical disk space: Snapshot data: Used (raw)'
               type: DEPENDENT
-              key: 'hpe.primera.cpg.sd.usage.raw.used["{#NAME}"]'
+              key: 'hpe.primera.cpg.sd.usage["{#NAME}",raw_used]'
               delay: '0'
               history: 7d
               units: B
-              description: 'Snapshot data space usage. Amount of physical (raw) logical disk used.'
+              description: 'Amount of physical (raw) logical disk used in snapshot data space.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1703,7 +1592,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
                 -
                   type: MULTIPLIER
                   parameters:
@@ -1722,13 +1611,13 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 797f3335d8704d4bb8b53e34b3e6589e
-              name: 'CPG [{#NAME}]: Total logical disk space in Snapshot data'
+              name: 'CPG [{#NAME}]: Logical disk space: Snapshot data: Total'
               type: DEPENDENT
-              key: 'hpe.primera.cpg.sd.usage.total["{#NAME}"]'
+              key: 'hpe.primera.cpg.sd.usage["{#NAME}",total]'
               delay: '0'
               history: 7d
               units: B
-              description: 'Snapshot data space usage. Total logical disk space.'
+              description: 'Total logical disk space in snapshot data space.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1756,13 +1645,13 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 51e40f6a1eb249d58bd79948d403d4f7
-              name: 'CPG [{#NAME}]: Used logical disk space in Snapshot data'
+              name: 'CPG [{#NAME}]: Logical disk space: Snapshot data: Used'
               type: DEPENDENT
-              key: 'hpe.primera.cpg.sd.usage.used["{#NAME}"]'
+              key: 'hpe.primera.cpg.sd.usage["{#NAME}",used]'
               delay: '0'
               history: 7d
               units: B
-              description: 'Snapshot data space usage. Amount of logical disk used.'
+              description: 'Amount of logical disk used in snapshot data space.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1771,7 +1660,41 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+              master_item:
+                key: hpe.primera.cpgs
+              tags:
+                -
+                  tag: component
+                  value: cpg
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: cpg
+                  value: '{#NAME}'
+            -
+              uuid: a6cd977f27a8463cb385715327e34955
+              name: 'CPG [{#NAME}]: CPG space: Free'
+              type: DEPENDENT
+              key: 'hpe.primera.cpg.space["{#NAME}",free]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Free CPG space.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "{#NAME}")].freeSpaceMiB.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
                 -
                   type: MULTIPLIER
                   parameters:
@@ -1790,9 +1713,9 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 17cf1cddafd444f8a5616a472c1a019b
-              name: 'CPG [{#NAME}]: Shared CPG space'
+              name: 'CPG [{#NAME}]: CPG space: Shared'
               type: DEPENDENT
-              key: 'hpe.primera.cpg.shared.space["{#NAME}"]'
+              key: 'hpe.primera.cpg.space["{#NAME}",shared]'
               delay: '0'
               history: 7d
               units: B
@@ -1823,99 +1746,10 @@ zabbix_export:
                   tag: cpg
                   value: '{#NAME}'
             -
-              uuid: 3fe9b7c875c248e3b09c98162e30ebf8
-              name: 'CPG [{#NAME}]: State'
-              type: DEPENDENT
-              key: 'hpe.primera.cpg.state["{#NAME}"]'
-              delay: '0'
-              history: 7d
-              description: |
-                Overall state of the CPG:
-                
-                NORMAL (1) - Normal operation;
-                DEGRADED (2) - Degraded state;
-                FAILED (3) - Abnormal operation;
-                UNKNOWN (99) - Unknown state.
-              valuemap:
-                name: 'Primera: State enum'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.name == "{#NAME}")].state.first()'
-              master_item:
-                key: hpe.primera.cpgs
-              tags:
-                -
-                  tag: component
-                  value: cpg
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: cpg
-                  value: '{#NAME}'
-              trigger_prototypes:
-                -
-                  uuid: 32a29b7a4bf340ef8ab07a8db3bef309
-                  expression: 'last(/HPE Primera by HTTP/hpe.primera.cpg.state["{#NAME}"])=2'
-                  name: 'CPG [{#NAME}]: Degraded'
-                  priority: AVERAGE
-                  description: 'CPG [{#NAME}] in degraded state.'
-                  tags:
-                    -
-                      tag: scope
-                      value: availability
-                    -
-                      tag: scope
-                      value: capacity
-                -
-                  uuid: 85c26e64c8074e8b9ab52f20394afeee
-                  expression: 'last(/HPE Primera by HTTP/hpe.primera.cpg.state["{#NAME}"])=3'
-                  name: 'CPG [{#NAME}]: Failed'
-                  priority: HIGH
-                  description: 'CPG [{#NAME}] in failed state.'
-                  tags:
-                    -
-                      tag: scope
-                      value: availability
-                    -
-                      tag: scope
-                      value: capacity
-            -
-              uuid: 18544a7742af4678bd8c37ad84a8d137
-              name: 'CPG [{#NAME}]: Number of TDVVs'
-              type: DEPENDENT
-              key: 'hpe.primera.cpg.tdvvs.number["{#NAME}"]'
-              delay: '0'
-              history: 7d
-              description: 'Number of TDVVs (Thinly Deduplicated Virtual Volume) created in the CPG.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.name == "{#NAME}")].numTDVVs.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-              master_item:
-                key: hpe.primera.cpgs
-              tags:
-                -
-                  tag: component
-                  value: cpg
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: cpg
-                  value: '{#NAME}'
-            -
               uuid: 3950d779a0394615b8ec311525ed4168
-              name: 'CPG [{#NAME}]: Total CPG space'
+              name: 'CPG [{#NAME}]: CPG space: Total'
               type: DEPENDENT
-              key: 'hpe.primera.cpg.total.space["{#NAME}"]'
+              key: 'hpe.primera.cpg.space["{#NAME}",total]'
               delay: '0'
               history: 7d
               units: B
@@ -1946,10 +1780,233 @@ zabbix_export:
                   tag: cpg
                   value: '{#NAME}'
             -
+              uuid: a7e2188d600a4715a58deba46f3b46ac
+              name: 'CPG [{#NAME}]: Degraded state'
+              type: DEPENDENT
+              key: 'hpe.primera.cpg.state["{#NAME}",degraded]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                Detailed state of the CPG:
+                
+                LDS_NOT_STARTED (1) - LDs not started.
+                NOT_STARTED (2) - VV not started.
+                NEEDS_CHECK (3) - check for consistency.
+                NEEDS_MAINT_CHECK (4) - maintenance check is required.
+                INTERNAL_CONSISTENCY_ERROR (5) - internal consistency error.
+                SNAPDATA_INVALID (6) - invalid snapshot data.
+                PRESERVED (7) - unavailable LD sets due to missing chunklets. Preserved remaining VV data.
+                STALE (8) - parts of the VV contain old data because of a copy-on-write operation.
+                COPY_FAILED (9) - a promote or copy operation to this volume failed.
+                DEGRADED_AVAIL (10) - degraded due to availability.
+                DEGRADED_PERF (11) - degraded due to performance.
+                PROMOTING (12) - volume is the current target of a promote operation.
+                COPY_TARGET (13) - volume is the current target of a physical copy operation.
+                RESYNC_TARGET (14) - volume is the current target of a resynchronized copy operation.
+                TUNING (15) - volume tuning is in progress.
+                CLOSING (16) - volume is closing.
+                REMOVING (17) - removing the volume.
+                REMOVING_RETRY (18) - retrying a volume removal operation.
+                CREATING (19) - creating a volume.
+                COPY_SOURCE (20) - copy source.
+                IMPORTING (21) - importing a volume.
+                CONVERTING (22) - converting a volume.
+                INVALID (23) - invalid.
+                EXCLUSIVE (24) - local storage system has exclusive access to the volume.
+                CONSISTENT (25) - volume is being imported consistently along with other volumes in the VV set.
+                STANDBY (26) - volume in standby mode.
+                SD_META_INCONSISTENT (27) - SD Meta Inconsistent.
+                SD_NEEDS_FIX (28) - SD needs fix.
+                SD_META_FIXING (29) - SD meta fix.
+                UNKNOWN (999) - unknown state.
+                NOT_SUPPORTED_BY_WSAPI (1000) - state not supported by WSAPI.
+              valuemap:
+                name: 'Volume detailed state enum'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "{#NAME}")].degradedStates.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return JSON.stringify(JSON.parse(value));'
+              master_item:
+                key: hpe.primera.cpgs
+              tags:
+                -
+                  tag: component
+                  value: cpg
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: cpg
+                  value: '{#NAME}'
+            -
+              uuid: 837b48053400487885bf051a78f2200a
+              name: 'CPG [{#NAME}]: Failed state'
+              type: DEPENDENT
+              key: 'hpe.primera.cpg.state["{#NAME}",failed]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                Detailed state of the CPG:
+                
+                LDS_NOT_STARTED (1) - LDs not started.
+                NOT_STARTED (2) - VV not started.
+                NEEDS_CHECK (3) - check for consistency.
+                NEEDS_MAINT_CHECK (4) - maintenance check is required.
+                INTERNAL_CONSISTENCY_ERROR (5) - internal consistency error.
+                SNAPDATA_INVALID (6) - invalid snapshot data.
+                PRESERVED (7) - unavailable LD sets due to missing chunklets. Preserved remaining VV data.
+                STALE (8) - parts of the VV contain old data because of a copy-on-write operation.
+                COPY_FAILED (9) - a promote or copy operation to this volume failed.
+                DEGRADED_AVAIL (10) - degraded due to availability.
+                DEGRADED_PERF (11) - degraded due to performance.
+                PROMOTING (12) - volume is the current target of a promote operation.
+                COPY_TARGET (13) - volume is the current target of a physical copy operation.
+                RESYNC_TARGET (14) - volume is the current target of a resynchronized copy operation.
+                TUNING (15) - volume tuning is in progress.
+                CLOSING (16) - volume is closing.
+                REMOVING (17) - removing the volume.
+                REMOVING_RETRY (18) - retrying a volume removal operation.
+                CREATING (19) - creating a volume.
+                COPY_SOURCE (20) - copy source.
+                IMPORTING (21) - importing a volume.
+                CONVERTING (22) - converting a volume.
+                INVALID (23) - invalid.
+                EXCLUSIVE (24) - local storage system has exclusive access to the volume.
+                CONSISTENT (25) - volume is being imported consistently along with other volumes in the VV set.
+                STANDBY (26) - volume in standby mode.
+                SD_META_INCONSISTENT (27) - SD Meta Inconsistent.
+                SD_NEEDS_FIX (28) - SD needs fix.
+                SD_META_FIXING (29) - SD meta fix.
+                UNKNOWN (999) - unknown state.
+                NOT_SUPPORTED_BY_WSAPI (1000) - state not supported by WSAPI.
+              valuemap:
+                name: 'Volume detailed state enum'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "{#NAME}")].failedStates.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return JSON.stringify(JSON.parse(value));'
+              master_item:
+                key: hpe.primera.cpgs
+              tags:
+                -
+                  tag: component
+                  value: cpg
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: cpg
+                  value: '{#NAME}'
+            -
+              uuid: 3fe9b7c875c248e3b09c98162e30ebf8
+              name: 'CPG [{#NAME}]: State'
+              type: DEPENDENT
+              key: 'hpe.primera.cpg.state["{#NAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                Overall state of the CPG:
+                
+                NORMAL (1) - normal operation;
+                DEGRADED (2) - degraded state;
+                FAILED (3) - abnormal operation;
+                UNKNOWN (99) - unknown state.
+              valuemap:
+                name: 'State enum'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "{#NAME}")].state.first()'
+              master_item:
+                key: hpe.primera.cpgs
+              tags:
+                -
+                  tag: component
+                  value: cpg
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: cpg
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 32a29b7a4bf340ef8ab07a8db3bef309
+                  expression: 'last(/HPE Primera by HTTP/hpe.primera.cpg.state["{#NAME}"])=2'
+                  name: 'CPG [{#NAME}]: Degraded'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'CPG [{#NAME}] is in degraded state.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: capacity
+                -
+                  uuid: 85c26e64c8074e8b9ab52f20394afeee
+                  expression: 'last(/HPE Primera by HTTP/hpe.primera.cpg.state["{#NAME}"])=3'
+                  name: 'CPG [{#NAME}]: Failed'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'CPG [{#NAME}] is in failed state.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: capacity
+            -
+              uuid: 18544a7742af4678bd8c37ad84a8d137
+              name: 'CPG [{#NAME}]: Number of TDVVs'
+              type: DEPENDENT
+              key: 'hpe.primera.cpg.tdvv["{#NAME}",count]'
+              delay: '0'
+              history: 7d
+              description: 'Number of TDVVs (Thinly Deduplicated Virtual Volume) created in the CPG.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "{#NAME}")].numTDVVs.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: hpe.primera.cpgs
+              tags:
+                -
+                  tag: component
+                  value: cpg
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: cpg
+                  value: '{#NAME}'
+            -
               uuid: f93dc70fa63a47da9253a447a67df685
               name: 'CPG [{#NAME}]: Number of TPVVs'
               type: DEPENDENT
-              key: 'hpe.primera.cpg.tpvvs.number["{#NAME}"]'
+              key: 'hpe.primera.cpg.tpvv["{#NAME}",count]'
               delay: '0'
               history: 7d
               description: 'Number of TPVVs (Thinly Provisioned Virtual Volumes) allocated in the CPG.'
@@ -1976,13 +2033,13 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: b7a8880bdafe4f0da4dd8cee6d4fdfa4
-              name: 'CPG [{#NAME}]: Total (raw) logical disk space in User space'
+              name: 'CPG [{#NAME}]: Logical disk space: User space: Total (raw)'
               type: DEPENDENT
-              key: 'hpe.primera.cpg.usr.usage.raw.total["{#NAME}"]'
+              key: 'hpe.primera.cpg.usr.usage["{#NAME}",raw_total]'
               delay: '0'
               history: 7d
               units: B
-              description: 'User data space usage. Total physical (raw) logical disk space.'
+              description: 'Total physical (raw) logical disk space in user data space.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2010,13 +2067,13 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 1feabd57f12a48b98dab098435179725
-              name: 'CPG [{#NAME}]: Used (raw) logical disk space in User space'
+              name: 'CPG [{#NAME}]: Logical disk space: User space: Used (raw)'
               type: DEPENDENT
-              key: 'hpe.primera.cpg.usr.usage.raw.used["{#NAME}"]'
+              key: 'hpe.primera.cpg.usr.usage["{#NAME}",raw_used]'
               delay: '0'
               history: 7d
               units: B
-              description: 'User data space usage. Amount of physical (raw) logical disk used.'
+              description: 'Amount of physical (raw) logical disk used in user data space.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2025,7 +2082,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
                 -
                   type: MULTIPLIER
                   parameters:
@@ -2044,13 +2101,13 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 6f85014bc639420aa409d97d42cb75b2
-              name: 'CPG [{#NAME}]: Total logical disk space in User space'
+              name: 'CPG [{#NAME}]: Logical disk space: User space: Total'
               type: DEPENDENT
-              key: 'hpe.primera.cpg.usr.usage.total["{#NAME}"]'
+              key: 'hpe.primera.cpg.usr.usage["{#NAME}",total]'
               delay: '0'
               history: 7d
               units: B
-              description: 'User data space usage. Total logical disk space.'
+              description: 'Total logical disk space in user data space.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2078,13 +2135,13 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: c21f77a45ab443099bf957fbb39478f3
-              name: 'CPG [{#NAME}]: Used logical disk space in User space'
+              name: 'CPG [{#NAME}]: Logical disk space: User space: Used'
               type: DEPENDENT
-              key: 'hpe.primera.cpg.usr.usage.used["{#NAME}"]'
+              key: 'hpe.primera.cpg.usr.usage["{#NAME}",used]'
               delay: '0'
               history: 7d
               units: B
-              description: 'User data space usage. Amount of logical disk used.'
+              description: 'Amount of logical disk used in user data space.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2093,7 +2150,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
                 -
                   type: MULTIPLIER
                   parameters:
@@ -2112,6 +2169,69 @@ zabbix_export:
                   value: '{#NAME}'
           graph_prototypes:
             -
+              uuid: c5d1e864f752465eae8822c06d635aeb
+              name: 'CPG [{#NAME}]: CPG space'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'HPE Primera by HTTP'
+                    key: 'hpe.primera.cpg.space["{#NAME}",free]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'HPE Primera by HTTP'
+                    key: 'hpe.primera.cpg.space["{#NAME}",shared]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'HPE Primera by HTTP'
+                    key: 'hpe.primera.cpg.space["{#NAME}",total]'
+            -
+              uuid: 1ef5d5b0090c4f168da6f842972af688
+              name: 'CPG [{#NAME}]: Number of virtual volumes'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'HPE Primera by HTTP'
+                    key: 'hpe.primera.cpg.fpvv["{#NAME}",count]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'HPE Primera by HTTP'
+                    key: 'hpe.primera.cpg.tpvv["{#NAME}",count]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'HPE Primera by HTTP'
+                    key: 'hpe.primera.cpg.tdvv["{#NAME}",count]'
+            -
+              uuid: 4c15694d488f42d6bc5b9caf4fe9e049
+              name: 'CPG [{#NAME}]: Raw space'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'HPE Primera by HTTP'
+                    key: 'hpe.primera.cpg.raw.space["{#NAME}",free]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'HPE Primera by HTTP'
+                    key: 'hpe.primera.cpg.raw.space["{#NAME}",shared]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'HPE Primera by HTTP'
+                    key: 'hpe.primera.cpg.raw.space["{#NAME}",total]'
+            -
               uuid: 0ffb02e0b9144e0583489ca1d1c8d2dd
               name: 'CPG [{#NAME}]: Snapshot administration usage'
               graph_items:
@@ -2119,25 +2239,25 @@ zabbix_export:
                   color: 1A7C11
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.cpg.sa.usage.total["{#NAME}"]'
+                    key: 'hpe.primera.cpg.sa.usage["{#NAME}",total]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.cpg.sa.usage.used["{#NAME}"]'
+                    key: 'hpe.primera.cpg.sa.usage["{#NAME}",used]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.cpg.sa.usage.raw.total["{#NAME}"]'
+                    key: 'hpe.primera.cpg.sa.usage["{#NAME}",raw_total]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.cpg.sa.usage.raw.used["{#NAME}"]'
+                    key: 'hpe.primera.cpg.sa.usage["{#NAME}",raw_used]'
             -
               uuid: d64484828dda48cbbf7dc0f8a9c2f34d
               name: 'CPG [{#NAME}]: Snapshot data usage'
@@ -2146,25 +2266,25 @@ zabbix_export:
                   color: 1A7C11
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.cpg.sd.usage.total["{#NAME}"]'
+                    key: 'hpe.primera.cpg.sd.usage["{#NAME}",total]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.cpg.sd.usage.used["{#NAME}"]'
+                    key: 'hpe.primera.cpg.sd.usage["{#NAME}",used]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.cpg.sd.usage.raw.total["{#NAME}"]'
+                    key: 'hpe.primera.cpg.sd.usage["{#NAME}",raw_total]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.cpg.sd.usage.raw.used["{#NAME}"]'
+                    key: 'hpe.primera.cpg.sd.usage["{#NAME}",raw_used]'
             -
               uuid: dd590898a3644130b897f57e8837cb3a
               name: 'CPG [{#NAME}]: User space'
@@ -2173,25 +2293,25 @@ zabbix_export:
                   color: 1A7C11
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.cpg.usr.usage.total["{#NAME}"]'
+                    key: 'hpe.primera.cpg.usr.usage["{#NAME}",total]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.cpg.usr.usage.used["{#NAME}"]'
+                    key: 'hpe.primera.cpg.usr.usage["{#NAME}",used]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.cpg.usr.usage.raw.total["{#NAME}"]'
+                    key: 'hpe.primera.cpg.usr.usage["{#NAME}",raw_total]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.cpg.usr.usage.raw.used["{#NAME}"]'
+                    key: 'hpe.primera.cpg.usr.usage["{#NAME}",raw_used]'
           master_item:
             key: hpe.primera.cpgs
           lld_macro_paths:
@@ -2208,7 +2328,7 @@ zabbix_export:
                 - 6h
         -
           uuid: a83ed573e6ab40e8b7306178ddd2658b
-          name: 'Disks Discovery'
+          name: 'Disks discovery'
           type: DEPENDENT
           key: hpe.primera.disks.discovery
           delay: '0'
@@ -2218,7 +2338,7 @@ zabbix_export:
               uuid: 40e074af5d7f44bb8691290971fc7c5c
               name: 'Disk [{#POSITION}]: Free size'
               type: DEPENDENT
-              key: 'hpe.primera.disk.free.size["{#POSITION}"]'
+              key: 'hpe.primera.disk["{#POSITION}",free_size]'
               delay: '0'
               history: 7d
               units: B
@@ -2231,7 +2351,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
                 -
                   type: MULTIPLIER
                   parameters:
@@ -2252,7 +2372,7 @@ zabbix_export:
               uuid: 9bb7a86118614d339b4dee3238b261ff
               name: 'Disk [{#POSITION}]: Firmware version'
               type: DEPENDENT
-              key: 'hpe.primera.disk.fw.version["{#POSITION}"]'
+              key: 'hpe.primera.disk["{#POSITION}",fw_version]'
               delay: '0'
               history: 7d
               trends: '0'
@@ -2281,14 +2401,14 @@ zabbix_export:
                   value: '{#POSITION}'
             -
               uuid: 288f7eef0a7c43afa7a3623471c92097
-              name: 'Disk [{#POSITION}]: Path A0 Degraded'
+              name: 'Disk [{#POSITION}]: Path A0 degraded'
               type: DEPENDENT
-              key: 'hpe.primera.disk.loop.a0.degraded["{#POSITION}"]'
+              key: 'hpe.primera.disk["{#POSITION}",loop_a0_degraded]'
               delay: '0'
               history: 7d
-              trends: '0'
-              value_type: CHAR
               description: 'Indicates if this is a degraded path for the disk.'
+              valuemap:
+                name: Boolean
               preprocessing:
                 -
                   type: JSONPATH
@@ -2315,16 +2435,27 @@ zabbix_export:
                 -
                   tag: disk
                   value: '{#POSITION}'
+              trigger_prototypes:
+                -
+                  uuid: f1672a33f9404216a1ffdbe3fcefd0bf
+                  expression: 'last(/HPE Primera by HTTP/hpe.primera.disk["{#POSITION}",loop_a0_degraded])=1'
+                  name: 'Disk [{#POSITION}]: Path A0 degraded'
+                  priority: AVERAGE
+                  description: 'Disk [{#POSITION}] path A0 in degraded state.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 1e89322b49fb46bdacd22a562995f2fc
-              name: 'Disk [{#POSITION}]: Path A1 Degraded'
+              name: 'Disk [{#POSITION}]: Path A1 degraded'
               type: DEPENDENT
-              key: 'hpe.primera.disk.loop.a1.degraded["{#POSITION}"]'
+              key: 'hpe.primera.disk["{#POSITION}",loop_a1_degraded]'
               delay: '0'
               history: 7d
               description: 'Indicates if this is a degraded path for the disk.'
               valuemap:
-                name: 'Primera: Boolean'
+                name: Boolean
               preprocessing:
                 -
                   type: JSONPATH
@@ -2351,16 +2482,27 @@ zabbix_export:
                 -
                   tag: disk
                   value: '{#POSITION}'
+              trigger_prototypes:
+                -
+                  uuid: a28b1b4cdc5d4cb4afd9b7dd5e5f4f46
+                  expression: 'last(/HPE Primera by HTTP/hpe.primera.disk["{#POSITION}",loop_a1_degraded])=1'
+                  name: 'Disk [{#POSITION}]: Path A1 degraded'
+                  priority: AVERAGE
+                  description: 'Disk [{#POSITION}] path A1 in degraded state.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 2b56e5a6ffbd4e6189fff707d508f955
-              name: 'Disk [{#POSITION}]: Path B0 Degraded'
+              name: 'Disk [{#POSITION}]: Path B0 degraded'
               type: DEPENDENT
-              key: 'hpe.primera.disk.loop.b0.degraded["{#POSITION}"]'
+              key: 'hpe.primera.disk["{#POSITION}",loop_b0_degraded]'
               delay: '0'
               history: 7d
               description: 'Indicates if this is a degraded path for the disk.'
               valuemap:
-                name: 'Primera: Boolean'
+                name: Boolean
               preprocessing:
                 -
                   type: JSONPATH
@@ -2387,16 +2529,27 @@ zabbix_export:
                 -
                   tag: disk
                   value: '{#POSITION}'
+              trigger_prototypes:
+                -
+                  uuid: 0ff32326e7784111842198ac6457c5cc
+                  expression: 'last(/HPE Primera by HTTP/hpe.primera.disk["{#POSITION}",loop_b0_degraded])=1'
+                  name: 'Disk [{#POSITION}]: Path B0 degraded'
+                  priority: AVERAGE
+                  description: 'Disk [{#POSITION}] path B0 in degraded state.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: cfb88804564d4e0c914760daec53276f
-              name: 'Disk [{#POSITION}]: Path B1 Degraded'
+              name: 'Disk [{#POSITION}]: Path B1 degraded'
               type: DEPENDENT
-              key: 'hpe.primera.disk.loop.b1.degraded["{#POSITION}"]'
+              key: 'hpe.primera.disk["{#POSITION}",loop_b1_degraded]'
               delay: '0'
               history: 7d
               description: 'Indicates if this is a degraded path for the disk.'
               valuemap:
-                name: 'Primera: Boolean'
+                name: Boolean
               preprocessing:
                 -
                   type: JSONPATH
@@ -2423,11 +2576,22 @@ zabbix_export:
                 -
                   tag: disk
                   value: '{#POSITION}'
+              trigger_prototypes:
+                -
+                  uuid: d55532408f3c40408dbd05671c66b5f3
+                  expression: 'last(/HPE Primera by HTTP/hpe.primera.disk["{#POSITION}",loop_b1_degraded])=1'
+                  name: 'Disk [{#POSITION}]: Path B1 degraded'
+                  priority: AVERAGE
+                  description: 'Disk [{#POSITION}] path B1 in degraded state.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 1387d1129e4a418e91fb0e99179116f5
               name: 'Disk [{#POSITION}]: Manufacturer'
               type: DEPENDENT
-              key: 'hpe.primera.disk.manufacturer["{#POSITION}"]'
+              key: 'hpe.primera.disk["{#POSITION}",manufacturer]'
               delay: '0'
               history: 7d
               trends: '0'
@@ -2458,7 +2622,7 @@ zabbix_export:
               uuid: 1892d6230e244e1089a5eca8654ba2fa
               name: 'Disk [{#POSITION}]: Model'
               type: DEPENDENT
-              key: 'hpe.primera.disk.model["{#POSITION}"]'
+              key: 'hpe.primera.disk["{#POSITION}",model]'
               delay: '0'
               history: 7d
               trends: '0'
@@ -2489,7 +2653,7 @@ zabbix_export:
               uuid: 495ceedbdf1644fdb56cf56123c1ec01
               name: 'Disk [{#POSITION}]: RPM'
               type: DEPENDENT
-              key: 'hpe.primera.disk.rpm["{#POSITION}"]'
+              key: 'hpe.primera.disk["{#POSITION}",rpm]'
               delay: '0'
               history: 7d
               units: '!rpm'
@@ -2503,7 +2667,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 1d
               master_item:
                 key: hpe.primera.disks
               tags:
@@ -2518,9 +2682,9 @@ zabbix_export:
                   value: '{#POSITION}'
             -
               uuid: 07fa233e273d4d6e9813705d0afc82f5
-              name: 'Disk [{#POSITION}]: Serial Number'
+              name: 'Disk [{#POSITION}]: Serial number'
               type: DEPENDENT
-              key: 'hpe.primera.disk.serial.number["{#POSITION}"]'
+              key: 'hpe.primera.disk["{#POSITION}",serial_number]'
               delay: '0'
               history: 7d
               trends: '0'
@@ -2551,19 +2715,19 @@ zabbix_export:
               uuid: acb23a0dc2674f57bada95dd12972662
               name: 'Disk [{#POSITION}]: State'
               type: DEPENDENT
-              key: 'hpe.primera.disk.state["{#POSITION}"]'
+              key: 'hpe.primera.disk["{#POSITION}",state]'
               delay: '0'
               history: 7d
               description: |
                 State of the physical disk:
                 
-                Normal (1) - Physical disk is in Normal state;
-                Degraded (2) - Physical disk is not operating normally;
-                New (3) - Physical disk is new, needs to be admitted;
-                Failed (4) - Physical disk has failed;
-                Unknown (99) - Physical disk state is unknown.
+                Normal (1) - physical disk is in Normal state;
+                Degraded (2) - physical disk is not operating normally;
+                New (3) - physical disk is new, needs to be admitted;
+                Failed (4) - physical disk has failed;
+                Unknown (99) - physical disk state is unknown.
               valuemap:
-                name: 'Primera: diskState enum'
+                name: 'diskState enum'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2571,6 +2735,10 @@ zabbix_export:
                     - '$[?(@.position == "{#POSITION}")].state.first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '99'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: hpe.primera.disks
               tags:
@@ -2586,7 +2754,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: d8991103e26b4ffea5fb64dc3519eb63
-                  expression: 'last(/HPE Primera by HTTP/hpe.primera.disk.state["{#POSITION}"])=2'
+                  expression: 'last(/HPE Primera by HTTP/hpe.primera.disk["{#POSITION}",state])=2'
                   name: 'Disk [{#POSITION}]: Degraded'
                   priority: AVERAGE
                   description: 'Disk [{#POSITION}] in degraded state.'
@@ -2599,7 +2767,7 @@ zabbix_export:
                       value: capacity
                 -
                   uuid: bc8c8281c3ac4742ba8f570a56753dd3
-                  expression: 'last(/HPE Primera by HTTP/hpe.primera.disk.state["{#POSITION}"])=3'
+                  expression: 'last(/HPE Primera by HTTP/hpe.primera.disk["{#POSITION}",state])=3'
                   name: 'Disk [{#POSITION}]: Failed'
                   priority: HIGH
                   description: 'Disk [{#POSITION}] in failed state.'
@@ -2612,7 +2780,7 @@ zabbix_export:
                       value: capacity
                 -
                   uuid: d4bda084df0b4a489fac08d1acae4e17
-                  expression: 'last(/HPE Primera by HTTP/hpe.primera.disk.state["{#POSITION}"])=99'
+                  expression: 'last(/HPE Primera by HTTP/hpe.primera.disk["{#POSITION}",state])=99'
                   name: 'Disk [{#POSITION}]: Unknown issue'
                   priority: INFO
                   description: 'Disk [{#POSITION}] in unknown state.'
@@ -2627,7 +2795,7 @@ zabbix_export:
               uuid: 83395e3165c949e8997e93bfce0ac1d0
               name: 'Disk [{#POSITION}]: Total size'
               type: DEPENDENT
-              key: 'hpe.primera.disk.total.size["{#POSITION}"]'
+              key: 'hpe.primera.disk["{#POSITION}",total_size]'
               delay: '0'
               history: 7d
               units: B
@@ -2657,6 +2825,45 @@ zabbix_export:
                 -
                   tag: disk
                   value: '{#POSITION}'
+          trigger_prototypes:
+            -
+              uuid: 4bd0c0c182204f62b15790bbb76196a9
+              expression: '(100 - max(/HPE Primera by HTTP/hpe.primera.disk["{#POSITION}",free_size],5m)/last(/HPE Primera by HTTP/hpe.primera.disk["{#POSITION}",total_size])) > {$HPE.PRIMERA.DISK.PUSED.MAX.WARN:"{#POSITION}"} and max(/HPE Primera by HTTP/hpe.primera.disk["{#POSITION}",free_size],5m) < {$HPE.PRIMERA.DISK.FREE.MIN.WARN:"{#POSITION}"}'
+              name: 'Disk [{#POSITION}]: High space usage'
+              event_name: 'Disk [{#POSITION}]: High space usage (more than {$HPE.PRIMERA.DISK.PUSED.MAX.WARN:"{#POSITION}"}% used)'
+              opdata: 'Current free space: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: |
+                Two conditions should match: First, space utilization should be above {$HPE.PRIMERA.DISK.PUSED.MAX.WARN:"{#POSITION}"}%.
+                Second condition: The pool free space is less than {$HPE.PRIMERA.DISK.FREE.MIN.WARN:"{#POSITION}"}.
+              dependencies:
+                -
+                  name: 'Disk [{#POSITION}]: Very high space usage'
+                  expression: '(100 - max(/HPE Primera by HTTP/hpe.primera.disk["{#POSITION}",free_size],5m)/last(/HPE Primera by HTTP/hpe.primera.disk["{#POSITION}",total_size])) > {$HPE.PRIMERA.DISK.PUSED.MAX.CRIT:"{#POSITION}"} and max(/HPE Primera by HTTP/hpe.primera.disk["{#POSITION}",free_size],5m) < {$HPE.PRIMERA.DISK.FREE.MIN.CRIT:"{#POSITION}"}'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: 457ac24a285343a4935d563c98349966
+              expression: '(100 - max(/HPE Primera by HTTP/hpe.primera.disk["{#POSITION}",free_size],5m)/last(/HPE Primera by HTTP/hpe.primera.disk["{#POSITION}",total_size])) > {$HPE.PRIMERA.DISK.PUSED.MAX.CRIT:"{#POSITION}"} and max(/HPE Primera by HTTP/hpe.primera.disk["{#POSITION}",free_size],5m) < {$HPE.PRIMERA.DISK.FREE.MIN.CRIT:"{#POSITION}"}'
+              name: 'Disk [{#POSITION}]: Very high space usage'
+              event_name: 'Disk [{#POSITION}]: Very high space usage (more than {$HPE.PRIMERA.DISK.PUSED.MAX.CRIT:"{#POSITION}"}% used)'
+              opdata: 'Current free space: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2}'
+              priority: HIGH
+              description: |
+                Two conditions should match: First, space utilization should be above {$HPE.PRIMERA.DISK.PUSED.MAX.CRIT:"{#POSITION}"}%.
+                Second condition: The pool free space is less than {$HPE.PRIMERA.DISK.FREE.MIN.CRIT:"{#POSITION}"}.
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
           master_item:
             key: hpe.primera.disks
           lld_macro_paths:
@@ -2673,23 +2880,33 @@ zabbix_export:
                 - 6h
         -
           uuid: 77ae172949044c148ac8f56f05d3af33
-          name: 'Hosts Discovery'
+          name: 'Hosts discovery'
           type: DEPENDENT
           key: hpe.primera.hosts.discovery
           delay: '0'
           filter:
+            evaltype: AND
             conditions:
               -
+                macro: '{#ID}'
+                value: '{$HPE.PRIMERA.HOST.ID.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#ID}'
+                value: '{$HPE.PRIMERA.HOST.ID.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              - 
                 macro: '{#NAME}'
                 operator: EXISTS
-                formulaid: A
-          description: 'List of host resources.'
+                formulaid: C
+          description: 'List of host properties.'
           item_prototypes:
             -
               uuid: 142a03a36dbf477ebbcb99994efe4246
               name: 'Host [{#NAME}]: Comment'
               type: DEPENDENT
-              key: 'hpe.primera.host.comment["{#NAME}"]'
+              key: 'hpe.primera.host["{#NAME}",comment]'
               delay: '0'
               history: 7d
               trends: '0'
@@ -2718,7 +2935,7 @@ zabbix_export:
               uuid: 44a06761b5174c67ace5487b7ec9f0e5
               name: 'Host [{#NAME}]: Contact'
               type: DEPENDENT
-              key: 'hpe.primera.host.contact["{#NAME}"]'
+              key: 'hpe.primera.host["{#NAME}",contact]'
               delay: '0'
               history: 7d
               trends: '0'
@@ -2745,9 +2962,9 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: b3bd017e96d843248bbb9cb2240e861b
-              name: 'Host [{#NAME}]: IP Address'
+              name: 'Host [{#NAME}]: IP address'
               type: DEPENDENT
-              key: 'hpe.primera.host.ipaddress["{#NAME}"]'
+              key: 'hpe.primera.host["{#NAME}",ipaddress]'
               delay: '0'
               history: 7d
               trends: '0'
@@ -2776,7 +2993,7 @@ zabbix_export:
               uuid: 367466a0f7084e579f3c11d820dc7f04
               name: 'Host [{#NAME}]: Location'
               type: DEPENDENT
-              key: 'hpe.primera.host.location["{#NAME}"]'
+              key: 'hpe.primera.host["{#NAME}",location]'
               delay: '0'
               history: 7d
               trends: '0'
@@ -2805,7 +3022,7 @@ zabbix_export:
               uuid: 997e52f8f50e47738a1aefbcedaa5a82
               name: 'Host [{#NAME}]: Model'
               type: DEPENDENT
-              key: 'hpe.primera.host.model["{#NAME}"]'
+              key: 'hpe.primera.host["{#NAME}",model]'
               delay: '0'
               history: 7d
               trends: '0'
@@ -2834,7 +3051,7 @@ zabbix_export:
               uuid: 4db5068c8aea4940adb5f8863d50ef47
               name: 'Host [{#NAME}]: OS'
               type: DEPENDENT
-              key: 'hpe.primera.host.os["{#NAME}"]'
+              key: 'hpe.primera.host["{#NAME}",os]'
               delay: '0'
               history: 7d
               trends: '0'
@@ -2875,7 +3092,7 @@ zabbix_export:
                 - 6h
         -
           uuid: 3c9222777f2649749df76cbf61601557
-          name: 'Ports Discovery'
+          name: 'Ports discovery'
           type: DEPENDENT
           key: hpe.primera.ports.discovery
           delay: '0'
@@ -2887,37 +3104,37 @@ zabbix_export:
                 value: '3'
                 operator: NOT_MATCHES_REGEX
                 formulaid: A
-          description: 'List of port resources.'
+          description: 'List of ports.'
           item_prototypes:
             -
               uuid: 9241e0b26de74ea49f28e1c09e15a2cd
-              name: 'Port [{#NODE}:{#SLOT}:{#CARD_PORT}]: Failover State'
+              name: 'Port [{#NODE}:{#SLOT}:{#CARD.PORT}]: Failover state'
               type: DEPENDENT
-              key: 'hpe.primera.port.failover.state["{#NODE}:{#SLOT}:{#CARD_PORT}"]'
+              key: 'hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",failover_state]'
               delay: '0'
               history: 7d
               description: |
                 The state of the failover operation, shown for the two ports indicated in the N:S:P and Partner columns. The value can be one of the following:
                 
-                none (1) - No failover in operation;
-                failover_pending (2) - In the process of failing over to partner;
-                failed_over (3) - Failed over to partner;
-                active (4) - The partner port is failed over to this port;
-                active_down (5) - The partner port is failed over to this port, but this port is down;
-                active_failed (6) - The partner port is failed over to this port, but this port is down;
-                failback_pending (7) - In the process of failing back from partner.
+                none (1) - no failover in operation;
+                failover_pending (2) - in the process of failing over to partner;
+                failed_over (3) - failed over to partner;
+                active (4) - the partner port is failed over to this port;
+                active_down (5) - the partner port is failed over to this port, but this port is down;
+                active_failed (6) - the partner port is failed over to this port, but this port is down;
+                failback_pending (7) - in the process of failing back from partner.
               valuemap:
-                name: 'Primera: portFailOverState enum'
+                name: 'portFailOverState enum'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.portPos.node == "{#NODE}" && @.portPos.slot == "{#SLOT}" && @.portPos.cardPort == "{#CARD_PORT}")].failoverState.first()'
+                    - '$[?(@.portPos.node == "{#NODE}" && @.portPos.slot == "{#SLOT}" && @.portPos.cardPort == "{#CARD.PORT}")].failoverState.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 10m
+                    - 1h
               master_item:
                 key: hpe.primera.ports
               tags:
@@ -2929,14 +3146,14 @@ zabbix_export:
                   value: '{#LABEL}'
                 -
                   tag: port
-                  value: '{#NODE}:{#SLOT}:{#CARD_PORT}'
+                  value: '{#NODE}:{#SLOT}:{#CARD.PORT}'
               trigger_prototypes:
                 -
                   uuid: 65f3f3b098984842b5246bfb5842bc78
-                  expression: 'last(/HPE Primera by HTTP/hpe.primera.port.failover.state["{#NODE}:{#SLOT}:{#CARD_PORT}"])<>1 and last(/HPE Primera by HTTP/hpe.primera.port.failover.state["{#NODE}:{#SLOT}:{#CARD_PORT}"])<>4'
-                  name: 'Port [{#NODE}:{#SLOT}:{#CARD_PORT}]: Failover state is {ITEM.VALUE1}'
+                  expression: 'last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",failover_state])<>1 and last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",failover_state])<>4'
+                  name: 'Port [{#NODE}:{#SLOT}:{#CARD.PORT}]: Failover state is {ITEM.VALUE1}'
                   priority: AVERAGE
-                  description: 'Port [{#NODE}:{#SLOT}:{#CARD_PORT}] has failover error.'
+                  description: 'Port [{#NODE}:{#SLOT}:{#CARD.PORT}] has failover error.'
                   tags:
                     -
                       tag: scope
@@ -2946,9 +3163,9 @@ zabbix_export:
                       value: capacity
             -
               uuid: 8abba6d6f6e749b0be277056421a1958
-              name: 'Port [{#NODE}:{#SLOT}:{#CARD_PORT}]: Hardware type'
+              name: 'Port [{#NODE}:{#SLOT}:{#CARD.PORT}]: Hardware type'
               type: DEPENDENT
-              key: 'hpe.primera.port.hw.type["{#NODE}:{#SLOT}:{#CARD_PORT}"]'
+              key: 'hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",hw_type]'
               delay: '0'
               history: 7d
               description: |
@@ -2961,18 +3178,18 @@ zabbix_export:
                 SAS (5) - SAS HBA;
                 COMBO (6) - Combo card;
                 NVME (7) - NVMe drive;
-                UNKNOWN (99) - Unknown hardware type.
+                UNKNOWN (99) - unknown hardware type.
               valuemap:
-                name: 'Primera: hardwareType enum'
+                name: 'hardwareType enum'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.portPos.node == "{#NODE}" && @.portPos.slot == "{#SLOT}" && @.portPos.cardPort == "{#CARD_PORT}")].hardwareType.first()'
+                    - '$[?(@.portPos.node == "{#NODE}" && @.portPos.slot == "{#SLOT}" && @.portPos.cardPort == "{#CARD.PORT}")].hardwareType.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 10m
+                    - 1h
               master_item:
                 key: hpe.primera.ports
               tags:
@@ -2984,47 +3201,47 @@ zabbix_export:
                   value: '{#LABEL}'
                 -
                   tag: port
-                  value: '{#NODE}:{#SLOT}:{#CARD_PORT}'
+                  value: '{#NODE}:{#SLOT}:{#CARD.PORT}'
             -
               uuid: 55119ce474024203ac039f4aa797dd4c
-              name: 'Port [{#NODE}:{#SLOT}:{#CARD_PORT}]: Link State'
+              name: 'Port [{#NODE}:{#SLOT}:{#CARD.PORT}]: Link state'
               type: DEPENDENT
-              key: 'hpe.primera.port.link.state["{#NODE}:{#SLOT}:{#CARD_PORT}"]'
+              key: 'hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state]'
               delay: '0'
               history: 7d
               description: |
                 Port link state:
                 
-                CONFIG_WAIT (1) - Configuration wait;
+                CONFIG_WAIT (1) - configuration wait;
                 ALPA_WAIT (2) - ALPA wait;
-                LOGIN_WAIT (3) - Login wait;
-                READY (4) - Link is ready;
-                LOSS_SYNC (5) - Link is loss sync;
-                ERROR_STATE (6) - In error state;
+                LOGIN_WAIT (3) - login wait;
+                READY (4) - link is ready;
+                LOSS_SYNC (5) - link is loss sync;
+                ERROR_STATE (6) - in error state;
                 XXX (7) - xxx;
-                NONPARTICIPATE (8) - Link did not participate;
-                COREDUMP (9) - Taking coredump;
-                OFFLINE (10) - Link is offline;
-                FWDEAD (11) - Firmware is dead;
-                IDLE_FOR_RESET (12) - Link is idle for reset;
+                NONPARTICIPATE (8) - link did not participate;
+                COREDUMP (9) - taking coredump;
+                OFFLINE (10) - link is offline;
+                FWDEAD (11) - firmware is dead;
+                IDLE_FOR_RESET (12) - link is idle for reset;
                 DHCP_IN_PROGRESS (13) - DHCP is in progress;
-                PENDING_RESET (14) - Link reset is pending;
-                NEW (15) - Link in new. This value is applicable for only virtual ports;
-                DISABLED (16) - Link in disabled. This value is applicable for only virtual ports;
-                DOWN (17) - Link in down. This value is applicable for only virtual ports;
-                FAILED (18) - Link in failed. This value is applicable for only virtual ports;
-                PURGING (19) - Link in purging. This value is applicable for only virtual ports.
+                PENDING_RESET (14) - link reset is pending;
+                NEW (15) - link in new. This value is applicable for only virtual ports;
+                DISABLED (16) - link in disabled. This value is applicable for only virtual ports;
+                DOWN (17) - link in down. This value is applicable for only virtual ports;
+                FAILED (18) - link in failed. This value is applicable for only virtual ports;
+                PURGING (19) - link in purging. This value is applicable for only virtual ports.
               valuemap:
-                name: 'Primera: portLinkState enum'
+                name: 'portLinkState enum'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.portPos.node == "{#NODE}" && @.portPos.slot == "{#SLOT}" && @.portPos.cardPort == "{#CARD_PORT}")].linkState.first()'
+                    - '$[?(@.portPos.node == "{#NODE}" && @.portPos.slot == "{#SLOT}" && @.portPos.cardPort == "{#CARD.PORT}")].linkState.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 10m
+                    - 1h
               master_item:
                 key: hpe.primera.ports
               tags:
@@ -3036,14 +3253,27 @@ zabbix_export:
                   value: '{#LABEL}'
                 -
                   tag: port
-                  value: '{#NODE}:{#SLOT}:{#CARD_PORT}'
+                  value: '{#NODE}:{#SLOT}:{#CARD.PORT}'
               trigger_prototypes:
                 -
                   uuid: c7ee19ea175d4c63a9ae67e0ab59253b
-                  expression: 'last(/HPE Primera by HTTP/hpe.primera.port.link.state["{#NODE}:{#SLOT}:{#CARD_PORT}"])<>4'
-                  name: 'Port [{#NODE}:{#SLOT}:{#CARD_PORT}]: Link state is {ITEM.VALUE1}'
+                  expression: 'last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])<>4 and last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])<>1 and last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])<>3 and last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])<>13 and last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])<>15 and last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])<>16'
+                  name: 'Port [{#NODE}:{#SLOT}:{#CARD.PORT}]: Link state is {ITEM.VALUE1}'
                   priority: HIGH
-                  description: 'Port [{#NODE}:{#SLOT}:{#CARD_PORT}] not in ready state.'
+                  description: 'Port [{#NODE}:{#SLOT}:{#CARD.PORT}] not in ready state.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: capacity
+                -
+                  uuid: f0c8851f843e41dcb6820c943efcbe2f
+                  expression: 'last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])=1 or last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])=3 or last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])=13 or last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])=15 or last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])=16'
+                  name: 'Port [{#NODE}:{#SLOT}:{#CARD.PORT}]: Link state is {ITEM.VALUE1}'
+                  priority: AVERAGE
+                  description: 'Port [{#NODE}:{#SLOT}:{#CARD.PORT}] not in ready state.'
                   tags:
                     -
                       tag: scope
@@ -3053,9 +3283,9 @@ zabbix_export:
                       value: capacity
             -
               uuid: c049e53b25bb4cb58cabbff1d91b3e88
-              name: 'Port [{#NODE}:{#SLOT}:{#CARD_PORT}]: Type'
+              name: 'Port [{#NODE}:{#SLOT}:{#CARD.PORT}]: Type'
               type: DEPENDENT
-              key: 'hpe.primera.port.type["{#NODE}:{#SLOT}:{#CARD_PORT}"]'
+              key: 'hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",type]'
               delay: '0'
               history: 7d
               description: |
@@ -3063,25 +3293,25 @@ zabbix_export:
                 
                 HOST (1) - FC port connected to hosts or fabric;
                 DISK (2) - FC port connected to disks;
-                FREE (3) - Port is not connected to hosts or disks;
-                IPORT (4) - Port is in iport mode;
-                RCFC (5) - FC port used for Remote Copy;
+                FREE (3) - port is not connected to hosts or disks;
+                IPORT (4) - port is in iport mode;
+                RCFC (5) - FC port used for remote copy;
                 PEER (6) - FC port used for data migration;
-                RCIP (7) - IP (Ethernet) port used for Remote Copy;
+                RCIP (7) - IP (Ethernet) port used for remote copy;
                 ISCSI (8) - iSCSI (Ethernet) port connected to hosts;
                 CNA (9) - CNA port, which can be FCoE or iSCSI;
                 FS (10) - Ethernet File Persona ports.
               valuemap:
-                name: 'Primera: portConnType enum'
+                name: 'portConnType enum'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.portPos.node == "{#NODE}" && @.portPos.slot == "{#SLOT}" && @.portPos.cardPort == "{#CARD_PORT}")].type.first()'
+                    - '$[?(@.portPos.node == "{#NODE}" && @.portPos.slot == "{#SLOT}" && @.portPos.cardPort == "{#CARD.PORT}")].type.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 10m
+                    - 1h
               master_item:
                 key: hpe.primera.ports
               tags:
@@ -3093,12 +3323,12 @@ zabbix_export:
                   value: '{#LABEL}'
                 -
                   tag: port
-                  value: '{#NODE}:{#SLOT}:{#CARD_PORT}'
+                  value: '{#NODE}:{#SLOT}:{#CARD.PORT}'
           master_item:
             key: hpe.primera.ports
           lld_macro_paths:
             -
-              lld_macro: '{#CARD_PORT}'
+              lld_macro: '{#CARD.PORT}'
               path: $.portPos.cardPort
             -
               lld_macro: '{#LABEL}'
@@ -3119,7 +3349,7 @@ zabbix_export:
                 - 6h
         -
           uuid: b47a6afafca6486ea4ffb12dd3322bab
-          name: 'Tasks Discovery'
+          name: 'Tasks discovery'
           type: DEPENDENT
           key: hpe.primera.tasks.discovery
           delay: '0'
@@ -3135,13 +3365,23 @@ zabbix_export:
                 value: '{$HPE.PRIMERA.LLD.FILTER.TASK.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'List of task resources.'
+              -
+                macro: '{#TYPE}'
+                value: '{$HPE.PRIMERA.LLD.FILTER.TASK.TYPE.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#TYPE}'
+                value: '{$HPE.PRIMERA.LLD.FILTER.TASK.TYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+          lifetime: 1d
+          description: 'List of tasks started within last 24 hours.'
           item_prototypes:
             -
               uuid: cbcdf169dcf646cb959206bbb6cf3642
-              name: 'Task [{#NAME}]: Finish Time'
+              name: 'Task [{#NAME}]: Finish time'
               type: DEPENDENT
-              key: 'hpe.primera.task.finish.time["{#NAME}"]'
+              key: 'hpe.primera.task["{#NAME}",finish_time]'
               delay: '0'
               history: 7d
               units: unixtime
@@ -3178,9 +3418,9 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 66140b134d954319a96eb17750da6b7c
-              name: 'Task [{#NAME}]: Start Time'
+              name: 'Task [{#NAME}]: Start time'
               type: DEPENDENT
-              key: 'hpe.primera.task.start.time["{#NAME}"]'
+              key: 'hpe.primera.task["{#NAME}",start_time]'
               delay: '0'
               history: 7d
               units: unixtime
@@ -3214,18 +3454,18 @@ zabbix_export:
               uuid: e01b3c84a6594e419c358c7ea297159b
               name: 'Task [{#NAME}]: Status'
               type: DEPENDENT
-              key: 'hpe.primera.task.status["{#NAME}"]'
+              key: 'hpe.primera.task["{#NAME}",status]'
               delay: '0'
               history: 7d
               description: |
                 Task status:
                 
-                DONE (1) - Task is finished;
-                ACTIVE (2) - Task is in progress;
-                CANCELLED (3) - Task is canceled;
-                FAILED (4) - Task failed.
+                DONE (1) - task is finished;
+                ACTIVE (2) - task is in progress;
+                CANCELLED (3) - task is canceled;
+                FAILED (4) - task failed.
               valuemap:
-                name: 'Primera: taskStatus enum'
+                name: 'taskStatus enum'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3247,7 +3487,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 63340c376d86492198e00d7ae10f063c
-                  expression: 'last(/HPE Primera by HTTP/hpe.primera.task.status["{#NAME}"])=3'
+                  expression: 'last(/HPE Primera by HTTP/hpe.primera.task["{#NAME}",status])=3'
                   name: 'Task [{#NAME}]: Cancelled'
                   priority: INFO
                   description: 'Task [{#NAME}] is cancelled.'
@@ -3257,7 +3497,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: af326c0f259144d28ebeb60e19bae903
-                  expression: 'last(/HPE Primera by HTTP/hpe.primera.task.status["{#NAME}"])=4'
+                  expression: 'last(/HPE Primera by HTTP/hpe.primera.task["{#NAME}",status])=4'
                   name: 'Task [{#NAME}]: Failed'
                   priority: AVERAGE
                   description: 'Task [{#NAME}] is failed.'
@@ -3265,12 +3505,88 @@ zabbix_export:
                     -
                       tag: scope
                       value: notice
+            -
+              uuid: a67262cd7be642b9b56194d8bbb7e928
+              name: 'Task [{#NAME}]: Type'
+              type: DEPENDENT
+              key: 'hpe.primera.task["{#NAME}",type]'
+              delay: '0'
+              history: 7d
+              description: |
+                Task type:
+                
+                VV_COPY (1) - track the physical copy operations;
+                PHYS_COPY_RESYNC (2) - track physical copy resynchronization operations;
+                MOVE_REGIONS (3) - track region move operations;
+                PROMOTE_SV (4) - track virtual-copy promotions;
+                REMOTE_COPY_SYNC (5) - track remote copy group synchronizations;
+                REMOTE_COPY_REVERSE (6) - track the reversal of a remote copy group;
+                REMOTE_COPY_FAILOVER (7) - track the change-over of a secondary volume group to a primaryvolume group;REMOTE_COPY_RECOVER (8) - track synchronization start after a failover operation from originalsecondary cluster to original primary cluster;
+                REMOTE_COPY_RESTORE (9) - tracks the restoration process for groups that have already beenrecovered;
+                COMPACT_CPG (10) - track space consolidation in CPGs;
+                COMPACT_IDS (11) - track space consolidation in logical disks;
+                SNAPSHOT_ACCOUNTING (12) - track progress of snapshot space usage accounting;
+                CHECK_VV (13) - track the progress of the check-volume operation;
+                SCHEDULED_TASK (14) - track tasks that have been executed by the system scheduler;
+                SYSTEM_TASK (15) - track tasks that are periodically run by the storage system;
+                BACKGROUND_TASK (16) - track commands started using the starttask command;
+                IMPORT_VV (17) - track tasks that migrate data to the local storage system;
+                ONLINE_COPY (18) - track physical copy of the volume while online (createvvcopy-online command);
+                CONVERT_VV (19) - track tasks that convert a volume from an FPVV to a TPVV, andthe reverse;
+                BACKGROUND_COMMAND (20) - track background command tasks;
+                CLX_SYNC (21) - track CLX synchronization tasks;
+                CLX_RECOVERY (22) - track CLX recovery tasks;
+                TUNE_SD (23) - tune copy space;
+                TUNE_VV (24) - tune virtual volume;
+                TUNE_VV_ROLLBACK (25) - tune virtual volume rollback;
+                TUNE_VV_RESTART (26) - tune virtual volume restart;
+                SYSTEM_TUNING (27) - system tuning;
+                NODE_RESCUE (28) - node rescue;
+                REPAIR_SYNC (29) - remote copy repair sync;
+                REMOTE_COPY_SWOVER (30) - remote copy switchover;
+                DEFRAGMENTATION (31) - defragmentation;
+                ENCRYPTION_CHANGE (32) - encryption change;
+                REMOTE_COPY_FAILSAFE (33) - remote copy failsafe;
+                TUNE_TPVV (34) - tune thin virtual volume;
+                REMOTE_COPY_CHG_MODE (35) - remote copy change mode;
+                ONLINE_PROMOTE (37) - online promote snap;
+                RELOCATE_PD (38) - relocate PD;
+                PERIODIC_CSS (39) - remote copy periodic CSS;
+                TUNEVV_LARGE (40) - tune large virtual volume;
+                SD_META_FIXER (41) - compression SD meta fixer;
+                DEDUP_DRYRUN (42) - preview dedup ratio;
+                COMPR_DRYRUN (43) - compression estimation;
+                DEDUP_COMPR_DRYRUN (44) - compression and dedup estimation;
+                UKNOWN (99) - unknown task type.
+              valuemap:
+                name: 'taskType enum'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "{#NAME}")].type.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: hpe.primera.tasks
+              tags:
+                -
+                  tag: component
+                  value: task
+                -
+                  tag: task
+                  value: '{#NAME}'
           master_item:
             key: hpe.primera.tasks
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
               path: $.name
+            -
+              lld_macro: '{#TYPE}'
+              path: $.type
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -3278,188 +3594,42 @@ zabbix_export:
                 - 6h
         -
           uuid: eb73fcc415c54ac18840d2655f048f6c
-          name: 'Volumes Discovery'
+          name: 'Volumes discovery'
           type: DEPENDENT
           key: hpe.primera.volumes.discovery
           delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ID}'
+                value: '{$HPE.PRIMERA.VOLUME.ID.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#ID}'
+                value: '{$HPE.PRIMERA.VOLUME.ID.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              -
+                macro: '{#NAME}'
+                value: '{$HPE.PRIMERA.VOLUME.NAME.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#NAME}'
+                value: '{$HPE.PRIMERA.VOLUME.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'List of storage volume resources.'
           item_prototypes:
-            -
-              uuid: bb78eda6a941407581f78cf29ef2b647
-              name: 'Volume [{#NAME}]: Administrative Free space'
-              type: DEPENDENT
-              key: 'hpe.primera.volume.admin.free.space["{#NAME}"]'
-              delay: '0'
-              history: 7d
-              units: B
-              description: 'Administrative space. Free space.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.name == "{#NAME}")].adminSpace.freeMiB.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '1048576'
-              master_item:
-                key: hpe.primera.volumes
-              tags:
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: component
-                  value: volume
-                -
-                  tag: volume
-                  value: '{#NAME}'
-            -
-              uuid: e4f9f8f5c1cd494896eba973b072fc57
-              name: 'Volume [{#NAME}]: Administrative Raw reserved space'
-              type: DEPENDENT
-              key: 'hpe.primera.volume.admin.raw.reserved.space["{#NAME}"]'
-              delay: '0'
-              history: 7d
-              units: B
-              description: 'Administrative space. Raw reserved space.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.name == "{#NAME}")].adminSpace.rawReservedMiB.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 12h
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '1048576'
-              master_item:
-                key: hpe.primera.volumes
-              tags:
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: component
-                  value: volume
-                -
-                  tag: volume
-                  value: '{#NAME}'
-            -
-              uuid: e5a93a042a3b41bab4cf59dc71ec66bf
-              name: 'Volume [{#NAME}]: Administrative reserved space'
-              type: DEPENDENT
-              key: 'hpe.primera.volume.admin.reserved.space["{#NAME}"]'
-              delay: '0'
-              history: 7d
-              units: B
-              description: 'Administrative space. Reserved space.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.name == "{#NAME}")].adminSpace.reservedMiB.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 12h
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '1048576'
-              master_item:
-                key: hpe.primera.volumes
-              tags:
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: component
-                  value: volume
-                -
-                  tag: volume
-                  value: '{#NAME}'
-            -
-              uuid: 67e182afc0124cf5913b0499317a7966
-              name: 'Volume [{#NAME}]: Administrative used space'
-              type: DEPENDENT
-              key: 'hpe.primera.volume.admin.used.space["{#NAME}"]'
-              delay: '0'
-              history: 7d
-              units: B
-              description: 'Administrative space. Used space.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.name == "{#NAME}")].adminSpace.usedMiB.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '1048576'
-              master_item:
-                key: hpe.primera.volumes
-              tags:
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: component
-                  value: volume
-                -
-                  tag: volume
-                  value: '{#NAME}'
-            -
-              uuid: 3b88e49e88484fe4a77e2a96f6d48322
-              name: 'Volume [{#NAME}]: Overprovisioning ratio'
-              type: DEPENDENT
-              key: 'hpe.primera.volume.capacity.efficiency..overprovisioning["{#NAME}"]'
-              delay: '0'
-              history: 7d
-              value_type: FLOAT
-              description: 'Capacity efficiency. Overprovisioning ratio.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.name == "{#NAME}")].capacityEfficiency.overProvisioning.first()'
-                  error_handler: DISCARD_VALUE
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-              master_item:
-                key: hpe.primera.volumes
-              tags:
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: component
-                  value: volume
-                -
-                  tag: volume
-                  value: '{#NAME}'
             -
               uuid: 40db4c8f6d85414e843c97770225f93d
               name: 'Volume [{#NAME}]: Compaction ratio'
               type: DEPENDENT
-              key: 'hpe.primera.volume.capacity.efficiency.compaction["{#NAME}"]'
+              key: 'hpe.primera.volume.capacity.efficiency["{#NAME}",compaction]'
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Capacity efficiency. The compaction ratio indicates the overall amount of storage space saved with thin technology.'
+              description: 'The compaction ratio indicates the overall amount of storage space saved with thin technology.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3486,7 +3656,7 @@ zabbix_export:
               uuid: ab2a583c4b4049a6ac8b7bbc02bda8f5
               name: 'Volume [{#NAME}]: Storage space saved using compression'
               type: DEPENDENT
-              key: 'hpe.primera.volume.capacity.efficiency.compression["{#NAME}"]'
+              key: 'hpe.primera.volume.capacity.efficiency["{#NAME}",compression]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -3496,37 +3666,6 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$[?(@.name == "{#NAME}")].capacityEfficiency.compression.first()'
-                  error_handler: DISCARD_VALUE
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 6h
-              master_item:
-                key: hpe.primera.volumes
-              tags:
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: component
-                  value: volume
-                -
-                  tag: volume
-                  value: '{#NAME}'
-            -
-              uuid: f584938e60f94c46b4ed28cc614c797d
-              name: 'Volume [{#NAME}]: Storage space saved using deduplication and compression'
-              type: DEPENDENT
-              key: 'hpe.primera.volume.capacity.efficiency.data.reduction["{#NAME}"]'
-              delay: '0'
-              history: 7d
-              value_type: FLOAT
-              description: 'Capacity efficiency. Indicates the amount of storage space saved using deduplication and compression together.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.name == "{#NAME}")].capacityEfficiency.dataReduction.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
@@ -3548,7 +3687,7 @@ zabbix_export:
               uuid: 1c4d78b2dcd64efbbf710ef602a94573
               name: 'Volume [{#NAME}]: Storage space saved using deduplication'
               type: DEPENDENT
-              key: 'hpe.primera.volume.capacity.efficiency.deduplication["{#NAME}"]'
+              key: 'hpe.primera.volume.capacity.efficiency["{#NAME}",deduplication]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -3576,26 +3715,24 @@ zabbix_export:
                   tag: volume
                   value: '{#NAME}'
             -
-              uuid: beb17415bd07492d83944da714c492e7
-              name: 'Volume [{#NAME}]: Compression State'
+              uuid: 3b88e49e88484fe4a77e2a96f6d48322
+              name: 'Volume [{#NAME}]: Overprovisioning ratio'
               type: DEPENDENT
-              key: 'hpe.primera.volume.compression.state["{#NAME}"]'
+              key: 'hpe.primera.volume.capacity.efficiency["{#NAME}",overprovisioning]'
               delay: '0'
               history: 7d
-              description: |
-                Volume compression state:
-                
-                YES (1) - Compression is enabled on the volume;
-                NO (2) - Compression is disabled on the volume;
-                OFF (3) - Compression is turned off;
-                NA (4) - Compression is not available on the volume.
-              valuemap:
-                name: 'Primera: Volume compressionState enum'
+              value_type: FLOAT
+              description: 'Overprovisioning capacity efficiency ratio.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#NAME}")].compressionState.first()'
+                    - '$[?(@.name == "{#NAME}")].capacityEfficiency.overProvisioning.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: hpe.primera.volumes
               tags:
@@ -3609,26 +3746,24 @@ zabbix_export:
                   tag: volume
                   value: '{#NAME}'
             -
-              uuid: 3962d07122a0460fa36c1b151a87717b
-              name: 'Volume [{#NAME}]: Deduplication State'
+              uuid: f584938e60f94c46b4ed28cc614c797d
+              name: 'Volume [{#NAME}]: Storage space saved using deduplication and compression'
               type: DEPENDENT
-              key: 'hpe.primera.volume.deduplication.state["{#NAME}"]'
+              key: 'hpe.primera.volume.capacity.efficiency["{#NAME}",reduction]'
               delay: '0'
               history: 7d
-              description: |
-                Volume deduplication state:
-                
-                YES (1) - Enables deduplication on the volume;
-                NO (2) - Disables deduplication on the volume;
-                NA (3) - Deduplication is not available;
-                OFF (4) - Deduplication is turned off.
-              valuemap:
-                name: 'Primera: Volume deduplicationState enum'
+              value_type: FLOAT
+              description: 'Indicates the amount of storage space saved using deduplication and compression together.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#NAME}")].deduplicationState.first()'
+                    - '$[?(@.name == "{#NAME}")].capacityEfficiency.dataReduction.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: hpe.primera.volumes
               tags:
@@ -3642,59 +3777,27 @@ zabbix_export:
                   tag: volume
                   value: '{#NAME}'
             -
-              uuid: 83222faf4e3e414789e028e0b17350c6
-              name: 'Volume [{#NAME}]: Degraded State'
+              uuid: bb78eda6a941407581f78cf29ef2b647
+              name: 'Volume [{#NAME}]: Administrative space: Free'
               type: DEPENDENT
-              key: 'hpe.primera.volume.degraded.state["{#NAME}"]'
+              key: 'hpe.primera.volume.space.admin["{#NAME}",free]'
               delay: '0'
               history: 7d
-              trends: '0'
-              value_type: CHAR
-              description: |
-                Volume detailed state:
-                
-                LDS_NOT_STARTED (1) - LDs not started.
-                NOT_STARTED (2) - VV not started.
-                NEEDS_CHECK (3) - Check for consistency.
-                NEEDS_MAINT_CHECK (4) - Maintenance check is required.
-                INTERNAL_CONSISTENCY_ERROR (5) - Internal consistency error.
-                SNAPDATA_INVALID (6) - Invalid snapshot data.
-                PRESERVED (7) - Unavailable LD sets due to missing chunklets. Preserved remaining VV data.
-                STALE (8) - Parts of the VV contain old data because of a copy-on-write operation.
-                COPY_FAILED (9) - A promote or copy operation to this volume failed.
-                DEGRADED_AVAIL (10) - Degraded due to availability.
-                DEGRADED_PERF (11) - Degraded due to performance.
-                PROMOTING (12) - Volume is the current target of a promote operation.
-                COPY_TARGET (13) - Volume is the current target of a physical copy operation.
-                RESYNC_TARGET (14) - Volume is the current target of a resynchronized copy operation.
-                TUNING (15) - Volume tuning is in progress.
-                CLOSING (16) - Volume is closing.
-                REMOVING (17) - Removing the volume.
-                REMOVING_RETRY (18) - Retrying a volume removal operation.
-                CREATING (19) - Creating a volume.
-                COPY_SOURCE (20) - Copy source.
-                IMPORTING (21) - Importing a volume.
-                CONVERTING (22) - Converting a volume.
-                INVALID (23) - Invalid.
-                EXCLUSIVE (24) - Local storage system has exclusive access to the volume.
-                CONSISTENT (25) - Volume is being imported consistently along with other volumes in the VV set.
-                STANDBY (26) - Volume in Standby mode.
-                SD_META_INCONSISTENT (27) - SD Meta Inconsistent.
-                SD_NEEDS_FIX (28) - SD needs fix.
-                SD_META_FIXING (29) - SD meta fix.
-                UNKNOWN (999) - Unknown state.
-                NOT_SUPPORTED_BY_WSAPI (1000) - State not supported by WSAPI.
-              valuemap:
-                name: 'Primera: Volume detailed state enum'
+              units: B
+              description: 'Free administrative space.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#NAME}")].degradedStates.first()'
+                    - '$[?(@.name == "{#NAME}")].adminSpace.freeMiB.first()'
                 -
-                  type: JAVASCRIPT
+                  type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 'return JSON.stringify(JSON.parse(value));'
+                    - 10m
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
               master_item:
                 key: hpe.primera.volumes
               tags:
@@ -3708,59 +3811,27 @@ zabbix_export:
                   tag: volume
                   value: '{#NAME}'
             -
-              uuid: 462e4b491dd94c78b299178af6d34ca0
-              name: 'Volume [{#NAME}]: Failed State'
+              uuid: e4f9f8f5c1cd494896eba973b072fc57
+              name: 'Volume [{#NAME}]: Administrative space: Raw reserved'
               type: DEPENDENT
-              key: 'hpe.primera.volume.failed.state["{#NAME}"]'
+              key: 'hpe.primera.volume.space.admin["{#NAME}",raw_reserved]'
               delay: '0'
               history: 7d
-              trends: '0'
-              value_type: CHAR
-              description: |
-                Volume detailed state:
-                
-                LDS_NOT_STARTED (1) - LDs not started.
-                NOT_STARTED (2) - VV not started.
-                NEEDS_CHECK (3) - Check for consistency.
-                NEEDS_MAINT_CHECK (4) - Maintenance check is required.
-                INTERNAL_CONSISTENCY_ERROR (5) - Internal consistency error.
-                SNAPDATA_INVALID (6) - Invalid snapshot data.
-                PRESERVED (7) - Unavailable LD sets due to missing chunklets. Preserved remaining VV data.
-                STALE (8) - Parts of the VV contain old data because of a copy-on-write operation.
-                COPY_FAILED (9) - A promote or copy operation to this volume failed.
-                DEGRADED_AVAIL (10) - Degraded due to availability.
-                DEGRADED_PERF (11) - Degraded due to performance.
-                PROMOTING (12) - Volume is the current target of a promote operation.
-                COPY_TARGET (13) - Volume is the current target of a physical copy operation.
-                RESYNC_TARGET (14) - Volume is the current target of a resynchronized copy operation.
-                TUNING (15) - Volume tuning is in progress.
-                CLOSING (16) - Volume is closing.
-                REMOVING (17) - Removing the volume.
-                REMOVING_RETRY (18) - Retrying a volume removal operation.
-                CREATING (19) - Creating a volume.
-                COPY_SOURCE (20) - Copy source.
-                IMPORTING (21) - Importing a volume.
-                CONVERTING (22) - Converting a volume.
-                INVALID (23) - Invalid.
-                EXCLUSIVE (24) - Local storage system has exclusive access to the volume.
-                CONSISTENT (25) - Volume is being imported consistently along with other volumes in the VV set.
-                STANDBY (26) - Volume in Standby mode.
-                SD_META_INCONSISTENT (27) - SD Meta Inconsistent.
-                SD_NEEDS_FIX (28) - SD needs fix.
-                SD_META_FIXING (29) - SD meta fix.
-                UNKNOWN (999) - Unknown state.
-                NOT_SUPPORTED_BY_WSAPI (1000) - State not supported by WSAPI.
-              valuemap:
-                name: 'Primera: Volume detailed state enum'
+              units: B
+              description: 'Raw reserved administrative space.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#NAME}")].failedStates.first()'
+                    - '$[?(@.name == "{#NAME}")].adminSpace.rawReservedMiB.first()'
                 -
-                  type: JAVASCRIPT
+                  type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 'return JSON.stringify(JSON.parse(value));'
+                    - 12h
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
               master_item:
                 key: hpe.primera.volumes
               tags:
@@ -3774,31 +3845,232 @@ zabbix_export:
                   tag: volume
                   value: '{#NAME}'
             -
-              uuid: 582544eb48d04a35ab03a9d01901feb9
-              name: 'Volume [{#NAME}]: Remote Copy Status'
+              uuid: e5a93a042a3b41bab4cf59dc71ec66bf
+              name: 'Volume [{#NAME}]: Administrative space: Reserved'
               type: DEPENDENT
-              key: 'hpe.primera.volume.rcopy.status["{#NAME}"]'
+              key: 'hpe.primera.volume.space.admin["{#NAME}",reserved]'
               delay: '0'
               history: 7d
-              trends: '0'
-              value_type: CHAR
-              description: |
-                Remote Copy status of the volume:
-                
-                NONE (1) - Volume is not associated with Remote Copy;
-                PRIMARY (2) - Volume is the primary copy;
-                SECONDARY (3) - Volume is the secondary copy;
-                SNAP (4) - Volume is the Remote Copy snapshot;
-                SYNC (5) - Volume is a Remote Copy snapshot being used for synchronization;
-                DELETE (6) - Volume is a Remote Copy snapshot that is marked for deletion;
-                UNKNOWN (99) - Remote Copy status is unknown for this volume.
-              valuemap:
-                name: 'Primera: rcopyStatus enum'
+              units: B
+              description: 'Reserved administrative space.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#NAME}")].rcopyStatus.first()'
+                    - '$[?(@.name == "{#NAME}")].adminSpace.reservedMiB.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+              master_item:
+                key: hpe.primera.volumes
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#NAME}'
+            -
+              uuid: 67e182afc0124cf5913b0499317a7966
+              name: 'Volume [{#NAME}]: Administrative space: Used'
+              type: DEPENDENT
+              key: 'hpe.primera.volume.space.admin["{#NAME}",used]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Used administrative space.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "{#NAME}")].adminSpace.usedMiB.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+              master_item:
+                key: hpe.primera.volumes
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#NAME}'
+            -
+              uuid: 5d4659c72ed3492da143ad9c37e71360
+              name: 'Volume [{#NAME}]: Snapshot space: Free'
+              type: DEPENDENT
+              key: 'hpe.primera.volume.space.snapshot["{#NAME}",free]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Free snapshot space.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "{#NAME}")].snapshotSpace.freeMiB.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+              master_item:
+                key: hpe.primera.volumes
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#NAME}'
+            -
+              uuid: a2c22eed1c004bcc9292b945b5038858
+              name: 'Volume [{#NAME}]: Snapshot space: Raw reserved'
+              type: DEPENDENT
+              key: 'hpe.primera.volume.space.snapshot["{#NAME}",raw_reserved]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Raw reserved snapshot space.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "{#NAME}")].snapshotSpace.rawReservedMiB.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+              master_item:
+                key: hpe.primera.volumes
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#NAME}'
+            -
+              uuid: a37265c4598f4179bdcfd816769a1d9b
+              name: 'Volume [{#NAME}]: Snapshot space: Reserved'
+              type: DEPENDENT
+              key: 'hpe.primera.volume.space.snapshot["{#NAME}",reserved]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Reserved snapshot space.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "{#NAME}")].snapshotSpace.reservedMiB.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+              master_item:
+                key: hpe.primera.volumes
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#NAME}'
+            -
+              uuid: a278f5ec08c747b085ec53a36357539c
+              name: 'Volume [{#NAME}]: Snapshot space: Used'
+              type: DEPENDENT
+              key: 'hpe.primera.volume.space.snapshot["{#NAME}",used]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Used snapshot space.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "{#NAME}")].snapshotSpace.usedMiB.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+              master_item:
+                key: hpe.primera.volumes
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#NAME}'
+            -
+              uuid: 64825e4092c6450a8ea7fb7bce2d85ce
+              name: 'Volume [{#NAME}]: Total reserved space'
+              type: DEPENDENT
+              key: 'hpe.primera.volume.space.total["{#NAME}",reserved]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total reserved space.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "{#NAME}")].totalReservedMiB.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
               master_item:
                 key: hpe.primera.volumes
               tags:
@@ -3813,9 +4085,9 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: af15ec5befd146afbfb2b9cc017d03be
-              name: 'Volume [{#NAME}]: Total Size'
+              name: 'Volume [{#NAME}]: Total space'
               type: DEPENDENT
-              key: 'hpe.primera.volume.size["{#NAME}"]'
+              key: 'hpe.primera.volume.space.total["{#NAME}",size]'
               delay: '0'
               history: 7d
               units: B
@@ -3847,245 +4119,14 @@ zabbix_export:
                   tag: volume
                   value: '{#NAME}'
             -
-              uuid: 5d4659c72ed3492da143ad9c37e71360
-              name: 'Volume [{#NAME}]: Snapshot Free space'
-              type: DEPENDENT
-              key: 'hpe.primera.volume.snapshot.free.space["{#NAME}"]'
-              delay: '0'
-              history: 7d
-              units: B
-              description: 'Snapshot space. Free space.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.name == "{#NAME}")].snapshotSpace.freeMiB.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '1048576'
-              master_item:
-                key: hpe.primera.volumes
-              tags:
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: component
-                  value: volume
-                -
-                  tag: volume
-                  value: '{#NAME}'
-            -
-              uuid: a2c22eed1c004bcc9292b945b5038858
-              name: 'Volume [{#NAME}]: Snapshot Raw reserved space'
-              type: DEPENDENT
-              key: 'hpe.primera.volume.snapshot.raw.reserved.space["{#NAME}"]'
-              delay: '0'
-              history: 7d
-              units: B
-              description: 'Snapshot space. Raw reserved space.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.name == "{#NAME}")].snapshotSpace.rawReservedMiB.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 12h
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '1048576'
-              master_item:
-                key: hpe.primera.volumes
-              tags:
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: component
-                  value: volume
-                -
-                  tag: volume
-                  value: '{#NAME}'
-            -
-              uuid: a37265c4598f4179bdcfd816769a1d9b
-              name: 'Volume [{#NAME}]: Snapshot reserved space'
-              type: DEPENDENT
-              key: 'hpe.primera.volume.snapshot.reserved.space["{#NAME}"]'
-              delay: '0'
-              history: 7d
-              units: B
-              description: 'Snapshot space. Reserved space.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.name == "{#NAME}")].snapshotSpace.reservedMiB.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 12h
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '1048576'
-              master_item:
-                key: hpe.primera.volumes
-              tags:
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: component
-                  value: volume
-                -
-                  tag: volume
-                  value: '{#NAME}'
-            -
-              uuid: a278f5ec08c747b085ec53a36357539c
-              name: 'Volume [{#NAME}]: Snapshot used space'
-              type: DEPENDENT
-              key: 'hpe.primera.volume.snapshot.used.space["{#NAME}"]'
-              delay: '0'
-              history: 7d
-              units: B
-              description: 'Snapshot space. Used space.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.name == "{#NAME}")].snapshotSpace.usedMiB.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '1048576'
-              master_item:
-                key: hpe.primera.volumes
-              tags:
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: component
-                  value: volume
-                -
-                  tag: volume
-                  value: '{#NAME}'
-            -
-              uuid: 4d4e34fdbac84cada109cbfe9b69812c
-              name: 'Volume [{#NAME}]: State'
-              type: DEPENDENT
-              key: 'hpe.primera.volume.state["{#NAME}"]'
-              delay: '0'
-              history: 7d
-              description: |
-                State of the volume:
-                
-                NORMAL (1) - Normal operation;
-                DEGRADED (2) - Degraded state;
-                FAILED (3) - Abnormal operation;
-                UNKNOWN (99) - Unknown state.
-              valuemap:
-                name: 'Primera: State enum'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.name == "{#NAME}")].state.first()'
-              master_item:
-                key: hpe.primera.volumes
-              tags:
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: component
-                  value: volume
-                -
-                  tag: volume
-                  value: '{#NAME}'
-              trigger_prototypes:
-                -
-                  uuid: c91920ca3ceb457cb9e2db0bb70d7fe0
-                  expression: 'last(/HPE Primera by HTTP/hpe.primera.volume.state["{#NAME}"])=2'
-                  name: 'Volume [{#NAME}]: Degraded'
-                  priority: AVERAGE
-                  description: 'Volume [{#NAME}] in degraded state.'
-                  tags:
-                    -
-                      tag: scope
-                      value: availability
-                    -
-                      tag: scope
-                      value: capacity
-                -
-                  uuid: 394b5bd072ac41acb0702601c5d5f049
-                  expression: 'last(/HPE Primera by HTTP/hpe.primera.volume.state["{#NAME}"])=3'
-                  name: 'Volume [{#NAME}]: Failed'
-                  priority: HIGH
-                  description: 'Volume [{#NAME}] in failed state.'
-                  tags:
-                    -
-                      tag: scope
-                      value: availability
-                    -
-                      tag: scope
-                      value: capacity
-            -
-              uuid: 64825e4092c6450a8ea7fb7bce2d85ce
-              name: 'Volume [{#NAME}]: Total Reserved Size'
-              type: DEPENDENT
-              key: 'hpe.primera.volume.total.reserved["{#NAME}"]'
-              delay: '0'
-              history: 7d
-              units: B
-              description: 'Total Reserved space.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.name == "{#NAME}")].totalReservedMiB.first()'
-                  error_handler: DISCARD_VALUE
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 12h
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '1048576'
-              master_item:
-                key: hpe.primera.volumes
-              tags:
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: component
-                  value: volume
-                -
-                  tag: volume
-                  value: '{#NAME}'
-            -
               uuid: 6000ab524b394e65afe111b65f7b6fd8
-              name: 'Volume [{#NAME}]: Total Used Size'
+              name: 'Volume [{#NAME}]: Total used space'
               type: DEPENDENT
-              key: 'hpe.primera.volume.total.used["{#NAME}"]'
+              key: 'hpe.primera.volume.space.total["{#NAME}",used]'
               delay: '0'
               history: 7d
               units: B
-              description: 'Total used space. Sum of used UserSpace and used Snapshot space.'
+              description: 'Total used space. Sum of used user space and used snapshot space.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -4110,13 +4151,13 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 43c278563b174005ac5302ee48e0cd30
-              name: 'Volume [{#NAME}]: User Free space'
+              name: 'Volume [{#NAME}]: User space: Free'
               type: DEPENDENT
-              key: 'hpe.primera.volume.user.free.space["{#NAME}"]'
+              key: 'hpe.primera.volume.space.user["{#NAME}",free]'
               delay: '0'
               history: 7d
               units: B
-              description: 'User space. Free space.'
+              description: 'Free user space.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -4125,7 +4166,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
                 -
                   type: MULTIPLIER
                   parameters:
@@ -4144,13 +4185,13 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 97aaefe8dffd4d2eb83f908ac8ad775b
-              name: 'Volume [{#NAME}]: User Raw reserved space'
+              name: 'Volume [{#NAME}]: User space: Raw reserved'
               type: DEPENDENT
-              key: 'hpe.primera.volume.user.raw.reserved.space["{#NAME}"]'
+              key: 'hpe.primera.volume.space.user["{#NAME}",raw_reserved]'
               delay: '0'
               history: 7d
               units: B
-              description: 'User space. Raw reserved space.'
+              description: 'Raw reserved user space.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -4178,13 +4219,13 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 135ad5457781492db1cec36787151a71
-              name: 'Volume [{#NAME}]: User reserved space'
+              name: 'Volume [{#NAME}]: User space: Reserved'
               type: DEPENDENT
-              key: 'hpe.primera.volume.user.reserved.space["{#NAME}"]'
+              key: 'hpe.primera.volume.space.user["{#NAME}",reserved]'
               delay: '0'
               history: 7d
               units: B
-              description: 'User space. Reserved space.'
+              description: 'Reserved user space.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -4212,13 +4253,13 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 3adf03216c4f442693fccbb991c0de3d
-              name: 'Volume [{#NAME}]: User used space'
+              name: 'Volume [{#NAME}]: User space: Used'
               type: DEPENDENT
-              key: 'hpe.primera.volume.user.used.space["{#NAME}"]'
+              key: 'hpe.primera.volume.space.user["{#NAME}",used]'
               delay: '0'
               history: 7d
               units: B
-              description: 'User space. Used space.'
+              description: 'Used user space.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -4227,7 +4268,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 10m
                 -
                   type: MULTIPLIER
                   parameters:
@@ -4244,6 +4285,351 @@ zabbix_export:
                 -
                   tag: volume
                   value: '{#NAME}'
+            -
+              uuid: beb17415bd07492d83944da714c492e7
+              name: 'Volume [{#NAME}]: Compression state'
+              type: DEPENDENT
+              key: 'hpe.primera.volume.state["{#NAME}",compression]'
+              delay: '0'
+              history: 7d
+              description: |
+                Volume compression state:
+                
+                YES (1) - compression is enabled on the volume;
+                NO (2) - compression is disabled on the volume;
+                OFF (3) - compression is turned off;
+                NA (4) - compression is not available on the volume.
+              valuemap:
+                name: 'Volume compressionState enum'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "{#NAME}")].compressionState.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: hpe.primera.volumes
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#NAME}'
+            -
+              uuid: 3962d07122a0460fa36c1b151a87717b
+              name: 'Volume [{#NAME}]: Deduplication state'
+              type: DEPENDENT
+              key: 'hpe.primera.volume.state["{#NAME}",deduplication]'
+              delay: '0'
+              history: 7d
+              description: |
+                Volume deduplication state:
+                
+                YES (1) - enables deduplication on the volume;
+                NO (2) - disables deduplication on the volume;
+                NA (3) - deduplication is not available;
+                OFF (4) - deduplication is turned off.
+              valuemap:
+                name: 'Volume deduplicationState enum'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "{#NAME}")].deduplicationState.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: hpe.primera.volumes
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#NAME}'
+            -
+              uuid: 83222faf4e3e414789e028e0b17350c6
+              name: 'Volume [{#NAME}]: Degraded state'
+              type: DEPENDENT
+              key: 'hpe.primera.volume.state["{#NAME}",degraded]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                Volume detailed state:
+                
+                LDS_NOT_STARTED (1) - LDs not started.
+                NOT_STARTED (2) - VV not started.
+                NEEDS_CHECK (3) - check for consistency.
+                NEEDS_MAINT_CHECK (4) - maintenance check is required.
+                INTERNAL_CONSISTENCY_ERROR (5) - internal consistency error.
+                SNAPDATA_INVALID (6) - invalid snapshot data.
+                PRESERVED (7) - unavailable LD sets due to missing chunklets. Preserved remaining VV data.
+                STALE (8) - parts of the VV contain old data because of a copy-on-write operation.
+                COPY_FAILED (9) - a promote or copy operation to this volume failed.
+                DEGRADED_AVAIL (10) - degraded due to availability.
+                DEGRADED_PERF (11) - degraded due to performance.
+                PROMOTING (12) - volume is the current target of a promote operation.
+                COPY_TARGET (13) - volume is the current target of a physical copy operation.
+                RESYNC_TARGET (14) - volume is the current target of a resynchronized copy operation.
+                TUNING (15) - volume tuning is in progress.
+                CLOSING (16) - volume is closing.
+                REMOVING (17) - removing the volume.
+                REMOVING_RETRY (18) - retrying a volume removal operation.
+                CREATING (19) - creating a volume.
+                COPY_SOURCE (20) - copy source.
+                IMPORTING (21) - importing a volume.
+                CONVERTING (22) - converting a volume.
+                INVALID (23) - invalid.
+                EXCLUSIVE (24) -lLocal storage system has exclusive access to the volume.
+                CONSISTENT (25) - volume is being imported consistently along with other volumes in the VV set.
+                STANDBY (26) - volume in standby mode.
+                SD_META_INCONSISTENT (27) - SD Meta Inconsistent.
+                SD_NEEDS_FIX (28) - SD needs fix.
+                SD_META_FIXING (29) - SD meta fix.
+                UNKNOWN (999) - unknown state.
+                NOT_SUPPORTED_BY_WSAPI (1000) - state not supported by WSAPI.
+              valuemap:
+                name: 'Volume detailed state enum'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "{#NAME}")].degradedStates.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return JSON.stringify(JSON.parse(value));'
+              master_item:
+                key: hpe.primera.volumes
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#NAME}'
+            -
+              uuid: 462e4b491dd94c78b299178af6d34ca0
+              name: 'Volume [{#NAME}]: Failed state'
+              type: DEPENDENT
+              key: 'hpe.primera.volume.state["{#NAME}",failed]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                Volume detailed state:
+                
+                LDS_NOT_STARTED (1) - LDs not started.
+                NOT_STARTED (2) - VV not started.
+                NEEDS_CHECK (3) - check for consistency.
+                NEEDS_MAINT_CHECK (4) - maintenance check is required.
+                INTERNAL_CONSISTENCY_ERROR (5) - internal consistency error.
+                SNAPDATA_INVALID (6) - invalid snapshot data.
+                PRESERVED (7) - unavailable LD sets due to missing chunklets. Preserved remaining VV data.
+                STALE (8) - parts of the VV contain old data because of a copy-on-write operation.
+                COPY_FAILED (9) - a promote or copy operation to this volume failed.
+                DEGRADED_AVAIL (10) - degraded due to availability.
+                DEGRADED_PERF (11) - degraded due to performance.
+                PROMOTING (12) - volume is the current target of a promote operation.
+                COPY_TARGET (13) - volume is the current target of a physical copy operation.
+                RESYNC_TARGET (14) - volume is the current target of a resynchronized copy operation.
+                TUNING (15) - volume tuning is in progress.
+                CLOSING (16) - volume is closing.
+                REMOVING (17) - removing the volume.
+                REMOVING_RETRY (18) - retrying a volume removal operation.
+                CREATING (19) - creating a volume.
+                COPY_SOURCE (20) - copy source.
+                IMPORTING (21) - importing a volume.
+                CONVERTING (22) - converting a volume.
+                INVALID (23) - invalid.
+                EXCLUSIVE (24) - local storage system has exclusive access to the volume.
+                CONSISTENT (25) - volume is being imported consistently along with other volumes in the VV set.
+                STANDBY (26) - volume in standby mode.
+                SD_META_INCONSISTENT (27) - SD Meta Inconsistent.
+                SD_NEEDS_FIX (28) - SD needs fix.
+                SD_META_FIXING (29) - SD meta fix.
+                UNKNOWN (999) - unknown state.
+                NOT_SUPPORTED_BY_WSAPI (1000) - state not supported by WSAPI.
+              valuemap:
+                name: 'Volume detailed state enum'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "{#NAME}")].failedStates.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return JSON.stringify(JSON.parse(value));'
+              master_item:
+                key: hpe.primera.volumes
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#NAME}'
+            -
+              uuid: 4d4e34fdbac84cada109cbfe9b69812c
+              name: 'Volume [{#NAME}]: State'
+              type: DEPENDENT
+              key: 'hpe.primera.volume.state["{#NAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                State of the volume:
+                
+                NORMAL (1) - normal operation;
+                DEGRADED (2) - degraded state;
+                FAILED (3) - abnormal operation;
+                UNKNOWN (99) - unknown state.
+              valuemap:
+                name: 'State enum'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "{#NAME}")].state.first()'
+              master_item:
+                key: hpe.primera.volumes
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: c91920ca3ceb457cb9e2db0bb70d7fe0
+                  expression: 'last(/HPE Primera by HTTP/hpe.primera.volume.state["{#NAME}"])=2'
+                  name: 'Volume [{#NAME}]: Degraded'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Volume [{#NAME}] is in degraded state.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: capacity
+                -
+                  uuid: 394b5bd072ac41acb0702601c5d5f049
+                  expression: 'last(/HPE Primera by HTTP/hpe.primera.volume.state["{#NAME}"])=3'
+                  name: 'Volume [{#NAME}]: Failed'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Volume [{#NAME}] is in failed state.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: capacity
+            -
+              uuid: 582544eb48d04a35ab03a9d01901feb9
+              name: 'Volume [{#NAME}]: Remote copy status'
+              type: DEPENDENT
+              key: 'hpe.primera.volume.status["{#NAME}",rcopy]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                Remote copy status of the volume:
+                
+                NONE (1) - volume is not associated with remote copy;
+                PRIMARY (2) - volume is the primary copy;
+                SECONDARY (3) - volume is the secondary copy;
+                SNAP (4) - volume is the remote copy snapshot;
+                SYNC (5) - volume is a remote copy snapshot being used for synchronization;
+                DELETE (6) - volume is a remote copy snapshot that is marked for deletion;
+                UNKNOWN (99) - remote copy status is unknown for this volume.
+              valuemap:
+                name: 'rcopyStatus enum'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "{#NAME}")].rcopyStatus.first()'
+              master_item:
+                key: hpe.primera.volumes
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#NAME}'
+          trigger_prototypes:
+            -
+              uuid: dd1f0c9a629e4fd0b507a0bb95cc40b4
+              expression: 'min(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#NAME}",used],5m)/last(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#NAME}",size]) > {$HPE.PRIMERA.VOLUME.PUSED.MAX.WARN:"{#NAME}"} and (last(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#NAME}",size]) - min(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#NAME}",used],5m)) < {$HPE.PRIMERA.VOLUME.FREE.MIN.WARN:"{#NAME}"}'
+              name: 'Volume [{#NAME}]: High space usage'
+              event_name: 'Volume [{#NAME}]: High space usage (more than {$HPE.PRIMERA.VOLUME.PUSED.MAX.WARN:"{#NAME}"}% used)'
+              opdata: 'Current usage: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: |
+                Two conditions should match: First, space utilization should be above {$HPE.PRIMERA.VOLUME.PUSED.MAX.WARN:"{#NAME}"}%.
+                Second condition: The pool free space is less than {$HPE.PRIMERA.VOLUME.FREE.MIN.WARN:"{#NAME}"}.
+              dependencies:
+                -
+                  name: 'Volume [{#NAME}]: Very high space usage'
+                  expression: 'min(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#NAME}",used],5m)/last(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#NAME}",size]) > {$HPE.PRIMERA.VOLUME.PUSED.MAX.CRIT:"{#NAME}"} and (last(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#NAME}",size]) - min(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#NAME}",used],5m)) < {$HPE.PRIMERA.VOLUME.FREE.MIN.CRIT:"{#NAME}"}'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: 59226030b2ce4c5e8a3cf31990e6b036
+              expression: 'min(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#NAME}",used],5m)/last(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#NAME}",size]) > {$HPE.PRIMERA.VOLUME.PUSED.MAX.CRIT:"{#NAME}"} and (last(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#NAME}",size]) - min(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#NAME}",used],5m)) < {$HPE.PRIMERA.VOLUME.FREE.MIN.CRIT:"{#NAME}"}'
+              name: 'Volume [{#NAME}]: Very high space usage'
+              event_name: 'Volume [{#NAME}]: Very high space usage (more than {$HPE.PRIMERA.VOLUME.PUSED.MAX.CRIT:"{#NAME}"}% used)'
+              opdata: 'Current usage: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2}'
+              priority: HIGH
+              description: |
+                Two conditions should match: First, space utilization should be above {$HPE.PRIMERA.VOLUME.PUSED.MAX.CRIT:"{#NAME}"}%.
+                Second condition: The pool free space is less than {$HPE.PRIMERA.VOLUME.FREE.MIN.CRIT:"{#NAME}"}.
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 8c7139d2b7d94773ad6ef813c7fa59c9
@@ -4253,61 +4639,61 @@ zabbix_export:
                   color: 1A7C11
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.volume.admin.free.space["{#NAME}"]'
+                    key: 'hpe.primera.volume.space.admin["{#NAME}",free]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.volume.admin.raw.reserved.space["{#NAME}"]'
+                    key: 'hpe.primera.volume.space.admin["{#NAME}",raw_reserved]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.volume.admin.reserved.space["{#NAME}"]'
+                    key: 'hpe.primera.volume.space.admin["{#NAME}",reserved]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.volume.admin.used.space["{#NAME}"]'
+                    key: 'hpe.primera.volume.space.admin["{#NAME}",used]'
             -
               uuid: c74b88d4e61d4264b804965854eb1da1
-              name: 'Volume [{#NAME}]: Capacity Efficiency (ratio)'
+              name: 'Volume [{#NAME}]: Capacity efficiency: Ratio'
               graph_items:
                 -
                   color: 1A7C11
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.volume.capacity.efficiency.compaction["{#NAME}"]'
+                    key: 'hpe.primera.volume.capacity.efficiency["{#NAME}",compaction]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.volume.capacity.efficiency..overprovisioning["{#NAME}"]'
+                    key: 'hpe.primera.volume.capacity.efficiency["{#NAME}",overprovisioning]'
             -
               uuid: d2a75ebb20c94eb4ab5e6a9b13d1d439
-              name: 'Volume [{#NAME}]: Capacity Efficiency (space)'
+              name: 'Volume [{#NAME}]: Capacity efficiency: Space saved'
               graph_items:
                 -
                   color: 1A7C11
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.volume.capacity.efficiency.compression["{#NAME}"]'
+                    key: 'hpe.primera.volume.capacity.efficiency["{#NAME}",compression]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.volume.capacity.efficiency.deduplication["{#NAME}"]'
+                    key: 'hpe.primera.volume.capacity.efficiency["{#NAME}",deduplication]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.volume.capacity.efficiency.data.reduction["{#NAME}"]'
+                    key: 'hpe.primera.volume.capacity.efficiency["{#NAME}",reduction]'
             -
               uuid: 7214605009354fd382368ec8699d5474
               name: 'Volume [{#NAME}]: Snapshot space'
@@ -4316,25 +4702,25 @@ zabbix_export:
                   color: 1A7C11
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.volume.snapshot.free.space["{#NAME}"]'
+                    key: 'hpe.primera.volume.space.snapshot["{#NAME}",free]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.volume.snapshot.raw.reserved.space["{#NAME}"]'
+                    key: 'hpe.primera.volume.space.snapshot["{#NAME}",raw_reserved]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.volume.snapshot.reserved.space["{#NAME}"]'
+                    key: 'hpe.primera.volume.space.snapshot["{#NAME}",reserved]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.volume.snapshot.used.space["{#NAME}"]'
+                    key: 'hpe.primera.volume.space.snapshot["{#NAME}",used]'
             -
               uuid: 0ad9f609419340168bf7f49de98e0135
               name: 'Volume [{#NAME}]: User space'
@@ -4343,25 +4729,25 @@ zabbix_export:
                   color: 1A7C11
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.volume.user.free.space["{#NAME}"]'
+                    key: 'hpe.primera.volume.space.user["{#NAME}",free]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.volume.user.raw.reserved.space["{#NAME}"]'
+                    key: 'hpe.primera.volume.space.user["{#NAME}",raw_reserved]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.volume.user.reserved.space["{#NAME}"]'
+                    key: 'hpe.primera.volume.space.user["{#NAME}",reserved]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
                     host: 'HPE Primera by HTTP'
-                    key: 'hpe.primera.volume.user.used.space["{#NAME}"]'
+                    key: 'hpe.primera.volume.space.user["{#NAME}",used]'
           master_item:
             key: hpe.primera.volumes
           lld_macro_paths:
@@ -4388,29 +4774,117 @@ zabbix_export:
           value: primera
       macros:
         -
+          macro: '{$HPE.PRIMERA.API.PASSWORD}'
+          type: SECRET_TEXT
+          description: 'Specify password for WSAPI.'
+        -
+          macro: '{$HPE.PRIMERA.API.PORT}'
+          value: '443'
+          description: 'The WSAPI port.'
+        -
+          macro: '{$HPE.PRIMERA.API.SCHEME}'
+          value: https
+          description: 'The WSAPI scheme (http/https).'
+        -
+          macro: '{$HPE.PRIMERA.API.USERNAME}'
+          value: zabbix
+          description: 'Specify user name for WSAPI.'
+        -
+          macro: '{$HPE.PRIMERA.CPG.ID.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in filters of CPGs discovery rule.'
+        -
+          macro: '{$HPE.PRIMERA.CPG.ID.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in filters of CPGs discovery rule.'
+        -
+          macro: '{$HPE.PRIMERA.CPG.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in filters of CPGs discovery rule.'
+        -
+          macro: '{$HPE.PRIMERA.CPG.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in filters of CPGs discovery rule.'
+        -
           macro: '{$HPE.PRIMERA.DATA.TIMEOUT}'
           value: 3s
           description: 'Response timeout for WSAPI.'
         -
-          macro: '{$HPE.PRIMERA.LLD.FILTER.TASK.NAME.MATCHES}'
+          macro: '{$HPE.PRIMERA.DISK.FREE.MIN.CRIT}'
+          value: 5G
+          description: 'This macro is used for trigger expression. It can be overridden on the host or linked on the template level.'
+        -
+          macro: '{$HPE.PRIMERA.DISK.FREE.MIN.WARN}'
+          value: 10G
+          description: 'This macro is used for trigger expression. It can be overridden on the host or linked on the template level.'
+        -
+          macro: '{$HPE.PRIMERA.DISK.PUSED.MAX.CRIT}'
+          value: '90'
+          description: 'Threshold of used disk space for high severity trigger in %.'
+        -
+          macro: '{$HPE.PRIMERA.DISK.PUSED.MAX.WARN}'
+          value: '80'
+          description: 'Threshold of used disk space for warning trigger in %.'
+        -
+          macro: '{$HPE.PRIMERA.HOST.ID.MATCHES}'
           value: '.*'
+          description: 'This macro is used in filters of hosts discovery rule.'
+        -
+          macro: '{$HPE.PRIMERA.HOST.ID.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in filters of hosts discovery rule.'
+        -
+          macro: '{$HPE.PRIMERA.LLD.FILTER.TASK.NAME.MATCHES}'
+          value: CHANGE_IF_NEEDED
           description: 'Filter of discoverable tasks by name.'
         -
           macro: '{$HPE.PRIMERA.LLD.FILTER.TASK.NAME.NOT_MATCHES}'
-          value: CHANGE_IF_NEEDED
+          value: '.*'
           description: 'Filter to exclude discovered tasks by name.'
         -
-          macro: '{$HPE.PRIMERA.PASSWORD}'
-          type: SECRET_TEXT
-          description: 'Specify password for WSAPI.'
+          macro: '{$HPE.PRIMERA.LLD.FILTER.TASK.TYPE.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable tasks by type.'
         -
-          macro: '{$HPE.PRIMERA.USERNAME}'
-          value: zabbix
-          description: 'Specify user name for WSAPI.'
+          macro: '{$HPE.PRIMERA.LLD.FILTER.TASK.TYPE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered tasks by type.'
+        -
+          macro: '{$HPE.PRIMERA.VOLUME.FREE.MIN.CRIT}'
+          value: 5G
+          description: 'This macro is used for trigger expression. It can be overridden on the host or linked on the template level.'
+        -
+          macro: '{$HPE.PRIMERA.VOLUME.FREE.MIN.WARN}'
+          value: 10G
+          description: 'This macro is used for trigger expression. It can be overridden on the host or linked on the template level.'
+        -
+          macro: '{$HPE.PRIMERA.VOLUME.ID.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in filters of volume discovery rule.'
+        -
+          macro: '{$HPE.PRIMERA.VOLUME.ID.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in filters of volume discovery rule.'
+        -
+          macro: '{$HPE.PRIMERA.VOLUME.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in filters of volume discovery rule.'
+        -
+          macro: '{$HPE.PRIMERA.VOLUME.NAME.NOT_MATCHES}'
+          value: ^(admin|.srdata|.mgmtdata)$
+          description: 'This macro is used in filters of volume discovery rule.'
+        -
+          macro: '{$HPE.PRIMERA.VOLUME.PUSED.MAX.CRIT}'
+          value: '90'
+          description: 'Threshold of used volume space for high severity trigger in %.'
+        -
+          macro: '{$HPE.PRIMERA.VOLUME.PUSED.MAX.WARN}'
+          value: '80'
+          description: 'Threshold of used volume space for warning trigger in %.'
       valuemaps:
         -
           uuid: 79ba0611293541f29f8b43b34e64465d
-          name: 'Primera: Boolean'
+          name: Boolean
           mappings:
             -
               value: '0'
@@ -4420,7 +4894,7 @@ zabbix_export:
               newvalue: 'Yes'
         -
           uuid: fd9a3483b02f45c6836b9a126b669402
-          name: 'Primera: diskState enum'
+          name: 'diskState enum'
           mappings:
             -
               value: '1'
@@ -4439,7 +4913,7 @@ zabbix_export:
               newvalue: Unknown
         -
           uuid: 7513c4c923884ed4b8e35ee9cdf4f627
-          name: 'Primera: hardwareType enum'
+          name: 'hardwareType enum'
           mappings:
             -
               value: '1'
@@ -4467,7 +4941,7 @@ zabbix_export:
               newvalue: Unknown
         -
           uuid: 5d243add5b534ebfac8ef95d55c4c8c9
-          name: 'Primera: portConnType enum'
+          name: 'portConnType enum'
           mappings:
             -
               value: '1'
@@ -4501,7 +4975,7 @@ zabbix_export:
               newvalue: FS
         -
           uuid: 5762248dd10143a3945c989f0fb73b47
-          name: 'Primera: portFailOverState enum'
+          name: 'portFailOverState enum'
           mappings:
             -
               value: '1'
@@ -4526,7 +5000,7 @@ zabbix_export:
               newvalue: Failback_pending
         -
           uuid: 5a6cdc765c254f17b136c4267fc71349
-          name: 'Primera: portLinkState enum'
+          name: 'portLinkState enum'
           mappings:
             -
               value: '1'
@@ -4587,7 +5061,7 @@ zabbix_export:
               newvalue: Purging
         -
           uuid: eb36574d642d4f9ea51688b4ff971c91
-          name: 'Primera: rcopyStatus enum'
+          name: 'rcopyStatus enum'
           mappings:
             -
               value: '1'
@@ -4611,8 +5085,18 @@ zabbix_export:
               value: '99'
               newvalue: Unknown
         -
+          uuid: aaa5a863e8524a7088e64a51f5976c98
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
+        -
           uuid: 86e4337cbc86423fb9f605a9fb3b25b1
-          name: 'Primera: State enum'
+          name: 'State enum'
           mappings:
             -
               value: '1'
@@ -4628,7 +5112,7 @@ zabbix_export:
               newvalue: Unknown
         -
           uuid: 5cfd4442b6244399b7aa8b57e9816a4e
-          name: 'Primera: taskStatus enum'
+          name: 'taskStatus enum'
           mappings:
             -
               value: '1'
@@ -4643,8 +5127,144 @@ zabbix_export:
               value: '4'
               newvalue: Failed
         -
+          uuid: 9a8e1dbbb8f7497c9492fc941fde7177
+          name: 'taskType enum'
+          mappings:
+            -
+              value: '1'
+              newvalue: 'VV copy'
+            -
+              value: '2'
+              newvalue: 'Phys copy resync'
+            -
+              value: '3'
+              newvalue: 'Move regions'
+            -
+              value: '4'
+              newvalue: 'Promote SV'
+            -
+              value: '5'
+              newvalue: 'Remote copy sync'
+            -
+              value: '6'
+              newvalue: 'Remote copy reverse'
+            -
+              value: '7'
+              newvalue: 'Remote copy failover'
+            -
+              value: '8'
+              newvalue: 'Remote copy recover'
+            -
+              value: '9'
+              newvalue: 'Remote copy restore'
+            -
+              value: '10'
+              newvalue: 'Compact CPG'
+            -
+              value: '11'
+              newvalue: 'Compact IDS'
+            -
+              value: '12'
+              newvalue: 'Snapshot accounting'
+            -
+              value: '13'
+              newvalue: 'Check VV'
+            -
+              value: '14'
+              newvalue: 'Scheduled task'
+            -
+              value: '15'
+              newvalue: 'System task'
+            -
+              value: '16'
+              newvalue: 'Background task'
+            -
+              value: '17'
+              newvalue: 'Import VV'
+            -
+              value: '18'
+              newvalue: 'Online copy'
+            -
+              value: '19'
+              newvalue: 'Convert VV'
+            -
+              value: '20'
+              newvalue: 'Background command'
+            -
+              value: '21'
+              newvalue: 'CLX sync'
+            -
+              value: '22'
+              newvalue: 'CLX recovery'
+            -
+              value: '23'
+              newvalue: 'Tune SD'
+            -
+              value: '24'
+              newvalue: 'Tune VV'
+            -
+              value: '25'
+              newvalue: 'Tune VV rollback'
+            -
+              value: '26'
+              newvalue: 'Tune VV restart'
+            -
+              value: '27'
+              newvalue: 'System tuning'
+            -
+              value: '28'
+              newvalue: 'Node rescue'
+            -
+              value: '29'
+              newvalue: 'Repair sync'
+            -
+              value: '30'
+              newvalue: 'Remote copy switchover'
+            -
+              value: '31'
+              newvalue: Defragmentation
+            -
+              value: '32'
+              newvalue: 'Encryption change'
+            -
+              value: '33'
+              newvalue: 'Remote copy failsafe'
+            -
+              value: '34'
+              newvalue: 'Tune TPVV'
+            -
+              value: '35'
+              newvalue: 'Remote copy change mode'
+            -
+              value: '37'
+              newvalue: 'Online promote'
+            -
+              value: '38'
+              newvalue: 'Relocate PD'
+            -
+              value: '39'
+              newvalue: 'Periodic CSS'
+            -
+              value: '40'
+              newvalue: 'Tune VV large'
+            -
+              value: '41'
+              newvalue: 'SD meta fixer'
+            -
+              value: '42'
+              newvalue: 'Dedup dryrun'
+            -
+              value: '43'
+              newvalue: 'Compr dryrun'
+            -
+              value: '44'
+              newvalue: 'Dedup compr dryrun'
+            -
+              value: '99'
+              newvalue: Unknown
+        -
           uuid: f529111642364bb3a23637adc554e592
-          name: 'Primera: Volume compressionState enum'
+          name: 'Volume compressionState enum'
           mappings:
             -
               value: '1'
@@ -4660,7 +5280,7 @@ zabbix_export:
               newvalue: NA
         -
           uuid: 716912c7b7d94f8e97fbf911edc9578e
-          name: 'Primera: Volume deduplicationState enum'
+          name: 'Volume deduplicationState enum'
           mappings:
             -
               value: '1'
@@ -4676,7 +5296,7 @@ zabbix_export:
               newvalue: 'Off'
         -
           uuid: 6a2355e32bf54483b252f1aaf170aa45
-          name: 'Primera: Volume detailed state enum'
+          name: 'Volume detailed state enum'
           mappings:
             -
               value: '1'
@@ -4771,3 +5391,31 @@ zabbix_export:
             -
               value: '1000'
               newvalue: 'State not supported by WSAPI'
+  graphs:
+    -
+      uuid: 79e292a64d9247c486812db7a62c0eda
+      name: 'HPE Primera: Capacity'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'HPE Primera by HTTP'
+            key: hpe.primera.system.capacity.allocated
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'HPE Primera by HTTP'
+            key: hpe.primera.system.capacity.failed
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'HPE Primera by HTTP'
+            key: hpe.primera.system.capacity.free
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'HPE Primera by HTTP'
+            key: hpe.primera.system.capacity.total
