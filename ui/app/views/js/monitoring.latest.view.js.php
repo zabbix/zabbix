@@ -37,6 +37,7 @@
 		timeout: null,
 		_refresh_message_box: null,
 		_popup_message_box: null,
+		active_filter: null,
 
 		checkbox_object: null,
 
@@ -51,6 +52,7 @@
 			this.refresh_simple_url = url.getUrl();
 
 			this.initTabFilter(filter_options);
+			this.initExpandableSubfilter();
 
 			if (this.refresh_interval != 0) {
 				this.running = true;
@@ -65,10 +67,51 @@
 
 			this.refresh_counters = this.createCountersRefresh(1);
 			this.filter = new CTabFilter(document.getElementById('monitoring_latest_filter'), filter_options);
+			this.active_filter = this.filter._active_item;
 
 			this.filter.on(TABFILTER_EVENT_URLSET, () => {
 				this.reloadPartialAndTabCounters();
+
+				if (this.active_filter !== this.filter._active_item) {
+					this.active_filter = this.filter._active_item;
+					chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
+					chkbxRange.clearSelectedOnFilterChange();
+				}
 			});
+
+			document.addEventListener('click', (event) => {
+				if (event.target.classList.contains('<?= ZBX_STYLE_BTN_TAG ?>')) {
+					view.setSubfilter(JSON.parse(event.target.dataset.subfilterTag));
+				}
+			});
+
+			// Tags must be activated also using the enter button on keyboard.
+			document.addEventListener('keydown', (event) => {
+				if (event.which == 13 && event.target.classList.contains('<?= ZBX_STYLE_BTN_TAG ?>')) {
+					view.setSubfilter(JSON.parse(event.target.dataset.subfilterTag));
+				}
+			});
+		},
+
+		initExpandableSubfilter() {
+			document.querySelectorAll('.expandable-subfilter').forEach((element) => {
+				const subfilter = new CExpandableSubfilter(element);
+				subfilter.on(EXPANDABLE_SUBFILTER_EVENT_EXPAND, (e) => {
+					this.filter.setExpandedSubfilters(e.detail.name);
+				});
+			});
+
+			const expand_tags = document.getElementById('expand_tag_values');
+			if (expand_tags !== null) {
+				expand_tags.addEventListener('click', () => {
+					document.querySelectorAll('.subfilter-option-grid.display-none').forEach((element) => {
+						element.classList.remove('display-none');
+					});
+
+					this.filter.setExpandedSubfilters(expand_tags.dataset['name']);
+					expand_tags.remove();
+				});
+			}
 		},
 
 		createCountersRefresh(timeout) {
@@ -175,6 +218,8 @@
 					return post_data;
 				}, {});
 
+			post_data['subfilters_expanded'] = this.filter.getExpandedSubfilters();
+
 			var deferred = $.ajax({
 				url: this.refresh_simple_url,
 				data: post_data,
@@ -222,6 +267,8 @@
 			if ('messages' in response) {
 				this._addRefreshMessage(response.messages);
 			}
+
+			this.initExpandableSubfilter();
 		},
 
 		onDataFail(jqXHR) {

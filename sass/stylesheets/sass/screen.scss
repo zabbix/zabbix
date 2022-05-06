@@ -33,6 +33,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20211222';
 @import "components/dashboard/widget-item";
 @import "components/dashboard/widget-tophosts";
 @import "components/diff";
+@import "components/expandable-subfilter";
 @import "components/form-search";
 @import "components/inline-filter";
 @import "components/menu-main";
@@ -358,7 +359,7 @@ form {
 								background-color: rgba($font-color, .5);
 							}
 
-							.icon-wzrd-action {
+							.icon-wizard-action {
 								background-position: -165px -624px;
 							}
 
@@ -384,7 +385,7 @@ form {
 								border-bottom-color: rgba(0, 0, 0, .5);
 							}
 
-							.icon-wzrd-action {
+							.icon-wizard-action {
 								background-position: -165px -624px;
 							}
 
@@ -405,7 +406,7 @@ form {
 
 							[class*='icon-depend-'],
 							.icon-description,
-							.icon-wzrd-action {
+							.icon-wizard-action {
 								background-color: transparent;
 							}
 						}
@@ -515,7 +516,7 @@ form {
 				background-position: -49px -767px;
 			}
 
-			.icon-wzrd-action {
+			.icon-wizard-action {
 				background: url($sprite-path) no-repeat -6px -624px;
 				height: 12px;
 				min-height: 12px;
@@ -1935,6 +1936,22 @@ button {
 	}
 }
 
+.btn-tag {
+	@extend .tag;
+
+	min-height: unset;
+	outline: none;
+	border: none;
+
+	&:hover {
+		text-decoration: underline;
+		background-color: $ui-bg-selected-color;
+	}
+	&:focus {
+		background-color: $ui-bg-selected-color;
+	}
+}
+
 .btn-grey {
 	color: $btn-form-font-color;
 	background-color: $btn-form-bg-color;
@@ -2628,12 +2645,12 @@ $trigger-expression-tree-icons: (
 
 $form-icon-btn: (
 	cal: url($sprite-path) no-repeat -42px -834px,
-	wzrd-action: url($sprite-path) no-repeat -6px -617px
+	wizard-action: url($sprite-path) no-repeat -6px -617px
 );
 
 // Dynamically generated classes:
 //  .icon-cal
-//  .icon-wzrd-action
+//  .icon-wizard-action
 @each $form-icon-btn, $bgimage in $form-icon-btn {
 	.icon-#{$form-icon-btn} {
 		background: $transparent $bgimage;
