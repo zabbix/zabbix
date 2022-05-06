@@ -324,7 +324,10 @@ int	main(int argc, char **argv)
 #if defined(_WINDOWS)
 	char		*error = NULL;
 #endif
+	/* see description of 'optarg' in 'man 3 getopt' */
 	char		*zbx_optarg = NULL;
+
+	/* see description of 'optind' in 'man 3 getopt' */
 	int		zbx_optind = 0;
 #if !defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (SUCCEED != zbx_coredump_disable())

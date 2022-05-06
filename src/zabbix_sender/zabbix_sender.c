@@ -1009,7 +1009,11 @@ static void	parse_commandline(int argc, char **argv)
 	char		ch;
 	unsigned int	opt_mask = 0;
 	unsigned short	opt_count[256] = {0};
+
+	/* see description of 'optarg' in 'man 3 getopt' */
 	char		*zbx_optarg = NULL;
+
+	/* see description of 'optind' in 'man 3 getopt' */
 	int		zbx_optind = 0;
 
 	/* parse the command-line */

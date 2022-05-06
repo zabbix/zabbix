@@ -1,5 +1,5 @@
 /*
-NOTICE, this file was modified by Zabbix
+NOTE: this file was modified by Zabbix
 
 Getopt for GNU.
 NOTE: getopt is now part of the C library, so if you don't know what
@@ -553,9 +553,9 @@ static int	zbx_getopt_internal (int argc, char **argv, const char *optstring, co
 		*/
 		if (!long_only || argv[(*zbx_optind)][1] == '-'
 #ifdef GETOPT_COMPAT
-		|| argv[(*zbx_optind)][0] == '+'
+				|| argv[(*zbx_optind)][0] == '+'
 #endif /* GETOPT_COMPAT */
-		|| strchr (optstring, *nextchar) == NULL)
+				|| strchr (optstring, *nextchar) == NULL)
 		{
 			if (argv[(*zbx_optind)][1] == '-')
 			{

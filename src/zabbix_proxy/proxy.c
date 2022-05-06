@@ -945,7 +945,11 @@ int	main(int argc, char **argv)
 	ZBX_TASK_EX	t = {ZBX_TASK_START};
 	char		ch;
 	int		opt_c = 0, opt_r = 0;
+
+	/* see description of 'optarg' in 'man 3 getopt' */
 	char		*zbx_optarg = NULL;
+
+	/* see description of 'optind' in 'man 3 getopt' */
 	int		zbx_optind = 0;
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);

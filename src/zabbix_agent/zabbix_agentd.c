@@ -341,7 +341,10 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 #endif
 	unsigned short	opt_count[256] = {0};
 
+	/* see description of 'optarg' in 'man 3 getopt' */
 	char		*zbx_optarg = NULL;
+
+	/* see description of 'optind' in 'man 3 getopt' */
 	int		zbx_optind = 0;
 
 	t->task = ZBX_TASK_START;
