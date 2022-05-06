@@ -180,6 +180,7 @@ event_hostinfo_node_t;
 
 ZBX_VECTOR_DECL(id_xmlnode, zbx_id_xmlnode_t)
 ZBX_VECTOR_IMPL(id_xmlnode, zbx_id_xmlnode_t)
+ZBX_PTR_VECTOR_IMPL(vmware_resourcepool, zbx_vmware_resourcepool_t *)
 
 static zbx_hashset_t	evt_msg_strpool;
 
@@ -361,7 +362,8 @@ static zbx_vmware_propmap_t	hv_propmap[] = {
 			zbx_xmlnode_to_json),			/* ZBX_VMWARE_HVPROP_SENSOR */
 	{"config.network.dnsConfig", "concat("			/* ZBX_VMWARE_HVPROP_NET_NAME */
 			ZBX_XPATH_PROP_NAME("config.network.dnsConfig") "/*[local-name()='hostName']" ",'.',"
-			ZBX_XPATH_PROP_NAME("config.network.dnsConfig") "/*[local-name()='domainName'])", NULL}
+			ZBX_XPATH_PROP_NAME("config.network.dnsConfig") "/*[local-name()='domainName'])", NULL},
+	ZBX_HVPROPMAP("parent")					/* ZBX_VMWARE_HVPROP_PARENT */
 };
 
 static zbx_vmware_propmap_t	vm_propmap[] = {
@@ -391,7 +393,8 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 			vmware_service_get_vm_snapshot},
 	{"datastore", ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM)/* ZBX_VMWARE_VMPROP_DATASTOREID */
 			ZBX_XPATH_PROP_NAME_NODE("datastore") ZBX_XPATH_LN("ManagedObjectReference"), NULL},
-	ZBX_VMPROPMAP("summary.runtime.consolidationNeeded")	/* ZBX_VMWARE_VMPROP_CONSOLIDATION_NEEDED */
+	ZBX_VMPROPMAP("summary.runtime.consolidationNeeded"),	/* ZBX_VMWARE_VMPROP_CONSOLIDATION_NEEDED */
+	ZBX_VMPROPMAP("resourcePool")				/* ZBX_VMWARE_VMPROP_RESOURCEPOOL */
 };
 
 #define ZBX_XPATH_OBJECTS_BY_TYPE(type)									\
@@ -413,13 +416,23 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 		"/*[local-name()='val'][@type!='Datacenter']"						\
 	"]/*[local-name()='propSet'][*[local-name()='name'][text()='name']]/*[local-name()='val']"
 
-#define ZBX_XPATH_GET_FOLDER_NAME(id)									\
-		ZBX_XPATH_PROP_OBJECTS_ID(ZBX_VMWARE_SOAP_FOLDER, "[text()='" id "']") "/"		\
+#define ZBX_XPATH_GET_OBJECT_NAME(object, id)								\
+		ZBX_XPATH_PROP_OBJECTS_ID(object, "[text()='" id "']") "/"				\
 		ZBX_XPATH_PROP_NAME_NODE("name")
+
+#define ZBX_XPATH_GET_FOLDER_NAME(id)									\
+		ZBX_XPATH_GET_OBJECT_NAME(ZBX_VMWARE_SOAP_FOLDER, id)
 
 #define ZBX_XPATH_GET_FOLDER_PARENTID(id)								\
 		ZBX_XPATH_PROP_OBJECTS_ID(ZBX_VMWARE_SOAP_FOLDER, "[text()='" id "']") "/"		\
 		ZBX_XPATH_PROP_NAME_NODE("parent") "[@type='Folder']"
+
+#define ZBX_XPATH_GET_RESOURCEPOOL_NAME(id)								\
+		ZBX_XPATH_GET_OBJECT_NAME(ZBX_VMWARE_SOAP_RESOURCEPOOL, id)
+
+#define ZBX_XPATH_GET_RESOURCEPOOL_PARENTID(id)								\
+		ZBX_XPATH_PROP_OBJECTS_ID(ZBX_VMWARE_SOAP_RESOURCEPOOL, "[text()='" id "']") "/"	\
+		ZBX_XPATH_PROP_NAME_NODE("parent") "[@type='ResourcePool']"
 
 /* hypervisor hashset support */
 static zbx_hash_t	vmware_hv_hash(const void *data)
@@ -990,6 +1003,22 @@ static void	vmware_datacenter_shared_free(zbx_vmware_datacenter_t *datacenter)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: frees shared resources allocated to store resourcepool data       *
+ *                                                                            *
+ * Parameters: resourcepool   - [IN] the resourcepool                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_resourcepool_shared_free(zbx_vmware_resourcepool_t *resourcepool)
+{
+	vmware_shared_strfree(resourcepool->id);
+	vmware_shared_strfree(resourcepool->parentid);
+	vmware_shared_strfree(resourcepool->path);
+
+	__vm_shmem_free_func(resourcepool);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: frees shared resources allocated to store properties list         *
  *                                                                            *
  * Parameters: props     - [IN] the properties list                           *
@@ -1193,6 +1222,9 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
 
 		zbx_vector_vmware_datacenter_clear_ext(&data->datacenters, vmware_datacenter_shared_free);
 		zbx_vector_vmware_datacenter_destroy(&data->datacenters);
+
+		zbx_vector_vmware_resourcepool_clear_ext(&data->resourcepools, vmware_resourcepool_shared_free);
+		zbx_vector_vmware_resourcepool_destroy(&data->resourcepools);
 
 		if (NULL != data->error)
 			vmware_shared_strfree(data->error);
@@ -1405,6 +1437,27 @@ static zbx_vmware_datacenter_t	*vmware_datacenter_shared_dup(const zbx_vmware_da
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: copies vmware resourcepool object into shared memory              *
+ *                                                                            *
+ * Parameters: src   - [IN] the vmware resourcepool object                    *
+ *                                                                            *
+ * Return value: a duplicated vmware resourcepool object                      *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_resourcepool_t	*vmware_resourcepool_shared_dup(const zbx_vmware_resourcepool_t *src)
+{
+	zbx_vmware_resourcepool_t	*resourcepool;
+
+	resourcepool = (zbx_vmware_resourcepool_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_resourcepool_t));
+	resourcepool->id = vmware_shared_strdup(src->id);
+	resourcepool->parentid = vmware_shared_strdup(src->parentid);
+	resourcepool->path = vmware_shared_strdup(src->path);
+
+	return resourcepool;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: copies vmware virtual machine device object into shared memory    *
  *                                                                            *
  * Parameters: src   - [IN] the vmware device object                          *
@@ -1590,10 +1643,12 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 	VMWARE_VECTOR_CREATE(&data->events, ptr);
 	VMWARE_VECTOR_CREATE(&data->datastores, vmware_datastore);
 	VMWARE_VECTOR_CREATE(&data->datacenters, vmware_datacenter);
+	VMWARE_VECTOR_CREATE(&data->resourcepools, vmware_resourcepool);
 	zbx_vector_ptr_reserve(&data->clusters, src->clusters.values_num);
 	zbx_vector_ptr_reserve(&data->events, src->events.values_alloc);
 	zbx_vector_vmware_datastore_reserve(&data->datastores, src->datastores.values_num);
 	zbx_vector_vmware_datacenter_reserve(&data->datacenters, src->datacenters.values_num);
+	zbx_vector_vmware_resourcepool_reserve(&data->resourcepools, (size_t)src->resourcepools.values_num);
 
 	zbx_hashset_create_ext(&data->vms_index, 100, vmware_vm_hash, vmware_vm_compare, NULL, __vm_shmem_malloc_func,
 			__vm_shmem_realloc_func, __vm_shmem_free_func);
@@ -1613,6 +1668,12 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 	{
 		zbx_vector_vmware_datacenter_append(&data->datacenters,
 				vmware_datacenter_shared_dup(src->datacenters.values[i]));
+	}
+
+	for (i = 0; i < src->resourcepools.values_num; i++)
+	{
+		zbx_vector_vmware_resourcepool_append(&data->resourcepools,
+				vmware_resourcepool_shared_dup(src->resourcepools.values[i]));
 	}
 
 	zbx_hashset_iter_reset(&src->hvs, &iter);
@@ -1687,6 +1748,21 @@ static void	vmware_datacenter_free(zbx_vmware_datacenter_t *datacenter)
 	zbx_free(datacenter->name);
 	zbx_free(datacenter->id);
 	zbx_free(datacenter);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: frees resources allocated to store resourcepool data              *
+ *                                                                            *
+ * Parameters: resourcepool   - [IN] the resourcepool                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_resourcepool_free(zbx_vmware_resourcepool_t *resourcepool)
+{
+	zbx_free(resourcepool->id);
+	zbx_free(resourcepool->parentid);
+	zbx_free(resourcepool->path);
+	zbx_free(resourcepool);
 }
 
 /******************************************************************************
@@ -1854,6 +1930,9 @@ static void	vmware_data_free(zbx_vmware_data_t *data)
 
 	zbx_vector_vmware_datacenter_clear_ext(&data->datacenters, vmware_datacenter_free);
 	zbx_vector_vmware_datacenter_destroy(&data->datacenters);
+
+	zbx_vector_vmware_resourcepool_clear_ext(&data->resourcepools, vmware_resourcepool_free);
+	zbx_vector_vmware_resourcepool_destroy(&data->resourcepools);
 
 	zbx_free(data->error);
 	zbx_free(data);
@@ -3024,6 +3103,73 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: get resource pool parentid and path (chain of resource pool       *
+ *          names divided by '/')                                             *
+ *                                                                            *
+ * Parameters: xdoc     - [IN] the xml with all vm details                    *
+ *             r_id     - [IN] the resource pool id                           *
+ *             parentid - [OUT] the resource pool parent id                   *
+ *             path     - [OUT] the resource pool path                        *
+ *                                                                            *
+ * Return value: SUCCEED   - the operation has completed successfully         *
+ *               FAIL      - the operation has failed                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_service_get_resourcepool_data(xmlDoc *xdoc, const char *r_id, char **parentid, char **path)
+{
+	char	tmp[MAX_STRING_LEN], *id, *name;
+	int	ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() resource pool id:'%s'", __func__, r_id);
+	id = zbx_strdup(NULL, r_id);
+	*path = *parentid = NULL;
+
+	do
+	{
+		char	*id_esc;
+
+		id_esc = zbx_xml_escape_dyn(id);
+		zbx_free(id);
+		zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_GET_RESOURCEPOOL_NAME("%s"), id_esc);
+
+		if (NULL == (name = zbx_xml_doc_read_value(xdoc , tmp)))
+		{
+			zbx_free(*parentid);
+			zbx_free(*path);
+			zbx_free(id_esc);
+			ret = FAIL;
+			break;
+		}
+
+		zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_GET_RESOURCEPOOL_PARENTID("%s"), id_esc);
+		zbx_free(id_esc);
+		id = zbx_xml_doc_read_value(xdoc , tmp);
+
+		if (NULL == *path)	/* we always resolve the first 'ResourcePool' name */
+		{
+			if (NULL != id)
+				*parentid = zbx_strdup(*parentid, id);
+
+			*path = name;
+			name = NULL;
+		}
+		else if (NULL != id)	/* we do not include the last default 'ResourcePool' */
+		{
+			*path = zbx_dsprintf(*path, "%s/%s", name, *path);
+		}
+
+		zbx_free(name);
+	}
+	while (NULL != id);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s resource pool path: '%s', parentid: '%s'", __func__,
+			zbx_result_string(ret), ZBX_NULL2EMPTY_STR(*path), ZBX_NULL2EMPTY_STR(*parentid));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: create virtual machine object                                     *
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
@@ -3980,6 +4126,19 @@ int	vmware_dsname_compare(const void *d1, const void *d2)
 	const zbx_vmware_dsname_t	*ds2 = *(const zbx_vmware_dsname_t * const *)d2;
 
 	return strcmp(ds1->name, ds2->name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sorting function to sort Resource pool names vector by name       *
+ *                                                                            *
+ ******************************************************************************/
+int	vmware_resourcepool_compare_id(const void *r1, const void *r2)
+{
+	const zbx_vmware_resourcepool_t	*rp1 = *(const zbx_vmware_resourcepool_t * const *)r1;
+	const zbx_vmware_resourcepool_t	*rp2 = *(const zbx_vmware_resourcepool_t * const *)r2;
+
+	return strcmp(rp1->id, rp2->id);
 }
 
 /******************************************************************************
@@ -5128,17 +5287,17 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieves a list of vmware service clusters                       *
+ * Purpose: retrieves a list of vmware service clusters and resource pools    *
  *                                                                            *
  * Parameters: easyhandle   - [IN] the CURL handle                            *
- *             clusters     - [OUT] a pointer to the output variable          *
+ *             data         - [OUT] a pointer to the output variable          *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_get_clusters(CURL *easyhandle, xmlDoc **clusters, char **error)
+static int	vmware_service_get_cluster_data(CURL *easyhandle, xmlDoc **data, char **error)
 {
 #	define ZBX_POST_VCENTER_CLUSTER								\
 		ZBX_POST_VSPHERE_HEADER								\
@@ -5148,6 +5307,18 @@ static int	vmware_service_get_clusters(CURL *easyhandle, xmlDoc **clusters, char
 				"<ns0:propSet>"							\
 					"<ns0:type>ClusterComputeResource</ns0:type>"		\
 					"<ns0:pathSet>name</ns0:pathSet>"			\
+					"<ns0:pathSet>resourcePool</ns0:pathSet>"		\
+				"</ns0:propSet>"						\
+				"<ns0:propSet>"							\
+					"<ns0:type>ComputeResource</ns0:type>"			\
+					"<ns0:pathSet>resourcePool</ns0:pathSet>"		\
+					"<ns0:pathSet>name</ns0:pathSet>"			\
+				"</ns0:propSet>"						\
+				"<ns0:propSet>"							\
+					"<ns0:type>ResourcePool</ns0:type>"			\
+					"<ns0:pathSet>resourcePool</ns0:pathSet>"		\
+					"<ns0:pathSet>name</ns0:pathSet>"			\
+					"<ns0:pathSet>parent</ns0:pathSet>"			\
 				"</ns0:propSet>"						\
 				"<ns0:objectSet>"						\
 					"<ns0:obj type=\"Folder\">group-d1</ns0:obj>"		\
@@ -5226,6 +5397,9 @@ static int	vmware_service_get_clusters(CURL *easyhandle, xmlDoc **clusters, char
 						"<ns0:selectSet>"				\
 							"<ns0:name>rpToVm</ns0:name>"		\
 						"</ns0:selectSet>"				\
+						"<ns0:selectSet>"				\
+							"<ns0:name>rp</ns0:name>"		\
+						"</ns0:selectSet>"				\
 					"</ns0:selectSet>"					\
 					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
 						"<ns0:name>rpToRp</ns0:name>"			\
@@ -5254,6 +5428,15 @@ static int	vmware_service_get_clusters(CURL *easyhandle, xmlDoc **clusters, char
 						"<ns0:path>vm</ns0:path>"			\
 						"<ns0:skip>false</ns0:skip>"			\
 					"</ns0:selectSet>"					\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
+						"<ns0:name>rp</ns0:name>"			\
+						"<ns0:type>ResourcePool</ns0:type>"		\
+						"<ns0:path>resourcePool</ns0:path>"		\
+						"<ns0:skip>false</ns0:skip>"			\
+						"<ns0:selectSet>"				\
+							"<ns0:name>rp</ns0:name>"		\
+						"</ns0:selectSet>"				\
+					"</ns0:selectSet>"					\
 				"</ns0:objectSet>"						\
 			"</ns0:specSet>"							\
 			"<ns0:options/>"							\
@@ -5264,7 +5447,7 @@ static int	vmware_service_get_clusters(CURL *easyhandle, xmlDoc **clusters, char
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, ZBX_POST_VCENTER_CLUSTER, clusters, error))
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, ZBX_POST_VCENTER_CLUSTER, data, error))
 		goto out;
 
 	ret = SUCCEED;
@@ -5338,29 +5521,33 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: creates list of vmware cluster objects                            *
+ * Purpose: creates lists of vmware cluster and resource pool objects         *
  *                                                                            *
- * Parameters: easyhandle   - [IN] the CURL handle                            *
- *             clusters     - [OUT] a pointer to the resulting cluster vector *
- *             error        - [OUT] the error message in the case of failure  *
+ * Parameters: easyhandle    - [IN] the CURL handle                           *
+ *             clusters      - [OUT] a pointer to the resulting clusters      *
+ *                              vector                                        *
+ *             resourcepools - [OUT] a pointer to the resulting resource pool *
+ *                              vector                                        *
+ *             error         - [OUT] the error message in the case of failure *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_get_cluster_list(CURL *easyhandle, zbx_vector_ptr_t *clusters, char **error)
+static int	vmware_service_get_clusters_and_resourcepools(CURL *easyhandle, zbx_vector_ptr_t *clusters,
+		zbx_vector_vmware_resourcepool_t *resourcepools, char **error)
 {
-	char			xpath[MAX_STRING_LEN], *name;
-	xmlDoc			*cluster_data = NULL;
-	zbx_vector_str_t	ids;
-	zbx_vmware_cluster_t	*cluster;
+	char			xpath[MAX_STRING_LEN];
 	int			i, ret = FAIL;
+	xmlDoc			*cluster_data = NULL;
+	zbx_vector_str_t	ids, rpools_all, rpools_uniq;
+	zbx_vmware_cluster_t	*cluster;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_str_create(&ids);
 
-	if (SUCCEED != vmware_service_get_clusters(easyhandle, &cluster_data, error))
+	if (SUCCEED != vmware_service_get_cluster_data(easyhandle, &cluster_data, error))
 		goto out;
 
 	zbx_xml_read_values(cluster_data, "//*[@type='ClusterComputeResource']", &ids);
@@ -5368,7 +5555,7 @@ static int	vmware_service_get_cluster_list(CURL *easyhandle, zbx_vector_ptr_t *c
 
 	for (i = 0; i < ids.values_num; i++)
 	{
-		char	*status;
+		char	*status, *name;
 
 		zbx_snprintf(xpath, sizeof(xpath), "//*[@type='ClusterComputeResource'][.='%s']"
 				"/.." ZBX_XPATH_LN2("propSet", "val"), ids.values[i]);
@@ -5386,18 +5573,48 @@ static int	vmware_service_get_cluster_list(CURL *easyhandle, zbx_vector_ptr_t *c
 		cluster->id = zbx_strdup(NULL, ids.values[i]);
 		cluster->name = name;
 		cluster->status = status;
-
 		zbx_vector_ptr_append(clusters, cluster);
 	}
 
+	/* Add resource pools */
+
+	zbx_vector_str_create(&rpools_all);
+	zbx_vector_str_create(&rpools_uniq);
+	zbx_xml_read_values(cluster_data, "//*[@type='ResourcePool']", &rpools_all);
+	zbx_vector_str_sort(&rpools_all, ZBX_DEFAULT_STR_COMPARE_FUNC);
+	zbx_vector_str_append_array(&rpools_uniq, rpools_all.values, rpools_all.values_num);
+	zbx_vector_str_uniq(&rpools_uniq, ZBX_DEFAULT_STR_COMPARE_FUNC);
+	zbx_vector_vmware_resourcepool_reserve(resourcepools, (size_t)rpools_all.values_num);
+
+	for (i = 0; i < rpools_uniq.values_num; i++)
+	{
+		zbx_vmware_resourcepool_t	*rpool;
+
+		rpool = (zbx_vmware_resourcepool_t *)zbx_malloc(NULL, sizeof(zbx_vmware_resourcepool_t));
+		rpool->id = zbx_strdup(NULL, rpools_uniq.values[i]);
+
+		if (SUCCEED != vmware_service_get_resourcepool_data(cluster_data, rpool->id, &rpool->parentid,
+				&rpool->path))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot find resource pool name for id:%s", __func__,
+					rpool->id);
+		}
+
+		zbx_vector_vmware_resourcepool_append(resourcepools, rpool);
+	}
+
+	zbx_vector_vmware_resourcepool_sort(resourcepools, vmware_resourcepool_compare_id);
+	zbx_vector_str_clear_ext(&rpools_all, zbx_str_free);
+	zbx_vector_str_destroy(&rpools_all);
+	zbx_vector_str_destroy(&rpools_uniq);
 	ret = SUCCEED;
 out:
 	zbx_xml_free_doc(cluster_data);
 	zbx_vector_str_clear_ext(&ids, zbx_str_free);
 	zbx_vector_str_destroy(&ids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found:%d", __func__, zbx_result_string(ret),
-			clusters->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found cl:%d rp:%d", __func__, zbx_result_string(ret),
+			clusters->values_num, resourcepools->values_num);
 
 	return ret;
 }
@@ -5794,6 +6011,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	zbx_vector_ptr_create(&data->events);
 	zbx_vector_vmware_datastore_create(&data->datastores);
 	zbx_vector_vmware_datacenter_create(&data->datacenters);
+	zbx_vector_vmware_resourcepool_create(&data->resourcepools);
 
 	zbx_vector_str_create(&hvs);
 	zbx_vector_str_create(&dss);
@@ -5934,7 +6152,8 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	}
 
 	if (ZBX_VMWARE_TYPE_VCENTER == service->type &&
-			SUCCEED != vmware_service_get_cluster_list(easyhandle, &data->clusters, &data->error))
+			SUCCEED != vmware_service_get_clusters_and_resourcepools(easyhandle, &data->clusters,
+			&data->resourcepools, &data->error))
 	{
 		goto clean;
 	}

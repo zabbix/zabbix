@@ -2917,14 +2917,34 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			zbx_json_addstring(&json_data, "{#DATASTORE.NAME}", datastore->name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#DATASTORE.UUID}", datastore->uuid, ZBX_JSON_TYPE_STRING);
 
+			zbx_json_addstring(&json_data, "{#VM.RPOOL.ID}",
+					ZBX_NULL2EMPTY_STR(vm->props[ZBX_VMWARE_VMPROP_RESOURCEPOOL]),
+					ZBX_JSON_TYPE_STRING);
+
+			if (NULL != vm->props[ZBX_VMWARE_VMPROP_RESOURCEPOOL])
+			{
+				zbx_vmware_resourcepool_t	rpool_cmp;
+				int				idx;
+
+				rpool_cmp.id = vm->props[ZBX_VMWARE_VMPROP_RESOURCEPOOL];
+
+				if (FAIL != (idx = zbx_vector_vmware_resourcepool_bsearch(&service->data->resourcepools,
+						&rpool_cmp, vmware_resourcepool_compare_id)))
+				{
+					zbx_json_addstring(&json_data, "{#VM.RPOOL.PATH}",
+							ZBX_NULL2EMPTY_STR(service->data->resourcepools.values[idx]->path),
+							ZBX_JSON_TYPE_STRING);
+				}
+				else
+					zbx_json_addstring(&json_data, "{#VM.RPOOL.PATH}", "", ZBX_JSON_TYPE_STRING);
+			}
+
 			zbx_json_close(&json_data);
 		}
 	}
 
 	zbx_json_close(&json_data);
-
 	SET_STR_RESULT(result, zbx_strdup(NULL, json_data.buffer));
-
 	zbx_json_free(&json_data);
 
 	ret = SYSINFO_RET_OK;
