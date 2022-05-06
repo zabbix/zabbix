@@ -106,7 +106,6 @@ ZBX_PTR_VECTOR_IMPL(vmware_dsname, zbx_vmware_dsname_t *)
 ZBX_PTR_VECTOR_IMPL(custquery_param, zbx_vmware_custquery_param_t)
 ZBX_PTR_VECTOR_IMPL(vmware_dvswitch, zbx_vmware_dvswitch_t *)
 
-
 /* VMware service object name mapping for vcenter and vsphere installations */
 typedef struct
 {
@@ -4167,8 +4166,8 @@ static int	vmware_service_get_dvswitch_list(xmlDoc *doc, zbx_vector_vmware_dvswi
 	xmlXPathContext		*xpathCtx;
 	xmlXPathObject		*xpathObj;
 	xmlNodeSetPtr		nodeset;
-	char			*id, *name, *uuid;
 	zbx_vmware_dvswitch_t	*dvswitch;
+	char			*id, *name, *uuid;
 	int			i, ret = FAIL;
 
 	if (NULL == doc)
@@ -4396,10 +4395,10 @@ static int	vmware_service_get_hv_ds_dc_dvs_list(const zbx_vmware_service_t *serv
 		"</ns0:RetrievePropertiesEx>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
-	char				tmp[MAX_STRING_LEN * 2];
-	int				ret = FAIL;
 	xmlDoc				*doc = NULL;
 	zbx_property_collection_iter	*iter = NULL;
+	char				tmp[MAX_STRING_LEN * 2];
+	int				ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -5890,10 +5889,10 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_t
 			"</ns0:FetchDVPorts>"									\
 		ZBX_POST_VSPHERE_FOOTER
 
+	xmlDoc	*doc = NULL;
+	size_t	offset;
 	char	*error, tmp[MAX_STRING_LEN], criteria[MAX_STRING_LEN];
 	int	i, j;
-	size_t	offset;
-	xmlDoc	*doc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() dvs count:%d", __func__, cq_values->values_num);
 
