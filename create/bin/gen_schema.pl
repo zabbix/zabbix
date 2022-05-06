@@ -931,8 +931,7 @@ sub process
 		print "DELIMITER \$\$${eol}\n";
 	}
 
-	print $sequences.$sql_suffix;
-	print $triggers.$sql_suffix;
+	print $sequences . $triggers . $sql_suffix;
 	
 	if ($output{"database"} eq "mysql")
 	{
