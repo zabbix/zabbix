@@ -109,7 +109,8 @@ struct zbx_dbsync
 };
 
 void	zbx_dbsync_init_env(ZBX_DC_CONFIG *cache);
-void	zbx_dbsync_free_env(void);
+int	zbx_dbsync_prepare_env(unsigned char mode);
+void	zbx_dbsync_clear_env(void);
 
 void	zbx_dbsync_init(zbx_dbsync_t *sync, unsigned char mode);
 void	zbx_dbsync_clear(zbx_dbsync_t *sync);

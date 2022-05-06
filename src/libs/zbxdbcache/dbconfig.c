@@ -5420,7 +5420,7 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
  ******************************************************************************/
 void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 {
-	int		i, flags;
+	int		i, flags, changelog_num;
 	double		sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, idsec, isec, tisec, pisec, tsec, dsec, fsec, expr_sec,
 			csec2, hsec2, hisec2, ifsec2, idsec2, isec2, tisec2, pisec2, tsec2, dsec2, fsec2, expr_sec2,
 			action_sec, action_sec2, action_op_sec, action_op_sec2, action_condition_sec,
@@ -5428,7 +5428,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 			correlation_sec, correlation_sec2, corr_condition_sec, corr_condition_sec2, corr_operation_sec,
 			corr_operation_sec2, hgroups_sec, hgroups_sec2, itempp_sec, itempp_sec2, itemscrp_sec,
 			itemscrp_sec2, total, total2, update_sec, maintenance_sec, maintenance_sec2, item_tag_sec,
-			item_tag_sec2, um_cache_sec, queues_sec;
+			item_tag_sec2, um_cache_sec, queues_sec, changelog_sec;
 
 	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
 			template_items_sync, prototype_items_sync, item_discovery_sync, triggers_sync, tdep_sync,
@@ -5447,7 +5447,9 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 
 	config->sync_start_ts = time(NULL);
 
-	zbx_dbsync_init_env(config);
+	sec = zbx_time();
+	changelog_num = zbx_dbsync_prepare_env(mode);
+	changelog_sec = zbx_time() - sec;
 
 	if (ZBX_DBSYNC_INIT == mode)
 	{
@@ -5876,6 +5878,9 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 				correlation_sec2 + corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2 +
 				itempp_sec2 + maintenance_sec2 + item_tag_sec2 + update_sec + um_cache_sec;
 
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() changelog  : sql:" ZBX_FS_DBL " sec (%d records)",
+				__func__, changelog_sec, changelog_num);
+
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, csec, csec2, config_sync.add_num, config_sync.update_num,
@@ -6186,7 +6191,7 @@ out:
 	if (ZBX_DBSYNC_INIT == mode)
 		zbx_hashset_destroy(&trend_queue);
 
-	zbx_dbsync_free_env();
+	zbx_dbsync_clear_env();
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		DCdump_configuration();
@@ -6654,6 +6659,8 @@ int	init_configuration_cache(char **error)
 	}
 	else
 		config->session_token = NULL;
+
+	zbx_dbsync_init_env(config);
 
 #undef CREATE_HASHSET
 #undef CREATE_HASHSET_EXT

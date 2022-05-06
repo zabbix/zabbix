@@ -231,8 +231,11 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 #elif defined(HAVE_POSTGRESQL)
 #	define ZBX_DB_TIMESTAMP()	"cast(extract(epoch from now()) as int)"
 #	define ZBX_DB_CHAR_LENGTH(str)	"char_length(" #str ")"
-#else /* HAVE_ORACLE */
+#elif defined(HAVE_ORACLE)
 #	define ZBX_DB_TIMESTAMP()	"(cast(sys_extract_utc(systimestamp) as date) - date'1970-01-01') * 86400"
+#	define ZBX_DB_CHAR_LENGTH(str)	"length(" #str ")"
+#elif
+#	define ZBX_DB_TIMESTAMP()	"cast(strftime('%s', 'now') as integer)"
 #	define ZBX_DB_CHAR_LENGTH(str)	"length(" #str ")"
 #endif
 

@@ -25,10 +25,46 @@
 #include "base64.h"
 #include "zbxeval.h"
 
+#define ZBX_DBSYNC_OBJ_HOST		1
+#define ZBX_DBSYNC_OBJ_HOST_TAG		2
+#define ZBX_DBSYNC_OBJ_ITEM		3
+#define ZBX_DBSYNC_OBJ_ITEM_TAG		4
+#define ZBX_DBSYNC_OBJ_TRIGGER		5
+#define ZBX_DBSYNC_OBJ_TRIGGER_TAG	6
+#define ZBX_DBSYNC_OBJ_FUNCTION		7
+#define ZBX_DBSYNC_OBJ_ITEM_PREPROC	8
+
+/* number of dbsync objects - keep in sync with above defines */
+#define ZBX_DBSYNC_OBJ_COUNT		8
+
+#define ZBX_DBSYNC_JOURNAL(X)		(X - 1)
+
+#define ZBX_DBSYNC_CHANGELOG_PRUNE_INTERVAL	SEC_PER_MIN * 10
+#define ZBX_DBSYNC_CHANGELOG_MAX_AGE		SEC_PER_HOUR
+
 typedef struct
 {
-	zbx_hashset_t	strpool;
-	ZBX_DC_CONFIG	*cache;
+	zbx_uint64_t	changelogid;
+	int		clock;
+}
+zbx_dbsync_changelog_t;
+
+typedef struct
+{
+	zbx_vector_uint64_t	inserts;
+	zbx_vector_uint64_t	updates;
+	zbx_vector_uint64_t	deletes;
+}
+zbx_dbsync_journal_t;
+
+typedef struct
+{
+	zbx_hashset_t		strpool;
+	ZBX_DC_CONFIG		*cache;
+
+	zbx_hashset_t		changelog;
+
+	zbx_dbsync_journal_t	journals[ZBX_DBSYNC_OBJ_COUNT];
 }
 zbx_dbsync_env_t;
 
@@ -231,15 +267,154 @@ static char	**dbsync_preproc_row(zbx_dbsync_t *sync, char **row)
 	return sync->row;
 }
 
+void	zbx_dbsync_journal_init(zbx_dbsync_journal_t *journal)
+{
+	zbx_vector_uint64_create(&journal->inserts);
+	zbx_vector_uint64_create(&journal->updates);
+	zbx_vector_uint64_create(&journal->deletes);
+}
+
+void	zbx_dbsync_journal_destroy(zbx_dbsync_journal_t *journal)
+{
+	zbx_vector_uint64_destroy(&journal->inserts);
+	zbx_vector_uint64_destroy(&journal->updates);
+	zbx_vector_uint64_destroy(&journal->deletes);
+}
+
 void	zbx_dbsync_init_env(ZBX_DC_CONFIG *cache)
 {
 	dbsync_env.cache = cache;
-	zbx_hashset_create(&dbsync_env.strpool, 100, dbsync_strpool_hash_func, dbsync_strpool_compare_func);
+	zbx_hashset_create(&dbsync_env.changelog, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
-void	zbx_dbsync_free_env(void)
+static void	dbsync_prune_changelog()
 {
+	static int		last_prune_time;
+	int			now;
+	zbx_dbsync_changelog_t	*changelog;
+	DB_ROW			row;
+	DB_RESULT		result;
+
+	now = time(NULL);
+
+	if (0 == last_prune_time)
+	{
+		last_prune_time = now;
+		return;
+	}
+
+	if (now - last_prune_time < ZBX_DBSYNC_CHANGELOG_PRUNE_INTERVAL)
+		return;
+
+	last_prune_time = now;
+
+#ifndef HAVE_ORACLE
+	result = DBselect("select %s", ZBX_DB_TIMESTAMP());
+#else
+	result = DBselect("select %s from dual", ZBX_DB_TIMESTAMP());
+#endif
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		int	changelog_num;
+
+		changelog_num = dbsync_env.changelog.num_data;
+		now = atoi(row[0]);
+
+		if (ZBX_DB_OK <= DBexecute("delete from changelog where clock<%d", now - ZBX_DBSYNC_CHANGELOG_MAX_AGE))
+		{
+			zbx_hashset_iter_t	iter;
+
+			zbx_hashset_iter_reset(&dbsync_env.changelog, &iter);
+			while (NULL != (changelog = (zbx_dbsync_changelog_t *)zbx_hashset_iter_next(&iter)))
+			{
+				if (now - changelog->clock > ZBX_DBSYNC_CHANGELOG_MAX_AGE)
+					zbx_hashset_iter_remove(&iter);
+			}
+
+			zabbix_log(LOG_LEVEL_DEBUG, "removed %d old changelog records",
+					changelog_num - dbsync_env.changelog.num_data);
+		}
+	}
+
+	DBfree_result(result);
+}
+
+int	zbx_dbsync_prepare_env(unsigned char mode)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_dbsync_changelog_t	changelog_local;
+	void			*changelog = NULL;
+	int			changelog_num;
+	size_t			i;
+
+	zbx_hashset_create(&dbsync_env.strpool, 100, dbsync_strpool_hash_func, dbsync_strpool_compare_func);
+
+	for (i = 0; i < ARRSIZE(dbsync_env.journals); i++)
+		zbx_dbsync_journal_init(&dbsync_env.journals[i]);
+
+	dbsync_prune_changelog();
+	changelog_num = dbsync_env.changelog.num_data;
+
+	result = DBselect("select changelogid,object,objectid,operation,clock from changelog");
+
+	if (ZBX_DBSYNC_INIT == mode)
+	{
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_DBROW2UINT64(changelog_local.changelogid, row[0]);
+			changelog_local.clock = atoi(row[4]);
+			zbx_hashset_insert(&dbsync_env.changelog, &changelog_local, sizeof(changelog_local));
+		}
+	}
+	else
+	{
+		while (NULL != (row = DBfetch(result)))
+		{
+			int			operation;
+			zbx_uint64_t		objectid;
+			zbx_dbsync_journal_t	*journal;
+
+			ZBX_DBROW2UINT64(changelog_local.changelogid, row[0]);
+
+			if (NULL != zbx_hashset_search(&dbsync_env.changelog, &changelog_local))
+				continue;
+
+			changelog_local.clock = atoi(row[4]);
+			zbx_hashset_insert(&dbsync_env.changelog, &changelog_local, sizeof(changelog_local));
+
+			journal = &dbsync_env.journals[ZBX_DBSYNC_JOURNAL(atoi(row[1]))];
+			ZBX_DBROW2UINT64(objectid, row[2]);
+			operation = atoi(row[3]);
+
+			switch (operation)
+			{
+				case ZBX_DBSYNC_ROW_ADD:
+					zbx_vector_uint64_append(&journal->inserts, objectid);
+					break;
+				case ZBX_DBSYNC_ROW_UPDATE:
+					zbx_vector_uint64_append(&journal->updates, objectid);
+					break;
+				case ZBX_DBSYNC_ROW_REMOVE:
+					zbx_vector_uint64_append(&journal->deletes, objectid);
+					break;
+			}
+		}
+	}
+	DBfree_result(result);
+
+	return dbsync_env.changelog.num_data - changelog_num;
+}
+
+void	zbx_dbsync_clear_env(void)
+{
+	size_t	i;
+
 	zbx_hashset_destroy(&dbsync_env.strpool);
+
+	for (i = 0; i < ARRSIZE(dbsync_env.journals); i++)
+		zbx_dbsync_journal_destroy(&dbsync_env.journals[i]);
 }
 
 /******************************************************************************
