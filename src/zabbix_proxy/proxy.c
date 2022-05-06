@@ -946,6 +946,50 @@ static const char	*get_pid_file_path(void)
 	return CONFIG_PID_FILE;
 }
 
+static void	zbx_on_exit(int ret)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
+
+	if (NULL != threads)
+	{
+		zbx_threads_wait(threads, threads_flags, threads_num, ret); /* wait for all child processes to exit */
+		zbx_free(threads);
+		zbx_free(threads_flags);
+	}
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+	zbx_locks_disable();
+#endif
+	free_metrics();
+	zbx_ipc_service_free_env();
+
+	DBconnect(ZBX_DB_CONNECT_EXIT);
+	free_database_cache(ZBX_SYNC_ALL);
+	free_configuration_cache();
+	DBclose();
+
+	DBdeinit();
+
+	/* free vmware support */
+	zbx_vmware_destroy();
+
+	free_selfmon_collector();
+	free_proxy_history_lock();
+
+	zbx_unload_modules();
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Proxy stopped. Zabbix %s (revision %s).",
+			ZABBIX_VERSION, ZABBIX_REVISION);
+
+	zabbix_close_log();
+
+	zbx_locks_destroy();
+
+#if defined(PS_OVERWRITE_ARGV)
+	setproctitle_free_env();
+#endif
+	exit(EXIT_SUCCESS);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: executes proxy processes                                          *
@@ -1456,49 +1500,4 @@ out:
 	zbx_on_exit(ZBX_EXIT_STATUS());
 
 	return SUCCEED;
-}
-
-void	zbx_on_exit(int ret)
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
-
-	if (NULL != threads)
-	{
-		zbx_threads_wait(threads, threads_flags, threads_num, ret); /* wait for all child processes to exit */
-		zbx_free(threads);
-		zbx_free(threads_flags);
-	}
-#ifdef HAVE_PTHREAD_PROCESS_SHARED
-	zbx_locks_disable();
-#endif
-	free_metrics();
-	zbx_ipc_service_free_env();
-
-	DBconnect(ZBX_DB_CONNECT_EXIT);
-	free_database_cache(ZBX_SYNC_ALL);
-	free_configuration_cache();
-	DBclose();
-
-	DBdeinit();
-
-	/* free vmware support */
-	zbx_vmware_destroy();
-
-	free_selfmon_collector();
-	free_proxy_history_lock();
-
-	zbx_unload_modules();
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Proxy stopped. Zabbix %s (revision %s).",
-			ZABBIX_VERSION, ZABBIX_REVISION);
-
-	zabbix_close_log();
-
-	zbx_locks_destroy();
-
-#if defined(PS_OVERWRITE_ARGV)
-	setproctitle_free_env();
-#endif
-
-	exit(EXIT_SUCCESS);
 }

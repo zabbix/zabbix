@@ -1045,6 +1045,26 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 }
 #endif	/* _WINDOWS */
 
+static void	zbx_on_exit(int ret)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
+
+	zbx_free_service_resources(ret);
+
+#if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+	zbx_tls_free();
+	zbx_tls_library_deinit();	/* deinitialize crypto library from parent thread */
+#endif
+#if defined(PS_OVERWRITE_ARGV)
+	setproctitle_free_env();
+#endif
+#ifdef _WINDOWS
+	while (0 == WSACleanup())
+		;
+#endif
+	exit(EXIT_SUCCESS);
+}
+
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t	listen_sock;
@@ -1299,27 +1319,6 @@ void	zbx_free_service_resources(int ret)
 #ifndef _WINDOWS
 	zbx_locks_destroy();
 #endif
-}
-
-void	zbx_on_exit(int ret)
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
-
-	zbx_free_service_resources(ret);
-
-#if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	zbx_tls_free();
-	zbx_tls_library_deinit();	/* deinitialize crypto library from parent thread */
-#endif
-#if defined(PS_OVERWRITE_ARGV)
-	setproctitle_free_env();
-#endif
-#ifdef _WINDOWS
-	while (0 == WSACleanup())
-		;
-#endif
-
-	exit(EXIT_SUCCESS);
 }
 
 int	main(int argc, char **argv)

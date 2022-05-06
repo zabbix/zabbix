@@ -1009,6 +1009,70 @@ static const char	*get_pid_file_path(void)
 	return CONFIG_PID_FILE;
 }
 
+static void	zbx_on_exit(int ret)
+{
+	char	*error = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
+
+	if (NULL != threads)
+	{
+		zbx_threads_wait(threads, threads_flags, threads_num, ret);	/* wait for all child processes to exit */
+		zbx_free(threads);
+		zbx_free(threads_flags);
+	}
+
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+		zbx_locks_disable();
+#endif
+
+	if (SUCCEED != zbx_ha_stop(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
+		zbx_free(error);
+		zbx_ha_kill();
+	}
+
+	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
+	{
+		free_metrics();
+		zbx_ipc_service_free_env();
+
+		DBconnect(ZBX_DB_CONNECT_EXIT);
+
+		free_database_cache(ZBX_SYNC_ALL);
+
+		DBclose();
+
+		free_configuration_cache();
+
+		/* free history value cache */
+		zbx_vc_destroy();
+
+		/* free vmware support */
+		zbx_vmware_destroy();
+
+		free_selfmon_collector();
+	}
+
+	zbx_uninitialize_events();
+
+	zbx_unload_modules();
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
+			ZABBIX_VERSION, ZABBIX_REVISION);
+
+	zabbix_close_log();
+
+	zbx_locks_destroy();
+
+#if defined(PS_OVERWRITE_ARGV)
+	setproctitle_free_env();
+#endif
+
+	exit(EXIT_SUCCESS);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: executes server processes                                         *
@@ -1908,68 +1972,4 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_on_exit(ZBX_EXIT_STATUS());
 
 	return SUCCEED;
-}
-
-void	zbx_on_exit(int ret)
-{
-	char	*error = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
-
-	if (NULL != threads)
-	{
-		zbx_threads_wait(threads, threads_flags, threads_num, ret);	/* wait for all child processes to exit */
-		zbx_free(threads);
-		zbx_free(threads_flags);
-	}
-
-#ifdef HAVE_PTHREAD_PROCESS_SHARED
-		zbx_locks_disable();
-#endif
-
-	if (SUCCEED != zbx_ha_stop(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
-		zbx_free(error);
-		zbx_ha_kill();
-	}
-
-	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
-	{
-		free_metrics();
-		zbx_ipc_service_free_env();
-
-		DBconnect(ZBX_DB_CONNECT_EXIT);
-
-		free_database_cache(ZBX_SYNC_ALL);
-
-		DBclose();
-
-		free_configuration_cache();
-
-		/* free history value cache */
-		zbx_vc_destroy();
-
-		/* free vmware support */
-		zbx_vmware_destroy();
-
-		free_selfmon_collector();
-	}
-
-	zbx_uninitialize_events();
-
-	zbx_unload_modules();
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
-			ZABBIX_VERSION, ZABBIX_REVISION);
-
-	zabbix_close_log();
-
-	zbx_locks_destroy();
-
-#if defined(PS_OVERWRITE_ARGV)
-	setproctitle_free_env();
-#endif
-
-	exit(EXIT_SUCCESS);
 }

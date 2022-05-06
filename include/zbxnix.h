@@ -37,7 +37,6 @@ int	zbx_coredump_disable(void);
 #endif
 
 typedef void	(*zbx_on_exit_t)(int);
-void	zbx_on_exit(int ret); /* calls exit() at the end! */
 void	zbx_fail_sig_exiting(void);
 void	zbx_succeed_sig_exiting(void);
 int	ZBX_IS_RUNNING(void);
