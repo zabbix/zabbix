@@ -39,7 +39,7 @@ class CControllerWidgetClockView extends CControllerWidget {
 			'type' => $fields['clock_type'],
 			'time' => null,
 			'time_zone_offset' => null,
-			'date' => null,
+			'date' => date(ZBX_DATE),
 			'time_zone' => TIMEZONE_DEFAULT_LOCAL,
 			'is_enabled' => true,
 			'critical_error' => null
@@ -268,7 +268,7 @@ class CControllerWidgetClockView extends CControllerWidget {
 					$now = new DateTime($last_value['value']);
 
 					if ($this->showDate($fields)) {
-						$clock['date'] = $now->format('Y/m/d');
+						$clock['date'] = $now->format(ZBX_DATE);
 					}
 
 					$clock['time_zone_offset'] = (int) $now->format('Z');

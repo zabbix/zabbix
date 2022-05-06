@@ -45,23 +45,16 @@ else {
 				switch ($show) {
 					case WIDGET_CLOCK_SHOW_DATE:
 						$div->addClass('clock-date');
-						if ($clock_data['date'] !== null) {
-							$div->addItem($clock_data['date']);
-						}
 						$styles = $data['styles']['date'];
 						break;
 
 					case WIDGET_CLOCK_SHOW_TIME:
 						$div->addClass('clock-time');
-						$div->addItem('00:00:00');
 						$styles = $data['styles']['time'];
 						break;
 
 					case WIDGET_CLOCK_SHOW_TIMEZONE:
 						$div->addClass('clock-time-zone');
-						if ($clock_data['time_zone'] !== null && $clock_data['time_zone'] !== TIMEZONE_DEFAULT_LOCAL) {
-							$div->addItem($clock_data['time_zone']);
-						}
 						$styles = $data['styles']['timezone'];
 						break;
 

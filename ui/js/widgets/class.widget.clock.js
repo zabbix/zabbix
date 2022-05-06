@@ -115,6 +115,7 @@ class CWidgetClock extends CWidget {
 			}
 
 			if (this._clock_type === CWidgetClock.TYPE_DIGITAL) {
+				this._date = response.clock_data.date;
 				this._time_zone = response.clock_data.time_zone;
 				this._show_seconds = response.clock_data.seconds;
 				this._time_format = response.clock_data.time_format;
@@ -143,14 +144,12 @@ class CWidgetClock extends CWidget {
 				break;
 
 			case CWidgetClock.TYPE_DIGITAL:
-				if (this._time_zone === CWidgetClock.TIMEZONE_LOCAL) {
-					if (this._show.includes(CWidgetClock.SHOW_DATE)) {
-						this._fillDate();
-					}
+				if (this._show.includes(CWidgetClock.SHOW_DATE)) {
+					this._fillDate();
+				}
 
-					if (this._show.includes(CWidgetClock.SHOW_TIMEZONE)) {
-						this._fillTimeZone();
-					}
+				if (this._show.includes(CWidgetClock.SHOW_TIMEZONE)) {
+					this._fillTimeZone();
 				}
 
 				this._interval_id = setInterval(() => this._clockDigitalUpdate(), 1000);
@@ -223,12 +222,7 @@ class CWidgetClock extends CWidget {
 			return;
 		}
 
-		const now = new Date();
-		const year = now.getFullYear().toString();
-		const month = (now.getMonth() + 1).toString().padStart(2, '0');
-		const day = now.getDate().toString().padStart(2, '0');
-
-		clock_date.textContent = `${year}-${month}-${day}`;
+		clock_date.textContent = this._date;
 	}
 
 	_fillTimeZone() {
@@ -238,25 +232,31 @@ class CWidgetClock extends CWidget {
 			return;
 		}
 
-		const now = new Date();
-		let time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+		let timezone_text = this._time_zone;
 
-		if (this._tzone_format === CWidgetClock.TIMEZONE_SHORT) {
-			const pos = time_zone.lastIndexOf('/');
+		if (this._time_zone === CWidgetClock.TIMEZONE_LOCAL) {
+			const now = new Date();
+			let time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-			if (pos !== -1) {
-				time_zone = time_zone.substring(pos + 1);
+			if (this._tzone_format === CWidgetClock.TIMEZONE_SHORT) {
+				const pos = time_zone.lastIndexOf('/');
+
+				if (pos !== -1) {
+					time_zone = time_zone.substring(pos + 1);
+				}
 			}
+			else {
+				const offset = now.getTimezoneOffset();
+
+				const hours = Math.floor(Math.abs(offset) / 60).toString().padStart(2, '0');
+				const minutes = (Math.abs(offset) % 60).toString().padStart(2, '0');
+
+				time_zone = `(UTC${offset > 0 ? '-' : '+'}${hours}:${minutes}) ${time_zone}`;
+			}
+
+			timezone_text = time_zone.replace(/_/g, ' ');
 		}
-		else {
-			const offset = now.getTimezoneOffset();
 
-			const hours = Math.floor(Math.abs(offset) / 60).toString().padStart(2, '0');
-			const minutes = (Math.abs(offset) % 60).toString().padStart(2, '0');
-
-			time_zone = `(UTC${offset > 0 ? '-' : '+'}${hours}:${minutes}) ${time_zone}`;
-		}
-
-		clock_time_zone.textContent = time_zone.replace(/_/g, ' ');
+		clock_time_zone.textContent = timezone_text;
 	}
 }
