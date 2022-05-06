@@ -1,8 +1,16 @@
 Changes for 6.2.0beta2
 
 New features:
+.......PS. [ZBXNEXT-2591] added resource pool path to vmware.vm.discovery (asestakovs)
+.......PS. [ZBXNEXT-2043] added support for collecting vmware snapshot information and new items vmware.vm.snapshot.get and vmware.vm.consolidationneeded (MVekslers)
+.......PS. [ZBXNEXT-2012] added additional NIC counters for VMware monitoring (asestakovs)
+.........T [ZBXNEXT-7607] added template Envoy Proxy by HTTP (ychukina)
+A.F....... [ZBXNEXT-7476] disabled php 8 strict type validation (ashubin)
 
 Bug fixes:
+.........T [ZBX-20982] fixed api request by coordinates in openweathermap template (vkhaliev)
+........S. [ZBX-20918] moved final history/trends cache sync in main process to be done before stopping HA (wiper)
+..F....... [ZBX-20458] fixed broken host link not opening in Inventory (rdetlavs)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.0beta1
