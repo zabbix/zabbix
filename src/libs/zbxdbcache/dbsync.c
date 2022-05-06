@@ -42,6 +42,8 @@
 #define ZBX_DBSYNC_CHANGELOG_PRUNE_INTERVAL	SEC_PER_MIN * 10
 #define ZBX_DBSYNC_CHANGELOG_MAX_AGE		SEC_PER_HOUR
 
+#define ZBX_DBSYNC_BATCH_SIZE			1000
+
 typedef struct
 {
 	zbx_uint64_t	changelogid;
@@ -345,7 +347,6 @@ int	zbx_dbsync_prepare_env(unsigned char mode)
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_dbsync_changelog_t	changelog_local;
-	void			*changelog = NULL;
 	int			changelog_num;
 	size_t			i;
 
@@ -415,6 +416,43 @@ void	zbx_dbsync_clear_env(void)
 
 	for (i = 0; i < ARRSIZE(dbsync_env.journals); i++)
 		zbx_dbsync_journal_destroy(&dbsync_env.journals[i]);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get rows changed since last sync                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	dbsync_get_rows(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *field, const char *order, zbx_vector_uint64_t *ids, unsigned char tag)
+{
+	DB_ROW		dbrow;
+	DB_RESULT	result;
+	char		**row;
+	size_t		sql_offset_reset = *sql_offset;
+	zbx_uint64_t	rowid, *batch;
+	int		batch_size;
+
+	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	for (batch = ids->values; batch < ids->values + ids->values_num; batch += ZBX_DBSYNC_BATCH_SIZE)
+	{
+		batch_size = MIN(ZBX_DBSYNC_BATCH_SIZE, ids->values + ids->values_num - batch);
+		DBadd_condition_alloc(sql, sql_alloc, sql_offset, field, batch, batch_size);
+		if (NULL != order)
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, order);
+
+		result = DBselect("%s", *sql);
+		*sql_offset = sql_offset_reset;
+
+		while (NULL != (dbrow = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(rowid, dbrow[0]);
+			if (NULL != (row = dbsync_preproc_row(sync, dbrow)))
+				dbsync_add_row(sync, rowid, tag, row);
+		}
+		DBfree_result(result);
+	}
 }
 
 /******************************************************************************
@@ -736,117 +774,6 @@ int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compares hosts table row with cached configuration data           *
- *                                                                            *
- * Parameter: host  - [IN] the cached host                                    *
- *            dbrow - [IN] the database row                                   *
- *                                                                            *
- * Return value: SUCCEED - the row matches configuration data                 *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	dbsync_compare_host(ZBX_DC_HOST *host, const DB_ROW dbrow)
-{
-	signed char	ipmi_authtype;
-	unsigned char	ipmi_privilege;
-	ZBX_DC_IPMIHOST	*ipmihost;
-	ZBX_DC_PROXY	*proxy;
-
-	if (FAIL == dbsync_compare_uint64(dbrow[1], host->proxy_hostid))
-	{
-		host->update_items = 1;
-		return FAIL;
-	}
-
-	if (FAIL == dbsync_compare_uchar(dbrow[10], host->status))
-	{
-		host->update_items = 1;
-		return FAIL;
-	}
-
-	host->update_items = 0;
-
-	if (FAIL == dbsync_compare_str(dbrow[2], host->host))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_str(dbrow[11], host->name))
-		return FAIL;
-
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (FAIL == dbsync_compare_str(dbrow[15], host->tls_issuer))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_str(dbrow[16], host->tls_subject))
-		return FAIL;
-
-	if ('\0' == *dbrow[17] || '\0' == *dbrow[18])
-	{
-		if (NULL != host->tls_dc_psk)
-			return FAIL;
-	}
-	else
-	{
-		if (NULL == host->tls_dc_psk)
-			return FAIL;
-
-		if (FAIL == dbsync_compare_str(dbrow[17], host->tls_dc_psk->tls_psk_identity))
-			return FAIL;
-
-		if (FAIL == dbsync_compare_str(dbrow[18], host->tls_dc_psk->tls_psk))
-			return FAIL;
-	}
-
-#endif
-	if (FAIL == dbsync_compare_uchar(dbrow[13], host->tls_connect))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_uchar(dbrow[14], host->tls_accept))
-		return FAIL;
-
-	/* IPMI hosts */
-
-	ipmi_authtype = (signed char)atoi(dbrow[3]);
-	ipmi_privilege = (unsigned char)atoi(dbrow[4]);
-
-	if (ZBX_IPMI_DEFAULT_AUTHTYPE != ipmi_authtype || ZBX_IPMI_DEFAULT_PRIVILEGE != ipmi_privilege ||
-			'\0' != *dbrow[5] || '\0' != *dbrow[6])	/* useipmi */
-	{
-		if (NULL == (ipmihost = (ZBX_DC_IPMIHOST *)zbx_hashset_search(&dbsync_env.cache->ipmihosts,
-				&host->hostid)))
-		{
-			return FAIL;
-		}
-
-		if (ipmihost->ipmi_authtype != ipmi_authtype)
-			return FAIL;
-
-		if (ipmihost->ipmi_privilege != ipmi_privilege)
-			return FAIL;
-
-		if (FAIL == dbsync_compare_str(dbrow[5], ipmihost->ipmi_username))
-			return FAIL;
-
-		if (FAIL == dbsync_compare_str(dbrow[6], ipmihost->ipmi_password))
-			return FAIL;
-	}
-	else if (NULL != zbx_hashset_search(&dbsync_env.cache->ipmihosts, &host->hostid))
-		return FAIL;
-
-	/* proxies */
-	if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&dbsync_env.cache->proxies, &host->hostid)))
-	{
-		if (FAIL == dbsync_compare_str(dbrow[15 + ZBX_HOST_TLS_OFFSET], proxy->proxy_address))
-			return FAIL;
-
-		if (FAIL == dbsync_compare_uchar(dbrow[16 + ZBX_HOST_TLS_OFFSET], proxy->auto_compress))
-			return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: compares hosts table with cached configuration data               *
  *          and populates the changeset                                       *
  *                                                                            *
@@ -858,15 +785,14 @@ static int	dbsync_compare_host(ZBX_DC_HOST *host, const DB_ROW dbrow)
  ******************************************************************************/
 int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 {
-	DB_ROW			dbrow;
-	DB_RESULT		result;
-	zbx_hashset_t		ids;
-	zbx_hashset_iter_t	iter;
-	zbx_uint64_t		rowid;
-	ZBX_DC_HOST		*host;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	int			i, ret = SUCCEED;
+	zbx_dbsync_journal_t	*journal;
+
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (NULL == (result = DBselect(
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hostid,proxy_hostid,host,ipmi_authtype,ipmi_privilege,ipmi_username,"
 				"ipmi_password,maintenance_status,maintenance_type,maintenance_from,"
 				"status,name,lastaccess,tls_connect,tls_accept,tls_issuer,tls_subject,"
@@ -876,14 +802,11 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 				" and flags<>%d",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 			HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE,
-			ZBX_FLAG_DISCOVERY_PROTOTYPE)))
-	{
-		return FAIL;
-	}
+			ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	dbsync_prepare(sync, 22, NULL);
 #else
-	if (NULL == (result = DBselect(
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hostid,proxy_hostid,host,ipmi_authtype,ipmi_privilege,ipmi_username,"
 				"ipmi_password,maintenance_status,maintenance_type,maintenance_from,"
 				"status,name,lastaccess,tls_connect,tls_accept,"
@@ -893,50 +816,47 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 				" and flags<>%d",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 			HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE,
-			ZBX_FLAG_DISCOVERY_PROTOTYPE)))
-	{
-		return FAIL;
-	}
+			ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	dbsync_prepare(sync, 18, NULL);
 #endif
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		sync->dbresult = result;
-		return SUCCEED;
+		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+			ret = FAIL;
+		goto out;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->hosts.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	journal = &dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST)];
 
-	while (NULL != (dbrow = DBfetch(result)))
+	if (0 != journal->inserts.values_num || 0 != journal->updates.values_num)
 	{
-		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
 
-		ZBX_STR2UINT64(rowid, dbrow[0]);
-		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
+		if (0 != journal->inserts.values_num)
+		{
+			dbsync_get_rows(sync, &sql, &sql_alloc, &sql_offset, "hostid", NULL, &journal->inserts,
+					ZBX_DBSYNC_ROW_ADD);
+		}
 
-		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&dbsync_env.cache->hosts, &rowid)))
-			tag = ZBX_DBSYNC_ROW_ADD;
-		else if (FAIL == dbsync_compare_host(host, dbrow))
-			tag = ZBX_DBSYNC_ROW_UPDATE;
-
-		if (ZBX_DBSYNC_ROW_NONE != tag)
-			dbsync_add_row(sync, rowid, tag, dbrow);
+		if (0 != journal->updates.values_num)
+		{
+			dbsync_get_rows(sync, &sql, &sql_alloc, &sql_offset, "hostid", NULL, &journal->updates,
+					ZBX_DBSYNC_ROW_UPDATE);
+		}
 	}
 
-	zbx_hashset_iter_reset(&dbsync_env.cache->hosts, &iter);
-	while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
-	{
-		if (NULL == zbx_hashset_search(&ids, &host->hostid))
-			dbsync_add_row(sync, host->hostid, ZBX_DBSYNC_ROW_REMOVE, NULL);
-	}
+	for (i = 0; i < journal->deletes.values_num; i++)
+		dbsync_add_row(sync, journal->deletes.values[i], ZBX_DBSYNC_ROW_REMOVE, NULL);
 
-	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	sync->add_num = journal->inserts.values_num;
+	sync->update_num = journal->updates.values_num;
+	sync->remove_num = journal->deletes.values_num;
+out:
+	zbx_free(sql);
 
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
