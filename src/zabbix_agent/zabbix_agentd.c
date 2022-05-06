@@ -1236,7 +1236,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 #ifdef _WINDOWS
-	set_parent_signal_handler();	/* must be called after all threads are created */
+	set_parent_signal_handler(zbx_on_exit);	/* must be called after all threads are created */
 
 	/* wait for an exiting thread */
 	res = WaitForMultipleObjectsEx(threads_num, threads, FALSE, INFINITE, FALSE);

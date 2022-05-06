@@ -35,6 +35,8 @@ static	SERVICE_STATUS_HANDLE	serviceHandle;
 /* required for closing application from service */
 static int	application_status = ZBX_APP_RUNNING;
 
+static zbx_on_exit_t	zbx_on_exit_cb;
+
 int	ZBX_IS_RUNNING(void)
 {
 	return application_status;
@@ -58,7 +60,7 @@ static void	parent_signal_handler(int sig)
 		case SIGTERM:
 			ZBX_DO_EXIT();
 			zabbix_log(LOG_LEVEL_INFORMATION, "Got signal. Exiting ...");
-			zbx_on_exit(SUCCEED);
+			zbx_on_exit_cb(SUCCEED);
 			break;
 	}
 }
@@ -409,8 +411,9 @@ int	ZabbixStopService(void)
 	return ret;
 }
 
-void	set_parent_signal_handler(void)
+void	set_parent_signal_handler(zbx_on_exit_t zbx_on_exit_cb_arg)
 {
+	zbx_on_exit_cb = zbx_on_exit_cb_arg;
 	signal(SIGINT, parent_signal_handler);
 	signal(SIGTERM, parent_signal_handler);
 }
