@@ -24,7 +24,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 func replicationSlaveStatusHandler(ctx context.Context, conn MyClient, _ map[string]string,
