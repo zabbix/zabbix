@@ -23,8 +23,8 @@ import (
 	"context"
 	"errors"
 
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/jackc/pgx/v4"
-	"zabbix.com/pkg/zbxerr"
 )
 
 // processNameDiscoveryHandler gets names of all sender processes in pg_stat_replication

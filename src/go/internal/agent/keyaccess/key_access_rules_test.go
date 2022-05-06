@@ -25,7 +25,7 @@ package keyaccess
 import (
 	"testing"
 
-	"zabbix.com/pkg/conf"
+	"git.zabbix.com/ap/plugin-support/conf"
 	"zabbix.com/pkg/itemutil"
 )
 

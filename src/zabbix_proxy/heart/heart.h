@@ -20,7 +20,7 @@
 #ifndef ZABBIX_HEART_H
 #define ZABBIX_HEART_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 extern int	CONFIG_HEARTBEAT_FREQUENCY;
 

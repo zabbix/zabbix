@@ -239,11 +239,13 @@ class CWidgetIterator extends CWidget {
 		const alt_content = document.createElement('div');
 
 		if (messages !== null) {
-			alt_content.insertAdjacentHTML('afterbegin', messages);
+			const message_box = makeMessageBox('bad', messages)[0];
+
+			alt_content.appendChild(message_box);
 		}
 
 		if (body !== null) {
-			alt_content.insertAdjacentHTML('afterbegin', body);
+			alt_content.insertAdjacentHTML('beforeend', body);
 		}
 
 		this._content_body.appendChild(alt_content);
@@ -261,6 +263,14 @@ class CWidgetIterator extends CWidget {
 		}
 	}
 
+	_setErrorContents({error}) {
+		this._clearContents();
+
+		this._setAltContent({
+			messages: error.messages
+		});
+	}
+
 	_getUpdateRequestData() {
 		const request_data = super._getUpdateRequestData();
 
@@ -270,9 +280,11 @@ class CWidgetIterator extends CWidget {
 	}
 
 	_processUpdateResponse(response) {
-		this._setHeaderName(response.name);
+		if ('name' in response) {
+			this._setHeaderName(response.name);
+		}
 
-		if (response.body !== undefined || response.messages !== undefined) {
+		if ('body' in response || 'messages' in response) {
 			this._clearContents();
 
 			this._setAltContent({

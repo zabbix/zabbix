@@ -574,6 +574,7 @@ class testFormUserRoles extends CWebTest {
 						'Close problems' => false,
 						'Execute scripts' => false,
 						'Manage API tokens' => false,
+						'Invoke "Execute now" on read-only hosts' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'User role created'
@@ -596,6 +597,7 @@ class testFormUserRoles extends CWebTest {
 						'Manage API tokens' => false,
 						'Manage scheduled reports' => false,
 						'Manage SLA' => false,
+						'Invoke "Execute now" on read-only hosts' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'User role created'
@@ -974,7 +976,8 @@ class testFormUserRoles extends CWebTest {
 						'token.get', 'token.update', 'trend.get', 'trigger.adddependencies', 'trigger.create', 'trigger.delete',
 						'trigger.deletedependencies', 'trigger.get', 'trigger.update', 'triggerprototype.create',
 						'triggerprototype.delete', 'triggerprototype.get', 'triggerprototype.update', 'user.create',
-						'user.delete', 'user.get', 'user.logout', 'user.unblock', 'user.update', 'usergroup.create',
+						'user.delete', 'user.get', 'user.logout', 'user.unblock', 'user.update', 'userdirectory.create',
+						'userdirectory.delete', 'userdirectory.get', 'userdirectory.test', 'userdirectory.update', 'usergroup.create',
 						'usergroup.delete', 'usergroup.get', 'usergroup.update', 'usermacro.create', 'usermacro.createglobal',
 						'usermacro.delete', 'usermacro.deleteglobal', 'usermacro.get', 'usermacro.update', 'usermacro.updateglobal',
 						'valuemap.create', 'valuemap.delete', 'valuemap.get', 'valuemap.update'

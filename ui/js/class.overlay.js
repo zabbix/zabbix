@@ -266,6 +266,8 @@ Overlay.prototype.unmount = function() {
 
 	jQuery.unsubscribe('debug.click', this.center_dialog_function);
 
+	this.unsetProperty('prevent_navigation');
+
 	this.$backdrop.remove();
 	this.$dialogue.remove();
 
@@ -396,6 +398,11 @@ Overlay.prototype.makeButtons = function(arr) {
 	return buttons;
 };
 
+Overlay.prototype.preventNavigation = function(event) {
+	event.preventDefault();
+	event.returnValue = '';
+};
+
 /**
  * @param {string} key
  */
@@ -433,6 +440,10 @@ Overlay.prototype.unsetProperty = function(key) {
 
 		case 'script_inline':
 			this.$dialogue.$script.remove();
+			break;
+
+		case 'prevent_navigation':
+			window.removeEventListener('beforeunload', this.preventNavigation);
 			break;
 	}
 };
@@ -498,6 +509,11 @@ Overlay.prototype.setProperties = function(obj) {
 				// If content matches this regex it will be parsed in jQuery.buildFragment as HTML, but here we have JS.
 				this.$dialogue.$script.get(0).innerHTML = obj[key];
 				this.$dialogue.$footer.prepend(this.$dialogue.$script);
+				break;
+
+			case 'prevent_navigation':
+				this.unsetProperty(key);
+				window.addEventListener('beforeunload', this.preventNavigation, {passive: false});
 				break;
 
 			case 'element':

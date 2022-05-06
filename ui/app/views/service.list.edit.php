@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -155,12 +155,10 @@ $filter->addFilterTab(_('Filter'), [
 (new CScriptTag('
 	view.init('.json_encode([
 		'serviceid' => $data['service'] !== null ? $data['service']['serviceid'] : null,
+		'path' => $data['path'],
+		'is_filtered' => $data['is_filtered'],
 		'mode_switch_url' => $data['view_mode_url'],
 		'parent_url' => $data['parent_url'],
-		'delete_url' => (new CUrl('zabbix.php'))
-			->setArgument('action', 'service.delete')
-			->setArgumentSID()
-			->getUrl(),
 		'refresh_url' => $data['refresh_url'],
 		'refresh_interval' => $data['refresh_interval'],
 		'back_url' => $data['back_url']

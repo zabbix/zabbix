@@ -30,7 +30,7 @@
 #include "zbxdbupgrade.h"
 #include "log.h"
 #include "zbxgetopt.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "zbxmodules.h"
 #include "zbxnix.h"
 
@@ -73,6 +73,8 @@
 #include "ha/ha.h"
 #include "zbxrtc.h"
 #include "zbxha.h"
+#include "zbxdiag.h"
+#include "diag/diag_server.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -100,23 +102,26 @@ const char	*help_message[] = {
 	"  -R --runtime-control runtime-option   Perform administrative functions",
 	"",
 	"    Runtime control options:",
-	"      " ZBX_CONFIG_CACHE_RELOAD "         Reload configuration cache",
-	"      " ZBX_HOUSEKEEPER_EXECUTE "         Execute the housekeeper",
-	"      " ZBX_TRIGGER_HOUSEKEEPER_EXECUTE " Execute the trigger housekeeper",
-	"      " ZBX_LOG_LEVEL_INCREASE "=target   Increase log level, affects all processes if",
-	"                                  target is not specified",
-	"      " ZBX_LOG_LEVEL_DECREASE "=target   Decrease log level, affects all processes if",
-	"                                  target is not specified",
-	"      " ZBX_SNMP_CACHE_RELOAD "           Reload SNMP cache",
-	"      " ZBX_SECRETS_RELOAD "              Reload secrets from Vault",
-	"      " ZBX_DIAGINFO "=section            Log internal diagnostic information of the",
-	"                                  section (historycache, preprocessing, alerting,",
-	"                                  lld, valuecache, locks) or everything if section is",
-	"                                  not specified",
-	"      " ZBX_SERVICE_CACHE_RELOAD "        Reload service manager cache",
-	"      " ZBX_HA_STATUS "                   Display HA cluster status",
-	"      " ZBX_HA_REMOVE_NODE "=target       Remove the HA node specified by its name or ID",
-	"      " ZBX_HA_SET_FAILOVER_DELAY "=delay Set HA failover delay",
+	"      " ZBX_CONFIG_CACHE_RELOAD "             Reload configuration cache",
+	"      " ZBX_HOUSEKEEPER_EXECUTE "             Execute the housekeeper",
+	"      " ZBX_TRIGGER_HOUSEKEEPER_EXECUTE "     Execute the trigger housekeeper",
+	"      " ZBX_LOG_LEVEL_INCREASE "=target       Increase log level, affects all processes if",
+	"                                        target is not specified",
+	"      " ZBX_LOG_LEVEL_DECREASE "=target       Decrease log level, affects all processes if",
+	"                                        target is not specified",
+	"      " ZBX_SNMP_CACHE_RELOAD "               Reload SNMP cache",
+	"      " ZBX_SECRETS_RELOAD "                  Reload secrets from Vault",
+	"      " ZBX_DIAGINFO "=section                Log internal diagnostic information of the",
+	"                                        section (historycache, preprocessing, alerting,",
+	"                                        lld, valuecache, locks) or everything if section is",
+	"                                        not specified",
+	"      " ZBX_SERVICE_CACHE_RELOAD "             Reload service manager cache",
+	"      " ZBX_HA_STATUS "                        Display HA cluster status",
+	"      " ZBX_HA_REMOVE_NODE "=target            Remove the HA node specified by its name or ID",
+	"      " ZBX_HA_SET_FAILOVER_DELAY "=delay      Set HA failover delay",
+	"      " ZBX_PROXY_CONFIG_CACHE_RELOAD "[=name] Reload configuration cache on proxy by its name,",
+	"                                        comma-separated list can be used to pass multiple names.",
+	"                                        All proxies will be reloaded if no names were specified.",
 	"",
 	"      Log level control targets:",
 	"        process-type              All processes of specified type",
@@ -237,7 +242,7 @@ zbx_uint64_t	CONFIG_CONF_CACHE_SIZE		= 32 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE	= 16 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
-zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
+static zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_EXPORT_FILE_SIZE		= ZBX_GIBIBYTE;
@@ -290,8 +295,8 @@ int	CONFIG_SERVER_STARTUP_TIME	= 0;	/* zabbix server startup time */
 
 int	CONFIG_PROXYPOLLER_FORKS	= 1;	/* parameters for passive proxies */
 
-/* how often Zabbix server sends configuration data to proxy, in seconds */
-int	CONFIG_PROXYCONFIG_FREQUENCY	= SEC_PER_HOUR;
+/* how often Zabbix server sends configuration data to passive proxy, in seconds */
+int	CONFIG_PROXYCONFIG_FREQUENCY	= SEC_PER_MIN * 5;
 int	CONFIG_PROXYDATA_FREQUENCY	= 1;	/* 1s */
 
 char	*CONFIG_LOAD_MODULE_PATH	= NULL;
@@ -1004,13 +1009,20 @@ int	main(int argc, char **argv)
 	char		ch;
 	int		opt_c = 0, opt_r = 0;
 
+	/* see description of 'optarg' in 'man 3 getopt' */
+	char		*zbx_optarg = NULL;
+
+	/* see description of 'optind' in 'man 3 getopt' */
+	int		zbx_optind = 0;
+
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
 	progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
-	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
+	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
+			&zbx_optind)))
 	{
 		switch (ch)
 		{
@@ -1226,7 +1238,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_tfc_init(&error))
+	if (SUCCEED != zbx_tfc_init(CONFIG_TREND_FUNC_CACHE_SIZE, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize trends read cache: %s", error);
 		zbx_free(error);
@@ -1748,6 +1760,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		sig_exiting = ZBX_EXIT_FAILURE;
 	}
 
+	zbx_diag_init(diag_add_section_info);
+
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
 		if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc))
@@ -1909,6 +1923,13 @@ void	zbx_on_exit(int ret)
 		zbx_locks_disable();
 #endif
 
+	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
+	{
+		DBconnect(ZBX_DB_CONNECT_EXIT);
+		free_database_cache(ZBX_SYNC_ALL);
+		DBclose();
+	}
+
 	if (SUCCEED != zbx_ha_stop(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
@@ -1920,13 +1941,6 @@ void	zbx_on_exit(int ret)
 	{
 		free_metrics();
 		zbx_ipc_service_free_env();
-
-		DBconnect(ZBX_DB_CONNECT_EXIT);
-
-		free_database_cache(ZBX_SYNC_ALL);
-
-		DBclose();
-
 		free_configuration_cache();
 
 		/* free history value cache */

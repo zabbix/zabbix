@@ -24,7 +24,7 @@
 #	include <libxml/xpath.h>
 #endif
 
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "zbxshmem.h"
 #include "log.h"
 #include "zbxnix.h"
@@ -5646,6 +5646,9 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 						"datastore/totalReadLatency[average]",
 						"datastore/totalWriteLatency[average]", "cpu/usage[average]",
 						"cpu/utilization[average]", "power/power[average]",
+						"net/droppedRx[summation]", "net/droppedTx[summation]",
+						"net/errorsRx[summation]", "net/errorsTx[summation]",
+						"net/broadcastRx[summation]", "net/broadcastTx[summation]",
 						"power/powerCap[average]",
 						NULL
 					};

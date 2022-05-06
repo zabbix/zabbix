@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -100,19 +100,11 @@ class CControllerTokenCreate extends CController {
 
 		$result = API::Token()->create($token);
 
+		$output = [];
+
 		if ($result) {
 			['tokenids' => $tokenids] = $result;
 			[['token' => $auth_token]] = API::Token()->generate($tokenids);
-
-			$output = [];
-
-			$success = ['title' => _('API token added')];
-
-			if ($messages = get_and_clear_messages()) {
-				$success['messages'] = array_column($messages, 'message');
-			}
-
-			$output['success'] = $success;
 
 			[$user] = (CWebUser::$data['userid'] != $token['userid'])
 				? API::User()->get([
@@ -121,7 +113,13 @@ class CControllerTokenCreate extends CController {
 				])
 				: [CWebUser::$data];
 
-			$data = [
+			$output['success']['title'] = _('API token added');
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
+
+			$output['data'] = [
 				'name' => $token['name'],
 				'user_name' => getUserFullname($user),
 				'auth_token' => $auth_token,
@@ -131,11 +129,8 @@ class CControllerTokenCreate extends CController {
 				'message' => _('API token added'),
 				'admin_mode' => $this->getInput('admin_mode')
 			];
-
-			$output['data'] = $data;
 		}
 		else {
-
 			$output['error'] = [
 				'title' => _('Cannot add API token'),
 				'messages' => array_column(get_and_clear_messages(), 'message')

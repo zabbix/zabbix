@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -25,16 +25,17 @@
 ?>
 
 <script>
-	const view = {
+	const view = new class {
+
 		init() {
 			jQuery('#filter_serviceid')
 				.multiSelect('getSelectButton')
 				.addEventListener('click', () => {
-					this.selectService();
+					this._selectService();
 				});
-		},
+		}
 
-		selectService() {
+		_selectService() {
 			const overlay = PopUp('popup.services', {
 				title: <?= json_encode(_('Service')) ?>,
 				multiple: 0

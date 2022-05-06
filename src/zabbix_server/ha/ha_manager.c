@@ -23,9 +23,8 @@
 #include "db.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
-#include "threads.h"
-#include "mutexs.h"
-
+#include "zbxthreads.h"
+#include "zbxmutexs.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_ha.h"
 #include "audit/zbxaudit_settings.h"

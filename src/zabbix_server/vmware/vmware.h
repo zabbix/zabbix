@@ -20,7 +20,7 @@
 #define ZABBIX_VMWARE_H
 
 #include "config.h"
-#include "threads.h"
+#include "zbxthreads.h"
 #include "zbxalgo.h"
 
 /* the vmware service state */
