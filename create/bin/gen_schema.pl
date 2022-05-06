@@ -751,6 +751,10 @@ sub table_type
 	{
 		return 7;
 	}
+	if (${table_name} eq "item_preproc")
+	{
+		return 8;
+	}
 }
 
 sub open_trigger

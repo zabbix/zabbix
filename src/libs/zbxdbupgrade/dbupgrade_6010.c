@@ -284,6 +284,21 @@ static int	DBpatch_6010030(void)
 {
 	return DBcreate_changelog_delete_trigger("functions", "functionid");
 }
+
+static int	DBpatch_6010031(void)
+{
+	return DBcreate_changelog_insert_trigger("item_preproc", "item_preprocid");
+}
+
+static int	DBpatch_6010032(void)
+{
+	return DBcreate_changelog_update_trigger("item_preproc", "item_preprocid");
+}
+
+static int	DBpatch_6010033(void)
+{
+	return DBcreate_changelog_delete_trigger("item_preproc", "item_preprocid");
+}
 #endif
 
 DBPATCH_START(6010)
@@ -321,5 +336,8 @@ DBPATCH_ADD(6010027, 0, 1)
 DBPATCH_ADD(6010028, 0, 1)
 DBPATCH_ADD(6010029, 0, 1)
 DBPATCH_ADD(6010030, 0, 1)
+DBPATCH_ADD(6010031, 0, 1)
+DBPATCH_ADD(6010032, 0, 1)
+DBPATCH_ADD(6010033, 0, 1)
 
 DBPATCH_END()
