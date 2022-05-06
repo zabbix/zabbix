@@ -7,7 +7,7 @@ use Exception;
 /**
  * xmlseclibs.php
  *
- * Copyright (c) 2007-2019, Robert Richards <rrichards@cdatazone.org>.
+ * Copyright (c) 2007-2020, Robert Richards <rrichards@cdatazone.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@ use Exception;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @author    Robert Richards <rrichards@cdatazone.org>
- * @copyright 2007-2019 Robert Richards <rrichards@cdatazone.org>
+ * @copyright 2007-2020 Robert Richards <rrichards@cdatazone.org>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
  */
 
@@ -50,14 +50,19 @@ class XMLSecurityKey
     const AES128_CBC = 'http://www.w3.org/2001/04/xmlenc#aes128-cbc';
     const AES192_CBC = 'http://www.w3.org/2001/04/xmlenc#aes192-cbc';
     const AES256_CBC = 'http://www.w3.org/2001/04/xmlenc#aes256-cbc';
+    const AES128_GCM = 'http://www.w3.org/2009/xmlenc11#aes128-gcm';
+    const AES192_GCM = 'http://www.w3.org/2009/xmlenc11#aes192-gcm';
+    const AES256_GCM = 'http://www.w3.org/2009/xmlenc11#aes256-gcm';
     const RSA_1_5 = 'http://www.w3.org/2001/04/xmlenc#rsa-1_5';
     const RSA_OAEP_MGF1P = 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p';
+    const RSA_OAEP = 'http://www.w3.org/2009/xmlenc11#rsa-oaep';
     const DSA_SHA1 = 'http://www.w3.org/2000/09/xmldsig#dsa-sha1';
     const RSA_SHA1 = 'http://www.w3.org/2000/09/xmldsig#rsa-sha1';
     const RSA_SHA256 = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256';
     const RSA_SHA384 = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384';
     const RSA_SHA512 = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512';
     const HMAC_SHA1 = 'http://www.w3.org/2000/09/xmldsig#hmac-sha1';
+    const AUTHTAG_LENGTH = 16;
 
     /** @var array */
     private $cryptParams = array();
@@ -142,6 +147,30 @@ class XMLSecurityKey
                 $this->cryptParams['keysize'] = 32;
                 $this->cryptParams['blocksize'] = 16;
                 break;
+            case (self::AES128_GCM):
+                $this->cryptParams['library'] = 'openssl';
+                $this->cryptParams['cipher'] = 'aes-128-gcm';
+                $this->cryptParams['type'] = 'symmetric';
+                $this->cryptParams['method'] = 'http://www.w3.org/2009/xmlenc11#aes128-gcm';
+                $this->cryptParams['keysize'] = 16;
+                $this->cryptParams['blocksize'] = 16;
+                break;
+            case (self::AES192_GCM):
+                $this->cryptParams['library'] = 'openssl';
+                $this->cryptParams['cipher'] = 'aes-192-gcm';
+                $this->cryptParams['type'] = 'symmetric';
+                $this->cryptParams['method'] = 'http://www.w3.org/2009/xmlenc11#aes192-gcm';
+                $this->cryptParams['keysize'] = 24;
+                $this->cryptParams['blocksize'] = 16;
+                break;
+            case (self::AES256_GCM):
+                $this->cryptParams['library'] = 'openssl';
+                $this->cryptParams['cipher'] = 'aes-256-gcm';
+                $this->cryptParams['type'] = 'symmetric';
+                $this->cryptParams['method'] = 'http://www.w3.org/2009/xmlenc11#aes256-gcm';
+                $this->cryptParams['keysize'] = 32;
+                $this->cryptParams['blocksize'] = 16;
+                break;
             case (self::RSA_1_5):
                 $this->cryptParams['library'] = 'openssl';
                 $this->cryptParams['padding'] = OPENSSL_PKCS1_PADDING;
@@ -158,6 +187,18 @@ class XMLSecurityKey
                 $this->cryptParams['padding'] = OPENSSL_PKCS1_OAEP_PADDING;
                 $this->cryptParams['method'] = 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p';
                 $this->cryptParams['hash'] = null;
+                if (is_array($params) && ! empty($params['type'])) {
+                    if ($params['type'] == 'public' || $params['type'] == 'private') {
+                        $this->cryptParams['type'] = $params['type'];
+                        break;
+                    }
+                }
+                throw new Exception('Certificate "type" (private/public) must be passed via parameters');
+            case (self::RSA_OAEP):
+                $this->cryptParams['library'] = 'openssl';
+                $this->cryptParams['padding'] = OPENSSL_PKCS1_OAEP_PADDING;
+                $this->cryptParams['method'] = 'http://www.w3.org/2009/xmlenc11#rsa-oaep';
+                $this->cryptParams['hash'] = 'http://www.w3.org/2009/xmlenc11#mgf1sha1';
                 if (is_array($params) && ! empty($params['type'])) {
                     if ($params['type'] == 'public' || $params['type'] == 'private') {
                         $this->cryptParams['type'] = $params['type'];
@@ -347,7 +388,7 @@ class XMLSecurityKey
 
                 case'symmetric':
                     if (strlen($this->key) < $this->cryptParams['keysize']) {
-                        throw new Exception('Key must contain at least 25 characters for this cipher');
+                        throw new Exception('Key must contain at least '.$this->cryptParams['keysize'].' characters for this cipher, contains '.strlen($this->key));
                     }
                     break;
 
@@ -397,12 +438,22 @@ class XMLSecurityKey
     private function encryptSymmetric($data)
     {
         $this->iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length($this->cryptParams['cipher']));
-        $data = $this->padISO10126($data, $this->cryptParams['blocksize']);
-        $encrypted = openssl_encrypt($data, $this->cryptParams['cipher'], $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $this->iv);
+        $authTag = null;
+        if(in_array($this->cryptParams['cipher'], ['aes-128-gcm', 'aes-192-gcm', 'aes-256-gcm'])) {
+            if (version_compare(PHP_VERSION, '7.1.0') < 0) {
+                throw new Exception('PHP 7.1.0 is required to use AES GCM algorithms');
+            }
+            $authTag = openssl_random_pseudo_bytes(self::AUTHTAG_LENGTH);
+            $encrypted = openssl_encrypt($data, $this->cryptParams['cipher'], $this->key, OPENSSL_RAW_DATA, $this->iv, $authTag);
+        } else {
+            $data = $this->padISO10126($data, $this->cryptParams['blocksize']);
+            $encrypted = openssl_encrypt($data, $this->cryptParams['cipher'], $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $this->iv);
+        }
+        
         if (false === $encrypted) {
             throw new Exception('Failure encrypting Data (openssl symmetric) - ' . openssl_error_string());
         }
-        return $this->iv . $encrypted;
+        return $this->iv . $encrypted . $authTag;
     }
 
     /**
@@ -416,11 +467,24 @@ class XMLSecurityKey
         $iv_length = openssl_cipher_iv_length($this->cryptParams['cipher']);
         $this->iv = substr($data, 0, $iv_length);
         $data = substr($data, $iv_length);
-        $decrypted = openssl_decrypt($data, $this->cryptParams['cipher'], $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $this->iv);
+        $authTag = null;
+        if(in_array($this->cryptParams['cipher'], ['aes-128-gcm', 'aes-192-gcm', 'aes-256-gcm'])) {
+            if (version_compare(PHP_VERSION, '7.1.0') < 0) {
+                throw new Exception('PHP 7.1.0 is required to use AES GCM algorithms');
+            }
+            // obtain and remove the authentication tag
+            $offset = 0 - self::AUTHTAG_LENGTH;
+            $authTag = substr($data, $offset);
+            $data = substr($data, 0, $offset);
+            $decrypted = openssl_decrypt($data, $this->cryptParams['cipher'], $this->key, OPENSSL_RAW_DATA, $this->iv, $authTag);
+        } else {
+            $decrypted = openssl_decrypt($data, $this->cryptParams['cipher'], $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $this->iv);
+        }
+        
         if (false === $decrypted) {
             throw new Exception('Failure decrypting Data (openssl symmetric) - ' . openssl_error_string());
         }
-        return $this->unpadISO10126($decrypted);
+        return null !== $authTag ? $decrypted : $this->unpadISO10126($decrypted);
     }
 
     /**

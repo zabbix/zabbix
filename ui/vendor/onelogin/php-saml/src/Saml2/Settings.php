@@ -164,7 +164,7 @@ class Settings
             'base' => $basePath,
             'config' => $basePath,
             'cert' => $basePath.'certs/',
-            'lib' => $basePath.'src/Saml2/'
+            'lib' => __DIR__ . '/',
         );
 
         if (defined('ONELOGIN_CUSTOMPATH')) {
@@ -397,6 +397,11 @@ class Settings
             $this->_security['destinationStrictlyMatches'] = false;
         }
 
+        // Allow duplicated Attribute Names
+        if (!isset($this->_security['allowRepeatAttributeName'])) {
+            $this->_security['allowRepeatAttributeName'] = false;
+        }
+
         // InResponseTo
         if (!isset($this->_security['rejectUnsolicitedResponsesWithInResponseTo'])) {
             $this->_security['rejectUnsolicitedResponsesWithInResponseTo'] = false;
@@ -423,6 +428,11 @@ class Settings
         // DigestAlgorithm
         if (!isset($this->_security['digestAlgorithm'])) {
             $this->_security['digestAlgorithm'] = XMLSecurityDSig::SHA256;
+        }
+
+        // EncryptionAlgorithm
+        if (!isset($this->_security['encryption_algorithm'])) {
+            $this->_security['encryption_algorithm'] = XMLSecurityKey::AES128_CBC;
         }
 
         if (!isset($this->_security['lowercaseUrlencoding'])) {
@@ -552,19 +562,18 @@ class Settings
                 $errors[] = 'idp_slo_response_url_invalid';
             }
 
-            if (isset($settings['security'])) {
-                $security = $settings['security'];
+            $existsX509 = isset($idp['x509cert']) && !empty($idp['x509cert']);
+            $existsMultiX509Sign = isset($idp['x509certMulti']) && isset($idp['x509certMulti']['signing']) && !empty($idp['x509certMulti']['signing']);
+            $existsFingerprint = isset($idp['certFingerprint']) && !empty($idp['certFingerprint']);
+            if (!($existsX509 || $existsFingerprint || $existsMultiX509Sign)
+            ) {
+                $errors[] = 'idp_cert_or_fingerprint_not_found_and_required';
+            }
 
-                $existsX509 = isset($idp['x509cert']) && !empty($idp['x509cert']);
-                $existsMultiX509Sign = isset($idp['x509certMulti']) && isset($idp['x509certMulti']['signing']) && !empty($idp['x509certMulti']['signing']);
+            if (isset($settings['security'])) {
                 $existsMultiX509Enc = isset($idp['x509certMulti']) && isset($idp['x509certMulti']['encryption']) && !empty($idp['x509certMulti']['encryption']);
 
-                $existsFingerprint = isset($idp['certFingerprint']) && !empty($idp['certFingerprint']);
-                if (!($existsX509 || $existsFingerprint || $existsMultiX509Sign)
-                ) {
-                    $errors[] = 'idp_cert_or_fingerprint_not_found_and_required';
-                }
-                if ((isset($security['nameIdEncrypted']) && $security['nameIdEncrypted'] == true)
+                if ((isset($settings['security']['nameIdEncrypted']) && $settings['security']['nameIdEncrypted'] == true)
                     && !($existsX509 || $existsMultiX509Enc)
                 ) {
                     $errors[] = 'idp_cert_not_found_and_required';
@@ -819,6 +828,47 @@ class Settings
     public function shouldCompressResponses()
     {
         return $this->_compress['responses'];
+    }
+
+    /**
+     * Gets the IdP SSO url.
+     *
+     * @return string|null The url of the IdP Single Sign On Service
+     */
+    public function getIdPSSOUrl()
+    {
+        $ssoUrl = null;
+        if (isset($this->_idp['singleSignOnService']) && isset($this->_idp['singleSignOnService']['url'])) {
+            $ssoUrl = $this->_idp['singleSignOnService']['url'];
+        }
+        return $ssoUrl;
+    }
+
+    /**
+     * Gets the IdP SLO url.
+     *
+     * @return string|null The request url of the IdP Single Logout Service
+     */
+    public function getIdPSLOUrl()
+    {
+        $sloUrl = null;
+        if (isset($this->_idp['singleLogoutService']) && isset($this->_idp['singleLogoutService']['url'])) {
+            $sloUrl = $this->_idp['singleLogoutService']['url'];
+        }
+        return $sloUrl;
+    }
+
+    /**
+     * Gets the IdP SLO response url.
+     *
+     * @return string|null The response url of the IdP Single Logout Service
+     */
+    public function getIdPSLOResponseUrl()
+    {
+        if (isset($this->_idp['singleLogoutService']) && isset($this->_idp['singleLogoutService']['responseUrl'])) {
+            return $this->_idp['singleLogoutService']['responseUrl'];
+        }
+        return $this->getIdPSLOUrl();
     }
 
     /**

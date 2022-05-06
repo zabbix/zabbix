@@ -1,4 +1,4 @@
-# OneLogin's SAML PHP Toolkit Compatible with PHP 5.X & 7.X
+# OneLogin's SAML PHP Toolkit Compatible with PHP 7.X & 8.X
 
 [![Build Status](https://api.travis-ci.org/onelogin/php-saml.png?branch=master)](http://travis-ci.org/onelogin/php-saml) [![Coverage Status](https://coveralls.io/repos/onelogin/php-saml/badge.png)](https://coveralls.io/r/onelogin/php-saml) [![License](https://poser.pugx.org/onelogin/php-saml/license.png)](https://packagist.org/packages/onelogin/php-saml)
 
@@ -10,15 +10,7 @@ and supported by OneLogin Inc.
 Warning
 -------
 
-Version 3.4.0 introduces the 'rejectUnsolicitedResponsesWithInResponseTo' setting parameter, by default disabled, that will allow invalidate unsolicited SAMLResponse. This version as well will reject SAMLResponse if requestId was provided to the validator but the SAMLResponse does not contain a InResponseTo attribute. And an additional setting parameter 'destinationStrictlyMatches', by default disabled, that will force that the Destination URL should strictly match to the address that process the SAMLResponse.
-
-Version 3.3.1 updates xmlseclibs to 3.0.4 (CVE-2019-3465), but php-saml was not directly affected since it implements additional checks that prevent to exploit that vulnerability.
-
-Version 3.3.0 sets strict mode active by default
-
-Update php-saml to 3.1.0, this version includes a security patch related to XEE attacks.
-
-This version is compatible with PHP 7.X and does not include xmlseclibs (you will need to install it via composer, dependency described in composer.json)
+This version is compatible with PHP >=7.3 and 8.X and does not include xmlseclibs (you will need to install it via composer, dependency described in composer.json)
 
 Security Guidelines
 -------------------
@@ -132,7 +124,9 @@ Your settings are at risk of being deleted when updating packages using `compose
 Compatibility
 -------------
 
-This 3.X.X supports PHP 7.X. but can be used with PHP >=5.4 as well  (5.6.24+ recommended for security reasons).
+This 4.X.X supports PHP >=7.3 .
+
+It is not compatible with PHP5.6 or PHP7.0.
 
 Namespaces
 ----------
@@ -472,7 +466,7 @@ $advancedSettings = array(
         // Set to false and no AuthContext will be sent in the AuthNRequest.
         // Set true or don't present this parameter and you will get an AuthContext 'exact' 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'.
         // Set an array with the possible auth context values: array('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509').
-        'requestedAuthnContext' => true,
+        'requestedAuthnContext' => false,
 
         // Indicates if the SP will validate all received xmls.
         // (In order to validate the xml, 'strict' and 'wantXMLValidation' must be true).
@@ -487,6 +481,10 @@ $advancedSettings = array(
         // Notice that if 'relaxDestinationValidation' is true an empty Destintation
         // will be accepted.
         'destinationStrictlyMatches' => false,
+
+        // If true, the toolkit will not raised an error when the Statement Element
+        // contain atribute elements with name duplicated
+        'allowRepeatAttributeName' => false,
 
         // If true, SAMLResponses with an InResponseTo value will be rejectd if not
         // AuthNRequest ID provided to the validation method.
@@ -508,6 +506,17 @@ $advancedSettings = array(
         //    'http://www.w3.org/2001/04/xmlenc#sha512'
         // Notice that sha1 is a deprecated algorithm and should not be used
         'digestAlgorithm' => 'http://www.w3.org/2001/04/xmlenc#sha256',
+
+        // Algorithm that the toolkit will use for encryption process. Options:
+        // 'http://www.w3.org/2001/04/xmlenc#tripledes-cbc'
+        // 'http://www.w3.org/2001/04/xmlenc#aes128-cbc'
+        // 'http://www.w3.org/2001/04/xmlenc#aes192-cbc'
+        // 'http://www.w3.org/2001/04/xmlenc#aes256-cbc'
+        // 'http://www.w3.org/2009/xmlenc11#aes128-gcm'
+        // 'http://www.w3.org/2009/xmlenc11#aes192-gcm'
+        // 'http://www.w3.org/2009/xmlenc11#aes256-gcm';
+        // Notice that aes-cbc are not consider secure anymore so should not be used
+        'encryption_algorithm' => 'http://www.w3.org/2009/xmlenc11#aes128-gcm',
 
         // ADFS URL-Encodes SAML data as lowercase, and the toolkit by default uses
         // uppercase. Turn it True for ADFS compatibility on signature verification
@@ -1202,7 +1211,7 @@ Main class of OneLogin PHP Toolkit
  * `getNameId` - Returns the nameID
  * `getNameIdFormat` - Gets the NameID Format provided by the SAML response from the IdP.
  * `getNameIdNameQualifier` - Gets the NameID NameQualifier provided from the SAML Response String.
- * `getNameIdNameSPQualifier` - Gets the NameID SP NameQualifier provided from the SAML Response String.
+ * `getNameIdSPNameQualifier` - Gets the NameID SP NameQualifier provided from the SAML Response String.
  * `getSessionIndex` - Gets the SessionIndex from the AuthnStatement.
  * `getErrors` - Returns if there were any error
  * `getSSOurl` - Gets the SSO url.
@@ -1240,7 +1249,7 @@ SAML 2 Authentication Response class
  * `getNameId` - Gets the NameID provided by the SAML response from the IdP.
  * `getNameIdFormat` - Gets the NameID Format provided by the SAML response from the IdP.
  * `getNameIdNameQualifier` - Gets the NameID NameQualifier provided from the SAML Response String.
- * `getNameIdNameSPQualifier` - Gets the NameID SP NameQualifier provided from the SAML Response String.
+ * `getNameIdSPNameQualifier` - Gets the NameID SP NameQualifier provided from the SAML Response String.
  * `getSessionNotOnOrAfter` - Gets the SessionNotOnOrAfter from the
    AuthnStatement
  * `getSessionIndex` - Gets the SessionIndex from the AuthnStatement.
