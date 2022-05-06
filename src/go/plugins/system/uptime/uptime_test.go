@@ -27,7 +27,7 @@ import (
 	"testing"
 	"time"
 
-	"zabbix.com/pkg/std"
+	"git.zabbix.com/ap/plugin-support/std"
 )
 
 var procStat = `

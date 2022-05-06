@@ -24,18 +24,8 @@
 #include "common.h"
 #include "dbcache.h"
 
-typedef enum
-{
-	ZBX_TREND_STATE_UNKNOWN,
-	ZBX_TREND_STATE_NORMAL,
-	ZBX_TREND_STATE_NODATA,
-	ZBX_TREND_STATE_OVERFLOW,
-	ZBX_TREND_STATE_COUNT
-}
-zbx_trend_state_t;
-
 int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **error);
-int	zbx_parse_timeshift(time_t from, const char *timeshift, struct tm *tm, char **error);
+int	zbx_trends_parse_timeshift(time_t from, const char *timeshift, struct tm *tm, char **error);
 
 int	zbx_trends_parse_range(time_t from, const char *param, int *start, int *end, char **error);
 int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *nextcheck, char **error);
@@ -56,7 +46,7 @@ typedef struct
 }
 zbx_tfc_stats_t;
 
-int	zbx_tfc_init(char **error);
+int	zbx_tfc_init(zbx_uint64_t cache_size, char **error);
 void	zbx_tfc_destroy(void);
 int	zbx_tfc_get_stats(zbx_tfc_stats_t *stats, char **error);
 void	zbx_tfc_invalidate_trends(ZBX_DC_TREND *trends, int trends_num);
@@ -64,7 +54,4 @@ void	zbx_tfc_invalidate_trends(ZBX_DC_TREND *trends, int trends_num);
 int	zbx_baseline_get_data(zbx_uint64_t itemid, unsigned char value_type, time_t now, const char *period,
 		int season_num, zbx_time_unit_t season_unit, int skip, zbx_vector_dbl_t *values,
 		zbx_vector_uint64_t *index, char **error);
-
-zbx_trend_state_t	zbx_trends_get_avg(const char *table, zbx_uint64_t itemid, int start, int end, double *value);
-const char	*zbx_trends_error(zbx_trend_state_t state);
 #endif

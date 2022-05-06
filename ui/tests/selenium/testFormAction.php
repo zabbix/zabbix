@@ -484,13 +484,13 @@ class testFormAction extends CLegacyWebTest {
 		if ($eventsource == EVENT_SOURCE_TRIGGERS && array_key_exists('evaltype', $data)) {
 			$this->zbxTestAssertElementText('//tr[@id="conditions_0"]/td[2]', 'Trigger name contains TEST1');
 			$this->zbxTestAssertElementText('//tr[@id="conditions_1"]/td[2]', 'Trigger name contains TEST2');
-			$this->zbxTestAssertElementPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(0);"]');
-			$this->zbxTestAssertElementPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(1);"]');
+			$this->zbxTestAssertElementPresentXpath('//button[@name="remove" and @onclick="removeCondition(0);"]');
+			$this->zbxTestAssertElementPresentXpath('//button[@name="remove" and @onclick="removeCondition(1);"]');
 		}
 		else {
 			$this->zbxTestAssertElementNotPresentXpath('//tr[@id="conditions_0"]');
-			$this->zbxTestAssertElementNotPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(0);"]');
-			$this->zbxTestAssertElementNotPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(1);"]');
+			$this->zbxTestAssertElementNotPresentXpath('//button[@name="remove" and @onclick="removeCondition(0);"]');
+			$this->zbxTestAssertElementNotPresentXpath('//button[@name="remove" and @onclick="removeCondition(1);"]');
 		}
 
 		// Open Condition overlay dialog.
@@ -1483,6 +1483,7 @@ class testFormAction extends CLegacyWebTest {
 				$condition_form = $this->query('id:popup.condition')->asForm()->one();
 				$condition_form->fill($condition);
 				$condition_form->submit();
+				COverlayDialogElement::ensureNotPresent();
 			}
 		}
 

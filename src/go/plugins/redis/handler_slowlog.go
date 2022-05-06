@@ -20,8 +20,8 @@
 package redis
 
 import (
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/mediocregopher/radix/v3"
-	"zabbix.com/pkg/zbxerr"
 )
 
 type slowlog []interface{}

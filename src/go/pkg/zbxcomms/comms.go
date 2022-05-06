@@ -29,7 +29,7 @@ import (
 	"net"
 	"time"
 
-	"zabbix.com/pkg/log"
+	"git.zabbix.com/ap/plugin-support/log"
 	"zabbix.com/pkg/tls"
 )
 

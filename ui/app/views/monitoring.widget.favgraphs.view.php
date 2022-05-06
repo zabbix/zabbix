@@ -30,14 +30,13 @@ foreach ($data['graphs'] as $graph) {
 		->setArgument('action', HISTORY_GRAPH)
 		->setArgument('itemids', [$graph['itemid']]);
 
-	$on_click = "rm4favorites('itemid','".$graph['itemid']."')";
-
 	$table->addRow([
 		$data['allowed_ui_latest_data']
 			? new CLink($graph['label'], $url)
 			: $graph['label'],
 		(new CButton())
-			->onClick($on_click)
+			->setAttribute('data-itemid', $graph['itemid'])
+			->onClick('rm4favorites("itemid", this.dataset.itemid);')
 			->addClass(ZBX_STYLE_BTN_REMOVE)
 			->setAttribute('aria-label', _xs('Remove, %1$s', 'screen reader', $graph['label']))
 			->removeId()
@@ -49,8 +48,8 @@ $output = [
 	'body' => $table->toString()
 ];
 
-if (($messages = getMessages()) !== null) {
-	$output['messages'] = $messages->toString();
+if ($messages = get_and_clear_messages()) {
+	$output['messages'] = array_column($messages, 'message');
 }
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

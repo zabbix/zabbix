@@ -44,8 +44,8 @@ $output = [
 	'navtree_data' => $item->getScriptData()
 ];
 
-if (($messages = getMessages()) !== null) {
-	$output['messages'] = $messages->toString();
+if ($messages = get_and_clear_messages()) {
+	$output['messages'] = array_column($messages, 'message');
 }
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

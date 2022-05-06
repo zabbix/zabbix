@@ -23,7 +23,7 @@
 #include "actions.h"
 #include "zbxserver.h"
 #include "export.h"
-#include "service_protocol.h"
+#include "zbxservice.h"
 
 /* event recovery data */
 typedef struct

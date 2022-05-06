@@ -22,11 +22,42 @@
 
 #include <tlhelp32.h>
 
-#include "symbols.h"
+#include "zbxsymbols.h"
 #include "log.h"
+#include "zbxjson.h"
+#include "zbxalgo.h"
 
 #define MAX_PROCESSES	4096
 #define MAX_NAME	256
+
+typedef struct
+{
+	unsigned int	pid;
+	unsigned int	ppid;
+	unsigned int	tid;
+
+	char		*name;
+	zbx_uint64_t	processes;
+	zbx_uint64_t	threads;
+	zbx_int64_t	handles;
+
+	double		cputime_user;
+	double		cputime_system;
+	double		page_faults;
+	double		io_read_b;
+	double		io_write_b;
+	double		io_other_b;
+	double		io_read_op;
+	double		io_write_op;
+	double		io_other_op;
+
+	double		vmsize;
+	double		wkset;
+}
+proc_data_t;
+
+ZBX_PTR_VECTOR_DECL(proc_data_ptr, proc_data_t *)
+ZBX_PTR_VECTOR_IMPL(proc_data_ptr, proc_data_t *)
 
 /* function 'zbx_get_process_username' require 'userName' with size 'MAX_NAME' */
 static int	zbx_get_process_username(HANDLE hProcess, char *userName)
@@ -422,4 +453,300 @@ int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain process information."));
 
 	return ret;
+}
+
+static void	proc_data_free(proc_data_t *proc_data)
+{
+	zbx_free(proc_data->name);
+	zbx_free(proc_data);
+}
+
+int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+#define SUM_PROC_VALUE_DBL(param)					\
+	do								\
+	{								\
+		if (0.0 <= proc_data->param && 0.0 <= pdata_cmp->param)	\
+			proc_data->param += pdata_cmp->param;		\
+		else if (0.0 <= proc_data->param)			\
+			proc_data->param = -1.0;			\
+	} while(0)
+
+	int				zbx_proc_mode, i;
+	struct zbx_json			j;
+	HANDLE				hProcessSnap, hThreadSnap;
+	PROCESSENTRY32			pe32;
+	DWORD				access;
+	const OSVERSIONINFOEX		*vi;
+	char				*param, *procName, *userName, *procComm, baseName[MAX_PATH], uname[MAX_NAME];
+	proc_data_t			*proc_data;
+	zbx_vector_proc_data_ptr_t	proc_data_ctx;
+
+	if (4 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	procName = get_rparam(request, 0);
+	userName = get_rparam(request, 1);
+	procComm = get_rparam(request, 2);
+	param = get_rparam(request, 3);
+
+	if (NULL != procComm && '\0' != *procComm)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == param || '\0' == *param || 0 == strcmp(param, "process"))
+	{
+		zbx_proc_mode = ZBX_PROC_MODE_PROCESS;
+	}
+	else if (0 == strcmp(param, "thread"))
+	{
+		zbx_proc_mode = ZBX_PROC_MODE_THREAD;
+	}
+	else if (0 == strcmp(param, "summary"))
+	{
+		zbx_proc_mode = ZBX_PROC_MODE_SUMMARY;
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (vi = zbx_win_getversion()))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot retrieve system version."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (6 > vi->dwMajorVersion)
+	{
+		/* PROCESS_QUERY_LIMITED_INFORMATION is not supported on Windows Server 2003 and XP */
+		access = PROCESS_QUERY_INFORMATION;
+	}
+	else
+		access = PROCESS_QUERY_LIMITED_INFORMATION;
+
+	if (INVALID_HANDLE_VALUE == (hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	pe32.dwSize = sizeof(PROCESSENTRY32);
+
+	if (FALSE == Process32First(hProcessSnap, &pe32) || (ZBX_PROC_MODE_THREAD == zbx_proc_mode &&
+			INVALID_HANDLE_VALUE == (hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0))))
+	{
+		CloseHandle(hProcessSnap);
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_vector_proc_data_ptr_create(&proc_data_ctx);
+
+	do
+	{
+		HANDLE	hProcess;
+
+		zbx_unicode_to_utf8_static(pe32.szExeFile, baseName, MAX_NAME);
+
+		if (NULL != procName && '\0' != *procName && 0 != stricmp(baseName, procName))
+			continue;
+
+		if (NULL == (hProcess = OpenProcess(access, FALSE, pe32.th32ProcessID)))
+			continue;
+
+		if (NULL != userName && '\0' != *userName && (SUCCEED != zbx_get_process_username(hProcess, uname) ||
+				0 != stricmp(uname, userName)))
+		{
+			goto next;
+		}
+
+		if (ZBX_PROC_MODE_THREAD == zbx_proc_mode)
+		{
+			THREADENTRY32	te32;
+
+			te32.dwSize = sizeof(THREADENTRY32);
+
+			if (FALSE == Thread32First(hThreadSnap, &te32))
+				goto next;
+
+			do
+			{
+				if (te32.th32OwnerProcessID == pe32.th32ProcessID)
+				{
+					proc_data = (proc_data_t *)zbx_malloc(NULL, sizeof(proc_data_t));
+
+					proc_data->pid = pe32.th32ProcessID;
+					proc_data->ppid = pe32.th32ParentProcessID;
+					proc_data->name = zbx_strdup(NULL, baseName);
+					proc_data->tid = te32.th32ThreadID;
+
+					zbx_vector_proc_data_ptr_append(&proc_data_ctx, proc_data);
+				}
+			}
+			while (TRUE == Thread32Next(hThreadSnap, &te32));
+		}
+		else
+		{
+			DWORD			handleCount;
+			PROCESS_MEMORY_COUNTERS	mc;
+			IO_COUNTERS		ioCounters;
+			FILETIME		ftCreate, ftExit, ftKernel, ftUser;
+
+			proc_data = (proc_data_t *)zbx_malloc(NULL, sizeof(proc_data_t));
+
+			proc_data->pid = pe32.th32ProcessID;
+			proc_data->ppid = pe32.th32ParentProcessID;
+			proc_data->name = zbx_strdup(NULL, baseName);
+			proc_data->threads = pe32.cntThreads;
+
+			if (FALSE != GetProcessHandleCount(hProcess, &handleCount))
+				proc_data->handles = (zbx_uint64_t)handleCount;
+			else
+				proc_data->handles = -1;
+
+			if (FALSE != GetProcessMemoryInfo(hProcess, &mc, sizeof(PROCESS_MEMORY_COUNTERS)))
+			{
+				proc_data->vmsize = (double)mc.PagefileUsage / 1024;
+				proc_data->wkset = (double)mc.WorkingSetSize / 1024;
+				proc_data->page_faults = (double)mc.PageFaultCount;
+			}
+			else
+				proc_data->vmsize = proc_data->wkset = proc_data->page_faults = -1.0;
+
+			if (FALSE != GetProcessTimes(hProcess, &ftCreate, &ftExit, &ftKernel, &ftUser))
+			{
+				proc_data->cputime_system = ConvertProcessTime(&ftKernel) / 1000.0;
+				proc_data->cputime_user = ConvertProcessTime(&ftUser) / 1000.0;
+			}
+			else
+				proc_data->cputime_system = proc_data->cputime_user = -1.0;
+
+			if (NULL != zbx_GetProcessIoCounters &&
+					FALSE != zbx_GetProcessIoCounters(hProcess, &ioCounters))
+			{
+				proc_data->io_read_b = (double)((__int64)ioCounters.ReadTransferCount);
+				proc_data->io_read_op = (double)((__int64)ioCounters.ReadOperationCount);
+				proc_data->io_write_b = (double)((__int64)ioCounters.WriteTransferCount);
+				proc_data->io_write_op = (double)((__int64)ioCounters.WriteOperationCount);
+				proc_data->io_other_b = (double)((__int64)ioCounters.OtherTransferCount);
+				proc_data->io_other_op = (double)((__int64)ioCounters.OtherOperationCount);
+			}
+			else
+			{
+				proc_data->io_read_b = proc_data->io_read_op = proc_data->io_write_b =
+						proc_data->io_write_op = proc_data->io_other_b =
+						proc_data->io_other_op = -1.0;
+			}
+
+			zbx_vector_proc_data_ptr_append(&proc_data_ctx, proc_data);
+		}
+next:
+		CloseHandle(hProcess);
+	}
+	while (TRUE == Process32Next(hProcessSnap, &pe32));
+
+	if (ZBX_PROC_MODE_THREAD == zbx_proc_mode)
+		CloseHandle(hThreadSnap);
+
+	CloseHandle(hProcessSnap);
+
+	if (ZBX_PROC_MODE_SUMMARY == zbx_proc_mode)
+	{
+		int	k;
+
+		for (i = 0; i < proc_data_ctx.values_num; i++)
+		{
+			proc_data = proc_data_ctx.values[i];
+			proc_data->processes = 1;
+
+			for (k = i + 1; k < proc_data_ctx.values_num; k++)
+			{
+				proc_data_t	*pdata_cmp = proc_data_ctx.values[k];
+
+				if (0 == strcmp(proc_data->name, pdata_cmp->name))
+				{
+					proc_data->processes++;
+					proc_data->threads += pdata_cmp->threads;
+
+					SUM_PROC_VALUE_DBL(vmsize);
+					SUM_PROC_VALUE_DBL(wkset);
+					SUM_PROC_VALUE_DBL(cputime_user);
+					SUM_PROC_VALUE_DBL(cputime_system);
+					SUM_PROC_VALUE_DBL(page_faults);
+					SUM_PROC_VALUE_DBL(io_read_b);
+					SUM_PROC_VALUE_DBL(io_write_b);
+					SUM_PROC_VALUE_DBL(io_other_b);
+					SUM_PROC_VALUE_DBL(io_read_op);
+					SUM_PROC_VALUE_DBL(io_write_op);
+					SUM_PROC_VALUE_DBL(io_other_op);
+
+					if (0 <= proc_data->handles && 0 <= pdata_cmp->handles)
+						proc_data->handles += pdata_cmp->handles;
+					else if (0 <= proc_data->handles)
+						proc_data->handles = -1;
+
+					proc_data_free(pdata_cmp);
+					zbx_vector_proc_data_ptr_remove(&proc_data_ctx, k--);
+				}
+			}
+		}
+	}
+
+	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	for (i = 0; i < proc_data_ctx.values_num; i++)
+	{
+		proc_data = proc_data_ctx.values[i];
+
+		zbx_json_addobject(&j, NULL);
+
+		if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode)
+		{
+			zbx_json_adduint64(&j, "pid", proc_data->pid);
+			zbx_json_adduint64(&j, "ppid", proc_data->ppid);
+		}
+
+		zbx_json_addstring(&j, "name", proc_data->name, ZBX_JSON_TYPE_STRING);
+
+		if (ZBX_PROC_MODE_SUMMARY == zbx_proc_mode)
+			zbx_json_adduint64(&j, "processes", proc_data->processes);
+
+		if (ZBX_PROC_MODE_THREAD != zbx_proc_mode)
+		{
+			zbx_json_addint64(&j, "vmsize", (zbx_uint64_t)proc_data->vmsize);
+			zbx_json_addint64(&j, "wkset", (zbx_uint64_t)proc_data->wkset);
+			zbx_json_addfloat(&j, "cputime_user", proc_data->cputime_user);
+			zbx_json_addfloat(&j, "cputime_system", proc_data->cputime_system);
+			zbx_json_adduint64(&j, "threads", proc_data->threads);
+			zbx_json_addint64(&j, "page_faults", (zbx_uint64_t)proc_data->page_faults);
+			zbx_json_addint64(&j, "handles", (zbx_uint64_t)proc_data->handles);
+			zbx_json_addint64(&j, "io_read_b", (zbx_uint64_t)proc_data->io_read_b);
+			zbx_json_addint64(&j, "io_write_b", (zbx_uint64_t)proc_data->io_write_b);
+			zbx_json_addint64(&j, "io_read_op", (zbx_uint64_t)proc_data->io_read_op);
+			zbx_json_addint64(&j, "io_write_op", (zbx_uint64_t)proc_data->io_write_op);
+			zbx_json_addint64(&j, "io_other_b", (zbx_uint64_t)proc_data->io_other_b);
+			zbx_json_addint64(&j, "io_other_op", (zbx_uint64_t)proc_data->io_other_op);
+		}
+		else
+			zbx_json_adduint64(&j, "tid", proc_data->tid);
+
+		zbx_json_close(&j);
+	}
+
+	zbx_json_close(&j);
+	zbx_vector_proc_data_ptr_clear_ext(&proc_data_ctx, proc_data_free);
+	zbx_vector_proc_data_ptr_destroy(&proc_data_ctx);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+	zbx_json_free(&j);
+
+	return SYSINFO_RET_OK;
+#undef SUM_PROC_VALUE_DBL
 }

@@ -25,10 +25,10 @@ import (
 	"reflect"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/zbxlib"
 )
 

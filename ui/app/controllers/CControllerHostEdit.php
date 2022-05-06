@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -133,7 +133,8 @@ class CControllerHostEdit extends CController {
 			if ($this->hasInput('full_clone') || $this->hasInput('clone')) {
 				$clone_hostid = $this->getInput('hostid');
 				$this->host = ['hostid' => null];
-			} else {
+			}
+			else {
 				$hosts = API::Host()->get([
 					'output' => ['hostid', 'host', 'name', 'status', 'description', 'proxy_hostid', 'ipmi_authtype',
 						'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_connect', 'tls_accept', 'tls_issuer',
@@ -147,7 +148,7 @@ class CControllerHostEdit extends CController {
 					],
 					'selectInventory' => array_column(getHostInventories(), 'db_field'),
 					'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type'],
-					'selectParentTemplates' => ['templateid', 'name'],
+					'selectParentTemplates' => ['templateid', 'name', 'link_type'],
 					'selectTags' => ['tag', 'value'],
 					'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 					'hostids' => $this->getInput('hostid')
@@ -254,6 +255,7 @@ class CControllerHostEdit extends CController {
 		$data['groups_ms'] = $this->hostGroupsForMultiselect($data['host']['groups']);
 		unset($data['groups']);
 
+		CArrayHelper::sort($data['host']['parentTemplates'], ['name']);
 		$this->extendLinkedTemplates($data['editable_templates']);
 		$this->extendDiscoveryRule($data['editable_discovery_rules']);
 		$this->extendProxies($data['proxies']);
@@ -482,7 +484,7 @@ class CControllerHostEdit extends CController {
 			$main_interfaces = $this->getInput('mainInterfaces', []);
 			$inputs['interfaces'] = $this->getInput('interfaces', []);
 
-			foreach($inputs['interfaces'] as &$interface) {
+			foreach ($inputs['interfaces'] as &$interface) {
 				$interface['main'] = (in_array($interface['interfaceid'], $main_interfaces))
 					? INTERFACE_PRIMARY
 					: INTERFACE_SECONDARY;
@@ -491,6 +493,13 @@ class CControllerHostEdit extends CController {
 			unset($interface);
 
 			$inputs['parentTemplates'] = array_intersect_key($linked_templates, array_flip($field_templates));
+
+			// When cloning host, templates should be manually linked.
+			foreach ($inputs['parentTemplates'] as &$template) {
+				$template['link_type'] = TEMPLATE_LINK_MANUAL;
+			}
+			unset($template);
+
 			$inputs['add_templates'] = array_map(function ($tmpl) {
 				return CArrayHelper::renameKeys($tmpl, ['templateid' => 'id']);
 			}, array_intersect_key($linked_templates, array_flip($field_add_templates)));

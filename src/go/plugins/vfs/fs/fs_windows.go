@@ -22,8 +22,8 @@ package vfsfs
 import (
 	"syscall"
 
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"golang.org/x/sys/windows"
-	"zabbix.com/pkg/plugin"
 )
 
 func getMountPaths() (paths []string, err error) {

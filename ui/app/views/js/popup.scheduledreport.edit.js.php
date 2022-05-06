@@ -36,25 +36,38 @@ function submitScheduledReport(overlay) {
 	})
 		.then(response => response.json())
 		.then(response => {
+			if ('error' in response) {
+				throw {error: response.error};
+			}
+
+			postMessageOk(response.success.title);
+
+			if ('messages' in response.success) {
+				postMessageDetails('success', response.success.messages);
+			}
+
+			overlayDialogueDestroy(overlay.dialogueid);
+
+			location.href = location.href;
+		})
+		.catch((exception) => {
 			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
-			if ('errors' in response) {
-				overlay.unsetLoading();
-				$(response.errors).insertBefore($form);
+			let title, messages;
+
+			if (typeof exception === 'object' && 'error' in exception) {
+				title = exception.error.title;
+				messages = exception.error.messages;
 			}
 			else {
-				postMessageOk(response['title']);
-				if ('messages' in response) {
-					postMessageDetails('success', response.messages);
-				}
-				overlayDialogueDestroy(overlay.dialogueid);
-				location.href = location.href;
+				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 			}
+
+			const message_box = makeMessageBox('bad', messages, title);
+
+			message_box.insertBefore($form);
 		})
-		.catch((e) => {
-			document
-				.querySelector(`.overlay-dialogue[data-dialogueid='${overlay.dialogueid}'] .overlay-dialogue-body`)
-				.prepend(makeMessageBox('bad', e, null)[0]);
+		.finally(() => {
 			overlay.unsetLoading();
 		});
 }

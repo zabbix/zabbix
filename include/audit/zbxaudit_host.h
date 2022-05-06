@@ -160,7 +160,7 @@ void	zbx_audit_host_prototype_update_json_update_group_details(zbx_uint64_t host
 
 #define PREPARE_AUDIT_TEMPLATE_ADD_H(funcname)									\
 void	zbx_audit_##funcname##_update_json_add_parent_template(zbx_uint64_t hostid,				\
-		zbx_uint64_t hosttemplateid, zbx_uint64_t templateid);
+		zbx_uint64_t hosttemplateid, zbx_uint64_t templateid, int link_type);
 #define PREPARE_AUDIT_TEMPLATE_DELETE_H(funcname)								\
 void	zbx_audit_##funcname##_update_json_delete_parent_template(zbx_uint64_t hostid,				\
 		zbx_uint64_t hosttemplateid);

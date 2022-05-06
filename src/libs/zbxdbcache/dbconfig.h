@@ -20,7 +20,7 @@
 #ifndef ZABBIX_DBCONFIG_H
 #define ZABBIX_DBCONFIG_H
 
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
 

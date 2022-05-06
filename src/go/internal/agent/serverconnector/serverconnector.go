@@ -29,13 +29,13 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/resultcache"
 	"zabbix.com/internal/agent/scheduler"
 	"zabbix.com/internal/monitor"
 	"zabbix.com/pkg/glexpr"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/tls"
 	"zabbix.com/pkg/version"
 	"zabbix.com/pkg/zbxcomms"
@@ -284,7 +284,7 @@ func (c *Connector) refreshActiveChecks() {
 			return
 		}
 
-		if len(*response.Expressions[i].Delimiter) != 1 {
+		if len(*response.Expressions[i].Delimiter) > 1 {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: invalid tag "exp_delimiter" value "%s"`,
 				c.clientID, c.addresses[0], *response.Expressions[i].Delimiter)
 			return

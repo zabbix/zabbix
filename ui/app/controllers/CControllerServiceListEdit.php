@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -86,9 +86,10 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 
 		foreach ($this->getInput('filter_tags', []) as $tag) {
 			if (!array_key_exists('tag', $tag) || !array_key_exists('value', $tag)
-				|| ($tag['tag'] === '' && $tag['value'] === '')) {
+					|| ($tag['tag'] === '' && $tag['value'] === '')) {
 				continue;
 			}
+
 			$filter['tags'][] = $tag;
 		}
 

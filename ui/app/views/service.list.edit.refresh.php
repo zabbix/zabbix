@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -28,8 +28,8 @@ $output = [
 	'body' => (new CPartial('service.list.edit', $data))->getOutput()
 ];
 
-if (($messages = getMessages()) !== null) {
-	$output['messages'] = $messages->toString();
+if ($messages = get_and_clear_messages()) {
+	$output['error']['messages'] = array_column($messages, 'message');
 }
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

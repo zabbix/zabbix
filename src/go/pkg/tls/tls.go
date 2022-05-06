@@ -29,7 +29,7 @@ package tls
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
-#include "config.h"
+#include "common/config.h"
 
 #define TLS_UNUSED(var)	(void)(var)
 
@@ -942,8 +942,8 @@ import (
 	"time"
 	"unsafe"
 
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/uri"
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/uri"
 )
 
 // TLS initialization

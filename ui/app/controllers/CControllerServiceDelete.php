@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -53,11 +53,11 @@ class CControllerServiceDelete extends CController {
 	 * @throws APIException
 	 */
 	protected function doAction(): void {
-		$output = [];
-
 		$serviceids = $this->getInput('serviceids');
 
 		$result = API::Service()->delete($serviceids);
+
+		$output = [];
 
 		if ($result) {
 			$output['success']['title'] = _n('Service deleted', 'Services deleted', count($serviceids));
@@ -67,6 +67,11 @@ class CControllerServiceDelete extends CController {
 			}
 		}
 		else {
+			$output['error'] = [
+				'title' => _n('Cannot delete service', 'Cannot delete services', count($serviceids)),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
+
 			$services = API::Service()->get([
 				'output' => [],
 				'serviceids' => $serviceids,
@@ -74,11 +79,7 @@ class CControllerServiceDelete extends CController {
 				'preservekeys' => true
 			]);
 
-			$output['error'] = [
-				'title' => _n('Cannot delete service', 'Cannot delete services', count($serviceids)),
-				'messages' => array_column(get_and_clear_messages(), 'message'),
-				'keepids' => array_keys($services)
-			];
+			$output['keepids'] = array_keys($services);
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
