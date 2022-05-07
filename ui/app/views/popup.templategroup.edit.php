@@ -20,57 +20,14 @@
 
 
 /**
- * @var CView $this
  * @var array $data
  */
 
-$form = (new CForm())
-	->setName('templategroupForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addVar('groupid', $data['groupid']);
-
-// Enable form submitting on Enter.
-$form->addItem((new CInput('submit'))->addStyle('display: none;'));
-
-$form_grid = (new CFormGrid())
-	->addItem([
-		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		new CFormField((new CTextBox('name', $data['name']))
-			->setAttribute('autofocus', 'autofocus')
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-		)
-	]);
-
-if ($data['groupid'] != 0 && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-	$form_grid->addItem([
-		new CFormField((new CCheckBox('subgroups'))
-			->setLabel(_('Apply permissions to all subgroups'))
-			->setChecked($data['subgroups']))
-	]);
-}
-
-$form
-	->addItem($form_grid)
-	->addItem(
-		(new CScriptTag('
-			templategroup_edit_popup.init('.json_encode([
-				'groupid' => $data['groupid'],
-				'subgroups' => $data['subgroups'],
-				'create_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'templategroup.create')
-					->getUrl(),
-				'update_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'templategroup.update')
-					->getUrl(),
-				'delete_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'templategroup.delete')
-					->getUrl()
-			]).');
-		'))->setOnDocumentReady()
-	);
+$popup_url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'templategroup.edit');
 
 if ($data['groupid'] !== null) {
+	$popup_url->setArgument('groupid', $data['groupid']);
 	$title = _('Template group');
 	$buttons = [
 		[
@@ -85,23 +42,7 @@ if ($data['groupid'] !== null) {
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'templategroup_edit_popup.clone('.json_encode([
-					'title' => _('New template group'),
-					'buttons' => [
-						[
-							'title' => _('Add'),
-							'class' => 'js-add',
-							'keepOpen' => true,
-							'isSubmit' => true,
-							'action' => 'templategroup_edit_popup.submit();'
-						],
-						[
-							'title' => _('Cancel'),
-							'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-cancel']),
-							'action' => 'templategroup_edit_popup.cancel();'
-						]
-					]
-				]).');'
+			'action' => 'templategroup_edit_popup.clone();'
 		],
 		[
 			'title' => _('Delete'),
@@ -128,10 +69,20 @@ else {
 
 $output = [
 	'header' => $title,
-	'body' => $form->toString(),
+	'body' => (new CPartial('configuration.templategroup.edit.html', $data))->getOutput(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('popup.templategroup.edit.js.php')
+		$this->readJsFile('popup.templategroup.edit.js.php').
+		'templategroup_edit_popup.init('.json_encode([
+			'popup_url' => $popup_url->getUrl(),
+			'groupid' => $data['groupid'],
+			'name' => $data['name']
+		]).');'
 ];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
 
 echo json_encode($output);

@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerPopupTemplateGroupEdit extends CController{
+class CControllerTemplateGroupEdit extends CController{
 
 	protected function init(): void {
 		$this->disableSIDValidation();
@@ -28,6 +28,7 @@ class CControllerPopupTemplateGroupEdit extends CController{
 	protected function checkInput(): bool {
 		$fields = [
 			'groupid' =>			'db hstgrp.groupid',
+			'name' =>				'string',
 			'subgroups' =>			'in 0,1'
 		];
 
@@ -82,12 +83,14 @@ class CControllerPopupTemplateGroupEdit extends CController{
 			$data['name'] = $group['name'];
 		}
 		// for clone action
-		if (hasRequest('name')) {
-			$data['name'] = getRequest('name');
+		if ($this->hasInput('name')) {
+			$data['name'] = $this->getInput('name');
 		}
 
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 
-		$this->setResponse(new CControllerResponseData($data));
+		$response = new CControllerResponseData($data);
+		$response->setTitle(_('Configuration of template group'));
+		$this->setResponse($response);
 	}
 }

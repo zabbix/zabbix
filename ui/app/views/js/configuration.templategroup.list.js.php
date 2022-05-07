@@ -51,12 +51,18 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail));
-			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
-				uncheckTableRows('hostgroup');
+			const url = new Curl('zabbix.php', false);
+			url.setArgument('action', 'templategroup.list');
 
-				this._reload(e.detail);
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail, url.getUrl()));
+			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
+				uncheckTableRows('templategroup');
+
+				this._reload(e.detail, url.getUrl());
 			});
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', url.getUrl());
+			}, {once: true});
 		},
 
 		delete(target, groupids) {
@@ -115,14 +121,14 @@
 				});
 		},
 
-		_reload(success) {
+		_reload(success, original_url) {
 			postMessageOk(success.title);
 
 			if ('messages' in success) {
 				postMessageDetails('success', success.messages);
 			}
 
-			location.href = location.href;
+			original_url === null ? location.href = location.href : location.href = original_url;
 		}
 	}
 </script>
