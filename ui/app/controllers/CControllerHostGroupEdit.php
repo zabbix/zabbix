@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerPopupHostGroupEdit extends CController{
+class CControllerHostGroupEdit extends CController{
 
 	protected function init(): void {
 		$this->disableSIDValidation();
@@ -28,6 +28,7 @@ class CControllerPopupHostGroupEdit extends CController{
 	protected function checkInput(): bool {
 		$fields = [
 			'groupid' =>			'db hstgrp.groupid',
+			'name' =>				'string',
 			'subgroups' =>			'in 0,1'
 		];
 
@@ -82,13 +83,15 @@ class CControllerPopupHostGroupEdit extends CController{
 			$data['name'] = $group['name'];
 		}
 		// for clone action
-		if (hasRequest('name')) {
-			$data['name'] = getRequest('name');
+		if ($this->hasInput('name')) {
+			$data['name'] = $this->getInput('name');
 		}
 
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 
-		$this->setResponse(new CControllerResponseData($data));
+		$response = new CControllerResponseData($data);
+		$response->setTitle(_('Configuration of host group'));
+		$this->setResponse($response);
 	}
 }
 

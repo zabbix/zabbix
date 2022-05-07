@@ -24,53 +24,11 @@
  * @var array $data
  */
 
-$form = (new CForm())
-	->setName('hostgroupForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addVar('groupid', $data['groupid']);
-
-// Enable form submitting on Enter.
-$form->addItem((new CInput('submit'))->addStyle('display: none;'));
-
-$form_grid = (new CFormGrid())
-	->addItem([
-		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		new CFormField((new CTextBox('name', $data['name']))
-			->setAttribute('autofocus', 'autofocus')
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-		)
-	]);
-
-if ($data['groupid'] != 0 && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-	$form_grid->addItem([
-		new CFormField((new CCheckBox('subgroups'))
-			->setLabel(_('Apply permissions and tag filters to all subgroups'))
-			->setChecked($data['subgroups']))
-	]);
-}
-
-$form
-	->addItem($form_grid)
-	->addItem(
-		(new CScriptTag('
-			hostgroup_edit_popup.init('.json_encode([
-				'groupid' => $data['groupid'],
-				'subgroups' => $data['subgroups'],
-				'create_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'hostgroup.create')
-					->getUrl(),
-				'update_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'hostgroup.update')
-					->getUrl(),
-				'delete_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'hostgroup.delete')
-					->getUrl()
-			]).');
-		'))->setOnDocumentReady()
-	);
+$popup_url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'hostgroup.edit');
 
 if ($data['groupid'] !== null) {
+	$popup_url->setArgument('groupid', $data['groupid']);
 	$title = _('Host group');
 	$buttons = [
 		[
@@ -85,23 +43,7 @@ if ($data['groupid'] !== null) {
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'hostgroup_edit_popup.clone('.json_encode([
-					'title' => _('New host group'),
-					'buttons' => [
-						[
-							'title' => _('Add'),
-							'class' => 'js-add',
-							'keepOpen' => true,
-							'isSubmit' => true,
-							'action' => 'hostgroup_edit_popup.submit();'
-						],
-						[
-							'title' => _('Cancel'),
-							'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-cancel']),
-							'action' => 'hostgroup_edit_popup.cancel();'
-						]
-					]
-				]).');'
+			'action' => 'hostgroup_edit_popup.clone();'
 		],
 		[
 			'title' => _('Delete'),
@@ -129,11 +71,21 @@ else {
 $output = [
 	'header' => $title,
 	'doc_url' => CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOSTGROUPS_EDIT),
-	'body' => $form->toString(),
+	'body' => (new CPartial('configuration.hostgroup.edit.html', $data))->getOutput(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('popup.hostgroup.edit.js.php')
+		$this->readJsFile('popup.hostgroup.edit.js.php').
+		'hostgroup_edit_popup.init('.json_encode([
+			'popup_url' => $popup_url->getUrl(),
+			'groupid' => $data['groupid'],
+			'name' => $data['name']
+		]).');'
 ];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
 
 echo json_encode($output);
 

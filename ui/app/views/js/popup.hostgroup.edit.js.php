@@ -26,23 +26,18 @@
 
 window.hostgroup_edit_popup = {
 	groupid: null,
-	subgroups: null,
-
-	create_url: null,
-	update_url: null,
-	delete_url: null,
+	name: null,
 
 	overlay: null,
 	dialogue: null,
 	form: null,
 	footer: null,
 
-	init({groupid, subgroups, create_url, update_url, delete_url}) {
-		this.groupid = groupid;
+	init({popup_url, groupid, name}) {
+		history.replaceState({}, '', popup_url);
 
-		this.create_url = create_url;
-		this.update_url = update_url;
-		this.delete_url = delete_url;
+		this.groupid = groupid;
+		this.name = name;
 
 		this.overlay = overlays_stack.getById('hostgroup_edit');
 		this.dialogue = this.overlay.$dialogue[0];
@@ -67,7 +62,12 @@ window.hostgroup_edit_popup = {
 
 		this.overlay.setLoading();
 
-		const curl = new Curl(this.groupid !== null ? this.update_url : this.create_url);
+		const update_url = new Curl('zabbix.php', false);
+		update_url.setArgument('action', 'hostgroup.update');
+		const create_url = new Curl('zabbix.php', false);
+		create_url.setArgument('action', 'hostgroup.create');
+
+		const curl = this.groupid !== null ? update_url : create_url;
 
 		this._post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
@@ -80,15 +80,20 @@ window.hostgroup_edit_popup = {
 		overlayDialogueDestroy(this.overlay.dialogueid);
 	},
 
-	clone({title, buttons}) {
+	clone() {
 		this.groupid = null;
 
-		this.overlay.unsetLoading();
-		this.overlay.setProperties({title, buttons});
+		PopUp('popup.hostgroup.edit', {name: this.name}, {
+			dialogueid: 'hostgroup_edit',
+			dialogue_class: 'modal-popup-static',
+			prevent_navigation: true
+		});
 	},
 
 	delete() {
-		const curl = new Curl(this.delete_url);
+		const curl = new Curl('zabbix.php', false);
+		curl.setArgument('action', 'hostgroup.delete');
+		curl.addSID();
 
 		this._post(curl.getUrl(), {groupids: [this.groupid]}, (response) => {
 				overlayDialogueDestroy(this.overlay.dialogueid);
