@@ -26,7 +26,10 @@
 
 <script>
 	const view = {
+		original_url: null,
+
 		init() {
+			this.original_url = location.href;
 
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-edit-templategroup')) {
@@ -54,7 +57,6 @@
 		},
 
 		openHostPopup(host_data) {
-			const original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {
 				dialogueid: 'host_edit',
 				dialogue_class: 'modal-popup-large',
@@ -65,7 +67,7 @@
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
-				history.replaceState({}, '', original_url);
+				history.replaceState({}, '', this.original_url);
 			}, {once: true});
 		},
 
@@ -75,15 +77,11 @@
 				dialogue_class: 'modal-popup-static'
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				postMessageOk(e.detail.title);
-
-				if (e.detail.messages !== null) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				location.href = location.href;
-			});
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.groupSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.groupSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', this.original_url);
+			}, {once: true});
 		},
 
 		editHostGroup(parameters = {}) {
@@ -92,15 +90,11 @@
 				dialogue_class: 'modal-popup-static'
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				postMessageOk(e.detail.title);
-
-				if (e.detail.messages !== null) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				location.href = location.href;
-			});
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.groupSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.groupSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', this.original_url);
+			}, {once: true});
 		},
 
 		events: {
@@ -113,6 +107,16 @@
 					if ('messages' in data.success) {
 						postMessageDetails('success', data.success.messages);
 					}
+				}
+
+				location.href = location.href;
+			},
+
+			groupSuccess(e) {
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
 				}
 
 				location.href = location.href;
