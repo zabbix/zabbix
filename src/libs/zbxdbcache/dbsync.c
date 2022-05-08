@@ -59,12 +59,16 @@ typedef struct
 }
 zbx_dbsync_journal_t;
 
+ZBX_VECTOR_DECL(dbsync_changelog, zbx_dbsync_changelog_t)
+ZBX_VECTOR_IMPL(dbsync_changelog, zbx_dbsync_changelog_t)
+
 typedef struct
 {
-	zbx_hashset_t		strpool;
-	ZBX_DC_CONFIG		*cache;
+	zbx_hashset_t			strpool;
+	ZBX_DC_CONFIG			*cache;
 
-	zbx_hashset_t		changelog;
+	zbx_hashset_t			changelog;
+	zbx_vector_dbsync_changelog_t	changelog_queue;
 
 	zbx_dbsync_journal_t	journals[ZBX_DBSYNC_OBJ_COUNT];
 }
@@ -283,7 +287,7 @@ void	zbx_dbsync_journal_destroy(zbx_dbsync_journal_t *journal)
 	zbx_vector_uint64_destroy(&journal->deletes);
 }
 
-void	zbx_dbsync_init_env(ZBX_DC_CONFIG *cache)
+void	zbx_dbsync_env_init(ZBX_DC_CONFIG *cache)
 {
 	dbsync_env.cache = cache;
 	zbx_hashset_create(&dbsync_env.changelog, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -342,13 +346,15 @@ static void	dbsync_prune_changelog()
 	DBfree_result(result);
 }
 
-int	zbx_dbsync_prepare_env(unsigned char mode)
+int	zbx_dbsync_env_prepare(unsigned char mode)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_dbsync_changelog_t	changelog_local;
 	int			changelog_num;
 	size_t			i;
+
+	zbx_vector_dbsync_changelog_create(&dbsync_env.changelog_queue);
 
 	zbx_hashset_create(&dbsync_env.strpool, 100, dbsync_strpool_hash_func, dbsync_strpool_compare_func);
 
@@ -383,7 +389,7 @@ int	zbx_dbsync_prepare_env(unsigned char mode)
 				continue;
 
 			changelog_local.clock = atoi(row[4]);
-			zbx_hashset_insert(&dbsync_env.changelog, &changelog_local, sizeof(changelog_local));
+			zbx_vector_dbsync_changelog_append(&dbsync_env.changelog_queue, changelog_local);
 
 			journal = &dbsync_env.journals[ZBX_DBSYNC_JOURNAL(atoi(row[1]))];
 			ZBX_DBROW2UINT64(objectid, row[2]);
@@ -415,10 +421,22 @@ int	zbx_dbsync_prepare_env(unsigned char mode)
 	return dbsync_env.changelog.num_data - changelog_num;
 }
 
-void	zbx_dbsync_clear_env(void)
+void zbx_dbsync_env_flush_queue(void)
+{
+	int	i;
+
+	for (i = 0; i < dbsync_env.changelog_queue.values_num; i++)
+	{
+		zbx_hashset_insert(&dbsync_env.changelog, &dbsync_env.changelog_queue.values[i],
+				sizeof(zbx_dbsync_changelog_t));
+	}
+}
+
+void	zbx_dbsync_env_clear(void)
 {
 	size_t	i;
 
+	zbx_vector_dbsync_changelog_destroy(&dbsync_env.changelog_queue);
 	zbx_hashset_destroy(&dbsync_env.strpool);
 
 	for (i = 0; i < ARRSIZE(dbsync_env.journals); i++)
@@ -430,7 +448,7 @@ void	zbx_dbsync_clear_env(void)
  * Purpose: get rows changed since last sync                                  *
  *                                                                            *
  ******************************************************************************/
-static void	dbsync_get_rows(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, size_t *sql_offset,
+static int	dbsync_get_rows(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *field, const char *order, const zbx_vector_uint64_t *ids, unsigned char tag)
 {
 	DB_ROW		dbrow;
@@ -447,7 +465,9 @@ static void	dbsync_get_rows(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, s
 		if (NULL != order)
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, order);
 
-		result = DBselect("%s", *sql);
+		if (NULL == (result = DBselect("%s", *sql)))
+			return FAIL;
+
 		*sql_offset = sql_offset_reset;
 
 		while (NULL != (dbrow = DBfetch(result)))
@@ -458,6 +478,8 @@ static void	dbsync_get_rows(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, s
 		}
 		DBfree_result(result);
 	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -465,7 +487,7 @@ static void	dbsync_get_rows(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, s
  * Purpose: read query data based on changelog journal                        *
  *                                                                            *
  ******************************************************************************/
-static void	dbsync_read_journal(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, size_t *sql_offset,
+static int	dbsync_read_journal(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *field, const char *keyword, const char *order, const zbx_dbsync_journal_t *journal)
 {
 	int	i;
@@ -477,14 +499,20 @@ static void	dbsync_read_journal(zbx_dbsync_t *sync, char **sql, size_t *sql_allo
 
 		if (0 != journal->inserts.values_num)
 		{
-			dbsync_get_rows(sync, sql, sql_alloc, sql_offset, field, order, &journal->inserts,
-					ZBX_DBSYNC_ROW_ADD);
+			if (FAIL == dbsync_get_rows(sync, sql, sql_alloc, sql_offset, field, order, &journal->inserts,
+					ZBX_DBSYNC_ROW_ADD))
+			{
+				return FAIL;
+			}
 		}
 
 		if (0 != journal->updates.values_num)
 		{
-			dbsync_get_rows(sync, sql, sql_alloc, sql_offset, field, order, &journal->updates,
-					ZBX_DBSYNC_ROW_UPDATE);
+			if (FAIL == dbsync_get_rows(sync, sql, sql_alloc, sql_offset, field, order, &journal->updates,
+					ZBX_DBSYNC_ROW_UPDATE))
+			{
+				return FAIL;
+			}
 		}
 	}
 
@@ -494,6 +522,8 @@ static void	dbsync_read_journal(zbx_dbsync_t *sync, char **sql, size_t *sql_allo
 	sync->add_num = journal->inserts.values_num;
 	sync->update_num = journal->updates.values_num;
 	sync->remove_num = journal->deletes.values_num;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -819,7 +849,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "hostid", "and", NULL,
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "hostid", "and", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST)]);
 out:
 	zbx_free(sql);
@@ -1514,7 +1544,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "i.itemid", "and", NULL,
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "i.itemid", "and", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM)]);
 out:
 	zbx_free(sql);
@@ -1860,7 +1890,7 @@ int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "triggerid", "where", NULL,
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "triggerid", "where", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_TRIGGER)]);
 out:
 	zbx_free(sql);
@@ -2010,7 +2040,7 @@ int	zbx_dbsync_compare_functions(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "functionid", "where", NULL,
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "functionid", "where", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_FUNCTION)]);
 out:
 	zbx_free(sql);
@@ -2439,7 +2469,7 @@ int	zbx_dbsync_compare_trigger_tags(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "triggertagid", "where", NULL,
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "triggertagid", "where", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_TRIGGER_TAG)]);
 out:
 	zbx_free(sql);
@@ -2474,7 +2504,7 @@ int	zbx_dbsync_compare_item_tags(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "itemtagid", "where", NULL,
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "itemtagid", "where", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM_TAG)]);
 out:
 	zbx_free(sql);
@@ -2509,7 +2539,7 @@ int	zbx_dbsync_compare_host_tags(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "hosttagid", "where", NULL,
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "hosttagid", "where", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST_TAG)]);
 out:
 	zbx_free(sql);
@@ -2965,7 +2995,7 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "pp.item_preprocid", "and", NULL,
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "pp.item_preprocid", "and", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM_PREPROC)]);
 out:
 	zbx_free(sql);

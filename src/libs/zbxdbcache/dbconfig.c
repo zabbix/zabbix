@@ -5448,7 +5448,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	config->sync_start_ts = time(NULL);
 
 	sec = zbx_time();
-	changelog_num = zbx_dbsync_prepare_env(mode);
+	changelog_num = zbx_dbsync_env_prepare(mode);
 	changelog_sec = zbx_time() - sec;
 
 	if (ZBX_DBSYNC_INIT == mode)
@@ -6132,6 +6132,8 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 
 		zbx_shmem_dump_stats(LOG_LEVEL_DEBUG, config_mem);
 	}
+
+	zbx_dbsync_env_flush_queue();
 out:
 	if (0 == sync_in_progress)
 	{
@@ -6191,7 +6193,7 @@ out:
 	if (ZBX_DBSYNC_INIT == mode)
 		zbx_hashset_destroy(&trend_queue);
 
-	zbx_dbsync_clear_env();
+	zbx_dbsync_env_clear();
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		DCdump_configuration();
@@ -6660,7 +6662,7 @@ int	init_configuration_cache(char **error)
 	else
 		config->session_token = NULL;
 
-	zbx_dbsync_init_env(config);
+	zbx_dbsync_env_init(config);
 
 #undef CREATE_HASHSET
 #undef CREATE_HASHSET_EXT
