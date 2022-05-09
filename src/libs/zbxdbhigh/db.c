@@ -888,12 +888,14 @@ int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int
 		zabbix_log(LOG_LEVEL_WARNING, "PostgreSQL version %lu is not supported with TimescaleDB, minimum"
 				" required is %d.", (unsigned long)db_version_info->current_version,
 				ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB);
+		db_version_info->ext_err_code = ZBX_TIMESCALEDB_POSTGRES_TOO_OLD;
 		ret = FAIL;
 		goto out;
 	}
 
 	if (DB_VERSION_FAILED_TO_RETRIEVE == db_version_info->ext_flag)
 	{
+		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_FAILED_TO_RETRIEVE;
 		ret = FAIL;
 		goto out;
 	}
@@ -903,6 +905,7 @@ int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int
 		zabbix_log(LOG_LEVEL_WARNING, "Version must be at least %d. Recommended version should be at least"
 				" %s %s.", ZBX_TIMESCALE_MIN_VERSION, ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY,
 				ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY);
+		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_LOWER_THAN_MINIMUM;
 		ret = FAIL;
 		goto out;
 	}
@@ -913,6 +916,7 @@ int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int
 					db_version_info->ext_current_version);
 		zabbix_log(LOG_LEVEL_WARNING, "Recommended version should be at least %s %s.",
 				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY, ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY);
+		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_NOT_SUPPORTED;
 
 		if (0 == allow_unsupported_ver)
 		{
@@ -929,6 +933,7 @@ int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Recommended version should not be higher than %s %s.",
 				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY, ZBX_TIMESCALE_MAX_VERSION_FRIENDLY);
+		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_HIGHER_THAN_MAXIMUM;
 
 		if (0 == allow_unsupported_ver)
 		{
@@ -946,12 +951,14 @@ int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int
 				ZBX_NULL2EMPTY_STR(db_version_info->ext_lic));
 		zabbix_log(LOG_LEVEL_WARNING, "%s is required to use TimescaleDB compression.",
 				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY);
+		db_version_info->ext_err_code = ZBX_TIMESCALEDB_LICENSE_NOT_COMMUNITY;
 		db_version_info->ext_status |= ZBX_DB_EXT_STATUS_FLAGS_TSDB_DISABLE_COMPRESSION;
 		goto out;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s was detected. TimescaleDB compression is supported.",
 			ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY);
+	db_version_info->ext_err_code = ZBX_EXT_SUCCEED;
 	db_version_info->ext_status |= ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE;
 out:
 	return ret;

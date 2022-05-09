@@ -214,6 +214,19 @@ typedef enum
 }
 zbx_db_version_status_t;
 
+typedef enum
+{	/* db extension error codes shared with FRONTEND */
+	ZBX_EXT_ERR_UNDEFINED = 0,
+	ZBX_EXT_SUCCEED = 1,
+	ZBX_TIMESCALEDB_POSTGRES_TOO_OLD,
+	ZBX_TIMESCALEDB_VERSION_FAILED_TO_RETRIEVE,
+	ZBX_TIMESCALEDB_VERSION_LOWER_THAN_MINIMUM,
+	ZBX_TIMESCALEDB_VERSION_NOT_SUPPORTED,
+	ZBX_TIMESCALEDB_VERSION_HIGHER_THAN_MAXIMUM,
+	ZBX_TIMESCALEDB_LICENSE_NOT_COMMUNITY,
+}
+zbx_db_ext_err_code_t;
+
 zbx_uint32_t	zbx_dbms_version_get(void);
 
 struct zbx_db_version_info_t
@@ -254,6 +267,7 @@ struct zbx_db_version_info_t
 
 	char			*ext_lic;
 	zbx_uint32_t		ext_status;
+	zbx_db_ext_err_code_t	ext_err_code;
 };
 
 void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);
