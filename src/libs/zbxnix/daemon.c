@@ -33,8 +33,10 @@
 #define ZBX_PID_FILE_SLEEP_TIME 100000000
 #endif
 
-char		*CONFIG_PID_FILE = NULL;
 static int	parent_pid = -1;
+
+/* pointer to function for getting caller's PID file location */
+static zbx_get_pid_file_pathname_f	get_pid_file_pathname_cb = NULL;
 
 extern pid_t	*threads;
 extern int	threads_num;
@@ -317,13 +319,20 @@ static void	set_daemon_signal_handlers(void)
  *             user       - user on the system to which to drop the           *
  *                          privileges                                        *
  *             flags      - daemon startup flags                              *
+ *        get_pid_file_cb - callback function for getting absolute path and   *
+ *                          name of PID file                                  *
+ *       zbx_on_exit_cb_arg - callback function called when terminating       *
+ *                            signal handler                                  *
  *                                                                            *
  * Comments: it doesn't allow running under 'root' if allow_root is zero      *
  *                                                                            *
  ******************************************************************************/
-int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags)
+int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
+		zbx_get_pid_file_pathname_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg)
 {
 	struct passwd	*pwd;
+
+	get_pid_file_pathname_cb = get_pid_file_cb;
 
 	if (0 == allow_root && 0 == getuid())	/* running as root? */
 	{
@@ -391,7 +400,7 @@ int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags)
 				struct timespec	ts = {0, ZBX_PID_FILE_SLEEP_TIME};
 
 				/* wait for the forked child to create pid file */
-				while (0 < pid_file_timeout && 0 != zbx_stat(CONFIG_PID_FILE, &stat_buff))
+				while (0 < pid_file_timeout && 0 != zbx_stat(get_pid_file_cb(), &stat_buff))
 				{
 					pid_file_timeout--;
 					nanosleep(&ts, NULL);
@@ -417,14 +426,14 @@ int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags)
 			exit(EXIT_FAILURE);
 	}
 
-	if (FAIL == create_pid_file(CONFIG_PID_FILE))
+	if (FAIL == create_pid_file(get_pid_file_cb()))
 		exit(EXIT_FAILURE);
 
 	atexit(zbx_daemon_stop);
 
 	parent_pid = (int)getpid();
 
-	zbx_set_common_signal_handlers();
+	zbx_set_common_signal_handlers(zbx_on_exit_cb_arg);
 	set_daemon_signal_handlers();
 
 	/* Set SIGCHLD now to avoid race conditions when a child process is created before */
@@ -443,17 +452,17 @@ void	zbx_daemon_stop(void)
 	if (parent_pid != (int)getpid())
 		return;
 
-	drop_pid_file(CONFIG_PID_FILE);
+	drop_pid_file(get_pid_file_pathname_cb());
 }
 
-int	zbx_sigusr_send(int flags)
+int	zbx_sigusr_send(int flags, const char *pid_file_pathname)
 {
 	int	ret = FAIL;
 	char	error[256];
 #ifdef HAVE_SIGQUEUE
 	pid_t	pid;
 
-	if (SUCCEED == read_pid_file(CONFIG_PID_FILE, &pid, error, sizeof(error)))
+	if (SUCCEED == read_pid_file(pid_file_pathname, &pid, error, sizeof(error)))
 	{
 		union sigval	s;
 

@@ -171,15 +171,42 @@ zbx_vmware_dvswitch_t;
 int	vmware_dvs_uuid_compare(const void *d1, const void *d2);
 ZBX_PTR_VECTOR_DECL(vmware_dvswitch, zbx_vmware_dvswitch_t *)
 
-#define ZBX_VMWARE_DEV_TYPE_NIC		1
-#define ZBX_VMWARE_DEV_TYPE_DISK	2
+#define ZBX_VMWARE_DEV_TYPE_NIC				1
+#define ZBX_VMWARE_DEV_TYPE_DISK			2
+#define ZBX_VMWARE_DEV_PROPS_IFMAC			0
+#define ZBX_VMWARE_DEV_PROPS_IFCONNECTED		1
+#define ZBX_VMWARE_DEV_PROPS_IFTYPE			2
+#define ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE		3
+#define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID		4
+#define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP	5
+#define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORT		6
+#define ZBX_VMWARE_DEV_PROPS_NUM			7
+
 typedef struct
 {
 	int	type;
 	char	*instance;
 	char	*label;
+	char	**props;
 }
 zbx_vmware_dev_t;
+
+#define ZBX_DUPLEX_FULL		0
+#define ZBX_DUPLEX_HALF		1
+
+/* hypervisor physical NIC data */
+typedef struct
+{
+	char		*name;
+	zbx_uint64_t	speed;
+	int		duplex;
+	char		*driver;
+	char		*mac;
+}
+zbx_vmware_pnic_t;
+
+int	vmware_pnic_compare(const void *v1, const void *v2);
+ZBX_PTR_VECTOR_DECL(vmware_pnic, zbx_vmware_pnic_t *)
 
 /* file system data */
 typedef struct
@@ -215,6 +242,7 @@ typedef struct
 	char				**props;
 	zbx_vector_vmware_dsname_t	dsnames;
 	zbx_vector_ptr_t		vms;
+	zbx_vector_vmware_pnic_t	pnics;
 }
 zbx_vmware_hv_t;
 
@@ -453,8 +481,11 @@ zbx_vmware_cust_query_t	*zbx_vmware_service_get_cust_query(zbx_vmware_service_t 
 #define ZBX_VMWARE_HVPROP_SENSOR			17
 #define ZBX_VMWARE_HVPROP_NET_NAME			18
 #define ZBX_VMWARE_HVPROP_PARENT			19
+#define ZBX_VMWARE_HVPROP_CONNECTIONSTATE		20
+#define ZBX_VMWARE_HVPROP_HW_SERIALNUMBER		21
+#define ZBX_VMWARE_HVPROP_HW_SENSOR			22
 
-#define ZBX_VMWARE_HVPROPS_NUM				20
+#define ZBX_VMWARE_HVPROPS_NUM				23
 
 /* virtual machine properties */
 #define ZBX_VMWARE_VMPROP_CPU_NUM			0
@@ -482,8 +513,11 @@ zbx_vmware_cust_query_t	*zbx_vmware_service_get_cust_query(zbx_vmware_service_t 
 #define ZBX_VMWARE_VMPROP_DATASTOREID			22
 #define ZBX_VMWARE_VMPROP_CONSOLIDATION_NEEDED		23
 #define ZBX_VMWARE_VMPROP_RESOURCEPOOL			24
+#define ZBX_VMWARE_VMPROP_TOOLS_VERSION			25
+#define ZBX_VMWARE_VMPROP_TOOLS_RUNNING_STATUS		26
+#define ZBX_VMWARE_VMPROP_STATE				27
 
-#define ZBX_VMWARE_VMPROPS_NUM				25
+#define ZBX_VMWARE_VMPROPS_NUM				28
 
 /* vmware service types */
 #define ZBX_VMWARE_TYPE_UNKNOWN	0

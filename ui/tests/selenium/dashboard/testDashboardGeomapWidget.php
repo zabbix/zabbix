@@ -166,7 +166,7 @@ class testDashboardGeomapWidget extends CWebTest {
 
 		// Check operator's dropdown options presence.
 		$this->assertEquals(['Exists', 'Equals', 'Contains', 'Does not exist', 'Does not equal',
-				'Does not contain'], $form->getField('id:tags_0_operator')->asZDropdown()->getOptions()->asText()
+				'Does not contain'], $form->getField('id:tags_0_operator')->asDropdown()->getOptions()->asText()
 		);
 
 		$hint_text = "Comma separated center coordinates and zoom level to display when the widget is initially loaded.".

@@ -224,7 +224,7 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 		$this->assertEquals('', $form->getField($fields['value'])->getValue());
 
 		// Fill value with text.
-		$form->getField($fields['dropdown'])->asZDropdown()->fill('label');
+		$form->getField($fields['dropdown'])->fill('label');
 		$form->getField($fields['value'])->fill('test');
 
 		$values = [
@@ -239,7 +239,7 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 
 		// Change dropdown values and check label field value and editability.
 		foreach ($values as $value => $enabled) {
-			$form->getField($fields['dropdown'])->asZDropdown()->fill($value);
+			$form->getField($fields['dropdown'])->fill($value);
 			$this->assertTrue($form->getField($fields['value'])->isEnabled($enabled));
 
 			// Check that entered value did not disappear.
