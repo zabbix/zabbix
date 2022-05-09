@@ -32,17 +32,12 @@
 			this.original_url = location.href;
 
 			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-edit-templategroup')) {
-					this.editTemplateGroup({groupid: e.target.dataset.groupid});
-				}
-				else if (e.target.classList.contains('js-edit-hostgroup')) {
-					this.editHostGroup({groupid: e.target.dataset.groupid});
-				}
-				else if (e.target.closest('a')) {
-					if (e.target.closest('a').classList.contains('js-edit-templategroup')) {
+				const group_link = e.target.closest('a');
+				if (group_link !== null) {
+					if (group_link.classList.contains('js-edit-templategroup')) {
 						this.editTemplateGroup({groupid: e.target.closest('a').dataset.groupid});
 					}
-					if (e.target.closest('a').classList.contains('js-edit-hostgroup')) {
+					else if (group_link.classList.contains('js-edit-hostgroup')) {
 						this.editHostGroup({groupid: e.target.closest('a').dataset.groupid});
 					}
 				}
