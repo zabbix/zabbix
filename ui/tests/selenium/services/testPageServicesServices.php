@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  *
  * @onBefore prepareServicesData
  */
-class testPageMonitoringServices extends CWebTest {
+class testPageServicesServices extends CWebTest {
 
 	use TableTrait;
 
@@ -39,6 +39,11 @@ class testPageMonitoringServices extends CWebTest {
 	const LAYOUT_PARENT = 'Server 3';
 	const LAYOUT_CHILD = 'Server 2';
 	const LAYOUT_CHILD2 = 'Server 1';
+
+	const ROOTCAUSE_PARENT = 'Test order';
+	const ROOTCAUSE_CHILD1 = '1';
+	const ROOTCAUSE_CHILD2 = '2';
+	const ROOTCAUSE_CHILD3 = '3';
 
 	const BREADCRUMB_SELECTOR = 'xpath://ul[@class="breadcrumbs"]';
 	const TABLE_SELECTOR = 'id:service-list';
@@ -219,17 +224,20 @@ class testPageMonitoringServices extends CWebTest {
 			[
 				'name' => '1',
 				'algorithm' => 1,
-				'sortorder' => 2
+				'sortorder' => 2,
+				'weight' => 10
 			],
 			[
 				'name' => '2',
 				'algorithm' => 1,
-				'sortorder' => 2
+				'sortorder' => 2,
+				'weight' => 10
 			],
 			[
 				'name' => '3',
 				'algorithm' => 1,
-				'sortorder' => 2
+				'sortorder' => 2,
+				'weight' => 10
 			]
 		]);
 
@@ -321,7 +329,40 @@ class testPageMonitoringServices extends CWebTest {
 		DBexecute("UPDATE services SET status = 5 WHERE name = 'Server with problem'");
 	}
 
-	public function testPageMonitoringServices_LayoutView() {
+	/**
+	 * Set parent and child services to Problem status and link the child services to the corresponding problem events.
+	 */
+	public static function prepareServiceProblemsData() {
+		// Statuses: Warning = 2, Average = 3, High = 4.
+		$service_statuses = [
+			self::ROOTCAUSE_PARENT => 4,
+			self::ROOTCAUSE_CHILD1 => 2,
+			self::ROOTCAUSE_CHILD2 => 3,
+			self::ROOTCAUSE_CHILD3 => 4
+		];
+
+		$service_ids = [];
+		$i = 1;
+
+		foreach ($service_statuses as $service => $status) {
+			$service_ids[$service] = CDBHelper::getValue('SELECT serviceid FROM services WHERE name='.zbx_dbstr($service));
+
+			// Change service status to Problem with the corresponding severity.
+			DBexecute('UPDATE services SET status='.zbx_dbstr($status).' WHERE serviceid='.zbx_dbstr($service_ids[$service]));
+
+			// Link child services to the corresponding problem events.
+			if ($service !== self::ROOTCAUSE_PARENT) {
+				// Corresponding trigger problem events have ids starting from 9001 in data_test.sql, so "9000 + $i" is used.
+				DBexecute('INSERT into service_problem (service_problemid, eventid, serviceid, severity) '.
+						'VALUES ('.$i.', '.(9000 + $i).', '.$service_ids[$service].', '.$status.')'
+				);
+
+				$i++;
+			}
+		}
+	}
+
+	public function testPageServicesServices_LayoutView() {
 		$this->page->login()->open('zabbix.php?action=service.list');
 		$this->page->assertTitle('Services');
 		$this->page->assertHeader('Services');
@@ -370,7 +411,7 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertTrue($this->query('id:service-list')->exists());
 	}
 
-	public function testPageMonitoringServices_LayoutEdit() {
+	public function testPageServicesServices_LayoutEdit() {
 		$this->page->login()->open('zabbix.php?action=service.list');
 		$this->query('id:list_mode')->asSegmentedRadio()->one()->waitUntilClickable()->select('Edit');
 		$this->page->waitUntilReady();
@@ -803,7 +844,7 @@ class testPageMonitoringServices extends CWebTest {
 	/**
 	 * @dataProvider getFilterCommonData
 	 */
-	public function testPageMonitoringServices_FilterView($data) {
+	public function testPageServicesServices_FilterView($data) {
 		$this->checkFiltering($data);
 	}
 
@@ -811,12 +852,12 @@ class testPageMonitoringServices extends CWebTest {
 	 * @dataProvider getFilterEditData
 	 * @dataProvider getFilterCommonData
 	 */
-	public function testPageMonitoringServices_FilterEdit($data) {
+	public function testPageServicesServices_FilterEdit($data) {
 		$this->checkFiltering($data, self::EDIT);
 	}
 
 	/**
-	 * Function for checking filtering on Monitoring->Service page.
+	 * Function for checking filtering on Services->Service page.
 	 *
 	 * @param array      $data      data provider
 	 * @param boolean    $edit      true if is edit scenario, false otherwise
@@ -881,7 +922,7 @@ class testPageMonitoringServices extends CWebTest {
 		}
 	}
 
-	public function testPageMonitoringServices_ResetButton() {
+	public function testPageServicesServices_ResetButton() {
 		$this->page->login()->open('zabbix.php?action=service.list');
 
 		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
@@ -912,7 +953,7 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertEquals($start_contents, $this->getTableResult('Name'));
 	}
 
-	public function testPageMonitoringServices_AddChild() {
+	public function testPageServicesServices_AddChild() {
 		$parent = 'Server with problem';
 		$child_name = 'Added child for Server with problem';
 
@@ -947,11 +988,11 @@ class testPageMonitoringServices extends CWebTest {
 				$parentid.' AND servicedownid ='.zbx_dbstr($childid)));
 	}
 
-	public function testPageMonitoringServices_CancelDeleteFromRow() {
+	public function testPageServicesServices_CancelDeleteFromRow() {
 		$this->cancelDelete();
 	}
 
-	public function testPageMonitoringServices_CancelMassDelete() {
+	public function testPageServicesServices_CancelMassDelete() {
 		$this->cancelDelete(true);
 	}
 
@@ -988,7 +1029,7 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 	}
 
-	public function testPageMonitoringServices_SimpleServiceDeleteFromRow() {
+	public function testPageServicesServices_SimpleServiceDeleteFromRow() {
 		$name = 'Server 7 for delete';
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
@@ -1012,7 +1053,7 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($name)));
 	}
 
-	public function testPageMonitoringServices_DeleteChildFromRow() {
+	public function testPageServicesServices_DeleteChildFromRow() {
 		$parent = 'Server 8 with child for delete';
 		$name = 'Server 10 child for Server 8';
 
@@ -1042,7 +1083,7 @@ class testPageMonitoringServices extends CWebTest {
 
 	}
 
-	public function testPageMonitoringServices_DeleteParentFromRow() {
+	public function testPageServicesServices_DeleteParentFromRow() {
 		$name = 'Server 9 with child for delete';
 		$child = 'Server 11 child for Server 9';
 
@@ -1080,7 +1121,7 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($child)));
 	}
 
-	public function testPageMonitoringServices_SimpleServicesMassDelete() {
+	public function testPageServicesServices_SimpleServicesMassDelete() {
 		$names = [
 			'Server for mass delete 1',
 			'Server for mass delete 2',
@@ -1105,8 +1146,7 @@ class testPageMonitoringServices extends CWebTest {
 
 		// Services disappeared from frontend.
 		foreach ($names as $name) {
-			$this->assertFalse($table->query("xpath:.//td/a[text()=".CXPathHelper::escapeQuotes($name)."]")->exists()
-			);
+			$this->assertFalse($table->query("xpath:.//td/a[text()=".CXPathHelper::escapeQuotes($name)."]")->exists());
 		}
 
 		// Check database.
@@ -1115,7 +1155,7 @@ class testPageMonitoringServices extends CWebTest {
 		);
 	}
 
-	public function testPageMonitoringServices_ChildrenMassDelete() {
+	public function testPageServicesServices_ChildrenMassDelete() {
 		$parent = 'Server 12';
 		$names = [
 			'Child for mass deleting 1',
@@ -1157,12 +1197,12 @@ class testPageMonitoringServices extends CWebTest {
 	/**
 	 * Test for checking services ordering.
 	 */
-	public function testPageMonitoringServices_TestOrder() {
+	public function testPageServicesServices_TestOrder() {
 		$parent = 'Test order';
 		$children = ['1' => 2, '2' => 3, '3' => 1];
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
-		$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
+		$table = $this->query('class:list-table')->waitUntilVisible()->asTable()->one();
 		$table->findRow('Name', $parent, true)->query('link', $parent)->waitUntilClickable()->one()->click();
 		$this->assertTableDataColumn(['1', '2', '3']);
 
@@ -1176,5 +1216,597 @@ class testPageMonitoringServices extends CWebTest {
 		}
 
 		$this->assertTableDataColumn(['3', '1', '2']);
+	}
+
+	public static function getRootCauseData() {
+		return [
+			// All children have problems without any advanced configuration on parent or on child services.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Most critical if all children have problems'
+					],
+					'parent_rootcause' => '1_trigger_High, 1_trigger_Average, 1_trigger_Warning'
+				]
+			],
+			// Most critical of child services without any advanced configuration on parent or on child services.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Most critical of child services'
+					],
+					'parent_rootcause' => '1_trigger_High, 1_trigger_Average, 1_trigger_Warning'
+				]
+			],
+			// Set status to OK any advanced configuration on parent or on child services.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK'
+					]
+				]
+			],
+			// Warning - If at least 1 child service has High status or above.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK',
+						'Additional rules' => [
+							[
+								'Set status to' => 'Warning',
+								'Condition' => 'If at least N child services have Status status or above',
+								'name:limit_value' => 1,
+								'Status' => 'High'
+							]
+						]
+					],
+					'parent_rootcause' => '1_trigger_High'
+				]
+			],
+			// Warning - If at least 2 child service has High status or above.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK',
+						'Additional rules' => [
+							[
+								'Set status to' => 'Warning',
+								'Condition' => 'If at least N child services have Status status or above',
+								'name:limit_value' => 2,
+								'Status' => 'High'
+							]
+						]
+					]
+				]
+			],
+			// Warning - If at least 50% of child services have Average status or above.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK',
+						'Additional rules' => [
+							[
+								'Set status to' => 'Warning',
+								'Condition' => 'If at least N% of child services have Status status or above',
+								'name:limit_value' => 50,
+								'Status' => 'Average'
+							]
+						]
+					],
+					'parent_rootcause' => '1_trigger_High, 1_trigger_Average'
+				]
+			],
+			// Warning - If at least 90% of child services have Average status or above.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK',
+						'Additional rules' => [
+							[
+								'Set status to' => 'Warning',
+								'Condition' => 'If at least N% of child services have Status status or above',
+								'name:limit_value' => 90,
+								'Status' => 'Average'
+							]
+						]
+					]
+				]
+			],
+			// Warning - If less than 3 child services have Average status or below.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK',
+						'Additional rules' => [
+							[
+								'Set status to' => 'Warning',
+								'Condition' => 'If less than N child services have Status status or below',
+								'name:limit_value' => 3,
+								'Status' => 'Average'
+							]
+						]
+					],
+					'parent_rootcause' => '1_trigger_High'
+				]
+			],
+			// Warning - If less than 2 child services have Average status or below.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK',
+						'Additional rules' => [
+							[
+								'Set status to' => 'Warning',
+								'Condition' => 'If less than N child services have Status status or below',
+								'name:limit_value' => 2,
+								'Status' => 'Average'
+							]
+						]
+					]
+				]
+			],
+			// Warning - If less than 35% of child services have Warning status or below.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK',
+						'Additional rules' => [
+							[
+								'Set status to' => 'Warning',
+								'Condition' => 'If less than N% of child services have Status status or below',
+								'name:limit_value' => 35,
+								'Status' => 'Warning'
+							]
+						]
+					],
+					'parent_rootcause' => '1_trigger_High, 1_trigger_Average'
+				]
+			],
+			// Warning - If less than 30% of child services have Warning status or below.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK',
+						'Additional rules' => [
+							[
+								'Set status to' => 'Warning',
+								'Condition' => 'If less than N% of child services have Status status or below',
+								'name:limit_value' => 30,
+								'Status' => 'Warning'
+							]
+						]
+					]
+				]
+			],
+			// Warning - If weight of child services with Average status or above is at least 30.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK',
+						'Additional rules' => [
+							[
+								'Set status to' => 'Warning',
+								'Condition' => 'If weight of child services with Status status or above is at least W',
+								'name:limit_value' => 20,
+								'Status' => 'Average'
+							]
+						]
+					],
+					'parent_rootcause' => '1_trigger_High, 1_trigger_Average'
+				]
+			],
+			// Warning - If weight of child services with Average status or above is at least 25.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK',
+						'Additional rules' => [
+							[
+								'Set status to' => 'Warning',
+								'Condition' => 'If weight of child services with Status status or above is at least W',
+								'name:limit_value' => 25,
+								'Status' => 'Average'
+							]
+						]
+					]
+				]
+			],
+			// Warning - If weight of child services with Average status or above is at least 66%.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK',
+						'Additional rules' => [
+							[
+								'Set status to' => 'Warning',
+								'Condition' => 'If weight of child services with Status status or above is at least N%',
+								'name:limit_value' => 66,
+								'Status' => 'Average'
+							]
+						]
+					],
+					'parent_rootcause' => '1_trigger_High, 1_trigger_Average'
+				]
+			],
+			// Warning - If weight of child services with Average status or above is at least 67%.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK',
+						'Additional rules' => [
+							[
+								'Set status to' => 'Warning',
+								'Condition' => 'If weight of child services with Status status or above is at least N%',
+								'name:limit_value' => 67,
+								'Status' => 'Average'
+							]
+						]
+					]
+				]
+			],
+			// Warning - If weight of child services with Average status or below is less than 21.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK',
+						'Additional rules' => [
+							[
+								'Set status to' => 'Warning',
+								'Condition' => 'If weight of child services with Status status or below is less than W',
+								'name:limit_value' => 21,
+								'Status' => 'Average'
+							]
+						]
+					],
+					'parent_rootcause' => '1_trigger_High'
+				]
+			],
+			// Warning - If weight of child services with Average status or below is less than 20.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK',
+						'Additional rules' => [
+							[
+								'Set status to' => 'Warning',
+								'Condition' => 'If weight of child services with Status status or below is less than W',
+								'name:limit_value' => 20,
+								'Status' => 'Average'
+							]
+						]
+					]
+				]
+			],
+			// Warning - If weight of child services with Average status or below is less than 67%.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK',
+						'Additional rules' => [
+							[
+								'Set status to' => 'Warning',
+								'Condition' => 'If weight of child services with Status status or below is less than N%',
+								'name:limit_value' => 67,
+								'Status' => 'Average'
+							]
+						]
+					],
+					'parent_rootcause' => '1_trigger_High'
+				]
+			],
+			// Warning - If weight of child services with Average status or below is less than 66%.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK',
+						'Additional rules' => [
+							[
+								'Set status to' => 'Warning',
+								'Condition' => 'If weight of child services with Status status or below is less than N%',
+								'name:limit_value' => 66,
+								'Status' => 'Average'
+							]
+						]
+					]
+				]
+			],
+			// Multiple additional rules.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK',
+						'Additional rules' => [
+							[
+								'Set status to' => 'Information',
+								'Condition' => 'If weight of child services with Status status or below is less than N%',
+								'name:limit_value' => 67,
+								'Status' => 'Average'
+							],
+							[
+								'Set status to' => 'Warning',
+								'Condition' => 'If weight of child services with Status status or above is at least N%',
+								'name:limit_value' => 66,
+								'Status' => 'Average'
+							],
+							[
+								'Set status to' => 'High',
+								'Condition' => 'If less than N% of child services have Status status or below',
+								'name:limit_value' => 30,
+								'Status' => 'Warning'
+							]
+						]
+					],
+					'parent_rootcause' => '1_trigger_High, 1_trigger_Average'
+				]
+			],
+			// Child status propagation rule - Increase by.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK',
+						'Additional rules' => [
+							[
+								'Set status to' => 'Average',
+								'Condition' => 'If at least N child services have Status status or above',
+								'name:limit_value' => 2,
+								'Status' => 'High'
+							]
+						]
+					],
+					'child' => [
+						[
+							'name' => self::ROOTCAUSE_CHILD1,
+							'fields' => [
+								'Status propagation rule' => 'Increase by',
+								'id:propagation_value_number' => 3
+							]
+						]
+					],
+					'child_rootcause' => [
+						'1' => '1_trigger_Warning',
+						'2' => '1_trigger_Average',
+						'3' => '1_trigger_High'
+					],
+					'parent_rootcause' => '1_trigger_High, 1_trigger_Warning'
+				]
+			],
+			// Child status propagation rule - Decrease by.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK',
+						'Additional rules' => [
+							[
+								'Set status to' => 'Average',
+								'Condition' => 'If at least N child services have Status status or above',
+								'name:limit_value' => 2,
+								'Status' => 'Average'
+							]
+						]
+					],
+					'child' => [
+						[
+							'name' => self::ROOTCAUSE_CHILD1,
+							'fields' => [
+								'Status propagation rule' => 'As is'
+							]
+						],
+						[
+							'name' => self::ROOTCAUSE_CHILD3,
+							'fields' => [
+								'Status propagation rule' => 'Decrease by',
+								'id:propagation_value_number' => 2
+							]
+						]
+					]
+				]
+			],
+			// Child status propagation rule - Ignore this service.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK',
+						'Additional rules' => [
+							[
+								'Set status to' => 'Average',
+								'Condition' => 'If less than N% of child services have Status status or below',
+								'name:limit_value' => 51,
+								'Status' => 'Average'
+							]
+						]
+					],
+					'child' => [
+						[
+							'name' => self::ROOTCAUSE_CHILD3,
+							'fields' => [
+								'Status propagation rule' => 'As is'
+							]
+						],
+						[
+							'name' => self::ROOTCAUSE_CHILD2,
+							'fields' => [
+								'Status propagation rule' => 'Ignore this service'
+							]
+						]
+					],
+					'parent_rootcause' => '1_trigger_High'
+				]
+			],
+			// Child status propagation rule - Fixed status.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Set status to OK',
+						'Additional rules' => [
+							[
+								'Set status to' => 'High',
+								'Condition' => 'If weight of child services with Status status or above is at least W',
+								'name:limit_value' => 20,
+								'Status' => 'High'
+							]
+						]
+					],
+					'child' => [
+						[
+							'name' => self::ROOTCAUSE_CHILD2,
+							'fields' => [
+								'Status propagation rule' => 'As is'
+							]
+						],
+						[
+							'name' => self::ROOTCAUSE_CHILD1,
+							'fields' => [
+								'Status propagation rule' => 'Fixed status',
+								'id:propagation_value_status' => 'Disaster'
+							]
+						]
+					],
+					'parent_rootcause' => '1_trigger_High, 1_trigger_Warning'
+				]
+			],
+			// All three child services use status propagation modifications. Should not be possible to decrease to OK.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Most critical of child services'
+					],
+					'child' => [
+						[
+							'name' => self::ROOTCAUSE_CHILD1,
+							'fields' => [
+								'Status propagation rule' => 'Decrease by',
+								'id:propagation_value_number' => 5
+							]
+						],
+						[
+							'name' => self::ROOTCAUSE_CHILD2,
+							'fields' => [
+								'Status propagation rule' => 'Fixed status',
+								'id:propagation_value_status' => 'OK'
+							]
+						],
+						[
+							'name' => self::ROOTCAUSE_CHILD3,
+							'fields' => [
+								'Status propagation rule' => 'Ignore this service'
+							]
+						]
+					],
+					'parent_rootcause' => '1_trigger_Warning'
+				]
+			],
+			// All three child services use status propagation modifications. Increase all to High and above.
+			[
+				[
+					'parent' => [
+						'Status calculation rule' => 'Most critical if all children have problems',
+						'Additional rules' => [
+							[
+								'Set status to' => 'High',
+								'Condition' => 'If weight of child services with Status status or below is less than W',
+								'name:limit_value' => 1,
+								'Status' => 'Average'
+							]
+						]
+					],
+					'child' => [
+						[
+							'name' => self::ROOTCAUSE_CHILD1,
+							'fields' => [
+								'Status propagation rule' => 'Increase by',
+								'id:propagation_value_number' => 5
+							]
+						],
+						[
+							'name' => self::ROOTCAUSE_CHILD2,
+							'fields' => [
+								'Status propagation rule' => 'Fixed status',
+								'id:propagation_value_status' => 'Disaster'
+							]
+						],
+						[
+							'name' => self::ROOTCAUSE_CHILD3,
+							'fields' => [
+								'Status propagation rule' => 'As is'
+							]
+						]
+					],
+					'parent_rootcause' => '1_trigger_High, 1_trigger_Average, 1_trigger_Warning'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @onBeforeOnce prepareServiceProblemsData
+	 *
+	 * @dataProvider getRootCauseData
+	 */
+	public function testPageServicesServices_RootCause($data) {
+		$this->page->login()->open('zabbix.php?action=service.list.edit');
+
+		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
+		$row = $table->findRow('Name', self::ROOTCAUSE_PARENT, true);
+		$row->query('xpath:.//button[@title="Edit"]')->waitUntilClickable()->one()->click();
+
+		COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $this->query('id:service-form')->asForm()->one();
+		$form->getField('Status calculation rule')->fill($data['parent']['Status calculation rule']);
+
+		if (array_key_exists('Additional rules', $data['parent'])) {
+			$form->query('id:advanced_configuration')->asCheckbox()->one()->set(true);
+
+			// Remove the additional rules from previous test cases.
+			$form->getFieldContainer('Additional rules')->query('button:Remove')->all(false)->click();
+
+			// Fill in configuration of each Addirional rule separately.
+			foreach ($data['parent']['Additional rules'] as $rule_fields) {
+				$form->getFieldContainer('Additional rules')->query('button:Add')->waitUntilClickable()->one()->click();
+				$rules_form = COverlayDialogElement::find()->all()->last()->waitUntilReady()->asForm();
+				$rules_form->fill($rule_fields);
+				$rules_form->submit();
+			}
+		}
+
+		$form->submit();
+		$table->waitUntilReloaded();
+
+		// Fill in the Advanced configuration fields for child services, that impact the root cause on the parent service.
+		if (array_key_exists('child', $data)) {
+			$this->query('link', self::ROOTCAUSE_PARENT)->one()->waitUntilClickable()->click();
+			$this->page->waitUntilReady();
+
+			$child_table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
+
+			// Check the root causes for the child services if corresponding data exists in the data provider.
+			if (array_key_exists('child_rootcause', $data)) {
+				foreach ($data['child_rootcause'] as $service_name => $child_rootcause) {
+					$this->assertEquals($data['child_rootcause'][$service_name], $child_table->findRow('Name', $service_name)
+							->getColumn('Root cause')->getText()
+					);
+				}
+			}
+
+			// Fill in configuration of each child service separately.
+			foreach ($data['child'] as $child_service) {
+				$child_table->findRow('Name', $child_service['name'])->query('xpath:.//button[@title="Edit"]')->one()->click();
+
+				COverlayDialogElement::find()->one()->waitUntilReady();
+				$form = $this->query('id:service-form')->asForm()->one();
+
+				$form->fill($child_service['fields']);
+				$form->submit();
+
+				$child_table->waitUntilReloaded();
+			}
+
+			// Exit to the default services view, where parent root cause can be seen.
+			$this->query('link:All services')->one()->waitUntilClickable()->click();
+			$this->page->waitUntilReady();
+		}
+
+		// Check root cause of the parent service.
+		$row->invalidate();
+		$this->assertEquals(CTestArrayHelper::get($data, 'parent_rootcause', ''), $row->getColumn('Root cause')->getText());
 	}
 }
