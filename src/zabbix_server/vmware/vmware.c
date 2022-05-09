@@ -102,6 +102,7 @@ ZBX_PTR_VECTOR_IMPL(vmware_datacenter, zbx_vmware_datacenter_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_diskextent, zbx_vmware_diskextent_t *)
 ZBX_VECTOR_IMPL(vmware_hvdisk, zbx_vmware_hvdisk_t)
 ZBX_PTR_VECTOR_IMPL(vmware_dsname, zbx_vmware_dsname_t *)
+ZBX_PTR_VECTOR_IMPL(vmware_pnic, zbx_vmware_pnic_t *)
 
 /* VMware service object name mapping for vcenter and vsphere installations */
 typedef struct
@@ -226,6 +227,9 @@ static zbx_uint64_t	evt_req_chunk_size;
 	"/*/*/*/*/*/*[local-name()='propSet']/*/*[local-name()='DatastoreHostMount']"			\
 	"/*[local-name()='mountInfo']/*[local-name()='path']"
 
+#define ZBX_XPATH_HV_PNICS()										\
+	"/*/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='PhysicalNic']"	\
+
 #define ZBX_XPATH_HV_DATASTORES()									\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='datastore']]"		\
 	"/*[local-name()='val']/*[@type='Datastore']"
@@ -321,12 +325,12 @@ static zbx_uint64_t	evt_req_chunk_size;
 
 #define ZBX_VM_NONAME_XML	"noname.xml"
 
-#define ZBX_HVPROPMAP_EXT(property, func)								\
-	{property, ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE(property), func}
+#define ZBX_HVPROPMAP_EXT(property, func, ver)								\
+	{property, ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE(property), func, ver}
 #define ZBX_HVPROPMAP(property)										\
-	ZBX_HVPROPMAP_EXT(property, NULL)
+	ZBX_HVPROPMAP_EXT(property, NULL, 0)
 #define ZBX_VMPROPMAP(property)										\
-	{property, ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE(property), NULL}
+	{property, ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE(property), NULL, 0}
 
 typedef int	(*nodeprocfunc_t)(void *, char **);
 static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr);
@@ -336,6 +340,7 @@ typedef struct
 	const char	*name;
 	const char	*xpath;
 	nodeprocfunc_t	func;
+	unsigned short	vc_min;
 }
 zbx_vmware_propmap_t;
 
@@ -352,18 +357,22 @@ static zbx_vmware_propmap_t	hv_propmap[] = {
 	ZBX_HVPROPMAP("summary.hardware.vendor"), 		/* ZBX_VMWARE_HVPROP_HW_VENDOR */
 	ZBX_HVPROPMAP("summary.quickStats.overallMemoryUsage"),	/* ZBX_VMWARE_HVPROP_MEMORY_USED */
 	{NULL, ZBX_XPATH_HV_SENSOR_STATUS("runtime.healthSystemRuntime.systemHealthInfo.numericSensorInfo",
-			"VMware Rollup Health State"), NULL},	/* ZBX_VMWARE_HVPROP_HEALTH_STATE */
+			"VMware Rollup Health State"), NULL, 0},/* ZBX_VMWARE_HVPROP_HEALTH_STATE */
 	ZBX_HVPROPMAP("summary.quickStats.uptime"),		/* ZBX_VMWARE_HVPROP_UPTIME */
-	ZBX_HVPROPMAP("summary.config.product.version"),		/* ZBX_VMWARE_HVPROP_VERSION */
+	ZBX_HVPROPMAP("summary.config.product.version"),	/* ZBX_VMWARE_HVPROP_VERSION */
 	ZBX_HVPROPMAP("summary.config.name"),			/* ZBX_VMWARE_HVPROP_NAME */
 	ZBX_HVPROPMAP("overallStatus"),				/* ZBX_VMWARE_HVPROP_STATUS */
 	ZBX_HVPROPMAP("runtime.inMaintenanceMode"),		/* ZBX_VMWARE_HVPROP_MAINTENANCE */
 	ZBX_HVPROPMAP_EXT("summary.runtime.healthSystemRuntime.systemHealthInfo.numericSensorInfo",
-			zbx_xmlnode_to_json),			/* ZBX_VMWARE_HVPROP_SENSOR */
+			zbx_xmlnode_to_json, 0),		/* ZBX_VMWARE_HVPROP_SENSOR */
 	{"config.network.dnsConfig", "concat("			/* ZBX_VMWARE_HVPROP_NET_NAME */
 			ZBX_XPATH_PROP_NAME("config.network.dnsConfig") "/*[local-name()='hostName']" ",'.',"
-			ZBX_XPATH_PROP_NAME("config.network.dnsConfig") "/*[local-name()='domainName'])", NULL},
-	ZBX_HVPROPMAP("parent")					/* ZBX_VMWARE_HVPROP_PARENT */
+			ZBX_XPATH_PROP_NAME("config.network.dnsConfig") "/*[local-name()='domainName'])", NULL, 0},
+	ZBX_HVPROPMAP("parent"),				/* ZBX_VMWARE_HVPROP_PARENT */
+	ZBX_HVPROPMAP("runtime.connectionState"),		/* ZBX_VMWARE_HVPROP_CONNECTIONSTATE */
+	ZBX_HVPROPMAP_EXT("hardware.systemInfo.serialNumber", NULL, 67),/* ZBX_VMWARE_HVPROP_HW_SERIALNUMBER */
+	ZBX_HVPROPMAP_EXT("runtime.healthSystemRuntime.hardwareStatusInfo",
+			zbx_xmlnode_to_json, 0)			/* ZBX_VMWARE_HVPROP_SENSOR */
 };
 
 static zbx_vmware_propmap_t	vm_propmap[] = {
@@ -390,11 +399,14 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 	ZBX_VMPROPMAP("parent"),				/* ZBX_VMWARE_VMPROP_FOLDER */
 	{"layoutEx</ns0:pathSet><ns0:pathSet>snapshot",		/* ZBX_VMWARE_VMPROP_SNAPSHOT */
 			ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE("snapshot"),
-			vmware_service_get_vm_snapshot},
+			vmware_service_get_vm_snapshot, 0},
 	{"datastore", ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM)/* ZBX_VMWARE_VMPROP_DATASTOREID */
-			ZBX_XPATH_PROP_NAME_NODE("datastore") ZBX_XPATH_LN("ManagedObjectReference"), NULL},
+			ZBX_XPATH_PROP_NAME_NODE("datastore") ZBX_XPATH_LN("ManagedObjectReference"), NULL, 0},
 	ZBX_VMPROPMAP("summary.runtime.consolidationNeeded"),	/* ZBX_VMWARE_VMPROP_CONSOLIDATION_NEEDED */
-	ZBX_VMPROPMAP("resourcePool")				/* ZBX_VMWARE_VMPROP_RESOURCEPOOL */
+	ZBX_VMPROPMAP("resourcePool"),				/* ZBX_VMWARE_VMPROP_RESOURCEPOOL */
+	ZBX_VMPROPMAP("guest.toolsVersion"),			/* ZBX_VMWARE_VMPROP_TOOLS_VERSION */
+	ZBX_VMPROPMAP("guest.toolsRunningStatus"),		/* ZBX_VMWARE_VMPROP_TOOLS_RUNNING_STATUS */
+	ZBX_VMPROPMAP("guest.guestState")			/* ZBX_VMWARE_VMPROP_STATE */
 };
 
 #define ZBX_XPATH_OBJECTS_BY_TYPE(type)									\
@@ -1056,6 +1068,8 @@ static void	vmware_dev_shared_free(zbx_vmware_dev_t *dev)
 	if (NULL != dev->label)
 		vmware_shared_strfree(dev->label);
 
+	vmware_props_shared_free(dev->props, ZBX_VMWARE_DEV_PROPS_NUM);
+
 	__vm_shmem_free_func(dev);
 }
 
@@ -1117,6 +1131,22 @@ static void	vmware_dsname_shared_free(zbx_vmware_dsname_t *dsname)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: frees shared resources allocated to store physical NIC data       *
+ *                                                                            *
+ * Parameters: nic - [IN] the physical NIC of hv                              *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_pnic_shared_free(zbx_vmware_pnic_t *nic)
+{
+	vmware_shared_strfree(nic->name);
+	vmware_shared_strfree(nic->driver);
+	vmware_shared_strfree(nic->mac);
+
+	__vm_shmem_free_func(nic);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: frees shared resources allocated to store vmware hypervisor       *
  *                                                                            *
  * Parameters: hv   - [IN] the vmware hypervisor                              *
@@ -1129,6 +1159,9 @@ static void	vmware_hv_shared_clean(zbx_vmware_hv_t *hv)
 
 	zbx_vector_ptr_clear_ext(&hv->vms, (zbx_clean_func_t)vmware_vm_shared_free);
 	zbx_vector_ptr_destroy(&hv->vms);
+
+	zbx_vector_vmware_pnic_clear_ext(&hv->pnics, vmware_pnic_shared_free);
+	zbx_vector_vmware_pnic_destroy(&hv->pnics);
 
 	if (NULL != hv->uuid)
 		vmware_shared_strfree(hv->uuid);
@@ -1458,27 +1491,6 @@ static zbx_vmware_resourcepool_t	*vmware_resourcepool_shared_dup(const zbx_vmwar
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copies vmware virtual machine device object into shared memory    *
- *                                                                            *
- * Parameters: src   - [IN] the vmware device object                          *
- *                                                                            *
- * Return value: a duplicated vmware device object                            *
- *                                                                            *
- ******************************************************************************/
-static zbx_vmware_dev_t	*vmware_dev_shared_dup(const zbx_vmware_dev_t *src)
-{
-	zbx_vmware_dev_t	*dev;
-
-	dev = (zbx_vmware_dev_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_dev_t));
-	dev->type = src->type;
-	dev->instance = vmware_shared_strdup(src->instance);
-	dev->label = vmware_shared_strdup(src->label);
-
-	return dev;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: copies vmware virtual machine file system object into shared      *
  *          memory                                                            *
  *                                                                            *
@@ -1514,12 +1526,37 @@ static char	**vmware_props_shared_dup(char ** const src, int props_num)
 	char	**props;
 	int	i;
 
+	if (NULL == src)
+		return NULL;
+
 	props = (char **)__vm_shmem_malloc_func(NULL, sizeof(char *) * props_num);
 
 	for (i = 0; i < props_num; i++)
 		props[i] = vmware_shared_strdup(src[i]);
 
 	return props;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: copies vmware virtual machine device object into shared memory    *
+ *                                                                            *
+ * Parameters: src   - [IN] the vmware device object                          *
+ *                                                                            *
+ * Return value: a duplicated vmware device object                            *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_dev_t	*vmware_dev_shared_dup(const zbx_vmware_dev_t *src)
+{
+	zbx_vmware_dev_t	*dev;
+
+	dev = (zbx_vmware_dev_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_dev_t));
+	dev->type = src->type;
+	dev->instance = vmware_shared_strdup(src->instance);
+	dev->label = vmware_shared_strdup(src->label);
+	dev->props = vmware_props_shared_dup(src->props, ZBX_VMWARE_DEV_PROPS_NUM);
+
+	return dev;
 }
 
 /******************************************************************************
@@ -1588,6 +1625,29 @@ static zbx_vmware_dsname_t	*vmware_dsname_shared_dup(const zbx_vmware_dsname_t *
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: copies vmware physical NIC object into shared memory              *
+ *                                                                            *
+ * Parameters: src   - [IN] the vmware physical NIC object                    *
+ *                                                                            *
+ * Return value: a duplicated vmware physical NIC object                      *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_pnic_t	*vmware_pnic_shared_dup(const zbx_vmware_pnic_t *src)
+{
+	zbx_vmware_pnic_t	*pnic;
+
+	pnic = (zbx_vmware_pnic_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_pnic_t));
+	pnic->name = vmware_shared_strdup(src->name);
+	pnic->speed = src->speed;
+	pnic->duplex = src->duplex;
+	pnic->driver = vmware_shared_strdup(src->driver);
+	pnic->mac = vmware_shared_strdup(src->mac);
+
+	return pnic;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: copies vmware hypervisor object into shared memory                *
  *                                                                            *
  * Parameters: dst - [OUT] the vmware hypervisor object into shared memory    *
@@ -1600,8 +1660,10 @@ static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
 
 	VMWARE_VECTOR_CREATE(&dst->dsnames, vmware_dsname);
 	VMWARE_VECTOR_CREATE(&dst->vms, ptr);
+	VMWARE_VECTOR_CREATE(&dst->pnics, vmware_pnic);
 	zbx_vector_vmware_dsname_reserve(&dst->dsnames, src->dsnames.values_num);
 	zbx_vector_ptr_reserve(&dst->vms, src->vms.values_num);
+	zbx_vector_vmware_pnic_reserve(&dst->pnics, src->pnics.values_num);
 
 	dst->uuid = vmware_shared_strdup(src->uuid);
 	dst->id = vmware_shared_strdup(src->id);
@@ -1618,6 +1680,9 @@ static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
 
 	for (i = 0; i < src->vms.values_num; i++)
 		zbx_vector_ptr_append(&dst->vms, vmware_vm_shared_dup((zbx_vmware_vm_t *)src->vms.values[i]));
+
+	for (i = 0; i < src->pnics.values_num; i++)
+		zbx_vector_vmware_pnic_append(&dst->pnics, vmware_pnic_shared_dup(src->pnics.values[i]));
 }
 
 /******************************************************************************
@@ -1790,13 +1855,14 @@ static void	vmware_props_free(char **props, int props_num)
  *                                                                            *
  * Purpose: frees resources allocated to store vm device object               *
  *                                                                            *
- * Parameters: dev   - [IN] the vm device                                     *
+ * Parameters: dev - [IN] the vm device                                       *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_dev_free(zbx_vmware_dev_t *dev)
 {
 	zbx_free(dev->instance);
 	zbx_free(dev->label);
+	vmware_props_free(dev->props, ZBX_VMWARE_DEV_PROPS_NUM);
 	zbx_free(dev);
 }
 
@@ -1850,6 +1916,21 @@ static void	vmware_dsname_free(zbx_vmware_dsname_t *dsname)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: frees resources allocated to store Datastore name data            *
+ *                                                                            *
+ * Parameters: nic - [IN] the pnic of hv                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_pnic_free(zbx_vmware_pnic_t *nic)
+{
+	zbx_free(nic->name);
+	zbx_free(nic->driver);
+	zbx_free(nic->mac);
+	zbx_free(nic);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: frees resources allocated to store vmware hypervisor              *
  *                                                                            *
  * Parameters: hv   - [IN] the vmware hypervisor                              *
@@ -1862,6 +1943,9 @@ static void	vmware_hv_clean(zbx_vmware_hv_t *hv)
 
 	zbx_vector_ptr_clear_ext(&hv->vms, (zbx_clean_func_t)vmware_vm_free);
 	zbx_vector_ptr_destroy(&hv->vms);
+
+	zbx_vector_vmware_pnic_clear_ext(&hv->pnics, vmware_pnic_free);
+	zbx_vector_vmware_pnic_destroy(&hv->pnics);
 
 	zbx_free(hv->uuid);
 	zbx_free(hv->id);
@@ -2461,6 +2545,49 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: gets virtual machine network interface devices' additional        *
+ * properties (props member of zbx_vmware_dev_t)                              *
+ *                                                                            *
+ * Parameters: details - [IN] a xml document containing virtual machine data  *
+ *             xmlNode - [IN] a xml document node that corresponds to given   *
+ *                            network interface device                        *
+ *                                                                            *
+ ******************************************************************************/
+static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node)
+{
+	char	**props;
+	xmlChar	*attr_value;
+
+	props = (char **)zbx_malloc(NULL, sizeof(char *) * ZBX_VMWARE_DEV_PROPS_NUM);
+
+	props[ZBX_VMWARE_DEV_PROPS_IFMAC] = zbx_xml_node_read_value(details, node, ZBX_XNN("macAddress"));
+	props[ZBX_VMWARE_DEV_PROPS_IFCONNECTED] = zbx_xml_node_read_value(details, node,
+			ZBX_XNN("connectable") ZBX_XPATH_LN("connected"));
+
+	if (NULL != (attr_value = xmlGetProp(node, (const xmlChar *)"type")))
+	{
+		props[ZBX_VMWARE_DEV_PROPS_IFTYPE] = zbx_strdup(NULL, (const char *)attr_value);
+		xmlFree(attr_value);
+	}
+	else
+	{
+		props[ZBX_VMWARE_DEV_PROPS_IFTYPE] = NULL;
+	}
+
+	props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE] = zbx_xml_node_read_value(details, node,
+			ZBX_XNN("backing") ZBX_XPATH_LN("deviceName"));
+	props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID] = zbx_xml_node_read_value(details, node,
+			ZBX_XNN("backing") ZBX_XPATH_LN2("port", "switchUuid"));
+	props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP] = zbx_xml_node_read_value(details, node,
+			ZBX_XNN("backing") ZBX_XPATH_LN2("port", "portgroupKey"));
+	props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORT] = zbx_xml_node_read_value(details, node,
+			ZBX_XNN("backing") ZBX_XPATH_LN2("port", "portKey"));
+
+	return props;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: gets virtual machine network interface devices                    *
  *                                                                            *
  * Parameters: vm      - [OUT] the virtual machine                            *
@@ -2502,10 +2629,11 @@ static void	vmware_vm_get_nic_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 			continue;
 
 		dev = (zbx_vmware_dev_t *)zbx_malloc(NULL, sizeof(zbx_vmware_dev_t));
-		dev->type =  ZBX_VMWARE_DEV_TYPE_NIC;
+		dev->type = ZBX_VMWARE_DEV_TYPE_NIC;
 		dev->instance = key;
 		dev->label = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
 				"*[local-name()='deviceInfo']/*[local-name()='label']");
+		dev->props = vmware_vm_get_nic_device_props(details, nodeset->nodeTab[i]);
 
 		zbx_vector_ptr_append(&vm->devs, dev);
 		nics++;
@@ -2594,6 +2722,7 @@ static void	vmware_vm_get_disk_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 
 			dev = (zbx_vmware_dev_t *)zbx_malloc(NULL, sizeof(zbx_vmware_dev_t));
 			dev->type =  ZBX_VMWARE_DEV_TYPE_DISK;
+			dev->props = NULL;
 
 			/* the virtual disk instance has format <controller type><busNumber>:<unitNumber>     */
 			/* where controller type is either ide, sata or scsi depending on the controller type */
@@ -3513,6 +3642,7 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 					"<ns0:pathSet>parent</ns0:pathSet>"				\
 					"<ns0:pathSet>datastore</ns0:pathSet>"				\
 					"<ns0:pathSet>config.virtualNicManagerInfo.netConfig</ns0:pathSet>"\
+					"<ns0:pathSet>config.network.pnic</ns0:pathSet>"		\
 					"<ns0:pathSet>config.network.ipRouteConfig.defaultGateway</ns0:pathSet>"\
 					"<ns0:pathSet>summary.managementServerIp</ns0:pathSet>"		\
 					"<ns0:pathSet>config.storageDevice.scsiTopology</ns0:pathSet>"	\
@@ -3548,6 +3678,9 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 	for (i = 0; i < props_num; i++)
 	{
 		if (NULL == propmap[i].name)
+			continue;
+
+		if (0 != propmap[i].vc_min && propmap[i].vc_min > service->major_version * 10 + service->minor_version)
 			continue;
 
 		zbx_strlcat(props, "<ns0:pathSet>", sizeof(props));
@@ -4131,6 +4264,73 @@ int	vmware_dsname_compare(const void *d1, const void *d2)
 	return strcmp(ds1->name, ds2->name);
 }
 
+int	vmware_pnic_compare(const void *v1, const void *v2)
+{
+	const zbx_vmware_pnic_t		*nic1 = *(const zbx_vmware_pnic_t * const *)v1;
+	const zbx_vmware_pnic_t		*nic2 = *(const zbx_vmware_pnic_t * const *)v2;
+
+	return strcmp(nic1->name, nic2->name);
+}
+
+static void	vmware_service_get_hv_pnics_data(xmlDoc *details, zbx_vector_vmware_pnic_t *nics)
+{
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+	int 		i = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	xpathCtx = xmlXPathNewContext(details);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_HV_PNICS(), xpathCtx)))
+		goto clean;
+
+	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+		goto clean;
+
+	nodeset = xpathObj->nodesetval;
+	zbx_vector_vmware_pnic_reserve(nics, nodeset->nodeNr);
+
+	for (; i < nodeset->nodeNr; i++)
+	{
+		zbx_vmware_pnic_t	*nic;
+		char			*value;
+
+		if (NULL == (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], ZBX_XNN("device"))))
+			continue;
+
+		nic = (zbx_vmware_pnic_t *)zbx_malloc(NULL, sizeof(zbx_vmware_pnic_t));
+		memset(nic, 0, sizeof(zbx_vmware_pnic_t));
+		nic->name = value;
+
+		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
+				ZBX_XNN("linkSpeed") ZBX_XPATH_LN("speedMb"))))
+		{
+			ZBX_STR2UINT64(nic->speed, value);
+			zbx_free(value);
+		}
+
+		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
+				ZBX_XNN("linkSpeed") ZBX_XPATH_LN("duplex"))))
+		{
+			nic->duplex = 0 == strcmp(value, "true") ? ZBX_DUPLEX_FULL : ZBX_DUPLEX_HALF;
+			zbx_free(value);
+		}
+
+		nic->driver = zbx_xml_node_read_value(details, nodeset->nodeTab[i], ZBX_XNN("driver"));
+		nic->mac = zbx_xml_node_read_value(details, nodeset->nodeTab[i], ZBX_XNN("mac"));
+		zbx_vector_vmware_pnic_append(nics, nic);
+	}
+
+	zbx_vector_vmware_pnic_sort(nics, vmware_pnic_compare);
+clean:
+	xmlXPathFreeObject(xpathObj);
+	xmlXPathFreeContext(xpathCtx);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, i);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: sorting function to sort Resource pool names vector by name       *
@@ -4162,10 +4362,10 @@ int	vmware_resourcepool_compare_id(const void *r1, const void *r2)
 static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, const char *id,
 		zbx_vector_vmware_datastore_t *dss, zbx_vmware_hv_t *hv, char **error)
 {
-	char			*value;
-	xmlDoc			*details = NULL, *multipath_data = NULL;
-	zbx_vector_str_t	datastores, vms;
-	int			i, j, ret = FAIL;
+	char				*value;
+	xmlDoc				*details = NULL, *multipath_data = NULL;
+	zbx_vector_str_t		datastores, vms;
+	int				i, j, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hvid:'%s'", __func__, id);
 
@@ -4176,6 +4376,8 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 
 	zbx_vector_str_create(&datastores);
 	zbx_vector_str_create(&vms);
+
+	zbx_vector_vmware_pnic_create(&hv->pnics);
 
 	if (SUCCEED != vmware_service_get_hv_data(service, easyhandle, id, hv_propmap,
 			ZBX_VMWARE_HVPROPS_NUM, &details, error))
@@ -4191,6 +4393,8 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 
 	hv->uuid = zbx_strdup(NULL, hv->props[ZBX_VMWARE_HVPROP_HW_UUID]);
 	hv->id = zbx_strdup(NULL, id);
+
+	vmware_service_get_hv_pnics_data(details, &hv->pnics);
 
 	if (NULL != (value = zbx_xml_doc_read_value(details, "//*[@type='" ZBX_VMWARE_SOAP_CLUSTER "']")))
 		hv->clusterid = value;
@@ -5912,40 +6116,42 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 	zbx_vmware_vm_t		*vm;
 	zbx_hashset_iter_t	iter;
 
-	const char			*hv_perfcounters[] = {
-						"net/packetsRx[summation]", "net/packetsTx[summation]",
-						"net/received[average]", "net/transmitted[average]",
-						"datastore/totalReadLatency[average]",
-						"datastore/totalWriteLatency[average]", "cpu/usage[average]",
-						"cpu/utilization[average]", "power/power[average]",
-						"net/droppedRx[summation]", "net/droppedTx[summation]",
-						"net/errorsRx[summation]", "net/errorsTx[summation]",
-						"net/broadcastRx[summation]", "net/broadcastTx[summation]",
-						"power/powerCap[average]",
-						NULL
-					};
+	const char		*hv_perfcounters[] = {
+					"net/packetsRx[summation]", "net/packetsTx[summation]",
+					"net/received[average]", "net/transmitted[average]",
+					"datastore/totalReadLatency[average]",
+					"datastore/totalWriteLatency[average]",
+					"datastore/numberReadAveraged[average]",
+					"datastore/numberWriteAveraged[average]",
+					"cpu/usage[average]", "cpu/utilization[average]",
+					"power/power[average]", "power/powerCap[average]",
+					"net/droppedRx[summation]", "net/droppedTx[summation]",
+					"net/errorsRx[summation]", "net/errorsTx[summation]",
+					"net/broadcastRx[summation]", "net/broadcastTx[summation]",
+					NULL
+				};
 
-	const char			*vm_perfcounters[] = {
-						"virtualDisk/read[average]", "virtualDisk/write[average]",
-						"virtualDisk/numberReadAveraged[average]",
-						"virtualDisk/numberWriteAveraged[average]",
-						"net/packetsRx[summation]", "net/packetsTx[summation]",
-						"net/received[average]", "net/transmitted[average]",
-						"cpu/ready[summation]", "net/usage[average]", "cpu/usage[average]",
-						"cpu/latency[average]", "cpu/readiness[average]",
-						"cpu/swapwait[summation]", "sys/osUptime[latest]",
-						"mem/consumed[average]", "mem/usage[average]", "mem/swapped[average]",
-						"net/usage[average]", "virtualDisk/readOIO[latest]",
-						"virtualDisk/writeOIO[latest]",
-						"virtualDisk/totalWriteLatency[average]",
-						"virtualDisk/totalReadLatency[average]",
-						NULL
-					};
+	const char		*vm_perfcounters[] = {
+					"virtualDisk/read[average]", "virtualDisk/write[average]",
+					"virtualDisk/numberReadAveraged[average]",
+					"virtualDisk/numberWriteAveraged[average]",
+					"net/packetsRx[summation]", "net/packetsTx[summation]",
+					"net/received[average]", "net/transmitted[average]",
+					"cpu/ready[summation]", "net/usage[average]", "cpu/usage[average]",
+					"cpu/latency[average]", "cpu/readiness[average]",
+					"cpu/swapwait[summation]", "sys/osUptime[latest]",
+					"mem/consumed[average]", "mem/usage[average]", "mem/swapped[average]",
+					"net/usage[average]", "virtualDisk/readOIO[latest]",
+					"virtualDisk/writeOIO[latest]",
+					"virtualDisk/totalWriteLatency[average]",
+					"virtualDisk/totalReadLatency[average]",
+					NULL
+				};
 
-	const char			*ds_perfcounters[] = {
-						"disk/used[latest]", "disk/provisioned[latest]",
-						"disk/capacity[latest]", NULL
-					};
+	const char		*ds_perfcounters[] = {
+					"disk/used[latest]", "disk/provisioned[latest]",
+					"disk/capacity[latest]", NULL
+				};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -6262,7 +6468,6 @@ out:
 		zbx_vector_ptr_append_array(&service->data->events, events.values, events.values_num);
 
 	service->lastcheck = time(NULL);
-
 	vmware_service_update_perf_entities(service);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
