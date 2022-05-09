@@ -23,7 +23,7 @@ import (
 	"reflect"
 	"testing"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 func TestPlugin_Start(t *testing.T) {

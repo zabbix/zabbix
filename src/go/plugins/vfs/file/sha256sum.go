@@ -26,7 +26,7 @@ import (
 	"io"
 	"time"
 
-	"zabbix.com/pkg/std"
+	"git.zabbix.com/ap/plugin-support/std"
 )
 
 func sha256sum(file std.File, start time.Time, timeout int) (result interface{}, err error) {

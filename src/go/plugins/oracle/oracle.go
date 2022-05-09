@@ -25,12 +25,12 @@ import (
 	"net/url"
 	"time"
 
-	"zabbix.com/pkg/uri"
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/uri"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 
 	"github.com/omeid/go-yarn"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 const (
