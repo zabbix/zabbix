@@ -70,7 +70,7 @@ class CControllerHostGroupEdit extends CController{
 			'name' => '',
 			'subgroups' => 0
 		];
-		// get values from the database
+
 		if ($this->getInput('groupid', 0)) {
 			$data['groupid'] = $this->getInput('groupid');
 
@@ -82,7 +82,7 @@ class CControllerHostGroupEdit extends CController{
 			$group = $groups[0];
 			$data['name'] = $group['name'];
 		}
-		// for clone action
+		// For clone action
 		if ($this->hasInput('name')) {
 			$data['name'] = $this->getInput('name');
 		}

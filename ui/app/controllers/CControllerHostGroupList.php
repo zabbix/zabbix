@@ -54,7 +54,6 @@ class CControllerHostGroupList extends CController {
 		CProfile::update('web.hostgroups.php.sort', $sort_field, PROFILE_TYPE_STR);
 		CProfile::update('web.hostgroups.php.sortorder', $sort_order, PROFILE_TYPE_STR);
 
-		// filter
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.groups.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 		}
@@ -90,7 +89,6 @@ class CControllerHostGroupList extends CController {
 		]);
 		order_result($groups, $sort_field, $sort_order);
 
-		// pager
 		if (hasRequest('page')) {
 			$page_num = getRequest('page', 1);
 		}
@@ -105,7 +103,6 @@ class CControllerHostGroupList extends CController {
 
 		$groupids = array_column($groups, 'groupid');
 
-		// get host count
 		$data['groupCounts'] = API::HostGroup()->get([
 			'output' => ['groupid'],
 			'groupids' => $groupids,
@@ -113,7 +110,6 @@ class CControllerHostGroupList extends CController {
 			'preservekeys' => true
 		]);
 
-		// get host groups
 		$limit = CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE) + 1;
 		$data['groups'] = API::HostGroup()->get([
 			'output' => ['groupid', 'name', 'flags'],

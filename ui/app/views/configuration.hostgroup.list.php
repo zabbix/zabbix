@@ -58,14 +58,12 @@ $widget = (new CWidget())
 		->addVar('action', 'hostgroup.list')
 	);
 
-// create form
 $form = (new CForm())->setName('hostgroup_list');
 
 $view_url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'hostgroup.list')
 	->getUrl();
 
-// create table
 $table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
@@ -115,7 +113,7 @@ foreach ($this->data['groups'] as $group) {
 
 	$host_count = $this->data['groupCounts'][$group['groupid']]['hosts'];
 
-	// name
+
 	$name = [];
 	if ($group['discoveryRule']) {
 		if ($data['allowed_ui_conf_hosts']) {
@@ -136,7 +134,6 @@ foreach ($this->data['groups'] as $group) {
 		->addClass('js-edit-hostgroup')
 		->setAttribute('data-groupid', $group['groupid']);
 
-	// info, discovered item lifetime indicator
 	$info_icons = [];
 	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $group['groupDiscovery']['ts_delete'] != 0) {
 		$info_icons[] = getHostGroupLifetimeIndicator($current_time, $group['groupDiscovery']['ts_delete']);
@@ -166,7 +163,6 @@ foreach ($this->data['groups'] as $group) {
 	]);
 }
 
-// append table to form
 $form->addItem([
 	$table,
 	$this->data['paging'],
@@ -192,7 +188,6 @@ $form->addItem([
 	], 'hostgroup')
 ]);
 
-// append form to widget
 $widget
 	->addItem($form)
 	->show();

@@ -20,7 +20,6 @@
 
 
 /**
- * @var CView $this
  * @var array $data
  */
 

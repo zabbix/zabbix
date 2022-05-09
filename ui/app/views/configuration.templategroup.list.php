@@ -55,7 +55,6 @@ $filter = (new CFilter())
 		])
 		->addVar('action', 'templategroup.list');
 
-// create form
 $form = (new CForm())
 	->setId('templategroup-list')
 	->setName('templategroup_list');
@@ -64,7 +63,6 @@ $view_url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'templategroup.list')
 	->getUrl();
 
-// create table
 $table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
@@ -109,7 +107,6 @@ foreach ($this->data['groups'] as $group) {
 
 	$template_count = $this->data['groupCounts'][$group['groupid']]['templates'];
 
-	// name
 	$name = [];
 
 	$name[] = (new CLink($group['name']))
@@ -139,7 +136,6 @@ foreach ($this->data['groups'] as $group) {
 	]);
 }
 
-// append table to form
 $form->addItem([
 	$table,
 	$this->data['paging'],
@@ -153,7 +149,6 @@ $form->addItem([
 	], 'templategroup')
 ]);
 
-// append filter and form to widget
 $widget
 	->addItem($filter)
 	->addItem($form);
