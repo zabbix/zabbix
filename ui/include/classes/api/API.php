@@ -445,6 +445,13 @@ class API {
 	}
 
 	/**
+	 * @return CUserDirectory
+	 */
+	public static function UserDirectory() {
+		return self::getApi('userdirectory');
+	}
+
+	/**
 	 * @return CUserGroup
 	 */
 	public static function UserGroup() {
