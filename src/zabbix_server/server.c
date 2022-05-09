@@ -73,6 +73,8 @@
 #include "ha/ha.h"
 #include "zbxrtc.h"
 #include "zbxha.h"
+#include "zbxserver.h"
+#include "stats/zabbix_stats.h"
 #include "zbxdiag.h"
 #include "diag/diag_server.h"
 
@@ -1835,6 +1837,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_set_exiting_with_fail();
 	}
 
+	zbx_zabbix_stats_init(zbx_get_zabbix_stats_ext);
 	zbx_diag_init(diag_add_section_info);
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)

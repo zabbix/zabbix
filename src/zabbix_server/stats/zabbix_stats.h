@@ -17,18 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_EVALFUNC_H
-#define ZABBIX_EVALFUNC_H
+#ifndef ZABBIX_ZABBIX_STATS_H_
+#define ZABBIX_ZABBIX_STATS_H_
 
-#include "zbxtypes.h"
-#include "dbcache.h"
+#include "zbxjson.h"
 
-int	zbx_evaluatable_for_notsupported(const char *fn);
-int	zbx_evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
-		char **error);
-int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function, const char *parameter,
-		const zbx_timespec_t *ts, char **error);
+void	zbx_get_zabbix_stats_ext(struct zbx_json *json);
 
-int	zbx_is_trigger_function(const char *name, size_t len);
-
-#endif
+#endif /* ZABBIX_ZABBIX_STATS_H_ */

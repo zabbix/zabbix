@@ -24,7 +24,7 @@
 #include "preproc.h"
 #include "zbxtrends.h"
 #include "../vmware/vmware.h"
-#include "../../libs/zbxserver/zabbix_stats.h"
+#include "zbxserver.h"
 #include "../../libs/zbxsysinfo/common/zabbix_stats.h"
 
 extern unsigned char	program_type;

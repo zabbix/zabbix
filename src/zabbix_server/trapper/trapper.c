@@ -29,7 +29,7 @@
 #include "zbxnix.h"
 #include "zbxcrypto.h"
 #include "zbxcommshigh.h"
-#include "../../libs/zbxserver/zabbix_stats.h"
+#include "zbxserver.h"
 #include "../poller/checks_snmp.h"
 #include "trapper_auth.h"
 #include "trapper_preproc.h"

@@ -1916,7 +1916,7 @@ void	zbx_expression_eval_resolve_filter_macros(zbx_expression_eval_t *eval, cons
 	{
 		zbx_expression_query_t	*query = (zbx_expression_query_t *)eval->queries.values[i];
 
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL, NULL, NULL, NULL,
+		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL, NULL, NULL, NULL,
 				&query->ref.filter, MACRO_TYPE_QUERY_FILTER, NULL, 0);
 	}
 }
