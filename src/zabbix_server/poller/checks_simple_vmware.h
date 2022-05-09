@@ -46,6 +46,11 @@ int	check_vcenter_datastore_write(AGENT_REQUEST *request, const char *username, 
 int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 
+int	check_vcenter_dvswitch_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_dvswitch_fetchports_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+
 int	check_vcenter_hv_cluster_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_connectionstate(AGENT_REQUEST *request, const char *username, const char *password,

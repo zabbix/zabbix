@@ -235,6 +235,8 @@ final class CItemData {
 			'vmware.datastore.size[<url>,<datastore>,<mode>]',
 			'vmware.datastore.write[<url>,<datastore>,<mode>]',
 			'vmware.dc.discovery[<url>]',
+			'vmware.dvswitch.discovery[<url>]',
+			'vmware.dvswitch.fetchports.get[<url>,<filter>,<mode>]',
 			'vmware.eventlog[<url>,<mode>]',
 			'vmware.fullname[<url>]',
 			'vmware.hv.cluster.name[<url>,<uuid>]',
@@ -1246,7 +1248,15 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.dc.discovery[<url>]' => [
-				'description' => _('VMware datacenters and their IDs. Returns JSON'),
+				'description' => _('VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
+			'vmware.dvswitch.discovery[<url>]' => [
+				'description' => _('VMware Distributed Virtual Switch, <url> - VMware service URL. Returns JSON'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
+			'vmware.dvswitch.fetchports.get[<url>,<filter>,<mode>]' => [
+				'description' => _('VMware FetchDVPorts wrapper, <url> - VMware service URL, <filter> - vmware data object DistributedVirtualSwitchPortCriteria, <mode> - state(default)/full. Returns JSON'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.eventlog[<url>,<mode>]' => [
