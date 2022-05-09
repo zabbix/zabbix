@@ -4354,6 +4354,10 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					replace_to = zbx_strdup(replace_to, interface.addr);
 				require_address = 1;
 			}
+			else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
+			{
+				ret = get_host_inventory_by_hostid(m, dc_host->hostid, &replace_to);
+			}
 			else if (NULL != userid)
 			{
 				if (0 == strcmp(m, MVAR_USER_USERNAME) || 0 == strcmp(m, MVAR_USER_NAME) ||
