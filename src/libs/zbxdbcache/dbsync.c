@@ -51,16 +51,29 @@ typedef struct
 }
 zbx_dbsync_changelog_t;
 
-typedef struct
-{
-	zbx_vector_uint64_t	inserts;
-	zbx_vector_uint64_t	updates;
-	zbx_vector_uint64_t	deletes;
-}
-zbx_dbsync_journal_t;
-
 ZBX_VECTOR_DECL(dbsync_changelog, zbx_dbsync_changelog_t)
 ZBX_VECTOR_IMPL(dbsync_changelog, zbx_dbsync_changelog_t)
+
+typedef struct
+{
+	zbx_uint64_t		objectid;
+	zbx_dbsync_changelog_t	changelog;
+}
+zbx_dbsync_obj_changelog_t;
+
+ZBX_VECTOR_DECL(dbsync_obj_changelog, zbx_dbsync_obj_changelog_t)
+ZBX_VECTOR_IMPL(dbsync_obj_changelog, zbx_dbsync_obj_changelog_t)
+
+typedef struct
+{
+	zbx_vector_uint64_t			inserts;
+	zbx_vector_uint64_t			updates;
+	zbx_vector_uint64_t			deletes;
+
+	const zbx_dbsync_t			*sync;
+	zbx_vector_dbsync_obj_changelog_t	changelog;
+}
+zbx_dbsync_journal_t;
 
 typedef struct
 {
@@ -68,9 +81,9 @@ typedef struct
 	ZBX_DC_CONFIG			*cache;
 
 	zbx_hashset_t			changelog;
-	zbx_vector_dbsync_changelog_t	changelog_queue;
 
-	zbx_dbsync_journal_t	journals[ZBX_DBSYNC_OBJ_COUNT];
+	zbx_dbsync_journal_t		journals[ZBX_DBSYNC_OBJ_COUNT];
+	zbx_vector_dbsync_changelog_t	changelog_queue;
 }
 zbx_dbsync_env_t;
 
@@ -278,6 +291,8 @@ void	zbx_dbsync_journal_init(zbx_dbsync_journal_t *journal)
 	zbx_vector_uint64_create(&journal->inserts);
 	zbx_vector_uint64_create(&journal->updates);
 	zbx_vector_uint64_create(&journal->deletes);
+
+	zbx_vector_dbsync_obj_changelog_create(&journal->changelog);
 }
 
 void	zbx_dbsync_journal_destroy(zbx_dbsync_journal_t *journal)
@@ -285,6 +300,8 @@ void	zbx_dbsync_journal_destroy(zbx_dbsync_journal_t *journal)
 	zbx_vector_uint64_destroy(&journal->inserts);
 	zbx_vector_uint64_destroy(&journal->updates);
 	zbx_vector_uint64_destroy(&journal->deletes);
+
+	zbx_vector_dbsync_obj_changelog_destroy(&journal->changelog);
 }
 
 void	zbx_dbsync_env_init(ZBX_DC_CONFIG *cache)
@@ -293,6 +310,12 @@ void	zbx_dbsync_env_init(ZBX_DC_CONFIG *cache)
 	zbx_hashset_create(&dbsync_env.changelog, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: remove old (1h+) changelog records from database and cache using  *
+ *          database time                                                     *
+ *                                                                            *
+ ******************************************************************************/
 static void	dbsync_prune_changelog()
 {
 	static int		last_prune_time;
@@ -346,6 +369,54 @@ static void	dbsync_prune_changelog()
 	DBfree_result(result);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: remove from first vector all ids found in second vector           *
+ *                                                                            *
+ * Comments: Both vectors must be sorted in ascending order                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	dbsync_remove_duplicate_ids(zbx_vector_uint64_t *dst, const zbx_vector_uint64_t *src)
+{
+	int	i, j;
+
+	if (0 == dst->values_num || 0 == src->values_num)
+		return;
+
+	for (i = 0, j = 0;;)
+	{
+		if (dst->values[i] == src->values[j])
+		{
+			if (i == --dst->values_num)
+				break;
+
+			memmove(dst->values + i, dst->values + i + 1, (dst->values_num - i) * sizeof(zbx_uint64_t));
+
+			if (++j == src->values_num)
+				break;
+
+			continue;
+		}
+
+		if (dst->values[i] < src->values[j])
+		{
+			if (++i == dst->values_num)
+				break;
+		}
+		else
+		{
+			if (++j == src->values_num)
+				break;
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: read changelog and prepare lists of modified objects since last   *
+ *          sync                                                              *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_dbsync_env_prepare(unsigned char mode)
 {
 	DB_RESULT		result;
@@ -354,9 +425,9 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 	int			changelog_num;
 	size_t			i;
 
-	zbx_vector_dbsync_changelog_create(&dbsync_env.changelog_queue);
-
 	zbx_hashset_create(&dbsync_env.strpool, 100, dbsync_strpool_hash_func, dbsync_strpool_compare_func);
+
+	zbx_vector_dbsync_changelog_create(&dbsync_env.changelog_queue);
 
 	for (i = 0; i < ARRSIZE(dbsync_env.journals); i++)
 		zbx_dbsync_journal_init(&dbsync_env.journals[i]);
@@ -379,32 +450,32 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 	{
 		while (NULL != (row = DBfetch(result)))
 		{
-			int			operation;
-			zbx_uint64_t		objectid;
-			zbx_dbsync_journal_t	*journal;
+			int				operation;
+			zbx_dbsync_journal_t		*journal;
+			zbx_dbsync_obj_changelog_t	obj;
 
-			ZBX_DBROW2UINT64(changelog_local.changelogid, row[0]);
+			ZBX_DBROW2UINT64(obj.changelog.changelogid, row[0]);
 
-			if (NULL != zbx_hashset_search(&dbsync_env.changelog, &changelog_local))
+			if (NULL != zbx_hashset_search(&dbsync_env.changelog, &obj.changelog))
 				continue;
 
-			changelog_local.clock = atoi(row[4]);
-			zbx_vector_dbsync_changelog_append(&dbsync_env.changelog_queue, changelog_local);
-
-			journal = &dbsync_env.journals[ZBX_DBSYNC_JOURNAL(atoi(row[1]))];
-			ZBX_DBROW2UINT64(objectid, row[2]);
+			obj.changelog.clock = atoi(row[4]);
+			ZBX_DBROW2UINT64(obj.objectid, row[2]);
 			operation = atoi(row[3]);
+			journal = &dbsync_env.journals[ZBX_DBSYNC_JOURNAL(atoi(row[1]))];
+
+			zbx_vector_dbsync_obj_changelog_append(&journal->changelog, obj);
 
 			switch (operation)
 			{
 				case ZBX_DBSYNC_ROW_ADD:
-					zbx_vector_uint64_append(&journal->inserts, objectid);
+					zbx_vector_uint64_append(&journal->inserts, obj.objectid);
 					break;
 				case ZBX_DBSYNC_ROW_UPDATE:
-					zbx_vector_uint64_append(&journal->updates, objectid);
+					zbx_vector_uint64_append(&journal->updates, obj.objectid);
 					break;
 				case ZBX_DBSYNC_ROW_REMOVE:
-					zbx_vector_uint64_append(&journal->deletes, objectid);
+					zbx_vector_uint64_append(&journal->deletes, obj.objectid);
 					break;
 			}
 		}
@@ -415,13 +486,71 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 	{
 		zbx_vector_uint64_sort(&dbsync_env.journals[i].inserts, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_sort(&dbsync_env.journals[i].updates, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&dbsync_env.journals[i].updates, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_sort(&dbsync_env.journals[i].deletes, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		/* in the case multiple changelog records are registered for the same object          */
+		/* the operation priority is delete, insert, update:                                  */
+		/*   delete - if object is removed any prior changes to it does not matter            */
+		/*   insert - if object was added and then updated, only the insert operation matters */
+		dbsync_remove_duplicate_ids(&dbsync_env.journals[i].inserts, &dbsync_env.journals[i].deletes);
+		dbsync_remove_duplicate_ids(&dbsync_env.journals[i].updates, &dbsync_env.journals[i].deletes);
+		dbsync_remove_duplicate_ids(&dbsync_env.journals[i].updates, &dbsync_env.journals[i].inserts);
 	}
 
 	return dbsync_env.changelog.num_data - changelog_num;
 }
 
-void zbx_dbsync_env_flush_queue(void)
+void	zbx_dbsync_env_set_sync(int object, const zbx_dbsync_t *sync)
+{
+	dbsync_env.journals[ZBX_DBSYNC_JOURNAL(object)].sync = sync;
+}
+
+static void	dbsync_env_flush_journal(zbx_dbsync_journal_t *journal)
+{
+	zbx_vector_uint64_t	objectids;
+	int			i;
+
+	zbx_vector_uint64_create(&objectids);
+
+	for (i = 0; i < journal->sync->rows.values_num; i++)
+	{
+		zbx_dbsync_row_t	*row = (zbx_dbsync_row_t *)journal->sync->rows.values[i];
+
+		if (0 != row->rowid)
+			zbx_vector_uint64_append(&objectids, row->rowid);
+	}
+
+	zbx_vector_uint64_sort(&objectids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	for (i = 0; i < journal->changelog.values_num; i++)
+	{
+		if (FAIL != zbx_vector_uint64_bsearch(&objectids, journal->changelog.values[i].objectid,
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		{
+			zbx_vector_dbsync_changelog_append(&dbsync_env.changelog_queue,
+					journal->changelog.values[i].changelog);
+		}
+	}
+
+	zbx_vector_uint64_destroy(&objectids);
+}
+
+int	zbx_dbsync_env_prepare_changelog(unsigned char mode)
+{
+	size_t	i;
+
+	if (ZBX_DBSYNC_INIT == mode)
+		return FAIL;
+
+	for (i = 0; i < ARRSIZE(dbsync_env.journals); i++)
+		dbsync_env_flush_journal(&dbsync_env.journals[i]);
+
+	return (0 == dbsync_env.changelog_queue.values_num ? FAIL : SUCCEED);
+
+}
+
+void	zbx_dbsync_env_flush_changelog(void)
 {
 	int	i;
 
@@ -436,11 +565,12 @@ void	zbx_dbsync_env_clear(void)
 {
 	size_t	i;
 
-	zbx_vector_dbsync_changelog_destroy(&dbsync_env.changelog_queue);
 	zbx_hashset_destroy(&dbsync_env.strpool);
 
 	for (i = 0; i < ARRSIZE(dbsync_env.journals); i++)
 		zbx_dbsync_journal_destroy(&dbsync_env.journals[i]);
+
+	zbx_vector_dbsync_changelog_destroy(&dbsync_env.changelog_queue);
 }
 
 /******************************************************************************
@@ -486,9 +616,11 @@ static int	dbsync_get_rows(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, si
  *                                                                            *
  ******************************************************************************/
 static int	dbsync_read_journal(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const char *field, const char *keyword, const zbx_dbsync_journal_t *journal)
+		const char *field, const char *keyword, zbx_dbsync_journal_t *journal)
 {
 	int	i;
+
+	journal->sync = sync;
 
 	if (0 != journal->inserts.values_num || 0 != journal->updates.values_num)
 	{
@@ -545,7 +677,7 @@ void	zbx_dbsync_init(zbx_dbsync_t *sync, unsigned char mode)
 	if (ZBX_DBSYNC_UPDATE == sync->mode)
 	{
 		zbx_vector_ptr_create(&sync->rows);
-		sync->row_index = 0;
+		sync->row_index = -1;
 	}
 	else
 		sync->dbresult = NULL;
@@ -614,12 +746,10 @@ int	zbx_dbsync_next(zbx_dbsync_t *sync, zbx_uint64_t *rowid, char ***row, unsign
 	{
 		zbx_dbsync_row_t	*sync_row;
 
-		if (sync->row_index == sync->rows.values_num)
-		{
+		if (++sync->row_index == sync->rows.values_num)
 			return FAIL;
-		}
 
-		sync_row = (zbx_dbsync_row_t *)sync->rows.values[sync->row_index++];
+		sync_row = (zbx_dbsync_row_t *)sync->rows.values[sync->row_index];
 		*rowid = sync_row->rowid;
 		*row = sync_row->row;
 		*tag = sync_row->tag;
@@ -643,6 +773,19 @@ int	zbx_dbsync_next(zbx_dbsync_t *sync, zbx_uint64_t *rowid, char ***row, unsign
 	}
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: skip current row - it will not be synced to configuration cache   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dbsync_skip(zbx_dbsync_t *sync)
+{
+	if (ZBX_DBSYNC_UPDATE != sync->mode)
+		return;
+
+	((zbx_dbsync_row_t *)sync->rows.values[sync->row_index])->rowid = 0;
 }
 
 /******************************************************************************
