@@ -30,7 +30,10 @@ $browser-sprite-path: '../img/browser-sprite.png?20211222';
 @import "components/buttons";
 @import "components/color-picker";
 @import "components/dashboard/dashboard";
+@import "components/dashboard/widget-clock";
 @import "components/dashboard/widget-item";
+@import "components/dashboard/widget-slareport";
+@import "components/dashboard/widget-svggraph";
 @import "components/dashboard/widget-tophosts";
 @import "components/diff";
 @import "components/expandable-subfilter";
@@ -46,9 +49,6 @@ $browser-sprite-path: '../img/browser-sprite.png?20211222';
 @import "components/toc";
 @import "components/z-bar-gauge";
 @import "components/z-select";
-
-@import "components/dashboard/widget-slareport";
-@import "components/dashboard/widget-svggraph";
 
 .link-action {
 	border-bottom: 1px dotted;

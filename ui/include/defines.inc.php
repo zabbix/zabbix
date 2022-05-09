@@ -1554,6 +1554,18 @@ define('WIDGET_ITEM',				'item');
 // Deprecated widgets
 define('WIDGET_DATA_OVER',			'dataover');
 
+// Clock widget type
+define('WIDGET_CLOCK_TYPE_ANALOG',	0);
+define('WIDGET_CLOCK_TYPE_DIGITAL',	1);
+
+// Clock time zone format
+define('WIDGET_CLOCK_TIMEZONE_SHORT',	0);
+define('WIDGET_CLOCK_TIMEZONE_FULL',	1);
+
+// Clock widget time format
+define('WIDGET_CLOCK_HOUR_TWENTY_FOUR',	0);
+define('WIDGET_CLOCK_HOUR_TWELVE',		1);
+
 // Item widget object positions.
 define('WIDGET_ITEM_POS_LEFT',		0);
 define('WIDGET_ITEM_POS_CENTER',	1);
@@ -1591,6 +1603,11 @@ define('WIDGET_SEARCH_TEMPLATES',		'search_templates');
 // dashboard widget dynamic state
 define('WIDGET_SIMPLE_ITEM',	0);
 define('WIDGET_DYNAMIC_ITEM',	1);
+
+// clock widget blocks
+define('WIDGET_CLOCK_SHOW_DATE', 1);
+define('WIDGET_CLOCK_SHOW_TIME', 2);
+define('WIDGET_CLOCK_SHOW_TIMEZONE', 3);
 
 // item widget blocks
 define('WIDGET_ITEM_SHOW_DESCRIPTION',		1);
@@ -1643,6 +1660,7 @@ define('ZBX_DEFAULT_LANG', 'en_US');
 
 // user default time zone
 define('TIMEZONE_DEFAULT', 'default');
+define('TIMEZONE_DEFAULT_LOCAL', 'local');
 
 // the default time zone
 define('ZBX_DEFAULT_TIMEZONE', 'system');
