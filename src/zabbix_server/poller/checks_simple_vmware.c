@@ -3145,6 +3145,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			zbx_json_addstring(&json_data, "{#VM.NAME}", vm_name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#HV.NAME}", hv_name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#HV.UUID}", hv_uuid, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "{#HV.ID}", hv->id, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#DATACENTER.NAME}", hv->datacenter_name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#CLUSTER.NAME}",
 					NULL != cluster ? cluster->name : "", ZBX_JSON_TYPE_STRING);
