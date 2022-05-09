@@ -4771,7 +4771,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 			unsigned char			*data = NULL;
 			zbx_uint32_t			data_len;
 			DC_HOST				*hosts;
-			int				i, hosts_num, *errcodes;
+			int				i, *errcodes;
 			zbx_vector_uint64_t		hostids;
 			zbx_vector_proxy_hostdata_ptr_t	proxy_host_avails;
 
