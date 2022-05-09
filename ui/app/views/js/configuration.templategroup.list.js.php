@@ -39,7 +39,7 @@
 					this.edit({groupid: e.target.dataset.groupid});
 				}
 				else if (e.target.classList.contains('js-massdelete-templategroup')) {
-					this.delete(e.target, Object.values(chkbxRange.getSelectedIds()));
+					this.delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 			});
 		},

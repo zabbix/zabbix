@@ -47,13 +47,13 @@
 					this.edit({groupid: e.target.dataset.groupid});
 				}
 				else if (e.target.classList.contains('js-massenable-hostgroup')) {
-					this.enable(e.target, Object.values(chkbxRange.getSelectedIds()));
+					this.enable(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (e.target.classList.contains('js-massdisable-hostgroup')) {
-					this.disable(e.target, Object.values(chkbxRange.getSelectedIds()));
+					this.disable(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (e.target.classList.contains('js-massdelete-hostgroup')) {
-					this.delete(e.target, Object.values(chkbxRange.getSelectedIds()));
+					this.delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 			});
 		},
