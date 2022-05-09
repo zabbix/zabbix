@@ -1414,7 +1414,7 @@ class testUserRolesPermissions extends CWebTest {
 
 		// Filter out unnecessary services.
 		$this->query('id:filter_tags_0_tag')->waitUntilVisible()->one()->fill('action');
-		$this->query('id:filter_tags_0_operator')->asZDropdown()->waitUntilVisible()->one()->fill('Does not exist');
+		$this->query('id:filter_tags_0_operator')->asDropdown()->waitUntilVisible()->one()->fill('Does not exist');
 
 		// Apply filter in order to see the list of available services.
 		$this->query('name:filter_set')->waitUntilClickable()->one()->click();

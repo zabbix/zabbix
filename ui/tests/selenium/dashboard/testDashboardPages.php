@@ -584,6 +584,7 @@ class testDashboardPages extends CWebTest {
 			}
 
 			$page_dialog->query('button:Apply')->one()->click();
+			COverlayDialogElement::ensureNotPresent();
 			$dashboard->waitUntilReady();
 			$allpage_name = ($page_name === 'not_page_number') ? ['Page 1', 'not_page_number'] : ['Page 1', 'not_page_number', 'Page 3'];
 			$this->assertEquals($allpage_name, $this->getPagesTitles());
@@ -728,7 +729,7 @@ class testDashboardPages extends CWebTest {
 		$this->assertEquals('Dashboard page properties', $page_dialog->getTitle());
 		$this->assertEquals(['Name', 'Page display period'], $page_form->getLabels()->asText());
 		$this->assertEquals(['Default (30 seconds)', '10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes',
-				'30 minutes', '1 hour'], $page_form->query('name:display_period')->asZDropdown()->one()->getOptions()->asText()
+				'30 minutes', '1 hour'], $page_form->query('name:display_period')->asDropdown()->one()->getOptions()->asText()
 		);
 		$page_dialog->query('button:Cancel')->one()->click();
 	}
