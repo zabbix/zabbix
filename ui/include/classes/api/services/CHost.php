@@ -504,6 +504,7 @@ class CHost extends CHostGeneral {
 		if ($options['output'] === API_OUTPUT_EXTEND) {
 			$all_keys = array_keys(DB::getSchema($this->tableName())['fields']);
 			$all_keys[] = 'inventory_mode';
+			$all_keys[] = 'active_available';
 			$options['output'] = array_diff($all_keys, $write_only_keys);
 		}
 		/*
@@ -1777,7 +1778,9 @@ class CHost extends CHostGeneral {
 			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings'],
 			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => 'templateid,host,name,description,uuid,link_type']
 		]];
+
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
+
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
