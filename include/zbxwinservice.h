@@ -39,6 +39,6 @@ typedef void	(*zbx_on_exit_t)(int);
 void	set_parent_signal_handler(zbx_on_exit_t zbx_on_exit_cb_arg);
 
 int	ZBX_IS_RUNNING(void);
-int	ZBX_DO_EXIT(void);
+void	ZBX_DO_EXIT(void);
 
 #endif /* ZABBIX_SERVICE_H */

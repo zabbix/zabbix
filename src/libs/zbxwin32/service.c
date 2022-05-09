@@ -42,7 +42,7 @@ int	ZBX_IS_RUNNING(void)
 	return application_status;
 }
 
-int	ZBX_DO_EXIT(void)
+void	ZBX_DO_EXIT(void)
 {
 	application_status = ZBX_APP_STOPPED;
 }
