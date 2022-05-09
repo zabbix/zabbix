@@ -223,7 +223,7 @@ typedef struct
 	char		*value;
 }
 zbx_vmware_custom_attr_t;
-ZBX_PTR_VECTOR_DECL(vmware_custom_attr, zbx_vmware_custom_attr_t *);
+ZBX_PTR_VECTOR_DECL(vmware_custom_attr, zbx_vmware_custom_attr_t *)
 int	vmware_custom_attr_compare_name(const void *a1, const void *a2);
 
 /* the vmware virtual machine data */
