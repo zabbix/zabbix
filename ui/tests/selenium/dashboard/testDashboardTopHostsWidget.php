@@ -1568,6 +1568,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			}
 
 			$column_form->waitUntilNotVisible();
+			COverlayDialogElement::find()->waitUntilReady()->one();
 		}
 	}
 
