@@ -2958,6 +2958,7 @@ static int	vmware_vm_snapshot_collect(xmlDoc *xdoc, xmlNode *snap_node, xmlNode 
 	if (FAIL == zbx_xml_node_read_values(xdoc, layout_node, xpath, &ids))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s() empty list of fileKey", __func__);
+		zbx_free(value);
 		goto out;
 	}
 
@@ -3225,9 +3226,11 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 		struct zbx_json_parse	jp;
 		char			count[ZBX_MAX_UINT64_LEN];
 
-		zbx_json_open(vm->props[ZBX_VMWARE_VMPROP_SNAPSHOT], &jp);
-		zbx_json_value_by_name(&jp, "count", count, sizeof(count), NULL);
-		vm->snapshot_count = (unsigned int)atoi(count);
+		if (SUCCEED == zbx_json_open(vm->props[ZBX_VMWARE_VMPROP_SNAPSHOT], &jp) &&
+				SUCCEED == zbx_json_value_by_name(&jp, "count", count, sizeof(count), NULL))
+		{
+			vm->snapshot_count = (unsigned int)atoi(count);
+		}
 	}
 	else
 	{
