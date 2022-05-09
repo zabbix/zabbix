@@ -101,7 +101,7 @@ else {
 									'srcfld1' => 'groupid',
 									'dstfrm' => 'zbx_filter',
 									'dstfld1' => 'filter_groupids_',
-									'with_hosts' => 1,
+									'real_hosts' => 1,
 									'editable' => 1,
 									'enrich_parent_groups' => true
 								] + $hg_ms_params
