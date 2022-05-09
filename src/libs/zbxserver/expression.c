@@ -4261,6 +4261,10 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 							ZBX_REQUEST_HOST_CONN);
 				}
 			}
+			else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
+			{
+				ret = get_host_inventory_by_itemid(m, dc_item->itemid, &replace_to);
+			}
 			else if (0 != (macro_type & MACRO_TYPE_SCRIPT_PARAMS_FIELD))
 			{
 				if (0 == strcmp(m, MVAR_ITEM_ID))
