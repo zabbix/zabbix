@@ -297,7 +297,7 @@ class testTriggerLinking extends CIntegrationTest {
 	 * Test trigger linking cases.
 	 *
 	 * @configurationDataProvider agentConfigurationProvider
-	 * @required-components agent
+	 * @required-components server, agent
 	 */
 	public function testTriggerLinking_checkMe() {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, ['End of DBregister_host_active():SUCCEED']);
