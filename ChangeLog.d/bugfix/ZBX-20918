@@ -1,1 +1,0 @@
-........S. [ZBX-20918] moved final history/trends cache sync in main process to be done before stopping HA (wiper)

@@ -29,8 +29,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/plugins/external"
 )
 

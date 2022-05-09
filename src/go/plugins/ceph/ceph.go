@@ -25,9 +25,9 @@ import (
 	"net/http"
 	"time"
 
-	"zabbix.com/pkg/uri"
+	"git.zabbix.com/ap/plugin-support/uri"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 const pluginName = "Ceph"

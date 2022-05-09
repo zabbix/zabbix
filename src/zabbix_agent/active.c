@@ -35,7 +35,7 @@ extern ZBX_THREAD_LOCAL char		*CONFIG_HOSTNAME;
 extern int				CONFIG_HEARTBEAT_FREQUENCY;
 
 #if defined(ZABBIX_SERVICE)
-#	include "service.h"
+#	include "zbxwinservice.h"
 #elif defined(ZABBIX_DAEMON)
 #	include "zbxnix.h"
 #endif
