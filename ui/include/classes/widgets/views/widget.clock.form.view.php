@@ -58,7 +58,7 @@ $form_list
 		CWidgetHelper::getCheckBoxList($fields['show'], [
 			WIDGET_CLOCK_SHOW_DATE => _('Date'),
 			WIDGET_CLOCK_SHOW_TIME => _('Time'),
-			WIDGET_CLOCK_SHOW_TIMEZONE => _('Time zone'),
+			WIDGET_CLOCK_SHOW_TIMEZONE => _('Time zone')
 		]),
 		'show-row'
 	)
