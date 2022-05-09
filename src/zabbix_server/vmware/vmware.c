@@ -2737,8 +2737,8 @@ out:
  * Purpose: gets virtual machine network interface devices' additional        *
  * properties (props member of zbx_vmware_dev_t)                              *
  *                                                                            *
- * Parameters: details - [IN] a xml document containing virtual machine data  *
- *             xmlNode - [IN] a xml document node that corresponds to given   *
+ * Parameters: details - [IN] an xml document containing virtual machine data *
+ *             xmlNode - [IN] an xml document node that corresponds to given  *
  *                            network interface device                        *
  *                                                                            *
  ******************************************************************************/
@@ -2780,7 +2780,7 @@ static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node)
  * Purpose: gets virtual machine network interface devices                    *
  *                                                                            *
  * Parameters: vm      - [OUT] the virtual machine                            *
- *             details - [IN] a xml document containing virtual machine data  *
+ *             details - [IN] an xml document containing virtual machine data *
  *                                                                            *
  * Comments: The network interface devices are taken from vm device list      *
  *           filtered by macAddress key.                                      *
@@ -2838,7 +2838,7 @@ clean:
  * Purpose: gets virtual machine virtual disk devices                         *
  *                                                                            *
  * Parameters: vm      - [OUT] the virtual machine                            *
- *             details - [IN] a xml document containing virtual machine data  *
+ *             details - [IN] an xml document containing virtual machine data *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_vm_get_disk_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
@@ -2968,7 +2968,7 @@ clean:
  * Purpose: gets the parameters of virtual machine disks                      *
  *                                                                            *
  * Parameters: vm      - [OUT] the virtual machine                            *
- *             details - [IN] a xml document containing virtual machine data  *
+ *             details - [IN] an xml document containing virtual machine data *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_vm_get_file_systems(zbx_vmware_vm_t *vm, xmlDoc *details)
@@ -4171,7 +4171,7 @@ int	vmware_dvs_uuid_compare(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- * Purpose: populate array of values from a xml data                          *
+ * Purpose: populate array of values from an xml data                         *
  *                                                                            *
  * Parameters: xdoc   - [IN] XML document                                     *
  *             ds_id  - [IN] datastore id                                     *
@@ -4281,7 +4281,7 @@ static int	vmware_v4mask2pefix(const char *mask)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Search HV management interface ip value from a xml data           *
+ * Purpose: Search HV management interface ip value from an xml data          *
  *                                                                            *
  * Parameters: xdoc   - [IN] XML document                                     *
  *                                                                            *
