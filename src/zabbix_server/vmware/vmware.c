@@ -1785,6 +1785,20 @@ static void	vmware_fs_free(zbx_vmware_fs_t *fs)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: frees resources allocated to store vm custom attributes           *
+ *                                                                            *
+ * Parameters: ca - [IN] the custom attribute                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_custom_attr_free(zbx_vmware_custom_attr_t *ca)
+{
+	zbx_free(ca->name);
+	zbx_free(ca->value);
+	zbx_free(ca);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: frees resources allocated to store virtual machine                *
  *                                                                            *
  * Parameters: vm   - [IN] the virtual machine                                *
@@ -1797,6 +1811,9 @@ static void	vmware_vm_free(zbx_vmware_vm_t *vm)
 
 	zbx_vector_ptr_clear_ext(&vm->file_systems, (zbx_mem_free_func_t)vmware_fs_free);
 	zbx_vector_ptr_destroy(&vm->file_systems);
+
+	zbx_vector_vmware_custom_attr_clear_ext(&vm->custom_attrs, vmware_custom_attr_free);
+	zbx_vector_vmware_custom_attr_destroy(&vm->custom_attrs);
 
 	zbx_free(vm->uuid);
 	zbx_free(vm->id);
