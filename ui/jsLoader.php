@@ -298,7 +298,8 @@ $translate_strings = [
 		'S_CANNOT_SUPPORT_NOTIFICATION_AUDIO' => _('Cannot support notification audio for this device.'),
 		'S_UNMUTE' => _('Unmute'),
 		'S_CLOSE' => _('Close'),
-		'S_SNOOZE' => _('Snooze')
+		'S_SNOOZE' => _('Snooze'),
+		'Unexpected server error.' => _('Unexpected server error.')
 	],
 	'class.cookie.js' => [
 		'S_MAX_COOKIE_SIZE_REACHED' => _('We are sorry, the maximum possible number of elements to remember has been reached.')
@@ -364,6 +365,7 @@ $translate_strings = [
 		'Delete' => _('Delete'),
 		'Delete dashboard?' => _('Delete dashboard?'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
+		'Execute now' => _('Execute now'),
 		'Item' => _('Item'),
 		'Insert expression' => _('Insert expression'),
 		'Sharing' => _('Sharing'),

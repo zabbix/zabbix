@@ -71,9 +71,6 @@ function confirmSubmit(import_overlay, compare_overlay) {
 }
 
 function openImportComparePopup(overlay) {
-	// Remove error message.
-	overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
-
 	const form = document.getElementById('import-form');
 
 	const url = new Curl('zabbix.php', false);
@@ -86,13 +83,12 @@ function openImportComparePopup(overlay) {
 		method: 'post',
 		body: new FormData(form)
 	})
-	.then((response) => response.json())
-	.then((response) => {
-		if ('errors' in response) {
-			document.getElementById('import_file').value = '';
-			$(response.errors).insertBefore(form);
-		}
-		else {
+		.then((response) => response.json())
+		.then((response) => {
+			if ('error' in response) {
+				throw {error: response.error};
+			}
+
 			overlayDialogue({
 				title: response.header,
 				class: response.no_changes ? 'position-middle' : 'modal-popup modal-popup-fullscreen',
@@ -101,21 +97,36 @@ function openImportComparePopup(overlay) {
 				script_inline: response.script_inline,
 				debug: response.debug
 			}, overlay.$btn_submit);
-		}
+		})
+		.catch((exception) => {
+			document.getElementById('import_file').value = '';
 
-		overlay.unsetLoading();
-	});
+			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
+
+			let title, messages;
+
+			if (typeof exception === 'object' && 'error' in exception) {
+				title = exception.error.title;
+				messages = exception.error.messages;
+			}
+			else {
+				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+			}
+
+			const message_box = makeMessageBox('bad', messages, title);
+
+			message_box.insertBefore(form);
+		})
+		.finally(() => {
+			overlay.unsetLoading();
+		});
 }
 
 function submitImportPopup(overlay) {
-	// Remove error message.
-	overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
-
 	const form = document.getElementById('import-form');
 
 	const url = new Curl('zabbix.php', false);
 	url.setArgument('action', 'popup.import');
-	url.setArgument('output', 'ajax');
 
 	overlay.setLoading();
 
@@ -123,22 +134,44 @@ function submitImportPopup(overlay) {
 		method: 'post',
 		body: new FormData(form)
 	})
-	.then((response) => response.json())
-	.then((response) => {
-		if ('errors' in response) {
-			document.getElementById('import_file').value = '';
-			overlay.unsetLoading();
-			$(response.errors).insertBefore(form);
-		}
-		else {
-			postMessageOk(response.title);
-			if ('messages' in response) {
-				postMessageDetails('success', response.messages);
+		.then((response) => response.json())
+		.then((response) => {
+			if ('error' in response) {
+				throw {error: response.error};
 			}
+
+			postMessageOk(response.success.title);
+
+			if ('messages' in response.success) {
+				postMessageDetails('success', response.success.messages);
+			}
+
 			overlayDialogueDestroy(overlay.dialogueid);
+
 			location.href = location.href.split('#')[0];
-		}
-	});
+		})
+		.catch((exception) => {
+			document.getElementById('import_file').value = '';
+
+			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
+
+			let title, messages;
+
+			if (typeof exception === 'object' && 'error' in exception) {
+				title = exception.error.title;
+				messages = exception.error.messages;
+			}
+			else {
+				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+			}
+
+			const message_box = makeMessageBox('bad', messages, title);
+
+			message_box.insertBefore(form);
+		})
+		.finally(() => {
+			overlay.unsetLoading();
+		});
 }
 
 function updateWarning(obj, content) {

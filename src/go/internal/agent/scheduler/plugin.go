@@ -22,7 +22,7 @@ package scheduler
 import (
 	"container/heap"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 // pluginAgent manages plugin usage

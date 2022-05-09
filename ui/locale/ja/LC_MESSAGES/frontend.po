@@ -1,19 +1,20 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-02-25 13:35+0300\n"
-"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
+"PO-Revision-Date: 2022-04-24 12:35+0000\n"
+"Last-Translator: Atsushi <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1645788938.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
@@ -280,6 +281,10 @@ msgstr "(0 - アクションのデフォルトを使用)"
 #: include/views/configuration.hostgroups.list.php:37
 msgid "(Only super admins can create groups)"
 msgstr "(特権管理者のみがグループを作成できます)"
+
+#: app/partials/configuration.host.edit.html.php:131
+msgid "(linked by host discovery)"
+msgstr ""
 
 #: app/partials/configuration.host.edit.html.php:275
 #: app/views/popup.itemtestedit.view.php:241
@@ -1309,6 +1314,10 @@ msgstr "毎%4$s %3$s日 %1$s:%2$s"
 msgid "At (hour:minute)"
 msgstr "開始時刻 (時:分)"
 
+#: app/controllers/CControllerAuthenticationUpdate.php:125
+msgid "At least one LDAP server must exist."
+msgstr ""
+
 #: app/views/administration.userrole.edit.php:117
 msgid "At least one UI element must be checked."
 msgstr "少なくとも1つのUI要素をチェックしてください。"
@@ -2081,6 +2090,11 @@ msgstr[0] "トリガーをコピーできません"
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
 msgstr "条件式に複数のホストが使用されているため、トリガー\"%1$s:%2$s\"をコピーできません。"
 
+#: app/controllers/CControllerSlaCreate.php:69
+#: app/controllers/CControllerSlaCreate.php:127
+msgid "Cannot create SLA"
+msgstr "SLAを作成できません"
+
 #: include/classes/api/services/CHostPrototype.php:1110
 #, c-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
@@ -2112,9 +2126,18 @@ msgstr "ディスカバリルールを作成できません"
 msgid "Cannot create icon map"
 msgstr "アイコンのマッピングを作成できません"
 
+#: app/controllers/CControllerProxyConfigRefresh.php:79
+msgid "Cannot create request"
+msgstr "リクエストを作成できません"
+
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
 msgstr "定期レポートを作成できません"
+
+#: app/controllers/CControllerServiceCreate.php:96
+#: app/controllers/CControllerServiceCreate.php:184
+msgid "Cannot create service"
+msgstr "サービスを作成できません"
 
 #: include/classes/api/services/CService.php:2373
 #: include/classes/api/services/CService.php:2397
@@ -2165,6 +2188,10 @@ msgstr[0] "相関関係を削除できません"
 msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
 msgstr[0] "ダッシュボードを削除できません"
+
+#: include/classes/api/services/CUserDirectory.php:383
+msgid "Cannot delete default user directory."
+msgstr ""
 
 #: include/classes/api/services/CTrigger.php:882
 #: include/classes/api/services/CTriggerPrototype.php:570
@@ -2273,6 +2300,10 @@ msgstr[0] "モジュールを削除できません: %1$s。"
 msgid "Cannot delete network map"
 msgstr "ネットワークマップを削除できません"
 
+#: app/controllers/CControllerProxyDelete.php:39
+msgid "Cannot delete proxies"
+msgstr "プロキシを削除できません"
+
 #: app/controllers/CControllerProxyDelete.php:69
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
@@ -2377,6 +2408,11 @@ msgstr "トリガーを削除できません"
 msgid "Cannot delete user"
 msgid_plural "Cannot delete users"
 msgstr[0] "ユーザーを削除できません"
+
+#: include/classes/api/services/CUserDirectory.php:398
+#, c-format
+msgid "Cannot delete user directory \"%1$s\"."
+msgstr ""
 
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
@@ -2530,6 +2566,11 @@ msgstr[0] "Webシナリオを有効にできません"
 msgid "Cannot evaluate expression"
 msgstr "条件式を評価できません"
 
+#: app/controllers/CControllerItemMassCheckNow.php:243
+#: app/controllers/CControllerItemMassCheckNow.php:251
+msgid "Cannot execute operation"
+msgstr ""
+
 #: app/controllers/CControllerPopupScriptExec.php:123
 msgid "Cannot execute script."
 msgstr "スクリプトを実行できません。"
@@ -2656,6 +2697,10 @@ msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"の\"%2$s\"を上書き
 #, c-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "マップ\"%2$s\"で使用されているトリガー\"%1$s\"が見つかりません。"
+
+#: include/classes/api/services/CUser.php:1510
+msgid "Cannot find user directory for LDAP."
+msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:732
 #, c-format
@@ -3003,6 +3048,11 @@ msgstr "ディスカバリされたトリガー\"%1$s\"の\"%2$s\"を更新で�
 msgid "Cannot update API token"
 msgstr "APIトークンを更新できません"
 
+#: app/controllers/CControllerSlaUpdate.php:70
+#: app/controllers/CControllerSlaUpdate.php:138
+msgid "Cannot update SLA"
+msgstr "SLAを更新できません"
+
 #: include/classes/api/services/CGraphGeneral.php:67
 msgid "Cannot update a discovered graph."
 msgstr "ディスカバリされたグラフを更新できません。"
@@ -3189,6 +3239,11 @@ msgstr "スクリプトを更新できません"
 #, c-format
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
 msgstr "スクリプトの範囲を更新できません。\"%1$s\"はアクション\"%2$s\"で使用されています。"
+
+#: app/controllers/CControllerServiceUpdate.php:97
+#: app/controllers/CControllerServiceUpdate.php:200
+msgid "Cannot update service"
+msgstr "サービスを更新できません"
 
 #: include/classes/api/services/CService.php:2310
 #: include/classes/api/services/CService.php:2372
@@ -3866,6 +3921,10 @@ msgstr "ユーザーの設定"
 msgid "Configuration of web monitoring"
 msgstr "Web監視の設定"
 
+#: app/controllers/CControllerAuditLogList.php:199
+msgid "Configuration refresh"
+msgstr "設定リフレッシュ"
+
 #: app/controllers/CControllerAuditSettingsUpdate.php:78
 #: app/controllers/CControllerAutoregUpdate.php:69
 #: app/controllers/CControllerGeomapsUpdate.php:81
@@ -4508,7 +4567,7 @@ msgstr "カスタムサイズ"
 #: app/views/administration.miscconfig.edit.php:104
 #: include/classes/setup/CSetupWizard.php:563
 msgid "CyberArk Vault"
-msgstr ""
+msgstr "CyberArk Vault"
 
 #: app/partials/scheduledreport.formgrid.html.php:95
 msgid "Cycle"
@@ -4853,6 +4912,10 @@ msgstr "標準"
 msgid "Default (%1$s)"
 msgstr "デフォルト (%1$s)"
 
+#: app/controllers/CControllerAuthenticationUpdate.php:134
+msgid "Default LDAP server must be specified."
+msgstr ""
+
 #: app/views/administration.userrole.edit.php:123
 msgid "Default access to new UI elements"
 msgstr "デフォルトで新しいUI要素に対してアクセス"
@@ -5165,6 +5228,10 @@ msgstr "選択したメディアタイプを削除しますか？"
 msgid "Delete selected proxies?"
 msgstr "選択したプロキシを削除しますか？"
 
+#: app/views/js/proxy.list.js.php:152 app/views/popup.proxy.edit.php:249
+msgid "Delete selected proxy?"
+msgstr "選択したプロキシを削除しますか？"
+
 #: app/views/administration.regex.list.php:82
 msgid "Delete selected regular expressions?"
 msgstr "選択した正規表現を削除しますか？"
@@ -5428,6 +5495,10 @@ msgstr "選択したホストグループのホストを無効にしますか？
 
 #: app/views/administration.proxy.list.php:188
 msgid "Disable hosts monitored by selected proxies?"
+msgstr "選択したプロキシによるホストの監視を無効にしますか？"
+
+#: app/views/js/proxy.list.js.php:137
+msgid "Disable hosts monitored by selected proxy?"
 msgstr "選択したプロキシによるホストの監視を無効にしますか？"
 
 #: app/views/administration.token.list.php:199
@@ -6158,6 +6229,10 @@ msgstr "ホストを有効"
 msgid "Enable hosts monitored by selected proxies?"
 msgstr "選択したプロキシによるホストの監視を有効にしますか？"
 
+#: app/views/js/proxy.list.js.php:122
+msgid "Enable hosts monitored by selected proxy?"
+msgstr "選択したプロキシによるホストの監視を有効にしますか？"
+
 #: app/views/administration.audit.settings.edit.php:48
 #: app/views/administration.housekeeping.edit.php:44
 #: app/views/administration.housekeeping.edit.php:98
@@ -6312,6 +6387,10 @@ msgstr "終了日付"
 #: app/views/popup.itemtestedit.view.php:296
 msgid "End of line sequence"
 msgstr "改行コード"
+
+#: include/locales.inc.php:33
+msgid "English (en_GB)"
+msgstr "英語 (en_GB)"
 
 #: include/locales.inc.php:33
 msgid "English (en_US)"
@@ -6729,6 +6808,10 @@ msgstr "ダッシュボードページの貼り付けに失敗しました。"
 msgid "Failed to paste widget."
 msgstr "ウィジェットの貼り付けに失敗しました。"
 
+#: app/controllers/CControllerAuthenticationUpdate.php:390
+msgid "Failed to select default LDAP server."
+msgstr ""
+
 #: app/controllers/CControllerDashboardUpdate.php:141
 #: app/controllers/CControllerTemplateDashboardUpdate.php:135
 #: app/views/js/configuration.dashboard.edit.js.php:156
@@ -6743,6 +6826,11 @@ msgstr "ダッシュボードページのプロパティの変更に失敗しま
 #: jsLoader.php:140
 msgid "Failed to update dashboard properties."
 msgstr "ダッシュボードのプロパティの変更に失敗しました。"
+
+#: app/controllers/CControllerDashboardShareUpdate.php:110
+#: app/views/js/popup.dashboard.share.edit.js.php:83
+msgid "Failed to update dashboard sharing."
+msgstr "ダッシュボードの共有の更新に失敗しました。"
 
 #: jsLoader.php:141
 msgid "Failed to update widget properties."
@@ -9591,6 +9679,13 @@ msgstr "IPアドレス\"%1$s\"が正しくありません。"
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
 msgstr "JSONデータが正しくありません。JSONテキストのパース中にサーバーでエラーが発生しました。"
 
+#: app/controllers/CControllerPopupLdapCheck.php:52
+#: app/controllers/CControllerPopupLdapEdit.php:49
+#: app/controllers/CControllerPopupLdapTestEdit.php:44
+#: app/controllers/CControllerPopupLdapTestSend.php:50
+msgid "Invalid LDAP configuration"
+msgstr ""
+
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
 msgstr "YAMLファイルの内容が正しくありません"
@@ -9980,6 +10075,10 @@ msgstr "インベントリフィールド"
 #: app/views/popup.massupdate.host.php:179
 msgid "Inventory mode"
 msgstr "インベントリモード"
+
+#: include/classes/helpers/CRoleHelper.php:480
+msgid "Invoke \"Execute now\" on read-only hosts"
+msgstr ""
 
 #: app/views/administration.user.list.php:112
 msgid "Is online?"
@@ -10395,9 +10494,18 @@ msgstr "韓国語 (ko_KR)"
 msgid "LDAP"
 msgstr "LDAP"
 
+#: app/views/administration.usergroup.edit.php:88
+#: app/views/popup.ldap.edit.php:157
+msgid "LDAP Server"
+msgstr ""
+
 #: include/perm.inc.php:49
 msgid "LDAP authentication"
 msgstr "LDAP認証"
+
+#: include/classes/api/services/CUser.php:1491
+msgid "LDAP authentication is disabled."
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:163
 msgid "LDAP host"
@@ -10410,6 +10518,10 @@ msgstr "LDAPは設定されていません"
 #: app/controllers/CControllerAuthenticationUpdate.php:273
 msgid "LDAP login successful"
 msgstr "LDAPによるログインが成功しました"
+
+#: include/classes/api/services/CAuthentication.php:171
+msgid "LDAP must be enabled"
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:336
 msgid "LDAP settings"
@@ -10710,6 +10822,10 @@ msgstr "リンク"
 msgid "List is empty"
 msgstr "リストがありません"
 
+#: include/classes/data/CItemData.php:983
+msgid "List of OS processes with attributes. Returns JSON array"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr "ブロックデバイスとそのタイプのリスト。JSONで返す"
@@ -10842,9 +10958,17 @@ msgstr "ログインの試行"
 msgid "Login blocking interval"
 msgstr "ログインブロックの間隔"
 
+#: app/controllers/CControllerPopupLdapTestSend.php:86
+msgid "Login failed"
+msgstr ""
+
 #: include/classes/validators/CLdapAuthValidator.php:87
 msgid "Login name or password is incorrect."
 msgstr "ログイン名かパスワードが間違っています。"
+
+#: app/controllers/CControllerPopupLdapTestSend.php:76
+msgid "Login successful"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:193
 msgid "Logout"
@@ -11991,6 +12115,10 @@ msgstr "未監視"
 msgid "New API token"
 msgstr "新規APIトークン"
 
+#: app/views/popup.ldap.edit.php:145
+msgid "New LDAP server"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:255 app/views/popup.sla.edit.php:283
 msgid "New SLA"
 msgstr "新規SLA"
@@ -12043,6 +12171,10 @@ msgstr "新しいホストの作成"
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
 msgstr "実行内容の作成"
+
+#: app/views/popup.proxy.edit.php:229 app/views/popup.proxy.edit.php:258
+msgid "New proxy"
+msgstr "新規プロキシ"
 
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
@@ -14176,7 +14308,7 @@ msgstr "プロパティ"
 #: include/classes/vaults/CVaultHashiCorp.php:55
 #, c-format
 msgid "Provided API endpoint \"%1$s\" is invalid."
-msgstr ""
+msgstr "指定されたAPIエンドポイント \"%1$s\" は正しくありません。"
 
 #: app/controllers/CControllerMenuPopup.php:405
 #: app/controllers/CControllerMenuPopup.php:693
@@ -14190,7 +14322,7 @@ msgstr "指定されたURL \"%1$s\"は正しくありません。"
 #: include/classes/vaults/CVaultHashiCorp.php:64
 #, c-format
 msgid "Provided authentication token \"%1$s\" is empty."
-msgstr ""
+msgstr "指定された認証トークン \"%1$s\" が空です。"
 
 #: include/classes/vaults/CVaultHashiCorp.php:60
 #, c-format
@@ -14494,6 +14626,18 @@ msgstr "長方形"
 #: app/views/administration.user.edit.php:276
 msgid "Refresh"
 msgstr "リフレッシュ"
+
+#: app/views/popup.proxy.edit.php:216 app/views/proxy.list.php:178
+msgid "Refresh configuration"
+msgstr "設定リフレッシュ"
+
+#: app/views/js/proxy.list.js.php:106
+msgid "Refresh configuration of the selected proxies?"
+msgstr "選択したプロキシの設定をリフレッシュしますか？"
+
+#: app/views/js/proxy.list.js.php:107 app/views/popup.proxy.edit.php:217
+msgid "Refresh configuration of the selected proxy?"
+msgstr "選択したプロキシの設定をリフレッシュしますか？"
 
 #: include/classes/widgets/forms/CWidgetForm.php:58 jsLoader.php:169
 msgid "Refresh interval"
@@ -14838,9 +14982,17 @@ msgstr "リクエストボディ"
 msgid "Request body type"
 msgstr "リクエストボディのタイプ"
 
+#: app/controllers/CControllerProxyConfigRefresh.php:71
+msgid "Request created successfully"
+msgstr "リクエストが正常に作成されました"
+
 #: host_discovery.php:428 host_discovery.php:800 items.php:895 items.php:1011
 msgid "Request sent successfully"
 msgstr "リクエストを送信しました"
+
+#: app/controllers/CControllerItemMassCheckNow.php:236
+msgid "Request sent successfully. Some items are filtered due to access permissions or type."
+msgstr ""
 
 #: include/views/configuration.host.discovery.edit.php:271
 #: include/views/configuration.item.edit.php:328
@@ -15642,6 +15794,10 @@ msgstr "検索"
 msgid "Search attribute"
 msgstr "検索の属性"
 
+#: app/views/popup.ldap.edit.php:128
+msgid "Search filter"
+msgstr ""
+
 #: app/controllers/CControllerSearch.php:73
 msgid "Search pattern is empty"
 msgstr "検索パターンが空白です"
@@ -15853,6 +16009,10 @@ msgstr "サーバーまたはプロキシ"
 #: include/classes/widgets/forms/CWidgetFormClock.php:33
 msgid "Server time"
 msgstr "サーバー時間"
+
+#: app/views/administration.authentication.edit.php:146
+msgid "Servers"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:225
 #: app/views/js/slareport.list.js.php:39
@@ -16506,6 +16666,10 @@ msgstr "開始時刻はSLA\"%1$s\"の終了時刻よりも前にしてくださ�
 #, c-format
 msgid "Start time must be less than end time for excluded downtime \"%2$s\" of SLA \"%1$s\"."
 msgstr "開始時刻はSLA\"%1$s\"の除外ダウンタイム\"%2$s\"よりも前にしてください。"
+
+#: app/views/popup.ldap.edit.php:121
+msgid "StartTLS"
+msgstr ""
 
 #: include/classes/validators/CLdapAuthValidator.php:81
 msgid "Starting TLS failed."
@@ -17187,6 +17351,10 @@ msgstr "テンプレート"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "テンプレート\"%1$s\"とホスト\"%2$s\"のリンクを削除しました。"
 
+#: app/partials/configuration.host.edit.html.php:187
+msgid "Templates linked by host discovery cannot be unlinked."
+msgstr "ホストのディスカバリでリンクされたテンプレートは削除できません。"
+
 #: app/controllers/CControllerPopupMassupdateTemplate.php:358
 msgid "Templates updated"
 msgstr "テンプレートを更新しました"
@@ -17425,6 +17593,10 @@ msgstr "今月"
 #: include/func.inc.php:2477
 msgid "This month so far"
 msgstr "今月(現在まで)"
+
+#: app/views/popup.tophosts.column.edit.php:172
+msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
+msgstr "この設定は数値データにだけ適用されます。非数値データは常にヒストリから取得されます。"
 
 #: include/views/configuration.item.edit.php:125
 #: include/views/configuration.item.prototype.edit.php:111
@@ -18518,6 +18690,10 @@ msgstr "イベントのステータスの文字色を変更"
 msgid "Use default"
 msgstr "デフォルトを使用"
 
+#: app/partials/configuration.host.edit.html.php:188
+msgid "Use host prototype configuration form to remove automatically linked templates on upcoming discovery."
+msgstr "ディスカバリ時に自動的にテンプレートのリンクが削除されるよう、ホストのプロトタイプを設定してください。"
+
 #: app/views/administration.user.edit.php:300 app/views/popup.media.php:88
 msgid "Use if severity"
 msgstr "指定した深刻度のときに使用"
@@ -18614,6 +18790,15 @@ msgstr "ユーザーは自分の役割のユーザーの種類を変更できま
 msgid "User deleted"
 msgid_plural "Users deleted"
 msgstr[0] "ユーザーを削除しました"
+
+#: app/controllers/CControllerAuditLogList.php:246
+msgid "User directory"
+msgstr ""
+
+#: include/classes/api/services/CUserDirectory.php:330
+#, c-format
+msgid "User directory \"%1$s\" already exists."
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: app/partials/js/scheduledreport.subscription.js.php:83
@@ -19562,6 +19747,13 @@ msgstr "ウィジェットは廃止予定です。"
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "指定された列と行の数に対してウィジェットが小さすぎます。"
 
+#: app/controllers/CControllerDashboardWidgetCheck.php:46
+#: app/controllers/CControllerDashboardWidgetConfigure.php:46
+#: app/controllers/CControllerDashboardWidgetEdit.php:47
+#: app/controllers/CControllerDashboardWidgetsSanitize.php:66
+msgid "Widget type is not supported in this context."
+msgstr "このコンテキストでは、ウィジェットタイプはサポートされていません。"
+
 #: graphs.php:44 include/classes/widgets/CWidgetHelper.php:923
 #: include/classes/widgets/CWidgetHelper.php:956
 #: include/classes/widgets/CWidgetHelper.php:957
@@ -19611,6 +19803,10 @@ msgstr "障害名と一緒に"
 #: app/views/monitoring.widget.problemhosts.view.php:33
 msgid "With problems"
 msgstr "障害あり"
+
+#: app/views/popup.tophosts.column.edit.php:119
+msgid "With this setting only numeric items will be displayed in this column."
+msgstr "この設定では、数値アイテムだけがこの列内に表示されます。"
 
 #: include/forms.inc.php:346 include/forms.inc.php:566
 msgid "With triggers"
@@ -21339,6 +21535,10 @@ msgctxt "new element in multiselect"
 msgid "new"
 msgstr "新規"
 
+#: include/classes/api/services/CAuthentication.php:180
+msgid "no LDAP servers"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1464
 #: include/classes/graphdraw/CPieGraphDraw.php:320
 msgid "no data"
@@ -21535,6 +21735,11 @@ msgstr "サービスへの表示/設定アクセス権限を保持していま�
 #: include/classes/widgets/fields/CWidgetFieldNavTree.php:110
 msgid "reference to a non-existent tree element"
 msgstr "存在しないツリー要素への参照です"
+
+#: include/classes/api/services/CAuthentication.php:154
+#: include/classes/api/services/CUserGroup.php:1208
+msgid "referred object does not exist"
+msgstr ""
 
 #: app/controllers/CControllerQueueDetails.php:110
 #: app/controllers/CControllerQueueOverview.php:82
@@ -22211,6 +22416,11 @@ msgstr "ディスカバリルールのタイプが間違っている"
 #: include/classes/api/services/CTask.php:444
 msgid "wrong item type"
 msgstr "アイテムのタイプが間違っている"
+
+#: app/controllers/CControllerItemMassCheckNow.php:178
+#: include/classes/api/services/CTask.php:591
+msgid "wrong master item type"
+msgstr ""
 
 #: include/func.inc.php:591 jsLoader.php:221
 msgctxt "year short"

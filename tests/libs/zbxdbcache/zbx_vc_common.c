@@ -24,7 +24,7 @@
 #include "zbxmockutil.h"
 
 #include "common.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "valuecache.h"
 #include "valuecache_test.h"
 #include "mocks/valuecache/valuecache_mock.h"

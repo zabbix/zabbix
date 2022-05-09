@@ -91,7 +91,7 @@ class testPasswordComplexity extends CWebTest {
 	public function testPasswordComplexity_Layout() {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$this->page->assertTitle('Configuration of authentication');
-		$form = $this->query('name:form_auth')->asForm()->one();
+		$form = $this->query('id:authentication-form')->asForm()->one();
 
 		// Check authentication swithcher options and default value.
 		$auth_radio = $form->getField('Default authentication')->asSegmentedRadio();
@@ -221,7 +221,7 @@ class testPasswordComplexity extends CWebTest {
 		}
 
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
-		$form = $this->query('name:form_auth')->asForm()->one();
+		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->fill($data['fields']);
 		$form->submit();
 
@@ -1040,7 +1040,7 @@ class testPasswordComplexity extends CWebTest {
 
 		$this->page->userLogin('Admin', $admin_password);
 		$this->page->open('zabbix.php?action=authentication.edit');
-		$auth_form = $this->query('name:form_auth')->asForm()->waitUntilPresent()->one();
+		$auth_form = $this->query('id:authentication-form')->asForm()->waitUntilPresent()->one();
 		$auth_form->fill($data['auth_fields']);
 		$auth_form->submit();
 		$this->page->waitUntilReady();

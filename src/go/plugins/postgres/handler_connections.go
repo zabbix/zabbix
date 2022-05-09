@@ -23,8 +23,8 @@ import (
 	"context"
 	"errors"
 
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/jackc/pgx/v4"
-	"zabbix.com/pkg/zbxerr"
 )
 
 // connectionsHandler executes select from pg_stat_activity command and returns JSON if all is OK or nil otherwise.

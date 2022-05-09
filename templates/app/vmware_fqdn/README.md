@@ -159,7 +159,7 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|VMware: VM has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/VMware Guest/vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}])<10m` |WARNING |<p>Manual close: YES</p> |
+|VMware: VM has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/VMware Guest/vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}])<10m` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
 
@@ -242,7 +242,7 @@ There are no template links in this template.
 |VMware: Hypervisor is down |<p>The service is unavailable or does not accept ICMP ping.</p> |`last(/VMware Hypervisor/icmpping[])=0` |AVERAGE |<p>Manual close: YES</p> |
 |VMware: The {$VMWARE.HV.UUID} health is Red |<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p> |`last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3` |HIGH | |
 |VMware: The {$VMWARE.HV.UUID} health is Yellow |<p>One or more components in the appliance might become overloaded soon.</p> |`last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2` |AVERAGE |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p> |
-|VMware: Hypervisor has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/VMware Hypervisor/vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}])<10m` |WARNING |<p>Manual close: YES</p> |
+|VMware: Hypervisor has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/VMware Hypervisor/vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}])<10m` |WARNING |<p>Manual close: YES</p> |
 |VMware: The multipath count has been changed |<p>The number of available datastore paths less than registered ({#MULTIPATH.COUNT}).</p> |`last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#1)<>last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#2) and last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}])<{#MULTIPATH.COUNT}` |AVERAGE |<p>Manual close: YES</p> |
 |VMware: The {$VMWARE.HV.UUID} health is Red |<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p> |`last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])="Red"` |HIGH |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p> |
 |VMware: The {$VMWARE.HV.UUID} health is Yellow |<p>One or more components in the appliance might become overloaded soon.</p> |`last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])="Yellow"` |AVERAGE |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p><p>- VMware: The {$VMWARE.HV.UUID} health is Yellow</p> |

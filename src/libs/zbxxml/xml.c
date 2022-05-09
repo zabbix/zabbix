@@ -1279,7 +1279,7 @@ out:
  *                                                                            *
  * Purpose: retrieve a value from xml data relative to the specified node     *
  *                                                                            *
- * Parameters: doc    - [IN] the XML document                                 *
+ * Parameters: xdoc   - [IN] the XML document                                 *
  *             node   - [IN] the XML node                                     *
  *             xpath  - [IN] the XML XPath                                    *
  *                                                                            *
@@ -1287,7 +1287,7 @@ out:
  *         contain the value specified by xpath.                              *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_xml_node_read_value(xmlDoc *doc, xmlNode *node, const char *xpath)
+char	*zbx_xml_node_read_value(xmlDoc *xdoc, xmlNode *node, const char *xpath)
 {
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
@@ -1295,7 +1295,7 @@ char	*zbx_xml_node_read_value(xmlDoc *doc, xmlNode *node, const char *xpath)
 	xmlChar		*val;
 	char		*value = NULL;
 
-	xpathCtx = xmlXPathNewContext(doc);
+	xpathCtx = xmlXPathNewContext(xdoc);
 
 	xpathCtx->node = node;
 
@@ -1313,7 +1313,7 @@ char	*zbx_xml_node_read_value(xmlDoc *doc, xmlNode *node, const char *xpath)
 
 	nodeset = xpathObj->nodesetval;
 
-	if (NULL != (val = xmlNodeListGetString(doc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
+	if (NULL != (val = xmlNodeListGetString(xdoc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
 	{
 		value = zbx_strdup(NULL, (const char *)val);
 		xmlFree(val);
@@ -1347,7 +1347,7 @@ char	*zbx_xml_doc_read_value(xmlDoc *xdoc, const char *xpath)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve a xmlNode from xml data relative to the specified node   *
+ * Purpose: retrieve an xmlNode from xml data relative to the specified node  *
  *                                                                            *
  * Parameters: xdoc    - [IN] the XML document                                *
  *             node   - [IN] the XML node                                     *
@@ -1387,10 +1387,10 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve a xmlNode from xml document                              *
+ * Purpose: retrieve an xmlNode from xml document                             *
  *                                                                            *
- * Parameters: xdoc   - [IN] the XML document                                 *
- *             xpath  - [IN] the XML XPath                                    *
+ * Parameters: xdoc  - [IN] the XML document                                  *
+ *             xpath - [IN] the XML XPath                                     *
  *                                                                            *
  * Return: The pointer to xmlNode or NULL if the xml data does not            *
  *         contain the value specified by xpath.                              *
@@ -1450,5 +1450,4 @@ clean:
 out:
 	return ret;
 }
-
 #endif // HAVE_LIBXML2 && HAVE_LIBCURL

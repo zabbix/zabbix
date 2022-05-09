@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -105,14 +105,12 @@ class CControllerPopupMassupdateItem extends CController {
 		}
 
 		if (!$ret) {
-			$output = [];
-
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
 			);
 		}
 
@@ -363,8 +361,10 @@ class CControllerPopupMassupdateItem extends CController {
 			}
 		}
 		else {
-			$output['errors'] = makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())
-				->toString();
+			$output['error'] = [
+				'title' => CMessageHelper::getTitle(),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
 		return (new CControllerResponseData(['main_block' => json_encode($output)]))->disableView();

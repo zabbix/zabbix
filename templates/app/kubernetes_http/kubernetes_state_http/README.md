@@ -4,8 +4,7 @@
 ## Overview
 
 For Zabbix version: 6.2 and higher  
-The template to monitor Kubernetes state that work without any external scripts.  
-
+The template to monitor Kubernetes state that work without any external scripts. 
 It works without external scripts and uses the script item to make HTTP requests to the Kubernetes API.
 
 Template `Kubernetes cluster state by HTTP` — collects metrics by HTTP agent from kube-state-metrics endpoint and Kubernetes API.

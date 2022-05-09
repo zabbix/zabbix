@@ -46,13 +46,12 @@ class CControllerPopupMedia extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$output = [];
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
 			);
 		}
 
@@ -109,8 +108,8 @@ class CControllerPopupMedia extends CController {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto', _('cannot be empty')));
 			}
 
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
+			if ($messages = get_and_clear_messages()) {
+				$output['error']['messages'] = array_column($messages, 'message');
 			}
 			else {
 				$severity = 0;

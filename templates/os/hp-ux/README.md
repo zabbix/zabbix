@@ -76,7 +76,7 @@ There are no template links in this template.
 |Lack of available memory on server |<p>-</p> |`last(/HP-UX by Zabbix agent/vm.memory.size[available])<20M` |AVERAGE | |
 |{#FSNAME}: Free inodes is less than 20% |<p>-</p> |`last(/HP-UX by Zabbix agent/vfs.fs.inode[{#FSNAME},pfree])<20` |WARNING | |
 |{#FSNAME}: Free disk space is less than 20% |<p>-</p> |`last(/HP-UX by Zabbix agent/vfs.fs.size[{#FSNAME},pfree])<20` |WARNING | |
-|Zabbix agent is not available (for {$AGENT.TIMEOUT}) |<p>For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.</p> |`max(/HP-UX by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0` |AVERAGE |<p>Manual close: YES</p> |
+|Zabbix agent is not available |<p>For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.</p> |`max(/HP-UX by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0` |AVERAGE |<p>Manual close: YES</p> |
 
 ## Feedback
 

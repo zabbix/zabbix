@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -22,9 +22,6 @@
 /**
  * @var CView $this
  */
-
-// Visibility box javascript is already added. It should not be added in popup response.
-define('CVISIBILITYBOX_JAVASCRIPT_INSERTED', 1);
 
 // Create form.
 $form = (new CForm())
@@ -420,35 +417,37 @@ if ($data['single_host_selected']) {
 		$master_item[] = (new CButton('button', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->removeId()
-			->onClick(
-				'return PopUp("popup.generic", '.json_encode([
-					'srctbl' => 'items',
-					'srcfld1' => 'itemid',
-					'srcfld2' => 'name',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'master_itemid',
-					'dstfld2' => 'master_itemname',
-					'only_hostid' => $data['hostid'],
-					'with_webitems' => 1,
-					'normal_only' => 1
-				]).', {dialogue_class: "modal-popup-generic"});'
-			);
+			->setAttribute('data-hostid', $data['hostid'])
+			->onClick('
+				PopUp("popup.generic", {
+					srctbl: "items",
+					srcfld1: "itemid",
+					srcfld2: "name",
+					dstfrm: "'.$form->getName().'",
+					dstfld1: "master_itemid",
+					dstfld2: "master_itemname",
+					only_hostid: this.dataset.hostid,
+					with_webitems: 1,
+					normal_only: 1
+				}, {dialogue_class: "modal-popup-generic"});
+			');
 
 		$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$master_item[] = (new CButton('button', _('Select prototype')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->removeId()
-			->onClick(
-				'return PopUp("popup.generic", '.json_encode([
-					'srctbl' => 'item_prototypes',
-					'srcfld1' => 'itemid',
-					'srcfld2' => 'name',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'master_itemid',
-					'dstfld2' => 'master_itemname',
-					'parent_discoveryid' => $data['parent_discoveryid']
-				]).', {dialogue_class: "modal-popup-generic"});'
-			);
+			->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
+			->onClick('
+				PopUp("popup.generic", {
+					srctbl: "item_prototypes",
+					srcfld1: "itemid",
+					srcfld2: "name",
+					dstfrm: "'.$form->getName().'",
+					dstfld1: "master_itemid",
+					dstfld2: "master_itemname",
+					parent_discoveryid: this.dataset.parent_discoveryid
+				}, {dialogue_class: "modal-popup-generic"});
+			');
 	}
 
 	$item_form_list->addRow(

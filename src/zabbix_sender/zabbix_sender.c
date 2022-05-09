@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "threads.h"
+#include "zbxthreads.h"
 #include "zbxcommshigh.h"
 #include "cfg.h"
 #include "log.h"
 #include "zbxgetopt.h"
 #include "zbxjson.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "zbxcrypto.h"
 #if defined(_WINDOWS)
 #	include "../libs/zbxcrypto/tls.h"
@@ -1010,8 +1010,15 @@ static void	parse_commandline(int argc, char **argv)
 	unsigned int	opt_mask = 0;
 	unsigned short	opt_count[256] = {0};
 
+	/* see description of 'optarg' in 'man 3 getopt' */
+	char		*zbx_optarg = NULL;
+
+	/* see description of 'optind' in 'man 3 getopt' */
+	int		zbx_optind = 0;
+
 	/* parse the command-line */
-	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
+	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
+			&zbx_optind)))
 	{
 		opt_count[(unsigned char)ch]++;
 

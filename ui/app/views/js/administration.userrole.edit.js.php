@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -77,7 +77,7 @@
 				return;
 			}
 
-			const access = <?= json_encode([
+			const access_min = <?= json_encode([
 				CRoleHelper::UI_MONITORING_DASHBOARD => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::UI_MONITORING_PROBLEMS => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::UI_MONITORING_HOSTS => USER_TYPE_ZABBIX_USER,
@@ -126,17 +126,31 @@
 				CRoleHelper::ACTIONS_MANAGE_SLA => USER_TYPE_ZABBIX_ADMIN
 			], JSON_FORCE_OBJECT) ?>;
 
-			for (const [id, value] of Object.entries(access)) {
+			for (const [id, value] of Object.entries(access_min)) {
 				const checkbox = document.getElementById(id);
 
 				if (user_type < value) {
 					checkbox.readOnly = true;
 					checkbox.checked = false;
-				} else {
+				}
+				else {
 					if (checkbox.readOnly) {
 						checkbox.checked = true;
 					}
 					checkbox.readOnly = false;
+				}
+			}
+
+			const access_max = <?= json_encode([
+					CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW => USER_TYPE_ZABBIX_ADMIN
+			], JSON_FORCE_OBJECT) ?>;
+
+			for (const [id, value] of Object.entries(access_max)) {
+				const checkbox = document.getElementById(id);
+				checkbox.readOnly = (user_type > value);
+
+				if (checkbox.readOnly) {
+					checkbox.checked = true;
 				}
 			}
 		},

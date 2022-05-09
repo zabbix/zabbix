@@ -91,36 +91,3 @@ function submitOperationPopup(response) {
 
 	submitFormWithParam('action.edit', form_param, '1');
 }
-
-/**
- * Validate popup form.
- *
- * @param {Overlay} overlay
- */
-function validateOperationPopup(overlay) {
-	var $form = overlay.$dialogue.find('form'),
-		url = new Curl($form.attr('action'));
-
-	url.setArgument('validate', 1);
-
-	overlay.setLoading();
-	overlay.xhr = jQuery.ajax({
-		url: url.getUrl(),
-		data:  $form.serialize(),
-		dataType: 'json',
-		method: 'POST'
-	});
-
-	overlay.xhr
-		.done(function(response) {
-			overlay.$dialogue.find('.msg-bad').remove();
-
-			if (typeof response.errors !== 'undefined') {
-				jQuery(response.errors).insertBefore($form);
-				overlay.unsetLoading();
-			}
-			else {
-				submitOperationPopup(response);
-			}
-		});
-}

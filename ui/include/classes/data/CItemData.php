@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -57,6 +57,7 @@ final class CItemData {
 			'perf_instance.discovery[object]',
 			'perf_instance_en.discovery[object]',
 			'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
+			'proc.get[<name>,<user>,<cmdline>,<mode>]',
 			'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
 			'proc.num[<name>,<user>,<state>,<cmdline>,<zone>]',
 			'proc_info[process,<attribute>,<type>]',
@@ -156,6 +157,7 @@ final class CItemData {
 			'perf_instance.discovery[object]',
 			'perf_instance_en.discovery[object]',
 			'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
+			'proc.get[<name>,<user>,<cmdline>,<mode>]',
 			'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
 			'proc.num[<name>,<user>,<state>,<cmdline>,<zone>]',
 			'proc_info[process,<attribute>,<type>]',
@@ -273,6 +275,7 @@ final class CItemData {
 			'vmware.hv.vm.num[<url>,<uuid>]',
 			'vmware.version[<url>]',
 			'vmware.vm.cluster.name[<url>,<uuid>]',
+			'vmware.vm.consolidationneeded[<url>,<uuid>]',
 			'vmware.vm.cpu.latency[<url>,<uuid>]',
 			'vmware.vm.cpu.num[<url>,<uuid>]',
 			'vmware.vm.cpu.readiness[<url>,<uuid>,<instance>]',
@@ -301,6 +304,7 @@ final class CItemData {
 			'vmware.vm.net.if.usage[<url>,<uuid>,<instance>]',
 			'vmware.vm.perfcounter[<url>,<uuid>,<path>,<instance>]',
 			'vmware.vm.powerstate[<url>,<uuid>]',
+			'vmware.vm.snapshot.get[<url>,<uuid>]',
 			'vmware.vm.storage.committed[<url>,<uuid>]',
 			'vmware.vm.storage.readoio[<url>,<uuid>,<instance>]',
 			'vmware.vm.storage.totalreadlatency[<url>,<uuid>,<instance>]',
@@ -425,9 +429,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_DB_MONITOR => [
 					'js-item-delay-label',
@@ -443,19 +446,17 @@ final class CItemData {
 					'password',
 					'js-item-sql-query-label',
 					'js-item-sql-query-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
 					['id' => 'key', 'defaultValue' => $data['is_discovery_rule']
 						? ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY
 						: ZBX_DEFAULT_KEY_DB_MONITOR
-					]
+					],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_DEPENDENT => [
 					'js-item-master-item-label',
 					'js-item-master-item-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_EXTERNAL => [
 					'js-item-interface-label',
@@ -466,9 +467,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_HTTPAGENT => [
 					'js-item-url-label',
@@ -517,13 +517,12 @@ final class CItemData {
 					'js-item-interface-label',
 					'js-item-interface-field',
 					'interfaceid',
-					'js-item-trends-label',
-					'js-item-trends-field',
 					'js-item-allow-traps-label',
 					'js-item-allow-traps-field',
 					'allow_traps',
 					'trapper_hosts',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_INTERNAL => [
 					'js-item-delay-label',
@@ -531,9 +530,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_IPMI => [
 					'js-item-interface-label',
@@ -547,9 +545,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_JMX => [
 					'js-item-interface-label',
@@ -569,9 +566,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_SCRIPT => [
 					'js-item-parameters-label',
@@ -585,9 +581,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_SIMPLE => [
 					'js-item-delay-label',
@@ -604,9 +599,8 @@ final class CItemData {
 					'js-item-password-label',
 					'js-item-password-field',
 					'password',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_SNMP => [
 					'js-item-interface-label',
@@ -620,17 +614,15 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_SNMPTRAP => [
 					'js-item-interface-label',
 					'js-item-interface-field',
 					'interfaceid',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_SSH => [
 					'js-item-interface-label',
@@ -652,10 +644,9 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
 					'params_script',
-					['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_SSH]
+					['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_SSH],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_TELNET => [
 					'js-item-interface-label',
@@ -674,18 +665,16 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
 					'params_script',
-					['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_TELNET]
+					['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_TELNET],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_TRAPPER => [
 					'js-item-trapper-hosts-label',
 					'js-item-trapper-hosts-field',
 					'trapper_hosts',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_ZABBIX => [
 					'js-item-interface-label',
@@ -696,9 +685,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				],
 				ITEM_TYPE_ZABBIX_ACTIVE => [
 					'js-item-delay-label',
@@ -706,9 +694,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
-					'js-item-trends-field',
-					'js-item-trends-label',
-					['id' => 'key', 'defaultValue' => '']
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				]
 			],
 			// Ids to toggle when the field 'authtype' is changed.
@@ -995,6 +982,10 @@ final class CItemData {
 			'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]' => [
 				'description' => _('Process CPU utilization percentage. Returns float'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
+			],
+			'proc.get[<name>,<user>,<cmdline>,<mode>]' => [
+				'description' => _('List of OS processes with attributes. Returns JSON array'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]' => [
 				'description' => _('Memory used by process in bytes. Returns integer'),
@@ -1412,6 +1403,10 @@ final class CItemData {
 				'description' => _('VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
+			'vmware.vm.consolidationneeded[<url>,<uuid>]' => [
+				'description' => _('VMware virtual machine disk requires consolidation, <url> - VMware service URL, <uuid> - VMware virtual machine host name'),
+				'value_type' => ITEM_VALUE_TYPE_STR
+			],
 			'vmware.vm.cpu.latency[<url>,<uuid>]' => [
 				'description' => _('Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
@@ -1523,6 +1518,10 @@ final class CItemData {
 			'vmware.vm.powerstate[<url>,<uuid>]' => [
 				'description' => _('VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
+			'vmware.vm.snapshot.get[<url>,<uuid>]' => [
+				'description' => _('VMware virtual machine snapshot state, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.vm.storage.committed[<url>,<uuid>]' => [
 				'description' => _('VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name'),

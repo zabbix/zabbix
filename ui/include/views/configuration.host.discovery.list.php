@@ -33,21 +33,21 @@ $widget = (new CWidget())
 	))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())->addItem(
-				($data['hostid'] != 0)
-					? new CRedirectButton(_('Create discovery rule'),
-						(new CUrl('host_discovery.php'))
-							->setArgument('form', 'create')
-							->setArgument('hostid', $data['hostid'])
-							->setArgument('context', $data['context'])
-							->getUrl()
-					)
-					: (new CButton('form',
-						($data['context'] === 'host')
-							? _('Create discovery rule (select host first)')
-							: _('Create discovery rule (select template first)')
-					))->setEnabled(false)
-			)
+			(new CList())
+				->addItem(
+					$data['hostid'] != 0
+						? new CRedirectButton(_('Create discovery rule'),
+							(new CUrl('host_discovery.php'))
+								->setArgument('form', 'create')
+								->setArgument('hostid', $data['hostid'])
+								->setArgument('context', $data['context'])
+						)
+						: (new CButton('form',
+							$data['context'] === 'host'
+								? _('Create discovery rule (select host first)')
+								: _('Create discovery rule (select template first)')
+						))->setEnabled(false)
+				)
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 
@@ -278,8 +278,16 @@ foreach ($data['discoveries'] as $discovery) {
 		}
 	}
 
+	$checkbox = new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', $discovery['itemid']);
+
+	if (in_array($discovery['type'], checkNowAllowedTypes())
+			&& $discovery['status'] == ITEM_STATUS_ACTIVE
+			&& $discovery['hosts'][0]['status'] == HOST_STATUS_MONITORED) {
+		$checkbox->setAttribute('data-actions', 'execute');
+	}
+
 	$discoveryTable->addRow([
-		new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', $discovery['itemid']),
+		$checkbox,
 		$discovery['hosts'][0]['name'],
 		$description,
 		[
@@ -330,7 +338,15 @@ $button_list = [
 ];
 
 if ($data['context'] === 'host') {
-	$button_list += ['discoveryrule.masscheck_now' => ['name' => _('Execute now'), 'disabled' => $data['is_template']]];
+	$button_list += [
+		'discoveryrule.masscheck_now' => [
+			'content' => (new CSimpleButton(_('Execute now')))
+				->onClick('view.massCheckNow(this);')
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('no-chkbxrange')
+				->setAttribute('data-required', 'execute')
+		]
+	];
 }
 
 $button_list += [
@@ -347,6 +363,11 @@ $widget->addItem($discoveryForm);
 
 $widget->show();
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('
+	view.init('.json_encode([
+		'checkbox_hash' => $data['checkbox_hash'],
+		'checkbox_object' => 'g_hostdruleid'
+	]).');
+'))
 	->setOnDocumentReady()
 	->show();
