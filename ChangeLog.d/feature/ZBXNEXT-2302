@@ -1,0 +1,1 @@
+.......PS. [ZBXNEXT-2302] added new vmware keys *.hv.connectionstate *.hv.hw.serialnumber *.hv.net.if.discovery *.hv.network.linkspeed *.hv.hw.sensors.get *.vm.state *.vm.tools and other improvements (MVekslers, ssimonenko)

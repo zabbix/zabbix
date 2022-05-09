@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  *
  * @onBefore prepareServicesTagsData
  */
-class testPageMonitoringServicesMassUpdate extends CWebTest {
+class testPageServicesServicesMassUpdate extends CWebTest {
 
 	use TableTrait;
 
@@ -546,7 +546,7 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 	 *
 	 * @dataProvider getTagsData
 	 */
-	public function testPageMonitoringServicesMassUpdate_Tags($data) {
+	public function testPageServicesServicesMassUpdate_Tags($data) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash(self::$service_sql);
 		}
@@ -616,7 +616,7 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 	/**
 	 * Cancel Mass updating of Services.
 	 */
-	public function testPageMonitoringServicesMassUpdate_Cancel() {
+	public function testPageServicesServicesMassUpdate_Cancel() {
 		$old_hash = CDBHelper::getHash(self::$service_sql);
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');

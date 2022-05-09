@@ -23,6 +23,8 @@
 #include "zbxcomms.h"
 #include "modbtype.h"
 
+static char	*CONFIG_PID_FILE = NULL;
+
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAMES		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
@@ -108,7 +110,7 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 #include "zbxsymbols.h"
 
 #if defined(ZABBIX_SERVICE)
-#	include "service.h"
+#	include "zbxwinservice.h"
 #elif defined(ZABBIX_DAEMON)
 #	include "zbxnix.h"
 #endif
@@ -1010,6 +1012,18 @@ static void	zbx_free_config(void)
 #endif
 }
 
+#if defined(ZABBIX_DAEMON)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: callback function for providing PID file path to libraries        *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*get_pid_file_path(void)
+{
+	return CONFIG_PID_FILE;
+}
+#endif
+
 #ifdef _WINDOWS
 static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 {
@@ -1037,6 +1051,26 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 	return ret;
 }
 #endif	/* _WINDOWS */
+
+static void	zbx_on_exit(int ret)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
+
+	zbx_free_service_resources(ret);
+
+#if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+	zbx_tls_free();
+	zbx_tls_library_deinit();	/* deinitialize crypto library from parent thread */
+#endif
+#if defined(PS_OVERWRITE_ARGV)
+	setproctitle_free_env();
+#endif
+#ifdef _WINDOWS
+	while (0 == WSACleanup())
+		;
+#endif
+	exit(EXIT_SUCCESS);
+}
 
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
@@ -1209,7 +1243,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 #ifdef _WINDOWS
-	set_parent_signal_handler();	/* must be called after all threads are created */
+	set_parent_signal_handler(zbx_on_exit);	/* must be called after all threads are created */
 
 	/* wait for an exiting thread */
 	res = WaitForMultipleObjectsEx(threads_num, threads, FALSE, INFINITE, FALSE);
@@ -1244,7 +1278,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
-			sig_exiting = ZBX_EXIT_FAILURE;
+			zbx_set_exiting_with_fail();
 			break;
 		}
 	}
@@ -1294,27 +1328,6 @@ void	zbx_free_service_resources(int ret)
 #endif
 }
 
-void	zbx_on_exit(int ret)
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
-
-	zbx_free_service_resources(ret);
-
-#if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	zbx_tls_free();
-	zbx_tls_library_deinit();	/* deinitialize crypto library from parent thread */
-#endif
-#if defined(PS_OVERWRITE_ARGV)
-	setproctitle_free_env();
-#endif
-#ifdef _WINDOWS
-	while (0 == WSACleanup())
-		;
-#endif
-
-	exit(EXIT_SUCCESS);
-}
-
 int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t = {ZBX_TASK_START};
@@ -1360,7 +1373,7 @@ int	main(int argc, char **argv)
 #ifndef _WINDOWS
 		case ZBX_TASK_RUNTIME_CONTROL:
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
-			exit(SUCCEED == zbx_sigusr_send(t.data) ? EXIT_SUCCESS : EXIT_FAILURE);
+			exit(SUCCEED == zbx_sigusr_send(t.data, CONFIG_PID_FILE) ? EXIT_SUCCESS : EXIT_FAILURE);
 			break;
 #else
 		case ZBX_TASK_INSTALL_SERVICE:
@@ -1409,7 +1422,7 @@ int	main(int argc, char **argv)
 
 			load_perf_counters(CONFIG_PERF_COUNTERS, CONFIG_PERF_COUNTERS_EN);
 #else
-			zbx_set_common_signal_handlers();
+			zbx_set_common_signal_handlers(zbx_on_exit);
 #endif
 #ifndef _WINDOWS
 			if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 0))
@@ -1467,7 +1480,10 @@ int	main(int argc, char **argv)
 			break;
 	}
 
-	ZBX_START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
-
+#if defined(ZABBIX_SERVICE)
+	service_start(t.flags);
+#elif defined(ZABBIX_DAEMON)
+	zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit);
+#endif
 	exit(EXIT_SUCCESS);
 }

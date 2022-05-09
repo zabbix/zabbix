@@ -141,6 +141,7 @@ static char	shortopts[] = "c:hVR:f";
 int		threads_num = 0;
 pid_t		*threads = NULL;
 static int	*threads_flags;
+static char	*CONFIG_PID_FILE = NULL;
 
 unsigned char			program_type	= ZBX_PROGRAM_TYPE_PROXY_ACTIVE;
 
@@ -937,6 +938,60 @@ static void	zbx_free_config(void)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: callback function for providing PID file path to libraries        *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*get_pid_file_path(void)
+{
+	return CONFIG_PID_FILE;
+}
+
+static void	zbx_on_exit(int ret)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
+
+	if (NULL != threads)
+	{
+		zbx_threads_wait(threads, threads_flags, threads_num, ret); /* wait for all child processes to exit */
+		zbx_free(threads);
+		zbx_free(threads_flags);
+	}
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+	zbx_locks_disable();
+#endif
+	free_metrics();
+	zbx_ipc_service_free_env();
+
+	DBconnect(ZBX_DB_CONNECT_EXIT);
+	free_database_cache(ZBX_SYNC_ALL);
+	free_configuration_cache();
+	DBclose();
+
+	DBdeinit();
+
+	/* free vmware support */
+	zbx_vmware_destroy();
+
+	free_selfmon_collector();
+	free_proxy_history_lock();
+
+	zbx_unload_modules();
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Proxy stopped. Zabbix %s (revision %s).",
+			ZABBIX_VERSION, ZABBIX_REVISION);
+
+	zabbix_close_log();
+
+	zbx_locks_destroy();
+
+#if defined(PS_OVERWRITE_ARGV)
+	setproctitle_free_env();
+#endif
+	exit(EXIT_SUCCESS);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: executes proxy processes                                          *
  *                                                                            *
  ******************************************************************************/
@@ -1042,7 +1097,7 @@ int	main(int argc, char **argv)
 		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
-	return zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
+	return zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit);
 }
 
 static void	zbx_check_db(void)
@@ -1433,14 +1488,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (0 < (ret = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "PROCESS EXIT: %d", ret);
-			sig_exiting = ZBX_EXIT_FAILURE;
+			zbx_set_exiting_with_fail();
 			break;
 		}
 
 		if (-1 == ret && EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
-			sig_exiting = ZBX_EXIT_FAILURE;
+			zbx_set_exiting_with_fail();
 			break;
 		}
 	}
@@ -1451,49 +1506,4 @@ out:
 	zbx_on_exit(ZBX_EXIT_STATUS());
 
 	return SUCCEED;
-}
-
-void	zbx_on_exit(int ret)
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
-
-	if (NULL != threads)
-	{
-		zbx_threads_wait(threads, threads_flags, threads_num, ret);	/* wait for all child processes to exit */
-		zbx_free(threads);
-		zbx_free(threads_flags);
-	}
-#ifdef HAVE_PTHREAD_PROCESS_SHARED
-	zbx_locks_disable();
-#endif
-	free_metrics();
-	zbx_ipc_service_free_env();
-
-	DBconnect(ZBX_DB_CONNECT_EXIT);
-	free_database_cache(ZBX_SYNC_ALL);
-	free_configuration_cache();
-	DBclose();
-
-	DBdeinit();
-
-	/* free vmware support */
-	zbx_vmware_destroy();
-
-	free_selfmon_collector();
-	free_proxy_history_lock();
-
-	zbx_unload_modules();
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Proxy stopped. Zabbix %s (revision %s).",
-			ZABBIX_VERSION, ZABBIX_REVISION);
-
-	zabbix_close_log();
-
-	zbx_locks_destroy();
-
-#if defined(PS_OVERWRITE_ARGV)
-	setproctitle_free_env();
-#endif
-
-	exit(EXIT_SUCCESS);
 }
