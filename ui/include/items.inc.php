@@ -1194,13 +1194,23 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 		['field' => 'name', 'order' => ZBX_SORT_UP]
 	]);
 
-	$has_hidden_hosts = (count($db_hosts) > ZBX_MAX_TABLE_COLUMNS);
+	$has_hidden_data = count($data) > ZBX_MAX_TABLE_COLUMNS || count($db_hosts) > ZBX_MAX_TABLE_COLUMNS;
 	$db_hosts = array_slice($db_hosts, 0, ZBX_MAX_TABLE_COLUMNS, true);
 	$host_names = array_column($db_hosts, 'name', 'name');
 
 	$itemids = [];
+	$items_left = ZBX_MAX_TABLE_COLUMNS;
 
 	foreach ($data as &$item_columns) {
+		if ($items_left != 0) {
+			$item_columns = array_slice($item_columns, 0, min(ZBX_MAX_TABLE_COLUMNS, $items_left));
+			$items_left -= count($item_columns);
+		}
+		else {
+			$item_columns = null;
+			break;
+		}
+
 		foreach ($item_columns as &$item_column) {
 			CArrayHelper::ksort($item_column);
 			$item_column = array_slice($item_column, 0, ZBX_MAX_TABLE_COLUMNS, true);
@@ -1223,12 +1233,12 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 	$data = array_filter($data);
 	$data = array_slice($data, 0, ZBX_MAX_TABLE_COLUMNS, true);
 
-	$has_hidden_items = (count($db_items) != count($itemids));
+	$has_hidden_data = $has_hidden_data || count($db_items) != count($itemids);
 
 	$db_items = array_intersect_key($db_items, $itemids);
 	$data = getDataOverviewCellData($db_items, $data, $filter['show_suppressed']);
 
-	return [$data, $db_hosts, ($has_hidden_items || $has_hidden_hosts)];
+	return [$data, $db_hosts, $has_hidden_data];
 }
 
 /**
