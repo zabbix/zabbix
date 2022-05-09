@@ -2718,7 +2718,7 @@ out:
 	return ret;
 }
 
-static int	dvs_param_validate(zbx_vector_custquery_param_t *query_params)
+static int	dvs_param_validate(zbx_vector_custquery_param_t *query_params, unsigned int vc_version)
 {
 	int	i;
 
@@ -2738,6 +2738,12 @@ static int	dvs_param_validate(zbx_vector_custquery_param_t *query_params)
 		{
 			return FAIL;
 		}
+
+		if (0 == strcmp("host", p->name) && vc_version < 65)
+			return FAIL;
+
+		if (0 == strcmp("nsxPort", p->name) && vc_version < 70)
+			return FAIL;
 	}
 
 	return SUCCEED;
@@ -2846,7 +2852,8 @@ int	check_vcenter_dvswitch_fetchports_get(AGENT_REQUEST *request, const char *us
 
 	if (NULL == (custom_query = zbx_vmware_service_get_cust_query(service, type, dvs->id, key, query_type, mode))
 			&& (SUCCEED != custquery_param_create(key, &query_params)
-			|| SUCCEED != dvs_param_validate(&query_params)))
+			|| SUCCEED != dvs_param_validate(&query_params,
+			service->major_version * 10 + service->minor_version)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL,
 				"Unknown format of vmware DistributedVirtualSwitchPortCriteria."));

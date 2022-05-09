@@ -6397,12 +6397,18 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_t
 
 		for (j = 0; j < cqv->instance->query_params->values_num; j++)
 		{
-			char	*name_esc, *value_esc;
+			char		*name_esc, *value_esc;
+			const char	*host_type;
+
+			if (0 == strcmp(cqv->instance->query_params->values[j].name, "host"))
+				host_type = " type=\"HostSystem\"";
+			else
+				host_type = NULL;
 
 			name_esc = zbx_xml_escape_dyn(cqv->instance->query_params->values[j].name);
 			value_esc = zbx_xml_escape_dyn(cqv->instance->query_params->values[j].value);
-			offset += zbx_snprintf(criteria + offset, sizeof(criteria) - offset, "<%s>%s</%s>",
-					name_esc, value_esc, name_esc);
+			offset += zbx_snprintf(criteria + offset, sizeof(criteria) - offset, "<ns0:%s%s>%s</ns0:%s>",
+					name_esc, ZBX_NULL2EMPTY_STR(host_type), value_esc, name_esc);
 			zbx_free(name_esc);
 			zbx_free(value_esc);
 		}
