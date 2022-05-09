@@ -1400,5 +1400,4 @@ xmlNode	*zbx_xml_doc_get(xmlDoc *xdoc, const char *xpath)
 {
 	return zbx_xml_node_get(xdoc, NULL, xpath);
 }
-
 #endif // HAVE_LIBXML2 && HAVE_LIBCURL
