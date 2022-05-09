@@ -3,7 +3,7 @@ package agent
 import (
 	"testing"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 type Input struct {

@@ -22,9 +22,9 @@ package serverlistener
 import (
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/log"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/scheduler"
-	"zabbix.com/pkg/log"
 )
 
 const notsupported = "ZBX_NOTSUPPORTED"

@@ -121,6 +121,8 @@ int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, const char *username, 
 		AGENT_RESULT *result);
 int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_vm_consolidationneeded(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_vm_cpu_ready(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_cpu_usage(AGENT_REQUEST *request, const char *username, const char *password,
@@ -166,6 +168,8 @@ int	check_vcenter_vm_memory_size_shared(AGENT_REQUEST *request, const char *user
 int	check_vcenter_vm_net_if_usage(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_powerstate(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_vm_snapshot_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);

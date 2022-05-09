@@ -24,7 +24,7 @@ import (
 	"errors"
 	"strconv"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 const pluginName = "Cpu"

@@ -274,6 +274,7 @@ final class CItemData {
 			'vmware.version[<url>]',
 			'vmware.vm.attribute[<url>,<uuid>,<name>]',
 			'vmware.vm.cluster.name[<url>,<uuid>]',
+			'vmware.vm.consolidationneeded[<url>,<uuid>]',
 			'vmware.vm.cpu.latency[<url>,<uuid>]',
 			'vmware.vm.cpu.num[<url>,<uuid>]',
 			'vmware.vm.cpu.readiness[<url>,<uuid>,<instance>]',
@@ -302,6 +303,7 @@ final class CItemData {
 			'vmware.vm.net.if.usage[<url>,<uuid>,<instance>]',
 			'vmware.vm.perfcounter[<url>,<uuid>,<path>,<instance>]',
 			'vmware.vm.powerstate[<url>,<uuid>]',
+			'vmware.vm.snapshot.get[<url>,<uuid>]',
 			'vmware.vm.storage.committed[<url>,<uuid>]',
 			'vmware.vm.storage.readoio[<url>,<uuid>,<instance>]',
 			'vmware.vm.storage.totalreadlatency[<url>,<uuid>,<instance>]',
@@ -1396,6 +1398,10 @@ final class CItemData {
 				'description' => _('VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
+			'vmware.vm.consolidationneeded[<url>,<uuid>]' => [
+				'description' => _('VMware virtual machine disk requires consolidation, <url> - VMware service URL, <uuid> - VMware virtual machine host name'),
+				'value_type' => ITEM_VALUE_TYPE_STR
+			],
 			'vmware.vm.cpu.latency[<url>,<uuid>]' => [
 				'description' => _('Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
@@ -1507,6 +1513,10 @@ final class CItemData {
 			'vmware.vm.powerstate[<url>,<uuid>]' => [
 				'description' => _('VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
+			'vmware.vm.snapshot.get[<url>,<uuid>]' => [
+				'description' => _('VMware virtual machine snapshot state, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.vm.storage.committed[<url>,<uuid>]' => [
 				'description' => _('VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name'),

@@ -21,7 +21,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT([Zabbix],[6.2.0beta2])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE([subdir-objects filename-length-max=99])
+AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -2080,6 +2080,7 @@ AC_OUTPUT([
 	src/libs/zbxconf/Makefile
 	src/libs/zbxdbcache/Makefile
 	src/libs/zbxdbhigh/Makefile
+	src/libs/zbxgetopt/Makefile
 	src/libs/zbxmedia/Makefile
 	src/libs/zbxsysinfo/Makefile
 	src/libs/zbxcommon/Makefile
