@@ -23,9 +23,9 @@ require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/../CElement.php';
 
 /**
- * Custom dropdown (z-select) element.
+ * List (select) element.
  */
-class CZDropdownElement extends CElement {
+class CListElement extends CElement {
 
 	/**
 	 * Get collection of options.
@@ -33,16 +33,22 @@ class CZDropdownElement extends CElement {
 	 * @return CElementCollection
 	 */
 	public function getOptions() {
-		return $this->query('xpath:.//li[not(@optgroup)]')->all();
+		return $this->query('tag:option')->all();
 	}
 
 	/**
-	 * Get text of selected element.
+	 * Get text of selected option.
 	 *
 	 * @return string
 	 */
 	public function getText() {
-		return $this->query('xpath:./button')->one()->getText();
+		foreach ($this->getOptions() as $option) {
+			if ($option->isSelected()) {
+				return $option->getText();
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -53,25 +59,17 @@ class CZDropdownElement extends CElement {
 	 * @return $this
 	 */
 	public function select($text) {
-		$xpath = 'xpath:.//li[not(@optgroup) and text()='.CXPathHelper::escapeQuotes($text).']';
-
-		if ($text === $this->getText()) {
-			return $this;
-		}
-
-		for ($i = 0; $i < 5; $i++) {
-			try {
-				$this->waitUntilClickable()->click();
-				$this->query($xpath)->one()->click();
-
-				return $this;
+		$option = $this->query('xpath:.//option[text()='.CXPathHelper::escapeQuotes($text).']')->one();
+		if (!$option->isSelected()) {
+			if ($option->isClickable()) {
+				$option->click();
 			}
-			catch (Exception $exception) {
-				// Code is not missing here.
+			else {
+				throw new Exception('Cannot select disabled list element.');
 			}
 		}
 
-		throw new Exception('Failed to select dropdown option "'.$text.'".');
+		return $this;
 	}
 
 	/**
