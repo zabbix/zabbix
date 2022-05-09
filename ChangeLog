@@ -1,3 +1,24 @@
+Changes for 6.0.5rc1
+
+New features:
+A.F....... [ZBXNEXT-7476] disabled php 8 strict type validation (ashubin)
+..F....... [ZBXNEXT-7461] implemented expandable subfilters in latest data page; fixed clickable tags (miks)
+.........T [ZBXNEXT-7607] added template Envoy Proxy by HTTP (ychukina)
+.........T [ZBXNEXT-7547] added CockroachDB template (drasihov)
+A.F....... [ZBXNEXT-7491] fixed PHP 8.1 runtime warnings with PostgreSQL backend (Sasha)
+
+Bug fixes:
+..F....... [ZBX-20573] fixed service filter functionality in SLA report page (rdetlavs)
+.........T [ZBX-20982] fixed api request by coordinates in openweathermap template (vkhaliev)
+........S. [ZBX-20918] moved final history/trends cache sync in main process to be done before stopping HA (wiper)
+..F....... [ZBX-20458] fixed broken host link not opening in Inventory (rdetlavs)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.4
+
+6.0.4rc1 was released as 6.0.4 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.4rc1
 
 New features:
@@ -1853,6 +1874,18 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.24rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.23
+
+5.0.23rc1 was released as 5.0.23 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.23rc1
@@ -4326,6 +4359,18 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.41rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.40
+
+4.0.40rc1 was released as 4.0.40 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.40rc1

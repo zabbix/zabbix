@@ -1784,6 +1784,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$this->assertFalse($column_form->query('xpath:'.$warning)->one()->isVisible());
 		}
 
+
 		// Check that History data hint ID is visible.
 		$this->assertTrue($column_form->query('xpath:'.$info.'/a')->one()->isVisible());
 

@@ -20,9 +20,9 @@
 package memcached
 
 import (
-	"zabbix.com/pkg/metric"
-	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/uri"
+	"git.zabbix.com/ap/plugin-support/metric"
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/uri"
 )
 
 // handlerFunc defines an interface must be implemented by handlers.
