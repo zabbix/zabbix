@@ -812,9 +812,9 @@ zabbix_export:
           triggers:
             -
               uuid: 153cc67416614c13878a6f5655d99b09
-              expression: 'max(/Linux by Zabbix agent active/zabbix[host,active_agent,available])=2'
+              expression: 'max(/Linux by Zabbix agent active/zabbix[host,active_agent,available],5m)=2'
               name: 'Zabbix agent: active checks are not available'
-              rtdata: 'Current state: {ITEM.LASTVALUE1}'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Active checks are considered unavailable. Agent is not sending heartbeat for prolonged time.'
       discovery_rules:
@@ -2309,6 +2309,19 @@ zabbix_export:
             -
               value: '1'
               newvalue: Up
+        -
+          uuid: c75840508f98402498289c5f99e0d59e
+          name: zabbix.host.active_agent.available
+          mappings:
+            -
+              value: '0'
+              newvalue: unknown
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: 'not available'
   triggers:
     -
       uuid: fa21b02aebe143b192a20cd9403a68d0

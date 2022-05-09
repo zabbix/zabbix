@@ -168,9 +168,9 @@ zabbix_export:
           triggers:
             -
               uuid: 8f04c3d6b3224382abf7472e8a4e38ba
-              expression: 'max(/Microsoft Exchange Server 2016 by Zabbix agent active/zabbix[host,active_agent,available])=2'
+              expression: 'max(/Microsoft Exchange Server 2016 by Zabbix agent active/zabbix[host,active_agent,available],5m)=2'
               name: 'Zabbix agent: active checks are not available'
-              rtdata: 'Current state: {ITEM.LASTVALUE1}'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Active checks are considered unavailable. Agent is not sending heartbeat for prolonged time.'
       discovery_rules:
@@ -789,6 +789,19 @@ zabbix_export:
             -
               value: '2'
               newvalue: Healthy
+        -
+          uuid: 0407f8e83ce94d9b88db8dab241e44c0
+          name: zabbix.host.active_agent.available
+          mappings:
+            -
+              value: '0'
+              newvalue: unknown
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: 'not available'
   graphs:
     -
       uuid: d1e720c28aba4d48a522d509bdd7d324

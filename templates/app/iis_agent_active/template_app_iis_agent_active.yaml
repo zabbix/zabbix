@@ -708,9 +708,9 @@ zabbix_export:
           triggers:
             -
               uuid: b9d8edc865f54e8eb56e84392817ff5b
-              expression: 'max(/IIS by Zabbix agent active/zabbix[host,active_agent,available])=2'
+              expression: 'max(/IIS by Zabbix agent active/zabbix[host,active_agent,available],5m)=2'
               name: 'Zabbix agent: active checks are not available'
-              rtdata: 'Current state: {ITEM.LASTVALUE1}'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Active checks are considered unavailable. Agent is not sending heartbeat for prolonged time.'
       discovery_rules:
@@ -967,6 +967,19 @@ zabbix_export:
             -
               value: '255'
               newvalue: 'No such service'
+        -
+          uuid: c63064c6717e4604805491ce54166356
+          name: zabbix.host.active_agent.available
+          mappings:
+            -
+              value: '0'
+              newvalue: unknown
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: 'not available'
   graphs:
     -
       uuid: e3b3f8f973204070a37b9eb861e2a079
