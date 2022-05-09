@@ -42,15 +42,26 @@
 				continue;
 			}
 
+			let curl;
+			if (list.object === 'deptrigger_prototype') {
+				curl = new Curl('trigger_prototypes.php')
+				curl.setArgument('form', 'update')
+				curl.setArgument('parent_discoveryid', '<?= $data['parent_discoveryid'] ?>')
+				curl.setArgument('triggerid',`${value.triggerid}`)
+			}
+			else {
+				curl = new Curl('triggers.php')
+				curl.setArgument('form', 'update')
+				curl.setArgument('triggerid',`${value.triggerid}`)
+				curl.setArgument('context', '<?= $data['context'] ?>')
+			}
+
 			document
 				.querySelector('#dependency-table tr:last-child')
 				.insertAdjacentHTML('afterend', tmpl.evaluate({
 					triggerid: value.triggerid,
 					name: value.name,
-					url: ((list.object === 'deptrigger_prototype')
-							? 'trigger_prototypes.php?form=update&parent_discoveryid=<?= $data['parent_discoveryid'] ?>&triggerid='
-							: 'triggers.php?form=update&triggerid=')
-						+ value.triggerid
+					url: curl.getUrl()
 				}));
 		}
 	}
