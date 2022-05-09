@@ -2280,16 +2280,17 @@ function getUserGraphTheme() {
 /**
  * Custom error handler for PHP errors.
  *
- * @param int     $errno Level of the error raised.
- * @param string  $errstr Error message.
- * @param string  $errfile Filename that the error was raised in.
- * @param int     $errline Line number the error was raised in.
+ * @param int    $errno    Level of the error raised.
+ * @param string $errstr   Error message.
+ * @param string $errfile  Filename that the error was raised in.
+ * @param int    $errline  Line number the error was raised in.
  *
- * @return bool  False, to continue with the default error handler.
+ * @return bool
  */
 function zbx_err_handler($errno, $errstr, $errfile, $errline) {
-	// Necessary to suppress errors when calling with error control operator like @function_name().
-	if (error_reporting() === 0) {
+	// Suppress errors when calling with error control operator @function_name().
+	if ((error_reporting()
+			& ~(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR)) == 0) {
 		return true;
 	}
 

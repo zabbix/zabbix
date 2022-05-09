@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T07:48:16Z'
+  date: '2022-04-21T13:07:34Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -183,11 +183,11 @@ zabbix_export:
             key: proxmox.cluster.status
           lld_macro_paths:
             -
-              lld_macro: '{#RESOURCE.TYPE}'
-              path: $.type
-            -
               lld_macro: '{#RESOURCE.NAME}'
               path: $.name
+            -
+              lld_macro: '{#RESOURCE.TYPE}'
+              path: $.type
         -
           uuid: 78a4018328954d408e415aa0ce7ce41c
           name: 'LXC discovery'
@@ -644,17 +644,17 @@ zabbix_export:
             key: proxmox.cluster.resources
           lld_macro_paths:
             -
-              lld_macro: '{#RESOURCE.TYPE}'
-              path: $.type
-            -
-              lld_macro: '{#NODE.NAME}'
-              path: $.node
+              lld_macro: '{#LXC.ID}'
+              path: $.id
             -
               lld_macro: '{#LXC.NAME}'
               path: $.name
             -
-              lld_macro: '{#LXC.ID}'
-              path: $.id
+              lld_macro: '{#NODE.NAME}'
+              path: $.node
+            -
+              lld_macro: '{#RESOURCE.TYPE}'
+              path: $.type
         -
           uuid: ba55f69b12ee46faa319203483d8008f
           name: 'Node discovery'
@@ -1436,11 +1436,11 @@ zabbix_export:
             key: proxmox.cluster.resources
           lld_macro_paths:
             -
-              lld_macro: '{#RESOURCE.TYPE}'
-              path: $.type
-            -
               lld_macro: '{#NODE.NAME}'
               path: $.node
+            -
+              lld_macro: '{#RESOURCE.TYPE}'
+              path: $.type
         -
           uuid: 31aa7234aa294fce8f4735a9216ddf31
           name: 'QEMU discovery'
@@ -1651,7 +1651,7 @@ zabbix_export:
                   tag: qemu
                   value: '{#QEMU.ID}'
             -
-              uuid: ffd3c0a6e9764d9ea0091d2fcf0234e2
+              uuid: c3cb5366103743c2823f522482e9f2e4
               name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Incoming data, rate'
               type: DEPENDENT
               key: 'proxmox.qemu.netin[{#QEMU.ID}]'
@@ -1787,7 +1787,7 @@ zabbix_export:
                       tag: scope
                       value: notice
             -
-              uuid: 77ba70e0ce6f486585f870d3b57033ba
+              uuid: 9b6de7e610c64950a3b477b9dc666751
               name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Status'
               type: DEPENDENT
               key: 'proxmox.qemu.vmstatus[{#QEMU.ID}]'
@@ -1897,17 +1897,17 @@ zabbix_export:
             key: proxmox.cluster.resources
           lld_macro_paths:
             -
-              lld_macro: '{#RESOURCE.TYPE}'
-              path: $.type
-            -
               lld_macro: '{#NODE.NAME}'
               path: $.node
+            -
+              lld_macro: '{#QEMU.ID}'
+              path: $.id
             -
               lld_macro: '{#QEMU.NAME}'
               path: $.name
             -
-              lld_macro: '{#QEMU.ID}'
-              path: $.id
+              lld_macro: '{#RESOURCE.TYPE}'
+              path: $.type
         -
           uuid: 61faca6204854bc4af8dc6c5c63ddcd1
           name: 'Storage discovery'
@@ -2079,11 +2079,11 @@ zabbix_export:
             key: proxmox.cluster.resources
           lld_macro_paths:
             -
-              lld_macro: '{#RESOURCE.TYPE}'
-              path: $.type
-            -
               lld_macro: '{#NODE.NAME}'
               path: $.node
+            -
+              lld_macro: '{#RESOURCE.TYPE}'
+              path: $.type
             -
               lld_macro: '{#STORAGE.NAME}'
               path: $.storage

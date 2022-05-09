@@ -556,14 +556,16 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 					if ($subfilter_tags !== null
 							&& !(array_key_exists($tag['tag'], $subfilter_tags)
 								&& array_key_exists($tag['value'], $subfilter_tags[$tag['tag']]))) {
-						$value = (new CLinkAction($value))->onClick(CHtml::encode(
-							'view.setSubfilter('.json_encode(['subfilter_tags['.$tag['tag'].'][]', $tag['value']]).')'
-						));
+						$tags[$element[$key]][] = (new CSimpleButton($value))
+							->setAttribute('data-subfilter-tag', ['subfilter_tags['.$tag['tag'].'][]', $tag['value']])
+							->addClass(ZBX_STYLE_BTN_TAG)
+							->setHint(getTagString($tag), '', false);
 					}
-
-					$tags[$element[$key]][] = (new CSpan($value))
-						->addClass(ZBX_STYLE_TAG)
-						->setHint(getTagString($tag));
+					else {
+						$tags[$element[$key]][] = (new CSpan($value))
+							->addClass(ZBX_STYLE_TAG)
+							->setHint(getTagString($tag));
+					}
 
 					$tags_shown++;
 
@@ -584,18 +586,20 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 					if ($subfilter_tags !== null
 							&& !(array_key_exists($tag['tag'], $subfilter_tags)
 								&& array_key_exists($tag['value'], $subfilter_tags[$tag['tag']]))) {
-						$value = (new CLinkAction($value))->onClick(CHtml::encode(
-							'view.setSubfilter('.json_encode(['subfilter_tags['.$tag['tag'].'][]', $tag['value']]).')'
-						));
+						$hint_content[$element[$key]][] = (new CSimpleButton($value))
+							->setAttribute('data-subfilter-tag', ['subfilter_tags['.$tag['tag'].'][]', $tag['value']])
+							->addClass(ZBX_STYLE_BTN_TAG)
+							->setHint(getTagString($tag), '', false);
 					}
-
-					$hint_content[$element[$key]][] = (new CSpan($value))
-						->addClass(ZBX_STYLE_TAG)
-						->setHint($value);
+					else {
+						$hint_content[$element[$key]][] = (new CSpan($value))
+							->addClass(ZBX_STYLE_TAG)
+							->setHint($value);
+					}
 				}
 
 				$tags[$element[$key]][] = (new CButton(null))
-					->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+					->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
 					->setHint($hint_content, ZBX_STYLE_HINTBOX_WRAP, true);
 			}
 		}
