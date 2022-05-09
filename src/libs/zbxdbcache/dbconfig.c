@@ -62,8 +62,6 @@ int	sync_in_progress = 0;
 #define ZBX_QUEUE_PRIORITY_NORMAL	1
 #define ZBX_QUEUE_PRIORITY_LOW		2
 
-#define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
-
 /* shorthand macro for calling in_maintenance_without_data_collection() */
 #define DCin_maintenance_without_data_collection(dc_host, dc_item)			\
 		in_maintenance_without_data_collection(dc_host->maintenance_status,	\
@@ -2227,6 +2225,8 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 	char	*addr;
 	DC_HOST	host;
 
+#define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
+
 	macros = STR_CONTAINS_MACROS(interface->ip) ? 0x01 : 0;
 	macros |= STR_CONTAINS_MACROS(interface->dns) ? 0x02 : 0;
 
@@ -2254,6 +2254,7 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 			zbx_free(addr);
 		}
 	}
+#undef STR_CONTAINS_MACROS
 }
 
 /******************************************************************************
