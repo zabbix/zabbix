@@ -277,6 +277,7 @@ final class CItemData {
 			'vmware.hv.version[<url>,<uuid>]',
 			'vmware.hv.vm.num[<url>,<uuid>]',
 			'vmware.version[<url>]',
+			'vmware.vm.attribute[<url>,<uuid>,<name>]',
 			'vmware.vm.cluster.name[<url>,<uuid>]',
 			'vmware.vm.consolidationneeded[<url>,<uuid>]',
 			'vmware.vm.cpu.latency[<url>,<uuid>]',
@@ -1414,6 +1415,10 @@ final class CItemData {
 			],
 			'vmware.version[<url>]' => [
 				'description' => _('VMware service version, <url> - VMware service URL'),
+				'value_type' => ITEM_VALUE_TYPE_STR
+			],
+			'vmware.vm.attribute[<url>,<uuid>,<name>]' => [
+				'description' => _('VMware virtual machine custom attribute value, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <name> - custom attribute name'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
 			'vmware.vm.cluster.name[<url>,<uuid>]' => [

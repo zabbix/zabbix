@@ -2888,6 +2888,63 @@ out:
 	return ret;
 }
 
+int	check_vcenter_vm_attribute(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	zbx_vmware_service_t		*service;
+	zbx_vmware_vm_t			*vm;
+	zbx_vmware_custom_attr_t	custom_attr;
+	const char			*url, *vm_uuid, *attr_name;
+	int				index, ret = SYSINFO_RET_FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (3 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	vm_uuid = get_rparam(request, 1);
+	attr_name = get_rparam(request, 2);
+
+	if ('\0' == *vm_uuid)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (vm = service_vm_get(service, vm_uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown virtual machine uuid."));
+		goto unlock;
+	}
+
+	custom_attr.name = (char *)attr_name;
+
+	if (FAIL == (index = zbx_vector_vmware_custom_attr_bsearch(&vm->custom_attrs, &custom_attr,
+			vmware_custom_attr_compare_name)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Custom attribute is not available."));
+		goto unlock;
+	}
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, vm->custom_attrs.values[index]->value));
+	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
 int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
@@ -3194,7 +3251,22 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 				else
 					zbx_json_addstring(&json_data, "{#VM.RPOOL.PATH}", "", ZBX_JSON_TYPE_STRING);
 			}
+			else
+				zbx_json_addstring(&json_data, "{#VM.RPOOL.PATH}", "", ZBX_JSON_TYPE_STRING);
 
+			zbx_json_addarray(&json_data, "vm.customattribute");
+
+			for (j = 0; j < vm->custom_attrs.values_num; j++)
+			{
+				zbx_json_addobject(&json_data, NULL);
+				zbx_json_addstring(&json_data, "name",
+						vm->custom_attrs.values[j]->name, ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_data, "value",
+						vm->custom_attrs.values[j]->value, ZBX_JSON_TYPE_STRING);
+				zbx_json_close(&json_data);
+			}
+
+			zbx_json_close(&json_data);
 			zbx_json_close(&json_data);
 		}
 	}

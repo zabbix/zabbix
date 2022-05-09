@@ -206,15 +206,25 @@ typedef struct
 }
 zbx_vmware_fs_t;
 
+typedef struct
+{
+	char		*name;
+	char		*value;
+}
+zbx_vmware_custom_attr_t;
+ZBX_PTR_VECTOR_DECL(vmware_custom_attr, zbx_vmware_custom_attr_t *);
+int	vmware_custom_attr_compare_name(const void *a1, const void *a2);
+
 /* the vmware virtual machine data */
 typedef struct
 {
-	char			*uuid;
-	char			*id;
-	char			**props;
-	zbx_vector_ptr_t	devs;
-	zbx_vector_ptr_t	file_systems;
-	unsigned int		snapshot_count;
+	char				*uuid;
+	char				*id;
+	char				**props;
+	zbx_vector_ptr_t		devs;
+	zbx_vector_ptr_t		file_systems;
+	unsigned int			snapshot_count;
+	zbx_vector_vmware_custom_attr_t	custom_attrs;
 }
 zbx_vmware_vm_t;
 
