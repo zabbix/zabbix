@@ -652,8 +652,8 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 				continue;
 
 			*error = zbx_strdcatf(*error, "Cannot %s host:"
-					" host with the same name \"%s\" already exists.\n",
-					(0 != host->hostid ? "update" : "create"), host->host);
+					" host with the same name \"%s\" (\"%s\") already exists.\n",
+					(0 != host->hostid ? "update" : "create"), host->host, host->name);
 
 			if (0 != host->hostid)
 			{
@@ -777,8 +777,8 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 				if (0 == strcmp(host->host, row[0]))
 				{
 					*error = zbx_strdcatf(*error, "Cannot %s host:"
-							" host with the same name \"%s\" already exists.\n",
-							(0 != host->hostid ? "update" : "create"), host->host);
+							" host with the same name \"%s\" (\"%s\") already exists.\n",
+							(0 != host->hostid ? "update" : "create"), host->host, host->name);
 
 					if (0 != host->hostid)
 					{

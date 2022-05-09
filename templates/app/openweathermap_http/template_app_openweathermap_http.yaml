@@ -114,7 +114,7 @@ zabbix_export:
                     else if (/^.*,[\w]+$/g.test(locations[i])) {
                         result = getHttpData('zip=' + locations[i]);
                     }
-                    else if (/^[0-9]{1,2}(\.[0-9]+)?,[0-9]{1,2}(\.[0-9]+)?/g.test(locations[i])) {
+                    else if (/^(\-)?[0-9]{1,2}(\.[0-9]+)?,(\-)?[0-9]{1,2}(\.[0-9]+)?/g.test(locations[i])) {
                         coordinates = locations[i].split(',');
                         result = getHttpData('lat=' + coordinates[0] + '&lon=' + coordinates[1]);
                     }

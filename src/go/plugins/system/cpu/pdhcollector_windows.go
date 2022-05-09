@@ -23,7 +23,7 @@ import (
 	"fmt"
 	"unsafe"
 
-	"zabbix.com/pkg/log"
+	"git.zabbix.com/ap/plugin-support/log"
 	"zabbix.com/pkg/pdh"
 	"zabbix.com/pkg/win32"
 )

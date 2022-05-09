@@ -95,7 +95,7 @@ class testPageDashboard extends CLegacyWebTest {
 		$properties_form->checkValue(['Default page display period' => '30 seconds', 'Name' => 'New dashboard']);
 		$this->assertEquals('255', $properties_form->query('id:name')->one()->getAttribute('maxlength'));
 		$this->assertEquals(['10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes', '30 minutes', '1 hour'],
-				$properties_form->query('name:display_period')->asZDropdown()->one()->getOptions()->asText()
+				$properties_form->query('name:display_period')->asDropdown()->one()->getOptions()->asText()
 		);
 
 		$properties_form->fill(['Name' => 'Dashboard creation']);
@@ -166,9 +166,10 @@ class testPageDashboard extends CLegacyWebTest {
 			$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 			$FavouriteGraphs = DBfetchArray(DBselect('SELECT value_id FROM profiles WHERE idx='.zbx_dbstr('web.favorite.graphids')));
 			foreach ($FavouriteGraphs as $FavouriteGraph) {
-				$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//div[@class="dashboard-grid-widget-container"]/div[2]//button[@onclick="rm4favorites(\'itemid\',\''.$FavouriteGraph['value_id'].'\')"]'));
-				$this->zbxTestClickXpathWait('//div[@class="dashboard-grid-widget-container"]/div[2]//button[@onclick="rm4favorites(\'itemid\',\''.$FavouriteGraph['value_id'].'\')"]');
-				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@class="dashboard-grid-widget-container"]/div[2]//button[@onclick="rm4favorites(\'itemid\',\''.$FavouriteGraph['value_id'].'\')"]'));
+				$remove_item = $this->query('xpath://button[@data-itemid='.zbx_dbstr($FavouriteGraph['value_id']).
+						' and contains(@onclick, "rm4favorites")]')->waituntilClickable()->one();
+				$remove_item->click();
+				$remove_item->waitUntilNotVisible();
 			}
 			$this->zbxTestAssertElementText('//div[@class="dashboard-grid-widget-container"]//tr[@class="nothing-to-show"]/td', 'No graphs added.');
 			$this->assertEquals(0, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.zbx_dbstr('web.favorite.graphids')));
@@ -204,11 +205,10 @@ class testPageDashboard extends CLegacyWebTest {
 				zbx_dbstr('web.favorite.sysmapids')));
 
 		foreach ($favourite_maps as $favourite_map) {
-			$widget_content->query('xpath://button[contains(@onclick, "(\'sysmapid\',\''.
-					$favourite_map['value_id'].'\')")]')->waitUntilClickable()->one()->click();
-			$map_name = CDBHelper::getValue('SELECT name FROM sysmaps WHERE sysmapid='.
-					zbx_dbstr($favourite_map['value_id']));
-			$widget_content->query('link', $map_name)->waitUntilNotPresent();
+			$remove_item = $this->query('xpath://button[@data-sysmapid='.zbx_dbstr($favourite_map['value_id']).
+					' and contains(@onclick, "rm4favorites")]')->waituntilClickable()->one();
+			$remove_item->click();
+			$remove_item->waitUntilNotVisible();
 		}
 
 		$this->assertTrue($widget_content->query('xpath://table//td[text()="No maps added."]')->waitUntilVisible()

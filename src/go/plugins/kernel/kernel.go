@@ -20,9 +20,9 @@
 package kernel
 
 import (
-	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/std"
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/std"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 // Plugin -

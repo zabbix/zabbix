@@ -484,13 +484,13 @@ class testFormAction extends CLegacyWebTest {
 		if ($eventsource == EVENT_SOURCE_TRIGGERS && array_key_exists('evaltype', $data)) {
 			$this->zbxTestAssertElementText('//tr[@id="conditions_0"]/td[2]', 'Trigger name contains TEST1');
 			$this->zbxTestAssertElementText('//tr[@id="conditions_1"]/td[2]', 'Trigger name contains TEST2');
-			$this->zbxTestAssertElementPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(0);"]');
-			$this->zbxTestAssertElementPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(1);"]');
+			$this->zbxTestAssertElementPresentXpath('//button[@name="remove" and @onclick="removeCondition(0);"]');
+			$this->zbxTestAssertElementPresentXpath('//button[@name="remove" and @onclick="removeCondition(1);"]');
 		}
 		else {
 			$this->zbxTestAssertElementNotPresentXpath('//tr[@id="conditions_0"]');
-			$this->zbxTestAssertElementNotPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(0);"]');
-			$this->zbxTestAssertElementNotPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(1);"]');
+			$this->zbxTestAssertElementNotPresentXpath('//button[@name="remove" and @onclick="removeCondition(0);"]');
+			$this->zbxTestAssertElementNotPresentXpath('//button[@name="remove" and @onclick="removeCondition(1);"]');
 		}
 
 		// Open Condition overlay dialog.
@@ -975,7 +975,7 @@ class testFormAction extends CLegacyWebTest {
 			$this->assertTrue($this->query('xpath://label[text()="Operation"]/../../div[text()="Send message"]')->one()->isValid());
 		}
 		elseif (isset($data['check_operationtype'])) {
-			$options = $this->query('id:operation-type-select')->asZDropdown()->one();
+			$options = $this->query('id:operation-type-select')->asDropdown()->one();
 			switch ($eventsource) {
 				case EVENT_SOURCE_TRIGGERS:
 				case EVENT_SOURCE_SERVICE:
@@ -1155,7 +1155,7 @@ class testFormAction extends CLegacyWebTest {
 			? ['Send message', 'Notify all involved']
 			: ['Send message', 'Notify all involved', 'Reboot', 'Selenium script'];
 		$this->assertEquals($message_types, $operation_details->query('id:operation-type-select')
-				->asZDropdown()->one()->getOptions()->asText());
+				->asDropdown()->one()->getOptions()->asText());
 		$this->assertEquals('Send message', $operation_details->getField('Operation')->getValue());
 		// Make sure that Custom message is unchecked and that message related fields are not visible.
 		$this->assertFalse($operation_details->getField('Custom message')->getValue());
@@ -1483,6 +1483,7 @@ class testFormAction extends CLegacyWebTest {
 				$condition_form = $this->query('id:popup.condition')->asForm()->one();
 				$condition_form->fill($condition);
 				$condition_form->submit();
+				COverlayDialogElement::ensureNotPresent();
 			}
 		}
 

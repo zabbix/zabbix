@@ -241,13 +241,23 @@ class CControllerMenuPopup extends CController {
 		if ($db_items) {
 			$db_item = $db_items[0];
 			$is_writable = false;
+			$is_executable = false;
 
-			if ($db_item['type'] != ITEM_TYPE_HTTPTEST && CWebUser::getType() > USER_TYPE_ZABBIX_USER) {
-				$is_writable = (bool) API::Host()->get([
-					'output' => [],
-					'hostids' => $db_item['hostid'],
-					'editable' => true
-				]);
+			if ($db_item['type'] != ITEM_TYPE_HTTPTEST) {
+				if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+					$is_writable = true;
+				}
+				elseif (CWebUser::getType() == USER_TYPE_ZABBIX_ADMIN) {
+					$is_writable = (bool) API::Host()->get([
+						'output' => [],
+						'hostids' => $db_item['hostid'],
+						'editable' => true
+					]);
+				}
+			}
+
+			if (in_array($db_item['type'], checkNowAllowedTypes())) {
+				$is_executable = $is_writable ? true : CWebUser::checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW);
 			}
 
 			return [
@@ -260,6 +270,7 @@ class CControllerMenuPopup extends CController {
 				'history' => $db_item['history'] != 0,
 				'trends' => $db_item['trends'] != 0,
 				'isWriteable' => $is_writable,
+				'isExecutable' => $is_executable,
 				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 			];
 		}

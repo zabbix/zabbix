@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -34,11 +34,10 @@
 
 		const tmpl = new Template($('#dependency-row-tmpl').html());
 
-
 		for (var i = 0; i < list.values.length; i++) {
 			const value = list.values[i];
 
-			if (document.querySelectorAll(`[data-triggerid="${value.triggerid}"]`).length > 0) {
+			if (document.querySelectorAll(`#dependency-table [data-triggerid="${value.triggerid}"]`).length > 0) {
 				continue;
 			}
 

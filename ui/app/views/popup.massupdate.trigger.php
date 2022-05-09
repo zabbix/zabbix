@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -96,20 +96,21 @@ $dependencies_table = (new CTable())
 $bttn_prototype = '';
 if ($data['prototype']) {
 	$bttn_prototype = (new CButton('add_dep_trigger_prototype', _('Add prototype')))
-	->onClick(
-		'return PopUp("popup.generic", '.json_encode([
-			'srctbl' => 'trigger_prototypes',
-			'srcfld1' => 'triggerid',
-			'dstfrm' => 'massupdate',
-			'dstfld1' => 'new_dependency',
-			'dstact' => 'add_dependency',
-			'reference' => 'deptrigger_prototype',
-			'multiselect' => '1',
-			'objname' => 'triggers',
-			'parent_discoveryid' => $data['parent_discoveryid']
-		]).', {dialogue_class: "modal-popup-generic"});'
-	)
-	->addClass(ZBX_STYLE_BTN_LINK);
+		->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
+		->onClick('
+			PopUp("popup.generic", {
+				srctbl: "trigger_prototypes",
+				srcfld1: "triggerid",
+				dstfrm: "massupdate",
+				dstfld1: "new_dependency",
+				dstact: "add_dependency",
+				reference: "deptrigger_prototype",
+				multiselect: 1,
+				objname: "triggers",
+				parent_discoveryid: this.dataset.parent_discoveryid
+			}, {dialogue_class: "modal-popup-generic"});
+		')
+		->addClass(ZBX_STYLE_BTN_LINK);
 }
 
 $dependencies_form_list->addRow(
@@ -130,8 +131,7 @@ $dependencies_form_list->addRow(
 						'objname' => 'triggers',
 						'multiselect' => '1',
 						'with_triggers' => '1',
-						'normal_only' => '1',
-						'noempty' => '1'
+						'normal_only' => '1'
 					]).', {dialogue_class: "modal-popup-generic"});'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK),

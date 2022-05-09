@@ -26,7 +26,6 @@
 #include "zbxcommshigh.h"
 #include "zbxthreads.h"
 #include "zbxjson.h"
-#include "alias.h"
 #include "zbxregexp.h"
 
 extern unsigned char			program_type;
@@ -35,7 +34,7 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 extern ZBX_THREAD_LOCAL char		*CONFIG_HOSTNAME;
 
 #if defined(ZABBIX_SERVICE)
-#	include "service.h"
+#	include "zbxwinservice.h"
 #elif defined(ZABBIX_DAEMON)
 #	include "zbxnix.h"
 #endif

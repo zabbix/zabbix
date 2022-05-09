@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -238,6 +238,7 @@ final class CItemData {
 			'vmware.eventlog[<url>,<mode>]',
 			'vmware.fullname[<url>]',
 			'vmware.hv.cluster.name[<url>,<uuid>]',
+			'vmware.hv.connectionstate[<url>,<uuid>]',
 			'vmware.hv.cpu.usage.perf[<url>,<uuid>]',
 			'vmware.hv.cpu.usage[<url>,<uuid>]',
 			'vmware.hv.cpu.utilization[<url>,<uuid>]',
@@ -256,12 +257,16 @@ final class CItemData {
 			'vmware.hv.hw.cpu.threads[<url>,<uuid>]',
 			'vmware.hv.hw.memory[<url>,<uuid>]',
 			'vmware.hv.hw.model[<url>,<uuid>]',
+			'vmware.hv.hw.sensors.get[<url>,<uuid>]',
+			'vmware.hv.hw.serialnumber[<url>,<uuid>]',
 			'vmware.hv.hw.uuid[<url>,<uuid>]',
 			'vmware.hv.hw.vendor[<url>,<uuid>]',
 			'vmware.hv.maintenance[<url>,<uuid>]',
 			'vmware.hv.memory.size.ballooned[<url>,<uuid>]',
 			'vmware.hv.memory.used[<url>,<uuid>]',
+			'vmware.hv.net.if.discovery[<url>,<uuid>]',
 			'vmware.hv.network.in[<url>,<uuid>,<mode>]',
+			'vmware.hv.network.linkspeed[<url>,<uuid>,<ifname>]',
 			'vmware.hv.network.out[<url>,<uuid>,<mode>]',
 			'vmware.hv.perfcounter[<url>,<uuid>,<path>,<instance>]',
 			'vmware.hv.power[<url>,<uuid>,<max>]',
@@ -273,6 +278,7 @@ final class CItemData {
 			'vmware.hv.vm.num[<url>,<uuid>]',
 			'vmware.version[<url>]',
 			'vmware.vm.cluster.name[<url>,<uuid>]',
+			'vmware.vm.consolidationneeded[<url>,<uuid>]',
 			'vmware.vm.cpu.latency[<url>,<uuid>]',
 			'vmware.vm.cpu.num[<url>,<uuid>]',
 			'vmware.vm.cpu.readiness[<url>,<uuid>,<instance>]',
@@ -301,6 +307,8 @@ final class CItemData {
 			'vmware.vm.net.if.usage[<url>,<uuid>,<instance>]',
 			'vmware.vm.perfcounter[<url>,<uuid>,<path>,<instance>]',
 			'vmware.vm.powerstate[<url>,<uuid>]',
+			'vmware.vm.snapshot.get[<url>,<uuid>]',
+			'vmware.vm.state[<url>,<uuid>]',
 			'vmware.vm.storage.committed[<url>,<uuid>]',
 			'vmware.vm.storage.readoio[<url>,<uuid>,<instance>]',
 			'vmware.vm.storage.totalreadlatency[<url>,<uuid>,<instance>]',
@@ -308,6 +316,7 @@ final class CItemData {
 			'vmware.vm.storage.uncommitted[<url>,<uuid>]',
 			'vmware.vm.storage.unshared[<url>,<uuid>]',
 			'vmware.vm.storage.writeoio[<url>,<uuid>,<instance>]',
+			'vmware.vm.tools[<url>,<uuid>,<mode>]',
 			'vmware.vm.uptime[<url>,<uuid>]',
 			'vmware.vm.vfs.dev.discovery[<url>,<uuid>]',
 			'vmware.vm.vfs.dev.read[<url>,<uuid>,<instance>,<mode>]',
@@ -1251,6 +1260,10 @@ final class CItemData {
 				'description' => _('VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
+			'vmware.hv.connectionstate[<url>,<uuid>]' => [
+				'description' => _('VMware hypervisor connection state, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
+				'value_type' => ITEM_VALUE_TYPE_STR
+			],
 			'vmware.hv.cpu.usage.perf[<url>,<uuid>]' => [
 				'description' => _('CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
@@ -1323,6 +1336,14 @@ final class CItemData {
 				'description' => _('VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
+			'vmware.hv.hw.sensors.get[<url>,<uuid>]' => [
+				'description' => _('VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
+			'vmware.hv.hw.serialnumber[<url>,<uuid>]' => [
+				'description' => _('VMware hypervisor serialnumber, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
+				'value_type' => ITEM_VALUE_TYPE_STR
+			],
 			'vmware.hv.hw.uuid[<url>,<uuid>]' => [
 				'description' => _('VMware hypervisor BIOS UUID, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
 				'value_type' => ITEM_VALUE_TYPE_STR
@@ -1343,8 +1364,16 @@ final class CItemData {
 				'description' => _('VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
+			'vmware.hv.net.if.discovery[<url>,<uuid>]' => [
+				'description' => _('Discovery of VMware hypervisor network interfaces, <url> - VMware service URL, <uuid> - VMware hypervisor. Returns JSON'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
 			'vmware.hv.network.in[<url>,<uuid>,<mode>]' => [
 				'description' => _('VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
+			'vmware.hv.network.linkspeed[<url>,<uuid>,<ifname>]' => [
+				'description' => _('VMware hypervisor network interface speed, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <ifname> - interface name'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.hv.network.out[<url>,<uuid>,<mode>]' => [
@@ -1389,6 +1418,10 @@ final class CItemData {
 			],
 			'vmware.vm.cluster.name[<url>,<uuid>]' => [
 				'description' => _('VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name'),
+				'value_type' => ITEM_VALUE_TYPE_STR
+			],
+			'vmware.vm.consolidationneeded[<url>,<uuid>]' => [
+				'description' => _('VMware virtual machine disk requires consolidation, <url> - VMware service URL, <uuid> - VMware virtual machine host name'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
 			'vmware.vm.cpu.latency[<url>,<uuid>]' => [
@@ -1503,6 +1536,14 @@ final class CItemData {
 				'description' => _('VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
+			'vmware.vm.snapshot.get[<url>,<uuid>]' => [
+				'description' => _('VMware virtual machine snapshot state, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
+			'vmware.vm.state[<url>,<uuid>]' => [
+				'description' => _('VMware virtual machine state, <url> - VMware service URL, <uuid> - VMware virtual machine host name'),
+				'value_type' => ITEM_VALUE_TYPE_STR
+			],
 			'vmware.vm.storage.committed[<url>,<uuid>]' => [
 				'description' => _('VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name'),
 				'value_type' => null
@@ -1530,6 +1571,10 @@ final class CItemData {
 			'vmware.vm.storage.writeoio[<url>,<uuid>,<instance>]' => [
 				'description' => _('Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
+			'vmware.vm.tools[<url>,<uuid>,<mode>]' => [
+				'description' => _('VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status'),
+				'value_type' => ITEM_VALUE_TYPE_STR
 			],
 			'vmware.vm.uptime[<url>,<uuid>]' => [
 				'description' => _('VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name'),

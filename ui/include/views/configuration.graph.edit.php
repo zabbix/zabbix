@@ -139,7 +139,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 		$percentLeftCheckbox = (new CCheckBox('visible[percent_left]'))
 			->setChecked(true)
-			->onClick('javascript: showHideVisible("percent_left");')
+			->onClick('showHideVisible("percent_left");')
 			->setEnabled(!$readonly);
 
 		if(isset($this->data['visible']) && isset($this->data['visible']['percent_left'])) {
@@ -157,7 +157,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 		$percentRightCheckbox = (new CCheckBox('visible[percent_right]'))
 			->setChecked(true)
-			->onClick('javascript: showHideVisible("percent_right");')
+			->onClick('showHideVisible("percent_right");')
 			->setEnabled(!$readonly);
 
 		if(isset($this->data['visible']) && isset($this->data['visible']['percent_right'])) {
@@ -218,18 +218,19 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 			$yaxisMinData[] = (new CButton('yaxis_min_prototype', _('Select prototype')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick(
-					'return PopUp("popup.generic", '.json_encode([
-						'srctbl' => 'item_prototypes',
-						'srcfld1' => 'itemid',
-						'srcfld2' => 'name',
-						'dstfrm' => $graphForm->getName(),
-						'dstfld1' => 'ymin_itemid',
-						'dstfld2' => 'ymin_name',
-						'parent_discoveryid' => $data['parent_discoveryid'],
-						'numeric' => '1'
-					]).', {dialogue_class: "modal-popup-generic"});'
-				)
+				->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
+				->onClick('
+					PopUp("popup.generic", {
+						srctbl: "item_prototypes",
+						srcfld1: "itemid",
+						srcfld2: "name",
+						dstfrm: "'.$graphForm->getName().'",
+						dstfld1: "ymin_itemid",
+						dstfld2: "ymin_name",
+						parent_discoveryid: this.dataset.parent_discoveryid,
+						numeric: 1
+					}, {dialogue_class: "modal-popup-generic"});
+				')
 				->setEnabled(!$readonly);
 		}
 	}
@@ -293,18 +294,19 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 			$yaxisMaxData[] = (new CButton('yaxis_max_prototype', _('Select prototype')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick(
-					'return PopUp("popup.generic", '.json_encode([
-						'srctbl' => 'item_prototypes',
-						'srcfld1' => 'itemid',
-						'srcfld2' => 'name',
-						'dstfrm' => $graphForm->getName(),
-						'dstfld1' => 'ymax_itemid',
-						'dstfld2' => 'ymax_name',
-						'parent_discoveryid' => $data['parent_discoveryid'],
-						'numeric' => '1'
-					]).', {dialogue_class: "modal-popup-generic"});'
-				)
+				->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
+				->onClick('
+					PopUp("popup.generic", {
+						srctbl: "item_prototypes",
+						srcfld1: "itemid",
+						srcfld2: "name",
+						dstfrm: "'.$graphForm->getName().'",
+						dstfld1: "ymax_itemid",
+						dstfld2: "ymax_name",
+						parent_discoveryid: this.dataset.parent_discoveryid,
+						numeric: 1
+					}, {dialogue_class: "modal-popup-generic"});
+				')
 				->setEnabled(!$readonly);
 		}
 	}
@@ -400,16 +402,18 @@ $items_table->addRow(
 			: (new CCol(
 				new CHorList([
 					(new CButton('add_item', _('Add')))
+						->setAttribute('data-parameters', json_encode($parameters_add))
 						->onClick(
 							'return PopUp("popup.generic",
-								jQuery.extend('.json_encode($parameters_add).', view.getOnlyHostParam())
+								jQuery.extend(JSON.parse(this.dataset.parameters), view.getOnlyHostParam())
 							);'
 						)
 						->addClass(ZBX_STYLE_BTN_LINK),
 					$data['parent_discoveryid']
 						? (new CButton('add_protoitem', _('Add prototype')))
+							->setAttribute('data-parameters', json_encode($parameters_add_prototype))
 							->onClick(
-								'return PopUp("popup.generic", '.json_encode($parameters_add_prototype).',
+								'return PopUp("popup.generic", JSON.parse(this.dataset.parameters),
 									{dialogue_class: "modal-popup-generic"}
 								);'
 							)

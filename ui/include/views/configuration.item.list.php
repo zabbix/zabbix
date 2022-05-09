@@ -165,11 +165,12 @@ foreach ($data['items'] as $item) {
 					: 'item.massdisable'
 				)
 				->setArgument('context', $data['context'])
+				->setArgument('checkbox_hash', $data['checkbox_hash'])
+				->setArgumentSID()
 				->getUrl()
 		))
-		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(itemIndicatorStyle($item['status'], $item['state']))
-		->addSID()
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(itemIndicatorStyle($item['status'], $item['state']))
 	);
 
 	// triggers info
@@ -235,7 +236,7 @@ foreach ($data['items'] as $item) {
 	}
 
 	$wizard = (new CButton(null))
-		->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+		->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
 		->setMenuPopup(CMenuPopupHelper::getItemConfiguration([
 			'itemid' => $item['itemid'],
 			'context' => $data['context'],
@@ -270,8 +271,15 @@ foreach ($data['items'] as $item) {
 		}
 	}
 
+	$checkbox = new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']);
+
+	if (in_array($item['type'], checkNowAllowedTypes())
+			&& $item['status'] == ITEM_STATUS_ACTIVE && $item['hosts'][0]['status'] == HOST_STATUS_MONITORED) {
+		$checkbox->setAttribute('data-actions', 'execute');
+	}
+
 	$itemTable->addRow([
-		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
+		$checkbox,
 		$wizard,
 		($data['hostid'] == 0) ? $item['host'] : null,
 		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
@@ -295,8 +303,7 @@ $button_list = [
 if ($data['context'] === 'host') {
 	$massclearhistory = [
 		'name' => _('Clear history'),
-		'confirm' => _('Delete history of selected items?'),
-		'disabled' => $data['is_template']
+		'confirm' => _('Delete history of selected items?')
 	];
 
 	if ($data['config']['compression_status']) {
@@ -304,7 +311,13 @@ if ($data['context'] === 'host') {
 	}
 
 	$button_list += [
-		'item.masscheck_now' => ['name' => _('Execute now'), 'disabled' => $data['is_template']],
+		'item.masscheck_now' => [
+			'content' => (new CSimpleButton(_('Execute now')))
+				->onClick('view.massCheckNow(this);')
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('no-chkbxrange')
+				->setAttribute('data-required', 'execute')
+		],
 		'item.massclearhistory' => $massclearhistory
 	];
 }
@@ -335,6 +348,11 @@ $widget->addItem($itemForm);
 
 $widget->show();
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('
+	view.init('.json_encode([
+		'checkbox_hash' => $data['checkbox_hash'],
+		'checkbox_object' => 'group_itemid'
+	]).');
+'))
 	->setOnDocumentReady()
 	->show();
