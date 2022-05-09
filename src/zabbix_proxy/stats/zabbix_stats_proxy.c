@@ -25,7 +25,7 @@
  *                                                                            *
  * Purpose: get program type (proxy) specific internal statistics             *
  *                                                                            *
- * Parameters: param1  - [IN/OUT] the json data                               *
+ * Parameters: json - [IN/OUT] the json data                                  *
  *                                                                            *
  * Comments: This function is used to gather proxy specific internal          *
  *           statistics.                                                      *

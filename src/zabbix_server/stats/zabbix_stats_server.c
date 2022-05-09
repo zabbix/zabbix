@@ -31,7 +31,7 @@
  *                                                                            *
  * Purpose: get program type (server) specific internal statistics            *
  *                                                                            *
- * Parameters: param1  - [IN/OUT] the json data                               *
+ * Parameters: json - [IN/OUT] the json data                                  *
  *                                                                            *
  * Comments: This function is used to gather server specific internal         *
  *           statistics.                                                      *
