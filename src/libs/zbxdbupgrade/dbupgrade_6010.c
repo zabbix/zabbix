@@ -20,6 +20,7 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "log.h"
 
 extern unsigned char	program_type;
 
@@ -280,6 +281,58 @@ static int	DBpatch_6010020(void)
 	return DBdrop_field("config", "ldap_search_attribute");
 }
 
+static int	DBpatch_6010021(void)
+{
+	const ZBX_TABLE	table =
+			{"host_rtdata", "hostid", 0,
+				{
+					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"active_available", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6010022(void)
+{
+	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("host_rtdata", 1, &field);
+}
+
+static int	DBpatch_6010023(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	hostid;
+	zbx_db_insert_t	insert;
+	int		ret;
+
+	zbx_db_insert_prepare(&insert, "host_rtdata", "hostid", "active_available", NULL);
+
+	result = DBselect("select hostid from hosts where flags!=%i and status in (%i,%i)",
+			ZBX_FLAG_DISCOVERY_PROTOTYPE, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(hostid, row[0]);
+		zbx_db_insert_add_values(&insert, hostid, INTERFACE_AVAILABLE_UNKNOWN);
+	}
+	DBfree_result(result);
+
+	if (0 != insert.rows.values_num)
+		ret = zbx_db_insert_execute(&insert);
+	else
+		ret = SUCCEED;
+
+	zbx_db_insert_clean(&insert);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(6010)
@@ -307,5 +360,8 @@ DBPATCH_ADD(6010017, 0, 1)
 DBPATCH_ADD(6010018, 0, 1)
 DBPATCH_ADD(6010019, 0, 1)
 DBPATCH_ADD(6010020, 0,	1)
+DBPATCH_ADD(6010021, 0,	1)
+DBPATCH_ADD(6010022, 0,	1)
+DBPATCH_ADD(6010023, 0,	1)
 
 DBPATCH_END()

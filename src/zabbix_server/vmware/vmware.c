@@ -103,6 +103,7 @@ ZBX_PTR_VECTOR_IMPL(vmware_diskextent, zbx_vmware_diskextent_t *)
 ZBX_VECTOR_IMPL(vmware_hvdisk, zbx_vmware_hvdisk_t)
 ZBX_PTR_VECTOR_IMPL(vmware_dsname, zbx_vmware_dsname_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_pnic, zbx_vmware_pnic_t *)
+ZBX_PTR_VECTOR_IMPL(vmware_custom_attr, zbx_vmware_custom_attr_t *)
 ZBX_PTR_VECTOR_IMPL(custquery_param, zbx_vmware_custquery_param_t)
 ZBX_PTR_VECTOR_IMPL(vmware_dvswitch, zbx_vmware_dvswitch_t *)
 
@@ -280,6 +281,9 @@ static zbx_uint64_t	evt_req_chunk_size;
 #define ZBX_XPATH_VM_INSTANCE_UUID()									\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.instanceUuid']]"	\
 		"/*[local-name()='val']"
+
+#define ZBX_XPATH_VM_CUSTOM_FIELD_VALUES()								\
+	ZBX_XPATH_PROP_NAME("customValue") ZBX_XPATH_LN("CustomFieldValue")
 
 #define ZBX_XPATH_HV_SENSOR_STATUS(node, sensor)							\
 	ZBX_XPATH_PROP_NAME(node) "/*[local-name()='HostNumericSensorInfo']"				\
@@ -1196,6 +1200,24 @@ static void	vmware_fs_shared_free(zbx_vmware_fs_t *fs)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: frees shared resources allocated to store attributes object       *
+ *                                                                            *
+ * Parameters: custom_attr   - [IN] the custom attributes object              *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_custom_attr_shared_free(zbx_vmware_custom_attr_t *custom_attr)
+{
+	if (NULL != custom_attr->name)
+		vmware_shared_strfree(custom_attr->name);
+
+	if (NULL != custom_attr->value)
+		vmware_shared_strfree(custom_attr->value);
+
+	__vm_shmem_free_func(custom_attr);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: frees shared resources allocated to store virtual machine         *
  *                                                                            *
  * Parameters: vm   - [IN] the virtual machine                                *
@@ -1208,6 +1230,9 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 
 	zbx_vector_ptr_clear_ext(&vm->file_systems, (zbx_mem_free_func_t)vmware_fs_shared_free);
 	zbx_vector_ptr_destroy(&vm->file_systems);
+
+	zbx_vector_vmware_custom_attr_clear_ext(&vm->custom_attrs, vmware_custom_attr_shared_free);
+	zbx_vector_vmware_custom_attr_destroy(&vm->custom_attrs);
 
 	if (NULL != vm->uuid)
 		vmware_shared_strfree(vm->uuid);
@@ -1675,6 +1700,27 @@ static zbx_vmware_fs_t	*vmware_fs_shared_dup(const zbx_vmware_fs_t *src)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: copies vmware virtual machine custom attribute object into shared *
+ *          memory                                                            *
+ *                                                                            *
+ * Parameters: src   - [IN] the vmware custom attribute object                *
+ *                                                                            *
+ * Return value: a duplicated vmware custom attribute object                  *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_custom_attr_t	*vmware_attr_shared_dup(const zbx_vmware_custom_attr_t *src)
+{
+	zbx_vmware_custom_attr_t	*custom_attr;
+
+	custom_attr = (zbx_vmware_custom_attr_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_custom_attr_t));
+	custom_attr->name = vmware_shared_strdup(src->name);
+	custom_attr->value = vmware_shared_strdup(src->value);
+
+	return custom_attr;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: copies object properties list into shared memory                  *
  *                                                                            *
  * Parameters: src       - [IN] the properties list                           *
@@ -1739,8 +1785,10 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
 
 	VMWARE_VECTOR_CREATE(&vm->devs, ptr);
 	VMWARE_VECTOR_CREATE(&vm->file_systems, ptr);
+	VMWARE_VECTOR_CREATE(&vm->custom_attrs, vmware_custom_attr);
 	zbx_vector_ptr_reserve(&vm->devs, src->devs.values_num);
 	zbx_vector_ptr_reserve(&vm->file_systems, src->file_systems.values_num);
+	zbx_vector_vmware_custom_attr_reserve(&vm->custom_attrs, src->custom_attrs.values_num);
 
 	vm->uuid = vmware_shared_strdup(src->uuid);
 	vm->id = vmware_shared_strdup(src->id);
@@ -1752,6 +1800,12 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
 
 	for (i = 0; i < src->file_systems.values_num; i++)
 		zbx_vector_ptr_append(&vm->file_systems, vmware_fs_shared_dup((zbx_vmware_fs_t *)src->file_systems.values[i]));
+
+	for (i = 0; i < src->custom_attrs.values_num; i++)
+	{
+		zbx_vector_vmware_custom_attr_append(&vm->custom_attrs,
+				vmware_attr_shared_dup(src->custom_attrs.values[i]));
+	}
 
 	return vm;
 }
@@ -2066,6 +2120,20 @@ static void	vmware_fs_free(zbx_vmware_fs_t *fs)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: frees resources allocated to store vm custom attributes           *
+ *                                                                            *
+ * Parameters: ca - [IN] the custom attribute                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_custom_attr_free(zbx_vmware_custom_attr_t *ca)
+{
+	zbx_free(ca->name);
+	zbx_free(ca->value);
+	zbx_free(ca);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: frees resources allocated to store virtual machine                *
  *                                                                            *
  * Parameters: vm   - [IN] the virtual machine                                *
@@ -2078,6 +2146,9 @@ static void	vmware_vm_free(zbx_vmware_vm_t *vm)
 
 	zbx_vector_ptr_clear_ext(&vm->file_systems, (zbx_mem_free_func_t)vmware_fs_free);
 	zbx_vector_ptr_destroy(&vm->file_systems);
+
+	zbx_vector_vmware_custom_attr_clear_ext(&vm->custom_attrs, vmware_custom_attr_free);
+	zbx_vector_vmware_custom_attr_destroy(&vm->custom_attrs);
 
 	zbx_free(vm->uuid);
 	zbx_free(vm->id);
@@ -3026,6 +3097,72 @@ clean:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: gets custom attributes data of the virtual machine                *
+ *                                                                            *
+ * Parameters: vm      - [OUT] the virtual machine                            *
+ *             details - [IN] an xml document containing virtual machine data *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_vm_get_custom_attrs(zbx_vmware_vm_t *vm, xmlDoc *details)
+{
+	xmlXPathContext			*xpathCtx;
+	xmlXPathObject			*xpathObj;
+	xmlNodeSetPtr			nodeset;
+	xmlNode				*node;
+	int				i;
+	char				*value;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	xpathCtx = xmlXPathNewContext(details);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_VM_CUSTOM_FIELD_VALUES(), xpathCtx)))
+		goto clean;
+
+	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+		goto clean;
+
+	if (NULL == (node = zbx_xml_doc_get(details, ZBX_XPATH_PROP_NAME("availableField"))))
+		goto clean;
+
+	nodeset = xpathObj->nodesetval;
+	zbx_vector_vmware_custom_attr_reserve(&vm->custom_attrs, (size_t)nodeset->nodeNr);
+
+	for (i = 0; i < nodeset->nodeNr; i++)
+	{
+		char				xpath[MAX_STRING_LEN];
+		zbx_vmware_custom_attr_t	*attr;
+
+		if (NULL == (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], ZBX_XNN("key"))))
+			continue;
+
+		zbx_snprintf(xpath, sizeof(xpath),
+				ZBX_XNN("CustomFieldDef") "[" ZBX_XNN("key") "=%s][1]/" ZBX_XNN("name"), value);
+		zbx_free(value);
+
+		if (NULL == (value = zbx_xml_node_read_value(details, node, xpath)))
+			continue;
+
+		attr = (zbx_vmware_custom_attr_t *)zbx_malloc(NULL, sizeof(zbx_vmware_custom_attr_t));
+		attr->name = value;
+		value = NULL;
+
+		if (NULL == (attr->value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], ZBX_XNN("value"))))
+			attr->value = zbx_strdup(NULL, "");
+
+		zbx_vector_vmware_custom_attr_append(&vm->custom_attrs, attr);
+	}
+
+	zbx_vector_vmware_custom_attr_sort(&vm->custom_attrs, vmware_custom_attr_compare_name);
+clean:
+	xmlXPathFreeObject(xpathObj);
+	xmlXPathFreeContext(xpathCtx);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() attributes:%d", __func__, vm->custom_attrs.values_num);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: gets the virtual machine data                                     *
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
@@ -3054,6 +3191,8 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 					"<ns0:pathSet>config.uuid</ns0:pathSet>"	\
 					"<ns0:pathSet>config.instanceUuid</ns0:pathSet>"\
 					"<ns0:pathSet>guest.disk</ns0:pathSet>"		\
+					"<ns0:pathSet>customValue</ns0:pathSet>"	\
+					"<ns0:pathSet>availableField</ns0:pathSet>"	\
 					"%s"						\
 				"</ns0:propSet>"					\
 				"<ns0:propSet>"						\
@@ -3516,6 +3655,7 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 
 	zbx_vector_ptr_create(&vm->devs);
 	zbx_vector_ptr_create(&vm->file_systems);
+	zbx_vector_vmware_custom_attr_create(&vm->custom_attrs);
 
 	if (SUCCEED != vmware_service_get_vm_data(service, easyhandle, id, vm_propmap,
 			ZBX_VMWARE_VMPROPS_NUM, &details, error))
@@ -3559,6 +3699,7 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 	vmware_vm_get_nic_devices(vm, details);
 	vmware_vm_get_disk_devices(vm, details);
 	vmware_vm_get_file_systems(vm, details);
+	vmware_vm_get_custom_attrs(vm, details);
 
 	ret = SUCCEED;
 out:
@@ -4157,6 +4298,14 @@ static int	vmware_dc_id_compare(const void *d1, const void *d2)
 	return strcmp(dc1->id, dc2->id);
 }
 
+int	vmware_custom_attr_compare_name(const void *a1, const void *a2)
+{
+	const zbx_vmware_custom_attr_t	*attr1 = *(const zbx_vmware_custom_attr_t * const *)a1;
+	const zbx_vmware_custom_attr_t	*attr2 = *(const zbx_vmware_custom_attr_t * const *)a2;
+
+	return strcmp(attr1->name, attr2->name);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: sorting function to sort DVSwitch vector by uuid                  *
@@ -4171,6 +4320,7 @@ int	vmware_dvs_uuid_compare(const void *d1, const void *d2)
 }
 
 /******************************************************************************
+ *                                                                            *
  * Purpose: populate array of values from an xml data                         *
  *                                                                            *
  * Parameters: xdoc   - [IN] XML document                                     *
