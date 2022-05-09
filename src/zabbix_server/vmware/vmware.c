@@ -6636,8 +6636,8 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_t
 		if (NULL == (node = zbx_xml_doc_get(doc, "/*/*" ZBX_XPATH_LN("FetchDVPortsResponse"))))
 			continue;
 
-		if (0 == strcmp(cqv->instance->mode, "state"))	/* Ignore node remove error for empty result */
-				zbx_xml_node_remove(doc ,node, ZBX_XNN("returnval") ZBX_XPATH_LN("config"));
+		if (0 == strcmp(cqv->instance->mode, "state"))	/* ignore node remove error for empty result */
+			zbx_xml_node_remove(doc ,node, ZBX_XNN("returnval") ZBX_XPATH_LN("config"));
 
 		if (SUCCEED != zbx_xmlnode_to_json(node, &cqv->response))
 		{
