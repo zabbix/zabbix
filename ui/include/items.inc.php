@@ -1237,13 +1237,23 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 	]);
 
 	$data_display_limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
-	$has_hidden_hosts = (count($db_hosts) > $data_display_limit);
+	$has_hidden_data = count($data) > $data_display_limit || count($db_hosts) > $data_display_limit;
 	$db_hosts = array_slice($db_hosts, 0, $data_display_limit, true);
 	$host_names = array_column($db_hosts, 'name', 'name');
 
 	$itemids = [];
+	$items_left = $data_display_limit;
 
 	foreach ($data as &$item_columns) {
+		if ($items_left != 0) {
+			$item_columns = array_slice($item_columns, 0, min($data_display_limit, $items_left));
+			$items_left -= count($item_columns);
+		}
+		else {
+			$item_columns = null;
+			break;
+		}
+
 		foreach ($item_columns as &$item_column) {
 			CArrayHelper::ksort($item_column);
 			$item_column = array_slice($item_column, 0, $data_display_limit, true);
@@ -1266,12 +1276,12 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 	$data = array_filter($data);
 	$data = array_slice($data, 0, $data_display_limit, true);
 
-	$has_hidden_items = (count($db_items) != count($itemids));
+	$has_hidden_data = $has_hidden_data || count($db_items) != count($itemids);
 
 	$db_items = array_intersect_key($db_items, $itemids);
 	$data = getDataOverviewCellData($db_items, $data, $filter['show_suppressed']);
 
-	return [$data, $db_hosts, ($has_hidden_items || $has_hidden_hosts)];
+	return [$data, $db_hosts, $has_hidden_data];
 }
 
 /**
