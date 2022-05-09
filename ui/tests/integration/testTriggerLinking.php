@@ -300,6 +300,8 @@ class testTriggerLinking extends CIntegrationTest {
 	 * @required-components server, agent
 	 */
 	public function testTriggerLinking_checkMe() {
+		$this->reloadConfigurationCache();
+
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, ['End of DBregister_host_active():SUCCEED']);
 		$this->checkTriggersCreate();
 	}
