@@ -90,12 +90,12 @@ class CControllerSearch extends CController {
 		];
 
 		if ($this->search !== '') {
-			list($data['hosts'], $data['total_hosts_cnt']) = $this->getHostsData();
-			list($data['template_groups'], $data['total_template_groups_cnt']) = $this->getTemplateGroupsData();
-			list($data['host_groups'], $data['total_host_groups_cnt']) = $this->getHostGroupsData();
+			[$data['hosts'], $data['total_hosts_cnt']] = $this->getHostsData();
+			[$data['template_groups'], $data['total_template_groups_cnt']] = $this->getTemplateGroupsData();
+			[$data['host_groups'], $data['total_host_groups_cnt']] = $this->getHostGroupsData();
 
 			if ($this->admin) {
-				list($data['templates'], $data['total_templates_cnt'])  = $this->getTemplatesData();
+				[$data['templates'], $data['total_templates_cnt']]  = $this->getTemplatesData();
 			}
 			$data['search'] = $this->search;
 		}
@@ -149,12 +149,12 @@ class CControllerSearch extends CController {
 		unset($template);
 
 		$total_count = API::Template()->get([
+			'countOutput' => true,
 			'search' => [
 				'host' => $this->search,
 				'name' => $this->search
 			],
-			'searchByAny' => true,
-			'countOutput' => true
+			'searchByAny' => true
 		]);
 
 		return [$templates, $total_count];
@@ -194,8 +194,8 @@ class CControllerSearch extends CController {
 		unset($group);
 
 		$total_count = API::HostGroup()->get([
-			'search' => ['name' => $this->search],
-			'countOutput' => true
+			'countOutput' => true,
+			'search' => ['name' => $this->search]
 		]);
 
 		return [$groups, $total_count];
@@ -235,8 +235,8 @@ class CControllerSearch extends CController {
 		unset($group);
 
 		$total_count = API::TemplateGroup()->get([
-			'search' => ['name' => $this->search],
-			'countOutput' => true
+			'countOutput' => true,
+			'search' => ['name' => $this->search]
 		]);
 
 		return [$groups, $total_count];
@@ -287,14 +287,14 @@ class CControllerSearch extends CController {
 		unset($host);
 
 		$total_count = API::Host()->get([
+			'countOutput' => true,
 			'search' => [
 				'host' => $this->search,
 				'name' => $this->search,
 				'dns' => $this->search,
 				'ip' => $this->search
 			],
-			'searchByAny' => true,
-			'countOutput' => true
+			'searchByAny' => true
 		]);
 
 		return [$hosts, $total_count];
