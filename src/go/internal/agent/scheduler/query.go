@@ -25,7 +25,7 @@ import (
 	"sort"
 	"strings"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/plugins/external"
 )
 
