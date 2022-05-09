@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-04T08:32:23Z'
+  date: '2022-04-10T20:21:27Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -261,7 +261,7 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: UCD-SNMP-MIB
-                Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system)
+                Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system).
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -288,7 +288,7 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: UCD-SNMP-MIB
-                Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel)
+                Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel).
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -529,7 +529,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'CPU utilization in %'
+              description: 'CPU utilization in %.'
               preprocessing:
                 -
                   type: JAVASCRIPT
@@ -547,7 +547,8 @@ zabbix_export:
                 -
                   uuid: 305450aac4ce4170a3a7942f6b092593
                   expression: 'min(/Linux CPU SNMP/system.cpu.util[snmp,{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
-                  name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  name: 'High CPU utilization'
+                  event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -717,7 +718,8 @@ zabbix_export:
                 -
                   uuid: 377f4ffa529f4b0690a11228f4021294
                   expression: 'min(/Linux filesystems SNMP/vfs.fs.inode.pfree[dskPercentNode.{#SNMPINDEX}],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
-                  name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
+                  name: '{#FSNAME}: Running out of free inodes'
+                  event_name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -733,7 +735,8 @@ zabbix_export:
                 -
                   uuid: 5f80199affa44ed7a6b875c49ca00aa7
                   expression: 'min(/Linux filesystems SNMP/vfs.fs.inode.pfree[dskPercentNode.{#SNMPINDEX}],5m)<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}'
-                  name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)'
+                  name: '{#FSNAME}: Running out of free inodes'
+                  event_name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)'
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: |
@@ -741,7 +744,7 @@ zabbix_export:
                     As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.
                   dependencies:
                     -
-                      name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
+                      name: '{#FSNAME}: Running out of free inodes'
                       expression: 'min(/Linux filesystems SNMP/vfs.fs.inode.pfree[dskPercentNode.{#SNMPINDEX}],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
                   tags:
                     -
@@ -820,14 +823,15 @@ zabbix_export:
               uuid: ae3535ef3f674dccb6c809dc7d01172c
               expression: |
                 last(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Linux filesystems SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Linux filesystems SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<5G or timeleft(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+                ((last(/Linux filesystems SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Linux filesystems SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+              name: '{#FSNAME}: Disk space is critically low'
+              event_name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.
                  Second condition should be one of the following:
-                 - The disk free space is less than 5G.
+                 - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               tags:
@@ -841,22 +845,23 @@ zabbix_export:
               uuid: 3bef4897bcd549288203241c5ca9f017
               expression: |
                 last(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Linux filesystems SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Linux filesystems SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<10G or timeleft(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
+                ((last(/Linux filesystems SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Linux filesystems SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+              name: '{#FSNAME}: Disk space is low'
+              event_name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.
                  Second condition should be one of the following:
-                 - The disk free space is less than 10G.
+                 - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               dependencies:
                 -
-                  name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+                  name: '{#FSNAME}: Disk space is critically low'
                   expression: |
                     last(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Linux filesystems SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Linux filesystems SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<5G or timeleft(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+                    ((last(/Linux filesystems SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Linux filesystems SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux filesystems SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -888,6 +893,14 @@ zabbix_export:
                     host: 'Linux filesystems SNMP'
                     key: 'vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]'
       macros:
+        -
+          macro: '{$VFS.FS.FREE.MIN.CRIT}'
+          value: 5G
+          description: 'The critical threshold of the filesystem utilization.'
+        -
+          macro: '{$VFS.FS.FREE.MIN.WARN}'
+          value: 10G
+          description: 'The warning threshold of the filesystem utilization.'
         -
           macro: '{$VFS.FS.FSNAME.MATCHES}'
           value: .+
@@ -1019,7 +1032,7 @@ zabbix_export:
           units: B
           description: |
             MIB: UCD-SNMP-MIB
-            Memory used by kernel buffers (Buffers in /proc/meminfo)
+            Memory used by kernel buffers (Buffers in /proc/meminfo).
           preprocessing:
             -
               type: MULTIPLIER
@@ -1039,7 +1052,7 @@ zabbix_export:
           units: B
           description: |
             MIB: UCD-SNMP-MIB
-            Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo)
+            Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo).
           preprocessing:
             -
               type: MULTIPLIER
@@ -1077,7 +1090,7 @@ zabbix_export:
           units: B
           description: |
             MIB: UCD-SNMP-MIB
-            Total memory in Bytes
+            Total memory in Bytes.
           preprocessing:
             -
               type: MULTIPLIER
@@ -1105,12 +1118,13 @@ zabbix_export:
             -
               uuid: 38e4d31ccb594ba1a041c47633887ef6
               expression: 'min(/Linux memory SNMP/vm.memory.util[snmp],5m)>{$MEMORY.UTIL.MAX}'
-              name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               dependencies:
                 -
-                  name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+                  name: 'Lack of available memory'
                   expression: 'max(/Linux memory SNMP/vm.memory.available[snmp],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux memory SNMP/vm.memory.total[memTotalReal.0])>0'
               tags:
                 -
@@ -1133,16 +1147,17 @@ zabbix_export:
     -
       uuid: 12324c6e7b564c858406702148b43bc4
       expression: 'max(/Linux memory SNMP/system.swap.pfree[snmp],5m)<{$SWAP.PFREE.MIN.WARN} and last(/Linux memory SNMP/system.swap.total[memTotalSwap.0])>0'
-      name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
+      name: 'High swap space usage'
+      event_name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: WARNING
-      description: 'This trigger is ignored, if there is no swap configured'
+      description: 'This trigger is ignored, if there is no swap configured.'
       dependencies:
         -
-          name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+          name: 'High memory utilization'
           expression: 'min(/Linux memory SNMP/vm.memory.util[snmp],5m)>{$MEMORY.UTIL.MAX}'
         -
-          name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+          name: 'Lack of available memory'
           expression: 'max(/Linux memory SNMP/vm.memory.available[snmp],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux memory SNMP/vm.memory.total[memTotalReal.0])>0'
       tags:
         -
@@ -1151,7 +1166,8 @@ zabbix_export:
     -
       uuid: 687586e62f4b4191aa95ba1ba74c7787
       expression: 'max(/Linux memory SNMP/vm.memory.available[snmp],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux memory SNMP/vm.memory.total[memTotalReal.0])>0'
-      name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+      name: 'Lack of available memory'
+      event_name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
       opdata: 'Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: AVERAGE
       tags:
@@ -1167,7 +1183,8 @@ zabbix_export:
         min(/Linux CPU SNMP/system.cpu.load.avg1[laLoad.1],5m)/last(/Linux CPU SNMP/system.cpu.num[snmp])>{$LOAD_AVG_PER_CPU.MAX.WARN}
         and last(/Linux CPU SNMP/system.cpu.load.avg5[laLoad.2])>0
         and last(/Linux CPU SNMP/system.cpu.load.avg15[laLoad.3])>0
-      name: 'Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
+      name: 'Load average is too high'
+      event_name: 'Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
       opdata: 'Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}'
       priority: AVERAGE
       description: 'Per CPU load average is too high. Your system may be slow to respond.'

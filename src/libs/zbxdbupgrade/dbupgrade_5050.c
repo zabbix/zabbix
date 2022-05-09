@@ -336,28 +336,6 @@ static int	DBpatch_5050031(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_5050032(void)
-{
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > DBexecute("update config set default_lang='en_US' where default_lang='en_GB'"))
-		return FAIL;
-
-	return SUCCEED;
-}
-
-static int	DBpatch_5050033(void)
-{
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > DBexecute("update users set lang='en_US' where lang='en_GB'"))
-		return FAIL;
-
-	return SUCCEED;
-}
-
 static int	DBpatch_5050034(void)
 {
 	const ZBX_FIELD	field = {"default_lang", "en_US", NULL, NULL, 5, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
@@ -1942,6 +1920,17 @@ static int	DBpatch_5050147(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_5050148(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update services set algorithm=case algorithm when 1 then 2 when 2 then 1 else 0 end"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -1974,8 +1963,6 @@ DBPATCH_ADD(5050023, 0, 1)
 DBPATCH_ADD(5050024, 0, 1)
 DBPATCH_ADD(5050030, 0, 1)
 DBPATCH_ADD(5050031, 0, 1)
-DBPATCH_ADD(5050032, 0, 1)
-DBPATCH_ADD(5050033, 0, 1)
 DBPATCH_ADD(5050034, 0, 1)
 DBPATCH_ADD(5050040, 0, 1)
 DBPATCH_ADD(5050041, 0, 1)
@@ -2083,5 +2070,6 @@ DBPATCH_ADD(5050144, 0, 1)
 DBPATCH_ADD(5050145, 0, 1)
 DBPATCH_ADD(5050146, 0, 1)
 DBPATCH_ADD(5050147, 0, 1)
+DBPATCH_ADD(5050148, 0, 1)
 
 DBPATCH_END()

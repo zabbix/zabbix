@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-01T13:16:13Z'
+  date: '2022-04-06T19:27:28Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -216,7 +216,8 @@ zabbix_export:
             -
               uuid: 88d7ceb3a683436da666e8802b2d29b5
               expression: 'last(/GitLab by HTTP/gitlab.deployments.version,#1)<>last(/GitLab by HTTP/gitlab.deployments.version,#2) and length(last(/GitLab by HTTP/gitlab.deployments.version))>0'
-              name: 'GitLab: Version has changed (new version: {ITEM.VALUE})'
+              name: 'GitLab: Version has changed'
+              event_name: 'GitLab: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'GitLab version has changed. Ack to close.'
               manual_close: 'YES'
@@ -328,7 +329,8 @@ zabbix_export:
             -
               uuid: 7021e3b0b49a4990a1d8ce356b7ae130
               expression: 'min(/GitLab by HTTP/gitlab.http.requests.5xx.rate,5m)>{$GITLAB.HTTP.FAIL.MAX.WARN}'
-              name: 'GitLab: Too many HTTP requests failures (over {$GITLAB.HTTP.FAIL.MAX.WARN} for 5m)'''
+              name: 'GitLab: Too many HTTP requests failures'
+              event_name: 'GitLab: Too many HTTP requests failures (over {$GITLAB.HTTP.FAIL.MAX.WARN} for 5m)'''
               priority: WARNING
               description: '"Too many requests failed on GitLab instance with 5xx HTTP code"'
               tags:
@@ -607,7 +609,8 @@ zabbix_export:
             -
               uuid: a7e460f174fd4e16b2358fd3867390b4
               expression: 'min(/GitLab by HTTP/gitlab.redis.client_exceptions.cache.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}'
-              name: 'GitLab: Too many Redis cache client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)'
+              name: 'GitLab: Too many Redis cache client exceptions'
+              event_name: 'GitLab: Too many Redis cache client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)'
               priority: WARNING
               description: '"Too many  Redis client exceptions during the requests to  Redis instance cache."'
               tags:
@@ -643,7 +646,8 @@ zabbix_export:
             -
               uuid: 36ec79901f324f27992ea68274eedb71
               expression: 'min(/GitLab by HTTP/gitlab.redis.client_exceptions.queues.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}'
-              name: 'GitLab: Too many Redis queues client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)'
+              name: 'GitLab: Too many Redis queues client exceptions'
+              event_name: 'GitLab: Too many Redis queues client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)'
               priority: WARNING
               description: '"Too many  Redis client exceptions during the requests to  Redis instance queues."'
               tags:
@@ -679,7 +683,8 @@ zabbix_export:
             -
               uuid: b475d6ecbc564f9b8f7fe9b24bcdf013
               expression: 'min(/GitLab by HTTP/gitlab.redis.client_exceptions.shared_state.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}'
-              name: 'GitLab: Too many Redis shared_state client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)'
+              name: 'GitLab: Too many Redis shared_state client exceptions'
+              event_name: 'GitLab: Too many Redis shared_state client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)'
               priority: WARNING
               description: '"Too many  Redis client exceptions during the requests to  Redis instance shared_state."'
               tags:
@@ -1004,7 +1009,8 @@ zabbix_export:
             -
               uuid: e24496a9499447b2bbdf70f85bbf2113
               expression: 'nodata(/GitLab by HTTP/gitlab.ruby.threads_running,30m)=1'
-              name: 'GitLab: Failed to fetch info data (or no data for 30m)'
+              name: 'GitLab: Failed to fetch info data'
+              event_name: 'GitLab: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for metrics for the last 30 minutes'
               manual_close: 'YES'
@@ -1230,7 +1236,8 @@ zabbix_export:
                 -
                   uuid: 356c8dc915d84382b3f8dfe45b901f46
                   expression: 'min(/GitLab by HTTP/gitlab.puma.queued_connections[{#SINGLETON}],15m)>{$GITLAB.PUMA.QUEUE.MAX.WARN}'
-                  name: 'GitLab: Puma is queueing requests (over {$GITLAB.PUMA.QUEUE.MAX.WARN}% for 15m)'
+                  name: 'GitLab: Puma is queueing requests'
+                  event_name: 'GitLab: Puma is queueing requests (over {$GITLAB.PUMA.QUEUE.MAX.WARN}% for 15m)'
                   priority: WARNING
                   tags:
                     -
@@ -1316,7 +1323,8 @@ zabbix_export:
             -
               uuid: b69fe81449bd4b6cb6dfddeb333e8898
               expression: 'min(/GitLab by HTTP/gitlab.puma.active_connections[{#SINGLETON}],5m)/last(/GitLab by HTTP/gitlab.puma.max_threads[{#SINGLETON}])*100>{$GITLAB.PUMA.UTILIZATION.MAX.WARN}'
-              name: 'GitLab: Puma instance thread utilization is too high (over {$GITLAB.PUMA.UTILIZATION.MAX.WARN}% for 5m)'
+              name: 'GitLab: Puma instance thread utilization is too high'
+              event_name: 'GitLab: Puma instance thread utilization is too high (over {$GITLAB.PUMA.UTILIZATION.MAX.WARN}% for 5m)'
               priority: WARNING
               tags:
                 -
@@ -1382,7 +1390,8 @@ zabbix_export:
                 -
                   uuid: 84142d0996c0420c8b07c7e17d1b9a47
                   expression: 'min(/GitLab by HTTP/gitlab.unicorn.queued_connections[{#SINGLETON}],5m)>{$GITLAB.UNICORN.QUEUE.MAX.WARN}'
-                  name: 'GitLab: Unicorn is queueing requests (over {$GITLAB.UNICORN.QUEUE.MAX.WARN}% for 5m)'
+                  name: 'GitLab: Unicorn is queueing requests'
+                  event_name: 'GitLab: Unicorn is queueing requests (over {$GITLAB.UNICORN.QUEUE.MAX.WARN}% for 5m)'
                   priority: WARNING
                   tags:
                     -
@@ -1411,7 +1420,8 @@ zabbix_export:
             -
               uuid: 731bf8eb456c49739a3fcd7aec24c7d7
               expression: 'min(/GitLab by HTTP/gitlab.unicorn.active_connections[{#SINGLETON}],5m)/last(/GitLab by HTTP/gitlab.unicorn.unicorn_workers[{#SINGLETON}])*100>{$GITLAB.UNICORN.UTILIZATION.MAX.WARN}'
-              name: 'GitLab: Unicorn worker utilization is too high (over {$GITLAB.UNICORN.UTILIZATION.MAX.WARN}% for 5m)'
+              name: 'GitLab: Unicorn worker utilization is too high'
+              event_name: 'GitLab: Unicorn worker utilization is too high (over {$GITLAB.UNICORN.UTILIZATION.MAX.WARN}% for 5m)'
               priority: WARNING
               tags:
                 -
@@ -1483,7 +1493,8 @@ zabbix_export:
     -
       uuid: 4ac37991b2ca4edd9329fff1e752b05b
       expression: 'min(/GitLab by HTTP/gitlab.ruby.file_descriptors.max,5m)/last(/GitLab by HTTP/gitlab.ruby.process_max_fds)*100>{$GITLAB.OPEN.FDS.MAX.WARN}'
-      name: 'GitLab: Current number of open files is too high (over {$GITLAB.OPEN.FDS.MAX.WARN}% for 5m)'
+      name: 'GitLab: Current number of open files is too high'
+      event_name: 'GitLab: Current number of open files is too high (over {$GITLAB.OPEN.FDS.MAX.WARN}% for 5m)'
       priority: WARNING
       tags:
         -

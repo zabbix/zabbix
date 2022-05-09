@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-05T06:43:34Z'
+  date: '2022-04-06T19:33:37Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -556,7 +556,8 @@ zabbix_export:
             -
               uuid: 000d3e773f6e4ebf89f16daa2ce8c168
               expression: 'nodata(/RabbitMQ cluster by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"],30m)=1'
-              name: 'RabbitMQ: Failed to fetch overview data (or no data for 30m)'
+              name: 'RabbitMQ: Failed to fetch overview data'
+              event_name: 'RabbitMQ: Failed to fetch overview data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes'
               manual_close: 'YES'
@@ -1323,7 +1324,8 @@ zabbix_export:
             -
               uuid: 5cb80a7552d74e44a83d0825f039f89f
               expression: 'min(/RabbitMQ node by Zabbix agent/net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}'
-              name: 'RabbitMQ: Service response time is too high (over {$RABBITMQ.RESPONSE_TIME.MAX.WARN}s for 5m)'
+              name: 'RabbitMQ: Service response time is too high'
+              event_name: 'RabbitMQ: Service response time is too high (over {$RABBITMQ.RESPONSE_TIME.MAX.WARN}s for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
@@ -1473,7 +1475,8 @@ zabbix_export:
             -
               uuid: b68cb12ecd4046fd80a717fb557f04e8
               expression: 'last(/RabbitMQ node by Zabbix agent/rabbitmq.node.disk_free_alarm)=1'
-              name: 'RabbitMQ: Free disk space alarm (Free space threshold has been reached)'
+              name: 'RabbitMQ: Free disk space alarm'
+              event_name: 'RabbitMQ: Free disk space alarm (Free space threshold has been reached)'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'https://www.rabbitmq.com/disk-alarms.html'
@@ -1549,7 +1552,8 @@ zabbix_export:
             -
               uuid: ec6ae727fe774b0fa56bb4d9ad773e35
               expression: 'last(/RabbitMQ node by Zabbix agent/rabbitmq.node.mem_alarm)=1'
-              name: 'RabbitMQ: Memory alarm (Memory usage threshold has been reached)'
+              name: 'RabbitMQ: Memory alarm'
+              event_name: 'RabbitMQ: Memory alarm (Memory usage threshold has been reached)'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'https://www.rabbitmq.com/memory.html'
@@ -1651,7 +1655,8 @@ zabbix_export:
             -
               uuid: daf98bb4593d4697bc51423b2f65ba41
               expression: 'last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version,#1)<>last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version,#2) and length(last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version))>0'
-              name: 'RabbitMQ: Version has changed (new version: {ITEM.VALUE})'
+              name: 'RabbitMQ: Version has changed'
+              event_name: 'RabbitMQ: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'RabbitMQ version has changed. Ack to close.'
               manual_close: 'YES'
@@ -1686,7 +1691,8 @@ zabbix_export:
             -
               uuid: 5bed266725e94000804b0ecc7bce6209
               expression: 'min(/RabbitMQ node by Zabbix agent/rabbitmq.node.partitions,5m)>0'
-              name: 'RabbitMQ: Number of network partitions is too high (more than 0 for 5m)'
+              name: 'RabbitMQ: Number of network partitions is too high'
+              event_name: 'RabbitMQ: Number of network partitions is too high (more than 0 for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'https://www.rabbitmq.com/partitions.html#detecting'
@@ -1824,7 +1830,8 @@ zabbix_export:
             -
               uuid: 729c448ebabb417bb7ce17b1634c4484
               expression: 'last(/RabbitMQ node by Zabbix agent/rabbitmq.node.uptime)<10m'
-              name: 'RabbitMQ: has been restarted (uptime < 10m)'
+              name: 'RabbitMQ: has been restarted'
+              event_name: 'RabbitMQ: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -1854,7 +1861,8 @@ zabbix_export:
             -
               uuid: 4f2a88d09b1b49879d80e0794ec19e0e
               expression: 'nodata(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"],30m)=1'
-              name: 'RabbitMQ: Failed to fetch nodes data (or no data for 30m)'
+              name: 'RabbitMQ: Failed to fetch nodes data'
+              event_name: 'RabbitMQ: Failed to fetch nodes data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes.'
               manual_close: 'YES'
@@ -2650,7 +2658,8 @@ zabbix_export:
                 -
                   uuid: 58986cee2b4846b3b7bd3caf772d7ac6
                   expression: 'min(/RabbitMQ node by Zabbix agent/rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"],5m)>{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}'
-                  name: 'RabbitMQ: Too many messages in queue [{#VHOST}][{#QUEUE}] (over {$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"} for 5m)'
+                  name: 'RabbitMQ: Too many messages in queue [{#VHOST}][{#QUEUE}]'
+                  event_name: 'RabbitMQ: Too many messages in queue [{#VHOST}][{#QUEUE}] (over {$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"} for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   tags:
@@ -2866,14 +2875,14 @@ zabbix_export:
             key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
           lld_macro_paths:
             -
-              lld_macro: '{#NODE}'
-              path: $.node
-            -
               lld_macro: '{#QUEUE}'
               path: $.name
             -
               lld_macro: '{#VHOST}'
               path: $.vhost
+            -
+              lld_macro: '{#NODE}'
+              path: $.node
       tags:
         -
           tag: class

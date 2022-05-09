@@ -94,7 +94,7 @@ class testTriggerDependencies extends CLegacyWebTest {
 	public function getTriggerDependenciesData() {
 		return [
 			[
-				'Zabbix agent is not available (for {$AGENT.TIMEOUT})',
+				'Zabbix agent is not available',
 				self::TEMPLATE_FREEBSD,
 				'/etc/passwd has been changed on FreeBSD by Zabbix agent',
 				'Not all templates are linked to'
@@ -102,17 +102,17 @@ class testTriggerDependencies extends CLegacyWebTest {
 			[
 				'Apache: Service is down',
 				self::TEMPLATE_APACHE,
-				'Apache: Service response time is too high (over 10s for 5m)',
+				'Apache: Service response time is too high',
 				'Cannot create circular dependencies.'
 			],
 			[
-				'Apache: has been restarted (uptime < 10m)',
+				'Apache: has been restarted',
 				self::TEMPLATE_APACHE,
-				'Apache: has been restarted (uptime < 10m)',
+				'Apache: has been restarted',
 				'Cannot create dependency on trigger itself.'
 			],
 			[
-				'Apache: has been restarted (uptime < 10m)',
+				'Apache: has been restarted',
 				self::TEMPLATE_APACHE,
 				'Apache: Service is down',
 				'Trigger updated'

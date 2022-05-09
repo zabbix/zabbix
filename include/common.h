@@ -98,6 +98,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	AGENT_ERROR	-5
 #define	GATEWAY_ERROR	-6
 #define	CONFIG_ERROR	-7
+#define	SIG_ERROR	-8
 
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_sysinfo_ret_string(int ret);
@@ -187,6 +188,7 @@ typedef enum
 	INTERFACE_TYPE_SNMP,
 	INTERFACE_TYPE_IPMI,
 	INTERFACE_TYPE_JMX,
+	INTERFACE_TYPE_OPT = 254,
 	INTERFACE_TYPE_ANY = 255
 }
 zbx_interface_type_t;

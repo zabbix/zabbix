@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:33:53Z'
+  date: '2022-04-06T19:27:47Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -176,12 +176,13 @@ zabbix_export:
                 -
                   uuid: e9c37c1847d64920b80a20cc764b6c81
                   expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)>{#SENSOR_HI_CRIT}'
-                  name: 'IPMI: {#SENSOR_ID} value is above critical high (greater than {#SENSOR_HI_CRIT} for 5m)'
+                  name: 'IPMI: {#SENSOR_ID} value is above critical high'
+                  event_name: 'IPMI: {#SENSOR_ID} value is above critical high (greater than {#SENSOR_HI_CRIT} for 5m)'
                   priority: HIGH
                   description: 'The trigger is informing that a value higher than the upper critical threshold has been reached.'
                   dependencies:
                     -
-                      name: 'IPMI: {#SENSOR_ID} value is above non-recoverable high (greater than {#SENSOR_HI_DISAST} for 5m)'
+                      name: 'IPMI: {#SENSOR_ID} value is above non-recoverable high'
                       expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)>{#SENSOR_HI_DISAST}'
                   tags:
                     -
@@ -190,15 +191,16 @@ zabbix_export:
                 -
                   uuid: 0fc9d9baa3dd4d3db841e2153b6c39b2
                   expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)>{#SENSOR_HI_WARN}'
-                  name: 'IPMI: {#SENSOR_ID} value is above non-critical high (greater than {#SENSOR_HI_WARN} for 5m)'
+                  name: 'IPMI: {#SENSOR_ID} value is above non-critical high'
+                  event_name: 'IPMI: {#SENSOR_ID} value is above non-critical high (greater than {#SENSOR_HI_WARN} for 5m)'
                   priority: WARNING
                   description: 'The trigger is informing that a value higher than the upper non-critical threshold has been reached.'
                   dependencies:
                     -
-                      name: 'IPMI: {#SENSOR_ID} value is above critical high (greater than {#SENSOR_HI_CRIT} for 5m)'
+                      name: 'IPMI: {#SENSOR_ID} value is above critical high'
                       expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)>{#SENSOR_HI_CRIT}'
                     -
-                      name: 'IPMI: {#SENSOR_ID} value is above non-recoverable high (greater than {#SENSOR_HI_DISAST} for 5m)'
+                      name: 'IPMI: {#SENSOR_ID} value is above non-recoverable high'
                       expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)>{#SENSOR_HI_DISAST}'
                   tags:
                     -
@@ -207,7 +209,8 @@ zabbix_export:
                 -
                   uuid: 2c3dbc3f68db44f1924682a8241e0086
                   expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)>{#SENSOR_HI_DISAST}'
-                  name: 'IPMI: {#SENSOR_ID} value is above non-recoverable high (greater than {#SENSOR_HI_DISAST} for 5m)'
+                  name: 'IPMI: {#SENSOR_ID} value is above non-recoverable high'
+                  event_name: 'IPMI: {#SENSOR_ID} value is above non-recoverable high (greater than {#SENSOR_HI_DISAST} for 5m)'
                   priority: DISASTER
                   description: 'The trigger is informing that a value higher than the upper non-recoverable threshold has been reached.'
                   tags:
@@ -217,12 +220,13 @@ zabbix_export:
                 -
                   uuid: adbb7e20a46d42329e4744548aa9d5f6
                   expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)<{#SENSOR_LO_CRIT}'
-                  name: 'IPMI: {#SENSOR_ID} value is below critical low (less than {#SENSOR_LO_CRIT} for 5m)'
+                  name: 'IPMI: {#SENSOR_ID} value is below critical low'
+                  event_name: 'IPMI: {#SENSOR_ID} value is below critical low (less than {#SENSOR_LO_CRIT} for 5m)'
                   priority: HIGH
                   description: 'The trigger is informing that a value less than the lower critical threshold has been reached.'
                   dependencies:
                     -
-                      name: 'IPMI: {#SENSOR_ID} value is below non-recoverable low (less than {#SENSOR_LO_DISAST} for 5m)'
+                      name: 'IPMI: {#SENSOR_ID} value is below non-recoverable low'
                       expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)<{#SENSOR_LO_DISAST}'
                   tags:
                     -
@@ -231,15 +235,16 @@ zabbix_export:
                 -
                   uuid: 7b712e7b11a34635948517467f77ad9d
                   expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)<{#SENSOR_LO_WARN}'
-                  name: 'IPMI: {#SENSOR_ID} value is below non-critical low (less than {#SENSOR_LO_WARN} for 5m)'
+                  name: 'IPMI: {#SENSOR_ID} value is below non-critical low'
+                  event_name: 'IPMI: {#SENSOR_ID} value is below non-critical low (less than {#SENSOR_LO_WARN} for 5m)'
                   priority: WARNING
                   description: 'The trigger is informing that a value less than the lower non-critical threshold has been reached.'
                   dependencies:
                     -
-                      name: 'IPMI: {#SENSOR_ID} value is below critical low (less than {#SENSOR_LO_CRIT} for 5m)'
+                      name: 'IPMI: {#SENSOR_ID} value is below critical low'
                       expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)<{#SENSOR_LO_CRIT}'
                     -
-                      name: 'IPMI: {#SENSOR_ID} value is below non-recoverable low (less than {#SENSOR_LO_DISAST} for 5m)'
+                      name: 'IPMI: {#SENSOR_ID} value is below non-recoverable low'
                       expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)<{#SENSOR_LO_DISAST}'
                   tags:
                     -
@@ -248,7 +253,8 @@ zabbix_export:
                 -
                   uuid: b078ee6b820f44f2871c2e3fcd0ce4cf
                   expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)<{#SENSOR_LO_DISAST}'
-                  name: 'IPMI: {#SENSOR_ID} value is below non-recoverable low (less than {#SENSOR_LO_DISAST} for 5m)'
+                  name: 'IPMI: {#SENSOR_ID} value is below non-recoverable low'
+                  event_name: 'IPMI: {#SENSOR_ID} value is below non-recoverable low (less than {#SENSOR_LO_DISAST} for 5m)'
                   priority: DISASTER
                   description: 'The trigger is informing that a value less than the lower non-recoverable threshold has been reached.'
                   tags:
@@ -269,26 +275,8 @@ zabbix_export:
             key: ipmi.get
           lld_macro_paths:
             -
-              lld_macro: '{#SENSOR_HI_CRIT}'
-              path: $.threshold.upper.crit
-            -
-              lld_macro: '{#SENSOR_HI_DISAST}'
-              path: $.threshold.upper.non_recover
-            -
-              lld_macro: '{#SENSOR_HI_WARN}'
-              path: $.threshold.upper.non_crit
-            -
               lld_macro: '{#SENSOR_ID}'
               path: $.id
-            -
-              lld_macro: '{#SENSOR_LO_CRIT}'
-              path: $.threshold.lower.crit
-            -
-              lld_macro: '{#SENSOR_LO_DISAST}'
-              path: $.threshold.lower.non_recover
-            -
-              lld_macro: '{#SENSOR_LO_WARN}'
-              path: $.threshold.lower.non_crit
             -
               lld_macro: '{#SENSOR_READING_TYPE}'
               path: $.reading.text
@@ -298,6 +286,24 @@ zabbix_export:
             -
               lld_macro: '{#SENSOR_UNIT}'
               path: $.units
+            -
+              lld_macro: '{#SENSOR_LO_WARN}'
+              path: $.threshold.lower.non_crit
+            -
+              lld_macro: '{#SENSOR_LO_CRIT}'
+              path: $.threshold.lower.crit
+            -
+              lld_macro: '{#SENSOR_LO_DISAST}'
+              path: $.threshold.lower.non_recover
+            -
+              lld_macro: '{#SENSOR_HI_WARN}'
+              path: $.threshold.upper.non_crit
+            -
+              lld_macro: '{#SENSOR_HI_CRIT}'
+              path: $.threshold.upper.crit
+            -
+              lld_macro: '{#SENSOR_HI_DISAST}'
+              path: $.threshold.upper.non_recover
           overrides:
             -
               name: 'trigger SENSOR_HI_CRIT'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-10T10:31:15Z'
+  date: '2022-04-15T08:03:37Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -596,9 +596,10 @@ zabbix_export:
             -
               uuid: d28aa18c85cb4f48a9e7b8ba55d65400
               expression: 'last(/Elasticsearch Cluster by HTTP/es.nodes.jvm.max_uptime)<10m'
-              name: 'ES: Cluster has been restarted (uptime < 10m)'
+              name: 'ES: Cluster has been restarted'
+              event_name: 'ES: Cluster has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -621,7 +622,8 @@ zabbix_export:
             -
               uuid: 2a3f3b96e5dd47de998ccc17f109e149
               expression: 'min(/Elasticsearch Cluster by HTTP/net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"],5m)>{$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN}'
-              name: 'ES: Service response time is too high (over {$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN} for 5m)'
+              name: 'ES: Service response time is too high'
+              event_name: 'ES: Service response time is too high (over {$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'The performance of the TCP service is very low.'
               manual_close: 'YES'
@@ -810,7 +812,8 @@ zabbix_export:
                 -
                   uuid: 6c2ea291374b4de1ab06ddeccba635b1
                   expression: 'min(/Elasticsearch Cluster by HTTP/es.node.indices.flush.latency[{#ES.NODE}],5m)>{$ELASTICSEARCH.FLUSH_LATENCY.MAX.WARN}'
-                  name: 'ES {#ES.NODE}: Flush latency is too high (over {$ELASTICSEARCH.FLUSH_LATENCY.MAX.WARN}ms for 5m)'
+                  name: 'ES {#ES.NODE}: Flush latency is too high'
+                  event_name: 'ES {#ES.NODE}: Flush latency is too high (over {$ELASTICSEARCH.FLUSH_LATENCY.MAX.WARN}ms for 5m)'
                   priority: WARNING
                   description: |
                     If you see this metric increasing steadily, it may indicate a problem with slow disks; this problem may escalate
@@ -919,7 +922,8 @@ zabbix_export:
                 -
                   uuid: 2755b3f8811a45fba7c48347707ceaf8
                   expression: 'min(/Elasticsearch Cluster by HTTP/es.node.indices.indexing.index_latency[{#ES.NODE}],5m)>{$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}'
-                  name: 'ES {#ES.NODE}: Indexing latency is too high (over {$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}ms for 5m)'
+                  name: 'ES {#ES.NODE}: Indexing latency is too high'
+                  event_name: 'ES {#ES.NODE}: Indexing latency is too high (over {$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}ms for 5m)'
                   priority: WARNING
                   description: |
                     If the latency is increasing, it may indicate that you are indexing too many documents at the same time (Elasticsearch's documentation
@@ -1208,7 +1212,8 @@ zabbix_export:
                 -
                   uuid: 6edd6851f31842659a57e29c444a9b32
                   expression: 'min(/Elasticsearch Cluster by HTTP/es.node.indices.search.fetch_latency[{#ES.NODE}],5m)>{$ELASTICSEARCH.FETCH_LATENCY.MAX.WARN}'
-                  name: 'ES {#ES.NODE}: Fetch latency is too high (over {$ELASTICSEARCH.FETCH_LATENCY.MAX.WARN}ms for 5m)'
+                  name: 'ES {#ES.NODE}: Fetch latency is too high'
+                  event_name: 'ES {#ES.NODE}: Fetch latency is too high (over {$ELASTICSEARCH.FETCH_LATENCY.MAX.WARN}ms for 5m)'
                   priority: WARNING
                   description: |
                     The fetch phase should typically take much less time than the query phase. If you notice this metric consistently increasing,
@@ -1376,7 +1381,8 @@ zabbix_export:
                 -
                   uuid: 1892000290c843e887d128bf9f97c869
                   expression: 'min(/Elasticsearch Cluster by HTTP/es.node.indices.search.query_latency[{#ES.NODE}],5m)>{$ELASTICSEARCH.QUERY_LATENCY.MAX.WARN}'
-                  name: 'ES {#ES.NODE}: Query latency is too high (over {$ELASTICSEARCH.QUERY_LATENCY.MAX.WARN}ms for 5m)'
+                  name: 'ES {#ES.NODE}: Query latency is too high'
+                  event_name: 'ES {#ES.NODE}: Query latency is too high (over {$ELASTICSEARCH.QUERY_LATENCY.MAX.WARN}ms for 5m)'
                   priority: WARNING
                   description: 'If latency exceeds a threshold, look for potential resource bottlenecks, or investigate whether you need to optimize your queries.'
                   tags:
@@ -1581,7 +1587,8 @@ zabbix_export:
                 -
                   uuid: 9d199607ddda48eebe9f93cae6d6575d
                   expression: 'min(/Elasticsearch Cluster by HTTP/es.node.jvm.mem.heap_used_percent[{#ES.NODE}],1h)>{$ELASTICSEARCH.HEAP_USED.MAX.CRIT}'
-                  name: 'ES {#ES.NODE}: Percent of JVM heap in use is critical (over {$ELASTICSEARCH.HEAP_USED.MAX.CRIT}% for 1h)'
+                  name: 'ES {#ES.NODE}: Percent of JVM heap in use is critical'
+                  event_name: 'ES {#ES.NODE}: Percent of JVM heap in use is critical (over {$ELASTICSEARCH.HEAP_USED.MAX.CRIT}% for 1h)'
                   priority: HIGH
                   description: |
                     This indicates that the rate of garbage collection isn't keeping up with the rate of garbage creation.
@@ -1594,7 +1601,8 @@ zabbix_export:
                 -
                   uuid: bbba4a577a2c4328b2392fdeb1ff9bb4
                   expression: 'min(/Elasticsearch Cluster by HTTP/es.node.jvm.mem.heap_used_percent[{#ES.NODE}],1h)>{$ELASTICSEARCH.HEAP_USED.MAX.WARN}'
-                  name: 'ES {#ES.NODE}: Percent of JVM heap in use is high (over {$ELASTICSEARCH.HEAP_USED.MAX.WARN}% for 1h)'
+                  name: 'ES {#ES.NODE}: Percent of JVM heap in use is high'
+                  event_name: 'ES {#ES.NODE}: Percent of JVM heap in use is high (over {$ELASTICSEARCH.HEAP_USED.MAX.WARN}% for 1h)'
                   priority: WARNING
                   description: |
                     This indicates that the rate of garbage collection isn't keeping up with the rate of garbage creation.
@@ -1602,7 +1610,7 @@ zabbix_export:
                     guidelines stated above), or scale out the cluster by adding more nodes.
                   dependencies:
                     -
-                      name: 'ES {#ES.NODE}: Percent of JVM heap in use is critical (over {$ELASTICSEARCH.HEAP_USED.MAX.CRIT}% for 1h)'
+                      name: 'ES {#ES.NODE}: Percent of JVM heap in use is critical'
                       expression: 'min(/Elasticsearch Cluster by HTTP/es.node.jvm.mem.heap_used_percent[{#ES.NODE}],1h)>{$ELASTICSEARCH.HEAP_USED.MAX.CRIT}'
                   tags:
                     -
@@ -1640,9 +1648,10 @@ zabbix_export:
                 -
                   uuid: 580ae8aadf994fbcb34c9c8ad7cd5fad
                   expression: 'last(/Elasticsearch Cluster by HTTP/es.node.jvm.uptime[{#ES.NODE}])<10m'
-                  name: 'ES {#ES.NODE}: Node {#ES.NODE} has been restarted (uptime < 10m)'
+                  name: 'ES {#ES.NODE}: has been restarted'
+                  event_name: 'ES {#ES.NODE}: has been restarted (uptime < 10m)'
                   priority: INFO
-                  description: 'Uptime is less than 10 minutes'
+                  description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1752,7 +1761,8 @@ zabbix_export:
                 -
                   uuid: b416941e8e0141c6af27c62f052ac860
                   expression: 'min(/Elasticsearch Cluster by HTTP/es.node.thread_pool.refresh.rejected.rate[{#ES.NODE}],5m)>0'
-                  name: 'ES {#ES.NODE}: Refresh thread pool executor has the rejected tasks (for 5m)'
+                  name: 'ES {#ES.NODE}: Refresh thread pool executor has the rejected tasks'
+                  event_name: 'ES {#ES.NODE}: Refresh thread pool executor has the rejected tasks (for 5m)'
                   priority: WARNING
                   description: 'The number of tasks rejected by the refresh thread pool executor is over 0 for 5m.'
                   tags:
@@ -1863,7 +1873,8 @@ zabbix_export:
                 -
                   uuid: 5cfd3f9924614a4283f1255752b672f0
                   expression: 'min(/Elasticsearch Cluster by HTTP/es.node.thread_pool.search.rejected.rate[{#ES.NODE}],5m)>0'
-                  name: 'ES {#ES.NODE}: Search thread pool executor has the rejected tasks (for 5m)'
+                  name: 'ES {#ES.NODE}: Search thread pool executor has the rejected tasks'
+                  event_name: 'ES {#ES.NODE}: Search thread pool executor has the rejected tasks (for 5m)'
                   priority: WARNING
                   description: 'The number of tasks rejected by the search thread pool executor is over 0 for 5m.'
                   tags:
@@ -1974,7 +1985,8 @@ zabbix_export:
                 -
                   uuid: 1f5e30a34bb84cef831670974ec7c3e8
                   expression: 'min(/Elasticsearch Cluster by HTTP/es.node.thread_pool.write.rejected.rate[{#ES.NODE}],5m)>0'
-                  name: 'ES {#ES.NODE}: Write thread pool executor has the rejected tasks (for 5m)'
+                  name: 'ES {#ES.NODE}: Write thread pool executor has the rejected tasks'
+                  event_name: 'ES {#ES.NODE}: Write thread pool executor has the rejected tasks (for 5m)'
                   priority: WARNING
                   description: 'The number of tasks rejected by the write thread pool executor is over 0 for 5m.'
                   tags:

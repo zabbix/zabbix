@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-01T10:42:41Z'
+  date: '2022-04-06T19:28:05Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -186,7 +186,8 @@ zabbix_export:
             -
               uuid: 922a59008cd94e0688db8528be296f89
               expression: 'min(/Memcached by Zabbix agent 2/memcached.connections.queued.rate,5m)>{$MEMCACHED.CONN.QUEUED.MAX.WARN}'
-              name: 'Memcached: Too many queued connections (over {$MEMCACHED.CONN.QUEUED.MAX.WARN} in 5m)'
+              name: 'Memcached: Too many queued connections'
+              event_name: 'Memcached: Too many queued connections (over {$MEMCACHED.CONN.QUEUED.MAX.WARN} in 5m)'
               priority: WARNING
               description: 'The max number of connections is reached and a new connection had to wait in the queue as a result.'
               tags:
@@ -264,7 +265,8 @@ zabbix_export:
             -
               uuid: 33c9b918d21343dea3bcd2c3e3505fc5
               expression: 'min(/Memcached by Zabbix agent 2/memcached.connections.throttled.rate,5m)>{$MEMCACHED.CONN.THROTTLED.MAX.WARN}'
-              name: 'Memcached: Too many throttled connections (over {$MEMCACHED.CONN.THROTTLED.MAX.WARN} in 5m)'
+              name: 'Memcached: Too many throttled connections'
+              event_name: 'Memcached: Too many throttled connections (over {$MEMCACHED.CONN.THROTTLED.MAX.WARN} in 5m)'
               priority: WARNING
               description: |
                 Number of times a client connection was throttled is too high.
@@ -298,7 +300,8 @@ zabbix_export:
             -
               uuid: a30bb4344e714b7f984e86046797b9b1
               expression: 'nodata(/Memcached by Zabbix agent 2/memcached.cpu.sys,30m)=1'
-              name: 'Memcached: Failed to fetch info data (or no data for 30m)'
+              name: 'Memcached: Failed to fetch info data'
+              event_name: 'Memcached: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes'
               manual_close: 'YES'
@@ -620,7 +623,8 @@ zabbix_export:
             -
               uuid: c53a2d7b861b41458976bfa03ab1a105
               expression: 'last(/Memcached by Zabbix agent 2/memcached.uptime)<10m'
-              name: 'Memcached: has been restarted (uptime < 10m)'
+              name: 'Memcached: has been restarted'
+              event_name: 'Memcached: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -657,7 +661,8 @@ zabbix_export:
             -
               uuid: 086e757b4a2048eabd5e91b4a0ccc07b
               expression: 'last(/Memcached by Zabbix agent 2/memcached.version,#1)<>last(/Memcached by Zabbix agent 2/memcached.version,#2) and length(last(/Memcached by Zabbix agent 2/memcached.version))>0'
-              name: 'Memcached: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Memcached: Version has changed'
+              event_name: 'Memcached: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Memcached version has changed. Ack to close.'
               manual_close: 'YES'
@@ -708,7 +713,8 @@ zabbix_export:
     -
       uuid: e6129a8ace1945fa9020c6c0008cb19c
       expression: 'min(/Memcached by Zabbix agent 2/memcached.stats.bytes,5m)/last(/Memcached by Zabbix agent 2/memcached.config.limit_maxbytes)*100>{$MEMCACHED.MEM.PUSED.MAX.WARN}'
-      name: 'Memcached: Memory usage is too high (over {$MEMCACHED.MEM.PUSED.MAX.WARN} in 5m)'
+      name: 'Memcached: Memory usage is too high'
+      event_name: 'Memcached: Memory usage is too high (over {$MEMCACHED.MEM.PUSED.MAX.WARN} in 5m)'
       priority: WARNING
       tags:
         -
@@ -717,7 +723,8 @@ zabbix_export:
     -
       uuid: 61021d383c9f41b990292bab2738356d
       expression: 'min(/Memcached by Zabbix agent 2/memcached.connections.current,5m)/last(/Memcached by Zabbix agent 2/memcached.connections.max)*100>{$MEMCACHED.CONN.PRC.MAX.WARN}'
-      name: 'Memcached: Total number of connected clients is too high (over {$MEMCACHED.CONN.PRC.MAX.WARN}% in 5m)'
+      name: 'Memcached: Total number of connected clients is too high'
+      event_name: 'Memcached: Total number of connected clients is too high (over {$MEMCACHED.CONN.PRC.MAX.WARN}% in 5m)'
       priority: WARNING
       description: 'When the number of connections reaches the value of the "max_connections" parameter, new connections will be rejected.'
       tags:

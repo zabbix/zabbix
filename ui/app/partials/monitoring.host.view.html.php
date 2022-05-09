@@ -43,14 +43,12 @@ $table->setHeader([
 	(new CColHeader(_('Web')))
 ]);
 
-$interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI];
-
 foreach ($data['hosts'] as $hostid => $host) {
 	$host_name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostid));
 
 	$interface = null;
 	if ($host['interfaces']) {
-		foreach ($interface_types as $interface_type) {
+		foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $interface_type) {
 			$host_interfaces = array_filter($host['interfaces'], function(array $host_interface) use ($interface_type) {
 				return ($host_interface['type'] == $interface_type);
 			});
@@ -123,7 +121,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 						->setArgument('hostids', [$host['hostid']])
 						->setArgument('filter_name', '')
 				)
-				: _('Latest data')
+				: (new CSpan(_('Latest data')))->addClass(ZBX_STYLE_DISABLED),
+				CViewHelper::showNum($host['items_count'])
 		],
 		$problems_link,
 		$host['graphs']

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:46:52Z'
+  date: '2022-04-06T19:35:32Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -129,7 +129,8 @@ zabbix_export:
             -
               uuid: 6baed695cac34d349a42ab6e8295910d
               expression: 'nodata(/Travis CI by HTTP/travis.get_health,30m)=1'
-              name: 'Travis: Failed to fetch home page (or no data for 30m)'
+              name: 'Travis: Failed to fetch home page'
+              event_name: 'Travis: Failed to fetch home page (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes.'
               manual_close: 'YES'
@@ -312,7 +313,8 @@ zabbix_export:
                 -
                   uuid: 8279ce31c4fe4cb7a03baa8a0149a557
                   expression: 'last(/Travis CI by HTTP/travis.repo.builds.passed.pct[{#SLUG}])<{$TRAVIS.BUILDS.SUCCESS.PERCENT}'
-                  name: 'Travis: Repo [{#SLUG}]: Percent of successful builds are < {$TRAVIS.BUILDS.SUCCESS.PERCENT}%'
+                  name: 'Travis: Repo [{#SLUG}]: Percent of successful builds'
+                  event_name: 'Travis: Repo [{#SLUG}]: Percent of successful builds are < {$TRAVIS.BUILDS.SUCCESS.PERCENT}%'
                   priority: WARNING
                   description: 'Low successful builds rate.'
                   manual_close: 'YES'

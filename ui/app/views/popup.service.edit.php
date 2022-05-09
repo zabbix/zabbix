@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -381,7 +381,8 @@ if ($data['serviceid'] !== null) {
 					[
 						'title' => _('Cancel'),
 						'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-cancel']),
-						'cancel' => true
+						'cancel' => true,
+						'action' => ''
 					]
 				]
 			]).');'
