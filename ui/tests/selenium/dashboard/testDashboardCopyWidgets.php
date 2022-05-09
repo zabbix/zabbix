@@ -31,6 +31,8 @@ class testDashboardCopyWidgets extends CWebTest {
 
 	const NEW_PAGE_NAME = 'Test_page';
 	const TEMPLATED_PAGE_NAME = 'Page for pasting widgets';
+	const DASHBOARD_NAME1 = 'Dashboard_1 for Copying widgets';
+	const DASHBOARD_NAME2 = 'Dashboard_2 for Copying widgets';
 
 	private static $replaced_widget_name = "Test widget for replace";
 	private static $replaced_widget_size = [ 'width' => '13', 'height' => '8'];
@@ -56,33 +58,35 @@ class testDashboardCopyWidgets extends CWebTest {
 	public static function prepareIds() {
 		self::$new_page_ids	= CDBHelper::getColumn('SELECT * FROM dashboard_page WHERE name ='.zbx_dbstr('Test_page').
 				' ORDER BY dashboard_pageid', 'dashboard_pageid');
-		self::$paste_dashboard_id = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.zbx_dbstr('Dashboard for Paste widgets'));
+		self::$paste_dashboard_id = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
+				zbx_dbstr('Dashboard for Paste widgets'));
 		self::$dashboardid_with_widgets = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
 				zbx_dbstr('Templated dashboard with all widgets'));
 		self::$empty_dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
 				zbx_dbstr('Dashboard without widgets'));
 		self::$templated_page_id = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE name='.
 				zbx_dbstr(self::TEMPLATED_PAGE_NAME));
+		self::$dashboard_id1 = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.zbx_dbstr(self::DASHBOARD_NAME1));
+		self::$dashboard_id2 = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.zbx_dbstr(self::DASHBOARD_NAME2));
 	}
 
 	/**
 	 * Data provider for copying widgets from the first dashboard.
 	 */
-//	public static function getCopyWidgetsFirstData() {
-//		$this->getCopyWidgetsData(self::$dashboard_id1, 'Dashboard_1 for Copying widgets');
-//	}
+	public function getCopyWidgetsFirstData() {
+		return $this->getCopyWidgetsData('Dashboard_1 for Copying widgets');
+	}
 
 	/**
 	 * Data provider for copying widgets from the second dashboard.
 	 */
-//	public static function getCopyWidgetsSecondData() {
-//		$this->getCopyWidgetsData(self::$dashboard_id2, 'Dashboard_2 for Copying widgets');
-//	}
+	public function getCopyWidgetsSecondData() {
+		return $this->getCopyWidgetsData('Dashboard_2 for Copying widgets');
+	}
 
-/*
-	private function getCopyWidgetsData($dashboardid, $dashboard_name) {
-		static $data = null;
-		if ($data === null) {
+	private function getCopyWidgetsData($dashboard_name) {
+		static $data = [];
+		if (!array_key_exists($dashboard_name, $data)) {
 			global $DB;
 			if (!isset($DB['DB'])) {
 				DBconnect($error);
@@ -90,7 +94,7 @@ class testDashboardCopyWidgets extends CWebTest {
 			CDataHelper::load('CopyWidgetsDashboards');
 
 			$dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.zbx_dbstr($dashboard_name));
-			$data = CDBHelper::getDataProvider('SELECT * FROM widget w'.
+			$data[$dashboard_name] = CDBHelper::getDataProvider('SELECT * FROM widget w'.
 				' WHERE EXISTS ('.
 					'SELECT NULL'.
 					' FROM dashboard_page dp'.
@@ -100,62 +104,7 @@ class testDashboardCopyWidgets extends CWebTest {
 			);
 		}
 
-		return $data;
-	}
- */
-
-	/**
-	 * Data provider for copying widgets from the first dashboard.
-	 */
-	public static function getCopyWidgetsFirstData() {
-		static $data = null;
-		if ($data === null) {
-			global $DB;
-			if (!isset($DB['DB'])) {
-				DBconnect($error);
-			}
-			CDataHelper::load('CopyWidgetsDashboards');
-
-			self::$dashboard_id1 = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
-					zbx_dbstr('Dashboard_1 for Copying widgets'));
-			$data = CDBHelper::getDataProvider('SELECT * FROM widget w'.
-				' WHERE EXISTS ('.
-					'SELECT NULL'.
-					' FROM dashboard_page dp'.
-					' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
-						' AND dp.dashboardid='.self::$dashboard_id1.
-				') ORDER BY w.widgetid DESC'
-			);
-		}
-
-		return $data;
-	}
-
-	/**
-	 * Data provider for copying widgets from the second dashboard.
-	 */
-	public static function getCopyWidgetsSecondData() {
-		static $data = null;
-		if ($data === null) {
-			global $DB;
-			if (!isset($DB['DB'])) {
-				DBconnect($error);
-			}
-			CDataHelper::load('CopyWidgetsDashboards');
-
-			self::$dashboard_id2 = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
-					zbx_dbstr('Dashboard_2 for Copying widgets'));
-			$data = CDBHelper::getDataProvider('SELECT * FROM widget w'.
-				' WHERE EXISTS ('.
-					'SELECT NULL'.
-					' FROM dashboard_page dp'.
-					' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
-						' AND dp.dashboardid='.self::$dashboard_id2.
-				') ORDER BY w.widgetid DESC'
-			);
-		}
-
-		return $data;
+		return $data[$dashboard_name];
 	}
 
 	/**

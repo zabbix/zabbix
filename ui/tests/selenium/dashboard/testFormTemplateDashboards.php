@@ -139,7 +139,7 @@ class testFormTemplateDashboards extends CWebTest {
 			],
 			[
 				'templateid' => self::UPDATE_TEMPLATEID,
-				'name' => 'Dashboard without widgets',
+				'name' => 'Empty Dashboard without widgets',
 				'pages' => [[]]
 			],
 			[
@@ -498,9 +498,9 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'dashboard_properties' => [
-						'Name' => 'Dashboard without widgets'
+						'Name' => 'Empty Dashboard without widgets'
 					],
-					'error_message' => 'Dashboard "Dashboard without widgets" already exists.',
+					'error_message' => 'Dashboard "Empty Dashboard without widgets" already exists.',
 					'check_save' => true
 				]
 			],
@@ -1201,7 +1201,7 @@ class testFormTemplateDashboards extends CWebTest {
 
 			$dashboard_name = ($check === 'dashboard action')
 					? $created_values['Name']
-					: (($check === 'widget create') ? 'Dashboard without widgets' : 'Dashboard for widget update');
+					: (($check === 'widget create') ? 'Empty Dashboard without widgets' : 'Dashboard for widget update');
 			$this->query('link', $dashboard_name)->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
 
