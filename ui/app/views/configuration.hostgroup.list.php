@@ -65,15 +65,17 @@ $view_url = (new CUrl('zabbix.php'))
 	->getUrl();
 
 $table = (new CTableInfo())
-	->setHeader([
-		(new CColHeader(
+	->setHeader((new CRowHeader())
+		->addItem((new CColHeader(
 			(new CCheckBox('all_groups'))
 				->onClick("checkAll('".$form->getName()."', 'all_groups', 'groups');")
-		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder'], $view_url),
-		_('Hosts'),
-		(new CColHeader(_('Info')))->addClass(ZBX_STYLE_CELL_WIDTH)
-	]);
+			))->addClass(ZBX_STYLE_CELL_WIDTH))
+		->addItem(
+			make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder'], $view_url)
+		)
+		->addItem((new CColHeader(_('Hosts')))->setColSpan(2))
+		->addItem((new CColHeader(_('Info')))->addClass(ZBX_STYLE_CELL_WIDTH))
+	);
 
 $current_time = time();
 
@@ -153,12 +155,8 @@ foreach ($this->data['groups'] as $group) {
 	$table->addRow([
 		new CCheckBox('groups['.$group['groupid'].']', $group['groupid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
-		[
-			$data['allowed_ui_conf_hosts']
-				? $count
-				: '',
-			empty($hosts_output) ? '' : $hosts_output
-		],
+		$data['allowed_ui_conf_hosts'] ? $count : '',
+		empty($hosts_output) ? '' : $hosts_output,
 		makeInformationList($info_icons)
 	]);
 }
