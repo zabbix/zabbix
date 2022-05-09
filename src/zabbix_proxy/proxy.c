@@ -51,11 +51,12 @@
 #include "zbxcrypto.h"
 #include "../zabbix_server/preprocessor/preproc_manager.h"
 #include "../zabbix_server/preprocessor/preproc_worker.h"
-#include "../zabbix_server/availability/avail_manager.h"
+#include "zbxavailability.h"
 #include "../libs/zbxvault/vault.h"
 #include "zbxdiag.h"
 #include "diag/diag_proxy.h"
 #include "zbxrtc.h"
+#include "../zabbix_server/availability/avail_manager.h"
 #include "zbxserver.h"
 #include "stats/zabbix_stats.h"
 

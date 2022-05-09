@@ -575,6 +575,7 @@ static int	process_proxy(void)
 			}
 		}
 error:
+
 		if (proxy_old.version != proxy.version || proxy_old.auto_compress != proxy.auto_compress ||
 				proxy_old.lastaccess != proxy.lastaccess)
 		{

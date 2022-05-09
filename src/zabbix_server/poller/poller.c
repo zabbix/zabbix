@@ -66,7 +66,7 @@ static int	update_interface_availability(unsigned char **data, size_t *data_allo
 	if (FAIL == zbx_interface_availability_is_set(ia))
 		return FAIL;
 
-	zbx_availability_serialize(data, data_alloc, data_offset, ia);
+	zbx_availability_serialize_interface(data, data_alloc, data_offset, ia);
 
 	return SUCCEED;
 }
@@ -904,7 +904,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 	if (NULL != data)
 	{
-		zbx_availability_flush(data, data_offset);
+		zbx_availability_send(ZBX_IPC_AVAILABILITY_REQUEST, data, (zbx_uint32_t)data_offset, NULL);
 		zbx_free(data);
 	}
 

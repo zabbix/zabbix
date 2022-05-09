@@ -21,6 +21,7 @@
 
 #include "log.h"
 #include "zbxserver.h"
+#include "zbxavailability.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_host.h"
 
@@ -2676,7 +2677,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				sql2_alloc = 0, sql2_offset = 0;
 	zbx_db_insert_t		db_insert, db_insert_hdiscovery, db_insert_hinventory, db_insert_hgroups,
 				db_insert_hmacro, db_insert_interface, db_insert_idiscovery, db_insert_snmp,
-				db_insert_tag;
+				db_insert_tag, db_insert_host_rtdata;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2859,6 +2860,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				"custom_interfaces", NULL);
 
 		zbx_db_insert_prepare(&db_insert_hdiscovery, "host_discovery", "hostid", "parent_hostid", "host", NULL);
+		zbx_db_insert_prepare(&db_insert_host_rtdata, "host_rtdata", "hostid", "active_available", NULL);
 	}
 
 	if (0 != new_host_inventories)
@@ -2931,6 +2933,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_ADD, host->hostid, host->host);
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host->hostid, parent_hostid, host_proto);
+			zbx_db_insert_add_values(&db_insert_host_rtdata, host->hostid, INTERFACE_AVAILABLE_UNKNOWN);
 
 			if (HOST_INVENTORY_DISABLED != host->inventory_mode)
 			{
@@ -3384,6 +3387,9 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 		zbx_db_insert_execute(&db_insert_hdiscovery);
 		zbx_db_insert_clean(&db_insert_hdiscovery);
+
+		zbx_db_insert_execute(&db_insert_host_rtdata);
+		zbx_db_insert_clean(&db_insert_host_rtdata);
 	}
 
 	if (0 != new_host_inventories)

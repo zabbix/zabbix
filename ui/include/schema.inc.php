@@ -8955,6 +8955,24 @@ return [
 			]
 		]
 	],
+	'host_rtdata' => [
+		'key' => 'hostid',
+		'fields' => [
+			'hostid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid'
+			],
+			'active_available' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			]
+		]
+	],
 	'dbversion' => [
 		'key' => 'dbversionid',
 		'fields' => [
