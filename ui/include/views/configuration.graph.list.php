@@ -117,9 +117,9 @@ else {
 							'object_name' => ($data['context'] === 'host') ? 'hosts' : 'templates',
 							'data' => $data['filter']['hosts'],
 							'popup' => [
-								'filter_preselect_fields' => [
-									'hostgroups' => 'filter_groupids_'
-								],
+								'filter_preselect_fields' => ($data['context'] === 'host')
+									? ['hostgroups' => 'filter_groupids_']
+									: ['templategroups' => 'filter_groupids_'],
 								'parameters' => [
 									'srctbl' => ($data['context'] === 'host') ? 'hosts' : 'templates',
 									'srcfld1' => 'hostid',
