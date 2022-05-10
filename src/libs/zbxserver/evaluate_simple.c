@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "expression_evaluate.h"
+#include "zbxserver.h"
 
 #include "common.h"
 #include "zbxvariant.h"

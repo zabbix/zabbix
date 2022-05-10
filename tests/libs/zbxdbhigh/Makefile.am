@@ -48,6 +48,7 @@ COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxaudit/libzbxaudit.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
+	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 

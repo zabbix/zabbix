@@ -15,6 +15,7 @@ HISTORY_LIBS = \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxshmem/libzbxshmem.a \
 	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
+	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
