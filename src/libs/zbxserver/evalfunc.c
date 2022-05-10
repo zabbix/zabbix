@@ -18,6 +18,7 @@
 **/
 
 #include "evalfunc.h"
+#include "evalfunc_common.h"
 
 #include "log.h"
 #include "zbxserver.h"
@@ -25,8 +26,6 @@
 #include "valuecache.h"
 #include "zbxtrends.h"
 #include "anomalystl.h"
-
-#include "evalfunc_common.h"
 
 #define ZBX_VALUEMAP_STRING_LEN	64
 

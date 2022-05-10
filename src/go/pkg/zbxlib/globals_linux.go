@@ -100,10 +100,6 @@ const char	*help_message[] = {};
 ZBX_METRIC	parameters_agent[] = {NULL};
 ZBX_METRIC	parameters_specific[] = {NULL};
 
-void zbx_on_exit(int ret)
-{
-}
-
 int	zbx_procstat_collector_started(void)
 {
 	return FAIL;

@@ -406,7 +406,7 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 			if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 				continue;
 
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL,
 					NULL, NULL, NULL, NULL, NULL, &dc_items[i].delay, MACRO_TYPE_COMMON, NULL, 0);
 
 			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
@@ -644,14 +644,14 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 			if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 				continue;
 
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL,
 					NULL, NULL, NULL, NULL, NULL, &dc_items[i].delay, MACRO_TYPE_COMMON, NULL, 0);
 
 			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
 				continue;
 
 			dc_items[i].key = zbx_strdup(dc_items[i].key, dc_items[i].key_orig);
-			substitute_key_macros_unmasked(&dc_items[i].key, NULL, &dc_items[i], NULL, NULL,
+			zbx_substitute_key_macros_unmasked(&dc_items[i].key, NULL, &dc_items[i], NULL, NULL,
 					MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 			zbx_json_addobject(&json, NULL);

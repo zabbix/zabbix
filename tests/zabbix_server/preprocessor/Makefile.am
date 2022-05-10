@@ -33,6 +33,7 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
+	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/tests/libzbxmockdata.a

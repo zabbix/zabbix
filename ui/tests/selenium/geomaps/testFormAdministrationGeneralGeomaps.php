@@ -119,7 +119,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 		if ($data['Tile provider'] === 'OpenStreetMap Mapnik') {
 			// Check dropdown options presence.
 			$this->assertEquals(['OpenStreetMap Mapnik', 'OpenTopoMap', 'Stamen Toner Lite', 'Stamen Terrain',
-					'USGS US Topo', 'USGS US Imagery', 'Other'], $form->getField('Tile provider')->asZDropdown()
+					'USGS US Topo', 'USGS US Imagery', 'Other'], $form->getField('Tile provider')->asDropdown()
 					->getOptions()->asText()
 			);
 

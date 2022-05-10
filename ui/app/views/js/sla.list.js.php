@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -65,13 +65,13 @@
 					this._disable(e.target, [e.target.dataset.slaid]);
 				}
 				else if (e.target.classList.contains('js-massenable-sla')) {
-					this._enable(e.target, Object.values(chkbxRange.getSelectedIds()));
+					this._enable(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (e.target.classList.contains('js-massdisable-sla')) {
-					this._disable(e.target, Object.values(chkbxRange.getSelectedIds()));
+					this._disable(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (e.target.classList.contains('js-massdelete-sla')) {
-					this._delete(e.target, Object.values(chkbxRange.getSelectedIds()));
+					this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 			});
 		}

@@ -29,7 +29,7 @@ extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 #if defined(ZABBIX_SERVICE)
-#	include "service.h"
+#	include "zbxwinservice.h"
 #elif defined(ZABBIX_DAEMON)
 #	include "zbxnix.h"
 #endif

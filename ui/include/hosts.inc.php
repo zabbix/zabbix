@@ -493,6 +493,10 @@ function getHostInterface(?array $interface): string {
 		return '';
 	}
 
+	if ($interface['type'] == INTERFACE_TYPE_AGENT_ACTIVE) {
+		return _('Active checks');
+	}
+
 	if ($interface['useip'] == INTERFACE_USE_IP) {
 		$ip_or_dns = (filter_var($interface['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false)
 			? '['.$interface['ip'].']'

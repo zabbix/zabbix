@@ -24,7 +24,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 // queriesHandler executes select from pg_database command and returns JSON if all is OK or nil otherwise.
