@@ -57,7 +57,8 @@ class CControllerLatestView extends CControllerLatest {
 			'subfilter_hostids' =>		'array',
 			'subfilter_tagnames' =>		'array',
 			'subfilter_tags' =>			'array',
-			'subfilter_data' =>			'array'
+			'subfilter_data' =>			'array',
+			'subfilters_expanded' =>	'array'
 		];
 
 		$ret = $this->validateInput($fields);

@@ -1,8 +1,27 @@
 Changes for 6.2.0beta2
 
 New features:
+....I..... [ZBXNEXT-7693] replaced filename-length-max=99 option with tar-pax in configure.ac (yurii)
+.......PS. [ZBXNEXT-7029] added support of vmware.dvswitch.discovery and vmware.dvswitch.fetchports.get (MVekslers)
+A.FG...PS. [ZBXNEXT-5088] added active check availability icon (acikuns, dgoloscapov)
+.......PS. [ZBXNEXT-5341] added new VMware item vmware.vm.attribute (MVekslers, ssimonenko)
+.......PS. [ZBXNEXT-2302] added new VMware keys *.hv.connectionstate *.hv.hw.serialnumber *.hv.net.if.discovery *.hv.network.linkspeed *.hv.hw.sensors.get *.vm.state *.vm.tools and other improvements (MVekslers, ssimonenko)
+..F....... [ZBXNEXT-5771] added digital clock feature to the clock widget (ashubin, mkrisjanis, rlataria)
+..F....... [ZBX-20946] enabled German and Vietnamese languages in the frontend (miks)
+..F....... [ZBXNEXT-7461] implemented expandable subfilters at the Latest data page; fixed clickable tags (miks)
+.......PS. [ZBXNEXT-7604] modified functionality to ignore NaN in Prometheus preprocessing aggregate functions (akozlovs)
+.......PS. [ZBXNEXT-2591] added resource pool path to vmware.vm.discovery (asestakovs)
+.......PS. [ZBXNEXT-2043] added support for collecting vmware snapshot information and new items vmware.vm.snapshot.get and vmware.vm.consolidationneeded (MVekslers)
+.......PS. [ZBXNEXT-2012] added additional NIC counters for VMware monitoring (asestakovs)
+.........T [ZBXNEXT-7607] added template Envoy Proxy by HTTP (ychukina)
+A.F....... [ZBXNEXT-7476] disabled PHP 8 strict type validation (ashubin)
 
 Bug fixes:
+..F....... [ZBX-21008] fixed broken popup for SLA selection for User role (averza)
+..F....... [ZBX-20380] fixed maintenance highlighting having priority over problem severity highlighting for map elements of map, host group and trigger types (agriscenko)
+.........T [ZBX-20982] fixed API request by coordinates in the OpenWeatherMap template (vkhaliev)
+........S. [ZBX-20918] moved final history/trends cache sync in main process to be done before stopping HA (wiper)
+..F....... [ZBX-20548] fixed broken host link not opening in the Inventory (rdetlavs)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.0beta1
@@ -61,8 +80,23 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.5rc1
 
 New features:
+....I..... [ZBXNEXT-7693] replaced filename-length-max=99 option with tar-pax in configure.ac (yurii)
+..F....... [ZBX-20946] enabled German and Vietnamese languages in frontend (miks)
+.......PS. [ZBXNEXT-7604] modified functionality to ignore NaN in Prometheus preprocessing aggregate functions (akozlovs)
+..F....... [ZBXNEXT-7526] added number of items for Latest data column in Monitoring -> Hosts page (Ivo)
+A.F....... [ZBXNEXT-7476] disabled php 8 strict type validation (ashubin)
+..F....... [ZBXNEXT-7461] implemented expandable subfilters in latest data page; fixed clickable tags (miks)
+.........T [ZBXNEXT-7607] added template Envoy Proxy by HTTP (ychukina)
+.........T [ZBXNEXT-7547] added CockroachDB template (drasihov)
+A.F....... [ZBXNEXT-7491] fixed PHP 8.1 runtime warnings with PostgreSQL backend (Sasha)
 
 Bug fixes:
+..F....... [ZBX-21008] fixed broken popup for SLA selection for User role (averza)
+..F....... [ZBX-20380] fixed maintenance highlighting having priority over problem severity highlighting for map elements of map, host group and trigger types (agriscenko)
+..F....... [ZBX-20573] fixed service filter functionality in SLA report page (rdetlavs)
+.........T [ZBX-20982] fixed api request by coordinates in openweathermap template (vkhaliev)
+........S. [ZBX-20918] moved final history/trends cache sync in main process to be done before stopping HA (wiper)
+..F....... [ZBX-20548] fixed broken host link not opening in Inventory (rdetlavs)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.4
@@ -1930,8 +1964,10 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.24rc1
 
 New features:
+..F....... [ZBX-20946] enabled German, Greek, Romanian, Spanish and Vietnamese languages in frontend (miks)
 
 Bug fixes:
+..F....... [ZBX-20380] fixed maintenance highlighting having priority over problem severity highlighting for map elements of map, host group and trigger types (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.23
@@ -4415,6 +4451,7 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.41rc1
 
 New features:
+..F....... [ZBX-20946] enabled Bulgarian, Chinese (zh_TW), German, Greek, Indonesian, Romanian, Spanish and Vietnamese languages in frontend (miks)
 
 Bug fixes:
 

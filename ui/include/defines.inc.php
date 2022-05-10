@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.2.0beta2');
 define('ZABBIX_API_VERSION',	'6.2.0');
 define('ZABBIX_EXPORT_VERSION',	'6.2');
 
-define('ZABBIX_DB_VERSION',		6010020);
+define('ZABBIX_DB_VERSION',		6010023);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -63,6 +63,8 @@ define('ZBX_MAX_TIMESHIFT',	788400000); // Max valid timeshift value in seconds 
 define('ZBX_GEOMAP_MAX_ZOOM', 30); // Max zoom level for geomap.
 
 define('ZBX_MAX_GRAPHS_PER_PAGE', 20);
+
+define('SUBFILTER_VALUES_PER_GROUP', 1000); // Number of subfilter values per group.
 
 // Date and time format separators must be synced with setSDateFromOuterObj() in class.calendar.js.
 define('ZBX_FULL_DATE_TIME',	'Y-m-d H:i:s'); // Time selector full date and time presentation format.
@@ -322,13 +324,14 @@ define('INTERFACE_PRIMARY',		1);
 define('INTERFACE_USE_DNS',	0);
 define('INTERFACE_USE_IP',	1);
 
-define('INTERFACE_TYPE_OPT',		-2);
-define('INTERFACE_TYPE_ANY',		-1);
-define('INTERFACE_TYPE_UNKNOWN',	0);
-define('INTERFACE_TYPE_AGENT',		1);
-define('INTERFACE_TYPE_SNMP',		2);
-define('INTERFACE_TYPE_IPMI',		3);
-define('INTERFACE_TYPE_JMX',		4);
+define('INTERFACE_TYPE_OPT',			-2);
+define('INTERFACE_TYPE_ANY',			-1);
+define('INTERFACE_TYPE_UNKNOWN',		0);
+define('INTERFACE_TYPE_AGENT',			1);
+define('INTERFACE_TYPE_SNMP',			2);
+define('INTERFACE_TYPE_IPMI',			3);
+define('INTERFACE_TYPE_JMX',			4);
+define('INTERFACE_TYPE_AGENT_ACTIVE',	5);
 
 define('HOST_PROT_INTERFACES_INHERIT',	0);
 define('HOST_PROT_INTERFACES_CUSTOM',	1);
@@ -1552,6 +1555,18 @@ define('WIDGET_ITEM',				'item');
 // Deprecated widgets
 define('WIDGET_DATA_OVER',			'dataover');
 
+// Clock widget type
+define('WIDGET_CLOCK_TYPE_ANALOG',	0);
+define('WIDGET_CLOCK_TYPE_DIGITAL',	1);
+
+// Clock time zone format
+define('WIDGET_CLOCK_TIMEZONE_SHORT',	0);
+define('WIDGET_CLOCK_TIMEZONE_FULL',	1);
+
+// Clock widget time format
+define('WIDGET_CLOCK_HOUR_TWENTY_FOUR',	0);
+define('WIDGET_CLOCK_HOUR_TWELVE',		1);
+
 // Item widget object positions.
 define('WIDGET_ITEM_POS_LEFT',		0);
 define('WIDGET_ITEM_POS_CENTER',	1);
@@ -1589,6 +1604,11 @@ define('WIDGET_SEARCH_TEMPLATES',		'search_templates');
 // dashboard widget dynamic state
 define('WIDGET_SIMPLE_ITEM',	0);
 define('WIDGET_DYNAMIC_ITEM',	1);
+
+// clock widget blocks
+define('WIDGET_CLOCK_SHOW_DATE', 1);
+define('WIDGET_CLOCK_SHOW_TIME', 2);
+define('WIDGET_CLOCK_SHOW_TIMEZONE', 3);
 
 // item widget blocks
 define('WIDGET_ITEM_SHOW_DESCRIPTION',		1);
@@ -1641,6 +1661,7 @@ define('ZBX_DEFAULT_LANG', 'en_US');
 
 // user default time zone
 define('TIMEZONE_DEFAULT', 'default');
+define('TIMEZONE_DEFAULT_LOCAL', 'local');
 
 // the default time zone
 define('ZBX_DEFAULT_TIMEZONE', 'system');
@@ -1763,6 +1784,7 @@ define('ZBX_STYLE_BTN_KIOSK', 'btn-kiosk');
 define('ZBX_STYLE_BTN_MIN', 'btn-min');
 define('ZBX_STYLE_BTN_REMOVE', 'btn-remove');
 define('ZBX_STYLE_BTN_REMOVE_FAV', 'btn-remove-fav');
+define('ZBX_STYLE_BTN_TAG', 'btn-tag');
 define('ZBX_STYLE_BTN_TIME', 'btn-time');
 define('ZBX_STYLE_BTN_TIME_LEFT', 'btn-time-left');
 define('ZBX_STYLE_BTN_TIME_OUT', 'btn-time-out');
@@ -1879,7 +1901,7 @@ define('ZBX_STYLE_ICON_INVISIBLE', 'icon-invisible');
 define('ZBX_STYLE_ICON_USER', 'icon-user');
 define('ZBX_STYLE_ICON_USER_GROUP', 'icon-user-group');
 define('ZBX_STYLE_ICON_MAINTENANCE', 'icon-maintenance');
-define('ZBX_STYLE_ICON_WZRD_ACTION', 'icon-wzrd-action');
+define('ZBX_STYLE_ICON_WIZARD_ACTION', 'icon-wizard-action');
 define('ZBX_STYLE_ACTION_COMMAND', 'icon-action-command');
 define('ZBX_STYLE_ACTION_ICON_CLOSE', 'icon-action-close');
 define('ZBX_STYLE_ACTION_ICON_MSG', 'icon-action-msg');

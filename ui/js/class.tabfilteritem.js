@@ -51,6 +51,7 @@ class CTabFilterItem extends CBaseComponent {
 		this._src_url = null;
 		this._apply_url = null;
 		this._default = options.default;
+		this._subfilters_expanded = [];
 
 		this.init();
 		this.registerEvents();
@@ -560,6 +561,29 @@ class CTabFilterItem extends CBaseComponent {
 				.filter(el => (el.name === key && el.value === value))
 				.forEach(el => el.remove());
 		}
+	}
+
+	/**
+	 * Set expanded subfilter name.
+	 */
+	setExpandedSubfilters(name) {
+		return this._subfilters_expanded.push(name);
+	}
+
+	/**
+	 * Retrieve expanded subfilter names.
+	 *
+	 * @returns {array}
+	 */
+	getExpandedSubfilters() {
+		return this._subfilters_expanded;
+	}
+
+	/**
+	 * Unset expanded subfilters.
+	 */
+	unsetExpandedSubfilters() {
+		this._subfilters_expanded = [];
 	}
 
 	registerEvents() {

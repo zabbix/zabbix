@@ -33,6 +33,8 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		margin-bottom: 6px;
 
 		&.tabfilter-collapsed {
+			padding: 0 0 10px 0;
+
 			.tabfilter-tabs-container,
 			.form-buttons {
 				display: none;

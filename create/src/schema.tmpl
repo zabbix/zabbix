@@ -1932,6 +1932,10 @@ FIELD		|operator		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|value			|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1			|slaid
 
+TABLE|host_rtdata|hostid|0
+FIELD		|hostid			|t_id		|	|NOT NULL	|0	|1|hosts|hostid
+FIELD		|active_available	|t_integer	|'0'	|NOT NULL	|0
+
 TABLE|userdirectory|userdirectoryid
 FIELD		|userdirectoryid	|t_id			|		|NOT NULL	|0
 FIELD		|name				|t_varchar(128)	|''		|NOT NULL	|0
@@ -1949,4 +1953,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6010020	|6010020
+ROW		|1		|6010023	|6010023

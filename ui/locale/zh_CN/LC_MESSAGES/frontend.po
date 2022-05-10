@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-05-01 14:39+0000\n"
-"Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
+"PO-Revision-Date: 2022-05-09 09:26+0000\n"
+"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -317,6 +317,14 @@ msgstr "10秒"
 #: include/views/reports.toptriggers.php:118 toptriggers.php:25
 msgid "100 busiest triggers"
 msgstr "触发器TOP100"
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:184
+msgid "12-hour"
+msgstr ""
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:183
+msgid "24-hour"
+msgstr ""
 
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
@@ -657,6 +665,10 @@ msgstr "主动式"
 msgctxt "maintenance status"
 msgid "Active"
 msgstr "启用中"
+
+#: include/hosts.inc.php:497
+msgid "Active checks"
+msgstr ""
 
 #: include/views/configuration.maintenance.edit.php:112
 #: include/views/configuration.maintenance.list.php:91 maintenance.php:44
@@ -1147,6 +1159,10 @@ msgstr "换出到缓存空间的客户机物理内存量, <url> - VMware服务UR
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "用于备份客户物理内存页面的主机物理内存量, <url> - VMware服务URL, <uuid> - VMware虚机主机名"
 
+#: include/classes/widgets/forms/CWidgetFormClock.php:73
+msgid "Analog"
+msgstr ""
+
 #: app/partials/popup.operations.php:240
 #: app/views/configuration.correlation.edit.php:119
 #: app/views/popup.lldoverride.php:68 include/triggers.inc.php:1060
@@ -1280,7 +1296,7 @@ msgstr "不变"
 
 #: include/views/monitoring.history.php:102
 msgid "As plain text"
-msgstr "纯文字"
+msgstr "纯文本"
 
 #: app/views/administration.authentication.edit.php:275
 #: app/views/administration.authentication.edit.php:309
@@ -1319,16 +1335,16 @@ msgstr "于(时:分)"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:125
 msgid "At least one LDAP server must exist."
-msgstr ""
+msgstr "LDAP 服务必须存在"
 
 #: app/views/administration.userrole.edit.php:117
 msgid "At least one UI element must be checked."
-msgstr "至少需要检查一个 UI 元素。"
+msgstr "至少选中一个 UI 元素。"
 
 #: include/classes/api/services/CRole.php:487
 #, c-format
 msgid "At least one UI element must be enabled for user role \"%1$s\"."
-msgstr "用户角色\"%1$s\"至少需要启用一个UI元素。"
+msgstr "用户角色\"%1$s\"至少需要启用一个UI页面。"
 
 #: app/controllers/CControllerPopupLldOperation.php:122
 msgid "At least one action is mandatory."
@@ -1338,17 +1354,17 @@ msgstr "至少需要执行一项操作。"
 #: include/classes/api/services/CUser.php:1286
 #, c-format
 msgid "At least one active user must exist with role \"%1$s\"."
-msgstr "至少需要为活动用户分配一个角色 \"%1$s\"。"
+msgstr "角色\"%1$s\"至少存在一个启用的用户"
 
 #: include/classes/api/services/CMaintenance.php:683
 msgid "At least one day of the week or day of the month must be specified."
-msgstr "至少需要指定一周中的一天或一个月中的一天。"
+msgstr "至少须指定一周或一个月中的某一天。"
 
 #: include/classes/api/services/CMaintenance.php:382
 #: include/classes/api/services/CMaintenance.php:574
 #: include/views/configuration.maintenance.edit.php:247
 msgid "At least one host group or host must be selected."
-msgstr "至少选择一个主机群组或主机。"
+msgstr "至少选择一个主机组或主机。"
 
 #: include/classes/api/services/CHostGroup.php:1111
 #: include/classes/api/services/CHostGroup.php:1268
@@ -1357,7 +1373,7 @@ msgstr "至少需要指定一个主机或模板。"
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
-msgstr "应该至少支持MySQL，PostgreSQL或Oracle中的一种。"
+msgstr "应该至少支持MySQL，PostgreSQL或Oracle之一。"
 
 #: app/views/configuration.correlation.edit.php:161
 msgid "At least one operation must be selected."
@@ -1365,11 +1381,11 @@ msgstr "至少需要选择一项操作。"
 
 #: include/views/configuration.action.edit.php:522
 msgid "At least one operation must exist."
-msgstr "必须至少设置一个执行内容。"
+msgstr "必须至少设置一个操作。"
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:172
 msgid "At least one update operation or message is mandatory"
-msgstr "至少需要选择一个更新操作或消息内容"
+msgstr "至少需要选择一个更新操作或消息"
 
 #: app/views/popup.acknowledge.edit.php:105
 msgid "At least one update operation or message must exist."
@@ -1395,7 +1411,7 @@ msgstr "尝试次数"
 
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
-msgstr ""
+msgstr "根因"
 
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
@@ -1465,18 +1481,18 @@ msgstr "认证方法"
 #: app/views/popup.discovery.check.php:103
 #: app/views/popup.itemtestedit.view.php:202
 msgid "Authentication passphrase"
-msgstr "验证口令"
+msgstr "认证口令"
 
 #: app/partials/configuration.host.interface.row.php:143
 #: app/views/popup.discovery.check.php:96
 #: app/views/popup.itemtestedit.view.php:191
 msgid "Authentication protocol"
-msgstr "验证协议"
+msgstr "认证协议"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:395
 #: app/controllers/CControllerAuthenticationUpdate.php:403
 msgid "Authentication settings updated"
-msgstr "身份验证配置已更新"
+msgstr "验证配置已更新"
 
 #: app/views/administration.module.edit.php:40
 #: app/views/administration.module.list.php:77
@@ -1517,16 +1533,16 @@ msgstr "自动注销"
 #: include/hosts.inc.php:1128
 #: include/views/configuration.host.prototype.edit.php:365
 msgid "Automatic"
-msgstr "自动地"
+msgstr "自动"
 
 #: include/views/monitoring.sysmap.edit.php:140
 msgid "Automatic icon mapping"
-msgstr "自动的图标映射"
+msgstr "自动映射图标"
 
 #: include/views/js/monitoring.sysmaps.js.php:260
 #: include/views/js/monitoring.sysmaps.js.php:693
 msgid "Automatic icon selection"
-msgstr "自动的图标选择"
+msgstr "自动选择图标"
 
 #: app/controllers/CControllerAuditLogList.php:212
 #: app/controllers/CControllerAutoregEdit.php:67
@@ -1570,15 +1586,15 @@ msgstr "一般严重"
 
 #: include/classes/data/CItemData.php:1522
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "收集间隔期间对虚拟磁盘的平均未完成读取请求数，<url> - VMware 服务 URL，<uuid> - VMware 虚拟机主机名，<instance> - 磁盘设备实例"
 
 #: include/classes/data/CItemData.php:1542
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "收集间隔期间对虚拟磁盘的平均未完成写入请求数，<url> - VMware服务URL，<uuid> - VMware虚机主机名，<instance> - 磁盘设备实例"
 
 #: app/views/administration.authentication.edit.php:93
 msgid "Avoid easy-to-guess passwords"
-msgstr "避免容易猜到的密码"
+msgstr "避免弱密码"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:307
 msgid "Axes"
@@ -1609,7 +1625,7 @@ msgstr "背景图片"
 #: include/classes/widgets/CWidgetHelper.php:971
 #: include/classes/widgets/CWidgetHelper.php:1219
 msgid "Bar"
-msgstr "条形"
+msgstr "柱状图"
 
 #: app/views/administration.authentication.edit.php:175
 msgid "Base DN"
@@ -1627,11 +1643,11 @@ msgstr "基础的"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
-msgstr "值前"
+msgstr "前值"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:253
 msgid "Below value"
-msgstr "值下"
+msgstr "低值"
 
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
@@ -1644,11 +1660,11 @@ msgstr "绑定密码"
 #: app/controllers/CControllerPopupTriggerExpr.php:428
 #: app/controllers/CControllerPopupTriggerExpr.php:461
 msgid "Bits to shift"
-msgstr ""
+msgstr "移位"
 
 #: app/views/popup.triggerexpr.php:110
 msgid "Bitwise functions"
-msgstr ""
+msgstr "按位函数"
 
 #: app/views/administration.user.list.php:144
 msgid "Blocked"
@@ -1720,7 +1736,7 @@ msgstr "底部"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:133
 msgid "Bottom N"
-msgstr "底部 N"
+msgstr "倒数N"
 
 #: jsLoader.php:276
 msgid "Bring forward"
@@ -1768,27 +1784,27 @@ msgstr "CPU 负载。返回浮点数"
 
 #: include/classes/data/CItemData.php:1422
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
-msgstr ""
+msgstr "等待换入所花费的CPU时间，<url> - VMware服务URL，<uuid> - VMware虚机主机名，<instance> - CPU实例 "
 
 #: include/classes/data/CItemData.php:1274
 msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "间隔期间的CPU使用率百分比取决于电源管理或HT，<url> - VMware服务URL，<uuid> - VMware hypervisor主机名"
 
 #: include/classes/data/CItemData.php:1266
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "间隔期间的CPU使用率百分比，<url> - VMware服务URL，<uuid> - VMware hypervisor主机名"
 
 #: include/classes/data/CItemData.php:1426
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "间隔期间的CPU使用率百分比，<url> - VMware服务URL，<uuid> - VMware hypervisor主机名"
 
 #: include/classes/data/CItemData.php:1054
 msgid "CPU utilization percentage. Returns float"
-msgstr "CPU 使用率。返回浮点数"
+msgstr "CPU 使用率百分比。返回浮点数"
 
 #: app/views/popup.itemtestedit.view.php:300
 msgid "CRLF"
-msgstr "CRLF"
+msgstr "换行"
 
 #: include/items.inc.php:1828
 msgid "CSV to JSON"
@@ -1797,7 +1813,7 @@ msgstr "转换 CSV 为 JSON"
 #: include/classes/validators/CApiInputValidator.php:2717
 #: include/classes/validators/CNewValidator.php:352
 msgid "CUID is expected"
-msgstr ""
+msgstr "预计CUID"
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:179
 #: include/views/configuration.graph.edit.php:254
@@ -1856,13 +1872,13 @@ msgstr "无法添加API token"
 #: include/classes/api/services/CGraph.php:545
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
-msgstr "不能添加一个非数字监控项 \"%1$s\" 到图表 \"%2$s\"."
+msgstr "无法添加一个非数字监控项 \"%1$s\" 到图表 \"%2$s\"."
 
 #: include/classes/api/services/CGraphPrototype.php:471
 #: include/classes/api/services/CGraphPrototype.php:535
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
-msgstr "不可以添加一个非数值型的监控项目 \"%1$s\"到数据图模板\"%2$s\"."
+msgstr "无法添加一个非数值型的监控项目 \"%1$s\"到数据图模板\"%2$s\"."
 
 #: actionconf.php:302
 msgid "Cannot add action"
@@ -1875,7 +1891,7 @@ msgstr "无法添加关联"
 #: jsLoader.php:133
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
-msgstr ""
+msgstr "无法添加仪表盘页面：已添加最多 %1$d 个仪表盘页面。"
 
 #: include/classes/api/services/CTrigger.php:979
 #: include/classes/api/services/CTriggerPrototype.php:788
@@ -1925,7 +1941,7 @@ msgstr "无法添加监控项"
 
 #: disc_prototypes.php:553
 msgid "Cannot add item prototype"
-msgstr "不能添加监控项原型"
+msgstr "无法添加监控项原型"
 
 #: maintenance.php:123
 msgid "Cannot add maintenance"
@@ -1955,7 +1971,7 @@ msgstr "无法添加超过一个 \"图形总计\" 类型的监控项于图形 \"
 #: include/classes/api/services/CGraphPrototype.php:40
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr "不可以在数据图模板\"%1$s\"上添加超过一个\"Graph sum\"类型的监控项目."
+msgstr "无法在数据图模板\"%1$s\"上添加超过一个\"Graph sum\"类型的监控项目."
 
 #: sysmaps.php:214
 msgid "Cannot add network map"
@@ -1973,7 +1989,7 @@ msgstr "无法添加正则表达式"
 
 #: app/controllers/CControllerScheduledReportCreate.php:152
 msgid "Cannot add scheduled report"
-msgstr "无法添加定时报表"
+msgstr "无法添加计划报表"
 
 #: app/controllers/CControllerScriptCreate.php:60
 #: app/controllers/CControllerScriptCreate.php:155
@@ -2008,16 +2024,16 @@ msgstr "无法添加用户组"
 
 #: httpconf.php:198
 msgid "Cannot add web scenario"
-msgstr "不能添加web场景"
+msgstr "无法添加web场景"
 
 #: jsLoader.php:134
 msgid "Cannot add widget: not enough free space on the dashboard."
-msgstr "无法添加小部件：仪表板上的可用空间不足。"
+msgstr "无法添加部件：仪表板上的可用空间不足。"
 
 #: jsLoader.php:343
 msgctxt "screen reader"
 msgid "Cannot be removed"
-msgstr "无法被删除"
+msgstr "无法移除"
 
 #: include/classes/validators/CLdapAuthValidator.php:79
 msgid "Cannot bind anonymously to LDAP server."
@@ -2040,7 +2056,7 @@ msgstr "无法更改自己角色的用户类型。"
 
 #: httpconf.php:189 httpconf.php:433 items.php:901 items.php:981
 msgid "Cannot clear history"
-msgstr "无法清除历史"
+msgstr "无法清除历史数据"
 
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
@@ -2067,7 +2083,7 @@ msgstr "无法连接到 LDAP 服务器。"
 
 #: include/classes/setup/CSetupWizard.php:593
 msgid "Cannot connect to the database."
-msgstr "不能连接到数据库。"
+msgstr "无法连接到数据库。"
 
 #: include/views/js/configuration.httpconf.edit.js.php:182
 msgid "Cannot convert POST data:"
@@ -2110,11 +2126,11 @@ msgstr "无法创建其他的数据库连接."
 #: include/classes/api/services/CTrigger.php:1013
 #: include/classes/api/services/CTriggerPrototype.php:819
 msgid "Cannot create circular dependencies."
-msgstr "不能创建环形的依赖关系。"
+msgstr "无法创建循环依赖关系。"
 
 #: include/classes/api/services/CTrigger.php:985
 msgid "Cannot create dependency on trigger itself."
-msgstr "不能创建触发器本身的依赖."
+msgstr "无法创建触发器本身的依赖."
 
 #: include/classes/api/services/CTriggerPrototype.php:758
 msgid "Cannot create dependency on trigger prototype itself."
@@ -2135,7 +2151,7 @@ msgstr "无法创建请求"
 
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
-msgstr "无法创建定时报表"
+msgstr "无法创建计划报表"
 
 #: app/controllers/CControllerServiceCreate.php:96
 #: app/controllers/CControllerServiceCreate.php:184
@@ -2182,7 +2198,6 @@ msgid "Cannot delete assigned user role \"%1$s\"."
 msgstr "无法删除已分配的用户角色\"%1$s\"。"
 
 #: app/controllers/CControllerCorrelationDelete.php:68
-#, fuzzy
 msgid "Cannot delete correlation"
 msgid_plural "Cannot delete correlations"
 msgstr[0] "无法删除关联"
@@ -2195,7 +2210,7 @@ msgstr[0] "无法删除仪表盘"
 
 #: include/classes/api/services/CUserDirectory.php:383
 msgid "Cannot delete default user directory."
-msgstr ""
+msgstr "无法删除默认用户目录"
 
 #: include/classes/api/services/CTrigger.php:882
 #: include/classes/api/services/CTriggerPrototype.php:570
@@ -2203,7 +2218,6 @@ msgid "Cannot delete dependency"
 msgstr "无法删除依赖关系"
 
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:416
-#, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "无法删除自动发现规则"
@@ -2214,7 +2228,7 @@ msgstr "无法删除自动发现规则"
 
 #: graphs.php:279
 msgid "Cannot delete graph"
-msgstr "无法删除图形"
+msgstr "无法删除图表"
 
 #: graphs.php:271
 msgid "Cannot delete graph prototype"
@@ -2222,11 +2236,11 @@ msgstr "无法删除图表原型"
 
 #: graphs.php:312
 msgid "Cannot delete graph prototypes"
-msgstr "无法删除数据图模板"
+msgstr "无法删除图表模板"
 
 #: graphs.php:329
 msgid "Cannot delete graphs"
-msgstr "无法删除图形"
+msgstr "无法删除图表"
 
 #: hostgroups.php:134 hostgroups.php:156
 msgid "Cannot delete group"
@@ -2241,13 +2255,13 @@ msgstr "无法删除主机"
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete hosts %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
+msgstr[0] "无法删除主机 %1$s 因为维护 \"%2$s\" 必须包含至少一个主机或一个主机群组。"
 
 #: include/classes/api/services/CHostGroup.php:849
 #, c-format
 msgid "Cannot delete host group %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete host groups %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
+msgstr[0] "无法删除主机组 %1$s 因为维护 \"%2$s\" 必须包含至少一个主机或一个主机群组。"
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -2268,7 +2282,7 @@ msgstr "无法删除自动发现主机\"%1$s\"的接口。"
 
 #: include/classes/api/services/CHost.php:1142
 msgid "Cannot delete inventory."
-msgstr "无法删除资产纪录."
+msgstr "无法删除资产记录."
 
 #: items.php:516
 msgid "Cannot delete item"
@@ -2276,11 +2290,11 @@ msgstr "无法删除监控项"
 
 #: disc_prototypes.php:310
 msgid "Cannot delete item prototype"
-msgstr "无法删除监控项目模板"
+msgstr "无法删除监控项原型"
 
 #: disc_prototypes.php:596
 msgid "Cannot delete item prototypes"
-msgstr "无法删除监控项目模板"
+msgstr "无法删除监控项原型"
 
 #: items.php:991
 msgid "Cannot delete items"
@@ -2293,7 +2307,7 @@ msgstr "无法删除维护"
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
-msgstr[0] "无法删除示警媒介类型"
+msgstr[0] "无法删除告警媒介类型"
 
 #: app/controllers/CControllerModuleScan.php:118
 #, c-format
@@ -2417,7 +2431,7 @@ msgstr[0] "无法删除用户"
 #: include/classes/api/services/CUserDirectory.php:398
 #, c-format
 msgid "Cannot delete user directory \"%1$s\"."
-msgstr ""
+msgstr "无法删除默认用户目录 %1$s"
 
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
@@ -2451,7 +2465,7 @@ msgstr[0] "无法禁用动作"
 #: app/controllers/CControllerCorrelationDisable.php:75
 msgid "Cannot disable correlation"
 msgid_plural "Cannot disable correlations"
-msgstr[0] "无法停用关联项"
+msgstr[0] "无法禁用关联项"
 
 #: app/controllers/CControllerDiscoveryDisable.php:74 host_discovery.php:770
 msgid "Cannot disable discovery rule"
@@ -2503,7 +2517,7 @@ msgstr "无法显示监控项队列."
 
 #: chart7.php:91
 msgid "Cannot display more than one item with type \"Graph sum\"."
-msgstr "不可以显示超过一个 \"Graph sum\"类型的监控项目"
+msgstr "无法显示超过一个 \"Graph sum\"类型的监控项目"
 
 #: app/controllers/CControllerTokenEnable.php:66
 msgid "Cannot enable API token"
@@ -2574,7 +2588,7 @@ msgstr "无法计算表达式"
 #: app/controllers/CControllerItemMassCheckNow.php:243
 #: app/controllers/CControllerItemMassCheckNow.php:251
 msgid "Cannot execute operation"
-msgstr ""
+msgstr "无法执行操作"
 
 #: app/controllers/CControllerPopupScriptExec.php:123
 msgid "Cannot execute script."
@@ -2587,12 +2601,12 @@ msgstr "无法扩展宏."
 #: include/classes/import/importers/CMapImporter.php:270
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
-msgstr "无法找到用在聚合图形 \"%2$s\" 中的群组 \"%1$s\"."
+msgstr "无法找到用在拓扑图 \"%2$s\" 中的背景图片 \"%1$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:170
 #, c-format
 msgid "Cannot find graph \"%1$s\" used in dashboard \"%2$s\"."
-msgstr "无法找到仪表板 \"%2$s\" 中使用的图形 \"%1$s\"。"
+msgstr "无法找到仪表板 \"%2$s\" 中使用的图表 \"%1$s\"。"
 
 #: include/classes/import/importers/CMapImporter.php:152
 #, c-format
@@ -3584,6 +3598,10 @@ msgstr "点击查看或编辑"
 #: include/classes/widgets/CWidgetConfig.php:53
 msgid "Clock"
 msgstr "时钟"
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:72
+msgid "Clock type"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:225
 #: app/views/administration.iconmap.edit.php:139
@@ -5443,6 +5461,10 @@ msgstr "设备唯一性准则"
 msgid "Digest"
 msgstr ""
 
+#: include/classes/widgets/forms/CWidgetFormClock.php:74
+msgid "Digital"
+msgstr ""
+
 #: app/views/administration.module.edit.php:42
 msgid "Directory"
 msgstr "目录"
@@ -5702,6 +5724,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1282
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1379
+msgid "Discovery of VMware hypervisor network interfaces, <url> - VMware service URL, <uuid> - VMware hypervisor. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1306
@@ -7091,6 +7117,11 @@ msgstr "字体大小"
 #: app/views/popup.httpstep.php:85
 msgid "Form data"
 msgstr "表格资料"
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:182
+#: include/classes/widgets/forms/CWidgetFormClock.php:242
+msgid "Format"
+msgstr ""
 
 #: include/items.inc.php:1769 include/views/configuration.item.edit.php:734
 #: include/views/configuration.item.prototype.edit.php:707
@@ -10901,6 +10932,10 @@ msgstr "正在加载..."
 #: app/controllers/CControllerWidgetClockView.php:123
 msgid "Local"
 msgstr "本地"
+
+#: include/classes/widgets/fields/CWidgetFieldTimeZone.php:58
+msgid "Local default"
+msgstr ""
 
 #: include/classes/screens/CScreenHistory.php:267
 #: include/classes/widgets/forms/CWidgetFormClock.php:32
@@ -15842,6 +15877,10 @@ msgstr "第二个POC电话B"
 msgid "Secondary POC screen name"
 msgstr "第二个POC聚合图形名称"
 
+#: include/classes/widgets/forms/CWidgetFormClock.php:173
+msgid "Seconds"
+msgstr ""
+
 #: include/classes/html/CMacroValue.php:157
 msgid "Secret text"
 msgstr ""
@@ -16272,6 +16311,10 @@ msgstr "分享"
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "共享选项 \"%1$s\" 没有在拓补图中指定值 \"%2$s\" 。"
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:243
+msgid "Short"
+msgstr ""
 
 #: app/partials/monitoring.latest.filter.php:154
 #: app/partials/monitoring.problem.filter.php:222
@@ -19052,6 +19095,14 @@ msgstr ""
 msgid "Users"
 msgstr "用户"
 
+#: include/classes/data/CItemData.php:1255
+msgid "VMware Distributed Virtual Switch, <url> - VMware service URL. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1259
+msgid "VMware FetchDVPorts wrapper, <url> - VMware service URL, <filter> - vmware data object DistributedVirtualSwitchPortCriteria, <mode> - state(default)/full. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1702
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMware缓存统计.可用的mode有:total, free, pfree, used and pused."
@@ -19063,6 +19114,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMware集群状态, <url> - VMware 服务 URL, <name> - VMware 集群名称"
+
+#: include/classes/data/CItemData.php:1251
+msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1250
 msgid "VMware datacenters and their IDs. Returns JSON"
@@ -19105,6 +19160,10 @@ msgstr "VMware 虚拟机澎涨内存大小, <url> - VMware 服务 URL, <uuid> - 
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor 集群名,<url> - VMware 服务 URL, <uuid> - VMware hypervisor 主机名"
 
+#: include/classes/data/CItemData.php:1275
+msgid "VMware hypervisor connection state, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1278
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
 msgstr ""
@@ -19137,6 +19196,10 @@ msgstr "VMware hypervisor 名称, <url> - VMware 服务 URL, <uuid> - VMware hyp
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware hypervisor 网络进流量统计, <url> - VMware 服务 URL, <uuid> - VMware hypervisor 主机名, <mode> - bps"
 
+#: include/classes/data/CItemData.php:1387
+msgid "VMware hypervisor network interface speed, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <ifname> - interface name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1362
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware hypervisor 网络输出流量统计, <url> - VMware 服务 URL, <uuid> - VMware hypervisor 主机名, <mode> - bps"
@@ -19156,6 +19219,14 @@ msgstr "VMware hypervisor 处理器型号, <url> - VMware 服务 URL, <uuid> - V
 #: include/classes/data/CItemData.php:1270
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor 处理器使用率单位Hz, <url> - VMware 服务 URL, <uuid> - VMware hypervisor 主机名"
+
+#: include/classes/data/CItemData.php:1351
+msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1355
+msgid "VMware hypervisor serialnumber, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1382
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -19201,6 +19272,10 @@ msgstr "VMware 虚拟机已经使用的存储空间, <url> - VMware 服务 URL, 
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware虚拟机压缩内存大小, <url> - VMware 服务 URL, <uuid> - VMware 虚拟机名"
 
+#: include/classes/data/CItemData.php:1431
+msgid "VMware virtual machine custom attribute value, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <name> - custom attribute name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1434
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
 msgstr ""
@@ -19212,6 +19287,10 @@ msgstr "VMware 虚拟机磁盘设备读统计, <url> - VMware 服务 URL, <uuid>
 #: include/classes/data/CItemData.php:1558
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware 虚拟机磁盘设备写统计, <url> - VMware 服务 URL, <uuid> - VMware 虚拟机主机名, <instance> - 磁盘设备, <mode> - bps/ops - bytes/operations per second"
+
+#: include/classes/data/CItemData.php:1439
+msgid "VMware virtual machine disk requires consolidation, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1566
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
@@ -19265,9 +19344,21 @@ msgstr "VMware 虚拟机处理器使用率，单位Hz, <url> - VMware 服务 URL
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware 虚拟机共享内存大小, <url> - VMware 服务 URL, <uuid> - VMware 虚拟机主机名"
 
+#: include/classes/data/CItemData.php:1555
+msgid "VMware virtual machine snapshot state, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1559
+msgid "VMware virtual machine state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1474
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware 虚拟机交换分区大小, <url> - VMware 服务 URL, <uuid> - VMware 虚拟机主机名"
+
+#: include/classes/data/CItemData.php:1591
+msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1486
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
