@@ -21,6 +21,7 @@
 #include "db.h"
 #include "dbupgrade.h"
 #include "log.h"
+#include "sysinfo.h"
 
 extern unsigned char	program_type;
 
