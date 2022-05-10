@@ -363,14 +363,25 @@ $filter_hostids = [];
 
 // Get host groups.
 if ($filter['groups']) {
-	$filter['groups'] = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-		'output' => ['groupid', 'name'],
-		'groupids' => $filter['groups'],
-		'editable' => true,
-		'preservekeys' => true
-	]), ['groupid' => 'id']);
+	if (getRequest('context') === 'host') {
+		$filter['groups'] = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $filter['groups'],
+			'editable' => true,
+			'preservekeys' => true
+		]), ['groupid' => 'id']);
+	}
+	else {
+		$filter['groups'] = CArrayHelper::renameObjectsKeys(API::TemplateGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $filter['groups'],
+			'editable' => true,
+			'preservekeys' => true
+		]), ['groupid' => 'id']);
+	}
 
-	$filter_groupids = getSubGroups(array_keys($filter['groups']));
+
+	$filter_groupids = getSubGroups(array_keys($filter['groups']), $ms_groups, [], getRequest('context'));
 }
 
 // Get hosts.
