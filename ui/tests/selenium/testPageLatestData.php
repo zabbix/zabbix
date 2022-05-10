@@ -589,7 +589,7 @@ class testPageLatestData extends CWebTest {
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('ЗАББИКС Сервер'));
 		$this->page->login()->open('zabbix.php?action=latest.view&hostids%5B%5D='.$hostid)->waitUntilReady();
 
-		$this->getTable()->query('link', $tag['tag'].$tag['value'])->waitUntilClickable()->one()->click();
+		$this->getTable()->query('button', $tag['tag'].$tag['value'])->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 
 		// Check that page remained the same.
