@@ -670,15 +670,26 @@ else {
 
 	$filter_groupids_enriched =  [];
 	if ($filter_groupids) {
-		$filter_groupids = API::HostGroup()->get([
-			'output' => ['groupid', 'name'],
-			'groupids' => $filter_groupids,
-			'editable' => true,
-			'preservekeys' => true
-		]);
+		if ($data['context'] === 'host') {
+			$filter_groupids = API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $filter_groupids,
+				'editable' => true,
+				'preservekeys' => true
+			]);
+		}
+		else {
+			$filter_groupids = API::TemplateGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $filter_groupids,
+				'editable' => true,
+				'preservekeys' => true
+			]);
+		}
+
 		$filter_groupids_ms = CArrayHelper::renameObjectsKeys($filter_groupids, ['groupid' => 'id']);
 		$filter_groupids = array_keys($filter_groupids);
-		$filter_groupids_enriched = getSubGroups($filter_groupids);
+		$filter_groupids_enriched = getSubGroups($filter_groupids, $ms_groups, [], $data['context']);
 	}
 
 	if ($filter_hostids) {
