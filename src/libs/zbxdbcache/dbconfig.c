@@ -5430,7 +5430,9 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
  ******************************************************************************/
 void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 {
-	int		i, flags, changelog_num;
+	static int	sync_status = ZBX_DBSYNC_STATUS_UNKNOWN;
+
+	int		i, flags, changelog_num, ret = FAIL;
 	double		sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, idsec, isec, tisec, pisec, tsec, dsec, fsec, expr_sec,
 			csec2, hsec2, hisec2, ifsec2, idsec2, isec2, tisec2, pisec2, tsec2, dsec2, fsec2, expr_sec2,
 			action_sec, action_sec2, action_op_sec, action_op_sec2, action_condition_sec,
@@ -5450,8 +5452,9 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	double		autoreg_csec, autoreg_csec2;
 	zbx_dbsync_t	autoreg_config_sync;
 	zbx_uint64_t	update_flags = 0;
+	unsigned char	changelog_sync_mode = mode;	/* sync mode for objects using incremental sync */
 
-	zbx_hashset_t		trend_queue;
+	zbx_hashset_t	trend_queue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -5466,23 +5469,25 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 		zbx_hashset_create(&trend_queue, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		dc_load_trigger_queue(&trend_queue);
 	}
+	else if (ZBX_DBSYNC_STATUS_INITIALIZED != sync_status)
+		changelog_sync_mode = ZBX_DBSYNC_INIT;
 
 	/* global configuration must be synchronized directly with database */
 	zbx_dbsync_init(&config_sync, ZBX_DBSYNC_INIT);
 	zbx_dbsync_init(&autoreg_config_sync, mode);
-	zbx_dbsync_init(&hosts_sync, mode);
+	zbx_dbsync_init(&hosts_sync, changelog_sync_mode);
 	zbx_dbsync_init(&hi_sync, mode);
 	zbx_dbsync_init(&htmpl_sync, mode);
 	zbx_dbsync_init(&gmacro_sync, mode);
 	zbx_dbsync_init(&hmacro_sync, mode);
 	zbx_dbsync_init(&if_sync, mode);
-	zbx_dbsync_init(&items_sync, mode);
+	zbx_dbsync_init(&items_sync, changelog_sync_mode);
 	zbx_dbsync_init(&template_items_sync, mode);
 	zbx_dbsync_init(&prototype_items_sync, mode);
 	zbx_dbsync_init(&item_discovery_sync, mode);
-	zbx_dbsync_init(&triggers_sync, mode);
+	zbx_dbsync_init(&triggers_sync, changelog_sync_mode);
 	zbx_dbsync_init(&tdep_sync, mode);
-	zbx_dbsync_init(&func_sync, mode);
+	zbx_dbsync_init(&func_sync, changelog_sync_mode);
 	zbx_dbsync_init(&expr_sync, mode);
 	zbx_dbsync_init(&action_sync, mode);
 
@@ -5492,15 +5497,15 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	zbx_dbsync_init(&action_op_sync, ZBX_DBSYNC_UPDATE);
 
 	zbx_dbsync_init(&action_condition_sync, mode);
-	zbx_dbsync_init(&trigger_tag_sync, mode);
-	zbx_dbsync_init(&item_tag_sync, mode);
-	zbx_dbsync_init(&host_tag_sync, mode);
+	zbx_dbsync_init(&trigger_tag_sync, changelog_sync_mode);
+	zbx_dbsync_init(&item_tag_sync, changelog_sync_mode);
+	zbx_dbsync_init(&host_tag_sync, changelog_sync_mode);
 	zbx_dbsync_init(&correlation_sync, mode);
 	zbx_dbsync_init(&corr_condition_sync, mode);
 	zbx_dbsync_init(&corr_operation_sync, mode);
 	zbx_dbsync_init(&hgroups_sync, mode);
 	zbx_dbsync_init(&hgroup_host_sync, mode);
-	zbx_dbsync_init(&itempp_sync, mode);
+	zbx_dbsync_init(&itempp_sync, changelog_sync_mode);
 	zbx_dbsync_init(&itemscrp_sync, mode);
 
 	zbx_dbsync_init(&maintenance_sync, mode);
@@ -5508,6 +5513,8 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	zbx_dbsync_init(&maintenance_tag_sync, mode);
 	zbx_dbsync_init(&maintenance_group_sync, mode);
 	zbx_dbsync_init(&maintenance_host_sync, mode);
+
+	DBbegin();
 
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_config(&config_sync))
@@ -6142,6 +6149,8 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 
 		zbx_shmem_dump_stats(LOG_LEVEL_DEBUG, config_mem);
 	}
+
+	ret = SUCCEED;
 out:
 	if (0 == sync_in_progress)
 	{
@@ -6155,14 +6164,20 @@ out:
 
 	FINISH_SYNC;
 
-	if (SUCCEED == zbx_dbsync_env_prepare_changelog(mode))
+	if (ZBX_DB_OK != DBcommit())
+		ret = FAIL;
+
+	if (SUCCEED == ret)
 	{
-		WRLOCK_CACHE;
-		zbx_dbsync_env_flush_changelog();
-		UNLOCK_CACHE;
+		if (SUCCEED == zbx_dbsync_env_prepare_changelog(changelog_sync_mode))
+		{
+			WRLOCK_CACHE;
+			zbx_dbsync_env_flush_changelog();
+			UNLOCK_CACHE;
+		}
+
+		sync_status = ZBX_DBSYNC_STATUS_INITIALIZED;
 	}
-
-
 
 	if (0 != (update_flags & (ZBX_DBSYNC_UPDATE_HOSTS | ZBX_DBSYNC_UPDATE_ITEMS | ZBX_DBSYNC_UPDATE_MACROS)))
 	{

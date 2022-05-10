@@ -664,7 +664,9 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 #define ZBX_DBSYNC_INIT		0
 /* update sync, get changed data */
 #define ZBX_DBSYNC_UPDATE	1
-#define ZBX_SYNC_SECRETS	2
+
+#define ZBX_DBSYNC_STATUS_INITIALIZED	0
+#define ZBX_DBSYNC_STATUS_UNKNOWN	-1
 
 typedef enum
 {
