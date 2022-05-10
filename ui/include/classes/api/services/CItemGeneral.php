@@ -1616,21 +1616,23 @@ abstract class CItemGeneral extends CApiService {
 		]);
 
 		foreach ($items as $i => $item) {
-			if (!array_key_exists($item['interfaceid'], $db_interfaces)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-					'/'.($i + 1).'/interfaceid', _('the host interface ID is expected')
-				));
-			}
-
-			if (bccomp($db_interfaces[$item['interfaceid']]['hostid'], $item['hostid']) != 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-					'/'.($i + 1).'/interfaceid', _('cannot be the host interface ID from another host')
-				));
-			}
-
 			$interface_type = itemTypeInterface($item['type']);
 
-			if ($interface_type !== false && !in_array($interface_type, [INTERFACE_TYPE_ANY, INTERFACE_TYPE_OPT])
+			if ($interface_type != INTERFACE_TYPE_OPT && $item['interfaceid'] != 0) {
+				if (!array_key_exists($item['interfaceid'], $db_interfaces)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i + 1).'/interfaceid', _('the host interface ID is expected')
+					));
+				}
+
+				if (bccomp($db_interfaces[$item['interfaceid']]['hostid'], $item['hostid']) != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i + 1).'/interfaceid', _('cannot be the host interface ID from another host')
+					));
+				}
+			}
+
+			if (!in_array($interface_type, [false, INTERFACE_TYPE_ANY, INTERFACE_TYPE_OPT])
 					&& $db_interfaces[$item['interfaceid']]['type'] != $interface_type) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 					'/'.($i + 1).'/interfaceid',

@@ -558,9 +558,11 @@ class CItemPrototype extends CItemGeneral {
 	/**
 	 * @return array
 	 */
-	private static function getValidationRules(): array {
+	public static function getValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'itemid' =>			['type' => API_ANY],
+			'hostid' =>			['type' => API_ANY],
+			'ruleid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
 			'key_' =>			['type' => API_ITEM_KEY, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'key_')],
