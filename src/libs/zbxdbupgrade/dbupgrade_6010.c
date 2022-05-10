@@ -333,6 +333,102 @@ static int	DBpatch_6010023(void)
 	return ret;
 }
 
+static int	DBpatch_6010024(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = SUCCEED;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
+		return SUCCEED;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select itemid,name,key_ from items where type=9");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	itemid;
+		char		*expression = row[1], *out = NULL;
+		int		pos = 0, last_pos = 0;
+		zbx_token_t	token;
+		size_t		out_alloc = 0, out_offset = 0;
+		AGENT_REQUEST	request;
+
+		ZBX_STR2UINT64(itemid, row[0]);
+
+		init_request(&request);
+
+		if (SUCCEED != parse_item_key(row[2], &request))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		for (; SUCCEED == zbx_token_find(expression, pos, &token, ZBX_TOKEN_SEARCH_REFERENCES); pos++)
+		{
+			char	*param;
+
+			switch (token.type)
+			{
+				case ZBX_TOKEN_REFERENCE:
+					if (0 < token.data.reference.index && 9 >= token.data.reference.index &&
+							NULL != (param = get_rparam(&request,
+							token.data.reference.index - 1)))
+					{
+						zbx_strncpy_alloc(&out, &out_alloc, &out_offset,
+								expression + last_pos, token.loc.l - last_pos);
+						zbx_strcpy_alloc(&out, &out_alloc, &out_offset, param);
+
+						last_pos = token.loc.r + 1;
+					}
+					ZBX_FALLTHROUGH;
+				default:
+					pos = token.loc.r;
+					break;
+			}
+		}
+
+		zbx_strcpy_alloc(&out, &out_alloc, &out_offset, expression + last_pos);
+
+		free_request(&request);
+
+		if (ITEM_NAME_LEN < zbx_strlen_utf8(out))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert web monitoring item \"" ZBX_FS_UI64 "\" name:"
+					" too long parameter", itemid);
+		}
+		else
+		{
+			char	*esc;
+
+			esc = DBdyn_escape_field("items", "name", out);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set name='%s' where itemid="
+					ZBX_FS_UI64 ";\n", esc, itemid);
+			zbx_free(esc);
+
+			ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+
+		zbx_free(out);
+	}
+
+	DBfree_result(result);
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+	}
+
+	zbx_free(sql);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(6010)
@@ -363,5 +459,6 @@ DBPATCH_ADD(6010020, 0,	1)
 DBPATCH_ADD(6010021, 0,	1)
 DBPATCH_ADD(6010022, 0,	1)
 DBPATCH_ADD(6010023, 0,	1)
+DBPATCH_ADD(6010024, 0,	1)
 
 DBPATCH_END()
