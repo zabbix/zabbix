@@ -185,9 +185,6 @@ int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 
 #define ZBX_DB_EXTENSION_TIMESCALEDB				"timescaledb"
 
-#define ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE	0x00000001
-#define ZBX_DB_EXT_STATUS_FLAGS_TSDB_DISABLE_COMPRESSION	0x00000002
-
 #define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB		100002
 #define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB_FRIENDLY	"10.2"
 #define ZBX_TIMESCALE_MIN_VERSION				10500
@@ -266,12 +263,15 @@ struct zbx_db_version_info_t
 	zbx_db_version_status_t	ext_flag;
 
 	char			*ext_lic;
-	zbx_uint32_t		ext_status;
 	zbx_db_ext_err_code_t	ext_err_code;
 };
 
 void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);
+#ifdef HAVE_POSTGRESQL
 void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info);
+void	zbx_tsdb_set_compression_availability(int compression_availabile);
+int	zbx_tsdb_get_compression_availability(void);
+#endif
 
 #ifdef HAVE_MYSQL
 int	zbx_dbms_mariadb_used(void);

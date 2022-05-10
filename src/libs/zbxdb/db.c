@@ -107,6 +107,7 @@ static unsigned int		ZBX_PG_BYTEAOID = 0;
 static int			ZBX_TSDB_VERSION = -1;
 static zbx_uint32_t		ZBX_PG_SVERSION = ZBX_DBVERSION_UNDEFINED;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
+static int 			ZBX_TIMESCALE_COMPRESSION_AVAILABLE = OFF;
 #elif defined(HAVE_SQLITE3)
 static sqlite3			*conn = NULL;
 static zbx_mutex_t		sqlite_access = ZBX_MUTEX_NULL;
@@ -2549,7 +2550,7 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 
 		if (0 == zbx_strcmp_null(info->extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 		{
-			if (0 != (ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE & info->ext_status))
+			if (ON == zbx_tsdb_get_compression_availability())
 			{
 				zbx_json_addstring(json, "compression_availability", "true", ZBX_JSON_TYPE_INT);
 			}
@@ -2955,6 +2956,34 @@ char	*zbx_tsdb_get_license(void)
 	DBfree_result(result);
 
 	return tsdb_lic;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sets TimescaleDB (TSDB) compression availability                  *
+ *                                                                            *
+ * Parameters:  compression_availabile - [IN] compression availability        *
+ *              0 (OFF): compression is not available                         *
+ *              1 (ON): compression is available                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_tsdb_set_compression_availability(int compression_availabile)
+{
+	ZBX_TIMESCALE_COMPRESSION_AVAILABLE = compression_availabile;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrievs TimescaleDB (TSDB) compression availability              *
+ *                                                                            *
+ * Return value: compression availability as as integer                       *
+ *               0 (OFF): compression is not available                        *
+ *               1 (ON): compression is available                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_tsdb_get_compression_availability(void)
+{
+	return ZBX_TIMESCALE_COMPRESSION_AVAILABLE;
 }
 #endif
 

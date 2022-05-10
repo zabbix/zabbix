@@ -1172,14 +1172,7 @@ static void	zbx_check_db(void)
 	}
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-#ifdef HAVE_POSTGRESQL
-	if (SUCCEED == result &&
-			0 != (ZBX_DB_EXT_STATUS_FLAGS_TSDB_DISABLE_COMPRESSION & db_version_info.ext_status) &&
-			ZBX_DB_OK > DBexecute("update config set compression_status=0"))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "failed to set database compression status");
-	}
-#endif
+
 	if (SUCCEED == DBfield_exists("config", "dbversion_status"))
 	{
 		zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);

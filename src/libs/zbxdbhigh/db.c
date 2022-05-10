@@ -925,7 +925,7 @@ int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int
 		}
 
 		db_version_info->ext_flag = DB_VERSION_NOT_SUPPORTED_WARNING;
-		db_version_info->ext_status |= ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE;
+		zbx_tsdb_set_compression_availability(ON);
 		goto out;
 	}
 
@@ -952,14 +952,13 @@ int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int
 		zabbix_log(LOG_LEVEL_WARNING, "%s is required to use TimescaleDB compression.",
 				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY);
 		db_version_info->ext_err_code = ZBX_TIMESCALEDB_LICENSE_NOT_COMMUNITY;
-		db_version_info->ext_status |= ZBX_DB_EXT_STATUS_FLAGS_TSDB_DISABLE_COMPRESSION;
 		goto out;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s was detected. TimescaleDB compression is supported.",
 			ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY);
 	db_version_info->ext_err_code = ZBX_EXT_SUCCEED;
-	db_version_info->ext_status |= ZBX_DB_EXT_STATUS_FLAGS_TSDB_COMPRESSION_AVAILABLE;
+	zbx_tsdb_set_compression_availability(ON);
 out:
 	return ret;
 }
