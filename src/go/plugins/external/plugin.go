@@ -23,7 +23,9 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"sync"
 	"time"
@@ -59,6 +61,9 @@ func (p *Plugin) Register() (response *comms.RegisterResponse, err error) {
 func (p *Plugin) ExecutePlugin() {
 	startLock.Lock()
 	defer startLock.Unlock()
+
+	p.setPath()
+
 	p.cmd = exec.Command(p.Path, p.Socket, strconv.FormatBool(p.Initial))
 
 	err := p.cmd.Start()
@@ -146,6 +151,19 @@ func (p *Plugin) CheckPid(pid int) bool {
 func (p *Plugin) Cleanup() {
 	p.broker.stop()
 	p.cmd = nil
+}
+
+func (p *Plugin) setPath() {
+	if filepath.IsAbs(p.Path) {
+		return
+	}
+
+	e, err := os.Executable()
+	if err != nil {
+		panic(fmt.Sprintf("failed to start plugin %s, %s", p.Path, err.Error()))
+	}
+
+	p.Path = filepath.Join(filepath.Dir(e), p.Path)
 }
 
 func getConnection(listener net.Listener, timeout time.Duration) (conn net.Conn, err error) {
