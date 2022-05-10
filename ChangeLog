@@ -21,7 +21,7 @@ Bug fixes:
 ..F....... [ZBX-20380] fixed maintenance highlighting having priority over problem severity highlighting for map elements of map, host group and trigger types (agriscenko)
 .........T [ZBX-20982] fixed API request by coordinates in the OpenWeatherMap template (vkhaliev)
 ........S. [ZBX-20918] moved final history/trends cache sync in main process to be done before stopping HA (wiper)
-..F....... [ZBX-20458] fixed broken host link not opening in the Inventory (rdetlavs)
+..F....... [ZBX-20548] fixed broken host link not opening in the Inventory (rdetlavs)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.0beta1
@@ -96,7 +96,7 @@ Bug fixes:
 ..F....... [ZBX-20573] fixed service filter functionality in SLA report page (rdetlavs)
 .........T [ZBX-20982] fixed api request by coordinates in openweathermap template (vkhaliev)
 ........S. [ZBX-20918] moved final history/trends cache sync in main process to be done before stopping HA (wiper)
-..F....... [ZBX-20458] fixed broken host link not opening in Inventory (rdetlavs)
+..F....... [ZBX-20548] fixed broken host link not opening in Inventory (rdetlavs)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.4
