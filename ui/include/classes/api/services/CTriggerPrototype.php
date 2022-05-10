@@ -534,7 +534,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 *
 	 * @param array $triggerPrototypes
 	 */
-	protected function _updateDependencies(array $triggerPrototypes) {
+	protected function updateDependencies(array $triggerPrototypes) {
 		$this->deleteDependencies($triggerPrototypes);
 
 		$this->addDependencies($triggerPrototypes);
