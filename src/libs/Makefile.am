@@ -47,7 +47,8 @@ DIST_SUBDIRS = \
 	zbxserialize \
 	zbxxml \
 	zbxha \
-	zbxrtc
+	zbxrtc \
+	zbxvariant
 
 if SERVER
 SERVER_SUBDIRS = \
@@ -79,7 +80,8 @@ SERVER_SUBDIRS = \
 	zbxeval \
 	zbxserialize \
 	zbxha \
-	zbxrtc
+	zbxrtc \
+	zbxvariant
 else
 if PROXY
 PROXY_SUBDIRS = \
@@ -108,7 +110,8 @@ PROXY_SUBDIRS = \
 	zbxaudit \
 	zbxeval \
 	zbxserialize \
-	zbxrtc
+	zbxrtc \
+	zbxvariant
 endif
 endif
 

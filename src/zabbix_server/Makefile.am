@@ -89,6 +89,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_builddir)/src/libs/zbxdbcache/libzbxdbcache.a \
 	$(top_builddir)/src/libs/zbxserver/libzbxserver.a \
+	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_builddir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_builddir)/src/libs/zbxhistory/libzbxhistory.a \
